@@ -839,8 +839,8 @@ const HeroProfileHeader = ({
                        const { first, last } = splitName(displayName);
                        return (
                          <>
-                           <span className="block leading-tight font-semibold">{first}</span>
-                           <span className="block leading-tight font-semibold">{last}</span>
+                           <span className="block leading-tight font-bold text-[clamp(28px,7vw,38px)]">{first}</span>
+                           <span className="block leading-tight font-bold text-[clamp(28px,7vw,38px)]">{last}</span>
                            <div className="mt-1 text-sm text-gray-600">@{username}</div>
                          </>
                        );
