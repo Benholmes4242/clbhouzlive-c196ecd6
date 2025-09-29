@@ -215,33 +215,25 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* GLASS PANEL — 2-column grid for perfect centering */}
+            {/* GLASS PANEL — with name centering but original mini card positioning */}
             <section
               ref={profileCardRef}
               className="relative z-20 mx-0 sm:mx-0 md:mx-0 lg:mx-4 rounded-none lg:rounded-2xl border border-white/35 bg-white/10 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
               style={{
                 marginTop: 'calc(var(--panel-overlap) * -1)',
-                paddingInline: 'var(--panel-pad-x)',
-                paddingBlock: 'var(--panel-pad-y)',
-                display: 'grid',
-                gridTemplateColumns: '1fr var(--mini-w)',
-                columnGap: '8px',
-                alignItems: 'start',
-                position: 'relative',
-                gridTemplateRows: 'auto auto auto auto'
+                padding: 'var(--panel-pad-y) var(--panel-pad-x)'
               }}
             >
-              {/* NAME LANE — lives entirely in column 1 */}
-              <div
-                className="text-center"
-                style={{
-                  gridColumn: '1',
-                  gridRow: '1',
-                  justifySelf: 'center',
-                  width: '100%',
-                  maxWidth: 'min(100%, 22ch)'
-                }}
-              >
+              <div className="flex flex-col items-center relative">
+                
+                {/* NAME LANE — centered between glass inner left and mini card left */}
+                <div
+                  className="text-center"
+                  style={{
+                    width: 'calc(100% - var(--mini-w) - 8px)',
+                    marginRight: 'calc(var(--mini-w) + 8px)'
+                  }}
+                >
                 {(() => {
                   const parts = (displayName || '').trim().split(/\s+/);
                   const firstName = parts[0] || '';
@@ -262,18 +254,17 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
                 </div>
               </div>
 
-              {/* MINI CARD — fixed in column 2 */}
-              <button
-                className="overflow-hidden rounded-xl border border-white/40 shadow-[0_16px_36px_rgba(0,0,0,0.22)]"
+              {/* MINI CARD — restored to original styling */}
+              <div
+                className="absolute overflow-hidden rounded-xl border border-white/40 shadow-[0_8px_28px_rgba(0,0,0,0.28)]"
                 style={{
-                  gridColumn: '2',
-                  gridRow: '1',
-                  justifySelf: 'end',
+                  top: 'calc(var(--mini-h) * -0.24)',
+                  right: '8px',
                   width: 'var(--mini-w)',
-                  aspectRatio: '3 / 4',
-                  marginTop: 'calc(var(--mini-h) * -0.24)'
+                  height: 'var(--mini-h)'
                 }}
                 onClick={() => openImmersive?.(0)}
+                role="button"
                 aria-label="Open immersive profile"
               >
                 {profile?.profile_photo_url ? (
@@ -291,14 +282,12 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
                     loading="lazy"
                   />
                 ) : null}
-              </button>
+              </div>
 
-              {/* Golf Club info - spans full grid width */}
+              {/* Golf Club (left) + Handicap (centered under mini card) */}
               <div
-                className="grid items-start col-span-2"
+                className="grid items-start"
                 style={{
-                  gridColumn: '1 / -1',
-                  gridRow: '2',
                   gridTemplateColumns: '1fr 1fr var(--mini-w)',
                   columnGap: 'clamp(12px, 4vw, 28px)',
                   marginTop: 'calc(var(--mini-h) * 0.55 - 8px)'
@@ -341,8 +330,8 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
                 </div>
               </div>
 
-              {/* Bio section - spans full grid width */}
-              <div className="col-span-2 w-full mt-6" style={{ gridColumn: '1 / -1', gridRow: '3' }}>
+              {/* Bio section below the content column */}
+              <div className="w-full mt-6">
                 <div className="text-center">
                   {profile?.bio && (
                     <p className="text-sm text-gray-700 mb-2 line-clamp-2 leading-relaxed">
@@ -365,7 +354,7 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
               </div>
 
               {/* Slim Stats Row */}
-              <div className="w-full grid grid-cols-4 gap-3 text-center mt-4 col-span-2" style={{ gridColumn: '1 / -1', gridRow: '4' }}>
+              <div className="w-full grid grid-cols-4 gap-3 text-center mt-4">
                 <div className="flex flex-col">
                   <span className="text-lg font-semibold text-gray-900">{postsCount}</span>
                   <span className="text-xs text-gray-600 uppercase tracking-wide">Posts</span>
@@ -385,7 +374,7 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
               </div>
 
               {/* Tab Navigation - pinned to bottom */}
-              <div className="w-full border-t border-gray-300 mt-4 pt-4 col-span-2" style={{ gridColumn: '1 / -1', gridRow: '5' }}>
+              <div className="w-full border-t border-gray-300 mt-4 pt-4">
                 <div className="flex" role="tablist" aria-label="Profile sections">
                   {tabs.map((tab) => (
                     <button
@@ -419,6 +408,7 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
                       />
                     </button>
                   ))}
+                </div>
                 </div>
               </div>
             </section>
