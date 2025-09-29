@@ -1109,19 +1109,19 @@ const HeroProfileHeader = ({
                      </div>
                    </div>
 
-                   {/* Golf Club and Handicap aligned with user name positioning (desktop/tablet only) */}
-                   <div className="mt-3 flex justify-between" 
+                   {/* Golf Club and Handicap centered with fixed gap (desktop/tablet only) */}
+                   <div className="mt-3 flex justify-center items-start gap-6" 
                         style={{
                           width: 'calc(100% - var(--mini-w) - 8px)',
                           marginRight: 'calc(var(--mini-w) + 8px)'
                         }}>
-                     {/* Golf Club - centered to left side of user name */}
+                     {/* Golf Club */}
                      <div className="text-center">
                        <div className="font-semibold" style={{ fontSize: 'var(--fs-label)' }}>Golf Club</div>
                        <div style={{ fontSize: 'var(--fs-value)' }}>{homeClub}</div>
                      </div>
 
-                     {/* Handicap - centered to right side of user name */}
+                     {/* Handicap */}
                      <div className="text-center">
                        <div className="font-semibold" style={{ fontSize: 'var(--fs-label)' }}>Handicap</div>
                        <div style={{ fontSize: 'var(--fs-value)' }}>{handicap}</div>
