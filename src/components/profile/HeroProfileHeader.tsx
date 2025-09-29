@@ -829,7 +829,9 @@ const HeroProfileHeader = ({
                             const cx = (profile?.mini_card_crop_x ?? 0) + (profile?.mini_card_crop_width ?? 100) / 2;
                             const cy = (profile?.mini_card_crop_y ?? 0) + (profile?.mini_card_crop_height ?? 100) / 2;
                             return `${cx}% ${cy}%`;
-                          })()
+                          })(),
+                          WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 92%, transparent 100%)',
+                          maskImage: 'linear-gradient(to bottom, black 0%, black 92%, transparent 100%)'
                         }}
                         loading="lazy"
                       />
@@ -1077,13 +1079,15 @@ const HeroProfileHeader = ({
                         src={profile.profile_photo_url}
                         alt=""
                         className="w-full h-full object-cover"
-                        style={{
-                          objectPosition: (() => {
-                            const cx = (profile?.mini_card_crop_x ?? 0) + (profile?.mini_card_crop_width ?? 100) / 2;
-                            const cy = (profile?.mini_card_crop_y ?? 0) + (profile?.mini_card_crop_height ?? 100) / 2;
-                            return `${cx}% ${cy}%`;
-                          })()
-                        }}
+                         style={{
+                           objectPosition: (() => {
+                             const cx = (profile?.mini_card_crop_x ?? 0) + (profile?.mini_card_crop_width ?? 100) / 2;
+                             const cy = (profile?.mini_card_crop_y ?? 0) + (profile?.mini_card_crop_height ?? 100) / 2;
+                             return `${cx}% ${cy}%`;
+                           })(),
+                           WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 92%, transparent 100%)',
+                           maskImage: 'linear-gradient(to bottom, black 0%, black 92%, transparent 100%)'
+                         }}
                         loading="lazy"
                       />
                     ) : null}
@@ -1174,8 +1178,7 @@ const HeroProfileHeader = ({
                      </div>
                   </div>
 
-                  {/* Tab Navigation - pinned to bottom */}
-                  <div className="w-full border-t border-gray-300 mt-4 pt-4">
+                  <div className="w-full mt-4 pt-4">
                     <div className="flex" role="tablist" aria-label="Profile sections">
                       {tabs.map((tab) => (
                         <button
