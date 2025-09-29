@@ -850,7 +850,7 @@ const HeroProfileHeader = ({
                   )}
 
                   {/* Content column with space reserved for the overhang */}
-                  <div className="text-center"
+                  <div className="text-left"
                        style={{
                          maxWidth: 'calc(100% - var(--mini-w) - var(--panel-pad-x) - 8px)'
                        }}>
