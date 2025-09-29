@@ -885,7 +885,7 @@ const HeroProfileHeader = ({
                           {homeClub}
                         </div>
                       </div>
-                      <div className="flex flex-col gap-y-1 mt-2">
+                      <div className="flex flex-col gap-y-1">
                         <span className="text-[11px] uppercase tracking-wide text-neutral-800/80 text-center">Handicap</span>
                         <div className="text-base leading-6 font-normal text-center text-neutral-900">
                           {handicap ?? '—'}
