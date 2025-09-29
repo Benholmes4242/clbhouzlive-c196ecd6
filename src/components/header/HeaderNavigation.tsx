@@ -183,9 +183,31 @@ const HeaderNavigation = () => {
         )}
       </Button>
 
-      <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleProfileClick}>
-        <User className="h-5 w-5" />
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}>
+            <User className="h-5 w-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48 mr-2 bg-white border shadow-lg z-50">
+          <DropdownMenuItem onClick={handleProfileClick}>
+            View Profile
+          </DropdownMenuItem>
+          {/* Add Edit Profile option only when on profile page */}
+          {isProfilePage && (
+            <DropdownMenuItem onClick={() => {
+              // Trigger edit profile modal using the hidden trigger
+              const editButton = document.querySelector('[data-edit-profile-trigger]') as HTMLButtonElement;
+              if (editButton) {
+                editButton.click();
+              }
+            }}>
+              Edit Profile
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuSeparator />
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

@@ -831,23 +831,6 @@ const HeroProfileHeader = ({
                     ) : null}
                   </div>
 
-                  {/* Three dots menu - positioned absolutely on left */}
-                  {isOwnProfile && (
-                    <div className="absolute top-0 left-0">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
-                            <MoreVertical size={20} />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
-                          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                            Edit Profile
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  )}
 
                    {/* Content column centered between left edge and mini card */}
                    <div className="flex flex-col items-center"
@@ -1102,23 +1085,6 @@ const HeroProfileHeader = ({
                     ) : null}
                   </div>
 
-                  {/* Three dots menu - positioned absolutely on left */}
-                  {isOwnProfile && (
-                    <div className="absolute top-0 left-0">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="p-1 rounded-full transition-colors duration-300 hover:bg-black/10 text-gray-700 hover:text-gray-900">
-                            <MoreVertical size={24} />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg z-50">
-                          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                            Edit Profile
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  )}
 
                    {/* Content column with space reserved for the overhang */}
                    <div style={{ paddingRight: 'calc(var(--mini-w) + 16px)' }}>
@@ -1419,6 +1385,14 @@ const HeroProfileHeader = ({
       {/* Remove FullscreenMediaModal - handled by individual components */}
 
       {/* Rest of content sections would continue here... */}
+      
+      {/* Hidden trigger for header to access edit profile functionality */}
+      <button 
+        data-edit-profile-trigger 
+        className="hidden" 
+        onClick={() => setEditDialogOpen(true)}
+        aria-hidden="true"
+      />
       
       {/* New comprehensive Edit Profile Modal */}
       <ProfileEditDialog
