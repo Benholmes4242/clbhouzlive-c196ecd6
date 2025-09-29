@@ -807,7 +807,7 @@ const HeroProfileHeader = ({
                <div className="flex flex-col items-center relative">
                    {/* Overhanging mini profile card */}
                     <div
-                      className="absolute overflow-hidden rounded-xl border border-white/40 shadow-[0_8px_28px_rgba(0,0,0,0.28)]"
+                      className="absolute overflow-hidden rounded-xl shadow-[0_8px_28px_rgba(0,0,0,0.28)]"
                       style={{
                        top: 'calc(var(--mini-h) * -0.24)',   // 24% overhang
                        right: '8px',                         // anchor 8px from right
@@ -1061,7 +1061,7 @@ const HeroProfileHeader = ({
                <div className="flex flex-col items-center relative">
                   {/* Overhanging mini profile card */}
                    <div
-                     className="absolute rounded-lg overflow-hidden border border-white/40 bg-white/20 backdrop-blur-sm shadow-[0_12px_28px_rgba(0,0,0,0.25)] z-10"
+                     className="absolute rounded-lg overflow-hidden bg-white/20 backdrop-blur-sm shadow-[0_12px_28px_rgba(0,0,0,0.25)] z-10"
                      style={{
                        width: 'var(--mini-w)',
                        height: 'var(--mini-h)',
