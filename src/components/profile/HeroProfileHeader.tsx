@@ -943,6 +943,9 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
+                    <div className="space-y-0">
+                      <hr className="m-0 border-white/10" />
+
                     {/* Tab Navigation */}
                     <nav className="w-full">
                       <div className="mx-auto max-w-[360px] w-full flex" role="tablist" aria-label="Profile sections">
@@ -955,7 +958,7 @@ const HeroProfileHeader = ({
                             aria-controls={`tabpanel-${tab.id}`}
                             tabIndex={activeSection === tab.id ? 0 : -1}
                              className={`
-                               relative py-1 px-2 text-base font-normal transition-colors duration-200 min-h-[44px]
+                               relative py-3 px-2 text-base font-normal transition-colors duration-200 min-h-[44px]
                                ${activeSection === tab.id 
                                  ? 'text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50' 
                                  : 'text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'
@@ -980,6 +983,7 @@ const HeroProfileHeader = ({
                         ))}
                       </div>
                     </nav>
+                    </div>
                   </div>
 
                </div>
