@@ -136,7 +136,13 @@ serve(async (req: Request) => {
 
     // Priority 1: SwingCoach analysis (UNCHANGED - preserves existing functionality)
     if (images && images.length > 0) {
-      console.log('🎯 Using OpenAI for swing analysis with images:', images?.length || 0);
+      // [AUDIT] Track Edge Function processing for SwingCoach
+      const edgeStart = performance.now();
+      const frameCount = images?.length || 0;
+      const messageLength = message?.length || 0;
+      
+      console.log('🎯 Using OpenAI for swing analysis with images:', frameCount);
+      console.log(`[SC-EDGE] Starting processing - frames=${frameCount}, msgLen=${messageLength}, detailMode=${detailMode}`);
       
       const systemPrompt = `You are Echo, a professional golf instructor and swing coach with expertise in biomechanics and golf technique. When analyzing golf swing images/frames:
 
@@ -181,7 +187,15 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
 
       // Add timeout for faster failure/fallback
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s SLA for full analysis
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+        console.warn(`[SC-EDGE] OpenAI timeout after 20s - frames=${frameCount}`);
+      }, 20000); // 20s SLA for full analysis
+
+      // [AUDIT] Track OpenAI call timing
+      const openaiStart = performance.now();
+      let openaiSuccess = false;
+      let tokenCount = 0;
 
       try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -210,9 +224,12 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
         const data = await response.json();
         const finalResponse = data.choices[0].message.content.trim();
         
-        // Calculate payload size and log metrics
+        // [AUDIT] Calculate timing and payload metrics
+        const openaiTime = performance.now() - openaiStart;
+        const edgeTime = performance.now() - edgeStart;
         const payloadSize = JSON.stringify(messages).length;
-        const tokenCount = data.usage?.total_tokens || 0;
+        tokenCount = data.usage?.total_tokens || 0;
+        openaiSuccess = true;
         
         console.log('✅ EDGE FUNCTION DEBUG - Response generated successfully:', {
           responseLength: finalResponse.length,
@@ -221,6 +238,9 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
           tokenCount: tokenCount,
           timedOut: false
         });
+
+        // [AUDIT] Log comprehensive Edge Function metrics
+        console.info(`[SC-EDGE] SUCCESS openai=${openaiTime.toFixed(0)}ms, total=${edgeTime.toFixed(0)}ms, frames=${frameCount}, payloadKB=${Math.round(payloadSize / 1024)}, tokens=${tokenCount}, outcome=detailed`);
 
         console.log('📤 EDGE FUNCTION DEBUG - Sending response back to client');
 
@@ -237,7 +257,11 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
         
         // Handle AbortController timeout gracefully
         if (error.name === 'AbortError') {
+          // [AUDIT] Log timeout scenario
+          const timeoutTime = performance.now() - edgeStart;
           console.log('🚨 API call aborted due to 20s timeout - returning quick analysis');
+          console.info(`[SC-EDGE] TIMEOUT openai=20000ms+, total=${timeoutTime.toFixed(0)}ms, frames=${frameCount}, outcome=quick`);
+          
           const quickAnalysis = `## Quick Swing Analysis
 
 Based on the submitted frames, I can see:
@@ -258,6 +282,9 @@ Based on the submitted frames, I can see:
         });
         }
         
+        // [AUDIT] Log other errors
+        const errorTime = performance.now() - edgeStart;
+        console.error(`[SC-EDGE] ERROR total=${errorTime.toFixed(0)}ms, frames=${frameCount}, error=${error.message}, outcome=error`);
         throw error;
       }
     }
