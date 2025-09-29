@@ -849,13 +849,13 @@ const HeroProfileHeader = ({
                         const { first, last } = splitName(displayName);
                         return (
                           <>
-                            <span className="block font-extrabold leading-tight text-[clamp(26px,6.2vw,34px)]">
+                            <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-[1.1]">
                               {first}
                             </span>
-                            <span className="block font-extrabold leading-tight text-[clamp(26px,6.2vw,34px)] mt-1">
+                            <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-[1.1] mt-2">
                               {last}
                             </span>
-                            <span className="mt-2 text-[clamp(14px,3.5vw,16px)] text-neutral-600">
+                            <span className="mt-2 text-base font-medium text-neutral-600">
                               @{username}
                             </span>
                           </>
@@ -864,19 +864,19 @@ const HeroProfileHeader = ({
                     </div>
 
                     {/* TITLES ROW (golf club & handicap on the SAME line) */}
-                    <div className="col-[1] row-[2] flex justify-center">
-                      <div className="text-[clamp(12px,3.2vw,14px)] font-semibold">Golf Club</div>
+                    <div className="col-[1] row-[2] flex justify-center mt-4">
+                      <div className="text-sm font-semibold text-center">Golf Club</div>
                     </div>
-                    <div className="col-[3] row-[2] flex justify-center">
-                      <div className="text-[clamp(12px,3.2vw,14px)] font-semibold">Handicap</div>
+                    <div className="col-[3] row-[2] flex justify-center mt-4">
+                      <div className="text-sm font-semibold text-center">Handicap</div>
                     </div>
 
                     {/* VALUES ROW */}
-                    <div className="col-[1] row-[3] flex justify-center">
+                    <div className="col-[1] row-[3] flex justify-center mt-2">
                       <div
                         className="
-                          text-[clamp(17px,4.2vw,20px)]
-                          leading-[1.15]
+                          text-base
+                          leading-[1.4]
                           font-normal
                           text-center
                           max-w-[22ch]
@@ -893,17 +893,24 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    <div className="col-[3] row-[3] flex justify-center">
-                      <div className="text-[clamp(20px,5vw,26px)] leading-none font-semibold">
+                    <div className="col-[3] row-[3] flex justify-center mt-2">
+                      <div className="text-base leading-none font-normal text-center">
                         {handicap ?? '—'}
                       </div>
                     </div>
 
                     {/* BIO — sits directly UNDER the values row */}
-                    <div className="col-[1_/_span_3] row-[4] mt-6">
-                      {/* mt-6 = 24px exact gap */}
+                    <div className="col-[1_/_span_3] row-[4] mt-4">
                       {profile?.bio && (
-                        <p className="m-0 text-[clamp(14px,3.6vw,16px)] text-center text-neutral-800">
+                        <p 
+                          className="m-0 text-base font-normal text-center leading-[1.4] text-neutral-800"
+                          style={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden'
+                          }}
+                        >
                           {profile.bio}
                         </p>
                       )}
@@ -923,27 +930,27 @@ const HeroProfileHeader = ({
                   </div>
 
                   {/* Slim Stats Row */}
-                  <div className="w-full grid grid-cols-4 gap-3 text-center mt-4">
+                  <div className="w-full grid grid-cols-4 gap-3 text-center mt-6">
                     <div className="flex flex-col">
-                      <span className="text-lg font-semibold text-gray-900">{postsCount}</span>
-                      <span className="text-xs text-gray-600 uppercase tracking-wide">Posts</span>
+                      <span className="text-xl font-bold text-gray-900">{postsCount}</span>
+                      <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Posts</span>
                     </div>
                     <div className="flex flex-col border-l border-gray-300 pl-3">
-                      <span className="text-lg font-semibold text-gray-900">2,500</span>
-                      <span className="text-xs text-gray-600 uppercase tracking-wide">Total XP</span>
+                      <span className="text-xl font-bold text-gray-900">2,500</span>
+                      <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total XP</span>
                     </div>
                     <div className="flex flex-col border-l border-gray-300 pl-3">
-                      <span className="text-lg font-semibold text-gray-900">{followingCount}</span>
-                      <span className="text-xs text-gray-600 uppercase tracking-wide">Following</span>
+                      <span className="text-xl font-bold text-gray-900">{followingCount}</span>
+                      <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Following</span>
                     </div>
                     <div className="flex flex-col border-l border-gray-300 pl-3">
-                      <span className="text-lg font-semibold text-gray-900">{followersCount}</span>
-                      <span className="text-xs text-gray-600 uppercase tracking-wide">Followers</span>
+                      <span className="text-xl font-bold text-gray-900">{followersCount}</span>
+                      <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Followers</span>
                     </div>
                   </div>
 
                   {/* Tab Navigation - pinned to bottom */}
-                  <div className="w-full border-t border-gray-300 mt-4 pt-4">
+                  <div className="w-full border-t border-gray-300 mt-6 pt-4">
                     <div className="flex" role="tablist" aria-label="Profile sections">
                       {tabs.map((tab) => (
                         <button
