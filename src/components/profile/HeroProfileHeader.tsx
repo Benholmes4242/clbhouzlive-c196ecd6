@@ -832,30 +832,30 @@ const HeroProfileHeader = ({
                   </div>
 
 
-                   {/* Content column centered between left edge and mini card */}
-                   <div className="flex flex-col items-center justify-center"
-                        style={{
-                          width: 'calc(100% - var(--mini-w) - 16px)',
-                          marginRight: 'calc(var(--mini-w) + 16px)',
-                          paddingLeft: '16px',
-                          paddingRight: '16px'
-                        }}>
-                      <h1
-                        className="font-bold text-2xl leading-tight break-words text-center"
-                        style={{
-                          marginTop: 'clamp(4px, 1.2vh, 10px)',
-                          wordWrap: 'break-word',
-                          overflowWrap: 'break-word',
-                          hyphens: 'auto'
-                        }}
-                      >
-                        {displayName}
-                      </h1>
-
-                     <div
-                       className="opacity-70 text-base font-medium text-center"
-                       style={{ marginTop: '6px' }}
-                     >
+                   {/* Name lane - perfectly centered between glass inner left and mini card left */}
+                   <div
+                     className="text-center"
+                     style={{
+                       width: 'calc(100% - var(--mini-w) - 8px)',
+                       marginRight: 'calc(var(--mini-w) + 8px)'
+                     }}
+                   >
+                     {(() => {
+                       const parts = (displayName || '').trim().split(/\s+/);
+                       const firstName = parts[0] || '';
+                       const lastName = parts.length > 1 ? parts.slice(1).join(' ') : '';
+                       return (
+                         <h1
+                           className="leading-tight font-semibold"
+                           style={{ fontSize: 'var(--fs-display)' }}
+                         >
+                           <span className="block">{firstName}</span>
+                           {lastName && <span className="block">{lastName}</span>}
+                         </h1>
+                       );
+                     })()}
+ 
+                     <div className="mt-1 opacity-70" style={{ fontSize: 'var(--fs-handle)' }}>
                        @{username}
                      </div>
                    </div>
