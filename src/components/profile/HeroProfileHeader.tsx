@@ -833,18 +833,10 @@ const HeroProfileHeader = ({
                   </div>
 
 
-                  {/* MOBILE: glass content layout with grid */}
-                  <div
-                    className="
-                      grid
-                      grid-cols-[1fr,8px,var(--mini-w)]
-                      auto-rows-auto
-                      gap-y-4
-                    "
-                    style={{ marginTop: 'calc(var(--mini-h) * 0.15)' }}
-                  >
-                    {/* NAME + HANDLE (left column, centered) */}
-                    <div className="col-[1] row-[1] flex flex-col items-center text-center">
+                  {/* MOBILE: glass content layout with vertical stack */}
+                  <div className="flex flex-col gap-y-4" style={{ marginTop: 'calc(var(--mini-h) * 0.15)' }}>
+                    {/* Name + handle */}
+                    <div className="flex flex-col gap-y-2 items-center text-center">
                       {(() => {
                         const { first, last } = splitName(displayName);
                         return (
@@ -852,10 +844,10 @@ const HeroProfileHeader = ({
                             <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-[1.1]">
                               {first}
                             </span>
-                            <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-[1.1] mt-[2px]">
+                            <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-[1.1]">
                               {last}
                             </span>
-                            <span className="mt-2 text-base font-normal text-neutral-800">
+                            <span className="text-base font-normal text-neutral-800">
                               @{username}
                             </span>
                           </>
@@ -863,44 +855,40 @@ const HeroProfileHeader = ({
                       })()}
                     </div>
 
-                    {/* TITLES ROW (golf club & handicap on the SAME line) */}
-                    <div className="col-[1] row-[2] flex justify-center mt-10">
-                      <div className="text-base font-semibold text-center">Golf Club</div>
-                    </div>
-                    <div className="col-[3] row-[2] flex justify-center mt-10">
-                      <div className="text-base font-semibold text-center">Handicap</div>
-                    </div>
-
-                    {/* VALUES ROW */}
-                    <div className="col-[1] row-[3] flex justify-center -mt-3.5">
-                      <div
-                        className="
-                          text-base
-                          leading-[1.4]
-                          font-normal
-                          text-center
-                          max-w-[22ch]
-                          break-words
-                        "
-                        style={{
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden'
-                        }}
-                      >
-                        {homeClub}
+                    {/* Titles + values (two columns) */}
+                    <div className="grid grid-cols-2 gap-x-4">
+                      <div className="flex flex-col gap-y-1">
+                        <span className="text-[11px] uppercase tracking-wide opacity-80 text-center">Golf Club</span>
+                        <div
+                          className="
+                            text-base
+                            leading-[1.4]
+                            font-normal
+                            text-center
+                            max-w-[22ch]
+                            break-words
+                            mx-auto
+                          "
+                          style={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          {homeClub}
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-y-1">
+                        <span className="text-[11px] uppercase tracking-wide opacity-80 text-center">Handicap</span>
+                        <div className="text-base leading-none font-normal text-center">
+                          {handicap ?? '—'}
+                        </div>
                       </div>
                     </div>
 
-                    <div className="col-[3] row-[3] flex justify-center -mt-3.5">
-                      <div className="text-base leading-none font-normal text-center">
-                        {handicap ?? '—'}
-                      </div>
-                    </div>
-
-                    {/* BIO — sits directly UNDER the values row */}
-                    <div className="col-[1_/_span_3] row-[4] mt-5">
+                    {/* Bio */}
+                    <div>
                       {profile?.bio && (
                         <p 
                           className="m-0 text-base font-normal text-center leading-[1.4] text-neutral-800"
@@ -927,64 +915,67 @@ const HeroProfileHeader = ({
                         </div>
                       )}
                     </div>
-                  </div>
-
-                   {/* Slim Stats Row */}
-                    <div className="w-full grid grid-cols-4 gap-3 text-center mt-5">
-                     <div className="flex flex-col">
-                       <span className="text-lg font-bold text-gray-900">{postsCount}</span>
-                       <span className="text-base font-normal text-neutral-800">Posts</span>
-                     </div>
-                     <div className="flex flex-col border-l border-gray-300 pl-3">
-                       <span className="text-lg font-bold text-gray-900">2,500</span>
-                       <span className="text-base font-normal text-neutral-800">Total XP</span>
-                     </div>
-                     <div className="flex flex-col border-l border-gray-300 pl-3">
-                       <span className="text-lg font-bold text-gray-900">{followingCount}</span>
-                       <span className="text-base font-normal text-neutral-800">Following</span>
-                     </div>
-                     <div className="flex flex-col border-l border-gray-300 pl-3">
-                       <span className="text-lg font-bold text-gray-900">{followersCount}</span>
-                       <span className="text-base font-normal text-neutral-800">Followers</span>
-                     </div>
-                  </div>
-
-                  {/* Tab Navigation - pinned to bottom */}
-                  <div className="w-full border-t border-gray-300 mt-6 pt-4">
-                    <div className="flex" role="tablist" aria-label="Profile sections">
-                      {tabs.map((tab) => (
-                        <button
-                          key={tab.id}
-                          onClick={() => handleTabChange(tab.id)}
-                          role="tab"
-                          aria-selected={activeSection === tab.id}
-                          aria-controls={`tabpanel-${tab.id}`}
-                          tabIndex={activeSection === tab.id ? 0 : -1}
-                           className={`
-                             relative py-3 px-2 text-base font-normal transition-colors duration-200
-                             ${activeSection === tab.id 
-                               ? 'text-gray-900 focus:outline-none' 
-                               : 'text-gray-600 hover:text-gray-800 focus:outline-none'
-                             }
-                             flex-1 text-center
-                           `}
-                        >
-                          {tab.label}
-                          {/* Brand orange underline animation */}
-                          <div 
-                            className={`
-                              absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
-                              transition-all duration-300 ease-out
-                              ${activeSection === tab.id 
-                                ? 'scale-x-100 opacity-100' 
-                                : 'scale-x-0 opacity-0'
-                              }
-                              origin-center
-                            `}
-                          />
-                        </button>
-                      ))}
+                    {/* Stats */}
+                    <div className="rounded-xl border border-white/10">
+                      <div className="grid grid-cols-4 gap-3 text-center px-3 py-3.5">
+                        <div className="flex flex-col">
+                          <span className="text-lg font-bold text-gray-900">{postsCount}</span>
+                          <span className="text-base font-normal text-neutral-800">Posts</span>
+                        </div>
+                        <div className="flex flex-col border-l border-gray-300 pl-3">
+                          <span className="text-lg font-bold text-gray-900">2,500</span>
+                          <span className="text-base font-normal text-neutral-800">Total XP</span>
+                        </div>
+                        <div className="flex flex-col border-l border-gray-300 pl-3">
+                          <span className="text-lg font-bold text-gray-900">{followingCount}</span>
+                          <span className="text-base font-normal text-neutral-800">Following</span>
+                        </div>
+                        <div className="flex flex-col border-l border-gray-300 pl-3">
+                          <span className="text-lg font-bold text-gray-900">{followersCount}</span>
+                          <span className="text-base font-normal text-neutral-800">Followers</span>
+                        </div>
+                      </div>
                     </div>
+
+                    <hr className="border-white/10" />
+
+                    {/* Tab Navigation */}
+                    <nav className="flex items-center gap-4 py-2">
+                      <div className="flex" role="tablist" aria-label="Profile sections">
+                        {tabs.map((tab) => (
+                          <button
+                            key={tab.id}
+                            onClick={() => handleTabChange(tab.id)}
+                            role="tab"
+                            aria-selected={activeSection === tab.id}
+                            aria-controls={`tabpanel-${tab.id}`}
+                            tabIndex={activeSection === tab.id ? 0 : -1}
+                             className={`
+                               relative py-3 px-2 text-base font-normal transition-colors duration-200
+                               ${activeSection === tab.id 
+                                 ? 'text-gray-900 focus:outline-none' 
+                                 : 'text-gray-600 hover:text-gray-800 focus:outline-none'
+                               }
+                               flex-1 text-center
+                             `}
+                          >
+                            {tab.label}
+                            {/* Brand orange underline animation */}
+                            <div 
+                              className={`
+                                absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
+                                transition-all duration-300 ease-out
+                                ${activeSection === tab.id 
+                                  ? 'scale-x-100 opacity-100' 
+                                  : 'scale-x-0 opacity-0'
+                                }
+                                origin-center
+                              `}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </nav>
                   </div>
 
                </div>
