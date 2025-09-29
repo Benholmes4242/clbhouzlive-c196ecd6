@@ -1091,34 +1091,46 @@ const HeroProfileHeader = ({
                   </div>
 
 
-                   {/* Content column with space reserved for the overhang */}
-                   <div style={{ paddingRight: 'calc(var(--mini-w) + 16px)' }}>
-                     {/* Name & handle */}
-                     <div className="text-left">
-                       <h1 className="font-semibold leading-tight text-[length:var(--fs-display)]">
+                   {/* Name + handle block, perfectly centered between glass edge and mini card */}
+                   <div
+                     className="relative"
+                     style={{
+                       width: 'calc(100% - var(--mini-w) - 8px)',
+                       marginRight: 'calc(var(--mini-w) + 8px)'
+                     }}
+                   >
+                     <div className="mx-auto text-center">
+                       <h1 className="font-semibold leading-tight"
+                           style={{ fontSize: 'var(--fs-display)' }}>
                          {displayName}
                        </h1>
-                       <div className="mt-1 opacity-70 text-[length:var(--fs-handle)]">
+                       <div className="opacity-70" style={{ fontSize: 'var(--fs-handle)' }}>
                          @{username}
                        </div>
                      </div>
+                   </div>
 
-                     {/* Golf Club (left) + Handicap (right) */}
-                     <div
-                       className="mt-6 grid items-start"
-                       style={{ gridTemplateColumns: '1fr 1fr', columnGap: '24px' }}
-                     >
-                       {/* Golf Club – left aligned */}
-                       <div className="text-left">
-                         <div className="opacity-60 text-[length:var(--fs-label)]">Golf Club</div>
-                         <div className="text-[length:var(--fs-value)]">{homeClub}</div>
-                       </div>
+                   {/* Club + Handicap (left area)  ·  Spacer  ·  Handicap (under mini card) */}
+                   <div
+                     className="grid mt-3 items-start"
+                     style={{
+                       gridTemplateColumns: '1fr var(--mini-w) 1fr',
+                       columnGap: '24px'
+                     }}
+                   >
+                     {/* Golf Club */}
+                     <div className="text-left">
+                       <div className="font-semibold" style={{ fontSize: 'var(--fs-label)' }}>Golf Club</div>
+                       <div style={{ fontSize: 'var(--fs-value)' }}>{homeClub}</div>
+                     </div>
 
-                       {/* Handicap – right aligned */}
-                       <div className="text-right">
-                         <div className="opacity-60 text-[length:var(--fs-label)]">Handicap</div>
-                         <div className="text-[length:var(--fs-value)]">{handicap}</div>
-                       </div>
+                     {/* Spacer under the mini card (keep empty) */}
+                     <div />
+
+                     {/* Handicap */}
+                     <div className="text-center">
+                       <div className="font-semibold" style={{ fontSize: 'var(--fs-label)' }}>Handicap</div>
+                       <div style={{ fontSize: 'var(--fs-value)' }}>{handicap}</div>
                      </div>
                    </div>
 
