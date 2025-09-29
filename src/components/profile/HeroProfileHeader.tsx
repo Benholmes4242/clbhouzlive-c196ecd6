@@ -1093,13 +1093,13 @@ const HeroProfileHeader = ({
 
                    {/* Name + handle block, perfectly centered between glass edge and mini card */}
                    <div
-                     className="flex justify-center"
+                     className="relative"
                      style={{
                        width: 'calc(100% - var(--mini-w) - 8px)',
                        marginRight: 'calc(var(--mini-w) + 8px)'
                      }}
                    >
-                     <div className="text-center">
+                     <div className="mx-auto text-center">
                        <h1 className="font-semibold leading-tight"
                            style={{ fontSize: 'var(--fs-display)' }}>
                          {displayName}
