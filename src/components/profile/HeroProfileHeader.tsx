@@ -847,30 +847,30 @@ const HeroProfileHeader = ({
                      })()}
                    </div>
 
-                   {/* Golf Club - centered with user handle */}
-                   <div 
-                     className="absolute text-center"
-                     style={{
-                       top: 'calc(var(--mini-h) * 0.15 + 140px)', // Aligned with handle level
-                       left: '50%', // Center horizontally
-                       transform: 'translateX(-50%)', // Perfect center alignment
-                       width: 'auto' // Auto width for content
-                     }}
-                   >
-                     <div className="font-semibold opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
-                       Golf Club
-                     </div>
-                     <div
-                       className="leading-snug"
-                       style={{
-                         fontSize: 'var(--fs-value)',
-                         display: 'inline-block',
-                         maxWidth: 'min(100%, 26ch)'
-                       }}
-                     >
-                       {homeClub}
-                     </div>
-                   </div>
+                  {/* Golf Club (left only) */}
+                  <div
+                    className="flex justify-start"
+                    style={{
+                      marginTop: 'calc(var(--mini-h) * 0.55 - 8px)' // tune if needed
+                    }}
+                  >
+                    {/* Golf Club */}
+                    <div className="text-left">
+                      <div className="font-semibold opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
+                        Golf Club
+                      </div>
+                      <div
+                        className="leading-snug"
+                        style={{
+                          fontSize: 'var(--fs-value)',
+                          display: 'inline-block',
+                          maxWidth: 'min(100%, 26ch)'
+                        }}
+                      >
+                        {homeClub}
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Handicap section - positioned under mini card */}
                   <div 
