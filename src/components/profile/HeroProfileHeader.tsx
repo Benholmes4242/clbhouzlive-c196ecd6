@@ -849,28 +849,29 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                  {/* Content column with space reserved for the overhang */}
-                  <div className="text-center"
+                   {/* Content column with space reserved for the overhang */}
+                   <div className="text-center w-full">
+                     <h1
+                       className="font-semibold leading-tight max-w-full break-words"
                        style={{
-                         maxWidth: 'calc(100% - var(--mini-w) - var(--panel-pad-x) - 8px)'
-                       }}>
-                    <h1
-                      className="font-semibold leading-snug line-clamp-2"
-                      style={{
-                        fontSize: 'var(--fs-display)',
-                        marginTop: 'clamp(4px, 1.2vh, 10px)'
-                      }}
-                    >
-                      {displayName}
-                    </h1>
+                         fontSize: 'var(--fs-display)',
+                         marginTop: 'clamp(4px, 1.2vh, 10px)',
+                         lineHeight: '1.2',
+                         wordWrap: 'break-word',
+                         overflowWrap: 'break-word',
+                         hyphens: 'auto'
+                       }}
+                     >
+                       {displayName}
+                     </h1>
 
-                    <div
-                      className="opacity-70"
-                      style={{ fontSize: 'var(--fs-handle)', marginTop: '6px' }}
-                    >
-                      @{username}
-                    </div>
-                  </div>
+                     <div
+                       className="opacity-70 text-center w-full"
+                       style={{ fontSize: 'var(--fs-handle)', marginTop: '8px' }}
+                     >
+                       @{username}
+                     </div>
+                   </div>
 
                   {/* Golf Club (left) + Handicap (centered under mini card) */}
                   <div
