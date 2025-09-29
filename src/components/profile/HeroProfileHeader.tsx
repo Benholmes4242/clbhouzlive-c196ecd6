@@ -802,14 +802,14 @@ const HeroProfileHeader = ({
             >
                <div className="flex flex-col items-center relative">
                   {/* Overhanging mini profile card */}
-                  <div
-                    className="absolute rounded-lg overflow-hidden border border-white/40 bg-white/20 backdrop-blur-sm shadow-[0_12px_28px_rgba(0,0,0,0.25)] z-10"
-                    style={{
-                      width: 'var(--mini-w)',
-                      height: 'var(--mini-h)',
-                      right: 'var(--panel-pad-x)',
-                      top: 'calc(var(--mini-h) * -0.28)'
-                    }}
+                   <div
+                     className="absolute rounded-lg overflow-hidden border border-white/40 bg-white/20 backdrop-blur-sm shadow-[0_12px_28px_rgba(0,0,0,0.25)] z-10"
+                     style={{
+                       width: 'var(--mini-w)',
+                       height: 'var(--mini-h)',
+                       right: '8px',
+                       top: 'calc(var(--mini-h) * -0.28)'
+                     }}
                     onClick={() => openImmersive?.(0)}
                     role="button"
                     aria-label="Open immersive profile"
@@ -1035,14 +1035,14 @@ const HeroProfileHeader = ({
             >
                <div className="flex flex-col items-center relative">
                   {/* Overhanging mini profile card */}
-                  <div
-                    className="absolute rounded-lg overflow-hidden border border-white/40 bg-white/20 backdrop-blur-sm shadow-[0_12px_28px_rgba(0,0,0,0.25)] z-10"
-                    style={{
-                      width: 'var(--mini-w)',
-                      height: 'var(--mini-h)',
-                      right: 'var(--panel-pad-x)',
-                      top: 'calc(var(--mini-h) * -0.28)'
-                    }}
+                   <div
+                     className="absolute rounded-lg overflow-hidden border border-white/40 bg-white/20 backdrop-blur-sm shadow-[0_12px_28px_rgba(0,0,0,0.25)] z-10"
+                     style={{
+                       width: 'var(--mini-w)',
+                       height: 'var(--mini-h)',
+                       right: '8px',
+                       top: 'calc(var(--mini-h) * -0.28)'
+                     }}
                     onClick={() => openImmersive?.(0)}
                     role="button"
                     aria-label="Open immersive profile"
