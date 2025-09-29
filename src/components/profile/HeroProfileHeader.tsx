@@ -847,28 +847,27 @@ const HeroProfileHeader = ({
                      })()}
                    </div>
 
-                  {/* Golf Club (left only) */}
-                  <div
-                    className="flex justify-start"
+                  {/* Golf Club title - centered with name text, same line as handicap */}
+                  <div 
+                    className="absolute text-center"
                     style={{
-                      marginTop: 'calc(var(--mini-h) * 0.55 - 8px)' // tune if needed
+                      top: 'calc(var(--mini-h) * 0.76 + 12px)', // Same vertical position as handicap
+                      left: '50%', // Center horizontally
+                      transform: 'translateX(-50%)', // Perfect center alignment
+                      width: 'auto'
                     }}
                   >
-                    {/* Golf Club */}
-                    <div className="text-left">
-                      <div className="font-semibold opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
-                        Golf Club
-                      </div>
-                      <div
-                        className="leading-snug"
-                        style={{
-                          fontSize: 'var(--fs-value)',
-                          display: 'inline-block',
-                          maxWidth: 'min(100%, 26ch)'
-                        }}
-                      >
-                        {homeClub}
-                      </div>
+                    <div className="font-semibold opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
+                      Golf Club
+                    </div>
+                    <div
+                      className="leading-snug"
+                      style={{
+                        fontSize: 'var(--fs-value)',
+                        paddingTop: '2px'
+                      }}
+                    >
+                      {homeClub}
                     </div>
                   </div>
 
