@@ -1091,22 +1091,21 @@ const HeroProfileHeader = ({
                   </div>
 
 
-                   {/* Name + handle block, perfectly centered between glass edge and mini card */}
+                   {/* Name + handle block, perfectly centered between glass edge and mini card for all devices */}
                    <div
-                     className="flex justify-center"
+                     className="text-center"
                      style={{
                        width: 'calc(100% - var(--mini-w) - 8px)',
+                       marginLeft: '0',
                        marginRight: 'calc(var(--mini-w) + 8px)'
                      }}
                    >
-                     <div className="text-center">
-                       <h1 className="font-semibold leading-tight"
-                           style={{ fontSize: 'var(--fs-display)' }}>
-                         {displayName}
-                       </h1>
-                       <div className="opacity-70" style={{ fontSize: 'var(--fs-handle)' }}>
-                         @{username}
-                       </div>
+                     <h1 className="font-semibold leading-tight"
+                         style={{ fontSize: 'var(--fs-display)' }}>
+                       {displayName}
+                     </h1>
+                     <div className="opacity-70" style={{ fontSize: 'var(--fs-handle)' }}>
+                       @{username}
                      </div>
                    </div>
 
