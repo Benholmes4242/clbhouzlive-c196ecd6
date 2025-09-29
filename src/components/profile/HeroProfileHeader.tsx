@@ -865,10 +865,10 @@ const HeroProfileHeader = ({
 
                     {/* TITLES ROW (golf club & handicap on the SAME line) */}
                     <div className="col-[1] row-[2] flex justify-center mt-10">
-                      <div className="text-sm font-semibold text-center">Golf Club</div>
+                      <div className="text-base font-semibold text-center">Golf Club</div>
                     </div>
                     <div className="col-[3] row-[2] flex justify-center mt-10">
-                      <div className="text-sm font-semibold text-center">Handicap</div>
+                      <div className="text-base font-semibold text-center">Handicap</div>
                     </div>
 
                     {/* VALUES ROW */}
@@ -1117,13 +1117,13 @@ const HeroProfileHeader = ({
                         }}>
                      {/* Golf Club */}
                      <div className="text-center">
-                       <div className="font-semibold" style={{ fontSize: 'var(--fs-label)' }}>Golf Club</div>
+                       <div className="text-base font-semibold">Golf Club</div>
                        <div className="text-base text-gray-700">{homeClub}</div>
                      </div>
 
                      {/* Handicap */}
                      <div className="text-center">
-                       <div className="font-semibold" style={{ fontSize: 'var(--fs-label)' }}>Handicap</div>
+                       <div className="text-base font-semibold">Handicap</div>
                        <div className="text-base text-gray-700">{handicap}</div>
                      </div>
                    </div>
