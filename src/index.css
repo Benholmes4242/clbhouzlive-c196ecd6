@@ -31,6 +31,31 @@ html, body {
   --safe-right: 0px;
 }
 
+/* Mobile-only name block centering */
+@media (max-width: 768px) {
+  /* The mini card sits at right: 8px with width var(--mini-w) inside the glass panel.
+     This block exactly spans the space from the panel's inner-left padding to the mini-card's left edge. */
+  .nameBlock-mobile {
+    /* span exactly from glass inner-left to mini left */
+    width: calc(100% - var(--mini-w) - 8px);
+    margin-right: calc(var(--mini-w) + 8px); /* reserve space for the mini card on the right */
+    margin-left: 0;
+    padding-inline: 0;                      /* no extra padding that would skew centering */
+    text-align: center;                     /* center the two name lines within that span */
+    margin-top: clamp(4px, 1.2vh, 10px);
+  }
+
+  /* Tidy type on mobile */
+  .nameBlock-mobile span {
+    font-size: var(--fs-display);           /* you already have this custom prop */
+    line-height: 1.05;                      /* tight but readable */
+  }
+
+  .nameBlock-mobile > div {                 /* the @handle */
+    font-size: var(--fs-handle);
+  }
+}
+
 /* Modern safe area inset support */
 @supports (padding: env(safe-area-inset-top)) {
   :root {

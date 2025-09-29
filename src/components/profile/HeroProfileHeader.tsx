@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffect } from 'react';
+import { splitName } from '@/utils/name';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
@@ -832,88 +833,65 @@ const HeroProfileHeader = ({
                   </div>
 
 
-                   {/* GLASS CONTENT (mobile) - Grid layout */}
-                   <div
-                     className="
-                       grid
-                       grid-cols-[1fr,8px,var(--mini-w)]
-                       auto-rows-auto
-                       gap-y-3
-                     "
-                   >
-                     {/* NAME + HANDLE – centered within left track */}
-                     <div className="col-[1] row-[1] flex flex-col items-center text-center">
-                       {(() => {
-                         const parts = (displayName || '').trim().split(/\s+/);
-                         const firstName = parts.shift() || '';
-                         const lastName = parts.join(' ');
-                         
-                         return (
-                           <>
-                             <span className="block font-extrabold leading-tight
-                                            text-[clamp(26px,6.2vw,34px)]">
-                               {firstName}
-                             </span>
-                             <span className="block font-extrabold leading-tight
-                                            text-[clamp(26px,6.2vw,34px)] mt-1">
-                               {lastName}
-                             </span>
-
-                             <span className="mt-2 text-[clamp(14px,3.5vw,16px)] text-neutral-600">
-                               @{username}
-                             </span>
-                           </>
-                         );
-                       })()}
-                     </div>
-
-                     {/* ----- TWO-ROW INFO STRIP ----- */}
-                     {/* Row 1 = titles (bold). Row 2 = values (regular). This lines the handicap title with the first line of club value,
-                         and puts the handicap value level with the second line. */}
-
-                     {/* Golf Club — title (row 2 in visual stack under name) */}
-                     <div className="col-[1] row-[2] flex justify-center">
-                       <div className="text-[clamp(12px,3.2vw,14px)] font-semibold tracking-tight">
-                         Golf Club
-                       </div>
-                     </div>
-
-                     {/* Handicap — title (under the mini card = column 3) */}
-                     <div className="col-[3] row-[2] flex justify-center">
-                       <div className="text-[clamp(12px,3.2vw,14px)] font-semibold tracking-tight">
-                         Handicap
-                       </div>
-                     </div>
-
-                     {/* Golf Club — value (allow 2 lines, centered) */}
-                     <div className="col-[1] row-[3] flex justify-center">
-                       <div
-                         className="
-                           text-[clamp(17px,4.2vw,20px)]
-                           leading-[1.15]
-                           font-normal
-                           text-center
-                           max-w-[22ch]
-                           break-words
-                         "
-                         style={{ 
-                           display: '-webkit-box' as any, 
-                           WebkitLineClamp: 2, 
-                           WebkitBoxOrient: 'vertical' as any, 
-                           overflow: 'hidden' 
-                         }}
-                       >
-                         {homeClub}
-                       </div>
-                     </div>
-
-                     {/* Handicap — value (centered under mini card) */}
-                     <div className="col-[3] row-[3] flex justify-center">
-                       <div className="text-[clamp(20px,5vw,26px)] leading-none font-semibold">
-                         {handicap ?? '—'}
-                       </div>
-                     </div>
+                   {/* Name block (mobile): always 2 lines, centered */}
+                   <div className="nameBlock-mobile">
+                     {(() => {
+                       const { first, last } = splitName(displayName);
+                       return (
+                         <>
+                           <span className="block leading-tight font-semibold">{first}</span>
+                           <span className="block leading-tight font-semibold">{last}</span>
+                           <div className="mt-1 text-sm text-gray-600">@{username}</div>
+                         </>
+                       );
+                     })()}
                    </div>
+
+                  {/* Golf Club (left) + Handicap (centered under mini card) */}
+                  <div
+                    className="grid items-start"
+                    style={{
+                      gridTemplateColumns: '1fr 1fr var(--mini-w)',
+                      columnGap: 'clamp(12px, 4vw, 28px)',
+                      marginTop: 'calc(var(--mini-h) * 0.55 - 8px)' // tune if needed
+                    }}
+                  >
+                    {/* Column 1 — Golf Club */}
+                    <div className="text-left">
+                      <div className="font-semibold opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
+                        Golf Club
+                      </div>
+                      <div
+                        className="leading-snug"
+                        style={{
+                          fontSize: 'var(--fs-value)',
+                          display: 'inline-block',
+                          maxWidth: 'min(100%, 26ch)'
+                        }}
+                      >
+                        {homeClub}
+                      </div>
+                    </div>
+
+                    {/* Column 2 — spacer (do not render content) */}
+                    <div />
+
+                    {/* Column 3 — Handicap (centered under the mini card) */}
+                    <div className="text-center">
+                      <div className="font-semibold opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
+                        Handicap
+                      </div>
+                      <div
+                        className="leading-snug"
+                        style={{
+                          fontSize: 'var(--fs-value)',
+                          paddingTop: '2px'
+                        }}
+                      >
+                        {handicap}
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Bio section below the content column */}
                   <div className="w-full mt-6">
