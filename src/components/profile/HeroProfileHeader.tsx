@@ -859,9 +859,8 @@ const HeroProfileHeader = ({
                       Golf Club
                     </div>
                     <div
-                      className="leading-snug"
+                      className="leading-snug text-sm text-gray-700"
                       style={{
-                        fontSize: 'var(--fs-value)',
                         display: 'inline-block',
                         maxWidth: 'min(100%, 26ch)'
                       }}
@@ -883,9 +882,8 @@ const HeroProfileHeader = ({
                       Handicap
                     </div>
                     <div
-                      className="leading-snug"
+                      className="leading-snug text-sm text-gray-700"
                       style={{
-                        fontSize: 'var(--fs-value)',
                         paddingTop: '2px'
                       }}
                     >
