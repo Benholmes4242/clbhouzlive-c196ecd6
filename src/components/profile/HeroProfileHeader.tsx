@@ -808,7 +808,7 @@ const HeroProfileHeader = ({
                        width: 'var(--mini-w)',
                        height: 'var(--mini-h)',
                        right: '8px',
-                       top: 'calc(var(--mini-h) * -0.28)'
+                       top: 'calc(var(--mini-h) * -0.22)'
                      }}
                     onClick={() => openImmersive?.(0)}
                     role="button"
@@ -1041,7 +1041,7 @@ const HeroProfileHeader = ({
                        width: 'var(--mini-w)',
                        height: 'var(--mini-h)',
                        right: '8px',
-                       top: 'calc(var(--mini-h) * -0.28)'
+                       top: 'calc(var(--mini-h) * -0.22)'
                      }}
                     onClick={() => openImmersive?.(0)}
                     role="button"
