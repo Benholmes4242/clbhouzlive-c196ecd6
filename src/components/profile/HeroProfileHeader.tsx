@@ -900,7 +900,7 @@ const HeroProfileHeader = ({
                     </div>
 
                     {/* BIO — sits directly UNDER the values row */}
-                    <div className="col-[1_/_span_3] row-[4]">
+                    <div className="col-[1_/_span_3] row-[4] mt-5">
                       {profile?.bio && (
                         <p 
                           className="m-0 text-base font-normal text-center leading-[1.4] text-neutral-800"
@@ -950,7 +950,7 @@ const HeroProfileHeader = ({
                   </div>
 
                   {/* Tab Navigation - pinned to bottom */}
-                  <div className="w-full border-t border-gray-300 mt-4 pt-4">
+                  <div className="w-full border-t border-gray-300 mt-6 pt-4">
                     <div className="flex" role="tablist" aria-label="Profile sections">
                       {tabs.map((tab) => (
                         <button
