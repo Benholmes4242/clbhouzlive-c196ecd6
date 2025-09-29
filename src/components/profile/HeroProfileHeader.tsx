@@ -807,7 +807,7 @@ const HeroProfileHeader = ({
                <div className="flex flex-col items-center relative">
                    {/* Overhanging mini profile card */}
                     <div
-                      className="absolute overflow-hidden rounded-xl shadow-[0_8px_28px_rgba(0,0,0,0.28)]"
+                      className="absolute overflow-hidden rounded-xl border border-white/40 shadow-[0_8px_28px_rgba(0,0,0,0.28)]"
                       style={{
                        top: 'calc(var(--mini-h) * -0.24)',   // 24% overhang
                        right: '8px',                         // anchor 8px from right
@@ -829,9 +829,7 @@ const HeroProfileHeader = ({
                             const cx = (profile?.mini_card_crop_x ?? 0) + (profile?.mini_card_crop_width ?? 100) / 2;
                             const cy = (profile?.mini_card_crop_y ?? 0) + (profile?.mini_card_crop_height ?? 100) / 2;
                             return `${cx}% ${cy}%`;
-                          })(),
-                          WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 92%, transparent 100%)',
-                          maskImage: 'linear-gradient(to bottom, black 0%, black 92%, transparent 100%)'
+                          })()
                         }}
                         loading="lazy"
                       />
@@ -1063,7 +1061,7 @@ const HeroProfileHeader = ({
                <div className="flex flex-col items-center relative">
                   {/* Overhanging mini profile card */}
                    <div
-                     className="absolute rounded-lg overflow-hidden bg-white/20 backdrop-blur-sm shadow-[0_12px_28px_rgba(0,0,0,0.25)] z-10"
+                     className="absolute rounded-lg overflow-hidden border border-white/40 bg-white/20 backdrop-blur-sm shadow-[0_12px_28px_rgba(0,0,0,0.25)] z-10"
                      style={{
                        width: 'var(--mini-w)',
                        height: 'var(--mini-h)',
@@ -1079,15 +1077,13 @@ const HeroProfileHeader = ({
                         src={profile.profile_photo_url}
                         alt=""
                         className="w-full h-full object-cover"
-                         style={{
-                           objectPosition: (() => {
-                             const cx = (profile?.mini_card_crop_x ?? 0) + (profile?.mini_card_crop_width ?? 100) / 2;
-                             const cy = (profile?.mini_card_crop_y ?? 0) + (profile?.mini_card_crop_height ?? 100) / 2;
-                             return `${cx}% ${cy}%`;
-                           })(),
-                           WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 92%, transparent 100%)',
-                           maskImage: 'linear-gradient(to bottom, black 0%, black 92%, transparent 100%)'
-                         }}
+                        style={{
+                          objectPosition: (() => {
+                            const cx = (profile?.mini_card_crop_x ?? 0) + (profile?.mini_card_crop_width ?? 100) / 2;
+                            const cy = (profile?.mini_card_crop_y ?? 0) + (profile?.mini_card_crop_height ?? 100) / 2;
+                            return `${cx}% ${cy}%`;
+                          })()
+                        }}
                         loading="lazy"
                       />
                     ) : null}
@@ -1178,7 +1174,8 @@ const HeroProfileHeader = ({
                      </div>
                   </div>
 
-                  <div className="w-full mt-4 pt-4">
+                  {/* Tab Navigation - pinned to bottom */}
+                  <div className="w-full border-t border-gray-300 mt-4 pt-4">
                     <div className="flex" role="tablist" aria-label="Profile sections">
                       {tabs.map((tab) => (
                         <button

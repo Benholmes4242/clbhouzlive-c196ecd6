@@ -390,6 +390,8 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
               </div>
             </div>
 
+            {/* Subtle Divider */}
+            <div className="mx-6 mb-4 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           </div>
 
           {/* Recent Posts Section - Scrollable */}
