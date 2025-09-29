@@ -840,55 +840,56 @@ const HeroProfileHeader = ({
                   {/* MOBILE: glass content layout with vertical stack */}
                   <div className="flex flex-col gap-y-4" style={{ marginTop: 'calc(var(--mini-h) * 0.15)' }}>
                     {/* Name + handle */}
-                    <div className="exclude-mini flex flex-col gap-y-1 items-center text-center mt-2">
+                    <div className="exclude-mini flex flex-col gap-y-2 items-center text-center mt-2">
                       {(() => {
                         const { first, last } = splitName(displayName);
                         return (
                           <>
-                            <h1 className="text-[clamp(28px,6vw,32px)] font-semibold leading-[1.1] tracking-tight text-neutral-900">
-                              {first} {last}
-                            </h1>
-                            <p className="text-sm text-neutral-800/80 leading-5">
+                            <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-tight">
+                              {first}
+                            </span>
+                            <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-tight">
+                              {last}
+                            </span>
+                            <span className="text-sm font-normal text-neutral-800 leading-5">
                               @{username}
-                            </p>
+                            </span>
                           </>
                         );
                       })()}
                     </div>
 
-                    {/* Titles + values (two rows, two columns) */}
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 items-start">
-                      {/* titles row */}
-                      <span className="text-[11px] uppercase tracking-wide text-neutral-800/80 justify-self-start">
-                        Golf Club
-                      </span>
-                      <span className="text-[11px] uppercase tracking-wide text-neutral-800/80 justify-self-end">
-                        Handicap
-                      </span>
-
-                      {/* values row */}
-                      <div
-                        className="
-                          text-base
-                          leading-6
-                          font-normal
-                          justify-self-start
-                          max-w-[22ch]
-                          break-words
-                          text-neutral-900
-                        "
-                        style={{
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden'
-                        }}
-                      >
-                        {homeClub}
+                    {/* Titles + values (two columns) */}
+                    <div className="grid grid-cols-2 gap-x-4">
+                      <div className="flex flex-col gap-y-1">
+                        <span className="text-[11px] uppercase tracking-wide text-neutral-800/80 text-center">Golf Club</span>
+                        <div
+                          className="
+                            text-base
+                            leading-6
+                            font-normal
+                            text-center
+                            max-w-[22ch]
+                            break-words
+                            mx-auto
+                            text-neutral-900
+                          "
+                          style={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          {homeClub}
+                        </div>
                       </div>
-                      <span className="text-base leading-6 justify-self-end text-neutral-900">
-                        {handicap ?? '—'}
-                      </span>
+                      <div className="flex flex-col gap-y-1 mt-2">
+                        <span className="text-[11px] uppercase tracking-wide text-neutral-800/80 text-center">Handicap</span>
+                        <div className="text-base leading-6 font-normal text-center text-neutral-900">
+                          {handicap ?? '—'}
+                        </div>
+                      </div>
                     </div>
 
                     {/* Bio */}
@@ -941,43 +942,44 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    {/* Tabs with built-in divider + tighter spacing */}
-                    <nav className="mt-3 w-full border-t border-white/10 pt-2">
-                      <ul className="mx-auto max-w-[360px] w-full flex items-center justify-between text-sm text-center">
+                    <hr className="mt-3 border-white/10" />
+
+                    {/* Tab Navigation */}
+                    <nav className="mt-3 w-full">
+                      <div className="mx-auto max-w-[360px] w-full flex" role="tablist" aria-label="Profile sections">
                         {tabs.map((tab) => (
-                          <li key={tab.id} className="py-2">
-                            <button
-                              onClick={() => handleTabChange(tab.id)}
-                              role="tab"
-                              aria-selected={activeSection === tab.id}
-                              aria-controls={`tabpanel-${tab.id}`}
-                              tabIndex={activeSection === tab.id ? 0 : -1}
-                               className={`
-                                 relative py-1 px-2 text-sm font-normal transition-colors duration-200 min-h-[44px]
-                                 ${activeSection === tab.id 
-                                   ? 'text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50' 
-                                   : 'text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'
-                                 }
-                                 text-center rounded
-                               `}
-                            >
-                              {tab.label}
-                              {/* Brand orange underline animation */}
-                              <div 
-                                className={`
-                                  absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
-                                  transition-all duration-300 ease-out
-                                  ${activeSection === tab.id 
-                                    ? 'scale-x-100 opacity-100' 
-                                    : 'scale-x-0 opacity-0'
-                                  }
-                                  origin-center
-                                `}
-                              />
-                            </button>
-                          </li>
+                          <button
+                            key={tab.id}
+                            onClick={() => handleTabChange(tab.id)}
+                            role="tab"
+                            aria-selected={activeSection === tab.id}
+                            aria-controls={`tabpanel-${tab.id}`}
+                            tabIndex={activeSection === tab.id ? 0 : -1}
+                             className={`
+                               relative py-3 px-2 text-base font-normal transition-colors duration-200 min-h-[44px]
+                               ${activeSection === tab.id 
+                                 ? 'text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50' 
+                                 : 'text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'
+                               }
+                               flex-1 text-center rounded
+                             `}
+                          >
+                            {tab.label}
+                            {/* Brand orange underline animation */}
+                            <div 
+                              className={`
+                                absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
+                                transition-all duration-300 ease-out
+                                ${activeSection === tab.id 
+                                  ? 'scale-x-100 opacity-100' 
+                                  : 'scale-x-0 opacity-0'
+                                }
+                                origin-center
+                              `}
+                            />
+                          </button>
                         ))}
-                      </ul>
+                      </div>
                     </nav>
                   </div>
 
