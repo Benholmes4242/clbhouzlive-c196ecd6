@@ -930,21 +930,21 @@ const HeroProfileHeader = ({
                   </div>
 
                   {/* Slim Stats Row */}
-                  <div className="w-full grid grid-cols-4 gap-3 text-center mt-6">
+                   <div className="w-full grid grid-cols-4 gap-3 text-center mt-6">
                      <div className="flex flex-col">
-                       <span className="text-xl font-bold text-gray-900">{postsCount}</span>
+                       <span className="text-lg font-bold text-gray-900">{postsCount}</span>
                        <span className="text-base font-normal text-neutral-800">Posts</span>
                      </div>
                      <div className="flex flex-col border-l border-gray-300 pl-3">
-                       <span className="text-xl font-bold text-gray-900">2,500</span>
-                       <span className="text-base font-normal text-neutral-800">Total Xp</span>
+                       <span className="text-lg font-bold text-gray-900">2,500</span>
+                       <span className="text-base font-normal text-neutral-800">Total XP</span>
                      </div>
                      <div className="flex flex-col border-l border-gray-300 pl-3">
-                       <span className="text-xl font-bold text-gray-900">{followingCount}</span>
+                       <span className="text-lg font-bold text-gray-900">{followingCount}</span>
                        <span className="text-base font-normal text-neutral-800">Following</span>
                      </div>
                      <div className="flex flex-col border-l border-gray-300 pl-3">
-                       <span className="text-xl font-bold text-gray-900">{followersCount}</span>
+                       <span className="text-lg font-bold text-gray-900">{followersCount}</span>
                        <span className="text-base font-normal text-neutral-800">Followers</span>
                      </div>
                   </div>
@@ -1156,21 +1156,21 @@ const HeroProfileHeader = ({
                    </div>
 
                   {/* Slim Stats Row */}
-                  <div className="w-full grid grid-cols-4 gap-3 text-center mt-5">
+                   <div className="w-full grid grid-cols-4 gap-3 text-center mt-5">
                      <div className="flex flex-col">
-                       <span className="text-xl font-semibold text-gray-900">{postsCount}</span>
+                       <span className="text-lg font-semibold text-gray-900">{postsCount}</span>
                        <span className="text-base font-normal text-neutral-800">Posts</span>
                      </div>
                      <div className="flex flex-col border-l border-gray-300 pl-3">
-                       <span className="text-xl font-semibold text-gray-900">2,500</span>
-                       <span className="text-base font-normal text-neutral-800">Total Xp</span>
+                       <span className="text-lg font-semibold text-gray-900">2,500</span>
+                       <span className="text-base font-normal text-neutral-800">Total XP</span>
                      </div>
                      <div className="flex flex-col border-l border-gray-300 pl-3">
-                       <span className="text-xl font-semibold text-gray-900">{followingCount}</span>
+                       <span className="text-lg font-semibold text-gray-900">{followingCount}</span>
                        <span className="text-base font-normal text-neutral-800">Following</span>
                      </div>
                      <div className="flex flex-col border-l border-gray-300 pl-3">
-                       <span className="text-xl font-semibold text-gray-900">{followersCount}</span>
+                       <span className="text-lg font-semibold text-gray-900">{followersCount}</span>
                        <span className="text-base font-normal text-neutral-800">Followers</span>
                      </div>
                   </div>
