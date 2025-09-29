@@ -3,6 +3,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 @import './components/ai-chat/ai-chat-fixes.css';
 @import './styles/liquid-glass.css';
+@import './styles/profile-spacing.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -42,7 +43,8 @@ html, body {
     margin-left: 0;
     padding-inline: 0;                      /* no extra padding that would skew centering */
     text-align: center;                     /* center the two name lines within that span */
-    margin-top: clamp(4px, 1.2vh, 10px);
+    /* Fixed margin instead of vh-based for browser chrome stability */
+    margin-top: 8px;
   }
 
   /* Tidy type on mobile */

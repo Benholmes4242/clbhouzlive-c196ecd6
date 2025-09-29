@@ -1,0 +1,64 @@
+/* Centralized spacing utilities for profile components */
+
+/* Stack layouts with consistent vertical rhythm */
+.stack-16 {
+  @apply flex flex-col gap-y-4;
+}
+
+.stack-8 {
+  @apply flex flex-col gap-y-2;
+}
+
+.stack-4 {
+  @apply flex flex-col gap-y-1;
+}
+
+/* Glass panel content spacing */
+.glass-content {
+  @apply stack-16;
+}
+
+/* Profile section spacing */
+.profile-section {
+  @apply stack-8;
+}
+
+/* Typography tokens for profile content */
+.profile-name {
+  @apply text-[clamp(28px,6vw,32px)] font-bold leading-tight;
+}
+
+.profile-handle {
+  @apply text-sm font-normal leading-5;
+}
+
+.profile-label {
+  @apply text-[11px] uppercase tracking-wide font-medium;
+}
+
+.profile-value {
+  @apply text-base font-normal leading-6;
+}
+
+.profile-bio {
+  @apply text-base font-normal leading-6;
+}
+
+/* Tap targets for mobile accessibility */
+.tap-target {
+  @apply min-h-[44px] rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50;
+}
+
+/* Glass panel contrast improvements */
+.glass-enhanced {
+  @apply backdrop-blur-xl border-white/35;
+  background-color: rgba(255, 255, 255, 0.16);
+}
+
+.glass-text-primary {
+  @apply text-neutral-900;
+}
+
+.glass-text-secondary {
+  @apply text-neutral-800/80;
+}

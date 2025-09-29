@@ -795,10 +795,13 @@ const HeroProfileHeader = ({
             {/* GLASS PANEL — consistent overlap & padding */}
             <section
               ref={profileCardRef}
-              className="relative z-20 mx-0 sm:mx-0 md:mx-0 lg:mx-4 rounded-none lg:rounded-2xl border border-white/35 bg-white/10 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+              className="relative z-20 mx-0 sm:mx-0 md:mx-0 lg:mx-4 rounded-none lg:rounded-2xl border border-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
               style={{
                 marginTop: 'calc(var(--panel-overlap) * -1)',
-                padding: 'var(--panel-pad-y) var(--panel-pad-x)'
+                padding: 'var(--panel-pad-y) var(--panel-pad-x)',
+                paddingTop: 'calc(var(--panel-pad-y) + var(--safe-top))',
+                paddingBottom: 'calc(var(--panel-pad-y) + var(--safe-bottom))',
+                backgroundColor: 'rgba(255, 255, 255, 0.16)'
               }}
             >
                <div className="flex flex-col items-center relative">
@@ -836,18 +839,18 @@ const HeroProfileHeader = ({
                   {/* MOBILE: glass content layout with vertical stack */}
                   <div className="flex flex-col gap-y-4" style={{ marginTop: 'calc(var(--mini-h) * 0.15)' }}>
                     {/* Name + handle */}
-                    <div className="flex flex-col gap-y-2 items-center text-center">
+                    <div className="flex flex-col gap-y-2 items-center text-center mt-2">
                       {(() => {
                         const { first, last } = splitName(displayName);
                         return (
                           <>
-                            <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-[1.1]">
+                            <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-tight">
                               {first}
                             </span>
-                            <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-[1.1]">
+                            <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-tight">
                               {last}
                             </span>
-                            <span className="text-base font-normal text-neutral-800">
+                            <span className="text-sm font-normal text-neutral-800 leading-5">
                               @{username}
                             </span>
                           </>
@@ -858,16 +861,17 @@ const HeroProfileHeader = ({
                     {/* Titles + values (two columns) */}
                     <div className="grid grid-cols-2 gap-x-4">
                       <div className="flex flex-col gap-y-1">
-                        <span className="text-[11px] uppercase tracking-wide opacity-80 text-center">Golf Club</span>
+                        <span className="text-[11px] uppercase tracking-wide text-neutral-800/80 text-center">Golf Club</span>
                         <div
                           className="
                             text-base
-                            leading-[1.4]
+                            leading-6
                             font-normal
                             text-center
                             max-w-[22ch]
                             break-words
                             mx-auto
+                            text-neutral-900
                           "
                           style={{
                             display: '-webkit-box',
@@ -880,8 +884,8 @@ const HeroProfileHeader = ({
                         </div>
                       </div>
                       <div className="flex flex-col gap-y-1">
-                        <span className="text-[11px] uppercase tracking-wide opacity-80 text-center">Handicap</span>
-                        <div className="text-base leading-none font-normal text-center">
+                        <span className="text-[11px] uppercase tracking-wide text-neutral-800/80 text-center">Handicap</span>
+                        <div className="text-base leading-6 font-normal text-center text-neutral-900">
                           {handicap ?? '—'}
                         </div>
                       </div>
@@ -891,7 +895,7 @@ const HeroProfileHeader = ({
                     <div>
                       {profile?.bio && (
                         <p 
-                          className="m-0 text-base font-normal text-center leading-[1.4] text-neutral-800"
+                          className="m-0 text-base font-normal text-center leading-6 text-neutral-800"
                           style={{
                             display: '-webkit-box',
                             WebkitLineClamp: 2,
@@ -916,24 +920,24 @@ const HeroProfileHeader = ({
                       )}
                     </div>
                     {/* Stats */}
-                    <div className="rounded-xl border border-white/10">
-                      <div className="grid grid-cols-4 gap-3 text-center px-3 py-3.5">
-                        <div className="flex flex-col">
+                    <div className="rounded-xl border border-white/10 bg-white/12">
+                      <div className="grid grid-cols-4 gap-3 text-center px-3 py-4 min-h-[44px]">
+                        <button className="flex flex-col gap-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-1">
                           <span className="text-lg font-bold text-gray-900">{postsCount}</span>
-                          <span className="text-base font-normal text-neutral-800">Posts</span>
-                        </div>
-                        <div className="flex flex-col border-l border-gray-300 pl-3">
+                          <span className="text-sm font-normal text-neutral-800/80 leading-5">Posts</span>
+                        </button>
+                        <button className="flex flex-col gap-y-1 border-l border-gray-300 pl-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-1">
                           <span className="text-lg font-bold text-gray-900">2,500</span>
-                          <span className="text-base font-normal text-neutral-800">Total XP</span>
-                        </div>
-                        <div className="flex flex-col border-l border-gray-300 pl-3">
+                          <span className="text-sm font-normal text-neutral-800/80 leading-5">Total XP</span>
+                        </button>
+                        <button className="flex flex-col gap-y-1 border-l border-gray-300 pl-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-1">
                           <span className="text-lg font-bold text-gray-900">{followingCount}</span>
-                          <span className="text-base font-normal text-neutral-800">Following</span>
-                        </div>
-                        <div className="flex flex-col border-l border-gray-300 pl-3">
+                          <span className="text-sm font-normal text-neutral-800/80 leading-5">Following</span>
+                        </button>
+                        <button className="flex flex-col gap-y-1 border-l border-gray-300 pl-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-1">
                           <span className="text-lg font-bold text-gray-900">{followersCount}</span>
-                          <span className="text-base font-normal text-neutral-800">Followers</span>
-                        </div>
+                          <span className="text-sm font-normal text-neutral-800/80 leading-5">Followers</span>
+                        </button>
                       </div>
                     </div>
 
@@ -951,12 +955,12 @@ const HeroProfileHeader = ({
                             aria-controls={`tabpanel-${tab.id}`}
                             tabIndex={activeSection === tab.id ? 0 : -1}
                              className={`
-                               relative py-3 px-2 text-base font-normal transition-colors duration-200
+                               relative py-3 px-2 text-base font-normal transition-colors duration-200 min-h-[44px]
                                ${activeSection === tab.id 
-                                 ? 'text-gray-900 focus:outline-none' 
-                                 : 'text-gray-600 hover:text-gray-800 focus:outline-none'
+                                 ? 'text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50' 
+                                 : 'text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'
                                }
-                               flex-1 text-center
+                               flex-1 text-center rounded
                              `}
                           >
                             {tab.label}
