@@ -841,9 +841,19 @@ const HeroProfileHeader = ({
                    <div className="flex flex-col gap-y-4" style={{ marginTop: 'calc(var(--mini-h) * 0.15)' }}>
                      {/* Name + handle (internal tightening only) */}
                      <div className="exclude-mini flex flex-col items-center text-center gap-y-1">
-                       <h1 className="text-[clamp(28px,6vw,32px)] font-semibold leading-[1.12] tracking-tight">
-                         {displayName}
-                       </h1>
+                       {(() => {
+                         const { first, last } = splitName(displayName);
+                         return (
+                           <>
+                             <span className="block text-[clamp(28px,6vw,32px)] font-semibold leading-[1.12] tracking-tight">
+                               {first}
+                             </span>
+                             <span className="block text-[clamp(28px,6vw,32px)] font-semibold leading-[1.12] tracking-tight">
+                               {last}
+                             </span>
+                           </>
+                         );
+                       })()}
                        <p className="text-sm text-neutral-800/80 leading-5">@{username}</p>
                      </div>
 
