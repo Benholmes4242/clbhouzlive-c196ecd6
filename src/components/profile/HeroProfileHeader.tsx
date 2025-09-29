@@ -837,28 +837,27 @@ const HeroProfileHeader = ({
                   </div>
 
 
-                   {/* MOBILE: glass content layout with vertical stack */}
-                   <div className="flex flex-col gap-y-4" style={{ marginTop: 'calc(var(--mini-h) * 0.15)' }}>
-                     {/* Name + handle (internal tightening only) */}
-                     <div className="exclude-mini flex flex-col items-center text-center gap-y-1">
-                       {(() => {
-                         const { first, last } = splitName(displayName);
-                         return (
-                           <>
-                             <span className="block text-[clamp(28px,6vw,32px)] font-semibold leading-[1.12] tracking-tight">
-                               {first}
-                             </span>
-                             <span className="block text-[clamp(28px,6vw,32px)] font-semibold leading-[1.12] tracking-tight">
-                               {last}
-                             </span>
-                           </>
-                         );
-                       })()}
-                       <p className="text-sm text-neutral-800/80 leading-5">@{username}</p>
-                     </div>
-
-                     {/* Spacer lock: preserves full TPX between handle and titles */}
-                     <div className="h-[var(--handle-titles-gap-mobile)]"></div>
+                  {/* MOBILE: glass content layout with vertical stack */}
+                  <div className="flex flex-col gap-y-4" style={{ marginTop: 'calc(var(--mini-h) * 0.15)' }}>
+                    {/* Name + handle */}
+                    <div className="exclude-mini flex flex-col gap-y-2 items-center text-center mt-2">
+                      {(() => {
+                        const { first, last } = splitName(displayName);
+                        return (
+                          <>
+                            <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-tight">
+                              {first}
+                            </span>
+                            <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-tight">
+                              {last}
+                            </span>
+                            <span className="text-sm font-normal text-neutral-800 leading-5">
+                              @{username}
+                            </span>
+                          </>
+                        );
+                      })()}
+                    </div>
 
                     {/* Titles + values (two columns) */}
                     <div className="grid grid-cols-2 gap-x-4">

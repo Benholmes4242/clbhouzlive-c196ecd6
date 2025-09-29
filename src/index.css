@@ -58,10 +58,6 @@ html, body {
     margin-top: 8px;
   }
 
-  :root {
-    --handle-titles-gap-mobile: 16px;
-  }
-
   /* Tidy type on mobile */
   .nameBlock-mobile span {
     font-size: var(--fs-display);           /* you already have this custom prop */
