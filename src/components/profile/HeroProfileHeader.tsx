@@ -530,6 +530,8 @@ const HeroProfileHeader = ({
         isOpen={mediaManagerOpen}
         onClose={() => setMediaManagerOpen(false)}
         userId={profile?.id || ''}
+        mediaItems={mediaItems}
+        onMediaUpdate={refetchMedia}
       />
 
       {/* ProfileModalRouter - Available to all profile visitors for course viewing */}
