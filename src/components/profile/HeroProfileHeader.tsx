@@ -801,19 +801,26 @@ const HeroProfileHeader = ({
               }}
             >
                <div className="flex flex-col items-center relative">
-                  {/* Overhanging mini profile card */}
-                   <div
-                     className="absolute overflow-hidden rounded-xl shadow-[0_8px_28px_rgba(0,0,0,0.28)]"
-                     style={{
-                       top: 'calc(var(--mini-h) * -0.24)',   // 24% overhang
-                       right: '8px',                         // anchor 8px from right
-                       width: 'var(--mini-w)',
-                       height: 'var(--mini-h)'
-                     }}
-                    onClick={() => openImmersive?.(0)}
-                    role="button"
-                    aria-label="Open immersive profile"
-                  >
+                   {/* Mini profile card (absolute, overhanging) */}
+                    <div
+                      className="
+                        absolute
+                        overflow-hidden
+                        rounded-xl
+                        shadow-xl
+                        border border-white/90
+                        bg-white/10 backdrop-blur-sm
+                      "
+                      style={{
+                        top: 'calc(var(--mini-h) * -0.24)',
+                        right: 'var(--mini-right-gap)',
+                        width: 'var(--mini-w)',
+                        height: 'var(--mini-h)',
+                      }}
+                     onClick={() => openImmersive?.(0)}
+                     role="button"
+                     aria-label="Open immersive profile"
+                   >
                     {profile?.profile_photo_url ? (
                       <img
                         src={profile.profile_photo_url}
@@ -849,67 +856,59 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                  {/* Content column with space reserved for the overhang */}
-                  <div className="text-left"
-                       style={{
-                         maxWidth: 'calc(100% - var(--mini-w) - var(--panel-pad-x) - 8px)'
-                       }}>
+                  {/* Header text block (reserves space for the mini card on the right) */}
+                  <div
+                    className="text-center"
+                    style={{
+                      paddingRight: 'calc(var(--mini-w) + var(--mini-right-gap))',
+                    }}
+                  >
+                    {/* Name: two-line wrap, larger, bold */}
                     <h1
-                      className="font-semibold leading-snug line-clamp-2"
-                      style={{
-                        fontSize: 'var(--fs-display)',
-                        marginTop: 'clamp(4px, 1.2vh, 10px)'
-                      }}
+                      className="
+                        font-semibold leading-tight
+                        text-[length:var(--fs-display)]
+                        line-clamp-2
+                      "
                     >
                       {displayName}
                     </h1>
 
-                    <div
-                      className="opacity-70"
-                      style={{ fontSize: 'var(--fs-handle)', marginTop: '6px' }}
-                    >
+                    {/* Handle: sits under the name */}
+                    <div className="opacity-70 text-[length:var(--fs-handle)]">
                       @{username}
                     </div>
                   </div>
 
-                  {/* Golf Club (left) + Handicap (right) — aligned to mini card */}
+                  {/* Club + Handicap row: aligns with the mini card */}
                   <div
-                    className="grid items-start"
+                    className="mt-3 grid items-start"
                     style={{
-                      gridTemplateColumns: '1fr 1fr',
-                      columnGap: '24px',
-                      marginTop: 'calc(var(--mini-h) * 0.55 - 8px)' // tune if needed
+                      gridTemplateColumns: `1fr 1fr var(--mini-w)`,
+                      columnGap: 'clamp(12px, 4vw, 28px)',
+                      paddingRight: 'var(--mini-right-gap)', // keeps the row clear of the card edge
                     }}
                   >
-                    {/* LEFT: Golf Club */}
+                    {/* Column 1 — Golf Club (title above value, left area) */}
                     <div className="text-left">
-                      <div className="opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
+                      <div className="font-semibold opacity-70 text-[length:var(--fs-label)]">
                         Golf Club
                       </div>
-                      <div
-                        className="leading-snug"
-                        style={{
-                          fontSize: 'var(--fs-value)',
-                          display: 'inline-block',
-                          maxWidth: 'min(100%, 26ch)'
-                        }}
-                      >
+                      <div className="text-[length:var(--fs-value)] leading-snug">
+                        {/* allow two-line wrap like the mock */}
                         {homeClub}
                       </div>
                     </div>
 
-                    {/* RIGHT: Handicap */}
-                    <div className="text-right">
-                      <div className="opacity-70" style={{ fontSize: 'var(--fs-label)' }}>
+                    {/* Column 2 — spacer (do not render content) */}
+                    <div />
+
+                    {/* Column 3 — Handicap (centered under the mini card) */}
+                    <div className="text-center">
+                      <div className="font-semibold opacity-70 text-[length:var(--fs-label)]">
                         Handicap
                       </div>
-                      <div
-                        className="leading-snug"
-                        style={{
-                          fontSize: 'var(--fs-value)',
-                          paddingTop: '2px'
-                        }}
-                      >
+                      <div className="text-[length:var(--fs-value)] leading-snug">
                         {handicap}
                       </div>
                     </div>
@@ -1069,19 +1068,26 @@ const HeroProfileHeader = ({
               }}
             >
                <div className="flex flex-col items-center relative">
-                  {/* Overhanging mini profile card */}
-                   <div
-                     className="absolute rounded-lg overflow-hidden border border-white/40 bg-white/20 backdrop-blur-sm shadow-[0_12px_28px_rgba(0,0,0,0.25)] z-10"
-                     style={{
-                       width: 'var(--mini-w)',
-                       height: 'var(--mini-h)',
-                       right: '8px',
-                       top: 'calc(var(--mini-h) * -0.24)'
-                     }}
-                    onClick={() => openImmersive?.(0)}
-                    role="button"
-                    aria-label="Open immersive profile"
-                  >
+                   {/* Mini profile card (absolute, overhanging) */}
+                    <div
+                      className="
+                        absolute
+                        overflow-hidden
+                        rounded-xl
+                        shadow-xl
+                        border border-white/90
+                        bg-white/10 backdrop-blur-sm
+                      "
+                      style={{
+                        top: 'calc(var(--mini-h) * -0.24)',
+                        right: 'var(--mini-right-gap)',
+                        width: 'var(--mini-w)',
+                        height: 'var(--mini-h)',
+                      }}
+                     onClick={() => openImmersive?.(0)}
+                     role="button"
+                     aria-label="Open immersive profile"
+                   >
                     {profile?.profile_photo_url ? (
                       <img
                         src={profile.profile_photo_url}
@@ -1117,35 +1123,63 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                   {/* Content column with space reserved for the overhang */}
-                   <div style={{ paddingRight: 'calc(var(--mini-w) + 16px)' }}>
-                     {/* Name & handle */}
-                     <div className="text-left">
-                       <h1 className="font-semibold leading-tight text-[length:var(--fs-display)]">
-                         {displayName}
-                       </h1>
-                       <div className="mt-1 opacity-70 text-[length:var(--fs-handle)]">
-                         @{username}
-                       </div>
-                     </div>
+                    {/* Header text block (reserves space for the mini card on the right) */}
+                    <div
+                      className="text-center"
+                      style={{
+                        paddingRight: 'calc(var(--mini-w) + var(--mini-right-gap))',
+                      }}
+                    >
+                      {/* Name: two-line wrap, larger, bold */}
+                      <h1
+                        className="
+                          font-semibold leading-tight
+                          text-[length:var(--fs-display)]
+                          line-clamp-2
+                        "
+                      >
+                        {displayName}
+                      </h1>
 
-                     {/* Golf Club (left) + Handicap (right) */}
-                     <div
-                       className="mt-6 grid items-start"
-                       style={{ gridTemplateColumns: '1fr 1fr', columnGap: '24px' }}
-                     >
-                       {/* Golf Club – left aligned */}
-                       <div className="text-left">
-                         <div className="opacity-60 text-[length:var(--fs-label)]">Golf Club</div>
-                         <div className="text-[length:var(--fs-value)]">{homeClub}</div>
-                       </div>
+                      {/* Handle: sits under the name */}
+                      <div className="opacity-70 text-[length:var(--fs-handle)]">
+                        @{username}
+                      </div>
+                    </div>
 
-                       {/* Handicap – right aligned */}
-                       <div className="text-right">
-                         <div className="opacity-60 text-[length:var(--fs-label)]">Handicap</div>
-                         <div className="text-[length:var(--fs-value)]">{handicap}</div>
-                       </div>
-                     </div>
+                      {/* Club + Handicap row: aligns with the mini card */}
+                      <div
+                        className="mt-3 grid items-start"
+                        style={{
+                          gridTemplateColumns: `1fr 1fr var(--mini-w)`,
+                          columnGap: 'clamp(12px, 4vw, 28px)',
+                          paddingRight: 'var(--mini-right-gap)', // keeps the row clear of the card edge
+                        }}
+                      >
+                        {/* Column 1 — Golf Club (title above value, left area) */}
+                        <div className="text-left">
+                          <div className="font-semibold opacity-70 text-[length:var(--fs-label)]">
+                            Golf Club
+                          </div>
+                          <div className="text-[length:var(--fs-value)] leading-snug">
+                            {/* allow two-line wrap like the mock */}
+                            {homeClub}
+                          </div>
+                        </div>
+
+                        {/* Column 2 — spacer (do not render content) */}
+                        <div />
+
+                        {/* Column 3 — Handicap (centered under the mini card) */}
+                        <div className="text-center">
+                          <div className="font-semibold opacity-70 text-[length:var(--fs-label)]">
+                            Handicap
+                          </div>
+                          <div className="text-[length:var(--fs-value)] leading-snug">
+                            {handicap}
+                          </div>
+                        </div>
+                      </div>
                    </div>
 
                       {/* Bio section - left exactly as is */}
