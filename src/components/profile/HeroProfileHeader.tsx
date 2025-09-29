@@ -849,61 +849,33 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                  {/* Content layout with reserved space for the mini card */}
-                  <div className="w-full">
-                    {/* Name & Handle - bigger, 2 lines allowed */}
-                    <div className="text-left"
-                         style={{
-                           maxWidth: 'calc(100% - var(--mini-w) - var(--panel-pad-x) - 8px)'
-                         }}>
-                      <h1
-                        className="font-semibold leading-snug line-clamp-2"
-                        style={{
-                          fontSize: 'var(--fs-display)',
-                          marginTop: 'clamp(4px, 1.2vh, 10px)'
-                        }}
-                      >
+                  {/* Content column with space reserved for the overhang */}
+                  <div style={{ paddingRight: 'calc(var(--mini-w) + 16px)' }}>
+                    {/* Name & handle */}
+                    <div className="text-left">
+                      <h1 className="font-semibold leading-tight text-[length:var(--fs-display)]">
                         {displayName}
                       </h1>
-
-                      <div
-                        className="opacity-70"
-                        style={{ fontSize: 'var(--fs-handle)', marginTop: '6px' }}
-                      >
+                      <div className="mt-1 opacity-70 text-[length:var(--fs-handle)]">
                         @{username}
                       </div>
                     </div>
 
-                    {/* Club + Handicap row: aligns with the mini card */}
+                    {/* Golf Club (left) + Handicap (right) */}
                     <div
-                      className="mt-3 grid items-start"
-                      style={{
-                        gridTemplateColumns: `1fr 1fr var(--mini-w)`,
-                        columnGap: 'clamp(12px, 4vw, 28px)',
-                        paddingRight: 'var(--mini-right-gap)',
-                      }}
+                      className="mt-6 grid items-start"
+                      style={{ gridTemplateColumns: '1fr 1fr', columnGap: '24px' }}
                     >
-                      {/* Column 1 — Golf Club (title above value, left area) */}
+                      {/* Golf Club – left aligned */}
                       <div className="text-left">
-                        <div className="font-semibold opacity-70 text-[length:var(--fs-label)]">
-                          Golf Club
-                        </div>
-                        <div className="text-[length:var(--fs-value)] leading-snug">
-                          {homeClub}
-                        </div>
+                        <div className="opacity-60 text-[length:var(--fs-label)]">Golf Club</div>
+                        <div className="text-[length:var(--fs-value)]">{homeClub}</div>
                       </div>
 
-                      {/* Column 2 — spacer (do not render content) */}
-                      <div />
-
-                      {/* Column 3 — Handicap (centered under the mini card) */}
-                      <div className="text-center">
-                        <div className="font-semibold opacity-70 text-[length:var(--fs-label)]">
-                          Handicap
-                        </div>
-                        <div className="text-[length:var(--fs-value)] leading-snug">
-                          {handicap}
-                        </div>
+                      {/* Handicap – right aligned */}
+                      <div className="text-right">
+                        <div className="opacity-60 text-[length:var(--fs-label)]">Handicap</div>
+                        <div className="text-[length:var(--fs-value)]">{handicap}</div>
                       </div>
                     </div>
                   </div>
