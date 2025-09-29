@@ -931,22 +931,22 @@ const HeroProfileHeader = ({
 
                   {/* Slim Stats Row */}
                   <div className="w-full grid grid-cols-4 gap-3 text-center mt-6">
-                    <div className="flex flex-col">
-                      <span className="text-xl font-bold text-gray-900">{postsCount}</span>
-                      <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Posts</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-3">
-                      <span className="text-xl font-bold text-gray-900">2,500</span>
-                      <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total XP</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-3">
-                      <span className="text-xl font-bold text-gray-900">{followingCount}</span>
-                      <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Following</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-3">
-                      <span className="text-xl font-bold text-gray-900">{followersCount}</span>
-                      <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Followers</span>
-                    </div>
+                     <div className="flex flex-col">
+                       <span className="text-xl font-bold text-gray-900">{postsCount}</span>
+                       <span className="text-base font-normal text-neutral-800">Posts</span>
+                     </div>
+                     <div className="flex flex-col border-l border-gray-300 pl-3">
+                       <span className="text-xl font-bold text-gray-900">2,500</span>
+                       <span className="text-base font-normal text-neutral-800">Total Xp</span>
+                     </div>
+                     <div className="flex flex-col border-l border-gray-300 pl-3">
+                       <span className="text-xl font-bold text-gray-900">{followingCount}</span>
+                       <span className="text-base font-normal text-neutral-800">Following</span>
+                     </div>
+                     <div className="flex flex-col border-l border-gray-300 pl-3">
+                       <span className="text-xl font-bold text-gray-900">{followersCount}</span>
+                       <span className="text-base font-normal text-neutral-800">Followers</span>
+                     </div>
                   </div>
 
                   {/* Tab Navigation - pinned to bottom */}
@@ -960,14 +960,14 @@ const HeroProfileHeader = ({
                           aria-selected={activeSection === tab.id}
                           aria-controls={`tabpanel-${tab.id}`}
                           tabIndex={activeSection === tab.id ? 0 : -1}
-                          className={`
-                            relative py-3 px-2 text-sm font-medium transition-colors duration-200
-                            ${activeSection === tab.id 
-                              ? 'text-gray-900 focus:outline-none' 
-                              : 'text-gray-600 hover:text-gray-800 focus:outline-none'
-                            }
-                            flex-1 text-center
-                          `}
+                           className={`
+                             relative py-3 px-2 text-base font-normal transition-colors duration-200
+                             ${activeSection === tab.id 
+                               ? 'text-gray-900 focus:outline-none' 
+                               : 'text-gray-600 hover:text-gray-800 focus:outline-none'
+                             }
+                             flex-1 text-center
+                           `}
                         >
                           {tab.label}
                           {/* Brand orange underline animation */}
@@ -1157,22 +1157,22 @@ const HeroProfileHeader = ({
 
                   {/* Slim Stats Row */}
                   <div className="w-full grid grid-cols-4 gap-3 text-center mt-5">
-                    <div className="flex flex-col">
-                      <span className="text-xl font-semibold text-gray-900">{postsCount}</span>
-                      <span className="text-sm text-gray-600 uppercase tracking-wide">Posts</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-3">
-                      <span className="text-xl font-semibold text-gray-900">2,500</span>
-                      <span className="text-sm text-gray-600 uppercase tracking-wide">Total XP</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-3">
-                      <span className="text-xl font-semibold text-gray-900">{followingCount}</span>
-                      <span className="text-sm text-gray-600 uppercase tracking-wide">Following</span>
-                    </div>
-                    <div className="flex flex-col border-l border-gray-300 pl-3">
-                      <span className="text-xl font-semibold text-gray-900">{followersCount}</span>
-                      <span className="text-sm text-gray-600 uppercase tracking-wide">Followers</span>
-                    </div>
+                     <div className="flex flex-col">
+                       <span className="text-xl font-semibold text-gray-900">{postsCount}</span>
+                       <span className="text-base font-normal text-neutral-800">Posts</span>
+                     </div>
+                     <div className="flex flex-col border-l border-gray-300 pl-3">
+                       <span className="text-xl font-semibold text-gray-900">2,500</span>
+                       <span className="text-base font-normal text-neutral-800">Total Xp</span>
+                     </div>
+                     <div className="flex flex-col border-l border-gray-300 pl-3">
+                       <span className="text-xl font-semibold text-gray-900">{followingCount}</span>
+                       <span className="text-base font-normal text-neutral-800">Following</span>
+                     </div>
+                     <div className="flex flex-col border-l border-gray-300 pl-3">
+                       <span className="text-xl font-semibold text-gray-900">{followersCount}</span>
+                       <span className="text-base font-normal text-neutral-800">Followers</span>
+                     </div>
                   </div>
 
                   {/* Tab Navigation - pinned to bottom */}
@@ -1186,14 +1186,14 @@ const HeroProfileHeader = ({
                           aria-selected={activeSection === tab.id}
                           aria-controls={`tabpanel-${tab.id}`}
                           tabIndex={activeSection === tab.id ? 0 : -1}
-                          className={`
-                            relative py-3 px-3 text-base font-medium transition-colors duration-200
-                            ${activeSection === tab.id 
-                              ? 'text-gray-900 focus:outline-none' 
-                              : 'text-gray-600 hover:text-gray-800 focus:outline-none'
-                            }
-                            flex-1 text-center
-                          `}
+                           className={`
+                             relative py-3 px-3 text-base font-normal transition-colors duration-200
+                             ${activeSection === tab.id 
+                               ? 'text-gray-900 focus:outline-none' 
+                               : 'text-gray-600 hover:text-gray-800 focus:outline-none'
+                             }
+                             flex-1 text-center
+                           `}
                         >
                           {tab.label}
                           {/* Brand orange underline animation */}
