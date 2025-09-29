@@ -837,8 +837,8 @@ const HeroProfileHeader = ({
                   </div>
 
 
-                    {/* MOBILE: glass content layout with vertical stack */}
-                    <div className="flex flex-col space-y-4" style={{ marginTop: 'calc(var(--mini-h) * 0.15)' }}>
+                   {/* MOBILE: glass content layout with vertical stack */}
+                   <div className="flex flex-col gap-y-4" style={{ marginTop: 'calc(var(--mini-h) * 0.15)' }}>
                      {/* Name + handle (internal tightening only) */}
                      <div className="exclude-mini flex flex-col items-center text-center gap-y-1">
                        {(() => {
@@ -893,36 +893,36 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                     {/* Bio */}
-                     <div className="mb-[18px]">
-                       {profile?.bio && (
-                         <p 
-                           className="m-0 text-base font-normal text-center leading-6 text-neutral-800"
-                           style={{
-                             display: '-webkit-box',
-                             WebkitLineClamp: 2,
-                             WebkitBoxOrient: 'vertical',
-                             overflow: 'hidden'
-                           }}
-                         >
-                           {profile.bio}
-                         </p>
-                       )}
-                       {profile?.website && (
-                         <div className="text-center mt-2">
-                           <a 
-                             href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                             target="_blank"
-                             rel="noopener noreferrer"
-                             className="text-sm text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
-                           >
-                             {profile.website.replace(/^https?:\/\//, '')}
-                           </a>
-                         </div>
-                       )}
-                     </div>
-                     {/* Stats */}
-                     <div className="rounded-xl border border-white/10 bg-white/12">
+                    {/* Bio */}
+                    <div>
+                      {profile?.bio && (
+                        <p 
+                          className="m-0 text-base font-normal text-center leading-6 text-neutral-800"
+                          style={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          {profile.bio}
+                        </p>
+                      )}
+                      {profile?.website && (
+                        <div className="text-center mt-2">
+                          <a 
+                            href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
+                          >
+                            {profile.website.replace(/^https?:\/\//, '')}
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                    {/* Stats */}
+                    <div className="rounded-xl border border-white/10 bg-white/12">
                       <div className="grid grid-cols-4 gap-3 text-center px-3 py-4 min-h-[44px]">
                         <button className="flex flex-col gap-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-1">
                           <span className="text-lg font-bold text-gray-900">{postsCount}</span>
