@@ -850,24 +850,21 @@ const HeroProfileHeader = ({
                   )}
 
                    {/* Content column with space reserved for the overhang */}
-                   <div className="text-center w-full">
+                   <div className="text-center w-full px-2">
                      <h1
-                       className="font-semibold leading-tight max-w-full break-words"
+                       className="font-semibold text-xl leading-tight max-w-full break-words"
                        style={{
-                         fontSize: 'var(--fs-display)',
                          marginTop: 'clamp(4px, 1.2vh, 10px)',
-                         lineHeight: '1.2',
+                         lineHeight: '1.3',
                          wordWrap: 'break-word',
-                         overflowWrap: 'break-word',
-                         hyphens: 'auto'
+                         overflowWrap: 'break-word'
                        }}
                      >
                        {displayName}
                      </h1>
 
                      <div
-                       className="opacity-70 text-center w-full"
-                       style={{ fontSize: 'var(--fs-handle)', marginTop: '8px' }}
+                       className="opacity-70 text-center w-full text-sm mt-2"
                      >
                        @{username}
                      </div>
