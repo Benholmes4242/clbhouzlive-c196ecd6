@@ -893,7 +893,7 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
 
-                    <div className="col-[3] row-[3] flex justify-center -mt-3.5">
+                    <div className="col-[3] row-[3] flex justify-center">
                       <div className="text-base leading-none font-normal text-center">
                         {handicap ?? '—'}
                       </div>
