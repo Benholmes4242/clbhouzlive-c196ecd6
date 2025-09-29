@@ -855,7 +855,7 @@ const HeroProfileHeader = ({
                             <span className="block text-[clamp(28px,6vw,32px)] font-bold leading-[1.1] mt-[2px]">
                               {last}
                             </span>
-                            <span className="mt-2 text-base font-medium text-neutral-600">
+                            <span className="mt-2 text-base font-normal text-neutral-800">
                               @{username}
                             </span>
                           </>
@@ -1104,9 +1104,9 @@ const HeroProfileHeader = ({
                          style={{ fontSize: 'var(--fs-display)' }}>
                        {displayName}
                      </h1>
-                     <div className="opacity-70" style={{ fontSize: 'var(--fs-handle)' }}>
-                       @{username}
-                     </div>
+                      <div className="text-base text-gray-700">
+                        @{username}
+                      </div>
                    </div>
 
                     {/* Golf Club and Handicap centered with fixed gap (desktop/tablet only) */}
