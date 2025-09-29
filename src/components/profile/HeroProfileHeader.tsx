@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffect } from 'react';
+import MobileProfileHeader from './MobileProfileHeader';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
