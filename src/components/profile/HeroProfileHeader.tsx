@@ -849,13 +849,14 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                   {/* Content column with space reserved for the overhang */}
-                   <div className="text-center"
+                   {/* Content column centered between left edge and mini card */}
+                   <div className="flex flex-col items-center"
                         style={{
-                          maxWidth: 'calc(100% - var(--mini-w) - var(--panel-pad-x) - 8px)'
+                          width: 'calc(100% - var(--mini-w) - 8px)',
+                          marginRight: 'calc(var(--mini-w) + 8px)'
                         }}>
                      <h1
-                       className="font-bold text-xl leading-tight break-words"
+                       className="font-bold text-xl leading-tight break-words text-center"
                        style={{
                          marginTop: 'clamp(4px, 1.2vh, 10px)'
                        }}
@@ -864,7 +865,7 @@ const HeroProfileHeader = ({
                      </h1>
 
                      <div
-                       className="opacity-70 text-sm font-medium"
+                       className="opacity-70 text-sm font-medium text-center"
                        style={{ marginTop: '6px' }}
                      >
                        @{username}
