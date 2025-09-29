@@ -41,12 +41,6 @@ html, body {
   }
 }
 
-/* Profile mini card CSS variables */
-:root {
-  --mini-overhang: 24%;   /* card overlaps panel by 24% of its own height */
-  --mini-right-gap: 8px;  /* card sits 8px from the panel's right edge */
-}
-
 /* Legacy iOS support (iOS 11.0-11.2) */
 @supports (padding: constant(safe-area-inset-top)) {
   :root {
