@@ -807,7 +807,7 @@ const HeroProfileHeader = ({
                      style={{
                        width: 'var(--mini-w)',
                        height: 'var(--mini-h)',
-                        right: '6px',
+                       right: '8px',
                        top: 'calc(var(--mini-h) * -0.24)'
                      }}
                     onClick={() => openImmersive?.(0)}
@@ -1040,7 +1040,7 @@ const HeroProfileHeader = ({
                      style={{
                        width: 'var(--mini-w)',
                        height: 'var(--mini-h)',
-                       right: '6px',
+                       right: '8px',
                        top: 'calc(var(--mini-h) * -0.24)'
                      }}
                     onClick={() => openImmersive?.(0)}
