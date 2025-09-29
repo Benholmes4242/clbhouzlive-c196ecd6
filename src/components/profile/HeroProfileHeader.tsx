@@ -1118,13 +1118,13 @@ const HeroProfileHeader = ({
                      {/* Golf Club */}
                      <div className="text-center">
                        <div className="font-semibold" style={{ fontSize: 'var(--fs-label)' }}>Golf Club</div>
-                       <div style={{ fontSize: 'var(--fs-value)' }}>{homeClub}</div>
+                       <div className="text-base text-gray-700">{homeClub}</div>
                      </div>
 
                      {/* Handicap */}
                      <div className="text-center">
                        <div className="font-semibold" style={{ fontSize: 'var(--fs-label)' }}>Handicap</div>
-                       <div style={{ fontSize: 'var(--fs-value)' }}>{handicap}</div>
+                       <div className="text-base text-gray-700">{handicap}</div>
                      </div>
                    </div>
 
