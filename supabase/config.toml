@@ -1,1 +1,6 @@
 project_id = "ybxkehyomcakqjvuhnna"
+
+[functions]
+# Make preflight (OPTIONS) requests succeed without JWT and let the function verify POST auth itself
+[functions.cloudflare-r2-upload]
+verify_jwt = false
