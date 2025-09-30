@@ -871,20 +871,20 @@ const HeroProfileHeader = ({
                 {/* Stats row */}
                 <div className="stats">
                   <div className="stat">
+                    <div className="stat-value">{handicap}</div>
+                    <div className="stat-label">Handicap</div>
+                  </div>
+                  <div className="stat">
                     <div className="stat-value">{postsCount}</div>
                     <div className="stat-label">Posts</div>
                   </div>
                   <div className="stat">
-                    <div className="stat-value">2,500</div>
-                    <div className="stat-label">Total XP</div>
+                    <div className="stat-value">{followersCount}</div>
+                    <div className="stat-label">Followers</div>
                   </div>
                   <div className="stat">
                     <div className="stat-value">{followingCount}</div>
                     <div className="stat-label">Following</div>
-                  </div>
-                  <div className="stat">
-                    <div className="stat-value">{followersCount}</div>
-                    <div className="stat-label">Followers</div>
                   </div>
                 </div>
 
