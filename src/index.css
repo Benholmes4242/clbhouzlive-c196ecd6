@@ -150,6 +150,16 @@ html, body {
   margin-top: var(--sp-24);
 }
 
+/* Golf club centered in available space (left of mini card) */
+.meta-club {
+  grid-column: 1 / -1;
+  width: calc(100% - var(--mini-w) - 8px);
+  margin-right: calc(var(--mini-w) + 8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .meta-label {
   font-size: var(--fs-label);
   font-weight: var(--fw-label);
