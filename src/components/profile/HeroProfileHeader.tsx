@@ -831,32 +831,39 @@ const HeroProfileHeader = ({
                   )}
                 </button>
 
-                {/* Panel left with grid layout for ⅓/⅔ positioning */}
-                <div data-panel-left>
-                  {/* Name & handle block at ⅓ */}
-                  <div data-nameblock>
-                    {(() => {
-                      const { first, last } = splitName(displayName);
-                      return (
-                        <>
-                          <span className="name-first">{first}</span>
-                          <span className="name-last">{last}</span>
-                          <div className="handle">@{username}</div>
-                        </>
-                      );
-                    })()}
-                  </div>
+                {/* Name & handle block */}
+                <div className="name-wrap" data-nameblock>
+                  {(() => {
+                    const { first, last } = splitName(displayName);
+                    return (
+                      <>
+                        <span className="name-first">{first}</span>
+                        <span className="name-last">{last}</span>
+                        <div className="handle">@{username}</div>
+                      </>
+                    );
+                  })()}
+                </div>
 
-                  {/* Golf Club block at ⅔ */}
-                  <div data-clubblock>
-                    <div className="club-title">GOLF CLUB</div>
-                    <div className="club-value">{homeClub}</div>
+                {/* Club / Handicap row */}
+                <div className="meta-row">
+                  <div className="meta meta-club">
+                    <div className="meta-label">Golf Club</div>
+                    <div className="meta-value">
+                      {homeClub}
+                    </div>
+                  </div>
+                  <div className="meta meta-hcp">
+                    <div className="meta-label">Handicap</div>
+                    <div className="meta-value meta-value--hcp">
+                      {handicap ?? '—'}
+                    </div>
                   </div>
                 </div>
 
-                {/* Bio with proper offset */}
+                {/* Bio */}
                 {profile?.bio && (
-                  <p data-bio className="bio">
+                  <p className="bio">
                     {profile.bio}
                   </p>
                 )}
