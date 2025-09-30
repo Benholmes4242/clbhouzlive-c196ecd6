@@ -116,7 +116,6 @@ html, body {
 .name-wrap {
   width: calc(100% - var(--mini-w) - 8px);
   margin-right: calc(var(--mini-w) + 8px);
-  margin-top: var(--sp-32);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -191,7 +190,7 @@ html, body {
   font-weight: var(--fw-bio);
   line-height: 1.5;
   text-align: center;
-  margin-top: calc(var(--mini-h) * 0.20);
+  margin-top: calc(var(--mini-h) * 0.20 + 32px);
   padding-inline: var(--sp-16);
 }
 
