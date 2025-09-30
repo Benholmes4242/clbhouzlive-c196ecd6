@@ -105,7 +105,10 @@ const ProfilePage = () => {
     <div className="min-h-screen bg-background relative">
       <ProfilePageHeader />
       
-      <HeroProfileHeader
+      {/* Add spacing for fixed header */}
+      <div className="h-16 md:h-18" />
+      
+      <HeroProfileHeader 
         profile={profile}
         isOwnProfile={true} // This is always the user's own profile on this route
         onProfileUpdate={refreshProfile}
