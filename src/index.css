@@ -39,7 +39,7 @@ html, body {
   /* Card */
   --mini-w: clamp(164px, 44vw, 216px);
   --mini-h: calc(var(--mini-w) * 4 / 3);
-  --mini-overhang: 0.16;
+  --mini-overhang: 0.14;
 
   /* Type scale (mobile) */
   --fs-name: clamp(28px, 6.4vw, 34px);

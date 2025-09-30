@@ -38,7 +38,7 @@ const ProfilePageHeader: React.FC = () => {
       <header
         className={cn(
           "profile-page-header",
-          "fixed top-0 left-0 right-0",
+          "relative",
           "z-40", // Layer above content
           "h-16 md:h-18", // 64px mobile, 72px desktop
           "transition-all duration-300",
