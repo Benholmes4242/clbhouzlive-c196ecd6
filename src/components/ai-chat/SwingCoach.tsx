@@ -721,12 +721,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
       const apiStartTime = Date.now();
       
-      // Add AbortController for 22s timeout (aligned with helper)
+      // Add AbortController for 32s timeout (aligned with helper)
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
         controller.abort();
-        console.warn('[SC] API call aborted after 22s timeout');
-      }, 22000);
+        console.warn('[SC] API call aborted after 32s timeout');
+      }, 32000);
 
       try {
         const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {

@@ -181,7 +181,7 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
 
       // Add timeout for faster failure/fallback
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s SLA for full analysis
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s SLA for full analysis
 
       try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -237,7 +237,7 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
         
         // Handle AbortController timeout gracefully
         if (error.name === 'AbortError') {
-          console.log('🚨 API call aborted due to 20s timeout - returning quick analysis');
+          console.log('🚨 API call aborted due to 30s timeout - returning quick analysis');
           const quickAnalysis = `## Quick Swing Analysis
 
 Based on the submitted frames, I can see:
