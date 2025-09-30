@@ -442,11 +442,11 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         }
       };
 
-      // Setup timeout
+      // Setup timeout - shorter for windowed capture
       timeoutId = setTimeout(() => {
         cleanup();
         reject(new Error('Playback capture timed out'));
-      }, 15000);
+      }, 6500);
 
       try {
         const t0 = scNow();
@@ -473,7 +473,19 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
         const duration = video.duration;
         const percents = [0.03, 0.13, 0.28, 0.48, 0.58, 0.73, 0.87, 0.95];
-        const targets = percents.map(p => +(p * duration).toFixed(2));
+        
+        let targets: number[];
+        if (duration > 12) {
+          // For long clips, analyze a 3-second window in the center
+          const windowLen = 3.0;
+          const windowStart = Math.max(0, (duration / 2) - 1.5);
+          const windowEnd = windowStart + windowLen;
+          targets = percents.map(p => +(windowStart + p * windowLen).toFixed(2));
+        } else {
+          // For short clips, use full duration as before
+          targets = percents.map(p => +(p * duration).toFixed(2));
+        }
+        
         scLog({ evt: 'targets_set', targets });
         const captured = new Array<boolean>(targets.length).fill(false);
         const frames: string[] = [];
