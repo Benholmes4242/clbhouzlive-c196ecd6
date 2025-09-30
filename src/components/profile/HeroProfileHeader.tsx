@@ -337,8 +337,8 @@ const HeroProfileHeader = ({
         // target: center meta row in the band from handle bottom → mini card bottom
         let raw = (cardH - nameH - metaH) / 2;
 
-        // clamp (px) - increased minimum for more spacing
-        const gap = Math.max(28, Math.min(raw, 64));
+        // clamp (px)
+        const gap = Math.max(16, Math.min(raw, 64));
 
         metaRowEl.style.setProperty('--club-gap', `${Math.round(gap)}px`);
       };
