@@ -803,12 +803,7 @@ const HeroProfileHeader = ({
                 paddingTop: 'calc(var(--panel-pad-y) + var(--safe-top))',
                 paddingBottom: 'calc(var(--panel-pad-y) + var(--safe-bottom))',
                 backgroundColor: 'rgba(255, 255, 255, 0.16)',
-                boxShadow: 'var(--panel-shadow)',
-                '--mini-w': 'clamp(140px,38vw,200px)',
-                '--mini-h': 'calc(var(--mini-w) * 4 / 3)',
-                '--mini-overhang': '0.24',
-                '--mini-radius': '16px',
-                '--mini-shadow': '0 20px 40px rgba(0,0,0,.18)'
+                boxShadow: 'var(--panel-shadow)'
               } as React.CSSProperties}
             >
               <div className="relative">
@@ -817,26 +812,13 @@ const HeroProfileHeader = ({
                   data-mini-card
                   type="button"
                   aria-label="Open mini profile media"
-                  className="
-                    absolute right-2 z-[2]
-                    w-[var(--mini-w)] aspect-[3/4]
-                    rounded-[var(--mini-radius)]
-                    overflow-hidden
-                    border border-white/90
-                    shadow-[var(--mini-shadow)]
-                    bg-white/10 backdrop-blur-sm
-                    cursor-pointer
-                  "
-                  style={{
-                    top: 'calc(var(--mini-h) * -1 * var(--mini-overhang))'
-                  }}
+                  className="mini-card cursor-pointer"
                   onClick={() => openImmersive?.(0)}
                 >
-                  {profile?.profile_photo_url ? (
+                  {profile?.profile_photo_url && (
                     <img
                       src={profile.profile_photo_url}
                       alt=""
-                      className="w-full h-full object-cover"
                       style={{
                         objectPosition: (() => {
                           const cx = (profile?.mini_card_crop_x ?? 0) + (profile?.mini_card_crop_width ?? 100) / 2;
@@ -846,155 +828,79 @@ const HeroProfileHeader = ({
                       }}
                       loading="lazy"
                     />
-                  ) : null}
+                  )}
                 </button>
 
-                {/* Content stack with 24px rhythm */}
-                <div className="flex flex-col" style={{ marginTop: 'calc(var(--mini-h) * 0.15)', gap: 'var(--gap-lg)' }}>
-                  {/* Name & handle block */}
-                  <div className="name-wrap">
-                    {(() => {
-                      const { first, last } = splitName(displayName);
-                      return (
-                        <>
-                          <span className="first">{first}</span>
-                          <span className="last">{last}</span>
-                          <div className="handle">@{username}</div>
-                        </>
-                      );
-                    })()}
-                  </div>
+                {/* Name & handle block */}
+                <div className="name-wrap" data-nameblock>
+                  {(() => {
+                    const { first, last } = splitName(displayName);
+                    return (
+                      <>
+                        <span className="name-first">{first}</span>
+                        <span className="name-last">{last}</span>
+                        <div className="handle">@{username}</div>
+                      </>
+                    );
+                  })()}
+                </div>
 
-                   {/* Club / Handicap row */}
-                  <div className="info grid grid-cols-[1fr_var(--gap-lg)_1fr] items-start">
-                    <div className="info--club justify-self-center">
-                      <div className="label">Golf Club</div>
-                      <div className="value max-w-[22ch] break-words"
-                        style={{
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden'
-                        }}
-                      >
-                        {homeClub}
-                      </div>
-                    </div>
-                    <div></div>
-                    <div 
-                      className="info--hcp justify-self-center"
-                      style={{
-                        marginTop: 'calc(var(--mini-h) * var(--mini-overhang) + 8px)'
-                      }}
-                    >
-                      <div className="label">Handicap</div>
-                      <div className="value">{handicap ?? '—'}</div>
+                {/* Club / Handicap row */}
+                <div className="meta-row">
+                  <div className="meta meta-club">
+                    <div className="meta-label">Golf Club</div>
+                    <div className="meta-value">
+                      {homeClub}
                     </div>
                   </div>
-
-                  {/* Bio */}
-                  {profile?.bio && (
-                    <div className="text-center">
-                      <p 
-                        className="m-0 leading-[1.4]"
-                        style={{
-                          fontSize: 'var(--value-size)',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden'
-                        }}
-                      >
-                        {profile.bio}
-                      </p>
-                      {profile?.website && (
-                        <a 
-                          href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-block mt-2 text-sm text-blue-600 hover:text-blue-800 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                        >
-                          {profile.website.replace(/^https?:\/\//, '')}
-                        </a>
-                      )}
+                  <div className="meta meta-hcp">
+                    <div className="meta-label">Handicap</div>
+                    <div className="meta-value meta-value--hcp">
+                      {handicap ?? '—'}
                     </div>
-                  )}
-
-                  {/* Stats row - straight dividers with centered values */}
-                  <div className="grid grid-cols-4 border-y border-black/10 divide-x divide-black/10 bg-white">
-                    <div className="flex flex-col items-center justify-center py-4">
-                      <div className="text-[20px] font-semibold leading-none text-gray-900">
-                        {postsCount}
-                      </div>
-                      <div className="mt-1 text-[12px] tracking-wide uppercase text-black/60">
-                        Posts
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-center justify-center py-4">
-                      <div className="text-[20px] font-semibold leading-none text-gray-900">
-                        2,500
-                      </div>
-                      <div className="mt-1 text-[12px] tracking-wide uppercase text-black/60">
-                        Total XP
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-center justify-center py-4">
-                      <div className="text-[20px] font-semibold leading-none text-gray-900">
-                        {followingCount}
-                      </div>
-                      <div className="mt-1 text-[12px] tracking-wide uppercase text-black/60">
-                        Following
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-center justify-center py-4">
-                      <div className="text-[20px] font-semibold leading-none text-gray-900">
-                        {followersCount}
-                      </div>
-                      <div className="mt-1 text-[12px] tracking-wide uppercase text-black/60">
-                        Followers
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Tabs */}
-                  <div>
-                    <hr className="m-0 border-white/10" />
-                    <nav className="w-full">
-                      <div className="flex" role="tablist" aria-label="Profile sections">
-                        {tabs.map((tab) => (
-                          <button
-                            key={tab.id}
-                            onClick={() => handleTabChange(tab.id)}
-                            role="tab"
-                            aria-selected={activeSection === tab.id}
-                            aria-controls={`tabpanel-${tab.id}`}
-                            tabIndex={activeSection === tab.id ? 0 : -1}
-                            className={`
-                              relative flex-1 text-center py-3 px-2 min-h-[44px]
-                              transition-colors duration-200 rounded
-                              ${activeSection === tab.id 
-                                ? 'text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50' 
-                                : 'text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'
-                              }
-                            `}
-                            style={{
-                              fontSize: '14.5px',
-                              fontWeight: 600
-                            }}
-                          >
-                            {tab.label}
-                            {activeSection === tab.id && (
-                              <div 
-                                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] rounded-sm bg-orange-500 transition-all duration-300"
-                                style={{ width: '56%' }}
-                              />
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </nav>
                   </div>
                 </div>
+
+                {/* Bio */}
+                {profile?.bio && (
+                  <p className="bio">
+                    {profile.bio}
+                  </p>
+                )}
+
+                {/* Stats row */}
+                <div className="stats">
+                  <div className="stat">
+                    <div className="stat-value">{postsCount}</div>
+                    <div className="stat-label">Posts</div>
+                  </div>
+                  <div className="stat">
+                    <div className="stat-value">2,500</div>
+                    <div className="stat-label">Total XP</div>
+                  </div>
+                  <div className="stat">
+                    <div className="stat-value">{followingCount}</div>
+                    <div className="stat-label">Following</div>
+                  </div>
+                  <div className="stat">
+                    <div className="stat-value">{followersCount}</div>
+                    <div className="stat-label">Followers</div>
+                  </div>
+                </div>
+
+                {/* Tabs */}
+                <nav className="tabs">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => handleTabChange(tab.id)}
+                      className="tab"
+                      aria-selected={activeSection === tab.id}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </nav>
               </div>
             </section>
              

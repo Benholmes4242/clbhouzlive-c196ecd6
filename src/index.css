@@ -36,31 +36,49 @@ html, body {
    Mobile Profile Design Tokens
    ======================================== */
 :root {
-  /* Spacing scale */
-  --gap-xxs: 4px;
-  --gap-xs: 8px;
-  --gap-sm: 12px;
-  --gap-md: 16px;
-  --gap-lg: 24px;
+  /* Card */
+  --mini-w: clamp(164px, 44vw, 216px);
+  --mini-h: calc(var(--mini-w) * 4 / 3);
+  --mini-overhang: 0.28;
 
-  /* Typography */
-  --name-size: clamp(28px, 5.8vw, 32px);
-  --name-weight: 800;
-  --handle-size: clamp(14px, 3.5vw, 15px);
-  --handle-weight: 500;
-  --label-size: 12.5px;
-  --label-weight: 600;
-  --value-size: 16px;
-  --value-weight: 400;
-  --stat-value-size: 19px;
-  --stat-value-weight: 700;
-  --stat-label-size: 13px;
-  --stat-label-weight: 600;
+  /* Type scale (mobile) */
+  --fs-name: clamp(28px, 6.4vw, 34px);
+  --fs-handle: clamp(14px, 3.4vw, 16px);
+  --fs-label: clamp(12px, 3.0vw, 14px);
+  --fs-value: clamp(16px, 3.8vw, 18px);
+  --fs-hcp: clamp(24px, 6.0vw, 28px);
+  --fs-bio: clamp(14px, 3.6vw, 16px);
+  --fs-stat-value: clamp(20px, 5.2vw, 24px);
+  --fs-stat-label: clamp(12px, 3.2vw, 14px);
+  --fs-tab: clamp(14px, 3.6vw, 16px);
+
+  /* Font weights */
+  --fw-name: 700;
+  --fw-handle: 500;
+  --fw-label: 700;
+  --fw-value: 500;
+  --fw-hcp: 700;
+  --fw-bio: 400;
+  --fw-stat-value: 700;
+  --fw-stat-label: 500;
+
+  /* Line-height */
+  --lh-tight: 1.05;
+  --lh-snug: 1.15;
+  --lh-normal: 1.35;
+
+  /* Spacing rhythm (8-pt) */
+  --sp-4: 4px;
+  --sp-6: 6px;
+  --sp-8: 8px;
+  --sp-12: 12px;
+  --sp-16: 16px;
+  --sp-20: 20px;
+  --sp-24: 24px;
+  --sp-28: 28px;
+  --sp-32: 32px;
 
   /* Mini card */
-  --mini-w: clamp(160px, 42vw, 208px);
-  --mini-h: calc(var(--mini-w) * 4 / 3);
-  --mini-overhang: 24%;
   --mini-radius: 16px;
 
   /* Panel paddings */
@@ -69,106 +87,158 @@ html, body {
 
   /* Effects */
   --panel-shadow: 0 10px 30px rgba(0,0,0,.12);
-  --mini-shadow: 0 12px 30px rgba(0,0,0,.25);
+  --mini-shadow: 0 18px 34px rgba(0,0,0,.25);
 }
 
 /* Mobile profile layout utilities */
-@media (max-width: 768px) {
-  /* Name block - spans space between glass inner-left and mini card left */
-  .name-wrap {
-    width: calc(100% - var(--mini-w) - 8px);
-    margin-right: calc(var(--mini-w) + 8px);
-    margin-left: 0;
-    text-align: center;
-  }
+.mini-card {
+  position: absolute;
+  right: 8px;
+  top: calc(var(--mini-h) * var(--mini-overhang) * -1);
+  width: var(--mini-w);
+  height: var(--mini-h);
+  border-radius: 16px;
+  border: 2px solid rgba(255,255,255,.9);
+  box-shadow: 0 18px 34px rgba(0,0,0,.25);
+  overflow: hidden;
+  z-index: 2;
+}
 
-  .name-wrap .first,
-  .name-wrap .last {
-    display: block;
-    font-size: var(--name-size);
-    font-weight: var(--name-weight);
-    line-height: 1.08;
-    letter-spacing: 0.1px;
-    margin: 0;
-  }
+.mini-card img { 
+  object-fit: cover; 
+  width: 100%; 
+  height: 100%; 
+}
 
-  .name-wrap .last {
-    margin-top: var(--gap-xs);
-  }
+/* Name + handle block */
+.name-wrap {
+  width: calc(100% - var(--mini-w) - 8px);
+  margin-right: calc(var(--mini-w) + 8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-  .name-wrap .handle {
-    margin-top: var(--gap-xs);
-    font-size: var(--handle-size);
-    font-weight: var(--handle-weight);
-    opacity: 0.9;
-  }
+.name-first, .name-last {
+  display: block;
+  font-size: var(--fs-name);
+  font-weight: var(--fw-name);
+  line-height: var(--lh-tight);
+  letter-spacing: 0;
+}
 
-  /* Stats - bulletproof centering */
-  .stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    min-width: 0;
-  }
+.name-first { 
+  margin-bottom: var(--sp-6); 
+}
 
-  .stat .value {
-    font-size: var(--stat-value-size);
-    font-weight: var(--stat-value-weight);
-    line-height: 1.1;
-  }
+.handle {
+  font-size: var(--fs-handle);
+  font-weight: var(--fw-handle);
+  line-height: var(--lh-normal);
+  opacity: .9;
+  margin-top: var(--sp-8);
+}
 
-  .stat .label {
-    margin-top: var(--gap-xs);
-    font-size: var(--stat-label-size);
-    font-weight: var(--stat-label-weight);
-    opacity: 0.8;
-    line-height: 1.2;
-  }
+/* Golf Club & Handicap row */
+.meta-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--sp-24);
+  align-items: start;
+  margin-top: var(--sp-24);
+}
 
-  /* Info row labels/values */
-  .info .label {
-    font-size: var(--label-size);
-    font-weight: var(--label-weight);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    opacity: 0.7;
-    text-align: center;
-    margin-bottom: var(--gap-xs);
-  }
+.meta-label {
+  font-size: var(--fs-label);
+  font-weight: var(--fw-label);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  line-height: var(--lh-snug);
+  opacity: .9;
+  text-align: center;
+}
 
-  .info .value {
-    font-size: var(--value-size);
-    font-weight: var(--value-weight);
-    line-height: 1.35;
-    text-align: center;
-    word-break: break-word;
-  }
+.meta-value {
+  font-size: var(--fs-value);
+  font-weight: var(--fw-value);
+  line-height: var(--lh-normal);
+  text-align: center;
+  margin-top: var(--sp-8);
+}
 
-  /* Mini card styles */
-  .mini-card {
-    position: absolute;
-    top: calc(var(--mini-h) * -1 * var(--mini-overhang));
-    right: 8px;
-    width: var(--mini-w);
-    aspect-ratio: 3 / 4;
-    border-radius: var(--mini-radius);
-    overflow: hidden;
-    border: 2px solid rgba(255, 255, 255, 0.9);
-    box-shadow: var(--mini-shadow);
-    background: #fff;
-  }
+.meta-value--hcp {
+  font-size: var(--fs-hcp);
+  font-weight: var(--fw-hcp);
+  line-height: var(--lh-tight);
+}
 
-  /* Glass panel readability fade */
-  .glass-panel::after {
-    content: "";
-    position: absolute;
-    inset: auto 0 0 0;
-    height: 28px;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.12));
-    pointer-events: none;
-  }
+/* Bio */
+.bio {
+  font-size: var(--fs-bio);
+  font-weight: var(--fw-bio);
+  line-height: 1.5;
+  text-align: center;
+  margin-top: var(--sp-24);
+  padding-inline: var(--sp-16);
+}
+
+/* Stats row */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-top: var(--sp-28);
+  width: 100%;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-16) 0;
+}
+
+.stat + .stat {
+  border-left: 1px solid rgba(0,0,0,.08);
+}
+
+.stat-value {
+  font-size: var(--fs-stat-value);
+  font-weight: var(--fw-stat-value);
+  line-height: var(--lh-tight);
+}
+
+.stat-label {
+  font-size: var(--fs-stat-label);
+  font-weight: var(--fw-stat-label);
+  line-height: var(--lh-normal);
+  opacity: .8;
+  margin-top: var(--sp-6);
+}
+
+/* Tabs row */
+.tabs {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: var(--sp-8);
+  padding: var(--sp-16) 0 var(--sp-8);
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  margin-top: var(--sp-24);
+}
+
+.tab {
+  font-size: var(--fs-tab);
+  font-weight: 600;
+}
+
+.tab[aria-selected="true"] { 
+  color: #111; 
+}
+
+.tab[aria-selected="false"] { 
+  color: #6b7280; 
 }
 
 /* Modern safe area inset support */
