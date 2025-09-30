@@ -27,6 +27,31 @@ import { CoachCta } from '@/components/swing/CoachCta';
 // Single source of truth for SwingCoach mode
 export const SWINGCOACH_MODE: 'live' | 'sim' = 'live';
 
+// --- Telemetry helpers (read-only) ---
+const scNow = () => Math.round(performance.now());
+const scKb = (n: number) => Math.round(n / 1024);
+
+type ScCaptureLog = {
+  evt: string;
+  dur?: number;
+  width?: number;
+  height?: number;
+  videoDur?: number;
+  rvfc?: boolean;
+  targets?: number[];
+  mediaTimes?: number[];
+  framesReq?: number;
+  framesGot?: number;
+  payloadKB?: number;
+  mime?: string;
+  err?: string;
+};
+
+const scLog = (data: ScCaptureLog) => {
+  // Single tag so logs are easy to filter
+  console.info('[SC-TELEMETRY]', data);
+};
+
 interface SwingAnalysis {
   id: string;
   save_card: string;
@@ -424,6 +449,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       }, 15000);
 
       try {
+        const t0 = scNow();
         // Wait for video to be ready
         await new Promise<void>((res, rej) => {
           const onError = () => rej(new Error('Video failed to load'));
@@ -435,10 +461,23 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           video.addEventListener('canplaythrough', onReady, { once: true });
         });
 
+        const rvfc = 'requestVideoFrameCallback' in (video as any);
+        scLog({
+          evt: 'video_ready',
+          dur: scNow() - t0,
+          width: video.videoWidth,
+          height: video.videoHeight,
+          videoDur: video.duration,
+          rvfc
+        });
+
         const duration = video.duration;
-        const targets = [0.03, 0.13, 0.28, 0.48, 0.58, 0.73, 0.87, 0.95].map(p => p * duration);
+        const percents = [0.03, 0.13, 0.28, 0.48, 0.58, 0.73, 0.87, 0.95];
+        const targets = percents.map(p => +(p * duration).toFixed(2));
+        scLog({ evt: 'targets_set', targets });
         const captured = new Array<boolean>(targets.length).fill(false);
         const frames: string[] = [];
+        const capturedTimes: number[] = [];
 
         console.log('Video metadata loaded:', {
           width: video.videoWidth,
@@ -462,6 +501,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               ctx.drawImage(video, 0, 0, canvasWidth, canvasHeight);
               frames.push(canvas.toDataURL('image/jpeg', 0.65));
               captured[i] = true;
+              capturedTimes.push(+currentTime.toFixed(2));
               console.log(`Captured frame ${i + 1}/${targets.length} at ${currentTime.toFixed(2)}s`);
               break;
             }
@@ -470,17 +510,14 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           // Check if we're done
           if (captured.filter(Boolean).length >= targets.length || video.ended) {
             if (frames.length >= 4) {
-              // Add telemetry
-              console.info('[SC] capture', {
-                frames: frames.length,
-                targets: 8,
-                mime: file.type,
-                duration: video.duration
+              const payloadBytes = JSON.stringify(frames).length;
+              scLog({
+                evt: 'capture_done',
+                framesReq: targets.length,
+                framesGot: frames.length,
+                payloadKB: scKb(payloadBytes),
+                mediaTimes: capturedTimes
               });
-
-              if (frames.length < 8) {
-                console.warn('[SC] partial_capture', { frames: frames.length });
-              }
 
               cleanup();
               resolve(frames);
@@ -510,7 +547,8 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         
         await video.play();
 
-      } catch (error) {
+      } catch (error: any) {
+        scLog({ evt: 'capture_error', err: String(error?.message || error) });
         cleanup();
         reject(error);
       }
@@ -720,6 +758,8 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       console.info(`[SC] Payload size: ${Math.round(payloadSize / 1024)}KB`);
 
       const apiStartTime = Date.now();
+      const tSend = scNow();
+      scLog({ evt: 'edge_invoke', framesGot: extractedFrames.length, payloadKB: scKb(JSON.stringify(extractedFrames).length) });
       
       // Add AbortController for 32s timeout (aligned with helper)
       const controller = new AbortController();
@@ -744,6 +784,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         });
         
         clearTimeout(timeoutId);
+
+        scLog({
+          evt: 'edge_return',
+          dur: scNow() - tSend,
+          err: error ? String(error?.message || error) : undefined
+        });
 
         const apiResponseTime = Date.now() - apiStartTime;
         

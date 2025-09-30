@@ -174,6 +174,12 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
 
       messages.push(userMessage);
 
+      // Add edge function telemetry
+      const edgeT0 = Date.now();
+      const frames = images?.length || 0;
+      const payloadBytes = messages ? JSON.stringify(messages).length : 0;
+      console.log('[SC-EDGE]', JSON.stringify({ evt: 'start', frames, payloadKB: Math.round(payloadBytes/1024), detailMode }));
+
       console.log('🚀 Sending to OpenAI with images:', images?.length || 0);
       if (images && images.length > 0) {
         console.log('📸 Image details:', images.map((img, i) => `Frame ${i + 1}: ${img.substring(0, 50)}...`));
@@ -183,6 +189,7 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s SLA for full analysis
 
+      const openaiT0 = Date.now();
       try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -207,8 +214,12 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
           throw new Error(`OpenAI API error: ${response.status}`);
         }
 
+        const openaiMs = Date.now() - openaiT0;
         const data = await response.json();
         const finalResponse = data.choices[0].message.content.trim();
+        
+        // If you have token usage in `body.usage`, include it; if not, omit it.
+        console.log('[SC-EDGE]', JSON.stringify({ evt: 'openai_ok', openaiMs, status: response.status, usage: data?.usage || null }));
         
         // Calculate payload size and log metrics
         const payloadSize = JSON.stringify(messages).length;
@@ -223,6 +234,7 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
         });
 
         console.log('📤 EDGE FUNCTION DEBUG - Sending response back to client');
+        console.log('[SC-EDGE]', JSON.stringify({ evt: 'done', totalMs: Date.now() - edgeT0 }));
 
         return new Response(JSON.stringify({ 
           response: finalResponse, 
@@ -234,6 +246,9 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
 
       } catch (error: any) {
         clearTimeout(timeoutId);
+        const openaiMs = Date.now() - openaiT0;
+        const isAbort = error?.name === 'AbortError';
+        console.warn('[SC-EDGE]', JSON.stringify({ evt: 'openai_fail', openaiMs, abort: isAbort, msg: String(error?.message || error) }));
         
         // Handle AbortController timeout gracefully
         if (error.name === 'AbortError') {
@@ -258,7 +273,10 @@ Based on the submitted frames, I can see:
         });
         }
         
+        console.log('[SC-EDGE]', JSON.stringify({ evt: 'done', totalMs: Date.now() - edgeT0 }));
         throw error;
+      } finally {
+        console.log('[SC-EDGE]', JSON.stringify({ evt: 'done', totalMs: Date.now() - edgeT0 }));
       }
     }
 
