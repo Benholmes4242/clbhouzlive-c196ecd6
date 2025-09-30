@@ -116,6 +116,7 @@ html, body {
 .name-wrap {
   width: calc(100% - var(--mini-w) - 8px);
   margin-right: calc(var(--mini-w) + 8px);
+  margin-top: var(--sp-24);
   display: flex;
   flex-direction: column;
   align-items: center;
