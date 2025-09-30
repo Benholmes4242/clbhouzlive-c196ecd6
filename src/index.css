@@ -191,7 +191,7 @@ html, body {
   font-weight: var(--fw-bio);
   line-height: 1.5;
   text-align: center;
-  margin-top: calc(var(--mini-h) * 0.20 + 32px);
+  margin-top: calc(var(--mini-h) * 0.20);
   padding-inline: var(--sp-16);
 }
 

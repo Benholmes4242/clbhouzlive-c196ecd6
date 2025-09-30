@@ -845,18 +845,12 @@ const HeroProfileHeader = ({
                   })()}
                 </div>
 
-                {/* Club / Handicap row */}
+                {/* Club row */}
                 <div className="meta-row">
                   <div className="meta meta-club">
                     <div className="meta-label">Golf Club</div>
                     <div className="meta-value">
                       {homeClub}
-                    </div>
-                  </div>
-                  <div className="meta meta-hcp">
-                    <div className="meta-label">Handicap</div>
-                    <div className="meta-value meta-value--hcp">
-                      {handicap ?? '—'}
                     </div>
                   </div>
                 </div>
