@@ -280,63 +280,114 @@ Based on the submitted frames, I can see:
       }
     }
 
-    // Priority 2: Text Q&A with Freshness Router (NEW IMPLEMENTATION)
-    console.log('📥 EDGE FUNCTION DEBUG - Processing text query with freshness router');
+    // Priority 2: Text Q&A with Enhanced Routing
+    console.log('📥 EDGE FUNCTION DEBUG - Processing text query with enhanced routing');
+
+    const CHAT_EDGE_TIMEOUT_MS = 30000; // align with client 32s
+
+    // Enhanced router with auto-switching
+    const needsWebCheck = (q: string): [boolean, string] => {
+      const p = q.toLowerCase();
+      if (/(today|tonight|tomorrow|yesterday|this (week|month|year)|current|latest|now|live|right now|up-to-date|as of|breaking|recent)/i.test(p)) {
+        return [true, 'time keywords'];
+      }
+      if (/\b20(2[3-9]|3[0-5])\b/.test(p)) {
+        return [true, 'explicit year'];
+      }
+      if (/(leaderboard|pairings|tee times|result|price|schedule|fixture|odds|rankings|captain|coach|manager|injury|withdrawn|weather|pga|lpga|ryder cup|presidents cup)/i.test(p)) {
+        return [true, 'volatile entity'];
+      }
+      return [false, 'default static'];
+    };
+
+    const modelDeclined = (text: string | undefined): boolean => {
+      if (!text) return false;
+      const p = text.toLowerCase();
+      return /\b(i (don'?t|do not) have (current|real-?time) info|knowledge cutoff|can'?t browse|check the web|not up to date)\b/.test(p);
+    };
 
     let route: Mode = mode;
+    let routeReason = 'default';
 
     if (mode === "auto") {
-      const decision = shouldUseLiveSearch(message);
-      route = decision.useLive ? "live" : "static";
-      console.log('🤖 Auto-routing decision:', { route, reason: decision.reason });
+      const [needsWeb, reason] = needsWebCheck(message);
+      route = needsWeb ? "live" : "static";
+      routeReason = reason;
+      console.log('🤖 Auto-routing decision:', { route, reason });
     }
 
-    const STATIC_SYSTEM = [
-      "You are Echo, the Clbhouz assistant.",
-      "Answer clearly and concisely for golf users.",
-      "If the user requests historical facts (past years), answer directly.",
-      "If the user asks about 'current/latest/now' and you are in STATIC mode, prefer general background and suggest clarifying year if needed.",
+    const staticSystem = [
+      "You are Echo, a friendly golf-first assistant.",
+      "Prefer golf context but answer general questions too.",
+      "Be concise, structured, and practical.",
+      "If you are not using live search, avoid claiming real-time facts."
     ].join("\n");
 
-    const STATIC_BRIDGE = (q: string) =>
-      `User (asked at ${now}): ${q}\n\nIf historical/timeless, answer directly. If time-sensitive but STATIC, give background and suggest 'latest' or a year.`;
-
-    const askedForCurrent =
-      TIME_KEYWORDS.some((k) => normalize(message).includes(k)) ||
-      /^(who\s+(is|are)\b)/i.test(message.trim());
+    const liveSystem = `You are Echo with live search. Verify changing facts with fresh sources and include concise citations. Say "As of ${now.split('T')[0]}".`;
 
     const t0 = Date.now();
     let answer: string;
+    let provider = '';
+    let sources: any = null;
+
+    // Prepare conversation history (last 8 turns for better context)
+    const history = conversation.slice(-8);
+
+    async function callOpenAIEnhanced(messages: any[], maxTokens = 900) {
+      const response = await callOpenAI(staticSystem, message, messages);
+      return { text: response, usage: {}, sources: null };
+    }
+
+    async function callPerplexityEnhanced(messages: any[]) {
+      const response = await callPerplexity(message, now, messages);
+      // Perplexity often includes citations in response - preserve them
+      const sources = response.match(/\[(\d+)\]/g) ? 'Available' : null;
+      return { text: response, usage: {}, sources };
+    }
 
     try {
       if (route === "live") {
         console.log('🔍 Using live search (Perplexity) for current information');
-        answer = await withTimeout(callPerplexity(message, now, conversation));
+        const result = await withTimeout(callPerplexityEnhanced(history), CHAT_EDGE_TIMEOUT_MS);
+        answer = result.text;
+        provider = 'perplexity';
+        sources = result.sources;
       } else {
         console.log('💬 Using static knowledge (OpenAI) for general/historical information');
-        answer = await withTimeout(callOpenAI(STATIC_SYSTEM, STATIC_BRIDGE(message), conversation));
+        const result = await withTimeout(callOpenAIEnhanced(history), CHAT_EDGE_TIMEOUT_MS);
+        answer = result.text;
+        provider = 'openai';
+
+        // Auto-switch if model declined or hinted cutoff
+        if (!answer?.trim() || modelDeclined(answer)) {
+          console.log('🔄 Auto-switching to live search due to model decline');
+          try {
+            const altResult = await withTimeout(callPerplexityEnhanced(history), CHAT_EDGE_TIMEOUT_MS);
+            if (altResult.text?.trim()) {
+              answer = altResult.text;
+              provider = 'perplexity';
+              sources = altResult.sources;
+              routeReason = 'model-declined';
+            }
+          } catch (e) {
+            console.warn('⚠️ Auto-switch to live search failed:', (e as Error).message);
+          }
+        }
       }
     } catch (e) {
-      console.warn('⚠️ Primary route failed:', (e as Error).message);
+      // Fallback to static if live search fails
       if (route === "live") {
-        // fallback to static background
         console.log('🔄 Falling back to static knowledge');
-        const bg = await callOpenAI(STATIC_SYSTEM, STATIC_BRIDGE(message), conversation);
-        answer = `I couldn't reach live sources quickly. Here's background info instead:\n\n${bg}`;
+        try {
+          const result = await withTimeout(callOpenAIEnhanced(history), CHAT_EDGE_TIMEOUT_MS);
+          answer = `I couldn't reach live sources quickly. Here's background info instead:\n\n${result.text}`;
+          provider = 'openai';
+        } catch (fallbackError) {
+          answer = "Sorry, I'm having trouble responding right now. Please try again in a moment.";
+          provider = 'error';
+        }
       } else {
         throw e;
-      }
-    }
-
-    // Backstop: if user asked for current and static answer looks old, auto-fetch live
-    if (route === "static" && askedForCurrent && /20(1\d|20|21|22|23)\b/.test(answer)) {
-      console.log('🚨 Detected potential staleness, fetching live update');
-      try {
-        const live = await withTimeout(callPerplexity(message, now, conversation), 10000);
-        answer = `${answer}\n\n—\n**Live Update:** ${live}`;
-        route = "live";
-      } catch (e) {
-        console.warn('⚠️ Live update failed:', (e as Error).message);
       }
     }
 
@@ -345,19 +396,25 @@ Based on the submitted frames, I can see:
     console.log('✅ EDGE FUNCTION DEBUG - Response generated successfully:', {
       responseLength: answer.length,
       responsePreview: answer.substring(0, 100),
-      modeUsed: route,
-      latencyMs
+      provider,
+      routeReason,
+      latencyMs,
+      hasSources: !!sources
     });
 
     console.log('📤 EDGE FUNCTION DEBUG - Sending response back to client');
 
     return new Response(JSON.stringify({ 
       response: answer,
-      answer: answer, // For compatibility
-      modeUsed: route, 
-      nowIso: now, 
-      latencyMs,
-      metadata: { route, latencyMs, now }
+      modeUsed: provider === 'perplexity' ? 'live' : 'static',
+      sources,
+      meta: { 
+        provider, 
+        routeReason, 
+        latencyMs, 
+        now: now.split('T')[0], // Just the date part
+        usage: {} // placeholder for token counts
+      }
     }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

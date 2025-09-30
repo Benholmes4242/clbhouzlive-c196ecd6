@@ -314,7 +314,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           message: finalMessage,
           conversation,
           detailMode,
-          isEcho: false
+          isEcho: true // Enable Echo mode for chat
         }
       });
 
@@ -325,7 +325,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         type: 'ai',
         content: data.response,
         timestamp: new Date(),
-        metadata: data.metadata
+        metadata: {
+          ...data.metadata,
+          modeUsed: data.modeUsed,
+          sources: data.sources,
+          provider: data.meta?.provider,
+          asOf: data.meta?.now,
+          latencyMs: data.meta?.latencyMs
+        }
       };
 
       console.log('🐛 CHAT DEBUG - Creating AI message:', {
