@@ -36,27 +36,27 @@ html, body {
    Mobile Profile Design Tokens
    ======================================== */
 :root {
-  /* Card */
-  --mini-w: clamp(164px, 44vw, 216px);
+  /* Card - smaller by ~8-10% */
+  --mini-w: clamp(148px, 34vw, 188px);
   --mini-h: calc(var(--mini-w) * 4 / 3);
   --mini-overhang: 0.16;
 
   /* Type scale (mobile) */
-  --fs-name: clamp(28px, 6.4vw, 34px);
-  --fs-handle: clamp(14px, 3.4vw, 16px);
-  --fs-label: clamp(12px, 3.0vw, 14px);
-  --fs-value: clamp(16px, 3.8vw, 18px);
+  --fs-name: clamp(22px, 5.8vw, 28px);
+  --fs-handle: clamp(13px, 3.6vw, 16px);
+  --fs-label: 12px;
+  --fs-value: clamp(16px, 4.6vw, 20px);
   --fs-hcp: clamp(24px, 6.0vw, 28px);
-  --fs-bio: clamp(14px, 3.6vw, 16px);
+  --fs-bio: clamp(14px, 3.9vw, 16px);
   --fs-stat-value: clamp(20px, 5.2vw, 24px);
   --fs-stat-label: clamp(12px, 3.2vw, 14px);
   --fs-tab: clamp(14px, 3.6vw, 16px);
 
   /* Font weights */
-  --fw-name: 700;
+  --fw-name: 800;
   --fw-handle: 500;
   --fw-label: 700;
-  --fw-value: 500;
+  --fw-value: 600;
   --fw-hcp: 700;
   --fw-bio: 400;
   --fw-stat-value: 700;
@@ -112,36 +112,63 @@ html, body {
   height: 100%; 
 }
 
-/* Name + handle block */
-.name-wrap {
+/* Panel left - grid layout for ⅓/⅔ positioning */
+[data-panel-left] {
+  display: grid;
+  grid-template-rows: 1fr auto 1fr auto 1fr;
   width: calc(100% - var(--mini-w) - 8px);
   margin-right: calc(var(--mini-w) + 8px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+}
+
+/* Name + handle block at ⅓ */
+[data-nameblock] {
+  grid-row: 2;
+  text-align: center;
 }
 
 .name-first, .name-last {
   display: block;
   font-size: var(--fs-name);
   font-weight: var(--fw-name);
-  line-height: var(--lh-tight);
+  line-height: 1.1;
   letter-spacing: 0;
+  margin: 0;
 }
 
-.name-first { 
-  margin-bottom: var(--sp-6); 
+.name-last { 
+  margin-top: 6px; 
 }
 
 .handle {
   font-size: var(--fs-handle);
   font-weight: var(--fw-handle);
   line-height: var(--lh-normal);
-  opacity: .9;
-  margin-top: var(--sp-8);
+  opacity: .85;
+  margin-top: 8px;
 }
 
-/* Golf Club & Handicap row */
+/* Golf Club block at ⅔ */
+[data-clubblock] {
+  grid-row: 4;
+  text-align: center;
+}
+
+[data-clubblock] .club-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+[data-clubblock] .club-value {
+  font-size: var(--fs-value);
+  font-weight: var(--fw-value);
+  line-height: var(--lh-normal);
+  margin-top: 6px;
+}
+
+/* Legacy meta-row for handicap (if still needed) */
 .meta-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -174,13 +201,13 @@ html, body {
   line-height: var(--lh-tight);
 }
 
-/* Bio */
-.bio {
+/* Bio - with proper offset */
+[data-bio], .bio {
   font-size: var(--fs-bio);
   font-weight: var(--fw-bio);
-  line-height: 1.5;
+  line-height: 1.45;
   text-align: center;
-  margin-top: calc(var(--mini-h) * 0.20 + 32px);
+  margin-top: calc(var(--mini-h) * var(--mini-overhang) + 28px);
   padding-inline: var(--sp-16);
 }
 

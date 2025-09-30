@@ -831,39 +831,32 @@ const HeroProfileHeader = ({
                   )}
                 </button>
 
-                {/* Name & handle block */}
-                <div className="name-wrap" data-nameblock>
-                  {(() => {
-                    const { first, last } = splitName(displayName);
-                    return (
-                      <>
-                        <span className="name-first">{first}</span>
-                        <span className="name-last">{last}</span>
-                        <div className="handle">@{username}</div>
-                      </>
-                    );
-                  })()}
-                </div>
-
-                {/* Club / Handicap row */}
-                <div className="meta-row">
-                  <div className="meta meta-club">
-                    <div className="meta-label">Golf Club</div>
-                    <div className="meta-value">
-                      {homeClub}
-                    </div>
+                {/* Panel left with grid layout for ⅓/⅔ positioning */}
+                <div data-panel-left>
+                  {/* Name & handle block at ⅓ */}
+                  <div data-nameblock>
+                    {(() => {
+                      const { first, last } = splitName(displayName);
+                      return (
+                        <>
+                          <span className="name-first">{first}</span>
+                          <span className="name-last">{last}</span>
+                          <div className="handle">@{username}</div>
+                        </>
+                      );
+                    })()}
                   </div>
-                  <div className="meta meta-hcp">
-                    <div className="meta-label">Handicap</div>
-                    <div className="meta-value meta-value--hcp">
-                      {handicap ?? '—'}
-                    </div>
+
+                  {/* Golf Club block at ⅔ */}
+                  <div data-clubblock>
+                    <div className="club-title">GOLF CLUB</div>
+                    <div className="club-value">{homeClub}</div>
                   </div>
                 </div>
 
-                {/* Bio */}
+                {/* Bio with proper offset */}
                 {profile?.bio && (
-                  <p className="bio">
+                  <p data-bio className="bio">
                     {profile.bio}
                   </p>
                 )}
