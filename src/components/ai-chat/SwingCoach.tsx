@@ -48,6 +48,8 @@ type ScCaptureLog = {
   start?: number;
   len?: number;
   playbackRate?: number;
+  windowStart?: number;
+  at?: number;
 };
 
 const scLog = (data: ScCaptureLog) => {
@@ -490,19 +492,71 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           
           scLog({ evt: 'window', start: +(windowStart.toFixed(2)), len: 3.0, targets });
           
-          // Seek to window start before capture
-          await new Promise<void>((resolve, reject) => {
-            let seekTimeoutId: NodeJS.Timeout | undefined;
-            const onSeeked = () => {
+          // Seek handshake that can't stall
+          scLog({ evt: 'seek_begin', windowStart: +(windowStart.toFixed(2)) });
+          
+          // Start playback first
+          try { 
+            await video.play(); 
+          } catch { 
+            /* ignore autoplay errors */ 
+          }
+          
+          // Attempt seek
+          video.currentTime = windowStart + 0.001;
+          
+          // Wait for whichever happens first (max 3s)
+          await new Promise<void>((resolve) => {
+            let guardTimeoutId: NodeJS.Timeout | undefined;
+            let resolved = false;
+            
+            const cleanup = () => {
+              if (guardTimeoutId) clearTimeout(guardTimeoutId);
               video.removeEventListener('seeked', onSeeked);
-              if (seekTimeoutId) clearTimeout(seekTimeoutId);
+              video.removeEventListener('timeupdate', onTimeUpdate);
+            };
+            
+            const finishSeek = () => {
+              if (resolved) return;
+              resolved = true;
+              cleanup();
+              scLog({ evt: 'seek_end', at: +(video.currentTime.toFixed(2)) });
               resolve();
             };
+            
+            const onSeeked = () => finishSeek();
+            
+            const useRVFC = 'requestVideoFrameCallback' in (video as any);
+            const onRvfc: VideoFrameRequestCallback = (_now, meta) => {
+              if (meta.mediaTime >= windowStart - 0.05) {
+                finishSeek();
+              } else if (!resolved) {
+                (video as any).requestVideoFrameCallback(onRvfc);
+              }
+            };
+            
+            const onTimeUpdate = () => {
+              if (video.currentTime >= windowStart - 0.05) {
+                finishSeek();
+              }
+            };
+            
+            // Attach listeners
             video.addEventListener('seeked', onSeeked, { once: true });
-            video.currentTime = windowStart;
-            seekTimeoutId = setTimeout(() => {
-              video.removeEventListener('seeked', onSeeked);
-              reject(new Error('Seek to windowStart timed out'));
+            if (useRVFC) {
+              (video as any).requestVideoFrameCallback(onRvfc);
+            } else {
+              video.addEventListener('timeupdate', onTimeUpdate);
+            }
+            
+            // 3s guard timeout
+            guardTimeoutId = setTimeout(() => {
+              if (!resolved) {
+                resolved = true;
+                cleanup();
+                scLog({ evt: 'seek_timeout', at: +(video.currentTime.toFixed(2)) });
+                resolve(); // treat as best-effort; proceed anyway
+              }
             }, 3000);
           });
 
@@ -589,15 +643,23 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           }
         };
 
-        // --- dynamic timeout from last target ---
-        const lastTarget = targets[targets.length - 1]; // seconds
-        const nowS = video.currentTime || 0;
-        const safety = duration > 12 ? 2.0 : 1.5;      // seconds
-        // for long clips you already analyze a 3s window; for short clips use to-lastTarget
-        const capWindow = duration > 12 ? 3.0 : Math.max(0, lastTarget - nowS);
-        
-        // cap total timeout to 12s just in case
-        const captureTimeoutMs = Math.min(Math.ceil((capWindow + safety) * 1000), 12000);
+        // --- dynamic timeout from actual position (after seek handshake) ---
+        const nowS = video.currentTime; // actual position after seek
+        if (duration > 12) {
+          // For long clips: compute timeout from where we actually are
+          const windowStart = Math.max(0, (duration / 2) - 1.5);
+          const windowLen = 3.0;
+          const remainingToWindow = Math.max(0, windowStart - nowS);
+          const safety = 2000; // ms
+          const baseMs = (remainingToWindow + windowLen) * 1000;
+          var captureTimeoutMs = Math.min(Math.ceil(baseMs + safety), 12000);
+        } else {
+          // For short clips: use distance to last target
+          const lastTarget = targets[targets.length - 1];
+          const safety = 1500; // ms
+          const capWindow = Math.max(0, lastTarget - nowS);
+          var captureTimeoutMs = Math.min(Math.ceil((capWindow + safety) * 1000), 12000);
+        }
 
         // ---- stable handler refs (defined after maybeCapture) ----
         const onTimeUpdate = () => { if (!isComplete) maybeCapture(video.currentTime); };
@@ -618,11 +680,13 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           video.addEventListener('timeupdate', onTimeUpdate);
         }
 
-        // start playback, then start the ONLY timer (post-stabilization)
-        try { 
-          await video.play(); 
-        } catch { 
-          /* ignore autoplay errors */ 
+        // For short clips, start playback since seek handshake wasn't used
+        if (duration <= 12) {
+          try { 
+            await video.play(); 
+          } catch { 
+            /* ignore autoplay errors */ 
+          }
         }
         
         // Log capture start details
