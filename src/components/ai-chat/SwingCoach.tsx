@@ -47,6 +47,7 @@ type ScCaptureLog = {
   err?: string;
   start?: number;
   len?: number;
+  playbackRate?: number;
 };
 
 const scLog = (data: ScCaptureLog) => {
@@ -435,12 +436,19 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           // Ignore pause errors
         }
         
-        // Event listeners will be cleaned up automatically
+        // Remove any event listeners that might still be attached
+        const listeners = ['timeupdate', 'seeked', 'error', 'canplaythrough'];
+        listeners.forEach(event => {
+          video.removeEventListener(event, () => {});
+        });
+        
+        // Clean up video src
         URL.revokeObjectURL(video.src);
         video.src = '';
         
         if (timeoutId) {
           clearTimeout(timeoutId);
+          timeoutId = undefined;
         }
       };
 
@@ -484,28 +492,41 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           
           // Seek to window start before capture
           await new Promise<void>((resolve, reject) => {
+            let seekTimeoutId: NodeJS.Timeout | undefined;
             const onSeeked = () => {
               video.removeEventListener('seeked', onSeeked);
+              if (seekTimeoutId) clearTimeout(seekTimeoutId);
               resolve();
             };
             video.addEventListener('seeked', onSeeked, { once: true });
             video.currentTime = windowStart;
-            setTimeout(() => {
+            seekTimeoutId = setTimeout(() => {
               video.removeEventListener('seeked', onSeeked);
               reject(new Error('Seek to windowStart timed out'));
             }, 3000);
           });
+
+          // One RVFC tick after seek to stabilize first frame
+          await new Promise<void>(res => (video as any).requestVideoFrameCallback(() => res()));
         } else {
           // For short clips, use full duration as before
           targets = percents.map(p => +(p * duration).toFixed(2));
           scLog({ evt: 'targets_set', targets });
         }
 
-        // Setup timeout - shorter for windowed capture
+        // Clear any existing timeout and setup capture timeout
+        if (timeoutId) clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           cleanup();
           reject(new Error('Playback capture timed out'));
         }, 6500);
+
+        // Log capture start details
+        scLog({ 
+          evt: 'capture_start',
+          rvfc: !!video.requestVideoFrameCallback, 
+          playbackRate: video.playbackRate 
+        });
         
         const captured = new Array<boolean>(targets.length).fill(false);
         const frames: string[] = [];
@@ -526,7 +547,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         canvas.height = canvasHeight;
         const ctx = canvas.getContext('2d')!;
 
-        const tolerance = 0.045; // 45ms tolerance
+        const tolerance = video.duration > 12 ? 0.07 : 0.045; // Wider tolerance for long clips
         const maybeCapture = (currentTime: number) => {
           for (let i = 0; i < targets.length; i++) {
             if (!captured[i] && Math.abs(currentTime - targets[i]) <= tolerance) {
