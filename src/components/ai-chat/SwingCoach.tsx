@@ -45,6 +45,8 @@ type ScCaptureLog = {
   payloadKB?: number;
   mime?: string;
   err?: string;
+  start?: number;
+  len?: number;
 };
 
 const scLog = (data: ScCaptureLog) => {
@@ -442,11 +444,8 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         }
       };
 
-      // Setup timeout - shorter for windowed capture
-      timeoutId = setTimeout(() => {
-        cleanup();
-        reject(new Error('Playback capture timed out'));
-      }, 6500);
+        // Setup timeout after seek (for windowed capture) or immediately (for short clips)
+        // This will be set after the seek logic below
 
       try {
         const t0 = scNow();
@@ -479,14 +478,35 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           // For long clips, analyze a 3-second window in the center
           const windowLen = 3.0;
           const windowStart = Math.max(0, (duration / 2) - 1.5);
-          const windowEnd = windowStart + windowLen;
           targets = percents.map(p => +(windowStart + p * windowLen).toFixed(2));
+          
+          scLog({ evt: 'window', start: +(windowStart.toFixed(2)), len: 3.0, targets });
+          
+          // Seek to window start before capture
+          await new Promise<void>((resolve, reject) => {
+            const onSeeked = () => {
+              video.removeEventListener('seeked', onSeeked);
+              resolve();
+            };
+            video.addEventListener('seeked', onSeeked, { once: true });
+            video.currentTime = windowStart;
+            setTimeout(() => {
+              video.removeEventListener('seeked', onSeeked);
+              reject(new Error('Seek to windowStart timed out'));
+            }, 3000);
+          });
         } else {
           // For short clips, use full duration as before
           targets = percents.map(p => +(p * duration).toFixed(2));
+          scLog({ evt: 'targets_set', targets });
         }
+
+        // Setup timeout - shorter for windowed capture
+        timeoutId = setTimeout(() => {
+          cleanup();
+          reject(new Error('Playback capture timed out'));
+        }, 6500);
         
-        scLog({ evt: 'targets_set', targets });
         const captured = new Array<boolean>(targets.length).fill(false);
         const frames: string[] = [];
         const capturedTimes: number[] = [];
