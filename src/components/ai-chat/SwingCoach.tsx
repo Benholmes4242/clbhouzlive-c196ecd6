@@ -589,24 +589,33 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           }
         };
 
-        // ---- stable handler refs (defined after maybeCapture) ----
-        const onTimeUpdate = () => {
-          if (isComplete) return;
-          maybeCapture(video.currentTime);
-        };
+        // --- dynamic timeout from last target ---
+        const lastTarget = targets[targets.length - 1]; // seconds
+        const nowS = video.currentTime || 0;
+        const safety = duration > 12 ? 2.0 : 1.5;      // seconds
+        // for long clips you already analyze a 3s window; for short clips use to-lastTarget
+        const capWindow = duration > 12 ? 3.0 : Math.max(0, lastTarget - nowS);
         
+        // cap total timeout to 12s just in case
+        const captureTimeoutMs = Math.min(Math.ceil((capWindow + safety) * 1000), 12000);
+
+        // ---- stable handler refs (defined after maybeCapture) ----
+        const onTimeUpdate = () => { if (!isComplete) maybeCapture(video.currentTime); };
         const onRvfc: VideoFrameRequestCallback = (_now, meta) => {
           if (isComplete) return;
           maybeCapture(meta.mediaTime);
-          // re-arm
-          (video as any).requestVideoFrameCallback(onRvfc);
+          if (!isComplete && frames.length < targets.length && !video.ended) {
+            (video as any).requestVideoFrameCallback(onRvfc);
+          }
         };
 
-        // attach listeners using stable refs
-        attachedTimeUpdateHandler = onTimeUpdate;
-        video.addEventListener('timeupdate', attachedTimeUpdateHandler);
-        if ('requestVideoFrameCallback' in (video as any)) {
+        // attach only ONE mechanism
+        const useRVFC = 'requestVideoFrameCallback' in (video as any);
+        if (useRVFC) {
           (video as any).requestVideoFrameCallback(onRvfc);
+        } else {
+          attachedTimeUpdateHandler = onTimeUpdate;
+          video.addEventListener('timeupdate', onTimeUpdate);
         }
 
         // start playback, then start the ONLY timer (post-stabilization)
@@ -619,15 +628,20 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         // Log capture start details
         scLog({ 
           evt: 'capture_start',
-          rvfc: !!video.requestVideoFrameCallback, 
+          rvfc: useRVFC, 
           playbackRate: video.playbackRate 
         });
 
         if (timeoutId) clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           cleanup();
-          reject(new Error('Playback capture timed out'));
-        }, duration > 12 ? 6500 : 5000);
+          // partial success path: proceed if we got enough frames
+          if (frames.length >= 4) {
+            resolve(frames);
+          } else {
+            reject(new Error('Playback capture timed out'));
+          }
+        }, captureTimeoutMs);
 
       } catch (error: any) {
         scLog({ evt: 'capture_error', err: String(error?.message || error) });
