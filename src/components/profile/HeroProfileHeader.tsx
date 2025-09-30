@@ -792,163 +792,137 @@ const HeroProfileHeader = ({
                               pointer-events-none z-[5]" />
             </div>
 
-            {/* GLASS PANEL — consistent overlap & padding */}
+            {/* GLASS PANEL — Mobile polish spec */}
             <section
               ref={profileCardRef}
-              className="relative z-20 mx-0 sm:mx-0 md:mx-0 lg:mx-4 rounded-none lg:rounded-2xl border border-white/35 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
+              className="glass-panel relative z-20 mx-0 rounded-none border border-white/35 backdrop-blur-xl"
               style={{
                 marginTop: 'calc(var(--panel-overlap) * -1)',
                 padding: 'var(--panel-pad-y) var(--panel-pad-x)',
                 paddingTop: 'calc(var(--panel-pad-y) + var(--safe-top))',
                 paddingBottom: 'calc(var(--panel-pad-y) + var(--safe-bottom))',
-                backgroundColor: 'rgba(255, 255, 255, 0.16)'
+                backgroundColor: 'rgba(255, 255, 255, 0.16)',
+                boxShadow: 'var(--panel-shadow)'
               }}
             >
-               <div className="flex flex-col items-center relative">
-                   {/* Overhanging mini profile card */}
-                    <div
-                      className="absolute overflow-hidden rounded-xl border border-white/40 shadow-[0_8px_28px_rgba(0,0,0,0.28)]"
+              <div className="relative">
+                {/* Mini profile card */}
+                <div
+                  className="mini-card cursor-pointer"
+                  onClick={() => openImmersive?.(0)}
+                  role="button"
+                  aria-label="Open immersive profile"
+                >
+                  {profile?.profile_photo_url ? (
+                    <img
+                      src={profile.profile_photo_url}
+                      alt=""
+                      className="w-full h-full object-cover"
                       style={{
-                       top: 'calc(var(--mini-h) * -0.24)',   // 24% overhang
-                       right: '8px',                         // anchor 8px from right
-                       width: 'var(--mini-w)',
-                       height: 'var(--mini-h)',
-                       pointerEvents: 'none'
-                     }}
-                    onClick={() => openImmersive?.(0)}
-                    role="button"
-                    aria-label="Open immersive profile"
-                  >
-                    {profile?.profile_photo_url ? (
-                      <img
-                        src={profile.profile_photo_url}
-                        alt=""
-                        className="w-full h-full object-cover"
-                        style={{
-                          objectPosition: (() => {
-                            const cx = (profile?.mini_card_crop_x ?? 0) + (profile?.mini_card_crop_width ?? 100) / 2;
-                            const cy = (profile?.mini_card_crop_y ?? 0) + (profile?.mini_card_crop_height ?? 100) / 2;
-                            return `${cx}% ${cy}%`;
-                          })()
-                        }}
-                        loading="lazy"
-                      />
-                    ) : null}
+                        objectPosition: (() => {
+                          const cx = (profile?.mini_card_crop_x ?? 0) + (profile?.mini_card_crop_width ?? 100) / 2;
+                          const cy = (profile?.mini_card_crop_y ?? 0) + (profile?.mini_card_crop_height ?? 100) / 2;
+                          return `${cx}% ${cy}%`;
+                        })()
+                      }}
+                      loading="lazy"
+                    />
+                  ) : null}
+                </div>
+
+                {/* Content stack with 24px rhythm */}
+                <div className="flex flex-col" style={{ marginTop: 'calc(var(--mini-h) * 0.15)', gap: 'var(--gap-lg)' }}>
+                  {/* Name & handle block */}
+                  <div className="name-wrap">
+                    {(() => {
+                      const { first, last } = splitName(displayName);
+                      return (
+                        <>
+                          <span className="first">{first}</span>
+                          <span className="last">{last}</span>
+                          <div className="handle">@{username}</div>
+                        </>
+                      );
+                    })()}
                   </div>
 
-
-                   {/* MOBILE: glass content layout with vertical stack */}
-                   <div className="flex flex-col gap-y-4" style={{ marginTop: 'calc(var(--mini-h) * 0.15)' }}>
-                     {/* Name + handle (internal tightening only) */}
-                     <div className="exclude-mini flex flex-col items-center text-center gap-y-1">
-                       {(() => {
-                         const { first, last } = splitName(displayName);
-                         return (
-                           <>
-                             <span className="block text-[clamp(28px,6vw,32px)] font-semibold leading-[1.12] tracking-tight">
-                               {first}
-                             </span>
-                             <span className="block text-[clamp(28px,6vw,32px)] font-semibold leading-[1.12] tracking-tight">
-                               {last}
-                             </span>
-                           </>
-                         );
-                       })()}
-                       <p className="text-sm text-neutral-800/80 leading-5">@{username}</p>
-                     </div>
-
-                     {/* Spacer lock: preserves full TPX between handle and titles */}
-                     <div className="h-[var(--handle-titles-gap-mobile)]"></div>
-
-                    {/* Titles + values (two columns) */}
-                    <div className="grid grid-cols-2 gap-x-4">
-                      <div className="flex flex-col gap-y-1">
-                        <span className="text-[11px] uppercase tracking-wide text-neutral-800/80 text-center">Golf Club</span>
-                        <div
-                          className="
-                            text-base
-                            leading-6
-                            font-normal
-                            text-center
-                            max-w-[22ch]
-                            break-words
-                            mx-auto
-                            text-neutral-900
-                          "
-                          style={{
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden'
-                          }}
-                        >
-                          {homeClub}
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-y-1">
-                        <span className="text-[11px] uppercase tracking-wide text-neutral-800/80 text-center">Handicap</span>
-                        <div className="text-base leading-6 font-normal text-center text-neutral-900">
-                          {handicap ?? '—'}
-                        </div>
+                  {/* Club / Handicap row */}
+                  <div className="info grid grid-cols-[1fr_var(--gap-lg)_1fr] items-start">
+                    <div className="info--club justify-self-center">
+                      <div className="label">Golf Club</div>
+                      <div className="value max-w-[22ch] break-words"
+                        style={{
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden'
+                        }}
+                      >
+                        {homeClub}
                       </div>
                     </div>
+                    <div></div>
+                    <div className="info--hcp justify-self-center">
+                      <div className="label">Handicap</div>
+                      <div className="value">{handicap ?? '—'}</div>
+                    </div>
+                  </div>
 
-                    {/* Bio */}
-                    <div>
-                      {profile?.bio && (
-                        <p 
-                          className="m-0 text-base font-normal text-center leading-6 text-neutral-800"
-                          style={{
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden'
-                          }}
-                        >
-                          {profile.bio}
-                        </p>
-                      )}
+                  {/* Bio */}
+                  {profile?.bio && (
+                    <div className="text-center">
+                      <p 
+                        className="m-0 leading-[1.4]"
+                        style={{
+                          fontSize: 'var(--value-size)',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden'
+                        }}
+                      >
+                        {profile.bio}
+                      </p>
                       {profile?.website && (
-                        <div className="text-center mt-2">
-                          <a 
-                            href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
-                          >
-                            {profile.website.replace(/^https?:\/\//, '')}
-                          </a>
-                        </div>
+                        <a 
+                          href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block mt-2 text-sm text-blue-600 hover:text-blue-800 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                        >
+                          {profile.website.replace(/^https?:\/\//, '')}
+                        </a>
                       )}
                     </div>
-                    {/* Stats */}
-                    <div className="rounded-xl border border-white/10 bg-white/12">
-                      <div className="grid grid-cols-4 gap-3 text-center px-3 py-4 min-h-[44px]">
-                        <button className="flex flex-col gap-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-1">
-                          <span className="text-lg font-bold text-gray-900">{postsCount}</span>
-                          <span className="text-sm font-normal text-neutral-800/80 leading-5">Posts</span>
-                        </button>
-                        <button className="flex flex-col gap-y-1 border-l border-gray-300 pl-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-1">
-                          <span className="text-lg font-bold text-gray-900">2,500</span>
-                          <span className="text-sm font-normal text-neutral-800/80 leading-5">Total XP</span>
-                        </button>
-                        <button className="flex flex-col gap-y-1 border-l border-gray-300 pl-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-1">
-                          <span className="text-lg font-bold text-gray-900">{followingCount}</span>
-                          <span className="text-sm font-normal text-neutral-800/80 leading-5">Following</span>
-                        </button>
-                        <button className="flex flex-col gap-y-1 border-l border-gray-300 pl-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-1">
-                          <span className="text-lg font-bold text-gray-900">{followersCount}</span>
-                          <span className="text-sm font-normal text-neutral-800/80 leading-5">Followers</span>
-                        </button>
-                      </div>
+                  )}
+
+                  {/* Stats row - bulletproof centering */}
+                  <div className="rounded-xl border border-white/10 bg-white/12">
+                    <div className="grid grid-cols-4 gap-0 px-[var(--panel-pad-x)]">
+                      <button className="stat py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded">
+                        <span className="value text-gray-900">{postsCount}</span>
+                        <span className="label text-neutral-800/80">Posts</span>
+                      </button>
+                      <button className="stat py-4 border-l border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded">
+                        <span className="value text-gray-900">2,500</span>
+                        <span className="label text-neutral-800/80">Total XP</span>
+                      </button>
+                      <button className="stat py-4 border-l border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded">
+                        <span className="value text-gray-900">{followingCount}</span>
+                        <span className="label text-neutral-800/80">Following</span>
+                      </button>
+                      <button className="stat py-4 border-l border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded">
+                        <span className="value text-gray-900">{followersCount}</span>
+                        <span className="label text-neutral-800/80">Followers</span>
+                      </button>
                     </div>
+                  </div>
 
-                    <div className="space-y-0">
-                      <hr className="m-0 border-white/10" />
-
-                    {/* Tab Navigation */}
+                  {/* Tabs */}
+                  <div>
+                    <hr className="m-0 border-white/10" />
                     <nav className="w-full">
-                      <div className="mx-auto max-w-[360px] w-full flex" role="tablist" aria-label="Profile sections">
+                      <div className="flex" role="tablist" aria-label="Profile sections">
                         {tabs.map((tab) => (
                           <button
                             key={tab.id}
@@ -957,36 +931,33 @@ const HeroProfileHeader = ({
                             aria-selected={activeSection === tab.id}
                             aria-controls={`tabpanel-${tab.id}`}
                             tabIndex={activeSection === tab.id ? 0 : -1}
-                             className={`
-                               relative py-3 px-2 text-base font-normal transition-colors duration-200 min-h-[44px]
-                               ${activeSection === tab.id 
-                                 ? 'text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50' 
-                                 : 'text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'
-                               }
-                               flex-1 text-center rounded
-                             `}
+                            className={`
+                              relative flex-1 text-center py-3 px-2 min-h-[44px]
+                              transition-colors duration-200 rounded
+                              ${activeSection === tab.id 
+                                ? 'text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50' 
+                                : 'text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'
+                              }
+                            `}
+                            style={{
+                              fontSize: '14.5px',
+                              fontWeight: 600
+                            }}
                           >
                             {tab.label}
-                            {/* Brand orange underline animation */}
-                            <div 
-                              className={`
-                                absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500
-                                transition-all duration-300 ease-out
-                                ${activeSection === tab.id 
-                                  ? 'scale-x-100 opacity-100' 
-                                  : 'scale-x-0 opacity-0'
-                                }
-                                origin-center
-                              `}
-                            />
+                            {activeSection === tab.id && (
+                              <div 
+                                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] rounded-sm bg-orange-500 transition-all duration-300"
+                                style={{ width: '56%' }}
+                              />
+                            )}
                           </button>
                         ))}
                       </div>
                     </nav>
-                    </div>
                   </div>
-
-               </div>
+                </div>
+              </div>
             </section>
              
              {/* Spacer below for 16px gap before tab content */}

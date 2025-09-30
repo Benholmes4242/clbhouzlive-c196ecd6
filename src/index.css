@@ -32,44 +32,142 @@ html, body {
   --safe-right: 0px;
 }
 
-/* Exclusion padding to center content within left area */
-:root { 
-  --mini-w: 132px; 
+/* ========================================
+   Mobile Profile Design Tokens
+   ======================================== */
+:root {
+  /* Spacing scale */
+  --gap-xxs: 4px;
+  --gap-xs: 8px;
+  --gap-sm: 12px;
+  --gap-md: 16px;
+  --gap-lg: 24px;
+
+  /* Typography */
+  --name-size: clamp(28px, 5.8vw, 32px);
+  --name-weight: 800;
+  --handle-size: clamp(14px, 3.5vw, 15px);
+  --handle-weight: 500;
+  --label-size: 12.5px;
+  --label-weight: 600;
+  --value-size: 16px;
+  --value-weight: 400;
+  --stat-value-size: 19px;
+  --stat-value-weight: 700;
+  --stat-label-size: 13px;
+  --stat-label-weight: 600;
+
+  /* Mini card */
+  --mini-w: clamp(160px, 42vw, 208px);
+  --mini-h: calc(var(--mini-w) * 4 / 3);
+  --mini-overhang: 24%;
+  --mini-radius: 16px;
+
+  /* Panel paddings */
+  --panel-pad-x: clamp(16px, 4vw, 24px);
+  --panel-pad-y: 14px;
+
+  /* Effects */
+  --panel-shadow: 0 10px 30px rgba(0,0,0,.12);
+  --mini-shadow: 0 12px 30px rgba(0,0,0,.25);
 }
 
-@media (max-width: 430px) {
-  .exclude-mini { 
-    padding-right: calc(var(--mini-w) + 12px); 
-  }
-}
-
-/* Mobile-only name block centering */
+/* Mobile profile layout utilities */
 @media (max-width: 768px) {
-  /* The mini card sits at right: 8px with width var(--mini-w) inside the glass panel.
-     This block exactly spans the space from the panel's inner-left padding to the mini-card's left edge. */
-  .nameBlock-mobile {
-    /* span exactly from glass inner-left to mini left */
+  /* Name block - spans space between glass inner-left and mini card left */
+  .name-wrap {
     width: calc(100% - var(--mini-w) - 8px);
-    margin-right: calc(var(--mini-w) + 8px); /* reserve space for the mini card on the right */
+    margin-right: calc(var(--mini-w) + 8px);
     margin-left: 0;
-    padding-inline: 0;                      /* no extra padding that would skew centering */
-    text-align: center;                     /* center the two name lines within that span */
-    /* Fixed margin instead of vh-based for browser chrome stability */
-    margin-top: 8px;
+    text-align: center;
   }
 
-  :root {
-    --handle-titles-gap-mobile: 16px;
+  .name-wrap .first,
+  .name-wrap .last {
+    display: block;
+    font-size: var(--name-size);
+    font-weight: var(--name-weight);
+    line-height: 1.08;
+    letter-spacing: 0.1px;
+    margin: 0;
   }
 
-  /* Tidy type on mobile */
-  .nameBlock-mobile span {
-    font-size: var(--fs-display);           /* you already have this custom prop */
-    line-height: 1.05;                      /* tight but readable */
+  .name-wrap .last {
+    margin-top: var(--gap-xs);
   }
 
-  .nameBlock-mobile > div {                 /* the @handle */
-    font-size: var(--fs-handle);
+  .name-wrap .handle {
+    margin-top: var(--gap-xs);
+    font-size: var(--handle-size);
+    font-weight: var(--handle-weight);
+    opacity: 0.9;
+  }
+
+  /* Stats - bulletproof centering */
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-width: 0;
+  }
+
+  .stat .value {
+    font-size: var(--stat-value-size);
+    font-weight: var(--stat-value-weight);
+    line-height: 1.1;
+  }
+
+  .stat .label {
+    margin-top: var(--gap-xs);
+    font-size: var(--stat-label-size);
+    font-weight: var(--stat-label-weight);
+    opacity: 0.8;
+    line-height: 1.2;
+  }
+
+  /* Info row labels/values */
+  .info .label {
+    font-size: var(--label-size);
+    font-weight: var(--label-weight);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    text-align: center;
+    margin-bottom: var(--gap-xs);
+  }
+
+  .info .value {
+    font-size: var(--value-size);
+    font-weight: var(--value-weight);
+    line-height: 1.35;
+    text-align: center;
+    word-break: break-word;
+  }
+
+  /* Mini card styles */
+  .mini-card {
+    position: absolute;
+    top: calc(var(--mini-h) * -1 * var(--mini-overhang));
+    right: 8px;
+    width: var(--mini-w);
+    aspect-ratio: 3 / 4;
+    border-radius: var(--mini-radius);
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    box-shadow: var(--mini-shadow);
+    background: #fff;
+  }
+
+  /* Glass panel readability fade */
+  .glass-panel::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 28px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.12));
+    pointer-events: none;
   }
 }
 
