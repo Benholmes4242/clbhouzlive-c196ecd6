@@ -123,7 +123,7 @@ const HeroProfileHeader = ({
   // Refs for dynamic gap calculation
   const nameBlockRef = useRef<HTMLDivElement | null>(null);
   const metaRowRef = useRef<HTMLDivElement | null>(null);
-  const miniCardRef = useRef<HTMLButtonElement | null>(null);
+  const miniCardRef = useRef<HTMLDivElement | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
   const { uploadImage, uploading: photoUploading } = useR2Upload();
@@ -320,8 +320,8 @@ const HeroProfileHeader = ({
   const { posts, loading: postsLoading, fetchUserPosts } = useActivityPosts(profile?.id);
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
 
-  // Hook to align midpoint between handle and golf club title with mini card center
-  function useAlignToMiniCardCenter(
+  // Hook to compute even gap between handle and mini card
+  function useEvenGapToMiniCard(
     nameBlockEl: HTMLElement | null,
     metaRowEl: HTMLElement | null,
     miniCardEl: HTMLElement | null
@@ -331,27 +331,16 @@ const HeroProfileHeader = ({
 
       const compute = () => {
         const nameH = nameBlockEl.getBoundingClientRect().height || 0;
+        const metaH = metaRowEl.getBoundingClientRect().height || 0;
         const cardH = miniCardEl.getBoundingClientRect().height || 0;
-        
-        // Get the height of just the golf club title (first child)
-        const clubTitleEl = metaRowEl.querySelector('.meta-label') as HTMLElement;
-        const clubTitleH = clubTitleEl?.getBoundingClientRect().height || 0;
 
-        // Center of mini card (inside glass panel, not counting overhang)
-        const cardCenter = cardH / 2;
-        
-        // We want the midpoint between handle bottom and club title top to align with card center
-        // Fixed 12px gap between handle and club title
-        const fixedGap = 12;
-        
-        // Calculate: nameH + gap + (clubTitleH / 2) = cardCenter
-        // Solve for gap adjustment: gap = cardCenter - nameH - (clubTitleH / 2)
-        let dynamicGap = cardCenter - nameH - (clubTitleH / 2);
-        
-        // Ensure minimum gap for readability
-        dynamicGap = Math.max(12, dynamicGap);
+        // target: center meta row in the band from handle bottom → mini card bottom
+        let raw = (cardH - nameH - metaH) / 2;
 
-        metaRowEl.style.setProperty('--dynamic-meta-gap', `${Math.round(dynamicGap)}px`);
+        // clamp (px)
+        const gap = Math.max(16, Math.min(raw, 64));
+
+        metaRowEl.style.setProperty('--club-gap', `${Math.round(gap)}px`);
       };
 
       // initial + on layout changes
@@ -381,7 +370,7 @@ const HeroProfileHeader = ({
   }
 
   // Wire the hook
-  useAlignToMiniCardCenter(nameBlockRef.current, metaRowRef.current, miniCardRef.current);
+  useEvenGapToMiniCard(nameBlockRef.current, metaRowRef.current, miniCardRef.current);
 
   // Auto-open immersive mode for other users when they have media (default entry)
   useEffect(() => {
@@ -821,7 +810,6 @@ const HeroProfileHeader = ({
                 {/* Mini profile card */}
                 <button
                   data-mini-card
-                  ref={miniCardRef}
                   type="button"
                   aria-label="Open mini profile media"
                   className="mini-card cursor-pointer"
@@ -844,7 +832,7 @@ const HeroProfileHeader = ({
                 </button>
 
                 {/* Name & handle block */}
-                <div className="name-wrap" ref={nameBlockRef} data-nameblock>
+                <div className="name-wrap" data-nameblock>
                   {(() => {
                     const { first, last } = splitName(displayName);
                     return (
@@ -857,12 +845,18 @@ const HeroProfileHeader = ({
                   })()}
                 </div>
 
-                {/* Club row (handicap removed from glass panel) */}
-                <div className="meta-row" ref={metaRowRef}>
+                {/* Club / Handicap row */}
+                <div className="meta-row">
                   <div className="meta meta-club">
                     <div className="meta-label">Golf Club</div>
                     <div className="meta-value">
                       {homeClub}
+                    </div>
+                  </div>
+                  <div className="meta meta-hcp">
+                    <div className="meta-label">Handicap</div>
+                    <div className="meta-value meta-value--hcp">
+                      {handicap ?? '—'}
                     </div>
                   </div>
                 </div>

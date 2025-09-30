@@ -144,10 +144,10 @@ html, body {
 /* Golf Club & Handicap row */
 .meta-row {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
   column-gap: var(--sp-24);
   align-items: start;
-  margin-top: var(--dynamic-meta-gap, 12px);
+  margin-top: var(--sp-24);
 }
 
 .meta-label {
@@ -166,11 +166,6 @@ html, body {
   line-height: var(--lh-normal);
   text-align: center;
   margin-top: var(--sp-8);
-  /* Force golf club to always use two lines */
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  min-height: calc(var(--lh-normal) * var(--fs-value) * 2);
 }
 
 .meta-value--hcp {
