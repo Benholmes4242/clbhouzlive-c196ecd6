@@ -27,7 +27,14 @@ import { CoachCta } from '@/components/swing/CoachCta';
 // Single source of truth for SwingCoach mode
 export const SWINGCOACH_MODE: 'live' | 'sim' = 'live';
 
-// --- Telemetry helpers (read-only) ---
+// --- Config constants ---
+const MAX_VIDEO_SECONDS = 20;
+const LONG_CLIP_THRESHOLD = 12;
+const WINDOW_LEN = 3.0;
+const JPEG_QUALITY = 0.65;
+const MAX_CANVAS_W = 512;
+
+// --- Telemetry helpers ---
 const scNow = () => Math.round(performance.now());
 const scKb = (n: number) => Math.round(n / 1024);
 
@@ -55,6 +62,16 @@ type ScCaptureLog = {
 const scLog = (data: ScCaptureLog) => {
   // Single tag so logs are easy to filter
   console.info('[SC-TELEMETRY]', data);
+};
+
+// Helper for toast notifications
+const notify = (msg: string, variant: "default" | "destructive" = "destructive") => {
+  // This will be called from the validation function
+  if (typeof window !== "undefined" && (window as any).swingCoachToast) {
+    (window as any).swingCoachToast({ title: "Video validation", description: msg, variant });
+  } else {
+    alert(msg);
+  }
 };
 
 interface SwingAnalysis {
@@ -379,6 +396,15 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         return;
       }
 
+      // Validate video duration (20s max)
+      if (file.type.startsWith('video/')) {
+        const isValid = await validateVideoBeforeUse(file);
+        if (!isValid) {
+          event.target.value = ''; // Reset input
+          return;
+        }
+      }
+
       // Check file size (50MB limit)
       if (file.size > 50 * 1024 * 1024) {
         toast({
@@ -417,302 +443,267 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     }
   };
 
-  const extractFramesViaPlayback = async (file: File): Promise<string[]> => {
-    return new Promise<string[]>(async (resolve, reject) => {
-      const video = document.createElement('video') as HTMLVideoElement;
-      video.muted = true;
-      video.playsInline = true;
-      video.preload = 'auto';
-      video.src = URL.createObjectURL(file);
+  // Video validation function
+  const validateVideoBeforeUse = async (file: File): Promise<boolean> => {
+    try {
+      console.info("Tip: For best results, keep clips ≤20s. We focus on a 3s window around your swing.");
+      const meta = await probeVideo(file);
 
-      let isComplete = false;
-      let timeoutId: ReturnType<typeof setTimeout> | undefined;
-      let attachedTimeUpdateHandler: (() => void) | null = null;
-
-      const cleanup = () => {
-        if (isComplete) return;
-        isComplete = true;
-        
-        try {
-          video.pause();
-        } catch {}
-        
-        // Remove timeupdate listener if we stored the reference
-        if (attachedTimeUpdateHandler) {
-          video.removeEventListener('timeupdate', attachedTimeUpdateHandler);
-        }
-        // RVFC can't be "removed"; isComplete=true gates future work
-        
-        try {
-          URL.revokeObjectURL(video.src);
-        } catch {}
-        video.src = '';
-        
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-          timeoutId = undefined;
-        }
-      };
-
-        // Setup timeout after seek (for windowed capture) or immediately (for short clips)
-        // This will be set after the seek logic below
-
-      try {
-        const t0 = scNow();
-        // Wait for video to be ready
-        await new Promise<void>((res, rej) => {
-          const onError = () => rej(new Error('Video failed to load'));
-          const onReady = () => {
-            video.removeEventListener('error', onError);
-            res();
-          };
-          video.addEventListener('error', onError);
-          video.addEventListener('canplaythrough', onReady, { once: true });
+      if (meta.duration > MAX_VIDEO_SECONDS) {
+        toast({
+          title: "Video too long",
+          description: "The maximum video length is 20 seconds. Please re-upload a shorter clip.",
+          variant: "destructive"
         });
+        return false;
+      }
+      return true;
+    } catch {
+      toast({
+        title: "Video validation failed",
+        description: "We couldn't read the video. Please try a different file.",
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
 
-        const rvfc = 'requestVideoFrameCallback' in (video as any);
-        scLog({
-          evt: 'video_ready',
-          dur: scNow() - t0,
-          width: video.videoWidth,
-          height: video.videoHeight,
-          videoDur: video.duration,
-          rvfc
-        });
+  // Probe video metadata safely
+  const probeVideo = async (file: File): Promise<{ duration: number; width: number; height: number }> => {
+    const video = document.createElement("video");
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = "metadata";
+    video.src = URL.createObjectURL(file);
 
-        const duration = video.duration;
-        const percents = [0.03, 0.13, 0.28, 0.48, 0.58, 0.73, 0.87, 0.95];
-        
-        let targets: number[];
-        if (duration > 12) {
-          // For long clips, analyze a 3-second window in the center
-          const windowLen = 3.0;
-          const windowStart = Math.max(0, (duration / 2) - 1.5);
-          targets = percents.map(p => +(windowStart + p * windowLen).toFixed(2));
-          
-          scLog({ evt: 'window', start: +(windowStart.toFixed(2)), len: 3.0, targets });
-          
-          // Seek handshake that can't stall
-          scLog({ evt: 'seek_begin', windowStart: +(windowStart.toFixed(2)) });
-          
-          // Start playback first
-          try { 
-            await video.play(); 
-          } catch { 
-            /* ignore autoplay errors */ 
-          }
-          
-          // Attempt seek
-          video.currentTime = windowStart + 0.001;
-          
-          // Wait for whichever happens first (max 3s)
-          await new Promise<void>((resolve) => {
-            let guardTimeoutId: NodeJS.Timeout | undefined;
-            let resolved = false;
-            
-            const cleanup = () => {
-              if (guardTimeoutId) clearTimeout(guardTimeoutId);
-              video.removeEventListener('seeked', onSeeked);
-              video.removeEventListener('timeupdate', onTimeUpdate);
-            };
-            
-            const finishSeek = () => {
-              if (resolved) return;
-              resolved = true;
-              cleanup();
-              scLog({ evt: 'seek_end', at: +(video.currentTime.toFixed(2)) });
-              resolve();
-            };
-            
-            const onSeeked = () => finishSeek();
-            
-            const useRVFC = 'requestVideoFrameCallback' in (video as any);
-            const onRvfc: VideoFrameRequestCallback = (_now, meta) => {
-              if (meta.mediaTime >= windowStart - 0.05) {
-                finishSeek();
-              } else if (!resolved) {
-                (video as any).requestVideoFrameCallback(onRvfc);
-              }
-            };
-            
-            const onTimeUpdate = () => {
-              if (video.currentTime >= windowStart - 0.05) {
-                finishSeek();
-              }
-            };
-            
-            // Attach listeners
-            video.addEventListener('seeked', onSeeked, { once: true });
-            if (useRVFC) {
-              (video as any).requestVideoFrameCallback(onRvfc);
-            } else {
-              video.addEventListener('timeupdate', onTimeUpdate);
-            }
-            
-            // 3s guard timeout
-            guardTimeoutId = setTimeout(() => {
-              if (!resolved) {
-                resolved = true;
-                cleanup();
-                scLog({ evt: 'seek_timeout', at: +(video.currentTime.toFixed(2)) });
-                resolve(); // treat as best-effort; proceed anyway
-              }
-            }, 3000);
-          });
-
-          // One RVFC tick after seek to stabilize first frame
-          await new Promise<void>(res => (video as any).requestVideoFrameCallback(() => res()));
-        } else {
-          // For short clips, use full duration as before
-          targets = percents.map(p => +(p * duration).toFixed(2));
-          scLog({ evt: 'targets_set', targets });
-        }
-
-        const captured = new Array<boolean>(targets.length).fill(false);
-        const frames: string[] = [];
-        const capturedTimes: number[] = [];
-
-        console.log('Video metadata loaded:', {
-          width: video.videoWidth,
-          height: video.videoHeight,
-          duration: video.duration
-        });
-
-        // Setup canvas
-        const canvas = document.createElement('canvas');
-        const maxWidth = 512;
-        const canvasWidth = Math.min(video.videoWidth || 512, maxWidth);
-        const canvasHeight = Math.round(canvasWidth * (video.videoHeight / video.videoWidth));
-        canvas.width = canvasWidth;
-        canvas.height = canvasHeight;
-        const ctx = canvas.getContext('2d')!;
-
-        const tolerance = video.duration > 12 ? 0.07 : 0.045; // Wider tolerance for long clips
-        const maybeCapture = (currentTime: number) => {
-          if (isComplete) return;
-          
-          // Early finish if past last target
-          if (currentTime >= targets[targets.length-1] + 0.2) {
-            if (frames.length >= 4) {
-              const payloadBytes = JSON.stringify(frames).length;
-              scLog({
-                evt: 'capture_done',
-                framesReq: targets.length,
-                framesGot: frames.length,
-                payloadKB: scKb(payloadBytes),
-                mediaTimes: capturedTimes
-              });
-              cleanup();
-              resolve(frames);
-              return;
-            }
-          }
-          
-          for (let i = 0; i < targets.length; i++) {
-            if (!captured[i] && Math.abs(currentTime - targets[i]) <= tolerance) {
-              // Guard against duplicate captures
-              if (capturedTimes.includes(+currentTime.toFixed(2))) continue;
-              
-              ctx.drawImage(video, 0, 0, canvasWidth, canvasHeight);
-              frames.push(canvas.toDataURL('image/jpeg', 0.65));
-              captured[i] = true;
-              capturedTimes.push(+currentTime.toFixed(2));
-              console.log(`Captured frame ${i + 1}/${targets.length} at ${currentTime.toFixed(2)}s`);
-              break;
-            }
-          }
-
-          // Check if we're done
-          if (captured.filter(Boolean).length >= targets.length || video.ended) {
-            if (frames.length >= 4) {
-              const payloadBytes = JSON.stringify(frames).length;
-              scLog({
-                evt: 'capture_done',
-                framesReq: targets.length,
-                framesGot: frames.length,
-                payloadKB: scKb(payloadBytes),
-                mediaTimes: capturedTimes
-              });
-
-              cleanup();
-              resolve(frames);
-            } else if (video.ended) {
-              cleanup();
-              reject(new Error('Insufficient frames captured'));
-            }
-          }
+    try {
+      await new Promise<void>((res, rej) => {
+        const onLoaded = () => { cleanup(); res(); };
+        const onErr = () => { cleanup(); rej(new Error("Failed to load video metadata")); };
+        const cleanup = () => {
+          video.removeEventListener("loadedmetadata", onLoaded);
+          video.removeEventListener("error", onErr);
         };
+        video.addEventListener("loadedmetadata", onLoaded, { once: true });
+        video.addEventListener("error", onErr, { once: true });
+      });
 
-        // --- dynamic timeout from actual position (after seek handshake) ---
-        const nowS = video.currentTime; // actual position after seek
-        if (duration > 12) {
-          // For long clips: compute timeout from where we actually are
-          const windowStart = Math.max(0, (duration / 2) - 1.5);
-          const windowLen = 3.0;
-          const remainingToWindow = Math.max(0, windowStart - nowS);
-          const safety = 2000; // ms
-          const baseMs = (remainingToWindow + windowLen) * 1000;
-          var captureTimeoutMs = Math.min(Math.ceil(baseMs + safety), 12000);
-        } else {
-          // For short clips: use distance to last target
-          const lastTarget = targets[targets.length - 1];
-          const safety = 1500; // ms
-          const capWindow = Math.max(0, lastTarget - nowS);
-          var captureTimeoutMs = Math.min(Math.ceil((capWindow + safety) * 1000), 12000);
-        }
+      return { duration: video.duration, width: video.videoWidth, height: video.videoHeight };
+    } finally {
+      URL.revokeObjectURL(video.src);
+    }
+  };
 
-        // ---- stable handler refs (defined after maybeCapture) ----
-        const onTimeUpdate = () => { if (!isComplete) maybeCapture(video.currentTime); };
+  // Store toast function reference for validation
+  useEffect(() => {
+    (window as any).swingCoachToast = toast;
+    return () => {
+      delete (window as any).swingCoachToast;
+    };
+  }, [toast]);
+
+  const extractFramesViaPlayback = async (file: File): Promise<string[]> => {
+    const video = document.createElement('video') as HTMLVideoElement;
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'auto';
+    video.src = URL.createObjectURL(file);
+
+    const loadedT0 = scNow();
+    await new Promise<void>((res, rej) => {
+      const onErr = () => { cleanup(); rej(new Error("Video failed to load")); };
+      const onReady = () => { cleanup(); res(); };
+      const cleanup = () => {
+        video.removeEventListener("canplaythrough", onReady);
+        video.removeEventListener("error", onErr);
+      };
+      video.addEventListener("canplaythrough", onReady, { once: true });
+      video.addEventListener("error", onErr, { once: true });
+    });
+
+    const duration = video.duration;
+    const hasRVFC = "requestVideoFrameCallback" in (video as any);
+    scLog({ evt: "video_ready", dur: scNow() - loadedT0, width: video.videoWidth, height: video.videoHeight, videoDur: +duration.toFixed(3), rvfc: hasRVFC });
+
+    // Targets: always 8 phases
+    const percents = [0.03, 0.13, 0.28, 0.48, 0.58, 0.73, 0.87, 0.95];
+    let targets: number[] = [];
+
+    // Long clips → 3s centered window
+    let windowStart = 0;
+    if (duration > LONG_CLIP_THRESHOLD) {
+      windowStart = Math.max(0, (duration / 2) - (WINDOW_LEN / 2));
+      targets = percents.map(p => +(windowStart + p * WINDOW_LEN).toFixed(2));
+
+      // Seek handshake that can't stall
+      scLog({ evt: 'seek_begin', windowStart: +windowStart.toFixed(2) });
+      
+      // Start playback first
+      try { 
+        await video.play();
+      } catch { 
+        /* ignore autoplay errors */ 
+      }
+      
+      // Attempt seek
+      video.currentTime = windowStart + 0.001;
+      
+      // Wait for whichever happens first (max 3s)
+      await new Promise<void>((resolve) => {
+        let guardTimeoutId: NodeJS.Timeout | undefined;
+        let resolved = false;
+        
+        const cleanup = () => {
+          if (guardTimeoutId) clearTimeout(guardTimeoutId);
+          video.removeEventListener('seeked', onSeeked);
+          video.removeEventListener('timeupdate', onTimeUpdate);
+        };
+        
+        const finishSeek = () => {
+          if (resolved) return;
+          resolved = true;
+          cleanup();
+          scLog({ evt: 'seek_end', at: +(video.currentTime.toFixed(2)) });
+          resolve();
+        };
+        
+        const onSeeked = () => finishSeek();
+        
+        const useRVFC = 'requestVideoFrameCallback' in (video as any);
         const onRvfc: VideoFrameRequestCallback = (_now, meta) => {
-          if (isComplete) return;
-          maybeCapture(meta.mediaTime);
-          if (!isComplete && frames.length < targets.length && !video.ended) {
+          if (meta.mediaTime >= windowStart - 0.05) {
+            finishSeek();
+          } else if (!resolved) {
             (video as any).requestVideoFrameCallback(onRvfc);
           }
         };
-
-        // attach only ONE mechanism
-        const useRVFC = 'requestVideoFrameCallback' in (video as any);
+        
+        const onTimeUpdate = () => {
+          if (video.currentTime >= windowStart - 0.05) {
+            finishSeek();
+          }
+        };
+        
+        // Attach listeners
+        video.addEventListener('seeked', onSeeked, { once: true });
         if (useRVFC) {
           (video as any).requestVideoFrameCallback(onRvfc);
         } else {
-          attachedTimeUpdateHandler = onTimeUpdate;
           video.addEventListener('timeupdate', onTimeUpdate);
         }
-
-        // For short clips, start playback since seek handshake wasn't used
-        if (duration <= 12) {
-          try { 
-            await video.play(); 
-          } catch { 
-            /* ignore autoplay errors */ 
-          }
-        }
         
-        // Log capture start details
-        scLog({ 
-          evt: 'capture_start',
-          rvfc: useRVFC, 
-          playbackRate: video.playbackRate 
-        });
-
-        if (timeoutId) clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          cleanup();
-          // partial success path: proceed if we got enough frames
-          if (frames.length >= 4) {
-            resolve(frames);
-          } else {
-            reject(new Error('Playback capture timed out'));
+        // 3s guard timeout
+        guardTimeoutId = setTimeout(() => {
+          if (!resolved) {
+            resolved = true;
+            cleanup();
+            scLog({ evt: 'seek_timeout', at: +(video.currentTime.toFixed(2)) });
+            resolve(); // treat as best-effort; proceed anyway
           }
-        }, captureTimeoutMs);
+        }, 3000);
+      });
 
-      } catch (error: any) {
-        scLog({ evt: 'capture_error', err: String(error?.message || error) });
-        cleanup();
-        reject(error);
+      // One RVFC tick after seek to stabilize first frame
+      await new Promise<void>(res => (video as any).requestVideoFrameCallback(() => res()));
+    } else {
+      // For short clips, use full duration
+      targets = percents.map(p => +(p * duration).toFixed(2));
+      scLog({ evt: 'targets_set', targets });
+    }
+
+    // Canvas setup
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d')!;
+    const w = Math.min(video.videoWidth || MAX_CANVAS_W, MAX_CANVAS_W);
+    const h = Math.round((w / (video.videoWidth || 1)) * video.videoHeight);
+    canvas.width = w;
+    canvas.height = h;
+
+    // Capture state
+    const frames: string[] = [];
+    const captured = new Array(targets.length).fill(false);
+    const capturedTimes: number[] = [];
+    const tolerance = duration > LONG_CLIP_THRESHOLD ? 0.07 : 0.045;
+
+    // Handlers (only one mode: RVFC OR timeupdate)
+    let isComplete = false;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const maybeCapture = (currentTime: number) => {
+      if (isComplete) return;
+      for (let i = 0; i < targets.length; i++) {
+        if (!captured[i] && Math.abs(currentTime - targets[i]) <= tolerance) {
+          ctx.drawImage(video, 0, 0, w, h);
+          frames.push(canvas.toDataURL("image/jpeg", JPEG_QUALITY));
+          captured[i] = true;
+          capturedTimes.push(+currentTime.toFixed(2));
+          break;
+        }
       }
-    });
+      const done = captured.every(Boolean) || video.ended;
+      if (done) finish();
+    };
+
+    const onTimeUpdate = () => maybeCapture(video.currentTime);
+    const onRvfc: VideoFrameRequestCallback = (_now, meta) => {
+      maybeCapture(meta.mediaTime);
+      if (!isComplete && !captured.every(Boolean) && !video.ended) {
+        (video as any).requestVideoFrameCallback(onRvfc);
+      }
+    };
+
+    // Attach a single capture mechanism
+    const useRVFC = hasRVFC;
+    if (useRVFC) (video as any).requestVideoFrameCallback(onRvfc);
+    else video.addEventListener("timeupdate", onTimeUpdate);
+
+    // Start playback for short clips
+    if (duration <= LONG_CLIP_THRESHOLD) {
+      try { await video.play(); } catch { /* ignore autoplay issues */ }
+    }
+
+    scLog({ evt: "capture_start", rvfc: useRVFC, playbackRate: video.playbackRate });
+
+    // Dynamic timeout
+    const lastTarget = targets[targets.length - 1];
+    const nowS = video.currentTime;
+    const safety = duration > LONG_CLIP_THRESHOLD ? 2.0 : 1.5;
+    const rawTimeout = duration > LONG_CLIP_THRESHOLD 
+      ? (WINDOW_LEN + safety) 
+      : (Math.max(0, lastTarget - nowS) + safety);
+    const captureTimeoutMs = Math.min(Math.ceil(rawTimeout * 1000), 12000);
+    
+    timeoutId = setTimeout(() => finish(new Error("Playback capture timed out")), captureTimeoutMs);
+
+    function finish(err?: Error) {
+      if (isComplete) return;
+      isComplete = true;
+
+      try { video.pause(); } catch {}
+      if (!useRVFC) video.removeEventListener("timeupdate", onTimeUpdate);
+      if (timeoutId) clearTimeout(timeoutId);
+      try { URL.revokeObjectURL(video.src); } catch {}
+      video.src = "";
+
+      const payloadBytes = JSON.stringify(frames).length;
+      scLog({
+        evt: "capture_done",
+        err: err?.message,
+        framesReq: targets.length,
+        framesGot: frames.length,
+        mediaTimes: capturedTimes,
+        payloadKB: scKb(payloadBytes),
+      });
+    }
+
+    // Wait until either all frames captured or timeout fires
+    const waitT0 = scNow();
+    while (!isComplete) {
+      await new Promise(r => setTimeout(r, 30));
+      if (scNow() - waitT0 > captureTimeoutMs + 2000) break;
+    }
+
+    if (frames.length >= 4) return frames;
+    throw new Error("Insufficient frames captured");
   };
 
   const analyzeSwing = async () => {
