@@ -794,6 +794,7 @@ const HeroProfileHeader = ({
 
             {/* GLASS PANEL — Mobile polish spec */}
             <section
+              data-profile-panel
               ref={profileCardRef}
               className="glass-panel relative z-20 mx-0 rounded-none border border-white/35 backdrop-blur-xl"
               style={{
@@ -802,16 +803,34 @@ const HeroProfileHeader = ({
                 paddingTop: 'calc(var(--panel-pad-y) + var(--safe-top))',
                 paddingBottom: 'calc(var(--panel-pad-y) + var(--safe-bottom))',
                 backgroundColor: 'rgba(255, 255, 255, 0.16)',
-                boxShadow: 'var(--panel-shadow)'
-              }}
+                boxShadow: 'var(--panel-shadow)',
+                '--mini-w': 'clamp(140px,38vw,200px)',
+                '--mini-h': 'calc(var(--mini-w) * 4 / 3)',
+                '--mini-overhang': '0.24',
+                '--mini-radius': '16px',
+                '--mini-shadow': '0 20px 40px rgba(0,0,0,.18)'
+              } as React.CSSProperties}
             >
               <div className="relative">
                 {/* Mini profile card */}
-                <div
-                  className="mini-card cursor-pointer"
+                <button
+                  data-mini-card
+                  type="button"
+                  aria-label="Open mini profile media"
+                  className="
+                    absolute right-2 z-[2]
+                    w-[var(--mini-w)] aspect-[3/4]
+                    rounded-[var(--mini-radius)]
+                    overflow-hidden
+                    border border-white/90
+                    shadow-[var(--mini-shadow)]
+                    bg-white/10 backdrop-blur-sm
+                    cursor-pointer
+                  "
+                  style={{
+                    top: 'calc(var(--mini-h) * -1 * var(--mini-overhang))'
+                  }}
                   onClick={() => openImmersive?.(0)}
-                  role="button"
-                  aria-label="Open immersive profile"
                 >
                   {profile?.profile_photo_url ? (
                     <img
@@ -828,7 +847,7 @@ const HeroProfileHeader = ({
                       loading="lazy"
                     />
                   ) : null}
-                </div>
+                </button>
 
                 {/* Content stack with 24px rhythm */}
                 <div className="flex flex-col" style={{ marginTop: 'calc(var(--mini-h) * 0.15)', gap: 'var(--gap-lg)' }}>
@@ -846,7 +865,7 @@ const HeroProfileHeader = ({
                     })()}
                   </div>
 
-                  {/* Club / Handicap row */}
+                   {/* Club / Handicap row */}
                   <div className="info grid grid-cols-[1fr_var(--gap-lg)_1fr] items-start">
                     <div className="info--club justify-self-center">
                       <div className="label">Golf Club</div>
@@ -862,7 +881,12 @@ const HeroProfileHeader = ({
                       </div>
                     </div>
                     <div></div>
-                    <div className="info--hcp justify-self-center">
+                    <div 
+                      className="info--hcp justify-self-center"
+                      style={{
+                        marginTop: 'calc(var(--mini-h) * var(--mini-overhang) + 8px)'
+                      }}
+                    >
                       <div className="label">Handicap</div>
                       <div className="value">{handicap ?? '—'}</div>
                     </div>
@@ -896,25 +920,39 @@ const HeroProfileHeader = ({
                     </div>
                   )}
 
-                  {/* Stats row - bulletproof centering */}
-                  <div className="rounded-xl border border-white/10 bg-white/12">
-                    <div className="grid grid-cols-4 gap-0 px-[var(--panel-pad-x)]">
-                      <button className="stat py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded">
-                        <span className="value text-gray-900">{postsCount}</span>
-                        <span className="label text-neutral-800/80">Posts</span>
-                      </button>
-                      <button className="stat py-4 border-l border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded">
-                        <span className="value text-gray-900">2,500</span>
-                        <span className="label text-neutral-800/80">Total XP</span>
-                      </button>
-                      <button className="stat py-4 border-l border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded">
-                        <span className="value text-gray-900">{followingCount}</span>
-                        <span className="label text-neutral-800/80">Following</span>
-                      </button>
-                      <button className="stat py-4 border-l border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded">
-                        <span className="value text-gray-900">{followersCount}</span>
-                        <span className="label text-neutral-800/80">Followers</span>
-                      </button>
+                  {/* Stats row - straight dividers with centered values */}
+                  <div className="grid grid-cols-4 border-y border-black/10 divide-x divide-black/10 bg-white">
+                    <div className="flex flex-col items-center justify-center py-4">
+                      <div className="text-[20px] font-semibold leading-none text-gray-900">
+                        {postsCount}
+                      </div>
+                      <div className="mt-1 text-[12px] tracking-wide uppercase text-black/60">
+                        Posts
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center justify-center py-4">
+                      <div className="text-[20px] font-semibold leading-none text-gray-900">
+                        2,500
+                      </div>
+                      <div className="mt-1 text-[12px] tracking-wide uppercase text-black/60">
+                        Total XP
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center justify-center py-4">
+                      <div className="text-[20px] font-semibold leading-none text-gray-900">
+                        {followingCount}
+                      </div>
+                      <div className="mt-1 text-[12px] tracking-wide uppercase text-black/60">
+                        Following
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center justify-center py-4">
+                      <div className="text-[20px] font-semibold leading-none text-gray-900">
+                        {followersCount}
+                      </div>
+                      <div className="mt-1 text-[12px] tracking-wide uppercase text-black/60">
+                        Followers
+                      </div>
                     </div>
                   </div>
 
