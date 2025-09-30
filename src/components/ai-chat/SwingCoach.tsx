@@ -425,28 +425,22 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
       let isComplete = false;
       let timeoutId: ReturnType<typeof setTimeout> | undefined;
-      let rvfcActive = false;
+      let attachedTimeUpdateHandler: (() => void) | null = null;
 
-      // Define stable handler references
-      let onTimeUpdate: () => void;
-      let onRvfc: VideoFrameRequestCallback;
-      
       const cleanup = () => {
         if (isComplete) return;
         isComplete = true;
         
         try {
           video.pause();
-        } catch {
-          // Ignore pause errors
-        }
+        } catch {}
         
-        // Remove specific event listeners with stable references
-        if (onTimeUpdate) {
-          video.removeEventListener('timeupdate', onTimeUpdate);
+        // Remove timeupdate listener if we stored the reference
+        if (attachedTimeUpdateHandler) {
+          video.removeEventListener('timeupdate', attachedTimeUpdateHandler);
         }
+        // RVFC can't be "removed"; isComplete=true gates future work
         
-        // Clean up video src
         try {
           URL.revokeObjectURL(video.src);
         } catch {}
@@ -595,34 +589,33 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           }
         };
 
-        // Define handlers with stable references
-        onTimeUpdate = () => {
+        // ---- stable handler refs (defined after maybeCapture) ----
+        const onTimeUpdate = () => {
           if (isComplete) return;
           maybeCapture(video.currentTime);
         };
-
-        onRvfc = (_: any, metadata: any) => {
+        
+        const onRvfc: VideoFrameRequestCallback = (_now, meta) => {
           if (isComplete) return;
-          rvfcActive = true;
-          maybeCapture(metadata.mediaTime);
-          // Re-arm if not complete
-          if (!isComplete && captured.filter(Boolean).length < targets.length && !video.ended) {
-            (video as any).requestVideoFrameCallback(onRvfc);
-          }
+          maybeCapture(meta.mediaTime);
+          // re-arm
+          (video as any).requestVideoFrameCallback(onRvfc);
         };
 
-        const useRVFC = 'requestVideoFrameCallback' in (video as any);
-
-        // Start capturing
-        if (useRVFC) {
+        // attach listeners using stable refs
+        attachedTimeUpdateHandler = onTimeUpdate;
+        video.addEventListener('timeupdate', attachedTimeUpdateHandler);
+        if ('requestVideoFrameCallback' in (video as any)) {
           (video as any).requestVideoFrameCallback(onRvfc);
-        } else {
-          video.addEventListener('timeupdate', onTimeUpdate);
         }
 
-        // Start playback
-        await video.play().catch(() => {/* ignore autoplay errors, we'll capture on timeupdate */});
-
+        // start playback, then start the ONLY timer (post-stabilization)
+        try { 
+          await video.play(); 
+        } catch { 
+          /* ignore autoplay errors */ 
+        }
+        
         // Log capture start details
         scLog({ 
           evt: 'capture_start',
@@ -630,13 +623,11 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           playbackRate: video.playbackRate 
         });
 
-        // NOW start the capture timeout (after seek + stabilization + play)
-        const windowLen = 3.0;
-        const captureTimeout = Math.ceil((windowLen + 2.0) * 1000); // 5s for 3s window
+        if (timeoutId) clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           cleanup();
           reject(new Error('Playback capture timed out'));
-        }, video.duration > 12 ? captureTimeout : 5000);
+        }, duration > 12 ? 6500 : 5000);
 
       } catch (error: any) {
         scLog({ evt: 'capture_error', err: String(error?.message || error) });
