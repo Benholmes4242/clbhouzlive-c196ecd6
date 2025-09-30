@@ -119,6 +119,13 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: var(--sp-24);
+}
+
+@media (min-width: 768px) {
+  .name-wrap {
+    margin-top: 0;
+  }
 }
 
 .name-first, .name-last {
