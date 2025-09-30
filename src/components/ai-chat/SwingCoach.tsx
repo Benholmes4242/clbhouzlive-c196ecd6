@@ -424,26 +424,32 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       video.src = URL.createObjectURL(file);
 
       let isComplete = false;
-      let timeoutId: NodeJS.Timeout;
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+      let rvfcActive = false;
 
+      // Define stable handler references
+      let onTimeUpdate: () => void;
+      let onRvfc: VideoFrameRequestCallback;
+      
       const cleanup = () => {
         if (isComplete) return;
         isComplete = true;
         
         try {
           video.pause();
-        } catch (e) {
+        } catch {
           // Ignore pause errors
         }
         
-        // Remove any event listeners that might still be attached
-        const listeners = ['timeupdate', 'seeked', 'error', 'canplaythrough'];
-        listeners.forEach(event => {
-          video.removeEventListener(event, () => {});
-        });
+        // Remove specific event listeners with stable references
+        if (onTimeUpdate) {
+          video.removeEventListener('timeupdate', onTimeUpdate);
+        }
         
         // Clean up video src
-        URL.revokeObjectURL(video.src);
+        try {
+          URL.revokeObjectURL(video.src);
+        } catch {}
         video.src = '';
         
         if (timeoutId) {
@@ -514,20 +520,6 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           scLog({ evt: 'targets_set', targets });
         }
 
-        // Clear any existing timeout and setup capture timeout
-        if (timeoutId) clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          cleanup();
-          reject(new Error('Playback capture timed out'));
-        }, 6500);
-
-        // Log capture start details
-        scLog({ 
-          evt: 'capture_start',
-          rvfc: !!video.requestVideoFrameCallback, 
-          playbackRate: video.playbackRate 
-        });
-        
         const captured = new Array<boolean>(targets.length).fill(false);
         const frames: string[] = [];
         const capturedTimes: number[] = [];
@@ -549,8 +541,30 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
         const tolerance = video.duration > 12 ? 0.07 : 0.045; // Wider tolerance for long clips
         const maybeCapture = (currentTime: number) => {
+          if (isComplete) return;
+          
+          // Early finish if past last target
+          if (currentTime >= targets[targets.length-1] + 0.2) {
+            if (frames.length >= 4) {
+              const payloadBytes = JSON.stringify(frames).length;
+              scLog({
+                evt: 'capture_done',
+                framesReq: targets.length,
+                framesGot: frames.length,
+                payloadKB: scKb(payloadBytes),
+                mediaTimes: capturedTimes
+              });
+              cleanup();
+              resolve(frames);
+              return;
+            }
+          }
+          
           for (let i = 0; i < targets.length; i++) {
             if (!captured[i] && Math.abs(currentTime - targets[i]) <= tolerance) {
+              // Guard against duplicate captures
+              if (capturedTimes.includes(+currentTime.toFixed(2))) continue;
+              
               ctx.drawImage(video, 0, 0, canvasWidth, canvasHeight);
               frames.push(canvas.toDataURL('image/jpeg', 0.65));
               captured[i] = true;
@@ -581,24 +595,48 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           }
         };
 
-        const useRVFC = 'requestVideoFrameCallback' in (video as any);
-        const onTimeUpdate = () => maybeCapture(video.currentTime);
-        
-        const rvfcLoop = (_: any, metadata: any) => {
+        // Define handlers with stable references
+        onTimeUpdate = () => {
+          if (isComplete) return;
+          maybeCapture(video.currentTime);
+        };
+
+        onRvfc = (_: any, metadata: any) => {
+          if (isComplete) return;
+          rvfcActive = true;
           maybeCapture(metadata.mediaTime);
+          // Re-arm if not complete
           if (!isComplete && captured.filter(Boolean).length < targets.length && !video.ended) {
-            (video as any).requestVideoFrameCallback(rvfcLoop);
+            (video as any).requestVideoFrameCallback(onRvfc);
           }
         };
 
+        const useRVFC = 'requestVideoFrameCallback' in (video as any);
+
         // Start capturing
         if (useRVFC) {
-          (video as any).requestVideoFrameCallback(rvfcLoop);
+          (video as any).requestVideoFrameCallback(onRvfc);
         } else {
           video.addEventListener('timeupdate', onTimeUpdate);
         }
-        
-        await video.play();
+
+        // Start playback
+        await video.play().catch(() => {/* ignore autoplay errors, we'll capture on timeupdate */});
+
+        // Log capture start details
+        scLog({ 
+          evt: 'capture_start',
+          rvfc: !!video.requestVideoFrameCallback, 
+          playbackRate: video.playbackRate 
+        });
+
+        // NOW start the capture timeout (after seek + stabilization + play)
+        const windowLen = 3.0;
+        const captureTimeout = Math.ceil((windowLen + 2.0) * 1000); // 5s for 3s window
+        timeoutId = setTimeout(() => {
+          cleanup();
+          reject(new Error('Playback capture timed out'));
+        }, video.duration > 12 ? captureTimeout : 5000);
 
       } catch (error: any) {
         scLog({ evt: 'capture_error', err: String(error?.message || error) });
