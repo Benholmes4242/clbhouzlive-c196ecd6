@@ -82,7 +82,7 @@
 /* Ultra-small screen optimizations for composer */
 @media (max-width: 360px) {
   .composer-compact {
-    padding: 0.4rem 0.6rem !important;
+    padding: 10px 10px !important;
   }
   
   .composer-compact textarea {
