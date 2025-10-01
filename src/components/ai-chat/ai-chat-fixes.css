@@ -95,7 +95,7 @@
 
 /* Ultra-small screen optimizations for composer */
 @media (max-width: 360px) {
-  .composer-pill {
+  .composer-pill form {
     padding: 6px 8px !important;
   }
   
@@ -116,10 +116,13 @@
     font-size: 12px !important;
   }
   
-  /* Attachment rail on small screens */
-  .attachment-rail img,
-  .attachment-rail > div {
-    height: 3rem !important;
-    width: 3rem !important;
+  /* Attachment tray on small screens - Phase 46 */
+  .attachment-tray img {
+    height: 44px !important;
+    width: 44px !important;
+  }
+  
+  .attachment-tray .file-chip {
+    height: 44px !important;
   }
 }

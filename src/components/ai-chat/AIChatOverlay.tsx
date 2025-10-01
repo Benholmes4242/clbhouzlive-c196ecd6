@@ -1002,27 +1002,79 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     </div>
                   )}
 
-                  {/* Error hint (non-blocking) - Phase 45 */}
-                  {false && ( /* Set to true to show error */
+                  {/* Attachment error (file too large, wrong type) - Phase 46 */}
+                  {false && ( /* Set to true to show attachment error */
                     <div className="mb-2 text-[12px] text-red-600">
-                      Network issue — your message will retry.
+                      "swing.mov" is too large (max 100 MB).
                     </div>
                   )}
 
-                  {/* Main composer pill - Phase 45 "Pro" Polish */}
-                  <div className={cn(
-                    "w-full transition-opacity duration-150",
-                    (isLoading || isProcessing) && "opacity-60 pointer-events-none select-none"
-                  )} aria-disabled={isLoading || isProcessing}>
+                  {/* Attachment preview tray - Phase 46 */}
+                  <div 
+                    className="mb-2 flex flex-wrap gap-2 data-[has-attachments=false]:hidden attachment-tray"
+                    data-has-attachments="false"
+                  >
+                    {/* Example: Image thumb */}
+                    {false && (
+                      <div className="group relative overflow-hidden rounded-xl border border-black/10 bg-white/90 backdrop-blur shadow-sm">
+                        <img className="block h-14 w-14 object-cover" src="https://via.placeholder.com/56" alt="Attachment preview" />
+                        <button 
+                          className="absolute -top-2 -right-2 h-6 w-6 grid place-items-center rounded-full bg-black/70 text-white text-[11px] shadow opacity-0 group-hover:opacity-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40" 
+                          aria-label="Remove"
+                          type="button"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
+                    
+                    {/* Example: File chip */}
+                    {false && (
+                      <div className="file-chip h-14 px-3 flex items-center gap-2 rounded-xl border border-black/10 bg-white/90 backdrop-blur shadow-sm">
+                        <span className="h-8 w-8 grid place-items-center rounded-lg bg-black/5 border border-black/10 text-[16px]">📄</span>
+                        <div className="min-w-0">
+                          <div className="text-[13px] font-medium text-gray-800 truncate max-w-[160px]">Trackman-session.pdf</div>
+                          <div className="text-[11px] text-gray-500">1.2 MB</div>
+                        </div>
+                        <button 
+                          className="ml-2 h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
+                          aria-label="Remove"
+                          type="button"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Attachment limit/count - Phase 46 */}
+                  {false && ( /* Set to true to show limit message */
+                    <div className="mb-2 text-[12px] text-gray-600">
+                      Showing 4 of 7 files • <button className="underline decoration-[#2A9D8F]/50 underline-offset-2 text-[#2A9D8F] hover:decoration-[#2A9D8F] transition focus-visible:outline-none" type="button">view all</button>
+                    </div>
+                  )}
+
+                  {/* Main composer pill - Phase 46 States & Attachments */}
+                  <div 
+                    className={cn(
+                      "composer-pill relative w-full transition-opacity duration-150",
+                      (isLoading || isProcessing) && "opacity-60 pointer-events-none select-none"
+                    )}
+                    data-state={isRecording ? "recording" : (isLoading || isProcessing) ? "sending" : "idle"}
+                    data-has-attachments="false"
+                    aria-disabled={isLoading || isProcessing}
+                  >
                     <form 
                       className={cn(
-                        "composer-pill flex items-end gap-2",
+                        "flex items-end gap-2",
                         "rounded-[28px] bg-white/92 backdrop-blur",
                         "border border-black/10 shadow-sm",
                         "px-3 py-2",
-                        "transition-[box-shadow,transform] duration-150",
+                        "transition-all duration-150",
                         "focus-within:shadow-md focus-within:ring-1 focus-within:ring-[#2A9D8F]/30",
-                        isRecording && "ring-1 ring-[#2A9D8F]/30"
+                        // Recording state - Phase 46
+                        isRecording && "ring-2 ring-red-500/30 shadow-[0_0_0_6px_rgba(239,68,68,0.08)]",
+                        // Sending state handled by parent opacity
                       )}
                       role="group"
                       aria-label="Message composer"
@@ -1069,53 +1121,48 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         />
                       </div>
 
-                      {/* Right action cluster */}
+                      {/* Right action cluster - Phase 46 Mic/Send swap */}
                       <div className="flex items-center gap-1.5 shrink-0">
-                        {/* Mic/Record button with visual state */}
+                        {/* Combined Mic/Send button with visual state swap */}
                         <button
-                          type="button"
-                          aria-label={isRecording ? "Stop recording" : "Record voice note"}
+                          type={isRecording ? "button" : "submit"}
+                          aria-label={isRecording ? "Stop recording" : "Send message"}
+                          disabled={!isRecording && (!inputValue?.trim() || isLoading || isProcessing)}
                           className={cn(
                             "h-9 w-9 grid place-items-center rounded-full shadow transition",
-                            "hover:brightness-110 active:brightness-95",
                             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
                             isRecording 
-                              ? "bg-red-500 text-white" 
-                              : "bg-[#2A9D8F] text-white"
+                              ? "bg-red-500 text-white hover:brightness-110 active:brightness-95" 
+                              : (!inputValue?.trim() || isLoading || isProcessing)
+                                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                                : "bg-[#2A9D8F] text-white hover:brightness-110 active:brightness-95"
                           )}
                           data-recording={isRecording ? "true" : "false"}
-                          onMouseDown={!isProcessing ? startRecording : undefined}
-                          onMouseUp={!isProcessing ? stopRecording : undefined}
-                          onMouseLeave={!isProcessing ? stopRecording : undefined}
-                          onTouchStart={!isProcessing ? startRecording : undefined}
-                          onTouchEnd={!isProcessing ? stopRecording : undefined}
+                          onClick={isRecording ? stopRecording : undefined}
+                          onMouseDown={!isRecording && !isProcessing ? startRecording : undefined}
+                          onMouseUp={!isRecording && !isProcessing ? stopRecording : undefined}
+                          onMouseLeave={!isRecording && !isProcessing ? stopRecording : undefined}
+                          onTouchStart={!isRecording && !isProcessing ? startRecording : undefined}
+                          onTouchEnd={!isRecording && !isProcessing ? stopRecording : undefined}
                         >
-                          {isRecording ? (
-                            <span className="text-[16px]">⏹️</span>
-                          ) : (
-                            <Mic className="h-[18px] w-[18px]" />
-                          )}
-                        </button>
-
-                        {/* Send button */}
-                        <button
-                          type="submit"
-                          aria-label="Send"
-                          disabled={!inputValue?.trim() || isLoading || isProcessing}
-                          className={cn(
-                            "h-9 w-9 grid place-items-center rounded-full shadow transition",
-                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
-                            (!inputValue?.trim() || isLoading || isProcessing)
-                              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                              : "bg-[#2A9D8F] text-white hover:brightness-110 active:brightness-95"
-                          )}
-                        >
-                          {isLoading || isProcessing ? (
+                          {/* Recording state - show stop icon */}
+                          <span className={cn(
+                            "inline",
+                            !isRecording && "hidden"
+                          )}>
+                            ⏹️
+                          </span>
+                          
+                          {/* Sending/processing state - show spinner */}
+                          {!isRecording && (isLoading || isProcessing) && (
                             <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
                               <circle cx="12" cy="12" r="10" className="opacity-25" stroke="currentColor" strokeWidth="4" fill="none"/>
                               <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
                             </svg>
-                          ) : (
+                          )}
+                          
+                          {/* Idle state - show send icon */}
+                          {!isRecording && !isLoading && !isProcessing && (
                             <span className="text-[16px]">➤</span>
                           )}
                         </button>
