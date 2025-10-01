@@ -1138,11 +1138,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                    </div>
                    </TabsContent>
                  </Tabs>
-               </div>
-             </div>
-           </div>
-         </div>
-       </SlideOver>
+                </div>
+              </div>
+            </div>
+        </SlideOver>
 
       {/* EchoProtection Modal */}
       {isProtectionOpen && (
