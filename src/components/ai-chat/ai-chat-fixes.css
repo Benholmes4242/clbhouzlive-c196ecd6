@@ -69,6 +69,18 @@
   animation: floatInUp 0.18s ease-out both;
 }
 
+/* Fade-in-up animation for scroll FAB - Phase 49 */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Subtle pulse animation for new message arrival */
 @keyframes subtlePulse {
   0%, 100% {
