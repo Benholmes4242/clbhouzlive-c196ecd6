@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen, Bot, Paperclip, ArrowUpRight } from 'lucide-react';
+import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen, Bot, Paperclip, ArrowUpRight, Settings } from 'lucide-react';
 import { PiWaveform } from 'react-icons/pi';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -474,35 +475,87 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         >
           {/* Header */}
           <header
-            className="shrink-0 px-4 sm:px-6 flex items-center justify-between"
-            style={{
-              height: '64px',
-              background: 'linear-gradient(135deg, rgba(18,30,54,.96) 0%, rgba(18,88,94,.92) 100%)',
-              borderBottom: '1px solid rgba(255,255,255,.10)',
-              boxShadow: '0 1px 0 rgba(255,255,255,.04) inset'
-            }}
+            className="sticky top-0 z-[1200] h-14 sm:h-16
+                       bg-[linear-gradient(180deg,rgba(255,255,255,0.78),rgba(255,255,255,0.64))]
+                       backdrop-blur-2xl border-b border-black/5"
+            data-echo-topbar
           >
-            <div className="flex items-center gap-3">
-              <PiWaveform 
-                size={32}
-                className="text-white/90 transition-all duration-200 ease-in-out"
-                style={{
-                  animation: `echoWave ${getAvatarState() === 'processing' ? '1s' : getAvatarState() === 'listening' ? '1.5s' : '3s'} ease-in-out infinite`
-                }}
-              />
-              <div>
-                <h2 className="text-[20px] font-semibold tracking-[-0.01em] text-white">Echo</h2>
-                <p className="text-[13px] text-white/80 leading-4">I'm your personal caddy</p>
+            <div className="mx-auto max-w-[1200px] h-full px-3 sm:px-5">
+              <div className="grid h-full grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3">
+                {/* Left cluster */}
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <button
+                    type="button"
+                    aria-label="Close Echo"
+                    onClick={handleClose}
+                    className="h-9 w-9 grid place-items-center rounded-full
+                               bg-white/90 backdrop-blur border border-black/5 shadow-sm
+                               hover:bg-white transition focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40"
+                  >
+                    <X className="h-5 w-5 text-gray-800" />
+                  </button>
+                </div>
+
+                {/* Center cluster */}
+                <div className="min-w-0 text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <PiWaveform 
+                      className="h-5 w-5 text-[#2A9D8F]" 
+                      aria-hidden="true"
+                      style={{
+                        animation: `echoWave ${getAvatarState() === 'processing' ? '1s' : getAvatarState() === 'listening' ? '1.5s' : '3s'} ease-in-out infinite`
+                      }}
+                    />
+                    <h1 className="truncate text-[17px] sm:text-[18px] font-semibold text-gray-900">
+                      Echo
+                    </h1>
+                    {isProcessing && (
+                      <span className="inline-flex items-center gap-1 rounded-full
+                                     bg-[#2A9D8F]/10 text-[#2A9D8F] border border-[#2A9D8F]/20
+                                     px-2 py-0.5 text-[12px] font-medium">
+                        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#2A9D8F]" />
+                        Live
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-0.5 text-[12px] text-gray-600 leading-none">
+                    {isLoading ? (
+                      <span className="truncate">Echo is typing…</span>
+                    ) : (
+                      <span className="opacity-70">Say anything, I'm listening</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right cluster */}
+                <div className="flex items-center justify-end gap-1.5 sm:gap-2">
+                  {/* Tab switcher (desktop only) */}
+                  <div className="hidden sm:flex items-center rounded-full
+                                 bg-white/90 backdrop-blur border border-black/5 shadow-sm p-0.5">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('chat')}
+                      className={cn(
+                        "h-8 px-3 rounded-full text-[13px] font-medium transition",
+                        activeTab === 'chat' ? "bg-white shadow text-gray-900" : "text-gray-700 hover:bg-white/60"
+                      )}
+                    >
+                      Chat
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('swing')}
+                      className={cn(
+                        "h-8 px-3 rounded-full text-[13px] font-medium transition",
+                        activeTab === 'swing' ? "bg-white shadow text-gray-900" : "text-gray-700 hover:bg-white/60"
+                      )}
+                    >
+                      Swing Coach
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-
-            <button
-              onClick={handleClose}
-              className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/10 active:bg-white/15 transition-colors"
-              aria-label="Close Echo"
-            >
-              <X className="h-4 w-4 text-white" />
-            </button>
           </header>
 
           {/* Segmented Tabs */}

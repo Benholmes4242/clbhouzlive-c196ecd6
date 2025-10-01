@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3, ChevronUp } from 'lucide-react';
+import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3, ChevronUp, Settings } from 'lucide-react';
 import { PiWaveform } from 'react-icons/pi';
+import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import Hls from 'hls.js';
 import EchoAvatar from './EchoAvatar';
@@ -693,69 +694,116 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           >
             {/* Header */}
             <header
-              className="shrink-0 px-4 sm:px-6 flex items-center justify-between"
-              style={{
-                height: '64px',
-                background: 'linear-gradient(135deg, rgba(18,30,54,.96) 0%, rgba(18,88,94,.92) 100%)',
-                borderBottom: '1px solid rgba(255,255,255,.10)',
-                boxShadow: '0 1px 0 rgba(255,255,255,.04) inset'
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <PiWaveform 
-                  size={32}
-                  className="text-white/90 transition-all duration-200 ease-in-out"
-                />
-                <div>
-                  <h2 className="text-[20px] font-semibold tracking-[-0.01em] text-white">Echo History</h2>
-                  <p className="text-[13px] text-white/80 leading-4">Find any past chat or swing</p>
-                </div>
-              </div>
-              
-              <button
-                onClick={onClose}
-                className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/10 active:bg-white/15 transition-colors"
-                aria-label="Close Echo History"
-              >
-                <X className="h-4 w-4 text-white" />
-              </button>
-            </header>
-
-            {/* Top bar container (sticky) */}
-            <div
-              className="sticky top-[var(--echo-top,56px)] z-[2] px-4 sm:px-6 py-2 bg-white/65 backdrop-blur-md border-b border-white/30"
+              className="sticky top-0 z-[1200] h-14 sm:h-16
+                         bg-[linear-gradient(180deg,rgba(255,255,255,0.78),rgba(255,255,255,0.64))]
+                         backdrop-blur-2xl border-b border-black/5"
               data-echo-topbar
             >
-              {/* Search */}
-              <div className="relative mb-3">
-                <Input
-                  placeholder="Search conversations and analyses..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-4 pr-4 py-3 bg-white/85 backdrop-blur-sm border border-white/50 shadow-sm rounded-full text-sm placeholder:text-slate-500/90 focus:ring-2 focus:ring-primary/20 focus:border-primary/20"
-                />
-              </div>
+              <div className="mx-auto max-w-[1200px] h-full px-3 sm:px-5">
+                <div className="grid h-full grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3">
+                  {/* Left cluster */}
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <button
+                      type="button"
+                      aria-label="Close History"
+                      onClick={onClose}
+                      className="h-9 w-9 grid place-items-center rounded-full
+                                 bg-white/90 backdrop-blur border border-black/5 shadow-sm
+                                 hover:bg-white transition focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40"
+                    >
+                      <X className="h-5 w-5 text-gray-800" />
+                    </button>
+                  </div>
 
-              {/* Tabs rail */}
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-                <div className="w-full max-w-[720px] mx-auto" data-echo-tabs-rail>
-                  <TabsList className="w-full h-11 rounded-full bg-white/80 backdrop-blur-md border border-black/5 shadow-sm grid grid-cols-2 gap-1 p-1">
-                    <TabsTrigger 
-                      value="chat" 
-                      className="rounded-full px-4 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5 data-[state=inactive]:text-gray-700 transition-all"
-                    >
-                      Chat {filteredConversations.length > 0 && <span className="ml-1 text-gray-500">({filteredConversations.length})</span>}
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="swing" 
-                      className="rounded-full px-4 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5 data-[state=inactive]:text-gray-700 transition-all"
-                    >
-                      Swing Coach {filteredSwingAnalyses.length > 0 && <span className="ml-1 text-gray-500">({filteredSwingAnalyses.length})</span>}
-                    </TabsTrigger>
-                  </TabsList>
+                  {/* Center cluster */}
+                  <div className="min-w-0 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <PiWaveform className="h-5 w-5 text-[#2A9D8F]" aria-hidden="true" />
+                      <h1 className="truncate text-[17px] sm:text-[18px] font-semibold text-gray-900">
+                        Echo History
+                      </h1>
+                    </div>
+                    <div className="mt-0.5 text-[12px] text-gray-600 leading-none">
+                      <span className="truncate">Browse or search your conversations</span>
+                    </div>
+                  </div>
+
+                  {/* Right cluster */}
+                  <div className="flex items-center justify-end gap-1.5 sm:gap-2">
+                    {/* New conversation button */}
+                    {onNewConversation && (
+                      <button
+                        type="button"
+                        aria-label="New conversation"
+                        onClick={onNewConversation}
+                        className="h-9 w-9 grid place-items-center rounded-full
+                                   bg-white/90 backdrop-blur border border-black/5 shadow-sm
+                                   hover:bg-white transition focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40"
+                      >
+                        <Plus className="h-5 w-5 text-gray-800" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </header>
+
+            {/* History utilities (sticky under header) */}
+            <div
+              className="sticky top-14 sm:top-16 z-[1199]
+                         bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(255,255,255,0.5))]
+                         backdrop-blur-2xl border-b border-black/5"
+            >
+              <div className="mx-auto max-w-[1200px] px-3 sm:px-5 py-2">
+                <div className="flex items-center gap-2 mb-3">
+                  {/* Search */}
+                  <div className="flex-1 min-w-0 h-10 rounded-full
+                                  bg-white/92 backdrop-blur border border-black/8
+                                  px-3.5 flex items-center gap-2">
+                    <Search className="h-4.5 w-4.5 text-gray-500 shrink-0" />
+                    <input
+                      type="search"
+                      placeholder="Search history"
+                      className="w-full bg-transparent text-[14px] text-gray-900 placeholder:text-gray-500 outline-none"
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      value={searchQuery}
+                    />
+                  </div>
                 </div>
 
-                <div className="flex-1 flex flex-col overflow-hidden bg-transparent">
+                {/* Tabs rail - visual only, actual Tabs below */}
+                <div className="w-full max-w-[720px] mx-auto" data-echo-tabs-rail>
+                  <div className="w-full h-11 rounded-full bg-white/80 backdrop-blur-md border border-black/5 shadow-sm grid grid-cols-2 gap-1 p-1">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('chat')}
+                      className={cn(
+                        "rounded-full px-4 text-sm font-medium transition-all",
+                        activeTab === 'chat' 
+                          ? "bg-white text-gray-900 shadow ring-1 ring-black/5" 
+                          : "text-gray-700 hover:bg-white/60"
+                      )}
+                    >
+                      Chat {filteredConversations.length > 0 && <span className="ml-1 text-gray-500">({filteredConversations.length})</span>}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('swing')}
+                      className={cn(
+                        "rounded-full px-4 text-sm font-medium transition-all",
+                        activeTab === 'swing' 
+                          ? "bg-white text-gray-900 shadow ring-1 ring-black/5" 
+                          : "text-gray-700 hover:bg-white/60"
+                      )}
+                    >
+                      Swing Coach {filteredSwingAnalyses.length > 0 && <span className="ml-1 text-gray-500">({filteredSwingAnalyses.length})</span>}
+                    </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-1 flex flex-col overflow-hidden bg-transparent">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
                   {/* Chat Tab */}
                   <TabsContent value="chat" className="m-0 flex-1" style={{ minHeight: 0 }} role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
                     <div 
@@ -1104,15 +1152,15 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                         })()}
                       </>
                     )}
-                  </div>
-                  </div>
-                  </TabsContent>
-                </div>
-              </Tabs>
-            </div>
-          </div>
-        </div>
-      </SlideOver>
+                   </div>
+                   </div>
+                   </TabsContent>
+                 </Tabs>
+               </div>
+             </div>
+           </div>
+         </div>
+       </SlideOver>
 
       {/* EchoProtection Modal */}
       {isProtectionOpen && (
