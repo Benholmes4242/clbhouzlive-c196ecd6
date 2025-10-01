@@ -1207,43 +1207,36 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
       </div>
       </SlideOver>
       
-        {/* Message action overlay (mobile long-press) - Phase 44 */}
+        {/* Message action long-press sheet (mobile) - Phase 47 */}
         <div 
-          id="msg-action-overlay"
-          className="hidden fixed inset-0 z-[60] bg-black/20 backdrop-blur data-[open=true]:block"
+          className="fixed inset-x-0 bottom-0 z-[60] px-3 pb-[max(12px,env(safe-area-inset-bottom))] data-[open=false]:hidden"
           data-open="false"
         >
-          <div className="absolute inset-x-0 bottom-[max(env(safe-area-inset-bottom),24px)] mx-auto w-full max-w-[720px] px-3 sm:px-4">
-            <div className="rounded-2xl bg-white/95 backdrop-blur border border-black/10 shadow-lg p-3 flex items-center justify-center gap-2">
-              <button 
-                className="h-10 w-10 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
-                aria-label="Copy"
-                type="button"
-              >
-                ⧉
-              </button>
-              <button 
-                className="h-10 w-10 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
-                aria-label="Quote"
-                type="button"
-              >
-                ❝
-              </button>
-              <button 
-                className="h-10 w-10 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
-                aria-label="Retry"
-                type="button"
-              >
-                ↻
-              </button>
-              <button 
-                className="h-10 w-10 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
-                aria-label="Delete for me"
-                type="button"
-              >
-                ✕
-              </button>
-            </div>
+          <div className="mx-auto w-full max-w-[720px] rounded-2xl bg-white/95 backdrop-blur border border-black/10 shadow-lg p-2 grid grid-cols-4 gap-2">
+            <button 
+              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              type="button"
+            >
+              Copy
+            </button>
+            <button 
+              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              type="button"
+            >
+              Retry
+            </button>
+            <button 
+              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              type="button"
+            >
+              Share
+            </button>
+            <button 
+              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              type="button"
+            >
+              Save
+            </button>
           </div>
         </div>
 

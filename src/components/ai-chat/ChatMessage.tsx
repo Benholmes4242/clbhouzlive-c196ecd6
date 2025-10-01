@@ -90,7 +90,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           <div className="hidden sm:block w-7 shrink-0" />
         )}
         
-        {/* Message content - actionable wrapper with Phase 44 toolbelt */}
+        {/* Message content - actionable wrapper with Phase 47 actions */}
         <div 
           className={cn(
             "group/message relative max-w-[78%]",
@@ -98,49 +98,67 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           )}
           data-message-id={message.id}
           data-author={isUser ? "user" : "echo"}
+          data-has-menu="true"
           data-state="ok"
         >
-          {/* Micro-toolbelt (Phase 44) - Desktop hover */}
+          {/* Subtle handle affordance (hover hint) - Phase 47 */}
+          <div 
+            className={cn(
+              "absolute -mt-2 top-0 z-[5]",
+              "opacity-0 group-hover/message:opacity-100 transition-opacity duration-150",
+              "pointer-events-none select-none",
+              "hidden sm:block",
+              isUser ? "right-0" : "left-0"
+            )}
+          >
+            <div className="h-6 px-2 rounded-full bg-black/5 border border-black/10 backdrop-blur text-[11px] text-gray-600 shadow-sm flex items-center justify-center">
+              •••
+            </div>
+          </div>
+
+          {/* Actions pod (Phase 47) - Desktop hover/focus */}
           <div
             className={cn(
-              "pointer-events-none absolute -top-3",
-              "opacity-0 translate-y-[-4px]",
+              "actions-pod pointer-events-none absolute z-10",
+              "opacity-0 -translate-y-2",
               "group-hover/message:opacity-100 group-hover/message:translate-y-0",
+              "focus-within:opacity-100 focus-within:translate-y-0",
               "transition-all duration-150",
               "hidden sm:block",
               isUser 
-                ? "right-0 translate-x-1" 
-                : "left-0 -translate-x-1"
+                ? "right-0 -top-3" 
+                : "left-0 -top-3"
             )}
+            data-open="false"
           >
-            <div className="pointer-events-auto flex items-center gap-1.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm px-1.5 py-1">
+            <div className="pointer-events-auto h-9 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm flex items-center gap-1 px-1">
               <button 
-                className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 rounded-full"
                 aria-label="Copy"
                 type="button"
               >
-                ⧉
+                📋
               </button>
               <button 
-                className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                aria-label="Quote"
-                type="button"
-              >
-                ❝
-              </button>
-              <button 
-                className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 rounded-full"
                 aria-label="Retry"
                 type="button"
               >
-                ↻
+                ⟲
               </button>
               <button 
-                className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                aria-label="Delete for me"
+                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 rounded-full"
+                aria-label="Share"
                 type="button"
               >
-                ✕
+                ↗
+              </button>
+              <button 
+                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 rounded-full"
+                aria-label="Save"
+                type="button"
+              >
+                ★
               </button>
             </div>
           </div>
