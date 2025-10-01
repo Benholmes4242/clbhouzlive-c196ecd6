@@ -111,6 +111,16 @@
   display: none;
 }
 
+/* Phase 58: Composer density for very small screens */
+@media (max-width: 360px) {
+  .echo-composer.rounded-\[28px\] { 
+    padding: 8px 10px !important;
+  }
+  .echo-composer textarea { 
+    font-size: 14px !important;
+  }
+}
+
 /* Phase 53: Composer density for very small screens */
 @media (max-width: 360px) {
   .chat-composer {

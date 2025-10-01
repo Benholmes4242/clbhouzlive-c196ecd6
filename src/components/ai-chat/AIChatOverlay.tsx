@@ -753,9 +753,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </TabsContent>
           </Tabs>
         
-          {/* Composer footer - Phase 53: Feel & Affordances */}
+          {/* Composer footer - Phase 58: Premium Affordances */}
           <footer 
-            className="sticky bottom-0 z-[1] bg-gradient-to-t from-white/85 to-white/60 backdrop-blur-xl border-t border-white/10"
+            className="sticky bottom-0 z-[2] bg-gradient-to-t from-white/85 to-white/60 backdrop-blur-xl border-t border-white/10 px-3 sm:px-4 pt-2 pb-[max(env(safe-area-inset-bottom),12px)]"
             role="region"
             aria-label="Message composer"
             data-echo-composer
@@ -768,80 +768,63 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             )}
             
-            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-3 pb-[max(env(safe-area-inset-bottom),12px)]">
+            <div className="mx-auto w-full max-w-[720px]">
               {activeTab === 'chat' && (
                 <div>
-                  {/* Attachments tray - Phase 51 (peek + expand) */}
-                  <div className="sticky bottom-[64px] sm:bottom-[72px] z-[2] -mx-3 sm:-mx-4 mb-2">
-                    <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4">
-                      <div
-                        className={cn(
-                          "overflow-hidden rounded-2xl bg-white/90 backdrop-blur border border-black/10 shadow-lg",
-                          "transition-all duration-200",
-                          "data-[open=false]:max-h-0 data-[open=false]:opacity-0 data-[open=false]:translate-y-2",
-                          "data-[open=true]:max-h-[220px] data-[open=true]:opacity-100 data-[open=true]:translate-y-0"
-                        )}
-                        data-open="false"
-                        id="attachmentsTray"
+                  {/* Attachments tray - Phase 58 */}
+                  <div 
+                    className={cn(
+                      "mb-2 transition-[height,opacity,transform] duration-200",
+                      "data-[open=false]:opacity-0 data-[open=false]:-translate-y-1 data-[open=false]:h-0 data-[open=false]:overflow-hidden",
+                      "data-[open=true]:opacity-100 data-[open=true]:translate-y-0 data-[open=true]:h-auto"
+                    )}
+                    data-open="false"
+                    id="attachmentsTray"
+                  >
+                    <div className="rounded-2xl border border-black/10 bg-white/90 backdrop-blur px-3 py-2.5 grid grid-cols-3 gap-2">
+                      {/* Photo tile */}
+                      <button 
+                        className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        aria-label="Photo"
+                        type="button"
                       >
-                        <div className="p-3 sm:p-3.5 grid grid-cols-4 gap-2 sm:gap-3">
-                          {/* Photo tile */}
-                          <button 
-                            className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                            aria-label="Photo"
-                            type="button"
-                          >
-                            <Camera className="h-5 w-5 text-gray-700" />
-                            <span className="text-[11px] text-gray-600">Photo</span>
-                          </button>
-                          
-                          {/* Video tile */}
-                          <button 
-                            className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                            aria-label="Video"
-                            type="button"
-                          >
-                            <svg className="h-5 w-5 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
-                              <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
-                            </svg>
-                            <span className="text-[11px] text-gray-600">Video</span>
-                          </button>
-                          
-                          {/* File tile */}
-                          <button 
-                            className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                            aria-label="File"
-                            type="button"
-                          >
-                            <Paperclip className="h-5 w-5 text-gray-700" />
-                            <span className="text-[11px] text-gray-600">File</span>
-                          </button>
-                          
-                          {/* Link tile */}
-                          <button 
-                            className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                            aria-label="Link"
-                            type="button"
-                          >
-                            <svg className="h-5 w-5 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd" />
-                            </svg>
-                            <span className="text-[11px] text-gray-600">Link</span>
-                          </button>
-                        </div>
-                      </div>
+                        <Camera className="h-5 w-5 text-gray-700" />
+                        <span className="text-[11px] text-gray-600">Photo</span>
+                      </button>
+                      
+                      {/* File tile */}
+                      <button 
+                        className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        aria-label="File"
+                        type="button"
+                      >
+                        <Paperclip className="h-5 w-5 text-gray-700" />
+                        <span className="text-[11px] text-gray-600">File</span>
+                      </button>
+                      
+                      {/* Link tile */}
+                      <button 
+                        className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        aria-label="Link"
+                        type="button"
+                      >
+                        <svg className="h-5 w-5 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-[11px] text-gray-600">Link</span>
+                      </button>
                     </div>
                   </div>
 
-                  {/* Main composer pill - Phase 53: Feel & Affordances */}
-                  <div className="chat-composer rounded-[28px] bg-white/92 backdrop-blur border border-black/10 shadow-sm px-3 py-2 flex items-center gap-2 transition-[box-shadow,transform,background] duration-200 focus-within:shadow-[0_10px_30px_rgba(0,0,0,0.08)] focus-within:bg-white">
+                  {/* Main composer pill - Phase 58 */}
+                  <div className="echo-composer relative flex items-center gap-2 rounded-[28px] border border-black/10 bg-white/92 backdrop-blur shadow-sm px-3.5 py-2.5">
                     {/* Left: attach toggle */}
                     <button
                       type="button"
                       aria-label="Attach"
-                      className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                      className="h-9 w-9 grid place-items-center rounded-full text-gray-600 hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
                     >
-                      <Paperclip className="h-[18px] w-[18px] text-gray-600" />
+                      <Paperclip className="h-[18px] w-[18px]" />
                     </button>
 
                     {/* Middle: input */}
@@ -861,18 +844,39 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       autoCorrect="on"
                       autoCapitalize="sentences"
                       rows={1}
-                      className="flex-1 bg-transparent outline-none resize-none text-[15px] leading-[1.5] text-gray-900 placeholder:text-gray-500/80 min-h-[40px] max-h-[40px] sm:min-h-[44px] sm:max-h-[44px]"
+                      className="flex-1 resize-none bg-transparent outline-none text-[15px] leading-[1.45] text-gray-900 placeholder:text-gray-500 max-h-[34vh] min-h-[22px] py-1"
                     />
 
                     {/* Right: mic/send combo */}
-                    <div className="flex items-center gap-1">
+                    {inputValue?.trim() ? (
                       <button
                         type="button"
-                        aria-label="Voice"
+                        onClick={() => sendMessage(inputValue)}
+                        aria-label="Send"
+                        disabled={isLoading || isProcessing}
                         className={cn(
-                          "h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition",
+                          "h-9 min-w-[44px] px-3 rounded-full bg-[#2A9D8F] text-white shadow hover:shadow-md active:shadow-sm transition",
                           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
-                          isRecording && "bg-red-500/10 text-red-600"
+                          "disabled:opacity-50 disabled:cursor-not-allowed"
+                        )}
+                      >
+                        {isLoading || isProcessing ? (
+                          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" className="opacity-25" stroke="currentColor" strokeWidth="4" fill="none"/>
+                            <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
+                          </svg>
+                        ) : (
+                          'Send'
+                        )}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        aria-label="Hold to talk"
+                        className={cn(
+                          "h-9 w-9 grid place-items-center rounded-full bg-white text-[#2A9D8F] border border-[#2A9D8F]/30 shadow hover:shadow-md active:shadow-sm transition",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+                          isRecording && "bg-red-500/10 text-red-600 border-red-600/30"
                         )}
                         onMouseDown={!isProcessing ? startRecording : undefined}
                         onMouseUp={!isProcessing ? stopRecording : undefined}
@@ -882,33 +886,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       >
                         <Mic className="h-[18px] w-[18px]" />
                       </button>
-                      
-                      <button
-                        type="button"
-                        onClick={() => sendMessage(inputValue)}
-                        aria-label="Send"
-                        disabled={!inputValue?.trim() || isLoading || isProcessing}
-                        aria-disabled={!inputValue?.trim() || isLoading || isProcessing}
-                        className={cn(
-                          "h-9 min-w-[44px] rounded-full px-4 font-medium shadow transition",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
-                          (!inputValue?.trim() || isLoading || isProcessing)
-                            ? "bg-gray-300 text-gray-500 cursor-not-allowed opacity-40"
-                            : "bg-[#2A9D8F] text-white hover:shadow-md active:scale-[0.98]"
-                        )}
-                      >
-                        {isLoading || isProcessing ? (
-                          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10" className="opacity-25" stroke="currentColor" strokeWidth="4" fill="none"/>
-                            <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
-                          </svg>
-                        ) : (
-                          <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                          </svg>
-                        )}
-                      </button>
-                    </div>
+                    )}
+                    
+                    {/* Error / disabled visual lock */}
+                    {(isLoading || isProcessing) && (
+                      <div 
+                        className="pointer-events-none absolute inset-0 rounded-[28px] ring-1 ring-black/5 bg-white/40 backdrop-blur-[1px]"
+                        aria-hidden="true"
+                      />
+                    )}
                   </div>
 
                   {/* Recent history peek */}
