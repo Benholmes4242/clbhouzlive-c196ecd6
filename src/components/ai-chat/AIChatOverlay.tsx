@@ -749,9 +749,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </TabsContent>
           </Tabs>
         
-          {/* Composer footer - Phase 58: Premium Affordances */}
+          {/* Composer footer - Phase 60: Cinematic Glass */}
           <footer 
-            className="sticky bottom-0 z-[2] bg-gradient-to-t from-white/85 to-white/60 backdrop-blur-xl border-t border-white/10 px-3 sm:px-4 pt-2 pb-[max(env(safe-area-inset-bottom),12px)]"
+            className="sticky bottom-0 z-20 bg-gradient-to-t from-white/80 to-white/50 backdrop-blur-xl border-t border-white/20 pb-[max(env(safe-area-inset-bottom),12px)] px-3 sm:px-4 pt-3"
             role="region"
             aria-label="Message composer"
             data-echo-composer
@@ -812,77 +812,102 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     </div>
                   </div>
 
-                  {/* Main composer pill - Phase 58 */}
-                  <div className="echo-composer relative flex items-center gap-2 rounded-[28px] border border-black/10 bg-white/92 backdrop-blur shadow-sm px-3.5 py-2.5">
-                    {/* Left: attach toggle */}
-                    <button
-                      type="button"
-                      aria-label="Attach"
-                      className="h-9 w-9 grid place-items-center rounded-full text-gray-600 hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                    >
-                      <Paperclip className="h-[18px] w-[18px]" />
-                    </button>
+                  {/* Main composer pill - Phase 60: Cinematic Glass Grid */}
+                  <div className="composer-pill group rounded-[28px] bg-white/92 backdrop-blur border border-black/10 shadow-md px-3.5 py-2.5 sm:px-4 sm:py-3 grid grid-cols-[auto,1fr,auto] items-center gap-2">
+                    {/* Left tools */}
+                    <div className="flex items-center gap-1.5">
+                      {isRecording ? (
+                        <div className="h-7 px-2.5 rounded-full bg-[#2A9D8F]/10 border border-[#2A9D8F]/25 text-[#2A9D8F] text-[12px] inline-flex items-center gap-1.5">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#2A9D8F] animate-pulse"></span>
+                          Recording…
+                        </div>
+                      ) : isProcessing ? (
+                        <div className="h-7 px-2.5 rounded-full bg-black/5 border border-black/10 text-[12px] text-gray-700 inline-flex items-center gap-1.5">
+                          <span className="h-3 w-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></span>
+                          Processing…
+                        </div>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            aria-label="Attach"
+                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                          >
+                            <Paperclip className="h-[18px] w-[18px] text-gray-600" />
+                          </button>
+                          <button
+                            type="button"
+                            aria-label="Voice"
+                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                            onMouseDown={!isProcessing ? startRecording : undefined}
+                            onMouseUp={!isProcessing ? stopRecording : undefined}
+                            onMouseLeave={!isProcessing ? stopRecording : undefined}
+                            onTouchStart={!isProcessing ? startRecording : undefined}
+                            onTouchEnd={!isProcessing ? stopRecording : undefined}
+                          >
+                            <Mic className="h-[18px] w-[18px] text-gray-600" />
+                          </button>
+                        </>
+                      )}
+                    </div>
 
-                    {/* Middle: input */}
-                    <textarea
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      placeholder="Message Echo…"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          sendMessage(inputValue);
-                        }
-                      }}
-                      disabled={isLoading || isRecording || isProcessing}
-                      aria-label="Message input"
-                      autoComplete="off"
-                      autoCorrect="on"
-                      autoCapitalize="sentences"
-                      rows={1}
-                      className="flex-1 resize-none bg-transparent outline-none text-[15px] leading-[1.45] text-gray-900 placeholder:text-gray-500 max-h-[34vh] min-h-[22px] py-1"
-                    />
+                    {/* Text input container */}
+                    <div className="min-w-0">
+                      <textarea
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        placeholder="Message Echo…"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            sendMessage(inputValue);
+                          }
+                        }}
+                        disabled={isLoading || isRecording || isProcessing}
+                        aria-label="Message input"
+                        autoComplete="off"
+                        autoCorrect="on"
+                        autoCapitalize="sentences"
+                        rows={1}
+                        className="w-full bg-transparent outline-none text-[15px] sm:text-[16px] leading-[1.4] placeholder:text-gray-500 resize-none focus-visible:outline-none"
+                      />
+                      
+                      {/* Helper row */}
+                      <div className="mt-1 flex items-center justify-between">
+                        <div className="text-[11px] text-gray-500/90">
+                          Shift + Enter = newline
+                        </div>
+                        <div className="text-[11px] text-gray-500/90 select-none">
+                          ~ concise answers
+                        </div>
+                      </div>
+                    </div>
 
-                    {/* Right: mic/send combo */}
-                    {inputValue?.trim() ? (
-                      <button
-                        type="button"
-                        onClick={() => sendMessage(inputValue)}
-                        aria-label="Send"
-                        disabled={isLoading || isProcessing}
-                        className={cn(
-                          "h-9 min-w-[44px] px-3 rounded-full bg-[#2A9D8F] text-white shadow hover:shadow-md active:shadow-sm transition",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
-                          "disabled:opacity-50 disabled:cursor-not-allowed"
-                        )}
-                      >
-                        {isLoading || isProcessing ? (
-                          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10" className="opacity-25" stroke="currentColor" strokeWidth="4" fill="none"/>
-                            <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
-                          </svg>
-                        ) : (
-                          'Send'
-                        )}
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        aria-label="Hold to talk"
-                        className={cn(
-                          "h-9 w-9 grid place-items-center rounded-full bg-white text-[#2A9D8F] border border-[#2A9D8F]/30 shadow hover:shadow-md active:shadow-sm transition",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
-                          isRecording && "bg-red-500/10 text-red-600 border-red-600/30"
-                        )}
-                        onMouseDown={!isProcessing ? startRecording : undefined}
-                        onMouseUp={!isProcessing ? stopRecording : undefined}
-                        onMouseLeave={!isProcessing ? stopRecording : undefined}
-                        onTouchStart={!isProcessing ? startRecording : undefined}
-                        onTouchEnd={!isProcessing ? stopRecording : undefined}
-                      >
-                        <Mic className="h-[18px] w-[18px]" />
-                      </button>
-                    )}
+                    {/* Send button */}
+                    <div className="flex items-center">
+                      {inputValue?.trim() ? (
+                        <button
+                          type="button"
+                          onClick={() => sendMessage(inputValue)}
+                          aria-label="Send"
+                          disabled={isLoading || isProcessing}
+                          className={cn(
+                            "h-10 px-4 rounded-full bg-[#2A9D8F] text-white shadow hover:shadow-md hover:brightness-[1.03] active:brightness-[0.97] transition",
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+                            "disabled:opacity-60 disabled:cursor-not-allowed"
+                          )}
+                        >
+                          {isLoading || isProcessing ? (
+                            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                              <circle cx="12" cy="12" r="10" className="opacity-25" stroke="currentColor" strokeWidth="4" fill="none"/>
+                              <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
+                            </svg>
+                          ) : (
+                            'Send'
+                          )}
+                        </button>
+                      ) : null}
+                    </div>
                     
                     {/* Error / disabled visual lock */}
                     {(isLoading || isProcessing) && (
