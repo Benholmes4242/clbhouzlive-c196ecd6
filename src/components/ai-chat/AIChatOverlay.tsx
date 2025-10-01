@@ -674,7 +674,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         
           {/* Composer footer */}
           <footer 
-            className="border-t border-black/10 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/70"
+            className="border-t border-white/10 bg-gradient-to-b from-white/80 to-white/95 backdrop-blur-xl"
             role="region"
             aria-label="Message composer"
             data-echo-composer
@@ -686,14 +686,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             )}
             
-            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-3">
+            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-3 pb-[max(env(safe-area-inset-bottom),12px)]">
               {activeTab === 'chat' && (
                 <div>
                   {/* Main composer pill */}
                   <div 
                     className={cn(
-                      "flex items-end gap-2 rounded-[28px]",
-                      "bg-white/92 backdrop-blur shadow-md border border-black/10",
+                      "composer-pill group flex items-end gap-2 rounded-[28px]",
+                      "bg-white/92 backdrop-blur shadow-[0_6px_24px_rgba(0,0,0,0.08)] border border-black/10",
                       "px-3 py-2",
                       "focus-within:ring-2 focus-within:ring-[#2A9D8F]/30",
                       "transition",
@@ -709,7 +709,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       className="
                         shrink-0 h-9 w-9 grid place-items-center rounded-full
                         text-gray-600 hover:bg-black/5 active:bg-black/10
-                        transition
+                        transition hover:-translate-y-[1px]
                         disabled:opacity-50 disabled:cursor-not-allowed
                       "
                       disabled={isLoading || isRecording || isProcessing}
@@ -722,7 +722,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       <Textarea
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
-                        placeholder="Message Echo…"
+                        placeholder="Ask Echo…"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
@@ -766,7 +766,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                             type="button"
                             aria-label="Voice"
                             className={cn(
-                              "h-9 w-9 grid place-items-center rounded-full transition",
+                              "h-9 w-9 grid place-items-center rounded-full transition hover:-translate-y-[1px]",
                               isRecording
                                 ? "text-red-600 bg-red-50"
                                 : "text-gray-600 hover:bg-black/5 active:bg-black/10"
@@ -788,13 +788,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         aria-label="Send message"
                         disabled={!inputValue?.trim() || isLoading || isProcessing}
                         className={cn(
-                          "shrink-0 h-9 px-3 rounded-full",
+                          "shrink-0 h-9 min-w-[40px] px-3 rounded-full",
                           "text-[14px] font-medium",
                           "transition shadow",
                           "focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/30",
                           (!inputValue?.trim() || isLoading || isProcessing)
-                            ? "bg-gray-200 text-gray-500 cursor-not-allowed opacity-50"
-                            : "bg-[#2A9D8F] text-white hover:bg-[#268b81] disabled:cursor-not-allowed"
+                            ? "bg-gray-200 text-gray-500 cursor-not-allowed opacity-40"
+                            : "bg-[#2A9D8F] text-white hover:brightness-[1.05] active:brightness-[0.95] disabled:cursor-not-allowed"
                         )}
                         onClick={() => sendMessage(inputValue)}
                       >
@@ -812,7 +812,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
                   {/* Recent history peek */}
                   <button
-                    className="mt-3 w-full rounded-full bg-white/40 backdrop-blur border border-black/5 shadow-sm flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-white/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                    className="mt-3 w-full rounded-full bg-white/80 backdrop-blur border border-black/10 shadow-sm flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
                     onClick={() => setShowHistory(true)}
                     aria-label="Open recent history"
                   >
@@ -822,11 +822,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     </span>
                     <svg className="h-3.5 w-3.5" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
                   </button>
+                  
+                  {/* Shy helper text */}
+                  <div className="mt-2 text-center text-[11px] text-gray-500 select-none">
+                    Echo helps with chat and swing analysis. No data is shared publicly.
+                  </div>
                 </div>
               )}
             </div>
-            {/* Safe area padding for iOS */}
-            <div className="pb-[max(env(safe-area-inset-bottom),0px)]"></div>
           </footer>
         </div>
       </div>

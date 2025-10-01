@@ -52,3 +52,15 @@
 .aiChatHistory__search .searchIcon--briefcase {
   display: none !important;
 }
+
+/* Ultra-small screen optimizations for composer */
+@media (max-width: 360px) {
+  .composer-pill {
+    padding: 6px 8px !important;
+  }
+  
+  .composer-pill input,
+  .composer-pill textarea {
+    font-size: 14px !important;
+  }
+}
