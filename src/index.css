@@ -24,12 +24,17 @@ html, body {
   background: hsl(var(--background)); /* Ensure background extends behind status bar */
 }
 
-/* Enhanced safe-area variables for iOS edge-to-edge */
+/* Enhanced safe area inset support */
 :root {
   --safe-top: 0px; 
   --safe-bottom: 0px; 
   --safe-left: 0px; 
   --safe-right: 0px;
+  
+  /* Echo modal design tokens */
+  --echo-header-h: 64px;
+  --echo-tabs-h: 48px;
+  --echo-composer-h: 84px; /* includes padding/safe-area */
 }
 
 /* ========================================

@@ -427,14 +427,23 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         width="w-full"
         zIndex="z-[1100]"
         ariaLabel="Echo AI chat interface"
+        backdrop="none"
       >
+      {/* Backdrop with vignette */}
       <div 
-        className="w-full h-full flex flex-col overflow-hidden"
+        className="fixed inset-0 z-[1099] pointer-events-auto"
         style={{
-          background: 'transparent',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
+          background: 'radial-gradient(120% 80% at 50% 0%, rgba(0,0,0,0.28), rgba(0,0,0,0.55))',
+          backdropFilter: 'blur(18px)',
+          WebkitBackdropFilter: 'blur(18px)',
+          willChange: 'backdrop-filter'
         }}
+        onClick={handleClose}
+      />
+      
+      {/* Panel shell */}
+      <div 
+        className="fixed inset-0 z-[1100] w-full h-full overflow-hidden pointer-events-auto"
         onWheel={(e) => {
           // Allow scrolling within the modal, but prevent it from bubbling up
           const target = e.currentTarget;
@@ -455,86 +464,78 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         }}
         onTouchMove={(e) => e.stopPropagation()}
       >
-        {/* Header - Fixed at top (UI only change) */}
-        <div
-          className="flex items-center justify-between px-2 py-4 flex-shrink-0"
+        {/* Safe-area wrapper */}
+        <div 
+          className="flex h-full flex-col"
           style={{
-            height: window.innerWidth <= 768 ? '56px' : '64px',
-            // Use same gradient as EchoAvatar
-            background: 'linear-gradient(135deg, #1D3557, #2A9D8F)',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.10)'
+            paddingTop: 'max(8px, env(safe-area-inset-top))',
+            paddingBottom: 'max(8px, env(safe-area-inset-bottom))'
           }}
         >
-          <div className="flex items-center gap-3">
-            <PiWaveform 
-              size={window.innerWidth <= 768 ? 28 : 32} 
-              className="text-white/90 transition-all duration-200 ease-in-out"
-              style={{
-                animation: `echoWave ${getAvatarState() === 'processing' ? '1s' : getAvatarState() === 'listening' ? '1.5s' : '3s'} ease-in-out infinite`
-              }}
-            />
-            <div>
-              <h2 className="text-xl font-semibold text-white">Echo</h2>
-              <p className="text-sm text-white/90">I'm your personal caddy</p>
+          {/* Header */}
+          <header
+            className="shrink-0 px-4 sm:px-6 flex items-center justify-between"
+            style={{
+              height: '64px',
+              background: 'linear-gradient(135deg, rgba(18,30,54,.96) 0%, rgba(18,88,94,.92) 100%)',
+              borderBottom: '1px solid rgba(255,255,255,.10)',
+              boxShadow: '0 1px 0 rgba(255,255,255,.04) inset'
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <PiWaveform 
+                size={32}
+                className="text-white/90 transition-all duration-200 ease-in-out"
+                style={{
+                  animation: `echoWave ${getAvatarState() === 'processing' ? '1s' : getAvatarState() === 'listening' ? '1.5s' : '3s'} ease-in-out infinite`
+                }}
+              />
+              <div>
+                <h2 className="text-[20px] font-semibold tracking-[-0.01em] text-white">Echo</h2>
+                <p className="text-[13px] text-white/80 leading-4">I'm your personal caddy</p>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <button
               onClick={handleClose}
-              className="h-8 w-8 p-0 hover:bg-white/15 transition-colors duration-120"
+              className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/10 active:bg-white/15 transition-colors"
+              aria-label="Close Echo"
             >
               <X className="h-4 w-4 text-white" />
-            </Button>
-          </div>
-        </div>
+            </button>
+          </header>
 
-        {/* Tabs - Fixed header */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0 bg-[rgba(110,146,119,0.06)]">
-          <div className="px-2 pt-4 pb-2 flex-shrink-0">
-            <TabsList
-              className="
-                w-full h-11 rounded-full
-                bg-white/85 backdrop-blur-sm border border-white/50
-                shadow-sm flex items-center justify-between px-1
-              "
-            >
-              <TabsTrigger
-                value="chat"
-                className="
-                  flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
-                  text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900
-                  data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
-                  transition-all
-                "
-              >
-                Chat
-              </TabsTrigger>
-              <TabsTrigger
-                value="swing"
-                className="
-                  flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
-                  text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900
-                  data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
-                  transition-all
-                "
-              >
-                Swing Coach
-              </TabsTrigger>
-            </TabsList>
-          </div>
+          {/* Segmented Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+            <div className="mx-4 sm:mx-6 mt-3 mb-1 flex-shrink-0">
+              <div className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/50 shadow-[0_1px_2px_rgba(0,0,0,.06)] flex items-center px-1">
+                <TabsTrigger
+                  value="chat"
+                  className="flex-1 h-9 rounded-full text-[14px] font-medium text-slate-700/85 transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 mx-1 px-3"
+                >
+                  Chat
+                </TabsTrigger>
+                <TabsTrigger
+                  value="swing"
+                  className="flex-1 h-9 rounded-full text-[14px] font-medium text-slate-700/85 transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 mx-1 px-3"
+                >
+                  Swing Coach
+                </TabsTrigger>
+              </div>
+            </div>
 
-          {/* Per-tab scrollable content areas */}
-            <TabsContent value="chat" className="h-full m-0">
+            {/* Scrollable content area */}
+            <TabsContent value="chat" className="m-0 flex-1" style={{ minHeight: 0 }}>
               <ScrollArea 
                 ref={chatAutoScroll.scrollAreaRef}
-                className="h-full min-h-0"
-                style={{ overscrollBehavior: 'contain' }}
+                style={{
+                  height: 'calc(100vh - (var(--echo-header-h, 64px) + var(--echo-tabs-h, 48px) + var(--echo-composer-h, 84px)))',
+                  WebkitOverflowScrolling: 'touch',
+                  overscrollBehavior: 'contain'
+                }}
+                className="overflow-y-auto px-4 sm:px-6 pt-4 pb-6"
               >
-                <div className="h-full min-h-0">
-                  <div className="px-2 py-5">
+                <div>
                     {messages.length === 0 ? (
                       <div className="text-left">
                         <p className="text-gray-800/80 text-base mb-5">
@@ -584,14 +585,19 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         )}
                       </div>
                     )}
-                  </div>
                 </div>
               </ScrollArea>
             </TabsContent>
 
-
-            <TabsContent value="swing" className="h-full m-0 flex flex-col justify-start items-stretch overflow-y-auto">
-              <div className="w-full px-2 py-3">
+            <TabsContent value="swing" className="m-0 flex-1" style={{ minHeight: 0 }}>
+              <div 
+                className="w-full px-4 sm:px-6 pt-4 pb-6 overflow-y-auto"
+                style={{
+                  height: 'calc(100vh - (var(--echo-header-h, 64px) + var(--echo-tabs-h, 48px) + 16px))',
+                  WebkitOverflowScrolling: 'touch',
+                  overscrollBehavior: 'contain'
+                }}
+              >
                 <SwingCoach 
                   onClose={() => setActiveTab('chat')}
                   isRecording={isRecording}
@@ -603,20 +609,20 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 />
               </div>
             </TabsContent>
-        </Tabs>
+          </Tabs>
         
-        {/* Shared composer/footer - Fixed at bottom */}
-        <div 
-          className="flex-shrink-0"
-          style={{
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-            background: 'linear-gradient(180deg, rgba(246, 247, 246, 0.85) 0%, rgba(246, 247, 246, 0.95) 100%)'
-          }}
-        >
-          {activeTab === 'chat' && (
-            <div className="p-4">
-              {/* Floating pill composer */}
-              <div className="rounded-[28px] bg-white/92 backdrop-blur shadow-md px-3 py-2 flex items-center">
+          {/* Composer footer */}
+          <footer 
+            className="shrink-0 px-4 sm:px-6 pt-3"
+            style={{
+              background: 'linear-gradient(180deg, rgba(246,247,246,.85) 0%, rgba(246,247,246,.95) 100%)',
+              borderTop: '1px solid rgba(255,255,255,.08)'
+            }}
+          >
+            {activeTab === 'chat' && (
+              <div>
+                {/* Composer pill */}
+                <div className="w-full rounded-[28px] bg-white/92 backdrop-blur shadow-[0_6px_18px_rgba(20,26,30,.16)] px-3 py-2 flex items-center gap-2">
                 {/* Left icons */}
                 <div className="flex items-center gap-1 pr-1">
                   <Button
@@ -647,148 +653,46 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   </Button>
                 </div>
 
-                {/* Input */}
-                <Input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="ask me anything at all, I'm here for you"
-                  onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
-                  disabled={isLoading || isRecording || isProcessing}
-                  className="border-0 focus-visible:ring-0 bg-transparent mx-2 text-[15px]"
-                />
-
-                {/* Send arrow */}
-                <Button
-                  onClick={() => sendMessage(inputValue)}
-                  disabled={isLoading || !inputValue.trim() || isRecording || isProcessing}
-                  size="icon"
-                  className="h-9 w-9 rounded-full bg-gray-900 text-white hover:bg-black transition"
-                  aria-label="Send"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-
-              {/* Recent history peek (opens existing AIChatHistory) */}
-              <button
-                className="mt-3 w-full rounded-[28px] bg-[#3da0a9]/15 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-gray-700"
-                onClick={() => setShowHistory(true)}
-                aria-label="Open recent history"
-              >
-                <span className="flex items-center gap-2">
-                  <span className="w-10 h-1 rounded-full block" style={{ background: 'linear-gradient(135deg, #1D3557, #2A9D8F)', opacity: 0.8 }} />
-                  Recent history
-                </span>
-                <svg className="h-4 w-4" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
-              </button>
-            </div>
-          )}
-          {activeTab === 'logs' && (
-            <div className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={requestLocation}
-                  className="text-xs"
-                >
-                  <MapPin className="h-3 w-3 mr-1" />
-                  Use My Location
-                </Button>
-                {userLocation && (
-                  <Badge variant="secondary" className="text-xs">
-                    {userLocation}
-                  </Badge>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <div className="flex-1">
+                  {/* Input */}
                   <Input
-                    placeholder="Record course notes and tips..."
-                    disabled={isRecording || isProcessing}
-                    readOnly
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder="ask me anything at all, I'm here for you"
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
+                    disabled={isLoading || isRecording || isProcessing}
+                    className="border-0 focus-visible:ring-0 bg-transparent mx-2 text-[15px] placeholder:text-slate-500/90"
                   />
+
+                  {/* Send arrow */}
+                  <Button
+                    onClick={() => sendMessage(inputValue)}
+                    disabled={isLoading || !inputValue.trim() || isRecording || isProcessing}
+                    size="icon"
+                    className="h-9 w-9 rounded-full bg-gray-900 text-white hover:bg-black transition"
+                    aria-label="Send"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button
-                  onClick={isRecording ? stopRecording : startRecording}
-                  disabled={isProcessing}
-                  variant={isRecording ? "destructive" : "outline"}
-                  size="sm"
-                  className="px-3"
+
+                {/* Recent history peek */}
+                <button
+                  className="mt-3 w-full rounded-[28px] bg-[#3da0a9]/15 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-gray-700"
+                  onClick={() => setShowHistory(true)}
+                  aria-label="Open recent history"
                 >
-                  {isRecording ? (
-                    <MicOff className="h-4 w-4" />
-                  ) : isProcessing ? (
-                    <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full" />
-                  ) : (
-                    <Mic className="h-4 w-4" />
-                  )}
-                </Button>
-                <Button
-                  onClick={() => {
-                    if (!isRecording && !isProcessing) {
-                      startRecording();
-                    }
-                  }}
-                  disabled={isRecording || isProcessing}
-                  size="sm"
-                  className="rounded-xl px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
+                  <span className="flex items-center gap-2">
+                    <span className="w-10 h-1 rounded-full block" style={{ background: 'linear-gradient(135deg, #1D3557, #2A9D8F)', opacity: 0.8 }} />
+                    Recent history
+                  </span>
+                  <svg className="h-4 w-4" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+                </button>
               </div>
-            </div>
-          )}
-          {activeTab === 'swing-coach' && (
-            <div className="p-4">
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <Input
-                    value={swingCoachAnalysisText}
-                    onChange={(e) => setSwingCoachAnalysisText(e.target.value)}
-                    placeholder="Describe your swing for analysis..."
-                    onKeyPress={(e) => e.key === 'Enter' && swingCoachAnalysisText.trim() && document.getElementById('swing-coach-send-btn')?.click()}
-                    disabled={isRecording || isProcessing}
-                  />
-                </div>
-                <Button
-                  onClick={isRecording ? stopRecording : startRecording}
-                  disabled={isProcessing}
-                  variant={isRecording ? "destructive" : "outline"}
-                  size="sm"
-                  className="px-3"
-                >
-                  {isRecording ? (
-                    <MicOff className="h-4 w-4" />
-                  ) : isProcessing ? (
-                    <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full" />
-                  ) : (
-                    <Mic className="h-4 w-4" />
-                  )}
-                </Button>
-                <Button
-                  id="swing-coach-send-btn"
-                  onClick={() => {
-                    // Trigger swing analysis in Swing Coach component
-                    const swingCoachEvent = new CustomEvent('triggerSwingAnalysis', { 
-                      detail: { analysisText: swingCoachAnalysisText } 
-                    });
-                    window.dispatchEvent(swingCoachEvent);
-                    setSwingCoachAnalysisText('');
-                  }}
-                  disabled={isRecording || isProcessing}
-                  size="sm"
-                  className="rounded-xl px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-0 disabled:opacity-40 disabled:cursor-not-allowed"
-                  aria-label="Analyze"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
+            )}
+          </footer>
         </div>
       </div>
-        </SlideOver>
+      </SlideOver>
         <AIChatHistory 
           isOpen={showHistory} 
           onClose={() => setShowHistory(false)}
