@@ -475,12 +475,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         >
           {/* Header */}
           <header
-            className="sticky top-0 z-[1200] h-14 sm:h-16 border-b border-black/[0.08]"
-            style={{
-              background: 'linear-gradient(to bottom, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.55) 80%, rgba(255,255,255,0.00) 100%)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)'
-            }}
+            className="relative z-[1] border-b border-white/10 bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50"
             data-echo-topbar
           >
             {/* Top progress bar when loading */}
@@ -500,126 +495,65 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             )}
             
-            <div className="mx-auto max-w-[1200px] h-full px-3 sm:px-5">
-              <div className="grid h-full grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3">
-                {/* Left cluster */}
-                <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4">
+              <div className="h-14 sm:h-16 grid grid-cols-[auto,1fr,auto] items-center gap-2">
+                {/* Left: close button */}
+                <button
+                  type="button"
+                  aria-label="Close"
+                  onClick={handleClose}
+                  className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition"
+                >
+                  <X className="h-5 w-5 text-gray-700" />
+                </button>
+
+                {/* Center: title/meta */}
+                <div className="min-w-0 text-center">
+                  <div className="truncate text-[17px] sm:text-[18px] font-semibold text-gray-900">
+                    Echo
+                  </div>
+                  <div className="truncate text-[12px] sm:text-[13px] text-gray-600/90 leading-tight">
+                    {isLoading ? "Echo is typing…" : "Chat • Private & secure"}
+                  </div>
+                </div>
+
+                {/* Right: actions */}
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
-                    aria-label="Close Echo"
-                    onClick={handleClose}
-                    className="h-9 w-9 rounded-full bg-white/80 border border-black/10 shadow-sm
-                               hover:bg-white transition flex items-center justify-center
-                               focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40"
+                    onClick={() => setShowHistory(true)}
+                    className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition"
+                    aria-label="History"
                   >
-                    <X className="h-5 w-5 text-gray-700" />
+                    <History className="h-5 w-5 text-gray-700" />
                   </button>
-                </div>
-
-                {/* Center cluster */}
-                <div className="min-w-0 text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="relative">
-                      <PiWaveform 
-                        className="h-5 w-5 text-[#2A9D8F]" 
-                        aria-hidden="true"
-                        style={{
-                          animation: getAvatarState() === 'processing' 
-                            ? 'echoRotate 2s linear infinite'
-                            : getAvatarState() === 'listening'
-                            ? 'echoBreathing 1.5s ease-in-out infinite'
-                            : 'echoBreathing 3s ease-in-out infinite'
-                        }}
-                      />
-                      {getAvatarState() === 'listening' && (
-                        <div 
-                          className="absolute inset-0 rounded-full"
-                          style={{
-                            animation: 'echoPulse 1.5s ease-in-out infinite'
-                          }}
-                        />
-                      )}
-                    </div>
-                    <h1 className="truncate text-lg md:text-xl font-semibold tracking-tight text-gray-900">
-                      Echo
-                    </h1>
-                    {isProcessing && (
-                      <span className="inline-flex items-center gap-1 rounded-full
-                                     bg-[#2A9D8F]/10 text-[#2A9D8F] border border-[#2A9D8F]/20
-                                     px-2 py-0.5 text-[12px] font-medium">
-                        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#2A9D8F]" />
-                        Live
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-0.5 text-sm text-gray-600 leading-none">
-                    {isLoading ? (
-                      <span className="truncate">Echo is typing…</span>
-                    ) : (
-                      <span>AI Chat</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Right cluster */}
-                <div className="flex items-center justify-end gap-1.5 sm:gap-2">
-                  {/* Tab switcher (desktop only) */}
-                  <div className="hidden sm:flex items-center h-11 rounded-full
-                                 bg-white/80 border border-black/10 backdrop-blur shadow-sm p-1">
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('chat')}
-                      className={cn(
-                        "h-9 px-4 rounded-full text-sm font-medium transition-all",
-                        activeTab === 'chat' 
-                          ? "bg-[#2A9D8F] text-white shadow" 
-                          : "text-gray-700 hover:bg-white"
-                      )}
-                    >
-                      Chat
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('swing')}
-                      className={cn(
-                        "h-9 px-4 rounded-full text-sm font-medium transition-all",
-                        activeTab === 'swing' 
-                          ? "bg-[#2A9D8F] text-white shadow" 
-                          : "text-gray-700 hover:bg-white"
-                      )}
-                    >
-                      Swing Coach
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>
+            {/* hairline highlight */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/30"></div>
           </header>
 
           {/* Segmented Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-            {/* Top bar container (sticky) */}
-            <div
-              className="sticky top-[var(--echo-top,56px)] z-[2] px-3 sm:px-4 py-3 bg-white/55 backdrop-blur-md border-b border-white/30"
-              data-echo-topbar
-            >
-              {/* Tabs rail */}
-              <div className="w-full max-w-[720px] mx-auto" data-echo-tabs-rail>
-                <TabsList className="w-full h-11 rounded-full bg-white/80 backdrop-blur border border-black/10 shadow-sm grid grid-cols-2 gap-1 p-1">
+            {/* Tabs under header */}
+            <div className="sticky top-0 z-[0] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm border-b border-white/10">
+              <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-2">
+                <TabsList className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/50 shadow-sm flex p-1">
                   <TabsTrigger
                     value="chat"
-                    className="rounded-full px-4 text-sm font-medium 
-                               data-[state=active]:bg-[#2A9D8F] data-[state=active]:text-white data-[state=active]:shadow
-                               data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-white
+                    className="flex-1 rounded-full px-4 text-[14px] font-medium 
+                               data-[state=active]:bg-white data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
+                               data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-white/50
                                transition-all"
                   >
                     Chat
                   </TabsTrigger>
                   <TabsTrigger
                     value="swing"
-                    className="rounded-full px-4 text-sm font-medium 
-                               data-[state=active]:bg-[#2A9D8F] data-[state=active]:text-white data-[state=active]:shadow
-                               data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-white
+                    className="flex-1 rounded-full px-4 text-[14px] font-medium 
+                               data-[state=active]:bg-white data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
+                               data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-white/50
                                transition-all"
                   >
                     Swing Coach
