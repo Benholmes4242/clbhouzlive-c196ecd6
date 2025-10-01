@@ -508,7 +508,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           {/* Segmented Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
             <div className="mx-4 sm:mx-6 mt-3 mb-1 flex-shrink-0">
-              <div className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/50 shadow-[0_1px_2px_rgba(0,0,0,.06)] flex items-center px-1">
+              <TabsList className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/50 shadow-[0_1px_2px_rgba(0,0,0,.06)] flex items-center px-1">
                 <TabsTrigger
                   value="chat"
                   className="flex-1 h-9 rounded-full text-[14px] font-medium text-slate-700/85 transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 mx-1 px-3"
@@ -521,7 +521,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 >
                   Swing Coach
                 </TabsTrigger>
-              </div>
+              </TabsList>
             </div>
 
             {/* Scrollable content area */}

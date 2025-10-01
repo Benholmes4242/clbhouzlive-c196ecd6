@@ -736,7 +736,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             {/* Segmented Tabs */}
             <div className="mx-4 sm:mx-6 mt-3 mb-1 flex-shrink-0">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-                <div className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/50 shadow-[0_1px_2px_rgba(0,0,0,.06)] flex items-center px-1">
+                <TabsList className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/50 shadow-[0_1px_2px_rgba(0,0,0,.06)] flex items-center px-1">
                   <TabsTrigger 
                     value="chat" 
                     className="flex-1 h-9 rounded-full text-[14px] font-medium text-slate-700/85 transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 mx-1 px-3"
@@ -749,7 +749,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                   >
                     Swing Coach {filteredSwingAnalyses.length > 0 && <span className="ml-1 text-gray-500">({filteredSwingAnalyses.length})</span>}
                   </TabsTrigger>
-                </div>
+                </TabsList>
 
                 <div className="flex-1 flex flex-col overflow-hidden bg-transparent">
                   {/* Chat Tab */}
