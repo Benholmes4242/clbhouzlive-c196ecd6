@@ -740,15 +740,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         
           {/* Composer footer */}
           <footer 
-            className="sticky bottom-0 z-[1]
-                       border-t border-black/10
-                       px-3 sm:px-4 py-3 sm:py-4
-                       pb-[max(env(safe-area-inset-bottom),12px)]"
-            style={{
-              background: 'linear-gradient(to bottom, rgba(255,255,255,0.70) 0%, rgba(255,255,255,0.92) 100%)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)'
-            }}
+            className="border-t border-black/10 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/70"
             role="region"
             aria-label="Message composer"
             data-echo-composer
@@ -760,61 +752,43 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             )}
             
-            <div className="mx-auto w-full max-w-[720px]">
+            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-3">
               {activeTab === 'chat' && (
                 <div>
                   {/* Main composer pill */}
                   <div 
                     className={cn(
-                      "flex items-end gap-2 sm:gap-3 rounded-[28px]",
-                      "bg-white/92 backdrop-blur shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-black/10",
-                      "px-3 py-2 sm:px-3.5 sm:py-2.5",
-                      "focus-within:ring-2 focus-within:ring-[#2A9D8F]/25",
-                      "transition-shadow",
+                      "flex items-end gap-2 rounded-[28px]",
+                      "bg-white/92 backdrop-blur shadow-md border border-black/10",
+                      "px-3 py-2",
+                      "focus-within:ring-2 focus-within:ring-[#2A9D8F]/30",
+                      "transition",
                       isRecording && "ring-2 ring-red-400/30"
                     )}
                     role="group"
                     aria-label="Message composer"
                   >
-                    {/* Left tool cluster */}
-                    <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                      <button
-                        type="button"
-                        aria-label="Attach file"
-                        className="
-                          h-9 w-9 grid place-items-center rounded-full
-                          text-gray-700 hover:bg-black/5 active:bg-black/10
-                          transition-colors
-                          disabled:opacity-50 disabled:cursor-not-allowed
-                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40
-                        "
-                        disabled={isLoading || isRecording || isProcessing}
-                      >
-                        <Paperclip className="h-[18px] w-[18px]" />
-                      </button>
-                      
-                      <button
-                        type="button"
-                        aria-label="Open camera"
-                        className="
-                          h-9 w-9 grid place-items-center rounded-full
-                          text-gray-700 hover:bg-black/5 active:bg-black/10
-                          transition-colors
-                          disabled:opacity-50 disabled:cursor-not-allowed
-                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40
-                        "
-                        disabled={isLoading || isRecording || isProcessing}
-                      >
-                        <Camera className="h-[18px] w-[18px]" />
-                      </button>
-                    </div>
+                    {/* Left actions */}
+                    <button
+                      type="button"
+                      aria-label="Attach"
+                      className="
+                        shrink-0 h-9 w-9 grid place-items-center rounded-full
+                        text-gray-600 hover:bg-black/5 active:bg-black/10
+                        transition
+                        disabled:opacity-50 disabled:cursor-not-allowed
+                      "
+                      disabled={isLoading || isRecording || isProcessing}
+                    >
+                      <Paperclip className="h-5 w-5" />
+                    </button>
 
                     {/* Textarea */}
                     <div className="flex-1 min-w-0">
                       <Textarea
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
-                        placeholder="Ask Echo or describe your swing…"
+                        placeholder="Message Echo…"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
@@ -825,9 +799,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         aria-label="Message"
                         className="
                           w-full resize-none bg-transparent outline-none
-                          text-[15px] sm:text-[16px] leading-[1.45] text-gray-900
+                          text-[15px] leading-[1.5] text-gray-900
                           placeholder:text-gray-500
-                          px-0 py-2 min-h-[40px] sm:min-h-[44px] max-h-[36vh]
+                          px-0 py-2 min-h-[28px] max-h-[84px]
                           focus-visible:ring-0 focus-visible:ring-offset-0
                           border-0
                           overflow-y-auto scrollbar-thin
@@ -839,31 +813,29 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         onInput={(e) => {
                           const target = e.target as HTMLTextAreaElement;
                           target.style.height = 'auto';
-                          const vh = window.innerHeight * 0.36;
-                          const newHeight = Math.min(target.scrollHeight, vh);
+                          const newHeight = Math.min(target.scrollHeight, 84);
                           target.style.height = `${newHeight}px`;
-                          target.style.overflowY = target.scrollHeight > vh ? 'auto' : 'hidden';
+                          target.style.overflowY = target.scrollHeight > 84 ? 'auto' : 'hidden';
                         }}
                       />
                     </div>
 
                     {/* Right tool cluster */}
                     <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                      {/* Mic button with pulse when recording */}
+                      {/* Voice (optional on mobile) */}
                       {!inputValue?.trim() && (
-                        <div className="relative">
+                        <div className="relative hidden sm:block">
                           {isRecording && (
                             <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-red-500 animate-pulse" />
                           )}
                           <button
                             type="button"
-                            aria-label={isRecording ? "Recording" : "Voice input"}
+                            aria-label="Voice"
                             className={cn(
-                              "h-9 w-9 grid place-items-center rounded-full transition-colors",
-                              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+                              "h-9 w-9 grid place-items-center rounded-full transition",
                               isRecording
                                 ? "text-red-600 bg-red-50"
-                                : "text-gray-700 hover:bg-black/5 active:bg-black/10"
+                                : "text-gray-600 hover:bg-black/5 active:bg-black/10"
                             )}
                             onMouseDown={startRecording}
                             onMouseUp={stopRecording}
@@ -871,24 +843,24 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                             onTouchEnd={stopRecording}
                             disabled={isProcessing}
                           >
-                            <Mic className="h-[18px] w-[18px]" />
+                            <Mic className="h-5 w-5" />
                           </button>
                         </div>
                       )}
                       
-                      {/* Send button - pill within pill */}
+                      {/* Send */}
                       <button
                         type="button"
                         aria-label="Send message"
                         disabled={!inputValue?.trim() || isLoading || isProcessing}
                         className={cn(
-                          "shrink-0 rounded-full h-9 sm:h-10 px-4 sm:px-5",
-                          "text-[14px] sm:text-[15px] font-medium",
-                          "transition-all",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/30",
+                          "shrink-0 h-9 px-3 rounded-full",
+                          "text-[14px] font-medium",
+                          "transition shadow",
+                          "focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/30",
                           (!inputValue?.trim() || isLoading || isProcessing)
-                            ? "bg-[#2A9D8F]/15 text-[#2A9D8F]/60 cursor-default shadow-none"
-                            : "bg-[#2A9D8F] text-white shadow-[0_10px_24px_rgba(42,157,143,0.25)] hover:bg-[#268C83] active:scale-[0.99]"
+                            ? "bg-gray-200 text-gray-500 cursor-not-allowed opacity-50"
+                            : "bg-[#2A9D8F] text-white hover:bg-[#268b81] disabled:cursor-not-allowed"
                         )}
                         onClick={() => sendMessage(inputValue)}
                       >
@@ -919,6 +891,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 </div>
               )}
             </div>
+            {/* Safe area padding for iOS */}
+            <div className="pb-[max(env(safe-area-inset-bottom),0px)]"></div>
           </footer>
         </div>
       </div>
