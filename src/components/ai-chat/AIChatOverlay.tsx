@@ -599,31 +599,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 
                 <div>
                     {messages.length === 0 ? (
-                      <div className="mx-auto max-w-sm text-center space-y-3 py-10 px-3 sm:px-4">
-                        <div className="size-12 rounded-full bg-[#2A9D8F]/8 text-[#2A9D8F] grid place-items-center mx-auto">
-                          <Bot className="h-6 w-6" />
+                      <div className="flex flex-col items-center justify-center text-center px-6 py-20 sm:py-28 space-y-6">
+                        <div className="h-20 w-20 rounded-3xl bg-white/80 backdrop-blur border border-black/10 shadow-sm grid place-items-center">
+                          <Bot className="h-9 w-9 text-[#2A9D8F]" />
                         </div>
-                        <h3 className="text-[17px] font-semibold text-gray-900">
-                          I'm Echo, your personal caddy
-                        </h3>
-                        <p className="text-[14px] text-gray-600">
-                          Ask me anything about golf—courses, tips, equipment, or swing analysis.
-                        </p>
-                        <div className="space-y-2 pt-2">
-                          {suggestedPrompts.slice(0, 3).map((prompt, index) => (
-                            <button
-                              key={index}
-                              onClick={() => handleSuggestedPrompt(prompt.text)}
-                              className="
-                                w-full text-left rounded-xl
-                                bg-white/92 backdrop-blur border border-black/10 shadow-sm
-                                px-3 py-2
-                                hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all
-                              "
-                            >
-                              <span className="text-[14px] text-gray-800">{prompt.text}</span>
-                            </button>
-                          ))}
+                        <div className="text-[17px] font-semibold text-gray-900">
+                          Start a conversation with Echo
+                        </div>
+                        <div className="text-[14px] text-gray-600 max-w-[280px]">
+                          Ask about your swing, your stats, or just chat golf — Echo's always here.
                         </div>
                       </div>
                     ) : (

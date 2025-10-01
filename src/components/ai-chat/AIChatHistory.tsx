@@ -372,36 +372,44 @@ const SkeletonCard: React.FC = () => (
   <div className="h-[92px] rounded-2xl bg-white/70 backdrop-blur border border-black/10 shadow-sm animate-pulse" />
 );
 
-// Empty State Component
+// Empty State Component - Phase 54
 const EmptyState: React.FC<{ 
   icon: React.ReactNode; 
   title: string; 
   subtitle: string;
 }> = ({ icon, title, subtitle }) => (
-  <div className="mx-auto w-full max-w-[520px] px-6 py-14 text-center rounded-2xl bg-white/80 backdrop-blur border border-black/10 shadow-sm">
-    <div className="mx-auto mb-3 h-12 w-12 rounded-full grid place-items-center bg-white border border-black/10 shadow-sm text-gray-700">
+  <div className="flex flex-col items-center justify-center text-center px-6 py-24 sm:py-32 space-y-5">
+    <div className="h-24 w-24 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow grid place-items-center text-gray-700">
       {icon}
     </div>
-    <h3 className="text-[17px] font-semibold text-gray-900">{title}</h3>
-    <p className="mt-1.5 text-[13px] text-gray-600/90">{subtitle}</p>
+    <div className="text-[18px] font-semibold text-gray-900">
+      {title}
+    </div>
+    <div className="text-[14px] text-gray-600 max-w-[280px]">
+      {subtitle}
+    </div>
   </div>
 );
 
-// Error State Component
+// Error State Component - Phase 54
 const ErrorState: React.FC<{ 
   message: string; 
   onRetry: () => void;
 }> = ({ message, onRetry }) => (
-  <div className="rounded-2xl border border-black/[0.06] bg-white/92 px-5 py-8 text-center">
-    <div className="h-12 w-12 rounded-full bg-red-50 mx-auto mb-3 flex items-center justify-center">
-      <AlertCircle className="h-6 w-6 text-red-600" />
+  <div className="flex flex-col items-center justify-center text-center px-6 py-20 sm:py-28 space-y-5">
+    <div className="h-20 w-20 rounded-full bg-red-50 border border-red-200 text-red-600 grid place-items-center">
+      <AlertCircle className="h-9 w-9" />
     </div>
-    <p className="text-[14px] text-red-700 mb-4">{message}</p>
+    <div className="text-[17px] font-semibold text-gray-900">
+      Something went wrong
+    </div>
+    <div className="text-[14px] text-gray-600 max-w-[280px]">
+      {message}
+    </div>
     <button
       onClick={onRetry}
-      className="h-9 px-4 rounded-full border border-black/10 bg-white text-[14px] text-gray-700 hover:bg-gray-50 transition inline-flex items-center gap-1.5"
+      className="mt-2 h-10 px-5 rounded-full bg-[#2A9D8F] text-white font-medium shadow hover:shadow-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
     >
-      <RotateCcw className="h-3 w-3" />
       Retry
     </button>
   </div>
@@ -869,9 +877,9 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                         </div>
                       ) : (
                         <EmptyState
-                          icon={<MessageCircle className="h-8 w-8" />}
-                          title="No conversations found"
-                          subtitle="Start a conversation to see your chat history here"
+                          icon={<MessageCircle className="h-10 w-10" />}
+                          title="No conversations yet"
+                          subtitle="Your chats and swing analyses will appear here once you've started."
                         />
                       )
                     ) : (
