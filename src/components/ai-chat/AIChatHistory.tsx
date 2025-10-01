@@ -746,13 +746,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/30"></div>
             </header>
 
-            {/* Search & Tabs (sticky under header) */}
-            <div className="sticky top-14 sm:top-16 z-[1] bg-gradient-to-b from-white/50 to-transparent backdrop-blur-sm border-b border-white/10">
+            {/* Search & Tabs (sticky under header) - Phase 55 */}
+            <div className="sticky top-14 sm:top-16 z-[1] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm border-b border-white/10">
               <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-2">
                 {/* Search bar */}
                 <div className="flex items-center gap-2 mb-2">
-                  <label className="flex-1 h-11 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm px-3 flex items-center gap-2 transition-[box-shadow] focus-within:ring-2 focus-within:ring-[#2A9D8F]/30">
-                    <Search className="h-4.5 w-4.5 text-gray-500" aria-hidden="true" />
+                  <label className="flex-1 h-11 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm px-3 flex items-center gap-2 transition">
+                    <Search className="h-4 w-4 text-gray-400" aria-hidden="true" />
                     <input
                       type="search"
                       placeholder="Search Echo…"
@@ -774,10 +774,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
                   {/* Filter button (UI placeholder) */}
                   <button
-                    className="h-11 px-4 rounded-full bg-white border border-black/10 hover:bg-gray-50 active:scale-[0.98] shadow-sm text-[14px] font-medium text-gray-700 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                    className="h-11 px-4 rounded-full bg-white border border-black/10 hover:bg-gray-50 shadow-sm text-[14px] font-medium text-gray-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 flex items-center gap-1.5"
                     aria-label="Open filters"
                   >
                     <Filter className="h-4 w-4" />
+                    <span className="hidden sm:inline">Filter</span>
                   </button>
                 </div>
 
