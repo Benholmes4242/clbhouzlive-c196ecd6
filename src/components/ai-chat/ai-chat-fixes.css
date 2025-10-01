@@ -144,6 +144,21 @@
   }
 }
 
+/* Phase 60: Composer pill compact rules for very small screens */
+@media (max-width: 360px) {
+  .composer-pill { 
+    padding: 8px 12px !important;
+  }
+  .composer-pill .h-9 { 
+    height: 36px !important; 
+    width: 36px !important;
+  }
+  .composer-pill input,
+  .composer-pill textarea { 
+    font-size: 14px !important;
+  }
+}
+
 /* Ultra-small screen optimizations for composer */
 @media (max-width: 360px) {
   /* Composer pill - Phase 48 */
