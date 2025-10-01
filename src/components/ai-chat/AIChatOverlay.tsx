@@ -767,9 +767,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </TabsContent>
           </Tabs>
         
-          {/* Composer footer - Phase 45 "Pro" Polish */}
+          {/* Composer footer - Phase 51 Polish */}
           <footer 
-            className="sticky bottom-0 z-10 bg-gradient-to-t from-white/85 to-white/60 backdrop-blur-xl border-t border-white/30"
+            className="sticky bottom-0 z-10 border-t border-white/10 bg-gradient-to-t from-white/70 to-white/40 backdrop-blur-xl pb-[max(env(safe-area-inset-bottom),0px)]"
             role="region"
             aria-label="Message composer"
             data-echo-composer
@@ -782,313 +782,88 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             )}
             
-            <div className="mx-auto w-full max-w-[720px] pb-[max(env(safe-area-inset-bottom),16px)] pt-3 px-3 sm:px-4">
+            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-3">
               {activeTab === 'chat' && (
                 <div>
-                  {/* Micro-hint - shows when input is empty */}
-                  {!inputValue?.trim() && messages.length === 0 && (
-                    <div className="mx-auto w-full max-w-[720px] pb-2 text-center">
-                      <div className="text-[12px] text-gray-500">
-                        Tip: attach a swing clip and ask "spot my early extension?"
+                  {/* Attachments tray - Phase 51 (peek + expand) */}
+                  <div className="sticky bottom-[64px] sm:bottom-[72px] z-[2] -mx-3 sm:-mx-4 mb-2">
+                    <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4">
+                      <div
+                        className={cn(
+                          "overflow-hidden rounded-2xl bg-white/90 backdrop-blur border border-black/10 shadow-lg",
+                          "transition-all duration-200",
+                          "data-[open=false]:max-h-0 data-[open=false]:opacity-0 data-[open=false]:translate-y-2",
+                          "data-[open=true]:max-h-[220px] data-[open=true]:opacity-100 data-[open=true]:translate-y-0"
+                        )}
+                        data-open="false"
+                        id="attachmentsTray"
+                      >
+                        <div className="p-3 sm:p-3.5 grid grid-cols-4 gap-2 sm:gap-3">
+                          {/* Photo tile */}
+                          <button 
+                            className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                            aria-label="Photo"
+                            type="button"
+                          >
+                            <Camera className="h-5 w-5 text-gray-700" />
+                            <span className="text-[11px] text-gray-600">Photo</span>
+                          </button>
+                          
+                          {/* Video tile */}
+                          <button 
+                            className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                            aria-label="Video"
+                            type="button"
+                          >
+                            <svg className="h-5 w-5 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
+                              <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                            </svg>
+                            <span className="text-[11px] text-gray-600">Video</span>
+                          </button>
+                          
+                          {/* File tile */}
+                          <button 
+                            className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                            aria-label="File"
+                            type="button"
+                          >
+                            <Paperclip className="h-5 w-5 text-gray-700" />
+                            <span className="text-[11px] text-gray-600">File</span>
+                          </button>
+                          
+                          {/* Link tile */}
+                          <button 
+                            className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                            aria-label="Link"
+                            type="button"
+                          >
+                            <svg className="h-5 w-5 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-[11px] text-gray-600">Link</span>
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  )}
-
-                  {/* Smart Suggestions & Quick Actions Row */}
-                  <div className="mb-2">
-                    <div 
-                      className={cn(
-                        "flex items-center gap-2 overflow-x-auto snap-x snap-mandatory scrollbar-none",
-                        "[-webkit-overflow-scrolling:touch]",
-                        "transition-opacity",
-                        inputValue?.trim() ? "opacity-70" : "opacity-100"
-                      )}
-                      role="toolbar"
-                      aria-label="Quick suggestions"
-                    >
-                      {/* Primary action when idle */}
-                      {!inputValue?.trim() && (
-                        <button 
-                          className="echo-suggestion-chip shrink-0 snap-start px-3.5 h-9 rounded-full bg-[#2A9D8F] text-white shadow hover:brightness-105 active:scale-[0.99] text-[13px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                          type="button"
-                          onClick={() => setInputValue("")}
-                        >
-                          Ask Echo anything
-                        </button>
-                      )}
-                      
-                      {/* Smart suggestions */}
-                      <button 
-                        className="echo-suggestion-chip shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                        type="button"
-                        onClick={() => setInputValue("Summarise my latest tips")}
-                      >
-                        Summarise latest tips
-                      </button>
-                      <button 
-                        className="echo-suggestion-chip shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                        type="button"
-                        onClick={() => setInputValue("Explain this video")}
-                      >
-                        Explain this video
-                      </button>
-                      <button 
-                        className="echo-suggestion-chip shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                        type="button"
-                        onClick={() => setInputValue("Summarise last round")}
-                      >
-                        Summarise last round
-                      </button>
-                      <button 
-                        className="echo-suggestion-chip shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                        type="button"
-                        onClick={() => setInputValue("Create practice plan")}
-                      >
-                        Create practice plan
-                      </button>
-                      <button 
-                        className="echo-suggestion-chip shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                        type="button"
-                        onClick={() => setInputValue("Analyse this swing")}
-                      >
-                        Analyse this swing
-                      </button>
-                      <button 
-                        className="echo-suggestion-chip shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                        type="button"
-                        onClick={() => setInputValue("Show me my improvement trends")}
-                      >
-                        My progress
-                      </button>
                     </div>
                   </div>
 
-                  {/* Attachment chips (queued media) - Phase 43 */}
-                  {false && ( /* Set to true to show attachment chips */
-                    <div className="mb-2">
-                      <div className="flex flex-wrap gap-2">
-                        <div className="group flex items-center gap-2 rounded-full border border-black/10 bg-white/90 backdrop-blur shadow-sm pl-2 pr-1.5 h-8">
-                          <span className="text-[13px] text-gray-700">video.mov</span>
-                          <button className="h-6 w-6 grid place-items-center rounded-full hover:bg-black/5 transition" aria-label="Remove" type="button">
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                        <div className="group flex items-center gap-2 rounded-full border border-black/10 bg-white/90 backdrop-blur shadow-sm pl-2 pr-1.5 h-8">
-                          <span className="text-[13px] text-gray-700">photo.jpg</span>
-                          <button className="h-6 w-6 grid place-items-center rounded-full hover:bg-black/5 transition" aria-label="Remove" type="button">
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Attach row - compact glass chips */}
-                  <div className="mb-2 flex items-center gap-2 text-gray-700">
-                    <button 
-                      type="button" 
-                      className="h-9 w-9 grid place-items-center rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm hover:bg-white active:scale-[0.98] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
-                      aria-label="Add photo/video"
-                      disabled={isLoading || isRecording || isProcessing}
+                  {/* Main composer pill - Phase 51 */}
+                  <div className="h-12 sm:h-13 rounded-full bg-white/92 backdrop-blur border border-black/10 shadow-sm grid grid-cols-[auto,1fr,auto] items-center gap-1.5 px-2 sm:px-2.5">
+                    {/* Left: attach toggle */}
+                    <button
+                      type="button"
+                      aria-label="Add"
+                      className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
                     >
-                      <Camera className="h-[18px] w-[18px]" />
-                    </button>
-                    <button 
-                      type="button" 
-                      className="h-9 w-9 grid place-items-center rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm hover:bg-white active:scale-[0.98] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
-                      aria-label="Attach file"
-                      disabled={isLoading || isRecording || isProcessing}
-                    >
-                      <Paperclip className="h-[18px] w-[18px]" />
-                    </button>
-                    <button 
-                      type="button" 
-                      className={cn(
-                        "h-9 w-9 grid place-items-center rounded-full backdrop-blur border shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
-                        isRecording 
-                          ? "bg-[#2A9D8F]/10 border-[#2A9D8F]/20 text-[#2A9D8F]"
-                          : "bg-white/85 border-black/10 hover:bg-white active:scale-[0.98]"
-                      )}
-                      aria-label="Voice note"
-                      disabled={isProcessing}
-                      onMouseDown={!isProcessing ? startRecording : undefined}
-                      onMouseUp={!isProcessing ? stopRecording : undefined}
-                      onMouseLeave={!isProcessing ? stopRecording : undefined}
-                      onTouchStart={!isProcessing ? startRecording : undefined}
-                      onTouchEnd={!isProcessing ? stopRecording : undefined}
-                    >
-                      <Mic className="h-[18px] w-[18px]" />
+                      <svg className="h-[18px] w-[18px] text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                      </svg>
                     </button>
 
-                    {/* Spacer */}
-                    <div className="flex-1"></div>
-
-                    {/* Safety indicator */}
-                    <div className="hidden sm:flex items-center gap-1.5 text-[12px] text-gray-600">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#2A9D8F]/70"></span>
-                      Private & secure
-                    </div>
-                  </div>
-
-                  {/* Attachment preview chips (example UI) */}
-                  {false && ( /* Toggle to true to show example attachment chips */
-                    <div className="mb-2 flex items-center gap-2 overflow-x-auto scrollbar-none">
-                      <div className="shrink-0 flex items-center gap-2 pl-2 pr-1 h-9 rounded-full bg-white/92 backdrop-blur border border-black/10 shadow-sm">
-                        <img className="h-7 w-7 rounded-full object-cover" src="https://via.placeholder.com/28" alt="" />
-                        <span className="text-[13px] text-gray-800">video.mp4</span>
-                        <button type="button" className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 transition" aria-label="Remove">
-                          <X className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                      <div className="shrink-0 flex items-center gap-2 pl-2 pr-1 h-9 rounded-full bg-white/92 backdrop-blur border border-black/10 shadow-sm">
-                        <img className="h-7 w-7 rounded-full object-cover" src="https://via.placeholder.com/28" alt="" />
-                        <span className="text-[13px] text-gray-800">photo.jpg</span>
-                        <button type="button" className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 transition" aria-label="Remove">
-                          <X className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Full attachment preview strip (legacy - kept for backward compat) */}
-                  {false && ( /* Toggle to true to show example attachments */
-                    <div className="mb-2">
-                      <div className="flex items-center gap-2 overflow-x-auto rounded-2xl bg-white/85 backdrop-blur border border-black/10 shadow-sm p-2 scrollbar-none">
-                        {/* Image attachment */}
-                        <div className="relative shrink-0">
-                          <img 
-                            className="h-14 w-14 rounded-xl object-cover border border-black/10" 
-                            src="https://via.placeholder.com/56"
-                            alt="Attachment preview"
-                          />
-                          <button 
-                            className="absolute -top-1.5 -right-1.5 h-6 w-6 grid place-items-center rounded-full bg-white/95 border border-black/10 shadow hover:bg-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                            aria-label="Remove"
-                          >
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-
-                        {/* Video attachment */}
-                        <div className="relative shrink-0">
-                          <div className="h-14 w-24 rounded-xl border border-black/10 overflow-hidden bg-black/5">
-                            <img 
-                              className="h-full w-full object-cover" 
-                              src="https://via.placeholder.com/96x56"
-                              alt="Video preview"
-                            />
-                            <div className="absolute inset-0 grid place-items-center">
-                              <div className="h-6 w-6 rounded-full bg-black/60 grid place-items-center">
-                                <svg className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                  <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                                </svg>
-                              </div>
-                            </div>
-                          </div>
-                          <button 
-                            className="absolute -top-1.5 -right-1.5 h-6 w-6 grid place-items-center rounded-full bg-white/95 border border-black/10 shadow hover:bg-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                            aria-label="Remove"
-                          >
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-
-                        {/* Add more button */}
-                        <button 
-                          className="h-14 w-14 grid place-items-center rounded-xl bg-white border border-black/10 hover:bg-gray-50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                          aria-label="Add more attachments"
-                        >
-                          <svg className="h-5 w-5 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Attachment rail (inline preview) - Phase 48 */}
-                  {false && ( /* Set to true to show attachments */
-                    <div className="pb-2">
-                      <div className="flex gap-2 overflow-x-auto no-scrollbar">
-                        {/* Example: Image/video thumbnail */}
-                        <div className="shrink-0 w-[88px] h-[88px] rounded-xl bg-white/90 backdrop-blur border border-black/10 shadow-sm relative overflow-hidden">
-                          <img 
-                            className="w-full h-full object-cover" 
-                            src="https://via.placeholder.com/88" 
-                            alt="Attachment preview" 
-                          />
-                          <button 
-                            className="absolute -top-2 -right-2 h-7 w-7 grid place-items-center rounded-full bg-white border border-black/10 shadow hover:bg-gray-50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
-                            aria-label="Remove"
-                            type="button"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                        
-                        {/* Example: Document/file */}
-                        <div className="shrink-0 w-[88px] h-[88px] rounded-xl bg-white/90 backdrop-blur border border-black/10 shadow-sm relative flex flex-col items-center justify-center p-2">
-                          <span className="text-[24px] mb-1">📄</span>
-                          <span className="text-[10px] text-gray-600 text-center truncate w-full px-1">video.mp4</span>
-                          <button 
-                            className="absolute -top-2 -right-2 h-7 w-7 grid place-items-center rounded-full bg-white border border-black/10 shadow hover:bg-gray-50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
-                            aria-label="Remove"
-                            type="button"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Main composer pill - Phase 48 Polish */}
-                  <div 
-                    className={cn(
-                      "composer-pill relative w-full transition-opacity duration-150",
-                      (isLoading || isProcessing) && "opacity-60 pointer-events-none select-none"
-                    )}
-                    data-state={isRecording ? "recording" : (isLoading || isProcessing) ? "sending" : "idle"}
-                    data-has-attachments="false"
-                    aria-disabled={isLoading || isProcessing}
-                  >
-                    <form 
-                      className={cn(
-                        "h-[52px] sm:h-[56px] rounded-[28px] bg-white/92 backdrop-blur",
-                        "border border-black/10 shadow-sm",
-                        "flex items-center gap-1.5 px-2 sm:px-3",
-                        "transition-all duration-150",
-                        "focus-within:shadow-md focus-within:ring-1 focus-within:ring-[#2A9D8F]/30",
-                        // Recording state - Phase 48
-                        isRecording && "ring-2 ring-red-400/40",
-                      )}
-                      role="group"
-                      aria-label="Message composer"
-                      autoComplete="off"
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        sendMessage(inputValue);
-                      }}
-                    >
-                      {/* Left tool cluster - Phase 48 */}
-                      <button
-                        type="button"
-                        aria-label="Attach"
-                        className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                      >
-                        <Paperclip className="h-[18px] w-[18px] text-gray-600" />
-                      </button>
-                      
-                      <button
-                        type="button"
-                        aria-label="Camera"
-                        className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                      >
-                        <Camera className="h-[18px] w-[18px] text-gray-600" />
-                      </button>
-
-                      {/* Input field - Phase 48 auto-grow */}
-                      <textarea
+                    {/* Middle: input */}
+                    <div className="min-w-0">
+                      <input
+                        type="text"
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         placeholder="Message Echo…"
@@ -1100,16 +875,20 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         }}
                         disabled={isLoading || isRecording || isProcessing}
                         aria-label="Message input"
-                        rows={1}
-                        className="flex-1 min-h-[24px] max-h-[140px] resize-none bg-transparent outline-none text-[15px] leading-[1.5] placeholder:text-gray-500 caret-[#2A9D8F] disabled:opacity-60 disabled:pointer-events-none px-1 sm:px-2 py-1 overflow-y-auto"
+                        autoComplete="off"
+                        autoCorrect="on"
+                        autoCapitalize="sentences"
+                        className="w-full bg-transparent outline-none text-[15px] sm:text-[15px] leading-[1.4] placeholder:text-gray-500 caret-[#2A9D8F] disabled:opacity-60"
                       />
+                    </div>
 
-                      {/* Right tool cluster - Phase 48 */}
+                    {/* Right: mic/send combo */}
+                    <div className="flex items-center gap-1">
                       <button
                         type="button"
-                        aria-label="Mic"
+                        aria-label="Voice"
                         className={cn(
-                          "h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 transition",
+                          "h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition",
                           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
                           isRecording && "bg-red-500/10 text-red-600"
                         )}
@@ -1123,14 +902,16 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       </button>
                       
                       <button
-                        type="submit"
+                        type="button"
+                        onClick={() => sendMessage(inputValue)}
                         aria-label="Send"
                         disabled={!inputValue?.trim() || isLoading || isProcessing}
+                        aria-disabled={!inputValue?.trim() || isLoading || isProcessing}
                         className={cn(
-                          "h-9 px-4 rounded-full text-[14px] font-medium shadow transition",
+                          "h-9 w-9 grid place-items-center rounded-full shadow transition",
                           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
                           (!inputValue?.trim() || isLoading || isProcessing)
-                            ? "bg-gray-200 text-gray-500 cursor-not-allowed opacity-60 pointer-events-none"
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed opacity-50"
                             : "bg-[#2A9D8F] text-white hover:brightness-[0.98] active:brightness-[0.95]"
                         )}
                       >
@@ -1140,10 +921,12 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                             <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
                           </svg>
                         ) : (
-                          'Send'
+                          <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                          </svg>
                         )}
                       </button>
-                    </form>
+                    </div>
                   </div>
 
                   {/* Recent history peek */}
