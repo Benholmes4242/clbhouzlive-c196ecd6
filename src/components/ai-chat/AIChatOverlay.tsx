@@ -584,6 +584,18 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 {/* Bottom vignette */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/80 to-transparent" />
                 
+                {/* Unread above notice (sticky hint at top while scrolling) */}
+                {false && ( /* Set to true to show "unread above" indicator */
+                  <div 
+                    className="sticky top-2 z-10 flex justify-center opacity-100 transition-opacity"
+                    data-show="true"
+                  >
+                    <div className="px-3 py-1.5 rounded-full bg-white/80 backdrop-blur border border-black/10 text-[11px] text-gray-600 shadow-sm">
+                      Unread messages above
+                    </div>
+                  </div>
+                )}
+                
                 <div>
                     {messages.length === 0 ? (
                       <div className="mx-auto max-w-sm text-center space-y-3 py-10 px-3 sm:px-4">
@@ -627,14 +639,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     
                     return (
                       <React.Fragment key={message.id}>
-                        {/* Unread separator - full design with lines */}
+                        {/* New messages divider (between historical and fresh) */}
                         {isFirstUnread && (
-                          <div className="sticky top-2 z-10 flex items-center gap-3 my-6">
-                            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
-                            <div className="px-3 py-1.5 rounded-full bg-white/80 backdrop-blur border border-black/10 text-[11px] text-gray-700 shadow-sm">
+                          <div className="relative my-6">
+                            <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-black/10"></div>
+                            <div className="relative mx-auto w-fit px-3 py-1.5 rounded-full bg-white/80 backdrop-blur border border-black/10 text-[11px] text-gray-600 shadow-sm">
                               New messages
                             </div>
-                            <div className="flex-1 h-px bg-gradient-to-l from-transparent via-black/10 to-transparent"></div>
                           </div>
                         )}
                         
@@ -680,28 +691,37 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   </div>
                 )}
 
-                {/* "New messages" pill - shows when scrolled up and new messages arrive */}
+                {/* Bottom pill for new messages when at bottom */}
                 {newMessageCount > 0 && !showScrollToBottom && (
                   <div className="fixed bottom-[96px] left-1/2 -translate-x-1/2 z-20 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[12px] text-gray-700 pointer-events-auto float-in">
                     {newMessageCount} new {newMessageCount === 1 ? 'message' : 'messages'} • Tap to view
                   </div>
                 )}
 
-                {/* Scroll-to-bottom FAB - shows when scrolled up */}
+                {/* Scroll-to-bottom FAB with unread badge */}
                 {showScrollToBottom && (
                   <button
                     onClick={scrollToBottom}
-                    className="group pointer-events-auto fixed bottom-[96px] right-4 sm:right-6 z-20 h-11 min-w-[44px] px-3 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-md flex items-center gap-2 hover:bg-white active:scale-[0.98] transition-all float-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                    aria-label="Scroll to latest"
+                    className={cn(
+                      "fixed right-4 z-20 grid place-items-center h-11 w-11 rounded-full",
+                      "bg-white/95 backdrop-blur border border-black/10 shadow-lg",
+                      "hover:bg-white active:scale-[0.98] transition-all float-in",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                    )}
+                    style={{
+                      bottom: `max(env(safe-area-inset-bottom), 20px)`
+                    }}
+                    aria-label="Jump to latest"
+                    data-show="true"
                   >
-                    <span className="grid place-items-center h-6 w-6 rounded-full border border-black/10">
-                      <ChevronDown className="h-4 w-4 text-gray-700" />
-                    </span>
-                    <span className="text-[12px] text-gray-700 pr-1 hidden sm:inline">Newer</span>
+                    <ChevronDown className="h-5 w-5 text-gray-700" />
                     
-                    {/* Badge for unread count */}
+                    {/* Unread count badge */}
                     {newMessageCount > 0 && (
-                      <span className="ml-1 h-5 min-w-[20px] px-1 rounded-full bg-[#ef4444] text-white text-[11px] leading-[1] grid place-items-center font-medium">
+                      <span 
+                        className="absolute -top-2 right-0 min-w-[26px] h-5 px-1.5 rounded-full bg-[#2A9D8F] text-white text-[11px] font-medium grid place-items-center shadow"
+                        data-has-new="true"
+                      >
                         {newMessageCount}
                       </span>
                     )}
