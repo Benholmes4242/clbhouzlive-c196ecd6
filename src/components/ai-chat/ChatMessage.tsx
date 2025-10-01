@@ -65,10 +65,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   }
 
   return (
-    <div className="flex flex-col" data-echo-group>
+    <div className="flex flex-col animate-[bubbleIn_.24s_ease-out_both]" data-echo-group>
       <div className={cn(
-        "group relative flex gap-[var(--bubble-gap-x)]",
-        isUser ? "flex-row-reverse self-end" : "self-start"
+        "group relative flex gap-2.5",
+        isUser ? "flex-row-reverse justify-start" : "justify-start"
       )} data-echo-msg={isUser ? 'user' : 'ai'}>
         {/* Avatar (AI only, hidden on mobile) */}
         {!isUser && (
@@ -79,19 +79,18 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         
         {/* Bubble shell */}
         <div className={cn(
-          "relative max-w-[var(--bubble-max)] sm:max-w-[min(70ch,var(--bubble-max-md))]",
-          isUser ? "self-end" : "self-start"
+          "relative max-w-[82%]",
+          isUser ? "ml-auto" : "mr-auto"
         )}>
           <div className={cn(
             "whitespace-pre-wrap break-words",
-            "rounded-[var(--bubble-radius)] border shadow-sm",
             "px-3.5 py-2.5 leading-[1.45]",
-            "shadow-[var(--bubble-shadow)]",
+            "text-[15px] tracking-[0.1px]",
             isUser 
-              ? "bg-[var(--me-bg)] border-[var(--me-brd)] text-[var(--me-fg)]" 
-              : "bg-[var(--ai-bg)] border-[var(--ai-brd)] text-[var(--ai-fg)] backdrop-blur supports-[backdrop-filter]:backdrop-blur-md"
+              ? "rounded-2xl rounded-tr-sm bg-[#2A9D8F] text-white shadow-md" 
+              : "rounded-2xl rounded-tl-sm bg-white/90 border border-black/5 backdrop-blur shadow"
           )}>
-            <div className="text-[15px] leading-[1.45]">
+            <div className="leading-[1.45]">
               {isUser ? (
                 <p className="m-0 break-words">{message.content}</p>
               ) : swingAnalysisData ? (
@@ -115,29 +114,29 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-headings:text-gray-900 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-strong:font-semibold prose-a:text-[#2A9D8F] prose-a:no-underline hover:prose-a:underline prose-code:text-[0.9em]">
+                <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-headings:text-gray-900 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-strong:font-semibold prose-a:text-[#2A9D8F] prose-a:underline prose-a:underline-offset-2 hover:prose-a:brightness-110 prose-code:text-[0.9em]">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
-                      a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-[#2A9D8F] hover:underline break-words" />,
+                      a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-[#2A9D8F] underline underline-offset-2 hover:brightness-110 break-words" />,
                       h1: ({ children }) => <h3 className="text-[15px] font-semibold mb-2 mt-0 text-gray-900">{children}</h3>,
                       h2: ({ children }) => <h4 className="text-[15px] font-semibold mb-2 mt-2 text-gray-900">{children}</h4>,
                       h3: ({ children }) => <h4 className="text-[15px] font-semibold mb-2 mt-2 text-gray-900">{children}</h4>,
                       p: ({ children }) => <p className="my-2 first:mt-0 last:mb-0 break-words">{children}</p>,
-                      ul: ({ children }) => <ul className="my-2 pl-5">{children}</ul>,
-                      ol: ({ children }) => <ol className="my-2 pl-5">{children}</ol>,
+                      ul: ({ children }) => <ul className="my-2 pl-5 space-y-0.5">{children}</ul>,
+                      ol: ({ children }) => <ol className="my-2 pl-5 space-y-0.5">{children}</ol>,
                       li: ({ children }) => <li className="my-0.5">{children}</li>,
                       strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
                       code: ({ inline, children, ...props }: any) => 
                         inline ? (
-                          <code className="bg-[rgba(2,16,32,0.06)] border border-[rgba(2,16,32,0.05)] rounded-md px-1 py-0.5 text-[0.9em]" {...props}>
+                          <code className="bg-black/[0.02] border border-black/5 rounded px-1 py-0.5 text-[0.9em]" {...props}>
                             {children}
                           </code>
                         ) : (
                           <code className="font-mono text-[12.5px]" {...props}>{children}</code>
                         ),
                       pre: ({ children }) => (
-                        <pre className="relative mt-2 overflow-auto rounded-lg border border-black/10 bg-white/85 backdrop-blur px-3 py-2 text-[12.5px] leading-[1.45]">
+                        <pre className="relative mt-2 overflow-auto rounded-lg border border-black/10 bg-black/[0.02] backdrop-blur px-3 py-2 text-[12.5px] leading-[1.45]">
                           {children}
                         </pre>
                       ),
@@ -233,9 +232,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           
           {/* Timestamp + status row */}
           <div className={cn(
-            "mt-1 text-[11px] leading-none select-none",
-            "text-[var(--meta-fg)]",
-            isUser ? "text-right pr-1" : "text-left pl-1"
+            "mt-1 text-[11px] leading-none select-none text-gray-500",
+            isUser ? "text-right" : "text-left"
           )}>
             {time}
             {!isUser && message.metadata?.latencyMs && (

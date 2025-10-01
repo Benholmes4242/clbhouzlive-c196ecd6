@@ -614,10 +614,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             {/* Scrollable content area */}
             <TabsContent value="chat" className="m-0 flex-1" style={{ minHeight: 0 }}>
               <div 
-                className="h-full overflow-y-auto px-3 sm:px-4 pt-4 pb-28"
+                className="relative h-full overflow-y-auto scroll-smooth [-webkit-overflow-scrolling:touch] px-3 sm:px-4 pt-10 pb-28"
                 data-echo-canvas
                 ref={chatAutoScroll.scrollAreaRef}
               >
+                {/* Top vignette */}
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-white/75 to-transparent" />
+                {/* Bottom vignette */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/80 to-transparent" />
+                
                 <div>
                     {messages.length === 0 ? (
                       <div className="text-left">
@@ -647,8 +652,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         </div>
                       </div>
                     ) : (
-                      <div className="mx-auto w-full max-w-[var(--bubble-max-md)] px-3 sm:px-5">
-                        <div className="flex flex-col gap-3 sm:gap-4">
+                      <div className="mx-auto w-full max-w-[var(--bubble-max-md)]">
+                        <div className="flex flex-col space-y-6">
                           {messages.map((message) => (
                             <ChatMessageComponent
                               key={message.id}
@@ -658,11 +663,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                             />
                           ))}
                           {isLoading && (
-                            <div className="self-start">
-                              <div className="inline-flex items-center gap-1.5 rounded-[12px] bg-white/80 border border-black/10 px-3 py-1.5 shadow-[var(--bubble-shadow)]">
-                                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-500 [animation-delay:-120ms]" />
-                                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-500 [animation-delay:-60ms]" />
-                                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-500" />
+                            <div className="flex justify-start">
+                              <div className="inline-flex items-center gap-1.5 rounded-full bg-white/85 border border-black/5 px-2.5 py-1">
+                                <span className="inline-flex gap-0.75">
+                                  <i className="w-1.5 h-1.5 rounded-full bg-gray-500/70 animate-bounce" style={{ animationDelay: '0ms' }} />
+                                  <i className="w-1.5 h-1.5 rounded-full bg-gray-500/70 animate-bounce" style={{ animationDelay: '120ms' }} />
+                                  <i className="w-1.5 h-1.5 rounded-full bg-gray-500/70 animate-bounce" style={{ animationDelay: '240ms' }} />
+                                </span>
                               </div>
                             </div>
                           )}
@@ -675,10 +682,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
             <TabsContent value="swing" className="m-0 flex-1" style={{ minHeight: 0 }}>
               <div 
-                className="h-full overflow-y-auto px-3 sm:px-4 pt-4 pb-28"
+                className="relative h-full overflow-y-auto scroll-smooth [-webkit-overflow-scrolling:touch] px-3 sm:px-4 pt-10 pb-28"
                 data-echo-canvas
               >
-                <SwingCoach 
+                {/* Top vignette */}
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-white/75 to-transparent" />
+                {/* Bottom vignette */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/80 to-transparent" />
+                
+                <SwingCoach
                   onClose={() => setActiveTab('chat')}
                   isRecording={isRecording}
                   isProcessing={isProcessing}

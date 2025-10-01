@@ -85,6 +85,18 @@ html, body {
   --kbd-fg: #111827;
 }
 
+/* Bubble appear animation */
+@keyframes bubbleIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(6px) scale(0.98); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
 @media (min-width: 640px) {
   :root {
     --echo-top: 64px;
