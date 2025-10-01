@@ -639,13 +639,16 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     
                     return (
                       <React.Fragment key={message.id}>
-                        {/* New messages divider (between historical and fresh) */}
+                        {/* New messages marker - Phase 41 spec */}
                         {isFirstUnread && (
-                          <div className="relative my-6">
-                            <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-black/10"></div>
-                            <div className="relative mx-auto w-fit px-3 py-1.5 rounded-full bg-white/80 backdrop-blur border border-black/10 text-[11px] text-gray-600 shadow-sm">
-                              New messages
+                          <div className="relative my-6 sm:my-8">
+                            <div className="sticky top-2 z-10 flex justify-center">
+                              <div className="px-3 py-1.5 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[11px] font-medium text-gray-700">
+                                New messages
+                              </div>
                             </div>
+                            {/* Hairline through stream for subtle continuity */}
+                            <div className="absolute inset-x-0 top-1/2 -z-10 h-px bg-black/10"></div>
                           </div>
                         )}
                         
@@ -682,46 +685,52 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                          </div>
                        )}
 
-                {/* Unread separator example (legacy simple version) */}
-                {false && ( /* Set to true to show legacy unread marker */
-                  <div className="sticky top-2 z-10 flex justify-center pointer-events-none mb-4">
-                    <div className="pointer-events-auto px-2.5 py-1 rounded-full bg-white/80 backdrop-blur border border-black/10 text-[11px] text-gray-700 shadow-sm">
-                      New since last visit
+                {/* "New since you left" banner (optional header slot) */}
+                {false && ( /* Set to true to show header banner style */
+                  <div className="sticky top-0 z-[0] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm">
+                    <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-2">
+                      <div className="h-9 w-full rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm px-3 flex items-center justify-between text-[12px] text-gray-700">
+                        <span className="truncate">New since your last visit</span>
+                        <span className="ml-2 rounded-full px-2 py-0.5 bg-black/5 border border-black/10 text-[11px]">3</span>
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {/* Bottom pill for new messages when at bottom */}
                 {newMessageCount > 0 && !showScrollToBottom && (
-                  <div className="fixed bottom-[96px] left-1/2 -translate-x-1/2 z-20 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[12px] text-gray-700 pointer-events-auto float-in">
+                  <div className="fixed bottom-[96px] left-1/2 -translate-x-1/2 z-20 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[12px] text-gray-700 pointer-events-auto float-in opacity-0 data-[visible=true]:opacity-100 transition-opacity duration-200" data-visible="true">
                     {newMessageCount} new {newMessageCount === 1 ? 'message' : 'messages'} • Tap to view
                   </div>
                 )}
 
-                {/* Scroll-to-bottom FAB with unread badge */}
+                {/* Jump to latest FAB - Phase 41 spec */}
                 {showScrollToBottom && (
                   <button
                     onClick={scrollToBottom}
                     className={cn(
-                      "fixed right-4 z-20 grid place-items-center h-11 w-11 rounded-full",
-                      "bg-white/95 backdrop-blur border border-black/10 shadow-lg",
+                      "fixed right-3 sm:right-5 z-20",
+                      "h-10 px-3.5 rounded-full",
+                      "bg-white/95 backdrop-blur border border-black/10 shadow-md",
+                      "text-[13px] font-medium text-gray-800",
+                      "flex items-center gap-2",
                       "hover:bg-white active:scale-[0.98] transition-all float-in",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+                      "opacity-0 data-[visible=true]:opacity-100"
                     )}
                     style={{
-                      bottom: `max(env(safe-area-inset-bottom), 20px)`
+                      bottom: `max(env(safe-area-inset-bottom), 16px)`
                     }}
                     aria-label="Jump to latest"
-                    data-show="true"
+                    data-visible="true"
                   >
-                    <ChevronDown className="h-5 w-5 text-gray-700" />
-                    
-                    {/* Unread count badge */}
+                    <span className="inline-block h-5 w-5 rounded-full grid place-items-center bg-[#2A9D8F]/10 text-[#2A9D8F] border border-[#2A9D8F]/20">
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    </span>
+                    <span>New</span>
+                    {/* Unread count chip */}
                     {newMessageCount > 0 && (
-                      <span 
-                        className="absolute -top-2 right-0 min-w-[26px] h-5 px-1.5 rounded-full bg-[#2A9D8F] text-white text-[11px] font-medium grid place-items-center shadow"
-                        data-has-new="true"
-                      >
+                      <span className="ml-1 rounded-full px-1.5 py-0.5 text-[11px] bg-black/5 border border-black/10">
                         {newMessageCount}
                       </span>
                     )}
