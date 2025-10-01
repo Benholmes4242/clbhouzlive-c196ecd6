@@ -95,12 +95,20 @@
 
 /* Ultra-small screen optimizations for composer */
 @media (max-width: 360px) {
+  /* Composer pill - Phase 48 */
   .composer-pill form {
-    padding: 6px 8px !important;
+    height: 48px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
   }
   
   .composer-pill textarea {
     font-size: 14px !important;
+  }
+  
+  .composer-pill button {
+    height: 32px !important;
+    width: 32px !important;
   }
   
   /* Suggestion chips */

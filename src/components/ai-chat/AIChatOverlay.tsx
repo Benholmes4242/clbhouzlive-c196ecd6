@@ -1002,59 +1002,43 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     </div>
                   )}
 
-                  {/* Attachment error (file too large, wrong type) - Phase 46 */}
-                  {false && ( /* Set to true to show attachment error */
-                    <div className="mb-2 text-[12px] text-red-600">
-                      "swing.mov" is too large (max 100 MB).
-                    </div>
-                  )}
-
-                  {/* Attachment preview tray - Phase 46 */}
-                  <div 
-                    className="mb-2 flex flex-wrap gap-2 data-[has-attachments=false]:hidden attachment-tray"
-                    data-has-attachments="false"
-                  >
-                    {/* Example: Image thumb */}
-                    {false && (
-                      <div className="group relative overflow-hidden rounded-xl border border-black/10 bg-white/90 backdrop-blur shadow-sm">
-                        <img className="block h-14 w-14 object-cover" src="https://via.placeholder.com/56" alt="Attachment preview" />
-                        <button 
-                          className="absolute -top-2 -right-2 h-6 w-6 grid place-items-center rounded-full bg-black/70 text-white text-[11px] shadow opacity-0 group-hover:opacity-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40" 
-                          aria-label="Remove"
-                          type="button"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    )}
-                    
-                    {/* Example: File chip */}
-                    {false && (
-                      <div className="file-chip h-14 px-3 flex items-center gap-2 rounded-xl border border-black/10 bg-white/90 backdrop-blur shadow-sm">
-                        <span className="h-8 w-8 grid place-items-center rounded-lg bg-black/5 border border-black/10 text-[16px]">📄</span>
-                        <div className="min-w-0">
-                          <div className="text-[13px] font-medium text-gray-800 truncate max-w-[160px]">Trackman-session.pdf</div>
-                          <div className="text-[11px] text-gray-500">1.2 MB</div>
+                  {/* Attachment rail (inline preview) - Phase 48 */}
+                  {false && ( /* Set to true to show attachments */
+                    <div className="pb-2">
+                      <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                        {/* Example: Image/video thumbnail */}
+                        <div className="shrink-0 w-[88px] h-[88px] rounded-xl bg-white/90 backdrop-blur border border-black/10 shadow-sm relative overflow-hidden">
+                          <img 
+                            className="w-full h-full object-cover" 
+                            src="https://via.placeholder.com/88" 
+                            alt="Attachment preview" 
+                          />
+                          <button 
+                            className="absolute -top-2 -right-2 h-7 w-7 grid place-items-center rounded-full bg-white border border-black/10 shadow hover:bg-gray-50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
+                            aria-label="Remove"
+                            type="button"
+                          >
+                            ✕
+                          </button>
                         </div>
-                        <button 
-                          className="ml-2 h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
-                          aria-label="Remove"
-                          type="button"
-                        >
-                          ✕
-                        </button>
+                        
+                        {/* Example: Document/file */}
+                        <div className="shrink-0 w-[88px] h-[88px] rounded-xl bg-white/90 backdrop-blur border border-black/10 shadow-sm relative flex flex-col items-center justify-center p-2">
+                          <span className="text-[24px] mb-1">📄</span>
+                          <span className="text-[10px] text-gray-600 text-center truncate w-full px-1">video.mp4</span>
+                          <button 
+                            className="absolute -top-2 -right-2 h-7 w-7 grid place-items-center rounded-full bg-white border border-black/10 shadow hover:bg-gray-50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
+                            aria-label="Remove"
+                            type="button"
+                          >
+                            ✕
+                          </button>
+                        </div>
                       </div>
-                    )}
-                  </div>
-
-                  {/* Attachment limit/count - Phase 46 */}
-                  {false && ( /* Set to true to show limit message */
-                    <div className="mb-2 text-[12px] text-gray-600">
-                      Showing 4 of 7 files • <button className="underline decoration-[#2A9D8F]/50 underline-offset-2 text-[#2A9D8F] hover:decoration-[#2A9D8F] transition focus-visible:outline-none" type="button">view all</button>
                     </div>
                   )}
 
-                  {/* Main composer pill - Phase 46 States & Attachments */}
+                  {/* Main composer pill - Phase 48 Polish */}
                   <div 
                     className={cn(
                       "composer-pill relative w-full transition-opacity duration-150",
@@ -1066,15 +1050,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   >
                     <form 
                       className={cn(
-                        "flex items-end gap-2",
-                        "rounded-[28px] bg-white/92 backdrop-blur",
+                        "h-[52px] sm:h-[56px] rounded-[28px] bg-white/92 backdrop-blur",
                         "border border-black/10 shadow-sm",
-                        "px-3 py-2",
+                        "flex items-center gap-1.5 px-2 sm:px-3",
                         "transition-all duration-150",
                         "focus-within:shadow-md focus-within:ring-1 focus-within:ring-[#2A9D8F]/30",
-                        // Recording state - Phase 46
-                        isRecording && "ring-2 ring-red-500/30 shadow-[0_0_0_6px_rgba(239,68,68,0.08)]",
-                        // Sending state handled by parent opacity
+                        // Recording state - Phase 48
+                        isRecording && "ring-2 ring-red-400/40",
                       )}
                       role="group"
                       aria-label="Message composer"
@@ -1084,102 +1066,80 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         sendMessage(inputValue);
                       }}
                     >
-                      {/* Left tool cluster */}
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <button
-                          type="button"
-                          aria-label="Attach media"
-                          className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                        >
-                          <Paperclip className="h-[18px] w-[18px] text-gray-600" />
-                        </button>
-                        <button
-                          type="button"
-                          aria-label="Camera"
-                          className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                        >
-                          <Camera className="h-[18px] w-[18px] text-gray-600" />
-                        </button>
-                      </div>
+                      {/* Left tool cluster - Phase 48 */}
+                      <button
+                        type="button"
+                        aria-label="Attach"
+                        className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                      >
+                        <Paperclip className="h-[18px] w-[18px] text-gray-600" />
+                      </button>
+                      
+                      <button
+                        type="button"
+                        aria-label="Camera"
+                        className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                      >
+                        <Camera className="h-[18px] w-[18px] text-gray-600" />
+                      </button>
 
-                      {/* Textarea (auto-grow) */}
-                      <div className="min-w-0 flex-1">
-                        <textarea
-                          value={inputValue}
-                          onChange={(e) => setInputValue(e.target.value)}
-                          placeholder="Ask Echo or describe your swing…"
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                              e.preventDefault();
-                              sendMessage(inputValue);
-                            }
-                          }}
-                          disabled={isLoading || isRecording || isProcessing}
-                          aria-label="Message input"
-                          rows={1}
-                          className="block w-full resize-none bg-transparent outline-none text-[15px] leading-[1.5] text-gray-900 placeholder:text-gray-500 caret-[#2A9D8F] disabled:opacity-60 disabled:pointer-events-none max-h-[calc(1.5em*5+2px)]"
-                        />
-                      </div>
+                      {/* Input field - Phase 48 auto-grow */}
+                      <textarea
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        placeholder="Message Echo…"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            sendMessage(inputValue);
+                          }
+                        }}
+                        disabled={isLoading || isRecording || isProcessing}
+                        aria-label="Message input"
+                        rows={1}
+                        className="flex-1 min-h-[24px] max-h-[140px] resize-none bg-transparent outline-none text-[15px] leading-[1.5] placeholder:text-gray-500 caret-[#2A9D8F] disabled:opacity-60 disabled:pointer-events-none px-1 sm:px-2 py-1 overflow-y-auto"
+                      />
 
-                      {/* Right action cluster - Phase 46 Mic/Send swap */}
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {/* Combined Mic/Send button with visual state swap */}
-                        <button
-                          type={isRecording ? "button" : "submit"}
-                          aria-label={isRecording ? "Stop recording" : "Send message"}
-                          disabled={!isRecording && (!inputValue?.trim() || isLoading || isProcessing)}
-                          className={cn(
-                            "h-9 w-9 grid place-items-center rounded-full shadow transition",
-                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
-                            isRecording 
-                              ? "bg-red-500 text-white hover:brightness-110 active:brightness-95" 
-                              : (!inputValue?.trim() || isLoading || isProcessing)
-                                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                                : "bg-[#2A9D8F] text-white hover:brightness-110 active:brightness-95"
-                          )}
-                          data-recording={isRecording ? "true" : "false"}
-                          onClick={isRecording ? stopRecording : undefined}
-                          onMouseDown={!isRecording && !isProcessing ? startRecording : undefined}
-                          onMouseUp={!isRecording && !isProcessing ? stopRecording : undefined}
-                          onMouseLeave={!isRecording && !isProcessing ? stopRecording : undefined}
-                          onTouchStart={!isRecording && !isProcessing ? startRecording : undefined}
-                          onTouchEnd={!isRecording && !isProcessing ? stopRecording : undefined}
-                        >
-                          {/* Recording state - show stop icon */}
-                          <span className={cn(
-                            "inline",
-                            !isRecording && "hidden"
-                          )}>
-                            ⏹️
-                          </span>
-                          
-                          {/* Sending/processing state - show spinner */}
-                          {!isRecording && (isLoading || isProcessing) && (
-                            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                              <circle cx="12" cy="12" r="10" className="opacity-25" stroke="currentColor" strokeWidth="4" fill="none"/>
-                              <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
-                            </svg>
-                          )}
-                          
-                          {/* Idle state - show send icon */}
-                          {!isRecording && !isLoading && !isProcessing && (
-                            <span className="text-[16px]">➤</span>
-                          )}
-                        </button>
-                      </div>
+                      {/* Right tool cluster - Phase 48 */}
+                      <button
+                        type="button"
+                        aria-label="Mic"
+                        className={cn(
+                          "h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 transition",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+                          isRecording && "bg-red-500/10 text-red-600"
+                        )}
+                        onMouseDown={!isProcessing ? startRecording : undefined}
+                        onMouseUp={!isProcessing ? stopRecording : undefined}
+                        onMouseLeave={!isProcessing ? stopRecording : undefined}
+                        onTouchStart={!isProcessing ? startRecording : undefined}
+                        onTouchEnd={!isProcessing ? stopRecording : undefined}
+                      >
+                        <Mic className="h-[18px] w-[18px]" />
+                      </button>
+                      
+                      <button
+                        type="submit"
+                        aria-label="Send"
+                        disabled={!inputValue?.trim() || isLoading || isProcessing}
+                        className={cn(
+                          "h-9 px-4 rounded-full text-[14px] font-medium shadow transition",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+                          (!inputValue?.trim() || isLoading || isProcessing)
+                            ? "bg-gray-200 text-gray-500 cursor-not-allowed opacity-60 pointer-events-none"
+                            : "bg-[#2A9D8F] text-white hover:brightness-[0.98] active:brightness-[0.95]"
+                        )}
+                      >
+                        {isLoading || isProcessing ? (
+                          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" className="opacity-25" stroke="currentColor" strokeWidth="4" fill="none"/>
+                            <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
+                          </svg>
+                        ) : (
+                          'Send'
+                        )}
+                      </button>
                     </form>
-
-                    {/* Helper row (hints / model chip) - Phase 45 */}
-                    {!inputValue?.trim() && messages.length === 0 && (
-                      <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-gray-600">
-                        <div className="px-2.5 py-1 rounded-full bg-white/85 backdrop-blur border border-black/10">
-                          Tip: Shift+Enter for newline
-                        </div>
-                        <div className="px-2.5 py-1 rounded-full bg-white/85 backdrop-blur border border-black/10">
-                          Model: Echo Pro
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   {/* Recent history peek */}
