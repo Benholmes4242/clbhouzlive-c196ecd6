@@ -631,7 +631,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             {/* Scrollable content area */}
             <TabsContent value="chat" className="m-0 flex-1" style={{ minHeight: 0 }}>
               <div 
-                className="relative h-full overflow-y-auto overscroll-y-contain scroll-smooth [-webkit-overflow-scrolling:touch] px-3 sm:px-4 pt-10 pb-[64px]"
+                className="relative h-full overflow-y-auto overscroll-y-contain scroll-smooth [-webkit-overflow-scrolling:touch] pt-10 pb-24"
                 data-echo-canvas
                 ref={chatAutoScroll.scrollAreaRef}
               >
@@ -642,49 +642,65 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 
                 <div>
                     {messages.length === 0 ? (
-                      <div className="text-left">
-                        <p className="text-gray-800/80 text-base mb-5">
-                          I'm your personal caddy.<br />
-                          Ask me anything, anytime - I've got you.
+                      <div className="mx-auto max-w-sm text-center space-y-3 py-10 px-3 sm:px-4">
+                        <div className="size-12 rounded-full bg-[#2A9D8F]/8 text-[#2A9D8F] grid place-items-center mx-auto">
+                          <Bot className="h-6 w-6" />
+                        </div>
+                        <h3 className="text-[17px] font-semibold text-gray-900">
+                          I'm Echo, your personal caddy
+                        </h3>
+                        <p className="text-[14px] text-gray-600">
+                          Ask me anything about golf—courses, tips, equipment, or swing analysis.
                         </p>
-
-                        <div className="space-y-3">
-                          {suggestedPrompts.map((prompt, index) => (
+                        <div className="space-y-2 pt-2">
+                          {suggestedPrompts.slice(0, 3).map((prompt, index) => (
                             <button
                               key={index}
                               onClick={() => handleSuggestedPrompt(prompt.text)}
                               className="
-                                w-full text-left rounded-2xl
-                                bg-white/90 backdrop-blur shadow
-                                px-4 py-4
-                                hover:-translate-y-0.5 active:translate-y-0 transition-transform
+                                w-full text-left rounded-xl
+                                bg-white/92 backdrop-blur border border-black/10 shadow-sm
+                                px-3 py-2
+                                hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all
                               "
                             >
-                              <div className="flex items-center gap-3">
-                                <span className="text-xl">{prompt.emoji}</span>
-                                <span className="text-lg font-medium text-gray-900">{prompt.text}</span>
-                              </div>
+                              <span className="text-[14px] text-gray-800">{prompt.text}</span>
                             </button>
                           ))}
                         </div>
                       </div>
                     ) : (
-                      <div className="mx-auto w-full max-w-[var(--bubble-max-md)]">
-                        <div className="flex flex-col space-y-6">
-                          {messages.map((message) => (
-                            <ChatMessageComponent
+                      <div className="max-w-screen-md mx-auto space-y-2 px-3 sm:px-4">
+                        {messages.map((message, index) => {
+                          const isUser = message.type === 'user';
+                          const prevMessage = index > 0 ? messages[index - 1] : null;
+                          const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
+                          const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
+                          const isLastInGroup = !nextMessage || nextMessage.type !== message.type;
+                          
+                          return (
+                            <div 
                               key={message.id}
-                              message={message}
-                              onSaveToInsights={saveToInsights}
-                              onRequestDetail={requestMoreDetail}
-                            />
-                          ))}
+                              className={cn(
+                                isFirstInGroup && index > 0 && "mt-4"
+                              )}
+                            >
+                              <ChatMessageComponent
+                                message={message}
+                                onSaveToInsights={saveToInsights}
+                                onRequestDetail={requestMoreDetail}
+                                isFirstInGroup={isFirstInGroup}
+                                showHeading={isFirstInGroup}
+                              />
+                            </div>
+                          );
+                        })}
                            {isLoading && (
-                             <div className="px-4 sm:px-6 py-2">
-                               <div className="flex gap-2 items-start">
-                                 <div className="h-8 w-8 shrink-0 rounded-full flex items-center justify-center bg-[#2A9D8F]/12 ring-1 ring-[#2A9D8F]/20 animate-[pulse_1.8s_ease-in-out_infinite]">
-                                   <Bot className="h-4 w-4 text-[#2A9D8F]" />
-                                 </div>
+                             <div className="flex gap-2 items-start mt-4">
+                               <div className="hidden sm:block h-7 w-7 shrink-0 rounded-full flex items-center justify-center bg-[#2A9D8F]/12 ring-1 ring-[#2A9D8F]/20 animate-[pulse_1.8s_ease-in-out_infinite]">
+                                 <Bot className="h-[14px] w-[14px] text-[#2A9D8F]" />
+                               </div>
+                               <div className="flex-1 max-w-[78%] sm:max-w-[70%]">
                                  <div className="inline-flex items-center gap-1.5 rounded-xl bg-white/80 border border-black/5 backdrop-blur px-2.5 py-1">
                                    <span className="inline-flex gap-1">
                                      <i className="w-[6px] h-[6px] rounded-full bg-gray-500/70 animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -696,8 +712,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                              </div>
                            )}
                         </div>
-                      </div>
-                    )}
+                      )}
                 </div>
               </div>
             </TabsContent>

@@ -34,6 +34,8 @@ interface ChatMessageProps {
   onAskEcho?: (prompt: string) => void;
   onShare?: (message: ChatMessage) => void;
   onAddVoiceNote?: (message: ChatMessage) => void;
+  isFirstInGroup?: boolean;
+  showHeading?: boolean;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ 
@@ -42,7 +44,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   onRequestDetail,
   onAskEcho,
   onShare,
-  onAddVoiceNote
+  onAddVoiceNote,
+  isFirstInGroup = true,
+  showHeading = true
 }) => {
   const isUser = message.type === 'user';
   const [showSources, setShowSources] = useState(false);
@@ -66,40 +70,50 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 
   return (
     <div 
-      className="px-4 sm:px-6 py-2 animate-[fadeInUp_.18s_ease-out_both]" 
-      data-echo-group
-      role="group"
-      aria-label={isUser ? "Your message" : "Echo message"}
+      role="article"
+      aria-label={`Message from ${isUser ? 'You' : 'Echo'}, ${time}`}
+      className="animate-[fadeInUp_.18s_ease-out_both]"
     >
       <div className={cn(
-        "grid gap-2",
-        isUser ? "justify-items-end" : "justify-items-start"
-      )} data-echo-msg={isUser ? 'user' : 'ai'}>
+        "flex gap-2 items-start",
+        isUser ? "flex-row-reverse" : ""
+      )}>
+        {/* Avatar - only show for AI on first message in group */}
+        {!isUser && isFirstInGroup && (
+          <div className="hidden sm:block h-7 w-7 shrink-0 rounded-full flex items-center justify-center bg-[#2A9D8F]/12 ring-1 ring-[#2A9D8F]/20 mt-5">
+            <Bot className="h-[14px] w-[14px] text-[#2A9D8F]" />
+          </div>
+        )}
+        
+        {/* Spacer for grouped messages */}
+        {!isUser && !isFirstInGroup && (
+          <div className="hidden sm:block w-7 shrink-0" />
+        )}
+        
+        {/* Message content */}
         <div className={cn(
-          "flex gap-2",
-          isUser ? "flex-row-reverse items-start" : "items-start"
+          "flex-1 max-w-[78%] sm:max-w-[70%]",
+          isUser ? "ml-auto" : ""
         )}>
-          {/* Avatar */}
-          {!isUser && (
-            <div className="h-8 w-8 shrink-0 rounded-full flex items-center justify-center bg-[#2A9D8F]/12 ring-1 ring-[#2A9D8F]/20">
-              <Bot className="h-4 w-4 text-[#2A9D8F]" />
+          {/* Heading - only on first in group for AI */}
+          {!isUser && showHeading && isFirstInGroup && (
+            <div className="flex items-center justify-between mb-1.5 px-0.5">
+              <span className="text-[11px] font-medium tracking-wide text-gray-600/80">Echo</span>
+              <span className="text-[11px] text-gray-500">{time}</span>
             </div>
           )}
-        
-          {/* Bubble shell */}
+          
+          {/* Bubble */}
           <div className={cn(
-            "relative max-w-[82%] md:max-w-[70%]",
+            "rounded-2xl shadow-[0_6px_20px_rgba(0,0,0,0.06)] border px-3.5 py-2.5 sm:px-4 sm:py-3",
+            isUser 
+              ? "bg-[#2A9D8F] text-white rounded-tr-md border-[#2A9D8F] hover:brightness-105 transition-all" 
+              : "bg-white/92 backdrop-blur border-black/5 text-gray-900 rounded-tl-md",
+            !isUser && isFirstInGroup && "relative before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:rounded-l-2xl before:bg-[#2A9D8F]/15"
           )}>
-            <div className={cn(
-              "rounded-2xl px-3.5 py-2.5 shadow-sm",
-              "drop-shadow-[0_1px_0_rgba(0,0,0,0.03)]",
-              isUser 
-                ? "bg-[#2A9D8F]/[0.09] border border-[#2A9D8F]/20 text-[#1E3D45]" 
-                : "bg-white/90 backdrop-blur border border-black/[0.06] text-gray-900"
-            )}>
-              <div className="text-[15px] leading-[1.45]">
+            <div className="text-[15px] sm:text-[15.5px] leading-[1.5]">
               {isUser ? (
-                <p className="m-0 break-words">{message.content}</p>
+                <p className="m-0 break-words leading-[1.5]">{message.content}</p>
               ) : swingAnalysisData ? (
                 <div className="mt-2 rounded-2xl overflow-hidden bg-white/92 backdrop-blur border border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.08)]" data-swing-card>
                   <SwingReview
@@ -121,31 +135,49 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-headings:text-gray-900 prose-p:my-2 prose-ul:my-2 prose-ul:pl-4 marker:prose-ul:text-gray-400 prose-ol:my-2 prose-ol:pl-4 prose-li:my-0.5 prose-strong:font-semibold prose-a:text-[#2A9D8F] prose-a:underline prose-a:underline-offset-2 hover:prose-a:brightness-110 prose-code:text-[0.9em]">
+                <div className="space-y-2">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
-                      a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-[#2A9D8F] underline underline-offset-2 hover:brightness-110 break-words focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40" />,
-                      h1: ({ children }) => <h3 className="text-[15px] font-semibold mb-2 mt-0 text-gray-900">{children}</h3>,
-                      h2: ({ children }) => <h4 className="text-[15px] font-semibold mb-2 mt-2 text-gray-900">{children}</h4>,
+                      a: (props) => (
+                        <a 
+                          {...props} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-[#2A9D8F] underline underline-offset-2 hover:brightness-110 break-words focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40 rounded"
+                        />
+                      ),
+                      h1: ({ children }) => <h3 className="text-[16px] font-semibold mb-2 mt-3 first:mt-0 text-gray-900">{children}</h3>,
+                      h2: ({ children }) => <h4 className="text-[15.5px] font-semibold mb-2 mt-3 text-gray-900">{children}</h4>,
                       h3: ({ children }) => <h4 className="text-[15px] font-semibold mb-2 mt-2 text-gray-900">{children}</h4>,
-                      p: ({ children }) => <p className="my-2 first:mt-0 last:mb-0 break-words">{children}</p>,
-                      ul: ({ children }) => <ul className="my-2 pl-4 marker:text-gray-400">{children}</ul>,
-                      ol: ({ children }) => <ol className="my-2 pl-4">{children}</ol>,
-                      li: ({ children }) => <li className="my-0.5">{children}</li>,
-                      strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                      p: ({ children }) => <p className="my-0 break-words leading-[1.5]">{children}</p>,
+                      ul: ({ children }) => <ul className="my-2 pl-4 space-y-1 marker:text-gray-500">{children}</ul>,
+                      ol: ({ children }) => <ol className="my-2 pl-4 space-y-1">{children}</ol>,
+                      li: ({ children }) => <li className="leading-[1.5]">{children}</li>,
+                      strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
                       code: ({ inline, children, ...props }: any) => 
                         inline ? (
-                          <code className="rounded px-1.5 py-0.5 bg-black/[0.05] text-[13px]" {...props}>
+                          <code className="font-mono text-[13px] bg-black/5 rounded px-1.5 py-0.5" {...props}>
                             {children}
                           </code>
                         ) : (
-                          <code className="font-mono text-[12.5px]" {...props}>{children}</code>
+                          <code className="font-mono text-[13px]" {...props}>{children}</code>
                         ),
                       pre: ({ children }) => (
-                        <pre className="relative mt-2 overflow-auto rounded-lg border border-black/10 bg-black/[0.02] backdrop-blur px-3 py-2 text-[12.5px] leading-[1.45]">
-                          {children}
-                        </pre>
+                        <div className="my-2 rounded-xl overflow-hidden border border-black/10 bg-black/[0.03]">
+                          <div className="flex items-center justify-between px-3 py-1.5 bg-black/5 border-b border-black/5">
+                            <span className="text-[12px] text-gray-600 font-medium">Code</span>
+                            <button
+                              aria-label="Copy code"
+                              className="text-[12px] text-gray-600 hover:text-gray-900 px-2 py-0.5 rounded hover:bg-black/5 transition-colors focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40"
+                            >
+                              Copy
+                            </button>
+                          </div>
+                          <pre className="p-3 overflow-x-auto text-[13px] leading-[1.45]">
+                            {children}
+                          </pre>
+                        </div>
                       ),
                     }}
                   >
@@ -153,7 +185,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   </ReactMarkdown>
                 </div>
               )}
-              </div>
+            </div>
             
             {/* Tags from metadata */}
             {message.metadata?.tags && (
@@ -237,22 +269,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             )}
           </div>
           
-          {/* Timestamp + status row */}
-          <div className={cn(
-            "mt-1 text-[12px] text-gray-500/80",
-            isUser ? "text-right" : "text-left"
-          )}>
-            <span className="sr-only">Sent at</span>
-            {time}
-            {!isUser && message.metadata?.latencyMs && (
-              <> • {message.metadata.latencyMs < 1000 ? 
-                `${message.metadata.latencyMs}ms` : 
-                `${(message.metadata.latencyMs / 1000).toFixed(1)}s`
-              }</>
-            )}
-            {isUser && <span className="ml-1">• Sent</span>}
-          </div>
-        </div>
+          {/* User message timestamp */}
+          {isUser && (
+            <div className="mt-1 text-right">
+              <span className="text-[11px] text-gray-500">{time}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
