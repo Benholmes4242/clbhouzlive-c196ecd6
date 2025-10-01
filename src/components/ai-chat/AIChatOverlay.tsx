@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen } from 'lucide-react';
+import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen, Bot } from 'lucide-react';
 import { PiWaveform } from 'react-icons/pi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -567,7 +567,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         </div>
                       </div>
                     ) : (
-                      <div className="space-y-4">
+                      <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 space-y-6">
                         {messages.map((message) => (
                           <ChatMessageComponent
                             key={message.id}
@@ -577,11 +577,17 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           />
                         ))}
                         {isLoading && (
-                          <div className="flex justify-start">
-                            <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                              <div className="flex items-center gap-2">
-                                <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
-                                <span className="text-sm">Echo is thinking...</span>
+                          <div className="space-y-2" data-echo-group>
+                            <div className="flex items-start gap-2" data-echo-typing>
+                              <div className="mt-0.5 h-6 w-6 shrink-0 rounded-full flex items-center justify-center bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] opacity-80">
+                                <Bot className="h-4 w-4 text-white/90" />
+                              </div>
+                              <div className="rounded-[18px] px-4 py-3 bg-white/75 backdrop-blur border border-black/5">
+                                <span className="inline-flex gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-gray-500/70 animate-bounce [animation-delay:-.2s]" />
+                                  <span className="w-1.5 h-1.5 rounded-full bg-gray-500/70 animate-bounce" />
+                                  <span className="w-1.5 h-1.5 rounded-full bg-gray-500/70 animate-bounce [animation-delay:.2s]" />
+                                </span>
                               </div>
                             </div>
                           </div>

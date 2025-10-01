@@ -64,25 +64,24 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   }
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div className={`w-full ${isUser ? 'order-2' : 'order-1'}`}>
-        <div className={`flex items-start gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
-          <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-            isUser ? 'bg-[#3da0a9]/10 text-[#3da0a9]' : 'bg-muted'
-          }`}>
-            {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+    <div className="space-y-2" data-echo-group>
+      <div className={`flex ${isUser ? 'justify-end' : 'items-start'} gap-2`} data-echo-msg={isUser ? 'user' : 'ai'}>
+        {!isUser && (
+          <div className="mt-0.5 h-6 w-6 shrink-0 rounded-full flex items-center justify-center bg-gradient-to-br from-[#1D3557] to-[#2A9D8F]">
+            <Bot className="h-4 w-4 text-white/90" />
           </div>
-          
-          <div className={`rounded-lg p-3 ${
-            isUser 
-              ? 'bg-[#3da0a9]/5 text-[#2d7580] border border-[#3da0a9]/20' 
-              : 'bg-muted'
-          }`}>
-            <div className="prose prose-sm max-w-none dark:prose-invert">
+        )}
+        
+        <div className={`max-w-[86%] rounded-[18px] px-4 py-3 shadow-[0_6px_20px_rgba(0,0,0,0.06)] ${
+          isUser 
+            ? 'bg-[#3da0a9]/7 border border-[#3da0a9]/20 text-gray-900 shadow-[0_6px_20px_rgba(61,160,169,0.15)]' 
+            : 'bg-white/90 backdrop-blur border border-black/5 text-gray-900'
+        }`}>
+            <div className="text-[15px] leading-[1.35]">
               {isUser ? (
-                <p className="m-0">{message.content}</p>
+                <p className="m-0 break-words">{message.content}</p>
               ) : swingAnalysisData ? (
-                <>
+                <div className="mt-2 rounded-2xl overflow-hidden bg-white/92 backdrop-blur border border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.08)]" data-swing-card>
                   <SwingReview
                     videoUrl={message.metadata!.videoUrl!}
                     summary={swingAnalysisData.summary}
@@ -92,29 +91,41 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                     onShare={() => onShare?.(message)}
                     onAddVoiceNote={() => onAddVoiceNote?.(message)}
                   />
-                  <div className="mt-4">
+                  <div className="p-3 sm:p-4">
                     <CoachPrompt
                       swingAnalysisId={message.id}
                       onOpen={() => {
-                        // Open coach finder modal - we'll implement this properly
                         console.log('Open coach finder for analysis:', message.id);
                       }}
                     />
                   </div>
-                </>
+                </div>
               ) : (
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
-                    a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" className="underline break-words" />,
-                    h1: ({ children }) => <h3 className="text-sm font-semibold mb-2 mt-0">{children}</h3>,
-                    h2: ({ children }) => <h4 className="text-sm font-semibold mb-2 mt-2">{children}</h4>,
-                    h3: ({ children }) => <h4 className="text-sm font-semibold mb-2 mt-2">{children}</h4>,
-                    p: ({ children }) => <p className="text-sm mb-2 last:mb-0 break-words">{children}</p>,
-                    ul: ({ children }) => <ul className="text-sm mb-2 ml-4">{children}</ul>,
-                    ol: ({ children }) => <ol className="text-sm mb-2 ml-4">{children}</ol>,
-                    li: ({ children }) => <li className="mb-1">{children}</li>,
+                    a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-[#2A9D8F] hover:underline break-words" />,
+                    h1: ({ children }) => <h3 className="text-[15px] font-semibold mb-2 mt-0">{children}</h3>,
+                    h2: ({ children }) => <h4 className="text-[15px] font-semibold mb-2 mt-2">{children}</h4>,
+                    h3: ({ children }) => <h4 className="text-[15px] font-semibold mb-2 mt-2">{children}</h4>,
+                    p: ({ children }) => <p className="my-2 first:mt-0 last:mb-0 break-words">{children}</p>,
+                    ul: ({ children }) => <ul className="my-2 pl-5">{children}</ul>,
+                    ol: ({ children }) => <ol className="my-2 pl-5">{children}</ol>,
+                    li: ({ children }) => <li className="my-1">{children}</li>,
                     strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                    code: ({ inline, children, ...props }: any) => 
+                      inline ? (
+                        <code className="bg-[rgba(2,16,32,0.06)] border border-[rgba(2,16,32,0.05)] rounded-md px-1 py-0.5 text-[.92em]" {...props}>
+                          {children}
+                        </code>
+                      ) : (
+                        <code {...props}>{children}</code>
+                      ),
+                    pre: ({ children }) => (
+                      <pre className="mt-2 overflow-auto rounded-lg bg-[#0b2537] text-white text-[13px] leading-[1.45] p-3 border border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+                        {children}
+                      </pre>
+                    ),
                   }}
                 >
                   {message.content}
@@ -124,11 +135,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             
             {/* Tags from metadata */}
             {message.metadata?.tags && (
-              <div className="flex flex-wrap gap-1 mt-2">
+              <div className="flex flex-wrap gap-2 mt-2">
                 {message.metadata.tags.map((tag, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs">
+                  <span key={index} className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-white/80 backdrop-blur border border-black/5 rounded-full">
                     {tag}
-                  </Badge>
+                  </span>
                 ))}
               </div>
             )}
@@ -202,20 +213,17 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 </Button>
               </div>
             )}
-          </div>
         </div>
-        
-        <div className={`flex items-center gap-2 text-xs text-muted-foreground mt-1 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
-          <span>{time}</span>
-          {!isUser && message.metadata?.latencyMs && (
-            <span className="opacity-60">
-              {message.metadata.latencyMs < 1000 ? 
-                `${message.metadata.latencyMs}ms` : 
-                `${(message.metadata.latencyMs / 1000).toFixed(1)}s`
-              }
-            </span>
-          )}
-        </div>
+      </div>
+      
+      <div className={`mt-1 text-[11px] leading-none text-gray-500/90 select-none ${isUser ? 'text-right' : 'text-left'}`}>
+        {time}
+        {!isUser && message.metadata?.latencyMs && (
+          <> • {message.metadata.latencyMs < 1000 ? 
+            `${message.metadata.latencyMs}ms` : 
+            `${(message.metadata.latencyMs / 1000).toFixed(1)}s`
+          }</>
+        )}
       </div>
     </div>
   );

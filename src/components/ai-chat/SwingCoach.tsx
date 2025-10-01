@@ -1441,14 +1441,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
             )}
 
             {messages.map((message) => (
-              <div key={message.id}>
+              <div key={message.id} className="mx-auto w-full max-w-[720px]">
                 <ChatMessageComponent
                   message={message}
                   onSaveToInsights={saveToSwingInsights}
                   onRequestDetail={requestMoreDetail}
                   onAskEcho={(prompt) => {
-                    // Open Echo with the specific prompt
-                    // This would integrate with the main Echo system
                     console.log('Ask Echo:', prompt);
                   }}
                 />
