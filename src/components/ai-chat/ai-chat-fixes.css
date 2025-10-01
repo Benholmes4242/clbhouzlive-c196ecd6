@@ -95,14 +95,11 @@
 
 /* Ultra-small screen optimizations for composer */
 @media (max-width: 360px) {
-  .composer-pill-tiny {
-    padding-left: 0.65rem !important;
-    padding-right: 0.65rem !important;
-    padding-top: 0.4rem !important;
-    padding-bottom: 0.4rem !important;
+  .composer-pill {
+    padding: 8px 12px !important;
   }
   
-  .composer-pill-tiny textarea {
+  .composer-pill textarea {
     font-size: 14px !important;
   }
   
