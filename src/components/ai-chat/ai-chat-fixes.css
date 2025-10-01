@@ -59,7 +59,13 @@
     padding: 0.5rem 0.6rem !important;
   }
   
-  .composer-bubble input {
+  .composer-bubble textarea {
     font-size: 14px !important;
+    min-height: 36px !important;
+  }
+  
+  .composer-bubble button {
+    height: 36px !important;
+    width: 36px !important;
   }
 }
