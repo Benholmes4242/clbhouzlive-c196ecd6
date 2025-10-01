@@ -825,10 +825,15 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                   {/* Chat Tab */}
                   <TabsContent value="chat" className="m-0 flex-1" style={{ minHeight: 0 }} role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
                       <div 
-                        className="h-full overflow-y-auto px-3 sm:px-4 pt-4 pb-6"
+                        className="relative h-full overflow-y-auto overscroll-contain scroll-smooth pt-4 pb-6 px-3 sm:px-4"
+                        style={{ WebkitOverflowScrolling: "touch" }}
                         data-echo-canvas
                         ref={chatAutoScroll.scrollAreaRef}
                       >
+                        {/* Top fade - Phase 52 */}
+                        <div className="pointer-events-none absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-white/60 to-transparent z-10" />
+                        {/* Bottom fade - Phase 52 */}
+                        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-white/60 to-transparent z-10" />
                         <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-5">
                     {loadingStates.conversations ? (
                       <>
@@ -1151,10 +1156,15 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                   {/* Swing Coach Tab */}
                   <TabsContent value="swing" className="m-0 flex-1" style={{ minHeight: 0 }} role="tabpanel" id="swing-panel" aria-labelledby="swing-tab">
                      <div 
-                       className="h-full overflow-y-auto px-3 sm:px-4 pt-4 pb-6"
+                       className="relative h-full overflow-y-auto overscroll-contain scroll-smooth pt-4 pb-6 px-3 sm:px-4"
+                       style={{ WebkitOverflowScrolling: "touch" }}
                        data-echo-canvas
                        ref={swingAutoScroll.scrollAreaRef}
                      >
+                        {/* Top fade - Phase 52 */}
+                        <div className="pointer-events-none absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-white/60 to-transparent z-10" />
+                        {/* Bottom fade - Phase 52 */}
+                        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-white/60 to-transparent z-10" />
                         <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-5">
                     {loadingStates.swingAnalyses ? (
                       <>

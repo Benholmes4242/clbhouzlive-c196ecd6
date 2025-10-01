@@ -574,15 +574,16 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             {/* Scrollable content area */}
             <TabsContent value="chat" className="m-0 flex-1" style={{ minHeight: 0 }}>
               <div 
-                className="relative h-full overflow-y-auto overscroll-y-contain scroll-smooth [-webkit-overflow-scrolling:touch] pt-10 pb-24"
+                className="relative h-full overflow-y-auto overscroll-contain scroll-smooth pt-10 pb-24"
+                style={{ WebkitOverflowScrolling: "touch" }}
                 data-echo-canvas
                 ref={chatScrollRef}
                 onScroll={handleChatScroll}
               >
-                {/* Top vignette */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-white/75 to-transparent" />
-                {/* Bottom vignette */}
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/80 to-transparent" />
+                {/* Top fade - Phase 52 */}
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-white/60 to-transparent z-10" />
+                {/* Bottom fade - Phase 52 */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white/60 to-transparent z-10" />
                 
                 {/* Unread above notice (sticky hint at top while scrolling) */}
                 {false && ( /* Set to true to show "unread above" indicator */
@@ -746,13 +747,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
             <TabsContent value="swing" className="m-0 flex-1" style={{ minHeight: 0 }}>
               <div 
-                className="relative h-full overflow-y-auto overscroll-y-contain scroll-smooth [-webkit-overflow-scrolling:touch] px-3 sm:px-4 pt-10 pb-[64px]"
+                className="relative h-full overflow-y-auto overscroll-contain scroll-smooth px-3 sm:px-4 pt-10 pb-[64px]"
+                style={{ WebkitOverflowScrolling: "touch" }}
                 data-echo-canvas
               >
-                {/* Top vignette */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-white/75 to-transparent" />
-                {/* Bottom vignette */}
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white/80 to-transparent" />
+                {/* Top fade - Phase 52 */}
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-white/60 to-transparent z-10" />
+                {/* Bottom fade - Phase 52 */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white/60 to-transparent z-10" />
                 
                 <SwingCoach
                   onClose={() => setActiveTab('chat')}
