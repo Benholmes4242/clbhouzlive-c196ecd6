@@ -108,6 +108,14 @@
     font-size: 12px !important;
   }
   
+  /* Message action buttons - compact mode */
+  .group [data-open="true"] > button {
+    height: 1.75rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    font-size: 12px !important;
+  }
+  
   /* Attachment rail on small screens */
   .attachment-rail img,
   .attachment-rail > div {

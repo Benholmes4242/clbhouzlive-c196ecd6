@@ -90,10 +90,101 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           <div className="hidden sm:block w-7 shrink-0" />
         )}
         
-        {/* Message content */}
-        <div className={cn(
-          "max-w-[78%]"
-        )}>
+        {/* Message content - actionable wrapper */}
+        <div 
+          className={cn(
+            "group relative max-w-[78%]"
+          )}
+          data-actions-open="false"
+          data-own={isUser ? "true" : "false"}
+        >
+          {/* Long-press hit area (for future mobile support) */}
+          <div 
+            className="absolute inset-0 rounded-2xl"
+            data-longpress-target="true"
+            aria-hidden="true"
+          ></div>
+
+          {/* Action bar (hover/long-press reveal) */}
+          <div
+            className={cn(
+              "pointer-events-none absolute z-10 translate-y-[-100%]",
+              "opacity-0 group-hover:opacity-100 transition-opacity",
+              "data-[open=true]:opacity-100 data-[open=true]:pointer-events-auto",
+              "flex items-center gap-1.5",
+              isUser ? "right-0 -top-3" : "left-0 -top-3"
+            )}
+            data-open="false"
+          >
+            <button 
+              className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              aria-label="Copy message"
+              type="button"
+            >
+              Copy
+            </button>
+            <button 
+              className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              aria-label="Quote message"
+              type="button"
+            >
+              Quote
+            </button>
+            <button 
+              className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              aria-label="Save message"
+              type="button"
+            >
+              Save
+            </button>
+            {/* Delete button - only for user's own messages */}
+            {isUser && (
+              <button 
+                className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] text-red-600 hover:bg-white active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40"
+                aria-label="Delete message"
+                type="button"
+              >
+                Delete
+              </button>
+            )}
+          </div>
+
+          {/* Reactions rail (optional) */}
+          {false && ( /* Set to true to show reactions */
+            <div
+              className={cn(
+                "pointer-events-none absolute z-10",
+                "opacity-0 group-hover:opacity-100 transition-opacity",
+                "data-[open=true]:opacity-100 data-[open=true]:pointer-events-auto",
+                "flex items-center gap-1.5",
+                isUser ? "right-0 -bottom-4" : "left-0 -bottom-4"
+              )}
+              data-open="false"
+            >
+              <button 
+                className="h-7 w-7 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm grid place-items-center text-[13px] hover:bg-white active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                aria-label="React with thumbs up"
+                type="button"
+              >
+                👍
+              </button>
+              <button 
+                className="h-7 w-7 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm grid place-items-center text-[13px] hover:bg-white active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                aria-label="React with heart"
+                type="button"
+              >
+                ❤️
+              </button>
+              <button 
+                className="h-7 w-7 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm grid place-items-center text-[13px] hover:bg-white active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                aria-label="React with golf flag"
+                type="button"
+              >
+                ⛳️
+              </button>
+            </div>
+          )}
+
           {/* Heading - only on first in group for AI */}
           {!isUser && showHeading && isFirstInGroup && (
             <div className="mb-1.5 ml-1 text-[11px] font-medium text-gray-600">
