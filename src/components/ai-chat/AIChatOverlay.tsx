@@ -670,47 +670,45 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         </div>
                       </div>
                     ) : (
-                      <div className="max-w-screen-md mx-auto space-y-2 px-3 sm:px-4">
-                        {messages.map((message, index) => {
-                          const isUser = message.type === 'user';
-                          const prevMessage = index > 0 ? messages[index - 1] : null;
-                          const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
-                          const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
-                          const isLastInGroup = !nextMessage || nextMessage.type !== message.type;
-                          
-                          return (
-                            <div 
-                              key={message.id}
-                              className={cn(
-                                isFirstInGroup && index > 0 && "mt-4"
-                              )}
-                            >
-                              <ChatMessageComponent
-                                message={message}
-                                onSaveToInsights={saveToInsights}
-                                onRequestDetail={requestMoreDetail}
-                                isFirstInGroup={isFirstInGroup}
-                                showHeading={isFirstInGroup}
-                              />
-                            </div>
-                          );
-                        })}
-                           {isLoading && (
-                             <div className="flex gap-2 items-start mt-4">
-                               <div className="hidden sm:block h-7 w-7 shrink-0 rounded-full flex items-center justify-center bg-[#2A9D8F]/12 ring-1 ring-[#2A9D8F]/20 animate-[pulse_1.8s_ease-in-out_infinite]">
-                                 <Bot className="h-[14px] w-[14px] text-[#2A9D8F]" />
-                               </div>
-                               <div className="flex-1 max-w-[78%] sm:max-w-[70%]">
-                                 <div className="inline-flex items-center gap-1.5 rounded-xl bg-white/80 border border-black/5 backdrop-blur px-2.5 py-1">
-                                   <span className="inline-flex gap-1">
-                                     <i className="w-[6px] h-[6px] rounded-full bg-gray-500/70 animate-bounce" style={{ animationDelay: '0ms' }} />
-                                     <i className="w-[6px] h-[6px] rounded-full bg-gray-500/70 animate-bounce" style={{ animationDelay: '200ms' }} />
-                                     <i className="w-[6px] h-[6px] rounded-full bg-gray-500/70 animate-bounce" style={{ animationDelay: '400ms' }} />
-                                   </span>
-                                 </div>
-                               </div>
-                             </div>
-                           )}
+                <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-5 space-y-2">
+                  {messages.map((message, index) => {
+                    const isUser = message.type === 'user';
+                    const prevMessage = index > 0 ? messages[index - 1] : null;
+                    const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
+                    const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
+                    const isLastInGroup = !nextMessage || nextMessage.type !== message.type;
+                    
+                    return (
+                      <div 
+                        key={message.id}
+                        className={cn(
+                          isFirstInGroup && index > 0 && "mt-4"
+                        )}
+                      >
+                        <ChatMessageComponent
+                          message={message}
+                          onSaveToInsights={saveToInsights}
+                          onRequestDetail={requestMoreDetail}
+                          isFirstInGroup={isFirstInGroup}
+                          showHeading={isFirstInGroup}
+                        />
+                      </div>
+                    );
+                  })}
+                   {isLoading && (
+                     <div className="flex items-end gap-2 mt-4">
+                       <div className="shrink-0 h-7 w-7 rounded-full grid place-items-center bg-white/80 backdrop-blur border border-black/10"></div>
+                       <div className="max-w-[78%]">
+                         <div className="rounded-2xl rounded-bl-md bg-white/92 backdrop-blur border border-black/10 shadow-[0_10px_28px_rgba(0,0,0,0.08)] px-3 py-2">
+                           <div className="flex items-center gap-1.5">
+                             <span className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
+                             <span className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce"></span>
+                             <span className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+                   )}
                         </div>
                       )}
                 </div>

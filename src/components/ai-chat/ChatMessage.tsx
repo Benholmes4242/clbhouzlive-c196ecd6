@@ -75,12 +75,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       className="animate-[fadeInUp_.18s_ease-out_both]"
     >
       <div className={cn(
-        "flex gap-2.5 items-start",
-        isUser ? "flex-row-reverse ml-[12%] sm:ml-[20%]" : "mr-[12%] sm:mr-[20%]"
+        "flex items-end gap-2",
+        isUser ? "flex-row-reverse justify-end" : "justify-start"
       )}>
         {/* Avatar - only show for AI on first message in group */}
         {!isUser && isFirstInGroup && (
-          <div className="hidden sm:block h-7 w-7 shrink-0 rounded-full flex items-center justify-center bg-[#2A9D8F]/12 ring-1 ring-[#2A9D8F]/20 mt-0.5">
+          <div className="shrink-0 h-7 w-7 rounded-full grid place-items-center bg-white/80 backdrop-blur border border-black/10">
             <Bot className="h-[14px] w-[14px] text-[#2A9D8F]" />
           </div>
         )}
@@ -92,12 +92,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         
         {/* Message content */}
         <div className={cn(
-          "flex-1 inline-flex flex-col max-w-[88%] sm:max-w-[75%]",
-          isUser ? "items-end" : "items-start"
+          "max-w-[78%]"
         )}>
           {/* Heading - only on first in group for AI */}
           {!isUser && showHeading && isFirstInGroup && (
-            <div className="mb-1 ml-10 text-[11px] font-medium text-gray-600">
+            <div className="mb-1.5 ml-1 text-[11px] font-medium text-gray-600">
               Echo
             </div>
           )}
@@ -107,17 +106,16 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             role="group"
             aria-label={`Message from ${isUser ? 'You' : 'Echo'} at ${time}`}
             className={cn(
-              "rounded-3xl px-3.5 py-2.5 sm:px-4 sm:py-3 break-words",
+              "rounded-2xl px-3.5 py-2.5 text-[15px] break-words",
               isUser 
-                ? "bg-[#2A9D8F] text-white rounded-br-md shadow-[0_8px_22px_rgba(42,157,143,0.25)] hover:brightness-105 transition-all" 
-                : "bg-white text-gray-900 border border-black/8 rounded-bl-md shadow-[0_8px_24px_rgba(0,0,0,0.06)]"
-            )}>
-            <div className="text-[15px] sm:text-[15.5px] leading-[1.5] first:mt-0 last:mb-0">
+                ? "rounded-br-md bg-[#2A9D8F]/10 border border-[#2A9D8F]/25 text-gray-900 shadow-[0_6px_18px_rgba(42,157,143,0.15)]" 
+                : "rounded-bl-md bg-white/92 backdrop-blur border border-black/10 text-gray-900 shadow-[0_10px_28px_rgba(0,0,0,0.08)]",
+              isUser ? "leading-[1.5]" : "leading-[1.55]"
+            )}
+          >
+            <div className="first:mt-0 last:mb-0">
               {isUser ? (
-                <div className="flex items-end gap-2">
-                  <p className="m-0 break-words break-all leading-[1.5] flex-1">{message.content}</p>
-                  <span className="ml-2 shrink-0 self-end translate-y-[2px] text-[11px] leading-none text-white/85">{time}</span>
-                </div>
+                <div className="break-words break-all">{message.content}</div>
               ) : swingAnalysisData ? (
                 <div className="mt-2 rounded-2xl overflow-hidden bg-white/92 backdrop-blur border border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.08)]" data-swing-card>
                   <SwingReview
@@ -139,7 +137,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div>
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
@@ -148,30 +146,30 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                           {...props} 
                           target="_blank" 
                           rel="noopener noreferrer" 
-                          className="text-[#2A9D8F] underline decoration-[#2A9D8F]/40 underline-offset-2 hover:decoration-[#2A9D8F] break-words focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40 rounded"
+                          className="underline decoration-[#2A9D8F]/50 underline-offset-2 hover:decoration-[#2A9D8F] text-[#2A9D8F] break-words focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40 rounded"
                         />
                       ),
                       h1: ({ children }) => <h3 className="text-[16px] font-semibold mb-2 mt-3 first:mt-0 text-gray-900">{children}</h3>,
                       h2: ({ children }) => <h4 className="text-[15.5px] font-semibold mb-2 mt-3 text-gray-900">{children}</h4>,
                       h3: ({ children }) => <h4 className="text-[15px] font-semibold mb-2 mt-2 text-gray-900">{children}</h4>,
-                      p: ({ children }) => <p className="my-2 first:mt-0 last:mb-0 break-words break-all leading-[1.5]">{children}</p>,
-                      ul: ({ children }) => <ul className="my-2 pl-4 space-y-1 marker:text-gray-500">{children}</ul>,
-                      ol: ({ children }) => <ol className="my-2 pl-4 space-y-1">{children}</ol>,
+                      p: ({ children }) => <p className="my-2 first:mt-0 last:mb-0 break-words break-all">{children}</p>,
+                      ul: ({ children }) => <ul className="list-disc pl-5 space-y-1.5 my-2 marker:text-gray-500">{children}</ul>,
+                      ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1.5 my-2 marker:text-gray-500">{children}</ol>,
                       li: ({ children }) => <li className="leading-[1.5]">{children}</li>,
                       strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
                       code: ({ inline, children, ...props }: any) => 
                         inline ? (
-                          <code className="font-mono text-[13px] bg-black/6 rounded-[6px] px-1.5 py-0.5" {...props}>
+                          <code className="px-1.5 py-0.5 rounded bg-black/5 border border-black/10 text-[13px] font-mono" {...props}>
                             {children}
                           </code>
                         ) : (
-                          <code className="font-mono text-[13px] text-white/95" {...props}>{children}</code>
+                          <code className="font-mono text-[13px] text-gray-100" {...props}>{children}</code>
                         ),
                       pre: ({ children }) => (
                         <div 
                           role="region" 
                           aria-label="Code snippet"
-                          className="my-2 rounded-xl overflow-x-auto bg-[#0F172A] text-white/95"
+                          className="mt-2 overflow-x-auto rounded-xl bg-gray-900 text-gray-100 border border-black/20 shadow-inner"
                         >
                           <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10">
                             <span className="text-[11px] text-white/60 font-medium">Code</span>
@@ -182,20 +180,20 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                               Copy
                             </button>
                           </div>
-                          <pre className="p-3 sm:p-3.5 text-[13px] leading-[1.5]">
+                          <pre className="p-3 text-[13px] leading-[1.5]">
                             {children}
                           </pre>
+                        </div>
+                      ),
+                      img: (props) => (
+                        <div className="mt-3 overflow-hidden rounded-xl border border-black/10 bg-white/80 backdrop-blur shadow-sm">
+                          <img {...props} className="block w-full h-auto" />
                         </div>
                       ),
                     }}
                   >
                     {message.content}
                   </ReactMarkdown>
-                  {!isUser && isFirstInGroup && (
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="ml-2 shrink-0 text-[11px] leading-none text-gray-500">{time}</span>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -282,6 +280,13 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             )}
           </div>
           
+          {/* Timestamp */}
+          <div className={cn(
+            "pt-1 text-[11px] text-gray-500 select-none",
+            isUser ? "text-right" : ""
+          )}>
+            {time}
+          </div>
         </div>
       </div>
     </div>
