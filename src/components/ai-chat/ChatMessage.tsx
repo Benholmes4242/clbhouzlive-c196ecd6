@@ -90,7 +90,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           <div className="hidden sm:block w-7 shrink-0" />
         )}
         
-        {/* Message content - actionable wrapper */}
+        {/* Message content - actionable wrapper with Phase 42 actions */}
         <div 
           className={cn(
             "group relative max-w-[78%]"
@@ -98,92 +98,52 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           data-actions-open="false"
           data-own={isUser ? "true" : "false"}
         >
-          {/* Long-press hit area (for future mobile support) */}
-          <div 
-            className="absolute inset-0 rounded-2xl"
-            data-longpress-target="true"
-            aria-hidden="true"
-          ></div>
+          {/* Long-press hit area (mobile visual only) */}
+          <button
+            className="sm:hidden absolute inset-0 opacity-0 rounded-2xl"
+            aria-label="Open message actions"
+            type="button"
+          ></button>
 
-          {/* Action bar (hover/long-press reveal) */}
+          {/* Actions toolbar (desktop hover/focus) - Phase 42 spec */}
           <div
             className={cn(
               "pointer-events-none absolute z-10 translate-y-[-100%]",
-              "opacity-0 group-hover:opacity-100 transition-opacity",
-              "data-[open=true]:opacity-100 data-[open=true]:pointer-events-auto",
-              "flex items-center gap-1.5",
-              isUser ? "right-0 -top-3" : "left-0 -top-3"
+              "opacity-0 group-hover:opacity-100 group-focus-within:opacity-100",
+              "transition-opacity duration-150",
+              "hidden sm:flex items-center gap-1",
+              isUser ? "right-0 -top-4" : "left-0 -top-4"
             )}
-            data-open="false"
           >
             <button 
-              className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              className="pointer-events-auto h-8 w-8 grid place-items-center rounded-full bg-white/95 backdrop-blur border border-black/10 shadow hover:bg-white active:scale-[.98] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              aria-label="React to message"
+              type="button"
+            >
+              😊
+            </button>
+            <button 
+              className="pointer-events-auto h-8 w-8 grid place-items-center rounded-full bg-white/95 backdrop-blur border border-black/10 shadow hover:bg-white active:scale-[.98] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
               aria-label="Copy message"
               type="button"
             >
-              Copy
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
             </button>
             <button 
-              className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-              aria-label="Quote message"
+              className="pointer-events-auto h-8 w-8 grid place-items-center rounded-full bg-white/95 backdrop-blur border border-black/10 shadow hover:bg-white active:scale-[.98] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              aria-label="More actions"
               type="button"
             >
-              Quote
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="5" r="1.5"></circle>
+                <circle cx="12" cy="12" r="1.5"></circle>
+                <circle cx="12" cy="19" r="1.5"></circle>
+              </svg>
             </button>
-            <button 
-              className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-              aria-label="Save message"
-              type="button"
-            >
-              Save
-            </button>
-            {/* Delete button - only for user's own messages */}
-            {isUser && (
-              <button 
-                className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] text-red-600 hover:bg-white active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40"
-                aria-label="Delete message"
-                type="button"
-              >
-                Delete
-              </button>
-            )}
           </div>
-
-          {/* Reactions rail (optional) */}
-          {false && ( /* Set to true to show reactions */
-            <div
-              className={cn(
-                "pointer-events-none absolute z-10",
-                "opacity-0 group-hover:opacity-100 transition-opacity",
-                "data-[open=true]:opacity-100 data-[open=true]:pointer-events-auto",
-                "flex items-center gap-1.5",
-                isUser ? "right-0 -bottom-4" : "left-0 -bottom-4"
-              )}
-              data-open="false"
-            >
-              <button 
-                className="h-7 w-7 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm grid place-items-center text-[13px] hover:bg-white active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                aria-label="React with thumbs up"
-                type="button"
-              >
-                👍
-              </button>
-              <button 
-                className="h-7 w-7 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm grid place-items-center text-[13px] hover:bg-white active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                aria-label="React with heart"
-                type="button"
-              >
-                ❤️
-              </button>
-              <button 
-                className="h-7 w-7 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm grid place-items-center text-[13px] hover:bg-white active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                aria-label="React with golf flag"
-                type="button"
-              >
-                ⛳️
-              </button>
-            </div>
-          )}
 
           {/* Heading - only on first in group for AI */}
           {!isUser && showHeading && isFirstInGroup && (
@@ -371,7 +331,28 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             )}
           </div>
           
-          {/* Timestamp with delivery status */}
+          {/* Quick reactions strip (inline) - Phase 42 */}
+          {false && ( /* Set data-reacting="true" to show */
+            <div className="mt-1 flex flex-wrap gap-1.5 data-[reacting=true]:flex hidden" data-reacting="false">
+              <button className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] hover:bg-white active:scale-95 transition" type="button">👍</button>
+              <button className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] hover:bg-white active:scale-95 transition" type="button">👏</button>
+              <button className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] hover:bg-white active:scale-95 transition" type="button">❤️</button>
+              <button className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] hover:bg-white active:scale-95 transition" type="button">🤯</button>
+            </div>
+          )}
+          
+          {/* Failed state banner - Phase 42 */}
+          {false && ( /* Set to true to show failed state */
+            <div className="mt-2 flex items-center gap-2 text-[12px] text-amber-700">
+              <span className="h-5 w-5 grid place-items-center rounded-full bg-amber-50 border border-amber-200">!</span>
+              <span className="flex-1">Delivery failed. Tap to retry.</span>
+              <button className="h-8 px-3 rounded-full bg-white border border-black/10 shadow-sm hover:bg-gray-50 text-[12px] transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40" type="button">
+                Retry
+              </button>
+            </div>
+          )}
+          
+          {/* Timestamp with delivery status and status ticks - Phase 42 */}
           <div className={cn(
             "pt-1 text-[11px] text-gray-500 select-none flex items-center gap-2",
             isUser ? "flex-row-reverse" : ""
@@ -381,6 +362,13 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               <>
                 <span className="h-1 w-1 rounded-full bg-gray-300"></span>
                 <span>{isUser ? "Delivered" : "Echo"}</span>
+                {/* Status ticks for user messages */}
+                {isUser && (
+                  <span className="inline-flex items-center gap-0.5 text-gray-400">
+                    <span>✓</span>
+                    <span className="opacity-40 data-[state=seen]:opacity-100" data-state="delivered">✓</span>
+                  </span>
+                )}
               </>
             )}
           </div>
