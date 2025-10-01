@@ -69,13 +69,30 @@
   animation: floatInUp 0.18s ease-out both;
 }
 
+/* Hide scrollbar for attachment preview strip */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* Ultra-small screen optimizations for composer */
 @media (max-width: 360px) {
   .composer-compact {
-    padding: 6px 12px !important;
+    padding: 0.4rem 0.6rem !important;
   }
   
   .composer-compact textarea {
     font-size: 14px !important;
+  }
+  
+  /* Attachment rail on small screens */
+  .attachment-rail img,
+  .attachment-rail > div {
+    height: 3rem !important;
+    width: 3rem !important;
   }
 }

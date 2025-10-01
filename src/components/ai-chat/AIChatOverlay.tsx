@@ -725,117 +725,177 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pt-3 pb-[max(env(safe-area-inset-bottom),16px)]">
               {activeTab === 'chat' && (
                 <div>
-                  {/* Main composer pill */}
-                  <form 
-                    className={cn(
-                      "composer-bubble composer-compact group flex items-end gap-2 rounded-[28px]",
-                      "bg-white/92 backdrop-blur border border-black/10",
-                      "shadow-[0_8px_24px_rgba(0,0,0,0.06)]",
-                      "px-3 py-2",
-                      "focus-within:ring-2 focus-within:ring-[#2A9D8F]/25",
-                      "transition-all",
-                      isRecording && "ring-2 ring-red-400/30"
-                    )}
-                    role="group"
-                    aria-label="Message composer"
-                    autoComplete="off"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      sendMessage(inputValue);
-                    }}
-                  >
-                    {/* Left tools */}
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <button
-                        type="button"
-                        aria-label="Attach"
-                        className="h-9 w-9 grid place-items-center rounded-full text-gray-600 hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 disabled:opacity-40 disabled:cursor-not-allowed"
-                        disabled={isLoading || isRecording || isProcessing}
-                      >
-                        <Paperclip className="h-[18px] w-[18px]" />
-                      </button>
-                      <button
-                        type="button"
-                        aria-label="Camera"
-                        className="h-9 w-9 grid place-items-center rounded-full text-gray-600 hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 disabled:opacity-40 disabled:cursor-not-allowed"
-                        disabled={isLoading || isRecording || isProcessing}
-                      >
-                        <Camera className="h-[18px] w-[18px]" />
-                      </button>
-                    </div>
-
-                    {/* Textarea */}
-                    <div className="min-w-0 flex-1">
-                      <textarea
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        placeholder="Message Echo…"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            sendMessage(inputValue);
-                          }
-                        }}
-                        disabled={isLoading || isRecording || isProcessing}
-                        aria-label="Message input"
-                        rows={1}
-                        className="block w-full resize-none bg-transparent outline-none text-[15px] leading-[1.4] text-gray-900 placeholder:text-gray-500 caret-[#2A9D8F] disabled:opacity-60 disabled:pointer-events-none max-h-[34vh]"
-                      />
-                    </div>
-
-                    {/* Right tools */}
-                    <div className="flex items-end gap-1.5 shrink-0">
-                      {!inputValue?.trim() ? (
-                        <div className="relative">
-                          {isRecording && (
-                            <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-red-500 animate-pulse z-10" />
-                          )}
-                          <button
-                            type="button"
-                            aria-label={isRecording ? "Recording - release to stop" : "Hold to talk"}
-                            className={cn(
-                              "h-9 w-9 grid place-items-center rounded-full transition-all",
-                              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
-                              isRecording
-                                ? "bg-red-50 text-red-600 scale-110"
-                                : "bg-white border border-black/10 text-gray-600 hover:bg-gray-50 active:scale-[0.98]",
-                              isProcessing && "opacity-60 cursor-not-allowed"
-                            )}
-                            onMouseDown={!isProcessing ? startRecording : undefined}
-                            onMouseUp={!isProcessing ? stopRecording : undefined}
-                            onMouseLeave={!isProcessing ? stopRecording : undefined}
-                            onTouchStart={!isProcessing ? startRecording : undefined}
-                            onTouchEnd={!isProcessing ? stopRecording : undefined}
-                            disabled={isProcessing}
+                  {/* Attachment preview strip (static UI for now) */}
+                  {false && ( /* Toggle to true to show example attachments */
+                    <div className="mb-2">
+                      <div className="flex items-center gap-2 overflow-x-auto rounded-2xl bg-white/85 backdrop-blur border border-black/10 shadow-sm p-2 scrollbar-none">
+                        {/* Image attachment */}
+                        <div className="relative shrink-0">
+                          <img 
+                            className="h-14 w-14 rounded-xl object-cover border border-black/10" 
+                            src="https://via.placeholder.com/56"
+                            alt="Attachment preview"
+                          />
+                          <button 
+                            className="absolute -top-1.5 -right-1.5 h-6 w-6 grid place-items-center rounded-full bg-white/95 border border-black/10 shadow hover:bg-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                            aria-label="Remove"
                           >
-                            <Mic className="h-[18px] w-[18px]" />
+                            <X className="h-3.5 w-3.5" />
                           </button>
                         </div>
-                      ) : (
-                        <button
-                          type="submit"
-                          aria-label="Send"
-                          disabled={!inputValue?.trim() || isLoading || isProcessing}
-                          className={cn(
-                            "h-9 w-9 grid place-items-center rounded-full shadow transition-all",
-                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
-                            (!inputValue?.trim() || isLoading || isProcessing)
-                              ? "bg-gray-200 text-gray-400 cursor-not-allowed opacity-50"
-                              : "bg-[#2A9D8F] text-white hover:brightness-[1.05] active:scale-[0.98]"
-                          )}
+
+                        {/* Video attachment */}
+                        <div className="relative shrink-0">
+                          <div className="h-14 w-24 rounded-xl border border-black/10 overflow-hidden bg-black/5">
+                            <img 
+                              className="h-full w-full object-cover" 
+                              src="https://via.placeholder.com/96x56"
+                              alt="Video preview"
+                            />
+                            <div className="absolute inset-0 grid place-items-center">
+                              <div className="h-6 w-6 rounded-full bg-black/60 grid place-items-center">
+                                <svg className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                  <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
+                          <button 
+                            className="absolute -top-1.5 -right-1.5 h-6 w-6 grid place-items-center rounded-full bg-white/95 border border-black/10 shadow hover:bg-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                            aria-label="Remove"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+
+                        {/* Add more button */}
+                        <button 
+                          className="h-14 w-14 grid place-items-center rounded-xl bg-white border border-black/10 hover:bg-gray-50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                          aria-label="Add more attachments"
                         >
-                          {isLoading || isProcessing ? (
-                            <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
-                              <circle cx="12" cy="12" r="10" className="opacity-25" stroke="currentColor" strokeWidth="4" fill="none"/>
-                              <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
-                            </svg>
-                          ) : (
-                            <Send className="h-[18px] w-[18px]" />
-                          )}
+                          <svg className="h-5 w-5 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                          </svg>
                         </button>
-                      )}
+                      </div>
                     </div>
-                  </form>
+                  )}
+
+                  {/* Main composer pill */}
+                  <div className="flex items-end gap-2 w-full">
+                    <div className="flex-1 min-w-0 transition-[height]">
+                      <form 
+                        className={cn(
+                          "composer-bubble composer-compact rounded-[28px]",
+                          "bg-white/92 backdrop-blur border border-black/10",
+                          "shadow-[0_8px_24px_rgba(0,0,0,0.06)]",
+                          "px-3 py-2 flex items-end gap-2",
+                          "focus-within:ring-2 focus-within:ring-[#2A9D8F]/25",
+                          "transition-all",
+                          isRecording && "ring-2 ring-red-400/30"
+                        )}
+                        role="group"
+                        aria-label="Message composer"
+                        autoComplete="off"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          sendMessage(inputValue);
+                        }}
+                      >
+                        {/* Left tools */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            aria-label="Attach"
+                            className="h-9 w-9 grid place-items-center rounded-full text-gray-600 hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 disabled:opacity-40 disabled:cursor-not-allowed"
+                            disabled={isLoading || isRecording || isProcessing}
+                          >
+                            <Paperclip className="h-[18px] w-[18px]" />
+                          </button>
+                          <button
+                            type="button"
+                            aria-label="Camera"
+                            className="h-9 w-9 grid place-items-center rounded-full text-gray-600 hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 disabled:opacity-40 disabled:cursor-not-allowed"
+                            disabled={isLoading || isRecording || isProcessing}
+                          >
+                            <Camera className="h-[18px] w-[18px]" />
+                          </button>
+                        </div>
+
+                        {/* Textarea */}
+                        <div className="min-w-0 flex-1">
+                          <textarea
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            placeholder="Message Echo…"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                sendMessage(inputValue);
+                              }
+                            }}
+                            disabled={isLoading || isRecording || isProcessing}
+                            aria-label="Message input"
+                            rows={1}
+                            className="block w-full resize-none bg-transparent outline-none text-[15px] leading-[1.4] text-gray-900 placeholder:text-gray-500 caret-[#2A9D8F] disabled:opacity-60 disabled:pointer-events-none max-h-[8.5rem]"
+                          />
+                        </div>
+
+                        {/* Right tools */}
+                        <div className="flex items-end gap-1.5 shrink-0">
+                          {!inputValue?.trim() ? (
+                            <div className="relative">
+                              {isRecording && (
+                                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-red-500 animate-pulse z-10" />
+                              )}
+                              <button
+                                type="button"
+                                aria-label={isRecording ? "Recording - release to stop" : "Hold to talk"}
+                                className={cn(
+                                  "h-9 w-9 grid place-items-center rounded-full transition-all",
+                                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+                                  isRecording
+                                    ? "bg-red-50 text-red-600 scale-110"
+                                    : "bg-white border border-black/10 text-gray-600 hover:bg-gray-50 active:scale-[0.98]",
+                                  isProcessing && "opacity-60 cursor-not-allowed"
+                                )}
+                                onMouseDown={!isProcessing ? startRecording : undefined}
+                                onMouseUp={!isProcessing ? stopRecording : undefined}
+                                onMouseLeave={!isProcessing ? stopRecording : undefined}
+                                onTouchStart={!isProcessing ? startRecording : undefined}
+                                onTouchEnd={!isProcessing ? stopRecording : undefined}
+                                disabled={isProcessing}
+                              >
+                                <Mic className="h-[18px] w-[18px]" />
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="submit"
+                              aria-label="Send"
+                              disabled={!inputValue?.trim() || isLoading || isProcessing}
+                              className={cn(
+                                "h-9 w-9 grid place-items-center rounded-full transition-all",
+                                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+                                (!inputValue?.trim() || isLoading || isProcessing)
+                                  ? "bg-black/5 text-gray-400 border border-black/10 cursor-not-allowed shadow-none"
+                                  : "bg-[#2A9D8F] text-white shadow hover:brightness-[1.05] active:scale-[0.98]"
+                              )}
+                            >
+                              {isLoading || isProcessing ? (
+                                <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
+                                  <circle cx="12" cy="12" r="10" className="opacity-25" stroke="currentColor" strokeWidth="4" fill="none"/>
+                                  <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
+                                </svg>
+                              ) : (
+                                <Send className="h-[18px] w-[18px]" />
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      </form>
+                    </div>
+                  </div>
 
                   {/* Recent history peek */}
                   <button
