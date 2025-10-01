@@ -58,6 +58,26 @@ html, body {
 
   /* Meta text */
   --meta-fg: rgba(17,24,39,.55);  /* gray-800 @ 55% */
+
+  /* Composer tokens */
+  --composer-h: 56px;
+  --composer-pad-x: 10px;
+  --composer-pad-y: 8px;
+  --composer-radius: 28px;
+  --composer-shadow: 0 8px 28px rgba(0,0,0,.08);
+
+  --chip-radius: 16px;
+  --chip-bg: rgba(255,255,255,.85);
+  --chip-brd: rgba(0,0,0,.08);
+
+  --btn-size: 36px;
+  --btn-brd: rgba(0,0,0,.12);
+
+  --composer-bg: rgba(255,255,255,.92);
+  --composer-brd: rgba(0,0,0,.10);
+
+  --kbd-bg: rgba(17,24,39,.06);
+  --kbd-fg: #111827;
 }
 
 @media (min-width: 640px) {

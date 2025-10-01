@@ -666,32 +666,94 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         
           {/* Composer footer */}
           <footer 
-            className="fixed inset-x-0 bottom-0 z-[1100]
-                       bg-[linear-gradient(180deg,rgba(246,247,246,0.75),rgba(246,247,246,0.92))]
-                       backdrop-blur-xl border-t border-black/5"
+            className="sticky bottom-0 z-[1]
+                       border-t border-white/10
+                       bg-gradient-to-b from-white/70 to-white/90
+                       backdrop-blur supports-[backdrop-filter]:backdrop-blur-md"
             data-echo-composer
           >
-            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pt-2 pb-[calc(12px+env(safe-area-inset-bottom))]">
+            <div className="mx-auto w-full max-w-[900px] px-3 sm:px-5 pb-[max(env(safe-area-inset-bottom),12px)] pt-3">
               {activeTab === 'chat' && (
                 <div>
-                  {/* Main composer */}
-                  <div className="flex items-end gap-2">
-                    {/* Attach button - left side */}
-                    <button
-                      type="button"
-                      aria-label="Attach"
-                      className="h-10 w-10 shrink-0 grid place-items-center rounded-full
-                                 bg-white/90 backdrop-blur border border-black/5 shadow-sm
-                                 hover:bg-white transition disabled:opacity-50"
-                      disabled={isLoading || isRecording || isProcessing}
-                    >
-                      <Paperclip className="h-5 w-5 text-gray-700" />
-                    </button>
+                  {/* Recording state overlay */}
+                  {isRecording && (
+                    <div className="
+                      mb-2 flex items-center gap-2 rounded-[14px]
+                      bg-white/90 border border-black/10 px-3 py-2
+                      shadow-sm backdrop-blur
+                    ">
+                      <div className="h-6 flex-1 bg-gradient-to-r from-[#2A9D8F]/20 to-transparent rounded relative overflow-hidden">
+                        <span className="absolute inset-y-0 left-2 flex items-center text-[11px] text-[#2A9D8F] font-medium">
+                          Listening…
+                        </span>
+                      </div>
+                      <button 
+                        type="button"
+                        className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5" 
+                        onClick={stopRecording}
+                        aria-label="Stop recording"
+                      >
+                        <MicOff className="h-4 w-4 text-red-600" />
+                      </button>
+                      <button 
+                        type="button"
+                        className="h-8 px-3 rounded-full bg-[#2A9D8F] text-white text-sm hover:brightness-105" 
+                        onClick={stopRecording}
+                      >
+                        Use
+                      </button>
+                    </div>
+                  )}
 
-                    {/* Input pill */}
-                    <div className="flex-1 min-w-0 rounded-[28px] border border-black/8
-                                    bg-white/92 backdrop-blur shadow-[0_6px_20px_rgba(0,0,0,0.06)]
-                                    px-4 py-2">
+                  {/* Main composer pill */}
+                  <div className="
+                    w-full rounded-[var(--composer-radius)]
+                    bg-[var(--composer-bg)] border border-[var(--composer-brd)]
+                    shadow-[var(--composer-shadow)]
+                    px-[var(--composer-pad-x)] py-[var(--composer-pad-y)]
+                    flex items-end gap-2
+                  ">
+                    {/* Left buttons */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        aria-label="Attach"
+                        className="
+                          h-[var(--btn-size)] w-[var(--btn-size)] rounded-full
+                          bg-white/90 border border-[var(--btn-brd)]
+                          hover:bg-white transition
+                          grid place-items-center
+                          disabled:opacity-50 disabled:cursor-not-allowed
+                        "
+                        disabled={isLoading || isRecording || isProcessing}
+                      >
+                        <Paperclip className="h-5 w-5 text-gray-700" />
+                      </button>
+
+                      <button
+                        type="button"
+                        aria-label="Start voice"
+                        className={cn(
+                          "h-[var(--btn-size)] w-[var(--btn-size)] rounded-full grid place-items-center transition",
+                          isRecording
+                            ? "bg-[#2A9D8F]/15 border border-[#2A9D8F]/40 ring-4 ring-[#2A9D8F]/20"
+                            : "bg-white/90 border border-[var(--btn-brd)] hover:bg-white"
+                        )}
+                        onMouseDown={startRecording}
+                        onMouseUp={stopRecording}
+                        onTouchStart={startRecording}
+                        onTouchEnd={stopRecording}
+                        disabled={isProcessing || inputValue.trim().length > 0}
+                      >
+                        <Mic className={cn(
+                          "h-5 w-5",
+                          isRecording ? "text-[#2A9D8F]" : "text-gray-700"
+                        )} />
+                      </button>
+                    </div>
+
+                    {/* Textarea */}
+                    <div className="flex-1 min-w-0">
                       <Textarea
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
@@ -703,9 +765,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           }
                         }}
                         disabled={isLoading || isRecording || isProcessing}
-                        className="w-full min-h-[24px] max-h-[120px] resize-none bg-transparent outline-none border-0
-                                   text-[15px] leading-[1.35] text-gray-900 placeholder:text-gray-500
-                                   focus-visible:ring-0 focus-visible:ring-offset-0 p-0"
+                        className="
+                          w-full resize-none bg-transparent outline-none
+                          text-[15px] leading-[1.45] text-gray-900
+                          placeholder:text-gray-500
+                          px-2 py-2 min-h-[24px] max-h-[120px]
+                          border-0 focus-visible:ring-0 focus-visible:ring-offset-0
+                        "
                         rows={1}
                         style={{ 
                           height: 'auto',
@@ -717,62 +783,42 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
                         }}
                       />
+                      {/* Shortcut hint on desktop */}
+                      <div className="hidden md:flex items-center gap-1.5 px-2 pb-1 pt-0.5">
+                        <span className="text-xs text-gray-500">Press</span>
+                        <kbd className="rounded bg-[var(--kbd-bg)] text-[var(--kbd-fg)] px-1.5 py-0.5 text-[11px]">Shift</kbd>
+                        <span className="text-xs text-gray-500">+</span>
+                        <kbd className="rounded bg-[var(--kbd-bg)] text-[var(--kbd-fg)] px-1.5 py-0.5 text-[11px]">Enter</kbd>
+                        <span className="text-xs text-gray-500">for a newline</span>
+                      </div>
                     </div>
 
-                    {/* Mic / Send toggle */}
-                    {!inputValue.trim() ? (
-                      <button
-                        type="button"
-                        aria-label="Hold to talk"
-                        className="h-10 w-10 shrink-0 grid place-items-center rounded-full
-                                   bg-[#2A9D8F] text-white shadow-md hover:brightness-110
-                                   active:scale-[0.98] transition disabled:opacity-50"
-                        onMouseDown={startRecording}
-                        onMouseUp={stopRecording}
-                        onTouchStart={startRecording}
-                        onTouchEnd={stopRecording}
-                        disabled={isProcessing}
-                      >
-                        {isRecording ? (
-                          <MicOff className="h-5 w-5" />
-                        ) : (
-                          <Mic className="h-5 w-5" />
-                        )}
-                      </button>
-                    ) : (
+                    {/* Right action - Send */}
+                    <div className="flex items-center gap-1.5 shrink-0">
                       <button
                         type="button"
                         aria-label="Send"
-                        className="h-10 w-10 shrink-0 grid place-items-center rounded-full
-                                   bg-[#2A9D8F] text-white shadow-md hover:brightness-110
-                                   active:scale-[0.98] transition disabled:opacity-50"
+                        disabled={!inputValue?.trim() || isLoading || isProcessing}
+                        className={cn(
+                          "h-[var(--btn-size)] w-[var(--btn-size)] rounded-full grid place-items-center",
+                          "transition border",
+                          (!inputValue?.trim() || isLoading || isProcessing)
+                            ? "bg-white/70 border-[var(--btn-brd)] text-gray-400 cursor-not-allowed"
+                            : "bg-[#2A9D8F] border-[#2A9D8F] text-white shadow-md hover:brightness-105"
+                        )}
                         onClick={() => sendMessage(inputValue)}
-                        disabled={isLoading || isRecording || isProcessing}
                       >
-                        <ArrowUpRight className="h-5 w-5" />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Voice recording state */}
-                  {isRecording && (
-                    <div className="mt-2 grid grid-cols-[1fr_auto] items-center gap-2">
-                      <div className="h-9 rounded-full bg-[#2A9D8F]/8 border border-[#2A9D8F]/20
-                                      overflow-hidden relative">
-                        <span className="absolute inset-y-0 left-3 flex items-center text-[12px] text-[#2A9D8F] font-medium">
-                          Listening…
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        className="h-9 px-3 rounded-full bg-[#E45757] text-white text-sm font-medium
-                                   shadow hover:brightness-110 transition"
-                        onClick={stopRecording}
-                      >
-                        Stop
+                        {isLoading || isProcessing ? (
+                          <svg className="h-5 w-5 animate-spin text-current" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" className="opacity-25" stroke="currentColor" strokeWidth="4" fill="none"/>
+                            <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
+                          </svg>
+                        ) : (
+                          <ArrowUpRight className="h-5 w-5" />
+                        )}
                       </button>
                     </div>
-                  )}
+                  </div>
 
                   {/* Recent history peek */}
                   <button
