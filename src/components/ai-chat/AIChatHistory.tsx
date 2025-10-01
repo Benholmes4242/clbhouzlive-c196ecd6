@@ -167,9 +167,9 @@ interface AIChatHistoryProps {
     <article 
       ref={cardRef}
       className={cn(
-        "block overflow-hidden rounded-2xl bg-white/92 backdrop-blur border border-black/10",
-        "shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+        "group relative block overflow-hidden rounded-2xl bg-white/92 backdrop-blur shadow-sm border border-black/10 hover:border-black/15",
+        "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.08)] active:translate-y-0 cursor-pointer",
+        "focus-visible:outline-none focus-within:ring-2 focus-within:ring-[#2A9D8F]/30",
         isExpanded && "shadow-lg"
       )}
       onClick={!isExpanded ? onToggleExpand : undefined}
@@ -179,45 +179,32 @@ interface AIChatHistoryProps {
     >
       {!isExpanded ? (
         <>
-          {/* Card header row */}
-          <div className="flex items-start gap-3 px-4 sm:px-5 pt-4">
-            {/* Swing badge */}
-            <span className="inline-flex items-center gap-1 px-2.5 h-6 rounded-full bg-white text-gray-800 border border-black/10 text-[11px] shrink-0">
-              <PiWaveform className="h-3.5 w-3.5" />
-              Swing
-            </span>
-            
-            <div className="min-w-0 flex-1">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <div className="text-[15px] font-semibold text-gray-900">
-                    Swing Analysis
-                  </div>
-                  <div className="text-[12px] text-gray-600/90 leading-tight mt-0.5">
-                    {analysis.tags && analysis.tags.length > 0 ? analysis.tags.slice(0, 2).join(' • ') : 'Golf swing'}
-                  </div>
+          <div className="px-4 py-3 sm:px-5 sm:py-4">
+            <div className="flex items-start gap-2">
+              <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center gap-1 rounded-full text-[11px] font-medium bg-[#2A9D8F]/10 text-[#2A9D8F] border border-[#2A9D8F]/20">
+                <PiWaveform className="h-3.5 w-3.5" />
+                Swing
+              </span>
+              
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-gray-900">
+                  Swing Analysis
                 </div>
-                
-                {/* right meta */}
-                <div className="shrink-0 text-right">
-                  <div className="text-[11px] text-gray-500">{analysis.timestamp.toLocaleDateString()}</div>
+                <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-gray-600">
+                  <span className="truncate">
+                    {analysis.tags && analysis.tags.length > 0 ? analysis.tags.slice(0, 2).join(' • ') : analysis.content?.substring(0, 60) || 'Golf swing'}
+                  </span>
+                  <span className="mx-1 h-1 w-1 rounded-full bg-gray-400/60 shrink-0"></span>
+                  <time className="shrink-0">{analysis.timestamp.toLocaleDateString()}</time>
                   {analysis.conversation && (
-                    <div className="text-[11px] text-gray-500">{analysis.conversation.length} msgs</div>
+                    <span className="hidden sm:inline text-gray-500 shrink-0">• {analysis.conversation.length} msgs</span>
                   )}
                 </div>
               </div>
-            </div>
-          </div>
-          
-          {/* Media rail */}
-          {analysis.videoThumbnail && (
-            <div className="mt-3 px-4 sm:px-5">
-              <div className="h-14 w-24 rounded-xl overflow-hidden border border-black/10 bg-black/5 relative">
-                {!thumbnailError ? (
-                  <>
-                    {thumbnailLoading && (
-                      <div className="absolute inset-0 bg-gray-200 animate-pulse" />
-                    )}
+              
+              {analysis.videoThumbnail && (
+                <div className="shrink-0 h-10 w-10 rounded-xl overflow-hidden bg-white/80 backdrop-blur border border-black/10">
+                  {!thumbnailError ? (
                     <img 
                       src={analysis.videoThumbnail} 
                       alt="Swing preview"
@@ -225,29 +212,20 @@ interface AIChatHistoryProps {
                       onError={handleThumbnailError}
                       onLoad={handleThumbnailLoad}
                     />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="h-6 w-6 rounded-full bg-black/60 grid place-items-center">
-                        <Play className="h-3 w-3 text-white" fill="currentColor" />
-                      </div>
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center">
+                      <FileText className="h-3 w-3 text-gray-400" />
                     </div>
-                  </>
-                ) : (
-                  <div className="h-full w-full flex items-center justify-center">
-                    <FileText className="h-4 w-4 text-gray-400" />
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </div>
-          )}
+          </div>
           
-          {/* Preview snippet */}
-          {analysis.content && (
-            <div className="mt-2 px-4 sm:px-5 pb-4">
-              <p className="text-[13px] text-gray-700/85 line-clamp-2">
-                {analysis.content.substring(0, 120)}...
-              </p>
-            </div>
-          )}
+          {/* Hover affordance stripe */}
+          <div className="pointer-events-none absolute inset-x-0 -bottom-px h-8 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
+            <div className="mx-4 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
+          </div>
         </>
       ) : (
         <div className="px-4 sm:px-5 py-4">{/* Expanded content stays as-is */}
@@ -843,7 +821,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                         <div className="pointer-events-none absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-white/60 to-transparent z-10" />
                         {/* Bottom fade - Phase 52 */}
                         <div className="pointer-events-none absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-white/60 to-transparent z-10" />
-                        <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-5">
+                         <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-5 space-y-4 sm:space-y-5">
                     {loadingStates.conversations ? (
                       <>
                         <SkeletonCard />
@@ -899,11 +877,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                 Last 7 Days
                               </h3>
-                                <div className="space-y-3 sm:space-y-4">
+                                <div className="space-y-4 sm:space-y-5">
                                  {last7Days.map((conversation) => (
                                    <article 
                                      key={conversation.id} 
-                                     className="group block overflow-hidden rounded-2xl bg-white/90 backdrop-blur border border-black/10 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                                     className="group relative rounded-2xl bg-white/92 backdrop-blur shadow-sm border border-black/10 hover:border-black/15 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.08)] active:translate-y-0 focus-within:ring-2 focus-within:ring-[#2A9D8F]/30 px-4 py-3 sm:px-5 sm:py-4 cursor-pointer"
                                      onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
                                      role="button"
                                      tabIndex={0}
@@ -919,7 +897,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                    >
                                      
                                      {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? (
-                                       <div className="px-4 py-3 sm:px-5 sm:py-4">
+                                       <>
                                          <div className="flex justify-between items-center mb-3">
                                            <h3 className="text-[17px] font-semibold text-gray-900">
                                              {conversation.customTitle || conversation.title}
@@ -971,40 +949,33 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                              Use this response
                                            </button>
                                          </div>
-                                       </div>
+                                       </>
                                      ) : (
-                                       <div className="px-4 py-3 sm:px-5 sm:py-4">
-                                         <div className="flex items-start gap-3">
-                                           <div className="shrink-0 h-9 w-9 rounded-xl grid place-items-center bg-white/85 backdrop-blur border border-black/10">
-                                             <MessageCircle className="h-4 w-4 text-gray-600" />
-                                           </div>
+                                       <>
+                                         <div className="flex items-start gap-2">
+                                           <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-full text-[11px] font-medium bg-[#2A9D8F]/10 text-[#2A9D8F] border border-[#2A9D8F]/20">
+                                             Chat
+                                           </span>
                                            <div className="min-w-0 flex-1">
-                                             <div className="flex items-center gap-2 min-w-0">
-                                               <h3 className="truncate text-[15px] sm:text-[16px] font-semibold text-gray-900">
-                                                 {conversation.customTitle || conversation.title}
-                                               </h3>
-                                               <div className="ml-auto hidden sm:flex items-center gap-1">
-                                                 <span className="px-2 py-0.5 rounded-full text-[11px] bg-black/[.04] border border-black/10 text-gray-700">
-                                                   Chat
-                                                 </span>
-                                               </div>
+                                             <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-gray-900">
+                                               {conversation.customTitle || conversation.title}
                                              </div>
-                                             <p className="mt-1 line-clamp-2 text-[13px] sm:text-[14px] leading-[1.5] text-gray-700/90">
-                                               {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
-                                             </p>
-                                             <div className="mt-2 flex items-center gap-3 text-[12px] text-gray-500">
-                                               <span>{conversation.timestamp.toLocaleDateString()}</span>
-                                               <span className="h-3 w-px bg-black/10"></span>
-                                               <span>{conversation.messages.length} messages</span>
-                                               <span className="ml-auto opacity-70 group-hover:opacity-100 transition">
-                                                 <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                   <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-                                                 </svg>
+                                             <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-gray-600">
+                                               <span className="truncate">
+                                                 {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
                                                </span>
+                                               <span className="mx-1 h-1 w-1 rounded-full bg-gray-400/60 shrink-0"></span>
+                                               <time className="shrink-0">{conversation.timestamp.toLocaleDateString()}</time>
+                                               <span className="hidden sm:inline text-gray-500 shrink-0">• {conversation.messages.length} msgs</span>
                                              </div>
                                            </div>
                                          </div>
-                                       </div>
+                                         
+                                         {/* Hover affordance stripe */}
+                                         <div className="pointer-events-none absolute inset-x-0 -bottom-px h-8 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
+                                           <div className="mx-4 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
+                                         </div>
+                                       </>
                                      )}
                                    </article>
                                  ))}
@@ -1027,47 +998,38 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                 This Month
                               </h3>
-                              <div className="space-y-3 sm:space-y-4">
+                              <div className="space-y-4 sm:space-y-5">
                                 {thisMonth.map((conversation) => (
                                   <article 
                                     key={conversation.id} 
-                                    className="group block overflow-hidden rounded-2xl bg-white/90 backdrop-blur border border-black/10 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                                    className="group relative rounded-2xl bg-white/92 backdrop-blur shadow-sm border border-black/10 hover:border-black/15 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.08)] active:translate-y-0 focus-within:ring-2 focus-within:ring-[#2A9D8F]/30 px-4 py-3 sm:px-5 sm:py-4 cursor-pointer"
                                     onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
                                     role="button"
                                     tabIndex={0}
                                     aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
                                   >
-                                    <div className="px-4 py-3 sm:px-5 sm:py-4">
-                                      <div className="flex items-start gap-3">
-                                        <div className="shrink-0 h-9 w-9 rounded-xl grid place-items-center bg-white/85 backdrop-blur border border-black/10">
-                                          <MessageCircle className="h-4 w-4 text-gray-600" />
+                                    <div className="flex items-start gap-2">
+                                      <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-full text-[11px] font-medium bg-[#2A9D8F]/10 text-[#2A9D8F] border border-[#2A9D8F]/20">
+                                        Chat
+                                      </span>
+                                      <div className="min-w-0 flex-1">
+                                        <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-gray-900">
+                                          {conversation.customTitle || conversation.title}
                                         </div>
-                                        <div className="min-w-0 flex-1">
-                                          <div className="flex items-center gap-2 min-w-0">
-                                            <h3 className="truncate text-[15px] sm:text-[16px] font-semibold text-gray-900">
-                                              {conversation.customTitle || conversation.title}
-                                            </h3>
-                                            <div className="ml-auto hidden sm:flex items-center gap-1">
-                                              <span className="px-2 py-0.5 rounded-full text-[11px] bg-black/[.04] border border-black/10 text-gray-700">
-                                                Chat
-                                              </span>
-                                            </div>
-                                          </div>
-                                          <p className="mt-1 line-clamp-2 text-[13px] sm:text-[14px] leading-[1.5] text-gray-700/90">
+                                        <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-gray-600">
+                                          <span className="truncate">
                                             {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
-                                          </p>
-                                          <div className="mt-2 flex items-center gap-3 text-[12px] text-gray-500">
-                                            <span>{conversation.timestamp.toLocaleDateString()}</span>
-                                            <span className="h-3 w-px bg-black/10"></span>
-                                            <span>{conversation.messages.length} messages</span>
-                                            <span className="ml-auto opacity-70 group-hover:opacity-100 transition">
-                                              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-                                              </svg>
-                                            </span>
-                                          </div>
+                                          </span>
+                                          <span className="mx-1 h-1 w-1 rounded-full bg-gray-400/60 shrink-0"></span>
+                                          <time className="shrink-0">{conversation.timestamp.toLocaleDateString()}</time>
+                                          <span className="hidden sm:inline text-gray-500 shrink-0">• {conversation.messages.length} msgs</span>
                                         </div>
                                       </div>
+                                    </div>
+                                    
+                                    {/* Hover affordance stripe */}
+                                    <div className="pointer-events-none absolute inset-x-0 -bottom-px h-8 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
+                                      <div className="mx-4 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
                                     </div>
                                    </article>
                                 ))}
@@ -1090,47 +1052,38 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                 Older
                               </h3>
-                              <div className="space-y-3 sm:space-y-4">
+                              <div className="space-y-4 sm:space-y-5">
                                 {older.map((conversation) => (
                                   <article 
                                     key={conversation.id} 
-                                    className="group block overflow-hidden rounded-2xl bg-white/90 backdrop-blur border border-black/10 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                                    className="group relative rounded-2xl bg-white/92 backdrop-blur shadow-sm border border-black/10 hover:border-black/15 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.08)] active:translate-y-0 focus-within:ring-2 focus-within:ring-[#2A9D8F]/30 px-4 py-3 sm:px-5 sm:py-4 cursor-pointer"
                                     onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
                                     role="button"
                                     tabIndex={0}
                                     aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
                                   >
-                                    <div className="px-4 py-3 sm:px-5 sm:py-4">
-                                      <div className="flex items-start gap-3">
-                                        <div className="shrink-0 h-9 w-9 rounded-xl grid place-items-center bg-white/85 backdrop-blur border border-black/10">
-                                          <MessageCircle className="h-4 w-4 text-gray-600" />
+                                    <div className="flex items-start gap-2">
+                                      <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-full text-[11px] font-medium bg-[#2A9D8F]/10 text-[#2A9D8F] border border-[#2A9D8F]/20">
+                                        Chat
+                                      </span>
+                                      <div className="min-w-0 flex-1">
+                                        <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-gray-900">
+                                          {conversation.customTitle || conversation.title}
                                         </div>
-                                        <div className="min-w-0 flex-1">
-                                          <div className="flex items-center gap-2 min-w-0">
-                                            <h3 className="truncate text-[15px] sm:text-[16px] font-semibold text-gray-900">
-                                              {conversation.customTitle || conversation.title}
-                                            </h3>
-                                            <div className="ml-auto hidden sm:flex items-center gap-1">
-                                              <span className="px-2 py-0.5 rounded-full text-[11px] bg-black/[.04] border border-black/10 text-gray-700">
-                                                Chat
-                                              </span>
-                                            </div>
-                                          </div>
-                                          <p className="mt-1 line-clamp-2 text-[13px] sm:text-[14px] leading-[1.5] text-gray-700/90">
+                                        <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-gray-600">
+                                          <span className="truncate">
                                             {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
-                                          </p>
-                                          <div className="mt-2 flex items-center gap-3 text-[12px] text-gray-500">
-                                            <span>{conversation.timestamp.toLocaleDateString()}</span>
-                                            <span className="h-3 w-px bg-black/10"></span>
-                                            <span>{conversation.messages.length} messages</span>
-                                            <span className="ml-auto opacity-70 group-hover:opacity-100 transition">
-                                              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-                                              </svg>
-                                            </span>
-                                          </div>
+                                          </span>
+                                          <span className="mx-1 h-1 w-1 rounded-full bg-gray-400/60 shrink-0"></span>
+                                          <time className="shrink-0">{conversation.timestamp.toLocaleDateString()}</time>
+                                          <span className="hidden sm:inline text-gray-500 shrink-0">• {conversation.messages.length} msgs</span>
                                         </div>
                                       </div>
+                                    </div>
+                                    
+                                    {/* Hover affordance stripe */}
+                                    <div className="pointer-events-none absolute inset-x-0 -bottom-px h-8 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
+                                      <div className="mx-4 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
                                     </div>
                                   </article>
                                 ))}
@@ -1163,7 +1116,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                         <div className="pointer-events-none absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-white/60 to-transparent z-10" />
                         {/* Bottom fade - Phase 52 */}
                         <div className="pointer-events-none absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-white/60 to-transparent z-10" />
-                        <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-5">
+                        <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-5 space-y-4 sm:space-y-5">
                     {loadingStates.swingAnalyses ? (
                       <>
                         <SkeletonCard />
@@ -1219,7 +1172,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                  Last 7 Days
                                </h3>
-                               <div className="space-y-3 sm:space-y-4">
+                               <div className="space-y-4 sm:space-y-5">
                                 {last7Days.map((analysis) => (
                                   <SwingAnalysisCard
                                     key={analysis.id}
@@ -1247,7 +1200,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                  This Month
                                </h3>
-                               <div className="space-y-3 sm:space-y-4">
+                               <div className="space-y-4 sm:space-y-5">
                                 {thisMonth.map((analysis) => (
                                   <SwingAnalysisCard
                                     key={analysis.id}
@@ -1275,7 +1228,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                  Older
                                </h3>
-                               <div className="space-y-3 sm:space-y-4">
+                               <div className="space-y-4 sm:space-y-5">
                                 {older.map((analysis) => (
                                   <SwingAnalysisCard
                                     key={analysis.id}
