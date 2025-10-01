@@ -656,6 +656,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                          </div>
                        )}
 
+                {/* Unread marker example - "New since last visit" pill */}
+                {false && ( /* Set to true to show example unread marker */
+                  <div className="sticky top-2 z-10 flex justify-center pointer-events-none mb-4">
+                    <div className="pointer-events-auto px-2.5 py-1 rounded-full bg-white/80 backdrop-blur border border-black/10 text-[11px] text-gray-700 shadow-sm">
+                      New since last visit
+                    </div>
+                  </div>
+                )}
+
                 {/* "New messages" pill - shows when scrolled up and new messages arrive */}
                 {newMessageCount > 0 && (
                   <div className="sticky bottom-20 sm:bottom-24 z-10 flex justify-center pointer-events-none">
@@ -669,16 +678,18 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 {showScrollToBottom && (
                   <button
                     onClick={scrollToBottom}
-                    className="pointer-events-auto fixed right-3 sm:right-4 z-20 h-11 px-4 rounded-full bg-white/92 backdrop-blur border border-black/10 shadow-[0_10px_28px_rgba(0,0,0,0.12)] text-[14px] font-medium text-gray-900 flex items-center gap-2 hover:bg-white active:scale-[0.98] transition-all float-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                    className="pointer-events-auto fixed right-3 sm:right-4 z-20 h-11 px-4 rounded-full bg-white/95 backdrop-blur border border-black/10 shadow-lg text-[14px] font-medium text-gray-900 flex items-center gap-2 hover:bg-white active:scale-[0.99] transition-all float-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 data-scrollfab"
                     style={{
-                      bottom: `calc(64px + max(env(safe-area-inset-bottom), 16px))`
+                      bottom: `calc(88px + env(safe-area-inset-bottom))`
                     }}
-                    aria-label="Back to latest"
+                    aria-label="Jump to latest"
                   >
-                    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 3a1 1 0 011 1v10.586l2.293-2.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V4a1 1 0 011-1z" clipRule="evenodd" />
-                    </svg>
-                    Latest
+                    <span className="inline-flex h-5 w-5 rounded-full items-center justify-center bg-[#2A9D8F]/10 text-[#2A9D8F]">
+                      <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v10.586l2.293-2.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V4a1 1 0 011-1z" clipRule="evenodd" />
+                      </svg>
+                    </span>
+                    {newMessageCount > 0 ? 'New messages' : 'Latest'}
                   </button>
                 )}
                 </div>
