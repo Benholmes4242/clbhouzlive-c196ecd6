@@ -736,26 +736,72 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-3 pb-[max(env(safe-area-inset-bottom),12px)]">
               {activeTab === 'chat' && (
                 <div>
-                  {/* Suggestion/Chip row (optional quick actions) */}
-                  <div className="mb-2 flex items-center gap-1.5 overflow-x-auto scrollbar-none">
-                    <button 
-                      className="h-8 px-3 rounded-full bg-white border border-black/10 text-[13px] text-gray-800 hover:bg-gray-50 shadow-sm whitespace-nowrap transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                      onClick={() => setInputValue("Summarise my latest tips")}
+                  {/* Smart Suggestions & Quick Actions Row */}
+                  <div className="mb-2">
+                    <div 
+                      className={cn(
+                        "flex items-center gap-2 overflow-x-auto snap-x snap-mandatory scrollbar-none",
+                        "transition-opacity",
+                        inputValue?.trim() ? "opacity-70" : "opacity-100"
+                      )}
+                      role="toolbar"
+                      aria-label="Quick suggestions"
                     >
-                      Summarise latest tips
-                    </button>
-                    <button 
-                      className="h-8 px-3 rounded-full bg-white border border-black/10 text-[13px] text-gray-800 hover:bg-gray-50 shadow-sm whitespace-nowrap transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                      onClick={() => setInputValue("Recommend a club for my next shot")}
-                    >
-                      Club recommendation
-                    </button>
-                    <button 
-                      className="h-8 px-3 rounded-full bg-white border border-black/10 text-[13px] text-gray-800 hover:bg-gray-50 shadow-sm whitespace-nowrap transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                      onClick={() => setInputValue("Show me my improvement trends")}
-                    >
-                      My progress
-                    </button>
+                      {/* Primary action when idle */}
+                      {!inputValue?.trim() && (
+                        <button 
+                          className="shrink-0 snap-start px-3.5 h-9 rounded-full bg-[#2A9D8F] text-white shadow hover:brightness-105 active:scale-[0.99] text-[13px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                          type="button"
+                          onClick={() => setInputValue("")}
+                        >
+                          Ask Echo anything
+                        </button>
+                      )}
+                      
+                      {/* Smart suggestions */}
+                      <button 
+                        className="shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        type="button"
+                        onClick={() => setInputValue("Summarise my latest tips")}
+                      >
+                        Summarise latest tips
+                      </button>
+                      <button 
+                        className="shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        type="button"
+                        onClick={() => setInputValue("Explain this video")}
+                      >
+                        Explain this video
+                      </button>
+                      <button 
+                        className="shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        type="button"
+                        onClick={() => setInputValue("Summarise last round")}
+                      >
+                        Summarise last round
+                      </button>
+                      <button 
+                        className="shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        type="button"
+                        onClick={() => setInputValue("Create practice plan")}
+                      >
+                        Create practice plan
+                      </button>
+                      <button 
+                        className="shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        type="button"
+                        onClick={() => setInputValue("Analyse this swing")}
+                      >
+                        Analyse this swing
+                      </button>
+                      <button 
+                        className="shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        type="button"
+                        onClick={() => setInputValue("Show me my improvement trends")}
+                      >
+                        My progress
+                      </button>
+                    </div>
                   </div>
 
                   {false && ( /* Toggle to true to show example attachments */
