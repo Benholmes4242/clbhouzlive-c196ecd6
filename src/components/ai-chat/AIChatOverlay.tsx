@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen, Bot } from 'lucide-react';
+import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen, Bot, Paperclip, ArrowUpRight } from 'lucide-react';
 import { PiWaveform } from 'react-icons/pi';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -618,82 +618,129 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         
           {/* Composer footer */}
           <footer 
-            className="shrink-0 px-4 sm:px-6 pt-3"
-            style={{
-              background: 'linear-gradient(180deg, rgba(246,247,246,.85) 0%, rgba(246,247,246,.95) 100%)',
-              borderTop: '1px solid rgba(255,255,255,.08)'
-            }}
+            className="fixed inset-x-0 bottom-0 z-[1100]
+                       bg-[linear-gradient(180deg,rgba(246,247,246,0.75),rgba(246,247,246,0.92))]
+                       backdrop-blur-xl border-t border-black/5"
+            data-echo-composer
           >
-            {activeTab === 'chat' && (
-              <div>
-                {/* Composer pill */}
-                <div className="w-full rounded-[28px] bg-white/92 backdrop-blur shadow-[0_6px_18px_rgba(20,26,30,.16)] px-3 py-2 flex items-center gap-2">
-                {/* Left icons */}
-                <div className="flex items-center gap-1 pr-1">
-                  <Button
-                    onClick={isRecording ? stopRecording : startRecording}
-                    disabled={isProcessing}
-                    variant={isRecording ? "destructive" : "ghost"}
-                    size="icon"
-                    className="h-9 w-9 rounded-full"
-                  >
-                    {isRecording ? (
-                      <MicOff className="h-4 w-4" />
-                    ) : isProcessing ? (
-                      <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full" />
+            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pt-2 pb-[calc(12px+env(safe-area-inset-bottom))]">
+              {activeTab === 'chat' && (
+                <div>
+                  {/* Main composer */}
+                  <div className="flex items-end gap-2">
+                    {/* Attach button - left side */}
+                    <button
+                      type="button"
+                      aria-label="Attach"
+                      className="h-10 w-10 shrink-0 grid place-items-center rounded-full
+                                 bg-white/90 backdrop-blur border border-black/5 shadow-sm
+                                 hover:bg-white transition disabled:opacity-50"
+                      disabled={isLoading || isRecording || isProcessing}
+                    >
+                      <Paperclip className="h-5 w-5 text-gray-700" />
+                    </button>
+
+                    {/* Input pill */}
+                    <div className="flex-1 min-w-0 rounded-[28px] border border-black/8
+                                    bg-white/92 backdrop-blur shadow-[0_6px_20px_rgba(0,0,0,0.06)]
+                                    px-4 py-2">
+                      <Textarea
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        placeholder="Message Echo…"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            sendMessage(inputValue);
+                          }
+                        }}
+                        disabled={isLoading || isRecording || isProcessing}
+                        className="w-full min-h-[24px] max-h-[120px] resize-none bg-transparent outline-none border-0
+                                   text-[15px] leading-[1.35] text-gray-900 placeholder:text-gray-500
+                                   focus-visible:ring-0 focus-visible:ring-offset-0 p-0"
+                        rows={1}
+                        style={{ 
+                          height: 'auto',
+                          overflow: 'hidden'
+                        }}
+                        onInput={(e) => {
+                          const target = e.target as HTMLTextAreaElement;
+                          target.style.height = 'auto';
+                          target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
+                        }}
+                      />
+                    </div>
+
+                    {/* Mic / Send toggle */}
+                    {!inputValue.trim() ? (
+                      <button
+                        type="button"
+                        aria-label="Hold to talk"
+                        className="h-10 w-10 shrink-0 grid place-items-center rounded-full
+                                   bg-[#2A9D8F] text-white shadow-md hover:brightness-110
+                                   active:scale-[0.98] transition disabled:opacity-50"
+                        onMouseDown={startRecording}
+                        onMouseUp={stopRecording}
+                        onTouchStart={startRecording}
+                        onTouchEnd={stopRecording}
+                        disabled={isProcessing}
+                      >
+                        {isRecording ? (
+                          <MicOff className="h-5 w-5" />
+                        ) : (
+                          <Mic className="h-5 w-5" />
+                        )}
+                      </button>
                     ) : (
-                      <Mic className="h-4 w-4" />
+                      <button
+                        type="button"
+                        aria-label="Send"
+                        className="h-10 w-10 shrink-0 grid place-items-center rounded-full
+                                   bg-[#2A9D8F] text-white shadow-md hover:brightness-110
+                                   active:scale-[0.98] transition disabled:opacity-50"
+                        onClick={() => sendMessage(inputValue)}
+                        disabled={isLoading || isRecording || isProcessing}
+                      >
+                        <ArrowUpRight className="h-5 w-5" />
+                      </button>
                     )}
-                  </Button>
+                  </div>
 
-                  {/* Camera button – keep if you already have a media picker handler.
-                     If not, you can disable it for now (UI only) */}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 rounded-full"
-                    // onClick={openMediaPicker} // only if this exists in your logic
+                  {/* Voice recording state */}
+                  {isRecording && (
+                    <div className="mt-2 grid grid-cols-[1fr_auto] items-center gap-2">
+                      <div className="h-9 rounded-full bg-[#2A9D8F]/8 border border-[#2A9D8F]/20
+                                      overflow-hidden relative">
+                        <span className="absolute inset-y-0 left-3 flex items-center text-[12px] text-[#2A9D8F] font-medium">
+                          Listening…
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        className="h-9 px-3 rounded-full bg-[#E45757] text-white text-sm font-medium
+                                   shadow hover:brightness-110 transition"
+                        onClick={stopRecording}
+                      >
+                        Stop
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Recent history peek */}
+                  <button
+                    className="mt-3 w-full rounded-[28px] bg-[#3da0a9]/15 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-[#3da0a9]/20 transition"
+                    onClick={() => setShowHistory(true)}
+                    aria-label="Open recent history"
                   >
-                    <svg viewBox="0 0 24 24" className="h-4 w-4"><path d="M4 7h3l2-2h6l2 2h3v12H4z" fill="currentColor"/></svg>
-                  </Button>
+                    <span className="flex items-center gap-2">
+                      <span className="w-10 h-1 rounded-full block" style={{ background: 'linear-gradient(135deg, #1D3557, #2A9D8F)', opacity: 0.8 }} />
+                      Recent history
+                    </span>
+                    <svg className="h-4 w-4" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+                  </button>
                 </div>
-
-                  {/* Input */}
-                  <Input
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="ask me anything at all, I'm here for you"
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
-                    disabled={isLoading || isRecording || isProcessing}
-                    className="border-0 focus-visible:ring-0 bg-transparent mx-2 text-[15px] placeholder:text-slate-500/90"
-                  />
-
-                  {/* Send arrow */}
-                  <Button
-                    onClick={() => sendMessage(inputValue)}
-                    disabled={isLoading || !inputValue.trim() || isRecording || isProcessing}
-                    size="icon"
-                    className="h-9 w-9 rounded-full bg-gray-900 text-white hover:bg-black transition"
-                    aria-label="Send"
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {/* Recent history peek */}
-                <button
-                  className="mt-3 w-full rounded-[28px] bg-[#3da0a9]/15 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-gray-700"
-                  onClick={() => setShowHistory(true)}
-                  aria-label="Open recent history"
-                >
-                  <span className="flex items-center gap-2">
-                    <span className="w-10 h-1 rounded-full block" style={{ background: 'linear-gradient(135deg, #1D3557, #2A9D8F)', opacity: 0.8 }} />
-                    Recent history
-                  </span>
-                  <svg className="h-4 w-4" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
-                </button>
-              </div>
-            )}
+              )}
+            </div>
           </footer>
         </div>
       </div>
