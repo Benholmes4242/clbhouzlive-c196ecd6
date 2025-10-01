@@ -95,6 +95,12 @@
   animation: subtlePulse 1.6s ease-in-out 3;
 }
 
+/* Phase 50 - Mobile long-press action pill reveal */
+[data-active="true"] .actions-pill {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
 /* Hide scrollbar for attachment preview strip */
 .scrollbar-none {
   scrollbar-width: none;

@@ -90,75 +90,57 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           <div className="hidden sm:block w-7 shrink-0" />
         )}
         
-        {/* Message content - actionable wrapper with Phase 47 actions */}
+        {/* Message content - Phase 50 actions & meta */}
         <div 
           className={cn(
-            "group/message relative max-w-[78%]",
-            isUser ? "message-right" : "message-left"
+            "relative group/message pt-2 max-w-[78%]",
+            isUser ? "user message-right" : "echo message-left"
           )}
           data-message-id={message.id}
           data-author={isUser ? "user" : "echo"}
           data-has-menu="true"
           data-state="ok"
+          data-active="false"
+          tabIndex={0}
         >
-          {/* Subtle handle affordance (hover hint) - Phase 47 */}
-          <div 
+          {/* Action bar - Phase 50 (hover on desktop, long-press on mobile) */}
+          <div
             className={cn(
-              "absolute -mt-2 top-0 z-[5]",
-              "opacity-0 group-hover/message:opacity-100 transition-opacity duration-150",
-              "pointer-events-none select-none",
-              "hidden sm:block",
+              "actions-pill pointer-events-none absolute -top-3",
+              "opacity-0 translate-y-1 transition-all duration-150",
+              "group-hover/message:opacity-100 group-hover/message:translate-y-0",
+              "group-focus-within/message:opacity-100 group-focus-within/message:translate-y-0",
               isUser ? "right-0" : "left-0"
             )}
           >
-            <div className="h-6 px-2 rounded-full bg-black/5 border border-black/10 backdrop-blur text-[11px] text-gray-600 shadow-sm flex items-center justify-center">
-              •••
-            </div>
-          </div>
-
-          {/* Actions pod (Phase 47) - Desktop hover/focus */}
-          <div
-            className={cn(
-              "actions-pod pointer-events-none absolute z-10",
-              "opacity-0 -translate-y-2",
-              "group-hover/message:opacity-100 group-hover/message:translate-y-0",
-              "focus-within:opacity-100 focus-within:translate-y-0",
-              "transition-all duration-150",
-              "hidden sm:block",
-              isUser 
-                ? "right-0 -top-3" 
-                : "left-0 -top-3"
-            )}
-            data-open="false"
-          >
-            <div className="pointer-events-auto h-9 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm flex items-center gap-1 px-1">
+            <div className="pointer-events-auto rounded-full bg-white/95 backdrop-blur border border-black/10 shadow-md h-8 px-1.5 flex items-center gap-0.5">
               <button 
-                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 rounded-full"
+                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
                 aria-label="Copy"
                 type="button"
               >
-                📋
+                ⧉
               </button>
               <button 
-                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 rounded-full"
-                aria-label="Retry"
+                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                aria-label="Quote"
                 type="button"
               >
-                ⟲
+                ❝
               </button>
               <button 
-                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 rounded-full"
+                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                aria-label="Re-run"
+                type="button"
+              >
+                ↻
+              </button>
+              <button 
+                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
                 aria-label="Share"
                 type="button"
               >
-                ↗
-              </button>
-              <button 
-                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 rounded-full"
-                aria-label="Save"
-                type="button"
-              >
-                ★
+                ⇪
               </button>
             </div>
           </div>
@@ -370,12 +352,16 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             </div>
           )}
           
-          {/* Timestamp row - Phase 44 polish */}
+          {/* Inline meta row - Phase 50 (timestamp + status) */}
           <div className={cn(
             "pt-1 text-[11px] text-gray-500 select-none",
             isUser ? "text-right" : ""
           )}>
-            {time && <span>{time} • {isUser ? "delivered" : "Echo"}</span>}
+            {time && (
+              <span>
+                {time} • {isUser ? "delivered" : "processed"}
+              </span>
+            )}
           </div>
         </div>
       </div>
