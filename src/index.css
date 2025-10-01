@@ -36,6 +36,28 @@ html, body {
   --echo-tabs-h: 48px;
   --echo-composer-h: 84px; /* includes padding/safe-area */
   --echo-top: 56px; /* header height on mobile */
+
+  /* Message bubble tokens */
+  --bubble-max: 92vw;             /* prevents edge-to-edge balloons on phones */
+  --bubble-max-md: 720px;         /* cap on larger screens */
+  --bubble-gap-y: 6px;            /* inter-bubble in a group */
+  --bubble-gap-x: 10px;           /* gap from avatar rail */
+  --bubble-radius: 16px;          /* base radius */
+  --bubble-radius-lg: 18px;       /* for first/last in a group */
+  --bubble-shadow: 0 4px 16px rgba(0,0,0,.08);
+
+  /* Echo (AI) bubble */
+  --ai-bg: rgba(255,255,255,.92);
+  --ai-brd: rgba(0,0,0,.06);
+  --ai-fg: #0f172a;               /* slate-900 */
+
+  /* User bubble */
+  --me-bg: rgba(42,157,143,.10);  /* brand teal wash */
+  --me-brd: rgba(42,157,143,.22);
+  --me-fg: #0c3b3f;
+
+  /* Meta text */
+  --meta-fg: rgba(17,24,39,.55);  /* gray-800 @ 55% */
 }
 
 @media (min-width: 640px) {

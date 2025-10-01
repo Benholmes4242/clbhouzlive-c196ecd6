@@ -1440,51 +1440,55 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               </div>
             )}
 
-            {messages.map((message) => (
-              <div key={message.id} className="mx-auto w-full max-w-[720px]">
-                <ChatMessageComponent
-                  message={message}
-                  onSaveToInsights={saveToSwingInsights}
-                  onRequestDetail={requestMoreDetail}
-                  onAskEcho={(prompt) => {
-                    console.log('Ask Echo:', prompt);
-                  }}
-                />
-                
-                {/* Show visual pack if this is the latest AI message with analysis */}
-                {message.type === 'ai' && 
-                 message.id === messages[messages.length - 1]?.id && 
-                 message.metadata?.category === 'swing_analysis' && (
-                  <div className="mt-4 space-y-4">
-                    <SwingVisualCarousel
-                      visuals={[]}
-                      isLoading={false}
-                      onExport={() => handleExportPack(message.id)}
+            <div className="mx-auto w-full max-w-[var(--bubble-max-md)] px-3 sm:px-5">
+              <div className="flex flex-col gap-3 sm:gap-4">
+                {messages.map((message) => (
+                  <React.Fragment key={message.id}>
+                    <ChatMessageComponent
+                      message={message}
+                      onSaveToInsights={saveToSwingInsights}
+                      onRequestDetail={requestMoreDetail}
+                      onAskEcho={(prompt) => {
+                        console.log('Ask Echo:', prompt);
+                      }}
                     />
                     
-                    {/* Coach Review CTA */}
-                    <div className="p-4 bg-muted/20 rounded-lg border">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-medium text-sm">Want a pro's perspective?</h4>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Get your swing reviewed by a local PGA professional
-                          </p>
+                    {/* Show visual pack if this is the latest AI message with analysis */}
+                    {message.type === 'ai' && 
+                     message.id === messages[messages.length - 1]?.id && 
+                     message.metadata?.category === 'swing_analysis' && (
+                      <div className="mt-4 space-y-4">
+                        <SwingVisualCarousel
+                          visuals={[]}
+                          isLoading={false}
+                          onExport={() => handleExportPack(message.id)}
+                        />
+                        
+                        {/* Coach Review CTA */}
+                        <div className="p-4 bg-muted/20 rounded-lg border">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="font-medium text-sm">Want a pro&apos;s perspective?</h4>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Get your swing reviewed by a local PGA professional
+                              </p>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleGetCoachReview(message.id)}
+                              className="shrink-0"
+                            >
+                              Find Local Coach
+                            </Button>
+                          </div>
                         </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleGetCoachReview(message.id)}
-                          className="shrink-0"
-                        >
-                          Find Local Coach
-                        </Button>
                       </div>
-                    </div>
-                  </div>
-                )}
+                    )}
+                  </React.Fragment>
+                ))}
               </div>
-            ))}
+            </div>
 
             {/* Show inline coach recommendations after swing analysis is complete */}
             {currentAnalysis && (

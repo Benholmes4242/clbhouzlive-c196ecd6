@@ -620,31 +620,26 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         </div>
                       </div>
                     ) : (
-                      <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 space-y-6">
-                        {messages.map((message) => (
-                          <ChatMessageComponent
-                            key={message.id}
-                            message={message}
-                            onSaveToInsights={saveToInsights}
-                            onRequestDetail={requestMoreDetail}
-                          />
-                        ))}
-                        {isLoading && (
-                          <div className="space-y-2" data-echo-group>
-                            <div className="flex items-start gap-2" data-echo-typing>
-                              <div className="mt-0.5 h-6 w-6 shrink-0 rounded-full flex items-center justify-center bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] opacity-80">
-                                <Bot className="h-4 w-4 text-white/90" />
-                              </div>
-                              <div className="rounded-[18px] px-4 py-3 bg-white/75 backdrop-blur border border-black/5">
-                                <span className="inline-flex gap-1">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-gray-500/70 animate-bounce [animation-delay:-.2s]" />
-                                  <span className="w-1.5 h-1.5 rounded-full bg-gray-500/70 animate-bounce" />
-                                  <span className="w-1.5 h-1.5 rounded-full bg-gray-500/70 animate-bounce [animation-delay:.2s]" />
-                                </span>
+                      <div className="mx-auto w-full max-w-[var(--bubble-max-md)] px-3 sm:px-5">
+                        <div className="flex flex-col gap-3 sm:gap-4">
+                          {messages.map((message) => (
+                            <ChatMessageComponent
+                              key={message.id}
+                              message={message}
+                              onSaveToInsights={saveToInsights}
+                              onRequestDetail={requestMoreDetail}
+                            />
+                          ))}
+                          {isLoading && (
+                            <div className="self-start">
+                              <div className="inline-flex items-center gap-1.5 rounded-[12px] bg-white/80 border border-black/10 px-3 py-1.5 shadow-[var(--bubble-shadow)]">
+                                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-500 [animation-delay:-120ms]" />
+                                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-500 [animation-delay:-60ms]" />
+                                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-500" />
                               </div>
                             </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                     )}
                 </div>
