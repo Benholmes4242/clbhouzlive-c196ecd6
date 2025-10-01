@@ -739,20 +739,38 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             </header>
 
             {/* Search & Tabs (sticky under header) */}
-            <div className="sticky top-0 z-[0] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm border-b border-white/10">
+            <div className="sticky top-14 sm:top-16 z-[1] bg-gradient-to-b from-white/50 to-transparent backdrop-blur-sm border-b border-white/10">
               <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-2">
                 {/* Search bar */}
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="flex-1 h-11 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm px-3 flex items-center gap-2">
-                    <Search className="h-4 w-4 text-gray-500" />
+                  <label className="flex-1 h-11 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm px-3 flex items-center gap-2 transition-[box-shadow] focus-within:ring-2 focus-within:ring-[#2A9D8F]/30">
+                    <Search className="h-4.5 w-4.5 text-gray-500" aria-hidden="true" />
                     <input
                       type="search"
                       placeholder="Search Echo…"
                       className="w-full bg-transparent outline-none text-[14px] placeholder:text-gray-500"
                       onChange={(e) => setSearchQuery(e.target.value)}
                       value={searchQuery}
+                      aria-label="Search Echo history"
                     />
-                  </div>
+                    {searchQuery && (
+                      <button
+                        className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:scale-[0.98] transition"
+                        onClick={() => setSearchQuery('')}
+                        aria-label="Clear search"
+                      >
+                        <X className="h-4 w-4 text-gray-500" />
+                      </button>
+                    )}
+                  </label>
+
+                  {/* Filter button (UI placeholder) */}
+                  <button
+                    className="h-11 px-4 rounded-full bg-white border border-black/10 hover:bg-gray-50 active:scale-[0.98] shadow-sm text-[14px] font-medium text-gray-700 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                    aria-label="Open filters"
+                  >
+                    <Filter className="h-4 w-4" />
+                  </button>
                 </div>
 
                 {/* Tabs */}
@@ -761,7 +779,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     type="button"
                     onClick={() => setActiveTab('chat')}
                     className={cn(
-                      "rounded-full px-4 text-[14px] font-medium transition-all",
+                      "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
                       activeTab === 'chat' 
                         ? "bg-white shadow ring-1 ring-black/5" 
                         : "text-gray-700 hover:bg-white/50"
@@ -773,7 +791,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     type="button"
                     onClick={() => setActiveTab('swing')}
                     className={cn(
-                      "rounded-full px-4 text-[14px] font-medium transition-all",
+                      "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
                       activeTab === 'swing' 
                         ? "bg-white shadow ring-1 ring-black/5" 
                         : "text-gray-700 hover:bg-white/50"
@@ -782,6 +800,23 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     Swing {filteredSwingAnalyses.length > 0 && <span className="ml-1 opacity-70">({filteredSwingAnalyses.length})</span>}
                   </button>
                 </div>
+
+                {/* Results header */}
+                {(searchQuery || filteredConversations.length > 0 || filteredSwingAnalyses.length > 0) && (
+                  <div className="mt-2 text-[12px] text-gray-600">
+                    {searchQuery ? (
+                      <>
+                        Results for <span className="font-medium text-gray-800">&ldquo;{searchQuery}&rdquo;</span> · {' '}
+                        {activeTab === 'chat' ? filteredConversations.length : filteredSwingAnalyses.length}
+                      </>
+                    ) : (
+                      <>
+                        {activeTab === 'chat' ? 'Recent conversations' : 'Recent analyses'} · {' '}
+                        {activeTab === 'chat' ? filteredConversations.length : filteredSwingAnalyses.length}
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -807,11 +842,33 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                         onRetry={loadChatConversations}
                       />
                     ) : filteredConversations.length === 0 ? (
-                      <EmptyState
-                        icon={<MessageCircle className="h-8 w-8" />}
-                        title="No conversations found"
-                        subtitle="Start a conversation to see your chat history here"
-                      />
+                      searchQuery ? (
+                        <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-10">
+                          <div className="rounded-2xl bg-white/80 backdrop-blur border border-black/10 text-center px-6 py-10">
+                            <div className="mx-auto mb-3 h-12 w-12 rounded-full grid place-items-center bg-white border border-black/10 shadow-sm text-gray-700">
+                              <Search className="h-6 w-6" />
+                            </div>
+                            <div className="text-[17px] font-semibold text-gray-900">No matches</div>
+                            <div className="mt-1.5 text-[13px] text-gray-600/90">
+                              Try a different search term or clear filters.
+                            </div>
+                            <div className="mt-4 flex items-center justify-center gap-2">
+                              <button 
+                                className="h-10 px-4 rounded-full bg-white border border-black/10 hover:bg-gray-50 shadow-sm text-[14px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                                onClick={() => setSearchQuery('')}
+                              >
+                                Clear search
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <EmptyState
+                          icon={<MessageCircle className="h-8 w-8" />}
+                          title="No conversations found"
+                          subtitle="Start a conversation to see your chat history here"
+                        />
+                      )
                     ) : (
                       <>
                         {/* Last 7 Days */}
@@ -1111,11 +1168,33 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                         onRetry={loadSwingAnalyses}
                       />
                     ) : filteredSwingAnalyses.length === 0 ? (
-                      <EmptyState
-                        icon={<BarChart3 className="h-8 w-8" />}
-                        title="No swing analyses found"
-                        subtitle="Upload a swing video to see analyses here"
-                      />
+                      searchQuery ? (
+                        <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-10">
+                          <div className="rounded-2xl bg-white/80 backdrop-blur border border-black/10 text-center px-6 py-10">
+                            <div className="mx-auto mb-3 h-12 w-12 rounded-full grid place-items-center bg-white border border-black/10 shadow-sm text-gray-700">
+                              <Search className="h-6 w-6" />
+                            </div>
+                            <div className="text-[17px] font-semibold text-gray-900">No matches</div>
+                            <div className="mt-1.5 text-[13px] text-gray-600/90">
+                              Try a different search term or clear filters.
+                            </div>
+                            <div className="mt-4 flex items-center justify-center gap-2">
+                              <button 
+                                className="h-10 px-4 rounded-full bg-white border border-black/10 hover:bg-gray-50 shadow-sm text-[14px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                                onClick={() => setSearchQuery('')}
+                              >
+                                Clear search
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <EmptyState
+                          icon={<BarChart3 className="h-8 w-8" />}
+                          title="No swing analyses found"
+                          subtitle="Upload a swing video to see analyses here"
+                        />
+                      )
                     ) : (
                       <>
                         {/* Group swing analyses by recency */}
