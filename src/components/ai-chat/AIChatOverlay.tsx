@@ -743,152 +743,140 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           {/* Composer footer */}
           <footer 
             className="sticky bottom-0 z-[1]
-                       border-t border-black/5
-                       bg-gradient-to-b from-white/70 to-white/90
-                       backdrop-blur-md"
+                       border-t border-black/10
+                       bg-white/80 backdrop-blur-md
+                       px-3 py-3 sm:px-4 sm:py-3.5
+                       pb-[max(env(safe-area-inset-bottom),12px)]"
+            role="region"
+            aria-label="Message composer"
             data-echo-composer
           >
-            <div className="mx-auto w-full max-w-screen-md px-3 sm:px-4 pb-[max(env(safe-area-inset-bottom),12px)] pt-3">
+            {/* Upload progress bar (shown during processing) */}
+            {(isLoading || isProcessing) && (
+              <div className="absolute left-0 right-0 top-0 h-[2px] bg-[#2A9D8F]/20 overflow-hidden">
+                <div className="h-full bg-[#2A9D8F] animate-[shimmer_1.6s_linear_infinite] w-1/3" />
+              </div>
+            )}
+            
+            <div className="mx-auto w-full max-w-screen-md">
               {activeTab === 'chat' && (
                 <div>
-                  {/* Recording state overlay */}
-                  {isRecording && (
-                    <div className="
-                      mb-2 flex items-center gap-2 rounded-[14px]
-                      bg-white/90 backdrop-blur border border-black/10 px-3 py-2
-                      shadow-sm
-                    ">
-                      <div className="h-6 flex-1 bg-gradient-to-r from-[#2A9D8F]/20 to-transparent rounded relative overflow-hidden">
-                        <span className="absolute inset-y-0 left-2 flex items-center text-[11px] text-[#2A9D8F] font-medium">
-                          Listening…
-                        </span>
-                      </div>
-                      <button 
-                        type="button"
-                        className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/45" 
-                        onClick={stopRecording}
-                        aria-label="Cancel recording"
-                      >
-                        <MicOff className="h-4 w-4 text-red-600" />
-                      </button>
-                      <button 
-                        type="button"
-                        className="h-8 px-3 rounded-full bg-[#2A9D8F] text-white text-[13px] hover:brightness-[1.05] active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/45" 
-                        onClick={stopRecording}
-                        aria-label="Use recording"
-                      >
-                        Use
-                      </button>
-                    </div>
-                  )}
-
                   {/* Main composer pill */}
-                  <div className="
-                    w-full rounded-[28px] min-h-[46px]
-                    bg-white/92 backdrop-blur border border-black/8
-                    shadow-md
-                    px-3 py-2
-                    flex items-end gap-2
-                    focus-within:ring-2 focus-within:ring-[#2A9D8F]/35 focus-within:border-transparent
-                    transition-shadow
-                  ">
+                  <div 
+                    className={cn(
+                      "flex items-center gap-2 rounded-[28px]",
+                      "bg-white/92 backdrop-blur shadow-[0_8px_24px_rgba(0,0,0,0.06)] border border-black/8",
+                      "px-3.5 py-2 sm:px-4 sm:py-2.5",
+                      "focus-within:ring-2 focus-within:ring-[#2A9D8F]/25",
+                      "transition-shadow",
+                      isRecording && "ring-2 ring-red-400/30"
+                    )}
+                    role="group"
+                    aria-label="Message composer"
+                  >
                     {/* Left buttons */}
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <button
-                        type="button"
-                        aria-label="Attach file"
-                        className="
-                          h-9 w-9 rounded-full
-                          text-gray-500 hover:text-gray-700
-                          hover:bg-black/5 active:bg-black/10
-                          grid place-items-center
-                          transition-colors
-                          disabled:opacity-50 disabled:cursor-not-allowed
-                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/45
-                        "
-                        disabled={isLoading || isRecording || isProcessing}
-                      >
-                        <Paperclip className="h-[18px] w-[18px]" />
-                      </button>
-
-                      <button
-                        type="button"
-                        aria-label={isRecording ? "Recording" : "Start voice input"}
-                        className={cn(
-                          "h-9 w-9 rounded-full grid place-items-center transition-all",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/45",
-                          isRecording
-                            ? "bg-[#2A9D8F]/15 border border-[#2A9D8F]/40 ring-4 ring-[#2A9D8F]/20 text-[#2A9D8F]"
-                            : "text-gray-500 hover:text-gray-700 hover:bg-black/5 active:bg-black/10"
-                        )}
-                        onMouseDown={startRecording}
-                        onMouseUp={stopRecording}
-                        onTouchStart={startRecording}
-                        onTouchEnd={stopRecording}
-                        disabled={isProcessing || inputValue.trim().length > 0}
-                      >
-                        <Mic className="h-[18px] w-[18px]" />
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      aria-label="Attach file"
+                      className="
+                        shrink-0 size-9 rounded-full
+                        text-gray-700 hover:bg-black/5 active:bg-black/10
+                        grid place-items-center
+                        transition-colors
+                        disabled:opacity-50 disabled:cursor-not-allowed
+                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40
+                      "
+                      disabled={isLoading || isRecording || isProcessing}
+                    >
+                      <Paperclip className="h-[18px] w-[18px]" />
+                    </button>
 
                     {/* Textarea */}
-                    <div className="flex-1 min-w-0">
-                      <Textarea
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        placeholder="Message Echo…"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            sendMessage(inputValue);
-                          }
-                        }}
-                        disabled={isLoading || isRecording || isProcessing}
-                        className="
-                          flex-1 resize-none bg-transparent outline-none
-                          text-[15px] leading-[1.45] text-gray-900
-                          placeholder:text-gray-500
-                          px-0 py-0 min-h-[24px] max-h-[7.5rem]
-                          border-0 focus-visible:ring-0 focus-visible:ring-offset-0
-                          overflow-y-auto -webkit-overflow-scrolling-touch
-                        "
-                        rows={1}
-                        style={{ 
-                          height: 'auto'
-                        }}
-                        onInput={(e) => {
-                          const target = e.target as HTMLTextAreaElement;
-                          target.style.height = 'auto';
-                          const newHeight = Math.min(target.scrollHeight, 120);
-                          target.style.height = `${newHeight}px`;
-                          target.style.overflowY = target.scrollHeight > 120 ? 'auto' : 'hidden';
-                        }}
-                      />
-                    </div>
+                    <Textarea
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      placeholder="Message Echo…"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          sendMessage(inputValue);
+                        }
+                      }}
+                      disabled={isLoading || isRecording || isProcessing}
+                      aria-label="Message"
+                      className="
+                        flex-1 min-w-0 resize-none border-0 bg-transparent outline-none
+                        text-[15px] sm:text-[15.5px] leading-[1.45] text-gray-900
+                        placeholder:text-gray-500
+                        px-0 py-0.5 min-h-[24px] max-h-[36vh]
+                        focus-visible:ring-0 focus-visible:ring-offset-0
+                        overflow-y-auto scrollbar-thin
+                      "
+                      rows={1}
+                      style={{ 
+                        height: 'auto'
+                      }}
+                      onInput={(e) => {
+                        const target = e.target as HTMLTextAreaElement;
+                        target.style.height = 'auto';
+                        const vh = window.innerHeight * 0.36;
+                        const newHeight = Math.min(target.scrollHeight, vh);
+                        target.style.height = `${newHeight}px`;
+                        target.style.overflowY = target.scrollHeight > vh ? 'auto' : 'hidden';
+                      }}
+                    />
 
-                    {/* Right action - Send */}
-                    <div className="flex items-center gap-1.5 shrink-0">
+                    {/* Right actions */}
+                    <div className="flex items-center gap-1 shrink-0">
+                      {/* Mic button with pulse when recording */}
+                      {!inputValue?.trim() && (
+                        <div className="relative">
+                          {isRecording && (
+                            <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                          )}
+                          <button
+                            type="button"
+                            aria-label={isRecording ? "Recording" : "Start voice input"}
+                            className={cn(
+                              "size-9 rounded-full grid place-items-center transition-colors",
+                              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+                              isRecording
+                                ? "text-red-600 bg-red-50"
+                                : "text-gray-700 hover:bg-black/5 active:bg-black/10"
+                            )}
+                            onMouseDown={startRecording}
+                            onMouseUp={stopRecording}
+                            onTouchStart={startRecording}
+                            onTouchEnd={stopRecording}
+                            disabled={isProcessing}
+                          >
+                            <Mic className="h-[18px] w-[18px]" />
+                          </button>
+                        </div>
+                      )}
+                      
+                      {/* Send button - pill within pill */}
                       <button
                         type="button"
                         aria-label="Send message"
                         disabled={!inputValue?.trim() || isLoading || isProcessing}
                         className={cn(
-                          "h-9 w-9 rounded-full grid place-items-center",
+                          "shrink-0 rounded-full px-3.5 h-9 text-[14px] font-medium",
                           "transition-all",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/45",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 focus-visible:ring-offset-2",
                           (!inputValue?.trim() || isLoading || isProcessing)
-                            ? "bg-[#2A9D8F]/15 text-[#2A9D8F]/60 cursor-default"
-                            : "bg-[#2A9D8F] text-white shadow-sm hover:brightness-[1.05] active:scale-[0.98]"
+                            ? "bg-[#2A9D8F]/15 text-[#2A9D8F]/60 cursor-default shadow-none"
+                            : "bg-[#2A9D8F] text-white shadow-[0_6px_18px_rgba(42,157,143,0.45)] hover:brightness-105 active:scale-[0.98]"
                         )}
                         onClick={() => sendMessage(inputValue)}
                       >
                         {isLoading || isProcessing ? (
-                          <svg className="h-[16px] w-[16px] animate-spin text-current" viewBox="0 0 24 24">
+                          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="10" className="opacity-25" stroke="currentColor" strokeWidth="4" fill="none"/>
                             <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
                           </svg>
                         ) : (
-                          <ArrowUpRight className="h-[16px] w-[16px]" />
+                          <span>Send</span>
                         )}
                       </button>
                     </div>
@@ -896,15 +884,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
                   {/* Recent history peek */}
                   <button
-                    className="mt-3 w-full rounded-[28px] bg-[#3da0a9]/15 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-[#3da0a9]/20 transition"
+                    className="mt-3 w-full rounded-full bg-white/40 backdrop-blur border border-black/5 shadow-sm flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-white/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
                     onClick={() => setShowHistory(true)}
                     aria-label="Open recent history"
                   >
-                    <span className="flex items-center gap-2">
-                      <span className="w-10 h-1 rounded-full block" style={{ background: 'linear-gradient(135deg, #1D3557, #2A9D8F)', opacity: 0.8 }} />
+                    <span className="flex items-center gap-2 text-[13px] font-medium">
+                      <History className="h-[14px] w-[14px]" />
                       Recent history
                     </span>
-                    <svg className="h-4 w-4" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+                    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
                   </button>
                 </div>
               )}
