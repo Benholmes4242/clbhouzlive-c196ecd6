@@ -756,6 +756,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     <div 
                       className={cn(
                         "flex items-center gap-2 overflow-x-auto snap-x snap-mandatory scrollbar-none",
+                        "[-webkit-overflow-scrolling:touch]",
                         "transition-opacity",
                         inputValue?.trim() ? "opacity-70" : "opacity-100"
                       )}
@@ -765,7 +766,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       {/* Primary action when idle */}
                       {!inputValue?.trim() && (
                         <button 
-                          className="shrink-0 snap-start px-3.5 h-9 rounded-full bg-[#2A9D8F] text-white shadow hover:brightness-105 active:scale-[0.99] text-[13px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                          className="echo-suggestion-chip shrink-0 snap-start px-3.5 h-9 rounded-full bg-[#2A9D8F] text-white shadow hover:brightness-105 active:scale-[0.99] text-[13px] font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
                           type="button"
                           onClick={() => setInputValue("")}
                         >
@@ -775,42 +776,42 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       
                       {/* Smart suggestions */}
                       <button 
-                        className="shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        className="echo-suggestion-chip shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
                         type="button"
                         onClick={() => setInputValue("Summarise my latest tips")}
                       >
                         Summarise latest tips
                       </button>
                       <button 
-                        className="shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        className="echo-suggestion-chip shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
                         type="button"
                         onClick={() => setInputValue("Explain this video")}
                       >
                         Explain this video
                       </button>
                       <button 
-                        className="shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        className="echo-suggestion-chip shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
                         type="button"
                         onClick={() => setInputValue("Summarise last round")}
                       >
                         Summarise last round
                       </button>
                       <button 
-                        className="shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        className="echo-suggestion-chip shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
                         type="button"
                         onClick={() => setInputValue("Create practice plan")}
                       >
                         Create practice plan
                       </button>
                       <button 
-                        className="shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        className="echo-suggestion-chip shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
                         type="button"
                         onClick={() => setInputValue("Analyse this swing")}
                       >
                         Analyse this swing
                       </button>
                       <button 
-                        className="shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        className="echo-suggestion-chip shrink-0 snap-start px-3.5 h-9 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[13px] text-gray-800 hover:bg-white active:scale-[0.99] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
                         type="button"
                         onClick={() => setInputValue("Show me my improvement trends")}
                       >
@@ -990,14 +991,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           rows={1}
                           className="w-full resize-none bg-transparent outline-none text-[15px] leading-[1.5] text-gray-900 placeholder:text-gray-500 caret-[#2A9D8F] disabled:opacity-60 disabled:pointer-events-none max-h-[36vh]"
                         />
-                        {/* Helper row */}
+                        {/* Hint row with counter */}
                         <div className="mt-1 flex items-center justify-between">
                           <div className="text-[11px] text-gray-500 select-none">
-                            Press ⌘⏎ to send
+                            Shift+Enter for newline
                           </div>
-                          {/* Optional char count */}
-                          <div className="text-[11px] text-gray-500 select-none">
-                            {/* {inputValue?.length || 0}/— */}
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[11px] text-gray-500 select-none">
+                              {inputValue?.length || 0}/2000
+                            </span>
                           </div>
                         </div>
                       </div>

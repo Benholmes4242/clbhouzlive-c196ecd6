@@ -96,11 +96,16 @@
 /* Ultra-small screen optimizations for composer */
 @media (max-width: 360px) {
   .composer-pill {
-    padding: 8px 12px !important;
+    padding: 6px 8px !important;
   }
   
   .composer-pill textarea {
     font-size: 14px !important;
+  }
+  
+  /* Suggestion chips */
+  .echo-suggestion-chip {
+    font-size: 12px !important;
   }
   
   /* Attachment rail on small screens */
