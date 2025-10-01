@@ -483,6 +483,23 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             }}
             data-echo-topbar
           >
+            {/* Top progress bar when loading */}
+            {isLoading && (
+              <div 
+                className="fixed top-[var(--overlay-top,0px)] left-0 right-0 h-[2px] z-[1300] overflow-hidden"
+                role="progressbar"
+                aria-label="Generating response"
+              >
+                <div 
+                  className="h-full bg-gradient-to-r from-[#2A9D8F] via-[#79C4BD] to-[#2A9D8F]"
+                  style={{
+                    backgroundSize: '200% 100%',
+                    animation: 'shimmer 1.6s linear infinite'
+                  }}
+                />
+              </div>
+            )}
+            
             <div className="mx-auto max-w-[1200px] h-full px-3 sm:px-5">
               <div className="grid h-full grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3">
                 {/* Left cluster */}
@@ -614,7 +631,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             {/* Scrollable content area */}
             <TabsContent value="chat" className="m-0 flex-1" style={{ minHeight: 0 }}>
               <div 
-                className="relative h-full overflow-y-auto scroll-smooth [-webkit-overflow-scrolling:touch] px-3 sm:px-4 pt-10 pb-28"
+                className="relative h-full overflow-y-auto overscroll-y-contain scroll-smooth [-webkit-overflow-scrolling:touch] px-3 sm:px-4 pt-10 pb-[64px]"
                 data-echo-canvas
                 ref={chatAutoScroll.scrollAreaRef}
               >
@@ -662,17 +679,22 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                               onRequestDetail={requestMoreDetail}
                             />
                           ))}
-                          {isLoading && (
-                            <div className="flex justify-start">
-                              <div className="inline-flex items-center gap-1.5 rounded-full bg-white/85 border border-black/5 px-2.5 py-1">
-                                <span className="inline-flex gap-0.75">
-                                  <i className="w-1.5 h-1.5 rounded-full bg-gray-500/70 animate-bounce" style={{ animationDelay: '0ms' }} />
-                                  <i className="w-1.5 h-1.5 rounded-full bg-gray-500/70 animate-bounce" style={{ animationDelay: '120ms' }} />
-                                  <i className="w-1.5 h-1.5 rounded-full bg-gray-500/70 animate-bounce" style={{ animationDelay: '240ms' }} />
-                                </span>
-                              </div>
-                            </div>
-                          )}
+                           {isLoading && (
+                             <div className="px-4 sm:px-6 py-2">
+                               <div className="flex gap-2 items-start">
+                                 <div className="h-8 w-8 shrink-0 rounded-full flex items-center justify-center bg-[#2A9D8F]/12 ring-1 ring-[#2A9D8F]/20 animate-[pulse_1.8s_ease-in-out_infinite]">
+                                   <Bot className="h-4 w-4 text-[#2A9D8F]" />
+                                 </div>
+                                 <div className="inline-flex items-center gap-1.5 rounded-xl bg-white/80 border border-black/5 backdrop-blur px-2.5 py-1">
+                                   <span className="inline-flex gap-1">
+                                     <i className="w-[6px] h-[6px] rounded-full bg-gray-500/70 animate-bounce" style={{ animationDelay: '0ms' }} />
+                                     <i className="w-[6px] h-[6px] rounded-full bg-gray-500/70 animate-bounce" style={{ animationDelay: '200ms' }} />
+                                     <i className="w-[6px] h-[6px] rounded-full bg-gray-500/70 animate-bounce" style={{ animationDelay: '400ms' }} />
+                                   </span>
+                                 </div>
+                               </div>
+                             </div>
+                           )}
                         </div>
                       </div>
                     )}
@@ -682,7 +704,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
             <TabsContent value="swing" className="m-0 flex-1" style={{ minHeight: 0 }}>
               <div 
-                className="relative h-full overflow-y-auto scroll-smooth [-webkit-overflow-scrolling:touch] px-3 sm:px-4 pt-10 pb-28"
+                className="relative h-full overflow-y-auto overscroll-y-contain scroll-smooth [-webkit-overflow-scrolling:touch] px-3 sm:px-4 pt-10 pb-[64px]"
                 data-echo-canvas
               >
                 {/* Top vignette */}

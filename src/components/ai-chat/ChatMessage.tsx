@@ -65,32 +65,39 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   }
 
   return (
-    <div className="flex flex-col animate-[bubbleIn_.24s_ease-out_both]" data-echo-group>
+    <div 
+      className="px-4 sm:px-6 py-2 animate-[fadeInUp_.18s_ease-out_both]" 
+      data-echo-group
+      role="group"
+      aria-label={isUser ? "Your message" : "Echo message"}
+    >
       <div className={cn(
-        "group relative flex gap-2.5",
-        isUser ? "flex-row-reverse justify-start" : "justify-start"
+        "grid gap-2",
+        isUser ? "justify-items-end" : "justify-items-start"
       )} data-echo-msg={isUser ? 'user' : 'ai'}>
-        {/* Avatar (AI only, hidden on mobile) */}
-        {!isUser && (
-          <div className="mt-0.5 h-7 w-7 shrink-0 rounded-full hidden sm:flex items-center justify-center bg-gradient-to-br from-[#1D3557] to-[#2A9D8F]">
-            <Bot className="h-4 w-4 text-white/90" />
-          </div>
-        )}
-        
-        {/* Bubble shell */}
         <div className={cn(
-          "relative max-w-[82%]",
-          isUser ? "ml-auto" : "mr-auto"
+          "flex gap-2",
+          isUser ? "flex-row-reverse items-start" : "items-start"
         )}>
+          {/* Avatar */}
+          {!isUser && (
+            <div className="h-8 w-8 shrink-0 rounded-full flex items-center justify-center bg-[#2A9D8F]/12 ring-1 ring-[#2A9D8F]/20">
+              <Bot className="h-4 w-4 text-[#2A9D8F]" />
+            </div>
+          )}
+        
+          {/* Bubble shell */}
           <div className={cn(
-            "whitespace-pre-wrap break-words",
-            "px-3.5 py-2.5 leading-[1.45]",
-            "text-[15px] tracking-[0.1px]",
-            isUser 
-              ? "rounded-2xl rounded-tr-sm bg-[#2A9D8F] text-white shadow-md" 
-              : "rounded-2xl rounded-tl-sm bg-white/90 border border-black/5 backdrop-blur shadow"
+            "relative max-w-[82%] md:max-w-[70%]",
           )}>
-            <div className="leading-[1.45]">
+            <div className={cn(
+              "rounded-2xl px-3.5 py-2.5 shadow-sm",
+              "drop-shadow-[0_1px_0_rgba(0,0,0,0.03)]",
+              isUser 
+                ? "bg-[#2A9D8F]/[0.09] border border-[#2A9D8F]/20 text-[#1E3D45]" 
+                : "bg-white/90 backdrop-blur border border-black/[0.06] text-gray-900"
+            )}>
+              <div className="text-[15px] leading-[1.45]">
               {isUser ? (
                 <p className="m-0 break-words">{message.content}</p>
               ) : swingAnalysisData ? (
@@ -114,22 +121,22 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   </div>
                 </div>
               ) : (
-                <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-headings:text-gray-900 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-strong:font-semibold prose-a:text-[#2A9D8F] prose-a:underline prose-a:underline-offset-2 hover:prose-a:brightness-110 prose-code:text-[0.9em]">
+                <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-headings:text-gray-900 prose-p:my-2 prose-ul:my-2 prose-ul:pl-4 marker:prose-ul:text-gray-400 prose-ol:my-2 prose-ol:pl-4 prose-li:my-0.5 prose-strong:font-semibold prose-a:text-[#2A9D8F] prose-a:underline prose-a:underline-offset-2 hover:prose-a:brightness-110 prose-code:text-[0.9em]">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
-                      a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-[#2A9D8F] underline underline-offset-2 hover:brightness-110 break-words" />,
+                      a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-[#2A9D8F] underline underline-offset-2 hover:brightness-110 break-words focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40" />,
                       h1: ({ children }) => <h3 className="text-[15px] font-semibold mb-2 mt-0 text-gray-900">{children}</h3>,
                       h2: ({ children }) => <h4 className="text-[15px] font-semibold mb-2 mt-2 text-gray-900">{children}</h4>,
                       h3: ({ children }) => <h4 className="text-[15px] font-semibold mb-2 mt-2 text-gray-900">{children}</h4>,
                       p: ({ children }) => <p className="my-2 first:mt-0 last:mb-0 break-words">{children}</p>,
-                      ul: ({ children }) => <ul className="my-2 pl-5 space-y-0.5">{children}</ul>,
-                      ol: ({ children }) => <ol className="my-2 pl-5 space-y-0.5">{children}</ol>,
+                      ul: ({ children }) => <ul className="my-2 pl-4 marker:text-gray-400">{children}</ul>,
+                      ol: ({ children }) => <ol className="my-2 pl-4">{children}</ol>,
                       li: ({ children }) => <li className="my-0.5">{children}</li>,
                       strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
                       code: ({ inline, children, ...props }: any) => 
                         inline ? (
-                          <code className="bg-black/[0.02] border border-black/5 rounded px-1 py-0.5 text-[0.9em]" {...props}>
+                          <code className="rounded px-1.5 py-0.5 bg-black/[0.05] text-[13px]" {...props}>
                             {children}
                           </code>
                         ) : (
@@ -146,7 +153,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   </ReactMarkdown>
                 </div>
               )}
-            </div>
+              </div>
             
             {/* Tags from metadata */}
             {message.metadata?.tags && (
@@ -232,9 +239,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           
           {/* Timestamp + status row */}
           <div className={cn(
-            "mt-1 text-[11px] leading-none select-none text-gray-500",
+            "mt-1 text-[12px] text-gray-500/80",
             isUser ? "text-right" : "text-left"
           )}>
+            <span className="sr-only">Sent at</span>
             {time}
             {!isUser && message.metadata?.latencyMs && (
               <> • {message.metadata.latencyMs < 1000 ? 
@@ -242,7 +250,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 `${(message.metadata.latencyMs / 1000).toFixed(1)}s`
               }</>
             )}
+            {isUser && <span className="ml-1">• Sent</span>}
           </div>
+        </div>
         </div>
       </div>
     </div>
