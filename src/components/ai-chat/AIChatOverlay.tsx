@@ -763,12 +763,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </TabsContent>
           </Tabs>
         
-          {/* Composer footer */}
+          {/* Composer footer - Phase 43 polish */}
           <footer 
-            className="relative border-t border-white/10 bg-gradient-to-t from-white/70 to-white/40 backdrop-blur-xl"
+            className="sticky bottom-0 z-[5] border-t border-white/10 bg-gradient-to-t from-white/80 to-white/60 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60"
             role="region"
             aria-label="Message composer"
             data-echo-composer
+            data-streaming="false"
           >
             {/* Upload progress bar (shown during processing) */}
             {(isLoading || isProcessing) && (
@@ -777,9 +778,18 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             )}
             
-            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pb-[max(env(safe-area-inset-bottom),16px)] pt-2">
+            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-3 pb-[max(env(safe-area-inset-bottom),12px)]">
               {activeTab === 'chat' && (
                 <div>
+                  {/* Micro-hint - shows when input is empty */}
+                  {!inputValue?.trim() && messages.length === 0 && (
+                    <div className="mx-auto w-full max-w-[720px] pb-2 text-center">
+                      <div className="text-[12px] text-gray-500">
+                        Tip: attach a swing clip and ask "spot my early extension?"
+                      </div>
+                    </div>
+                  )}
+
                   {/* Smart Suggestions & Quick Actions Row */}
                   <div className="mb-2">
                     <div 
@@ -848,6 +858,26 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       </button>
                     </div>
                   </div>
+
+                  {/* Attachment chips (queued media) - Phase 43 */}
+                  {false && ( /* Set to true to show attachment chips */
+                    <div className="mb-2">
+                      <div className="flex flex-wrap gap-2">
+                        <div className="group flex items-center gap-2 rounded-full border border-black/10 bg-white/90 backdrop-blur shadow-sm pl-2 pr-1.5 h-8">
+                          <span className="text-[13px] text-gray-700">video.mov</span>
+                          <button className="h-6 w-6 grid place-items-center rounded-full hover:bg-black/5 transition" aria-label="Remove" type="button">
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                        <div className="group flex items-center gap-2 rounded-full border border-black/10 bg-white/90 backdrop-blur shadow-sm pl-2 pr-1.5 h-8">
+                          <span className="text-[13px] text-gray-700">photo.jpg</span>
+                          <button className="h-6 w-6 grid place-items-center rounded-full hover:bg-black/5 transition" aria-label="Remove" type="button">
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Attach row - compact glass chips */}
                   <div className="mb-2 flex items-center gap-2 text-gray-700">
@@ -972,16 +1002,17 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     </div>
                   )}
 
-                  {/* Main composer pill */}
+                  {/* Main composer pill - Phase 43 spec */}
                   <div className="w-full">
                     <form 
                       className={cn(
                         "composer-bubble composer-pill",
                         "rounded-[28px] bg-white/92 backdrop-blur",
-                        "border border-black/10 shadow-md",
-                        "px-3.5 py-2.5",
-                        "grid grid-cols-[auto,1fr,auto] items-end gap-2",
-                        "transition-all",
+                        "border border-black/10 shadow-sm",
+                        "px-2.5 py-2",
+                        "grid grid-cols-[auto,1fr,auto] items-center gap-1.5",
+                        "transition-[box-shadow,transform] duration-150",
+                        "focus-within:shadow-md focus-within:ring-1 focus-within:ring-[#2A9D8F]/30",
                         isRecording && "ring-1 ring-[#2A9D8F]/30"
                       )}
                       role="group"
@@ -992,23 +1023,35 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         sendMessage(inputValue);
                       }}
                     >
-                      {/* Left: more/emoji button */}
-                      <button
-                        type="button"
-                        aria-label="More options"
-                        className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                      >
-                        <svg className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-                        </svg>
-                      </button>
+                      {/* Left tools */}
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          aria-label="Attach"
+                          className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        >
+                          <Paperclip className="h-[18px] w-[18px] text-gray-600" />
+                        </button>
+                        <button
+                          type="button"
+                          aria-label="Mic"
+                          className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                          onMouseDown={!isProcessing ? startRecording : undefined}
+                          onMouseUp={!isProcessing ? stopRecording : undefined}
+                          onMouseLeave={!isProcessing ? stopRecording : undefined}
+                          onTouchStart={!isProcessing ? startRecording : undefined}
+                          onTouchEnd={!isProcessing ? stopRecording : undefined}
+                        >
+                          <Mic className="h-[18px] w-[18px] text-gray-600" />
+                        </button>
+                      </div>
 
-                      {/* Middle: textarea with helper */}
+                      {/* Input */}
                       <div className="min-w-0">
                         <textarea
                           value={inputValue}
                           onChange={(e) => setInputValue(e.target.value)}
-                          placeholder="Message Echo…"
+                          placeholder="Ask Echo anything…"
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {
                               e.preventDefault();
@@ -1018,43 +1061,47 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           disabled={isLoading || isRecording || isProcessing}
                           aria-label="Message input"
                           rows={1}
-                          className="w-full resize-none bg-transparent outline-none text-[15px] leading-[1.5] text-gray-900 placeholder:text-gray-500 caret-[#2A9D8F] disabled:opacity-60 disabled:pointer-events-none max-h-[36vh]"
+                          className="w-full resize-none bg-transparent outline-none text-[15px] leading-[1.45] text-gray-900 placeholder:text-gray-500 caret-[#2A9D8F] disabled:opacity-60 disabled:pointer-events-none max-h-[40vh] py-1"
                         />
-                        {/* Hint row with counter */}
-                        <div className="mt-1 flex items-center justify-between">
-                          <div className="text-[11px] text-gray-500 select-none">
-                            Shift+Enter for newline
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[11px] text-gray-500 select-none">
-                              {inputValue?.length || 0}/2000
-                            </span>
-                          </div>
-                        </div>
                       </div>
 
-                      {/* Right: send button */}
-                      <button
-                        type="submit"
-                        aria-label="Send"
-                        disabled={!inputValue?.trim() || isLoading || isProcessing}
-                        className={cn(
-                          "h-9 px-4 rounded-full text-[14px] font-medium shadow transition-all",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
-                          (!inputValue?.trim() || isLoading || isProcessing)
-                            ? "bg-gray-200 text-gray-500 cursor-not-allowed opacity-50"
-                            : "bg-[#2A9D8F] text-white hover:brightness-105 active:scale-[0.98]"
-                        )}
-                      >
-                        {isLoading || isProcessing ? (
-                          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10" className="opacity-25" stroke="currentColor" strokeWidth="4" fill="none"/>
-                            <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
-                          </svg>
-                        ) : (
-                          'Send'
-                        )}
-                      </button>
+                      {/* Right action - Send/Stop swap */}
+                      <div className="flex items-center gap-1.5">
+                        {/* Stop button (visible when streaming) */}
+                        <button
+                          type="button"
+                          className="hidden data-[streaming=true]:inline-flex h-9 px-4 rounded-full bg-black/5 hover:bg-black/10 text-[14px] border border-black/10 transition active:translate-y-[0.5px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                          aria-label="Stop"
+                          data-streaming={isLoading ? "true" : "false"}
+                        >
+                          Stop
+                        </button>
+
+                        {/* Send button (hidden when streaming) */}
+                        <button
+                          type="submit"
+                          aria-label="Send"
+                          disabled={!inputValue?.trim() || isLoading || isProcessing}
+                          className={cn(
+                            "inline-flex data-[streaming=true]:hidden h-9 px-4 rounded-full text-[14px] font-medium shadow transition-all active:translate-y-[0.5px]",
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+                            (!inputValue?.trim() || isLoading || isProcessing)
+                              ? "bg-gray-200 text-gray-500 cursor-not-allowed data-[state=disabled]:opacity-40 data-[state=disabled]:pointer-events-none"
+                              : "bg-[#2A9D8F] text-white hover:brightness-[1.05]"
+                          )}
+                          data-streaming={isLoading ? "true" : "false"}
+                          data-state={(!inputValue?.trim() || isLoading || isProcessing) ? "disabled" : "enabled"}
+                        >
+                          {isLoading || isProcessing ? (
+                            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                              <circle cx="12" cy="12" r="10" className="opacity-25" stroke="currentColor" strokeWidth="4" fill="none"/>
+                              <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
+                            </svg>
+                          ) : (
+                            'Send'
+                          )}
+                        </button>
+                      </div>
                     </form>
                   </div>
 
