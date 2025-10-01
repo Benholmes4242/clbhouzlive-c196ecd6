@@ -475,9 +475,12 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         >
           {/* Header */}
           <header
-            className="sticky top-0 z-[1200] h-14 sm:h-16
-                       bg-[linear-gradient(180deg,rgba(255,255,255,0.78),rgba(255,255,255,0.64))]
-                       backdrop-blur-2xl border-b border-black/5"
+            className="sticky top-0 z-[1200] h-14 sm:h-16 border-b border-black/[0.08]"
+            style={{
+              background: 'linear-gradient(to bottom, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.55) 80%, rgba(255,255,255,0.00) 100%)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)'
+            }}
             data-echo-topbar
           >
             <div className="mx-auto max-w-[1200px] h-full px-3 sm:px-5">
@@ -488,25 +491,39 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     type="button"
                     aria-label="Close Echo"
                     onClick={handleClose}
-                    className="h-9 w-9 grid place-items-center rounded-full
-                               bg-white/90 backdrop-blur border border-black/5 shadow-sm
-                               hover:bg-white transition focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40"
+                    className="h-9 w-9 rounded-full bg-white/80 border border-black/10 shadow-sm
+                               hover:bg-white transition flex items-center justify-center
+                               focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40"
                   >
-                    <X className="h-5 w-5 text-gray-800" />
+                    <X className="h-5 w-5 text-gray-700" />
                   </button>
                 </div>
 
                 {/* Center cluster */}
                 <div className="min-w-0 text-center">
                   <div className="flex items-center justify-center gap-2">
-                    <PiWaveform 
-                      className="h-5 w-5 text-[#2A9D8F]" 
-                      aria-hidden="true"
-                      style={{
-                        animation: `echoWave ${getAvatarState() === 'processing' ? '1s' : getAvatarState() === 'listening' ? '1.5s' : '3s'} ease-in-out infinite`
-                      }}
-                    />
-                    <h1 className="truncate text-[17px] sm:text-[18px] font-semibold text-gray-900">
+                    <div className="relative">
+                      <PiWaveform 
+                        className="h-5 w-5 text-[#2A9D8F]" 
+                        aria-hidden="true"
+                        style={{
+                          animation: getAvatarState() === 'processing' 
+                            ? 'echoRotate 2s linear infinite'
+                            : getAvatarState() === 'listening'
+                            ? 'echoBreathing 1.5s ease-in-out infinite'
+                            : 'echoBreathing 3s ease-in-out infinite'
+                        }}
+                      />
+                      {getAvatarState() === 'listening' && (
+                        <div 
+                          className="absolute inset-0 rounded-full"
+                          style={{
+                            animation: 'echoPulse 1.5s ease-in-out infinite'
+                          }}
+                        />
+                      )}
+                    </div>
+                    <h1 className="truncate text-lg md:text-xl font-semibold tracking-tight text-gray-900">
                       Echo
                     </h1>
                     {isProcessing && (
@@ -518,11 +535,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       </span>
                     )}
                   </div>
-                  <div className="mt-0.5 text-[12px] text-gray-600 leading-none">
+                  <div className="mt-0.5 text-sm text-gray-600 leading-none">
                     {isLoading ? (
                       <span className="truncate">Echo is typing…</span>
                     ) : (
-                      <span className="opacity-70">Say anything, I'm listening</span>
+                      <span>AI Chat</span>
                     )}
                   </div>
                 </div>
@@ -530,14 +547,16 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 {/* Right cluster */}
                 <div className="flex items-center justify-end gap-1.5 sm:gap-2">
                   {/* Tab switcher (desktop only) */}
-                  <div className="hidden sm:flex items-center rounded-full
-                                 bg-white/90 backdrop-blur border border-black/5 shadow-sm p-0.5">
+                  <div className="hidden sm:flex items-center h-11 rounded-full
+                                 bg-white/80 border border-black/10 backdrop-blur shadow-sm p-1">
                     <button
                       type="button"
                       onClick={() => setActiveTab('chat')}
                       className={cn(
-                        "h-8 px-3 rounded-full text-[13px] font-medium transition",
-                        activeTab === 'chat' ? "bg-white shadow text-gray-900" : "text-gray-700 hover:bg-white/60"
+                        "h-9 px-4 rounded-full text-sm font-medium transition-all",
+                        activeTab === 'chat' 
+                          ? "bg-[#2A9D8F] text-white shadow" 
+                          : "text-gray-700 hover:bg-white"
                       )}
                     >
                       Chat
@@ -546,8 +565,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       type="button"
                       onClick={() => setActiveTab('swing')}
                       className={cn(
-                        "h-8 px-3 rounded-full text-[13px] font-medium transition",
-                        activeTab === 'swing' ? "bg-white shadow text-gray-900" : "text-gray-700 hover:bg-white/60"
+                        "h-9 px-4 rounded-full text-sm font-medium transition-all",
+                        activeTab === 'swing' 
+                          ? "bg-[#2A9D8F] text-white shadow" 
+                          : "text-gray-700 hover:bg-white"
                       )}
                     >
                       Swing Coach
@@ -562,21 +583,27 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
             {/* Top bar container (sticky) */}
             <div
-              className="sticky top-[var(--echo-top,56px)] z-[2] px-3 sm:px-4 py-2 bg-white/55 backdrop-blur-md border-b border-white/30"
+              className="sticky top-[var(--echo-top,56px)] z-[2] px-3 sm:px-4 py-3 bg-white/55 backdrop-blur-md border-b border-white/30"
               data-echo-topbar
             >
               {/* Tabs rail */}
               <div className="w-full max-w-[720px] mx-auto" data-echo-tabs-rail>
-                <TabsList className="w-full h-11 rounded-full bg-white/80 backdrop-blur-md border border-black/5 shadow-sm grid grid-cols-2 gap-1 p-1">
+                <TabsList className="w-full h-11 rounded-full bg-white/80 backdrop-blur border border-black/10 shadow-sm grid grid-cols-2 gap-1 p-1">
                   <TabsTrigger
                     value="chat"
-                    className="rounded-full px-4 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5 data-[state=inactive]:text-gray-700 transition-all"
+                    className="rounded-full px-4 text-sm font-medium 
+                               data-[state=active]:bg-[#2A9D8F] data-[state=active]:text-white data-[state=active]:shadow
+                               data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-white
+                               transition-all"
                   >
                     Chat
                   </TabsTrigger>
                   <TabsTrigger
                     value="swing"
-                    className="rounded-full px-4 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5 data-[state=inactive]:text-gray-700 transition-all"
+                    className="rounded-full px-4 text-sm font-medium 
+                               data-[state=active]:bg-[#2A9D8F] data-[state=active]:text-white data-[state=active]:shadow
+                               data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-white
+                               transition-all"
                   >
                     Swing Coach
                   </TabsTrigger>

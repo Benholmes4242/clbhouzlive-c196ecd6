@@ -694,9 +694,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           >
             {/* Header */}
             <header
-              className="sticky top-0 z-[1200] h-14 sm:h-16
-                         bg-[linear-gradient(180deg,rgba(255,255,255,0.78),rgba(255,255,255,0.64))]
-                         backdrop-blur-2xl border-b border-black/5"
+              className="sticky top-0 z-[1200] h-14 sm:h-16 border-b border-black/[0.08]"
+              style={{
+                background: 'linear-gradient(to bottom, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.55) 80%, rgba(255,255,255,0.00) 100%)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)'
+              }}
               data-echo-topbar
             >
               <div className="mx-auto max-w-[1200px] h-full px-3 sm:px-5">
@@ -707,23 +710,29 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       type="button"
                       aria-label="Close History"
                       onClick={onClose}
-                      className="h-9 w-9 grid place-items-center rounded-full
-                                 bg-white/90 backdrop-blur border border-black/5 shadow-sm
-                                 hover:bg-white transition focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40"
+                      className="h-9 w-9 rounded-full bg-white/80 border border-black/10 shadow-sm
+                                 hover:bg-white transition flex items-center justify-center
+                                 focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40"
                     >
-                      <X className="h-5 w-5 text-gray-800" />
+                      <X className="h-5 w-5 text-gray-700" />
                     </button>
                   </div>
 
                   {/* Center cluster */}
                   <div className="min-w-0 text-center">
                     <div className="flex items-center justify-center gap-2">
-                      <PiWaveform className="h-5 w-5 text-[#2A9D8F]" aria-hidden="true" />
-                      <h1 className="truncate text-[17px] sm:text-[18px] font-semibold text-gray-900">
+                      <PiWaveform 
+                        className="h-5 w-5 text-[#2A9D8F]" 
+                        aria-hidden="true"
+                        style={{
+                          animation: 'echoBreathing 3s ease-in-out infinite'
+                        }}
+                      />
+                      <h1 className="truncate text-lg md:text-xl font-semibold tracking-tight text-gray-900">
                         Echo History
                       </h1>
                     </div>
-                    <div className="mt-0.5 text-[12px] text-gray-600 leading-none">
+                    <div className="mt-0.5 text-sm text-gray-600 leading-none">
                       <span className="truncate">Browse or search your conversations</span>
                     </div>
                   </div>
@@ -736,11 +745,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                         type="button"
                         aria-label="New conversation"
                         onClick={onNewConversation}
-                        className="h-9 w-9 grid place-items-center rounded-full
-                                   bg-white/90 backdrop-blur border border-black/5 shadow-sm
-                                   hover:bg-white transition focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40"
+                        className="h-9 w-9 rounded-full bg-white/80 border border-black/10 shadow-sm
+                                   hover:bg-white transition flex items-center justify-center
+                                   focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40"
                       >
-                        <Plus className="h-5 w-5 text-gray-800" />
+                        <Plus className="h-5 w-5 text-gray-700" />
                       </button>
                     )}
                   </div>
@@ -757,13 +766,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               <div className="mx-auto max-w-[1200px] px-3 sm:px-5 py-2">
                 <div className="flex items-center gap-2 mb-3">
                   {/* Search */}
-                  <div className="flex-1 min-w-0 h-10 rounded-full
-                                  bg-white/92 backdrop-blur border border-black/8
+                  <div className="flex-1 min-w-0 h-10 rounded-[24px]
+                                  bg-white/90 backdrop-blur border border-black/10 shadow-sm
                                   px-3.5 flex items-center gap-2">
-                    <Search className="h-4.5 w-4.5 text-gray-500 shrink-0" />
+                    <Search className="h-4 w-4 text-gray-500 shrink-0" />
                     <input
                       type="search"
-                      placeholder="Search history"
+                      placeholder="Search Echo history…"
                       className="w-full bg-transparent text-[14px] text-gray-900 placeholder:text-gray-500 outline-none"
                       onChange={(e) => setSearchQuery(e.target.value)}
                       value={searchQuery}
@@ -773,30 +782,32 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
                 {/* Tabs rail - visual only, actual Tabs below */}
                 <div className="w-full max-w-[720px] mx-auto" data-echo-tabs-rail>
-                  <div className="w-full h-11 rounded-full bg-white/80 backdrop-blur-md border border-black/5 shadow-sm grid grid-cols-2 gap-1 p-1">
+                  <div className="w-full h-11 rounded-full bg-white/80 backdrop-blur border border-black/10 shadow-sm grid grid-cols-2 gap-1 p-1">
                     <button
                       type="button"
                       onClick={() => setActiveTab('chat')}
+                      role="button"
                       className={cn(
                         "rounded-full px-4 text-sm font-medium transition-all",
                         activeTab === 'chat' 
-                          ? "bg-white text-gray-900 shadow ring-1 ring-black/5" 
-                          : "text-gray-700 hover:bg-white/60"
+                          ? "bg-[#2A9D8F] text-white shadow" 
+                          : "text-gray-700 hover:bg-white"
                       )}
                     >
-                      Chat {filteredConversations.length > 0 && <span className="ml-1 text-gray-500">({filteredConversations.length})</span>}
+                      Chat {filteredConversations.length > 0 && <span className="ml-1 opacity-70">({filteredConversations.length})</span>}
                     </button>
                     <button
                       type="button"
                       onClick={() => setActiveTab('swing')}
+                      role="button"
                       className={cn(
                         "rounded-full px-4 text-sm font-medium transition-all",
                         activeTab === 'swing' 
-                          ? "bg-white text-gray-900 shadow ring-1 ring-black/5" 
-                          : "text-gray-700 hover:bg-white/60"
+                          ? "bg-[#2A9D8F] text-white shadow" 
+                          : "text-gray-700 hover:bg-white"
                       )}
                     >
-                      Swing Coach {filteredSwingAnalyses.length > 0 && <span className="ml-1 text-gray-500">({filteredSwingAnalyses.length})</span>}
+                      Swing Coach {filteredSwingAnalyses.length > 0 && <span className="ml-1 opacity-70">({filteredSwingAnalyses.length})</span>}
                     </button>
                 </div>
               </div>
