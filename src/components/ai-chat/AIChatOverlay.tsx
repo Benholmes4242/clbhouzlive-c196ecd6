@@ -1130,29 +1130,53 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
       </div>
       </SlideOver>
       
-        {/* Mobile context menu bottom sheet - Phase 42 */}
+        {/* Message action overlay (mobile long-press) - Phase 44 */}
         <div 
-          className="fixed inset-x-0 bottom-0 z-[60] translate-y-full data-[open=true]:translate-y-0 transition-transform duration-250"
+          id="msg-action-overlay"
+          className="hidden fixed inset-0 z-[60] bg-black/20 backdrop-blur data-[open=true]:block"
           data-open="false"
         >
-          <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pb-[max(env(safe-area-inset-bottom),16px)]">
-            <div className="rounded-2xl bg-white/95 backdrop-blur border border-black/10 shadow-xl p-2">
-              <div className="mx-auto my-2 h-1 w-10 rounded-full bg-black/10"></div>
-              <div className="grid grid-cols-3 gap-2 p-2">
-                <button className="h-11 rounded-xl bg-black/[.04] hover:bg-black/[.06] transition text-[13px] font-medium text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" type="button">Copy</button>
-                <button className="h-11 rounded-xl bg-black/[.04] hover:bg-black/[.06] transition text-[13px] font-medium text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" type="button">React</button>
-                <button className="h-11 rounded-xl bg-black/[.04] hover:bg-black/[.06] transition text-[13px] font-medium text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" type="button">More</button>
-              </div>
+          <div className="absolute inset-x-0 bottom-[max(env(safe-area-inset-bottom),24px)] mx-auto w-full max-w-[720px] px-3 sm:px-4">
+            <div className="rounded-2xl bg-white/95 backdrop-blur border border-black/10 shadow-lg p-3 flex items-center justify-center gap-2">
+              <button 
+                className="h-10 w-10 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
+                aria-label="Copy"
+                type="button"
+              >
+                ⧉
+              </button>
+              <button 
+                className="h-10 w-10 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
+                aria-label="Quote"
+                type="button"
+              >
+                ❝
+              </button>
+              <button 
+                className="h-10 w-10 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
+                aria-label="Retry"
+                type="button"
+              >
+                ↻
+              </button>
+              <button 
+                className="h-10 w-10 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40" 
+                aria-label="Delete for me"
+                type="button"
+              >
+                ✕
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Toast notification - Phase 42 */}
+        {/* Copied toast - Phase 44 */}
         <div 
-          className="fixed top-3 right-3 sm:right-5 z-[70] data-[show=true]:opacity-100 opacity-0 transition-opacity duration-200 pointer-events-none data-[show=true]:pointer-events-auto"
+          id="toast"
+          className="pointer-events-none fixed left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),24px)] z-[70] hidden data-[show=true]:block"
           data-show="false"
         >
-          <div className="rounded-full bg-white/95 backdrop-blur border border-black/10 shadow px-3 py-1.5 text-[12px] text-gray-800">
+          <div className="rounded-full bg-gray-900 text-white text-[12px] px-3 py-1.5 shadow-lg">
             Copied to clipboard
           </div>
         </div>

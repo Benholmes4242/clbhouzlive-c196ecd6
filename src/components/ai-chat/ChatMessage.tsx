@@ -90,59 +90,59 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           <div className="hidden sm:block w-7 shrink-0" />
         )}
         
-        {/* Message content - actionable wrapper with Phase 42 actions */}
+        {/* Message content - actionable wrapper with Phase 44 toolbelt */}
         <div 
           className={cn(
-            "group relative max-w-[78%]"
+            "group/message relative max-w-[78%]",
+            isUser ? "message-right" : "message-left"
           )}
-          data-actions-open="false"
-          data-own={isUser ? "true" : "false"}
+          data-message-id={message.id}
+          data-author={isUser ? "user" : "echo"}
+          data-state="ok"
         >
-          {/* Long-press hit area (mobile visual only) */}
-          <button
-            className="sm:hidden absolute inset-0 opacity-0 rounded-2xl"
-            aria-label="Open message actions"
-            type="button"
-          ></button>
-
-          {/* Actions toolbar (desktop hover/focus) - Phase 42 spec */}
+          {/* Micro-toolbelt (Phase 44) - Desktop hover */}
           <div
             className={cn(
-              "pointer-events-none absolute z-10 translate-y-[-100%]",
-              "opacity-0 group-hover:opacity-100 group-focus-within:opacity-100",
-              "transition-opacity duration-150",
-              "hidden sm:flex items-center gap-1",
-              isUser ? "right-0 -top-4" : "left-0 -top-4"
+              "pointer-events-none absolute -top-3",
+              "opacity-0 translate-y-[-4px]",
+              "group-hover/message:opacity-100 group-hover/message:translate-y-0",
+              "transition-all duration-150",
+              "hidden sm:block",
+              isUser 
+                ? "right-0 translate-x-1" 
+                : "left-0 -translate-x-1"
             )}
           >
-            <button 
-              className="pointer-events-auto h-8 w-8 grid place-items-center rounded-full bg-white/95 backdrop-blur border border-black/10 shadow hover:bg-white active:scale-[.98] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-              aria-label="React to message"
-              type="button"
-            >
-              😊
-            </button>
-            <button 
-              className="pointer-events-auto h-8 w-8 grid place-items-center rounded-full bg-white/95 backdrop-blur border border-black/10 shadow hover:bg-white active:scale-[.98] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-              aria-label="Copy message"
-              type="button"
-            >
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
-            </button>
-            <button 
-              className="pointer-events-auto h-8 w-8 grid place-items-center rounded-full bg-white/95 backdrop-blur border border-black/10 shadow hover:bg-white active:scale-[.98] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-              aria-label="More actions"
-              type="button"
-            >
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="5" r="1.5"></circle>
-                <circle cx="12" cy="12" r="1.5"></circle>
-                <circle cx="12" cy="19" r="1.5"></circle>
-              </svg>
-            </button>
+            <div className="pointer-events-auto flex items-center gap-1.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm px-1.5 py-1">
+              <button 
+                className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                aria-label="Copy"
+                type="button"
+              >
+                ⧉
+              </button>
+              <button 
+                className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                aria-label="Quote"
+                type="button"
+              >
+                ❝
+              </button>
+              <button 
+                className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                aria-label="Retry"
+                type="button"
+              >
+                ↻
+              </button>
+              <button 
+                className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                aria-label="Delete for me"
+                type="button"
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           {/* Heading - only on first in group for AI */}
@@ -352,25 +352,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             </div>
           )}
           
-          {/* Timestamp with delivery status and status ticks - Phase 42 */}
+          {/* Timestamp row - Phase 44 polish */}
           <div className={cn(
-            "pt-1 text-[11px] text-gray-500 select-none flex items-center gap-2",
-            isUser ? "flex-row-reverse" : ""
+            "pt-1 text-[11px] text-gray-500 select-none",
+            isUser ? "text-right" : ""
           )}>
-            <span>{time}</span>
-            {time && (
-              <>
-                <span className="h-1 w-1 rounded-full bg-gray-300"></span>
-                <span>{isUser ? "Delivered" : "Echo"}</span>
-                {/* Status ticks for user messages */}
-                {isUser && (
-                  <span className="inline-flex items-center gap-0.5 text-gray-400">
-                    <span>✓</span>
-                    <span className="opacity-40 data-[state=seen]:opacity-100" data-state="delivered">✓</span>
-                  </span>
-                )}
-              </>
-            )}
+            {time && <span>{time} • {isUser ? "delivered" : "Echo"}</span>}
           </div>
         </div>
       </div>
