@@ -76,7 +76,7 @@ export const SwingReview: React.FC<SwingReviewProps> = ({
   const primaryDrill = drills[0];
 
   return (
-    <div className="space-y-4 motion-reduce:transition-none w-full animate-[cardIn_.22s_ease-out_both]">
+    <div className="space-y-4 motion-reduce:transition-none w-full">
       {/* Summary */}
       <SummaryCard summary={summary} />
 

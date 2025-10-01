@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen, Bot, Paperclip, ArrowUpRight, Settings, Camera, ChevronDown } from 'lucide-react';
+import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen } from 'lucide-react';
 import { PiWaveform } from 'react-icons/pi';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -55,10 +54,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
   const [activeTab, setActiveTab] = useState('chat');
   const [analysisText, setAnalysisText] = useState('');
   const [swingCoachAnalysisText, setSwingCoachAnalysisText] = useState('');
-  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
-  const [newMessageCount, setNewMessageCount] = useState(0);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const chatScrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   // Echo Protection System
@@ -175,19 +171,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
   const scrollToBottom = () => {
     setTimeout(() => {
-      if (chatScrollRef.current) {
-        chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
-        setShowScrollToBottom(false);
-        setNewMessageCount(0);
+      if (scrollAreaRef.current) {
+        const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (scrollContainer) {
+          scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        }
       }
     }, 100);
-  };
-
-  // Track scroll position for "back to latest" FAB
-  const handleChatScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const target = e.currentTarget;
-    const isNearBottom = target.scrollHeight - target.scrollTop - target.clientHeight < 100;
-    setShowScrollToBottom(!isNearBottom && messages.length > 3);
   };
 
   useEffect(() => {
@@ -437,23 +427,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         width="w-full"
         zIndex="z-[1100]"
         ariaLabel="Echo AI chat interface"
-        backdrop="none"
       >
-      {/* Backdrop with vignette */}
       <div 
-        className="fixed inset-0 z-[1099] pointer-events-auto"
+        className="w-full h-full flex flex-col overflow-hidden"
         style={{
-          background: 'radial-gradient(120% 80% at 50% 0%, rgba(0,0,0,0.28), rgba(0,0,0,0.55))',
-          backdropFilter: 'blur(18px)',
-          WebkitBackdropFilter: 'blur(18px)',
-          willChange: 'backdrop-filter'
+          background: 'transparent',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
         }}
-        onClick={handleClose}
-      />
-      
-      {/* Panel shell */}
-      <div 
-        className="fixed inset-0 z-[1100] w-full h-full overflow-hidden pointer-events-auto"
         onWheel={(e) => {
           // Allow scrolling within the modal, but prevent it from bubbling up
           const target = e.currentTarget;
@@ -474,269 +455,144 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         }}
         onTouchMove={(e) => e.stopPropagation()}
       >
-        {/* Safe-area wrapper */}
-        <div 
-          className="flex h-full flex-col"
+        {/* Header - Fixed at top (UI only change) */}
+        <div
+          className="flex items-center justify-between px-2 py-4 flex-shrink-0"
           style={{
-            paddingTop: 'max(8px, env(safe-area-inset-top))',
-            paddingBottom: 'max(8px, env(safe-area-inset-bottom))'
+            height: window.innerWidth <= 768 ? '56px' : '64px',
+            // Use same gradient as EchoAvatar
+            background: 'linear-gradient(135deg, #1D3557, #2A9D8F)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.10)'
           }}
         >
-          {/* Header */}
-          <header
-            className="relative z-[1] border-b border-white/10 bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50"
-            data-echo-topbar
-          >
-            {/* Top progress bar when loading */}
-            {isLoading && (
-              <div 
-                className="fixed top-[var(--overlay-top,0px)] left-0 right-0 h-[2px] z-[1300] overflow-hidden"
-                role="progressbar"
-                aria-label="Generating response"
-              >
-                <div 
-                  className="h-full bg-gradient-to-r from-[#2A9D8F] via-[#79C4BD] to-[#2A9D8F]"
-                  style={{
-                    backgroundSize: '200% 100%',
-                    animation: 'shimmer 1.6s linear infinite'
-                  }}
-                />
-              </div>
-            )}
-            
-            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4">
-              <div className="h-14 sm:h-16 grid grid-cols-[auto,1fr,auto] items-center gap-2">
-                {/* Left: close button */}
-                <button
-                  type="button"
-                  aria-label="Close"
-                  onClick={handleClose}
-                  className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition"
-                >
-                  <X className="h-5 w-5 text-gray-700" />
-                </button>
-
-                {/* Center: title/meta */}
-                <div className="min-w-0 text-center">
-                  <div className="truncate text-[17px] sm:text-[18px] font-semibold text-gray-900">
-                    Echo
-                  </div>
-                  <div className="truncate text-[12px] sm:text-[13px] text-gray-600/90 leading-tight">
-                    {isLoading ? "Echo is typing…" : "Chat • Private & secure"}
-                  </div>
-                </div>
-
-                {/* Right: actions */}
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setShowHistory(true)}
-                    className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition"
-                    aria-label="History"
-                  >
-                    <History className="h-5 w-5 text-gray-700" />
-                  </button>
-                </div>
-              </div>
+          <div className="flex items-center gap-3">
+            <PiWaveform 
+              size={window.innerWidth <= 768 ? 28 : 32} 
+              className="text-white/90 transition-all duration-200 ease-in-out"
+              style={{
+                animation: `echoWave ${getAvatarState() === 'processing' ? '1s' : getAvatarState() === 'listening' ? '1.5s' : '3s'} ease-in-out infinite`
+              }}
+            />
+            <div>
+              <h2 className="text-xl font-semibold text-white">Echo</h2>
+              <p className="text-sm text-white/90">I'm your personal caddy</p>
             </div>
-            {/* hairline highlight */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/30"></div>
-          </header>
+          </div>
 
-          {/* Segmented Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-            {/* Tabs under header */}
-            <div className="sticky top-0 z-[0] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm border-b border-white/10">
-              <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-2">
-                <TabsList className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/50 shadow-sm flex p-1">
-                  <TabsTrigger
-                    value="chat"
-                    className="flex-1 rounded-full px-4 text-[14px] font-medium 
-                               data-[state=active]:bg-white data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
-                               data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-white/50
-                               transition-all"
-                  >
-                    Chat
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="swing"
-                    className="flex-1 rounded-full px-4 text-[14px] font-medium 
-                               data-[state=active]:bg-white data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
-                               data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-white/50
-                               transition-all"
-                  >
-                    Swing Coach
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-            </div>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleClose}
+              className="h-8 w-8 p-0 hover:bg-white/15 transition-colors duration-120"
+            >
+              <X className="h-4 w-4 text-white" />
+            </Button>
+          </div>
+        </div>
 
-            {/* Scrollable content area */}
-            <TabsContent value="chat" className="m-0 flex-1" style={{ minHeight: 0 }}>
-              <div 
-                className="relative h-full overflow-y-auto overscroll-contain scroll-smooth pt-10 pb-24"
-                style={{ WebkitOverflowScrolling: "touch" }}
-                data-echo-canvas
-                ref={chatScrollRef}
-                onScroll={handleChatScroll}
+        {/* Tabs - Fixed header */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0 bg-[rgba(110,146,119,0.06)]">
+          <div className="px-2 pt-4 pb-2 flex-shrink-0">
+            <TabsList
+              className="
+                w-full h-11 rounded-full
+                bg-white/85 backdrop-blur-sm border border-white/50
+                shadow-sm flex items-center justify-between px-1
+              "
+            >
+              <TabsTrigger
+                value="chat"
+                className="
+                  flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
+                  text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900
+                  data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
+                  transition-all
+                "
               >
-                {/* Top fade - Phase 52 */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-white/60 to-transparent z-10" />
-                {/* Bottom fade - Phase 52 */}
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white/60 to-transparent z-10" />
-                
-                {/* "New replies below" toast - Phase 59 */}
-                {showScrollToBottom && newMessageCount > 0 && (
-                  <div className="sticky top-2 z-[1] mx-auto w-full max-w-[720px] px-3 sm:px-4 pointer-events-none">
-                    <div 
-                      className="mx-auto w-fit px-3 py-1.5 rounded-full bg-white/85 backdrop-blur border border-black/10 text-[12px] text-gray-700 shadow-sm"
-                      data-visible="true"
-                    >
-                      New replies below
-                    </div>
-                  </div>
-                )}
-                
-                {/* Unread above notice (sticky hint at top while scrolling) */}
-                {false && ( /* Set to true to show "unread above" indicator */
-                  <div 
-                    className="sticky top-2 z-10 flex justify-center opacity-100 transition-opacity"
-                    data-show="true"
-                  >
-                    <div className="px-3 py-1.5 rounded-full bg-white/80 backdrop-blur border border-black/10 text-[11px] text-gray-600 shadow-sm">
-                      Unread messages above
-                    </div>
-                  </div>
-                )}
-                
-                <div>
+                Chat
+              </TabsTrigger>
+              <TabsTrigger
+                value="swing"
+                className="
+                  flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium
+                  text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900
+                  data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
+                  transition-all
+                "
+              >
+                Swing Coach
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          {/* Per-tab scrollable content areas */}
+            <TabsContent value="chat" className="h-full m-0">
+              <ScrollArea 
+                ref={chatAutoScroll.scrollAreaRef}
+                className="h-full min-h-0"
+                style={{ overscrollBehavior: 'contain' }}
+              >
+                <div className="h-full min-h-0">
+                  <div className="px-2 py-5">
                     {messages.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center text-center px-6 py-20 sm:py-28 space-y-6">
-                        <div className="h-20 w-20 rounded-3xl bg-white/80 backdrop-blur border border-black/10 shadow-sm grid place-items-center">
-                          <Bot className="h-9 w-9 text-[#2A9D8F]" />
-                        </div>
-                        <div className="text-[17px] font-semibold text-gray-900">
-                          Start a conversation with Echo
-                        </div>
-                        <div className="text-[14px] text-gray-600 max-w-[280px]">
-                          Ask about your swing, your stats, or just chat golf — Echo's always here.
+                      <div className="text-left">
+                        <p className="text-gray-800/80 text-base mb-5">
+                          I'm your personal caddy.<br />
+                          Ask me anything, anytime - I've got you.
+                        </p>
+
+                        <div className="space-y-3">
+                          {suggestedPrompts.map((prompt, index) => (
+                            <button
+                              key={index}
+                              onClick={() => handleSuggestedPrompt(prompt.text)}
+                              className="
+                                w-full text-left rounded-2xl
+                                bg-white/90 backdrop-blur shadow
+                                px-4 py-4
+                                hover:-translate-y-0.5 active:translate-y-0 transition-transform
+                              "
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="text-xl">{prompt.emoji}</span>
+                                <span className="text-lg font-medium text-gray-900">{prompt.text}</span>
+                              </div>
+                            </button>
+                          ))}
                         </div>
                       </div>
                     ) : (
-                <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-5 space-y-2">
-                  {messages.map((message, index) => {
-                    const isUser = message.type === 'user';
-                    const prevMessage = index > 0 ? messages[index - 1] : null;
-                    const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
-                    const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
-                    const isLastInGroup = !nextMessage || nextMessage.type !== message.type;
-                    
-                    // Example: mark message at index 3 as first unread (UI only)
-                    const isFirstUnread = false; // Set to true on a specific message to show separator
-                    
-                    return (
-                      <React.Fragment key={message.id}>
-                        {/* "Unread" divider - Phase 59 */}
-                        {isFirstUnread && (
-                          <div className="relative my-6 flex items-center gap-3" role="separator" aria-label="Unread messages">
-                            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/15 to-transparent"></div>
-                            <div className="px-2 py-0.5 rounded-full bg-white/85 backdrop-blur border border-black/10 text-[11px] text-gray-600 shadow-sm">
-                              Unread
-                            </div>
-                            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/15 to-transparent"></div>
-                          </div>
-                        )}
-                        
-                        <div 
-                          className={cn(
-                            isFirstInGroup && index > 0 && "mt-4"
-                          )}
-                        >
+                      <div className="space-y-4">
+                        {messages.map((message) => (
                           <ChatMessageComponent
+                            key={message.id}
                             message={message}
                             onSaveToInsights={saveToInsights}
                             onRequestDetail={requestMoreDetail}
-                            isFirstInGroup={isFirstInGroup}
-                            showHeading={isFirstInGroup}
                           />
-                        </div>
-                      </React.Fragment>
-                    );
-                  })}
-                   {isLoading && (
-                     <div className="flex items-end gap-2 mt-4">
-                       <div className="shrink-0 h-7 w-7 rounded-full grid place-items-center bg-white/80 backdrop-blur border border-black/10"></div>
-                       <div className="max-w-[78%]">
-                         <div className="rounded-2xl rounded-bl-md bg-white/92 backdrop-blur border border-black/10 shadow-[0_10px_28px_rgba(0,0,0,0.08)] px-3 py-2">
-                           <div className="flex items-center gap-1.5">
-                             <span className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
-                             <span className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce"></span>
-                             <span className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
-                           </div>
-                         </div>
-                       </div>
-                     </div>
-                    )}
-                         </div>
-                       )}
-
-                {/* "New since you left" banner (optional header slot) */}
-                {false && ( /* Set to true to show header banner style */
-                  <div className="sticky top-0 z-[0] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm">
-                    <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-2">
-                      <div className="h-9 w-full rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm px-3 flex items-center justify-between text-[12px] text-gray-700">
-                        <span className="truncate">New since your last visit</span>
-                        <span className="ml-2 rounded-full px-2 py-0.5 bg-black/5 border border-black/10 text-[11px]">3</span>
+                        ))}
+                        {isLoading && (
+                          <div className="flex justify-start">
+                            <div className="bg-muted rounded-lg p-3 max-w-[80%]">
+                              <div className="flex items-center gap-2">
+                                <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full"></div>
+                                <span className="text-sm">Echo is thinking...</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Bottom pill for new messages when at bottom */}
-                {newMessageCount > 0 && !showScrollToBottom && (
-                  <div className="fixed bottom-[96px] left-1/2 -translate-x-1/2 z-20 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[12px] text-gray-700 pointer-events-auto float-in opacity-0 data-[visible=true]:opacity-100 transition-opacity duration-200" data-visible="true">
-                    {newMessageCount} new {newMessageCount === 1 ? 'message' : 'messages'} • Tap to view
-                  </div>
-                )}
-
-                {/* Scroll-to-bottom FAB - Phase 59 */}
-                {showScrollToBottom && (
-                  <button
-                    onClick={scrollToBottom}
-                    className="fixed md:absolute bottom-[88px] right-3 md:right-4 z-[2] h-10 px-3.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-[0_6px_20px_rgba(0,0,0,0.12)] text-[13px] text-gray-800 flex items-center gap-2 hover:shadow-md active:shadow-sm transition will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                    aria-label="Jump to latest"
-                    type="button"
-                    data-visible="true"
-                  >
-                    {/* Down chevron icon */}
-                    <span className="inline-block h-4 w-4 rounded-full grid place-items-center bg-black/5">
-                      <ChevronDown className="h-3 w-3" />
-                    </span>
-                    <span>Newer messages</span>
-                    {/* Optional unread count badge */}
-                    {newMessageCount > 0 && (
-                      <span className="ml-0.5 rounded-full bg-[#2A9D8F]/10 text-[#2A9D8F] px-2 py-0.5 text-[11px] font-medium">
-                        {newMessageCount}
-                      </span>
                     )}
-                  </button>
-                )}
+                  </div>
                 </div>
-              </div>
+              </ScrollArea>
             </TabsContent>
 
-            <TabsContent value="swing" className="m-0 flex-1" style={{ minHeight: 0 }}>
-              <div 
-                className="relative h-full overflow-y-auto overscroll-contain scroll-smooth px-3 sm:px-4 pt-10 pb-[64px]"
-                style={{ WebkitOverflowScrolling: "touch" }}
-                data-echo-canvas
-              >
-                {/* Top fade - Phase 52 */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-white/60 to-transparent z-10" />
-                {/* Bottom fade - Phase 52 */}
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white/60 to-transparent z-10" />
-                
-                <SwingCoach
+
+            <TabsContent value="swing" className="h-full m-0 flex flex-col justify-start items-stretch overflow-y-auto">
+              <div className="w-full px-2 py-3">
+                <SwingCoach 
                   onClose={() => setActiveTab('chat')}
                   isRecording={isRecording}
                   isProcessing={isProcessing}
@@ -747,247 +603,193 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 />
               </div>
             </TabsContent>
-          </Tabs>
+        </Tabs>
         
-          {/* Composer footer - Phase 60: Cinematic Glass */}
-          <footer 
-            className="sticky bottom-0 z-20 bg-gradient-to-t from-white/80 to-white/50 backdrop-blur-xl border-t border-white/20 pb-[max(env(safe-area-inset-bottom),12px)] px-3 sm:px-4 pt-3"
-            role="region"
-            aria-label="Message composer"
-            data-echo-composer
-            data-streaming={isLoading ? "true" : "false"}
-          >
-            {/* Upload progress bar (shown during processing) */}
-            {(isLoading || isProcessing) && (
-              <div className="absolute left-0 right-0 top-0 h-[2px] bg-[#2A9D8F]/20 overflow-hidden">
-                <div className="h-full bg-[#2A9D8F] animate-[shimmer_1.6s_linear_infinite] w-1/3" />
-              </div>
-            )}
-            
-            <div className="mx-auto w-full max-w-[720px]">
-              {activeTab === 'chat' && (
-                <div>
-                  {/* Attachments tray - Phase 58 */}
-                  <div 
-                    className={cn(
-                      "mb-2 transition-[height,opacity,transform] duration-200",
-                      "data-[open=false]:opacity-0 data-[open=false]:-translate-y-1 data-[open=false]:h-0 data-[open=false]:overflow-hidden",
-                      "data-[open=true]:opacity-100 data-[open=true]:translate-y-0 data-[open=true]:h-auto"
-                    )}
-                    data-open="false"
-                    id="attachmentsTray"
+        {/* Shared composer/footer - Fixed at bottom */}
+        <div 
+          className="flex-shrink-0"
+          style={{
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'linear-gradient(180deg, rgba(246, 247, 246, 0.85) 0%, rgba(246, 247, 246, 0.95) 100%)'
+          }}
+        >
+          {activeTab === 'chat' && (
+            <div className="p-4">
+              {/* Floating pill composer */}
+              <div className="rounded-[28px] bg-white/92 backdrop-blur shadow-md px-3 py-2 flex items-center">
+                {/* Left icons */}
+                <div className="flex items-center gap-1 pr-1">
+                  <Button
+                    onClick={isRecording ? stopRecording : startRecording}
+                    disabled={isProcessing}
+                    variant={isRecording ? "destructive" : "ghost"}
+                    size="icon"
+                    className="h-9 w-9 rounded-full"
                   >
-                    <div className="rounded-2xl border border-black/10 bg-white/90 backdrop-blur px-3 py-2.5 grid grid-cols-3 gap-2">
-                      {/* Photo tile */}
-                      <button 
-                        className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                        aria-label="Photo"
-                        type="button"
-                      >
-                        <Camera className="h-5 w-5 text-gray-700" />
-                        <span className="text-[11px] text-gray-600">Photo</span>
-                      </button>
-                      
-                      {/* File tile */}
-                      <button 
-                        className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                        aria-label="File"
-                        type="button"
-                      >
-                        <Paperclip className="h-5 w-5 text-gray-700" />
-                        <span className="text-[11px] text-gray-600">File</span>
-                      </button>
-                      
-                      {/* Link tile */}
-                      <button 
-                        className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                        aria-label="Link"
-                        type="button"
-                      >
-                        <svg className="h-5 w-5 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd" />
-                        </svg>
-                        <span className="text-[11px] text-gray-600">Link</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Main composer pill - Phase 60: Cinematic Glass Grid */}
-                  <div className="composer-pill group rounded-[28px] bg-white/92 backdrop-blur border border-black/10 shadow-md px-3.5 py-2.5 sm:px-4 sm:py-3 grid grid-cols-[auto,1fr,auto] items-center gap-2">
-                    {/* Left tools */}
-                    <div className="flex items-center gap-1.5">
-                      {isRecording ? (
-                        <div className="h-7 px-2.5 rounded-full bg-[#2A9D8F]/10 border border-[#2A9D8F]/25 text-[#2A9D8F] text-[12px] inline-flex items-center gap-1.5">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#2A9D8F] animate-pulse"></span>
-                          Recording…
-                        </div>
-                      ) : isProcessing ? (
-                        <div className="h-7 px-2.5 rounded-full bg-black/5 border border-black/10 text-[12px] text-gray-700 inline-flex items-center gap-1.5">
-                          <span className="h-3 w-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></span>
-                          Processing…
-                        </div>
-                      ) : (
-                        <>
-                          <button
-                            type="button"
-                            aria-label="Attach"
-                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                          >
-                            <Paperclip className="h-[18px] w-[18px] text-gray-600" />
-                          </button>
-                          <button
-                            type="button"
-                            aria-label="Voice"
-                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                            onMouseDown={!isProcessing ? startRecording : undefined}
-                            onMouseUp={!isProcessing ? stopRecording : undefined}
-                            onMouseLeave={!isProcessing ? stopRecording : undefined}
-                            onTouchStart={!isProcessing ? startRecording : undefined}
-                            onTouchEnd={!isProcessing ? stopRecording : undefined}
-                          >
-                            <Mic className="h-[18px] w-[18px] text-gray-600" />
-                          </button>
-                        </>
-                      )}
-                    </div>
-
-                    {/* Text input container */}
-                    <div className="min-w-0">
-                      <textarea
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        placeholder="Message Echo…"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            sendMessage(inputValue);
-                          }
-                        }}
-                        disabled={isLoading || isRecording || isProcessing}
-                        aria-label="Message input"
-                        autoComplete="off"
-                        autoCorrect="on"
-                        autoCapitalize="sentences"
-                        rows={1}
-                        className="w-full bg-transparent outline-none text-[15px] sm:text-[16px] leading-[1.4] placeholder:text-gray-500 resize-none focus-visible:outline-none"
-                      />
-                      
-                      {/* Helper row */}
-                      <div className="mt-1 flex items-center justify-between">
-                        <div className="text-[11px] text-gray-500/90">
-                          Shift + Enter = newline
-                        </div>
-                        <div className="text-[11px] text-gray-500/90 select-none">
-                          ~ concise answers
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Send button */}
-                    <div className="flex items-center">
-                      {inputValue?.trim() ? (
-                        <button
-                          type="button"
-                          onClick={() => sendMessage(inputValue)}
-                          aria-label="Send"
-                          disabled={isLoading || isProcessing}
-                          className={cn(
-                            "h-10 px-4 rounded-full bg-[#2A9D8F] text-white shadow hover:shadow-md hover:brightness-[1.03] active:brightness-[0.97] transition",
-                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
-                            "disabled:opacity-60 disabled:cursor-not-allowed"
-                          )}
-                        >
-                          {isLoading || isProcessing ? (
-                            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                              <circle cx="12" cy="12" r="10" className="opacity-25" stroke="currentColor" strokeWidth="4" fill="none"/>
-                              <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
-                            </svg>
-                          ) : (
-                            'Send'
-                          )}
-                        </button>
-                      ) : null}
-                    </div>
-                    
-                    {/* Error / disabled visual lock */}
-                    {(isLoading || isProcessing) && (
-                      <div 
-                        className="pointer-events-none absolute inset-0 rounded-[28px] ring-1 ring-black/5 bg-white/40 backdrop-blur-[1px]"
-                        aria-hidden="true"
-                      />
+                    {isRecording ? (
+                      <MicOff className="h-4 w-4" />
+                    ) : isProcessing ? (
+                      <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full" />
+                    ) : (
+                      <Mic className="h-4 w-4" />
                     )}
-                  </div>
+                  </Button>
 
-                  {/* Recent history peek */}
-                  <button
-                    className="mt-3 w-full rounded-full bg-white/80 backdrop-blur border border-black/10 shadow-sm flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                    onClick={() => setShowHistory(true)}
-                    aria-label="Open recent history"
+                  {/* Camera button – keep if you already have a media picker handler.
+                     If not, you can disable it for now (UI only) */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 rounded-full"
+                    // onClick={openMediaPicker} // only if this exists in your logic
                   >
-                    <span className="flex items-center gap-2 text-[13px] font-medium">
-                      <History className="h-[14px] w-[14px]" />
-                      Recent history
-                    </span>
-                    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
-                  </button>
-                  
-                  {/* Shy helper text */}
-                  <div className="mt-2 text-center text-[11px] text-gray-500 select-none">
-                    Echo helps with chat and swing analysis. No data is shared publicly.
-                  </div>
+                    <svg viewBox="0 0 24 24" className="h-4 w-4"><path d="M4 7h3l2-2h6l2 2h3v12H4z" fill="currentColor"/></svg>
+                  </Button>
                 </div>
-              )}
+
+                {/* Input */}
+                <Input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="ask me anything at all, I'm here for you"
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
+                  disabled={isLoading || isRecording || isProcessing}
+                  className="border-0 focus-visible:ring-0 bg-transparent mx-2 text-[15px]"
+                />
+
+                {/* Send arrow */}
+                <Button
+                  onClick={() => sendMessage(inputValue)}
+                  disabled={isLoading || !inputValue.trim() || isRecording || isProcessing}
+                  size="icon"
+                  className="h-9 w-9 rounded-full bg-gray-900 text-white hover:bg-black transition"
+                  aria-label="Send"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Recent history peek (opens existing AIChatHistory) */}
+              <button
+                className="mt-3 w-full rounded-[28px] bg-[#3da0a9]/15 backdrop-blur shadow flex items-center justify-between px-4 py-2 text-gray-700"
+                onClick={() => setShowHistory(true)}
+                aria-label="Open recent history"
+              >
+                <span className="flex items-center gap-2">
+                  <span className="w-10 h-1 rounded-full block" style={{ background: 'linear-gradient(135deg, #1D3557, #2A9D8F)', opacity: 0.8 }} />
+                  Recent history
+                </span>
+                <svg className="h-4 w-4" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+              </button>
             </div>
-          </footer>
+          )}
+          {activeTab === 'logs' && (
+            <div className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={requestLocation}
+                  className="text-xs"
+                >
+                  <MapPin className="h-3 w-3 mr-1" />
+                  Use My Location
+                </Button>
+                {userLocation && (
+                  <Badge variant="secondary" className="text-xs">
+                    {userLocation}
+                  </Badge>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    placeholder="Record course notes and tips..."
+                    disabled={isRecording || isProcessing}
+                    readOnly
+                  />
+                </div>
+                <Button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  disabled={isProcessing}
+                  variant={isRecording ? "destructive" : "outline"}
+                  size="sm"
+                  className="px-3"
+                >
+                  {isRecording ? (
+                    <MicOff className="h-4 w-4" />
+                  ) : isProcessing ? (
+                    <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full" />
+                  ) : (
+                    <Mic className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (!isRecording && !isProcessing) {
+                      startRecording();
+                    }
+                  }}
+                  disabled={isRecording || isProcessing}
+                  size="sm"
+                  className="rounded-xl px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+          {activeTab === 'swing-coach' && (
+            <div className="p-4">
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    value={swingCoachAnalysisText}
+                    onChange={(e) => setSwingCoachAnalysisText(e.target.value)}
+                    placeholder="Describe your swing for analysis..."
+                    onKeyPress={(e) => e.key === 'Enter' && swingCoachAnalysisText.trim() && document.getElementById('swing-coach-send-btn')?.click()}
+                    disabled={isRecording || isProcessing}
+                  />
+                </div>
+                <Button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  disabled={isProcessing}
+                  variant={isRecording ? "destructive" : "outline"}
+                  size="sm"
+                  className="px-3"
+                >
+                  {isRecording ? (
+                    <MicOff className="h-4 w-4" />
+                  ) : isProcessing ? (
+                    <div className="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full" />
+                  ) : (
+                    <Mic className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  id="swing-coach-send-btn"
+                  onClick={() => {
+                    // Trigger swing analysis in Swing Coach component
+                    const swingCoachEvent = new CustomEvent('triggerSwingAnalysis', { 
+                      detail: { analysisText: swingCoachAnalysisText } 
+                    });
+                    window.dispatchEvent(swingCoachEvent);
+                    setSwingCoachAnalysisText('');
+                  }}
+                  disabled={isRecording || isProcessing}
+                  size="sm"
+                  className="rounded-xl px-3 py-2 bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:ring-0 disabled:opacity-40 disabled:cursor-not-allowed"
+                  aria-label="Analyze"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-      </SlideOver>
-      
-        {/* Message action long-press sheet (mobile) - Phase 47 */}
-        <div 
-          className="fixed inset-x-0 bottom-0 z-[60] px-3 pb-[max(12px,env(safe-area-inset-bottom))] data-[open=false]:hidden"
-          data-open="false"
-        >
-          <div className="mx-auto w-full max-w-[720px] rounded-2xl bg-white/95 backdrop-blur border border-black/10 shadow-lg p-2 grid grid-cols-4 gap-2">
-            <button 
-              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-              type="button"
-            >
-              Copy
-            </button>
-            <button 
-              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-              type="button"
-            >
-              Retry
-            </button>
-            <button 
-              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-              type="button"
-            >
-              Share
-            </button>
-            <button 
-              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-              type="button"
-            >
-              Save
-            </button>
-          </div>
-        </div>
-
-        {/* Copied toast - Phase 44 */}
-        <div 
-          id="toast"
-          className="pointer-events-none fixed left-1/2 -translate-x-1/2 bottom-[max(env(safe-area-inset-bottom),24px)] z-[70] hidden data-[show=true]:block"
-          data-show="false"
-        >
-          <div className="rounded-full bg-gray-900 text-white text-[12px] px-3 py-1.5 shadow-lg">
-            Copied to clipboard
-          </div>
-        </div>
-
-        <AIChatHistory
+        </SlideOver>
+        <AIChatHistory 
           isOpen={showHistory} 
           onClose={() => setShowHistory(false)}
           onSelectMessage={(message) => {

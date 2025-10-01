@@ -7,7 +7,6 @@ import remarkGfm from 'remark-gfm';
 import { SwingReview } from '@/components/swing-review/SwingReview';
 import { CoachPrompt } from '@/components/swing-review/CoachPrompt';
 import { parseSwingAnalysis } from '@/utils/swingAnalysisParser';
-import { cn } from '@/lib/utils';
 
 interface ChatMessage {
   id: string;
@@ -34,8 +33,6 @@ interface ChatMessageProps {
   onAskEcho?: (prompt: string) => void;
   onShare?: (message: ChatMessage) => void;
   onAddVoiceNote?: (message: ChatMessage) => void;
-  isFirstInGroup?: boolean;
-  showHeading?: boolean;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ 
@@ -44,9 +41,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   onRequestDetail,
   onAskEcho,
   onShare,
-  onAddVoiceNote,
-  isFirstInGroup = true,
-  showHeading = true
+  onAddVoiceNote
 }) => {
   const isUser = message.type === 'user';
   const [showSources, setShowSources] = useState(false);
@@ -69,106 +64,25 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   }
 
   return (
-    <div 
-      role="article"
-      aria-label={`Message from ${isUser ? 'You' : 'Echo'}, ${time}`}
-      className="animate-[fadeInUp_.18s_ease-out_both]"
-    >
-      <div className={cn(
-        "flex items-end gap-2",
-        isUser ? "flex-row-reverse justify-end" : "justify-start"
-      )}>
-        {/* Avatar - only show for AI on first message in group */}
-        {!isUser && isFirstInGroup && (
-          <div className="shrink-0 h-7 w-7 rounded-full grid place-items-center bg-white/80 backdrop-blur border border-black/10">
-            <Bot className="h-[14px] w-[14px] text-[#2A9D8F]" />
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+      <div className={`w-full ${isUser ? 'order-2' : 'order-1'}`}>
+        <div className={`flex items-start gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+          <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+            isUser ? 'bg-[#3da0a9]/10 text-[#3da0a9]' : 'bg-muted'
+          }`}>
+            {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
           </div>
-        )}
-        
-        {/* Spacer for grouped messages */}
-        {!isUser && !isFirstInGroup && (
-          <div className="hidden sm:block w-7 shrink-0" />
-        )}
-        
-        {/* Message content - Phase 50 actions & meta */}
-        <div 
-          className={cn(
-            "relative group/message pt-2 max-w-[78%]",
-            isUser ? "user message-right" : "echo message-left"
-          )}
-          data-message-id={message.id}
-          data-author={isUser ? "user" : "echo"}
-          data-has-menu="true"
-          data-state="ok"
-          data-active="false"
-          tabIndex={0}
-        >
-          {/* Action bar - Phase 50 (hover on desktop, long-press on mobile) */}
-          <div
-            className={cn(
-              "actions-pill pointer-events-none absolute -top-3",
-              "opacity-0 translate-y-1 transition-all duration-150",
-              "group-hover/message:opacity-100 group-hover/message:translate-y-0",
-              "group-focus-within/message:opacity-100 group-focus-within/message:translate-y-0",
-              isUser ? "right-0" : "left-0"
-            )}
-          >
-            <div className="pointer-events-auto rounded-full bg-white/95 backdrop-blur border border-black/10 shadow-md h-8 px-1.5 flex items-center gap-0.5">
-              <button 
-                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                aria-label="Copy"
-                type="button"
-              >
-                ⧉
-              </button>
-              <button 
-                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                aria-label="Quote"
-                type="button"
-              >
-                ❝
-              </button>
-              <button 
-                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                aria-label="Re-run"
-                type="button"
-              >
-                ↻
-              </button>
-              <button 
-                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                aria-label="Share"
-                type="button"
-              >
-                ⇪
-              </button>
-            </div>
-          </div>
-
-          {/* Heading - only on first in group for AI */}
-          {!isUser && showHeading && isFirstInGroup && (
-            <div className="mb-1.5 ml-1 text-[11px] font-medium text-gray-600">
-              Echo
-            </div>
-          )}
           
-          {/* Bubble */}
-          <div 
-            role="group"
-            aria-label={`Message from ${isUser ? 'You' : 'Echo'} at ${time}`}
-            className={cn(
-              "rounded-2xl px-3.5 py-2.5 text-[15px] break-words",
-              isUser 
-                ? "rounded-br-md bg-[#2A9D8F]/10 border border-[#2A9D8F]/25 text-gray-900 shadow-[0_6px_18px_rgba(42,157,143,0.15)]" 
-                : "rounded-bl-md bg-white/92 backdrop-blur border border-black/10 text-gray-900 shadow-[0_10px_28px_rgba(0,0,0,0.08)]",
-              isUser ? "leading-[1.5]" : "leading-[1.55]"
-            )}
-          >
-            <div className="first:mt-0 last:mb-0">
+          <div className={`rounded-lg p-3 ${
+            isUser 
+              ? 'bg-[#3da0a9]/5 text-[#2d7580] border border-[#3da0a9]/20' 
+              : 'bg-muted'
+          }`}>
+            <div className="prose prose-sm max-w-none dark:prose-invert">
               {isUser ? (
-                <div className="break-words break-all">{message.content}</div>
+                <p className="m-0">{message.content}</p>
               ) : swingAnalysisData ? (
-                <div className="mt-2 rounded-2xl overflow-hidden bg-white/92 backdrop-blur border border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.08)]" data-swing-card>
+                <>
                   <SwingReview
                     videoUrl={message.metadata!.videoUrl!}
                     summary={swingAnalysisData.summary}
@@ -178,84 +92,43 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                     onShare={() => onShare?.(message)}
                     onAddVoiceNote={() => onAddVoiceNote?.(message)}
                   />
-                  <div className="p-3 sm:p-4">
+                  <div className="mt-4">
                     <CoachPrompt
                       swingAnalysisId={message.id}
                       onOpen={() => {
+                        // Open coach finder modal - we'll implement this properly
                         console.log('Open coach finder for analysis:', message.id);
                       }}
                     />
                   </div>
-                </div>
+                </>
               ) : (
-                <div>
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      a: (props) => (
-                        <a 
-                          {...props} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="underline decoration-[#2A9D8F]/50 underline-offset-2 hover:decoration-[#2A9D8F] text-[#2A9D8F] break-words focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40 rounded"
-                        />
-                      ),
-                      h1: ({ children }) => <h3 className="text-[16px] font-semibold mb-2 mt-3 first:mt-0 text-gray-900">{children}</h3>,
-                      h2: ({ children }) => <h4 className="text-[15.5px] font-semibold mb-2 mt-3 text-gray-900">{children}</h4>,
-                      h3: ({ children }) => <h4 className="text-[15px] font-semibold mb-2 mt-2 text-gray-900">{children}</h4>,
-                      p: ({ children }) => <p className="my-2 first:mt-0 last:mb-0 break-words break-all">{children}</p>,
-                      ul: ({ children }) => <ul className="list-disc pl-5 space-y-1.5 my-2 marker:text-gray-500">{children}</ul>,
-                      ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1.5 my-2 marker:text-gray-500">{children}</ol>,
-                      li: ({ children }) => <li className="leading-[1.5]">{children}</li>,
-                      strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
-                      code: ({ inline, children, ...props }: any) => 
-                        inline ? (
-                          <code className="px-1.5 py-0.5 rounded bg-black/5 border border-black/10 text-[13px] font-mono" {...props}>
-                            {children}
-                          </code>
-                        ) : (
-                          <code className="font-mono text-[13px] text-gray-100" {...props}>{children}</code>
-                        ),
-                      pre: ({ children }) => (
-                        <div 
-                          role="region" 
-                          aria-label="Code snippet"
-                          className="mt-2 overflow-x-auto rounded-xl bg-gray-900 text-gray-100 border border-black/20 shadow-inner"
-                        >
-                          <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10">
-                            <span className="text-[11px] text-white/60 font-medium">Code</span>
-                            <button
-                              aria-label="Copy code"
-                              className="text-[11px] text-white/60 hover:text-white/90 px-2 py-0.5 rounded hover:bg-white/5 transition-colors focus:outline-none focus:ring-2 focus:ring-white/20"
-                            >
-                              Copy
-                            </button>
-                          </div>
-                          <pre className="p-3 text-[13px] leading-[1.5]">
-                            {children}
-                          </pre>
-                        </div>
-                      ),
-                      img: (props) => (
-                        <div className="mt-3 overflow-hidden rounded-xl border border-black/10 bg-white/80 backdrop-blur shadow-sm">
-                          <img {...props} className="block w-full h-auto" />
-                        </div>
-                      ),
-                    }}
-                  >
-                    {message.content}
-                  </ReactMarkdown>
-                </div>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" className="underline break-words" />,
+                    h1: ({ children }) => <h3 className="text-sm font-semibold mb-2 mt-0">{children}</h3>,
+                    h2: ({ children }) => <h4 className="text-sm font-semibold mb-2 mt-2">{children}</h4>,
+                    h3: ({ children }) => <h4 className="text-sm font-semibold mb-2 mt-2">{children}</h4>,
+                    p: ({ children }) => <p className="text-sm mb-2 last:mb-0 break-words">{children}</p>,
+                    ul: ({ children }) => <ul className="text-sm mb-2 ml-4">{children}</ul>,
+                    ol: ({ children }) => <ol className="text-sm mb-2 ml-4">{children}</ol>,
+                    li: ({ children }) => <li className="mb-1">{children}</li>,
+                    strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                  }}
+                >
+                  {message.content}
+                </ReactMarkdown>
               )}
             </div>
             
             {/* Tags from metadata */}
             {message.metadata?.tags && (
-              <div className="flex flex-wrap gap-2 mt-2">
+              <div className="flex flex-wrap gap-1 mt-2">
                 {message.metadata.tags.map((tag, index) => (
-                  <span key={index} className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-white/80 backdrop-blur border border-black/5 rounded-full">
+                  <Badge key={index} variant="secondary" className="text-xs">
                     {tag}
-                  </span>
+                  </Badge>
                 ))}
               </div>
             )}
@@ -322,7 +195,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   onClick={() => onSaveToInsights(message)}
                   variant="outline"
                   size="sm"
-                  className="text-xs h-7 min-h-[28px]"
+                  className="text-xs h-7"
                 >
                   <Bookmark className="h-3 w-3 mr-1" />
                   Save to Insights
@@ -330,39 +203,18 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               </div>
             )}
           </div>
-          
-          {/* Quick reactions strip (inline) - Phase 42 */}
-          {false && ( /* Set data-reacting="true" to show */
-            <div className="mt-1 flex flex-wrap gap-1.5 data-[reacting=true]:flex hidden" data-reacting="false">
-              <button className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] hover:bg-white active:scale-95 transition" type="button">👍</button>
-              <button className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] hover:bg-white active:scale-95 transition" type="button">👏</button>
-              <button className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] hover:bg-white active:scale-95 transition" type="button">❤️</button>
-              <button className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] hover:bg-white active:scale-95 transition" type="button">🤯</button>
-            </div>
+        </div>
+        
+        <div className={`flex items-center gap-2 text-xs text-muted-foreground mt-1 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+          <span>{time}</span>
+          {!isUser && message.metadata?.latencyMs && (
+            <span className="opacity-60">
+              {message.metadata.latencyMs < 1000 ? 
+                `${message.metadata.latencyMs}ms` : 
+                `${(message.metadata.latencyMs / 1000).toFixed(1)}s`
+              }
+            </span>
           )}
-          
-          {/* Failed state banner - Phase 42 */}
-          {false && ( /* Set to true to show failed state */
-            <div className="mt-2 flex items-center gap-2 text-[12px] text-amber-700">
-              <span className="h-5 w-5 grid place-items-center rounded-full bg-amber-50 border border-amber-200">!</span>
-              <span className="flex-1">Delivery failed. Tap to retry.</span>
-              <button className="h-8 px-3 rounded-full bg-white border border-black/10 shadow-sm hover:bg-gray-50 text-[12px] transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40" type="button">
-                Retry
-              </button>
-            </div>
-          )}
-          
-          {/* Inline meta row - Phase 50 (timestamp + status) */}
-          <div className={cn(
-            "pt-1 text-[11px] text-gray-500 select-none",
-            isUser ? "text-right" : ""
-          )}>
-            {time && (
-              <span>
-                {time} • {isUser ? "delivered" : "processed"}
-              </span>
-            )}
-          </div>
         </div>
       </div>
     </div>

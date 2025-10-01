@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3, ChevronUp, Settings } from 'lucide-react';
+import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3, ChevronUp } from 'lucide-react';
 import { PiWaveform } from 'react-icons/pi';
-import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import Hls from 'hls.js';
 import EchoAvatar from './EchoAvatar';
@@ -143,7 +142,7 @@ interface AIChatHistoryProps {
 }
 
 // Swing Analysis Card Component
-  const SwingAnalysisCard: React.FC<{
+const SwingAnalysisCard: React.FC<{
   analysis: SwingAnalysis;
   onDelete: () => void;
   isExpanded: boolean;
@@ -164,102 +163,106 @@ interface AIChatHistoryProps {
   };
 
   return (
-    <article 
+    <div 
       ref={cardRef}
-      className={cn(
-        "group relative block overflow-hidden rounded-2xl bg-white/92 backdrop-blur shadow-sm border border-black/10 hover:border-black/15",
-        "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.08)] active:translate-y-0 cursor-pointer",
-        "focus-visible:outline-none focus-within:ring-2 focus-within:ring-[#2A9D8F]/30",
-        isExpanded && "shadow-lg"
-      )}
+      className={`rounded-2xl bg-white/92 backdrop-blur shadow px-4 py-3 sm:px-5 sm:py-4 hover:-translate-y-0.5 transition-all duration-200 flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
       onClick={!isExpanded ? onToggleExpand : undefined}
-      role="button"
-      tabIndex={0}
-      aria-label={`Swing analysis from ${analysis.timestamp.toLocaleDateString()}`}
+      style={{ cursor: !isExpanded ? 'pointer' : 'default' }}
     >
-      {!isExpanded ? (
-        <>
-          <div className="px-4 py-3 sm:px-5 sm:py-4">
-            <div className="flex items-start gap-2">
-              <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center gap-1 rounded-full text-[11px] font-medium bg-[#2A9D8F]/10 text-[#2A9D8F] border border-[#2A9D8F]/20">
-                <PiWaveform className="h-3.5 w-3.5" />
-                Swing
-              </span>
-              
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-gray-900">
-                  Swing Analysis
-                </div>
-                <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-gray-600">
-                  <span className="truncate">
-                    {analysis.tags && analysis.tags.length > 0 ? analysis.tags.slice(0, 2).join(' • ') : analysis.content?.substring(0, 60) || 'Golf swing'}
-                  </span>
-                  <span className="mx-1 h-1 w-1 rounded-full bg-gray-400/60 shrink-0"></span>
-                  <time className="shrink-0">{analysis.timestamp.toLocaleDateString()}</time>
-                  {analysis.conversation && (
-                    <span className="hidden sm:inline text-gray-500 shrink-0">• {analysis.conversation.length} msgs</span>
-                  )}
-                </div>
-              </div>
-              
-              {analysis.videoThumbnail && (
-                <div className="shrink-0 h-10 w-10 rounded-xl overflow-hidden bg-white/80 backdrop-blur border border-black/10">
-                  {!thumbnailError ? (
-                    <img 
-                      src={analysis.videoThumbnail} 
-                      alt="Swing preview"
-                      className="h-full w-full object-cover"
-                      onError={handleThumbnailError}
-                      onLoad={handleThumbnailLoad}
-                    />
-                  ) : (
-                    <div className="h-full w-full flex items-center justify-center">
-                      <FileText className="h-3 w-3 text-gray-400" />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {/* Hover affordance stripe */}
-          <div className="pointer-events-none absolute inset-x-0 -bottom-px h-8 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
-            <div className="mx-4 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
-          </div>
-        </>
-      ) : (
-        <div className="px-4 sm:px-5 py-4">{/* Expanded content stays as-is */}
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-[17px] font-semibold text-gray-900">
-              Swing Analysis
-            </h3>
-            <div className="flex items-center gap-1">
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleExpand();
-                }}
-                aria-label="Collapse"
-                className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-              >
-                <Minimize2 className="h-4 w-4 text-gray-600" />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (window.confirm('Are you sure you want to delete this swing analysis? This action cannot be undone.')) {
-                    onDelete();
-                  }
-                }}
-                aria-label="Delete"
-                className="h-8 w-8 grid place-items-center rounded-full hover:bg-red-50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-              >
-                <Trash2 className="h-4 w-4 text-red-600" />
-              </button>
-            </div>
-          </div>
+      {/* Collapsed Header */}
+      <div className="flex-1 flex flex-col">
+        {/* Header Row */}
+        <div className="flex items-start justify-between mb-2">
+          <span className="font-semibold text-sm text-gray-900 flex-shrink-0">
+            {analysis.timestamp.toLocaleDateString()}
+          </span>
+        </div>
 
-          {/* Expanded Content - Video & Analysis */}
+        {/* Body Preview */}
+        <div className="flex-1 mb-3 overflow-hidden">
+          <div className="flex items-start gap-3">
+            {/* Left Column - Video Thumbnail */}
+            <div className="flex-shrink-0">
+              <div className="relative w-20 sm:w-24 aspect-video bg-gray-100 rounded-[10px] overflow-hidden shadow-sm">
+                {analysis.videoThumbnail && !thumbnailError ? (
+                  <>
+                    {thumbnailLoading && (
+                      <div className="absolute inset-0 bg-muted animate-pulse" />
+                    )}
+                     <img 
+                       src={analysis.videoThumbnail} 
+                       alt="Swing thumbnail"
+                       className="w-full h-full object-cover"
+                       onError={handleThumbnailError}
+                       onLoad={handleThumbnailLoad}
+                     />
+                     <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                       <div className="bg-white/90 rounded-full p-1.5">
+                         <Play className="h-3 w-3 text-black" fill="currentColor" />
+                       </div>
+                     </div>
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                    <div className="text-center text-gray-400">
+                      <FileText className="h-4 w-4 mx-auto mb-1" />
+                      <p className="text-xs">No video</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Column - Text Content */}
+            <div className="flex-1 min-w-0 overflow-hidden">
+              <h4 className="font-medium text-sm text-gray-900 line-clamp-1 mb-1">
+                Swing Analysis
+              </h4>
+            </div>
+          </div>
+        </div>
+
+         {/* Action Row */}
+         <div className="flex items-center justify-between">
+           <div className="flex items-center gap-2">
+             <div className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full font-medium">
+               Analysis
+             </div>
+           </div>
+           <div className="flex items-center gap-1">
+             <Button
+               variant="ghost"
+               size="sm"
+               onClick={(e) => {
+                 e.stopPropagation();
+                 onToggleExpand();
+               }}
+                className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors focus:ring-0 focus:border-0 focus:outline-none"
+               title={isExpanded ? "Collapse" : "Expand"}
+             >
+               {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+             </Button>
+             <Button
+               variant="ghost"
+               size="sm"
+               onClick={(e) => {
+                 e.stopPropagation();
+                 if (window.confirm('Are you sure you want to delete this swing analysis? This action cannot be undone.')) {
+                   onDelete();
+                 }
+               }}
+               className="h-8 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+               title="Delete"
+             >
+               <Trash2 className="h-4 w-4" />
+             </Button>
+           </div>
+         </div>
+      </div>
+
+      {/* Expanded Content */}
+      {isExpanded && (
+        <div className="mt-3 pt-3 border-t border-gray-200 animate-accordion-down">
           <div className="space-y-4 max-h-80 overflow-y-auto">
             {/* Video Section */}
              {(analysis.videoUrl || analysis.videoSrc) && !(analysis.videoSrc && analysis.videoSrc.startsWith('blob:')) ? (
@@ -341,55 +344,65 @@ interface AIChatHistoryProps {
           </div>
         </div>
       )}
-    </article>
+    </div>
   );
 };
 
 // Skeleton Loading Component
 const SkeletonCard: React.FC = () => (
-  <div className="h-[92px] rounded-2xl bg-white/70 backdrop-blur border border-black/10 shadow-sm animate-pulse" />
+  <div className="rounded-2xl bg-white/92 backdrop-blur shadow px-4 py-3 sm:px-5 sm:py-4 animate-pulse">
+    <div className="flex items-start justify-between mb-2">
+      <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+      <div className="h-3 bg-gray-200 rounded w-16"></div>
+    </div>
+    <div className="space-y-2 mb-3">
+      <div className="h-3 bg-gray-200 rounded w-full"></div>
+      <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+    </div>
+    <div className="flex items-center justify-between">
+      <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+      <div className="flex gap-1">
+        <div className="h-8 w-8 bg-gray-200 rounded-md"></div>
+        <div className="h-8 w-8 bg-gray-200 rounded-md"></div>
+      </div>
+    </div>
+  </div>
 );
 
-// Empty State Component - Phase 54
+// Empty State Component
 const EmptyState: React.FC<{ 
   icon: React.ReactNode; 
   title: string; 
   subtitle: string;
 }> = ({ icon, title, subtitle }) => (
-  <div className="flex flex-col items-center justify-center text-center px-6 py-24 sm:py-32 space-y-5">
-    <div className="h-24 w-24 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow grid place-items-center text-gray-700">
+  <div className="flex flex-col items-center justify-center py-12 text-center">
+    <div className="text-gray-400 mb-4">
       {icon}
     </div>
-    <div className="text-[18px] font-semibold text-gray-900">
-      {title}
-    </div>
-    <div className="text-[14px] text-gray-600 max-w-[280px]">
-      {subtitle}
-    </div>
+    <h3 className="text-sm font-medium text-gray-900 mb-1">{title}</h3>
+    <p className="text-xs text-gray-500">{subtitle}</p>
   </div>
 );
 
-// Error State Component - Phase 54
+// Error State Component
 const ErrorState: React.FC<{ 
   message: string; 
   onRetry: () => void;
 }> = ({ message, onRetry }) => (
-  <div className="flex flex-col items-center justify-center text-center px-6 py-20 sm:py-28 space-y-5">
-    <div className="h-20 w-20 rounded-full bg-red-50 border border-red-200 text-red-600 grid place-items-center">
-      <AlertCircle className="h-9 w-9" />
+  <div className="flex flex-col items-center justify-center py-8 text-center">
+    <div className="text-red-400 mb-4">
+      <AlertCircle className="h-8 w-8" />
     </div>
-    <div className="text-[17px] font-semibold text-gray-900">
-      Something went wrong
-    </div>
-    <div className="text-[14px] text-gray-600 max-w-[280px]">
-      {message}
-    </div>
-    <button
+    <p className="text-sm text-red-600 mb-4">{message}</p>
+    <Button
+      variant="outline"
+      size="sm"
       onClick={onRetry}
-      className="mt-2 h-10 px-5 rounded-full bg-[#2A9D8F] text-white font-medium shadow hover:shadow-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+      className="bg-red-50 hover:bg-red-100 border-red-200 text-red-700 rounded-full px-4 py-1.5 text-xs h-auto font-medium transition-colors"
     >
+      <RotateCcw className="h-3 w-3 mr-1" />
       Retry
-    </button>
+    </Button>
   </div>
 );
 
@@ -654,174 +667,90 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         width="w-full"
         zIndex="z-[1100]"
         ariaLabel="Echo History"
-        backdrop="none"
       >
-        {/* Backdrop with vignette */}
         <div 
-          className="fixed inset-0 z-[1099] pointer-events-auto"
+          className="w-full h-full flex flex-col overflow-hidden"
           style={{
-            background: 'radial-gradient(120% 80% at 50% 0%, rgba(0,0,0,0.28), rgba(0,0,0,0.55))',
-            backdropFilter: 'blur(18px)',
-            WebkitBackdropFilter: 'blur(18px)',
-            willChange: 'backdrop-filter'
+            background: '#F6F7F6',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
           }}
-          onClick={onClose}
-        />
-        
-        {/* Panel shell */}
-        <div className="fixed inset-0 z-[1100] w-full h-full overflow-hidden pointer-events-auto">
-          {/* Safe-area wrapper */}
-          <div 
-            className="flex h-full flex-col"
+        >
+          {/* Header */}
+          <div
+            className="flex items-center justify-between px-6 py-4 flex-shrink-0"
             style={{
-              paddingTop: 'max(8px, env(safe-area-inset-top))',
-              paddingBottom: 'max(8px, env(safe-area-inset-bottom))'
+              height: '64px',
+              background: 'linear-gradient(135deg, #1D3557, #2A9D8F)',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.10)'
             }}
           >
-            {/* Header */}
-            <header
-              className="relative z-[1] border-b border-white/10 bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50"
-              data-echo-topbar
-            >
-              <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4">
-                <div className="h-14 sm:h-16 grid grid-cols-[auto,1fr,auto] items-center gap-2">
-                  {/* Left: close button */}
-                  <button
-                    type="button"
-                    aria-label="Close"
-                    onClick={onClose}
-                    className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition"
-                  >
-                    <X className="h-5 w-5 text-gray-700" />
-                  </button>
-
-                  {/* Center: title/meta */}
-                  <div className="min-w-0 text-center">
-                    <div className="truncate text-[17px] sm:text-[18px] font-semibold text-gray-900">
-                      Echo History
-                    </div>
-                    <div className="truncate text-[12px] sm:text-[13px] text-gray-600/90 leading-tight">
-                      All chats & swing analyses
-                    </div>
-                  </div>
-
-                  {/* Right: actions */}
-                  <div className="flex items-center gap-1.5">
-                    {onNewConversation && (
-                      <button
-                        type="button"
-                        aria-label="New chat"
-                        onClick={onNewConversation}
-                        className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition"
-                      >
-                        <Plus className="h-5 w-5 text-gray-700" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-              {/* hairline highlight */}
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/30"></div>
-            </header>
-
-            {/* Search & Tabs (sticky under header) - Phase 55 */}
-            <div className="sticky top-14 sm:top-16 z-[1] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm border-b border-white/10">
-              <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-2">
-                {/* Search bar */}
-                <div className="flex items-center gap-2 mb-2">
-                  <label className="flex-1 h-11 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm px-3 flex items-center gap-2 transition">
-                    <Search className="h-4 w-4 text-gray-400" aria-hidden="true" />
-                    <input
-                      type="search"
-                      placeholder="Search Echo…"
-                      className="w-full bg-transparent outline-none text-[14px] placeholder:text-gray-500"
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      value={searchQuery}
-                      aria-label="Search Echo history"
-                    />
-                    {searchQuery && (
-                      <button
-                        className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:scale-[0.98] transition"
-                        onClick={() => setSearchQuery('')}
-                        aria-label="Clear search"
-                      >
-                        <X className="h-4 w-4 text-gray-500" />
-                      </button>
-                    )}
-                  </label>
-
-                  {/* Filter button (UI placeholder) */}
-                  <button
-                    className="h-11 px-4 rounded-full bg-white border border-black/10 hover:bg-gray-50 shadow-sm text-[14px] font-medium text-gray-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 flex items-center gap-1.5"
-                    aria-label="Open filters"
-                  >
-                    <Filter className="h-4 w-4" />
-                    <span className="hidden sm:inline">Filter</span>
-                  </button>
-                </div>
-
-                {/* Tabs */}
-                <div className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/50 shadow-sm grid grid-cols-2 gap-1 p-1">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('chat')}
-                    className={cn(
-                      "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
-                      activeTab === 'chat' 
-                        ? "bg-white shadow ring-1 ring-black/5" 
-                        : "text-gray-700 hover:bg-white/50"
-                    )}
-                  >
-                    Chat {filteredConversations.length > 0 && <span className="ml-1 opacity-70">({filteredConversations.length})</span>}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('swing')}
-                    className={cn(
-                      "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
-                      activeTab === 'swing' 
-                        ? "bg-white shadow ring-1 ring-black/5" 
-                        : "text-gray-700 hover:bg-white/50"
-                    )}
-                  >
-                    Swing {filteredSwingAnalyses.length > 0 && <span className="ml-1 opacity-70">({filteredSwingAnalyses.length})</span>}
-                  </button>
-                </div>
-
-                {/* Results header */}
-                {(searchQuery || filteredConversations.length > 0 || filteredSwingAnalyses.length > 0) && (
-                  <div className="mt-2 text-[12px] text-gray-600">
-                    {searchQuery ? (
-                      <>
-                        Results for <span className="font-medium text-gray-800">&ldquo;{searchQuery}&rdquo;</span> · {' '}
-                        {activeTab === 'chat' ? filteredConversations.length : filteredSwingAnalyses.length}
-                      </>
-                    ) : (
-                      <>
-                        {activeTab === 'chat' ? 'Recent conversations' : 'Recent analyses'} · {' '}
-                        {activeTab === 'chat' ? filteredConversations.length : filteredSwingAnalyses.length}
-                      </>
-                    )}
-                  </div>
-                )}
+            <div className="flex items-center gap-3">
+              <PiWaveform 
+                size={32} 
+                className="text-white/90 transition-all duration-200 ease-in-out"
+              />
+              <div>
+                <h2 className="text-xl font-semibold text-white">Echo History</h2>
+                <p className="text-sm text-white/90">Find any past chat or swing</p>
               </div>
             </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onClose}
+              className="h-8 w-8 p-0 hover:bg-white/15 transition-colors duration-120"
+            >
+              <X className="h-4 w-4 text-white" />
+            </Button>
+          </div>
 
-            <div className="flex-1 flex flex-col overflow-hidden bg-transparent">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-                  {/* Chat Tab */}
-                  <TabsContent value="chat" className="m-0 flex-1" style={{ minHeight: 0 }} role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
-                      <div 
-                        className="relative h-full overflow-y-auto overscroll-contain scroll-smooth pt-4 pb-6 px-3 sm:px-4"
-                        style={{ WebkitOverflowScrolling: "touch" }}
-                        data-echo-canvas
-                        ref={chatAutoScroll.scrollAreaRef}
-                      >
-                        {/* Top fade - Phase 52 */}
-                        <div className="pointer-events-none absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-white/60 to-transparent z-10" />
-                        {/* Bottom fade - Phase 52 */}
-                        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-white/60 to-transparent z-10" />
-                         <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-5 space-y-4 sm:space-y-5">
+          {/* Search and Filter Controls */}
+          <div className="px-6 pt-4 pb-2 border-b border-gray-200/50 bg-[rgba(110,146,119,0.06)]">
+            <div className="relative">
+              <Input
+                placeholder="Search conversations and analyses..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-4 pr-4 py-3 bg-white/85 backdrop-blur-sm border border-white/50 shadow-sm rounded-full text-sm placeholder:text-gray-500 focus:ring-2 focus:ring-primary/20 focus:border-primary/20"
+              />
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+            <div className="px-6 pt-2 pb-4">
+              <TabsList className="w-full h-11 rounded-full bg-white/85 backdrop-blur-sm border border-white/50 shadow-sm flex items-center justify-between px-1">
+                <TabsTrigger 
+                  value="chat" 
+                  className="flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5 transition-all"
+                >
+                  Chat {filteredConversations.length > 0 && <span className="ml-1 text-gray-500">({filteredConversations.length})</span>}
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="swing" 
+                  className="flex-1 rounded-full mx-1 px-4 py-2 text-sm font-medium text-gray-800 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5 transition-all"
+                >
+                  Swing Coach {filteredSwingAnalyses.length > 0 && <span className="ml-1 text-gray-500">({filteredSwingAnalyses.length})</span>}
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <div className="flex-1 flex flex-col overflow-hidden bg-[rgba(110,146,119,0.06)]">
+              {/* Chat Tab */}
+              <TabsContent value="chat" className="h-full m-0" role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
+                <ScrollArea 
+                  ref={chatAutoScroll.scrollAreaRef}
+                  className="h-full overflow-y-auto"
+                  style={{ 
+                    overscrollBehavior: 'contain',
+                    WebkitOverflowScrolling: 'touch',
+                    maxHeight: 'calc(100vh - 220px)',
+                    flex: '1 1 auto',
+                    minHeight: 0
+                  }}
+                >
+                  <div className="space-y-6 px-4 sm:px-6 pb-6">
                     {loadingStates.conversations ? (
                       <>
                         <SkeletonCard />
@@ -834,33 +763,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                         onRetry={loadChatConversations}
                       />
                     ) : filteredConversations.length === 0 ? (
-                      searchQuery ? (
-                        <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-10">
-                          <div className="rounded-2xl bg-white/80 backdrop-blur border border-black/10 text-center px-6 py-10">
-                            <div className="mx-auto mb-3 h-12 w-12 rounded-full grid place-items-center bg-white border border-black/10 shadow-sm text-gray-700">
-                              <Search className="h-6 w-6" />
-                            </div>
-                            <div className="text-[17px] font-semibold text-gray-900">No matches</div>
-                            <div className="mt-1.5 text-[13px] text-gray-600/90">
-                              Try a different search term or clear filters.
-                            </div>
-                            <div className="mt-4 flex items-center justify-center gap-2">
-                              <button 
-                                className="h-10 px-4 rounded-full bg-white border border-black/10 hover:bg-gray-50 shadow-sm text-[14px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                                onClick={() => setSearchQuery('')}
-                              >
-                                Clear search
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <EmptyState
-                          icon={<MessageCircle className="h-10 w-10" />}
-                          title="No conversations yet"
-                          subtitle="Your chats and swing analyses will appear here once you've started."
-                        />
-                      )
+                      <EmptyState
+                        icon={<MessageCircle className="h-8 w-8" />}
+                        title="No conversations found"
+                        subtitle="Start a conversation to see your chat history here"
+                      />
                     ) : (
                       <>
                         {/* Last 7 Days */}
@@ -874,112 +781,98 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           
                           return (
                             <div>
-                              <h3 className="text-[13px] font-medium text-gray-700 mb-3">
+                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
                                 Last 7 Days
                               </h3>
-                                <div className="space-y-4 sm:space-y-5">
-                                 {last7Days.map((conversation) => (
-                                   <article 
-                                     key={conversation.id} 
-                                     className="group relative rounded-2xl bg-white/92 backdrop-blur shadow-sm border border-black/10 hover:border-black/15 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.08)] active:translate-y-0 focus-within:ring-2 focus-within:ring-[#2A9D8F]/30 px-4 py-3 sm:px-5 sm:py-4 cursor-pointer"
-                                     onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
-                                     role="button"
-                                     tabIndex={0}
-                                     aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
-                                     onKeyDown={(e) => {
-                                       if (e.key === 'Enter' || e.key === ' ') {
-                                         e.preventDefault();
-                                         if (!(expandedCard?.type === 'chat' && expandedCard?.id === conversation.id)) {
-                                           handleExpansion('chat', conversation.id);
-                                         }
-                                       }
-                                     }}
-                                   >
-                                     
-                                     {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? (
-                                       <>
-                                         <div className="flex justify-between items-center mb-3">
-                                           <h3 className="text-[17px] font-semibold text-gray-900">
-                                             {conversation.customTitle || conversation.title}
-                                           </h3>
-                                           <button 
-                                             onClick={(e) => {
-                                               e.stopPropagation();
-                                               setExpandedCard(null);
-                                             }}
-                                             aria-label="Collapse" 
-                                             className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                                           >
-                                             <ChevronUp className="h-4 w-4 text-gray-600" />
-                                           </button>
-                                         </div>
+                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
+                                {last7Days.map((conversation) => (
+                                  <div 
+                                    key={conversation.id} 
+                                    className={`
+                                      rounded-2xl bg-white/92 backdrop-blur shadow px-4 py-3 sm:px-5 sm:py-4 
+                                      hover:-translate-y-0.5 transition-all duration-200
+                                      ${expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? 'bg-white/95 shadow-lg' : 'cursor-pointer'}
+                                    `}
+                                    style={{
+                                      transition: 'max-height 0.25s ease, opacity 0.2s ease'
+                                    }}
+                                    onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
+                                  >
+                                    {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? (
+                                      <div>
+                                        <div className="flex justify-between items-center mb-3">
+                                          <h3 className="text-[17px] font-semibold text-gray-900">
+                                            {conversation.customTitle || conversation.title}
+                                          </h3>
+                                          <button 
+                                            onClick={() => setExpandedCard(null)}
+                                            aria-label="Collapse" 
+                                            className="p-2 rounded-full hover:bg-gray-100"
+                                          >
+                                            <ChevronUp className="h-4 w-4" />
+                                          </button>
+                                        </div>
 
-                                         <div className="space-y-3 max-h-80 overflow-y-auto">
-                                           {conversation.messages.map((message) => (
-                                             <div
-                                               key={message.id}
-                                               className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-                                             >
-                                               <div
-                                                 className={`
-                                                   max-w-[75%] px-3 py-2 rounded-xl text-sm
-                                                   ${message.type === 'user'
-                                                     ? 'bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] text-white rounded-br-none'
-                                                     : 'bg-gray-100 text-gray-900 rounded-bl-none'}
-                                                 `}
-                                               >
-                                                 {message.content}
-                                               </div>
-                                             </div>
-                                           ))}
-                                         </div>
+                                        <div className="space-y-3 max-h-80 overflow-y-auto">
+                                          {conversation.messages.map((message) => (
+                                            <div
+                                              key={message.id}
+                                              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                                            >
+                                              <div
+                                                className={`
+                                                  max-w-[75%] px-3 py-2 rounded-xl text-sm
+                                                  ${message.type === 'user'
+                                                    ? 'bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] text-white rounded-br-none'
+                                                    : 'bg-gray-100 text-gray-900 rounded-bl-none'}
+                                                `}
+                                              >
+                                                {message.content}
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
 
-                                         <div className="mt-3 flex justify-end">
-                                           <button 
-                                             onClick={(e) => {
-                                               e.stopPropagation();
-                                               const lastUserMessage = conversation.messages.filter(m => m.type === 'user').pop();
-                                               if (lastUserMessage) {
-                                                 onSelectMessage(lastUserMessage.content);
-                                                 onClose();
-                                               }
-                                             }}
-                                             className="text-sm font-medium text-[#2A9D8F] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 rounded"
-                                           >
-                                             Use this response
-                                           </button>
-                                         </div>
-                                       </>
-                                     ) : (
-                                       <>
-                                         <div className="flex items-start gap-2">
-                                           <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-full text-[11px] font-medium bg-[#2A9D8F]/10 text-[#2A9D8F] border border-[#2A9D8F]/20">
-                                             Chat
-                                           </span>
-                                           <div className="min-w-0 flex-1">
-                                             <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-gray-900">
-                                               {conversation.customTitle || conversation.title}
-                                             </div>
-                                             <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-gray-600">
-                                               <span className="truncate">
-                                                 {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
-                                               </span>
-                                               <span className="mx-1 h-1 w-1 rounded-full bg-gray-400/60 shrink-0"></span>
-                                               <time className="shrink-0">{conversation.timestamp.toLocaleDateString()}</time>
-                                               <span className="hidden sm:inline text-gray-500 shrink-0">• {conversation.messages.length} msgs</span>
-                                             </div>
-                                           </div>
-                                         </div>
-                                         
-                                         {/* Hover affordance stripe */}
-                                         <div className="pointer-events-none absolute inset-x-0 -bottom-px h-8 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
-                                           <div className="mx-4 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
-                                         </div>
-                                       </>
-                                     )}
-                                   </article>
-                                 ))}
-                               </div>
+                                        <div className="mt-3 flex justify-end">
+                                          <button 
+                                            onClick={() => {
+                                              const lastUserMessage = conversation.messages.filter(m => m.type === 'user').pop();
+                                              if (lastUserMessage) {
+                                                onSelectMessage(lastUserMessage.content);
+                                                onClose();
+                                              }
+                                            }}
+                                            className="text-sm font-medium text-[#2A9D8F] hover:underline"
+                                          >
+                                            Use this response
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="flex items-start gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-[rgba(110,146,119,0.12)] grid place-items-center text-[18px]">
+                                          🗨️
+                                        </div>
+                                        <div className="flex-1">
+                                          <h3 className="text-[17px] font-semibold text-gray-900 leading-tight">
+                                            {conversation.customTitle || conversation.title}
+                                          </h3>
+                                          <p className="text-[14px] text-gray-700/85 mt-1 line-clamp-2">
+                                            {conversation.messages.find(m => m.type === 'user')?.content}
+                                          </p>
+                                          <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
+                                            <span>{conversation.timestamp.toLocaleDateString()}</span>
+                                            <span>• {conversation.messages.length} replies</span>
+                                            <span className="ml-auto text-sm font-medium text-[#2A9D8F] hover:underline">
+                                              Show Conversation
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           );
                         })()}
@@ -995,43 +888,37 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           
                           return (
                             <div>
-                              <h3 className="text-[13px] font-medium text-gray-700 mb-3">
+                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
                                 This Month
                               </h3>
-                              <div className="space-y-4 sm:space-y-5">
+                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
                                 {thisMonth.map((conversation) => (
-                                  <article 
+                                  <div 
                                     key={conversation.id} 
-                                    className="group relative rounded-2xl bg-white/92 backdrop-blur shadow-sm border border-black/10 hover:border-black/15 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.08)] active:translate-y-0 focus-within:ring-2 focus-within:ring-[#2A9D8F]/30 px-4 py-3 sm:px-5 sm:py-4 cursor-pointer"
-                                    onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
-                                    role="button"
-                                    tabIndex={0}
-                                    aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
+                                    className="rounded-2xl bg-white/92 backdrop-blur shadow px-4 py-3 sm:px-5 sm:py-4 hover:-translate-y-0.5 transition-transform cursor-pointer"
+                                    onClick={() => handleExpansion('chat', conversation.id)}
                                   >
-                                    <div className="flex items-start gap-2">
-                                      <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-full text-[11px] font-medium bg-[#2A9D8F]/10 text-[#2A9D8F] border border-[#2A9D8F]/20">
-                                        Chat
-                                      </span>
-                                      <div className="min-w-0 flex-1">
-                                        <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-gray-900">
+                                    <div className="flex items-start gap-3">
+                                      <div className="h-8 w-8 rounded-full bg-[rgba(110,146,119,0.12)] grid place-items-center text-[18px]">
+                                        🗨️
+                                      </div>
+                                      <div className="flex-1">
+                                        <h3 className="text-[17px] font-semibold text-gray-900 leading-tight">
                                           {conversation.customTitle || conversation.title}
-                                        </div>
-                                        <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-gray-600">
-                                          <span className="truncate">
-                                            {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
+                                        </h3>
+                                        <p className="text-[14px] text-gray-700/85 mt-1 line-clamp-2">
+                                          {conversation.messages.find(m => m.type === 'user')?.content}
+                                        </p>
+                                        <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
+                                          <span>{conversation.timestamp.toLocaleDateString()}</span>
+                                          <span>• {conversation.messages.length} replies</span>
+                                          <span className="ml-auto text-sm font-medium text-[#2A9D8F] hover:underline">
+                                            Show Conversation
                                           </span>
-                                          <span className="mx-1 h-1 w-1 rounded-full bg-gray-400/60 shrink-0"></span>
-                                          <time className="shrink-0">{conversation.timestamp.toLocaleDateString()}</time>
-                                          <span className="hidden sm:inline text-gray-500 shrink-0">• {conversation.messages.length} msgs</span>
                                         </div>
                                       </div>
                                     </div>
-                                    
-                                    {/* Hover affordance stripe */}
-                                    <div className="pointer-events-none absolute inset-x-0 -bottom-px h-8 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
-                                      <div className="mx-4 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
-                                    </div>
-                                   </article>
+                                  </div>
                                 ))}
                               </div>
                             </div>
@@ -1049,74 +936,62 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           
                           return (
                             <div>
-                              <h3 className="text-[13px] font-medium text-gray-700 mb-3">
+                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
                                 Older
                               </h3>
-                              <div className="space-y-4 sm:space-y-5">
+                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
                                 {older.map((conversation) => (
-                                  <article 
+                                  <div 
                                     key={conversation.id} 
-                                    className="group relative rounded-2xl bg-white/92 backdrop-blur shadow-sm border border-black/10 hover:border-black/15 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.08)] active:translate-y-0 focus-within:ring-2 focus-within:ring-[#2A9D8F]/30 px-4 py-3 sm:px-5 sm:py-4 cursor-pointer"
-                                    onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
-                                    role="button"
-                                    tabIndex={0}
-                                    aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
+                                    className="rounded-2xl bg-white/92 backdrop-blur shadow px-4 py-3 sm:px-5 sm:py-4 hover:-translate-y-0.5 transition-transform cursor-pointer"
+                                    onClick={() => handleExpansion('chat', conversation.id)}
                                   >
-                                    <div className="flex items-start gap-2">
-                                      <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-full text-[11px] font-medium bg-[#2A9D8F]/10 text-[#2A9D8F] border border-[#2A9D8F]/20">
-                                        Chat
-                                      </span>
-                                      <div className="min-w-0 flex-1">
-                                        <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-gray-900">
+                                    <div className="flex items-start gap-3">
+                                      <div className="h-8 w-8 rounded-full bg-[rgba(110,146,119,0.12)] grid place-items-center text-[18px]">
+                                        🗨️
+                                      </div>
+                                      <div className="flex-1">
+                                        <h3 className="text-[17px] font-semibold text-gray-900 leading-tight">
                                           {conversation.customTitle || conversation.title}
-                                        </div>
-                                        <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-gray-600">
-                                          <span className="truncate">
-                                            {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
+                                        </h3>
+                                        <p className="text-[14px] text-gray-700/85 mt-1 line-clamp-2">
+                                          {conversation.messages.find(m => m.type === 'user')?.content}
+                                        </p>
+                                        <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
+                                          <span>{conversation.timestamp.toLocaleDateString()}</span>
+                                          <span>• {conversation.messages.length} replies</span>
+                                          <span className="ml-auto text-sm font-medium text-[#2A9D8F] hover:underline">
+                                            Show Conversation
                                           </span>
-                                          <span className="mx-1 h-1 w-1 rounded-full bg-gray-400/60 shrink-0"></span>
-                                          <time className="shrink-0">{conversation.timestamp.toLocaleDateString()}</time>
-                                          <span className="hidden sm:inline text-gray-500 shrink-0">• {conversation.messages.length} msgs</span>
                                         </div>
                                       </div>
                                     </div>
-                                    
-                                    {/* Hover affordance stripe */}
-                                    <div className="pointer-events-none absolute inset-x-0 -bottom-px h-8 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
-                                      <div className="mx-4 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
-                                    </div>
-                                  </article>
+                                  </div>
                                 ))}
                               </div>
                             </div>
                           );
                         })()}
-                        
-                        {/* End of list marker */}
-                        {filteredConversations.length > 0 && (
-                          <div className="py-6 text-center text-[12px] text-gray-500 select-none">
-                            You're all caught up
-                          </div>
-                        )}
-                       </>
-                     )}
-                       </div>
-                     </div>
-                   </TabsContent>
+                      </>
+                    )}
+                  </div>
+                </ScrollArea>
+              </TabsContent>
 
-                  {/* Swing Coach Tab */}
-                  <TabsContent value="swing" className="m-0 flex-1" style={{ minHeight: 0 }} role="tabpanel" id="swing-panel" aria-labelledby="swing-tab">
-                     <div 
-                       className="relative h-full overflow-y-auto overscroll-contain scroll-smooth pt-4 pb-6 px-3 sm:px-4"
-                       style={{ WebkitOverflowScrolling: "touch" }}
-                       data-echo-canvas
-                       ref={swingAutoScroll.scrollAreaRef}
-                     >
-                        {/* Top fade - Phase 52 */}
-                        <div className="pointer-events-none absolute top-0 inset-x-0 h-6 bg-gradient-to-b from-white/60 to-transparent z-10" />
-                        {/* Bottom fade - Phase 52 */}
-                        <div className="pointer-events-none absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-white/60 to-transparent z-10" />
-                        <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-5 space-y-4 sm:space-y-5">
+              {/* Swing Coach Tab */}
+              <TabsContent value="swing" className="h-full m-0" role="tabpanel" id="swing-panel" aria-labelledby="swing-tab">
+                <ScrollArea 
+                  ref={swingAutoScroll.scrollAreaRef}
+                  className="h-full overflow-y-auto"
+                  style={{ 
+                    overscrollBehavior: 'contain',
+                    WebkitOverflowScrolling: 'touch',
+                    maxHeight: 'calc(100vh - 220px)',
+                    flex: '1 1 auto',
+                    minHeight: 0
+                  }}
+                >
+                  <div className="space-y-6 px-4 sm:px-6 pb-6">
                     {loadingStates.swingAnalyses ? (
                       <>
                         <SkeletonCard />
@@ -1129,33 +1004,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                         onRetry={loadSwingAnalyses}
                       />
                     ) : filteredSwingAnalyses.length === 0 ? (
-                      searchQuery ? (
-                        <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-10">
-                          <div className="rounded-2xl bg-white/80 backdrop-blur border border-black/10 text-center px-6 py-10">
-                            <div className="mx-auto mb-3 h-12 w-12 rounded-full grid place-items-center bg-white border border-black/10 shadow-sm text-gray-700">
-                              <Search className="h-6 w-6" />
-                            </div>
-                            <div className="text-[17px] font-semibold text-gray-900">No matches</div>
-                            <div className="mt-1.5 text-[13px] text-gray-600/90">
-                              Try a different search term or clear filters.
-                            </div>
-                            <div className="mt-4 flex items-center justify-center gap-2">
-                              <button 
-                                className="h-10 px-4 rounded-full bg-white border border-black/10 hover:bg-gray-50 shadow-sm text-[14px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                                onClick={() => setSearchQuery('')}
-                              >
-                                Clear search
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <EmptyState
-                          icon={<BarChart3 className="h-8 w-8" />}
-                          title="No swing analyses found"
-                          subtitle="Upload a swing video to see analyses here"
-                        />
-                      )
+                      <EmptyState
+                        icon={<BarChart3 className="h-8 w-8" />}
+                        title="No swing analyses found"
+                        subtitle="Upload a swing video to see analyses here"
+                      />
                     ) : (
                       <>
                         {/* Group swing analyses by recency */}
@@ -1167,12 +1020,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           
                           if (last7Days.length === 0) return null;
                           
-                           return (
-                             <div>
-                               <h3 className="text-[13px] font-medium text-gray-700 mb-3">
-                                 Last 7 Days
-                               </h3>
-                               <div className="space-y-4 sm:space-y-5">
+                          return (
+                            <div>
+                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
+                                Last 7 Days
+                              </h3>
+                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
                                 {last7Days.map((analysis) => (
                                   <SwingAnalysisCard
                                     key={analysis.id}
@@ -1195,12 +1048,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           
                           if (thisMonth.length === 0) return null;
                           
-                           return (
-                             <div>
-                               <h3 className="text-[13px] font-medium text-gray-700 mb-3">
-                                 This Month
-                               </h3>
-                               <div className="space-y-4 sm:space-y-5">
+                          return (
+                            <div>
+                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
+                                This Month
+                              </h3>
+                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
                                 {thisMonth.map((analysis) => (
                                   <SwingAnalysisCard
                                     key={analysis.id}
@@ -1223,12 +1076,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           
                           if (older.length === 0) return null;
                           
-                           return (
-                             <div>
-                               <h3 className="text-[13px] font-medium text-gray-700 mb-3">
-                                 Older
-                               </h3>
-                               <div className="space-y-4 sm:space-y-5">
+                          return (
+                            <div>
+                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
+                                Older
+                              </h3>
+                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
                                 {older.map((analysis) => (
                                   <SwingAnalysisCard
                                     key={analysis.id}
@@ -1242,23 +1095,15 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                             </div>
                           );
                         })()}
-                        
-                        {/* End of list marker */}
-                        {filteredSwingAnalyses.length > 0 && (
-                          <div className="py-6 text-center text-[12px] text-gray-500 select-none">
-                            You're all caught up
-                          </div>
-                        )}
-                       </>
-                     )}
-                    </div>
-                    </div>
-                    </TabsContent>
-                 </Tabs>
-                </div>
-              </div>
+                      </>
+                    )}
+                  </div>
+                </ScrollArea>
+              </TabsContent>
             </div>
-        </SlideOver>
+          </Tabs>
+        </div>
+      </SlideOver>
 
       {/* EchoProtection Modal */}
       {isProtectionOpen && (

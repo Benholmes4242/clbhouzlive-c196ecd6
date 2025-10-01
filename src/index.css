@@ -24,127 +24,12 @@ html, body {
   background: hsl(var(--background)); /* Ensure background extends behind status bar */
 }
 
-/* Enhanced safe area inset support */
+/* Enhanced safe-area variables for iOS edge-to-edge */
 :root {
   --safe-top: 0px; 
   --safe-bottom: 0px; 
   --safe-left: 0px; 
   --safe-right: 0px;
-  
-  /* Echo modal design tokens */
-  --echo-header-h: 64px;
-  --echo-tabs-h: 48px;
-  --echo-composer-h: 84px; /* includes padding/safe-area */
-  --echo-top: 56px; /* header height on mobile */
-
-  /* Message bubble tokens */
-  --bubble-max: 92vw;             /* prevents edge-to-edge balloons on phones */
-  --bubble-max-md: 720px;         /* cap on larger screens */
-  --bubble-gap-y: 6px;            /* inter-bubble in a group */
-  --bubble-gap-x: 10px;           /* gap from avatar rail */
-  --bubble-radius: 16px;          /* base radius */
-  --bubble-radius-lg: 18px;       /* for first/last in a group */
-  --bubble-shadow: 0 4px 16px rgba(0,0,0,.08);
-
-  /* Echo (AI) bubble */
-  --ai-bg: rgba(255,255,255,.92);
-  --ai-brd: rgba(0,0,0,.06);
-  --ai-fg: #0f172a;               /* slate-900 */
-
-  /* User bubble */
-  --me-bg: rgba(42,157,143,.10);  /* brand teal wash */
-  --me-brd: rgba(42,157,143,.22);
-  --me-fg: #0c3b3f;
-
-  /* Meta text */
-  --meta-fg: rgba(17,24,39,.55);  /* gray-800 @ 55% */
-
-  /* Composer tokens */
-  --composer-h: 56px;
-  --composer-pad-x: 10px;
-  --composer-pad-y: 8px;
-  --composer-radius: 28px;
-  --composer-shadow: 0 8px 28px rgba(0,0,0,.08);
-
-  --chip-radius: 16px;
-  --chip-bg: rgba(255,255,255,.85);
-  --chip-brd: rgba(0,0,0,.08);
-
-  --btn-size: 36px;
-  --btn-brd: rgba(0,0,0,.12);
-
-  /* Echo avatar animation states */
-  --echo-breathing-duration: 3s;
-  --echo-listening-duration: 1.5s;
-  --echo-processing-duration: 1s;
-
-  --composer-bg: rgba(255,255,255,.92);
-  --composer-brd: rgba(0,0,0,.10);
-
-  --kbd-bg: rgba(17,24,39,.06);
-  --kbd-fg: #111827;
-}
-
-/* Bubble appear animation */
-@keyframes bubbleIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(6px) scale(0.98); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0) scale(1); 
-  }
-}
-
-/* Card appear animation */
-@keyframes cardIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-/* Dot pulse animation */
-@keyframes pulseDot {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.18);
-  }
-}
-
-/* Bubble fade in up */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Progress shimmer */
-@keyframes shimmer {
-  0% {
-    background-position: -200% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
-}
-
-@media (min-width: 640px) {
-  :root {
-    --echo-top: 64px;
-  }
 }
 
 /* ========================================
@@ -234,6 +119,13 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: var(--sp-24);
+}
+
+@media (min-width: 768px) {
+  .name-wrap {
+    margin-top: 0;
+  }
 }
 
 .name-first, .name-last {
@@ -653,36 +545,6 @@ html[data-immersive="true"] .app-shell--topSpacer {
   50% {
     transform: scaleY(1);
     opacity: 1;
-  }
-}
-
-/* Echo Avatar States */
-@keyframes echoBreathing {
-  0%, 100% {
-    transform: scale(0.96);
-    opacity: 0.9;
-  }
-  50% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes echoPulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(42, 157, 143, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 8px rgba(42, 157, 143, 0);
-  }
-}
-
-@keyframes echoRotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(180deg);
   }
 }
 

@@ -43,11 +43,12 @@ export const SwingAnalysisLoader = ({ isAnalyzing }: SwingAnalysisLoaderProps) =
     const interval = setInterval(() => {
       setCurrentStep(prev => {
         if (prev >= analysisSteps.length - 1) {
+          // Keep cycling through "Finalizing details..." and "Almost done..."
           return prev === analysisSteps.length - 1 ? analysisSteps.length : analysisSteps.length - 1;
         }
         return prev + 1;
       });
-    }, 1500);
+    }, 1500); // 1.5 seconds per step
 
     return () => clearInterval(interval);
   }, [isAnalyzing, analysisSteps.length]);
@@ -61,24 +62,10 @@ export const SwingAnalysisLoader = ({ isAnalyzing }: SwingAnalysisLoaderProps) =
       : "Almost done...";
 
   return (
-    <div className="rounded-2xl overflow-hidden border border-black/[0.06] bg-white animate-pulse">
-      {/* Video skeleton */}
-      <div className="h-40 bg-black/10" />
-      
-      {/* Content skeleton */}
-      <div className="px-4 sm:px-5 py-4 space-y-3">
-        {/* Header lines */}
-        <div className="h-3 rounded bg-black/10 w-2/3" />
-        <div className="h-3 rounded bg-black/10 w-1/2" />
-        
-        {/* Status text */}
-        <div className="flex items-center gap-2 pt-2">
-          <div className="h-5 w-5 rounded-full border-2 border-[#2A9D8F] border-t-transparent animate-spin" />
-          <span className="text-[13px] text-gray-600">{displayText}</span>
-        </div>
-        
-        {/* Button skeleton */}
-        <div className="h-9 rounded-full bg-black/10 w-24" />
+    <div className="flex items-center space-x-3 py-4">
+      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-muted-foreground/50"></div>
+      <div className="text-sm text-muted-foreground animate-fade-in">
+        {displayText}
       </div>
     </div>
   );
