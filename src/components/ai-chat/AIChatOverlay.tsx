@@ -507,33 +507,36 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
           {/* Segmented Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-            <div className="mx-4 sm:mx-6 mt-3 mb-1 flex-shrink-0">
-              <TabsList className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/50 shadow-[0_1px_2px_rgba(0,0,0,.06)] flex items-center px-1">
-                <TabsTrigger
-                  value="chat"
-                  className="flex-1 h-9 rounded-full text-[14px] font-medium text-slate-700/85 transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 mx-1 px-3"
-                >
-                  Chat
-                </TabsTrigger>
-                <TabsTrigger
-                  value="swing"
-                  className="flex-1 h-9 rounded-full text-[14px] font-medium text-slate-700/85 transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 mx-1 px-3"
-                >
-                  Swing Coach
-                </TabsTrigger>
-              </TabsList>
+            {/* Top bar container (sticky) */}
+            <div
+              className="sticky top-[var(--echo-top,56px)] z-[2] px-3 sm:px-4 py-2 bg-white/55 backdrop-blur-md border-b border-white/30"
+              data-echo-topbar
+            >
+              {/* Tabs rail */}
+              <div className="w-full max-w-[720px] mx-auto" data-echo-tabs-rail>
+                <TabsList className="w-full h-11 rounded-full bg-white/80 backdrop-blur-md border border-black/5 shadow-sm grid grid-cols-2 gap-1 p-1">
+                  <TabsTrigger
+                    value="chat"
+                    className="rounded-full px-4 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5 data-[state=inactive]:text-gray-700 transition-all"
+                  >
+                    Chat
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="swing"
+                    className="rounded-full px-4 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5 data-[state=inactive]:text-gray-700 transition-all"
+                  >
+                    Swing Coach
+                  </TabsTrigger>
+                </TabsList>
+              </div>
             </div>
 
             {/* Scrollable content area */}
             <TabsContent value="chat" className="m-0 flex-1" style={{ minHeight: 0 }}>
-              <ScrollArea 
+              <div 
+                className="h-full overflow-y-auto px-3 sm:px-4 pt-4 pb-28"
+                data-echo-canvas
                 ref={chatAutoScroll.scrollAreaRef}
-                style={{
-                  height: 'calc(100vh - (var(--echo-header-h, 64px) + var(--echo-tabs-h, 48px) + var(--echo-composer-h, 84px)))',
-                  WebkitOverflowScrolling: 'touch',
-                  overscrollBehavior: 'contain'
-                }}
-                className="overflow-y-auto px-4 sm:px-6 pt-4 pb-6"
               >
                 <div>
                     {messages.length === 0 ? (
@@ -586,17 +589,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       </div>
                     )}
                 </div>
-              </ScrollArea>
+              </div>
             </TabsContent>
 
             <TabsContent value="swing" className="m-0 flex-1" style={{ minHeight: 0 }}>
               <div 
-                className="w-full px-4 sm:px-6 pt-4 pb-6 overflow-y-auto"
-                style={{
-                  height: 'calc(100vh - (var(--echo-header-h, 64px) + var(--echo-tabs-h, 48px) + 16px))',
-                  WebkitOverflowScrolling: 'touch',
-                  overscrollBehavior: 'contain'
-                }}
+                className="h-full overflow-y-auto px-3 sm:px-4 pt-4 pb-28"
+                data-echo-canvas
               >
                 <SwingCoach 
                   onClose={() => setActiveTab('chat')}

@@ -35,6 +35,13 @@ html, body {
   --echo-header-h: 64px;
   --echo-tabs-h: 48px;
   --echo-composer-h: 84px; /* includes padding/safe-area */
+  --echo-top: 56px; /* header height on mobile */
+}
+
+@media (min-width: 640px) {
+  :root {
+    --echo-top: 64px;
+  }
 }
 
 /* ========================================

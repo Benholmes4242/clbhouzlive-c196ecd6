@@ -721,9 +721,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               </button>
             </header>
 
-            {/* Search and Filter Controls */}
-            <div className="px-4 sm:px-6 pt-4 pb-2 border-b border-gray-200/50 bg-transparent">
-              <div className="relative">
+            {/* Top bar container (sticky) */}
+            <div
+              className="sticky top-[var(--echo-top,56px)] z-[2] px-4 sm:px-6 py-2 bg-white/65 backdrop-blur-md border-b border-white/30"
+              data-echo-topbar
+            >
+              {/* Search */}
+              <div className="relative mb-3">
                 <Input
                   placeholder="Search conversations and analyses..."
                   value={searchQuery}
@@ -731,37 +735,33 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                   className="pl-4 pr-4 py-3 bg-white/85 backdrop-blur-sm border border-white/50 shadow-sm rounded-full text-sm placeholder:text-slate-500/90 focus:ring-2 focus:ring-primary/20 focus:border-primary/20"
                 />
               </div>
-            </div>
 
-            {/* Segmented Tabs */}
-            <div className="mx-4 sm:mx-6 mt-3 mb-1 flex-shrink-0">
+              {/* Tabs rail */}
               <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-                <TabsList className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/50 shadow-[0_1px_2px_rgba(0,0,0,.06)] flex items-center px-1">
-                  <TabsTrigger 
-                    value="chat" 
-                    className="flex-1 h-9 rounded-full text-[14px] font-medium text-slate-700/85 transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 mx-1 px-3"
-                  >
-                    Chat {filteredConversations.length > 0 && <span className="ml-1 text-gray-500">({filteredConversations.length})</span>}
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="swing" 
-                    className="flex-1 h-9 rounded-full text-[14px] font-medium text-slate-700/85 transition-all data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 mx-1 px-3"
-                  >
-                    Swing Coach {filteredSwingAnalyses.length > 0 && <span className="ml-1 text-gray-500">({filteredSwingAnalyses.length})</span>}
-                  </TabsTrigger>
-                </TabsList>
+                <div className="w-full max-w-[720px] mx-auto" data-echo-tabs-rail>
+                  <TabsList className="w-full h-11 rounded-full bg-white/80 backdrop-blur-md border border-black/5 shadow-sm grid grid-cols-2 gap-1 p-1">
+                    <TabsTrigger 
+                      value="chat" 
+                      className="rounded-full px-4 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5 data-[state=inactive]:text-gray-700 transition-all"
+                    >
+                      Chat {filteredConversations.length > 0 && <span className="ml-1 text-gray-500">({filteredConversations.length})</span>}
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="swing" 
+                      className="rounded-full px-4 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5 data-[state=inactive]:text-gray-700 transition-all"
+                    >
+                      Swing Coach {filteredSwingAnalyses.length > 0 && <span className="ml-1 text-gray-500">({filteredSwingAnalyses.length})</span>}
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
 
                 <div className="flex-1 flex flex-col overflow-hidden bg-transparent">
                   {/* Chat Tab */}
                   <TabsContent value="chat" className="m-0 flex-1" style={{ minHeight: 0 }} role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
-                    <ScrollArea 
+                    <div 
+                      className="h-full overflow-y-auto px-3 sm:px-4 pt-4 pb-6"
+                      data-echo-canvas
                       ref={chatAutoScroll.scrollAreaRef}
-                      style={{
-                        height: 'calc(100vh - (var(--echo-header-h, 64px) + var(--echo-tabs-h, 48px) + 100px))',
-                        WebkitOverflowScrolling: 'touch',
-                        overscrollBehavior: 'contain'
-                      }}
-                      className="overflow-y-auto px-4 sm:px-6 pt-4 pb-6"
                     >
                       <div className="space-y-6 px-4 sm:px-6 pb-6">
                     {loadingStates.conversations ? (
@@ -988,20 +988,16 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       </>
                     )}
                   </div>
-                    </ScrollArea>
+                  </div>
                   </TabsContent>
 
                   {/* Swing Coach Tab */}
                   <TabsContent value="swing" className="m-0 flex-1" style={{ minHeight: 0 }} role="tabpanel" id="swing-panel" aria-labelledby="swing-tab">
-                     <ScrollArea 
-                       ref={swingAutoScroll.scrollAreaRef}
-                       style={{
-                         height: 'calc(100vh - (var(--echo-header-h, 64px) + var(--echo-tabs-h, 48px) + 100px))',
-                         WebkitOverflowScrolling: 'touch',
-                         overscrollBehavior: 'contain'
-                       }}
-                       className="overflow-y-auto px-4 sm:px-6 pt-4 pb-6"
-                     >
+                    <div 
+                      className="h-full overflow-y-auto px-3 sm:px-4 pt-4 pb-6"
+                      data-echo-canvas
+                      ref={swingAutoScroll.scrollAreaRef}
+                    >
                       <div className="space-y-6 px-4 sm:px-6 pb-6">
                     {loadingStates.swingAnalyses ? (
                       <>
@@ -1109,7 +1105,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       </>
                     )}
                   </div>
-                    </ScrollArea>
+                  </div>
                   </TabsContent>
                 </div>
               </Tabs>
