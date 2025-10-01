@@ -763,13 +763,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </TabsContent>
           </Tabs>
         
-          {/* Composer footer - Phase 43 polish */}
+          {/* Composer footer - Phase 45 "Pro" Polish */}
           <footer 
-            className="sticky bottom-0 z-[5] border-t border-white/10 bg-gradient-to-t from-white/80 to-white/60 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60"
+            className="sticky bottom-0 z-10 bg-gradient-to-t from-white/85 to-white/60 backdrop-blur-xl border-t border-white/30"
             role="region"
             aria-label="Message composer"
             data-echo-composer
-            data-streaming="false"
+            data-streaming={isLoading ? "true" : "false"}
           >
             {/* Upload progress bar (shown during processing) */}
             {(isLoading || isProcessing) && (
@@ -778,7 +778,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             )}
             
-            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-3 pb-[max(env(safe-area-inset-bottom),12px)]">
+            <div className="mx-auto w-full max-w-[720px] pb-[max(env(safe-area-inset-bottom),16px)] pt-3 px-3 sm:px-4">
               {activeTab === 'chat' && (
                 <div>
                   {/* Micro-hint - shows when input is empty */}
@@ -1002,15 +1002,24 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     </div>
                   )}
 
-                  {/* Main composer pill - Phase 43 spec */}
-                  <div className="w-full">
+                  {/* Error hint (non-blocking) - Phase 45 */}
+                  {false && ( /* Set to true to show error */
+                    <div className="mb-2 text-[12px] text-red-600">
+                      Network issue — your message will retry.
+                    </div>
+                  )}
+
+                  {/* Main composer pill - Phase 45 "Pro" Polish */}
+                  <div className={cn(
+                    "w-full transition-opacity duration-150",
+                    (isLoading || isProcessing) && "opacity-60 pointer-events-none select-none"
+                  )} aria-disabled={isLoading || isProcessing}>
                     <form 
                       className={cn(
-                        "composer-bubble composer-pill",
+                        "composer-pill flex items-end gap-2",
                         "rounded-[28px] bg-white/92 backdrop-blur",
                         "border border-black/10 shadow-sm",
-                        "px-2.5 py-2",
-                        "grid grid-cols-[auto,1fr,auto] items-center gap-1.5",
+                        "px-3 py-2",
                         "transition-[box-shadow,transform] duration-150",
                         "focus-within:shadow-md focus-within:ring-1 focus-within:ring-[#2A9D8F]/30",
                         isRecording && "ring-1 ring-[#2A9D8F]/30"
@@ -1023,35 +1032,30 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         sendMessage(inputValue);
                       }}
                     >
-                      {/* Left tools */}
-                      <div className="flex items-center gap-1.5">
+                      {/* Left tool cluster */}
+                      <div className="flex items-center gap-1.5 shrink-0">
                         <button
                           type="button"
-                          aria-label="Attach"
+                          aria-label="Attach media"
                           className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
                         >
                           <Paperclip className="h-[18px] w-[18px] text-gray-600" />
                         </button>
                         <button
                           type="button"
-                          aria-label="Mic"
+                          aria-label="Camera"
                           className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                          onMouseDown={!isProcessing ? startRecording : undefined}
-                          onMouseUp={!isProcessing ? stopRecording : undefined}
-                          onMouseLeave={!isProcessing ? stopRecording : undefined}
-                          onTouchStart={!isProcessing ? startRecording : undefined}
-                          onTouchEnd={!isProcessing ? stopRecording : undefined}
                         >
-                          <Mic className="h-[18px] w-[18px] text-gray-600" />
+                          <Camera className="h-[18px] w-[18px] text-gray-600" />
                         </button>
                       </div>
 
-                      {/* Input */}
-                      <div className="min-w-0">
+                      {/* Textarea (auto-grow) */}
+                      <div className="min-w-0 flex-1">
                         <textarea
                           value={inputValue}
                           onChange={(e) => setInputValue(e.target.value)}
-                          placeholder="Ask Echo anything…"
+                          placeholder="Ask Echo or describe your swing…"
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {
                               e.preventDefault();
@@ -1061,36 +1065,50 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           disabled={isLoading || isRecording || isProcessing}
                           aria-label="Message input"
                           rows={1}
-                          className="w-full resize-none bg-transparent outline-none text-[15px] leading-[1.45] text-gray-900 placeholder:text-gray-500 caret-[#2A9D8F] disabled:opacity-60 disabled:pointer-events-none max-h-[40vh] py-1"
+                          className="block w-full resize-none bg-transparent outline-none text-[15px] leading-[1.5] text-gray-900 placeholder:text-gray-500 caret-[#2A9D8F] disabled:opacity-60 disabled:pointer-events-none max-h-[calc(1.5em*5+2px)]"
                         />
                       </div>
 
-                      {/* Right action - Send/Stop swap */}
-                      <div className="flex items-center gap-1.5">
-                        {/* Stop button (visible when streaming) */}
+                      {/* Right action cluster */}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {/* Mic/Record button with visual state */}
                         <button
                           type="button"
-                          className="hidden data-[streaming=true]:inline-flex h-9 px-4 rounded-full bg-black/5 hover:bg-black/10 text-[14px] border border-black/10 transition active:translate-y-[0.5px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                          aria-label="Stop"
-                          data-streaming={isLoading ? "true" : "false"}
+                          aria-label={isRecording ? "Stop recording" : "Record voice note"}
+                          className={cn(
+                            "h-9 w-9 grid place-items-center rounded-full shadow transition",
+                            "hover:brightness-110 active:brightness-95",
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+                            isRecording 
+                              ? "bg-red-500 text-white" 
+                              : "bg-[#2A9D8F] text-white"
+                          )}
+                          data-recording={isRecording ? "true" : "false"}
+                          onMouseDown={!isProcessing ? startRecording : undefined}
+                          onMouseUp={!isProcessing ? stopRecording : undefined}
+                          onMouseLeave={!isProcessing ? stopRecording : undefined}
+                          onTouchStart={!isProcessing ? startRecording : undefined}
+                          onTouchEnd={!isProcessing ? stopRecording : undefined}
                         >
-                          Stop
+                          {isRecording ? (
+                            <span className="text-[16px]">⏹️</span>
+                          ) : (
+                            <Mic className="h-[18px] w-[18px]" />
+                          )}
                         </button>
 
-                        {/* Send button (hidden when streaming) */}
+                        {/* Send button */}
                         <button
                           type="submit"
                           aria-label="Send"
                           disabled={!inputValue?.trim() || isLoading || isProcessing}
                           className={cn(
-                            "inline-flex data-[streaming=true]:hidden h-9 px-4 rounded-full text-[14px] font-medium shadow transition-all active:translate-y-[0.5px]",
+                            "h-9 w-9 grid place-items-center rounded-full shadow transition",
                             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
                             (!inputValue?.trim() || isLoading || isProcessing)
-                              ? "bg-gray-200 text-gray-500 cursor-not-allowed data-[state=disabled]:opacity-40 data-[state=disabled]:pointer-events-none"
-                              : "bg-[#2A9D8F] text-white hover:brightness-[1.05]"
+                              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                              : "bg-[#2A9D8F] text-white hover:brightness-110 active:brightness-95"
                           )}
-                          data-streaming={isLoading ? "true" : "false"}
-                          data-state={(!inputValue?.trim() || isLoading || isProcessing) ? "disabled" : "enabled"}
                         >
                           {isLoading || isProcessing ? (
                             <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
@@ -1098,11 +1116,23 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                               <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
                             </svg>
                           ) : (
-                            'Send'
+                            <span className="text-[16px]">➤</span>
                           )}
                         </button>
                       </div>
                     </form>
+
+                    {/* Helper row (hints / model chip) - Phase 45 */}
+                    {!inputValue?.trim() && messages.length === 0 && (
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-gray-600">
+                        <div className="px-2.5 py-1 rounded-full bg-white/85 backdrop-blur border border-black/10">
+                          Tip: Shift+Enter for newline
+                        </div>
+                        <div className="px-2.5 py-1 rounded-full bg-white/85 backdrop-blur border border-black/10">
+                          Model: Echo Pro
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Recent history peek */}
