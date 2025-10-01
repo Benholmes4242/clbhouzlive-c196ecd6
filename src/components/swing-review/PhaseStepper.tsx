@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { SwingPhase } from './SwingReview';
 
 interface PhaseStepperProps {
@@ -16,13 +15,13 @@ export const PhaseStepper: React.FC<PhaseStepperProps> = ({
   const getStatusColor = (status: SwingPhase['status']) => {
     switch (status) {
       case 'strong':
-        return 'border-green-500 bg-green-50';
+        return 'border-emerald-300 bg-emerald-50';
       case 'tip':
-        return 'border-amber-500 bg-amber-50';
+        return 'border-amber-300 bg-amber-50';
       case 'fix':
-        return 'border-red-500 bg-red-50';
+        return 'border-red-300 bg-red-50';
       default:
-        return 'border-muted bg-muted/50';
+        return 'border-black/10 bg-white';
     }
   };
 
@@ -41,25 +40,23 @@ export const PhaseStepper: React.FC<PhaseStepperProps> = ({
 
   return (
     <div className="w-full">
-      <h3 className="text-sm font-medium mb-3">Phase Timeline</h3>
       <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-        {phases.map((phase, index) => (
-          <Button
+        {phases.map((phase) => (
+          <button
             key={phase.id}
-            variant="ghost"
-            size="sm"
+            type="button"
             onClick={() => onPhaseSelect(phase)}
             className={`
-              flex-none flex flex-col items-center gap-1 p-2 h-auto min-w-16 rounded-lg border-2 transition-all duration-150
+              flex-none flex flex-col items-center gap-1.5 px-3 py-2 h-auto min-w-[72px] rounded-xl border-2 transition-all
               ${selectedPhase.id === phase.id 
-                ? `${getStatusColor(phase.status)} ring-2 ring-brand-orange/30` 
+                ? `${getStatusColor(phase.status)} ring-1 ring-[#2A9D8F]/35 shadow-[0_2px_12px_rgba(42,157,143,0.15)]` 
                 : getStatusColor(phase.status)
               }
               hover:scale-105 motion-reduce:hover:scale-100
             `}
           >
             {/* Thumbnail or icon */}
-            <div className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-xs border">
+            <div className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-xs border border-black/10">
               {phase.thumbnail ? (
                 <img 
                   src={phase.thumbnail} 
@@ -72,10 +69,10 @@ export const PhaseStepper: React.FC<PhaseStepperProps> = ({
             </div>
             
             {/* Phase name */}
-            <span className="text-xs font-medium text-center leading-tight">
+            <span className="text-[11px] font-medium text-center leading-tight text-gray-900">
               {phase.name}
             </span>
-          </Button>
+          </button>
         ))}
       </div>
     </div>

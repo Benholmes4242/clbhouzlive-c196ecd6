@@ -97,6 +97,28 @@ html, body {
   }
 }
 
+/* Card appear animation */
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Dot pulse animation */
+@keyframes pulseDot {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.18);
+  }
+}
+
 @media (min-width: 640px) {
   :root {
     --echo-top: 64px;
