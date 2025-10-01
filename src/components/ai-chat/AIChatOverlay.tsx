@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen, Bot, Paperclip, ArrowUpRight, Settings } from 'lucide-react';
+import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen, Bot, Paperclip, ArrowUpRight, Settings, Camera } from 'lucide-react';
 import { PiWaveform } from 'react-icons/pi';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -744,9 +744,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           <footer 
             className="sticky bottom-0 z-[1]
                        border-t border-black/10
-                       bg-white/80 backdrop-blur-md
-                       px-3 py-3 sm:px-4 sm:py-3.5
+                       px-3 sm:px-4 py-3 sm:py-4
                        pb-[max(env(safe-area-inset-bottom),12px)]"
+            style={{
+              background: 'linear-gradient(to bottom, rgba(255,255,255,0.70) 0%, rgba(255,255,255,0.92) 100%)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)'
+            }}
             role="region"
             aria-label="Message composer"
             data-echo-composer
@@ -758,15 +762,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             )}
             
-            <div className="mx-auto w-full max-w-screen-md">
+            <div className="mx-auto w-full max-w-[720px]">
               {activeTab === 'chat' && (
                 <div>
                   {/* Main composer pill */}
                   <div 
                     className={cn(
-                      "flex items-center gap-2 rounded-[28px]",
-                      "bg-white/92 backdrop-blur shadow-[0_8px_24px_rgba(0,0,0,0.06)] border border-black/8",
-                      "px-3.5 py-2 sm:px-4 sm:py-2.5",
+                      "flex items-end gap-2 sm:gap-3 rounded-[28px]",
+                      "bg-white/92 backdrop-blur shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-black/10",
+                      "px-3 py-2 sm:px-3.5 sm:py-2.5",
                       "focus-within:ring-2 focus-within:ring-[#2A9D8F]/25",
                       "transition-shadow",
                       isRecording && "ring-2 ring-red-400/30"
@@ -774,60 +778,79 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     role="group"
                     aria-label="Message composer"
                   >
-                    {/* Left buttons */}
-                    <button
-                      type="button"
-                      aria-label="Attach file"
-                      className="
-                        shrink-0 size-9 rounded-full
-                        text-gray-700 hover:bg-black/5 active:bg-black/10
-                        grid place-items-center
-                        transition-colors
-                        disabled:opacity-50 disabled:cursor-not-allowed
-                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40
-                      "
-                      disabled={isLoading || isRecording || isProcessing}
-                    >
-                      <Paperclip className="h-[18px] w-[18px]" />
-                    </button>
+                    {/* Left tool cluster */}
+                    <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                      <button
+                        type="button"
+                        aria-label="Attach file"
+                        className="
+                          h-9 w-9 grid place-items-center rounded-full
+                          text-gray-700 hover:bg-black/5 active:bg-black/10
+                          transition-colors
+                          disabled:opacity-50 disabled:cursor-not-allowed
+                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40
+                        "
+                        disabled={isLoading || isRecording || isProcessing}
+                      >
+                        <Paperclip className="h-[18px] w-[18px]" />
+                      </button>
+                      
+                      <button
+                        type="button"
+                        aria-label="Open camera"
+                        className="
+                          h-9 w-9 grid place-items-center rounded-full
+                          text-gray-700 hover:bg-black/5 active:bg-black/10
+                          transition-colors
+                          disabled:opacity-50 disabled:cursor-not-allowed
+                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40
+                        "
+                        disabled={isLoading || isRecording || isProcessing}
+                      >
+                        <Camera className="h-[18px] w-[18px]" />
+                      </button>
+                    </div>
 
                     {/* Textarea */}
-                    <Textarea
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      placeholder="Message Echo…"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          sendMessage(inputValue);
-                        }
-                      }}
-                      disabled={isLoading || isRecording || isProcessing}
-                      aria-label="Message"
-                      className="
-                        flex-1 min-w-0 resize-none border-0 bg-transparent outline-none
-                        text-[15px] sm:text-[15.5px] leading-[1.45] text-gray-900
-                        placeholder:text-gray-500
-                        px-0 py-0.5 min-h-[24px] max-h-[36vh]
-                        focus-visible:ring-0 focus-visible:ring-offset-0
-                        overflow-y-auto scrollbar-thin
-                      "
-                      rows={1}
-                      style={{ 
-                        height: 'auto'
-                      }}
-                      onInput={(e) => {
-                        const target = e.target as HTMLTextAreaElement;
-                        target.style.height = 'auto';
-                        const vh = window.innerHeight * 0.36;
-                        const newHeight = Math.min(target.scrollHeight, vh);
-                        target.style.height = `${newHeight}px`;
-                        target.style.overflowY = target.scrollHeight > vh ? 'auto' : 'hidden';
-                      }}
-                    />
+                    <div className="flex-1 min-w-0">
+                      <Textarea
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        placeholder="Ask Echo or describe your swing…"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            sendMessage(inputValue);
+                          }
+                        }}
+                        disabled={isLoading || isRecording || isProcessing}
+                        aria-label="Message"
+                        className="
+                          w-full resize-none bg-transparent outline-none
+                          text-[15px] sm:text-[16px] leading-[1.45] text-gray-900
+                          placeholder:text-gray-500
+                          px-0 py-2 min-h-[40px] sm:min-h-[44px] max-h-[36vh]
+                          focus-visible:ring-0 focus-visible:ring-offset-0
+                          border-0
+                          overflow-y-auto scrollbar-thin
+                        "
+                        rows={1}
+                        style={{ 
+                          height: 'auto'
+                        }}
+                        onInput={(e) => {
+                          const target = e.target as HTMLTextAreaElement;
+                          target.style.height = 'auto';
+                          const vh = window.innerHeight * 0.36;
+                          const newHeight = Math.min(target.scrollHeight, vh);
+                          target.style.height = `${newHeight}px`;
+                          target.style.overflowY = target.scrollHeight > vh ? 'auto' : 'hidden';
+                        }}
+                      />
+                    </div>
 
-                    {/* Right actions */}
-                    <div className="flex items-center gap-1 shrink-0">
+                    {/* Right tool cluster */}
+                    <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                       {/* Mic button with pulse when recording */}
                       {!inputValue?.trim() && (
                         <div className="relative">
@@ -836,9 +859,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           )}
                           <button
                             type="button"
-                            aria-label={isRecording ? "Recording" : "Start voice input"}
+                            aria-label={isRecording ? "Recording" : "Voice input"}
                             className={cn(
-                              "size-9 rounded-full grid place-items-center transition-colors",
+                              "h-9 w-9 grid place-items-center rounded-full transition-colors",
                               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
                               isRecording
                                 ? "text-red-600 bg-red-50"
@@ -861,12 +884,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         aria-label="Send message"
                         disabled={!inputValue?.trim() || isLoading || isProcessing}
                         className={cn(
-                          "shrink-0 rounded-full px-3.5 h-9 text-[14px] font-medium",
+                          "shrink-0 rounded-full h-9 sm:h-10 px-4 sm:px-5",
+                          "text-[14px] sm:text-[15px] font-medium",
                           "transition-all",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 focus-visible:ring-offset-2",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/30",
                           (!inputValue?.trim() || isLoading || isProcessing)
                             ? "bg-[#2A9D8F]/15 text-[#2A9D8F]/60 cursor-default shadow-none"
-                            : "bg-[#2A9D8F] text-white shadow-[0_6px_18px_rgba(42,157,143,0.45)] hover:brightness-105 active:scale-[0.98]"
+                            : "bg-[#2A9D8F] text-white shadow-[0_10px_24px_rgba(42,157,143,0.25)] hover:bg-[#268C83] active:scale-[0.99]"
                         )}
                         onClick={() => sendMessage(inputValue)}
                       >
