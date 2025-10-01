@@ -55,7 +55,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
   const [activeTab, setActiveTab] = useState('chat');
   const [analysisText, setAnalysisText] = useState('');
   const [swingCoachAnalysisText, setSwingCoachAnalysisText] = useState('');
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+  const [newMessageCount, setNewMessageCount] = useState(0);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   // Echo Protection System
@@ -172,13 +175,19 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
   const scrollToBottom = () => {
     setTimeout(() => {
-      if (scrollAreaRef.current) {
-        const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-        if (scrollContainer) {
-          scrollContainer.scrollTop = scrollContainer.scrollHeight;
-        }
+      if (chatScrollRef.current) {
+        chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+        setShowScrollToBottom(false);
+        setNewMessageCount(0);
       }
     }, 100);
+  };
+
+  // Track scroll position for "back to latest" FAB
+  const handleChatScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.currentTarget;
+    const isNearBottom = target.scrollHeight - target.scrollTop - target.clientHeight < 100;
+    setShowScrollToBottom(!isNearBottom && messages.length > 3);
   };
 
   useEffect(() => {
@@ -567,7 +576,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               <div 
                 className="relative h-full overflow-y-auto overscroll-y-contain scroll-smooth [-webkit-overflow-scrolling:touch] pt-10 pb-24"
                 data-echo-canvas
-                ref={chatAutoScroll.scrollAreaRef}
+                ref={chatScrollRef}
+                onScroll={handleChatScroll}
               >
                 {/* Top vignette */}
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-white/75 to-transparent" />
@@ -642,9 +652,35 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                          </div>
                        </div>
                      </div>
-                   )}
-                        </div>
-                      )}
+                    )}
+                         </div>
+                       )}
+
+                {/* "New messages" pill - shows when scrolled up and new messages arrive */}
+                {newMessageCount > 0 && (
+                  <div className="sticky bottom-20 sm:bottom-24 z-10 flex justify-center pointer-events-none">
+                    <div className="px-3 py-1.5 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[12px] text-gray-700 float-in">
+                      {newMessageCount} new {newMessageCount === 1 ? 'message' : 'messages'}
+                    </div>
+                  </div>
+                )}
+
+                {/* "Back to Latest" FAB - shows when scrolled up */}
+                {showScrollToBottom && (
+                  <button
+                    onClick={scrollToBottom}
+                    className="pointer-events-auto fixed right-3 sm:right-4 z-20 h-11 px-4 rounded-full bg-white/92 backdrop-blur border border-black/10 shadow-[0_10px_28px_rgba(0,0,0,0.12)] text-[14px] font-medium text-gray-900 flex items-center gap-2 hover:bg-white active:scale-[0.98] transition-all float-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                    style={{
+                      bottom: `calc(64px + max(env(safe-area-inset-bottom), 16px))`
+                    }}
+                    aria-label="Back to latest"
+                  >
+                    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 3a1 1 0 011 1v10.586l2.293-2.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V4a1 1 0 011-1z" clipRule="evenodd" />
+                    </svg>
+                    Latest
+                  </button>
+                )}
                 </div>
               </div>
             </TabsContent>

@@ -53,6 +53,22 @@
   display: none !important;
 }
 
+/* Float-in animation for FAB and pills */
+@keyframes floatInUp {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.float-in {
+  animation: floatInUp 0.18s ease-out both;
+}
+
 /* Ultra-small screen optimizations for composer */
 @media (max-width: 360px) {
   .composer-compact {
