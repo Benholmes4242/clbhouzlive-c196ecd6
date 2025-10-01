@@ -899,121 +899,116 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                 Last 7 Days
                               </h3>
-                              <div className="space-y-4">
+                                <div className="space-y-3 sm:space-y-4">
                                  {last7Days.map((conversation) => (
-                                  <article 
-                                    key={conversation.id} 
-                                    className="group block overflow-hidden rounded-2xl bg-white/92 backdrop-blur border border-black/10 shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.08)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                                    onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
-                                    role="button"
-                                    tabIndex={0}
-                                    aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter' || e.key === ' ') {
-                                        e.preventDefault();
-                                        if (!(expandedCard?.type === 'chat' && expandedCard?.id === conversation.id)) {
-                                          handleExpansion('chat', conversation.id);
-                                        }
-                                      }
-                                    }}
-                                  >
-                                    
-                                    {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? (
-                                      <div className="p-4 sm:p-5">
-                                        <div className="flex justify-between items-center mb-3">
-                                          <h3 className="text-[17px] font-semibold text-gray-900">
-                                            {conversation.customTitle || conversation.title}
-                                          </h3>
-                                          <button 
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              setExpandedCard(null);
-                                            }}
-                                            aria-label="Collapse" 
-                                            className="p-2 rounded-full hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                                          >
-                                            <ChevronUp className="h-4 w-4" />
-                                          </button>
-                                        </div>
+                                   <article 
+                                     key={conversation.id} 
+                                     className="group block overflow-hidden rounded-2xl bg-white/90 backdrop-blur border border-black/10 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                                     onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
+                                     role="button"
+                                     tabIndex={0}
+                                     aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
+                                     onKeyDown={(e) => {
+                                       if (e.key === 'Enter' || e.key === ' ') {
+                                         e.preventDefault();
+                                         if (!(expandedCard?.type === 'chat' && expandedCard?.id === conversation.id)) {
+                                           handleExpansion('chat', conversation.id);
+                                         }
+                                       }
+                                     }}
+                                   >
+                                     
+                                     {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? (
+                                       <div className="px-4 py-3 sm:px-5 sm:py-4">
+                                         <div className="flex justify-between items-center mb-3">
+                                           <h3 className="text-[17px] font-semibold text-gray-900">
+                                             {conversation.customTitle || conversation.title}
+                                           </h3>
+                                           <button 
+                                             onClick={(e) => {
+                                               e.stopPropagation();
+                                               setExpandedCard(null);
+                                             }}
+                                             aria-label="Collapse" 
+                                             className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                                           >
+                                             <ChevronUp className="h-4 w-4 text-gray-600" />
+                                           </button>
+                                         </div>
 
-                                        <div className="space-y-3 max-h-80 overflow-y-auto">
-                                          {conversation.messages.map((message) => (
-                                            <div
-                                              key={message.id}
-                                              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-                                            >
-                                              <div
-                                                className={`
-                                                  max-w-[75%] px-3 py-2 rounded-xl text-sm
-                                                  ${message.type === 'user'
-                                                    ? 'bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] text-white rounded-br-none'
-                                                    : 'bg-gray-100 text-gray-900 rounded-bl-none'}
-                                                `}
-                                              >
-                                                {message.content}
-                                              </div>
-                                            </div>
-                                          ))}
-                                        </div>
+                                         <div className="space-y-3 max-h-80 overflow-y-auto">
+                                           {conversation.messages.map((message) => (
+                                             <div
+                                               key={message.id}
+                                               className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                                             >
+                                               <div
+                                                 className={`
+                                                   max-w-[75%] px-3 py-2 rounded-xl text-sm
+                                                   ${message.type === 'user'
+                                                     ? 'bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] text-white rounded-br-none'
+                                                     : 'bg-gray-100 text-gray-900 rounded-bl-none'}
+                                                 `}
+                                               >
+                                                 {message.content}
+                                               </div>
+                                             </div>
+                                           ))}
+                                         </div>
 
-                                        <div className="mt-3 flex justify-end">
-                                          <button 
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              const lastUserMessage = conversation.messages.filter(m => m.type === 'user').pop();
-                                              if (lastUserMessage) {
-                                                onSelectMessage(lastUserMessage.content);
-                                                onClose();
-                                              }
-                                            }}
-                                            className="text-sm font-medium text-[#2A9D8F] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 rounded"
-                                          >
-                                            Use this response
-                                          </button>
-                                        </div>
-                                      </div>
-                                    ) : (
-                                      <>
-                                        {/* Top row */}
-                                        <div className="flex items-center gap-3 px-4 sm:px-5 pt-4">
-                                          {/* Avatar */}
-                                          <div className="h-9 w-9 rounded-full grid place-items-center bg-white/85 border border-black/10 shadow-sm text-[18px]">
-                                            🗨️
-                                          </div>
-                                          
-                                          {/* Title + date */}
-                                          <div className="min-w-0 flex-1">
-                                            <div className="flex items-center gap-2 min-w-0">
-                                              <h3 className="truncate text-[16px] sm:text-[17px] font-semibold text-gray-900">
-                                                {conversation.customTitle || conversation.title}
-                                              </h3>
-                                              <span className="shrink-0 text-[11px] text-gray-500">•</span>
-                                              <time className="shrink-0 text-[11px] text-gray-500">
-                                                {conversation.timestamp.toLocaleDateString()}
-                                              </time>
-                                            </div>
-                                            <p className="truncate text-[13px] text-gray-600/90 mt-0.5">
-                                              {conversation.messages.find(m => m.type === 'user')?.content}
-                                            </p>
-                                          </div>
-                                          
-                                          {/* Trailing chevron */}
-                                          <div className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400">
-                                            ➔
-                                          </div>
-                                        </div>
-                                        
-                                        {/* Meta row */}
-                                        <div className="mt-3 px-4 sm:px-5 pb-4 flex flex-wrap items-center gap-2">
-                                          <span className="h-7 px-2.5 rounded-full bg-white/90 border border-black/10 text-[12px] text-gray-700">
-                                            Chat • {conversation.messages.length} msgs
-                                          </span>
-                                        </div>
-                                      </>
-                                    )}
-                                  </article>
-                                ))}
-                              </div>
+                                         <div className="mt-3 flex justify-end">
+                                           <button 
+                                             onClick={(e) => {
+                                               e.stopPropagation();
+                                               const lastUserMessage = conversation.messages.filter(m => m.type === 'user').pop();
+                                               if (lastUserMessage) {
+                                                 onSelectMessage(lastUserMessage.content);
+                                                 onClose();
+                                               }
+                                             }}
+                                             className="text-sm font-medium text-[#2A9D8F] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 rounded"
+                                           >
+                                             Use this response
+                                           </button>
+                                         </div>
+                                       </div>
+                                     ) : (
+                                       <div className="px-4 py-3 sm:px-5 sm:py-4">
+                                         <div className="flex items-start gap-3">
+                                           <div className="shrink-0 h-9 w-9 rounded-xl grid place-items-center bg-white/85 backdrop-blur border border-black/10">
+                                             <MessageCircle className="h-4 w-4 text-gray-600" />
+                                           </div>
+                                           <div className="min-w-0 flex-1">
+                                             <div className="flex items-center gap-2 min-w-0">
+                                               <h3 className="truncate text-[15px] sm:text-[16px] font-semibold text-gray-900">
+                                                 {conversation.customTitle || conversation.title}
+                                               </h3>
+                                               <div className="ml-auto hidden sm:flex items-center gap-1">
+                                                 <span className="px-2 py-0.5 rounded-full text-[11px] bg-black/[.04] border border-black/10 text-gray-700">
+                                                   Chat
+                                                 </span>
+                                               </div>
+                                             </div>
+                                             <p className="mt-1 line-clamp-2 text-[13px] sm:text-[14px] leading-[1.5] text-gray-700/90">
+                                               {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
+                                             </p>
+                                             <div className="mt-2 flex items-center gap-3 text-[12px] text-gray-500">
+                                               <span>{conversation.timestamp.toLocaleDateString()}</span>
+                                               <span className="h-3 w-px bg-black/10"></span>
+                                               <span>{conversation.messages.length} messages</span>
+                                               <span className="ml-auto opacity-70 group-hover:opacity-100 transition">
+                                                 <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                   <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+                                                 </svg>
+                                               </span>
+                                             </div>
+                                           </div>
+                                         </div>
+                                       </div>
+                                     )}
+                                   </article>
+                                 ))}
+                               </div>
                             </div>
                           );
                         })()}
@@ -1032,50 +1027,47 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                 This Month
                               </h3>
-                              <div className="space-y-4">
+                              <div className="space-y-3 sm:space-y-4">
                                 {thisMonth.map((conversation) => (
                                   <article 
                                     key={conversation.id} 
-                                    className="group block overflow-hidden rounded-2xl bg-white/92 backdrop-blur border border-black/10 shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.08)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                                    onClick={() => handleExpansion('chat', conversation.id)}
+                                    className="group block overflow-hidden rounded-2xl bg-white/90 backdrop-blur border border-black/10 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                                    onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
                                     role="button"
                                     tabIndex={0}
                                     aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
                                   >
-                                    {/* Top row */}
-                                    <div className="flex items-center gap-3 px-4 sm:px-5 pt-4">
-                                      {/* Avatar */}
-                                      <div className="h-9 w-9 rounded-full grid place-items-center bg-white/85 border border-black/10 shadow-sm text-[18px]">
-                                        🗨️
-                                      </div>
-                                      
-                                      {/* Title + date */}
-                                      <div className="min-w-0 flex-1">
-                                        <div className="flex items-center gap-2 min-w-0">
-                                          <h3 className="truncate text-[16px] sm:text-[17px] font-semibold text-gray-900">
-                                            {conversation.customTitle || conversation.title}
-                                          </h3>
-                                          <span className="shrink-0 text-[11px] text-gray-500">•</span>
-                                          <time className="shrink-0 text-[11px] text-gray-500">
-                                            {conversation.timestamp.toLocaleDateString()}
-                                          </time>
+                                    <div className="px-4 py-3 sm:px-5 sm:py-4">
+                                      <div className="flex items-start gap-3">
+                                        <div className="shrink-0 h-9 w-9 rounded-xl grid place-items-center bg-white/85 backdrop-blur border border-black/10">
+                                          <MessageCircle className="h-4 w-4 text-gray-600" />
                                         </div>
-                                        <p className="truncate text-[13px] text-gray-600/90 mt-0.5">
-                                          {conversation.messages.find(m => m.type === 'user')?.content}
-                                        </p>
+                                        <div className="min-w-0 flex-1">
+                                          <div className="flex items-center gap-2 min-w-0">
+                                            <h3 className="truncate text-[15px] sm:text-[16px] font-semibold text-gray-900">
+                                              {conversation.customTitle || conversation.title}
+                                            </h3>
+                                            <div className="ml-auto hidden sm:flex items-center gap-1">
+                                              <span className="px-2 py-0.5 rounded-full text-[11px] bg-black/[.04] border border-black/10 text-gray-700">
+                                                Chat
+                                              </span>
+                                            </div>
+                                          </div>
+                                          <p className="mt-1 line-clamp-2 text-[13px] sm:text-[14px] leading-[1.5] text-gray-700/90">
+                                            {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
+                                          </p>
+                                          <div className="mt-2 flex items-center gap-3 text-[12px] text-gray-500">
+                                            <span>{conversation.timestamp.toLocaleDateString()}</span>
+                                            <span className="h-3 w-px bg-black/10"></span>
+                                            <span>{conversation.messages.length} messages</span>
+                                            <span className="ml-auto opacity-70 group-hover:opacity-100 transition">
+                                              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+                                              </svg>
+                                            </span>
+                                          </div>
+                                        </div>
                                       </div>
-                                      
-                                      {/* Trailing chevron */}
-                                      <div className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400">
-                                        ➔
-                                      </div>
-                                    </div>
-                                    
-                                    {/* Meta row */}
-                                    <div className="mt-3 px-4 sm:px-5 pb-4 flex flex-wrap items-center gap-2">
-                                      <span className="h-7 px-2.5 rounded-full bg-white/90 border border-black/10 text-[12px] text-gray-700">
-                                        Chat • {conversation.messages.length} msgs
-                                      </span>
                                     </div>
                                    </article>
                                 ))}
@@ -1098,50 +1090,47 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                 Older
                               </h3>
-                              <div className="space-y-4">
+                              <div className="space-y-3 sm:space-y-4">
                                 {older.map((conversation) => (
                                   <article 
                                     key={conversation.id} 
-                                    className="group block overflow-hidden rounded-2xl bg-white/92 backdrop-blur border border-black/10 shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.08)] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                                    onClick={() => handleExpansion('chat', conversation.id)}
+                                    className="group block overflow-hidden rounded-2xl bg-white/90 backdrop-blur border border-black/10 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                                    onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
                                     role="button"
                                     tabIndex={0}
                                     aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
                                   >
-                                    {/* Top row */}
-                                    <div className="flex items-center gap-3 px-4 sm:px-5 pt-4">
-                                      {/* Avatar */}
-                                      <div className="h-9 w-9 rounded-full grid place-items-center bg-white/85 border border-black/10 shadow-sm text-[18px]">
-                                        🗨️
-                                      </div>
-                                      
-                                      {/* Title + date */}
-                                      <div className="min-w-0 flex-1">
-                                        <div className="flex items-center gap-2 min-w-0">
-                                          <h3 className="truncate text-[16px] sm:text-[17px] font-semibold text-gray-900">
-                                            {conversation.customTitle || conversation.title}
-                                          </h3>
-                                          <span className="shrink-0 text-[11px] text-gray-500">•</span>
-                                          <time className="shrink-0 text-[11px] text-gray-500">
-                                            {conversation.timestamp.toLocaleDateString()}
-                                          </time>
+                                    <div className="px-4 py-3 sm:px-5 sm:py-4">
+                                      <div className="flex items-start gap-3">
+                                        <div className="shrink-0 h-9 w-9 rounded-xl grid place-items-center bg-white/85 backdrop-blur border border-black/10">
+                                          <MessageCircle className="h-4 w-4 text-gray-600" />
                                         </div>
-                                        <p className="truncate text-[13px] text-gray-600/90 mt-0.5">
-                                          {conversation.messages.find(m => m.type === 'user')?.content}
-                                        </p>
+                                        <div className="min-w-0 flex-1">
+                                          <div className="flex items-center gap-2 min-w-0">
+                                            <h3 className="truncate text-[15px] sm:text-[16px] font-semibold text-gray-900">
+                                              {conversation.customTitle || conversation.title}
+                                            </h3>
+                                            <div className="ml-auto hidden sm:flex items-center gap-1">
+                                              <span className="px-2 py-0.5 rounded-full text-[11px] bg-black/[.04] border border-black/10 text-gray-700">
+                                                Chat
+                                              </span>
+                                            </div>
+                                          </div>
+                                          <p className="mt-1 line-clamp-2 text-[13px] sm:text-[14px] leading-[1.5] text-gray-700/90">
+                                            {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
+                                          </p>
+                                          <div className="mt-2 flex items-center gap-3 text-[12px] text-gray-500">
+                                            <span>{conversation.timestamp.toLocaleDateString()}</span>
+                                            <span className="h-3 w-px bg-black/10"></span>
+                                            <span>{conversation.messages.length} messages</span>
+                                            <span className="ml-auto opacity-70 group-hover:opacity-100 transition">
+                                              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+                                              </svg>
+                                            </span>
+                                          </div>
+                                        </div>
                                       </div>
-                                      
-                                      {/* Trailing chevron */}
-                                      <div className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400">
-                                        ➔
-                                      </div>
-                                    </div>
-                                    
-                                    {/* Meta row */}
-                                    <div className="mt-3 px-4 sm:px-5 pb-4 flex flex-wrap items-center gap-2">
-                                      <span className="h-7 px-2.5 rounded-full bg-white/90 border border-black/10 text-[12px] text-gray-700">
-                                        Chat • {conversation.messages.length} msgs
-                                      </span>
                                     </div>
                                   </article>
                                 ))}
@@ -1230,7 +1219,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                  Last 7 Days
                                </h3>
-                               <div className="space-y-4">
+                               <div className="space-y-3 sm:space-y-4">
                                 {last7Days.map((analysis) => (
                                   <SwingAnalysisCard
                                     key={analysis.id}
@@ -1258,7 +1247,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                  This Month
                                </h3>
-                               <div className="space-y-4">
+                               <div className="space-y-3 sm:space-y-4">
                                 {thisMonth.map((analysis) => (
                                   <SwingAnalysisCard
                                     key={analysis.id}
@@ -1286,7 +1275,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                  Older
                                </h3>
-                               <div className="space-y-4">
+                               <div className="space-y-3 sm:space-y-4">
                                 {older.map((analysis) => (
                                   <SwingAnalysisCard
                                     key={analysis.id}
