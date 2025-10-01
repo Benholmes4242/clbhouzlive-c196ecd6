@@ -143,7 +143,7 @@ interface AIChatHistoryProps {
 }
 
 // Swing Analysis Card Component
-const SwingAnalysisCard: React.FC<{
+  const SwingAnalysisCard: React.FC<{
   analysis: SwingAnalysis;
   onDelete: () => void;
   isExpanded: boolean;
@@ -166,9 +166,8 @@ const SwingAnalysisCard: React.FC<{
   return (
     <div 
       ref={cardRef}
-      className={`rounded-2xl bg-white/92 backdrop-blur shadow px-4 py-3 sm:px-5 sm:py-4 hover:-translate-y-0.5 transition-all duration-200 flex flex-col ${isExpanded ? 'shadow-lg h-auto' : ''}`}
+      className={`group rounded-2xl bg-white/92 backdrop-blur border border-black/10 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all px-4 py-3 sm:px-5 sm:py-4 cursor-pointer flex flex-col ${isExpanded ? 'shadow-lg' : ''}`}
       onClick={!isExpanded ? onToggleExpand : undefined}
-      style={{ cursor: !isExpanded ? 'pointer' : 'default' }}
     >
       {/* Collapsed Header */}
       <div className="flex-1 flex flex-col">
@@ -771,12 +770,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
                   {/* Chat Tab */}
                   <TabsContent value="chat" className="m-0 flex-1" style={{ minHeight: 0 }} role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
-                    <div 
-                      className="h-full overflow-y-auto px-3 sm:px-4 pt-4 pb-6"
-                      data-echo-canvas
-                      ref={chatAutoScroll.scrollAreaRef}
-                    >
-                      <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-5 space-y-4">
+                      <div 
+                        className="h-full overflow-y-auto px-3 sm:px-4 pt-4 pb-6"
+                        data-echo-canvas
+                        ref={chatAutoScroll.scrollAreaRef}
+                      >
+                        <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-5">
                     {loadingStates.conversations ? (
                       <>
                         <SkeletonCard />
@@ -810,7 +809,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                 Last 7 Days
                               </h3>
-                              <div className="space-y-3">
+                              <div className="space-y-4">
                                 {last7Days.map((conversation) => (
                                   <article 
                                     key={conversation.id} 
@@ -922,7 +921,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                 This Month
                               </h3>
-                              <div className="space-y-3">
+                              <div className="space-y-4">
                                 {thisMonth.map((conversation) => (
                                   <article 
                                     key={conversation.id} 
@@ -982,7 +981,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                 Older
                               </h3>
-                              <div className="space-y-3">
+                              <div className="space-y-4">
                                 {older.map((conversation) => (
                                   <article 
                                     key={conversation.id} 
@@ -1035,12 +1034,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
                   {/* Swing Coach Tab */}
                   <TabsContent value="swing" className="m-0 flex-1" style={{ minHeight: 0 }} role="tabpanel" id="swing-panel" aria-labelledby="swing-tab">
-                    <div 
-                      className="h-full overflow-y-auto px-3 sm:px-4 pt-4 pb-6"
-                      data-echo-canvas
-                      ref={swingAutoScroll.scrollAreaRef}
-                    >
-                       <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-5 space-y-4">
+                     <div 
+                       className="h-full overflow-y-auto px-3 sm:px-4 pt-4 pb-6"
+                       data-echo-canvas
+                       ref={swingAutoScroll.scrollAreaRef}
+                     >
+                        <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-5">
                     {loadingStates.swingAnalyses ? (
                       <>
                         <SkeletonCard />
@@ -1069,12 +1068,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           
                           if (last7Days.length === 0) return null;
                           
-                          return (
-                            <div>
-                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
-                                Last 7 Days
-                              </h3>
-                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
+                           return (
+                             <div>
+                               <h3 className="text-[13px] font-medium text-gray-700 mb-3">
+                                 Last 7 Days
+                               </h3>
+                               <div className="space-y-4">
                                 {last7Days.map((analysis) => (
                                   <SwingAnalysisCard
                                     key={analysis.id}
@@ -1097,12 +1096,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           
                           if (thisMonth.length === 0) return null;
                           
-                          return (
-                            <div>
-                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
-                                This Month
-                              </h3>
-                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
+                           return (
+                             <div>
+                               <h3 className="text-[13px] font-medium text-gray-700 mb-3">
+                                 This Month
+                               </h3>
+                               <div className="space-y-4">
                                 {thisMonth.map((analysis) => (
                                   <SwingAnalysisCard
                                     key={analysis.id}
@@ -1125,12 +1124,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           
                           if (older.length === 0) return null;
                           
-                          return (
-                            <div>
-                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
-                                Older
-                              </h3>
-                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
+                           return (
+                             <div>
+                               <h3 className="text-[13px] font-medium text-gray-700 mb-3">
+                                 Older
+                               </h3>
+                               <div className="space-y-4">
                                 {older.map((analysis) => (
                                   <SwingAnalysisCard
                                     key={analysis.id}
