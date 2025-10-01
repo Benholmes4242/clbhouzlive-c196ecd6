@@ -351,20 +351,21 @@ const SwingAnalysisCard: React.FC<{
 
 // Skeleton Loading Component
 const SkeletonCard: React.FC = () => (
-  <div className="rounded-2xl bg-white/92 backdrop-blur shadow px-4 py-3 sm:px-5 sm:py-4 animate-pulse">
-    <div className="flex items-start justify-between mb-2">
-      <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-      <div className="h-3 bg-gray-200 rounded w-16"></div>
-    </div>
-    <div className="space-y-2 mb-3">
-      <div className="h-3 bg-gray-200 rounded w-full"></div>
-      <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-    </div>
-    <div className="flex items-center justify-between">
-      <div className="h-6 bg-gray-200 rounded-full w-20"></div>
-      <div className="flex gap-1">
-        <div className="h-8 w-8 bg-gray-200 rounded-md"></div>
-        <div className="h-8 w-8 bg-gray-200 rounded-md"></div>
+  <div className="rounded-2xl overflow-hidden border border-black/[0.06] bg-white animate-pulse">
+    {/* Video skeleton */}
+    <div className="h-40 bg-black/10" />
+    
+    {/* Content skeleton */}
+    <div className="px-4 sm:px-5 py-4 space-y-3">
+      {/* Header lines */}
+      <div className="h-3 rounded bg-black/10 w-2/3" />
+      <div className="h-3 rounded bg-black/10 w-1/2" />
+      <div className="h-3 rounded bg-black/10 w-3/4" />
+      
+      {/* Button skeletons */}
+      <div className="flex gap-2 pt-2">
+        <div className="h-9 rounded-full bg-black/10 w-24" />
+        <div className="h-9 rounded-full bg-black/10 w-24" />
       </div>
     </div>
   </div>
@@ -376,12 +377,12 @@ const EmptyState: React.FC<{
   title: string; 
   subtitle: string;
 }> = ({ icon, title, subtitle }) => (
-  <div className="flex flex-col items-center justify-center py-12 text-center">
-    <div className="text-gray-400 mb-4">
+  <div className="rounded-2xl border border-black/[0.06] bg-white/92 px-5 py-8 text-center">
+    <div className="h-12 w-12 rounded-full bg-black/[0.04] mx-auto mb-3 flex items-center justify-center text-gray-400">
       {icon}
     </div>
-    <h3 className="text-sm font-medium text-gray-900 mb-1">{title}</h3>
-    <p className="text-xs text-gray-500">{subtitle}</p>
+    <h3 className="text-[16px] font-semibold text-gray-900 mb-1">{title}</h3>
+    <p className="text-[14px] text-gray-600">{subtitle}</p>
   </div>
 );
 
@@ -390,20 +391,18 @@ const ErrorState: React.FC<{
   message: string; 
   onRetry: () => void;
 }> = ({ message, onRetry }) => (
-  <div className="flex flex-col items-center justify-center py-8 text-center">
-    <div className="text-red-400 mb-4">
-      <AlertCircle className="h-8 w-8" />
+  <div className="rounded-2xl border border-black/[0.06] bg-white/92 px-5 py-8 text-center">
+    <div className="h-12 w-12 rounded-full bg-red-50 mx-auto mb-3 flex items-center justify-center">
+      <AlertCircle className="h-6 w-6 text-red-600" />
     </div>
-    <p className="text-sm text-red-600 mb-4">{message}</p>
-    <Button
-      variant="outline"
-      size="sm"
+    <p className="text-[14px] text-red-700 mb-4">{message}</p>
+    <button
       onClick={onRetry}
-      className="bg-red-50 hover:bg-red-100 border-red-200 text-red-700 rounded-full px-4 py-1.5 text-xs h-auto font-medium transition-colors"
+      className="h-9 px-4 rounded-full border border-black/10 bg-white text-[14px] text-gray-700 hover:bg-gray-50 transition inline-flex items-center gap-1.5"
     >
-      <RotateCcw className="h-3 w-3 mr-1" />
+      <RotateCcw className="h-3 w-3" />
       Retry
-    </Button>
+    </button>
   </div>
 );
 
