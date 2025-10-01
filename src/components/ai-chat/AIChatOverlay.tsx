@@ -728,20 +728,20 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           {/* Composer footer */}
           <footer 
             className="sticky bottom-0 z-[1]
-                       border-t border-white/10
+                       border-t border-black/5
                        bg-gradient-to-b from-white/70 to-white/90
-                       backdrop-blur supports-[backdrop-filter]:backdrop-blur-md"
+                       backdrop-blur-md"
             data-echo-composer
           >
-            <div className="mx-auto w-full max-w-[900px] px-3 sm:px-5 pb-[max(env(safe-area-inset-bottom),12px)] pt-3">
+            <div className="mx-auto w-full max-w-screen-md px-3 sm:px-4 pb-[max(env(safe-area-inset-bottom),12px)] pt-3">
               {activeTab === 'chat' && (
                 <div>
                   {/* Recording state overlay */}
                   {isRecording && (
                     <div className="
                       mb-2 flex items-center gap-2 rounded-[14px]
-                      bg-white/90 border border-black/10 px-3 py-2
-                      shadow-sm backdrop-blur
+                      bg-white/90 backdrop-blur border border-black/10 px-3 py-2
+                      shadow-sm
                     ">
                       <div className="h-6 flex-1 bg-gradient-to-r from-[#2A9D8F]/20 to-transparent rounded relative overflow-hidden">
                         <span className="absolute inset-y-0 left-2 flex items-center text-[11px] text-[#2A9D8F] font-medium">
@@ -750,16 +750,17 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       </div>
                       <button 
                         type="button"
-                        className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5" 
+                        className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/45" 
                         onClick={stopRecording}
-                        aria-label="Stop recording"
+                        aria-label="Cancel recording"
                       >
                         <MicOff className="h-4 w-4 text-red-600" />
                       </button>
                       <button 
                         type="button"
-                        className="h-8 px-3 rounded-full bg-[#2A9D8F] text-white text-sm hover:brightness-105" 
+                        className="h-8 px-3 rounded-full bg-[#2A9D8F] text-white text-[13px] hover:brightness-[1.05] active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/45" 
                         onClick={stopRecording}
+                        aria-label="Use recording"
                       >
                         Use
                       </button>
@@ -768,37 +769,42 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
                   {/* Main composer pill */}
                   <div className="
-                    w-full rounded-[var(--composer-radius)]
-                    bg-[var(--composer-bg)] border border-[var(--composer-brd)]
-                    shadow-[var(--composer-shadow)]
-                    px-[var(--composer-pad-x)] py-[var(--composer-pad-y)]
+                    w-full rounded-[28px] min-h-[46px]
+                    bg-white/92 backdrop-blur border border-black/8
+                    shadow-md
+                    px-3 py-2
                     flex items-end gap-2
+                    focus-within:ring-2 focus-within:ring-[#2A9D8F]/35 focus-within:border-transparent
+                    transition-shadow
                   ">
                     {/* Left buttons */}
                     <div className="flex items-center gap-1.5 shrink-0">
                       <button
                         type="button"
-                        aria-label="Attach"
+                        aria-label="Attach file"
                         className="
-                          h-[var(--btn-size)] w-[var(--btn-size)] rounded-full
-                          bg-white/90 border border-[var(--btn-brd)]
-                          hover:bg-white transition
+                          h-9 w-9 rounded-full
+                          text-gray-500 hover:text-gray-700
+                          hover:bg-black/5 active:bg-black/10
                           grid place-items-center
+                          transition-colors
                           disabled:opacity-50 disabled:cursor-not-allowed
+                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/45
                         "
                         disabled={isLoading || isRecording || isProcessing}
                       >
-                        <Paperclip className="h-5 w-5 text-gray-700" />
+                        <Paperclip className="h-[18px] w-[18px]" />
                       </button>
 
                       <button
                         type="button"
-                        aria-label="Start voice"
+                        aria-label={isRecording ? "Recording" : "Start voice input"}
                         className={cn(
-                          "h-[var(--btn-size)] w-[var(--btn-size)] rounded-full grid place-items-center transition",
+                          "h-9 w-9 rounded-full grid place-items-center transition-all",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/45",
                           isRecording
-                            ? "bg-[#2A9D8F]/15 border border-[#2A9D8F]/40 ring-4 ring-[#2A9D8F]/20"
-                            : "bg-white/90 border border-[var(--btn-brd)] hover:bg-white"
+                            ? "bg-[#2A9D8F]/15 border border-[#2A9D8F]/40 ring-4 ring-[#2A9D8F]/20 text-[#2A9D8F]"
+                            : "text-gray-500 hover:text-gray-700 hover:bg-black/5 active:bg-black/10"
                         )}
                         onMouseDown={startRecording}
                         onMouseUp={stopRecording}
@@ -806,10 +812,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         onTouchEnd={stopRecording}
                         disabled={isProcessing || inputValue.trim().length > 0}
                       >
-                        <Mic className={cn(
-                          "h-5 w-5",
-                          isRecording ? "text-[#2A9D8F]" : "text-gray-700"
-                        )} />
+                        <Mic className="h-[18px] w-[18px]" />
                       </button>
                     </div>
 
@@ -827,55 +830,50 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         }}
                         disabled={isLoading || isRecording || isProcessing}
                         className="
-                          w-full resize-none bg-transparent outline-none
+                          flex-1 resize-none bg-transparent outline-none
                           text-[15px] leading-[1.45] text-gray-900
                           placeholder:text-gray-500
-                          px-2 py-2 min-h-[24px] max-h-[120px]
+                          px-0 py-0 min-h-[24px] max-h-[7.5rem]
                           border-0 focus-visible:ring-0 focus-visible:ring-offset-0
+                          overflow-y-auto -webkit-overflow-scrolling-touch
                         "
                         rows={1}
                         style={{ 
-                          height: 'auto',
-                          overflow: 'hidden'
+                          height: 'auto'
                         }}
                         onInput={(e) => {
                           const target = e.target as HTMLTextAreaElement;
                           target.style.height = 'auto';
-                          target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
+                          const newHeight = Math.min(target.scrollHeight, 120);
+                          target.style.height = `${newHeight}px`;
+                          target.style.overflowY = target.scrollHeight > 120 ? 'auto' : 'hidden';
                         }}
                       />
-                      {/* Shortcut hint on desktop */}
-                      <div className="hidden md:flex items-center gap-1.5 px-2 pb-1 pt-0.5">
-                        <span className="text-xs text-gray-500">Press</span>
-                        <kbd className="rounded bg-[var(--kbd-bg)] text-[var(--kbd-fg)] px-1.5 py-0.5 text-[11px]">Shift</kbd>
-                        <span className="text-xs text-gray-500">+</span>
-                        <kbd className="rounded bg-[var(--kbd-bg)] text-[var(--kbd-fg)] px-1.5 py-0.5 text-[11px]">Enter</kbd>
-                        <span className="text-xs text-gray-500">for a newline</span>
-                      </div>
                     </div>
 
                     {/* Right action - Send */}
                     <div className="flex items-center gap-1.5 shrink-0">
                       <button
                         type="button"
-                        aria-label="Send"
+                        aria-label="Send message"
                         disabled={!inputValue?.trim() || isLoading || isProcessing}
                         className={cn(
-                          "h-[var(--btn-size)] w-[var(--btn-size)] rounded-full grid place-items-center",
-                          "transition border",
+                          "h-9 w-9 rounded-full grid place-items-center",
+                          "transition-all",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/45",
                           (!inputValue?.trim() || isLoading || isProcessing)
-                            ? "bg-white/70 border-[var(--btn-brd)] text-gray-400 cursor-not-allowed"
-                            : "bg-[#2A9D8F] border-[#2A9D8F] text-white shadow-md hover:brightness-105"
+                            ? "bg-[#2A9D8F]/15 text-[#2A9D8F]/60 cursor-default"
+                            : "bg-[#2A9D8F] text-white shadow-sm hover:brightness-[1.05] active:scale-[0.98]"
                         )}
                         onClick={() => sendMessage(inputValue)}
                       >
                         {isLoading || isProcessing ? (
-                          <svg className="h-5 w-5 animate-spin text-current" viewBox="0 0 24 24">
+                          <svg className="h-[16px] w-[16px] animate-spin text-current" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="10" className="opacity-25" stroke="currentColor" strokeWidth="4" fill="none"/>
                             <path d="M4 12a8 8 0 018-8" className="opacity-90" stroke="currentColor" strokeWidth="4" fill="none" />
                           </svg>
                         ) : (
-                          <ArrowUpRight className="h-5 w-5" />
+                          <ArrowUpRight className="h-[16px] w-[16px]" />
                         )}
                       </button>
                     </div>
