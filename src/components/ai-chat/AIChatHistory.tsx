@@ -164,105 +164,124 @@ interface AIChatHistoryProps {
   };
 
   return (
-    <div 
+    <article 
       ref={cardRef}
-      className={`group block overflow-hidden rounded-2xl bg-white/92 backdrop-blur border border-black/10 shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.08)] transition-all px-4 py-3 sm:px-5 sm:py-4 cursor-pointer flex flex-col ${isExpanded ? 'shadow-lg' : ''}`}
+      className={cn(
+        "block overflow-hidden rounded-2xl bg-white/92 backdrop-blur border border-black/10",
+        "shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+        isExpanded && "shadow-lg"
+      )}
       onClick={!isExpanded ? onToggleExpand : undefined}
+      role="button"
+      tabIndex={0}
+      aria-label={`Swing analysis from ${analysis.timestamp.toLocaleDateString()}`}
     >
-      {/* Collapsed Header */}
-      <div className="flex-1 flex flex-col">
-        {/* Header Row */}
-        <div className="flex items-start justify-between mb-2">
-          <span className="font-semibold text-sm text-gray-900 flex-shrink-0">
-            {analysis.timestamp.toLocaleDateString()}
-          </span>
-        </div>
-
-        {/* Body Preview */}
-        <div className="flex-1 mb-3 overflow-hidden">
-          <div className="flex items-start gap-3">
-            {/* Left Column - Video Thumbnail */}
-            <div className="flex-shrink-0">
-              <div className="relative w-20 sm:w-24 aspect-video bg-gray-100 rounded-[10px] overflow-hidden shadow-sm">
-                {analysis.videoThumbnail && !thumbnailError ? (
+      {!isExpanded ? (
+        <>
+          {/* Card header row */}
+          <div className="flex items-start gap-3 px-4 sm:px-5 pt-4">
+            {/* Swing badge */}
+            <span className="inline-flex items-center gap-1 px-2.5 h-6 rounded-full bg-white text-gray-800 border border-black/10 text-[11px] shrink-0">
+              <PiWaveform className="h-3.5 w-3.5" />
+              Swing
+            </span>
+            
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="text-[15px] font-semibold text-gray-900">
+                    Swing Analysis
+                  </div>
+                  <div className="text-[12px] text-gray-600/90 leading-tight mt-0.5">
+                    {analysis.tags && analysis.tags.length > 0 ? analysis.tags.slice(0, 2).join(' • ') : 'Golf swing'}
+                  </div>
+                </div>
+                
+                {/* right meta */}
+                <div className="shrink-0 text-right">
+                  <div className="text-[11px] text-gray-500">{analysis.timestamp.toLocaleDateString()}</div>
+                  {analysis.conversation && (
+                    <div className="text-[11px] text-gray-500">{analysis.conversation.length} msgs</div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Media rail */}
+          {analysis.videoThumbnail && (
+            <div className="mt-3 px-4 sm:px-5">
+              <div className="h-14 w-24 rounded-xl overflow-hidden border border-black/10 bg-black/5 relative">
+                {!thumbnailError ? (
                   <>
                     {thumbnailLoading && (
-                      <div className="absolute inset-0 bg-muted animate-pulse" />
+                      <div className="absolute inset-0 bg-gray-200 animate-pulse" />
                     )}
-                     <img 
-                       src={analysis.videoThumbnail} 
-                       alt="Swing thumbnail"
-                       className="w-full h-full object-cover"
-                       onError={handleThumbnailError}
-                       onLoad={handleThumbnailLoad}
-                     />
-                     <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                       <div className="bg-white/90 rounded-full p-1.5">
-                         <Play className="h-3 w-3 text-black" fill="currentColor" />
-                       </div>
-                     </div>
+                    <img 
+                      src={analysis.videoThumbnail} 
+                      alt="Swing preview"
+                      className="h-full w-full object-cover"
+                      onError={handleThumbnailError}
+                      onLoad={handleThumbnailLoad}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="h-6 w-6 rounded-full bg-black/60 grid place-items-center">
+                        <Play className="h-3 w-3 text-white" fill="currentColor" />
+                      </div>
+                    </div>
                   </>
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                    <div className="text-center text-gray-400">
-                      <FileText className="h-4 w-4 mx-auto mb-1" />
-                      <p className="text-xs">No video</p>
-                    </div>
+                  <div className="h-full w-full flex items-center justify-center">
+                    <FileText className="h-4 w-4 text-gray-400" />
                   </div>
                 )}
               </div>
             </div>
-
-            {/* Right Column - Text Content */}
-            <div className="flex-1 min-w-0 overflow-hidden">
-              <h4 className="font-medium text-sm text-gray-900 line-clamp-1 mb-1">
-                Swing Analysis
-              </h4>
+          )}
+          
+          {/* Preview snippet */}
+          {analysis.content && (
+            <div className="mt-2 px-4 sm:px-5 pb-4">
+              <p className="text-[13px] text-gray-700/85 line-clamp-2">
+                {analysis.content.substring(0, 120)}...
+              </p>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="px-4 sm:px-5 py-4">{/* Expanded content stays as-is */}
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-[17px] font-semibold text-gray-900">
+              Swing Analysis
+            </h3>
+            <div className="flex items-center gap-1">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleExpand();
+                }}
+                aria-label="Collapse"
+                className="h-8 w-8 grid place-items-center rounded-full hover:bg-black/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              >
+                <Minimize2 className="h-4 w-4 text-gray-600" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (window.confirm('Are you sure you want to delete this swing analysis? This action cannot be undone.')) {
+                    onDelete();
+                  }
+                }}
+                aria-label="Delete"
+                className="h-8 w-8 grid place-items-center rounded-full hover:bg-red-50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              >
+                <Trash2 className="h-4 w-4 text-red-600" />
+              </button>
             </div>
           </div>
-        </div>
 
-         {/* Action Row */}
-         <div className="flex items-center justify-between">
-           <div className="flex items-center gap-2">
-             <div className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1 rounded-full font-medium">
-               Analysis
-             </div>
-           </div>
-           <div className="flex items-center gap-1">
-             <Button
-               variant="ghost"
-               size="sm"
-               onClick={(e) => {
-                 e.stopPropagation();
-                 onToggleExpand();
-               }}
-                className="h-8 px-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors focus:ring-0 focus:border-0 focus:outline-none"
-               title={isExpanded ? "Collapse" : "Expand"}
-             >
-               {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-             </Button>
-             <Button
-               variant="ghost"
-               size="sm"
-               onClick={(e) => {
-                 e.stopPropagation();
-                 if (window.confirm('Are you sure you want to delete this swing analysis? This action cannot be undone.')) {
-                   onDelete();
-                 }
-               }}
-               className="h-8 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
-               title="Delete"
-             >
-               <Trash2 className="h-4 w-4" />
-             </Button>
-           </div>
-         </div>
-      </div>
-
-      {/* Expanded Content */}
-      {isExpanded && (
-        <div className="mt-3 pt-3 border-t border-gray-200 animate-accordion-down">
+          {/* Expanded Content - Video & Analysis */}
           <div className="space-y-4 max-h-80 overflow-y-auto">
             {/* Video Section */}
              {(analysis.videoUrl || analysis.videoSrc) && !(analysis.videoSrc && analysis.videoSrc.startsWith('blob:')) ? (
@@ -344,7 +363,7 @@ interface AIChatHistoryProps {
           </div>
         </div>
       )}
-    </div>
+    </article>
   );
 };
 
@@ -1059,6 +1078,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                             </div>
                           );
                         })()}
+                        
+                        {/* End of list marker */}
+                        {filteredConversations.length > 0 && (
+                          <div className="py-6 text-center text-[12px] text-gray-500 select-none">
+                            You're all caught up
+                          </div>
+                        )}
                        </>
                      )}
                        </div>
@@ -1176,6 +1202,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                             </div>
                           );
                         })()}
+                        
+                        {/* End of list marker */}
+                        {filteredSwingAnalyses.length > 0 && (
+                          <div className="py-6 text-center text-[12px] text-gray-500 select-none">
+                            You're all caught up
+                          </div>
+                        )}
                        </>
                      )}
                     </div>
