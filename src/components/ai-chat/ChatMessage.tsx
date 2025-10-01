@@ -280,12 +280,18 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             )}
           </div>
           
-          {/* Timestamp */}
+          {/* Timestamp with delivery status */}
           <div className={cn(
-            "pt-1 text-[11px] text-gray-500 select-none",
-            isUser ? "text-right" : ""
+            "pt-1 text-[11px] text-gray-500 select-none flex items-center gap-2",
+            isUser ? "flex-row-reverse" : ""
           )}>
-            {time}
+            <span>{time}</span>
+            {time && (
+              <>
+                <span className="h-1 w-1 rounded-full bg-gray-300"></span>
+                <span>{isUser ? "Delivered" : "Echo"}</span>
+              </>
+            )}
           </div>
         </div>
       </div>

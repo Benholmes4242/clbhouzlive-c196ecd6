@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen, Bot, Paperclip, ArrowUpRight, Settings, Camera } from 'lucide-react';
+import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen, Bot, Paperclip, ArrowUpRight, Settings, Camera, ChevronDown } from 'lucide-react';
 import { PiWaveform } from 'react-icons/pi';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -622,21 +622,36 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
                     const isLastInGroup = !nextMessage || nextMessage.type !== message.type;
                     
+                    // Example: mark message at index 3 as first unread (UI only)
+                    const isFirstUnread = false; // Set to true on a specific message to show separator
+                    
                     return (
-                      <div 
-                        key={message.id}
-                        className={cn(
-                          isFirstInGroup && index > 0 && "mt-4"
+                      <React.Fragment key={message.id}>
+                        {/* Unread separator - full design with lines */}
+                        {isFirstUnread && (
+                          <div className="sticky top-2 z-10 flex items-center gap-3 my-6">
+                            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
+                            <div className="px-3 py-1.5 rounded-full bg-white/80 backdrop-blur border border-black/10 text-[11px] text-gray-700 shadow-sm">
+                              New messages
+                            </div>
+                            <div className="flex-1 h-px bg-gradient-to-l from-transparent via-black/10 to-transparent"></div>
+                          </div>
                         )}
-                      >
-                        <ChatMessageComponent
-                          message={message}
-                          onSaveToInsights={saveToInsights}
-                          onRequestDetail={requestMoreDetail}
-                          isFirstInGroup={isFirstInGroup}
-                          showHeading={isFirstInGroup}
-                        />
-                      </div>
+                        
+                        <div 
+                          className={cn(
+                            isFirstInGroup && index > 0 && "mt-4"
+                          )}
+                        >
+                          <ChatMessageComponent
+                            message={message}
+                            onSaveToInsights={saveToInsights}
+                            onRequestDetail={requestMoreDetail}
+                            isFirstInGroup={isFirstInGroup}
+                            showHeading={isFirstInGroup}
+                          />
+                        </div>
+                      </React.Fragment>
                     );
                   })}
                    {isLoading && (
@@ -656,8 +671,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                          </div>
                        )}
 
-                {/* Unread marker example - "New since last visit" pill */}
-                {false && ( /* Set to true to show example unread marker */
+                {/* Unread separator example (legacy simple version) */}
+                {false && ( /* Set to true to show legacy unread marker */
                   <div className="sticky top-2 z-10 flex justify-center pointer-events-none mb-4">
                     <div className="pointer-events-auto px-2.5 py-1 rounded-full bg-white/80 backdrop-blur border border-black/10 text-[11px] text-gray-700 shadow-sm">
                       New since last visit
@@ -666,30 +681,30 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 )}
 
                 {/* "New messages" pill - shows when scrolled up and new messages arrive */}
-                {newMessageCount > 0 && (
-                  <div className="sticky bottom-20 sm:bottom-24 z-10 flex justify-center pointer-events-none">
-                    <div className="px-3 py-1.5 rounded-full bg-white/85 backdrop-blur border border-black/10 shadow-sm text-[12px] text-gray-700 float-in">
-                      {newMessageCount} new {newMessageCount === 1 ? 'message' : 'messages'}
-                    </div>
+                {newMessageCount > 0 && !showScrollToBottom && (
+                  <div className="fixed bottom-[96px] left-1/2 -translate-x-1/2 z-20 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[12px] text-gray-700 pointer-events-auto float-in">
+                    {newMessageCount} new {newMessageCount === 1 ? 'message' : 'messages'} • Tap to view
                   </div>
                 )}
 
-                {/* "Back to Latest" FAB - shows when scrolled up */}
+                {/* Scroll-to-bottom FAB - shows when scrolled up */}
                 {showScrollToBottom && (
                   <button
                     onClick={scrollToBottom}
-                    className="pointer-events-auto fixed right-3 sm:right-4 z-20 h-11 px-4 rounded-full bg-white/95 backdrop-blur border border-black/10 shadow-lg text-[14px] font-medium text-gray-900 flex items-center gap-2 hover:bg-white active:scale-[0.99] transition-all float-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 data-scrollfab"
-                    style={{
-                      bottom: `calc(88px + env(safe-area-inset-bottom))`
-                    }}
-                    aria-label="Jump to latest"
+                    className="group pointer-events-auto fixed bottom-[96px] right-4 sm:right-6 z-20 h-11 min-w-[44px] px-3 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-md flex items-center gap-2 hover:bg-white active:scale-[0.98] transition-all float-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                    aria-label="Scroll to latest"
                   >
-                    <span className="inline-flex h-5 w-5 rounded-full items-center justify-center bg-[#2A9D8F]/10 text-[#2A9D8F]">
-                      <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v10.586l2.293-2.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V4a1 1 0 011-1z" clipRule="evenodd" />
-                      </svg>
+                    <span className="grid place-items-center h-6 w-6 rounded-full border border-black/10">
+                      <ChevronDown className="h-4 w-4 text-gray-700" />
                     </span>
-                    {newMessageCount > 0 ? 'New messages' : 'Latest'}
+                    <span className="text-[12px] text-gray-700 pr-1 hidden sm:inline">Newer</span>
+                    
+                    {/* Badge for unread count */}
+                    {newMessageCount > 0 && (
+                      <span className="ml-1 h-5 min-w-[20px] px-1 rounded-full bg-[#ef4444] text-white text-[11px] leading-[1] grid place-items-center font-medium">
+                        {newMessageCount}
+                      </span>
+                    )}
                   </button>
                 )}
                 </div>
