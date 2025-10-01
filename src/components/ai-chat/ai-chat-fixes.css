@@ -52,3 +52,136 @@
 .aiChatHistory__search .searchIcon--briefcase {
   display: none !important;
 }
+
+/* Float-in animation for FAB and pills */
+@keyframes floatInUp {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.float-in {
+  animation: floatInUp 0.18s ease-out both;
+}
+
+/* Fade-in-up animation for scroll FAB - Phase 49 */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Subtle pulse animation for new message arrival */
+@keyframes subtlePulse {
+  0%, 100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+[data-scrollfab].nudge {
+  animation: subtlePulse 1.6s ease-in-out 3;
+}
+
+/* Phase 50 - Mobile long-press action pill reveal */
+[data-active="true"] .actions-pill {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* Hide scrollbar for attachment preview strip */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Phase 59: Fade-up animation for FAB and toast */
+@keyframes echoFadeUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(6px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+[data-visible="true"] { 
+  animation: echoFadeUp 160ms ease-out;
+}
+
+/* Phase 58: Composer density for very small screens */
+@media (max-width: 360px) {
+  .echo-composer.rounded-\[28px\] { 
+    padding: 8px 10px !important;
+  }
+  .echo-composer textarea { 
+    font-size: 14px !important;
+  }
+}
+
+/* Phase 53: Composer density for very small screens */
+@media (max-width: 360px) {
+  .chat-composer {
+    padding: 6px 8px !important;
+  }
+}
+
+/* Ultra-small screen optimizations for composer */
+@media (max-width: 360px) {
+  /* Composer pill - Phase 48 */
+  .composer-pill form {
+    height: 48px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  
+  .composer-pill textarea {
+    font-size: 14px !important;
+  }
+  
+  .composer-pill button {
+    height: 32px !important;
+    width: 32px !important;
+  }
+  
+  /* Suggestion chips */
+  .echo-suggestion-chip {
+    font-size: 12px !important;
+  }
+  
+  /* Message action buttons - compact mode */
+  .group [data-open="true"] > button {
+    height: 1.75rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    font-size: 12px !important;
+  }
+  
+  /* Attachment tray on small screens - Phase 46 */
+  .attachment-tray img {
+    height: 44px !important;
+    width: 44px !important;
+  }
+  
+  .attachment-tray .file-chip {
+    height: 44px !important;
+  }
+}
