@@ -111,6 +111,13 @@
   display: none;
 }
 
+/* Phase 53: Composer density for very small screens */
+@media (max-width: 360px) {
+  .chat-composer {
+    padding: 6px 8px !important;
+  }
+}
+
 /* Ultra-small screen optimizations for composer */
 @media (max-width: 360px) {
   /* Composer pill - Phase 48 */

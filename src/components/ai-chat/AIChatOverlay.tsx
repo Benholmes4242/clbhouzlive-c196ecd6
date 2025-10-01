@@ -769,9 +769,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </TabsContent>
           </Tabs>
         
-          {/* Composer footer - Phase 51 Polish */}
+          {/* Composer footer - Phase 53: Feel & Affordances */}
           <footer 
-            className="sticky bottom-0 z-10 border-t border-white/10 bg-gradient-to-t from-white/70 to-white/40 backdrop-blur-xl pb-[max(env(safe-area-inset-bottom),0px)]"
+            className="sticky bottom-0 z-[1] bg-gradient-to-t from-white/85 to-white/60 backdrop-blur-xl border-t border-white/10"
             role="region"
             aria-label="Message composer"
             data-echo-composer
@@ -784,7 +784,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             )}
             
-            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-3">
+            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-3 pb-[max(env(safe-area-inset-bottom),12px)]">
               {activeTab === 'chat' && (
                 <div>
                   {/* Attachments tray - Phase 51 (peek + expand) */}
@@ -849,40 +849,36 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     </div>
                   </div>
 
-                  {/* Main composer pill - Phase 51 */}
-                  <div className="h-12 sm:h-13 rounded-full bg-white/92 backdrop-blur border border-black/10 shadow-sm grid grid-cols-[auto,1fr,auto] items-center gap-1.5 px-2 sm:px-2.5">
+                  {/* Main composer pill - Phase 53: Feel & Affordances */}
+                  <div className="chat-composer rounded-[28px] bg-white/92 backdrop-blur border border-black/10 shadow-sm px-3 py-2 flex items-center gap-2 transition-[box-shadow,transform,background] duration-200 focus-within:shadow-[0_10px_30px_rgba(0,0,0,0.08)] focus-within:bg-white">
                     {/* Left: attach toggle */}
                     <button
                       type="button"
-                      aria-label="Add"
+                      aria-label="Attach"
                       className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
                     >
-                      <svg className="h-[18px] w-[18px] text-gray-600" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                      </svg>
+                      <Paperclip className="h-[18px] w-[18px] text-gray-600" />
                     </button>
 
                     {/* Middle: input */}
-                    <div className="min-w-0">
-                      <input
-                        type="text"
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        placeholder="Message Echo…"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            sendMessage(inputValue);
-                          }
-                        }}
-                        disabled={isLoading || isRecording || isProcessing}
-                        aria-label="Message input"
-                        autoComplete="off"
-                        autoCorrect="on"
-                        autoCapitalize="sentences"
-                        className="w-full bg-transparent outline-none text-[15px] sm:text-[15px] leading-[1.4] placeholder:text-gray-500 caret-[#2A9D8F] disabled:opacity-60"
-                      />
-                    </div>
+                    <textarea
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      placeholder="Message Echo…"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          sendMessage(inputValue);
+                        }
+                      }}
+                      disabled={isLoading || isRecording || isProcessing}
+                      aria-label="Message input"
+                      autoComplete="off"
+                      autoCorrect="on"
+                      autoCapitalize="sentences"
+                      rows={1}
+                      className="flex-1 bg-transparent outline-none resize-none text-[15px] leading-[1.5] text-gray-900 placeholder:text-gray-500/80 min-h-[40px] max-h-[40px] sm:min-h-[44px] sm:max-h-[44px]"
+                    />
 
                     {/* Right: mic/send combo */}
                     <div className="flex items-center gap-1">
@@ -910,11 +906,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         disabled={!inputValue?.trim() || isLoading || isProcessing}
                         aria-disabled={!inputValue?.trim() || isLoading || isProcessing}
                         className={cn(
-                          "h-9 w-9 grid place-items-center rounded-full shadow transition",
+                          "h-9 min-w-[44px] rounded-full px-4 font-medium shadow transition",
                           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
                           (!inputValue?.trim() || isLoading || isProcessing)
-                            ? "bg-gray-300 text-gray-500 cursor-not-allowed opacity-50"
-                            : "bg-[#2A9D8F] text-white hover:brightness-[0.98] active:brightness-[0.95]"
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed opacity-40"
+                            : "bg-[#2A9D8F] text-white hover:shadow-md active:scale-[0.98]"
                         )}
                       >
                         {isLoading || isProcessing ? (
