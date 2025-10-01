@@ -111,6 +111,22 @@
   display: none;
 }
 
+/* Phase 59: Fade-up animation for FAB and toast */
+@keyframes echoFadeUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(6px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+[data-visible="true"] { 
+  animation: echoFadeUp 160ms ease-out;
+}
+
 /* Phase 58: Composer density for very small screens */
 @media (max-width: 360px) {
   .echo-composer.rounded-\[28px\] { 

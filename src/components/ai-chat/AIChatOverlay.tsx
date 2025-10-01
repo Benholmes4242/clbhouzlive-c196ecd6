@@ -585,6 +585,18 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 {/* Bottom fade - Phase 52 */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white/60 to-transparent z-10" />
                 
+                {/* "New replies below" toast - Phase 59 */}
+                {showScrollToBottom && newMessageCount > 0 && (
+                  <div className="sticky top-2 z-[1] mx-auto w-full max-w-[720px] px-3 sm:px-4 pointer-events-none">
+                    <div 
+                      className="mx-auto w-fit px-3 py-1.5 rounded-full bg-white/85 backdrop-blur border border-black/10 text-[12px] text-gray-700 shadow-sm"
+                      data-visible="true"
+                    >
+                      New replies below
+                    </div>
+                  </div>
+                )}
+                
                 {/* Unread above notice (sticky hint at top while scrolling) */}
                 {false && ( /* Set to true to show "unread above" indicator */
                   <div 
@@ -624,20 +636,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     
                     return (
                       <React.Fragment key={message.id}>
-                        {/* "New messages" separator - Phase 49 */}
+                        {/* "Unread" divider - Phase 59 */}
                         {isFirstUnread && (
-                          <div className="relative my-4" role="separator" aria-label="New messages">
-                            <div className="sticky top-2 z-10 flex justify-center">
-                              <div className="px-3 py-1.5 rounded-full bg-white/80 backdrop-blur border border-black/10 shadow-sm text-[11px] text-gray-600">
-                                New messages
-                              </div>
+                          <div className="relative my-6 flex items-center gap-3" role="separator" aria-label="Unread messages">
+                            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/15 to-transparent"></div>
+                            <div className="px-2 py-0.5 rounded-full bg-white/85 backdrop-blur border border-black/10 text-[11px] text-gray-600 shadow-sm">
+                              Unread
                             </div>
-                            {/* Hairline that spans the width */}
-                            <div className="absolute left-0 right-0 top-1/2 -z-0">
-                              <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4">
-                                <div className="h-px bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
-                              </div>
-                            </div>
+                            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/15 to-transparent"></div>
                           </div>
                         )}
                         
@@ -693,33 +699,23 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   </div>
                 )}
 
-                {/* Scroll-to-bottom FAB - Phase 49 */}
+                {/* Scroll-to-bottom FAB - Phase 59 */}
                 {showScrollToBottom && (
                   <button
                     onClick={scrollToBottom}
-                    className={cn(
-                      "fixed md:absolute z-30",
-                      "bottom-[calc(env(safe-area-inset-bottom)+76px)]",
-                      "right-3 md:right-0 md:translate-x-[calc(720px/2-1rem)]",
-                      "h-10 px-3 rounded-full",
-                      "bg-white/95 backdrop-blur border border-black/10 shadow-lg",
-                      "flex items-center gap-2 text-[13px] text-gray-800",
-                      "hover:bg-white active:scale-[0.98]",
-                      "transition will-change-transform",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
-                      "animate-[fadeInUp_220ms_ease-out]"
-                    )}
-                    aria-label="Scroll to latest"
+                    className="fixed md:absolute bottom-[88px] right-3 md:right-4 z-[2] h-10 px-3.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-[0_6px_20px_rgba(0,0,0,0.12)] text-[13px] text-gray-800 flex items-center gap-2 hover:shadow-md active:shadow-sm transition will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                    aria-label="Jump to latest"
                     type="button"
+                    data-visible="true"
                   >
                     {/* Down chevron icon */}
-                    <span className="inline-block h-5 w-5 grid place-items-center rounded-full bg-black/5">
+                    <span className="inline-block h-4 w-4 rounded-full grid place-items-center bg-black/5">
                       <ChevronDown className="h-3 w-3" />
                     </span>
-                    <span className="tabular-nums">New</span>
+                    <span>Newer messages</span>
                     {/* Optional unread count badge */}
                     {newMessageCount > 0 && (
-                      <span className="ml-1 rounded-full bg-[#2A9D8F]/10 text-[#2A9D8F] px-2 py-0.5 text-[11px]">
+                      <span className="ml-0.5 rounded-full bg-[#2A9D8F]/10 text-[#2A9D8F] px-2 py-0.5 text-[11px] font-medium">
                         {newMessageCount}
                       </span>
                     )}
