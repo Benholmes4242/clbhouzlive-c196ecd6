@@ -351,24 +351,7 @@ const SwingAnalysisCard: React.FC<{
 
 // Skeleton Loading Component
 const SkeletonCard: React.FC = () => (
-  <div className="rounded-2xl overflow-hidden border border-black/[0.06] bg-white animate-pulse">
-    {/* Video skeleton */}
-    <div className="h-40 bg-black/10" />
-    
-    {/* Content skeleton */}
-    <div className="px-4 sm:px-5 py-4 space-y-3">
-      {/* Header lines */}
-      <div className="h-3 rounded bg-black/10 w-2/3" />
-      <div className="h-3 rounded bg-black/10 w-1/2" />
-      <div className="h-3 rounded bg-black/10 w-3/4" />
-      
-      {/* Button skeletons */}
-      <div className="flex gap-2 pt-2">
-        <div className="h-9 rounded-full bg-black/10 w-24" />
-        <div className="h-9 rounded-full bg-black/10 w-24" />
-      </div>
-    </div>
-  </div>
+  <div className="h-[92px] rounded-2xl bg-white/70 backdrop-blur border border-black/10 shadow-sm animate-pulse" />
 );
 
 // Empty State Component
@@ -377,12 +360,12 @@ const EmptyState: React.FC<{
   title: string; 
   subtitle: string;
 }> = ({ icon, title, subtitle }) => (
-  <div className="rounded-2xl border border-black/[0.06] bg-white/92 px-5 py-8 text-center">
-    <div className="h-12 w-12 rounded-full bg-black/[0.04] mx-auto mb-3 flex items-center justify-center text-gray-400">
+  <div className="rounded-2xl border border-black/10 bg-white/80 backdrop-blur shadow-sm text-center p-8 sm:p-10">
+    <div className="mx-auto h-12 w-12 rounded-full grid place-items-center bg-white border border-black/10 text-gray-700 mb-4">
       {icon}
     </div>
-    <h3 className="text-[16px] font-semibold text-gray-900 mb-1">{title}</h3>
-    <p className="text-[14px] text-gray-600">{subtitle}</p>
+    <h3 className="text-[17px] font-semibold text-gray-900">{title}</h3>
+    <p className="mt-1.5 text-[14px] text-gray-600">{subtitle}</p>
   </div>
 );
 
@@ -793,7 +776,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       data-echo-canvas
                       ref={chatAutoScroll.scrollAreaRef}
                     >
-                      <div className="space-y-6 px-4 sm:px-6 pb-6">
+                      <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-5 space-y-4">
                     {loadingStates.conversations ? (
                       <>
                         <SkeletonCard />
@@ -824,25 +807,23 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           
                           return (
                             <div>
-                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
+                              <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                 Last 7 Days
                               </h3>
-                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
+                              <div className="space-y-3">
                                 {last7Days.map((conversation) => (
-                                  <div 
+                                  <article 
                                     key={conversation.id} 
-                                    className={`
-                                      rounded-2xl bg-white/92 backdrop-blur shadow px-4 py-3 sm:px-5 sm:py-4 
-                                      hover:-translate-y-0.5 transition-all duration-200
-                                      ${expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? 'bg-white/95 shadow-lg' : 'cursor-pointer'}
-                                    `}
-                                    style={{
-                                      transition: 'max-height 0.25s ease, opacity 0.2s ease'
-                                    }}
-                                    onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
+                                    className="group relative overflow-hidden rounded-2xl bg-white/92 backdrop-blur border border-black/10 shadow-[0_10px_28px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_34px_rgba(0,0,0,0.09)] transition-all"
                                   >
+                                    <button
+                                      className="absolute inset-0 z-0"
+                                      aria-label="Open conversation"
+                                      onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
+                                    />
+                                    
                                     {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? (
-                                      <div>
+                                      <div className="relative z-10 p-4 sm:p-5">
                                         <div className="flex justify-between items-center mb-3">
                                           <h3 className="text-[17px] font-semibold text-gray-900">
                                             {conversation.customTitle || conversation.title}
@@ -850,7 +831,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                           <button 
                                             onClick={() => setExpandedCard(null)}
                                             aria-label="Collapse" 
-                                            className="p-2 rounded-full hover:bg-gray-100"
+                                            className="relative z-20 p-2 rounded-full hover:bg-gray-100"
                                           >
                                             <ChevronUp className="h-4 w-4" />
                                           </button>
@@ -885,35 +866,42 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                                 onClose();
                                               }
                                             }}
-                                            className="text-sm font-medium text-[#2A9D8F] hover:underline"
+                                            className="relative z-20 text-sm font-medium text-[#2A9D8F] hover:underline"
                                           >
                                             Use this response
                                           </button>
                                         </div>
                                       </div>
                                     ) : (
-                                      <div className="flex items-start gap-3">
-                                        <div className="h-8 w-8 rounded-full bg-[rgba(110,146,119,0.12)] grid place-items-center text-[18px]">
+                                      <div className="relative z-10 p-4 sm:p-5 grid grid-cols-[auto,1fr,auto] items-start gap-3 sm:gap-4">
+                                        {/* left: avatar */}
+                                        <div className="h-9 w-9 rounded-full grid place-items-center bg-white/80 backdrop-blur border border-black/10 text-gray-700 text-[18px]">
                                           🗨️
                                         </div>
-                                        <div className="flex-1">
-                                          <h3 className="text-[17px] font-semibold text-gray-900 leading-tight">
+                                        
+                                        {/* center: title + preview */}
+                                        <div className="min-w-0">
+                                          <h3 className="truncate text-[16px] sm:text-[17px] font-semibold text-gray-900">
                                             {conversation.customTitle || conversation.title}
                                           </h3>
-                                          <p className="text-[14px] text-gray-700/85 mt-1 line-clamp-2">
+                                          <p className="mt-1 line-clamp-2 text-[13px] sm:text-[14px] leading-[1.45] text-gray-600">
                                             {conversation.messages.find(m => m.type === 'user')?.content}
                                           </p>
-                                          <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
-                                            <span>{conversation.timestamp.toLocaleDateString()}</span>
-                                            <span>• {conversation.messages.length} replies</span>
-                                            <span className="ml-auto text-sm font-medium text-[#2A9D8F] hover:underline">
-                                              Show Conversation
-                                            </span>
+                                        </div>
+                                        
+                                        {/* right: meta */}
+                                        <div className="shrink-0 text-right">
+                                          <div className="text-[12px] text-gray-500">{conversation.timestamp.toLocaleDateString()}</div>
+                                          <div className="mt-1 text-[12px] text-gray-600/90">
+                                            Chat • {conversation.messages.length} msgs
                                           </div>
                                         </div>
                                       </div>
                                     )}
-                                  </div>
+                                    
+                                    {/* subtle row-divider highlight */}
+                                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-black/5"></div>
+                                  </article>
                                 ))}
                               </div>
                             </div>
@@ -931,37 +919,49 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           
                           return (
                             <div>
-                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
+                              <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                 This Month
                               </h3>
-                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
+                              <div className="space-y-3">
                                 {thisMonth.map((conversation) => (
-                                  <div 
+                                  <article 
                                     key={conversation.id} 
-                                    className="rounded-2xl bg-white/92 backdrop-blur shadow px-4 py-3 sm:px-5 sm:py-4 hover:-translate-y-0.5 transition-transform cursor-pointer"
-                                    onClick={() => handleExpansion('chat', conversation.id)}
+                                    className="group relative overflow-hidden rounded-2xl bg-white/92 backdrop-blur border border-black/10 shadow-[0_10px_28px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_34px_rgba(0,0,0,0.09)] transition-all"
                                   >
-                                    <div className="flex items-start gap-3">
-                                      <div className="h-8 w-8 rounded-full bg-[rgba(110,146,119,0.12)] grid place-items-center text-[18px]">
+                                    <button
+                                      className="absolute inset-0 z-0"
+                                      aria-label="Open conversation"
+                                      onClick={() => handleExpansion('chat', conversation.id)}
+                                    />
+                                    
+                                    <div className="relative z-10 p-4 sm:p-5 grid grid-cols-[auto,1fr,auto] items-start gap-3 sm:gap-4">
+                                      {/* left: avatar */}
+                                      <div className="h-9 w-9 rounded-full grid place-items-center bg-white/80 backdrop-blur border border-black/10 text-gray-700 text-[18px]">
                                         🗨️
                                       </div>
-                                      <div className="flex-1">
-                                        <h3 className="text-[17px] font-semibold text-gray-900 leading-tight">
+                                      
+                                      {/* center: title + preview */}
+                                      <div className="min-w-0">
+                                        <h3 className="truncate text-[16px] sm:text-[17px] font-semibold text-gray-900">
                                           {conversation.customTitle || conversation.title}
                                         </h3>
-                                        <p className="text-[14px] text-gray-700/85 mt-1 line-clamp-2">
+                                        <p className="mt-1 line-clamp-2 text-[13px] sm:text-[14px] leading-[1.45] text-gray-600">
                                           {conversation.messages.find(m => m.type === 'user')?.content}
                                         </p>
-                                        <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
-                                          <span>{conversation.timestamp.toLocaleDateString()}</span>
-                                          <span>• {conversation.messages.length} replies</span>
-                                          <span className="ml-auto text-sm font-medium text-[#2A9D8F] hover:underline">
-                                            Show Conversation
-                                          </span>
+                                      </div>
+                                      
+                                      {/* right: meta */}
+                                      <div className="shrink-0 text-right">
+                                        <div className="text-[12px] text-gray-500">{conversation.timestamp.toLocaleDateString()}</div>
+                                        <div className="mt-1 text-[12px] text-gray-600/90">
+                                          Chat • {conversation.messages.length} msgs
                                         </div>
                                       </div>
                                     </div>
-                                  </div>
+                                    
+                                    {/* subtle row-divider highlight */}
+                                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-black/5"></div>
+                                   </article>
                                 ))}
                               </div>
                             </div>
@@ -979,47 +979,59 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           
                           return (
                             <div>
-                              <h3 className="px-4 sm:px-6 pt-6 pb-2 text-sm font-semibold text-gray-800/80">
+                              <h3 className="text-[13px] font-medium text-gray-700 mb-3">
                                 Older
                               </h3>
-                              <div className="grid gap-3 px-4 sm:px-6 sm:grid-cols-2">
+                              <div className="space-y-3">
                                 {older.map((conversation) => (
-                                  <div 
+                                  <article 
                                     key={conversation.id} 
-                                    className="rounded-2xl bg-white/92 backdrop-blur shadow px-4 py-3 sm:px-5 sm:py-4 hover:-translate-y-0.5 transition-transform cursor-pointer"
-                                    onClick={() => handleExpansion('chat', conversation.id)}
+                                    className="group relative overflow-hidden rounded-2xl bg-white/92 backdrop-blur border border-black/10 shadow-[0_10px_28px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_34px_rgba(0,0,0,0.09)] transition-all"
                                   >
-                                    <div className="flex items-start gap-3">
-                                      <div className="h-8 w-8 rounded-full bg-[rgba(110,146,119,0.12)] grid place-items-center text-[18px]">
+                                    <button
+                                      className="absolute inset-0 z-0"
+                                      aria-label="Open conversation"
+                                      onClick={() => handleExpansion('chat', conversation.id)}
+                                    />
+                                    
+                                    <div className="relative z-10 p-4 sm:p-5 grid grid-cols-[auto,1fr,auto] items-start gap-3 sm:gap-4">
+                                      {/* left: avatar */}
+                                      <div className="h-9 w-9 rounded-full grid place-items-center bg-white/80 backdrop-blur border border-black/10 text-gray-700 text-[18px]">
                                         🗨️
                                       </div>
-                                      <div className="flex-1">
-                                        <h3 className="text-[17px] font-semibold text-gray-900 leading-tight">
+                                      
+                                      {/* center: title + preview */}
+                                      <div className="min-w-0">
+                                        <h3 className="truncate text-[16px] sm:text-[17px] font-semibold text-gray-900">
                                           {conversation.customTitle || conversation.title}
                                         </h3>
-                                        <p className="text-[14px] text-gray-700/85 mt-1 line-clamp-2">
+                                        <p className="mt-1 line-clamp-2 text-[13px] sm:text-[14px] leading-[1.45] text-gray-600">
                                           {conversation.messages.find(m => m.type === 'user')?.content}
                                         </p>
-                                        <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
-                                          <span>{conversation.timestamp.toLocaleDateString()}</span>
-                                          <span>• {conversation.messages.length} replies</span>
-                                          <span className="ml-auto text-sm font-medium text-[#2A9D8F] hover:underline">
-                                            Show Conversation
-                                          </span>
+                                      </div>
+                                      
+                                      {/* right: meta */}
+                                      <div className="shrink-0 text-right">
+                                        <div className="text-[12px] text-gray-500">{conversation.timestamp.toLocaleDateString()}</div>
+                                        <div className="mt-1 text-[12px] text-gray-600/90">
+                                          Chat • {conversation.messages.length} msgs
                                         </div>
                                       </div>
                                     </div>
-                                  </div>
+                                    
+                                    {/* subtle row-divider highlight */}
+                                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-black/5"></div>
+                                  </article>
                                 ))}
                               </div>
                             </div>
                           );
                         })()}
-                      </>
-                    )}
-                  </div>
-                  </div>
-                  </TabsContent>
+                       </>
+                     )}
+                       </div>
+                     </div>
+                   </TabsContent>
 
                   {/* Swing Coach Tab */}
                   <TabsContent value="swing" className="m-0 flex-1" style={{ minHeight: 0 }} role="tabpanel" id="swing-panel" aria-labelledby="swing-tab">
@@ -1028,7 +1040,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       data-echo-canvas
                       ref={swingAutoScroll.scrollAreaRef}
                     >
-                      <div className="space-y-6 px-4 sm:px-6 pb-6">
+                       <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-5 space-y-4">
                     {loadingStates.swingAnalyses ? (
                       <>
                         <SkeletonCard />
@@ -1132,11 +1144,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                             </div>
                           );
                         })()}
-                      </>
-                    )}
-                   </div>
-                   </div>
-                   </TabsContent>
+                       </>
+                     )}
+                    </div>
+                    </div>
+                    </TabsContent>
                  </Tabs>
                 </div>
               </div>
