@@ -20,9 +20,12 @@ export const DaySeparator: React.FC<DaySeparatorProps> = ({ date }) => {
   };
 
   return (
-    <div className="my-3 grid place-items-center">
-      <div className="rounded-full px-3 py-1 text-[12px] font-medium bg-black/[0.05] text-gray-600">
-        {getDateLabel(date)}
+    <div className="relative my-3 sm:my-4">
+      <div className="h-px bg-black/10" />
+      <div className="absolute inset-x-0 -top-3 flex justify-center">
+        <div className="px-3 py-1 text-[12px] font-medium rounded-full bg-white/85 backdrop-blur border border-black/10 text-gray-700 shadow-sm">
+          {getDateLabel(date)}
+        </div>
       </div>
     </div>
   );
