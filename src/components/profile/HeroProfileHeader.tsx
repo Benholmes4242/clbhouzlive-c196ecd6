@@ -1008,30 +1008,38 @@ const HeroProfileHeader = ({
                        marginRight: 'calc(var(--mini-w) + 8px)'
                      }}
                    >
-                     <h1 className="font-semibold leading-tight"
-                         style={{ fontSize: 'var(--fs-display)' }}>
-                       {displayName}
-                     </h1>
-                      <div className="text-base text-gray-700">
-                        @{username}
+                      <h1 className="font-semibold leading-tight -space-y-1"
+                          style={{ fontSize: 'var(--fs-display)' }}>
+                        {(() => {
+                          const { first, last } = splitName(displayName);
+                          return (
+                            <>
+                              <span className="block">{first}</span>
+                              <span className="block">{last}</span>
+                            </>
+                          );
+                        })()}
+                      </h1>
+                       <div className="mt-2 text-base text-gray-700">
+                         @{username}
+                       </div>
+                    </div>
+
+                     {/* Home Club centered (desktop/tablet only) */}
+                     <div className="mt-6 flex justify-center items-start"
+                         style={{
+                           width: 'calc(100% - var(--mini-w) - 8px)',
+                           marginRight: 'calc(var(--mini-w) + 8px)'
+                         }}>
+                      {/* Home Club */}
+                      <div className="text-center space-y-1">
+                        <div className="text-base font-semibold">Home Club</div>
+                        <div className="text-base text-gray-700">{homeClub}</div>
                       </div>
-                   </div>
+                    </div>
 
-                    {/* Home Club centered (desktop/tablet only) */}
-                    <div className="mt-10 flex justify-center items-start"
-                        style={{
-                          width: 'calc(100% - var(--mini-w) - 8px)',
-                          marginRight: 'calc(var(--mini-w) + 8px)'
-                        }}>
-                     {/* Home Club */}
-                     <div className="text-center">
-                       <div className="text-base font-semibold">Home Club</div>
-                       <div className="text-base text-gray-700">{homeClub}</div>
-                     </div>
-                   </div>
-
-                   {/* Bio section - centered with user name */}
-                   <div className="mt-6"
+                    {/* Bio section - centered with user name */}
+                    <div className="mt-6"
                         style={{
                           width: 'calc(100% - var(--mini-w) - 8px)',
                           marginRight: 'calc(var(--mini-w) + 8px)'
