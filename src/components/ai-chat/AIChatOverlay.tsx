@@ -861,7 +861,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         autoCorrect="on"
                         autoCapitalize="sentences"
                         rows={1}
-                        className="w-full bg-transparent outline-none text-[15px] leading-[1.4] py-2 placeholder:text-gray-500 resize-none focus-visible:outline-none"
+                        className="w-full bg-transparent outline-none text-[15px] leading-[1.4] placeholder:text-gray-500 resize-none focus-visible:outline-none"
                       />
                     </div>
 
