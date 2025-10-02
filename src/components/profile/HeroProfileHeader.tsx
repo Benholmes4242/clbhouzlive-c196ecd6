@@ -799,14 +799,11 @@ const HeroProfileHeader = ({
               className="glass-panel relative z-20 mx-0 rounded-none border border-white/35 backdrop-blur-xl"
               style={{
                 marginTop: 'calc(var(--panel-overlap) * -1)',
-                padding: 'var(--panel-pad-y) var(--panel-pad-x)',
-                paddingTop: 'calc(var(--panel-pad-y) + var(--safe-top))',
-                paddingBottom: 'calc(var(--panel-pad-y) + var(--safe-bottom))',
                 backgroundColor: 'rgba(255, 255, 255, 0.16)',
                 boxShadow: 'var(--panel-shadow)'
               } as React.CSSProperties}
             >
-              <div className="relative">
+              <div className="relative px-4 sm:px-6 pt-8 pb-6">
                 {/* Mini profile card */}
                 <button
                   data-mini-card
@@ -837,25 +834,27 @@ const HeroProfileHeader = ({
                     const { first, last } = splitName(displayName);
                     return (
                       <>
-                        <span className="name-first">{first}</span>
-                        <span className="name-last">{last}</span>
-                        <div className="handle">@{username}</div>
+                        <h1 className="text-[32px] sm:text-[36px] font-extrabold leading-tight tracking-[-0.01em] text-gray-900">
+                          <span className="block">{first}</span>
+                          <span className="block -mt-1">{last}</span>
+                        </h1>
+                        <p className="mt-2 text-gray-600">@{username}</p>
                       </>
                     );
                   })()}
                 </div>
 
                 {/* Club / Handicap row */}
-                <div className="meta-row">
+                <div className="meta-row mt-6">
                   <div className="meta meta-club">
-                    <div className="meta-label">Golf Club</div>
-                    <div className="meta-value">
+                    <div className="text-[12px] font-medium text-gray-500 tracking-wide">Home Club</div>
+                    <div className="mt-0.5 text-[17px] font-semibold text-gray-900">
                       {homeClub}
                     </div>
                   </div>
                   <div className="meta meta-hcp">
-                    <div className="meta-label">Handicap</div>
-                    <div className="meta-value meta-value--hcp">
+                    <div className="text-[12px] font-medium text-gray-500 tracking-wide">Handicap</div>
+                    <div className="mt-0.5 text-[17px] font-semibold text-gray-900">
                       {handicap ?? '—'}
                     </div>
                   </div>
@@ -863,7 +862,7 @@ const HeroProfileHeader = ({
 
                 {/* Bio */}
                 {profile?.bio && (
-                  <p className="bio">
+                  <p className="mt-8 text-center text-[16px] text-gray-700">
                     {profile.bio}
                   </p>
                 )}
@@ -969,11 +968,10 @@ const HeroProfileHeader = ({
             <section
               className="relative z-20 mx-0 sm:mx-0 md:mx-0 lg:mx-4 rounded-none lg:rounded-2xl border border-white/35 bg-white/10 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
               style={{
-                marginTop: 'calc(var(--panel-overlap) * -1)',
-                padding: 'var(--panel-pad-y) var(--panel-pad-x)'
+                marginTop: 'calc(var(--panel-overlap) * -1)'
               }}
             >
-               <div className="flex flex-col items-center relative">
+               <div className="flex flex-col items-center relative px-4 sm:px-6 pt-8 pb-6">
                   {/* Overhanging mini profile card */}
                    <div
                      className="absolute rounded-lg overflow-hidden border border-white/40 bg-white/20 backdrop-blur-sm shadow-[0_12px_28px_rgba(0,0,0,0.25)] z-10"
@@ -1005,7 +1003,7 @@ const HeroProfileHeader = ({
                   </div>
 
 
-                   {/* Name + handle block, perfectly centered between glass edge and mini card for all devices */}
+                   {/* Name + handle block */}
                    <div
                      className="text-center"
                      style={{
@@ -1014,43 +1012,49 @@ const HeroProfileHeader = ({
                        marginRight: 'calc(var(--mini-w) + 8px)'
                      }}
                    >
-                     <h1 className="font-semibold leading-tight"
-                         style={{ fontSize: 'var(--fs-display)' }}>
-                       {displayName}
+                     <h1 className="text-[32px] sm:text-[36px] font-extrabold leading-tight tracking-[-0.01em] text-gray-900">
+                       <span className="block">{(() => {
+                         const { first } = splitName(displayName);
+                         return first;
+                       })()}</span>
+                       <span className="block -mt-1">{(() => {
+                         const { last } = splitName(displayName);
+                         return last;
+                       })()}</span>
                      </h1>
-                      <div className="text-base text-gray-700">
+                      <p className="mt-2 text-gray-600">
                         @{username}
-                      </div>
+                      </p>
                    </div>
 
-                    {/* Golf Club and Handicap centered with fixed gap (desktop/tablet only) */}
-                    <div className="mt-10 flex justify-center items-start gap-6"
+                    {/* Home Club and Handicap centered with tighter gaps */}
+                    <div className="mt-6 flex justify-center items-start gap-6"
                         style={{
                           width: 'calc(100% - var(--mini-w) - 8px)',
                           marginRight: 'calc(var(--mini-w) + 8px)'
                         }}>
-                     {/* Golf Club */}
+                     {/* Home Club */}
                      <div className="text-center">
-                       <div className="text-base font-semibold">Golf Club</div>
-                       <div className="text-base text-gray-700">{homeClub}</div>
+                       <div className="text-[12px] font-medium text-gray-500 tracking-wide">Home Club</div>
+                       <div className="mt-0.5 text-[17px] font-semibold text-gray-900">{homeClub}</div>
                      </div>
 
                      {/* Handicap */}
                      <div className="text-center">
-                       <div className="text-base font-semibold">Handicap</div>
-                       <div className="text-base text-gray-700">{handicap}</div>
+                       <div className="text-[12px] font-medium text-gray-500 tracking-wide">Handicap</div>
+                       <div className="mt-0.5 text-[17px] font-semibold text-gray-900">{handicap}</div>
                      </div>
                    </div>
 
-                   {/* Bio section - centered with user name */}
-                   <div className="mt-6"
+                   {/* Bio section - equal spacing to top */}
+                   <div className="mt-8"
                         style={{
                           width: 'calc(100% - var(--mini-w) - 8px)',
                           marginRight: 'calc(var(--mini-w) + 8px)'
                         }}>
                      <div className="text-center">
                        {profile?.bio && (
-                         <p className="text-base text-gray-700 mb-3 line-clamp-3 leading-relaxed">
+                         <p className="text-[16px] text-gray-700 mb-3 line-clamp-3 leading-relaxed">
                            {profile.bio}
                          </p>
                        )}
