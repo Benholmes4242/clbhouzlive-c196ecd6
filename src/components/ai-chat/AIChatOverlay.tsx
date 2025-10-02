@@ -805,7 +805,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   </div>
 
                   {/* Main composer pill - Phase 60: Cinematic Glass Grid */}
-                  <div className="composer-pill group rounded-[28px] bg-white/92 backdrop-blur border border-black/10 shadow-md px-3.5 py-2.5 sm:px-4 sm:py-3 grid grid-cols-[auto,1fr,auto] items-center gap-2">
+                  <div className="composer-pill group rounded-[28px] bg-white/92 backdrop-blur border border-black/10 shadow-md px-3 sm:px-3.5 min-h-[56px] grid grid-cols-[auto,1fr,auto] items-center gap-2">
                     {/* Left tools */}
                     <div className="flex items-center gap-1.5">
                       {isRecording ? (
@@ -861,18 +861,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         autoCorrect="on"
                         autoCapitalize="sentences"
                         rows={1}
-                        className="w-full bg-transparent outline-none text-[15px] sm:text-[16px] leading-[1.4] placeholder:text-gray-500 resize-none focus-visible:outline-none"
+                        className="w-full bg-transparent outline-none text-[15px] leading-[1.4] py-2 placeholder:text-gray-500 resize-none focus-visible:outline-none"
                       />
-                      
-                      {/* Helper row */}
-                      <div className="mt-1 flex items-center justify-between">
-                        <div className="text-[11px] text-gray-500/90">
-                          Shift + Enter = newline
-                        </div>
-                        <div className="text-[11px] text-gray-500/90 select-none">
-                          ~ concise answers
-                        </div>
-                      </div>
                     </div>
 
                     {/* Send button */}
