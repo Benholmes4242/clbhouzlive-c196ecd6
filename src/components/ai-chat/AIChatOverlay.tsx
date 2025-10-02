@@ -453,7 +453,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
       
       {/* Panel shell */}
       <div 
-        className="fixed inset-0 z-[1100] w-full h-full overflow-hidden pointer-events-auto"
+        className="fixed inset-0 z-[1100] flex flex-col bg-transparent"
         onWheel={(e) => {
           // Allow scrolling within the modal, but prevent it from bubbling up
           const target = e.currentTarget;
@@ -474,19 +474,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         }}
         onTouchMove={(e) => e.stopPropagation()}
       >
-        {/* Safe-area wrapper */}
-        <div 
-          className="flex h-full flex-col"
-          style={{
-            paddingTop: 'max(8px, env(safe-area-inset-top))',
-            paddingBottom: 'max(8px, env(safe-area-inset-bottom))'
-          }}
+        {/* Header */}
+        <header
+          className="sticky top-0 z-10 border-b border-white/10 bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50"
+          data-echo-topbar
         >
-          {/* Header */}
-          <header
-            className="relative z-[1] border-b border-white/10 bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50"
-            data-echo-topbar
-          >
             {/* Top progress bar when loading */}
             {isLoading && (
               <div 
@@ -504,7 +496,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             )}
             
-            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4">
+            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pt-[max(env(safe-area-inset-top),0px)]">
               <div className="h-14 sm:h-16 grid grid-cols-[auto,1fr,auto] items-center gap-2">
                 {/* Left: close button */}
                 <button
@@ -749,14 +741,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </TabsContent>
           </Tabs>
         
-          {/* Composer footer - Phase 60: Cinematic Glass */}
-          <footer 
-            className="sticky bottom-0 z-20 bg-gradient-to-t from-white/80 to-white/50 backdrop-blur-xl border-t border-white/20 pb-[max(env(safe-area-inset-bottom),12px)] px-3 sm:px-4 pt-3"
-            role="region"
-            aria-label="Message composer"
-            data-echo-composer
-            data-streaming={isLoading ? "true" : "false"}
-          >
+        {/* Composer footer - Phase 60: Cinematic Glass */}
+        <footer 
+          className="sticky bottom-0 z-10 bg-gradient-to-t from-white/80 to-white/50 backdrop-blur-xl border-t border-white/20"
+          role="region"
+          aria-label="Message composer"
+          data-echo-composer
+          data-streaming={isLoading ? "true" : "false"}
+        >
             {/* Upload progress bar (shown during processing) */}
             {(isLoading || isProcessing) && (
               <div className="absolute left-0 right-0 top-0 h-[2px] bg-[#2A9D8F]/20 overflow-hidden">
@@ -764,7 +756,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             )}
             
-            <div className="mx-auto w-full max-w-[720px]">
+            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pt-3 pb-[max(env(safe-area-inset-bottom),0px)]">
               {activeTab === 'chat' && (
                 <div>
                   {/* Attachments tray - Phase 58 */}
@@ -938,8 +930,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 </div>
               )}
             </div>
-          </footer>
-        </div>
+        </footer>
       </div>
       </SlideOver>
       

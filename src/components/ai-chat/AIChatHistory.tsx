@@ -669,21 +669,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         />
         
         {/* Panel shell */}
-        <div className="fixed inset-0 z-[1100] w-full h-full overflow-hidden pointer-events-auto">
-          {/* Safe-area wrapper */}
-          <div 
-            className="flex h-full flex-col"
-            style={{
-              paddingTop: 'max(8px, env(safe-area-inset-top))',
-              paddingBottom: 'max(8px, env(safe-area-inset-bottom))'
-            }}
+        <div className="fixed inset-0 z-[1100] flex flex-col bg-transparent">
+          {/* Header */}
+          <header
+            className="sticky top-0 z-10 border-b border-white/10 bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50"
+            data-echo-topbar
           >
-            {/* Header */}
-            <header
-              className="relative z-[1] border-b border-white/10 bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50"
-              data-echo-topbar
-            >
-              <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4">
+              <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pt-[max(env(safe-area-inset-top),0px)]">
                 <div className="h-14 sm:h-16 grid grid-cols-[auto,1fr,auto] items-center gap-2">
                   {/* Left: close button */}
                   <button
@@ -725,7 +717,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             </header>
 
             {/* Search & Tabs (sticky under header) - Phase 55 */}
-            <div className="sticky top-14 sm:top-16 z-[1] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm border-b border-white/10">
+            <div className="sticky top-0 z-[5] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm border-b border-white/10">
               <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-2">
                 {/* Search bar */}
                 <div className="flex items-center gap-2 mb-2">
@@ -807,12 +799,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               </div>
             </div>
 
-            <div className="flex-1 flex flex-col overflow-hidden bg-transparent">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+            <div className="flex-1 min-h-0">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col h-full">
                   {/* Chat Tab */}
                   <TabsContent value="chat" className="m-0 flex-1" style={{ minHeight: 0 }} role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
                       <div 
-                        className="relative h-full overflow-y-auto overscroll-contain scroll-smooth pt-4 pb-6 px-3 sm:px-4"
+                        className="h-full overflow-y-auto overscroll-contain scroll-smooth pb-[max(env(safe-area-inset-bottom),0px)]"
                         style={{ WebkitOverflowScrolling: "touch" }}
                         data-echo-canvas
                         ref={chatAutoScroll.scrollAreaRef}
@@ -1104,10 +1096,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                      </div>
                    </TabsContent>
 
-                  {/* Swing Coach Tab */}
-                  <TabsContent value="swing" className="m-0 flex-1" style={{ minHeight: 0 }} role="tabpanel" id="swing-panel" aria-labelledby="swing-tab">
+                   {/* Swing Coach Tab */}
+                   <TabsContent value="swing" className="m-0 flex-1" style={{ minHeight: 0 }} role="tabpanel" id="swing-panel" aria-labelledby="swing-tab">
                      <div 
-                       className="relative h-full overflow-y-auto overscroll-contain scroll-smooth pt-4 pb-6 px-3 sm:px-4"
+                       className="h-full overflow-y-auto overscroll-contain scroll-smooth pb-[max(env(safe-area-inset-bottom),0px)]"
                        style={{ WebkitOverflowScrolling: "touch" }}
                        data-echo-canvas
                        ref={swingAutoScroll.scrollAreaRef}
@@ -1251,13 +1243,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                         )}
                        </>
                      )}
-                    </div>
-                    </div>
-                    </TabsContent>
-                 </Tabs>
-                </div>
-              </div>
-            </div>
+                     </div>
+                     </div>
+                     </TabsContent>
+                  </Tabs>
+                 </div>
+         </div>
         </SlideOver>
 
       {/* EchoProtection Modal */}
