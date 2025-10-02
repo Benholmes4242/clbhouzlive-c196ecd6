@@ -2,6 +2,7 @@
 // Supabase Edge Function (Deno runtime)
 // ⚠️ Router applies ONLY to text Q&A. SwingCoach (CV/video) and CaddieLogs flows are untouched.
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
+import { needsStaticExplainer, modelDeclined, type Mode } from "./router.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY")!;
@@ -9,8 +10,6 @@ const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY")!;
 const OPENAI_MODEL = "gpt-4o-mini";
 const PERPLEXITY_MODEL = "sonar";
 const DEFAULT_TIMEZONE = "Europe/London";
-
-type Mode = "auto" | "live" | "static";
 
 interface EchoRequestBody {
   message: string;
@@ -284,30 +283,6 @@ Based on the submitted frames, I can see:
     console.log('📥 EDGE FUNCTION DEBUG - Processing text query with enhanced routing');
 
     const CHAT_EDGE_TIMEOUT_MS = 30000; // align with client 32s
-
-    // INVERTED HYBRID ROUTER: Default to Perplexity (live), use OpenAI only for explicit explainer/history
-    const needsStaticExplainer = (q: string): [boolean, string] => {
-      const p = q.toLowerCase();
-      
-      // Check for explicit explainer keywords
-      if (/(explain|how does|how do|what is|what are|how to|background|origin|history of)/i.test(p)) {
-        return [true, 'explainer'];
-      }
-      
-      // Check for explicit past years (1900-2022) for historical context
-      if (/\b(19\d{2}|20(0\d|1\d|2[0-2]))\b/.test(p)) {
-        return [true, 'historical'];
-      }
-      
-      // Default to live (Perplexity) for all other queries
-      return [false, 'default-live'];
-    };
-
-    const modelDeclined = (text: string | undefined): boolean => {
-      if (!text) return false;
-      const p = text.toLowerCase();
-      return /\b(i (don'?t|do not) have (current|real-?time) info|knowledge cutoff|can'?t browse|check the web|not up to date)\b/.test(p);
-    };
 
     let route: Mode = mode;
     let routeReason = 'default';
