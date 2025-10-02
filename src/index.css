@@ -245,7 +245,7 @@ html, body {
 }
 
 .name-first { 
-  margin-bottom: var(--sp-4); /* Tightened from --sp-6 */
+  margin-bottom: var(--sp-6); 
 }
 
 .handle {
@@ -280,7 +280,7 @@ html, body {
   font-weight: var(--fw-value);
   line-height: var(--lh-normal);
   text-align: center;
-  margin-top: var(--sp-4); /* Tightened from --sp-8 */
+  margin-top: var(--sp-8);
 }
 
 .meta-value--hcp {
@@ -295,7 +295,7 @@ html, body {
   font-weight: var(--fw-bio);
   line-height: 1.5;
   text-align: center;
-  margin-top: var(--panel-pad-y); /* Match top padding for symmetry */
+  margin-top: calc(var(--mini-h) * 0.20 + 32px);
   padding-inline: var(--sp-16);
 }
 
