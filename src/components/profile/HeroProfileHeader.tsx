@@ -845,18 +845,12 @@ const HeroProfileHeader = ({
                   })()}
                 </div>
 
-                {/* Club / Handicap row */}
+                {/* Home Club */}
                 <div className="meta-row">
                   <div className="meta meta-club">
-                    <div className="meta-label">Golf Club</div>
+                    <div className="meta-label">Home Club</div>
                     <div className="meta-value">
                       {homeClub}
-                    </div>
-                  </div>
-                  <div className="meta meta-hcp">
-                    <div className="meta-label">Handicap</div>
-                    <div className="meta-value meta-value--hcp">
-                      {handicap ?? '—'}
                     </div>
                   </div>
                 </div>
@@ -1023,22 +1017,16 @@ const HeroProfileHeader = ({
                       </div>
                    </div>
 
-                    {/* Golf Club and Handicap centered with fixed gap (desktop/tablet only) */}
-                    <div className="mt-10 flex justify-center items-start gap-6"
+                    {/* Home Club centered (desktop/tablet only) */}
+                    <div className="mt-10 flex justify-center items-start"
                         style={{
                           width: 'calc(100% - var(--mini-w) - 8px)',
                           marginRight: 'calc(var(--mini-w) + 8px)'
                         }}>
-                     {/* Golf Club */}
+                     {/* Home Club */}
                      <div className="text-center">
-                       <div className="text-base font-semibold">Golf Club</div>
+                       <div className="text-base font-semibold">Home Club</div>
                        <div className="text-base text-gray-700">{homeClub}</div>
-                     </div>
-
-                     {/* Handicap */}
-                     <div className="text-center">
-                       <div className="text-base font-semibold">Handicap</div>
-                       <div className="text-base text-gray-700">{handicap}</div>
                      </div>
                    </div>
 
