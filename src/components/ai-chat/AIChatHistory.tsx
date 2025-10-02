@@ -140,6 +140,7 @@ interface AIChatHistoryProps {
   onSelectMessage: (message: string) => void;
   onNewConversation?: () => void;
   defaultCategory?: string;
+  initialTab?: 'chat' | 'swing';
 }
 
 // Swing Analysis Card Component
@@ -393,7 +394,7 @@ const ErrorState: React.FC<{
   </div>
 );
 
-const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelectMessage, onNewConversation, defaultCategory }) => {
+const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelectMessage, onNewConversation, defaultCategory, initialTab = 'chat' }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(defaultCategory || 'all');
   const [selectedTag, setSelectedTag] = useState('all');
@@ -425,7 +426,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
   // Use the caddie logs hook
   const { caddieLogs, loading: caddieLogsLoading, deleteCaddieLog: deleteCaddieLogHook } = useCaddieLogs();
-  const [activeTab, setActiveTab] = useState('chat');
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [editingConversationId, setEditingConversationId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   

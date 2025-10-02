@@ -51,6 +51,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [historyInitialTab, setHistoryInitialTab] = useState<'chat' | 'swing'>('chat');
   const [userLocation, setUserLocation] = useState<string>('');
   const [activeTab, setActiveTab] = useState('chat');
   const [analysisText, setAnalysisText] = useState('');
@@ -414,6 +415,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
     sendMessage(originalMessage, true);
   };
 
+  // Helper to open history with specific tab
+  const openHistory = (tab: 'chat' | 'swing') => {
+    setHistoryInitialTab(tab);
+    setShowHistory(true);
+  };
 
   // Handle exit animation cleanup
   const handleExitComplete = useCallback(() => {
@@ -890,21 +896,23 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
                   {/* Recent history peek */}
                   <button
-                    className="mt-3 w-full rounded-full bg-white/80 backdrop-blur border border-black/10 shadow-sm flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                    onClick={() => setShowHistory(true)}
-                    aria-label="Open recent history"
+                    className="mt-3 w-full h-12 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm grid grid-cols-[auto,1fr,auto] items-center px-4 text-[15px] text-gray-800 hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                    onClick={() => openHistory('chat')}
+                    aria-label="Open chat history"
                   >
-                    <span className="flex items-center gap-2 text-[13px] font-medium">
+                    <span className="mr-2 grid h-6 w-6 place-items-center text-gray-600">
                       <History className="h-[14px] w-[14px]" />
-                      Recent history
                     </span>
-                    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+                    <span className="justify-self-start font-medium">Recent history</span>
+                    <span className="ml-2 text-gray-500">
+                      <svg className="h-3.5 w-3.5" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+                    </span>
                   </button>
                   
                   {/* Shy helper text */}
-                  <div className="mt-2 text-center text-[11px] text-gray-500 select-none">
+                  <p className="mt-2 text-center text-xs text-gray-500">
                     Echo helps with chat and swing analysis. No data is shared publicly.
-                  </div>
+                  </p>
                 </div>
               )}
             </div>
@@ -968,6 +976,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             setMessages([]);
             setShowHistory(false);
           }}
+          initialTab={historyInitialTab}
         />
       </>
     );
