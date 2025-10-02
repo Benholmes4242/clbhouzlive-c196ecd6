@@ -2,7 +2,7 @@
 // Supabase Edge Function (Deno runtime)
 // ⚠️ Router applies ONLY to text Q&A. SwingCoach (CV/video) and CaddieLogs flows are untouched.
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
-import { needsStaticExplainer, modelDeclined, type Mode } from "./router.ts";
+import { decideRoute, modelDeclined, type Mode } from "./router.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY")!;
@@ -284,15 +284,9 @@ Based on the submitted frames, I can see:
 
     const CHAT_EDGE_TIMEOUT_MS = 30000; // align with client 32s
 
-    let route: Mode = mode;
-    let routeReason = 'default';
-
-    if (mode === "auto") {
-      const [needsStatic, reason] = needsStaticExplainer(message);
-      route = needsStatic ? "static" : "live";
-      routeReason = reason;
-      console.log('🤖 INVERTED routing decision:', { route, reason, message: message.substring(0, 60) });
-    }
+    const { route, reason } = decideRoute(message, mode);
+    const routeReason = reason;
+    console.log('🤖 Route decision', { route, reason });
 
     const staticSystem = [
       "You are Echo, a friendly golf-first assistant.",
