@@ -123,27 +123,31 @@ export function SlideOver({
   const slideOverContent = (
     <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
       {open && (
-        <motion.div
-          key="slide-over"
-          initial={{ x: "100%" }}
-          animate={{ x: 0 }}
-          exit={{ x: "100%" }}
-          transition={{ type: "tween", duration: 0.25, ease: "easeInOut" }}
+        <div
           className={`fixed inset-0 ${zIndex} overflow-hidden`}
           role="dialog"
           aria-modal="true"
         >
-          {/* Backdrop - sits behind panel (z-10) */}
+          {/* Backdrop - sits behind panel (z-10) with fade animation */}
           {backdrop !== 'none' && (
-            <button
+            <motion.button
               aria-label="Close"
               onClick={onClose}
-              className={`absolute inset-0 z-10 ${backdrop === 'blurred' ? 'bg-white/10 backdrop-blur-xl' : 'bg-transparent'}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className={`absolute inset-0 z-10 ${backdrop === 'blurred' ? 'bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50' : 'bg-transparent'}`}
             />
           )}
           
-          {/* Panel wrapper - always above backdrop (z-20) */}
-          <div 
+          {/* Panel wrapper - always above backdrop (z-20) with slide animation */}
+          <motion.div 
+            key="slide-over-panel"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "tween", duration: 0.25, ease: "easeInOut" }}
             aria-label={ariaLabel}
             className={`
               relative z-20 h-full w-full flex flex-col pointer-events-auto
@@ -155,8 +159,8 @@ export function SlideOver({
             style={isMobile ? { height: '100dvh' } : undefined}
           >
             {children}
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       )}
     </AnimatePresence>
   );
