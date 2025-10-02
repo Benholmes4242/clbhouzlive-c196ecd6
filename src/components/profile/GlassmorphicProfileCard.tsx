@@ -31,7 +31,7 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
 
   return (
     <div 
-      className="relative mx-4 md:mx-8 text-center"
+      className="relative mx-4 md:mx-8 p-6 text-center"
       style={glassmorphicStyle}
     >
       {/* Profile photo - overlapping top of card */}
@@ -54,7 +54,7 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
       </div>
 
       {/* Profile content */}
-      <div className="px-4 sm:px-6 pt-8 pb-6">
+      <div className="pt-6 space-y-2">
         {/* Username row with edit button */}
         <div className="flex items-center justify-center gap-3">
           <p className="text-base text-white/80">
@@ -74,16 +74,16 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
         </div>
 
         {/* Name aligned with mini profile card and club/handicap info side by side */}
-        <div className="flex items-start justify-between gap-4 mt-2">
+        <div className="flex items-start justify-between gap-4">
           {/* Left side - Name and club/handicap info */}
-          <div className="flex-1 flex flex-col items-center gap-1">
+          <div className="flex-1 flex flex-col items-center gap-2">
             {/* Name - large, bold - aligned with mini card top */}
             <h2 className="text-2xl font-bold text-white">
               {profile?.display_name || 'User'}
             </h2>
             
-            {/* Home Club and Handicap - side by side */}
-            <div className="flex items-center gap-4 mt-0.5">
+            {/* Golf Club and Handicap - side by side */}
+            <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Flag className="w-4 h-4 text-white/60" />
                 <p className="text-sm text-white/60">
