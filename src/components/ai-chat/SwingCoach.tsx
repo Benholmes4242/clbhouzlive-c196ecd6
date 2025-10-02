@@ -1523,27 +1523,17 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       />
 
       {/* Recent History Bar */}
-      <div className="px-2 py-4 border-t">
+      <div className="px-2 py-4 border-t border-white/20">
         <button
-          className="w-full rounded-[28px] backdrop-blur shadow flex items-center justify-between px-4 py-2 text-white hover:opacity-90 transition-all"
-          style={{ 
-            background: 'linear-gradient(135deg, rgba(29, 53, 87, 0.15), rgba(42, 157, 143, 0.15))',
-            color: '#1D3557'
-          }}
+          className="w-full rounded-full bg-white/80 backdrop-blur border border-black/10 shadow-sm flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
           onClick={() => setShowHistory(true)}
           aria-label="Open recent swing coach history"
         >
-          <span className="flex items-center gap-2">
-            <span 
-              className="w-10 h-1 rounded-full" 
-              style={{ 
-                background: 'linear-gradient(135deg, #1D3557, #2A9D8F)', 
-                opacity: 0.8 
-              }} 
-            />
+          <span className="flex items-center gap-2 text-[13px] font-medium">
+            <svg className="h-[14px] w-[14px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             Recent history
           </span>
-          <svg className="h-4 w-4" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
         </button>
       </div>
 
