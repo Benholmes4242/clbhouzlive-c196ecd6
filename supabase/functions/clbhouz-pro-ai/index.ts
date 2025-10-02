@@ -377,14 +377,17 @@ Based on the submitted frames, I can see:
     } catch (e) {
       // Fallback to static if live search fails
       if (route === "live") {
-        console.log('🔄 Falling back to static knowledge');
+        console.log('🔄 Falling back to static knowledge due to Perplexity failure');
+        routeReason = 'perplexity-fallback-failed';
         try {
           const result = await withTimeout(callOpenAIEnhanced(history), CHAT_EDGE_TIMEOUT_MS);
           answer = `I couldn't reach live sources quickly. Here's background info instead:\n\n${result.text}`;
           provider = 'openai';
         } catch (fallbackError) {
+          console.log('❌ Both Perplexity and OpenAI fallback failed');
           answer = "Sorry, I'm having trouble responding right now. Please try again in a moment.";
           provider = 'error';
+          routeReason = 'all-providers-failed';
         }
       } else {
         throw e;
