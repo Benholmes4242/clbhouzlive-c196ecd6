@@ -453,7 +453,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
       
       {/* Panel shell */}
       <div 
-        className="fixed inset-0 z-[1100] flex flex-col bg-transparent"
+        className="relative h-full bg-gradient-to-b from-white/70 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50 flex flex-col"
         onWheel={(e) => {
           // Allow scrolling within the modal, but prevent it from bubbling up
           const target = e.currentTarget;
@@ -540,12 +540,12 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             {/* Tabs under header */}
             <div className="sticky top-0 z-[0] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm border-b border-white/10">
               <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-2">
-                <TabsList className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/50 shadow-sm flex p-1">
+                <TabsList className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/30 shadow-sm flex p-1">
                   <TabsTrigger
                     value="chat"
                     className="flex-1 rounded-full px-4 text-[14px] font-medium 
-                               data-[state=active]:bg-white data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
-                               data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-white/50
+                               data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
+                               data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-white/60
                                transition-all"
                   >
                     Chat
@@ -553,8 +553,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   <TabsTrigger
                     value="swing"
                     className="flex-1 rounded-full px-4 text-[14px] font-medium 
-                               data-[state=active]:bg-white data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
-                               data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-white/50
+                               data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
+                               data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-white/60
                                transition-all"
                   >
                     Swing Coach
@@ -743,7 +743,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         
         {/* Composer footer - Phase 60: Cinematic Glass */}
         <footer 
-          className="sticky bottom-0 z-10 bg-gradient-to-t from-white/80 to-white/50 backdrop-blur-xl border-t border-white/20"
+          className="sticky bottom-0 z-10 bg-gradient-to-t from-white/80 to-white/40 backdrop-blur-xl border-t border-white/20"
           role="region"
           aria-label="Message composer"
           data-echo-composer
@@ -805,7 +805,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   </div>
 
                   {/* Main composer pill - Phase 60: Cinematic Glass Grid */}
-                  <div className="composer-pill group rounded-[28px] bg-white/92 backdrop-blur border border-black/10 shadow-md px-3 sm:px-3.5 min-h-[56px] grid grid-cols-[auto,1fr,auto] items-center gap-2">
+                  <div className="composer-pill group rounded-[28px] bg-white/90 backdrop-blur border border-white/20 shadow-sm px-3 sm:px-3.5 min-h-[56px] grid grid-cols-[auto,1fr,auto] items-center gap-2">
                     {/* Left tools */}
                     <div className="flex items-center gap-1.5">
                       {isRecording ? (

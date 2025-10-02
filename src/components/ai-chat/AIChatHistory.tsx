@@ -669,7 +669,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         />
         
         {/* Panel shell */}
-        <div className="fixed inset-0 z-[1100] flex flex-col bg-transparent">
+        <div className="relative h-full bg-gradient-to-b from-white/70 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50 flex flex-col">
           {/* Header */}
           <header
             className="sticky top-0 z-10 border-b border-white/10 bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50"
@@ -721,7 +721,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-2">
                 {/* Search bar */}
                 <div className="flex items-center gap-2 mb-2">
-                  <label className="flex-1 h-11 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm px-3 flex items-center gap-2 transition">
+                  <label className="flex-1 h-11 rounded-full bg-white/90 backdrop-blur border border-white/20 shadow-sm px-3 flex items-center gap-2 transition">
                     <Search className="h-4 w-4 text-gray-400" aria-hidden="true" />
                     <input
                       type="search"
@@ -744,7 +744,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
                   {/* Filter button (UI placeholder) */}
                   <button
-                    className="h-11 px-4 rounded-full bg-white border border-black/10 hover:bg-gray-50 shadow-sm text-[14px] font-medium text-gray-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 flex items-center gap-1.5"
+                    className="h-11 px-4 rounded-full bg-white/90 backdrop-blur border border-white/20 hover:bg-white shadow-sm text-[14px] font-medium text-gray-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 flex items-center gap-1.5"
                     aria-label="Open filters"
                   >
                     <Filter className="h-4 w-4" />
@@ -753,15 +753,15 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 </div>
 
                 {/* Tabs */}
-                <div className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/50 shadow-sm grid grid-cols-2 gap-1 p-1">
+                <div className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/30 shadow-sm grid grid-cols-2 gap-1 p-1">
                   <button
                     type="button"
                     onClick={() => setActiveTab('chat')}
                     className={cn(
                       "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
                       activeTab === 'chat' 
-                        ? "bg-white shadow ring-1 ring-black/5" 
-                        : "text-gray-700 hover:bg-white/50"
+                        ? "bg-white text-gray-900 shadow ring-1 ring-black/5" 
+                        : "text-gray-700 hover:bg-white/60"
                     )}
                   >
                     Chat {filteredConversations.length > 0 && <span className="ml-1 opacity-70">({filteredConversations.length})</span>}
@@ -772,8 +772,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     className={cn(
                       "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
                       activeTab === 'swing' 
-                        ? "bg-white shadow ring-1 ring-black/5" 
-                        : "text-gray-700 hover:bg-white/50"
+                        ? "bg-white text-gray-900 shadow ring-1 ring-black/5" 
+                        : "text-gray-700 hover:bg-white/60"
                     )}
                   >
                     Swing {filteredSwingAnalyses.length > 0 && <span className="ml-1 opacity-70">({filteredSwingAnalyses.length})</span>}
