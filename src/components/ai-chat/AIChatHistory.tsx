@@ -654,25 +654,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         width="w-full"
         zIndex="z-[1100]"
         ariaLabel="Echo History"
-        backdrop="none"
+        backdrop="blurred"
       >
-        {/* Backdrop with vignette */}
-        <div 
-          className="fixed inset-0 z-[1099] pointer-events-auto"
-          style={{
-            background: 'radial-gradient(120% 80% at 50% 0%, rgba(0,0,0,0.28), rgba(0,0,0,0.55))',
-            backdropFilter: 'blur(18px)',
-            WebkitBackdropFilter: 'blur(18px)',
-            willChange: 'backdrop-filter'
-          }}
-          onClick={onClose}
-        />
-        
         {/* Panel shell */}
         <div className="relative h-full bg-gradient-to-b from-white/70 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50 flex flex-col">
           {/* Header */}
           <header
-            className="sticky top-0 z-10 border-b border-white/10 bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50"
+            className="sticky top-0 z-[2] border-b border-white/20 bg-gradient-to-b from-white/70 to-white/40 backdrop-blur-xl"
             data-echo-topbar
           >
               <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pt-[max(env(safe-area-inset-top),0px)]">
@@ -717,7 +705,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             </header>
 
             {/* Search & Tabs (sticky under header) - Phase 55 */}
-            <div className="sticky top-0 z-[5] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm border-b border-white/10">
+            <div className="sticky top-[56px] sm:top-[64px] z-[1] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm border-b border-white/10">
               <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-2">
                 {/* Search bar */}
                 <div className="flex items-center gap-2 mb-2">

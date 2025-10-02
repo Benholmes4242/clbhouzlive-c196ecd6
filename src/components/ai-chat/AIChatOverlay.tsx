@@ -437,21 +437,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         width="w-full"
         zIndex="z-[1100]"
         ariaLabel="Echo AI chat interface"
-        backdrop="none"
+        backdrop="blurred"
       >
-      {/* Backdrop with vignette */}
-      <div 
-        className="fixed inset-0 z-[1099] pointer-events-auto"
-        style={{
-          background: 'radial-gradient(120% 80% at 50% 0%, rgba(0,0,0,0.28), rgba(0,0,0,0.55))',
-          backdropFilter: 'blur(18px)',
-          WebkitBackdropFilter: 'blur(18px)',
-          willChange: 'backdrop-filter'
-        }}
-        onClick={handleClose}
-      />
-      
-      {/* Panel shell */}
+      {/* Panel shell - gradient background inside */}
       <div 
         className="relative h-full bg-gradient-to-b from-white/70 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50 flex flex-col"
         onWheel={(e) => {
@@ -476,7 +464,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
       >
         {/* Header */}
         <header
-          className="sticky top-0 z-10 border-b border-white/10 bg-gradient-to-b from-white/60 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50"
+          className="sticky top-0 z-[2] border-b border-white/20 bg-gradient-to-b from-white/70 to-white/40 backdrop-blur-xl"
           data-echo-topbar
         >
             {/* Top progress bar when loading */}
@@ -538,7 +526,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           {/* Segmented Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
             {/* Tabs under header */}
-            <div className="sticky top-0 z-[0] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm border-b border-white/10">
+            <div className="sticky top-[56px] sm:top-[64px] z-[1] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm border-b border-white/10">
               <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-2">
                 <TabsList className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/30 shadow-sm flex p-1">
                   <TabsTrigger
@@ -743,7 +731,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         
         {/* Composer footer - Phase 60: Cinematic Glass */}
         <footer 
-          className="sticky bottom-0 z-10 bg-gradient-to-t from-white/80 to-white/40 backdrop-blur-xl border-t border-white/20"
+          className="sticky bottom-0 z-[2] bg-gradient-to-t from-white/80 to-white/40 backdrop-blur-xl border-t border-white/20"
           role="region"
           aria-label="Message composer"
           data-echo-composer

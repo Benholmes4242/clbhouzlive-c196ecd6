@@ -129,41 +129,30 @@ export function SlideOver({
           animate={{ x: 0 }}
           exit={{ x: "100%" }}
           transition={{ type: "tween", duration: 0.25, ease: "easeInOut" }}
-          className={`
-            fixed flex ${zIndex}
-            ${isMobile 
-              ? 'top-0 left-0 right-0 bottom-0' 
-              : 'inset-0'
-            }
-          `}
+          className={`fixed inset-0 ${zIndex} overflow-hidden`}
+          role="dialog"
+          aria-modal="true"
         >
-          {/* Backdrop - blocks all background interaction */}
+          {/* Backdrop - sits behind panel (z-10) */}
           {backdrop !== 'none' && (
             <button
-              aria-label="Close Echo"
+              aria-label="Close"
               onClick={onClose}
-              className={`fixed cursor-default inset-0 ${backdrop === 'blurred' ? 'bg-white/10 backdrop-blur-xl' : 'bg-transparent'}`}
-              onMouseDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
+              className={`absolute inset-0 z-10 ${backdrop === 'blurred' ? 'bg-white/10 backdrop-blur-xl' : 'bg-transparent'}`}
             />
           )}
           
-          
-          {/* Modal Panel */}
+          {/* Panel wrapper - always above backdrop (z-20) */}
           <div 
-            role="dialog"
-            aria-modal="true"
             aria-label={ariaLabel}
             className={`
-              fixed bg-background z-10
+              relative z-20 h-full w-full flex flex-col pointer-events-auto
               ${isMobile 
-                ? `w-full right-0 top-0 bottom-0 shadow-lg ${heightClass}` 
-                : `inset-y-0 ${width} right-0 shadow-2xl ${heightClass}`
+                ? `shadow-lg ${heightClass}` 
+                : `ml-auto ${width} shadow-2xl ${heightClass}`
               }
             `}
             style={isMobile ? { height: '100dvh' } : undefined}
-            onMouseDown={(e) => e.stopPropagation()}
-            onTouchStart={(e) => e.stopPropagation()}
           >
             {children}
           </div>
