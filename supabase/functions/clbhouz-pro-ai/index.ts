@@ -285,19 +285,22 @@ Based on the submitted frames, I can see:
 
     const CHAT_EDGE_TIMEOUT_MS = 30000; // align with client 32s
 
-    // Enhanced router with auto-switching
-    const needsWebCheck = (q: string): [boolean, string] => {
+    // INVERTED HYBRID ROUTER: Default to Perplexity (live), use OpenAI only for explicit explainer/history
+    const needsStaticExplainer = (q: string): [boolean, string] => {
       const p = q.toLowerCase();
-      if (/(today|tonight|tomorrow|yesterday|this (week|month|year)|current|latest|now|live|right now|up-to-date|as of|breaking|recent)/i.test(p)) {
-        return [true, 'time keywords'];
+      
+      // Check for explicit explainer keywords
+      if (/(explain|how does|how do|what is|what are|how to|background|origin|history of)/i.test(p)) {
+        return [true, 'explainer'];
       }
-      if (/\b20(2[3-9]|3[0-5])\b/.test(p)) {
-        return [true, 'explicit year'];
+      
+      // Check for explicit past years (1900-2022) for historical context
+      if (/\b(19\d{2}|20(0\d|1\d|2[0-2]))\b/.test(p)) {
+        return [true, 'historical'];
       }
-      if (/(leaderboard|pairings|tee times|result|price|schedule|fixture|odds|rankings|captain|coach|manager|injury|withdrawn|weather|pga|lpga|ryder cup|presidents cup)/i.test(p)) {
-        return [true, 'volatile entity'];
-      }
-      return [false, 'default static'];
+      
+      // Default to live (Perplexity) for all other queries
+      return [false, 'default-live'];
     };
 
     const modelDeclined = (text: string | undefined): boolean => {
@@ -310,10 +313,10 @@ Based on the submitted frames, I can see:
     let routeReason = 'default';
 
     if (mode === "auto") {
-      const [needsWeb, reason] = needsWebCheck(message);
-      route = needsWeb ? "live" : "static";
+      const [needsStatic, reason] = needsStaticExplainer(message);
+      route = needsStatic ? "static" : "live";
       routeReason = reason;
-      console.log('🤖 Auto-routing decision:', { route, reason });
+      console.log('🤖 INVERTED routing decision:', { route, reason, message: message.substring(0, 60) });
     }
 
     const staticSystem = [
