@@ -13,6 +13,7 @@ import AIChatHistory from './AIChatHistory';
 import CaddieLogs from './CaddieLogs';
 import SwingCoach from './SwingCoach';
 import EchoAvatar from './EchoAvatar';
+import { OverlayFooter } from './OverlayFooter';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
@@ -894,25 +895,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     )}
                   </div>
 
-                  {/* Recent history peek */}
-                  <button
-                    className="mt-3 w-full h-12 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm grid grid-cols-[auto,1fr,auto] items-center px-4 text-[15px] text-gray-800 hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                    onClick={() => openHistory('chat')}
-                    aria-label="Open chat history"
-                  >
-                    <span className="mr-2 grid h-6 w-6 place-items-center text-gray-600">
-                      <History className="h-[14px] w-[14px]" />
-                    </span>
-                    <span className="justify-self-start font-medium">Recent history</span>
-                    <span className="ml-2 text-gray-500">
-                      <svg className="h-3.5 w-3.5" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
-                    </span>
-                  </button>
-                  
-                  {/* Shy helper text */}
-                  <p className="mt-2 text-center text-xs text-gray-500">
-                    Echo helps with chat and swing analysis. No data is shared publicly.
-                  </p>
+                  <OverlayFooter onOpen={() => openHistory('chat')} isSticky={false} />
                 </div>
               )}
             </div>
