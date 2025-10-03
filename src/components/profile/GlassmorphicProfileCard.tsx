@@ -74,9 +74,9 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
         </div>
 
         {/* Name aligned with mini profile card and club/handicap info side by side */}
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col md:flex-row items-center md:items-start md:justify-between gap-4">
           {/* Left side - Name and club/handicap info */}
-          <div className="flex-1 flex flex-col items-center gap-2">
+          <div className="flex-1 flex flex-col items-center gap-2 w-full md:w-auto">
             {/* Name - large, bold - aligned with mini card top */}
             <h2 className="text-2xl font-bold text-white">
               {profile?.display_name || 'User'}
