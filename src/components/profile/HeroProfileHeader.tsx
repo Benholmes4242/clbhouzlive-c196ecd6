@@ -803,9 +803,9 @@ const HeroProfileHeader = ({
                 boxShadow: 'var(--panel-shadow)'
               } as React.CSSProperties}
             >
-              <div className="px-4 sm:px-6 pt-8 pb-6"
+              <div className="px-4 sm:px-6 pt-10 pb-6"
                    style={{
-                     paddingTop: 'calc(2rem + var(--safe-top))',
+                     paddingTop: 'calc(2.5rem + var(--safe-top))',
                      paddingBottom: 'calc(1.5rem + var(--safe-bottom))'
                    }}
               >
@@ -849,7 +849,7 @@ const HeroProfileHeader = ({
                 </div>
 
                 {/* Home Club */}
-                <div className="meta-row">
+                <div className="meta-row" style={{ marginTop: '40px' }}>
                     <div className="meta meta-club">
                       <div className="meta-label">Home Club</div>
                       <div className="meta-value mt-0.5">
@@ -970,7 +970,7 @@ const HeroProfileHeader = ({
                 marginTop: 'calc(var(--panel-overlap) * -1)'
               }}
             >
-              <div className="px-4 sm:px-6 pt-8 pb-6">
+              <div className="px-4 sm:px-6 pt-10 pb-6">
                <div className="flex flex-col items-center relative">
                   {/* Overhanging mini profile card */}
                    <div
@@ -1029,7 +1029,7 @@ const HeroProfileHeader = ({
                    </div>
 
                     {/* Home Club centered (desktop/tablet only) */}
-                   <div className="mt-6 flex justify-center items-start"
+                   <div className="mt-[30px] flex justify-center items-start"
                         style={{
                           width: 'calc(100% - var(--mini-w) - 8px)',
                           marginRight: 'calc(var(--mini-w) + 8px)'
