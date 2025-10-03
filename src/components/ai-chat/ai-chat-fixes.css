@@ -206,7 +206,7 @@
    ======================================== */
 
 /* === Echo floating button: permanent frosted white === */
-.echoDock-btn {
+.echoDoc-btn {
   /* Fixed positioning - handled by inline styles in component */
   position: fixed;
   bottom: 1.5rem;
@@ -241,15 +241,15 @@
   outline: none;
 }
 
-.echoDock-btn:hover {
+.echoDoc-btn:hover {
   transform: translateY(-0.5px);
 }
 
-.echoDock-btn:active {
+.echoDoc-btn:active {
   transform: translateY(0.5px) scale(0.995);
 }
 
-.echoDock-btn:focus-visible {
+.echoDoc-btn:focus-visible {
   box-shadow:
     0 0 0 3px rgba(56,189,248,0.25),
     0 8px 20px rgba(0,0,0,0.10),
@@ -275,7 +275,7 @@
 
 /* Label/icon color for contrast on white */
 .echoDoc-label,
-.echoDock-btn svg {
+.echoDoc-btn svg {
   color: #374151; /* gray-700 equivalent */
   fill: currentColor;
 }
@@ -312,7 +312,7 @@
 
 /* Dark mode guard so it still reads in dark contexts */
 @media (prefers-color-scheme: dark) {
-  .echoDock-btn {
+  .echoDoc-btn {
     background: rgba(255,255,255,0.92);
     border-color: rgba(255,255,255,0.14);
     box-shadow:
@@ -321,14 +321,14 @@
       inset 0 1px 0 rgba(255,255,255,0.40);
   }
   .echoDoc-label,
-  .echoDock-btn svg {
+  .echoDoc-btn svg {
     color: #111827; /* gray-900 for pop */
   }
 }
 
 /* Reduced motion: keep still */
 @media (prefers-reduced-motion: reduce) {
-  .echoDock-btn { 
+  .echoDoc-btn { 
     transition: none; 
   }
   .echoDoc-btn.is-idle { 
