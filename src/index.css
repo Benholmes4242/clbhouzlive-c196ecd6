@@ -229,7 +229,7 @@ html, body {
 
 /* Name + handle block */
 .name-wrap {
-  width: calc(100% - var(--mini-w) - 8px);
+  width: 50%;
   margin-right: calc(var(--mini-w) + 8px);
   display: flex;
   flex-direction: column;
