@@ -56,7 +56,7 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
       {/* Profile content */}
       <div className="pt-6 space-y-2">
         {/* Username row with edit button */}
-        <div className="flex items-center justify-center gap-3">
+        <div className="hidden md:flex items-center justify-center gap-3">
           <p className="text-base text-white/80">
             @{profile?.username || 'username'}
           </p>
@@ -77,6 +77,21 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
         <div className="flex items-start justify-between gap-4">
           {/* Left side - Name and club/handicap info */}
           <div className="flex-1 flex flex-col items-center gap-2">
+            {/* Mobile-only Username row centered within left content area */}
+            <div className="relative w-full md:hidden flex items-center justify-center">
+              <p className="text-base text-white/80">
+                @{profile?.username || 'username'}
+              </p>
+              {isOwnProfile && (
+                <button
+                  onClick={onEditProfile}
+                  className="absolute right-0 px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-medium transition-all duration-300 flex items-center gap-1"
+                >
+                  <Edit className="w-3 h-3" />
+                  Edit
+                </button>
+              )}
+            </div>
             {/* Name - large, bold - aligned with mini card top */}
             <h2 className="text-2xl font-bold text-white">
               {profile?.display_name || 'User'}
