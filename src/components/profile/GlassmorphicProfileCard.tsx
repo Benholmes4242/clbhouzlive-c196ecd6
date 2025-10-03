@@ -56,8 +56,8 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
       {/* Profile content */}
       <div className="pt-6 space-y-2">
         {/* Username row with edit button */}
-        <div className="flex items-center justify-center gap-3">
-          <p className="text-base text-white/80">
+        <div className="relative flex items-center justify-center gap-3">
+          <p className="text-base text-white/80 text-center w-full md:w-auto pr-16 md:pr-0">
             @{profile?.username || 'username'}
           </p>
           
@@ -65,7 +65,7 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
           {isOwnProfile && (
             <button
               onClick={onEditProfile}
-              className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-medium transition-all duration-300 flex items-center gap-1"
+              className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-medium transition-all duration-300 flex items-center gap-1 absolute right-0 md:static"
             >
               <Edit className="w-3 h-3" />
               Edit
