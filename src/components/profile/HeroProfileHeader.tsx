@@ -832,7 +832,7 @@ const HeroProfileHeader = ({
                 </button>
 
                 {/* Name & handle block */}
-                <div className="name-wrap" data-nameblock>
+                <div className="name-wrap mt-3 md:mt-0" data-nameblock>
                   {(() => {
                     const { first, last } = splitName(displayName);
                     return (
