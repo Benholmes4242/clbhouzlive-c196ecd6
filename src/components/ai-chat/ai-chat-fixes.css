@@ -200,3 +200,202 @@
     height: 44px !important;
   }
 }
+
+/* ========================================
+   Echo Dock - Frosted White Button
+   ======================================== */
+
+/* Frosted white circular Echo button */
+.echoDoc-btn {
+  /* Fixed positioning - handled by inline styles in component */
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1rem;
+  z-index: 9999;
+  
+  /* Size */
+  width: 56px;
+  height: 56px;
+  border-radius: 9999px;
+
+  /* Frosted background */
+  background: linear-gradient(to bottom, rgba(255,255,255,0.70), rgba(255,255,255,0.65));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  /* Soft border + soft lift */
+  border: 1px solid rgba(255,255,255,0.40);
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.10),
+    0 2px 6px rgba(0,0,0,0.06);
+
+  /* Text color */
+  color: #374151; /* gray-700 */
+  
+  /* Center content */
+  display: grid;
+  place-items: center;
+  
+  /* Remove default button styles */
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover/active/focus feedback (subtle, iOS-like) */
+.echoDoc-btn:hover {
+  background: linear-gradient(to bottom, rgba(255,255,255,0.78), rgba(255,255,255,0.70));
+  box-shadow:
+    0 10px 24px rgba(0,0,0,0.12),
+    0 3px 8px rgba(0,0,0,0.08);
+}
+
+.echoDoc-btn:active {
+  transform: translateY(0.5px);
+  box-shadow:
+    0 6px 14px rgba(0,0,0,0.12),
+    0 2px 5px rgba(0,0,0,0.08);
+}
+
+.echoDoc-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(59,130,246,0.25), /* focus ring (blue/25%) */
+    0 8px 20px rgba(0,0,0,0.10),
+    0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* Slightly larger on >= md screens */
+@media (min-width: 768px) {
+  .echoDoc-btn {
+    width: 64px;
+    height: 64px;
+  }
+}
+
+/* Hide old teal styling elements if they exist */
+.echoDoc-btn .echoDoc-icon,
+.echoDoc-btn .echoDoc-bg,
+.echoDoc-btn .echoDoc-wave,
+.echoDoc-halo,
+.echoDoc-core {
+  display: none !important;
+}
+
+/* Echo label styling */
+.echoDoc-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: rgba(17, 24, 39, 0.85); /* gray-900 @ 85% */
+}
+
+/* Optional: Soft pulse on idle */
+@keyframes echoSoftPulse {
+  0%, 100% { 
+    box-shadow:
+      0 8px 20px rgba(0,0,0,0.10),
+      0 2px 6px rgba(0,0,0,0.06);
+  }
+  50% { 
+    box-shadow:
+      0 10px 24px rgba(0,0,0,0.12),
+      0 3px 8px rgba(0,0,0,0.08);
+  }
+}
+
+.echoDoc-btn.is-idle {
+  animation: echoSoftPulse 2.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .echoDoc-btn.is-idle { 
+    animation: none; 
+  }
+}
+
+/* Ripple animation for long-press feedback */
+@keyframes echo-ripple {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(255,255,255,0.4),
+      0 8px 20px rgba(0,0,0,0.10);
+  }
+  100% {
+    box-shadow:
+      0 0 0 12px rgba(255,255,255,0),
+      0 8px 20px rgba(0,0,0,0.10);
+  }
+}
+
+/* Wave animation for icon (disabled now) */
+@keyframes echoWave {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.1); }
+}
+
+/* ========================================
+   Echo Dock - Radial Fan Menu
+   ======================================== */
+
+.echoDoc-panel {
+  pointer-events: none;
+}
+
+.echoDoc-fanItem {
+  width: 72px;
+  height: 72px;
+  border-radius: 9999px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.75), rgba(255,255,255,0.70));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.40);
+  box-shadow:
+    0 6px 16px rgba(0,0,0,0.12),
+    0 2px 4px rgba(0,0,0,0.08);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.echoDoc-fanItem:hover {
+  background: linear-gradient(to bottom, rgba(255,255,255,0.85), rgba(255,255,255,0.80));
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.14),
+    0 3px 6px rgba(0,0,0,0.10);
+}
+
+.echoDoc-fanItem:active {
+  transform: scale(0.95);
+}
+
+.echoDoc-fanItem.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.echoDoc-fanText {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(17, 24, 39, 0.85);
+  text-align: center;
+  white-space: pre-line;
+  line-height: 1.2;
+}
+
+/* Stagger animation for fan items */
+@keyframes echoFanSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.echoDoc-fanItem.animate-in {
+  animation: echoFanSlideIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}

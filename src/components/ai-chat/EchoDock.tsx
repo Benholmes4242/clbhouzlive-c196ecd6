@@ -157,17 +157,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
         onPointerCancel={handlePointerCancel}
         onClick={handleClick}
       >
-        <span className="echoDoc-halo" aria-hidden />
-        <span className="echoDoc-core">
-          <PiWaveform 
-            size={22} 
-            className="text-white/90 transition-all duration-200 ease-in-out"
-            style={{
-              animation: 'echoWave 3s ease-in-out infinite'
-            }}
-          />
-          <span className="echoDoc-text">Echo</span>
-        </span>
+        <span className="echoDoc-label">Echo</span>
       </button>
 
       {panelOpen && <RadialFan onItemClick={(tab) => { setPanelOpen(false); openAIChatOverlay(tab); }} />}
