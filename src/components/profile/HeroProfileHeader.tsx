@@ -1005,7 +1005,8 @@ const HeroProfileHeader = ({
                      style={{
                        width: 'calc(100% - var(--mini-w) - 8px)',
                        marginLeft: '0',
-                       marginRight: 'calc(var(--mini-w) + 8px)'
+                       marginRight: 'calc(var(--mini-w) + 8px)',
+                       marginTop: '24px'
                      }}
                    >
                      <h1 className="font-semibold leading-tight"
