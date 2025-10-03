@@ -846,7 +846,15 @@ const HeroProfileHeader = ({
                 </div>
 
                 {/* Home Club */}
-                <div className="meta-row relative top-8 md:top-0">
+                <div
+                  className="meta-row relative top-8 md:top-0"
+                  style={{
+                    width: 'calc(100% - var(--mini-w) - 8px)',
+                    marginRight: 'calc(var(--mini-w) + 8px)',
+                    gridTemplateColumns: '1fr',
+                    justifyItems: 'center'
+                  }}
+                >
                   <div className="meta meta-club">
                     <div className="meta-label">Home Club</div>
                     <div className="meta-value">
