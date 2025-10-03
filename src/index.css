@@ -236,14 +236,6 @@ html, body {
   align-items: center;
 }
 
-/* Mobile: center name/handle across full panel */
-@media (max-width: 767px) {
-  .name-wrap {
-    width: 100%;
-    margin-right: 0;
-  }
-}
-
 .name-first, .name-last {
   display: block;
   font-size: var(--fs-name);
