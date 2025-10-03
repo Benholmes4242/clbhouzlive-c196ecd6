@@ -1522,27 +1522,29 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         className="hidden"
       />
 
-      {/* Recent History Bar */}
-      <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pb-[max(env(safe-area-inset-bottom),16px)] border-t border-white/20 pt-3">
-        <button
-          className="w-full h-12 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm grid grid-cols-[auto,1fr,auto] items-center px-4 text-[15px] text-gray-800 hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-          onClick={() => setShowHistory(true)}
-          aria-label="Open swing coach history"
-        >
-          <span className="mr-2 grid h-6 w-6 place-items-center text-gray-600">
-            <svg className="h-[14px] w-[14px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          </span>
-          <span className="justify-self-start font-medium">Recent history</span>
-          <span className="ml-2 text-gray-500">
-            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
-          </span>
-        </button>
-        
-        {/* Caption */}
-        <p className="mt-2 text-center text-xs text-gray-500">
-          Echo helps with chat and swing analysis. No data is shared publicly.
-        </p>
-      </div>
+      {/* Recent History Bar - matches Chat tab styling exactly */}
+      <footer className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pb-[max(env(safe-area-inset-bottom),16px)]">
+        <div className="border-t border-white/20 pt-3">
+          <button
+            className="mt-3 w-full h-12 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm grid grid-cols-[auto,1fr,auto] items-center px-4 text-[15px] text-gray-800 hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+            onClick={() => setShowHistory(true)}
+            aria-label="Open swing coach history"
+          >
+            <span className="mr-2 grid h-6 w-6 place-items-center text-gray-600">
+              <svg className="h-[14px] w-[14px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </span>
+            <span className="justify-self-start font-medium">Recent history</span>
+            <span className="ml-2 text-gray-500">
+              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+            </span>
+          </button>
+          
+          {/* Shy helper text */}
+          <p className="mt-2 text-center text-xs text-gray-500">
+            Echo helps with chat and swing analysis. No data is shared publicly.
+          </p>
+        </div>
+      </footer>
 
       {/* History Modal */}
       <AIChatHistory 
