@@ -245,7 +245,7 @@ html, body {
 }
 
 .name-first { 
-  margin-bottom: var(--sp-6); 
+  margin-bottom: 2px; 
 }
 
 .handle {
@@ -280,7 +280,7 @@ html, body {
   font-weight: var(--fw-value);
   line-height: var(--lh-normal);
   text-align: center;
-  margin-top: var(--sp-8);
+  margin-top: 2px;
 }
 
 .meta-value--hcp {
