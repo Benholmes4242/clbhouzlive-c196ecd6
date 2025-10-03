@@ -799,16 +799,13 @@ const HeroProfileHeader = ({
               className="glass-panel relative z-20 mx-0 rounded-none border border-white/35 backdrop-blur-xl"
               style={{
                 marginTop: 'calc(var(--panel-overlap) * -1)',
+                padding: 'var(--panel-pad-y) var(--panel-pad-x)',
+                paddingTop: 'calc(var(--panel-pad-y) + var(--safe-top))',
+                paddingBottom: 'calc(var(--panel-pad-y) + var(--safe-bottom))',
                 backgroundColor: 'rgba(255, 255, 255, 0.16)',
                 boxShadow: 'var(--panel-shadow)'
               } as React.CSSProperties}
             >
-              <div className="px-4 sm:px-6 pt-8 pb-6"
-                   style={{
-                     paddingTop: 'calc(2rem + var(--safe-top))',
-                     paddingBottom: 'calc(1.5rem + var(--safe-bottom))'
-                   }}
-              >
               <div className="relative">
                 {/* Mini profile card */}
                 <button
@@ -850,12 +847,12 @@ const HeroProfileHeader = ({
 
                 {/* Home Club */}
                 <div className="meta-row">
-                    <div className="meta meta-club">
-                      <div className="meta-label">Home Club</div>
-                      <div className="meta-value mt-0.5">
-                        {homeClub}
-                      </div>
+                  <div className="meta meta-club">
+                    <div className="meta-label">Home Club</div>
+                    <div className="meta-value">
+                      {homeClub}
                     </div>
+                  </div>
                 </div>
 
                 {/* Bio */}
@@ -898,7 +895,6 @@ const HeroProfileHeader = ({
                     </button>
                   ))}
                 </nav>
-              </div>
               </div>
             </section>
              
@@ -967,10 +963,10 @@ const HeroProfileHeader = ({
             <section
               className="relative z-20 mx-0 sm:mx-0 md:mx-0 lg:mx-4 rounded-none lg:rounded-2xl border border-white/35 bg-white/10 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
               style={{
-                marginTop: 'calc(var(--panel-overlap) * -1)'
+                marginTop: 'calc(var(--panel-overlap) * -1)',
+                padding: 'var(--panel-pad-y) var(--panel-pad-x)'
               }}
             >
-              <div className="px-4 sm:px-6 pt-8 pb-6">
                <div className="flex flex-col items-center relative">
                   {/* Overhanging mini profile card */}
                    <div
@@ -1014,22 +1010,15 @@ const HeroProfileHeader = ({
                    >
                      <h1 className="font-semibold leading-tight"
                          style={{ fontSize: 'var(--fs-display)' }}>
-                       <span className="block">{(() => {
-                         const { first, last } = splitName(displayName);
-                         return first;
-                       })()}</span>
-                       <span className="block -mt-1">{(() => {
-                         const { first, last } = splitName(displayName);
-                         return last;
-                       })()}</span>
+                       {displayName}
                      </h1>
-                      <div className="mt-2 text-base text-gray-700">
+                      <div className="text-base text-gray-700">
                         @{username}
                       </div>
                    </div>
 
                     {/* Home Club centered (desktop/tablet only) */}
-                   <div className="mt-6 flex justify-center items-start"
+                    <div className="mt-10 flex justify-center items-start"
                         style={{
                           width: 'calc(100% - var(--mini-w) - 8px)',
                           marginRight: 'calc(var(--mini-w) + 8px)'
@@ -1037,12 +1026,12 @@ const HeroProfileHeader = ({
                      {/* Home Club */}
                      <div className="text-center">
                        <div className="text-base font-semibold">Home Club</div>
-                       <div className="mt-0.5 text-base text-gray-700">{homeClub}</div>
+                       <div className="text-base text-gray-700">{homeClub}</div>
                      </div>
                    </div>
 
                    {/* Bio section - centered with user name */}
-                   <div className="mt-8"
+                   <div className="mt-6"
                         style={{
                           width: 'calc(100% - var(--mini-w) - 8px)',
                           marginRight: 'calc(var(--mini-w) + 8px)'
@@ -1126,7 +1115,6 @@ const HeroProfileHeader = ({
                     </div>
                   </div>
 
-              </div>
               </div>
             </section>
              

@@ -245,11 +245,7 @@ html, body {
 }
 
 .name-first { 
-  margin-bottom: 0; 
-}
-
-.name-last {
-  margin-top: 0.125rem; /* 2px gap between first and last name */
+  margin-bottom: var(--sp-6); 
 }
 
 .handle {
@@ -284,7 +280,7 @@ html, body {
   font-weight: var(--fw-value);
   line-height: var(--lh-normal);
   text-align: center;
-  margin-top: 0.125rem; /* mt-0.5 for tighter label ↔ value spacing */
+  margin-top: var(--sp-8);
 }
 
 .meta-value--hcp {
