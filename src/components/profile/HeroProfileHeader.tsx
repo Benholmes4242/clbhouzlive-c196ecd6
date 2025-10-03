@@ -799,13 +799,16 @@ const HeroProfileHeader = ({
               className="glass-panel relative z-20 mx-0 rounded-none border border-white/35 backdrop-blur-xl"
               style={{
                 marginTop: 'calc(var(--panel-overlap) * -1)',
-                padding: 'var(--panel-pad-y) var(--panel-pad-x)',
-                paddingTop: 'calc(var(--panel-pad-y) + var(--safe-top))',
-                paddingBottom: 'calc(var(--panel-pad-y) + var(--safe-bottom))',
                 backgroundColor: 'rgba(255, 255, 255, 0.16)',
                 boxShadow: 'var(--panel-shadow)'
               } as React.CSSProperties}
             >
+              <div className="px-4 sm:px-6 pt-8 pb-6"
+                   style={{
+                     paddingTop: 'calc(2rem + var(--safe-top))',
+                     paddingBottom: 'calc(1.5rem + var(--safe-bottom))'
+                   }}
+              >
               <div className="relative">
                 {/* Mini profile card */}
                 <button
@@ -896,6 +899,7 @@ const HeroProfileHeader = ({
                   ))}
                 </nav>
               </div>
+              </div>
             </section>
              
              {/* Spacer below for 16px gap before tab content */}
@@ -963,10 +967,10 @@ const HeroProfileHeader = ({
             <section
               className="relative z-20 mx-0 sm:mx-0 md:mx-0 lg:mx-4 rounded-none lg:rounded-2xl border border-white/35 bg-white/10 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
               style={{
-                marginTop: 'calc(var(--panel-overlap) * -1)',
-                padding: 'var(--panel-pad-y) var(--panel-pad-x)'
+                marginTop: 'calc(var(--panel-overlap) * -1)'
               }}
             >
+              <div className="px-4 sm:px-6 pt-8 pb-6">
                <div className="flex flex-col items-center relative">
                   {/* Overhanging mini profile card */}
                    <div
@@ -1115,6 +1119,7 @@ const HeroProfileHeader = ({
                     </div>
                   </div>
 
+              </div>
               </div>
             </section>
              
