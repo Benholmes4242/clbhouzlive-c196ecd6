@@ -236,6 +236,14 @@ html, body {
   align-items: center;
 }
 
+/* Mobile override: center name+handle to match Home Club */
+@media (max-width: 767px) {
+  .name-wrap {
+    width: 100%;
+    margin-right: 0;
+  }
+}
+
 .name-first, .name-last {
   display: block;
   font-size: var(--fs-name);
