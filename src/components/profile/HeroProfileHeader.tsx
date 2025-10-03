@@ -837,7 +837,7 @@ const HeroProfileHeader = ({
                     const { first, last } = splitName(displayName);
                     return (
                       <>
-                        <span className="name-first" style={{ marginBottom: '2px' }}>{first}</span>
+                        <span className="name-first">{first}</span>
                         <span className="name-last">{last}</span>
                         <div className="handle">@{username}</div>
                       </>
@@ -849,7 +849,7 @@ const HeroProfileHeader = ({
                 <div className="meta-row">
                   <div className="meta meta-club">
                     <div className="meta-label">Home Club</div>
-                    <div className="meta-value" style={{ marginTop: '2px' }}>
+                    <div className="meta-value">
                       {homeClub}
                     </div>
                   </div>
@@ -1027,7 +1027,7 @@ const HeroProfileHeader = ({
                      {/* Home Club */}
                      <div className="text-center">
                        <div className="text-base font-semibold">Home Club</div>
-                       <div className="text-base text-gray-700" style={{ marginTop: "2px" }}>{homeClub}</div>
+                       <div className="text-base text-gray-700">{homeClub}</div>
                      </div>
                    </div>
 
