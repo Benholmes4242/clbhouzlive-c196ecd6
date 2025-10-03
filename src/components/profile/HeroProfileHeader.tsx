@@ -832,7 +832,7 @@ const HeroProfileHeader = ({
                 </button>
 
                 {/* Name & handle block */}
-                <div className="name-wrap" data-nameblock>
+                <div className="name-wrap mt-3 md:mt-0" data-nameblock>
                   {(() => {
                     const { first, last } = splitName(displayName);
                     return (
@@ -1005,7 +1005,8 @@ const HeroProfileHeader = ({
                      style={{
                        width: 'calc(100% - var(--mini-w) - 8px)',
                        marginLeft: '0',
-                       marginRight: 'calc(var(--mini-w) + 8px)'
+                       marginRight: 'calc(var(--mini-w) + 8px)',
+                       marginTop: '24px'
                      }}
                    >
                      <h1 className="font-semibold leading-tight"
