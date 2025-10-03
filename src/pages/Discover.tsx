@@ -6,7 +6,7 @@ import SegmentedControl from '@/components/discover/SegmentedControl';
 import ExploreFilters from '@/components/explore/ExploreFilters';
 
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
-// import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned'; // Stored for future use
+import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned';
 import DiscoverContent from '@/components/discover/DiscoverContent';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
@@ -171,10 +171,9 @@ const Discover = () => {
           </div>
 
           {/* Suggested Users - Below Tabs/Search */}
-          {/* <div className="pt-1">
+          <div className="pt-1">
             <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
-          </div> */}
-          {/* Commented out for future use - SuggestedUsersRedesigned component is stored in /components/discover/ */}
+          </div>
 
           {/* Main Grid with Container */}
           <div className="md:container md:mx-auto md:px-0 mt-4">
