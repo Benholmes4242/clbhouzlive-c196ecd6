@@ -803,9 +803,9 @@ const HeroProfileHeader = ({
                 boxShadow: 'var(--panel-shadow)'
               } as React.CSSProperties}
             >
-              <div className="px-4 sm:px-6 pt-11 pb-6"
+              <div className="px-4 sm:px-6 pt-8 pb-6"
                    style={{
-                     paddingTop: 'calc(2.75rem + var(--safe-top))',
+                     paddingTop: 'calc(2rem + var(--safe-top))',
                      paddingBottom: 'calc(1.5rem + var(--safe-bottom))'
                    }}
               >
@@ -835,7 +835,7 @@ const HeroProfileHeader = ({
                 </button>
 
                 {/* Name & handle block */}
-                <div className="name-wrap" data-nameblock>
+                <div className="name-wrap mt-3" data-nameblock>
                   {(() => {
                     const { first, last } = splitName(displayName);
                     return (
