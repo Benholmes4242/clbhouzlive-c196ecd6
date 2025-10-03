@@ -266,7 +266,7 @@ html, body {
   grid-template-columns: 1fr 1fr;
   column-gap: var(--sp-24);
   align-items: start;
-  margin-top: 30px;
+  margin-top: var(--sp-24);
 }
 
 .meta-label {
