@@ -245,7 +245,11 @@ html, body {
 }
 
 .name-first { 
-  margin-bottom: var(--sp-6); 
+  margin-bottom: 0; 
+}
+
+.name-last {
+  margin-top: -0.25rem; /* -mt-1 equivalent for tighter first ↔ second name spacing */
 }
 
 .handle {
@@ -280,7 +284,7 @@ html, body {
   font-weight: var(--fw-value);
   line-height: var(--lh-normal);
   text-align: center;
-  margin-top: var(--sp-8);
+  margin-top: 0.125rem; /* mt-0.5 for tighter label ↔ value spacing */
 }
 
 .meta-value--hcp {
@@ -295,7 +299,7 @@ html, body {
   font-weight: var(--fw-bio);
   line-height: 1.5;
   text-align: center;
-  margin-top: calc(var(--mini-h) * 0.20 + 32px);
+  margin-top: 2rem; /* mt-8 - matches pt-8 top spacing for symmetry */
   padding-inline: var(--sp-16);
 }
 

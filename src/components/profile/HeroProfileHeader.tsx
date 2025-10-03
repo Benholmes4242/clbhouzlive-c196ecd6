@@ -1014,15 +1014,22 @@ const HeroProfileHeader = ({
                    >
                      <h1 className="font-semibold leading-tight"
                          style={{ fontSize: 'var(--fs-display)' }}>
-                       {displayName}
+                       <span className="block">{(() => {
+                         const { first, last } = splitName(displayName);
+                         return first;
+                       })()}</span>
+                       <span className="block -mt-1">{(() => {
+                         const { first, last } = splitName(displayName);
+                         return last;
+                       })()}</span>
                      </h1>
-                      <div className="text-base text-gray-700">
+                      <div className="mt-2 text-base text-gray-700">
                         @{username}
                       </div>
                    </div>
 
                     {/* Home Club centered (desktop/tablet only) */}
-                    <div className="mt-10 flex justify-center items-start"
+                   <div className="mt-6 flex justify-center items-start"
                         style={{
                           width: 'calc(100% - var(--mini-w) - 8px)',
                           marginRight: 'calc(var(--mini-w) + 8px)'
@@ -1030,12 +1037,12 @@ const HeroProfileHeader = ({
                      {/* Home Club */}
                      <div className="text-center">
                        <div className="text-base font-semibold">Home Club</div>
-                       <div className="text-base text-gray-700">{homeClub}</div>
+                       <div className="mt-0.5 text-base text-gray-700">{homeClub}</div>
                      </div>
                    </div>
 
                    {/* Bio section - centered with user name */}
-                   <div className="mt-6"
+                   <div className="mt-8"
                         style={{
                           width: 'calc(100% - var(--mini-w) - 8px)',
                           marginRight: 'calc(var(--mini-w) + 8px)'
