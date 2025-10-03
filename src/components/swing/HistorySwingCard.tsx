@@ -8,6 +8,8 @@ import { AiFeedbackBlock } from './AiFeedbackBlock';
 import { SwingVisualCarousel } from './SwingVisualCarousel';
 import { CoachThread } from './CoachThread';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { HLSVideoPlayer } from '@/components/ai-chat/AIChatHistory';
+import { MarkdownMessage } from '@/components/ai-chat/MarkdownMessage';
 
 interface SwingAnalysis {
   id: string;
@@ -146,21 +148,12 @@ export const HistorySwingCard: React.FC<HistorySwingCardProps> = ({
               {(analysis.videoUrl || analysis.videoId) && (
                 <div className="space-y-2">
                   <h4 className="text-sm font-semibold">Video</h4>
-                  <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                    {analysis.videoUrl ? (
-                      <video
-                        src={analysis.videoUrl}
-                        poster={getThumbnailUrl()}
-                        controls
-                        className="w-full h-full"
-                      >
-                        Your browser does not support the video tag.
-                      </video>
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-white">
-                        <Play className="h-12 w-12" />
-                      </div>
-                    )}
+                  <div className="overflow-hidden rounded-xl ring-1 ring-black/10 bg-black/5">
+                    <HLSVideoPlayer
+                      src={analysis.videoUrl!}
+                      poster={getThumbnailUrl() || undefined}
+                      className="w-full h-auto"
+                    />
                   </div>
                 </div>
               )}

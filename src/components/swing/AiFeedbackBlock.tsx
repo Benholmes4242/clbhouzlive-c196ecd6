@@ -20,7 +20,7 @@ export const AiFeedbackBlock: React.FC<AiFeedbackBlockProps> = ({
   const [isOpen, setIsOpen] = useState(!defaultCollapsed);
 
   return (
-    <Card className="p-4 space-y-3">
+    <div className="rounded-xl border border-black/10 bg-white/70 backdrop-blur p-3 sm:p-4 shadow-sm">
       <div className="flex items-start gap-3">
         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
           <span className="text-sm font-semibold text-primary">AI</span>
@@ -32,10 +32,10 @@ export const AiFeedbackBlock: React.FC<AiFeedbackBlockProps> = ({
               {analysis.save_card || 'Swing Analysis'}
             </h4>
             
-            <MarkdownMessage content={analysis.content} />
+            <MarkdownMessage content={analysis.content} className="text-[15px] leading-[1.55]" />
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 };
