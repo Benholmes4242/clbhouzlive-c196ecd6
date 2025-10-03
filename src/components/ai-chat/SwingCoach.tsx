@@ -1362,41 +1362,16 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         ) : (
           <div className="space-y-4">
             {uploadedVideo && (
-              <div className="bg-muted rounded-lg p-4">
-                {/* File name & size above media card */}
-                <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
-                  <p className="truncate">{uploadedVideo.name}</p>
-                  <p>{(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB</p>
+              <div className="rounded-3xl bg-white/70 backdrop-blur-xl border border-white/20 shadow-[0_10px_28px_rgba(0,0,0,0.08)] p-4 sm:p-5 space-y-4">
+                {/* File name & size */}
+                <div className="flex items-center justify-between">
+                  <div className="text-[15px] text-gray-700 truncate">{uploadedVideo.name}</div>
+                  <div className="text-[14px] text-gray-500 shrink-0">{(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB</div>
                 </div>
                 
-                {/* Analyze Swing button with trash icon */}
-                <div className="mb-3 flex items-center gap-2">
-                  <Button
-                    onClick={analyzeSwing}
-                    disabled={uploading || isAnalyzing}
-                    className="flex-1 gap-2 text-white"
-                    style={{ 
-                      background: 'linear-gradient(135deg, var(--echo-from), var(--echo-to))'
-                    }}
-                    aria-label={isAnalyzing ? 'Analyzing swing' : 'Analyze swing'}
-                  >
-                    {isAnalyzing ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Analyzing…
-                      </>
-                    ) : (
-                      "Analyze Swing"
-                    )}
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={discardVideo}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                <div className="flex flex-col gap-4">
-                   <div className="w-full">
-                     <div className="relative w-full h-64 overflow-hidden rounded-2xl bg-black">
+                {/* Video frame container (cinematic) */}
+                <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/60 backdrop-blur shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+                  <div className="relative w-full h-64 bg-black">
                        {/* Show cycling frames during analysis, otherwise show video/image preview */}
                         {isAnalyzing && extractedFrames.length > 0 ? (
                           <img 
@@ -1423,19 +1398,38 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                          />
                        )}
                      </div>
-                   </div>
-                      <div className="flex-1">
-                        {/* Analysis status display */}
-                         {isAnalyzing && analysisStatus && (
-                          <div className="mb-3 p-2 rounded-lg border" style={{ 
-                            backgroundColor: 'rgba(42, 157, 143, 0.08)', 
-                            borderColor: 'rgba(42, 157, 143, 0.2)',
-                            color: '#1D3557'
-                          }}>
-                            <p className="text-sm font-medium">{analysisStatus}</p>
-                          </div>
-                        )}
-                     </div>
+                </div>
+                
+                {/* Analysis status display */}
+                {isAnalyzing && analysisStatus && (
+                  <div className="rounded-xl bg-white/80 backdrop-blur border border-black/10 text-[14px] text-gray-700 px-3 py-2 inline-flex items-center gap-2 shadow-sm">
+                    <span className="h-2 w-2 rounded-full bg-gray-500 animate-pulse"></span>
+                    {analysisStatus}
+                  </div>
+                )}
+                
+                {/* Analyze Swing button with trash icon */}
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={analyzeSwing}
+                    disabled={uploading || isAnalyzing}
+                    variant="glass"
+                    size="lg"
+                    className="flex-1 gap-2 font-medium"
+                    aria-label={isAnalyzing ? 'Analyzing swing' : 'Analyze swing'}
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Analyzing…
+                      </>
+                    ) : (
+                      "Analyze Swing"
+                    )}
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={discardVideo}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             )}
