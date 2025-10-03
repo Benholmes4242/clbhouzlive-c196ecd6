@@ -796,9 +796,12 @@ const HeroProfileHeader = ({
             <section
               data-profile-panel
               ref={profileCardRef}
-              className="glass-panel relative z-20 mx-0 rounded-none border border-white/35 backdrop-blur-xl px-4 sm:px-6 pt-8 pb-6"
+              className="glass-panel relative z-20 mx-0 rounded-none border border-white/35 backdrop-blur-xl"
               style={{
                 marginTop: 'calc(var(--panel-overlap) * -1)',
+                padding: 'var(--panel-pad-y) var(--panel-pad-x)',
+                paddingTop: 'calc(var(--panel-pad-y) + var(--safe-top))',
+                paddingBottom: 'calc(var(--panel-pad-y) + var(--safe-bottom))',
                 backgroundColor: 'rgba(255, 255, 255, 0.16)',
                 boxShadow: 'var(--panel-shadow)'
               } as React.CSSProperties}
@@ -834,19 +837,19 @@ const HeroProfileHeader = ({
                     const { first, last } = splitName(displayName);
                     return (
                       <>
-                        <span className="name-first block">{first}</span>
-                        <span className="name-last block -mt-1">{last}</span>
-                        <div className="handle mt-2">@{username}</div>
+                        <span className="name-first">{first}</span>
+                        <span className="name-last">{last}</span>
+                        <div className="handle">@{username}</div>
                       </>
                     );
                   })()}
                 </div>
 
                 {/* Home Club */}
-                <div className="meta-row mt-6">
+                <div className="meta-row">
                   <div className="meta meta-club">
                     <div className="meta-label">Home Club</div>
-                    <div className="meta-value mt-0.5">
+                    <div className="meta-value">
                       {homeClub}
                     </div>
                   </div>
@@ -854,7 +857,7 @@ const HeroProfileHeader = ({
 
                 {/* Bio */}
                 {profile?.bio && (
-                  <p className="bio mt-8">
+                  <p className="bio">
                     {profile.bio}
                   </p>
                 )}
@@ -958,9 +961,10 @@ const HeroProfileHeader = ({
 
             {/* GLASS PANEL — consistent overlap & padding */}
             <section
-              className="relative z-20 mx-0 sm:mx-0 md:mx-0 lg:mx-4 rounded-none lg:rounded-2xl border border-white/35 bg-white/10 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)] px-4 sm:px-6 pt-8 pb-6"
+              className="relative z-20 mx-0 sm:mx-0 md:mx-0 lg:mx-4 rounded-none lg:rounded-2xl border border-white/35 bg-white/10 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
               style={{
-                marginTop: 'calc(var(--panel-overlap) * -1)'
+                marginTop: 'calc(var(--panel-overlap) * -1)',
+                padding: 'var(--panel-pad-y) var(--panel-pad-x)'
               }}
             >
                <div className="flex flex-col items-center relative">
@@ -1006,23 +1010,15 @@ const HeroProfileHeader = ({
                    >
                      <h1 className="font-semibold leading-tight"
                          style={{ fontSize: 'var(--fs-display)' }}>
-                       {(() => {
-                         const { first, last } = splitName(displayName);
-                         return (
-                           <>
-                             <span className="block">{first}</span>
-                             <span className="block -mt-1">{last}</span>
-                           </>
-                         );
-                       })()}
+                       {displayName}
                      </h1>
-                      <div className="text-base text-gray-700 mt-2">
+                      <div className="text-base text-gray-700">
                         @{username}
                       </div>
                    </div>
 
                     {/* Home Club centered (desktop/tablet only) */}
-                    <div className="mt-6 flex justify-center items-start"
+                    <div className="mt-10 flex justify-center items-start"
                         style={{
                           width: 'calc(100% - var(--mini-w) - 8px)',
                           marginRight: 'calc(var(--mini-w) + 8px)'
@@ -1030,12 +1026,12 @@ const HeroProfileHeader = ({
                      {/* Home Club */}
                      <div className="text-center">
                        <div className="text-base font-semibold">Home Club</div>
-                       <div className="text-base text-gray-700 mt-0.5">{homeClub}</div>
+                       <div className="text-base text-gray-700">{homeClub}</div>
                      </div>
                    </div>
 
                    {/* Bio section - centered with user name */}
-                   <div className="mt-8"
+                   <div className="mt-6"
                         style={{
                           width: 'calc(100% - var(--mini-w) - 8px)',
                           marginRight: 'calc(var(--mini-w) + 8px)'
