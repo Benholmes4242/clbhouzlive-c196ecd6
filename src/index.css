@@ -236,14 +236,6 @@ html, body {
   align-items: center;
 }
 
-/* Mobile override: center name+handle to match Home Club */
-@media (max-width: 767px) {
-  .name-wrap {
-    width: 100%;
-    margin-right: 0;
-  }
-}
-
 .name-first, .name-last {
   display: block;
   font-size: var(--fs-name);
@@ -271,6 +263,16 @@ html, body {
   column-gap: var(--sp-24);
   align-items: start;
   margin-top: var(--sp-24);
+}
+
+/* Mobile: constrain meta-row to left column and center single item */
+@media (max-width: 767px) {
+  .meta-row {
+    width: calc(100% - var(--mini-w) - 8px);
+    margin-right: calc(var(--mini-w) + 8px);
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
 }
 
 .meta-label {
