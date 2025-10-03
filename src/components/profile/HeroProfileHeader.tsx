@@ -846,7 +846,7 @@ const HeroProfileHeader = ({
                 </div>
 
                 {/* Home Club */}
-                <div className="meta-row">
+                <div className="meta-row relative top-6 md:top-0">
                   <div className="meta meta-club">
                     <div className="meta-label">Home Club</div>
                     <div className="meta-value">
