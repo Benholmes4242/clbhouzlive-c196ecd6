@@ -249,7 +249,7 @@ html, body {
 }
 
 .name-last {
-  margin-top: -0.25rem; /* -mt-1 equivalent for tighter first ↔ second name spacing */
+  margin-top: 0.125rem; /* 2px gap between first and last name */
 }
 
 .handle {
