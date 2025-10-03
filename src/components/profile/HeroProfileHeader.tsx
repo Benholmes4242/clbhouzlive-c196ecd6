@@ -796,7 +796,7 @@ const HeroProfileHeader = ({
             <section
               data-profile-panel
               ref={profileCardRef}
-              className="glass-panel relative z-20 mx-0 rounded-none border border-white/35 backdrop-blur-xl"
+              className="glass-panel relative z-20 mx-0 rounded-none border border-white/35 backdrop-blur-xl overflow-visible"
               style={{
                 marginTop: 'calc(var(--panel-overlap) * -1)',
                 backgroundColor: 'rgba(255, 255, 255, 0.16)',
