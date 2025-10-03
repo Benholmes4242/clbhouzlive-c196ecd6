@@ -152,7 +152,7 @@ html, body {
    ======================================== */
 :root {
   /* Card */
-  --mini-w: clamp(164px, 44vw, 216px);
+  --mini-w: clamp(152px, 40.92vw, 201px);
   --mini-h: calc(var(--mini-w) * 4 / 3);
   --mini-overhang: 0.16;
 
