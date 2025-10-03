@@ -796,7 +796,7 @@ const HeroProfileHeader = ({
             <section
               data-profile-panel
               ref={profileCardRef}
-              className="glass-panel relative z-20 mx-0 rounded-none border border-white/35 backdrop-blur-xl overflow-visible"
+              className="glass-panel relative z-20 mx-0 rounded-none border border-white/35 backdrop-blur-xl"
               style={{
                 marginTop: 'calc(var(--panel-overlap) * -1)',
                 backgroundColor: 'rgba(255, 255, 255, 0.16)',
@@ -835,7 +835,7 @@ const HeroProfileHeader = ({
                 </button>
 
                 {/* Name & handle block */}
-                <div className="name-wrap mt-3" data-nameblock>
+                <div className="name-wrap" data-nameblock>
                   {(() => {
                     const { first, last } = splitName(displayName);
                     return (
@@ -849,7 +849,7 @@ const HeroProfileHeader = ({
                 </div>
 
                 {/* Home Club */}
-                <div className="meta-row mt-11">
+                <div className="meta-row">
                     <div className="meta meta-club">
                       <div className="meta-label">Home Club</div>
                       <div className="meta-value mt-0.5">

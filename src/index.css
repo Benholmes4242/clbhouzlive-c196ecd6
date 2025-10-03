@@ -209,7 +209,7 @@ html, body {
 .mini-card {
   position: absolute;
   right: 8px;
-  top: -14px;
+  top: calc(var(--mini-h) * var(--mini-overhang) * -1);
   width: var(--mini-w);
   height: var(--mini-h);
   border-radius: 16px;
