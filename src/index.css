@@ -299,7 +299,7 @@ html, body {
   font-weight: var(--fw-bio);
   line-height: 1.5;
   text-align: center;
-  margin-top: 2rem; /* mt-8 - matches pt-8 top spacing for symmetry */
+  margin-top: calc(var(--mini-h) * 0.20 + 32px);
   padding-inline: var(--sp-16);
 }
 

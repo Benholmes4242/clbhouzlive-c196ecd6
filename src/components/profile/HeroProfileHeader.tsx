@@ -850,12 +850,12 @@ const HeroProfileHeader = ({
 
                 {/* Home Club */}
                 <div className="meta-row">
-                  <div className="meta meta-club">
-                    <div className="meta-label">Home Club</div>
-                    <div className="meta-value">
-                      {homeClub}
+                    <div className="meta meta-club">
+                      <div className="meta-label">Home Club</div>
+                      <div className="meta-value mt-0.5">
+                        {homeClub}
+                      </div>
                     </div>
-                  </div>
                 </div>
 
                 {/* Bio */}
