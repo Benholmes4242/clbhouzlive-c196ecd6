@@ -55,13 +55,13 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
 
       {/* Profile content */}
       <div className="pt-6 space-y-2">
-        {/* Username row with edit button */}
-        <div className="relative flex items-center justify-center">
+        {/* Username row with edit button (desktop only) */}
+        <div className="relative hidden md:flex items-center justify-center">
           <p className="text-base text-white/80 text-center mx-auto">
             @{profile?.username || 'username'}
           </p>
           
-          {/* Edit Profile button - pill style, subtle, positioned absolutely on mobile */}
+          {/* Edit Profile button - pill style, subtle, positioned absolutely on desktop */}
           {isOwnProfile && (
             <button
               onClick={onEditProfile}
@@ -81,8 +81,11 @@ const GlassmorphicProfileCard: React.FC<GlassmorphicProfileCardProps> = ({
             <h2 className="text-2xl font-bold text-white text-center mx-auto">
               {profile?.display_name || 'User'}
             </h2>
-            
-            {/* Golf Club and Handicap - side by side */}
+
+            {/* Mobile handle centered within left column */}
+            <p className="text-base text-white/80 text-center mx-auto md:hidden">
+              @{profile?.username || 'username'}
+            </p>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Flag className="w-4 h-4 text-white/60" />
