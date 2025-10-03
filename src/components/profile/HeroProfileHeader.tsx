@@ -796,9 +796,11 @@ const HeroProfileHeader = ({
             <section
               data-profile-panel
               ref={profileCardRef}
-              className="relative z-20 mx-0 rounded-3xl bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg"
+              className="glass-panel relative z-20 mx-0 rounded-none border border-white/35 backdrop-blur-xl"
               style={{
-                marginTop: 'calc(var(--panel-overlap) * -1)'
+                marginTop: 'calc(var(--panel-overlap) * -1)',
+                backgroundColor: 'rgba(255, 255, 255, 0.16)',
+                boxShadow: 'var(--panel-shadow)'
               } as React.CSSProperties}
             >
               <div className="px-4 sm:px-6 pt-8 pb-6"
@@ -963,7 +965,7 @@ const HeroProfileHeader = ({
 
             {/* GLASS PANEL — consistent overlap & padding */}
             <section
-              className="relative z-20 mx-0 sm:mx-0 md:mx-0 lg:mx-4 rounded-3xl bg-white/80 backdrop-blur-xl border border-white/20 shadow-lg"
+              className="relative z-20 mx-0 sm:mx-0 md:mx-0 lg:mx-4 rounded-none lg:rounded-2xl border border-white/35 bg-white/10 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
               style={{
                 marginTop: 'calc(var(--panel-overlap) * -1)'
               }}
