@@ -265,16 +265,6 @@ html, body {
   margin-top: var(--sp-24);
 }
 
-/* Mobile: constrain meta-row to left column and center single item */
-@media (max-width: 767px) {
-  .meta-row {
-    width: calc(100% - var(--mini-w) - 8px);
-    margin-right: calc(var(--mini-w) + 8px);
-    grid-template-columns: 1fr;
-    justify-items: center;
-  }
-}
-
 .meta-label {
   font-size: var(--fs-label);
   font-weight: var(--fw-label);
