@@ -600,7 +600,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     {messages.length === 0 ? (
                       <div className="flex flex-col items-center justify-center text-center px-6 py-20 sm:py-28 space-y-6">
                         <div className="h-20 w-20 rounded-3xl bg-white/80 backdrop-blur border border-black/10 shadow-sm grid place-items-center">
-                          <Bot className="h-9 w-9 text-[#2A9D8F]" />
+                          <Bot className="h-9 w-9 text-[#9ED6C2]" />
                         </div>
                         <div className="text-[17px] font-semibold text-gray-900">
                           Start a conversation with Echo
