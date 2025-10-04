@@ -217,21 +217,15 @@
   height: 56px;
   border-radius: 9999px;
 
-  /* Glassmorphic background */
-  background: rgba(255, 255, 255, 0.4);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-
-  /* Gradient border using box-shadow trick */
-  position: relative;
-  border: 3px solid transparent;
-  background-clip: padding-box;
+  /* Gradient border effect using background tricks */
+  background: linear-gradient(135deg, #6e9277 0%, #a8bfb3 100%);
+  padding: 2.5px; /* border width */
   
   /* Shadow for depth and subtle glow */
   box-shadow:
     0 4px 16px rgba(0, 0, 0, 0.08),
     0 1px 4px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 
   color: #000; /* black text */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -239,32 +233,25 @@
   mix-blend-mode: normal !important;
 
   /* Center content */
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   
   /* Remove default button styles */
   cursor: pointer;
   user-select: none;
 }
 
-/* Gradient border via ::before pseudo-element */
+/* Inner glassmorphic layer */
 .echoDoc-btn::before {
   content: "";
   position: absolute;
-  inset: -3px; /* matches border width */
-  border-radius: inherit;
-  padding: 3px;
-  background: linear-gradient(135deg, #6e9277 0%, #a8bfb3 100%);
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box, 
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask: 
-    linear-gradient(#fff 0 0) content-box, 
-    linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: -1;
+  inset: 2.5px; /* matches padding/border width */
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.4);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  z-index: 0;
 }
 
 /* Removed - using ::before for gradient border instead */
@@ -316,7 +303,7 @@
   display: none !important;
 }
 
-/* Echo label styling - bold black text */
+/* Echo label styling - bold black text with relative positioning */
 .echoDoc-label {
   font-size: 16px;
   font-weight: 700; /* bolder */
@@ -324,6 +311,8 @@
   color: #000; /* pure black */
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  position: relative;
+  z-index: 1; /* above ::before background */
 }
 
 /* Subtle idle pulse - gentle glow animation every 4s */
