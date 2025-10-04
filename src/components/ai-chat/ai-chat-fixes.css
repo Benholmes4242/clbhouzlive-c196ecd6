@@ -231,7 +231,7 @@
   backdrop-filter: blur(8px);
 
   /* ring + depth that survives on white backgrounds */
-  border: 1px solid rgba(0,0,0,.06);
+  border: 1px solid rgba(0,0,0,.08);
   box-shadow:
     0 8px 20px rgba(0,0,0,.10),
     0 2px 6px rgba(0,0,0,.06),
