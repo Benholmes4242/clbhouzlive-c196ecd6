@@ -653,7 +653,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                    {isLoading && (
                      <div className="flex items-end gap-2 mt-4">
                        <div className="shrink-0 h-7 w-7 rounded-full grid place-items-center bg-white/80 backdrop-blur border border-black/10"></div>
-                       <div className="max-w-[78%]">
+                       <div className="max-w-full flex-1">
                          <div className="rounded-2xl rounded-bl-md bg-white/92 backdrop-blur border border-black/10 shadow-[0_10px_28px_rgba(0,0,0,0.08)] px-3 py-2">
                            <div className="flex items-center gap-1.5">
                              <span className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>

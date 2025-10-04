@@ -1446,7 +1446,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
               </ChatMessageComponent>
             )}
 
-            <div className="mx-auto w-full max-w-[var(--bubble-max-md)] px-3 sm:px-5">
+            <div className="w-full px-3 sm:px-5">
               <div className="flex flex-col gap-3 sm:gap-4">
                 {messages.map((message) => (
                   <React.Fragment key={message.id}>
