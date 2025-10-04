@@ -76,42 +76,31 @@ const GlobalBottomNavigation: React.FC = () => {
   // Media handlers for camera, image, and video
   const { handleCameraClick, handleImageClick, handleVideoClick } = useMediaHandlers(closeSnapModal, openComposer);
 
-  // Handle keyboard visibility and visual viewport changes
+  // Handle iOS visual viewport - adjust bottom position for toolbar show/hide
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (!window.visualViewport) return;
 
-    const handleVisualViewportChange = () => {
-      if (window.visualViewport) {
-        // Use visual viewport API for accurate keyboard detection
-        const { height: vpHeight } = window.visualViewport;
-        const windowHeight = window.innerHeight;
-        
-        // Keyboard is considered visible if viewport is significantly smaller
-        const heightDiff = windowHeight - vpHeight;
-        setIsKeyboardVisible(heightDiff > 150);
-      }
-    };
+    const el = document.querySelector<HTMLElement>('.global-bottom-nav');
+    if (!el) return;
 
-    const handleResize = () => {
-      // Fallback for browsers without visual viewport support  
-      const heightDiff = window.screen.height - window.innerHeight;
+    const update = () => {
+      const vv = window.visualViewport!;
+      // Amount of space iOS is "stealing" at the bottom due to toolbars
+      const offset = Math.max(window.innerHeight - (vv.height + vv.offsetTop), 0);
+      el.style.setProperty('--vv-offset', `${Math.round(offset)}px`);
+      
+      // Also track keyboard visibility
+      const heightDiff = window.innerHeight - vv.height;
       setIsKeyboardVisible(heightDiff > 150);
     };
 
-    // Use visual viewport API when available (better for mobile)
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleVisualViewportChange);
-      window.visualViewport.addEventListener('scroll', handleVisualViewportChange);
-      
-      return () => {
-        window.visualViewport?.removeEventListener('resize', handleVisualViewportChange);
-        window.visualViewport?.removeEventListener('scroll', handleVisualViewportChange);
-      };
-    } else {
-      // Fallback for older browsers
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
+    update();
+    window.visualViewport.addEventListener('resize', update);
+    window.visualViewport.addEventListener('scroll', update);
+    return () => {
+      window.visualViewport?.removeEventListener('resize', update);
+      window.visualViewport?.removeEventListener('scroll', update);
+    };
   }, []);
 
   const handleCloseComposer = () => {
@@ -157,18 +146,6 @@ const GlobalBottomNavigation: React.FC = () => {
               stiffness: 300, 
               damping: 30,
               duration: 0.25 
-            }}
-            style={{
-              // Hardware acceleration and mobile-stable positioning
-              transform: 'translate3d(0, 0, 0)',
-              willChange: 'transform',
-              // Force stable bottom positioning on mobile
-              position: 'fixed',
-              bottom: '0px',
-              // Prevent iOS Safari viewport issues
-              paddingBottom: 'env(safe-area-inset-bottom)',
-              // Ensure it stays at viewport bottom, not document bottom
-              zIndex: 100,
             }}
           >
             <NavigationBar
