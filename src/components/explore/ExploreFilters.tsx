@@ -115,7 +115,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
 
   return (
     <div className="sticky top-16 z-10 bg-background/95 backdrop-blur-sm pb-0 mb-0">
-      <div className="pl-1 md:container md:mx-auto md:px-0">
+      <div className="px-1 md:container md:mx-auto md:px-0">
         {/* Single Row Horizontal Scroll */}
         <div className="relative">
           <div 
