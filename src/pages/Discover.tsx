@@ -161,8 +161,8 @@ const Discover = () => {
               </div>
             </div>
             
-            {/* Filter Pills Row - Sticky */}
-            <div className="sticky top-0 z-20 pt-1 pb-3 border-b border-gray-50 bg-white pl-1">
+            {/* Filter Pills Row */}
+            <div className="pt-1 pb-3 border-b border-gray-50">
               <ExploreFilters 
                 activeFilter={activeFilter}
                 onFilterChange={setActiveFilter}

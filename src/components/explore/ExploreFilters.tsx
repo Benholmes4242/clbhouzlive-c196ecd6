@@ -78,15 +78,15 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
       <button
         key={filter}
         onClick={handleFilterClick}
-        className={`discover-pill ${isActive ? 'discover-pill--active' : ''}`}
+        className={`pill ${isActive ? 'pill--active' : ''}`}
       >
         {/* Icon */}
-        <div className="discover-pill__icon">
+        <div className="pill__icon">
           {getFilterIcon(filter)}
         </div>
         
         {/* Label */}
-        <span className="discover-pill__label">{filter}</span>
+        <span>{filter}</span>
       </button>
     );
   };

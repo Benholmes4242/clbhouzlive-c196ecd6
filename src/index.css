@@ -1377,20 +1377,20 @@ html[data-immersive="true"] .app-shell--topSpacer {
     line-height: 1;
   }
 
-  /* Discover Page Specific Pills with Gradient Active State */
+  /* Discover Page Specific Pills with Subtle Orange */
   .discover-pill {
     @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5
            select-none whitespace-nowrap min-h-[44px]
            backdrop-blur-md bg-gray-50/80 text-gray-700
-           border-2 border-transparent shadow-none
-           transition-all duration-300 ease-in-out;
+           border border-gray-200/60 shadow-none
+           transition-all duration-200;
     line-height: 1;
     scroll-snap-align: start;
   }
 
   .discover-pill:hover {
+    border-color: hsl(var(--discover-orange) / 0.3);
     background-color: hsl(var(--discover-orange) / 0.05);
-    border-color: hsl(var(--discover-orange) / 0.2);
   }
 
   .discover-pill:focus-visible {
@@ -1399,11 +1399,10 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
 
   .discover-pill--active {
-    background: linear-gradient(135deg, #6e9277 0%, #a8bfb3 100%);
+    background-color: hsl(var(--discover-orange));
     color: white;
-    border-color: transparent;
-    @apply shadow-lg;
-    box-shadow: 0 4px 12px rgba(110, 146, 119, 0.3), 0 0 0 1px rgba(110, 146, 119, 0.1);
+    border-color: hsl(var(--discover-orange));
+    @apply shadow-md;
   }
 
   .discover-pill__icon {
@@ -1768,7 +1767,36 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
   .container { @apply max-w-6xl; }
 
-  /* Discover Page Specific Pills with Gradient Active State - Duplicate Removal */
+  /* Discover Page Specific Pills with Brand Orange */
+  .discover-pill {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2
+           select-none whitespace-nowrap
+           backdrop-blur-md bg-gray-50/80 text-gray-700
+           border border-gray-200/60 shadow-none
+           transition-all duration-200;
+    line-height: 1;
+    scroll-snap-align: start;
+  }
+
+  .discover-pill:hover {
+    @apply border-brand-orange/30 bg-brand-orange/5;
+  }
+
+  .discover-pill:focus-visible {
+    @apply outline-none ring-2 ring-brand-orange ring-offset-2;
+  }
+
+  .discover-pill--active {
+    @apply bg-brand-orange text-white border-brand-orange shadow-md;
+  }
+
+  .discover-pill__icon {
+    @apply w-4 h-4 flex-shrink-0;
+  }
+
+  .discover-pill__label {
+    @apply font-medium;
+  }
 
 @media (max-width: 960px) {
   .container {
