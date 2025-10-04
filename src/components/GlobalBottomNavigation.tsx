@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSnapModal } from '@/hooks/useSnapModal';
@@ -35,6 +36,7 @@ const GlobalBottomNavigation: React.FC = () => {
   const { activeTab, handleTabClick } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
   
   // Determine if current route should hide navigation
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname);
@@ -76,30 +78,30 @@ const GlobalBottomNavigation: React.FC = () => {
   // Media handlers for camera, image, and video
   const { handleCameraClick, handleImageClick, handleVideoClick } = useMediaHandlers(closeSnapModal, openComposer);
 
-  // Handle iOS visual viewport - adjust bottom position for toolbar show/hide
+  // Handle iOS visual viewport - lock to hardware bottom when Safari toolbar shows/hides
   useEffect(() => {
     if (!window.visualViewport) return;
 
-    const el = document.querySelector<HTMLElement>('.global-bottom-nav');
+    const el = navRef.current;
     if (!el) return;
 
-    const update = () => {
-      const vv = window.visualViewport!;
-      // Amount of space iOS is "stealing" at the bottom due to toolbars
-      const offset = Math.max(window.innerHeight - (vv.height + vv.offsetTop), 0);
-      el.style.setProperty('--vv-offset', `${Math.round(offset)}px`);
+    const onVV = () => {
+      // Lock to the *layout* viewport, not the shrinking visual viewport
+      // Keep bottom=0; compensate by translating by visual viewport offset
+      const offset = window.visualViewport?.offsetTop || 0;
+      el.style.transform = `translate3d(0, ${offset}px, 0)`;
       
-      // Also track keyboard visibility
-      const heightDiff = window.innerHeight - vv.height;
+      // Track keyboard visibility
+      const heightDiff = window.innerHeight - (window.visualViewport?.height || window.innerHeight);
       setIsKeyboardVisible(heightDiff > 150);
     };
 
-    update();
-    window.visualViewport.addEventListener('resize', update);
-    window.visualViewport.addEventListener('scroll', update);
+    window.visualViewport.addEventListener('resize', onVV);
+    window.visualViewport.addEventListener('scroll', onVV);
+    onVV();
     return () => {
-      window.visualViewport?.removeEventListener('resize', update);
-      window.visualViewport?.removeEventListener('scroll', update);
+      window.visualViewport?.removeEventListener('resize', onVV);
+      window.visualViewport?.removeEventListener('scroll', onVV);
     };
   }, []);
 
@@ -117,16 +119,15 @@ const GlobalBottomNavigation: React.FC = () => {
     }
   };
 
-  return (
+  const navigationContent = (
     <>
       {/* Global Fixed Bottom Navigation */}
       <AnimatePresence>
         {showNavigation && (
           <motion.div
+            ref={navRef}
             className={cn(
               "global-bottom-nav",
-              "fixed bottom-0 left-0 right-0 w-full",
-              "z-[100]",
               // Background extends to very bottom
               "backdrop-blur-md",
               isClubhouseRoute 
@@ -188,6 +189,9 @@ const GlobalBottomNavigation: React.FC = () => {
       />
     </>
   );
+
+  // Render via portal to document.body
+  return createPortal(navigationContent, document.body);
 };
 
 export default GlobalBottomNavigation;

@@ -36,6 +36,9 @@ html, body {
   --echo-tabs-h: 48px;
   --echo-composer-h: 84px; /* includes padding/safe-area */
   --echo-top: 56px; /* header height on mobile */
+  
+  /* Bottom nav tokens */
+  --bottom-nav-height: 64px; /* actual bar height (not including safe-area) */
 
   /* Message bubble tokens */
   --bubble-max: 92vw;             /* prevents edge-to-edge balloons on phones */
@@ -378,6 +381,18 @@ html, body {
   }
 }
 
+/* Reserve space in the page so content never sits under the bar */
+html, body, #root {
+  min-height: 100svh; /* NOT 100vh */
+}
+
+/* Modern viewport units support */
+@supports (height: 100dvh) {
+  html, body, #root {
+    min-height: 100dvh;
+  }
+}
+
 /* App shell applies safe-area padding and guarantees edge-to-edge */
 .app-shell {
   min-height: 100svh;
@@ -386,7 +401,7 @@ html, body {
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
   /* Global bottom padding for navigation */
-  padding-bottom: calc(var(--nav-height) + var(--safe-bottom));
+  padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom));
   box-sizing: border-box;
 }
 
@@ -394,6 +409,27 @@ html, body {
   .app-shell {
     min-height: 100dvh;
   }
+}
+
+/* Global spacer utility for pages with bottom nav */
+.page-has-bottom-nav {
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+}
+
+/* Bottom navigation bar - anchored to physical bottom */
+.global-bottom-nav {
+  position: fixed;
+  inset-inline: 0;
+  left: 0;
+  right: 0;
+  /* Anchor to PHYSICAL bottom, including the home-indicator area */
+  bottom: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+  z-index: 100;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
 }
 
 /* Clubhouse specific: remove global safe-area top padding and hide standard header */
@@ -433,65 +469,9 @@ img, video, canvas {
 /* Allow gestures globally */
 html, body, #root, .app-shell { touch-action: auto; }
 
-/* Global bottom navigation enhancements */
-:root {
-  /* Standard navigation heights */
-  --header-height: 64px;
-  --nav-height: 56px;
-  --safe-bottom: env(safe-area-inset-bottom);
-  
-  /* Bottom navigation height including safe area */
-  --bottom-nav-height: calc(var(--nav-height) + var(--safe-bottom));
-  
-  /* Visual viewport offset for iOS toolbar show/hide */
-  --vv-offset: 0px;
-}
+/* Global bottom navigation enhancements - REMOVED (now in :root above) */
 
-/* Global bottom navigation styling */
-.global-bottom-nav {
-  /* Ensure it's above all content but below toasts/modals */
-  z-index: 1000 !important;
-  
-  /* Hardware acceleration for smooth performance */
-  transform: translate3d(0, 0, 0);
-  will-change: transform;
-  
-  /* Ensure it never breaks from transforms in parent elements */
-  position: fixed !important;
-  left: 0;
-  right: 0;
-  
-  /* Anchor to bottom + allow visual-viewport offset if browser chrome slides in */
-  bottom: calc(max(env(safe-area-inset-bottom), 0px) + var(--vv-offset, 0px));
-  
-  /* Extend content to fill safe area properly */
-  padding-bottom: max(env(safe-area-inset-bottom), 0px);
-  height: var(--nav-height);
-}
-
-/* Ensure pages have bottom padding for the nav when needed */
-.page-with-bottom-nav,
-.page-content {
-  padding-bottom: calc(var(--nav-height) + max(env(safe-area-inset-bottom), 0px));
-}
-
-/* Modern viewport units utility */
-.min-h-screen {
-  min-height: 100svh;
-}
-
-@supports (min-height: 100dvh) {
-  .min-h-screen {
-    min-height: 100dvh;
-  }
-}
-
-/* Support for keyboard visibility on mobile - removed conflicting bottom positioning */
-
-/* Prevent nav from being affected by page transforms */
-.no-transform-context .global-bottom-nav {
-  position: fixed !important;
-}
+/* Global bottom navigation styling - REMOVED (now defined earlier in file) */
 
 /* Global header enhancements */
 :root {

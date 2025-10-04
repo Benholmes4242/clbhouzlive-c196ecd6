@@ -6,11 +6,15 @@ import { warmHlsJs } from "@/hooks/useHlsUrlCache";
  * fills the screen, and avoids white bars in a webview.
  * Also handles early performance optimizations.
  */
-export default function AppShell({ children }: PropsWithChildren) {
+interface AppShellProps extends PropsWithChildren {
+  className?: string;
+}
+
+export default function AppShell({ children, className }: AppShellProps) {
   // Warm hls.js chunk on app start to avoid delay on first video
   useEffect(() => {
     warmHlsJs();
   }, []);
 
-  return <div className="app-shell">{children}</div>;
+  return <div className={`app-shell ${className || ''}`}>{children}</div>;
 }

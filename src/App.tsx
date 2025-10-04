@@ -113,7 +113,7 @@ const App: React.FC = () => {
   }, []);
   
   return (
-    <AppShell>
+    <AppShell className="page-has-bottom-nav">
       <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
