@@ -636,6 +636,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         
                         <div 
                           className={cn(
+                            "w-full",
                             isFirstInGroup && index > 0 && "mt-4"
                           )}
                         >
@@ -645,6 +646,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                             onRequestDetail={requestMoreDetail}
                             isFirstInGroup={isFirstInGroup}
                             showHeading={isFirstInGroup}
+                            showActions={false}
                           />
                         </div>
                       </React.Fragment>

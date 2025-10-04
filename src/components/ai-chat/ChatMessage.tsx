@@ -111,49 +111,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           data-active="false"
           tabIndex={0}
         >
-          {/* Action bar - Phase 50 (hover on desktop, long-press on mobile) */}
-          {showActions && (
-            <div
-              className={cn(
-                "actions-pill pointer-events-none absolute -top-3",
-                "opacity-0 translate-y-1 transition-all duration-150",
-                "group-hover/message:opacity-100 group-hover/message:translate-y-0",
-                "group-focus-within/message:opacity-100 group-focus-within/message:translate-y-0",
-                isUser ? "right-0" : "left-0"
-              )}
-            >
-              <div className="pointer-events-auto rounded-full bg-white/95 backdrop-blur border border-black/10 shadow-md h-8 px-1.5 flex items-center gap-0.5">
-                <button 
-                  className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                  aria-label="Copy"
-                  type="button"
-                >
-                  ⧉
-                </button>
-                <button 
-                  className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                  aria-label="Quote"
-                  type="button"
-                >
-                  ❝
-                </button>
-                <button 
-                  className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                  aria-label="Re-run"
-                  type="button"
-                >
-                  ↻
-                </button>
-                <button 
-                  className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                  aria-label="Share"
-                  type="button"
-                >
-                  ⇪
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Action pills removed */}
 
           {/* Heading - only on first in group for AI */}
           {!isUser && showHeading && isFirstInGroup && (
@@ -167,7 +125,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             role="group"
             aria-label={`Message from ${isUser ? 'You' : 'Echo'} at ${time}`}
             className={cn(
-              "rounded-2xl text-[15px] break-words overflow-hidden",
+              "w-full rounded-2xl text-[15px] break-words overflow-hidden",
               isUser 
                 ? "rounded-br-md bg-[#2A9D8F]/10 border border-[#2A9D8F]/25 text-gray-900 shadow-[0_6px_18px_rgba(42,157,143,0.15)]" 
                 : "rounded-bl-md bg-white/92 backdrop-blur border border-black/10 text-gray-900 shadow-[0_10px_28px_rgba(0,0,0,0.08)]",
@@ -335,20 +293,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   </div>
                 )}
                 
-                {/* Action buttons for AI messages (only show for non-swing analysis) */}
-                {showActions && !isUser && !swingAnalysisData && showSaveOption && message.metadata && onSaveToInsights && (
-                  <div className="flex gap-2 mt-3">
-                    <Button
-                      onClick={() => onSaveToInsights(message)}
-                      variant="outline"
-                      size="sm"
-                      className="text-xs h-7 min-h-[28px]"
-                    >
-                      <Bookmark className="h-3 w-3 mr-1" />
-                      Save to Insights
-                    </Button>
-                  </div>
-                )}
+                {/* Action buttons removed */}
               </div>
             )}
           </div>
