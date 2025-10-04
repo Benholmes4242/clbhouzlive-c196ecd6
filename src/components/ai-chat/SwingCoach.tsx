@@ -1370,9 +1370,9 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                   content: '',
                   timestamp: new Date(),
                 }}
-                onSaveToInsights={() => {}}
-                onRequestDetail={() => {}}
+                showActions={false}
                 showHeading={false}
+                isUser={false}
                 isFirstInGroup={false}
                 mediaTop={
                   <div className="w-full bg-black">
@@ -1454,6 +1454,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                       message={message}
                       onSaveToInsights={saveToSwingInsights}
                       onRequestDetail={requestMoreDetail}
+                      showActions={false}
                       onAskEcho={(prompt) => {
                         console.log('Ask Echo:', prompt);
                       }}

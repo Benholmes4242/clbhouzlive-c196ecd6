@@ -29,14 +29,16 @@ interface ChatMessage {
 
 interface ChatMessageProps {
   message: ChatMessage;
-  onSaveToInsights: (message: ChatMessage) => void;
-  onRequestDetail: (content: string) => void;
+  onSaveToInsights?: (message: ChatMessage) => void;
+  onRequestDetail?: (content: string) => void;
   onAskEcho?: (prompt: string) => void;
   onShare?: (message: ChatMessage) => void;
   onAddVoiceNote?: (message: ChatMessage) => void;
   isFirstInGroup?: boolean;
   showHeading?: boolean;
-  mediaTop?: React.ReactNode;   // Optional media at the top of the bubble
+  showActions?: boolean;         // Control action pills visibility
+  isUser?: boolean;              // Override user detection
+  mediaTop?: React.ReactNode;    // Optional media at the top of the bubble
   children?: React.ReactNode;    // Override default content rendering
 }
 
@@ -49,10 +51,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   onAddVoiceNote,
   isFirstInGroup = true,
   showHeading = true,
+  showActions = true,
+  isUser: isUserProp,
   mediaTop,
   children,
 }) => {
-  const isUser = message.type === 'user';
+  const isUser = isUserProp ?? message.type === 'user';
   const [showSources, setShowSources] = useState(false);
   
   // Use metadata flag for save action instead of brittle string includes
@@ -94,14 +98,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           <div className="hidden sm:block w-7 shrink-0" />
         )}
         
-        {/* Message content - Phase 50 actions & meta */}
-        <div 
-          className={cn(
-            "relative group/message pt-2",
-            isUser
-              ? "max-w-[78%] user message-right"       // keep user bubble compact
-              : "max-w-[92%] echo message-left"        // make Echo bubble breathe
-          )}
+          {/* Message content - Phase 50 actions & meta */}
+          <div 
+            className={cn(
+              "relative group/message pt-2 max-w-full",
+              isUser ? "user message-right" : "echo message-left"
+            )}
           data-message-id={message.id}
           data-author={isUser ? "user" : "echo"}
           data-has-menu="true"
@@ -110,46 +112,48 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           tabIndex={0}
         >
           {/* Action bar - Phase 50 (hover on desktop, long-press on mobile) */}
-          <div
-            className={cn(
-              "actions-pill pointer-events-none absolute -top-3",
-              "opacity-0 translate-y-1 transition-all duration-150",
-              "group-hover/message:opacity-100 group-hover/message:translate-y-0",
-              "group-focus-within/message:opacity-100 group-focus-within/message:translate-y-0",
-              isUser ? "right-0" : "left-0"
-            )}
-          >
-            <div className="pointer-events-auto rounded-full bg-white/95 backdrop-blur border border-black/10 shadow-md h-8 px-1.5 flex items-center gap-0.5">
-              <button 
-                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                aria-label="Copy"
-                type="button"
-              >
-                ⧉
-              </button>
-              <button 
-                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                aria-label="Quote"
-                type="button"
-              >
-                ❝
-              </button>
-              <button 
-                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                aria-label="Re-run"
-                type="button"
-              >
-                ↻
-              </button>
-              <button 
-                className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
-                aria-label="Share"
-                type="button"
-              >
-                ⇪
-              </button>
+          {showActions && (
+            <div
+              className={cn(
+                "actions-pill pointer-events-none absolute -top-3",
+                "opacity-0 translate-y-1 transition-all duration-150",
+                "group-hover/message:opacity-100 group-hover/message:translate-y-0",
+                "group-focus-within/message:opacity-100 group-focus-within/message:translate-y-0",
+                isUser ? "right-0" : "left-0"
+              )}
+            >
+              <div className="pointer-events-auto rounded-full bg-white/95 backdrop-blur border border-black/10 shadow-md h-8 px-1.5 flex items-center gap-0.5">
+                <button 
+                  className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                  aria-label="Copy"
+                  type="button"
+                >
+                  ⧉
+                </button>
+                <button 
+                  className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                  aria-label="Quote"
+                  type="button"
+                >
+                  ❝
+                </button>
+                <button 
+                  className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                  aria-label="Re-run"
+                  type="button"
+                >
+                  ↻
+                </button>
+                <button 
+                  className="h-7 w-7 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                  aria-label="Share"
+                  type="button"
+                >
+                  ⇪
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Heading - only on first in group for AI */}
           {!isUser && showHeading && isFirstInGroup && (
@@ -332,7 +336,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 )}
                 
                 {/* Action buttons for AI messages (only show for non-swing analysis) */}
-                {!isUser && !swingAnalysisData && showSaveOption && message.metadata && (
+                {showActions && !isUser && !swingAnalysisData && showSaveOption && message.metadata && onSaveToInsights && (
                   <div className="flex gap-2 mt-3">
                     <Button
                       onClick={() => onSaveToInsights(message)}

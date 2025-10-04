@@ -10,6 +10,7 @@ import { CoachThread } from './CoachThread';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { HLSVideoPlayer } from '@/components/ai-chat/AIChatHistory';
 import { MarkdownMessage } from '@/components/ai-chat/MarkdownMessage';
+import ChatMessageComponent from '@/components/ai-chat/ChatMessage';
 
 interface SwingAnalysis {
   id: string;
@@ -61,89 +62,81 @@ export const HistorySwingCard: React.FC<HistorySwingCardProps> = ({
     return analysis.timestamp.toLocaleDateString();
   };
 
+  // Create a message object for ChatMessage component
+  const messageObj = {
+    id: analysis.id,
+    type: 'ai' as const,
+    content: analysis.content,
+    timestamp: analysis.timestamp,
+    metadata: {
+      save_card: analysis.save_card,
+      tags: analysis.tags,
+      category: analysis.category
+    }
+  };
+
   return (
-    <Card className="overflow-hidden">
-      <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-        {/* Collapsed Header */}
-        <div className="p-4">
-          <div className="flex items-center gap-4">
-            {/* Video Thumbnail */}
-            <div className="relative w-24 h-16 bg-muted rounded-lg overflow-hidden flex-shrink-0">
-              {getThumbnailUrl() ? (
-                <img
-                  src={getThumbnailUrl()}
-                  alt="Swing thumbnail"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Play className="h-6 w-6 text-muted-foreground" />
-                </div>
-              )}
-              
-              {/* Visuals badge */}
-              <div className="absolute top-1 right-1">
-                <Badge variant="secondary" className="text-xs px-1 py-0">
-                  Visuals ✓
-                </Badge>
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2">
-                <div className="space-y-2 min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-medium truncate">
-                      Swing analysis – {getRelativeDate()}
-                    </h3>
-                  </div>
-                  
-                  {/* Highlights */}
-                  {highlights.length > 0 && (
-                    <div className="space-y-1">
-                      {highlights.map((highlight, index) => (
-                        <p key={index} className="text-sm text-muted-foreground truncate">
-                          • {highlight}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Tags */}
-                  <div className="flex items-center gap-1 flex-wrap">
-                    {analysis.tags.slice(0, 3).map((tag, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                    {analysis.tags.length > 3 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{analysis.tags.length - 3}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-
-                {/* Expand Toggle */}
-                <CollapsibleTrigger asChild>
-                  <Button variant="ghost" size="sm" className="ml-2">
-                    {isExpanded ? (
-                      <ChevronUp className="h-4 w-4" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4" />
-                    )}
-                  </Button>
-                </CollapsibleTrigger>
-              </div>
-            </div>
+    <ChatMessageComponent
+      message={messageObj}
+      showActions={false}
+      isUser={false}
+      mediaTop={
+        !isExpanded && getThumbnailUrl() ? (
+          <div className="w-full aspect-video overflow-hidden">
+            <img
+              src={getThumbnailUrl()}
+              alt="Swing thumbnail"
+              className="block w-full h-auto object-cover"
+            />
           </div>
-        </div>
+        ) : null
+      }
+    >
+      {!isExpanded ? (
+        <div className="space-y-3">
+          {/* Highlights */}
+          {highlights.length > 0 && (
+            <div className="space-y-1">
+              {highlights.map((highlight, index) => (
+                <p key={index} className="text-sm text-muted-foreground truncate">
+                  • {highlight}
+                </p>
+              ))}
+            </div>
+          )}
 
-        {/* Expanded Content */}
-        <CollapsibleContent>
-          <div className="border-t">
-            <div className="p-4 space-y-6">
+          {/* Tags and Date */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1 flex-wrap">
+              {analysis.tags.slice(0, 3).map((tag, index) => (
+                <Badge key={index} variant="outline" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+              {analysis.tags.length > 3 && (
+                <Badge variant="outline" className="text-xs">
+                  +{analysis.tags.length - 3}
+                </Badge>
+              )}
+            </div>
+            <span className="text-xs text-muted-foreground shrink-0">{getRelativeDate()}</span>
+          </div>
+
+          {/* Expand Button */}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setIsExpanded(true)}
+            className="w-full rounded-full border border-black/10 bg-white hover:bg-white/90"
+          >
+            View Full Analysis
+            <ChevronDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      ) : (
+        <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+          <CollapsibleContent>
+            <div className="space-y-6 pt-4">
               {/* Video Player Row */}
               {(analysis.videoUrl || analysis.videoId) && (
                 <div className="space-y-2">
@@ -207,17 +200,20 @@ export const HistorySwingCard: React.FC<HistorySwingCardProps> = ({
                     </Button>
                   )}
                   
-                  <CollapsibleTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      Close
-                    </Button>
-                  </CollapsibleTrigger>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setIsExpanded(false)}
+                  >
+                    <ChevronUp className="mr-2 h-4 w-4" />
+                    Close
+                  </Button>
                 </div>
               </div>
             </div>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-    </Card>
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+    </ChatMessageComponent>
   );
 };
