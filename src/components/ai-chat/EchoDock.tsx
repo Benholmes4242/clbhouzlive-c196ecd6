@@ -17,7 +17,9 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [pressTimer, setPressTimer] = useState<number | null>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
   const dismissTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
 
   // Check for first-time onboarding (only first 3 sessions) - SSR safe
@@ -55,6 +57,30 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
       }
     }
   }, [panelOpen]);
+
+  // Scroll fade effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolling(true);
+      
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsScrolling(false);
+      }, 150);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Close panel on outside click or Escape
   useEffect(() => {
@@ -151,7 +177,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
       <button
         ref={btnRef}
         aria-label="Open Echo assistant"
-        className={`echoDoc-btn ${panelOpen ? 'is-panel-open' : ''}`}
+        className={`echoDoc-btn ${panelOpen ? 'is-panel-open' : ''} ${isScrolling ? 'is-scrolling' : ''}`}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
