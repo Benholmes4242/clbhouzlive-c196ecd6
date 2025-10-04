@@ -97,8 +97,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           {/* Message content - Phase 50 actions & meta */}
           <div 
             className={cn(
-              "relative group/message pt-2 max-w-full",
-              isUser ? "user message-right" : "echo message-left"
+              "relative group/message pt-2 max-w-[90%] w-fit",
+              isUser ? "user message-right ml-auto" : "echo message-left"
             )}
           data-message-id={message.id}
           data-author={isUser ? "user" : "echo"}
@@ -121,7 +121,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             role="group"
             aria-label={`Message from ${isUser ? 'You' : 'Echo'} at ${time}`}
             className={cn(
-              "w-full rounded-2xl text-[15px] break-words overflow-hidden",
+              "rounded-2xl text-[15px] overflow-hidden",
               isUser 
                 ? "rounded-br-md bg-[#2A9D8F]/10 border border-[#2A9D8F]/25 text-gray-900 shadow-[0_6px_18px_rgba(42,157,143,0.15)]" 
                 : "rounded-bl-md bg-white/92 backdrop-blur border border-black/10 text-gray-900 shadow-[0_10px_28px_rgba(0,0,0,0.08)]",
@@ -137,7 +137,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             ) : (
               <div className="px-3.5 py-2.5 first:mt-0 last:mb-0">
                 {isUser ? (
-                  <div className="break-words break-all">{message.content}</div>
+                  <div className="break-words">{message.content}</div>
                 ) : swingAnalysisData ? (
                 <div className="mt-2 rounded-2xl overflow-hidden bg-white/92 backdrop-blur border border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.08)]" data-swing-card>
                   <SwingReview
@@ -174,7 +174,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                       h1: ({ children }) => <h3 className="text-[16px] font-semibold mb-2 mt-3 first:mt-0 text-gray-900">{children}</h3>,
                       h2: ({ children }) => <h4 className="text-[15.5px] font-semibold mb-2 mt-3 text-gray-900">{children}</h4>,
                       h3: ({ children }) => <h4 className="text-[15px] font-semibold mb-2 mt-2 text-gray-900">{children}</h4>,
-                      p: ({ children }) => <p className="my-2 first:mt-0 last:mb-0 break-words break-all">{children}</p>,
+                      p: ({ children }) => <p className="my-2 first:mt-0 last:mb-0 break-words">{children}</p>,
                       ul: ({ children }) => <ul className="list-disc pl-5 space-y-1.5 my-2 marker:text-gray-500">{children}</ul>,
                       ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1.5 my-2 marker:text-gray-500">{children}</ol>,
                       li: ({ children }) => <li className="leading-[1.5]">{children}</li>,
