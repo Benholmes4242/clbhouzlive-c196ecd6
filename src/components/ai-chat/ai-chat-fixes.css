@@ -307,15 +307,6 @@
   display: none !important;
 }
 
-/* Scroll fade effect */
-.echoDoc-btn {
-  transition: opacity 0.2s ease-in-out;
-}
-
-.echoDoc-btn.is-scrolling {
-  opacity: 0.3;
-}
-
 /* Echo label styling */
 .echoDoc-label {
   font-size: 20px;
