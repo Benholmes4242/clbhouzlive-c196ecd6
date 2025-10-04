@@ -97,8 +97,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           {/* Message content - Phase 50 actions & meta */}
           <div 
             className={cn(
-              "relative group/message pt-2 w-fit",
-              isSwingAnalysis ? "max-w-full" : "max-w-[95%]",
+              "relative group/message pt-2 max-w-[95%] w-fit",
               isUser ? "user message-right ml-auto" : "echo message-left"
             )}
           data-message-id={message.id}
