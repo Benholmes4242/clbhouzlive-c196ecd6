@@ -93,8 +93,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         {/* Message content - Phase 50 actions & meta */}
         <div 
           className={cn(
-            "relative group/message pt-2 max-w-[78%]",
-            isUser ? "user message-right" : "echo message-left"
+            "relative group/message pt-2",
+            isUser
+              ? "max-w-[78%] user message-right"       // keep user bubble compact
+              : "max-w-[92%] echo message-left"        // make Echo bubble breathe
           )}
           data-message-id={message.id}
           data-author={isUser ? "user" : "echo"}
