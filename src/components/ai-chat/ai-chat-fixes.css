@@ -205,44 +205,43 @@
    Echo Dock - Frosted White Button
    ======================================== */
 
-/* Frosted white circular Echo button */
+/* Echo – permanently frosted white (opaque base) */
 .echoDoc-btn {
-  /* Fixed positioning - handled by inline styles in component */
   position: fixed;
-  bottom: 1.5rem;
   right: 1rem;
+  bottom: 1.5rem;
   z-index: 9999;
-  
+
   /* Size */
   width: 56px;
   height: 56px;
   border-radius: 9999px;
 
-  /* Permanently frosted white surface (high-contrast on white) */
-  border: 1px solid rgba(17,24,39,0.06);        /* hairline ring so it never disappears */
-  background-color: rgba(255,255,255,0.96);     /* near-opaque frosted white */
-  background-image: linear-gradient(             /* tiny depth gradient */
-    to bottom,
-    rgba(255,255,255,0.98),
-    rgba(255,255,255,0.94)
-  );
+  /* IMPORTANT: solid white base (no bleed-through) */
+  background-color: #fff; /* opaque */
+  /* gentle glass sheen on top of the white base */
+  background-image:
+    linear-gradient(to bottom, rgba(255,255,255,.98), rgba(255,255,255,.92)),
+    linear-gradient(to bottom, rgba(255,255,255,.70), rgba(0,0,0,.08));
   background-origin: border-box;
-  background-clip: padding-box;
+  background-clip: padding-box, border-box;
 
-  /* keep a touch of blur for the frosted feel (safe to keep even with solid fill) */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  /* keep a light frosted look, but base is already opaque */
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 
-  /* Depth + inner highlight */
+  /* ring + depth that survives on white backgrounds */
+  border: 1px solid rgba(0,0,0,.06);
   box-shadow:
-    0 8px 20px rgba(0,0,0,0.10),
-    0 2px 6px rgba(0,0,0,0.06),
-    inset 0 1px 0 rgba(255,255,255,0.65),
-    0 0 0 1px rgba(17,24,39,0.03);              /* subtle outer ring on pure white */
+    0 8px 20px rgba(0,0,0,.10),
+    0 2px 6px rgba(0,0,0,.06),
+    inset 0 1px 0 rgba(255,255,255,.55);
 
-  /* Slightly stronger label contrast for readability */
-  color: rgba(17,24,39,0.88); /* ~gray-900 */
-  
+  color: rgba(17,24,39,.85); /* label */
+  transition: transform .2s cubic-bezier(.4,0,.2,1), box-shadow .2s, background .2s;
+  opacity: 1 !important;      /* ensure no inherited opacity */
+  mix-blend-mode: normal !important; /* avoid blending with content */
+
   /* Center content */
   display: grid;
   place-items: center;
@@ -250,43 +249,37 @@
   /* Remove default button styles */
   cursor: pointer;
   user-select: none;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Hover/active/focus feedback (subtle, iOS-like) */
+/* Extra pop on bright/white areas */
+.echoDoc-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.04);
+}
+
+/* subtle lift */
 .echoDoc-btn:hover {
-  transform: translateY(-0.5px);
-  background-image: linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.99),
-    rgba(255,255,255,0.96)
-  );
-  box-shadow:
-    0 10px 24px rgba(0,0,0,0.12),
-    0 3px 8px rgba(0,0,0,0.08),
-    inset 0 1px 0 rgba(255,255,255,0.70),
-    0 0 0 1px rgba(17,24,39,0.04);
+  transform: translateY(-.5px);
 }
 
 .echoDoc-btn:active {
-  transform: translateY(0.5px) scale(0.995);
-  box-shadow:
-    0 6px 14px rgba(0,0,0,0.12),
-    0 2px 5px rgba(0,0,0,0.08),
-    inset 0 1px 0 rgba(255,255,255,0.55),
-    0 0 0 1px rgba(17,24,39,0.05);
+  transform: translateY(.5px) scale(.995);
 }
 
+/* focus ring (kept) */
 .echoDoc-btn:focus-visible {
   outline: none;
   box-shadow:
-    0 0 0 3px rgba(56,189,248,0.22),   /* slightly softer */
-    0 8px 20px rgba(0,0,0,0.10),
-    0 2px 6px rgba(0,0,0,0.06),
-    inset 0 1px 0 rgba(255,255,255,0.60);
+    0 0 0 3px rgba(56,189,248,.25),
+    0 8px 20px rgba(0,0,0,.10),
+    0 2px 6px rgba(0,0,0,.06),
+    inset 0 1px 0 rgba(255,255,255,.55);
 }
 
-/* Slightly larger on >= md screens */
 @media (min-width: 768px) {
   .echoDoc-btn {
     width: 64px;
