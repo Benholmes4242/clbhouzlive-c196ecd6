@@ -1488,109 +1488,119 @@ html[data-immersive="true"] .app-shell--topSpacer {
     }
   }
 
-  /* EchoDock Halo Button Styles */
-  :root {
-    --echo-gradient-from: #6e9277;
-    --echo-gradient-to: #a8bfb3;
-    --echo-shadow: rgba(110, 146, 119, 0.35);
-    --echo-halo: rgba(110, 146, 119, 0.12);
-    --echo-halo-strong: rgba(110, 146, 119, 0.18);
-    --echo-halo-ring: 3px;
-    --echo-halo-pulse: 2px;
-    --echo-halo-interval: 4s;
-    --nav-height: 56px;
-    --echo-clearance: 10px;
-  }
-
+  /* =============== Echo Glassmorphic Orb =============== */
   .echoDoc-btn {
     position: fixed;
-    right: calc(env(safe-area-inset-right, 0px) + 16px);
-    bottom: calc(env(safe-area-inset-bottom, 0px) + var(--nav-height,56px) + 28px);
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    padding: 3px;
-    background: linear-gradient(135deg, var(--echo-gradient-from) 0%, var(--echo-gradient-to) 100%);
-    z-index: 1000;
-    cursor: pointer;
-    isolation: isolate;
-    -webkit-tap-highlight-color: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    mix-blend-mode: normal !important;
-    opacity: 1 !important;
-  }
+    bottom: 1.25rem;
+    right: 1rem;
+    z-index: 9999;
 
-  .echoDoc-btn::before {
-    content: '';
-    position: absolute;
-    inset: 3px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    z-index: 0;
-  }
+    /* Size & shape */
+    width: 60px;
+    height: 60px;
+    border-radius: 9999px;
 
-  .echoDoc-btn:hover {
-    box-shadow: 0 0 12px rgba(110, 146, 119, 0.6);
-  }
+    /* Frosted core (opaque enough to work on white bg) */
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 
-  .echoDoc-btn:active {
-    transform: scale(0.95);
-  }
+    /* Remove any previous transparent/mix-blend rules */
+    border: 0;
+    mix-blend-mode: normal;
+    opacity: 1;
 
-  .echoDoc-core {
-    position: relative;
-    z-index: 1;
+    /* Depth + inner hairline */
+    box-shadow:
+      0 10px 22px rgba(0, 0, 0, 0.12),
+      0 3px 8px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.65);
+
     display: inline-flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0px;
-    color: #000;
+    color: #0f172a;
     font-weight: 700;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.15px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
   }
 
-  .echoDoc-icon {
-    width: 22px;
-    height: 22px;
-    fill: currentColor;
-  }
-
-  .echoDoc-text {
-    font-size: 12px;
-    line-height: 1;
-  }
-
-  .echoDoc-halo {
+  /* Gradient border RING only (so the center stays white).
+     We draw a stroke with a mask. */
+  .echoDoc-btn::before {
+    content: "";
     position: absolute;
     inset: 0;
-    border-radius: 50%;
-    z-index: -1;
-    box-shadow:
-      0 0 0 var(--echo-halo-ring) var(--echo-halo),
-      0 0 0 0 var(--echo-halo-strong);
-    animation: echoPulse var(--echo-halo-interval) ease-in-out infinite;
+    border-radius: inherit;
+    padding: 2px; /* ring thickness */
+    background: linear-gradient(135deg, #9ED6C2 0%, #7DB6A0 60%, #B6E2D3 100%);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude; /* only the rim shows */
+    pointer-events: none;
   }
 
-  .echoDoc-btn:is(:active, :focus-visible) .echoDoc-halo {
-    animation: echoTap 450ms ease;
-  }
-
-  @keyframes echoPulse {
+  /* Idle halo (very soft & slow) */
+  @keyframes echoHalo {
     0%, 100% {
       box-shadow:
-        0 0 0 var(--echo-halo-ring) var(--echo-halo),
-        0 0 8px rgba(110, 146, 119, 0.3);
+        0 10px 22px rgba(0, 0, 0, 0.12),
+        0 3px 8px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.65),
+        0 0 0 0 rgba(126, 193, 166, 0.18);
     }
     50% {
       box-shadow:
-        0 0 0 calc(var(--echo-halo-ring) + var(--echo-halo-pulse)) var(--echo-halo),
-        0 0 16px rgba(110, 146, 119, 0.5);
+        0 12px 28px rgba(0, 0, 0, 0.14),
+        0 4px 10px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.65),
+        0 0 0 8px rgba(126, 193, 166, 0.12);
+    }
+  }
+
+  .echoDoc-btn.is-idle {
+    animation: echoHalo 3.2s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .echoDoc-btn.is-idle {
+      animation: none;
+    }
+  }
+
+  /* Hover/press micro-interaction */
+  .echoDoc-btn:hover {
+    transform: translateY(-0.5px);
+  }
+
+  .echoDoc-btn:active {
+    transform: translateY(0.5px) scale(0.985);
+  }
+
+  /* Focus ring (iOS-style, subtle cyan-mint) */
+  .echoDoc-btn:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px rgba(94, 234, 212, 0.35),
+      0 12px 28px rgba(0, 0, 0, 0.14),
+      0 4px 10px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  }
+
+  /* Dark mode support (keeps core readable + ring visible) */
+  @media (prefers-color-scheme: dark) {
+    .echoDoc-btn {
+      background: rgba(17, 24, 39, 0.85);
+      color: rgba(255, 255, 255, 0.92);
+      box-shadow:
+        0 10px 22px rgba(0, 0, 0, 0.5),
+        0 3px 8px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    .echoDoc-btn::before {
+      background: linear-gradient(135deg, #74CDB2 0%, #58A994 60%, #9ADFCC 100%);
     }
   }
 
