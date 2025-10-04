@@ -104,7 +104,9 @@ const Clubhouse = () => {
   }
 
   return (
-    <div className="min-h-screen bg-transparent overflow-visible relative clubhouse-root">
+    <div className="h-screen bg-transparent overflow-hidden relative clubhouse-root" style={{
+      minHeight: '100dvh',
+    }}>
       {/* Intersection sentinel for header fade-away */}
       <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
       

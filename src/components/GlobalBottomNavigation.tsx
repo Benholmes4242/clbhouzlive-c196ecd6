@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSnapModal } from '@/hooks/useSnapModal';
@@ -36,7 +35,6 @@ const GlobalBottomNavigation: React.FC = () => {
   const { activeTab, handleTabClick } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  const navRef = useRef<HTMLDivElement>(null);
   
   // Determine if current route should hide navigation
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname);
@@ -78,31 +76,42 @@ const GlobalBottomNavigation: React.FC = () => {
   // Media handlers for camera, image, and video
   const { handleCameraClick, handleImageClick, handleVideoClick } = useMediaHandlers(closeSnapModal, openComposer);
 
-  // Handle iOS visual viewport - lock to hardware bottom when Safari toolbar shows/hides
+  // Handle keyboard visibility and visual viewport changes
   useEffect(() => {
-    if (!window.visualViewport) return;
+    if (typeof window === 'undefined') return;
 
-    const el = navRef.current;
-    if (!el) return;
+    const handleVisualViewportChange = () => {
+      if (window.visualViewport) {
+        // Use visual viewport API for accurate keyboard detection
+        const { height: vpHeight } = window.visualViewport;
+        const windowHeight = window.innerHeight;
+        
+        // Keyboard is considered visible if viewport is significantly smaller
+        const heightDiff = windowHeight - vpHeight;
+        setIsKeyboardVisible(heightDiff > 150);
+      }
+    };
 
-    const onVV = () => {
-      // Lock to the *layout* viewport, not the shrinking visual viewport
-      // Keep bottom=0; compensate by translating by visual viewport offset
-      const offset = window.visualViewport?.offsetTop || 0;
-      el.style.transform = `translate3d(0, ${offset}px, 0)`;
-      
-      // Track keyboard visibility
-      const heightDiff = window.innerHeight - (window.visualViewport?.height || window.innerHeight);
+    const handleResize = () => {
+      // Fallback for browsers without visual viewport support  
+      const heightDiff = window.screen.height - window.innerHeight;
       setIsKeyboardVisible(heightDiff > 150);
     };
 
-    window.visualViewport.addEventListener('resize', onVV);
-    window.visualViewport.addEventListener('scroll', onVV);
-    onVV();
-    return () => {
-      window.visualViewport?.removeEventListener('resize', onVV);
-      window.visualViewport?.removeEventListener('scroll', onVV);
-    };
+    // Use visual viewport API when available (better for mobile)
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleVisualViewportChange);
+      window.visualViewport.addEventListener('scroll', handleVisualViewportChange);
+      
+      return () => {
+        window.visualViewport?.removeEventListener('resize', handleVisualViewportChange);
+        window.visualViewport?.removeEventListener('scroll', handleVisualViewportChange);
+      };
+    } else {
+      // Fallback for older browsers
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
   }, []);
 
   const handleCloseComposer = () => {
@@ -119,15 +128,16 @@ const GlobalBottomNavigation: React.FC = () => {
     }
   };
 
-  const navigationContent = (
+  return (
     <>
       {/* Global Fixed Bottom Navigation */}
       <AnimatePresence>
         {showNavigation && (
           <motion.div
-            ref={navRef}
             className={cn(
               "global-bottom-nav",
+              "fixed bottom-0 left-0 right-0 w-full",
+              "z-[100]",
               // Background extends to very bottom
               "backdrop-blur-md",
               isClubhouseRoute 
@@ -147,6 +157,18 @@ const GlobalBottomNavigation: React.FC = () => {
               stiffness: 300, 
               damping: 30,
               duration: 0.25 
+            }}
+            style={{
+              // Hardware acceleration and mobile-stable positioning
+              transform: 'translate3d(0, 0, 0)',
+              willChange: 'transform',
+              // Force stable bottom positioning on mobile
+              position: 'fixed',
+              bottom: '0px',
+              // Prevent iOS Safari viewport issues
+              paddingBottom: 'env(safe-area-inset-bottom)',
+              // Ensure it stays at viewport bottom, not document bottom
+              zIndex: 100,
             }}
           >
             <NavigationBar
@@ -189,9 +211,6 @@ const GlobalBottomNavigation: React.FC = () => {
       />
     </>
   );
-
-  // Render via portal to document.body
-  return createPortal(navigationContent, document.body);
 };
 
 export default GlobalBottomNavigation;
