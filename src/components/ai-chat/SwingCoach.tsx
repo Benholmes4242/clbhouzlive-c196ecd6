@@ -137,6 +137,8 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
   const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
   const [analysisStatus, setAnalysisStatus] = useState('');
   const [showHistory, setShowHistory] = useState(false);
+  const [videoDurationSeconds, setVideoDurationSeconds] = useState<number | null>(null);
+  const heroRef = useRef<HTMLDivElement>(null);
   
   const [currentAnalysis, setCurrentAnalysis] = useState<SwingAnalysis | null>(null);
   const [isAddingVoiceNote, setIsAddingVoiceNote] = useState(false);
@@ -404,6 +406,13 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
           event.target.value = ''; // Reset input
           return;
         }
+        // Get video duration for metadata display
+        try {
+          const meta = await probeVideo(file);
+          setVideoDurationSeconds(meta.duration);
+        } catch (error) {
+          console.warn('Failed to get video duration:', error);
+        }
       }
 
       // Check file size (50MB limit)
@@ -439,6 +448,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     setVideoPreview('');
     setVideoPoster(''); // Clear poster too
     setAnalysisText('');
+    setVideoDurationSeconds(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -494,6 +504,18 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       URL.revokeObjectURL(video.src);
     }
   };
+
+  // Micro-parallax effect on hero video
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const y = Math.min(1, window.scrollY / 400);
+      el.style.transform = `translateY(${y * -2}px) scale(${1 + y * 0.01})`;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   // Store toast function reference for validation
   useEffect(() => {
@@ -1363,87 +1385,112 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         ) : (
           <div className="space-y-4">
             {uploadedVideo && (
-              <ChatMessageComponent
-                message={{
-                  id: 'upload-preview',
-                  type: 'ai',
-                  content: '',
-                  timestamp: new Date(),
-                }}
-                showActions={false}
-                showHeading={false}
-                isUser={false}
-                isFirstInGroup={false}
-                mediaTop={
-                  <div className="w-full bg-black">
+              <div className="relative animate-[fadeIn_320ms_ease-out]">
+                {/* Ambient brand glow */}
+                <div className="pointer-events-none absolute -inset-x-10 -top-6 -bottom-8 bg-[radial-gradient(60%_60%_at_70%_90%,rgba(110,146,119,0.10),transparent_70%)] blur-2xl" />
+                
+                {/* Content wrapper */}
+                <div ref={heroRef} className="relative transition-transform will-change-transform">
+                  {/* Ready for analysis header */}
+                  <div className="mb-2 px-1">
+                    <div className="text-sm font-semibold text-gray-900/80">Ready for analysis</div>
+                    <div className="text-xs text-gray-600/80">
+                      Your swing is loaded. Echo will analyze posture, tempo, and follow-through in seconds.
+                    </div>
+                  </div>
+
+                  {/* Borderless edge-to-edge hero video */}
+                  <div className="overflow-hidden rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.15)] relative bg-black/5">
                     {/* Show cycling frames during analysis, otherwise show video/image preview */}
                     {isAnalyzing && extractedFrames.length > 0 ? (
                       <img 
                         key={`frame-${currentFrameIndex}`}
                         src={extractedFrames[currentFrameIndex]} 
                         alt={`Analyzing swing frame ${currentFrameIndex + 1}`}
-                        className="block w-full h-auto aspect-video object-cover transition-all duration-500 ease-in-out animate-fade-in"
+                        className="w-full h-auto aspect-[16/9] object-cover transition-all duration-500 ease-in-out animate-fade-in"
                       />
                     ) : uploadedVideo.type.startsWith('video/') ? (
                       <video 
                         src={videoPreview} 
                         poster={videoPoster}
-                        className="block w-full h-auto aspect-video object-cover"
+                        className="w-full h-auto aspect-[16/9] object-cover"
                         playsInline
                         muted
+                        loop
                         preload="metadata"
-                        controls={false}
+                        onLoadedMetadata={(e) => {
+                          const v = e.currentTarget;
+                          v.currentTime = 0;
+                          v.play().catch(() => {});
+                        }}
                       />
                     ) : (
                       <img 
                         src={videoPreview} 
                         alt="Preview"
-                        className="block w-full h-auto aspect-video object-cover"
+                        className="w-full h-auto aspect-[16/9] object-cover"
                       />
                     )}
+                    
+                    {/* Vignette overlay */}
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(80%_120%_at_50%_80%,rgba(0,0,0,0.18),transparent_60%)] md:bg-[radial-gradient(70%_110%_at_50%_85%,rgba(0,0,0,0.15),transparent_55%)]" />
                   </div>
-                }
-              >
-                {/* File name & size */}
-                <div className="flex items-center justify-between text-[13px] text-gray-600 mb-3">
-                  <span className="truncate max-w-[60%]">{uploadedVideo.name}</span>
-                  <span>{(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB</span>
-                </div>
-                
-                {/* Analysis status display */}
-                {isAnalyzing && analysisStatus && (
-                  <div className="rounded-xl bg-white/80 backdrop-blur border border-black/10 text-[14px] text-gray-700 px-3 py-2 inline-flex items-center gap-2 shadow-sm mb-3">
-                    <span className="h-2 w-2 rounded-full bg-gray-500 animate-pulse"></span>
-                    {analysisStatus}
+
+                  {/* Elegant metadata caption */}
+                  <div className="flex items-center justify-between gap-3 mt-2 text-[11px] text-gray-600/80 font-mono">
+                    <div className="truncate">🎞️ {uploadedVideo.name}</div>
+                    <div className="shrink-0 flex items-center gap-2">
+                      <span>{(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB</span>
+                      {videoDurationSeconds && (
+                        <>
+                          <span className="opacity-50">•</span>
+                          <span>{videoDurationSeconds.toFixed(1)}s</span>
+                        </>
+                      )}
+                    </div>
                   </div>
-                )}
-                
-                {/* Analyze Swing button with trash icon */}
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={analyzeSwing}
-                    disabled={uploading || isAnalyzing}
-                    className="h-12 w-full rounded-full border border-black/10 bg-white hover:bg-white/90 transition disabled:opacity-50 font-medium text-[15px]"
-                    aria-label={isAnalyzing ? 'Analyzing swing' : 'Analyze swing'}
-                  >
-                    {isAnalyzing ? (
-                      <span className="inline-flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Analyzing…
+
+                  {/* Analysis status display */}
+                  {isAnalyzing && analysisStatus && (
+                    <div className="mt-3 rounded-xl bg-white/80 backdrop-blur border border-black/10 text-[14px] text-gray-700 px-3 py-2 inline-flex items-center gap-2 shadow-sm">
+                      <span className="h-2 w-2 rounded-full bg-gray-500 animate-pulse"></span>
+                      {analysisStatus}
+                    </div>
+                  )}
+
+                  {/* Glassmorphic Analyze CTA with trash icon */}
+                  <div className="flex items-center gap-3 mt-3">
+                    <button
+                      onClick={analyzeSwing}
+                      disabled={uploading || isAnalyzing}
+                      className={`
+                        group relative w-full h-12 rounded-full
+                        backdrop-blur-md
+                        bg-[linear-gradient(135deg,rgba(255,255,255,0.45),rgba(240,250,240,0.24))]
+                        border border-[rgba(110,146,119,0.35)]
+                        shadow-[0_6px_24px_rgba(0,0,0,0.08)]
+                        transition-all active:scale-[0.98]
+                        disabled:opacity-60 disabled:cursor-not-allowed
+                        ${!isAnalyzing ? 'animate-echoPulse' : ''}
+                      `}
+                      aria-label={isAnalyzing ? 'Analyzing swing' : 'Analyze swing'}
+                      aria-busy={isAnalyzing}
+                    >
+                      <span className="absolute inset-0 rounded-full group-active:opacity-80 transition-opacity before:content-[''] before:absolute before:inset-0 before:rounded-full before:shadow-[0_0_0_0_rgba(110,146,119,0.0)]" />
+                      <span className="relative font-semibold text-gray-900/90">
+                        {isAnalyzing ? 'Analyzing…' : 'Analyze Swing'}
                       </span>
-                    ) : (
-                      "Analyze Swing"
-                    )}
-                  </button>
-                  <button
-                    onClick={discardVideo}
-                    aria-label="Delete video"
-                    className="grid h-10 w-10 place-items-center rounded-full border border-black/10 bg-white hover:bg-white/90 transition"
-                  >
-                    <Trash2 className="h-4 w-4 text-gray-600" />
-                  </button>
+                    </button>
+                    <button
+                      onClick={discardVideo}
+                      aria-label="Delete video"
+                      className="grid h-12 w-12 place-items-center rounded-full backdrop-blur-md bg-[linear-gradient(135deg,rgba(255,255,255,0.45),rgba(240,250,240,0.24))] border border-[rgba(110,146,119,0.35)] shadow-[0_6px_24px_rgba(0,0,0,0.08)] hover:bg-white/80 transition active:scale-[0.98]"
+                    >
+                      <Trash2 className="h-4 w-4 text-gray-700" />
+                    </button>
+                  </div>
                 </div>
-              </ChatMessageComponent>
+              </div>
             )}
 
             <div className="w-full px-3 sm:px-5">
