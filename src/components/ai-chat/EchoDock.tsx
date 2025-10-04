@@ -157,7 +157,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
         onPointerCancel={handlePointerCancel}
         onClick={handleClick}
       >
-        <span className="echoDoc-label">Echo</span>
+        <span className="echoDoc-label">echo</span>
       </button>
 
       {panelOpen && <RadialFan onItemClick={(tab) => { setPanelOpen(false); openAIChatOverlay(tab); }} />}
