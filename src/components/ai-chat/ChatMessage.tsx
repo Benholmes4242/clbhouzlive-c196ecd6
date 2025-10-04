@@ -36,6 +36,8 @@ interface ChatMessageProps {
   onAddVoiceNote?: (message: ChatMessage) => void;
   isFirstInGroup?: boolean;
   showHeading?: boolean;
+  mediaTop?: React.ReactNode;   // Optional media at the top of the bubble
+  children?: React.ReactNode;    // Override default content rendering
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ 
@@ -46,7 +48,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   onShare,
   onAddVoiceNote,
   isFirstInGroup = true,
-  showHeading = true
+  showHeading = true,
+  mediaTop,
+  children,
 }) => {
   const isUser = message.type === 'user';
   const [showSources, setShowSources] = useState(false);
@@ -159,17 +163,24 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             role="group"
             aria-label={`Message from ${isUser ? 'You' : 'Echo'} at ${time}`}
             className={cn(
-              "rounded-2xl px-3.5 py-2.5 text-[15px] break-words",
+              "rounded-2xl text-[15px] break-words overflow-hidden",
               isUser 
                 ? "rounded-br-md bg-[#2A9D8F]/10 border border-[#2A9D8F]/25 text-gray-900 shadow-[0_6px_18px_rgba(42,157,143,0.15)]" 
                 : "rounded-bl-md bg-white/92 backdrop-blur border border-black/10 text-gray-900 shadow-[0_10px_28px_rgba(0,0,0,0.08)]",
               isUser ? "leading-[1.5]" : "leading-[1.55]"
             )}
           >
-            <div className="first:mt-0 last:mb-0">
-              {isUser ? (
-                <div className="break-words break-all">{message.content}</div>
-              ) : swingAnalysisData ? (
+            {/* Edge-to-edge media at top if provided */}
+            {mediaTop}
+            
+            {/* Content wrapper - only add padding if there's actual content */}
+            {children ? (
+              <div className="px-3.5 py-2.5">{children}</div>
+            ) : (
+              <div className="px-3.5 py-2.5 first:mt-0 last:mb-0">
+                {isUser ? (
+                  <div className="break-words break-all">{message.content}</div>
+                ) : swingAnalysisData ? (
                 <div className="mt-2 rounded-2xl overflow-hidden bg-white/92 backdrop-blur border border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.08)]" data-swing-card>
                   <SwingReview
                     videoUrl={message.metadata!.videoUrl!}
@@ -249,21 +260,24 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   </ReactMarkdown>
                 </div>
               )}
-            </div>
-            
-            {/* Tags from metadata */}
-            {message.metadata?.tags && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {message.metadata.tags.map((tag, index) => (
-                  <span key={index} className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-white/80 backdrop-blur border border-black/5 rounded-full">
-                    {tag}
-                  </span>
-                ))}
               </div>
             )}
+            
+            {/* Tags from metadata (wrapped with proper padding) */}
+            {!children && (
+              <div className="px-3.5 pb-2.5">
+                {message.metadata?.tags && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {message.metadata.tags.map((tag, index) => (
+                      <span key={index} className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium bg-white/80 backdrop-blur border border-black/5 rounded-full">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
-            {/* Mode badge and sources for AI messages */}
-            {!isUser && message.metadata?.modeUsed && (
+                {/* Mode badge and sources for AI messages */}
+                {!isUser && message.metadata?.modeUsed && (
               <div className="flex flex-wrap items-center gap-2 mt-2">
                 <Badge 
                   variant="outline" 
@@ -309,26 +323,28 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               </div>
             )}
 
-            {/* Expandable sources section */}
-            {!isUser && showSources && message.metadata?.sources && (
-              <div className="mt-2 p-2 bg-muted/50 rounded text-xs text-muted-foreground">
-                <div className="font-medium mb-1">Sources used:</div>
-                <div>Live search results from web sources</div>
-              </div>
-            )}
-            
-            {/* Action buttons for AI messages (only show for non-swing analysis) */}
-            {!isUser && !swingAnalysisData && showSaveOption && message.metadata && (
-              <div className="flex gap-2 mt-3">
-                <Button
-                  onClick={() => onSaveToInsights(message)}
-                  variant="outline"
-                  size="sm"
-                  className="text-xs h-7 min-h-[28px]"
-                >
-                  <Bookmark className="h-3 w-3 mr-1" />
-                  Save to Insights
-                </Button>
+                {/* Expandable sources section */}
+                {!isUser && showSources && message.metadata?.sources && (
+                  <div className="mt-2 p-2 bg-muted/50 rounded text-xs text-muted-foreground">
+                    <div className="font-medium mb-1">Sources used:</div>
+                    <div>Live search results from web sources</div>
+                  </div>
+                )}
+                
+                {/* Action buttons for AI messages (only show for non-swing analysis) */}
+                {!isUser && !swingAnalysisData && showSaveOption && message.metadata && (
+                  <div className="flex gap-2 mt-3">
+                    <Button
+                      onClick={() => onSaveToInsights(message)}
+                      variant="outline"
+                      size="sm"
+                      className="text-xs h-7 min-h-[28px]"
+                    >
+                      <Bookmark className="h-3 w-3 mr-1" />
+                      Save to Insights
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -1363,76 +1363,87 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         ) : (
           <div className="space-y-4">
             {uploadedVideo && (
-              <div className="rounded-3xl bg-white/70 backdrop-blur-xl border border-white/20 shadow-[0_10px_28px_rgba(0,0,0,0.08)] p-4 sm:p-5 space-y-4">
+              <ChatMessageComponent
+                message={{
+                  id: 'upload-preview',
+                  type: 'ai',
+                  content: '',
+                  timestamp: new Date(),
+                }}
+                onSaveToInsights={() => {}}
+                onRequestDetail={() => {}}
+                showHeading={false}
+                isFirstInGroup={false}
+                mediaTop={
+                  <div className="w-full bg-black">
+                    {/* Show cycling frames during analysis, otherwise show video/image preview */}
+                    {isAnalyzing && extractedFrames.length > 0 ? (
+                      <img 
+                        key={`frame-${currentFrameIndex}`}
+                        src={extractedFrames[currentFrameIndex]} 
+                        alt={`Analyzing swing frame ${currentFrameIndex + 1}`}
+                        className="block w-full h-auto aspect-video object-cover transition-all duration-500 ease-in-out animate-fade-in"
+                      />
+                    ) : uploadedVideo.type.startsWith('video/') ? (
+                      <video 
+                        src={videoPreview} 
+                        poster={videoPoster}
+                        className="block w-full h-auto aspect-video object-cover"
+                        playsInline
+                        muted
+                        preload="metadata"
+                        controls={false}
+                      />
+                    ) : (
+                      <img 
+                        src={videoPreview} 
+                        alt="Preview"
+                        className="block w-full h-auto aspect-video object-cover"
+                      />
+                    )}
+                  </div>
+                }
+              >
                 {/* File name & size */}
-                <div className="flex items-center justify-between">
-                  <div className="text-[15px] text-gray-700 truncate">{uploadedVideo.name}</div>
-                  <div className="text-[14px] text-gray-500 shrink-0">{(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB</div>
-                </div>
-                
-                {/* Video frame container (cinematic) */}
-                <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/60 backdrop-blur shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
-                  <div className="relative w-full h-64 bg-black">
-                       {/* Show cycling frames during analysis, otherwise show video/image preview */}
-                        {isAnalyzing && extractedFrames.length > 0 ? (
-                          <img 
-                            key={`frame-${currentFrameIndex}`}
-                            src={extractedFrames[currentFrameIndex]} 
-                            alt={`Analyzing swing frame ${currentFrameIndex + 1}`}
-                            className="absolute inset-0 h-full w-full object-cover transition-all duration-500 ease-in-out animate-fade-in"
-                          />
-                       ) : uploadedVideo.type.startsWith('video/') ? (
-                         <video 
-                           src={videoPreview} 
-                           poster={videoPoster}
-                           className="absolute inset-0 h-full w-full object-cover"
-                           playsInline
-                           muted
-                           preload="metadata"
-                           controls={false}
-                         />
-                       ) : (
-                         <img 
-                           src={videoPreview} 
-                           alt="Preview"
-                           className="absolute inset-0 h-full w-full object-cover"
-                         />
-                       )}
-                     </div>
+                <div className="flex items-center justify-between text-[13px] text-gray-600 mb-3">
+                  <span className="truncate max-w-[60%]">{uploadedVideo.name}</span>
+                  <span>{(uploadedVideo.size / 1024 / 1024).toFixed(1)} MB</span>
                 </div>
                 
                 {/* Analysis status display */}
                 {isAnalyzing && analysisStatus && (
-                  <div className="rounded-xl bg-white/80 backdrop-blur border border-black/10 text-[14px] text-gray-700 px-3 py-2 inline-flex items-center gap-2 shadow-sm">
+                  <div className="rounded-xl bg-white/80 backdrop-blur border border-black/10 text-[14px] text-gray-700 px-3 py-2 inline-flex items-center gap-2 shadow-sm mb-3">
                     <span className="h-2 w-2 rounded-full bg-gray-500 animate-pulse"></span>
                     {analysisStatus}
                   </div>
                 )}
                 
                 {/* Analyze Swing button with trash icon */}
-                <div className="flex items-center gap-2">
-                  <Button
+                <div className="flex items-center gap-3">
+                  <button
                     onClick={analyzeSwing}
                     disabled={uploading || isAnalyzing}
-                    variant="glass"
-                    size="lg"
-                    className="flex-1 gap-2 font-medium"
+                    className="h-12 w-full rounded-full border border-black/10 bg-white hover:bg-white/90 transition disabled:opacity-50 font-medium text-[15px]"
                     aria-label={isAnalyzing ? 'Analyzing swing' : 'Analyze swing'}
                   >
                     {isAnalyzing ? (
-                      <>
+                      <span className="inline-flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Analyzing…
-                      </>
+                      </span>
                     ) : (
                       "Analyze Swing"
                     )}
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={discardVideo}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  </button>
+                  <button
+                    onClick={discardVideo}
+                    aria-label="Delete video"
+                    className="grid h-10 w-10 place-items-center rounded-full border border-black/10 bg-white hover:bg-white/90 transition"
+                  >
+                    <Trash2 className="h-4 w-4 text-gray-600" />
+                  </button>
                 </div>
-              </div>
+              </ChatMessageComponent>
             )}
 
             <div className="mx-auto w-full max-w-[var(--bubble-max-md)] px-3 sm:px-5">
