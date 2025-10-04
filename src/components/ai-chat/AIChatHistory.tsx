@@ -689,16 +689,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
                   {/* Right: actions */}
                   <div className="flex items-center gap-1.5">
-                    {onNewConversation && (
-                      <button
-                        type="button"
-                        aria-label="New chat"
-                        onClick={onNewConversation}
-                        className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition"
-                      >
-                        <Plus className="h-5 w-5 text-gray-700" />
-                      </button>
-                    )}
+                    {/* Removed plus icon */}
                   </div>
                 </div>
               </div>

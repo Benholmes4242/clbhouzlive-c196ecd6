@@ -515,14 +515,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
                 {/* Right: actions */}
                 <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setShowHistory(true)}
-                    className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition"
-                    aria-label="History"
-                  >
-                    <History className="h-5 w-5 text-gray-700" />
-                  </button>
+                  {/* Removed back arrow icon */}
                 </div>
               </div>
             </div>
