@@ -1508,20 +1508,19 @@ html[data-immersive="true"] .app-shell--topSpacer {
     bottom: calc(env(safe-area-inset-bottom, 0px) + var(--nav-height,56px) + 28px);
     width: 56px;
     height: 56px;
-    border: 1px solid rgba(0,0,0,.08);
-    background-color: #fff;
-    background-image:
-      linear-gradient(to bottom, rgba(255,255,255,.98), rgba(255,255,255,.92)),
-      linear-gradient(to bottom, rgba(255,255,255,.70), rgba(0,0,0,.08));
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
+    border: 2px solid rgba(158, 214, 194, 0.4);
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.08),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.5);
     border-radius: 50%;
     padding: 0;
     z-index: 1000;
     cursor: pointer;
     isolation: isolate;
     -webkit-tap-highlight-color: transparent;
-    z-index: 1000;
     mix-blend-mode: normal !important;
     opacity: 1 !important;
   }
