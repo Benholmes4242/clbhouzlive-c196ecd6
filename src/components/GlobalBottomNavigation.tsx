@@ -166,7 +166,7 @@ const GlobalBottomNavigation: React.FC = () => {
               position: 'fixed',
               bottom: '0px',
               // Prevent iOS Safari viewport issues
-              paddingBottom: 'env(safe-area-inset-bottom)',
+              paddingBottom: '30px',
               // Ensure it stays at viewport bottom, not document bottom
               zIndex: 100,
             }}
