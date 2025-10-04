@@ -24,6 +24,7 @@ import { CoachPickerModal } from '@/components/swing/CoachPickerModal';
 import { AiFeedbackBlock } from '@/components/swing/AiFeedbackBlock';
 import { ProgressStrip } from '@/components/swing/ProgressStrip';
 import { CoachCta } from '@/components/swing/CoachCta';
+import AnalyzeButton from '@/components/ai-chat/AnalyzeButton';
 
 // Single source of truth for SwingCoach mode
 export const SWINGCOACH_MODE: 'live' | 'sim' = 'live';
@@ -1460,27 +1461,12 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
                   {/* Glassmorphic Analyze CTA with trash icon */}
                   <div className="flex items-center gap-3 mt-3">
-                    <button
-                      onClick={analyzeSwing}
+                    <AnalyzeButton
+                      isAnalyzing={isAnalyzing}
                       disabled={uploading || isAnalyzing}
-                      className={`
-                        group relative w-full h-12 rounded-full
-                        backdrop-blur-md
-                        bg-[linear-gradient(135deg,rgba(255,255,255,0.45),rgba(240,250,240,0.24))]
-                        border border-[rgba(110,146,119,0.35)]
-                        shadow-[0_6px_24px_rgba(0,0,0,0.08)]
-                        transition-all active:scale-[0.98]
-                        disabled:opacity-60 disabled:cursor-not-allowed
-                        ${!isAnalyzing ? 'animate-echoPulse' : ''}
-                      `}
-                      aria-label={isAnalyzing ? 'Analyzing swing' : 'Analyze swing'}
-                      aria-busy={isAnalyzing}
-                    >
-                      <span className="absolute inset-0 rounded-full group-active:opacity-80 transition-opacity before:content-[''] before:absolute before:inset-0 before:rounded-full before:shadow-[0_0_0_0_rgba(110,146,119,0.0)]" />
-                      <span className="relative font-semibold text-gray-900/90">
-                        {isAnalyzing ? 'Analyzing…' : 'Analyze Swing'}
-                      </span>
-                    </button>
+                      onClick={analyzeSwing}
+                      className="flex-1"
+                    />
                     <button
                       onClick={discardVideo}
                       aria-label="Delete video"
