@@ -86,18 +86,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         "flex items-end gap-2",
         isUser ? "flex-row-reverse justify-end" : "justify-start"
       )}>
-        {/* Avatar - only show for AI on first message in group */}
-        {!isUser && isFirstInGroup && (
-          <div className="shrink-0 h-7 w-7 rounded-full grid place-items-center bg-white/80 backdrop-blur border border-black/10">
-            <Bot className="h-[14px] w-[14px] text-[#2A9D8F]" />
-          </div>
-        )}
-        
-        {/* Spacer for grouped messages */}
-        {!isUser && !isFirstInGroup && (
-          <div className="hidden sm:block w-7 shrink-0" />
-        )}
-        
+        <div className="relative w-full">
+          {/* Avatar - only show for AI on first message in group (positioned outside flow) */}
+          {!isUser && isFirstInGroup && (
+            <div className="absolute -left-9 top-2 h-7 w-7 rounded-full grid place-items-center bg-white/80 backdrop-blur border border-black/10">
+              <Bot className="h-[14px] w-[14px] text-[#2A9D8F]" />
+            </div>
+          )}
+          
           {/* Message content - Phase 50 actions & meta */}
           <div 
             className={cn(
@@ -330,6 +326,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               </span>
             )}
           </div>
+        </div>
         </div>
       </div>
     </div>

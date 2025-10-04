@@ -622,7 +622,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     const isFirstUnread = false; // Set to true on a specific message to show separator
                     
                     return (
-                      <React.Fragment key={message.id}>
+                      <div key={message.id}>
                         {/* "Unread" divider - Phase 59 */}
                         {isFirstUnread && (
                           <div className="relative my-6 flex items-center gap-3" role="separator" aria-label="Unread messages">
@@ -649,7 +649,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                             showActions={false}
                           />
                         </div>
-                      </React.Fragment>
+                      </div>
                     );
                   })}
                    {isLoading && (
