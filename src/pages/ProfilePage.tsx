@@ -4,7 +4,6 @@ import ProfilePageHeader from '@/components/profile/ProfilePageHeader';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
-import { ProfileHeaderSkeleton } from '@/components/profile/ProfileSkeleton';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -44,9 +43,21 @@ const ProfilePage = () => {
     }
   }, [user, loading, navigate]);
 
-  // Show skeleton while checking authentication
+  // Show loading while checking authentication
   if (loading) {
-    return <ProfileHeaderSkeleton />;
+    return (
+      <div className="min-h-screen bg-background page-with-header">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div 
+              className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4"
+              style={{ borderBottomColor: '#6e9277' }}
+            ></div>
+            <span className="text-muted-foreground text-base">Loading...</span>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Show error if there's an issue

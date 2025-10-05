@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 
+
 import MediaSearch from '@/components/discover/MediaSearch';
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import ExploreFilters from '@/components/explore/ExploreFilters';
-import DiscoverSkeleton from '@/components/discover/DiscoverSkeleton';
 
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 // import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned'; // Stored for future use
@@ -138,11 +138,6 @@ const Discover = () => {
     });
   }, [allContent]);
 
-
-  // Show skeleton on initial load before content arrives
-  if (loading && !content?.length) {
-    return <DiscoverSkeleton />;
-  }
 
   return (
     <div className="min-h-screen bg-background text-foreground page-with-header">
