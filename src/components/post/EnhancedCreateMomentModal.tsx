@@ -376,15 +376,15 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
       {/* Bottom Sheet Overlay */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Semi-transparent background */}
+          {/* Frosted backdrop */}
           <div 
-            className="absolute inset-0 bg-black/50 transition-opacity"
+            className="absolute inset-0 bg-white/20 backdrop-blur-md"
             onClick={onClose}
           />
           
-          {/* Modal */}
+          {/* Modal with white frosted glassmorphism */}
           <div 
-            className="relative w-full max-w-[420px] md:max-w-[480px] bg-white rounded-[20px] shadow-[0_4px_16px_rgba(0,0,0,0.2)] py-6 px-5 max-h-[85vh] overflow-y-auto animate-fade-in animate-scale-in"
+            className="relative w-full max-w-[420px] md:max-w-[480px] bg-white/40 backdrop-blur-md border border-white/30 rounded-3xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] py-6 px-5 max-h-[85vh] overflow-y-auto animate-fade-in animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
