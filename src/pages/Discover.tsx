@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-
+import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
 
 import MediaSearch from '@/components/discover/MediaSearch';
 import SegmentedControl from '@/components/discover/SegmentedControl';
@@ -71,6 +71,11 @@ const Discover = () => {
   const allContent = React.useMemo(() => {
     return [...optimisticPosts, ...(content || [])];
   }, [optimisticPosts, content]);
+
+  // Show loader on first paint if no content yet
+  if (loading && allContent.length === 0) {
+    return <ClbhouzPageSpinner label="Loading videos…" />;
+  }
 
 
   const handleLike = (contentId: string) => {

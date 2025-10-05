@@ -11,6 +11,7 @@ import { SecurityHeaders } from "@/components/security/SecurityHeaders";
 import { GlobalLoadingProvider } from "@/loading/GlobalLoading";
 import GlobalSpinner from "@/loading/GlobalSpinner";
 import BindLoadingBus from "@/loading/BindLoadingBus";
+import ClbhouzPageSpinner from "@/components/ui/ClbhouzPageSpinner";
 import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 import { VideoManagerProvider } from './contexts/VideoManagerContext';
@@ -134,7 +135,7 @@ const App: React.FC = () => {
                             <VideoPlaybackManagerProvider>
                               <TopTenProvider>
                                 <AuthWrapper>
-                                  <Suspense fallback={null}>
+                                  <Suspense fallback={<ClbhouzPageSpinner />}>
                                   {/* Global header should render before routes so it sits at the top in normal flow */}
                                   <GlobalHeader />
                                   <Routes>
