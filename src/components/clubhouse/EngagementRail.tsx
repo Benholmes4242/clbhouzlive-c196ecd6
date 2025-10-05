@@ -116,11 +116,14 @@ const EngagementRail = ({
   };
 
   return (
-    <div className={cn(
-      "fixed right-4 bottom-32 z-overlay flex flex-col items-center",
-      gap,
-      className
-    )}>
+    <div 
+      className={cn(
+        "fixed right-4 z-30 flex flex-col items-center",
+        gap,
+        className
+      )}
+      style={{ bottom: 'calc(var(--bottom-nav-height) + var(--safe-bottom) + 12px)' }}
+    >
       {/* Three dots menu - only show for own posts */}
       {isOwnPost && onEdit && onDelete && (
         <DropdownMenu>

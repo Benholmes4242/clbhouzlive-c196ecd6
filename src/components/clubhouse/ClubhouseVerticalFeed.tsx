@@ -53,35 +53,37 @@ const VideoWithAutoplay: React.FC<{
   const isDesktop = typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches;
 
   return (
-    <div className="bg-black flex items-center justify-center w-full h-full relative z-video">
+    <div className="relative w-full h-full bg-black overflow-hidden">
+      {hlsUrl ? (
+        <div className="absolute inset-0" style={{ objectPosition: 'center center' }}>
+          <HLSVideoCard
+            hlsUrl={hlsUrl}
+            poster={poster}
+            className="absolute inset-0 w-full h-full"
+            aspectRatio="auto"
+            muted={muted}
+            loop={true}
+            autoplay={autoplay}
+            shouldAttach={shouldAttach}
+            showMuteButton={false}
+            externallyManaged={true}
+            fit="cover"
+          />
+        </div>
+      ) : (
+        <div className="absolute inset-0 w-full h-full bg-muted flex items-center justify-center">
+          <span className="text-muted-foreground text-sm">Invalid video source</span>
+        </div>
+      )}
+      
       {/* Readability gradient - 35% height from bottom */}
       <div 
-        className="absolute bottom-0 left-0 right-0 pointer-events-none z-gradient"
+        className="absolute bottom-0 left-0 right-0 pointer-events-none z-10"
         style={{
           height: '35vh',
           background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 70%, transparent 100%)'
         }}
       />
-      
-      {hlsUrl ? (
-        <HLSVideoCard
-          hlsUrl={hlsUrl}
-          poster={poster}
-          className="w-full h-full fullscreenVideoStage"
-          aspectRatio="auto"
-          muted={muted}
-          loop={true}
-          autoplay={autoplay}
-          shouldAttach={shouldAttach}
-          showMuteButton={false}
-          externallyManaged={true}
-          fit="cover"
-        />
-      ) : (
-        <div className="w-full h-full bg-muted flex items-center justify-center">
-          <span className="text-muted-foreground text-sm">Invalid video source</span>
-        </div>
-      )}
     </div>
   );
 });
@@ -98,14 +100,29 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   
-  // Helper function to check aspect ratio for portrait filtering
-  const getAspectRatio = useCallback((media: any) => {
-    if (media.aspect_ratio) return media.aspect_ratio;
-    if (media.width && media.height) return media.width / media.height;
-    return null;
+  // Portrait-only aspect ratio constant (height/width >= 1.2)
+  const PORTRAIT_MIN_AR = 1.2;
+
+  // Helper function to check if media is portrait
+  const isPortrait = useCallback((media?: { width?: number; height?: number; aspect_ratio?: number }) => {
+    if (!media) return false;
+    
+    // Check width/height first
+    if (media.width && media.height) {
+      return media.height / media.width >= PORTRAIT_MIN_AR;
+    }
+    
+    // If aspect_ratio is stored as width/height, invert it
+    if (media.aspect_ratio) {
+      const heightOverWidth = 1 / media.aspect_ratio;
+      return heightOverWidth >= PORTRAIT_MIN_AR;
+    }
+    
+    // Exclude items with missing metadata (no letterboxing allowed)
+    return false;
   }, []);
 
-  // Client-side filtering for portrait-only mode (transitional guard)
+  // Client-side filtering for portrait-only mode
   const filteredPosts = useMemo(() => {
     if (!FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY) return posts;
     
@@ -113,14 +130,13 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       const media = post.media?.[0];
       if (!media) return false;
       
-      const aspectRatio = getAspectRatio(media);
-      if (!aspectRatio) {
-        // TODO: Implement client-side probing for missing aspect ratios
-        // For now, include the post (backfill will handle this)
-        return true;
-      }
-      
-      return aspectRatio <= PORTRAIT_MAX_ASPECT_RATIO;
+      // Cast to include dimension properties
+      const mediaWithDimensions = media as any;
+      return isPortrait({
+        width: mediaWithDimensions.width,
+        height: mediaWithDimensions.height,
+        aspect_ratio: mediaWithDimensions.aspect_ratio
+      });
     });
 
     // Log telemetry for filtering effectiveness
@@ -129,7 +145,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     }
     
     return filtered;
-  }, [posts, getAspectRatio]);
+  }, [posts, isPortrait]);
   const isMobile = useIsMobile();
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   const { setActiveVideo } = useVideoManager();
@@ -559,9 +575,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               }}
               className="relative w-full snap-start snap-always"
               style={{ 
-                height: '100vh', // Full screen height now that nav is transparent
-                minHeight: '100vh',
-                maxHeight: '100vh',
+                height: '100svh',
+                minHeight: '100svh',
+                maxHeight: '100svh',
                 width: '100vw',
                 maxWidth: '100vw',
                 scrollSnapAlign: 'start',
@@ -616,22 +632,25 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     autoplay={!!autoplayMap[item.id]}
                   />
                 ) : (
-                  <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden z-video">
-                    {/* Readability gradient for images too */}
-                    <div 
-                      className="absolute bottom-0 left-0 right-0 pointer-events-none z-gradient"
-                      style={{
-                        height: '35vh',
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 70%, transparent 100%)'
-                      }}
-                    />
+                  <div className="relative w-full h-full bg-black overflow-hidden">
                     <img
                       src={currentMedia.media_url}
                       alt={item.title || 'Content image'}
-                      className="w-full h-full object-cover"
-                      loading="eager" // Always load media to prevent grey placeholders
+                      className="absolute inset-0 w-full h-full object-cover select-none"
+                      style={{ objectPosition: 'center center' }}
+                      draggable={false}
+                      loading="eager"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
+                      }}
+                    />
+                    
+                    {/* Readability gradient for images */}
+                    <div 
+                      className="absolute bottom-0 left-0 right-0 pointer-events-none z-10"
+                      style={{
+                        height: '35vh',
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 70%, transparent 100%)'
                       }}
                     />
                   </div>
