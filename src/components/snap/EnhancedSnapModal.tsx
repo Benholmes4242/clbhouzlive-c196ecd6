@@ -179,7 +179,7 @@ const EnhancedSnapModal = ({
         >
           {/* Backdrop */}
           <div 
-            className="absolute inset-0 bg-black/70 backdrop-blur-md"
+            className="absolute inset-0 bg-white/20 backdrop-blur-md"
             onClick={onClose}
           />
           
@@ -199,7 +199,7 @@ const EnhancedSnapModal = ({
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-md liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-hidden"
+              className="w-full max-w-md bg-white/40 backdrop-blur-md border border-white/30 rounded-3xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] overflow-hidden px-4 py-6 md:px-6 md:py-6"
               onClick={(e) => e.stopPropagation()}
               initial={{ y: 30, opacity: 0, scale: 0.95 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -218,22 +218,22 @@ const EnhancedSnapModal = ({
               }}
             >
               {/* Header with contextual helper */}
-              <div className="px-6 pt-6 pb-2">
+              <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
                   <div>
-                    <h2 className="text-2xl font-semibold text-white">Create a Moment</h2>
+                    <h2 className="text-2xl font-semibold text-black">Create a Moment</h2>
                   </div>
                   <button 
                     onClick={onClose} 
                     aria-label="Close" 
-                    className="w-8 h-8 rounded-full backdrop-filter backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-brand-orange/50 focus:outline-none"
+                    className="w-8 h-8 rounded-full bg-white/60 hover:bg-white/80 border border-white/30 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-[#6e9277]/50 focus:outline-none"
                   >
-                    <X className="w-4 h-4 text-white" />
+                    <X className="w-4 h-4 text-gray-700" />
                   </button>
                 </div>
                 {/* Contextual helper line */}
                 <div 
-                  className="text-sm text-white/70"
+                  className="text-sm text-gray-600"
                   role="status"
                   aria-live="polite"
                 >
@@ -242,16 +242,16 @@ const EnhancedSnapModal = ({
               </div>
 
               {/* Action Options */}
-              <div className="px-6 pb-6">
+              <div>
                 <div className="space-y-3">
                   {actionOptions.map(({ key, label, description, icon: Icon, onClick, previewVariant, previewImages, microInteraction, isSpecial }, index) => (
                     <motion.button
                       key={key}
                       onClick={onClick}
-                      className={`w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50 ${
+                      className={`w-full p-4 rounded-2xl transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 shadow-sm ${
                         isSpecial 
-                          ? 'bg-brand-orange/5 hover:bg-brand-orange/10 border border-brand-orange/20 hover:border-brand-orange/40 hover:shadow-[0_0_20px_rgba(247,147,30,0.2)]'
-                          : 'bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30'
+                          ? 'bg-white/60 backdrop-blur-sm border border-white/30 hover:bg-white/70 focus:ring-[#f7a700]/50 hover:shadow-[0_0_20px_rgba(247,167,0,0.2)]'
+                          : 'bg-white/60 backdrop-blur-sm border border-white/30 hover:bg-white/70 focus:ring-[#6e9277]/50'
                       }`}
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
@@ -278,23 +278,23 @@ const EnhancedSnapModal = ({
                               <div className="flex items-center flex-1">
                                 {/* Text content */}
                                 <div className="flex-1 min-w-0">
-                                  <h3 className="font-semibold text-base text-white">
+                                  <h3 className="font-semibold text-base text-black">
                                     {label}
                                   </h3>
-                                  <p className="text-sm text-white/70">{description}</p>
+                                  <p className="text-sm text-gray-600">{description}</p>
                                 </div>
                               </div>
                               
                               {/* Camera icon centered between text and right edge */}
                               <div className="flex items-center justify-center w-36">
                                 <motion.div 
-                                  className="w-24 h-16 rounded-xl flex items-center justify-center transition-all duration-200 bg-white/10 group-hover:bg-brand-orange/20 border border-white/20 group-hover:border-brand-orange/40"
+                                  className="w-24 h-16 rounded-xl flex items-center justify-center transition-all duration-200 bg-white/80 group-hover:bg-white/90 border border-white/40"
                                   whileHover={!prefersReducedMotion ? {
                                     opacity: [1, 0.5, 1]
                                   } : {}}
                                   transition={{ duration: 0.2 }}
                                 >
-                                  <Icon className="w-7 h-7 transition-colors duration-200 text-white group-hover:text-brand-orange" />
+                                  <Icon className="w-7 h-7 transition-colors duration-200 text-gray-700 group-hover:text-[#6e9277]" />
                                 </motion.div>
                               </div>
                             </>
@@ -304,10 +304,10 @@ const EnhancedSnapModal = ({
                               <div className="flex items-center flex-1">
                                 {/* Text content */}
                                 <div className="flex-1 min-w-0">
-                                  <h3 className="font-semibold text-base text-white">
+                                  <h3 className="font-semibold text-base text-black">
                                     {label}
                                   </h3>
-                                  <p className="text-sm text-white/70">{description}</p>
+                                  <p className="text-sm text-gray-600">{description}</p>
                                 </div>
                               </div>
                               
@@ -340,12 +340,12 @@ const EnhancedSnapModal = ({
                                 {/* Text content */}
                                 <div className="flex-1 min-w-0">
                                   <h3 className={`font-semibold text-base ${
-                                    isSpecial ? 'text-brand-orange' : 'text-white'
+                                    isSpecial ? 'text-[#f7a700] hover:text-[#f7a700]/80 transition-colors' : 'text-black'
                                   }`}>
                                     {label}
-                                    {isSpecial && <span className="ml-2 text-brand-orange/70">🎞</span>}
+                                    {isSpecial && <span className="ml-2">🎞</span>}
                                   </h3>
-                                  <p className="text-sm text-white/70">{description}</p>
+                                  <p className="text-sm text-gray-600">{description}</p>
                                 </div>
                               </div>
                               
@@ -370,14 +370,14 @@ const EnhancedSnapModal = ({
                 {/* Error state */}
                 {error && (
                   <motion.div 
-                    className="mt-4 px-4 py-3 rounded-2xl backdrop-filter backdrop-blur-sm bg-red-500/10 border border-red-500/20"
+                    className="mt-4 px-4 py-3 rounded-2xl bg-red-50/80 backdrop-blur-sm border border-red-200/50"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                   >
-                    <div className="text-sm text-red-200 mb-2">Couldn't load your media</div>
+                    <div className="text-sm text-red-700 mb-2">Couldn't load your media</div>
                     <button 
                       onClick={() => window.location.reload()} 
-                      className="text-xs text-red-300 hover:text-red-200 underline transition-colors duration-200"
+                      className="text-xs text-red-600 hover:text-red-700 underline transition-colors duration-200"
                     >
                       Retry
                     </button>
@@ -392,7 +392,7 @@ const EnhancedSnapModal = ({
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}
                   >
-                    <p className="text-sm text-white/60">No posts yet - start creating!</p>
+                    <p className="text-sm text-gray-500">No posts yet - start creating!</p>
                   </motion.div>
                 )}
               </div>
