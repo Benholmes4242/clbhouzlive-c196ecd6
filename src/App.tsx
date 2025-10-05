@@ -8,7 +8,9 @@ import ScrollToTop from '@/components/ScrollToTop';
 import { ThemeProvider } from '@/components/theme-provider';
 import SiteAccessControl from "@/components/SiteAccessControl";
 import { SecurityHeaders } from "@/components/security/SecurityHeaders";
-import ClubhouzLoading from "@/components/ClubhouzLoading";
+import { GlobalLoadingProvider } from "@/loading/GlobalLoading";
+import GlobalSpinner from "@/loading/GlobalSpinner";
+import BindLoadingBus from "@/loading/BindLoadingBus";
 import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 import { VideoManagerProvider } from './contexts/VideoManagerContext';
@@ -114,23 +116,25 @@ const App: React.FC = () => {
   
   return (
     <AppShell>
-      <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <SecurityHeaders />
-            <SiteAccessControl>
-              <HeaderProvider>
-                <ModalProvider>
-                  <BottomNavigationProvider>
-                    <UIProvider>
-                    <BrowserRouter>
-                      <ScrollToTop />
-                      <GlobalAudioProvider>
-                        <VideoManagerProvider>
-                          <VideoPlaybackManagerProvider>
-                            <TopTenProvider>
-                              <AuthWrapper>
-                                <Suspense fallback={<ClubhouzLoading />}>
+      <GlobalLoadingProvider>
+        <BindLoadingBus />
+        <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <SecurityHeaders />
+              <SiteAccessControl>
+                <HeaderProvider>
+                  <ModalProvider>
+                    <BottomNavigationProvider>
+                      <UIProvider>
+                      <BrowserRouter>
+                        <ScrollToTop />
+                        <GlobalAudioProvider>
+                          <VideoManagerProvider>
+                            <VideoPlaybackManagerProvider>
+                              <TopTenProvider>
+                                <AuthWrapper>
+                                  <Suspense fallback={null}>
                                   {/* Global header should render before routes so it sits at the top in normal flow */}
                                   <GlobalHeader />
                                   <Routes>
@@ -184,6 +188,8 @@ const App: React.FC = () => {
         </TooltipProvider>
       </QueryClientProvider>
       </ThemeProvider>
+      <GlobalSpinner />
+    </GlobalLoadingProvider>
     </AppShell>
   );
 };
