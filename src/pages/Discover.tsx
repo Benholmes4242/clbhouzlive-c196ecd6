@@ -72,44 +72,6 @@ const Discover = () => {
     return [...optimisticPosts, ...(content || [])];
   }, [optimisticPosts, content]);
 
-  // Show loader on first paint if no content yet
-  if (loading && allContent.length === 0) {
-    return <ClbhouzPageSpinner label="Loading videos…" />;
-  }
-
-
-  const handleLike = (contentId: string) => {
-    // Update likes optimistically - could be enhanced with actual API call
-    // For now, this is just visual feedback
-  };
-
-  const handleFollow = (contentId: string) => {
-    // Update follow status optimistically - could be enhanced with actual API call
-    // For now, this is just visual feedback
-  };
-
-  const handleMediaClick = (item: any) => {
-    if (USE_MODAL_DISCOVER) {
-      // Find the index of the clicked item in our flattened media array
-      const clickedIndex = mediaItems.findIndex(mediaItem => 
-        mediaItem.url === item.src || mediaItem.id === item.id
-      );
-      if (clickedIndex !== -1) {
-        setModalStartIndex(clickedIndex);
-        setModalOpen(true);
-      }
-    } else {
-      // Use vertical feed - set posts and open feed, using allContent instead of content
-      setPosts(allContent || []);
-      openFeed(item);
-    }
-  };
-
-  const handleUserFollow = (userId: string) => {
-    console.log('User followed:', userId);
-    // In real app: API call to follow user
-  };
-
   // Transform content to MediaItem[] for FullscreenMediaModal - use allContent
   const mediaItems: MediaItem[] = useMemo(() => {
     const currentContent = allContent || [];
@@ -143,6 +105,42 @@ const Discover = () => {
     });
   }, [allContent]);
 
+  // Show loader on first paint if no content yet
+  if (loading && allContent.length === 0) {
+    return <ClbhouzPageSpinner label="Loading videos…" />;
+  }
+
+  const handleLike = (contentId: string) => {
+    // Update likes optimistically - could be enhanced with actual API call
+    // For now, this is just visual feedback
+  };
+
+  const handleFollow = (contentId: string) => {
+    // Update follow status optimistically - could be enhanced with actual API call
+    // For now, this is just visual feedback
+  };
+
+  const handleMediaClick = (item: any) => {
+    if (USE_MODAL_DISCOVER) {
+      // Find the index of the clicked item in our flattened media array
+      const clickedIndex = mediaItems.findIndex(mediaItem => 
+        mediaItem.url === item.src || mediaItem.id === item.id
+      );
+      if (clickedIndex !== -1) {
+        setModalStartIndex(clickedIndex);
+        setModalOpen(true);
+      }
+    } else {
+      // Use vertical feed - set posts and open feed, using allContent instead of content
+      setPosts(allContent || []);
+      openFeed(item);
+    }
+  };
+
+  const handleUserFollow = (userId: string) => {
+    console.log('User followed:', userId);
+    // In real app: API call to follow user
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground page-with-header">
