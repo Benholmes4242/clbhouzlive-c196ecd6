@@ -864,7 +864,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         rows={1}
                         className="w-full bg-transparent outline-none text-[15px] leading-[1.4] 
                                    placeholder:text-emerald-900/50 text-emerald-950 font-medium 
-                                   resize-none focus-visible:outline-none"
+                                   resize-none focus-visible:outline-none caret-emerald-950"
+                        style={{ caretColor: 'rgb(5 46 22)' }}
                       />
                     </div>
 
