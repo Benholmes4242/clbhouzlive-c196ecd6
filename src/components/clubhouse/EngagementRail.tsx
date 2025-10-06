@@ -161,6 +161,15 @@ const EngagementRail = ({
         </DropdownMenu>
       )}
 
+      {/* Only show audio control for video posts */}
+      {isVideo && (
+        <EngagementButton
+          icon={isGloballyMuted ? VolumeX : Volume2}
+          count={0}
+          onClick={handleAudioToggle}
+        />
+      )}
+
       <EngagementButton
         icon={Heart}
         count={stats.likes}
@@ -179,15 +188,6 @@ const EngagementRail = ({
         count={stats.shares}
         onClick={onShare}
       />
-      
-      {/* Only show audio control for video posts */}
-      {isVideo && (
-        <EngagementButton
-          icon={isGloballyMuted ? VolumeX : Volume2}
-          count={0}
-          onClick={handleAudioToggle}
-        />
-      )}
     </div>
   );
 };
