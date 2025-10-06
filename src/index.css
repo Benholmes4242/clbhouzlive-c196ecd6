@@ -145,6 +145,12 @@ html, body {
 }
 .message-cta-idle { animation: halo 3s ease-in-out infinite; }
 
+/* Prevent caret jitter on iOS: disable halo while typing/focused */
+.group\/input:focus-within.message-cta-idle,
+.group\/input:focus-within {
+  animation: none !important;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(2px); }
   to   { opacity: 1; transform: translateY(0);   }
