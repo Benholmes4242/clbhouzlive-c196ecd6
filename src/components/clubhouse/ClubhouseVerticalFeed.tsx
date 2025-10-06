@@ -713,12 +713,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 }}
               />
 
-              {/* Audio Strip - Only show for video posts with custom audio */}
-              {currentMedia.media_type === 'video' && item.audioTrack && !item.audioTrack.isOriginal && (
-                <div className="absolute bottom-20 left-4 md:left-8 z-20">
-                  <AudioStrip audioTrack={item.audioTrack} />
-                </div>
-              )}
 
               {/* Engagement Rail - Bottom Right */}
               <EngagementRail
