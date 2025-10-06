@@ -154,7 +154,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
   }, [progressKey, isLoading, generateMotivation]);
 
   return (
-    <div className={`w-full pt-8 ${className}`}>
+    <div className={`w-full pt-0 ${className}`}>
       <div className="md:max-w-[1150px] md:mx-auto">
         {/* Course highlights section removed */}
 
