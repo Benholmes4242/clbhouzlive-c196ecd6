@@ -23,7 +23,7 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
   return (
     <div 
       className={cn(
-        "absolute z-overlay",
+        "absolute z-50",
         leftPadding,
         rightOffset,
         className
