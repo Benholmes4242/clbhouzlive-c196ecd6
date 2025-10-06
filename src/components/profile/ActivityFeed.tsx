@@ -129,7 +129,53 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
   return (
     <>
-      <div className="px-4 md:px-0 mb-0">
+      <div className="px-4 md:px-0">
+          {/* Filter Dropdown */}
+          <div className="flex justify-end mt-0 mb-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button 
+                  className="p-2 hover:bg-muted/50 transition-colors rounded-md"
+                >
+                  <IoFilter className="w-5 h-5 text-foreground" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="end" 
+                className="bg-background border border-border"
+              >
+                <DropdownMenuItem 
+                  onClick={() => setActiveFilter('all')}
+                  className={`cursor-pointer ${activeFilter === 'all' ? 'bg-accent' : ''}`}
+                >
+                  <span className="mr-2">📱</span>
+                  All Posts
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setActiveFilter('videos')}
+                  className={`cursor-pointer ${activeFilter === 'videos' ? 'bg-accent' : ''}`}
+                >
+                  <Video className="mr-2 h-4 w-4" />
+                  Videos only
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setActiveFilter('photos')}
+                  className={`cursor-pointer ${activeFilter === 'photos' ? 'bg-accent' : ''}`}
+                >
+                  <Image className="mr-2 h-4 w-4" />
+                  Photos only
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setActiveFilter('golf-courses')}
+                  className={`cursor-pointer ${activeFilter === 'golf-courses' ? 'bg-accent' : ''}`}
+                >
+                  <MapPin className="mr-2 h-4 w-4" />
+                  Posts tagged with golf course
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
         {posts.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-muted-foreground">No posts yet.</p>
