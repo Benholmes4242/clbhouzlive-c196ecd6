@@ -296,7 +296,6 @@ export default {
 		'w-1.5', 'w-5',
 		'bg-white', 'bg-white/60', 'dark:bg-white', 'dark:bg-white/50',
 		'h-1.5', 'rounded-full', 'transition-all', 'duration-200', 'ease-out',
-		'line-clamp-1', 'line-clamp-none',
 	],
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;

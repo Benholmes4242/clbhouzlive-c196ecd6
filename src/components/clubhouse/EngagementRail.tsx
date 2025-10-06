@@ -122,7 +122,7 @@ const EngagementRail = ({
         gap,
         className
       )}
-      style={{ bottom: 'calc(var(--bottom-nav-height) + var(--gap-rail))' }}
+      style={{ bottom: 'calc(var(--bottom-nav-height) + var(--safe-bottom) + 12px)' }}
     >
       {/* Three dots menu - only show for own posts */}
       {isOwnPost && onEdit && onDelete && (
@@ -161,15 +161,6 @@ const EngagementRail = ({
         </DropdownMenu>
       )}
 
-      {/* Mute/Unmute - Only show for video posts */}
-      {isVideo && (
-        <EngagementButton
-          icon={isGloballyMuted ? VolumeX : Volume2}
-          count={0}
-          onClick={handleAudioToggle}
-        />
-      )}
-
       <EngagementButton
         icon={Heart}
         count={stats.likes}
@@ -188,6 +179,15 @@ const EngagementRail = ({
         count={stats.shares}
         onClick={onShare}
       />
+      
+      {/* Only show audio control for video posts */}
+      {isVideo && (
+        <EngagementButton
+          icon={isGloballyMuted ? VolumeX : Volume2}
+          count={0}
+          onClick={handleAudioToggle}
+        />
+      )}
     </div>
   );
 };

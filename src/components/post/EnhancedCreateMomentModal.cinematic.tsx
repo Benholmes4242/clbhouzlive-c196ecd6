@@ -236,20 +236,20 @@ export default function EnhancedCreateMomentModalCinematic({
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* backdrop - white frosted */}
+          {/* backdrop */}
           <div 
-            className="absolute inset-0 bg-white/20 backdrop-blur-md" 
+            className="absolute inset-0 bg-black/70 backdrop-blur-md" 
             onClick={close}
           />
 
-          {/* shell - white frosted glassmorphism */}
+          {/* shell */}
           <div className="absolute inset-0 flex items-center justify-center py-16 px-6" onClick={close}>
             <motion.div
               ref={wrapperRef}
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-md h-[calc(100vh-4rem)] bg-white/40 backdrop-blur-md border border-white/30 rounded-3xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] text-white overflow-visible"
+              className="w-full max-w-md h-[calc(100vh-4rem)] liquid-glass rounded-3xl shadow-[0_12px_32px_rgba(0,0,0,0.4)] text-white overflow-visible"
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { y: 12, opacity: 0, scale: 0.98 }}

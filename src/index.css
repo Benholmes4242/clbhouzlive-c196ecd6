@@ -464,32 +464,6 @@ html, body, #root, .app-shell { touch-action: auto; }
   
   /* Bottom navigation height including safe area */
   --bottom-nav-height: calc(var(--nav-height) + var(--safe-bottom));
-
-  /* Unified gaps for Clubhouse overlays */
-  --gap-dots: 8px;         /* carousel dots - exactly 8px above nav */
-  --gap-rail: 12px;        /* right action rail spacing */
-  --gap-audio: 20px;       /* music label */
-  --gap-meta: 112px;       /* avatar/name/caption baseline (tunable) */
-  
-  /* Engagement rail metrics */
-  --rail-icon: 56px;       /* icon button outer size */
-  --rail-stack-gap: 16px;  /* vertical gap between icons (mobile default) */
-  
-  /* Computed: where the Share icon bottom edge sits */
-  --share-bottom-edge: calc(var(--bottom-nav-height) + var(--gap-rail) + var(--rail-icon));
-}
-
-/* Line clamp utilities for expandable captions */
-.line-clamp-1 {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-none {
-  -webkit-line-clamp: unset;
-  display: block;
 }
 
 /* Global bottom navigation styling */
