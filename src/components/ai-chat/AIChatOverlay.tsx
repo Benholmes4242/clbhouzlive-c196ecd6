@@ -804,7 +804,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       "hover:ring-emerald-400/50 hover:bg-white/80",
                       "active:scale-[0.99] transition",
                       !inputValue?.trim() && !isLoading && !isProcessing && "message-cta-idle",
-                      "grid grid-cols-[auto,1fr,auto] items-center gap-2 min-h-[56px]"
+                      "grid grid-cols-[auto,1fr,auto] items-center gap-2 min-h-[48px]"
                     )}
                   >
                     {/* Left tools */}
@@ -864,7 +864,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         rows={1}
                         className="w-full bg-transparent outline-none text-[15px] leading-[1.4] 
                                    placeholder:text-emerald-900/50 text-emerald-950 font-medium 
-                                   resize-none focus-visible:outline-none"
+                                   resize-none focus-visible:outline-none caret-transparent"
                       />
                     </div>
 
