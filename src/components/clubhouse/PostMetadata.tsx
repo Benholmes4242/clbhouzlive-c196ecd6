@@ -28,7 +28,10 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
         rightOffset,
         className
       )}
-      style={{ bottom: 'calc(var(--bottom-nav-height) + var(--gap-meta))' }}
+      style={{ 
+        bottom: 'var(--share-bottom-edge)',
+        transform: 'translateY(4px)' // optical baseline alignment
+      }}
     >
       {/* User Profile */}
       <div className="flex items-center gap-3 mb-3">

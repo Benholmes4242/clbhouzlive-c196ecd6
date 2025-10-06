@@ -53,7 +53,7 @@ export default function ExpandableCaption({
         className={cn(
           "whitespace-pre-line break-words", // keep line breaks & wrap hashtags
           expanded
-            ? "" // full text
+            ? "line-clamp-unset" // full text
             : "line-clamp-1"
         )}
       >
