@@ -453,3 +453,17 @@
   animation: none !important;
   transform: none !important;
 }
+
+/* Stabilize composer to prevent caret sway while typing */
+[data-echo-composer] .message-composer-stable,
+[data-echo-composer] .message-composer-stable * {
+  animation: none !important;
+  transform: none !important;
+}
+
+[data-echo-composer] .message-composer-stable textarea,
+[data-echo-composer] .message-composer-stable textarea:focus {
+  animation: none !important;
+  transform: none !important;
+  transition: none !important;
+}
