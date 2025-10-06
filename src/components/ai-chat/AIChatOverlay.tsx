@@ -898,6 +898,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   <OverlayFooter onOpen={() => openHistory('chat')} isSticky={false} />
                 </div>
               )}
+
+              {activeTab === 'swing' && (
+                <OverlayFooter onOpen={() => openHistory('swing')} isSticky={false} />
+              )}
             </div>
         </footer>
       </div>
