@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef, useCallback, useEffect } from "react"
 import { useUserTopTen } from "@/hooks/useUserTopTen";
 import CourseCard from "@/components/courses/CourseCard";
 import { Button } from "@/components/ui/button";
-import { InlineTypeahead } from "@/components/InlineTypeahead";
+import { CourseSearchSheet } from "@/components/courses/CourseSearchSheet";
 import { useSwipeable } from "react-swipeable";
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
@@ -45,6 +45,8 @@ export default function TopTenCoursesRatedByYou({
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [removeModalOpen, setRemoveModalOpen] = useState(false);
   const [courseToRemove, setCourseToRemove] = useState<{ course: any; index: number } | null>(null);
+  const [searchSheetOpen, setSearchSheetOpen] = useState(false);
+  const [searchSlotIndex, setSearchSlotIndex] = useState<number | undefined>(undefined);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   
@@ -183,6 +185,27 @@ export default function TopTenCoursesRatedByYou({
     }
   }, [courseToRemove, removeCourse]);
 
+  // Open search sheet for specific slot
+  const openCourseSearch = useCallback((slotIndex: number) => {
+    setSearchSlotIndex(slotIndex);
+    setSearchSheetOpen(true);
+  }, []);
+
+  // Handle course selection from sheet
+  const handleCourseSelected = useCallback((course: any) => {
+    if (searchSlotIndex !== undefined) {
+      addCourseAtIndex(course, searchSlotIndex);
+      toast.success(`Added ${course.name} to position ${searchSlotIndex + 1}`);
+    }
+    setSearchSheetOpen(false);
+    setSearchSlotIndex(undefined);
+  }, [searchSlotIndex, addCourseAtIndex]);
+
+  const existingCourseIds = useMemo(() => 
+    topTen.filter(Boolean).map(c => c.id), 
+    [topTen]
+  );
+
   // Swipe handlers for mobile carousel navigation
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
@@ -288,13 +311,10 @@ export default function TopTenCoursesRatedByYou({
                     index={index} 
                     course={course} 
                     userId={userId}
-                    isOwnProfile={canEdit} // Use canEdit instead of isOwnProfile for more accurate control
+                    isOwnProfile={canEdit}
                     onOpenModal={onOpenModal}
-                    onAddCourse={(selectedCourse, slotIndex) => {
-                      addCourseAtIndex(selectedCourse, slotIndex);
-                    }}
+                    onOpenSearch={() => openCourseSearch(index)}
                     onRemoveCourse={handleRemoveCourse}
-                    existingCourses={topTen}
                     activeIndex={activeIndex}
                   />
                 ))}
@@ -329,6 +349,19 @@ export default function TopTenCoursesRatedByYou({
         confirmText="Remove"
         confirmVariant="default"
       />
+
+      {/* Course search sheet */}
+      <CourseSearchSheet
+        isOpen={searchSheetOpen}
+        onClose={() => {
+          setSearchSheetOpen(false);
+          setSearchSlotIndex(undefined);
+        }}
+        onSelectCourse={handleCourseSelected}
+        userId={userId}
+        existingCourseIds={existingCourseIds}
+        slotIndex={searchSlotIndex}
+      />
     </section>
   );
 }
@@ -341,16 +374,14 @@ const TopTenSlot: React.FC<{
   userId?: string;
   isOwnProfile?: boolean;
   onOpenModal?: () => void;
-  onAddCourse?: (course: any, index: number) => void;
+  onOpenSearch?: () => void;
   onRemoveCourse?: (course: any, index: number) => void;
-  existingCourses?: any[];
   activeIndex?: number | null;
-}> = ({ id, index, course, userId, isOwnProfile, onOpenModal, onAddCourse, onRemoveCourse, existingCourses = [], activeIndex }) => {
-  const [isSearchMode, setIsSearchMode] = useState(false);
+}> = ({ id, index, course, userId, isOwnProfile, onOpenModal, onOpenSearch, onRemoveCourse, activeIndex }) => {
   
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ 
     id,
-    disabled: !isOwnProfile || isSearchMode // Re-add isSearchMode check to prevent dragging during search
+    disabled: !isOwnProfile
   });
 
   const handleRemoveClick = useCallback((e: React.MouseEvent) => {
@@ -397,15 +428,6 @@ const TopTenSlot: React.FC<{
     return position < 3 ? 'shadow-xl shadow-black/20' : 'shadow-lg';
   };
 
-  const handleAddCourse = (course: any) => {
-    if (onAddCourse) {
-      onAddCourse(course, index);
-      setIsSearchMode(false);
-    }
-  };
-
-  const existingCourseIds = existingCourses.filter(Boolean).map(c => c.id);
-
   if (!course) {
     // Empty slot with inline search
     return (
@@ -437,19 +459,28 @@ const TopTenSlot: React.FC<{
             </div>
           </div>
 
-          {/* Inline search or placeholder */}
+          {/* Search button or placeholder */}
           {isOwnProfile ? (
-            <div className="w-full h-full pt-12">
-              <InlineTypeahead
-                placeholder="search for a golf course"
-                onPick={handleAddCourse}
-                onClose={() => setIsSearchMode(false)}
-                onOpenSearch={() => setIsSearchMode(true)}
-                isSearchMode={isSearchMode}
-                userId={userId}
-                existingCourseIds={existingCourseIds}
-              />
-            </div>
+            <button
+              onClick={onOpenSearch}
+              className="w-full h-full flex flex-col items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors pt-12"
+              aria-label={`Add course to position ${rank}`}
+            >
+              <svg 
+                className="w-8 h-8 mb-2" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+                />
+              </svg>
+              <span className="text-xs text-center px-4">Search for a golf course</span>
+            </button>
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground pt-12">
               <div className="text-2xl font-bold mb-2">
