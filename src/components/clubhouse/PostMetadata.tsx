@@ -21,14 +21,19 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
   const rightOffset = 'right-28'; // ~112px to avoid engagement rail
 
   return (
-    <div className={cn(
-      "absolute bottom-32 z-overlay",
-      leftPadding,
-      rightOffset,
-      className
-    )}>
+    <div 
+      className={cn(
+        "absolute z-overlay pointer-events-none",
+        leftPadding,
+        rightOffset,
+        className
+      )}
+      style={{
+        bottom: 'calc(var(--bottom-nav-height) + 12px + 56px)', // nav height + gap + share icon height
+      }}
+    >
       {/* User Profile */}
-      <div className="flex items-center gap-3 mb-3">
+      <div className="flex items-center gap-3 mb-3 pointer-events-auto">
         <button
           onClick={onUserClick}
           className="flex items-center gap-3 hover:opacity-80 transition-opacity"
@@ -73,7 +78,7 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
 
       {/* Description */}
       {description && (
-        <div className="text-white/90">
+        <div className="text-white/90 pointer-events-auto">
           <p
             className={cn(
               "text-sm leading-relaxed",
