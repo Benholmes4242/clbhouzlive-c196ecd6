@@ -845,7 +845,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     </div>
 
                     {/* Text input container */}
-                    <div className="min-w-0 flex items-center message-composer-stable">
+                    <div className="min-w-0 flex items-center">
                       <textarea
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
@@ -864,8 +864,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         rows={1}
                         className="w-full bg-transparent outline-none text-[15px] leading-[1.4] 
                                    placeholder:text-emerald-900/50 text-emerald-950 font-medium 
-                                   resize-none focus-visible:outline-none caret-emerald-950 animate-none"
-                        style={{ caretColor: 'rgb(5 46 22)' }}
+                                   resize-none focus-visible:outline-none"
                       />
                     </div>
 
