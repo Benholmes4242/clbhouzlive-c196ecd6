@@ -208,8 +208,8 @@
 /* Echo – permanently frosted white (opaque base) */
 .echoDoc-btn {
   position: fixed;
-  right: 8px;
-  bottom: calc(var(--nav-height, 56px) + 8px);
+  right: 1rem;
+  bottom: 1.5rem;
   z-index: 9999;
 
   /* Size */
