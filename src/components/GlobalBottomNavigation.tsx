@@ -159,16 +159,18 @@ const GlobalBottomNavigation: React.FC = () => {
               duration: 0.25 
             }}
             style={{
-              // Hardware acceleration and mobile-stable positioning
-              transform: 'translate3d(0, 0, 0)',
-              willChange: 'transform',
-              // Force stable bottom positioning on mobile
+              // Force stable bottom positioning - prevents movement during swipes/scrolls
               position: 'fixed',
               bottom: '0px',
+              left: '0px',
+              right: '0px',
               // Prevent iOS Safari viewport issues
               paddingBottom: 'env(safe-area-inset-bottom)',
-              // Ensure it stays at viewport bottom, not document bottom
+              // Ensure it stays at viewport bottom with fixed positioning
               zIndex: 100,
+              // Prevent any movement or translation
+              transform: 'none',
+              touchAction: 'none',
             }}
           >
             <NavigationBar
