@@ -29,7 +29,7 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
         className
       )}
       style={{
-        bottom: 'calc(var(--bottom-nav-height) + 12px + 56px)', // nav height + gap + share icon height
+        bottom: 'calc(var(--bottom-nav-height) + 12px)', // aligned to share icon baseline (nav + gap)
       }}
     >
       {/* User Profile */}

@@ -122,7 +122,7 @@ const EngagementRail = ({
         gap,
         className
       )}
-      style={{ bottom: 'calc(var(--bottom-nav-height) + var(--safe-bottom) + 12px)' }}
+      style={{ bottom: 'calc(var(--bottom-nav-height) + 12px)' }}
     >
       {/* Three dots menu - only show for own posts */}
       {isOwnPost && onEdit && onDelete && (
