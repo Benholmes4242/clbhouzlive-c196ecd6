@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import ExpandableCaption from './ExpandableCaption';
 
 interface PostMetadataProps {
   title?: string;
@@ -14,7 +15,6 @@ interface PostMetadataProps {
 }
 
 const PostMetadata = ({ title, description, user, onUserClick, className }: PostMetadataProps) => {
-  const [showFullDescription, setShowFullDescription] = useState(false);
   const isMobile = useIsMobile();
   
   const leftPadding = isMobile ? 'left-4' : 'left-8'; // 16px mobile, 32px desktop
@@ -74,34 +74,17 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
         </h3>
       )}
 
-      {/* Description */}
+      {/* Description - Expandable Caption */}
       {description && (
-        <div className="text-white/90">
-          <p
-            className={cn(
-              "text-sm leading-relaxed",
-              !showFullDescription && "line-clamp-2"
-            )}
-            style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
-          >
-            {description}
-          </p>
-          
-          {description.length > 100 && (
-            <button
-              onClick={() => setShowFullDescription(!showFullDescription)}
-              className="text-white/80 text-sm mt-1 hover:text-white transition-colors"
-              style={{ 
-                textShadow: '0 1px 3px rgba(0,0,0,0.7)',
-                minWidth: '44px',
-                minHeight: '44px'
-              }}
-              aria-label={showFullDescription ? 'Show less description' : 'Show more description'}
-            >
-              {showFullDescription ? '... less' : '... more'}
-            </button>
+        <ExpandableCaption
+          postId={user.name} // Using user.name as unique identifier
+          text={description}
+          maxCollapsedLines={1}
+          className={cn(
+            "text-sm mt-2",
+            isMobile ? "text-sm" : "text-base"
           )}
-        </div>
+        />
       )}
     </div>
   );
