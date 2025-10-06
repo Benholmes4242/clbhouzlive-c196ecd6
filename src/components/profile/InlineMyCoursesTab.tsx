@@ -32,7 +32,7 @@ const InlineMyCoursesTab: React.FC<InlineMyCoursesTabProps> = ({
   const displayName = getDisplayName();
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6 px-4 pb-4">
       {/* Handicap Card - show for all personal profiles */}
       {profile && (
         <HandicapCard
