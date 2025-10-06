@@ -731,9 +731,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </TabsContent>
           </Tabs>
         
-        {/* Composer footer - pinned above safe area */}
+        {/* Composer footer - fixed to prevent keyboard-induced movement */}
         <footer 
-          className="sticky bottom-0 z-[2] bg-gradient-to-t from-white/95 to-white/40 backdrop-blur supports-[backdrop-filter]:backdrop-blur-md pt-3 pb-[calc(env(safe-area-inset-bottom)+8px)] px-4"
+          className="fixed bottom-0 left-0 right-0 z-[2] bg-gradient-to-t from-white/95 to-white/40 backdrop-blur supports-[backdrop-filter]:backdrop-blur-md pt-3 pb-[calc(env(safe-area-inset-bottom)+8px)] px-4"
           role="region"
           aria-label="Message composer"
           data-echo-composer
