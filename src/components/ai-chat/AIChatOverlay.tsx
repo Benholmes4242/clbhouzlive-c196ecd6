@@ -798,12 +798,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   <div 
                     className={cn(
                       "group/input rounded-[24px] px-4 py-3",
-                      "bg-white/70 backdrop-blur-md border border-transparent",
+                      "bg-white/80 backdrop-blur-md border border-transparent",
                       "[background-clip:padding-box] shadow-[0_6px_24px_rgba(0,0,0,0.06)]",
-                      "ring-1 ring-inset ring-emerald-400/30",
-                      "hover:ring-emerald-400/50 hover:bg-white/80",
+                      "ring-1 ring-inset ring-emerald-400/50",
                       "active:scale-[0.99] transition",
-                      !inputValue?.trim() && !isLoading && !isProcessing && "message-cta-idle",
                       "grid grid-cols-[auto,1fr,auto] items-center gap-2 min-h-[56px]"
                     )}
                   >
