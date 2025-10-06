@@ -59,11 +59,23 @@ export function CourseSearchSheet({
     }
   }, [isOpen, userId]);
 
-  // Focus management
+  // Body scroll lock & focus management
   useEffect(() => {
     if (isOpen) {
       returnFocusRef.current = document.activeElement as HTMLElement;
+      // Lock body scroll
+      const originalOverflow = document.body.style.overflow;
+      const originalPaddingRight = document.body.style.paddingRight;
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+      
       setTimeout(() => inputRef.current?.focus(), 100);
+      
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.body.style.paddingRight = originalPaddingRight;
+      };
     } else {
       setQuery("");
       setSuggestions([]);
@@ -138,8 +150,10 @@ export function CourseSearchSheet({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1200]"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1200] touch-none"
             onClick={onClose}
+            onTouchMove={(e) => e.preventDefault()}
+            style={{ WebkitTouchCallout: 'none' }}
           />
 
           {/* Sheet */}
