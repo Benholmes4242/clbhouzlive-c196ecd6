@@ -129,7 +129,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
   return (
     <>
-      <div className="px-4 md:px-0 mb-0">
+      <div className="px-4 md:px-0 mb-0 pt-0">
         {posts.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-muted-foreground">No posts yet.</p>
