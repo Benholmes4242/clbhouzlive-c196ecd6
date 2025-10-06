@@ -464,6 +464,12 @@ html, body, #root, .app-shell { touch-action: auto; }
   
   /* Bottom navigation height including safe area */
   --bottom-nav-height: calc(var(--nav-height) + var(--safe-bottom));
+
+  /* Unified gaps for Clubhouse overlays */
+  --gap-dots: 8px;         /* carousel dots - exactly 8px above nav */
+  --gap-rail: 16px;        /* right action rail spacing */
+  --gap-audio: 20px;       /* music label */
+  --gap-meta: 112px;       /* avatar/name/caption baseline (tunable) */
 }
 
 /* Global bottom navigation styling */

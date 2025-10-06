@@ -16,7 +16,7 @@ export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
   return (
     <div 
       className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 z-30 pointer-events-auto"
-      style={{ bottom: 'calc(var(--bottom-nav-height) + var(--safe-bottom) + 10px)' }}
+      style={{ bottom: 'calc(var(--bottom-nav-height) + var(--gap-dots))' }}
       role="tablist"
       aria-label="Media pagination"
     >

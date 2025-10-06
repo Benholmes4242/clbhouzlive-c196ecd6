@@ -636,8 +636,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     <img
                       src={currentMedia.media_url}
                       alt={item.title || 'Content image'}
-                      className="absolute inset-0 w-full h-full object-cover select-none"
-                      style={{ objectPosition: 'center center' }}
+                      className="absolute inset-0 w-full h-full object-cover object-center select-none"
                       draggable={false}
                       loading="eager"
                       onError={(e) => {
@@ -715,9 +714,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
               {/* Audio Strip - Only show for video posts with custom audio */}
               {currentMedia.media_type === 'video' && item.audioTrack && !item.audioTrack.isOriginal && (
-                <div className="absolute bottom-20 left-4 md:left-8 z-20">
-                  <AudioStrip audioTrack={item.audioTrack} />
-                </div>
+                <AudioStrip audioTrack={item.audioTrack} />
               )}
 
               {/* Engagement Rail - Bottom Right */}

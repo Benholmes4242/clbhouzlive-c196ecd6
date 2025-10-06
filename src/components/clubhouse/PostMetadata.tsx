@@ -21,12 +21,15 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
   const rightOffset = 'right-28'; // ~112px to avoid engagement rail
 
   return (
-    <div className={cn(
-      "absolute bottom-32 z-overlay",
-      leftPadding,
-      rightOffset,
-      className
-    )}>
+    <div 
+      className={cn(
+        "absolute z-overlay",
+        leftPadding,
+        rightOffset,
+        className
+      )}
+      style={{ bottom: 'calc(var(--bottom-nav-height) + var(--gap-meta))' }}
+    >
       {/* User Profile */}
       <div className="flex items-center gap-3 mb-3">
         <button
