@@ -20,10 +20,12 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
   const leftPadding = isMobile ? 'left-4' : 'left-8'; // 16px mobile, 32px desktop
   const rightOffset = 'right-28'; // ~112px to avoid engagement rail
 
+  const text = description || title || '';
+
   return (
     <div 
       className={cn(
-        "absolute z-50",
+        "absolute z-50 pointer-events-none",
         leftPadding,
         rightOffset,
         className
@@ -33,62 +35,46 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
         transform: 'translateY(4px)' // optical baseline alignment
       }}
     >
-      {/* User Profile */}
-      <div className="flex items-center gap-3 mb-3">
-        <button
-          onClick={onUserClick}
-          className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-          style={{ minWidth: '44px', minHeight: '44px' }}
-          aria-label={`View ${user.name}'s profile`}
-        >
-          <img
-            src={user.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-            alt={user.name}
-            className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
-            }}
-          />
-          <span 
-            className={cn(
-              "font-semibold text-white",
-              isMobile ? "text-lg" : "text-xl"
-            )}
-            style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
+      <div className="pointer-events-auto">
+        {/* User Profile */}
+        <div className="flex items-center gap-3 mb-3">
+          <button
+            onClick={onUserClick}
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            style={{ minWidth: '44px', minHeight: '44px' }}
+            aria-label={`View ${user.name}'s profile`}
           >
-            {user.name}
-          </span>
-        </button>
+            <img
+              src={user.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+              alt={user.name}
+              className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
+              }}
+            />
+            <span 
+              className={cn(
+                "font-semibold text-white",
+                isMobile ? "text-lg" : "text-xl"
+              )}
+              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
+            >
+              {user.name}
+            </span>
+          </button>
+        </div>
+
+        {/* Expandable Caption */}
+        {text && (
+          <ExpandableCaption
+            text={text}
+            className={cn(
+              "mt-2",
+              isMobile ? "text-sm" : "text-base"
+            )}
+          />
+        )}
       </div>
-
-      {/* Title */}
-      {title && (
-        <h3 
-          className={cn(
-            "font-semibold text-white mb-2",
-            isMobile ? "text-lg" : "text-xl"
-          )}
-          style={{ 
-            textShadow: '0 1px 3px rgba(0,0,0,0.7)',
-            lineHeight: '1.3'
-          }}
-        >
-          {title}
-        </h3>
-      )}
-
-      {/* Description - Expandable Caption */}
-      {description && (
-        <ExpandableCaption
-          postId={user.name} // Using user.name as unique identifier
-          text={description}
-          maxCollapsedLines={1}
-          className={cn(
-            "text-sm mt-2",
-            isMobile ? "text-sm" : "text-base"
-          )}
-        />
-      )}
     </div>
   );
 };

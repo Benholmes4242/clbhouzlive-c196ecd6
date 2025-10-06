@@ -1,43 +1,26 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 type Props = {
-  postId: string | number;
   text: string;
-  maxCollapsedLines?: number; // default 1
   className?: string;
-  onToggle?(expanded: boolean): void;
 };
 
-export default function ExpandableCaption({
-  postId,
-  text,
-  maxCollapsedLines = 1,
-  className,
-  onToggle
-}: Props) {
+export default function ExpandableCaption({ text, className }: Props) {
   const [expanded, setExpanded] = useState(false);
 
-  const handleToggle = () => {
-    const next = !expanded;
-    setExpanded(next);
-    onToggle?.(next);
-  };
-
-  // Optional micro-perf: precompute whether we even need truncation
-  const needsClamp = useMemo(() => text && text.length > 0, [text]);
-
   if (!text) return null;
+
+  const clampClass = expanded ? "line-clamp-none" : "line-clamp-1";
 
   return (
     <div
       role="button"
       aria-expanded={expanded}
       aria-label={expanded ? "Collapse caption" : "Expand caption"}
-      onClick={handleToggle}
+      onClick={() => setExpanded(v => !v)}
       className={cn(
-        "relative text-white/95 leading-snug cursor-pointer",
-        // keep taps easy
+        "relative text-white/95 leading-snug cursor-pointer pointer-events-auto",
         "active:opacity-90 transition-opacity",
         className
       )}
@@ -49,19 +32,12 @@ export default function ExpandableCaption({
       }}
     >
       {/* Text */}
-      <p
-        className={cn(
-          "whitespace-pre-line break-words", // keep line breaks & wrap hashtags
-          expanded
-            ? "line-clamp-unset" // full text
-            : "line-clamp-1"
-        )}
-      >
+      <p className={cn("whitespace-pre-line break-words", clampClass)}>
         {text}
       </p>
 
       {/* Fade-out hint only when collapsed */}
-      {!expanded && needsClamp && (
+      {!expanded && (
         <span
           aria-hidden="true"
           className="
@@ -73,4 +49,3 @@ export default function ExpandableCaption({
     </div>
   );
 }
-
