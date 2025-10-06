@@ -14,7 +14,6 @@ import ChatMessageComponent from './ChatMessage';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { SwingAnalysisLoader } from './SwingAnalysisLoader';
 import AIChatHistory from './AIChatHistory';
-import { OverlayFooter } from './OverlayFooter';
 import { CoachPromptInline } from '@/components/swing/CoachPromptInline';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { SwingVisualCarousel } from '@/components/swing/SwingVisualCarousel';
@@ -1561,8 +1560,6 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
         onChange={handleFileUpload}
         className="hidden"
       />
-
-      <OverlayFooter onOpen={() => setShowHistory(true)} isSticky={false} />
 
       {/* History Modal */}
       <AIChatHistory 
