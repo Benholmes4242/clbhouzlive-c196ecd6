@@ -552,9 +552,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </div>
 
             {/* Scrollable content area */}
-            <TabsContent value="chat" className="m-0 flex-1" style={{ minHeight: 0 }}>
+            <TabsContent value="chat" className="m-0 flex-1 overflow-hidden" style={{ minHeight: 0 }}>
               <div 
-                className="relative h-full overflow-y-auto overscroll-contain scroll-smooth pt-10 pb-24"
+                className="h-full overflow-y-auto overscroll-contain scroll-smooth px-4 pt-3 pb-4"
                 style={{ WebkitOverflowScrolling: "touch" }}
                 data-echo-canvas
                 ref={chatScrollRef}
@@ -707,9 +707,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             </TabsContent>
 
-            <TabsContent value="swing" className="m-0 flex-1" style={{ minHeight: 0 }}>
+            <TabsContent value="swing" className="m-0 flex-1 overflow-hidden" style={{ minHeight: 0 }}>
               <div 
-                className="relative h-full overflow-y-auto overscroll-contain scroll-smooth px-3 sm:px-4 pt-10 pb-[64px]"
+                className="h-full overflow-y-auto overscroll-contain scroll-smooth px-4 pt-3 pb-4"
                 style={{ WebkitOverflowScrolling: "touch" }}
                 data-echo-canvas
               >
@@ -731,9 +731,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             </TabsContent>
           </Tabs>
         
-        {/* Composer footer - Phase 60: Cinematic Glass */}
+        {/* Composer footer - pinned above safe area */}
         <footer 
-          className="sticky bottom-0 z-[2] bg-gradient-to-t from-white/80 to-white/40 backdrop-blur-xl border-t border-white/20"
+          className="sticky bottom-0 z-[2] bg-gradient-to-t from-white/95 to-white/40 backdrop-blur supports-[backdrop-filter]:backdrop-blur-md pt-3 pb-[calc(env(safe-area-inset-bottom)+8px)] px-4"
           role="region"
           aria-label="Message composer"
           data-echo-composer
@@ -746,9 +746,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             )}
             
-            <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pt-3 pb-[max(env(safe-area-inset-bottom),0px)]">
+            <div className="mx-auto w-full max-w-[720px] space-y-2">
               {activeTab === 'chat' && (
-                <div>
+                <div className="space-y-2">
                   {/* Attachments tray - Phase 58 */}
                   <div 
                     className={cn(
@@ -794,13 +794,24 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     </div>
                   </div>
 
-                  {/* Main composer pill - Phase 60: Cinematic Glass Grid */}
-                  <div className="composer-pill group rounded-[28px] bg-white/90 backdrop-blur border border-white/20 shadow-sm px-3 sm:px-3.5 min-h-[56px] grid grid-cols-[auto,1fr,auto] items-center gap-2">
+                  {/* Main composer pill - Primary CTA with glassmorphic styling */}
+                  <div 
+                    className={cn(
+                      "group/input rounded-[24px] px-4 py-3",
+                      "bg-white/70 backdrop-blur-md border border-transparent",
+                      "[background-clip:padding-box] shadow-[0_6px_24px_rgba(0,0,0,0.06)]",
+                      "ring-1 ring-inset ring-emerald-400/30",
+                      "hover:ring-emerald-400/50 hover:bg-white/80",
+                      "active:scale-[0.99] transition",
+                      !inputValue?.trim() && !isLoading && !isProcessing && "message-cta-idle",
+                      "grid grid-cols-[auto,1fr,auto] items-center gap-2 min-h-[56px]"
+                    )}
+                  >
                     {/* Left tools */}
                     <div className="flex items-center gap-1.5">
                       {isRecording ? (
-                        <div className="h-7 px-2.5 rounded-full bg-[#2A9D8F]/10 border border-[#2A9D8F]/25 text-[#2A9D8F] text-[12px] inline-flex items-center gap-1.5">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#2A9D8F] animate-pulse"></span>
+                        <div className="h-7 px-2.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-700 text-[12px] inline-flex items-center gap-1.5">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
                           Recording…
                         </div>
                       ) : isProcessing ? (
@@ -813,21 +824,21 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           <button
                             type="button"
                             aria-label="Attach"
-                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-emerald-500/10 active:bg-emerald-500/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60"
                           >
-                            <Paperclip className="h-[18px] w-[18px] text-gray-600" />
+                            <Paperclip className="h-[18px] w-[18px] text-emerald-700/80" />
                           </button>
                           <button
                             type="button"
                             aria-label="Voice"
-                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-emerald-500/10 active:bg-emerald-500/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60"
                             onMouseDown={!isProcessing ? startRecording : undefined}
                             onMouseUp={!isProcessing ? stopRecording : undefined}
                             onMouseLeave={!isProcessing ? stopRecording : undefined}
                             onTouchStart={!isProcessing ? startRecording : undefined}
                             onTouchEnd={!isProcessing ? stopRecording : undefined}
                           >
-                            <Mic className="h-[18px] w-[18px] text-gray-600" />
+                            <Mic className="h-[18px] w-[18px] text-emerald-700/80" />
                           </button>
                         </>
                       )}
@@ -851,7 +862,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         autoCorrect="on"
                         autoCapitalize="sentences"
                         rows={1}
-                        className="w-full bg-transparent outline-none text-[15px] leading-[1.4] placeholder:text-gray-500 resize-none focus-visible:outline-none"
+                        className="w-full bg-transparent outline-none text-[15px] leading-[1.4] 
+                                   placeholder:text-emerald-900/50 text-emerald-950 font-medium 
+                                   resize-none focus-visible:outline-none"
                       />
                     </div>
 
@@ -864,8 +877,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           aria-label="Send"
                           disabled={isLoading || isProcessing}
                           className={cn(
-                            "h-10 px-4 rounded-full bg-[#2A9D8F] text-white shadow hover:shadow-md hover:brightness-[1.03] active:brightness-[0.97] transition",
-                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+                            "h-10 px-4 rounded-full bg-emerald-600 text-white shadow hover:shadow-md hover:bg-emerald-700 active:bg-emerald-800 transition",
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60",
                             "disabled:opacity-60 disabled:cursor-not-allowed"
                           )}
                         >
@@ -880,14 +893,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         </button>
                       ) : null}
                     </div>
-                    
-                    {/* Error / disabled visual lock */}
-                    {(isLoading || isProcessing) && (
-                      <div 
-                        className="pointer-events-none absolute inset-0 rounded-[28px] ring-1 ring-black/5 bg-white/40 backdrop-blur-[1px]"
-                        aria-hidden="true"
-                      />
-                    )}
                   </div>
 
                   <OverlayFooter onOpen={() => openHistory('chat')} isSticky={false} />

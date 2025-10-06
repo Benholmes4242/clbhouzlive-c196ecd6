@@ -19,31 +19,29 @@ export function OverlayFooter({
     <div
       className={cn(
         isSticky && "sticky bottom-0 z-[3]",
-        "bg-gradient-to-t from-white/60 to-transparent backdrop-blur-sm border-t border-white/20",
         className
       )}
     >
-      <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pt-3 pb-[max(env(safe-area-inset-bottom),0px)]">
-        {/* Recent history pill */}
+      <div className="space-y-2">
+        {/* Recent history - de-emphasized secondary control */}
         <button
           onClick={onOpen}
           aria-label="Open recent history"
-          className="w-full h-12 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm
-                     grid grid-cols-[auto,1fr,auto] items-center px-4 mt-3 text-[15px] text-gray-800 
-                     hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 
-                     focus-visible:ring-[#2A9D8F]/40"
+          className="w-full rounded-xl border border-neutral-200/70 bg-white/40 backdrop-blur
+                     px-3 py-2 text-sm text-neutral-700
+                     hover:bg-white/55 hover:border-neutral-300 shadow-none
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60
+                     transition-colors"
         >
-          <span className="mr-2 grid h-6 w-6 place-items-center text-gray-600">
-            <Clock className="h-[14px] w-[14px]" aria-hidden="true" />
-          </span>
-          <span className="justify-self-start font-medium">Recent history</span>
-          <span className="ml-2 text-gray-500">
-            <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
-          </span>
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 opacity-60" aria-hidden="true" />
+            <span className="flex-1 text-left">Recent history</span>
+            <ChevronDown className="h-4 w-4 opacity-60" aria-hidden="true" />
+          </div>
         </button>
 
-        {/* Caption */}
-        <p className="mt-2 text-center text-xs text-gray-500">
+        {/* Caption - tighter spacing */}
+        <p className="text-[12px] leading-4 text-neutral-500 text-center mt-1">
           {caption}
         </p>
       </div>
