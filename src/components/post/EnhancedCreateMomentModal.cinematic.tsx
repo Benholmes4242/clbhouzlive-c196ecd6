@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
-import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Layers } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Layers, Camera } from "lucide-react";
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
@@ -341,26 +341,32 @@ export default function EnhancedCreateMomentModalCinematic({
                   className="h-full w-full"
                 >
                   {media.length === 0 ? (
-                    /* Empty State Panel */
-                    <div 
-                      className="h-full w-full flex items-center justify-center bg-black"
-                      role="region"
-                      aria-label="No media selected"
+                    /* Empty State Panel - Frosted White Gradient */
+                    <button
+                      onClick={handlePickFromLibrary}
+                      className="h-full w-full flex items-center justify-center bg-gradient-to-b from-white/85 to-white/65 backdrop-blur-[14px] cursor-pointer transition-all duration-200 hover:from-white/90 hover:to-white/70"
+                      role="button"
+                      aria-label="Add media"
                     >
-                      <div className="text-center px-6 max-w-xs">
-                        <Layers 
-                          className="w-14 h-14 mx-auto mb-4 text-zinc-400" 
+                      <motion.div 
+                        className="text-center px-6 max-w-[85%]"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.25, ease: "easeOut" }}
+                      >
+                        <Camera 
+                          className="w-14 h-14 mx-auto mb-5 text-[#2c2c2c]/70" 
                           strokeWidth={1.5}
                           aria-hidden="true"
                         />
-                        <h2 className="text-[17px] font-semibold text-zinc-600 mb-2">
+                        <h2 className="text-[18px] font-semibold mb-3" style={{ color: '#2c2c2c', opacity: 0.85 }}>
                           No media yet
                         </h2>
-                        <p className="text-[14px] leading-relaxed text-zinc-600">
-                          Capture a moment or choose from your gallery to share with a community of golfers.
+                        <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(0,0,0,0.65)' }}>
+                          Capture your next great golf moment – add a photo or video to share with the clbhouz community.
                         </p>
-                      </div>
-                    </div>
+                      </motion.div>
+                    </button>
                   ) : (
                     <MediaCarousel
                       items={media.map((item, index) => ({
