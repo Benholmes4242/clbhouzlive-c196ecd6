@@ -1,35 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
 import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
 import { updateRecentMediaFromItems } from '@/hooks/usePostSubmission/recentMediaListener';
-import { ComposerMediaItem } from '@/hooks/useSnapModal';
+import { useSnapModal } from '@/hooks/useSnapModal';
 import EnhancedCreateMomentModal from '@/components/post/EnhancedCreateMomentModal.cinematic';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-interface PostSubmissionHandlerProps {
-  isComposerOpen: boolean;
-  mediaItems: ComposerMediaItem[];
-  selectedFile: File | null; // Keep for backward compatibility
-  selectedCourse: any;
-  onCourseSelect: (course: any) => void;
-  onClose: () => void;
-  onShowToast: (message: string) => void;
-  isSubmitting: boolean;
-  setIsSubmitting: (submitting: boolean) => void;
-}
-
-const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
-  isComposerOpen,
-  mediaItems,
-  selectedFile,
-  selectedCourse,
-  onCourseSelect,
-  onClose,
-  onShowToast,
-  isSubmitting,
-  setIsSubmitting
-}) => {
+const PostSubmissionHandler: React.FC = () => {
+  const {
+    isComposerOpen,
+    mediaItems,
+    selectedFile,
+    selectedCourse,
+    setSelectedCourse,
+    closeComposer,
+    showConfirmationToast
+  } = useSnapModal();
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useSupabaseSession();
   const { submitPost } = useOptimisticPostSubmission();
   const { addOptimisticPost } = useOptimisticPostInsertion();
@@ -43,7 +32,7 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
       : (selectedFile ? [selectedFile] : []);
     
     if (files.length === 0) {
-      onShowToast('No media selected');
+      showConfirmationToast('No media selected');
       return;
     }
 
@@ -97,31 +86,31 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
         onError: () => {
           console.error('Post submission failed - background upload failed');
           setIsSubmitting(false);
-          onShowToast('Upload failed. Please try again later.');
+          showConfirmationToast('Upload failed. Please try again later.');
         }
       }).catch((error) => {
         console.error('Error in enhanced post submission:', error);
         setIsSubmitting(false);
-        onShowToast('Upload failed. Please try again later.');
+        showConfirmationToast('Upload failed. Please try again later.');
       });
       
     } catch (error) {
       console.error('Error in enhanced post submission:', error);
       setIsSubmitting(false);
-      onShowToast('Upload failed. Please try again later.');
+      showConfirmationToast('Upload failed. Please try again later.');
     }
   };
 
   return (
     <EnhancedCreateMomentModal
       isOpen={isComposerOpen}
-      onClose={onClose}
+      onClose={closeComposer}
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
       initialFiles={mediaItems.length > 0 ? mediaItems.map(item => item.file) : (selectedFile ? [selectedFile] : [])}
       mediaItems={mediaItems}
       selectedCourse={selectedCourse}
-      onCourseSelect={onCourseSelect}
+      onCourseSelect={setSelectedCourse}
     />
   );
 };
