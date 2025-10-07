@@ -29,7 +29,6 @@ export interface ComposerMediaItem {
 }
 
 type SnapState = {
-  isSnapModalOpen: boolean;
   isComposerOpen: boolean;
   mediaItems: ComposerMediaItem[];  // NEW - replaces selectedFile
   caption: string;
@@ -53,8 +52,7 @@ type SnapState = {
 
 export const useSnapModal = () => {
   const captionInputRef = useRef<HTMLDivElement>(null);
-  const { setSnapModalOpen, setCreateMomentModalOpen } = useModalContext();
-  const [isSnapModalOpen, setIsSnapModalOpen] = useState(false);
+  const { setCreateMomentModalOpen } = useModalContext();
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   
   // New multi-media state
@@ -75,15 +73,6 @@ export const useSnapModal = () => {
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
 
-  const openSnapModal = () => {
-    console.log('Opening snap modal');
-    setIsSnapModalOpen(true);
-  };
-
-  const closeSnapModal = () => {
-    console.log('Closing snap modal');
-    setIsSnapModalOpen(false);
-  };
 
   // Legacy single file opener (backward compatibility)
   const openComposer = async (file: File) => {
@@ -143,11 +132,6 @@ export const useSnapModal = () => {
       } catch (e2) {
         console.error('[composer] fallback failed:', e2);
       }
-    } finally {
-      // Close SnapModal after everything processes
-      console.log('[composer] closing snap modal');
-      setIsSnapModalOpen(false);
-      setSnapModalOpen(false); // Also update context
     }
   };
 
@@ -196,7 +180,6 @@ export const useSnapModal = () => {
   return {
     // Core state
     captionInputRef,
-    isSnapModalOpen,
     isComposerOpen,
     mediaItems,
     caption,
@@ -225,8 +208,6 @@ export const useSnapModal = () => {
     toastMessage,
     
     // Actions
-    openSnapModal,
-    closeSnapModal,
     openComposer,
     openComposerWithFiles, // NEW
     closeComposer,

@@ -3,12 +3,11 @@ import ClubhouzLoading from '@/components/ClubhouzLoading';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import NavigationBar from '@/components/bottom-navigation/NavigationBar';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
-import SnapModal from '@/components/snap/SnapModal';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
 import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigationHandlers';
 import { useSnapModal } from '@/hooks/useSnapModal';
-import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
+
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
@@ -28,9 +27,8 @@ const Clubhouse = () => {
   // Navigation handlers
   const { activeTab, handleTabClick } = useNavigationHandlers();
   
-  // Snap modal for camera functionality
+  // Composer state management
   const {
-    isSnapModalOpen,
     isComposerOpen,
     mediaItems,
     selectedFile,
@@ -41,8 +39,6 @@ const Clubhouse = () => {
     toastMessage,
     selectedCourse,
     setSelectedCourse,
-    openSnapModal,
-    closeSnapModal,
     openComposer,
     openComposerWithFiles,
     closeComposer,
@@ -50,8 +46,6 @@ const Clubhouse = () => {
     hideToast
   } = useSnapModal();
 
-  // Media handlers for camera, image, and video
-  const { handleCameraClick, handleImageClick, handleVideoClick } = useMediaHandlers(closeSnapModal, openComposer);
 
   const [headerActiveTab, setHeaderActiveTab] = useState('Following');
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
@@ -73,9 +67,9 @@ const Clubhouse = () => {
     console.log('[DEBUG] Clubhouse: handleTabClickWithCamera called with:', tab);
     
     if (tab.isAction && tab.id === 'post') {
-      // Handle camera action
-      console.log('[DEBUG] Clubhouse: Opening snap modal for camera');
-      openSnapModal();
+      // Open composer directly with empty state
+      console.log('[DEBUG] Clubhouse: Opening composer directly');
+      openComposerWithFiles([]);
     } else {
       // Handle regular navigation
       console.log('[DEBUG] Clubhouse: Handling regular navigation');
@@ -125,16 +119,7 @@ const Clubhouse = () => {
       </div>
       
       
-      {/* Snap Modal and Post Submission Components */}
-      <SnapModal
-        isOpen={isSnapModalOpen}
-        onClose={closeSnapModal}
-        onCameraClick={() => handleCameraClick({})}
-        onImageClick={() => handleImageClick({})}
-        onVideoClick={() => handleVideoClick({})}
-        openComposerWithFiles={openComposerWithFiles}
-      />
-
+      {/* Post Submission Handler */}
       <PostSubmissionHandler
         isComposerOpen={isComposerOpen}
         mediaItems={mediaItems}
