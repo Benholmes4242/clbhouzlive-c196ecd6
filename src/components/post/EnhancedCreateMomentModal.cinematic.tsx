@@ -275,7 +275,7 @@ export default function EnhancedCreateMomentModalCinematic({
     <AnimatePresence>
       {isOpen && (
         <motion.div 
-          className="fixed inset-0 z-50" 
+          className="enhanced-create-moment-modal fixed inset-0 z-[2000]" 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
           exit={{ opacity: 0 }}

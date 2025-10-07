@@ -34,23 +34,35 @@ const GlobalHeader: React.FC = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [isImmersive, setIsImmersive] = useState(false);
 
-  // Check for data-immersive attribute
+  // Check for data-immersive attribute AND ecm-open body class
   useEffect(() => {
     const checkImmersive = () => {
-      setIsImmersive(document.documentElement.hasAttribute('data-immersive'));
+      const hasImmersiveAttr = document.documentElement.hasAttribute('data-immersive');
+      const hasEcmClass = document.body.classList.contains('ecm-open');
+      setIsImmersive(hasImmersiveAttr || hasEcmClass);
     };
     
     // Check initially
     checkImmersive();
     
-    // Watch for changes using MutationObserver
-    const observer = new MutationObserver(checkImmersive);
-    observer.observe(document.documentElement, {
+    // Watch for changes to data-immersive attribute
+    const htmlObserver = new MutationObserver(checkImmersive);
+    htmlObserver.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['data-immersive']
     });
     
-    return () => observer.disconnect();
+    // Watch for changes to body class
+    const bodyObserver = new MutationObserver(checkImmersive);
+    bodyObserver.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+    
+    return () => {
+      htmlObserver.disconnect();
+      bodyObserver.disconnect();
+    };
   }, []);
 
   // Determine if current route should hide header
