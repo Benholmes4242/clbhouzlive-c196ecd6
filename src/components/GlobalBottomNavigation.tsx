@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useModalContext } from '@/contexts/ModalContext';
+import { useSnapModal } from '@/hooks/useSnapModal';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
@@ -38,7 +39,8 @@ const GlobalBottomNavigation: React.FC = () => {
   // Final visibility state - hide for routes, modals, or manual control
   const showNavigation = isVisible && !shouldHideForRoute && !shouldHideBottomNav;
   
-  // All modal state now handled by PostSubmissionHandler
+  // Get openComposerWithFiles from useSnapModal for camera icon
+  const { openComposerWithFiles } = useSnapModal();
 
   // Handle keyboard visibility and visual viewport changes
   useEffect(() => {
@@ -83,7 +85,8 @@ const GlobalBottomNavigation: React.FC = () => {
   // Handle tab clicks including camera action
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
-      // Camera icon opens EnhancedCreateMomentModal - handled in PostSubmissionHandler
+      // Camera icon opens EnhancedCreateMomentModal with empty state
+      openComposerWithFiles([]);
     } else {
       handleTabClick(tab);
     }
