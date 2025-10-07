@@ -195,7 +195,7 @@ const EnhancedSnapModal = ({
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="relative w-full max-w-[560px] md:max-w-[640px] max-h-[80vh] overflow-hidden"
+              className="relative w-full max-w-[560px] max-h-[80vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
               initial={{ y: 16, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -209,33 +209,26 @@ const EnhancedSnapModal = ({
             >
               {/* Glass surface with gradient ring */}
               <div 
-                className="relative bg-white/55 backdrop-blur-xl border border-white/50 rounded-3xl shadow-[0_24px_60px_rgba(0,0,0,0.25)] p-5 md:p-7"
-                style={{
-                  boxShadow: `
-                    0 24px 60px rgba(0,0,0,0.25),
-                    inset 0 0 0 1px rgba(110,146,119,0.1),
-                    inset 0 1px 0 0 rgba(255,255,255,0.4)
-                  `
-                }}
+                className="relative bg-white/55 backdrop-blur-xl border border-white/35 rounded-[22px] shadow-[0_30px_60px_-10px_rgba(0,0,0,0.3)] px-5 md:px-6 py-5"
               >
-                {/* Header */}
-                <div className="mb-5">
+              {/* Header */}
+              <div className="mb-4">
                   <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-black/90">
-                        Create a Moment
-                      </h2>
-                      <p className="text-sm text-black/60 mt-1">
-                        Share your golf moment with the community.
-                      </p>
-                    </div>
-                    <button 
-                      onClick={onClose} 
-                      aria-label="Close" 
-                      className="w-11 h-11 rounded-full bg-black/60 hover:bg-black/70 text-white active:scale-95 transition-all duration-120 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-300/60 focus:outline-none"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
+                  <div>
+                    <h2 className="text-[22px] font-bold tracking-tight text-black/90">
+                      Create a Moment
+                    </h2>
+                    <p className="text-[14px] text-black/55 mt-1 max-w-prose">
+                      Share your golf moment with the community.
+                    </p>
+                  </div>
+                  <button 
+                    onClick={onClose} 
+                    aria-label="Close" 
+                    className="w-10 h-10 rounded-full bg-white/45 border border-white/50 text-black/70 hover:bg-white/60 active:scale-95 transition-all duration-120 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-300/60 focus:outline-none"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
                   </div>
                 </div>
 
@@ -247,14 +240,13 @@ const EnhancedSnapModal = ({
                       onClick={onClick}
                       role="button"
                       aria-describedby={`${key}-description`}
-                      className={`
-                        w-full h-[88px] rounded-2xl border border-black/10 bg-white/70 backdrop-blur-md
-                        transition-all duration-120
-                        hover:scale-[0.995] hover:ring-1 hover:ring-emerald-200/40
-                        active:scale-[0.99]
-                        focus-visible:ring-2 focus-visible:ring-emerald-300/60 focus:outline-none
-                        ${key === "camera" ? "shadow-[0_8px_32px_rgba(110,146,119,0.18)]" : ""}
-                      `}
+                    className={`
+                      w-full h-[92px] rounded-[18px] bg-white/65 border border-white/50 backdrop-blur-md
+                      hover:bg-white/75 active:bg-white/80
+                      transition-all duration-120
+                      focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#6e9277]/50 focus:outline-none
+                      ${key === "camera" ? "shadow-[0_8px_32px_rgba(110,146,119,0.18)]" : ""}
+                    `}
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ 
@@ -265,67 +257,29 @@ const EnhancedSnapModal = ({
                       }}
                       whileTap={{ scale: prefersReducedMotion ? 1 : 0.99 }}
                     >
-                      <div className="flex items-center h-full px-4 gap-3">
-                        {/* Icon plate */}
-                        <div 
-                          className="w-14 h-14 rounded-xl bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] border border-black/10 flex items-center justify-center shrink-0"
-                        >
-                          <Icon className="w-6 h-6 text-black/70" strokeWidth={1.5} />
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 text-left min-w-0">
-                          <h3 className="text-base font-semibold text-black flex items-center gap-2">
-                            {label}
-                            {isSpecial && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#6E9277]/10 text-[#6E9277] border border-[#6E9277]/20">
-                                BETA
-                              </span>
-                            )}
-                          </h3>
-                          <p id={`${key}-description`} className="text-sm text-black/55">
-                            {description}
-                          </p>
-                        </div>
-
-                        {/* Preview */}
-                        {key === "photos" && previewImages && previewImages.length >= 2 && (
-                          <div className="flex gap-2 shrink-0">
-                            <div className="w-14 h-14 rounded-xl overflow-hidden">
-                              <img 
-                                src={previewImages[0]} 
-                                alt="" 
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            <div className="w-20 h-14 rounded-xl overflow-hidden">
-                              <img 
-                                src={previewImages[1]} 
-                                alt="" 
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          </div>
-                        )}
-
-                        {key === "story" && previewImages && previewImages.length > 0 && (
-                          <div className="flex gap-1 shrink-0">
-                            {/* Mini storyboard strip - 3 frames */}
-                            {[0, 0, 0].map((_, i) => (
-                              <div key={i} className="w-12 h-14 rounded-lg overflow-hidden">
-                                <img 
-                                  src={previewImages[0]} 
-                                  alt="" 
-                                  className="w-full h-full object-cover"
-                                  style={{
-                                    filter: i === 1 ? 'brightness(0.9)' : i === 2 ? 'brightness(0.8)' : 'none'
-                                  }}
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                    <div className="grid grid-cols-[64px,1fr] gap-4 items-center px-4 md:px-5 h-full">
+                      {/* Icon plate */}
+                      <div 
+                        className="w-14 h-14 rounded-[14px] bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] border border-black/5 flex items-center justify-center"
+                      >
+                        <Icon className="w-6 h-6 text-black/80" strokeWidth={1.5} />
                       </div>
+
+                      {/* Text block */}
+                      <div className="min-w-0">
+                        <h3 className="text-[17px] md:text-[18px] font-semibold leading-tight text-black/90 truncate flex items-center gap-2">
+                          {label}
+                          {isSpecial && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#6e9277]/12 text-[#6e9277] border border-[#6e9277]/25 align-middle">
+                              BETA
+                            </span>
+                          )}
+                        </h3>
+                        <p id={`${key}-description`} className="text-[14px] leading-snug text-black/60 line-clamp-2">
+                          {description}
+                        </p>
+                      </div>
+                    </div>
                     </motion.button>
                   ))}
                 </div>
