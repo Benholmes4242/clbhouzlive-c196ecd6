@@ -133,36 +133,6 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
           </button>
         )}
 
-        {/* Cover badge - positioned to the right of media counter */}
-        {onSetCover && (
-          <button
-            aria-label={coverIndex === index ? "Current cover" : "Set as cover"}
-            className="absolute top-2 left-12 rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm hover:bg-black/70 transition-colors"
-            onClick={(e) => { 
-              e.stopPropagation(); 
-              if (coverIndex !== index) {
-                onSetCover(index); 
-                haptic('light');
-                toast({ description: 'Cover set' });
-              }
-            }}
-            disabled={coverIndex === index}
-          >
-            {coverIndex === index ? 'Cover' : 'Set as cover'}
-          </button>
-        )}
-
-        {/* Close button - positioned where "Set as cover" was */}
-        <button
-          onClick={() => {
-            // Get the close function from parent component
-            window.dispatchEvent(new CustomEvent('closeModal'));
-          }}
-          className="absolute top-2 right-2 h-6 w-6 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-black/70 transition-colors"
-          aria-label="Close modal"
-        >
-          <X className="h-3 w-3 text-white" />
-        </button>
 
       </div>
     );
@@ -184,37 +154,6 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
         }`}
         draggable={false}
       />
-      
-      {/* Cover badge - positioned to the right of media counter */}
-      {onSetCover && (
-        <button
-          aria-label={coverIndex === index ? "Current cover" : "Set as cover"}
-          className="absolute top-2 left-12 rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm hover:bg-black/70 transition-colors"
-          onClick={(e) => { 
-            e.stopPropagation(); 
-            if (coverIndex !== index) {
-              onSetCover(index); 
-              haptic('light');
-              toast({ description: 'Cover set' });
-            }
-          }}
-          disabled={coverIndex === index}
-        >
-          {coverIndex === index ? 'Cover' : 'Set as cover'}
-        </button>
-      )}
-
-      {/* Close button - positioned where "Set as cover" was */}
-      <button
-        onClick={() => {
-          // Get the close function from parent component
-          window.dispatchEvent(new CustomEvent('closeModal'));
-        }}
-        className="absolute top-2 right-2 h-6 w-6 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-black/70 transition-colors"
-        aria-label="Close modal"
-      >
-        <X className="h-3 w-3 text-white" />
-      </button>
     </div>
   );
 }
