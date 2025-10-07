@@ -425,19 +425,26 @@ export default function EnhancedCreateMomentModalCinematic({
                     >
                       <div className="flex items-center justify-between mb-3">
                         <label className="block text-base font-semibold text-zinc-900">Add a caption</label>
-                        <button
-                          onClick={handleAICaption}
-                          disabled={aiLoading || media.length === 0}
-                          className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm disabled:opacity-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
-                          aria-label="Write a caption for me"
-                        >
-                          {aiLoading ? <StarsLoading /> : (
-                            <div className="flex items-center gap-1.5">
-                              <Sparkles className="h-3.5 w-3.5" />
-                              <span className="font-medium">Inspire Me</span>
-                            </div>
-                          )}
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={handleAICaption}
+                            disabled={aiLoading || media.length === 0}
+                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm disabled:opacity-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
+                            aria-label="Camera"
+                          >
+                            <span className="font-medium">Camera</span>
+                          </button>
+                          <button
+                            onClick={handleAICaption}
+                            disabled={aiLoading || media.length === 0}
+                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm disabled:opacity-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
+                            aria-label="Photos & Videos"
+                          >
+                            {aiLoading ? <StarsLoading /> : (
+                              <span className="font-medium">Photos & Videos</span>
+                            )}
+                          </button>
+                        </div>
                       </div>
                       
                       <textarea
