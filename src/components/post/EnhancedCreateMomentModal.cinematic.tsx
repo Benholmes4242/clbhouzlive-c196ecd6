@@ -17,8 +17,8 @@ import { normalizeFilesToMediaItems } from "@/lib/mediaUtils";
 
 const CAPTION_OVERLAP_PX = 16; // small, neat overlap
 
-// Sunset Backdrop Component
-const SunsetBackdrop = ({ isVisible }: { isVisible: boolean }) => {
+// Liquid Glass Backdrop Component
+const LiquidGlassBackdrop = ({ isVisible }: { isVisible: boolean }) => {
   const prefersReducedTransparency = window.matchMedia('(prefers-reduced-transparency: reduce)').matches;
   
   return (
@@ -28,33 +28,33 @@ const SunsetBackdrop = ({ isVisible }: { isVisible: boolean }) => {
       animate={{ opacity: isVisible ? 1 : 0 }}
       transition={{ duration: 0.18, ease: "easeOut" }}
     >
-      {/* Gradient layer */}
+      {/* Liquid glass layer with frosted effect */}
       <div 
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(180deg, var(--ecm-bg-start) 0%, var(--ecm-bg-mid) 45%, var(--ecm-bg-end) 100%)'
+          background: 'var(--ecm-glass-bg)',
+          backdropFilter: prefersReducedTransparency ? 'none' : `blur(var(--ecm-glass-blur)) saturate(var(--ecm-glass-saturate))`,
+          WebkitBackdropFilter: prefersReducedTransparency ? 'none' : `blur(var(--ecm-glass-blur)) saturate(var(--ecm-glass-saturate))`,
         }}
       />
       
-      {/* Bottom vignette */}
+      {/* Inner glow for depth */}
       <div 
-        className="absolute inset-x-0 bottom-0 h-[28vh]"
+        className="absolute inset-0"
         style={{
-          background: 'linear-gradient(180deg, transparent 0%, var(--ecm-vignette) 100%)'
+          background: 'radial-gradient(ellipse at center top, var(--ecm-inner-glow) 0%, transparent 60%)',
+          pointerEvents: 'none'
         }}
       />
       
-      {/* Subtle noise texture for anti-banding (optional, lightweight) */}
-      {!prefersReducedTransparency && (
-        <div 
-          className="absolute inset-0 opacity-[0.02] mix-blend-overlay"
-          style={{
-            backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' /%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' /%3E%3C/svg%3E")',
-            backgroundRepeat: 'repeat',
-            backgroundSize: '256px 256px'
-          }}
-        />
-      )}
+      {/* Border highlight */}
+      <div 
+        className="absolute inset-0 rounded-[inherit]"
+        style={{
+          boxShadow: 'inset 0 0 0 1px var(--ecm-glass-border), inset 0 2px 4px 0 rgba(255, 255, 255, 0.1)',
+          pointerEvents: 'none'
+        }}
+      />
     </motion.div>
   );
 };
@@ -327,9 +327,9 @@ export default function EnhancedCreateMomentModalCinematic({
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* backdrop - subtle dark */}
+          {/* backdrop - subtle dark with reduced opacity for liquid glass */}
           <div 
-            className="absolute inset-0 bg-black/35 backdrop-blur-[8px]" 
+            className="absolute inset-0 bg-black/20 backdrop-blur-[4px]" 
             onClick={close}
           />
 
@@ -355,8 +355,8 @@ export default function EnhancedCreateMomentModalCinematic({
               }
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Sunset glass background */}
-              <SunsetBackdrop isVisible={true} />
+              {/* Liquid glass background */}
+              <LiquidGlassBackdrop isVisible={true} />
               {/* MEDIA STAGE - full-bleed, top-anchored */}
               <section 
                 id="media" 

@@ -1,20 +1,18 @@
 :root {
-  /* Gradient (top cool → warm), tuned to the mock */
-  --ecm-bg-start: #a9c5d8;     /* sky blue */
-  --ecm-bg-mid:   #d9c4b2;     /* warm cream */
-  --ecm-bg-end:   #f2e0c9;     /* blush sand */
-  --ecm-vignette: rgba(0,0,0,.22); /* bottom vignette for legibility */
-  --ecm-glass: rgba(255,255,255,.10); /* modal sheet glass tint */
-  --ecm-blur: 18px;
+  /* Liquid Glass effect - semi-transparent with blur */
+  --ecm-glass-bg: rgba(110, 146, 119, 0.15);
+  --ecm-glass-blur: 20px;
+  --ecm-glass-saturate: 180%;
+  --ecm-glass-border: rgba(255, 255, 255, 0.3);
+  --ecm-inner-glow: rgba(255, 255, 255, 0.15);
+  --ecm-composer-glass: rgba(255, 255, 255, 0.25);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Slightly deeper but same hue family for dark */
-    --ecm-bg-start: #6a8799;
-    --ecm-bg-mid:   #b59f8b;
-    --ecm-bg-end:   #d2bca5;
-    --ecm-vignette: rgba(0,0,0,.35);
-    --ecm-glass: rgba(24,24,24,.14);
+    --ecm-glass-bg: rgba(90, 126, 99, 0.18);
+    --ecm-glass-border: rgba(255, 255, 255, 0.2);
+    --ecm-inner-glow: rgba(255, 255, 255, 0.1);
+    --ecm-composer-glass: rgba(255, 255, 255, 0.2);
   }
 }
