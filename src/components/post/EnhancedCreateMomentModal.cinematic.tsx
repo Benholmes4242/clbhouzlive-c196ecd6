@@ -405,7 +405,7 @@ export default function EnhancedCreateMomentModalCinematic({
                           style={{ color: 'white' }}
                         />
                         <p className="text-[17px] leading-relaxed text-white">
-                          Capture your next great golf moment – add a photo or video to share with the clbhouz community.
+                          Capture your next great golf moment – add a photo or video to share with your community.
                         </p>
                       </motion.div>
                     </button>
