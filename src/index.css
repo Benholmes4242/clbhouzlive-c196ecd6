@@ -445,6 +445,16 @@ body.route-clubhouse .global-header {
   display: none !important;
 }
 
+/* Hide global header when EnhancedCreateMoment modal is active */
+body.ecm-open .global-header {
+  display: none !important;
+}
+
+/* Remove top padding when ECM modal is open (header is hidden) */
+body.ecm-open .app-shell--with-header-padding {
+  padding-top: 0 !important;
+}
+
 /* Clubhouse header: anchored to top with safe-area handling */
 .clubhouse-header {
   position: relative;
