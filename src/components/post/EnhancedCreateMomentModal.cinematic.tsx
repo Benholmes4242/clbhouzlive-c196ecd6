@@ -11,6 +11,7 @@ import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 import MediaCarousel from "@/components/posts/MediaCarousel";
 import CarouselDots from "@/components/posts/CarouselDots";
+import { MediaNavigationDots } from "@/components/posts/user-post/overlays/MediaNavigationDots";
 import { openMediaPicker } from "@/utils/openMediaPicker";
 import { normalizeFilesToMediaItems } from "@/lib/mediaUtils";
 
@@ -399,6 +400,15 @@ export default function EnhancedCreateMomentModalCinematic({
                     </div>
                   </div>
                 )}
+
+                {/* Media Navigation Dots - centered, 12px from bottom */}
+                <div className="absolute left-1/2 -translate-x-1/2 z-20" style={{ bottom: '12px' }}>
+                  <MediaNavigationDots
+                    mediaCount={media.length}
+                    currentIndex={activeIndex}
+                    onJump={setActiveIndex}
+                  />
+                </div>
 
               </section>
 
