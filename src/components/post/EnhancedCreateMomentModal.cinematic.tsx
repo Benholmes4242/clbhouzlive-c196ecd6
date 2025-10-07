@@ -45,7 +45,8 @@ export default function EnhancedCreateMomentModalCinematic({
   initialFiles = [],
   mediaItems = [],
   selectedCourse,
-  onCourseSelect
+  onCourseSelect,
+  onAddFiles
 }: Props) {
   const { setCreateMomentModalOpen } = useModalContext();
   const [aiLoading, setAiLoading] = useState(false);
