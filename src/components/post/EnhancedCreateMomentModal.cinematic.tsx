@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
-import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Camera, Images } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play } from "lucide-react";
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,8 +11,6 @@ import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 import MediaCarousel from "@/components/posts/MediaCarousel";
 import CarouselDots from "@/components/posts/CarouselDots";
-import { openMediaPicker } from "@/utils/openMediaPicker";
-import { normalizeFilesToMediaItems } from "@/lib/mediaUtils";
 
 const CAPTION_OVERLAP_PX = 16; // small, neat overlap
 
@@ -35,7 +33,6 @@ type Props = {
   mediaItems?: ComposerMediaItem[];
   selectedCourse?: any;
   onCourseSelect?: (course: any) => void;
-  onAddFiles?: (files: File[]) => void;
 };
 
 export default function EnhancedCreateMomentModalCinematic({ 
@@ -47,8 +44,7 @@ export default function EnhancedCreateMomentModalCinematic({
   initialFiles = [],
   mediaItems = [],
   selectedCourse,
-  onCourseSelect,
-  onAddFiles
+  onCourseSelect
 }: Props) {
   const { setCreateMomentModalOpen } = useModalContext();
   const [aiLoading, setAiLoading] = useState(false);
@@ -234,35 +230,6 @@ export default function EnhancedCreateMomentModalCinematic({
     setTimeout(() => {
       onClose();
     }, 100);
-  };
-
-  // Handle camera capture
-  const handlePickFromCamera = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*,video/*';
-    input.capture = 'environment';
-    input.style.display = 'none';
-    document.body.appendChild(input);
-
-    input.addEventListener('change', () => {
-      const files = Array.from(input.files ?? []);
-      if (files.length > 0 && onAddFiles) {
-        onAddFiles(files);
-      }
-      document.body.removeChild(input);
-    });
-
-    input.click();
-  };
-
-  // Handle library picker
-  const handlePickFromLibrary = () => {
-    openMediaPicker((files) => {
-      if (files.length > 0 && onAddFiles) {
-        onAddFiles(files);
-      }
-    }, 10);
   };
 
   return (
@@ -456,53 +423,29 @@ export default function EnhancedCreateMomentModalCinematic({
                         damping: 30
                       }}
                     >
-                      {/* Empty state - show CTAs when no media */}
-                      {media.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-full gap-3">
-                          <div className="flex gap-2 w-full">
-                            <button
-                              onClick={handlePickFromCamera}
-                              className="flex-1 bg-white/90 backdrop-blur-sm border border-white/60 text-zinc-800 px-4 py-3 rounded-2xl transition-all duration-200 text-sm font-medium hover:bg-white hover:border-white/80 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[rgba(255,156,64,0.35)] shadow-sm flex items-center justify-center gap-2"
-                            >
-                              <Camera className="h-4 w-4" />
-                              <span>Camera</span>
-                            </button>
-                            <button
-                              onClick={handlePickFromLibrary}
-                              className="flex-1 bg-white/90 backdrop-blur-sm border border-white/60 text-zinc-800 px-4 py-3 rounded-2xl transition-all duration-200 text-sm font-medium hover:bg-white hover:border-white/80 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[rgba(255,156,64,0.35)] shadow-sm flex items-center justify-center gap-2"
-                            >
-                              <Images className="h-4 w-4" />
-                              <span>Photos & Videos</span>
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="flex items-center justify-between mb-3">
-                            <label className="block text-base font-semibold text-zinc-900">Add a caption</label>
-                            <button
-                              onClick={handleAICaption}
-                              disabled={aiLoading || media.length === 0}
-                              className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm disabled:opacity-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
-                              aria-label="Write a caption for me"
-                            >
-                              {aiLoading ? <StarsLoading /> : (
-                                <div className="flex items-center gap-1.5">
-                                  <Sparkles className="h-3.5 w-3.5" />
-                                  <span className="font-medium">Inspire Me</span>
-                                </div>
-                              )}
-                            </button>
-                          </div>
+                      <div className="flex items-center justify-between mb-3">
+                        <label className="block text-base font-semibold text-zinc-900">Add a caption</label>
+                        <button
+                          onClick={handleAICaption}
+                          disabled={aiLoading || media.length === 0}
+                          className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm disabled:opacity-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
+                          aria-label="Write a caption for me"
+                        >
+                          {aiLoading ? <StarsLoading /> : (
+                            <div className="flex items-center gap-1.5">
+                              <Sparkles className="h-3.5 w-3.5" />
+                              <span className="font-medium">Inspire Me</span>
+                            </div>
+                          )}
+                        </button>
+                      </div>
                       
-                          <textarea
-                            className="flex-1 w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 text-[15px] leading-snug resize-none placeholder:text-zinc-400 text-zinc-900 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)] transition-all duration-200"
-                            placeholder="Write a caption…"
-                            value={caption}
-                            onChange={(e) => setCaption(e.target.value)}
-                          />
-                        </>
-                      )}
+                      <textarea
+                        className="flex-1 w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 text-[15px] leading-snug resize-none placeholder:text-zinc-400 text-zinc-900 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)] transition-all duration-200"
+                        placeholder="Write a caption…"
+                        value={caption}
+                        onChange={(e) => setCaption(e.target.value)}
+                      />
                     </motion.div>
 
                     {/* COURSE CARD */}
