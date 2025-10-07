@@ -43,9 +43,18 @@ const GlobalBottomNavigation: React.FC = () => {
   
   // Composer state management
   const {
+    isComposerOpen,
+    mediaItems,
+    selectedFile,
+    selectedCourse,
+    setSelectedCourse,
     openComposerWithFiles,
+    closeComposer,
+    isSubmitting,
+    setIsSubmitting,
     showToast,
     toastMessage,
+    showConfirmationToast,
     hideToast
   } = useSnapModal();
 
@@ -90,8 +99,8 @@ const GlobalBottomNavigation: React.FC = () => {
   // Handle tab clicks including camera action
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
-      // Dispatch a global event so the single PostSubmissionHandler instance opens the composer
-      window.dispatchEvent(new CustomEvent('openComposer', { detail: { files: [] } }));
+      // Open composer in empty state using the same hook instance powering the modal
+      openComposerWithFiles([]);
     } else {
       handleTabClick(tab);
     }
@@ -152,7 +161,18 @@ const GlobalBottomNavigation: React.FC = () => {
       </AnimatePresence>
 
       {/* Post Submission Handler */}
-      <PostSubmissionHandler />
+      <PostSubmissionHandler
+        isComposerOpen={isComposerOpen}
+        mediaItems={mediaItems}
+        selectedFile={selectedFile}
+        selectedCourse={selectedCourse}
+        onCourseSelect={setSelectedCourse}
+        onClose={closeComposer}
+        onShowToast={showConfirmationToast}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={setIsSubmitting}
+        onAddFiles={openComposerWithFiles}
+      />
 
       {/* Snap Toast */}
       <SnapToast

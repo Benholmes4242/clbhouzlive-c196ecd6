@@ -17,7 +17,15 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
   
   // Composer state management
   const {
+    isComposerOpen,
+    mediaItems,
+    selectedFile,
+    selectedCourse,
+    setSelectedCourse,
     openComposerWithFiles,
+    closeComposer,
+    isSubmitting,
+    setIsSubmitting,
     showToast,
     toastMessage,
     hideToast
@@ -41,7 +49,18 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
         variant={variant}
       />
 
-      <PostSubmissionHandler />
+      <PostSubmissionHandler 
+        isComposerOpen={isComposerOpen}
+        mediaItems={mediaItems}
+        selectedFile={selectedFile}
+        selectedCourse={selectedCourse}
+        onCourseSelect={setSelectedCourse}
+        onClose={closeComposer}
+        onShowToast={() => {}}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={setIsSubmitting}
+        onAddFiles={openComposerWithFiles}
+      />
 
       <SnapToast
         message={toastMessage}

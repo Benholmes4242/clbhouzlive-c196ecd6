@@ -28,7 +28,15 @@ const Clubhouse = () => {
   
   // Composer state management
   const {
+    isComposerOpen,
+    mediaItems,
+    selectedFile,
+    selectedCourse,
+    setSelectedCourse,
     openComposerWithFiles,
+    closeComposer,
+    isSubmitting,
+    setIsSubmitting,
     showToast,
     toastMessage,
     hideToast
@@ -87,7 +95,18 @@ const Clubhouse = () => {
       
       
       {/* Post Submission Component */}
-      <PostSubmissionHandler />
+      <PostSubmissionHandler
+        isComposerOpen={isComposerOpen}
+        mediaItems={mediaItems}
+        selectedFile={selectedFile}
+        selectedCourse={selectedCourse}
+        onCourseSelect={setSelectedCourse}
+        onClose={closeComposer}
+        onShowToast={() => {}}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={setIsSubmitting}
+        onAddFiles={openComposerWithFiles}
+      />
 
       <SnapToast
         message={toastMessage}
