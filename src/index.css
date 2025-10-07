@@ -32,7 +32,7 @@ html, body {
   --safe-right: 0px;
   
   /* Create Moment composer tokens */
-  --composer-height: 320px;
+  --composer-height: 370px;
   
   /* Brand accent tokens */
   --brand-orange-accent: 248 156 42; /* #f89c2a */
@@ -93,7 +93,7 @@ html, body {
 
 @media (min-width: 768px) {
   :root {
-    --composer-height: 380px;
+    --composer-height: 440px;
   }
 }
 
