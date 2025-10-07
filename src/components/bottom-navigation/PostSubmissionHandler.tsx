@@ -15,7 +15,8 @@ const PostSubmissionHandler: React.FC = () => {
     selectedCourse,
     setSelectedCourse,
     closeComposer,
-    showConfirmationToast
+    showConfirmationToast,
+    openComposerWithFiles
   } = useSnapModal();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -111,6 +112,7 @@ const PostSubmissionHandler: React.FC = () => {
       mediaItems={mediaItems}
       selectedCourse={selectedCourse}
       onCourseSelect={setSelectedCourse}
+      onAddFiles={openComposerWithFiles}
     />
   );
 };

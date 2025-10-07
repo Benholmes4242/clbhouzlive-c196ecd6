@@ -90,8 +90,8 @@ const GlobalBottomNavigation: React.FC = () => {
   // Handle tab clicks including camera action
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
-      // Open composer in empty state
-      openComposerWithFiles([]);
+      // Dispatch a global event so the single PostSubmissionHandler instance opens the composer
+      window.dispatchEvent(new CustomEvent('openComposer', { detail: { files: [] } }));
     } else {
       handleTabClick(tab);
     }

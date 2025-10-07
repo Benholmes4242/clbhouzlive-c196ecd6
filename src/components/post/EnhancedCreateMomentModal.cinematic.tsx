@@ -1,7 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
 import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Camera, Image as ImageIcon } from "lucide-react";
-import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
+import type { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
 import PostSuccessOverlay from './PostSuccessOverlay';
@@ -33,6 +33,7 @@ type Props = {
   mediaItems?: ComposerMediaItem[];
   selectedCourse?: any;
   onCourseSelect?: (course: any) => void;
+  onAddFiles?: (files: File[]) => void;
 };
 
 export default function EnhancedCreateMomentModalCinematic({ 
@@ -101,17 +102,13 @@ export default function EnhancedCreateMomentModalCinematic({
   const captionRef = useRef<HTMLDivElement>(null);
   const [mediaHeight, setMediaHeight] = useState<number | undefined>(undefined);
 
-  const {
-    caption,
-    setCaption,
-    selectedCourse: snapCourse,
-    setSelectedCourse,
-    openComposerWithFiles
-  } = useSnapModal();
+  // Local caption state
+  const [caption, setCaption] = useState<string>('');
+
 
   // Use the media items or files and course from props
   const files = mediaItems?.length > 0 ? mediaItems.map(item => item.file) : initialFiles;
-  const course = selectedCourse || snapCourse;
+  const course = selectedCourse;
 
   const canPost = useMemo(() => media?.length > 0 && !isSubmitting, [media, isSubmitting]);
 
@@ -244,7 +241,7 @@ export default function EnhancedCreateMomentModalCinematic({
       input.onchange = async (e) => {
         const files = Array.from((e.target as HTMLInputElement).files || []);
         if (files.length > 0) {
-          await openComposerWithFiles(files);
+          await onAddFiles?.(files);
         }
       };
       input.click();
@@ -262,7 +259,7 @@ export default function EnhancedCreateMomentModalCinematic({
       input.onchange = async (e) => {
         const files = Array.from((e.target as HTMLInputElement).files || []);
         if (files.length > 0) {
-          await openComposerWithFiles(files);
+          await onAddFiles?.(files);
         }
       };
       input.click();
