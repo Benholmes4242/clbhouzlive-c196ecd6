@@ -355,14 +355,12 @@ export default function EnhancedCreateMomentModalCinematic({
                         transition={{ duration: 0.25, ease: "easeOut" }}
                       >
                         <Camera 
-                          className="w-14 h-14 mx-auto mb-5 text-[#2c2c2c]/70" 
+                          className="w-20 h-20 mx-auto mb-5" 
                           strokeWidth={1.5}
                           aria-hidden="true"
+                          style={{ color: 'rgba(0,0,0,0.65)' }}
                         />
-                        <h2 className="text-[18px] font-semibold mb-3" style={{ color: '#2c2c2c', opacity: 0.85 }}>
-                          No media yet
-                        </h2>
-                        <p className="text-[15px] leading-relaxed" style={{ color: 'rgba(0,0,0,0.65)' }}>
+                        <p className="text-[17px] leading-relaxed" style={{ color: 'rgba(0,0,0,0.65)' }}>
                           Capture your next great golf moment – add a photo or video to share with the clbhouz community.
                         </p>
                       </motion.div>
@@ -503,20 +501,22 @@ export default function EnhancedCreateMomentModalCinematic({
                         >
                           <button
                             onClick={handlePickFromCamera}
-                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm hover:scale-[0.98] active:scale-95 focus:outline-none focus:ring-1 focus:ring-[rgba(255,156,64,0.4)] focus:border-[rgba(255,156,64,0.4)] shadow-[0_2px_6px_rgba(0,0,0,0.10)]"
+                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-[15px] hover:scale-[0.98] active:scale-95 focus:outline-none focus:ring-1 focus:ring-[rgba(255,156,64,0.4)] focus:border-[rgba(255,156,64,0.4)] shadow-[0_2px_6px_rgba(0,0,0,0.10)]"
                             aria-label="Open camera"
                           >
                             <div className="flex items-center gap-1.5">
-                              <span className="font-medium">📷 Camera</span>
+                              <span className="text-lg">📷</span>
+                              <span className="font-medium">Camera</span>
                             </div>
                           </button>
                           <button
                             onClick={handlePickFromLibrary}
-                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm hover:scale-[0.98] active:scale-95 focus:outline-none focus:ring-1 focus:ring-[rgba(255,156,64,0.4)] focus:border-[rgba(255,156,64,0.4)] shadow-[0_2px_6px_rgba(0,0,0,0.10)]"
+                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-[15px] hover:scale-[0.98] active:scale-95 focus:outline-none focus:ring-1 focus:ring-[rgba(255,156,64,0.4)] focus:border-[rgba(255,156,64,0.4)] shadow-[0_2px_6px_rgba(0,0,0,0.10)]"
                             aria-label="Choose photos and videos"
                           >
                             <div className="flex items-center gap-1.5">
-                              <span className="font-medium">✨ Photos & Videos</span>
+                              <span className="text-lg">✨</span>
+                              <span className="font-medium">Photos & Videos</span>
                             </div>
                           </button>
                         </motion.div>
