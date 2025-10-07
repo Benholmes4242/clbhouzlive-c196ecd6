@@ -128,7 +128,7 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
             className="absolute inset-0 flex items-center justify-center group"
           >
             <div className="rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] p-4 group-hover:bg-white/65 group-hover:shadow-[0_6px_18px_rgba(0,0,0,0.16)] transition-all">
-              <Play className="w-7 h-7 text-[rgba(25,25,28,0.85)] fill-[rgba(25,25,28,0.85)] ml-1" />
+              <Play className="w-6 h-6 text-[rgba(25,25,28,0.85)] fill-[rgba(25,25,28,0.85)] ml-1" />
             </div>
           </button>
         )}

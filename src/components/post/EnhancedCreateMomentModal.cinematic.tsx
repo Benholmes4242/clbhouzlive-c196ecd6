@@ -388,14 +388,14 @@ export default function EnhancedCreateMomentModalCinematic({
                   style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
                   aria-label="Close"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
 
                 {/* Video duration - bottom left, 8px from media bottom, frosted white */}
                 {media[activeIndex]?.type === 'video' && (
                   <div className="absolute bottom-[8px] left-4 z-20">
                     <div className="rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] text-xs px-3 py-1.5 flex items-center gap-1.5">
-                      <Play className="w-3 h-3" />
+                      <Play className="w-2.5 h-2.5" />
                       <span className="font-medium">00:09</span>
                     </div>
                   </div>
