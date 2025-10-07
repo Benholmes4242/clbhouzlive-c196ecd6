@@ -21,7 +21,7 @@ const Discover = () => {
   // Use vertical feed for consistency with Activity tab
   const USE_MODAL_DISCOVER = false; // using DiscoverVerticalFeed for consistency
   
-  const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.VIDEOS);
+  const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.SHORTS);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalStartIndex, setModalStartIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,15 +32,15 @@ const Discover = () => {
   // Sync activeFilter with URL state
   React.useEffect(() => {
     const mainToFilter: Record<string, string> = {
-      'friends': FILTER_TYPES.FRIENDS,
+      'shorts': FILTER_TYPES.SHORTS,
+      'channels': FILTER_TYPES.CHANNELS,
       'videos': FILTER_TYPES.VIDEOS,
       'photos': FILTER_TYPES.PHOTOS,
-      'trending': FILTER_TYPES.TRENDING,
+      'friends': FILTER_TYPES.FRIENDS,
       'verified-pros': FILTER_TYPES.VERIFIED_PROS,
-      'channels': FILTER_TYPES.CHANNELS,
       'hack-shack': FILTER_TYPES.HACK_SHACK,
     };
-    const newFilter = mainToFilter[main] || FILTER_TYPES.VIDEOS;
+    const newFilter = mainToFilter[main] || FILTER_TYPES.SHORTS;
     if (newFilter !== activeFilter) {
       setActiveFilter(newFilter);
       // Reset tags when switching main pill
@@ -54,7 +54,7 @@ const Discover = () => {
     loading, 
     hasMore, 
     loadMore 
-  } = useInfiniteExploreContent(activeFilter === FILTER_TYPES.TRENDING ? FILTER_TYPES.FRIENDS : activeFilter);
+  } = useInfiniteExploreContent(activeFilter);
 
   const { 
     isOpen: isFeedOpen, 

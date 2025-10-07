@@ -20,16 +20,16 @@ interface DiscoverContentProps {
 function getFilterTypeFromPills(main: string): string {
   // Map main pill to base filter type
   const mainToFilter: Record<string, string> = {
-    'friends': FILTER_TYPES.FRIENDS,
+    'shorts': FILTER_TYPES.SHORTS,
+    'channels': FILTER_TYPES.CHANNELS,
     'videos': FILTER_TYPES.VIDEOS,
     'photos': FILTER_TYPES.PHOTOS,
-    'trending': FILTER_TYPES.TRENDING,
+    'friends': FILTER_TYPES.FRIENDS,
     'verified-pros': FILTER_TYPES.VERIFIED_PROS,
-    'channels': FILTER_TYPES.CHANNELS,
     'hack-shack': FILTER_TYPES.HACK_SHACK,
   };
   
-  return mainToFilter[main] || FILTER_TYPES.VIDEOS;
+  return mainToFilter[main] || FILTER_TYPES.SHORTS;
 }
 
 
@@ -64,7 +64,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     loading, 
     hasMore, 
     loadMore 
-  } = useInfiniteExploreContent(filterType === FILTER_TYPES.TRENDING ? FILTER_TYPES.FRIENDS : filterType);
+  } = useInfiniteExploreContent(filterType);
 
   // Apply search filtering and tag filtering whenever content changes
   useEffect(() => {

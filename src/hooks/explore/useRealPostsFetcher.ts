@@ -156,6 +156,11 @@ export const useRealPostsFetcher = () => {
           return tracks[Math.floor(Math.random() * tracks.length)];
         };
 
+        // Generate duration (random for now - will need DB field for actual implementation)
+        const durationSeconds = primaryMedia.media_type === 'video' 
+          ? Math.floor(Math.random() * 180) + 10 // 10-190 seconds
+          : undefined;
+
         const formattedPost = {
           id: post.id,
           type: primaryMedia.media_type as 'video' | 'image',
@@ -164,7 +169,8 @@ export const useRealPostsFetcher = () => {
           likes: Math.floor(Math.random() * 500) + 50,
           comments: Math.floor(Math.random() * 100) + 5,
           shares: Math.floor(Math.random() * 50) + 1,
-          duration: primaryMedia.media_type === 'video' ? `${Math.floor(Math.random() * 180) + 30}s` : undefined,
+          duration: durationSeconds ? `${durationSeconds}s` : undefined,
+          durationSeconds, // Store numeric value for filtering
           user: {
             id: post.user_id,
             name: userProfile?.display_name || userProfile?.username || 'User',
@@ -220,8 +226,9 @@ export const useRealPostsFetcher = () => {
         .limit(postsPerPage);
 
       // Add media type filter if specified
-      if (mediaFilter === FILTER_TYPES.VIDEOS) {
+      if (mediaFilter === FILTER_TYPES.SHORTS || mediaFilter === FILTER_TYPES.VIDEOS) {
         query = query.eq('post_media.media_type', MEDIA_TYPES.VIDEO);
+        // Note: Shorts filtering (≤30s) happens client-side below until duration field is added to DB
       } else if (mediaFilter === FILTER_TYPES.PHOTOS) {
         query = query.eq('post_media.media_type', MEDIA_TYPES.IMAGE);
       }
@@ -317,6 +324,11 @@ export const useRealPostsFetcher = () => {
           return tracks[Math.floor(Math.random() * tracks.length)];
         };
 
+        // Generate duration (random for now - will need DB field for actual implementation)
+        const durationSeconds = primaryMedia.media_type === 'video' 
+          ? Math.floor(Math.random() * 180) + 10 // 10-190 seconds
+          : undefined;
+
         const formattedPost = {
           id: post.id,
           type: primaryMedia.media_type as 'video' | 'image',
@@ -325,7 +337,8 @@ export const useRealPostsFetcher = () => {
           likes: Math.floor(Math.random() * 500) + 50,
           comments: Math.floor(Math.random() * 100) + 5,
           shares: Math.floor(Math.random() * 50) + 1,
-          duration: primaryMedia.media_type === 'video' ? `${Math.floor(Math.random() * 180) + 30}s` : undefined,
+          duration: durationSeconds ? `${durationSeconds}s` : undefined,
+          durationSeconds, // Store numeric value for filtering
           user: {
             id: post.user_id,
             name: userProfile?.display_name || userProfile?.username || 'User',
@@ -342,6 +355,15 @@ export const useRealPostsFetcher = () => {
 
         return formattedPost;
       }).filter(Boolean) as ExploreContentItem[];
+
+      // Apply Shorts filter (≤30s) client-side until duration field is added to post_media table
+      if (mediaFilter === FILTER_TYPES.SHORTS) {
+        const shortsFiltered = formattedPosts.filter(post => {
+          // @ts-ignore - durationSeconds is temporary field until DB migration
+          return post.type === 'video' && post.durationSeconds && post.durationSeconds <= 30;
+        });
+        return shortsFiltered;
+      }
 
       return formattedPosts;
     } catch (error) {

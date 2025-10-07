@@ -46,18 +46,18 @@ const DiscoverPillRow: React.FC<DiscoverPillRowProps> = ({
     const iconProps = { className: "w-4 h-4", strokeWidth: 2 };
     
     switch (filter) {
-      case FILTER_TYPES.FRIENDS:
-        return <Users {...iconProps} />;
+      case FILTER_TYPES.SHORTS:
+        return <MdOutlinePlayCircle className="w-4 h-4" />;
+      case FILTER_TYPES.CHANNELS:
+        return <TvMinimalPlay {...iconProps} />;
       case FILTER_TYPES.VIDEOS:
         return <MdOutlinePlayCircle className="w-4 h-4" />;
       case FILTER_TYPES.PHOTOS:
         return <Camera {...iconProps} />;
-      case FILTER_TYPES.TRENDING:
-        return <IoFlameOutline className="w-4 h-4" />;
+      case FILTER_TYPES.FRIENDS:
+        return <Users {...iconProps} />;
       case FILTER_TYPES.VERIFIED_PROS:
         return <PiGolf className="w-4 h-4" />;
-      case FILTER_TYPES.CHANNELS:
-        return <TvMinimalPlay {...iconProps} />;
       case FILTER_TYPES.HACK_SHACK:
         return <Zap {...iconProps} />;
       case FILTER_TYPES.BRAIN_GAME:

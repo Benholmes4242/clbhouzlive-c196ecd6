@@ -8,6 +8,7 @@ export interface ExploreContentItem {
   comments?: number;
   shares?: number;
   duration?: string;
+  durationSeconds?: number; // Numeric duration for filtering (temporary until DB field added)
   user?: {
     id: string;
     name: string;
@@ -48,12 +49,12 @@ export interface CTAContentItem {
 
 // Filter constants for type safety
 export const FILTER_TYPES = {
-  FRIENDS: 'Friends',
+  SHORTS: 'Shorts',
+  CHANNELS: 'Channels',
   VIDEOS: 'Videos',
   PHOTOS: 'Photos',
-  TRENDING: 'Trending',
+  FRIENDS: 'Friends',
   VERIFIED_PROS: 'Verified Pros',
-  CHANNELS: 'Channels',
   HACK_SHACK: 'Hack Shack',
   BRAIN_GAME: 'Brain Game'
 } as const;
@@ -64,11 +65,11 @@ export const MEDIA_TYPES = {
 } as const;
 
 export const filterOptions = [
-  FILTER_TYPES.FRIENDS,
+  FILTER_TYPES.SHORTS,
+  FILTER_TYPES.CHANNELS,
   FILTER_TYPES.VIDEOS,
   FILTER_TYPES.PHOTOS,
-  FILTER_TYPES.TRENDING,
+  FILTER_TYPES.FRIENDS,
   FILTER_TYPES.VERIFIED_PROS,
-  FILTER_TYPES.CHANNELS,
   FILTER_TYPES.HACK_SHACK
 ];

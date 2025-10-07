@@ -44,18 +44,18 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
     const iconProps = { className: "w-5 h-5", strokeWidth: 2 };
     
     switch (filter) {
-      case FILTER_TYPES.FRIENDS:
-        return <Users {...iconProps} />;
+      case FILTER_TYPES.SHORTS:
+        return <MdOutlinePlayCircle className="w-5 h-5" />;
+      case FILTER_TYPES.CHANNELS:
+        return <TvMinimalPlay {...iconProps} />;
       case FILTER_TYPES.VIDEOS:
         return <MdOutlinePlayCircle className="w-5 h-5" />;
       case FILTER_TYPES.PHOTOS:
         return <Camera {...iconProps} />;
-      case FILTER_TYPES.TRENDING:
-        return <IoFlameOutline className="w-5 h-5" />;
+      case FILTER_TYPES.FRIENDS:
+        return <Users {...iconProps} />;
       case FILTER_TYPES.VERIFIED_PROS:
         return <PiGolf className="w-5 h-5" />;
-      case FILTER_TYPES.CHANNELS:
-        return <TvMinimalPlay {...iconProps} />;
       case FILTER_TYPES.HACK_SHACK:
         return <Zap {...iconProps} />;
       case FILTER_TYPES.BRAIN_GAME:

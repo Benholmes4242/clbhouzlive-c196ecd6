@@ -7,11 +7,11 @@ interface SegmentedControlProps {
 }
 
 const tabs = [
-  { id: 'Trending', label: 'Trending' },
-  { id: 'Friends', label: 'Friends' },
+  { id: 'Shorts', label: 'Shorts' },
+  { id: 'Channels', label: 'Channels' },
   { id: 'Videos', label: 'Videos' },
   { id: 'Photos', label: 'Photos' },
-  { id: 'Channels', label: 'Channels' }
+  { id: 'Friends', label: 'Friends' }
 ];
 
 const SegmentedControl: React.FC<SegmentedControlProps> = ({ 
