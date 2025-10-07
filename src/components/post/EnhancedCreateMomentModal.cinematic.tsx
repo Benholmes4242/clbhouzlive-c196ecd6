@@ -391,10 +391,10 @@ export default function EnhancedCreateMomentModalCinematic({
                   </div>
                 )}
 
-                {/* Video duration - bottom left if video */}
+                {/* Video duration - bottom left, 8px from media bottom, frosted white */}
                 {media[activeIndex]?.type === 'video' && (
-                  <div className="absolute bottom-6 left-4 z-20">
-                    <div className="rounded-full bg-black/45 text-white text-xs px-3 py-1.5 flex items-center gap-1.5 backdrop-blur-sm">
+                  <div className="absolute bottom-[8px] left-4 z-20">
+                    <div className="rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] text-xs px-3 py-1.5 flex items-center gap-1.5">
                       <Play className="w-3 h-3" />
                       <span className="font-medium">00:09</span>
                     </div>
