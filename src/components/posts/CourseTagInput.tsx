@@ -90,15 +90,15 @@ const CourseTagInput = ({
       {selectedCourse ? (
         // Show selected course pill that replaces the search input
         <div className="w-full h-11 flex items-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl text-sm h-full">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-zinc-200 text-zinc-900 rounded-xl text-sm h-full shadow-sm">
             <span className="text-lg -ml-1" role="img" aria-label="golf">⛳</span>
             <span className="font-medium">{selectedCourse.name}</span>
-            <span className="text-white/60 text-xs">
+            <span className="text-zinc-600 text-xs">
               {selectedCourse.region ? `${selectedCourse.region}, ${selectedCourse.country}` : selectedCourse.country}
             </span>
             <button
               onClick={handleRemoveCourse}
-              className="ml-1 hover:bg-white/10 rounded-full p-1 transition-colors duration-150 text-white/60 hover:text-white"
+              className="ml-1 hover:bg-zinc-100 rounded-full p-1 transition-colors duration-150 text-zinc-500 hover:text-zinc-700"
               title="Remove course"
             >
               <X className="h-3 w-3" />
@@ -116,19 +116,19 @@ const CourseTagInput = ({
             onFocus={handleInputFocus}
             onBlur={handleInputBlur}
             placeholder={placeholder}
-            className="w-full pr-10 pl-4 h-11 rounded-xl bg-black/20 backdrop-blur-md border border-white/20 text-white placeholder:text-white/60 outline-none"
+            className="w-full pr-10 pl-4 h-11 rounded-xl bg-white border border-zinc-200 text-zinc-900 placeholder:text-zinc-400 outline-none shadow-inner focus:ring-2 focus:ring-[rgb(var(--brand-orange-accent))]/30 focus:border-[rgb(var(--brand-orange-accent))]/40 transition-all duration-200"
           />
-          <MapPin className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
+          <MapPin className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
           {isLoading && searchQuery.length >= 2 && (
             <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
-              <Loader2 className="h-4 w-4 animate-spin text-white/60" />
+              <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />
             </div>
           )}
 
           {showSuggestions && suggestions.length > 0 && typeof window !== 'undefined' && (
             createPortal(
               <div 
-                className="fixed z-[70] max-h-[40vh] overflow-auto rounded-2xl bg-neutral-900/85 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] divide-y divide-white/8 pointer-events-auto"
+                className="fixed z-[70] max-h-[40vh] overflow-auto rounded-2xl bg-white border border-zinc-200 shadow-[0_8px_32px_rgba(0,0,0,0.15)] divide-y divide-zinc-100 pointer-events-auto"
                 style={{
                   top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + window.scrollY + 8 : 0,
                   left: inputRef.current ? inputRef.current.getBoundingClientRect().left + window.scrollX : 0,
@@ -139,17 +139,17 @@ const CourseTagInput = ({
                   {suggestions.map((course) => (
                     <div
                       key={course.id}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-white/8 cursor-pointer transition-colors duration-150"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-[rgb(var(--brand-orange-accent))]/5 cursor-pointer transition-colors duration-150"
                       onClick={() => handleCourseSelect(course)}
                     >
                       <div className="flex-shrink-0">
                         <span className="text-lg" role="img" aria-label="golf">⛳</span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-white text-sm leading-5 truncate">
+                        <div className="font-medium text-zinc-900 text-sm leading-5 truncate">
                           {course.name}
                         </div>
-                        <div className="text-xs text-white/60 mt-0.5">
+                        <div className="text-xs text-zinc-600 mt-0.5">
                           {course.region ? `${course.region}, ${course.country}` : course.country}
                         </div>
                       </div>

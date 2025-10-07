@@ -267,7 +267,7 @@ export default function EnhancedCreateMomentModalCinematic({
               {/* MEDIA STAGE - full-bleed, top-anchored */}
               <section 
                 id="media" 
-                className="absolute inset-x-0 top-0 overflow-hidden"
+                className="absolute inset-x-0 top-0 overflow-hidden rounded-b-none"
                 style={{ height: 'calc(100svh - var(--composer-height))' }}
               >
                 {/* Top scrim for badge readability */}
@@ -352,30 +352,11 @@ export default function EnhancedCreateMomentModalCinematic({
                   </div>
                 )}
 
-                {/* Navigation arrows - if multiple media */}
-                {canSlide && (
-                  <>
-                    <button
-                      onClick={prevMedia}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/35 text-white backdrop-blur-sm hover:bg-black/45 transition-all flex items-center justify-center"
-                      aria-label="Previous media"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={nextMedia}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/35 text-white backdrop-blur-sm hover:bg-black/45 transition-all flex items-center justify-center"
-                      aria-label="Next media"
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </>
-                )}
               </section>
 
               {/* COMPOSER PANEL - fixed height, bottom-anchored */}
               <section 
-                className="absolute bottom-0 left-0 right-0 backdrop-blur-md bg-white/75 supports-[backdrop-filter]:bg-white/60 border-t border-white/60 shadow-[0_10px_40px_rgba(0,0,0,0.15)] rounded-t-3xl"
+                className="absolute bottom-0 left-0 right-0 backdrop-blur-md bg-white/75 supports-[backdrop-filter]:bg-white/60 border-t border-white/60 shadow-[0_10px_40px_rgba(0,0,0,0.15)] rounded-t-none"
                 style={{ height: 'var(--composer-height)' }}
               >
                 <div 
@@ -388,8 +369,8 @@ export default function EnhancedCreateMomentModalCinematic({
                       onClick={() => setActiveCard('caption')}
                       className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                         activeCard === 'caption'
-                          ? 'bg-[#6e9277] text-white'
-                          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50'
+                          ? 'bg-white border-2 border-[rgb(var(--brand-orange-accent))] text-zinc-900'
+                          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
                       }`}
                     >
                       Caption
@@ -398,8 +379,8 @@ export default function EnhancedCreateMomentModalCinematic({
                       onClick={() => setActiveCard('course')}
                       className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                         activeCard === 'course'
-                          ? 'bg-[#6e9277] text-white'
-                          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50'
+                          ? 'bg-white border-2 border-[rgb(var(--brand-orange-accent))] text-zinc-900'
+                          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
                       }`}
                     >
                       Tag a course
@@ -408,8 +389,8 @@ export default function EnhancedCreateMomentModalCinematic({
                       onClick={() => setActiveCard('music')}
                       className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                         activeCard === 'music'
-                          ? 'bg-[#6e9277] text-white'
-                          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50'
+                          ? 'bg-white border-2 border-[rgb(var(--brand-orange-accent))] text-zinc-900'
+                          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
                       }`}
                     >
                       Add music
@@ -504,7 +485,7 @@ export default function EnhancedCreateMomentModalCinematic({
                   <button
                     disabled={!canPost}
                     onClick={handlePost}
-                    className="w-full h-12 rounded-2xl bg-[#f89c2a] text-white font-semibold transition-all duration-200 hover:brightness-[.96] active:scale-[.99] disabled:bg-zinc-200 disabled:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#f89c2a]/50"
+                    className="w-full h-12 rounded-2xl bg-white border-2 border-[rgb(var(--brand-orange-accent))] text-zinc-900 font-semibold shadow-sm transition-all duration-200 hover:bg-zinc-50 hover:shadow-md active:scale-[.99] disabled:bg-zinc-200 disabled:text-zinc-500 disabled:border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--brand-orange-accent))]/30"
                     aria-label="Post your moment"
                   >
                     {isSubmitting ? "Sharing..." : "Share"}

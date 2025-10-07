@@ -34,6 +34,9 @@ html, body {
   /* Create Moment composer tokens */
   --composer-height: 320px;
   
+  /* Brand accent tokens */
+  --brand-orange-accent: 248 156 42; /* #f89c2a */
+  
   /* Echo modal design tokens */
   --echo-header-h: 64px;
   --echo-tabs-h: 48px;
