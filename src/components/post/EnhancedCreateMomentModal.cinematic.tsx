@@ -344,7 +344,7 @@ export default function EnhancedCreateMomentModalCinematic({
                     /* Empty State Panel - Frosted White Gradient */
                     <button
                       onClick={handlePickFromLibrary}
-                      className="h-full w-full flex items-center justify-center bg-gradient-to-b from-white/85 to-white/65 backdrop-blur-[14px] cursor-pointer transition-all duration-200 hover:from-white/90 hover:to-white/70"
+                      className="h-full w-full flex items-center justify-center bg-white cursor-pointer transition-all duration-200 hover:bg-white/95"
                       role="button"
                       aria-label="Add media"
                     >
