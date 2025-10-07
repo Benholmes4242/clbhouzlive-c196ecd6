@@ -384,7 +384,7 @@ export default function EnhancedCreateMomentModalCinematic({
                 {/* Close button - top right, 8px from top */}
                 <button 
                   onClick={close}
-                  className="absolute right-4 z-20 w-10 h-10 rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] hover:bg-white/65 transition-all flex items-center justify-center"
+                  className="absolute right-4 z-20 w-8 h-8 rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] hover:bg-white/65 transition-all flex items-center justify-center"
                   style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
                   aria-label="Close"
                 >
