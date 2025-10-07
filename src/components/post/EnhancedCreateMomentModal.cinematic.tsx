@@ -402,9 +402,9 @@ export default function EnhancedCreateMomentModalCinematic({
                           className="w-20 h-20 mx-auto mb-5" 
                           strokeWidth={1.5}
                           aria-hidden="true"
-                          style={{ color: 'rgba(0,0,0,0.65)' }}
+                          style={{ color: 'white' }}
                         />
-                        <p className="text-[17px] leading-relaxed" style={{ color: 'rgba(0,0,0,0.65)' }}>
+                        <p className="text-[17px] leading-relaxed text-white">
                           Capture your next great golf moment – add a photo or video to share with the clbhouz community.
                         </p>
                       </motion.div>
@@ -542,7 +542,7 @@ export default function EnhancedCreateMomentModalCinematic({
                       }}
                     >
                       <div className="flex items-center justify-between mb-3">
-                        <label className="block text-base font-semibold text-zinc-900">Add a caption</label>
+                        <label className="block text-base font-semibold text-white">Add a caption</label>
                         <motion.div 
                           className="flex gap-2"
                           initial={{ opacity: 0, scale: 1.03 }}

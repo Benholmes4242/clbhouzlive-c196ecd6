@@ -1,7 +1,7 @@
 :root {
   /* Liquid Glass effect - semi-transparent with blur */
   --ecm-glass-bg: rgba(110, 146, 119, 0.15);
-  --ecm-glass-blur: 20px;
+  --ecm-glass-blur: 32px;
   --ecm-glass-saturate: 180%;
   --ecm-glass-border: rgba(255, 255, 255, 0.3);
   --ecm-inner-glow: rgba(255, 255, 255, 0.15);
