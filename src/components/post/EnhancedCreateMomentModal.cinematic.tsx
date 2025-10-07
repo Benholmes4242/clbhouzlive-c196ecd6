@@ -236,20 +236,20 @@ export default function EnhancedCreateMomentModalCinematic({
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* backdrop - white frosted */}
+          {/* backdrop - subtle dark */}
           <div 
-            className="absolute inset-0 bg-white/20 backdrop-blur-md" 
+            className="absolute inset-0 bg-black/35 backdrop-blur-[8px]" 
             onClick={close}
           />
 
-          {/* shell - white frosted glassmorphism */}
-          <div className="absolute inset-0 flex items-center justify-center py-16 px-6" onClick={close}>
+          {/* modal shell - full screen on mobile, centered on desktop */}
+          <div className="absolute inset-0 flex items-center justify-center" onClick={close}>
             <motion.div
               ref={wrapperRef}
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-md h-[calc(100vh-4rem)] bg-white/40 backdrop-blur-md border border-white/30 rounded-3xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] text-white overflow-visible"
+              className="relative w-full max-w-md h-[100svh] md:h-[90vh] md:rounded-3xl overflow-hidden bg-black"
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { y: 12, opacity: 0, scale: 0.98 }}
@@ -264,68 +264,163 @@ export default function EnhancedCreateMomentModalCinematic({
               }
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex h-full flex-col overflow-visible">
-                {/* MEDIA SECTION - reduced to ~65% of modal height */}
-                <section id="media" className="relative flex-[0.65] -mx-2 -mt-6 rounded-t-3xl overflow-hidden">{/* Reduced from flex-1 to flex-[0.65] */}
-                  <motion.div
-                    initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
-                    animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-                    transition={prefersReducedMotion ? 
-                      { delay: 0.05, duration: 0.15 } : 
-                      { 
-                        delay: 0.1, 
-                        duration: 0.3,
-                        staggerChildren: 0.04
-                      }
+              {/* MEDIA STAGE - full-bleed, top-anchored */}
+              <section 
+                id="media" 
+                className="absolute inset-x-0 top-0 overflow-hidden"
+                style={{ height: 'calc(100svh - var(--composer-height))' }}
+              >
+                {/* Top scrim for badge readability */}
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/28 to-transparent z-10" 
+                  style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+                />
+
+                {/* Bottom scrim for controls */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/18 to-transparent z-10" />
+
+                <motion.div
+                  initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
+                  animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+                  transition={prefersReducedMotion ? 
+                    { delay: 0.05, duration: 0.15 } : 
+                    { 
+                      delay: 0.1, 
+                      duration: 0.3,
+                      staggerChildren: 0.04
                     }
+                  }
+                  className="h-full w-full"
+                >
+                  <MediaCarousel
+                    items={media.map((item, index) => ({
+                      id: item.id,
+                      type: item.type,
+                      previewUrl: item.previewUrl,
+                      url: item.url,
+                      file: item.file,
+                      alt: `Media item ${item.id}`
+                    }))}
+                    initialIndex={0}
+                    onIndexChange={setActiveIndex}
+                    onSetCover={setCoverIndex}
+                    coverIndex={coverIndex}
+                    enableSwipe
+                    loop={false}
                     className="h-full w-full"
+                  />
+                </motion.div>
+
+                {/* Close button - top right */}
+                <button 
+                  onClick={close}
+                  className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/35 text-white backdrop-blur-sm hover:bg-black/45 transition-all flex items-center justify-center"
+                  style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+
+                {/* Media counter - top left */}
+                <div 
+                  className="absolute top-4 left-4 z-20"
+                  style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
+                >
+                  <div className="rounded-full bg-black/45 text-white text-xs px-3 py-1.5 flex items-center gap-1 backdrop-blur-sm">
+                    <span className="font-medium">{activeIndex + 1}/{media.length}</span>
+                  </div>
+                </div>
+
+                {/* Cover badge - near counter */}
+                {coverIndex === activeIndex && (
+                  <div 
+                    className="absolute top-4 left-20 z-20"
+                    style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
                   >
-                    <MediaCarousel
-                      items={media.map((item, index) => ({
-                        id: item.id,
-                        type: item.type,
-                        previewUrl: item.previewUrl,
-                        url: item.url,
-                        file: item.file,
-                        alt: `Media item ${item.id}`
-                      }))}
-                      initialIndex={0}
-                      onIndexChange={setActiveIndex}
-                      onSetCover={setCoverIndex}
-                      coverIndex={coverIndex}
-                      enableSwipe
-                      loop={false}
-                      className="h-full w-full"
-                    />
-                  </motion.div>
-
-
-                  {/* Video duration pill - aligned with media counter */}
-                  {media[activeIndex]?.type === 'video' && (
-                    <div className="absolute bottom-6 left-2">
-                      <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
-                        <span>00:09</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Media counter - positioned on the left */}
-                  <div className="absolute top-2 left-2">
-                    <div className="rounded-full bg-black/50 text-white text-xs px-2 py-0.5 flex items-center gap-1 backdrop-blur-sm">
-                      <span>{activeIndex + 1}/{media.length}</span>
+                    <div className="rounded-full bg-black/45 text-white text-xs px-3 py-1.5 backdrop-blur-sm font-medium">
+                      Cover
                     </div>
                   </div>
+                )}
 
-                </section>
+                {/* Video duration - bottom left if video */}
+                {media[activeIndex]?.type === 'video' && (
+                  <div className="absolute bottom-6 left-4 z-20">
+                    <div className="rounded-full bg-black/45 text-white text-xs px-3 py-1.5 flex items-center gap-1.5 backdrop-blur-sm">
+                      <Play className="w-3 h-3" />
+                      <span className="font-medium">00:09</span>
+                    </div>
+                  </div>
+                )}
 
-                {/* CONTROLS SECTION - expanded bottom area with taller caption */}
-                <section className="flex-[0.35] px-6 pb-6 pt-4 space-y-3">
-                  {/* SLIDING CARDS CONTAINER - taller for better caption area */}
-                  <div className="relative h-[160px] overflow-hidden">{/* Increased from 120px to 160px */}
+                {/* Navigation arrows - if multiple media */}
+                {canSlide && (
+                  <>
+                    <button
+                      onClick={prevMedia}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/35 text-white backdrop-blur-sm hover:bg-black/45 transition-all flex items-center justify-center"
+                      aria-label="Previous media"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={nextMedia}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/35 text-white backdrop-blur-sm hover:bg-black/45 transition-all flex items-center justify-center"
+                      aria-label="Next media"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
+              </section>
+
+              {/* COMPOSER PANEL - fixed height, bottom-anchored */}
+              <section 
+                className="absolute bottom-0 left-0 right-0 backdrop-blur-md bg-white/75 supports-[backdrop-filter]:bg-white/60 border-t border-white/60 shadow-[0_10px_40px_rgba(0,0,0,0.15)] rounded-t-3xl"
+                style={{ height: 'var(--composer-height)' }}
+              >
+                <div 
+                  className="flex h-full flex-col px-4 pt-4 gap-4"
+                  style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
+                >
+                  {/* Tab chips */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setActiveCard('caption')}
+                      className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        activeCard === 'caption'
+                          ? 'bg-[#6e9277] text-white'
+                          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50'
+                      }`}
+                    >
+                      Caption
+                    </button>
+                    <button
+                      onClick={() => setActiveCard('course')}
+                      className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        activeCard === 'course'
+                          ? 'bg-[#6e9277] text-white'
+                          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50'
+                      }`}
+                    >
+                      Tag a course
+                    </button>
+                    <button
+                      onClick={() => setActiveCard('music')}
+                      className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        activeCard === 'music'
+                          ? 'bg-[#6e9277] text-white'
+                          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50'
+                      }`}
+                    >
+                      Add music
+                    </button>
+                  </div>
+
+                  {/* Sliding cards container */}
+                  <div className="relative flex-1 overflow-hidden">
                     {/* CAPTION CARD */}
                     <motion.div
-                      ref={captionRef}
-                      className="absolute inset-0 w-full p-3 pt-2 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+                      className="absolute inset-0 w-full flex flex-col"
                       initial={{ x: 0 }}
                       animate={{ 
                         x: activeCard === 'caption' ? 0 : '-100%',
@@ -337,12 +432,12 @@ export default function EnhancedCreateMomentModalCinematic({
                         damping: 30
                       }}
                     >
-                      <div className="flex items-center justify-between mb-3">{/* Increased bottom margin */}
-                        <label className="block text-base font-semibold text-white">Add a caption</label>
+                      <div className="flex items-center justify-between mb-3">
+                        <label className="block text-base font-semibold text-zinc-900">Add a caption</label>
                         <button
                           onClick={handleAICaption}
                           disabled={aiLoading || media.length === 0}
-                          className="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full shrink-0 transition-all duration-200 text-sm disabled:opacity-50 text-white border border-white/20 hover:border-white/30 active:scale-95 focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+                          className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm disabled:opacity-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
                           aria-label="Write a caption for me"
                         >
                           {aiLoading ? <StarsLoading /> : (
@@ -354,21 +449,17 @@ export default function EnhancedCreateMomentModalCinematic({
                         </button>
                       </div>
                       
-                       <div className="flex flex-col gap-2 h-full pb-3">{/* Added pb-3 for bottom padding */}
-                         <textarea
-                           className="w-full bg-transparent outline-none resize-none placeholder-white/50 text-white h-[80px] overflow-y-auto border border-white/20 rounded-lg px-3 py-2 focus:border-brand-orange/50 focus:ring-1 focus:ring-brand-orange/30 transition-all duration-200"
-                           placeholder="Write a caption…"
-                           value={caption}
-                           onChange={(e) => {
-                             setCaption(e.target.value);
-                           }}
-                         />
-                       </div>
+                      <textarea
+                        className="flex-1 w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 text-[15px] leading-snug resize-none placeholder:text-zinc-400 text-zinc-900 focus:ring-2 focus:ring-[#6e9277]/30 focus:border-[#6e9277]/40 transition-all duration-200 outline-none"
+                        placeholder="Write a caption…"
+                        value={caption}
+                        onChange={(e) => setCaption(e.target.value)}
+                      />
                     </motion.div>
 
                     {/* COURSE CARD */}
                     <motion.div
-                      className="absolute inset-0 w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+                      className="absolute inset-0 w-full"
                       initial={{ x: '100%' }}
                       animate={{ 
                         x: activeCard === 'course' ? 0 : '100%',
@@ -388,7 +479,7 @@ export default function EnhancedCreateMomentModalCinematic({
 
                     {/* MUSIC CARD */}
                     <motion.div
-                      className="absolute inset-0 w-full p-4 rounded-2xl backdrop-filter backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-orange/30 transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50"
+                      className="absolute inset-0 w-full"
                       initial={{ x: '100%' }}
                       animate={{ 
                         x: activeCard === 'music' ? 0 : '100%',
@@ -402,7 +493,6 @@ export default function EnhancedCreateMomentModalCinematic({
                     >
                       <BackgroundMusicSelector 
                         onMusicSelect={(music) => {
-                          // Handle music selection
                           console.log('Selected music:', music);
                         }}
                         hasVideo={media.some(item => item.type === 'video')}
@@ -410,64 +500,17 @@ export default function EnhancedCreateMomentModalCinematic({
                     </motion.div>
                   </div>
 
-                  {/* PILL BUTTONS */}
-                  <div className="flex justify-between w-full">
-                    <button
-                      onClick={() => setActiveCard('caption')}
-                      className={`flex-1 mr-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
-                        activeCard === 'caption'
-                          ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/40'
-                          : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
-                      }`}
-                    >
-                      Caption
-                    </button>
-                    <button
-                      onClick={() => setActiveCard('course')}
-                      className={`flex-1 mx-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
-                        activeCard === 'course'
-                          ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/40'
-                          : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
-                      }`}
-                    >
-                      Tag a course
-                    </button>
-                    <button
-                      onClick={() => setActiveCard('music')}
-                      className={`flex-1 ml-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
-                        activeCard === 'music'
-                          ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/40'
-                          : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
-                      }`}
-                    >
-                      Add music
-                    </button>
-                  </div>
-
-                  {/* POST BUTTON */}
-                  <motion.div
-                    className="mt-4 pt-4 border-t border-white/10"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
+                  {/* Primary Share button */}
+                  <button
+                    disabled={!canPost}
+                    onClick={handlePost}
+                    className="w-full h-12 rounded-2xl bg-[#f89c2a] text-white font-semibold transition-all duration-200 hover:brightness-[.96] active:scale-[.99] disabled:bg-zinc-200 disabled:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#f89c2a]/50"
+                    aria-label="Post your moment"
                   >
-                    <motion.button
-                      disabled={!canPost}
-                      onClick={handlePost}
-                      className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-brand-orange/10 to-brand-orange/5 hover:from-brand-orange/20 hover:to-brand-orange/10 border border-brand-orange/20 hover:border-brand-orange/40 transition-all duration-200 group min-h-[44px] focus:outline-none focus:ring-2 focus:ring-brand-orange/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                      whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
-                      whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
-                      aria-label="Post your moment"
-                    >
-                      <div className="flex items-center justify-center gap-2">
-                        <span className="text-sm font-medium text-brand-orange">
-                          {isSubmitting ? "Sharing..." : "Share"}
-                        </span>
-                      </div>
-                    </motion.button>
-                  </motion.div>
-                </section>
-              </div>
+                    {isSubmitting ? "Sharing..." : "Share"}
+                  </button>
+                </div>
+              </section>
             </motion.div>
           </div>
 

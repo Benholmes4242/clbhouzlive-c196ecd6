@@ -31,6 +31,9 @@ html, body {
   --safe-left: 0px; 
   --safe-right: 0px;
   
+  /* Create Moment composer tokens */
+  --composer-height: 320px;
+  
   /* Echo modal design tokens */
   --echo-header-h: 64px;
   --echo-tabs-h: 48px;
@@ -83,6 +86,12 @@ html, body {
 
   --kbd-bg: rgba(17,24,39,.06);
   --kbd-fg: #111827;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --composer-height: 380px;
+  }
 }
 
 /* Bubble appear animation */
