@@ -53,7 +53,7 @@ type SnapState = {
 
 export const useSnapModal = () => {
   const captionInputRef = useRef<HTMLDivElement>(null);
-  const { setSnapModalOpen, setCreateMomentModalOpen } = useModalContext();
+  const { setCreateMomentModalOpen } = useModalContext();
   const [isSnapModalOpen, setIsSnapModalOpen] = useState(false);
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   
@@ -147,7 +147,6 @@ export const useSnapModal = () => {
       // Close SnapModal after everything processes
       console.log('[composer] closing snap modal');
       setIsSnapModalOpen(false);
-      setSnapModalOpen(false); // Also update context
     }
   };
 

@@ -14,28 +14,12 @@ interface BottomNavigationProps {
 const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default' }) => {
   const { activeTab, handleTabClick } = useNavigationHandlers();
   
-  // Snap modal state management
   const {
-    isComposerOpen,
-    mediaItems,
-    selectedFile, // Keep for backward compatibility
-    isSubmitting,
+    openComposerWithFiles,
     showToast,
     toastMessage,
-    selectedCourse,
-    setSelectedCourse,
-    openComposerWithFiles,
-    closeComposer,
-    showConfirmationToast,
     hideToast
   } = useSnapModal();
-
-  // Register modal states with the modal detector
-  useModalState(isComposerOpen);
-
-  const handleCloseComposer = () => {
-    closeComposer();
-  };
 
   // Handle tab clicks including camera action
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
@@ -56,18 +40,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
         variant={variant}
       />
 
-      <PostSubmissionHandler
-        isComposerOpen={isComposerOpen}
-        mediaItems={mediaItems}
-        selectedFile={selectedFile}
-        selectedCourse={selectedCourse}
-        onCourseSelect={setSelectedCourse}
-        onClose={handleCloseComposer}
-        onShowToast={showConfirmationToast}
-        isSubmitting={isSubmitting}
-        setIsSubmitting={() => {}}
-        onAddMedia={openComposerWithFiles}
-      />
+      <PostSubmissionHandler />
 
       <SnapToast
         message={toastMessage}
