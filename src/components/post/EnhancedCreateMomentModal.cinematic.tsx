@@ -445,7 +445,7 @@ export default function EnhancedCreateMomentModalCinematic({
                   <div className="flex gap-2">
                     <button
                       onClick={() => setActiveCard('caption')}
-                      className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      className={`flex-1 px-3 py-2 rounded-xl text-base font-medium transition-all duration-200 ${
                         activeCard === 'caption'
                           ? 'bg-white border border-[rgba(255,156,64,0.35)] shadow-[0_1px_6px_rgba(0,0,0,0.06)] text-zinc-900'
                           : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
@@ -455,7 +455,7 @@ export default function EnhancedCreateMomentModalCinematic({
                     </button>
                     <button
                       onClick={() => setActiveCard('course')}
-                      className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      className={`flex-1 px-3 py-2 rounded-xl text-base font-medium transition-all duration-200 ${
                         activeCard === 'course'
                           ? 'bg-white border border-[rgba(255,156,64,0.35)] shadow-[0_1px_6px_rgba(0,0,0,0.06)] text-zinc-900'
                           : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
@@ -465,7 +465,7 @@ export default function EnhancedCreateMomentModalCinematic({
                     </button>
                     <button
                       onClick={() => setActiveCard('music')}
-                      className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      className={`flex-1 px-3 py-2 rounded-xl text-base font-medium transition-all duration-200 ${
                         activeCard === 'music'
                           ? 'bg-white border border-[rgba(255,156,64,0.35)] shadow-[0_1px_6px_rgba(0,0,0,0.06)] text-zinc-900'
                           : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
