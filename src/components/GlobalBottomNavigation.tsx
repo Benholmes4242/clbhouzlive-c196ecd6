@@ -47,6 +47,7 @@ const GlobalBottomNavigation: React.FC = () => {
     captionInputRef,
     isComposerOpen,
     mediaItems,
+    setMediaItems,
     selectedFile,
     caption,
     setCaption,
@@ -187,6 +188,7 @@ const GlobalBottomNavigation: React.FC = () => {
         onShowToast={showConfirmationToast}
         isSubmitting={isSubmitting}
         setIsSubmitting={() => {}}
+        onMediaChange={setMediaItems}
       />
 
       {/* Snap Toast */}

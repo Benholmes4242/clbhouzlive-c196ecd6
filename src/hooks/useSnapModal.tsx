@@ -182,6 +182,7 @@ export const useSnapModal = () => {
     captionInputRef,
     isComposerOpen,
     mediaItems,
+    setMediaItems,
     caption,
     setCaption,
     selectedCourse,

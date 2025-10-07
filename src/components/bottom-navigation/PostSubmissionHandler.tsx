@@ -17,6 +17,7 @@ interface PostSubmissionHandlerProps {
   onShowToast: (message: string) => void;
   isSubmitting: boolean;
   setIsSubmitting: (submitting: boolean) => void;
+  onMediaChange?: (items: ComposerMediaItem[]) => void;
 }
 
 const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
@@ -28,7 +29,8 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
   onClose,
   onShowToast,
   isSubmitting,
-  setIsSubmitting
+  setIsSubmitting,
+  onMediaChange
 }) => {
   const { user } = useSupabaseSession();
   const { submitPost } = useOptimisticPostSubmission();
@@ -122,6 +124,7 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
       mediaItems={mediaItems}
       selectedCourse={selectedCourse}
       onCourseSelect={onCourseSelect}
+      onMediaChange={onMediaChange}
     />
   );
 };

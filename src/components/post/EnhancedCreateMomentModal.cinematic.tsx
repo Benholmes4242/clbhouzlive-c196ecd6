@@ -35,6 +35,7 @@ type Props = {
   mediaItems?: ComposerMediaItem[];
   selectedCourse?: any;
   onCourseSelect?: (course: any) => void;
+  onMediaChange?: (items: ComposerMediaItem[]) => void;
 };
 
 export default function EnhancedCreateMomentModalCinematic({ 
@@ -46,7 +47,8 @@ export default function EnhancedCreateMomentModalCinematic({
   initialFiles = [],
   mediaItems = [],
   selectedCourse,
-  onCourseSelect
+  onCourseSelect,
+  onMediaChange
 }: Props) {
   const { setCreateMomentModalOpen } = useModalContext();
   const [aiLoading, setAiLoading] = useState(false);
@@ -221,8 +223,10 @@ export default function EnhancedCreateMomentModalCinematic({
 
     input.addEventListener('change', async () => {
       const files = Array.from(input.files ?? []);
-      if (files.length > 0 && openComposerWithFiles) {
-        openComposerWithFiles(files);
+      if (files.length > 0) {
+        const newItems = await normalizeFilesToMediaItems(files);
+        const combined = [...media, ...newItems].slice(0, 10); // Max 10 media items
+        onMediaChange?.(combined);
       }
       document.body.removeChild(input);
     });
@@ -233,10 +237,12 @@ export default function EnhancedCreateMomentModalCinematic({
   // Photo/Video library picker handler
   const handlePickFromLibrary = () => {
     openMediaPicker(async (files) => {
-      if (files.length > 0 && openComposerWithFiles) {
-        openComposerWithFiles(files);
+      if (files.length > 0) {
+        const newItems = await normalizeFilesToMediaItems(files);
+        const combined = [...media, ...newItems].slice(0, 10); // Max 10 media items
+        onMediaChange?.(combined);
       }
-    }, 5);
+    }, 10);
   };
 
   const handlePost = async () => {

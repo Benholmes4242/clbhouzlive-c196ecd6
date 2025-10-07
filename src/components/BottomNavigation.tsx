@@ -22,6 +22,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
     captionInputRef,
     isComposerOpen,
     mediaItems,
+    setMediaItems,
     selectedFile,
     caption,
     setCaption,
@@ -77,6 +78,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
         onShowToast={showConfirmationToast}
         isSubmitting={isSubmitting}
         setIsSubmitting={() => {}}
+        onMediaChange={setMediaItems}
       />
 
       <SnapToast

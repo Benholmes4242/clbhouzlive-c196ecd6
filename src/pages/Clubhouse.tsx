@@ -31,6 +31,7 @@ const Clubhouse = () => {
   const {
     isComposerOpen,
     mediaItems,
+    setMediaItems,
     selectedFile,
     caption,
     setCaption,
@@ -130,6 +131,7 @@ const Clubhouse = () => {
         onShowToast={showConfirmationToast}
         isSubmitting={isSubmitting}
         setIsSubmitting={() => {}}
+        onMediaChange={setMediaItems}
       />
 
       <SnapToast
