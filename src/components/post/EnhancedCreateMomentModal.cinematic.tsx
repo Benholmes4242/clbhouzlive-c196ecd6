@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
-import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Camera, Images } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play } from "lucide-react";
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
@@ -470,8 +470,7 @@ export default function EnhancedCreateMomentModalCinematic({
                             aria-label="Camera"
                           >
                             <div className="flex items-center gap-1.5">
-                              <Camera className="h-3.5 w-3.5" />
-                              <span className="font-medium">Camera</span>
+                              <span className="font-medium">📷 Camera</span>
                             </div>
                           </button>
                           <button
@@ -480,8 +479,7 @@ export default function EnhancedCreateMomentModalCinematic({
                             aria-label="Photos & Videos"
                           >
                             <div className="flex items-center gap-1.5">
-                              <Images className="h-3.5 w-3.5" />
-                              <span className="font-medium">Photos & Videos</span>
+                              <span className="font-medium">✨ Photos & Videos</span>
                             </div>
                           </button>
                         </div>
