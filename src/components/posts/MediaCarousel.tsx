@@ -181,7 +181,7 @@ const MediaCarousel = ({
   return (
     <div 
       ref={containerRef}
-      className={`relative w-full aspect-video overflow-hidden rounded-2xl ${className}`}
+      className={`relative w-full aspect-video overflow-hidden ${className}`}
       style={{ touchAction: 'pan-y' }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -209,28 +209,28 @@ const MediaCarousel = ({
             onClick={handlePrevious}
             disabled={!loop && activeIndex === 0}
             className="absolute left-3 top-1/2 -translate-y-1/2 z-20 
-                     h-10 w-10 rounded-full bg-white/12 backdrop-blur-md 
-                     border border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)]
-                     flex items-center justify-center hover:bg-white/18 
+                     h-10 w-10 rounded-full bg-white/55 backdrop-blur-[10px] 
+                     border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)]
+                     flex items-center justify-center hover:bg-white/65 hover:shadow-[0_6px_18px_rgba(0,0,0,0.16)]
                      active:scale-[0.98] transition-all
                      disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Previous media"
           >
-            <ChevronLeft className="h-5 w-5 text-white" />
+            <ChevronLeft className="h-5 w-5 text-[rgba(25,25,28,0.85)]" />
           </button>
 
           <button
             onClick={handleNext}
             disabled={!loop && activeIndex === items.length - 1}
             className="absolute right-3 top-1/2 -translate-y-1/2 z-20 
-                     h-10 w-10 rounded-full bg-white/12 backdrop-blur-md 
-                     border border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.35)]
-                     flex items-center justify-center hover:bg-white/18 
+                     h-10 w-10 rounded-full bg-white/55 backdrop-blur-[10px] 
+                     border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)]
+                     flex items-center justify-center hover:bg-white/65 hover:shadow-[0_6px_18px_rgba(0,0,0,0.16)]
                      active:scale-[0.98] transition-all
                      disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Next media"
           >
-            <ChevronRight className="h-5 w-5 text-white" />
+            <ChevronRight className="h-5 w-5 text-[rgba(25,25,28,0.85)]" />
           </button>
         </>
       )}

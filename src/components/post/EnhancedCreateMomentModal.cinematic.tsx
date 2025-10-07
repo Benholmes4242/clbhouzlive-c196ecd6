@@ -267,7 +267,7 @@ export default function EnhancedCreateMomentModalCinematic({
               {/* MEDIA STAGE - full-bleed, top-anchored */}
               <section 
                 id="media" 
-                className="absolute inset-x-0 top-0 overflow-hidden rounded-b-none"
+                className="absolute inset-x-0 top-0 overflow-hidden"
                 style={{ height: 'calc(100svh - var(--composer-height))' }}
               >
                 {/* Top scrim for badge readability */}
@@ -369,7 +369,7 @@ export default function EnhancedCreateMomentModalCinematic({
                       onClick={() => setActiveCard('caption')}
                       className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                         activeCard === 'caption'
-                          ? 'bg-white border-2 border-[rgb(var(--brand-orange-accent))] text-zinc-900'
+                          ? 'bg-white border border-[rgba(255,156,64,0.35)] shadow-[0_1px_6px_rgba(0,0,0,0.06)] text-zinc-900'
                           : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
                       }`}
                     >
@@ -379,7 +379,7 @@ export default function EnhancedCreateMomentModalCinematic({
                       onClick={() => setActiveCard('course')}
                       className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                         activeCard === 'course'
-                          ? 'bg-white border-2 border-[rgb(var(--brand-orange-accent))] text-zinc-900'
+                          ? 'bg-white border border-[rgba(255,156,64,0.35)] shadow-[0_1px_6px_rgba(0,0,0,0.06)] text-zinc-900'
                           : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
                       }`}
                     >
@@ -389,7 +389,7 @@ export default function EnhancedCreateMomentModalCinematic({
                       onClick={() => setActiveCard('music')}
                       className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                         activeCard === 'music'
-                          ? 'bg-white border-2 border-[rgb(var(--brand-orange-accent))] text-zinc-900'
+                          ? 'bg-white border border-[rgba(255,156,64,0.35)] shadow-[0_1px_6px_rgba(0,0,0,0.06)] text-zinc-900'
                           : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
                       }`}
                     >
@@ -431,7 +431,7 @@ export default function EnhancedCreateMomentModalCinematic({
                       </div>
                       
                       <textarea
-                        className="flex-1 w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 text-[15px] leading-snug resize-none placeholder:text-zinc-400 text-zinc-900 focus:ring-2 focus:ring-[#6e9277]/30 focus:border-[#6e9277]/40 transition-all duration-200 outline-none"
+                        className="flex-1 w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 text-[15px] leading-snug resize-none placeholder:text-zinc-400 text-zinc-900 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)] transition-all duration-200"
                         placeholder="Write a caption…"
                         value={caption}
                         onChange={(e) => setCaption(e.target.value)}
@@ -485,7 +485,7 @@ export default function EnhancedCreateMomentModalCinematic({
                   <button
                     disabled={!canPost}
                     onClick={handlePost}
-                    className="w-full h-12 rounded-2xl bg-white border-2 border-[rgb(var(--brand-orange-accent))] text-zinc-900 font-semibold shadow-sm transition-all duration-200 hover:bg-zinc-50 hover:shadow-md active:scale-[.99] disabled:bg-zinc-200 disabled:text-zinc-500 disabled:border-zinc-300 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--brand-orange-accent))]/30"
+                    className="w-full h-12 rounded-2xl bg-white border border-[rgba(255,156,64,0.35)] shadow-sm text-zinc-900 font-semibold transition-all duration-200 hover:bg-zinc-50 hover:border-[rgba(255,156,64,0.5)] active:scale-[.99] disabled:bg-zinc-200 disabled:text-zinc-500 disabled:border-zinc-300 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)]"
                     aria-label="Post your moment"
                   >
                     {isSubmitting ? "Sharing..." : "Share"}
