@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 
 interface ModalContextType {
+  isSnapModalOpen: boolean;
   isCreateMomentModalOpen: boolean;
+  setSnapModalOpen: (open: boolean) => void;
   setCreateMomentModalOpen: (open: boolean) => void;
   shouldHideHeader: boolean;
   shouldHideBottomNav: boolean;
@@ -22,10 +24,15 @@ interface ModalProviderProps {
 }
 
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
+  const [isSnapModalOpen, setIsSnapModalOpen] = useState(false);
   const [isCreateMomentModalOpen, setIsCreateMomentModalOpen] = useState(false);
 
-  const shouldHideHeader = isCreateMomentModalOpen;
-  const shouldHideBottomNav = isCreateMomentModalOpen;
+  const shouldHideHeader = isSnapModalOpen || isCreateMomentModalOpen;
+  const shouldHideBottomNav = isSnapModalOpen || isCreateMomentModalOpen;
+
+  const setSnapModalOpen = useCallback((open: boolean) => {
+    setIsSnapModalOpen(open);
+  }, []);
 
   const setCreateMomentModalOpen = useCallback((open: boolean) => {
     setIsCreateMomentModalOpen(open);
@@ -34,7 +41,9 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   return (
     <ModalContext.Provider
       value={{
+        isSnapModalOpen,
         isCreateMomentModalOpen,
+        setSnapModalOpen,
         setCreateMomentModalOpen,
         shouldHideHeader,
         shouldHideBottomNav,

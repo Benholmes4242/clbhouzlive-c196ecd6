@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSnapModal } from '@/hooks/useSnapModal';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useModalState } from '@/hooks/useModalDetector';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useModalContext } from '@/contexts/ModalContext';
-import { useSnapModal } from '@/hooks/useSnapModal';
+import SnapModal from '@/components/snap/SnapModal';
+import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
+import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
 import { cn } from '@/lib/utils';
 
 // Routes where bottom navigation should be hidden
@@ -39,8 +43,38 @@ const GlobalBottomNavigation: React.FC = () => {
   // Final visibility state - hide for routes, modals, or manual control
   const showNavigation = isVisible && !shouldHideForRoute && !shouldHideBottomNav;
   
-  // Get openComposerWithFiles from useSnapModal for camera icon
-  const { openComposerWithFiles } = useSnapModal();
+  // Snap modal state management
+  const {
+    captionInputRef,
+    isSnapModalOpen,
+    isComposerOpen,
+    mediaItems,
+    selectedFile,
+    caption,
+    setCaption,
+    isSubmitting,
+    showToast,
+    toastMessage,
+    selectedCourse,
+    setSelectedCourse,
+    openSnapModal,
+    closeSnapModal,
+    openComposer,
+    openComposerWithFiles,
+    closeComposer,
+    showConfirmationToast,
+    hideToast
+  } = useSnapModal();
+
+  // Register modal states with the modal detector
+  useModalState(isSnapModalOpen);
+  useModalState(isComposerOpen);
+
+  // State for tags handled in CreateMomentModal
+  const [localSelectedTags, setLocalSelectedTags] = React.useState<any[]>([]);
+
+  // Media handlers for camera, image, and video
+  const { handleCameraClick, handleImageClick, handleVideoClick } = useMediaHandlers(closeSnapModal, openComposer);
 
   // Handle keyboard visibility and visual viewport changes
   useEffect(() => {
@@ -80,13 +114,15 @@ const GlobalBottomNavigation: React.FC = () => {
     }
   }, []);
 
-  // No longer needed - handled in PostSubmissionHandler
+  const handleCloseComposer = () => {
+    closeComposer();
+    setLocalSelectedTags([]);
+  };
 
   // Handle tab clicks including camera action
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
-      // Camera icon opens EnhancedCreateMomentModal with empty state
-      openComposerWithFiles([]);
+      openSnapModal();
     } else {
       handleTabClick(tab);
     }
@@ -146,8 +182,35 @@ const GlobalBottomNavigation: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Post Submission Handler - includes EnhancedCreateMomentModal */}
-      <PostSubmissionHandler />
+      {/* Snap Modal */}
+      <SnapModal
+        isOpen={isSnapModalOpen}
+        onClose={closeSnapModal}
+        onCameraClick={() => handleCameraClick({})}
+        onImageClick={() => handleImageClick({})}
+        onVideoClick={() => handleVideoClick({})}
+        openComposerWithFiles={openComposerWithFiles}
+      />
+
+      {/* Post Submission Handler */}
+      <PostSubmissionHandler
+        isComposerOpen={isComposerOpen}
+        mediaItems={mediaItems}
+        selectedFile={selectedFile}
+        selectedCourse={selectedCourse}
+        onCourseSelect={setSelectedCourse}
+        onClose={handleCloseComposer}
+        onShowToast={showConfirmationToast}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={() => {}}
+      />
+
+      {/* Snap Toast */}
+      <SnapToast
+        message={toastMessage}
+        isVisible={showToast}
+        onHide={hideToast}
+      />
     </>
   );
 };

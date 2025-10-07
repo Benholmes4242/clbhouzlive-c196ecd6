@@ -1,7 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
-import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Camera, Images } from "lucide-react";
-import { ComposerMediaItem } from "@/hooks/useSnapModal";
+import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play } from "lucide-react";
+import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
 import PostSuccessOverlay from './PostSuccessOverlay';
@@ -10,8 +10,7 @@ import { useImmersiveHeader } from '@/hooks/useImmersiveHeader';
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 import MediaCarousel from "@/components/posts/MediaCarousel";
-import { MediaNavigationDots } from "@/components/posts/user-post/overlays/MediaNavigationDots";
-import { openMediaPicker } from "@/utils/openMediaPicker";
+import CarouselDots from "@/components/posts/CarouselDots";
 
 const CAPTION_OVERLAP_PX = 16; // small, neat overlap
 
@@ -34,8 +33,6 @@ type Props = {
   mediaItems?: ComposerMediaItem[];
   selectedCourse?: any;
   onCourseSelect?: (course: any) => void;
-  onAddMedia?: (files: File[]) => void;
-  initialMode?: 'empty' | 'with-media';
 };
 
 export default function EnhancedCreateMomentModalCinematic({ 
@@ -47,9 +44,7 @@ export default function EnhancedCreateMomentModalCinematic({
   initialFiles = [],
   mediaItems = [],
   selectedCourse,
-  onCourseSelect,
-  onAddMedia,
-  initialMode = 'with-media'
+  onCourseSelect
 }: Props) {
   const { setCreateMomentModalOpen } = useModalContext();
   const [aiLoading, setAiLoading] = useState(false);
@@ -57,7 +52,6 @@ export default function EnhancedCreateMomentModalCinematic({
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const [activeCard, setActiveCard] = useState<'caption' | 'course' | 'music'>('caption');
   const prefersReducedMotion = useReducedMotion();
-  const [localMediaItems, setLocalMediaItems] = useState<ComposerMediaItem[]>([]);
 
   // Check for reduced motion preference
   const prefersReducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -82,25 +76,18 @@ export default function EnhancedCreateMomentModalCinematic({
   
   console.log('🔍 EnhancedCreateMomentModal state:', { isOpen, hasDataImmersive: document.documentElement.hasAttribute('data-immersive') });
 
-  // Initialize local media from props
-  useEffect(() => {
-    if (mediaItems?.length > 0) {
-      setLocalMediaItems(mediaItems);
-    } else if (initialFiles?.length > 0) {
-      const items = initialFiles.map(file => ({
-        id: crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
-        type: file.type.startsWith('video') ? 'video' as const : 'image' as const,
-        file,
-        previewUrl: URL.createObjectURL(file)
-      }));
-      setLocalMediaItems(items);
-    }
-  }, [mediaItems, initialFiles]);
-
-  // Media carousel state - use localMediaItems
+  // Media carousel state - use mediaItems if available, fallback to initialFiles
   const media = useMemo(() => {
-    return localMediaItems.slice(0, 5);
-  }, [localMediaItems]);
+    if (mediaItems?.length > 0) {
+      return mediaItems.slice(0, 5);
+    }
+    return (initialFiles || []).slice(0, 5).map(file => ({
+      id: crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
+      type: file.type.startsWith('video') ? 'video' as const : 'image' as const,
+      file,
+      previewUrl: URL.createObjectURL(file)
+    }));
+  }, [mediaItems, initialFiles]);
   
   const [activeIndex, setActiveIndex] = useState(0);
   const [coverIndex, setCoverIndex] = useState(0);
@@ -114,56 +101,18 @@ export default function EnhancedCreateMomentModalCinematic({
   const captionRef = useRef<HTMLDivElement>(null);
   const [mediaHeight, setMediaHeight] = useState<number | undefined>(undefined);
 
-  // Local caption state
-  const [caption, setCaption] = useState('');
+  const {
+    caption,
+    setCaption,
+    selectedCourse: snapCourse,
+    setSelectedCourse
+  } = useSnapModal();
 
   // Use the media items or files and course from props
-  const files = media?.length > 0 ? media.map(item => item.file) : [];
-  const course = selectedCourse;
+  const files = mediaItems?.length > 0 ? mediaItems.map(item => item.file) : initialFiles;
+  const course = selectedCourse || snapCourse;
 
-  const isEmpty = media.length === 0;
   const canPost = useMemo(() => media?.length > 0 && !isSubmitting, [media, isSubmitting]);
-
-  // Media picker handlers
-  const handlePickFromCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      stream.getTracks().forEach(track => track.stop());
-      
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*,video/*';
-      input.capture = 'environment';
-      input.onchange = (e) => {
-        const files = Array.from((e.target as HTMLInputElement).files || []);
-        handleAddMedia(files);
-      };
-      input.click();
-    } catch (error) {
-      console.error('Camera access denied:', error);
-    }
-  };
-
-  const handlePickFromLibrary = () => {
-    openMediaPicker((files) => {
-      handleAddMedia(files);
-    }, 10);
-  };
-
-  const handleAddMedia = (files: File[]) => {
-    const newItems = files.slice(0, 10).map(file => ({
-      id: crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
-      type: file.type.startsWith('video') ? 'video' as const : 'image' as const,
-      file,
-      previewUrl: URL.createObjectURL(file)
-    }));
-    
-    setLocalMediaItems(newItems);
-    
-    if (onAddMedia) {
-      onAddMedia(files);
-    }
-  };
 
   // Close handler
   const close = () => onClose?.();
@@ -328,134 +277,50 @@ export default function EnhancedCreateMomentModalCinematic({
               {/* MEDIA STAGE - full-bleed, top-anchored */}
               <section 
                 id="media" 
-                className="absolute inset-x-0 top-0 overflow-hidden bg-neutral-900"
+                className="absolute inset-x-0 top-0 overflow-hidden"
                 style={{ height: 'calc(100svh - var(--composer-height))' }}
               >
-                {isEmpty ? (
-                  /* Empty State */
-                  <div className="h-full w-full flex flex-col items-center justify-center px-6 text-center">
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="space-y-6"
-                    >
-                      {/* Icon */}
-                      <div className="mx-auto w-20 h-20 rounded-full bg-white/10 flex items-center justify-center">
-                        <Images className="w-10 h-10 text-white/60" />
-                      </div>
+                {/* Top scrim for badge readability */}
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/28 to-transparent z-10" 
+                  style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+                />
 
-                      {/* Text */}
-                      <div className="space-y-2">
-                        <h3 className="text-xl font-semibold text-white">Add photos or capture a moment</h3>
-                        <p className="text-sm text-white/60 max-w-xs mx-auto">
-                          Camera or library — you can add up to 10 items.
-                        </p>
-                      </div>
+                {/* Bottom scrim for controls */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/18 to-transparent z-10" />
 
-                      {/* CTAs */}
-                      <div className="flex gap-3 pt-2">
-                        <button
-                          onClick={handlePickFromCamera}
-                          className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] font-medium hover:bg-white/65 hover:shadow-[0_6px_18px_rgba(0,0,0,0.16)] transition-all duration-200"
-                        >
-                          <Camera className="w-5 h-5" />
-                          Camera
-                        </button>
-                        <button
-                          onClick={handlePickFromLibrary}
-                          className="flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] font-medium hover:bg-white/65 hover:shadow-[0_6px_18px_rgba(0,0,0,0.16)] transition-all duration-200"
-                        >
-                          <Images className="w-5 h-5" />
-                          Photos & Videos
-                        </button>
-                      </div>
-                    </motion.div>
-                  </div>
-                ) : (
-                  /* Media Viewer */
-                  <>
-                    {/* Top scrim for badge readability */}
-                    <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/28 to-transparent z-10" 
-                      style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
-                    />
+                <motion.div
+                  initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
+                  animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+                  transition={prefersReducedMotion ? 
+                    { delay: 0.05, duration: 0.15 } : 
+                    { 
+                      delay: 0.1, 
+                      duration: 0.3,
+                      staggerChildren: 0.04
+                    }
+                  }
+                  className="h-full w-full"
+                >
+                  <MediaCarousel
+                    items={media.map((item, index) => ({
+                      id: item.id,
+                      type: item.type,
+                      previewUrl: item.previewUrl,
+                      url: item.url,
+                      file: item.file,
+                      alt: `Media item ${item.id}`
+                    }))}
+                    initialIndex={0}
+                    onIndexChange={setActiveIndex}
+                    onSetCover={setCoverIndex}
+                    coverIndex={coverIndex}
+                    enableSwipe
+                    loop={false}
+                    className="h-full w-full"
+                  />
+                </motion.div>
 
-                    {/* Bottom scrim for controls */}
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/18 to-transparent z-10" />
-
-                    <motion.div
-                      initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
-                      animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-                      transition={prefersReducedMotion ? 
-                        { delay: 0.05, duration: 0.15 } : 
-                        { 
-                          delay: 0.1, 
-                          duration: 0.3,
-                          staggerChildren: 0.04
-                        }
-                      }
-                      className="h-full w-full"
-                    >
-                      <MediaCarousel
-                        items={media.map((item, index) => ({
-                          id: item.id,
-                          type: item.type,
-                          previewUrl: item.previewUrl,
-                          file: item.file,
-                          alt: `Media item ${item.id}`
-                        }))}
-                        initialIndex={0}
-                        onIndexChange={setActiveIndex}
-                        onSetCover={setCoverIndex}
-                        coverIndex={coverIndex}
-                        enableSwipe
-                        loop={false}
-                        className="h-full w-full"
-                      />
-                    </motion.div>
-
-                    {/* Media counter - top left */}
-                    <div 
-                      className="absolute top-4 left-4 z-20"
-                      style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
-                    >
-                      <div className="rounded-full bg-black/45 text-white text-xs px-3 py-1.5 flex items-center gap-1 backdrop-blur-sm">
-                        <span className="font-medium">{activeIndex + 1}/{media.length}</span>
-                      </div>
-                    </div>
-
-                    {/* Cover badge - near counter */}
-                    {coverIndex === activeIndex && (
-                      <div 
-                        className="absolute top-4 left-20 z-20"
-                        style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
-                      >
-                        <div className="rounded-full bg-black/45 text-white text-xs px-3 py-1.5 backdrop-blur-sm font-medium">
-                          Cover
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Video duration - bottom left if video */}
-                    {media[activeIndex]?.type === 'video' && (
-                      <div className="absolute bottom-6 left-4 z-20">
-                        <div className="rounded-full bg-black/45 text-white text-xs px-3 py-1.5 flex items-center gap-1.5 backdrop-blur-sm">
-                          <Play className="w-3 h-3" />
-                          <span className="font-medium">00:09</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Carousel dots - Clubhouse style */}
-                    <MediaNavigationDots
-                      mediaCount={media.length}
-                      currentIndex={activeIndex}
-                      onJump={setActiveIndex}
-                    />
-                  </>
-                )}
-
-                {/* Close button - top right (always visible) */}
+                {/* Close button - top right */}
                 <button 
                   onClick={close}
                   className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/35 text-white backdrop-blur-sm hover:bg-black/45 transition-all flex items-center justify-center"
@@ -464,6 +329,39 @@ export default function EnhancedCreateMomentModalCinematic({
                 >
                   <X className="w-5 h-5" />
                 </button>
+
+                {/* Media counter - top left */}
+                <div 
+                  className="absolute top-4 left-4 z-20"
+                  style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
+                >
+                  <div className="rounded-full bg-black/45 text-white text-xs px-3 py-1.5 flex items-center gap-1 backdrop-blur-sm">
+                    <span className="font-medium">{activeIndex + 1}/{media.length}</span>
+                  </div>
+                </div>
+
+                {/* Cover badge - near counter */}
+                {coverIndex === activeIndex && (
+                  <div 
+                    className="absolute top-4 left-20 z-20"
+                    style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
+                  >
+                    <div className="rounded-full bg-black/45 text-white text-xs px-3 py-1.5 backdrop-blur-sm font-medium">
+                      Cover
+                    </div>
+                  </div>
+                )}
+
+                {/* Video duration - bottom left if video */}
+                {media[activeIndex]?.type === 'video' && (
+                  <div className="absolute bottom-6 left-4 z-20">
+                    <div className="rounded-full bg-black/45 text-white text-xs px-3 py-1.5 flex items-center gap-1.5 backdrop-blur-sm">
+                      <Play className="w-3 h-3" />
+                      <span className="font-medium">00:09</span>
+                    </div>
+                  </div>
+                )}
+
               </section>
 
               {/* COMPOSER PANEL - fixed height, bottom-anchored */}
@@ -527,33 +425,19 @@ export default function EnhancedCreateMomentModalCinematic({
                     >
                       <div className="flex items-center justify-between mb-3">
                         <label className="block text-base font-semibold text-zinc-900">Add a caption</label>
-                        {isEmpty ? (
-                          <button
-                            onClick={handlePickFromLibrary}
-                            disabled={aiLoading}
-                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm disabled:opacity-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
-                            aria-label="Add photos or videos"
-                          >
+                        <button
+                          onClick={handleAICaption}
+                          disabled={aiLoading || media.length === 0}
+                          className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm disabled:opacity-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
+                          aria-label="Write a caption for me"
+                        >
+                          {aiLoading ? <StarsLoading /> : (
                             <div className="flex items-center gap-1.5">
-                              <Images className="h-3.5 w-3.5" />
-                              <span className="font-medium">Photos & Videos</span>
+                              <Sparkles className="h-3.5 w-3.5" />
+                              <span className="font-medium">Inspire Me</span>
                             </div>
-                          </button>
-                        ) : (
-                          <button
-                            onClick={handleAICaption}
-                            disabled={aiLoading || media.length === 0}
-                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm disabled:opacity-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
-                            aria-label="Write a caption for me"
-                          >
-                            {aiLoading ? <StarsLoading /> : (
-                              <div className="flex items-center gap-1.5">
-                                <Sparkles className="h-3.5 w-3.5" />
-                                <span className="font-medium">Inspire Me</span>
-                              </div>
-                            )}
-                          </button>
-                        )}
+                          )}
+                        </button>
                       </div>
                       
                       <textarea
