@@ -401,8 +401,8 @@ export default function EnhancedCreateMomentModalCinematic({
                   </div>
                 )}
 
-                {/* Media Navigation Dots - centered, 4px above divider */}
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-1 z-20">
+                {/* Media Navigation Dots - centered, 12px from bottom */}
+                <div className="absolute left-1/2 -translate-x-1/2 z-20" style={{ bottom: '12px' }}>
                   <MediaNavigationDots
                     mediaCount={media.length}
                     currentIndex={activeIndex}
