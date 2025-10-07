@@ -359,37 +359,37 @@ export default function EnhancedCreateMomentModalCinematic({
                   />
                 </motion.div>
 
-                {/* Close button - top right */}
-                <button 
-                  onClick={close}
-                  className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/35 text-white backdrop-blur-sm hover:bg-black/45 transition-all flex items-center justify-center"
-                  style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
-                  aria-label="Close"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-
-                {/* Media counter - top left */}
+                {/* Media counter - top left, 8px from top */}
                 <div 
-                  className="absolute top-4 left-4 z-20"
-                  style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
+                  className="absolute left-4 z-20"
+                  style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
                 >
-                  <div className="rounded-full bg-black/45 text-white text-xs px-3 py-1.5 flex items-center gap-1 backdrop-blur-sm">
+                  <div className="rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] text-xs px-3 py-1.5 flex items-center gap-1">
                     <span className="font-medium">{activeIndex + 1}/{media.length}</span>
                   </div>
                 </div>
 
-                {/* Cover badge - near counter */}
+                {/* Cover badge - same row, 8px from top */}
                 {coverIndex === activeIndex && (
                   <div 
-                    className="absolute top-4 left-20 z-20"
-                    style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
+                    className="absolute left-20 z-20"
+                    style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
                   >
-                    <div className="rounded-full bg-black/45 text-white text-xs px-3 py-1.5 backdrop-blur-sm font-medium">
+                    <div className="rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] text-xs px-3 py-1.5 font-medium">
                       Cover
                     </div>
                   </div>
                 )}
+
+                {/* Close button - top right, 8px from top */}
+                <button 
+                  onClick={close}
+                  className="absolute right-4 z-20 w-10 h-10 rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] hover:bg-white/65 transition-all flex items-center justify-center"
+                  style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
 
                 {/* Video duration - bottom left, 8px from media bottom, frosted white */}
                 {media[activeIndex]?.type === 'video' && (
