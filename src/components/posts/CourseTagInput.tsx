@@ -128,7 +128,7 @@ const CourseTagInput = ({
           {showSuggestions && suggestions.length > 0 && typeof window !== 'undefined' && (
             createPortal(
               <div 
-                className="fixed z-[70] max-h-[40vh] overflow-auto rounded-2xl bg-white border border-zinc-200 shadow-[0_8px_32px_rgba(0,0,0,0.15)] divide-y divide-zinc-100 pointer-events-auto"
+                className="fixed z-[9999] max-h-[40vh] overflow-auto rounded-2xl bg-white border border-zinc-200 shadow-[0_8px_32px_rgba(0,0,0,0.15)] divide-y divide-zinc-100 pointer-events-auto"
                 style={{
                   top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + window.scrollY + 8 : 0,
                   left: inputRef.current ? inputRef.current.getBoundingClientRect().left + window.scrollX : 0,
