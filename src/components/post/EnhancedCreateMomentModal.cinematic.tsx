@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
-import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Camera, Images } from "lucide-react";
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,8 @@ import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 import MediaCarousel from "@/components/posts/MediaCarousel";
 import CarouselDots from "@/components/posts/CarouselDots";
+import { openMediaPicker } from "@/utils/openMediaPicker";
+import { normalizeFilesToMediaItems } from "@/lib/mediaUtils";
 
 const CAPTION_OVERLAP_PX = 16; // small, neat overlap
 
@@ -105,7 +107,8 @@ export default function EnhancedCreateMomentModalCinematic({
     caption,
     setCaption,
     selectedCourse: snapCourse,
-    setSelectedCourse
+    setSelectedCourse,
+    openComposerWithFiles
   } = useSnapModal();
 
   // Use the media items or files and course from props
@@ -205,6 +208,35 @@ export default function EnhancedCreateMomentModalCinematic({
     } finally {
       setAiLoading(false);
     }
+  };
+
+  // Camera capture handler
+  const handlePickFromCamera = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,video/*';
+    input.capture = 'environment';
+    input.style.display = 'none';
+    document.body.appendChild(input);
+
+    input.addEventListener('change', async () => {
+      const files = Array.from(input.files ?? []);
+      if (files.length > 0 && openComposerWithFiles) {
+        openComposerWithFiles(files);
+      }
+      document.body.removeChild(input);
+    });
+
+    input.click();
+  };
+
+  // Photo/Video library picker handler
+  const handlePickFromLibrary = () => {
+    openMediaPicker(async (files) => {
+      if (files.length > 0 && openComposerWithFiles) {
+        openComposerWithFiles(files);
+      }
+    }, 5);
   };
 
   const handlePost = async () => {
@@ -427,22 +459,24 @@ export default function EnhancedCreateMomentModalCinematic({
                         <label className="block text-base font-semibold text-zinc-900">Add a caption</label>
                         <div className="flex gap-2">
                           <button
-                            onClick={handleAICaption}
-                            disabled={aiLoading || media.length === 0}
-                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm disabled:opacity-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
+                            onClick={handlePickFromCamera}
+                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
                             aria-label="Camera"
                           >
-                            <span className="font-medium">Camera</span>
+                            <div className="flex items-center gap-1.5">
+                              <Camera className="h-3.5 w-3.5" />
+                              <span className="font-medium">Camera</span>
+                            </div>
                           </button>
                           <button
-                            onClick={handleAICaption}
-                            disabled={aiLoading || media.length === 0}
-                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm disabled:opacity-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
+                            onClick={handlePickFromLibrary}
+                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
                             aria-label="Photos & Videos"
                           >
-                            {aiLoading ? <StarsLoading /> : (
+                            <div className="flex items-center gap-1.5">
+                              <Images className="h-3.5 w-3.5" />
                               <span className="font-medium">Photos & Videos</span>
-                            )}
+                            </div>
                           </button>
                         </div>
                       </div>
