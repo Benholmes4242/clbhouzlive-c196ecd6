@@ -175,197 +175,160 @@ const EnhancedSnapModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.18, ease: "easeIn" }}
+          transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          {/* Backdrop */}
+          {/* Backdrop with noise texture */}
           <div 
-            className="absolute inset-0 bg-white/20 backdrop-blur-md"
+            className="absolute inset-0 bg-black/35 backdrop-blur-[8px]"
             onClick={onClose}
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E")`,
+            }}
           />
           
-          {/* Modal Panel with subtle parallax */}
+          {/* Modal Container */}
           <div 
-            className="absolute inset-0 flex items-center justify-center p-6" 
+            className="absolute inset-0 flex items-center justify-center p-4 pb-[calc(env(safe-area-inset-bottom)+16px)]" 
             onClick={onClose}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={() => {
-              if (!prefersReducedMotion) {
-                mouseX.set(0);
-                mouseY.set(0);
-              }
-            }}
           >
             <motion.div
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="w-full max-w-md bg-white/40 backdrop-blur-md border border-white/30 rounded-3xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] overflow-hidden px-4 py-6 md:px-6 md:py-6"
+              className="relative w-full max-w-[560px] md:max-w-[640px] max-h-[80vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
-              initial={{ y: 30, opacity: 0, scale: 0.95 }}
-              animate={{ y: 0, opacity: 1, scale: 1 }}
-              exit={{ y: 12, opacity: 0, scale: 0.98 }}
+              initial={{ y: 16, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 8, opacity: 0 }}
               transition={{ 
                 type: "spring", 
-                stiffness: 300, 
-                damping: 25,
-                duration: 0.18
-              }}
-              style={{
-                transform: isOpen ? 'translateZ(0)' : undefined,
-                rotateX: prefersReducedMotion ? 0 : rotateX,
-                rotateY: prefersReducedMotion ? 0 : rotateY,
-                transformStyle: 'preserve-3d',
+                stiffness: 320, 
+                damping: 28,
+                duration: 0.22
               }}
             >
-              {/* Header with contextual helper */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div>
-                    <h2 className="text-2xl font-semibold text-black">Create a Moment</h2>
+              {/* Glass surface with gradient ring */}
+              <div 
+                className="relative bg-white/55 backdrop-blur-xl border border-white/50 rounded-3xl shadow-[0_24px_60px_rgba(0,0,0,0.25)] p-5 md:p-7"
+                style={{
+                  boxShadow: `
+                    0 24px 60px rgba(0,0,0,0.25),
+                    inset 0 0 0 1px rgba(110,146,119,0.1),
+                    inset 0 1px 0 0 rgba(255,255,255,0.4)
+                  `
+                }}
+              >
+                {/* Header */}
+                <div className="mb-5">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-black/90">
+                        Create a Moment
+                      </h2>
+                      <p className="text-sm text-black/60 mt-1">
+                        Share your golf moment with the community.
+                      </p>
+                    </div>
+                    <button 
+                      onClick={onClose} 
+                      aria-label="Close" 
+                      className="w-11 h-11 rounded-full bg-black/60 hover:bg-black/70 text-white active:scale-95 transition-all duration-120 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-300/60 focus:outline-none"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
                   </div>
-                  <button 
-                    onClick={onClose} 
-                    aria-label="Close" 
-                    className="w-8 h-8 rounded-full bg-white/60 hover:bg-white/80 border border-white/30 active:scale-95 transition-all duration-200 flex items-center justify-center focus:ring-2 focus:ring-[#6e9277]/50 focus:outline-none"
-                  >
-                    <X className="w-4 h-4 text-gray-700" />
-                  </button>
                 </div>
-                {/* Contextual helper line */}
-                <div 
-                  className="text-sm text-gray-600"
-                  role="status"
-                  aria-live="polite"
-                >
-                  Share your golf moment with the community
-                </div>
-              </div>
 
-              {/* Action Options */}
-              <div>
-                <div className="space-y-3">
-                  {actionOptions.map(({ key, label, description, icon: Icon, onClick, previewVariant, previewImages, microInteraction, isSpecial }, index) => (
+                {/* Option Cards */}
+                <div className="space-y-4">
+                  {actionOptions.map(({ key, label, description, icon: Icon, onClick, previewImages, isSpecial }, index) => (
                     <motion.button
                       key={key}
                       onClick={onClick}
-                      className={`w-full p-4 rounded-2xl transition-all duration-200 text-left group min-h-[44px] focus:outline-none focus:ring-2 shadow-sm ${
-                        isSpecial 
-                          ? 'bg-white/60 backdrop-blur-sm border border-white/30 hover:bg-white/70 focus:ring-[#f7a700]/50 hover:shadow-[0_0_20px_rgba(247,167,0,0.2)]'
-                          : 'bg-white/60 backdrop-blur-sm border border-white/30 hover:bg-white/70 focus:ring-[#6e9277]/50'
-                      }`}
+                      role="button"
+                      aria-describedby={`${key}-description`}
+                      className={`
+                        w-full h-[88px] rounded-2xl border border-black/10 bg-white/70 backdrop-blur-md
+                        transition-all duration-120
+                        hover:scale-[0.995] hover:ring-1 hover:ring-emerald-200/40
+                        active:scale-[0.99]
+                        focus-visible:ring-2 focus-visible:ring-emerald-300/60 focus:outline-none
+                        ${key === "camera" ? "shadow-[0_8px_32px_rgba(110,146,119,0.18)]" : ""}
+                      `}
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ 
                         type: "spring", 
-                        stiffness: 400, 
-                        damping: 30,
-                        delay: index * 0.08
+                        stiffness: 380, 
+                        damping: 26,
+                        delay: index * 0.06
                       }}
-                      whileHover={{ 
-                        scale: prefersReducedMotion ? 1 : 1.02,
-                        ...(isSpecial && !prefersReducedMotion && {
-                          boxShadow: '0 0 24px rgba(247,147,30,0.3)'
-                        })
-                      }}
-                      whileTap={{ scale: prefersReducedMotion ? 1 : 0.98 }}
-                      aria-label={`${label}: ${description}`}
+                      whileTap={{ scale: prefersReducedMotion ? 1 : 0.99 }}
                     >
-                       <div className="flex items-center gap-2 h-16">
-                       {/* Conditional rendering based on card type */}
-                          {key === "camera" ? (
-                            // Camera card: text on left, centered camera icon, empty right
-                            <>
-                              <div className="flex items-center flex-1">
-                                {/* Text content */}
-                                <div className="flex-1 min-w-0">
-                                  <h3 className="font-semibold text-base text-black">
-                                    {label}
-                                  </h3>
-                                  <p className="text-sm text-gray-600">{description}</p>
-                                </div>
-                              </div>
-                              
-                              {/* Camera icon centered between text and right edge */}
-                              <div className="flex items-center justify-center w-36">
-                                <motion.div 
-                                  className="w-24 h-16 rounded-xl flex items-center justify-center transition-all duration-200 bg-white/80 group-hover:bg-white/90 border border-white/40"
-                                  whileHover={!prefersReducedMotion ? {
-                                    opacity: [1, 0.5, 1]
-                                  } : {}}
-                                  transition={{ duration: 0.2 }}
-                                >
-                                  <Icon className="w-7 h-7 transition-colors duration-200 text-gray-700 group-hover:text-[#6e9277]" />
-                                </motion.div>
-                              </div>
-                            </>
-                          ) : key === "photos" ? (
-                            // Photos card: text on left, small + large preview on right
-                            <>
-                              <div className="flex items-center flex-1">
-                                {/* Text content */}
-                                <div className="flex-1 min-w-0">
-                                  <h3 className="font-semibold text-base text-black">
-                                    {label}
-                                  </h3>
-                                  <p className="text-sm text-gray-600">{description}</p>
-                                </div>
-                              </div>
-                              
-                              {/* Two-card preview on the right */}
-                              {previewImages && previewImages.length > 0 && (
-                                <div className="flex gap-2 shrink-0">
-                                  {/* Smaller card on left - made wider */}
-                                  <div className="w-16 h-16 rounded-lg overflow-hidden">
-                                    <img 
-                                      src={previewImages[0]} 
-                                      alt="Preview" 
-                                      className="w-full h-full object-cover"
-                                    />
-                                  </div>
-                                   {/* Larger card on right */}
-                                   <div className="w-24 h-16 rounded-lg overflow-hidden">
-                                     <img 
-                                       src={previewImages[1]} 
-                                       alt="Preview" 
-                                       className="w-full h-full object-cover"
-                                     />
-                                   </div>
-                                </div>
-                              )}
-                            </>
-                          ) : (
-                            // Story card: text on left, wider preview close to emoji on right
-                            <>
-                              <div className="flex items-center flex-1">
-                                {/* Text content */}
-                                <div className="flex-1 min-w-0">
-                                  <h3 className={`font-semibold text-base ${
-                                    isSpecial ? 'text-[#f7a700] hover:text-[#f7a700]/80 transition-colors' : 'text-black'
-                                  }`}>
-                                    {label}
-                                    {isSpecial && <span className="ml-2">🎞</span>}
-                                  </h3>
-                                  <p className="text-sm text-gray-600">{description}</p>
-                                </div>
-                              </div>
-                              
-                              {/* Single wider image preview on the right, closer to emoji */}
-                              {previewImages && previewImages.length > 0 && (
-                                <div className="w-36 h-16 rounded-lg overflow-hidden shrink-0">
-                                  <img 
-                                    src={previewImages[0]} 
-                                    alt="Story preview" 
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                              )}
-                            </>
-                          )}
+                      <div className="flex items-center h-full px-4 gap-3">
+                        {/* Icon plate */}
+                        <div 
+                          className="w-14 h-14 rounded-xl bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] border border-black/10 flex items-center justify-center shrink-0"
+                        >
+                          <Icon className="w-6 h-6 text-black/70" strokeWidth={1.5} />
                         </div>
+
+                        {/* Content */}
+                        <div className="flex-1 text-left min-w-0">
+                          <h3 className="text-base font-semibold text-black flex items-center gap-2">
+                            {label}
+                            {isSpecial && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#6E9277]/10 text-[#6E9277] border border-[#6E9277]/20">
+                                BETA
+                              </span>
+                            )}
+                          </h3>
+                          <p id={`${key}-description`} className="text-sm text-black/55">
+                            {description}
+                          </p>
+                        </div>
+
+                        {/* Preview */}
+                        {key === "photos" && previewImages && previewImages.length >= 2 && (
+                          <div className="flex gap-2 shrink-0">
+                            <div className="w-14 h-14 rounded-xl overflow-hidden">
+                              <img 
+                                src={previewImages[0]} 
+                                alt="" 
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="w-20 h-14 rounded-xl overflow-hidden">
+                              <img 
+                                src={previewImages[1]} 
+                                alt="" 
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {key === "story" && previewImages && previewImages.length > 0 && (
+                          <div className="flex gap-1 shrink-0">
+                            {/* Mini storyboard strip - 3 frames */}
+                            {[0, 0, 0].map((_, i) => (
+                              <div key={i} className="w-12 h-14 rounded-lg overflow-hidden">
+                                <img 
+                                  src={previewImages[0]} 
+                                  alt="" 
+                                  className="w-full h-full object-cover"
+                                  style={{
+                                    filter: i === 1 ? 'brightness(0.9)' : i === 2 ? 'brightness(0.8)' : 'none'
+                                  }}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </motion.button>
                   ))}
                 </div>
-
 
                 {/* Error state */}
                 {error && (
@@ -390,9 +353,9 @@ const EnhancedSnapModal = ({
                     className="mt-4 text-center"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
+                    transition={{ delay: 0.3 }}
                   >
-                    <p className="text-sm text-gray-500">No posts yet - start creating!</p>
+                    <p className="text-sm text-black/45">No recent media yet</p>
                   </motion.div>
                 )}
               </div>
