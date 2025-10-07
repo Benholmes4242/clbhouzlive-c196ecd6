@@ -343,7 +343,7 @@ export default function EnhancedCreateMomentModalCinematic({
                   {media.length === 0 ? (
                     /* Empty State Panel */
                     <div 
-                      className="h-full w-full flex items-center justify-center bg-white"
+                      className="h-full w-full flex items-center justify-center bg-black"
                       role="region"
                       aria-label="No media selected"
                     >
