@@ -266,14 +266,9 @@ const EnhancedSnapModal = ({
                       </div>
 
                       {/* Text block */}
-                      <div className="min-w-0">
-                        <h3 className="text-[17px] md:text-[18px] font-semibold leading-tight text-black/90 truncate flex items-center gap-2">
+                      <div className="flex flex-col gap-1 min-w-0">
+                        <h3 className="text-[17px] md:text-[18px] font-semibold leading-tight text-black/90 truncate">
                           {label}
-                          {isSpecial && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#6e9277]/12 text-[#6e9277] border border-[#6e9277]/25 align-middle">
-                              BETA
-                            </span>
-                          )}
                         </h3>
                         <p id={`${key}-description`} className="text-[14px] leading-snug text-black/60 line-clamp-2">
                           {description}
