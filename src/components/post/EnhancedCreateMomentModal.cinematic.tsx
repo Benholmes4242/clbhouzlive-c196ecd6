@@ -343,7 +343,7 @@ export default function EnhancedCreateMomentModalCinematic({
                   {media.length === 0 ? (
                     /* Empty State Panel */
                     <div 
-                      className="h-full w-full flex items-center justify-center bg-gradient-to-b from-white/85 to-white/65 backdrop-blur-[12px]"
+                      className="h-full w-full flex items-center justify-center backdrop-blur-md bg-white/75 supports-[backdrop-filter]:bg-white/60"
                       role="region"
                       aria-label="No media selected"
                     >
