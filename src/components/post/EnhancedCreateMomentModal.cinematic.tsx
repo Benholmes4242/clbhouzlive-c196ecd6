@@ -353,7 +353,7 @@ export default function EnhancedCreateMomentModalCinematic({
                           strokeWidth={1.5}
                           aria-hidden="true"
                         />
-                        <h2 className="text-[17px] font-semibold text-zinc-900 mb-2">
+                        <h2 className="text-[17px] font-semibold text-zinc-600 mb-2">
                           No media yet
                         </h2>
                         <p className="text-[14px] leading-relaxed text-zinc-600">
