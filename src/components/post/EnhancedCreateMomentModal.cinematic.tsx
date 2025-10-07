@@ -388,7 +388,7 @@ export default function EnhancedCreateMomentModalCinematic({
                   style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
                   aria-label="Close"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
 
                 {/* Video duration - bottom left, 8px from media bottom, frosted white */}
