@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
-import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Layers } from "lucide-react";
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
@@ -340,34 +340,59 @@ export default function EnhancedCreateMomentModalCinematic({
                   }
                   className="h-full w-full"
                 >
-                  <MediaCarousel
-                    items={media.map((item, index) => ({
-                      id: item.id,
-                      type: item.type,
-                      previewUrl: item.previewUrl,
-                      url: item.url,
-                      file: item.file,
-                      alt: `Media item ${item.id}`
-                    }))}
-                    initialIndex={0}
-                    onIndexChange={setActiveIndex}
-                    onSetCover={setCoverIndex}
-                    coverIndex={coverIndex}
-                    enableSwipe
-                    loop={false}
-                    className="h-full w-full"
-                  />
+                  {media.length === 0 ? (
+                    /* Empty State Panel */
+                    <div 
+                      className="h-full w-full flex items-center justify-center bg-gradient-to-b from-white/85 to-white/65 backdrop-blur-[12px]"
+                      role="region"
+                      aria-label="No media selected"
+                    >
+                      <div className="text-center px-6 max-w-xs">
+                        <Layers 
+                          className="w-14 h-14 mx-auto mb-4 text-zinc-400" 
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                        />
+                        <h2 className="text-[17px] font-semibold text-zinc-900 mb-2">
+                          No media yet
+                        </h2>
+                        <p className="text-[14px] leading-relaxed text-zinc-600">
+                          Capture a moment or choose from your gallery to share with a community of golfers.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <MediaCarousel
+                      items={media.map((item, index) => ({
+                        id: item.id,
+                        type: item.type,
+                        previewUrl: item.previewUrl,
+                        url: item.url,
+                        file: item.file,
+                        alt: `Media item ${item.id}`
+                      }))}
+                      initialIndex={0}
+                      onIndexChange={setActiveIndex}
+                      onSetCover={setCoverIndex}
+                      coverIndex={coverIndex}
+                      enableSwipe
+                      loop={false}
+                      className="h-full w-full"
+                    />
+                  )}
                 </motion.div>
 
-                {/* Media counter - top left, 8px from top */}
-                <div 
-                  className="absolute left-4 z-20"
-                  style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
-                >
-                  <div className="rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] text-xs px-3 py-1.5 flex items-center gap-1">
-                    <span className="font-medium">{activeIndex + 1}/{media.length}</span>
+                {/* Media counter - top left, 8px from top - only show when media exists */}
+                {media.length > 0 && (
+                  <div 
+                    className="absolute left-4 z-20"
+                    style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
+                  >
+                    <div className="rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] text-xs px-3 py-1.5 flex items-center gap-1">
+                      <span className="font-medium">{activeIndex + 1}/{media.length}</span>
+                    </div>
                   </div>
-                </div>
+                )}
 
 
                 {/* Close button - top right, 8px from top */}
@@ -390,14 +415,16 @@ export default function EnhancedCreateMomentModalCinematic({
                   </div>
                 )}
 
-                {/* Media Navigation Dots - centered, 8px from bottom of media frame */}
-                <MediaNavigationDots
-                  mediaCount={media.length}
-                  currentIndex={activeIndex}
-                  onJump={setActiveIndex}
-                  bottomOffset={8}
-                  className="z-20"
-                />
+                {/* Media Navigation Dots - centered, 8px from bottom of media frame - only show when media exists */}
+                {media.length > 0 && (
+                  <MediaNavigationDots
+                    mediaCount={media.length}
+                    currentIndex={activeIndex}
+                    onJump={setActiveIndex}
+                    bottomOffset={8}
+                    className="z-20"
+                  />
+                )}
 
               </section>
 
@@ -462,11 +489,16 @@ export default function EnhancedCreateMomentModalCinematic({
                     >
                       <div className="flex items-center justify-between mb-3">
                         <label className="block text-base font-semibold text-zinc-900">Add a caption</label>
-                        <div className="flex gap-2">
+                        <motion.div 
+                          className="flex gap-2"
+                          initial={{ opacity: 0, scale: 1.03 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.24, ease: "easeOut" }}
+                        >
                           <button
                             onClick={handlePickFromCamera}
-                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
-                            aria-label="Camera"
+                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm hover:scale-[0.98] active:scale-95 focus:outline-none focus:ring-1 focus:ring-[rgba(255,156,64,0.4)] focus:border-[rgba(255,156,64,0.4)] shadow-[0_2px_6px_rgba(0,0,0,0.10)]"
+                            aria-label="Open camera"
                           >
                             <div className="flex items-center gap-1.5">
                               <span className="font-medium">📷 Camera</span>
@@ -474,14 +506,14 @@ export default function EnhancedCreateMomentModalCinematic({
                           </button>
                           <button
                             onClick={handlePickFromLibrary}
-                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
-                            aria-label="Photos & Videos"
+                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm hover:scale-[0.98] active:scale-95 focus:outline-none focus:ring-1 focus:ring-[rgba(255,156,64,0.4)] focus:border-[rgba(255,156,64,0.4)] shadow-[0_2px_6px_rgba(0,0,0,0.10)]"
+                            aria-label="Choose photos and videos"
                           >
                             <div className="flex items-center gap-1.5">
                               <span className="font-medium">✨ Photos & Videos</span>
                             </div>
                           </button>
-                        </div>
+                        </motion.div>
                       </div>
                       
                       <textarea
