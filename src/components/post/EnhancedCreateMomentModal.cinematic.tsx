@@ -369,17 +369,6 @@ export default function EnhancedCreateMomentModalCinematic({
                   </div>
                 </div>
 
-                {/* Cover badge - same row, 8px from top */}
-                {coverIndex === activeIndex && (
-                  <div 
-                    className="absolute left-20 z-20"
-                    style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
-                  >
-                    <div className="rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] text-xs px-3 py-1.5 font-medium">
-                      Cover
-                    </div>
-                  </div>
-                )}
 
                 {/* Close button - top right, 8px from top */}
                 <button 
