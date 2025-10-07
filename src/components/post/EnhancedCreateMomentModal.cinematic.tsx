@@ -17,6 +17,48 @@ import { normalizeFilesToMediaItems } from "@/lib/mediaUtils";
 
 const CAPTION_OVERLAP_PX = 16; // small, neat overlap
 
+// Sunset Backdrop Component
+const SunsetBackdrop = ({ isVisible }: { isVisible: boolean }) => {
+  const prefersReducedTransparency = window.matchMedia('(prefers-reduced-transparency: reduce)').matches;
+  
+  return (
+    <motion.div
+      className="absolute inset-0 pointer-events-none z-[1001]"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: isVisible ? 1 : 0 }}
+      transition={{ duration: 0.18, ease: "easeOut" }}
+    >
+      {/* Gradient layer */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(180deg, var(--ecm-bg-start) 0%, var(--ecm-bg-mid) 45%, var(--ecm-bg-end) 100%)'
+        }}
+      />
+      
+      {/* Bottom vignette */}
+      <div 
+        className="absolute inset-x-0 bottom-0 h-[28vh]"
+        style={{
+          background: 'linear-gradient(180deg, transparent 0%, var(--ecm-vignette) 100%)'
+        }}
+      />
+      
+      {/* Subtle noise texture for anti-banding (optional, lightweight) */}
+      {!prefersReducedTransparency && (
+        <div 
+          className="absolute inset-0 opacity-[0.02] mix-blend-overlay"
+          style={{
+            backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' /%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' /%3E%3C/svg%3E")',
+            backgroundRepeat: 'repeat',
+            backgroundSize: '256px 256px'
+          }}
+        />
+      )}
+    </motion.div>
+  );
+};
+
 // Stars loading component
 const StarsLoading = () => (
   <span className="inline-flex items-center gap-1" aria-live="polite" aria-busy="true">
@@ -275,7 +317,7 @@ export default function EnhancedCreateMomentModalCinematic({
     <AnimatePresence>
       {isOpen && (
         <motion.div 
-          className="enhanced-create-moment-modal fixed inset-0 z-[2000]" 
+          className="enhanced-create-moment-modal fixed inset-0 z-[1000]" 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
           exit={{ opacity: 0 }}
@@ -298,7 +340,7 @@ export default function EnhancedCreateMomentModalCinematic({
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="relative w-full max-w-md h-[100svh] md:h-[90vh] md:rounded-3xl overflow-hidden bg-black"
+              className="relative w-full max-w-md h-[100svh] md:h-[90vh] md:rounded-3xl overflow-hidden"
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { y: 12, opacity: 0, scale: 0.98 }}
@@ -313,10 +355,12 @@ export default function EnhancedCreateMomentModalCinematic({
               }
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Sunset glass background */}
+              <SunsetBackdrop isVisible={true} />
               {/* MEDIA STAGE - full-bleed, top-anchored */}
               <section 
                 id="media" 
-                className="absolute inset-x-0 top-0 overflow-hidden"
+                className="absolute inset-x-0 top-0 overflow-hidden z-[1002]"
                 style={{ height: 'calc(100svh - var(--composer-height))' }}
               >
                 {/* Top scrim for badge readability */}
@@ -341,10 +385,10 @@ export default function EnhancedCreateMomentModalCinematic({
                   className="h-full w-full"
                 >
                   {media.length === 0 ? (
-                    /* Empty State Panel - Frosted White Gradient */
+                    /* Empty State Panel - Transparent to show sunset gradient */
                     <button
                       onClick={handlePickFromLibrary}
-                      className="h-full w-full flex items-center justify-center bg-white cursor-pointer transition-all duration-200 hover:bg-white/95"
+                      className="h-full w-full flex items-center justify-center bg-transparent cursor-pointer transition-all duration-200"
                       role="button"
                       aria-label="Add media"
                     >
@@ -432,10 +476,16 @@ export default function EnhancedCreateMomentModalCinematic({
 
               </section>
 
-              {/* COMPOSER PANEL - fixed height, bottom-anchored */}
+              {/* COMPOSER PANEL - fixed height, bottom-anchored with glass effect */}
               <section 
-                className="absolute bottom-0 left-0 right-0 backdrop-blur-md bg-white/75 supports-[backdrop-filter]:bg-white/60 border-t border-white/60 shadow-[0_10px_40px_rgba(0,0,0,0.15)] rounded-t-none"
-                style={{ height: 'var(--composer-height)' }}
+                className="absolute bottom-0 left-0 right-0 z-[1003] rounded-t-none border-t border-white/35"
+                style={{ 
+                  height: 'var(--composer-height)',
+                  background: 'var(--ecm-glass)',
+                  backdropFilter: 'blur(var(--ecm-blur))',
+                  WebkitBackdropFilter: 'blur(var(--ecm-blur))',
+                  boxShadow: '0 -1px 0 0 rgba(255,255,255,0.35), 0 10px 40px rgba(0,0,0,0.15)'
+                }}
               >
                 <div 
                   className="flex h-full flex-col px-4 pt-4 gap-4"

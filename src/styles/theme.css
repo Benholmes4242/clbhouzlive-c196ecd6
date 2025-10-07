@@ -1,0 +1,20 @@
+:root {
+  /* Gradient (top cool → warm), tuned to the mock */
+  --ecm-bg-start: #a9c5d8;     /* sky blue */
+  --ecm-bg-mid:   #d9c4b2;     /* warm cream */
+  --ecm-bg-end:   #f2e0c9;     /* blush sand */
+  --ecm-vignette: rgba(0,0,0,.22); /* bottom vignette for legibility */
+  --ecm-glass: rgba(255,255,255,.10); /* modal sheet glass tint */
+  --ecm-blur: 18px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Slightly deeper but same hue family for dark */
+    --ecm-bg-start: #6a8799;
+    --ecm-bg-mid:   #b59f8b;
+    --ecm-bg-end:   #d2bca5;
+    --ecm-vignette: rgba(0,0,0,.35);
+    --ecm-glass: rgba(24,24,24,.14);
+  }
+}
