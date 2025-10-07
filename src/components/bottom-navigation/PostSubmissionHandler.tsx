@@ -17,7 +17,6 @@ interface PostSubmissionHandlerProps {
   onShowToast: (message: string) => void;
   isSubmitting: boolean;
   setIsSubmitting: (submitting: boolean) => void;
-  onAddFiles?: (files: File[]) => void;
 }
 
 const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
@@ -29,8 +28,7 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
   onClose,
   onShowToast,
   isSubmitting,
-  setIsSubmitting,
-  onAddFiles
+  setIsSubmitting
 }) => {
   const { user } = useSupabaseSession();
   const { submitPost } = useOptimisticPostSubmission();
@@ -124,7 +122,6 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
       mediaItems={mediaItems}
       selectedCourse={selectedCourse}
       onCourseSelect={onCourseSelect}
-      onAddFiles={onAddFiles}
     />
   );
 };

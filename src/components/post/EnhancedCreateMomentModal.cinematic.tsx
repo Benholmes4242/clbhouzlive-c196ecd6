@@ -1,8 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
-import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Camera, Image as ImageIcon } from "lucide-react";
-import { useSnapModal } from "@/hooks/useSnapModal";
-import type { ComposerMediaItem } from "@/hooks/useSnapModal";
+import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play } from "lucide-react";
+import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
 import PostSuccessOverlay from './PostSuccessOverlay';
@@ -11,7 +10,7 @@ import { useImmersiveHeader } from '@/hooks/useImmersiveHeader';
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 import MediaCarousel from "@/components/posts/MediaCarousel";
-import { MediaNavigationDots } from "@/components/posts/user-post/overlays/MediaNavigationDots";
+import CarouselDots from "@/components/posts/CarouselDots";
 
 const CAPTION_OVERLAP_PX = 16; // small, neat overlap
 
@@ -34,7 +33,6 @@ type Props = {
   mediaItems?: ComposerMediaItem[];
   selectedCourse?: any;
   onCourseSelect?: (course: any) => void;
-  onAddFiles?: (files: File[]) => void;
 };
 
 export default function EnhancedCreateMomentModalCinematic({ 
@@ -46,8 +44,7 @@ export default function EnhancedCreateMomentModalCinematic({
   initialFiles = [],
   mediaItems = [],
   selectedCourse,
-  onCourseSelect,
-  onAddFiles
+  onCourseSelect
 }: Props) {
   const { setCreateMomentModalOpen } = useModalContext();
   const [aiLoading, setAiLoading] = useState(false);
@@ -107,11 +104,13 @@ export default function EnhancedCreateMomentModalCinematic({
   const {
     caption,
     setCaption,
+    selectedCourse: snapCourse,
+    setSelectedCourse
   } = useSnapModal();
 
   // Use the media items or files and course from props
   const files = mediaItems?.length > 0 ? mediaItems.map(item => item.file) : initialFiles;
-  const course = selectedCourse;
+  const course = selectedCourse || snapCourse;
 
   const canPost = useMemo(() => media?.length > 0 && !isSubmitting, [media, isSubmitting]);
 
@@ -233,49 +232,11 @@ export default function EnhancedCreateMomentModalCinematic({
     }, 100);
   };
 
-  // Media picker handlers
-  const handleCameraClick = async () => {
-    try {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*,video/*';
-      input.capture = 'environment';
-      input.multiple = true;
-      input.onchange = async (e) => {
-        const files = Array.from((e.target as HTMLInputElement).files || []);
-        if (files.length > 0 && onAddFiles) {
-          await onAddFiles(files);
-        }
-      };
-      input.click();
-    } catch (error) {
-      console.error('Camera capture error:', error);
-    }
-  };
-
-  const handlePhotosVideosClick = async () => {
-    try {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*,video/*';
-      input.multiple = true;
-      input.onchange = async (e) => {
-        const files = Array.from((e.target as HTMLInputElement).files || []);
-        if (files.length > 0 && onAddFiles) {
-          await onAddFiles(files);
-        }
-      };
-      input.click();
-    } catch (error) {
-      console.error('File picker error:', error);
-    }
-  };
-
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div 
-          className="fixed inset-0 z-[200]" 
+          className="fixed inset-0 z-50" 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
           exit={{ opacity: 0 }}
@@ -327,104 +288,78 @@ export default function EnhancedCreateMomentModalCinematic({
                 {/* Bottom scrim for controls */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/18 to-transparent z-10" />
 
-                {media.length > 0 ? (
-                  // MEDIA VIEWER STATE
-                  <motion.div
-                    initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
-                    animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-                    transition={prefersReducedMotion ? 
-                      { delay: 0.05, duration: 0.15 } : 
-                      { 
-                        delay: 0.1, 
-                        duration: 0.3,
-                        staggerChildren: 0.04
-                      }
+                <motion.div
+                  initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
+                  animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+                  transition={prefersReducedMotion ? 
+                    { delay: 0.05, duration: 0.15 } : 
+                    { 
+                      delay: 0.1, 
+                      duration: 0.3,
+                      staggerChildren: 0.04
                     }
+                  }
+                  className="h-full w-full"
+                >
+                  <MediaCarousel
+                    items={media.map((item, index) => ({
+                      id: item.id,
+                      type: item.type,
+                      previewUrl: item.previewUrl,
+                      url: item.url,
+                      file: item.file,
+                      alt: `Media item ${item.id}`
+                    }))}
+                    initialIndex={0}
+                    onIndexChange={setActiveIndex}
+                    onSetCover={setCoverIndex}
+                    coverIndex={coverIndex}
+                    enableSwipe
+                    loop={false}
                     className="h-full w-full"
-                  >
-                    <MediaCarousel
-                      items={media.map((item, index) => ({
-                        id: item.id,
-                        type: item.type,
-                        previewUrl: item.previewUrl,
-                        url: item.url,
-                        file: item.file,
-                        alt: `Media item ${item.id}`
-                      }))}
-                      initialIndex={0}
-                      onIndexChange={setActiveIndex}
-                      onSetCover={setCoverIndex}
-                      coverIndex={coverIndex}
-                      enableSwipe
-                      loop={false}
-                      className="h-full w-full"
-                    />
-                    
-                    {/* Clubhouse-style carousel dots */}
-                    {media.length > 1 && (
-                      <div className="absolute left-1/2 -translate-x-1/2 z-30" style={{ bottom: '12px' }}>
-                        <MediaNavigationDots
-                          mediaCount={media.length}
-                          currentIndex={activeIndex}
-                          onJump={setActiveIndex}
-                        />
-                      </div>
-                    )}
-                  </motion.div>
-                ) : (
-                  // EMPTY STATE
-                  <div className="h-full w-full flex items-center justify-center bg-zinc-900">
-                    <div className="text-center px-6">
-                      <Camera className="w-16 h-16 text-white/40 mx-auto mb-4" />
-                      <p className="text-white/60 text-sm">Add photos or capture a moment</p>
-                    </div>
-                  </div>
-                )}
+                  />
+                </motion.div>
 
                 {/* Close button - top right */}
                 <button 
                   onClick={close}
-                  className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/90 text-black backdrop-blur-sm hover:bg-white transition-all flex items-center justify-center"
+                  className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/35 text-white backdrop-blur-sm hover:bg-black/45 transition-all flex items-center justify-center"
                   style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
                   aria-label="Close"
                 >
                   <X className="w-5 h-5" />
                 </button>
 
-                {/* Media counter - top left (only when media exists) */}
-                {media.length > 0 && (
-                  <>
-                    <div 
-                      className="absolute top-4 left-4 z-20"
-                      style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
-                    >
-                      <div className="rounded-full bg-white/90 text-black text-xs px-3 py-1.5 flex items-center gap-1 backdrop-blur-sm">
-                        <span className="font-medium">{activeIndex + 1}/{media.length}</span>
-                      </div>
+                {/* Media counter - top left */}
+                <div 
+                  className="absolute top-4 left-4 z-20"
+                  style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
+                >
+                  <div className="rounded-full bg-black/45 text-white text-xs px-3 py-1.5 flex items-center gap-1 backdrop-blur-sm">
+                    <span className="font-medium">{activeIndex + 1}/{media.length}</span>
+                  </div>
+                </div>
+
+                {/* Cover badge - near counter */}
+                {coverIndex === activeIndex && (
+                  <div 
+                    className="absolute top-4 left-20 z-20"
+                    style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
+                  >
+                    <div className="rounded-full bg-black/45 text-white text-xs px-3 py-1.5 backdrop-blur-sm font-medium">
+                      Cover
                     </div>
+                  </div>
+                )}
 
-                    {/* Cover badge - near counter */}
-                    {coverIndex === activeIndex && (
-                      <div 
-                        className="absolute top-4 left-20 z-20"
-                        style={{ top: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
-                      >
-                        <div className="rounded-full bg-white/90 text-black text-xs px-3 py-1.5 backdrop-blur-sm font-medium">
-                          Cover
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Video duration - bottom left if video */}
-                    {media[activeIndex]?.type === 'video' && (
-                      <div className="absolute bottom-6 left-4 z-20">
-                        <div className="rounded-full bg-white/90 text-black text-xs px-3 py-1.5 flex items-center gap-1.5 backdrop-blur-sm">
-                          <Play className="w-3 h-3" />
-                          <span className="font-medium">00:09</span>
-                        </div>
-                      </div>
-                    )}
-                  </>
+                {/* Video duration - bottom left if video */}
+                {media[activeIndex]?.type === 'video' && (
+                  <div className="absolute bottom-6 left-4 z-20">
+                    <div className="rounded-full bg-black/45 text-white text-xs px-3 py-1.5 flex items-center gap-1.5 backdrop-blur-sm">
+                      <Play className="w-3 h-3" />
+                      <span className="font-medium">00:09</span>
+                    </div>
+                  </div>
                 )}
 
               </section>
@@ -438,157 +373,133 @@ export default function EnhancedCreateMomentModalCinematic({
                   className="flex h-full flex-col px-4 pt-4 gap-4"
                   style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
                 >
-                  {/* Media CTAs row (in editor header) - shown when empty OR when media exists */}
+                  {/* Tab chips */}
                   <div className="flex gap-2">
                     <button
-                      onClick={handleCameraClick}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm"
+                      onClick={() => setActiveCard('caption')}
+                      className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        activeCard === 'caption'
+                          ? 'bg-white border border-[rgba(255,156,64,0.35)] shadow-[0_1px_6px_rgba(0,0,0,0.06)] text-zinc-900'
+                          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
+                      }`}
                     >
-                      <Camera className="h-4 w-4" />
-                      <span>Camera</span>
+                      Caption
                     </button>
                     <button
-                      onClick={handlePhotosVideosClick}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm"
+                      onClick={() => setActiveCard('course')}
+                      className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        activeCard === 'course'
+                          ? 'bg-white border border-[rgba(255,156,64,0.35)] shadow-[0_1px_6px_rgba(0,0,0,0.06)] text-zinc-900'
+                          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
+                      }`}
                     >
-                      <ImageIcon className="h-4 w-4" />
-                      <span>Photos & Videos</span>
+                      Tag a course
+                    </button>
+                    <button
+                      onClick={() => setActiveCard('music')}
+                      className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        activeCard === 'music'
+                          ? 'bg-white border border-[rgba(255,156,64,0.35)] shadow-[0_1px_6px_rgba(0,0,0,0.06)] text-zinc-900'
+                          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
+                      }`}
+                    >
+                      Add music
                     </button>
                   </div>
 
-                  {/* Tab chips - only show when media exists */}
-                  {media.length > 0 && (
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setActiveCard('caption')}
-                        className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                          activeCard === 'caption'
-                            ? 'bg-white border border-[rgba(255,156,64,0.35)] shadow-[0_1px_6px_rgba(0,0,0,0.06)] text-zinc-900'
-                            : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
-                        }`}
-                      >
-                        Caption
-                      </button>
-                      <button
-                        onClick={() => setActiveCard('course')}
-                        className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                          activeCard === 'course'
-                            ? 'bg-white border border-[rgba(255,156,64,0.35)] shadow-[0_1px_6px_rgba(0,0,0,0.06)] text-zinc-900'
-                            : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
-                        }`}
-                      >
-                        Tag a course
-                      </button>
-                      <button
-                        onClick={() => setActiveCard('music')}
-                        className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                          activeCard === 'music'
-                            ? 'bg-white border border-[rgba(255,156,64,0.35)] shadow-[0_1px_6px_rgba(0,0,0,0.06)] text-zinc-900'
-                            : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
-                        }`}
-                      >
-                        Add music
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Sliding cards container - only show when media exists */}
-                  {media.length > 0 && (
-                    <div className="relative flex-1 overflow-hidden">
-                      {/* CAPTION CARD */}
-                      <motion.div
-                        className="absolute inset-0 w-full flex flex-col"
-                        initial={{ x: 0 }}
-                        animate={{ 
-                          x: activeCard === 'caption' ? 0 : '-100%',
-                          opacity: activeCard === 'caption' ? 1 : 0
-                        }}
-                        transition={{ 
-                          type: "spring", 
-                          stiffness: 300, 
-                          damping: 30
-                        }}
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <label className="block text-base font-semibold text-zinc-900">Add a caption</label>
-                          <button
-                            onClick={handleAICaption}
-                            disabled={aiLoading || media.length === 0}
-                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm disabled:opacity-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
-                            aria-label="Write a caption for me"
-                          >
-                            {aiLoading ? <StarsLoading /> : (
-                              <div className="flex items-center gap-1.5">
-                                <Sparkles className="h-3.5 w-3.5" />
-                                <span className="font-medium">Inspire Me</span>
-                              </div>
-                            )}
-                          </button>
-                        </div>
-                        
-                        <textarea
-                          className="flex-1 w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 text-[15px] leading-snug resize-none placeholder:text-zinc-400 text-zinc-900 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)] transition-all duration-200"
-                          placeholder="Write a caption…"
-                          value={caption}
-                          onChange={(e) => setCaption(e.target.value)}
-                        />
-                      </motion.div>
-
-                      {/* COURSE CARD */}
-                      <motion.div
-                        className="absolute inset-0 w-full"
-                        initial={{ x: '100%' }}
-                        animate={{ 
-                          x: activeCard === 'course' ? 0 : '100%',
-                          opacity: activeCard === 'course' ? 1 : 0
-                        }}
-                        transition={{ 
-                          type: "spring", 
-                          stiffness: 300, 
-                          damping: 30
-                        }}
-                      >
-                        <CourseTagInput
-                          onCourseSelect={onCourseSelect}
-                          selectedCourse={course}
-                        />
-                      </motion.div>
-
-                      {/* MUSIC CARD */}
-                      <motion.div
-                        className="absolute inset-0 w-full"
-                        initial={{ x: '100%' }}
-                        animate={{ 
-                          x: activeCard === 'music' ? 0 : '100%',
-                          opacity: activeCard === 'music' ? 1 : 0
-                        }}
-                        transition={{ 
-                          type: "spring", 
-                          stiffness: 300, 
-                          damping: 30
-                        }}
-                      >
-                        <BackgroundMusicSelector 
-                          onMusicSelect={(music) => {
-                            console.log('Selected music:', music);
-                          }}
-                          hasVideo={media.some(item => item.type === 'video')}
-                        />
-                      </motion.div>
-                    </div>
-                  )}
-
-                  {/* Primary Share button - only when media exists */}
-                  {media.length > 0 && (
-                    <button
-                      disabled={!canPost}
-                      onClick={handlePost}
-                      className="w-full h-12 rounded-2xl bg-white border border-[rgba(255,156,64,0.35)] shadow-sm text-zinc-900 font-semibold transition-all duration-200 hover:bg-zinc-50 hover:border-[rgba(255,156,64,0.5)] active:scale-[.99] disabled:bg-zinc-200 disabled:text-zinc-500 disabled:border-zinc-300 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)]"
-                      aria-label="Post your moment"
+                  {/* Sliding cards container */}
+                  <div className="relative flex-1 overflow-hidden">
+                    {/* CAPTION CARD */}
+                    <motion.div
+                      className="absolute inset-0 w-full flex flex-col"
+                      initial={{ x: 0 }}
+                      animate={{ 
+                        x: activeCard === 'caption' ? 0 : '-100%',
+                        opacity: activeCard === 'caption' ? 1 : 0
+                      }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 300, 
+                        damping: 30
+                      }}
                     >
-                      {isSubmitting ? "Sharing..." : "Share"}
-                    </button>
-                  )}
+                      <div className="flex items-center justify-between mb-3">
+                        <label className="block text-base font-semibold text-zinc-900">Add a caption</label>
+                        <button
+                          onClick={handleAICaption}
+                          disabled={aiLoading || media.length === 0}
+                          className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-sm disabled:opacity-50 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#6e9277]/30"
+                          aria-label="Write a caption for me"
+                        >
+                          {aiLoading ? <StarsLoading /> : (
+                            <div className="flex items-center gap-1.5">
+                              <Sparkles className="h-3.5 w-3.5" />
+                              <span className="font-medium">Inspire Me</span>
+                            </div>
+                          )}
+                        </button>
+                      </div>
+                      
+                      <textarea
+                        className="flex-1 w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 text-[15px] leading-snug resize-none placeholder:text-zinc-400 text-zinc-900 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)] transition-all duration-200"
+                        placeholder="Write a caption…"
+                        value={caption}
+                        onChange={(e) => setCaption(e.target.value)}
+                      />
+                    </motion.div>
+
+                    {/* COURSE CARD */}
+                    <motion.div
+                      className="absolute inset-0 w-full"
+                      initial={{ x: '100%' }}
+                      animate={{ 
+                        x: activeCard === 'course' ? 0 : '100%',
+                        opacity: activeCard === 'course' ? 1 : 0
+                      }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 300, 
+                        damping: 30
+                      }}
+                    >
+                      <CourseTagInput
+                        onCourseSelect={onCourseSelect}
+                        selectedCourse={course}
+                      />
+                    </motion.div>
+
+                    {/* MUSIC CARD */}
+                    <motion.div
+                      className="absolute inset-0 w-full"
+                      initial={{ x: '100%' }}
+                      animate={{ 
+                        x: activeCard === 'music' ? 0 : '100%',
+                        opacity: activeCard === 'music' ? 1 : 0
+                      }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 300, 
+                        damping: 30
+                      }}
+                    >
+                      <BackgroundMusicSelector 
+                        onMusicSelect={(music) => {
+                          console.log('Selected music:', music);
+                        }}
+                        hasVideo={media.some(item => item.type === 'video')}
+                      />
+                    </motion.div>
+                  </div>
+
+                  {/* Primary Share button */}
+                  <button
+                    disabled={!canPost}
+                    onClick={handlePost}
+                    className="w-full h-12 rounded-2xl bg-white border border-[rgba(255,156,64,0.35)] shadow-sm text-zinc-900 font-semibold transition-all duration-200 hover:bg-zinc-50 hover:border-[rgba(255,156,64,0.5)] active:scale-[.99] disabled:bg-zinc-200 disabled:text-zinc-500 disabled:border-zinc-300 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)]"
+                    aria-label="Post your moment"
+                  >
+                    {isSubmitting ? "Sharing..." : "Share"}
+                  </button>
                 </div>
               </section>
             </motion.div>
@@ -604,3 +515,110 @@ export default function EnhancedCreateMomentModalCinematic({
     </AnimatePresence>
   );
 }
+
+// Segmented Control Component - matches Snap Modal style
+interface SegmentedOption {
+  value: string;
+  label: string;
+  icon: React.ComponentType<any>;
+}
+
+interface SegmentedProps {
+  options: SegmentedOption[];
+  value: string;
+  onChange: (value: string) => void;
+}
+
+const Segmented = ({ options, value, onChange }: SegmentedProps) => {
+  return (
+    <div className="flex rounded-lg bg-white/5 border border-white/10 p-1">
+      {options.map((option) => {
+        const isActive = value === option.value;
+        const Icon = option.icon;
+        
+        return (
+          <button
+            key={option.value}
+            onClick={() => onChange(option.value)}
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+              isActive
+                ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/30'
+                : 'text-white/70 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Icon className="w-4 h-4" />
+            <span>{option.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
+// Enhanced Media Carousel Component - simplified for this modal
+interface EnhancedMediaCarouselProps {
+  items: Array<{
+    id: string;
+    type: 'image' | 'video';
+    previewUrl?: string;
+    url?: string;
+    file?: File;
+  }>;
+  activeIndex: number;
+  onIndexChange: (index: number) => void;
+  onClose?: () => void;
+}
+
+const EnhancedMediaCarousel = ({ 
+  items, 
+  activeIndex, 
+  onIndexChange, 
+  onClose 
+}: EnhancedMediaCarouselProps) => {
+  const currentItem = items[activeIndex];
+  
+  if (!currentItem) return null;
+
+  const imageUrl = currentItem.previewUrl || currentItem.url || (currentItem.file ? URL.createObjectURL(currentItem.file) : '');
+
+  return (
+    <div className="relative w-full h-full bg-black rounded-xl overflow-hidden">
+
+      {/* Media display */}
+      <div className="w-full h-full flex items-center justify-center">
+        {currentItem.type === 'video' ? (
+          <video
+            src={imageUrl}
+            className="max-w-full max-h-full object-contain"
+            controls
+            muted
+            playsInline
+          />
+        ) : (
+          <img
+            src={imageUrl}
+            alt={`Media item ${currentItem.id}`}
+            className="max-w-full max-h-full object-contain"
+          />
+        )}
+      </div>
+
+      {/* Navigation dots */}
+      {items.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+          {items.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => onIndexChange(index)}
+              className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                index === activeIndex
+                  ? 'bg-white'
+                  : 'bg-white/50 hover:bg-white/70'
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};

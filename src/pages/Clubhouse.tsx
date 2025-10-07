@@ -3,10 +3,12 @@ import ClubhouzLoading from '@/components/ClubhouzLoading';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import NavigationBar from '@/components/bottom-navigation/NavigationBar';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
+import SnapModal from '@/components/snap/SnapModal';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
 import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigationHandlers';
 import { useSnapModal } from '@/hooks/useSnapModal';
+import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
@@ -26,24 +28,34 @@ const Clubhouse = () => {
   // Navigation handlers
   const { activeTab, handleTabClick } = useNavigationHandlers();
   
-  // Composer state management
+  // Snap modal for camera functionality
   const {
+    isSnapModalOpen,
     isComposerOpen,
     mediaItems,
     selectedFile,
-    selectedCourse,
-    setSelectedCourse,
-    openComposerWithFiles,
-    closeComposer,
+    caption,
+    setCaption,
     isSubmitting,
-    setIsSubmitting,
     showToast,
     toastMessage,
+    selectedCourse,
+    setSelectedCourse,
+    openSnapModal,
+    closeSnapModal,
+    openComposer,
+    openComposerWithFiles,
+    closeComposer,
+    showConfirmationToast,
     hideToast
   } = useSnapModal();
 
+  // Media handlers for camera, image, and video
+  const { handleCameraClick, handleImageClick, handleVideoClick } = useMediaHandlers(closeSnapModal, openComposer);
+
   const [headerActiveTab, setHeaderActiveTab] = useState('Following');
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
+  const [localSelectedTags, setLocalSelectedTags] = useState<any[]>([]);
   const isMobile = useIsMobile();
 
   const handleLike = (contentId: string) => {
@@ -56,6 +68,25 @@ const Clubhouse = () => {
     setCurrentPostIndex(index);
   };
 
+  // Handle tab clicks including camera action
+  const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
+    console.log('[DEBUG] Clubhouse: handleTabClickWithCamera called with:', tab);
+    
+    if (tab.isAction && tab.id === 'post') {
+      // Handle camera action
+      console.log('[DEBUG] Clubhouse: Opening snap modal for camera');
+      openSnapModal();
+    } else {
+      // Handle regular navigation
+      console.log('[DEBUG] Clubhouse: Handling regular navigation');
+      handleTabClick(tab);
+    }
+  };
+
+  const handleCloseComposer = () => {
+    closeComposer();
+    setLocalSelectedTags([]);
+  };
 
   // Debug logging for Clubhouse page
   useEffect(() => {
@@ -94,18 +125,26 @@ const Clubhouse = () => {
       </div>
       
       
-      {/* Post Submission Component */}
+      {/* Snap Modal and Post Submission Components */}
+      <SnapModal
+        isOpen={isSnapModalOpen}
+        onClose={closeSnapModal}
+        onCameraClick={() => handleCameraClick({})}
+        onImageClick={() => handleImageClick({})}
+        onVideoClick={() => handleVideoClick({})}
+        openComposerWithFiles={openComposerWithFiles}
+      />
+
       <PostSubmissionHandler
         isComposerOpen={isComposerOpen}
         mediaItems={mediaItems}
         selectedFile={selectedFile}
         selectedCourse={selectedCourse}
         onCourseSelect={setSelectedCourse}
-        onClose={closeComposer}
-        onShowToast={() => {}}
+        onClose={handleCloseComposer}
+        onShowToast={showConfirmationToast}
         isSubmitting={isSubmitting}
-        setIsSubmitting={setIsSubmitting}
-        onAddFiles={openComposerWithFiles}
+        setIsSubmitting={() => {}}
       />
 
       <SnapToast

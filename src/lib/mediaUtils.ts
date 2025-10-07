@@ -1,11 +1,6 @@
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 
 export async function normalizeFilesToMediaItems(files: File[]): Promise<ComposerMediaItem[]> {
-  // Handle empty files array - this is valid for opening empty composer
-  if (files.length === 0) {
-    return [];
-  }
-
   const tasks = files.map(async (file, idx) => {
     try {
       const type: "image" | "video" = file.type.startsWith("video") ? "video" : "image";
