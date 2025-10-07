@@ -216,7 +216,7 @@ const MediaCarousel = ({
                      disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Previous media"
           >
-            <ChevronLeft className="h-5 w-5 text-[rgba(25,25,28,0.85)]" />
+            <ChevronLeft className="h-4 w-4 text-[rgba(25,25,28,0.85)]" />
           </button>
 
           <button
@@ -230,7 +230,7 @@ const MediaCarousel = ({
                      disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Next media"
           >
-            <ChevronRight className="h-5 w-5 text-[rgba(25,25,28,0.85)]" />
+            <ChevronRight className="h-4 w-4 text-[rgba(25,25,28,0.85)]" />
           </button>
         </>
       )}

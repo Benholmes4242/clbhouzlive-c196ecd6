@@ -401,12 +401,12 @@ export default function EnhancedCreateMomentModalCinematic({
                   </div>
                 )}
 
-                {/* Media Navigation Dots - centered, 4px from bottom of media frame */}
+                {/* Media Navigation Dots - centered, 8px from bottom of media frame */}
                 <MediaNavigationDots
                   mediaCount={media.length}
                   currentIndex={activeIndex}
                   onJump={setActiveIndex}
-                  bottomOffset={4}
+                  bottomOffset={8}
                   className="z-20"
                 />
 
