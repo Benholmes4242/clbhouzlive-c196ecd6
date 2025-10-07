@@ -4,19 +4,23 @@ interface MediaNavigationDotsProps {
   mediaCount: number;
   currentIndex: number;
   onJump?: (index: number) => void;
+  bottomOffset?: number | string; // allows overriding default bottom positioning
+  className?: string; // optional className to override z-index or other styles
 }
 
 export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
   mediaCount,
   currentIndex,
-  onJump
+  onJump,
+  bottomOffset,
+  className
 }) => {
   if (mediaCount <= 1) return null;
 
   return (
     <div 
-      className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 z-30 pointer-events-auto"
-      style={{ bottom: 'calc(var(--bottom-nav-height) + 4px)' }}
+      className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-2 z-30 pointer-events-auto ${className ?? ''}`}
+      style={{ bottom: bottomOffset ?? 'calc(var(--bottom-nav-height) + 4px)' }}
       role="tablist"
       aria-label="Media pagination"
     >
