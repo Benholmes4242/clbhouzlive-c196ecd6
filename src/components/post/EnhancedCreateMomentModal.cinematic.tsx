@@ -327,49 +327,37 @@ export default function EnhancedCreateMomentModalCinematic({
                 {/* Bottom scrim for controls */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/18 to-transparent z-10" />
 
-                {/* Media wrapper - positioning context for dots */}
-                <div className="relative h-full w-full">
-                  <motion.div
-                    initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
-                    animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-                    transition={prefersReducedMotion ? 
-                      { delay: 0.05, duration: 0.15 } : 
-                      { 
-                        delay: 0.1, 
-                        duration: 0.3,
-                        staggerChildren: 0.04
-                      }
+                <motion.div
+                  initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
+                  animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+                  transition={prefersReducedMotion ? 
+                    { delay: 0.05, duration: 0.15 } : 
+                    { 
+                      delay: 0.1, 
+                      duration: 0.3,
+                      staggerChildren: 0.04
                     }
+                  }
+                  className="h-full w-full"
+                >
+                  <MediaCarousel
+                    items={media.map((item, index) => ({
+                      id: item.id,
+                      type: item.type,
+                      previewUrl: item.previewUrl,
+                      url: item.url,
+                      file: item.file,
+                      alt: `Media item ${item.id}`
+                    }))}
+                    initialIndex={0}
+                    onIndexChange={setActiveIndex}
+                    onSetCover={setCoverIndex}
+                    coverIndex={coverIndex}
+                    enableSwipe
+                    loop={false}
                     className="h-full w-full"
-                  >
-                    <MediaCarousel
-                      items={media.map((item, index) => ({
-                        id: item.id,
-                        type: item.type,
-                        previewUrl: item.previewUrl,
-                        url: item.url,
-                        file: item.file,
-                        alt: `Media item ${item.id}`
-                      }))}
-                      initialIndex={0}
-                      onIndexChange={setActiveIndex}
-                      onSetCover={setCoverIndex}
-                      coverIndex={coverIndex}
-                      enableSwipe
-                      loop={false}
-                      className="h-full w-full"
-                    />
-                  </motion.div>
-
-                  {/* Media Navigation Dots - 4px from media bottom */}
-                  <div className="absolute left-1/2 -translate-x-1/2 bottom-[4px] z-20">
-                    <MediaNavigationDots
-                      mediaCount={media.length}
-                      currentIndex={activeIndex}
-                      onJump={setActiveIndex}
-                    />
-                  </div>
-                </div>
+                  />
+                </motion.div>
 
                 {/* Close button - top right */}
                 <button 
@@ -412,6 +400,15 @@ export default function EnhancedCreateMomentModalCinematic({
                     </div>
                   </div>
                 )}
+
+                {/* Media Navigation Dots - centered, 12px from bottom */}
+                <div className="absolute left-1/2 -translate-x-1/2 z-20" style={{ bottom: '12px' }}>
+                  <MediaNavigationDots
+                    mediaCount={media.length}
+                    currentIndex={activeIndex}
+                    onJump={setActiveIndex}
+                  />
+                </div>
 
               </section>
 
