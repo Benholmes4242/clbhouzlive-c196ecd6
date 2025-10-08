@@ -231,7 +231,7 @@ export const useRealPostsFetcher = () => {
       if (mediaFilter === FILTER_TYPES.SHORTS) {
         query = query
           .eq('post_media.media_type', MEDIA_TYPES.VIDEO)
-          .lte('post_media.duration_seconds', 30);
+          .lte('post_media.duration_seconds', 180);
       } else if (mediaFilter === FILTER_TYPES.VIDEOS) {
         query = query.eq('post_media.media_type', MEDIA_TYPES.VIDEO);
       } else if (mediaFilter === FILTER_TYPES.PHOTOS) {
