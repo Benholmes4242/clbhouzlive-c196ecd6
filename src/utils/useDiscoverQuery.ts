@@ -6,9 +6,15 @@ export function useDiscoverQuery() {
   const navigate = useNavigate();
 
   const main = (params.get("main") || "shorts") as MainPill;
+  const sub = params.get("sub") || "";
 
   function setMain(next: MainPill) {
     navigate({ search: `?main=${next}` }, { replace: false });
+  }
+
+  function setSub(next: string) {
+    const currentMain = params.get("main") || "shorts";
+    navigate({ search: `?main=${currentMain}&sub=${next}` }, { replace: false });
   }
 
   // Helper to convert filter type to main pill for backwards compatibility
@@ -17,5 +23,5 @@ export function useDiscoverQuery() {
     setMain(mainPill);
   }
 
-  return { main, setMain, setMainFromFilter };
+  return { main, sub, setMain, setSub, setMainFromFilter };
 }

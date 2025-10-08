@@ -15,17 +15,37 @@ interface ExploreFiltersProps {
   activeFilter: string;
   onFilterChange: (filter: string) => void;
   excludeFilters?: string[];
+  main?: string;
+  sub?: string;
 }
 
-const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterChange, excludeFilters = [] }) => {
+const ExploreFilters: React.FC<ExploreFiltersProps> = ({ 
+  activeFilter, 
+  onFilterChange, 
+  excludeFilters = [],
+  main = 'shorts',
+  sub = ''
+}) => {
   const isMobile = useIsMobile();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
-  const { main, setMainFromFilter } = useDiscoverQuery();
+  const { setSub } = useDiscoverQuery();
 
-  // Filter out excluded filters
-  const availableFilters = filterOptions.filter(filter => !excludeFilters.includes(filter));
+  // Define subfilters for Shorts
+  const shortsSubfilters = [
+    { id: 'trending', label: 'Trending', icon: '🔥' },
+    { id: 'new', label: 'New', icon: '✨' },
+    { id: 'golf-swing', label: 'Golf Swing', icon: '⛳' },
+    { id: 'hole-in-one', label: 'Hole in One', icon: '🎯' },
+    { id: 'long-drive', label: 'Long Drive', icon: '🚀' },
+    { id: 'fail', label: 'Fail', icon: '😅' },
+  ];
+
+  // Determine which filters to show based on main tab
+  const availableFilters = main === 'shorts' 
+    ? shortsSubfilters.map(f => f.id)
+    : filterOptions.filter(filter => !excludeFilters.includes(filter));
 
   // Check scroll position
   const checkScrollPosition = () => {
@@ -65,28 +85,39 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
     }
   };
 
-  const renderFilterButton = (filter: string) => {
-    const isActive = activeFilter === filter;
+  const renderFilterButton = (filterId: string) => {
+    // For Shorts, use subfilter logic
+    if (main === 'shorts') {
+      const subfilter = shortsSubfilters.find(f => f.id === filterId);
+      if (!subfilter) return null;
+      
+      const isActive = sub === filterId;
+      
+      return (
+        <button
+          key={filterId}
+          onClick={() => setSub(filterId)}
+          className={`pill ${isActive ? 'pill--active' : ''}`}
+        >
+          <span className="mr-1">{subfilter.icon}</span>
+          <span>{subfilter.label}</span>
+        </button>
+      );
+    }
     
-    const handleFilterClick = () => {
-      // Update both the old filter state and new URL state
-      onFilterChange(filter);
-      setMainFromFilter(filter);
-    };
+    // For other tabs, use old filter logic (to be refactored later)
+    const isActive = activeFilter === filterId;
     
     return (
       <button
-        key={filter}
-        onClick={handleFilterClick}
+        key={filterId}
+        onClick={() => onFilterChange(filterId)}
         className={`pill ${isActive ? 'pill--active' : ''}`}
       >
-        {/* Icon */}
         <div className="pill__icon">
-          {getFilterIcon(filter)}
+          {getFilterIcon(filterId)}
         </div>
-        
-        {/* Label */}
-        <span>{filter}</span>
+        <span>{filterId}</span>
       </button>
     );
   };

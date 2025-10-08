@@ -52,19 +52,19 @@ function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): 
 }
 
 export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery, selectedTags = [] }: DiscoverContentProps) {
-  const { main } = useDiscoverQuery();
+  const { main, sub } = useDiscoverQuery();
   const [currentContent, setCurrentContent] = useState<ExploreContentItem[] | null>(null);
   
   // Get the filter type based on main pill
   const filterType = getFilterTypeFromPills(main);
   
-  // Use existing hook to fetch content
+  // Use existing hook to fetch content - pass sub for Shorts subfiltering
   const { 
     content, 
     loading, 
     hasMore, 
     loadMore 
-  } = useInfiniteExploreContent(filterType);
+  } = useInfiniteExploreContent(filterType, sub);
 
   // Apply search filtering and tag filtering whenever content changes
   useEffect(() => {

@@ -7,8 +7,10 @@ import { useMockPostsHandler } from './explore/useMockPostsHandler';
 const POSTS_PER_PAGE = 20; // Increased for better performance
 const PRELOAD_THRESHOLD = 2; // Reduced threshold for faster preloading
 
-export const useInfiniteExploreContent = (activeFilter?: string) => {
-  // Fast content caching by filter type
+export const useInfiniteExploreContent = (activeFilter?: string, subFilter?: string) => {
+  // Fast content caching by filter type (include subFilter in cache key)
+  const cacheKey = subFilter ? `${activeFilter}-${subFilter}` : activeFilter || 'Friends';
+  
   const [contentCache, setContentCache] = useState<Record<string, ExploreContentItem[]>>({});
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   const [hasMoreStates, setHasMoreStates] = useState<Record<string, boolean>>({});
@@ -21,7 +23,7 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
   const { fetchRealPosts, fetchFriendsPosts } = useRealPostsFetcher();
   const { getMockPosts } = useMockPostsHandler();
   
-  const currentFilter = activeFilter || 'Friends';
+  const currentFilter = cacheKey;
   
   // Current state
   const content = contentCache[currentFilter] || [];
@@ -41,10 +43,10 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
       const freshOffset = offsetStates[currentFilter] || 0;
       let posts = [];
       
-      if (currentFilter === 'Friends') {
+      if (activeFilter === 'Friends') {
         posts = await fetchFriendsPosts(freshOffset, POSTS_PER_PAGE);
       } else {
-        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, currentFilter);
+        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter);
       }
       
       if (posts.length > 0) {
@@ -103,11 +105,11 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
       let posts = [];
       
       // Use specific fetcher for Friends filter
-      if (currentFilter === 'Friends') {
+      if (activeFilter === 'Friends') {
         posts = await fetchFriendsPosts(freshOffset, POSTS_PER_PAGE);
       } else {
-        // Try to fetch real posts with filter
-        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, currentFilter);
+        // Try to fetch real posts with filter and subfilter
+        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter);
       }
       
       if (posts.length > 0) {

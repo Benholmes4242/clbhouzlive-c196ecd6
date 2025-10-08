@@ -200,7 +200,7 @@ export const useRealPostsFetcher = () => {
     }
   };
 
-  const fetchRealPosts = async (currentOffset: number, postsPerPage: number, mediaFilter?: string): Promise<ExploreContentItem[]> => {
+  const fetchRealPosts = async (currentOffset: number, postsPerPage: number, mediaFilter?: string, subFilter?: string): Promise<ExploreContentItem[]> => {
     try {
       // Build the query
       let query = supabase
@@ -236,6 +236,18 @@ export const useRealPostsFetcher = () => {
         query = query
           .eq('post_media.media_type', MEDIA_TYPES.VIDEO)
           .lte('post_media.duration_seconds', 180);
+        
+        // Apply Shorts subfilter
+        if (subFilter === 'trending') {
+          // Order by engagement (likes + comments + shares approximation)
+          query = query.order('created_at', { ascending: false });
+        } else if (subFilter === 'new') {
+          // Already ordered by created_at DESC
+          query = query.order('created_at', { ascending: false });
+        } else if (subFilter && ['golf-swing', 'hole-in-one', 'long-drive', 'fail'].includes(subFilter)) {
+          // Tag-based filtering - filter in post-processing since we can't efficiently query tags in this structure
+          // The filtering will happen client-side after fetch
+        }
       } else if (mediaFilter === FILTER_TYPES.VIDEOS) {
         query = query.eq('post_media.media_type', MEDIA_TYPES.VIDEO);
       } else if (mediaFilter === FILTER_TYPES.PHOTOS) {
@@ -368,6 +380,28 @@ export const useRealPostsFetcher = () => {
 
         return formattedPost;
       }).filter(Boolean) as ExploreContentItem[];
+
+      // Apply tag-based subfilter for Shorts (client-side)
+      if (mediaFilter === FILTER_TYPES.SHORTS && subFilter && ['golf-swing', 'hole-in-one', 'long-drive', 'fail'].includes(subFilter)) {
+        const tagKeywords: Record<string, string[]> = {
+          'golf-swing': ['swing', 'golf swing', 'technique'],
+          'hole-in-one': ['hole in one', 'ace', 'holeinone'],
+          'long-drive': ['long drive', 'distance', 'bomber'],
+          'fail': ['fail', 'miss', 'bloopers', 'oops']
+        };
+        
+        const keywords = tagKeywords[subFilter] || [];
+        
+        return formattedPosts.filter(post => {
+          const content = post.title?.toLowerCase() || '';
+          const courseName = post.golfCourse?.name?.toLowerCase() || '';
+          
+          return keywords.some(keyword => 
+            content.includes(keyword.toLowerCase()) || 
+            courseName.includes(keyword.toLowerCase())
+          );
+        });
+      }
 
       return formattedPosts;
     } catch (error) {

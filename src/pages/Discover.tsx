@@ -21,16 +21,15 @@ const Discover = () => {
   // Use vertical feed for consistency with Activity tab
   const USE_MODAL_DISCOVER = false; // using DiscoverVerticalFeed for consistency
   
-  const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.SHORTS);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalStartIndex, setModalStartIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
-  const { main } = useDiscoverQuery();
+  const { main, sub } = useDiscoverQuery();
   
-  // Sync activeFilter with URL state
-  React.useEffect(() => {
+  // Derive activeFilter from URL main param (single source of truth)
+  const activeFilter = React.useMemo(() => {
     const mainToFilter: Record<string, string> = {
       'shorts': FILTER_TYPES.SHORTS,
       'channels': FILTER_TYPES.CHANNELS,
@@ -40,12 +39,12 @@ const Discover = () => {
       'verified-pros': FILTER_TYPES.VERIFIED_PROS,
       'hack-shack': FILTER_TYPES.HACK_SHACK,
     };
-    const newFilter = mainToFilter[main] || FILTER_TYPES.SHORTS;
-    if (newFilter !== activeFilter) {
-      setActiveFilter(newFilter);
-      // Reset tags when switching main pill
-      setSelectedTags([]);
-    }
+    return mainToFilter[main] || FILTER_TYPES.SHORTS;
+  }, [main]);
+
+  // Reset tags when switching main pill
+  React.useEffect(() => {
+    setSelectedTags([]);
   }, [main]);
   
   // Get content for the vertical feed (we'll use the new DiscoverContent component for the grid)
@@ -149,8 +148,8 @@ const Discover = () => {
           <div className="relative z-30 bg-white">
             {/* Segmented Control Tabs */}
             <SegmentedControl 
-              activeTab={activeFilter} 
-              onTabChange={setActiveFilter}
+              activeTab={activeFilter}
+              onTabChange={() => {}} // No-op: tabs control via URL now
             />
             
             {/* Search Bar */}
@@ -168,7 +167,9 @@ const Discover = () => {
             <div className="pt-1 pb-3 border-b border-gray-50 pl-1.5">
               <ExploreFilters 
                 activeFilter={activeFilter}
-                onFilterChange={setActiveFilter}
+                onFilterChange={() => {}} // No-op: pills will be subfilters
+                main={main}
+                sub={sub}
               />
             </div>
           </div>
