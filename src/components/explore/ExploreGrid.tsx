@@ -3,6 +3,7 @@ import React, { memo, useState, useEffect, useMemo, useCallback } from 'react';
 import { MapPin } from 'lucide-react';
 import { MdOutlinePlayCircle } from 'react-icons/md';
 import { HiTrendingUp } from 'react-icons/hi';
+import { useLocation } from 'react-router-dom';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
 import MediaDisplay from './MediaDisplay';
@@ -11,6 +12,32 @@ import { MediaNavigationDots } from '@/components/posts/user-post/overlays/Media
 import { FILTER_TYPES } from './types';
 import { createMobileGridLayoutWithDeduplication, createDesktopGridLayoutWithDeduplication } from '@/utils/postPlacementUtils';
 import { PlacementConfig } from './types/PostPlacementTypes';
+
+/**
+ * Hook to track when the app window/tab regains focus or visibility
+ * Increments a counter on visibility change, useful for forcing re-renders/resets
+ */
+function useVisibilityTick() {
+  const [tick, setTick] = useState(0);
+  
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        setTick(t => t + 1);
+      }
+    };
+    
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
+    };
+  }, []);
+  
+  return tick;
+}
 
 interface ExploreGridProps {
   content: ExploreContentItem[];
@@ -42,28 +69,37 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
   const [isMobile, setIsMobile] = useState(false);
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const [itemLoadingStates, setItemLoadingStates] = useState<Record<string, boolean>>({});
+  
+  // Track route changes and visibility changes
+  const location = useLocation();
+  const visibilityTick = useVisibilityTick();
 
-  // Initialize loading states for new items and clean up stale ones
+  // Reset loading states on content change, tab change, route change, or visibility change
+  // This ensures grey tiles are cleared on every revisit scenario
   useEffect(() => {
-    if (!content?.length) return;
-    setItemLoadingStates(prev => {
-      const next = { ...prev };
-      // Initialize new items to loading=true
+    if (!content?.length) {
+      setItemLoadingStates({});
+      setMediaIndices({});
+      return;
+    }
+    
+    // Always rebuild loading state fresh for current dataset
+    setItemLoadingStates(() => {
+      const next: Record<string, boolean> = {};
       for (const item of content) {
-        if (next[item.id] === undefined) {
-          next[item.id] = true;
-        }
-      }
-      // Clean up stale IDs (optional optimization)
-      const currentIds = new Set(content.map(item => item.id));
-      for (const id of Object.keys(next)) {
-        if (!currentIds.has(id)) {
-          delete next[id];
-        }
+        next[item.id] = true; // Always initialize to loading
       }
       return next;
     });
-  }, [content]);
+    
+    // Reset media indices
+    setMediaIndices({});
+  }, [
+    content,           // Data changed
+    activeFilter,      // Tab changed (Shorts/Videos/Photos/Channels/Friends)
+    location.key,      // Route changed (navigated away/back or query params changed)
+    visibilityTick     // App regained focus (user returned from another tab/window)
+  ]);
 
   // Memoized handler to flip tiles to loaded state
   const handleTileLoaded = useCallback((id: string) => {
