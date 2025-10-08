@@ -97,7 +97,11 @@ export const useRealPostsFetcher = () => {
         const allMedia = (post.post_media || []);
         const primaryMedia = allMedia.find((m: any) => m.media_type === 'video') || allMedia[0]; // Prefer video as primary
         
-        if (!primaryMedia || !isValidImageUrl(primaryMedia.media_url)) {
+        const isValid =
+          (primaryMedia.media_type === 'image' && isValidImageUrl(primaryMedia.media_url)) ||
+          (primaryMedia.media_type === 'video' && !!primaryMedia.media_url);
+        
+        if (!primaryMedia || !isValid) {
           return null;
         }
 
@@ -269,7 +273,11 @@ export const useRealPostsFetcher = () => {
         const allMedia = (post.post_media || []);
         const primaryMedia = allMedia.find((m: any) => m.media_type === 'video') || allMedia[0]; // Prefer video as primary
         
-        if (!primaryMedia || !isValidImageUrl(primaryMedia.media_url)) {
+        const isValid =
+          (primaryMedia.media_type === 'image' && isValidImageUrl(primaryMedia.media_url)) ||
+          (primaryMedia.media_type === 'video' && !!primaryMedia.media_url);
+        
+        if (!primaryMedia || !isValid) {
           return null;
         }
 
