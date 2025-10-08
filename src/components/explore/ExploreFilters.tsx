@@ -42,9 +42,22 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({
     { id: 'fail', label: 'Fail', icon: '😅' },
   ];
 
+  // Define subfilters for Channels
+  const channelsSubfilters = [
+    { id: 'all', label: 'All', icon: '📺' },
+    { id: 'new', label: 'New', icon: '✨' },
+    { id: 'popular', label: 'Popular', icon: '🔥' },
+    { id: 'golf-tips', label: 'Golf Tips', icon: '💡' },
+    { id: 'equipment', label: 'Equipment', icon: '⛳' },
+    { id: 'on-course', label: 'On-Course', icon: '🏌️' },
+    { id: 'interviews', label: 'Interviews', icon: '🎤' },
+  ];
+
   // Determine which filters to show based on main tab
   const availableFilters = main === 'shorts' 
     ? shortsSubfilters.map(f => f.id)
+    : main === 'channels'
+    ? channelsSubfilters.map(f => f.id)
     : filterOptions.filter(filter => !excludeFilters.includes(filter));
 
   // Check scroll position
@@ -92,6 +105,25 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({
       if (!subfilter) return null;
       
       const isActive = sub === filterId;
+      
+      return (
+        <button
+          key={filterId}
+          onClick={() => setSub(filterId)}
+          className={`pill ${isActive ? 'pill--active' : ''}`}
+        >
+          <span className="mr-1">{subfilter.icon}</span>
+          <span>{subfilter.label}</span>
+        </button>
+      );
+    }
+
+    // For Channels, use subfilter logic
+    if (main === 'channels') {
+      const subfilter = channelsSubfilters.find(f => f.id === filterId);
+      if (!subfilter) return null;
+      
+      const isActive = (sub || 'all') === filterId;
       
       return (
         <button

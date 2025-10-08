@@ -8,6 +8,7 @@ import ExploreFilters from '@/components/explore/ExploreFilters';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 // import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned'; // Stored for future use
 import DiscoverContent from '@/components/discover/DiscoverContent';
+import { ChannelsFeed } from '@/components/channels/ChannelsFeed';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem } from '@/types/media';
@@ -180,16 +181,20 @@ const Discover = () => {
           </div> */}
           {/* Commented out for future use - SuggestedUsersRedesigned component is stored in /components/discover/ */}
 
-          {/* Main Grid with Container */}
-          <div className="md:container md:mx-auto md:px-0 mt-4">
-            <DiscoverContent
-              onLike={handleLike}
-              onFollow={handleFollow}
-              onMediaClick={handleMediaClick}
-              searchQuery={searchQuery}
-              selectedTags={selectedTags}
-            />
-          </div>
+          {/* Main Content - Conditional based on active tab */}
+          {main === 'channels' ? (
+            <ChannelsFeed />
+          ) : (
+            <div className="md:container md:mx-auto md:px-0 mt-4">
+              <DiscoverContent
+                onLike={handleLike}
+                onFollow={handleFollow}
+                onMediaClick={handleMediaClick}
+                searchQuery={searchQuery}
+                selectedTags={selectedTags}
+              />
+            </div>
+          )}
       </main>
         
         
