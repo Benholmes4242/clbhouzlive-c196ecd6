@@ -48,6 +48,7 @@ const Auth = lazy(() => import("./pages/Auth"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const CreateProfile = lazy(() => import("./pages/CreateProfile"));
 const ProfileTestPage = lazy(() => import("./pages/ProfileTestPage"));
+const AdminBackfill = lazy(() => import("./pages/AdminBackfill"));
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Courses = lazy(() => import("./pages/Courses"));
@@ -166,6 +167,7 @@ const App: React.FC = () => {
                                     <Route path="/achievements" element={<AchievementsPage />} />
                                     <Route path="/admin-setup" element={<AdminSetupPage />} />
                                     <Route path="/admin" element={<AdminPage />} />
+                                    <Route path="/admin-backfill" element={<AdminBackfill />} />
                                     
                                     
                                     <Route path="*" element={<NotFound />} />
