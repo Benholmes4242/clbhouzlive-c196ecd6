@@ -10,6 +10,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface ChannelVideoCardProps {
   video: ChannelVideo;
@@ -32,6 +40,26 @@ const formatViews = (count?: number): string => {
 
 export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPlay }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [showComingSoon, setShowComingSoon] = useState(false);
+  
+  const isMock = (video as any).mock === true;
+  
+  const handleClick = () => {
+    if (isMock) {
+      setShowComingSoon(true);
+    } else {
+      onPlay(video);
+    }
+  };
+  
+  const handleMenuAction = (action: string) => {
+    // Disable actions for mock videos
+    if (isMock) {
+      return;
+    }
+    // Handle real video actions here
+    console.log(`Action: ${action}`, video.id);
+  };
   
   const primaryMedia = video.post_media?.[0];
   const thumbnailUrl = primaryMedia?.poster_url || 
@@ -47,12 +75,13 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
   const timeAgo = formatDistanceToNow(new Date(video.created_at), { addSuffix: true });
 
   return (
-    <div 
-      className="group flex flex-col md:flex-row gap-3 md:gap-4 cursor-pointer hover:bg-accent/50 rounded-lg p-2 md:p-3 transition-colors"
-      onClick={() => onPlay(video)}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <>
+      <div 
+        className="group flex flex-col md:flex-row gap-3 md:gap-4 cursor-pointer hover:bg-accent/50 rounded-lg p-2 md:p-3 transition-colors"
+        onClick={handleClick}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
       {/* Thumbnail */}
       <div className="relative w-full md:w-80 md:flex-shrink-0 aspect-video bg-muted rounded-lg overflow-hidden">
         <img 
@@ -119,12 +148,44 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
             <MoreVertical className="w-5 h-5 text-muted-foreground" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>Save to playlist</DropdownMenuItem>
-            <DropdownMenuItem>Share</DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive">Report</DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => handleMenuAction('save')}
+              disabled={isMock}
+            >
+              Save to playlist
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => handleMenuAction('share')}
+              disabled={isMock}
+            >
+              Share
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => handleMenuAction('report')}
+              disabled={isMock}
+              className="text-destructive"
+            >
+              Report
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
     </div>
+
+    {/* Coming Soon Dialog */}
+    <Dialog open={showComingSoon} onOpenChange={setShowComingSoon}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Coming Soon</DialogTitle>
+          <DialogDescription>
+            Long-form creator videos are coming soon. Stay tuned!
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex justify-end mt-4">
+          <Button onClick={() => setShowComingSoon(false)}>Close</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  </>
   );
 };
