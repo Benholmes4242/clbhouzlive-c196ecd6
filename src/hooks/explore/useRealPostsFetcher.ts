@@ -95,7 +95,7 @@ export const useRealPostsFetcher = () => {
       const formattedPosts = postsData.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
         const allMedia = (post.post_media || []);
-        const primaryMedia = allMedia[0]; // First media for main display
+        const primaryMedia = allMedia.find((m: any) => m.media_type === 'video') || allMedia[0]; // Prefer video as primary
         
         if (!primaryMedia || !isValidImageUrl(primaryMedia.media_url)) {
           return null;
@@ -267,7 +267,7 @@ export const useRealPostsFetcher = () => {
       const formattedPosts = postsData.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
         const allMedia = (post.post_media || []);
-        const primaryMedia = allMedia[0]; // First media for main display
+        const primaryMedia = allMedia.find((m: any) => m.media_type === 'video') || allMedia[0]; // Prefer video as primary
         
         if (!primaryMedia || !isValidImageUrl(primaryMedia.media_url)) {
           return null;
