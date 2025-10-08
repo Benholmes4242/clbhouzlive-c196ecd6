@@ -877,6 +877,8 @@ export type Database = {
         Row: {
           aspect_ratio: number | null
           created_at: string
+          duration_ms: number | null
+          duration_seconds: number | null
           height: number | null
           id: string
           media_type: string
@@ -890,6 +892,8 @@ export type Database = {
         Insert: {
           aspect_ratio?: number | null
           created_at?: string
+          duration_ms?: number | null
+          duration_seconds?: number | null
           height?: number | null
           id?: string
           media_type: string
@@ -903,6 +907,8 @@ export type Database = {
         Update: {
           aspect_ratio?: number | null
           created_at?: string
+          duration_ms?: number | null
+          duration_seconds?: number | null
           height?: number | null
           id?: string
           media_type?: string

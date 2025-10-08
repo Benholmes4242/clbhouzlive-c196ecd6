@@ -42,7 +42,8 @@ export const useRealPostsFetcher = () => {
             width,
             height,
             aspect_ratio,
-            orientation
+            orientation,
+            duration_seconds
           ),
           post_tags (
             id,
@@ -156,9 +157,9 @@ export const useRealPostsFetcher = () => {
           return tracks[Math.floor(Math.random() * tracks.length)];
         };
 
-        // Generate duration (random for now - will need DB field for actual implementation)
+        // Use actual duration from database
         const durationSeconds = primaryMedia.media_type === 'video' 
-          ? Math.floor(Math.random() * 180) + 10 // 10-190 seconds
+          ? (primaryMedia as any).duration_seconds
           : undefined;
 
         const formattedPost = {
@@ -208,7 +209,8 @@ export const useRealPostsFetcher = () => {
           post_media!inner (
             id,
             media_type,
-            media_url
+            media_url,
+            duration_seconds
           ),
           post_tags (
             id,
@@ -226,9 +228,12 @@ export const useRealPostsFetcher = () => {
         .limit(postsPerPage);
 
       // Add media type filter if specified
-      if (mediaFilter === FILTER_TYPES.SHORTS || mediaFilter === FILTER_TYPES.VIDEOS) {
+      if (mediaFilter === FILTER_TYPES.SHORTS) {
+        query = query
+          .eq('post_media.media_type', MEDIA_TYPES.VIDEO)
+          .lte('post_media.duration_seconds', 30);
+      } else if (mediaFilter === FILTER_TYPES.VIDEOS) {
         query = query.eq('post_media.media_type', MEDIA_TYPES.VIDEO);
-        // Note: Shorts filtering (≤30s) happens client-side below until duration field is added to DB
       } else if (mediaFilter === FILTER_TYPES.PHOTOS) {
         query = query.eq('post_media.media_type', MEDIA_TYPES.IMAGE);
       }
@@ -324,9 +329,9 @@ export const useRealPostsFetcher = () => {
           return tracks[Math.floor(Math.random() * tracks.length)];
         };
 
-        // Generate duration (random for now - will need DB field for actual implementation)
+        // Use actual duration from database
         const durationSeconds = primaryMedia.media_type === 'video' 
-          ? Math.floor(Math.random() * 180) + 10 // 10-190 seconds
+          ? (primaryMedia as any).duration_seconds
           : undefined;
 
         const formattedPost = {
@@ -355,15 +360,6 @@ export const useRealPostsFetcher = () => {
 
         return formattedPost;
       }).filter(Boolean) as ExploreContentItem[];
-
-      // Apply Shorts filter (≤30s) client-side until duration field is added to post_media table
-      if (mediaFilter === FILTER_TYPES.SHORTS) {
-        const shortsFiltered = formattedPosts.filter(post => {
-          // @ts-ignore - durationSeconds is temporary field until DB migration
-          return post.type === 'video' && post.durationSeconds && post.durationSeconds <= 30;
-        });
-        return shortsFiltered;
-      }
 
       return formattedPosts;
     } catch (error) {
