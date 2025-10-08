@@ -4,3 +4,7 @@ project_id = "ybxkehyomcakqjvuhnna"
 # Make preflight (OPTIONS) requests succeed without JWT and let the function verify POST auth itself
 [functions.cloudflare-r2-upload]
 verify_jwt = false
+
+# Admin function for backfilling video durations (uses service role key internally)
+[functions.backfill-video-durations]
+verify_jwt = false
