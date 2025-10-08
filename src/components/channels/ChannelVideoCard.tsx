@@ -75,8 +75,8 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
   const thumbnailUrl = thumbnailError 
     ? FALLBACK_THUMBNAILS[0]
     : primaryMedia?.poster_url || 
-      primaryMedia?.media_url ||
       (primaryMedia?.stream_id ? getStreamPoster(primaryMedia.media_url, '1s') : null) ||
+      primaryMedia?.media_url ||
       FALLBACK_THUMBNAILS[0];
   
   const duration = primaryMedia?.duration_seconds;
