@@ -186,21 +186,19 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
           </div>
         </div>
 
-        {/* Metadata row */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>{formatViews(video.views_count)}</span>
-          <span>•</span>
-          <span>{timeAgo}</span>
-        </div>
-
-        {/* Course chip */}
-        {courseName && (
-          <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-            <span className="bg-muted px-2.5 py-1 rounded-full text-xs">
+        {/* Metadata row with course chip */}
+        <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <span>{formatViews(video.views_count)}</span>
+            <span>•</span>
+            <span>{timeAgo}</span>
+          </div>
+          {courseName && (
+            <span className="bg-muted px-2.5 py-1 rounded-full text-xs shrink-0">
               🏌️ {courseName}
             </span>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );
