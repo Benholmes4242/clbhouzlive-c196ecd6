@@ -68,7 +68,7 @@ const GlobalTop100 = lazy(() => import("./pages/GlobalTop100"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
-
+const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -169,6 +169,7 @@ const App: React.FC = () => {
                                     <Route path="/admin" element={<AdminPage />} />
                                     <Route path="/admin-backfill" element={<AdminBackfill />} />
                                     
+                                    <Route path="/channel/:slug" element={<ChannelProfile />} />
                                     
                                     <Route path="*" element={<NotFound />} />
                                   </Routes>

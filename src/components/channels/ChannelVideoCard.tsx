@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { MoreVertical, CheckCircle2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { ChannelVideo } from '@/hooks/channels/useChannelsFeed';
 import { getStreamPoster } from '@/utils/stream';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -53,10 +54,12 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
   const [imageLoaded, setImageLoaded] = useState(false);
   
   const isMock = (video as any).mock === true;
+  const mockIndex = (video as any).mockIndex || 0;
   
   const handleClick = () => {
     if (isMock) {
-      setShowComingSoon(true);
+      // Don't show modal, let the Link handle navigation
+      return;
     } else {
       onPlay(video);
     }
@@ -87,14 +90,8 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
   
   const timeAgo = formatDistanceToNow(new Date(video.created_at), { addSuffix: true });
 
-  return (
+  const content = (
     <>
-      <div 
-        className="group flex flex-col md:flex-row gap-3 md:gap-4 cursor-pointer rounded-lg p-2 md:p-3 transition-colors"
-        onClick={handleClick}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
       {/* Thumbnail */}
       <div className="relative w-full md:w-80 md:flex-shrink-0 aspect-video bg-muted rounded-lg overflow-hidden">
         {!imageLoaded && (
@@ -190,7 +187,30 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
           </div>
         )}
       </div>
-    </div>
+    </>
+  );
+
+  return (
+    <>
+      {isMock ? (
+        <Link
+          to={`/channel/mock-${mockIndex}`}
+          className="group flex flex-col md:flex-row gap-3 md:gap-4 cursor-pointer rounded-lg p-2 md:p-3 transition-colors"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          {content}
+        </Link>
+      ) : (
+        <div
+          className="group flex flex-col md:flex-row gap-3 md:gap-4 cursor-pointer rounded-lg p-2 md:p-3 transition-colors"
+          onClick={handleClick}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          {content}
+        </div>
+      )}
 
     {/* Coming Soon Dialog */}
     <Dialog open={showComingSoon} onOpenChange={setShowComingSoon}>

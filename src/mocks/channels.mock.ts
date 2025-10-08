@@ -228,7 +228,7 @@ export const getMockChannels = (
   }
 
   // Map to ChannelVideo format
-  return videos.map(video => ({
+  return videos.map((video, index) => ({
     id: video.id,
     user_id: video.creator.id,
     content: video.content,
@@ -260,5 +260,6 @@ export const getMockChannels = (
       }
     }] : [],
     mock: video.mock,
+    mockIndex: index,
   }));
 };
