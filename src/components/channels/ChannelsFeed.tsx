@@ -5,6 +5,7 @@ import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { useInView } from 'react-intersection-observer';
 import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
+import { isMockEnabled, getMockChannels } from '@/mocks/channels.mock';
 
 export const ChannelsFeed: React.FC = () => {
   const { sub } = useDiscoverQuery();
@@ -12,10 +13,24 @@ export const ChannelsFeed: React.FC = () => {
     subFilter: sub || 'all' 
   });
 
+  const [mockItems, setMockItems] = React.useState<any[]>([]);
+  const [mockPage, setMockPage] = React.useState(0);
+  const mockMode = isMockEnabled();
+
   const { ref: loadMoreRef } = useInView({
     onChange: (inView) => {
-      if (inView && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
+      if (!inView) return;
+      
+      if (!mockMode && !isEmptyReal) {
+        // Real data pagination
+        if (hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      } else {
+        // Mock pagination - load 1-2 pages then stop
+        if (mockPage < 1) {
+          setMockPage(p => p + 1);
+        }
       }
     },
     threshold: 0.5,
@@ -24,8 +39,26 @@ export const ChannelsFeed: React.FC = () => {
   const { openFeed, setPosts } = useVerticalMediaFeed();
 
   const allVideos = data?.pages.flatMap(page => page.items) || [];
+  const isEmptyReal = !allVideos || allVideos.length === 0;
+
+  // Load mock data when needed
+  React.useEffect(() => {
+    if (!mockMode && !isEmptyReal) return; // use real data
+    
+    const items = getMockChannels(mockPage, 15, sub || 'all');
+    if (mockPage === 0) {
+      setMockItems(items);
+    } else {
+      setMockItems(prev => [...prev, ...items]);
+    }
+  }, [mockMode, isEmptyReal, mockPage, sub]);
+
+  const itemsToRender = (!mockMode && !isEmptyReal) ? allVideos : mockItems;
 
   const handleVideoPlay = (video: any) => {
+    // Don't process mock videos - card handles it with dialog
+    if ((video as any).mock) return;
+
     // Convert to format expected by vertical feed
     const posts = allVideos.map(v => ({
       id: v.id,
@@ -53,11 +86,11 @@ export const ChannelsFeed: React.FC = () => {
     openFeed(posts.find(p => p.id === video.id)!);
   };
 
-  if (isLoading && allVideos.length === 0) {
+  if (isLoading && itemsToRender.length === 0) {
     return <ClbhouzPageSpinner label="Loading channels..." />;
   }
 
-  if (allVideos.length === 0) {
+  if (itemsToRender.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
         <div className="text-6xl mb-4">📺</div>
@@ -72,7 +105,7 @@ export const ChannelsFeed: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto px-2 md:px-4 py-4">
       <div className="space-y-2">
-        {allVideos.map((video) => (
+        {itemsToRender.map((video) => (
           <ChannelVideoCard 
             key={video.id} 
             video={video}
@@ -82,7 +115,7 @@ export const ChannelsFeed: React.FC = () => {
       </div>
 
       {/* Load more trigger */}
-      {hasNextPage && (
+      {((!mockMode && !isEmptyReal && hasNextPage) || (mockMode || isEmptyReal) && mockPage < 1) && (
         <div ref={loadMoreRef} className="py-8 flex justify-center">
           {isFetchingNextPage && (
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
