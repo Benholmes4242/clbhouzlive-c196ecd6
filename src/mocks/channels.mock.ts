@@ -227,13 +227,16 @@ export const getMockChannels = (
     }
   }
 
-  // Map to ChannelVideo format
+  // Map to ChannelVideo format - expose both top-level and primaryMedia fields
   return videos.map((video, index) => ({
     id: video.id,
     user_id: video.creator.id,
     content: video.content,
     created_at: video.created_at,
     views_count: video.views_count,
+    // Top-level mock fields (for tolerant card rendering)
+    thumbnail_url: video.thumbnail_url,
+    poster_url: video.thumbnail_url,
     user_profiles: {
       id: video.creator.id,
       display_name: video.creator.name,
@@ -246,8 +249,11 @@ export const getMockChannels = (
       media_type: 'video' as const,
       media_url: video.thumbnail_url,
       poster_url: video.thumbnail_url,
+      thumbnail_url: video.thumbnail_url,
       duration_seconds: video.duration_seconds,
       stream_id: null,
+      width: null,
+      height: null,
     }],
     post_tags: video.course ? [{
       id: `${video.id}-tag`,

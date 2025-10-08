@@ -20,13 +20,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
-const FALLBACK_THUMBNAILS = [
-  '/images/mocks/thumbnails/golf-01.jpg',
-  '/images/mocks/thumbnails/golf-02.jpg',
-  '/images/mocks/thumbnails/golf-03.jpg',
-  '/images/mocks/thumbnails/golf-04.jpg',
-  '/images/mocks/thumbnails/golf-05.jpg',
-];
+const FALLBACK_THUMBNAIL = 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=1280&q=60&auto=format';
 
 interface ChannelVideoCardProps {
   video: ChannelVideo;
@@ -48,13 +42,19 @@ const formatViews = (count?: number): string => {
 };
 
 export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPlay }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [showComingSoon, setShowComingSoon] = useState(false);
-  const [thumbnailError, setThumbnailError] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
-  
   const isMock = (video as any).mock === true;
   const mockIndex = (video as any).mockIndex || 0;
+  
+  // Diagnostics (DEV only)
+  if (import.meta.env.DEV) {
+    console.debug('[ChannelVideoCard] video', {
+      id: video?.id,
+      isMock,
+      primaryMedia: video?.post_media?.[0],
+      thumbnail_url: (video as any)?.thumbnail_url,
+      poster_url: (video as any)?.poster_url,
+    });
+  }
   
   const handleClick = () => {
     if (isMock) {
@@ -74,13 +74,28 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
     console.log(`Action: ${action}`, video.id);
   };
   
+  // Be generous for mocks - check both top-level and primaryMedia
   const primaryMedia = video.post_media?.[0];
-  const thumbnailUrl = thumbnailError 
-    ? FALLBACK_THUMBNAILS[0]
-    : primaryMedia?.poster_url || 
-      (primaryMedia?.stream_id ? getStreamPoster(primaryMedia.media_url, '1s') : null) ||
-      primaryMedia?.media_url ||
-      FALLBACK_THUMBNAILS[0];
+  const videoWithExtras = video as any;
+  
+  // Greedy fallback chain: prefer explicit mock fields first
+  const resolvedThumbnail =
+    // Top-level mock fields
+    videoWithExtras?.thumbnail_url ||
+    videoWithExtras?.poster_url ||
+    // Media-level fields
+    primaryMedia?.poster_url ||
+    (primaryMedia as any)?.thumbnail_url ||
+    // If Stream, compute poster
+    (primaryMedia?.stream_id ? getStreamPoster(primaryMedia.media_url, '1s') : undefined) ||
+    // Fallback to media URL (often an image for mocks)
+    primaryMedia?.media_url ||
+    // Last resort
+    FALLBACK_THUMBNAIL;
+
+  const [thumbnailUrl, setThumbnailUrl] = useState(resolvedThumbnail);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   
   const duration = primaryMedia?.duration_seconds;
   const title = video.content || 'Untitled';
@@ -95,15 +110,15 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
       {/* Thumbnail */}
       <div className="relative w-full md:w-80 md:flex-shrink-0 aspect-video bg-muted rounded-lg overflow-hidden">
         {!imageLoaded && (
-          <div className="absolute inset-0 animate-pulse bg-muted rounded-lg" />
+          <div className="absolute inset-0 animate-pulse bg-muted rounded-lg pointer-events-none" />
         )}
         <img 
           src={thumbnailUrl}
           alt={title}
-          className={`w-full h-full aspect-video object-cover rounded-lg ${imageLoaded ? '' : 'hidden'}`}
+          className="w-full h-full aspect-video object-cover rounded-lg"
           loading="lazy"
           onLoad={() => setImageLoaded(true)}
-          onError={() => setThumbnailError(true)}
+          onError={() => setThumbnailUrl(FALLBACK_THUMBNAIL)}
         />
         {/* Duration overlay */}
         {duration && (
@@ -212,20 +227,6 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
         </div>
       )}
 
-    {/* Coming Soon Dialog */}
-    <Dialog open={showComingSoon} onOpenChange={setShowComingSoon}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Coming Soon</DialogTitle>
-          <DialogDescription>
-            Long-form creator videos are coming soon. Stay tuned!
-          </DialogDescription>
-        </DialogHeader>
-        <div className="flex justify-end mt-4">
-          <Button onClick={() => setShowComingSoon(false)}>Close</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  </>
+    </>
   );
 };
