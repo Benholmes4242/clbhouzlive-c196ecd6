@@ -317,7 +317,7 @@ export default function EnhancedCreateMomentModalCinematic({
     <AnimatePresence>
       {isOpen && (
         <motion.div 
-          className="enhanced-create-moment-modal fixed inset-0 z-[1000]" 
+          className="enhanced-create-moment-modal fixed inset-0 z-[1000] overflow-hidden touch-none overscroll-none" 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
           exit={{ opacity: 0 }}
@@ -326,21 +326,31 @@ export default function EnhancedCreateMomentModalCinematic({
             ease: "easeIn"
           }}
           onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            touchAction: 'none',
+            overscrollBehavior: 'none'
+          }}
         >
           {/* backdrop - subtle dark with reduced opacity for liquid glass */}
           <div 
-            className="absolute inset-0 bg-black/20 backdrop-blur-[4px]" 
+            className="absolute inset-0 bg-black/20 backdrop-blur-[4px] touch-none" 
             onClick={close}
+            style={{ touchAction: 'none' }}
           />
 
           {/* modal shell - full screen on mobile, centered on desktop */}
-          <div className="absolute inset-0 flex items-center justify-center" onClick={close}>
+          <div className="absolute inset-0 flex items-center justify-center touch-none" onClick={close} style={{ touchAction: 'none' }}>
             <motion.div
               ref={wrapperRef}
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="relative w-full max-w-md h-[100svh] md:h-[90vh] md:rounded-3xl overflow-hidden"
+              className="relative w-full max-w-md h-[100svh] md:h-[90vh] md:rounded-3xl overflow-hidden touch-none"
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { y: 12, opacity: 0, scale: 0.98 }}
@@ -354,6 +364,11 @@ export default function EnhancedCreateMomentModalCinematic({
                 }
               }
               onClick={(e) => e.stopPropagation()}
+              style={{
+                position: 'fixed',
+                touchAction: 'none',
+                overscrollBehavior: 'none'
+              }}
             >
               {/* Liquid glass background */}
               <LiquidGlassBackdrop isVisible={true} />
