@@ -1,14 +1,32 @@
 import { ChannelVideo } from '@/hooks/channels/useChannelsFeed';
 
 const MOCK_CREATORS = [
-  { id: 'c1', name: 'Golf with Aimee', avatar: '/placeholder.svg', verified: true },
-  { id: 'c2', name: 'Rick Shiels Golf', avatar: '/placeholder.svg', verified: true },
-  { id: 'c3', name: 'Peter Finch Golf', avatar: '/placeholder.svg', verified: true },
-  { id: 'c4', name: 'Mark Crossfield', avatar: '/placeholder.svg', verified: false },
-  { id: 'c5', name: 'Good Good Golf', avatar: '/placeholder.svg', verified: true },
-  { id: 'c6', name: 'Me And My Golf', avatar: '/placeholder.svg', verified: true },
-  { id: 'c7', name: 'Golfholics', avatar: '/placeholder.svg', verified: false },
-  { id: 'c8', name: 'The Golf Mates', avatar: '/placeholder.svg', verified: false },
+  { id: 'c1', name: 'Golf with Aimee', avatar: '/images/mocks/avatars/avatar-01.png', verified: true },
+  { id: 'c2', name: 'Rick Shiels Golf', avatar: '/images/mocks/avatars/avatar-02.png', verified: true },
+  { id: 'c3', name: 'Peter Finch Golf', avatar: '/images/mocks/avatars/avatar-03.png', verified: true },
+  { id: 'c4', name: 'Mark Crossfield', avatar: '/images/mocks/avatars/avatar-04.png', verified: false },
+  { id: 'c5', name: 'Good Good Golf', avatar: '/images/mocks/avatars/avatar-05.png', verified: true },
+  { id: 'c6', name: 'Me And My Golf', avatar: '/images/mocks/avatars/avatar-06.png', verified: true },
+  { id: 'c7', name: 'Golfholics', avatar: '/images/mocks/avatars/avatar-07.png', verified: false },
+  { id: 'c8', name: 'The Golf Mates', avatar: '/images/mocks/avatars/avatar-08.png', verified: false },
+];
+
+const THUMBNAIL_POOL = [
+  '/images/mocks/thumbnails/golf-01.jpg',
+  '/images/mocks/thumbnails/golf-02.jpg',
+  '/images/mocks/thumbnails/golf-03.jpg',
+  '/images/mocks/thumbnails/golf-04.jpg',
+  '/images/mocks/thumbnails/golf-05.jpg',
+  '/images/mocks/thumbnails/golf-06.jpg',
+  '/images/mocks/thumbnails/golf-07.jpg',
+  '/images/mocks/thumbnails/golf-08.jpg',
+  '/images/mocks/thumbnails/golf-09.jpg',
+  '/images/mocks/thumbnails/golf-10.jpg',
+  '/images/mocks/thumbnails/golf-11.jpg',
+  '/images/mocks/thumbnails/golf-12.jpg',
+  '/images/mocks/thumbnails/golf-13.jpg',
+  '/images/mocks/thumbnails/golf-14.jpg',
+  '/images/mocks/thumbnails/golf-15.jpg',
 ];
 
 const MOCK_VIDEOS = [
@@ -18,7 +36,7 @@ const MOCK_VIDEOS = [
     duration_seconds: 1080, // 18 min
     views_count: 480000,
     created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-    thumbnail_url: '/placeholder.svg',
+    thumbnail_url: THUMBNAIL_POOL[0],
     creator: MOCK_CREATORS[0],
     course: { id: 'course-1', name: 'Royal County Down' },
     categories: ['on-course', 'travel'],
@@ -30,7 +48,7 @@ const MOCK_VIDEOS = [
     duration_seconds: 600, // 10 min
     views_count: 276000,
     created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
-    thumbnail_url: '/placeholder.svg',
+    thumbnail_url: THUMBNAIL_POOL[1],
     creator: MOCK_CREATORS[1],
     categories: ['golf-tips'],
     mock: true,
@@ -41,7 +59,7 @@ const MOCK_VIDEOS = [
     duration_seconds: 840, // 14 min
     views_count: 185000,
     created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 1 week ago
-    thumbnail_url: '/placeholder.svg',
+    thumbnail_url: THUMBNAIL_POOL[2],
     creator: MOCK_CREATORS[2],
     categories: ['equipment'],
     mock: true,
@@ -52,7 +70,7 @@ const MOCK_VIDEOS = [
     duration_seconds: 720, // 12 min
     views_count: 342000,
     created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days ago
-    thumbnail_url: '/placeholder.svg',
+    thumbnail_url: THUMBNAIL_POOL[3],
     creator: MOCK_CREATORS[4],
     course: { id: 'course-2', name: 'St Andrews Old Course' },
     categories: ['on-course'],
@@ -64,7 +82,7 @@ const MOCK_VIDEOS = [
     duration_seconds: 900, // 15 min
     views_count: 128000,
     created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(), // 2 weeks ago
-    thumbnail_url: '/placeholder.svg',
+    thumbnail_url: THUMBNAIL_POOL[4],
     creator: MOCK_CREATORS[5],
     categories: ['interviews', 'golf-tips'],
     mock: true,
@@ -75,7 +93,7 @@ const MOCK_VIDEOS = [
     duration_seconds: 480, // 8 min
     views_count: 420000,
     created_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(), // 3 weeks ago
-    thumbnail_url: '/placeholder.svg',
+    thumbnail_url: THUMBNAIL_POOL[5],
     creator: MOCK_CREATORS[1],
     categories: ['golf-tips'],
     mock: true,
@@ -86,7 +104,7 @@ const MOCK_VIDEOS = [
     duration_seconds: 1020, // 17 min
     views_count: 95000,
     created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 1 month ago
-    thumbnail_url: '/placeholder.svg',
+    thumbnail_url: THUMBNAIL_POOL[6],
     creator: MOCK_CREATORS[6],
     categories: ['on-course', 'travel'],
     mock: true,
@@ -97,7 +115,7 @@ const MOCK_VIDEOS = [
     duration_seconds: 540, // 9 min
     views_count: 156000,
     created_at: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(), // 1.5 months ago
-    thumbnail_url: '/placeholder.svg',
+    thumbnail_url: THUMBNAIL_POOL[7],
     creator: MOCK_CREATORS[5],
     categories: ['golf-tips'],
     mock: true,
@@ -108,7 +126,7 @@ const MOCK_VIDEOS = [
     duration_seconds: 660, // 11 min
     views_count: 203000,
     created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(), // 2 months ago
-    thumbnail_url: '/placeholder.svg',
+    thumbnail_url: THUMBNAIL_POOL[8],
     creator: MOCK_CREATORS[3],
     categories: ['golf-tips'],
     mock: true,
@@ -119,7 +137,7 @@ const MOCK_VIDEOS = [
     duration_seconds: 780, // 13 min
     views_count: 312000,
     created_at: new Date(Date.now() - 75 * 24 * 60 * 60 * 1000).toISOString(), // 2.5 months ago
-    thumbnail_url: '/placeholder.svg',
+    thumbnail_url: THUMBNAIL_POOL[9],
     creator: MOCK_CREATORS[2],
     categories: ['equipment'],
     mock: true,
@@ -130,7 +148,7 @@ const MOCK_VIDEOS = [
     duration_seconds: 960, // 16 min
     views_count: 267000,
     created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(), // 3 months ago
-    thumbnail_url: '/placeholder.svg',
+    thumbnail_url: THUMBNAIL_POOL[10],
     creator: MOCK_CREATORS[4],
     course: { id: 'course-3', name: 'Pebble Beach Golf Links' },
     categories: ['on-course', 'travel'],
@@ -142,7 +160,7 @@ const MOCK_VIDEOS = [
     duration_seconds: 840, // 14 min
     views_count: 189000,
     created_at: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString(), // 4 months ago
-    thumbnail_url: '/placeholder.svg',
+    thumbnail_url: THUMBNAIL_POOL[11],
     creator: MOCK_CREATORS[0],
     categories: ['interviews', 'golf-tips'],
     mock: true,
@@ -153,7 +171,7 @@ const MOCK_VIDEOS = [
     duration_seconds: 720, // 12 min
     views_count: 145000,
     created_at: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000).toISOString(), // 5 months ago
-    thumbnail_url: '/placeholder.svg',
+    thumbnail_url: THUMBNAIL_POOL[12],
     creator: MOCK_CREATORS[3],
     categories: ['equipment'],
     mock: true,
@@ -164,7 +182,7 @@ const MOCK_VIDEOS = [
     duration_seconds: 1200, // 20 min
     views_count: 385000,
     created_at: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(), // 6 months ago
-    thumbnail_url: '/placeholder.svg',
+    thumbnail_url: THUMBNAIL_POOL[13],
     creator: MOCK_CREATORS[7],
     course: { id: 'course-4', name: 'Augusta National Golf Club' },
     categories: ['on-course'],
@@ -176,7 +194,7 @@ const MOCK_VIDEOS = [
     duration_seconds: 900, // 15 min
     views_count: 221000,
     created_at: new Date(Date.now() - 240 * 24 * 60 * 60 * 1000).toISOString(), // 8 months ago
-    thumbnail_url: '/placeholder.svg',
+    thumbnail_url: THUMBNAIL_POOL[14],
     creator: MOCK_CREATORS[5],
     categories: ['golf-tips'],
     mock: true,

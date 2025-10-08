@@ -19,6 +19,14 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
+const FALLBACK_THUMBNAILS = [
+  '/images/mocks/thumbnails/golf-01.jpg',
+  '/images/mocks/thumbnails/golf-02.jpg',
+  '/images/mocks/thumbnails/golf-03.jpg',
+  '/images/mocks/thumbnails/golf-04.jpg',
+  '/images/mocks/thumbnails/golf-05.jpg',
+];
+
 interface ChannelVideoCardProps {
   video: ChannelVideo;
   onPlay: (video: ChannelVideo) => void;
@@ -41,6 +49,8 @@ const formatViews = (count?: number): string => {
 export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPlay }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showComingSoon, setShowComingSoon] = useState(false);
+  const [thumbnailError, setThumbnailError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   
   const isMock = (video as any).mock === true;
   
@@ -62,9 +72,12 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
   };
   
   const primaryMedia = video.post_media?.[0];
-  const thumbnailUrl = primaryMedia?.poster_url || 
-    (primaryMedia?.stream_id ? getStreamPoster(primaryMedia.media_url, '1s') : null) ||
-    primaryMedia?.media_url;
+  const thumbnailUrl = thumbnailError 
+    ? FALLBACK_THUMBNAILS[0]
+    : primaryMedia?.poster_url || 
+      (primaryMedia?.stream_id ? getStreamPoster(primaryMedia.media_url, '1s') : null) ||
+      primaryMedia?.media_url ||
+      FALLBACK_THUMBNAILS[0];
   
   const duration = primaryMedia?.duration_seconds;
   const title = video.content || 'Untitled';
@@ -77,23 +90,28 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
   return (
     <>
       <div 
-        className="group flex flex-col md:flex-row gap-3 md:gap-4 cursor-pointer hover:bg-accent/50 rounded-lg p-2 md:p-3 transition-colors"
+        className="group flex flex-col md:flex-row gap-3 md:gap-4 cursor-pointer rounded-lg p-2 md:p-3 transition-colors"
         onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
       {/* Thumbnail */}
       <div className="relative w-full md:w-80 md:flex-shrink-0 aspect-video bg-muted rounded-lg overflow-hidden">
+        {!imageLoaded && (
+          <div className="absolute inset-0 animate-pulse bg-muted rounded-lg" />
+        )}
         <img 
-          src={thumbnailUrl || '/placeholder.svg'}
-          alt={`${title} – ${creatorName}`}
-          className="w-full h-full object-cover"
+          src={thumbnailUrl}
+          alt={title}
+          className={`w-full h-full aspect-video object-cover rounded-lg ${imageLoaded ? '' : 'hidden'}`}
           loading="lazy"
+          onLoad={() => setImageLoaded(true)}
+          onError={() => setThumbnailError(true)}
         />
         {/* Duration overlay */}
         {duration && (
           <div 
-            className="absolute bottom-2 right-2 bg-black/80 text-white text-xs font-medium px-1.5 py-0.5 rounded"
+            className="absolute bottom-2 right-2 rounded-md bg-[rgba(0,0,0,0.65)] text-white text-xs px-2 py-1 font-medium"
             aria-label={`duration ${Math.floor(duration / 60)} minutes ${Math.floor(duration % 60)} seconds`}
           >
             {formatDuration(duration)}
@@ -103,10 +121,42 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
 
       {/* Content */}
       <div className="flex-1 flex flex-col justify-start gap-1 min-w-0">
-        {/* Title */}
-        <h3 className="font-semibold text-base leading-tight line-clamp-2 text-foreground">
-          {title}
-        </h3>
+        {/* Title row with menu */}
+        <div className="flex items-start gap-2">
+          <h3 className="flex-1 font-semibold text-base leading-tight line-clamp-2 text-foreground min-w-0">
+            {title}
+          </h3>
+          
+          {/* Actions menu */}
+          <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="p-2 hover:bg-muted rounded-full transition-colors">
+                <MoreVertical className="w-5 h-5 text-muted-foreground" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem 
+                  onClick={() => handleMenuAction('save')}
+                  disabled={isMock}
+                >
+                  Save to playlist
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => handleMenuAction('share')}
+                  disabled={isMock}
+                >
+                  Share
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => handleMenuAction('report')}
+                  disabled={isMock}
+                  className="text-destructive"
+                >
+                  Report
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
 
         {/* Creator row */}
         <div className="flex items-center gap-2 mt-1">
@@ -134,41 +184,11 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
         {/* Course chip */}
         {courseName && (
           <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-            <span className="bg-accent px-2 py-0.5 rounded-full">
+            <span className="bg-muted px-2.5 py-1 rounded-full text-xs">
               🏌️ {courseName}
             </span>
           </div>
         )}
-      </div>
-
-      {/* Actions menu */}
-      <div className="flex md:self-start" onClick={(e) => e.stopPropagation()}>
-        <DropdownMenu>
-          <DropdownMenuTrigger className="p-2 hover:bg-accent rounded-full transition-colors">
-            <MoreVertical className="w-5 h-5 text-muted-foreground" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem 
-              onClick={() => handleMenuAction('save')}
-              disabled={isMock}
-            >
-              Save to playlist
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => handleMenuAction('share')}
-              disabled={isMock}
-            >
-              Share
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => handleMenuAction('report')}
-              disabled={isMock}
-              className="text-destructive"
-            >
-              Report
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </div>
 
