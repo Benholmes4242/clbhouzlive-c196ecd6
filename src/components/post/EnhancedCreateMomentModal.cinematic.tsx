@@ -400,30 +400,53 @@ export default function EnhancedCreateMomentModalCinematic({
                   className="h-full w-full"
                 >
                   {media.length === 0 ? (
-                    /* Empty State Panel - Transparent to show sunset gradient */
-                    <button
-                      onClick={handlePickFromLibrary}
-                      className="h-full w-full flex items-center justify-center bg-transparent cursor-pointer transition-all duration-200"
-                      role="button"
-                      aria-label="Add media"
+                    /* Empty State Panel - with CTAs centered, no generic tap */
+                    <div
+                      className="h-full w-full flex items-center justify-center bg-transparent pointer-events-none"
                     >
                       <motion.div 
-                        className="text-center px-6 max-w-[85%]"
+                        className="text-center px-6 max-w-[520px] flex flex-col items-center"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.25, ease: "easeOut" }}
                       >
                         <Camera 
-                          className="w-20 h-20 mx-auto mb-5" 
+                          className="w-16 h-16 mb-4 opacity-80" 
                           strokeWidth={1.5}
                           aria-hidden="true"
                           style={{ color: 'white' }}
                         />
-                        <p className="text-[17px] leading-relaxed text-white">
+                        <h2 className="text-white/90 text-[18px] font-medium leading-snug max-w-[520px]">
                           Capture your next great golf moment – add a photo or video to share with your community.
-                        </p>
+                        </h2>
+                        
+                        {/* 16px gap below text */}
+                        <div className="h-4" />
+                        
+                        {/* CTA row - re-enable pointer events only for buttons */}
+                        <div className="pointer-events-auto flex items-center justify-center gap-3 sm:gap-4 z-10">
+                          <button
+                            type="button"
+                            onClick={handlePickFromCamera}
+                            aria-label="Open Camera"
+                            className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
+                          >
+                            <Camera className="w-5 h-5" />
+                            <span className="font-medium">Camera</span>
+                          </button>
+                          
+                          <button
+                            type="button"
+                            onClick={handlePickFromLibrary}
+                            aria-label="Choose Photos and Videos"
+                            className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
+                          >
+                            <Sparkles className="w-5 h-5" />
+                            <span className="font-medium">Photos &amp; Videos</span>
+                          </button>
+                        </div>
                       </motion.div>
-                    </button>
+                    </div>
                   ) : (
                     <MediaCarousel
                       items={media.map((item, index) => ({
@@ -558,33 +581,36 @@ export default function EnhancedCreateMomentModalCinematic({
                     >
                       <div className="flex items-center justify-between mb-3">
                         <label className="block text-base font-semibold text-white">Add a caption</label>
-                        <motion.div 
-                          className="flex gap-2"
-                          initial={{ opacity: 0, scale: 1.03 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ duration: 0.24, ease: "easeOut" }}
-                        >
-                          <button
-                            onClick={handlePickFromCamera}
-                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-[15px] hover:scale-[0.98] active:scale-95 focus:outline-none focus:ring-1 focus:ring-[rgba(255,156,64,0.4)] focus:border-[rgba(255,156,64,0.4)] shadow-[0_2px_6px_rgba(0,0,0,0.10)]"
-                            aria-label="Open camera"
+                        {/* CTAs removed - now in empty state media area */}
+                        {media.length > 0 && (
+                          <motion.div 
+                            className="flex gap-2"
+                            initial={{ opacity: 0, scale: 1.03 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.24, ease: "easeOut" }}
                           >
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-lg">📷</span>
-                              <span className="font-medium">Camera</span>
-                            </div>
-                          </button>
-                          <button
-                            onClick={handlePickFromLibrary}
-                            className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-[15px] hover:scale-[0.98] active:scale-95 focus:outline-none focus:ring-1 focus:ring-[rgba(255,156,64,0.4)] focus:border-[rgba(255,156,64,0.4)] shadow-[0_2px_6px_rgba(0,0,0,0.10)]"
-                            aria-label="Choose photos and videos"
-                          >
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-lg">✨</span>
-                              <span className="font-medium">Photos & Videos</span>
-                            </div>
-                          </button>
-                        </motion.div>
+                            <button
+                              onClick={handlePickFromCamera}
+                              className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-[15px] hover:scale-[0.98] active:scale-95 focus:outline-none focus:ring-1 focus:ring-[rgba(255,156,64,0.4)] focus:border-[rgba(255,156,64,0.4)] shadow-[0_2px_6px_rgba(0,0,0,0.10)]"
+                              aria-label="Open camera"
+                            >
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-lg">📷</span>
+                                <span className="font-medium">Camera</span>
+                              </div>
+                            </button>
+                            <button
+                              onClick={handlePickFromLibrary}
+                              className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-[15px] hover:scale-[0.98] active:scale-95 focus:outline-none focus:ring-1 focus:ring-[rgba(255,156,64,0.4)] focus:border-[rgba(255,156,64,0.4)] shadow-[0_2px_6px_rgba(0,0,0,0.10)]"
+                              aria-label="Choose photos and videos"
+                            >
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-lg">✨</span>
+                                <span className="font-medium">Photos & Videos</span>
+                              </div>
+                            </button>
+                          </motion.div>
+                        )}
                       </div>
                       
                       <textarea
