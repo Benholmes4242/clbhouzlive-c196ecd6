@@ -411,7 +411,7 @@ export default function EnhancedCreateMomentModalCinematic({
                         transition={{ duration: 0.25, ease: "easeOut" }}
                       >
                         <Camera 
-                          className="w-16 h-16 mb-4 opacity-80" 
+                          className="w-16 h-16 mb-5 opacity-80" 
                           strokeWidth={1.5}
                           aria-hidden="true"
                           style={{ color: 'white' }}
@@ -420,8 +420,8 @@ export default function EnhancedCreateMomentModalCinematic({
                           Capture your next great golf moment – add a photo or video to share with your community.
                         </h2>
                         
-                        {/* 16px gap below text */}
-                        <div className="h-4" />
+                        {/* 20px gap below text */}
+                        <div className="h-5" />
                         
                         {/* CTA row - re-enable pointer events only for buttons */}
                         <div className="pointer-events-auto flex items-center justify-center gap-3 sm:gap-4 z-10">
