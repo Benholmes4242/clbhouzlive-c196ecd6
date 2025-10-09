@@ -411,7 +411,7 @@ export default function EnhancedCreateMomentModalCinematic({
                         transition={{ duration: 0.25, ease: "easeOut" }}
                       >
                         <Camera 
-                          className="w-16 h-16 mb-5 opacity-80" 
+                          className="w-16 h-16 mb-4 opacity-80" 
                           strokeWidth={1.5}
                           aria-hidden="true"
                           style={{ color: 'white' }}
@@ -420,8 +420,8 @@ export default function EnhancedCreateMomentModalCinematic({
                           Capture your next great golf moment – add a photo or video to share with your community.
                         </h2>
                         
-                        {/* 20px gap below text */}
-                        <div className="h-5" />
+                        {/* 16px gap below text */}
+                        <div className="h-4" />
                         
                         {/* CTA row - re-enable pointer events only for buttons */}
                         <div className="pointer-events-auto flex items-center justify-center gap-3 sm:gap-4 z-10">
@@ -429,7 +429,7 @@ export default function EnhancedCreateMomentModalCinematic({
                             type="button"
                             onClick={handlePickFromCamera}
                             aria-label="Open Camera"
-                            className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
+                            className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
                           >
                             <Camera className="w-5 h-5" />
                             <span className="font-medium">Camera</span>
@@ -439,7 +439,7 @@ export default function EnhancedCreateMomentModalCinematic({
                             type="button"
                             onClick={handlePickFromLibrary}
                             aria-label="Choose Photos and Videos"
-                            className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
+                            className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
                           >
                             <Sparkles className="w-5 h-5" />
                             <span className="font-medium">Photos &amp; Videos</span>
