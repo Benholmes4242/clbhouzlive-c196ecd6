@@ -429,7 +429,7 @@ export default function EnhancedCreateMomentModalCinematic({
                             type="button"
                             onClick={handlePickFromCamera}
                             aria-label="Open Camera"
-                            className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 pb-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
+                            className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
                           >
                             <Camera className="w-5 h-5" />
                             <span className="font-medium">Camera</span>
@@ -439,7 +439,7 @@ export default function EnhancedCreateMomentModalCinematic({
                             type="button"
                             onClick={handlePickFromLibrary}
                             aria-label="Choose Photos and Videos"
-                            className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 pb-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
+                            className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
                           >
                             <Sparkles className="w-5 h-5" />
                             <span className="font-medium">Photos &amp; Videos</span>
