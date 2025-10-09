@@ -8,6 +8,7 @@ import ExploreFilters from '@/components/explore/ExploreFilters';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 // import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned'; // Stored for future use
 import DiscoverContent from '@/components/discover/DiscoverContent';
+import FollowingFeed from '@/components/discover/FollowingFeed';
 import { ChannelsFeed } from '@/components/channels/ChannelsFeed';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
@@ -185,6 +186,10 @@ const Discover = () => {
           {/* Main Content - Conditional based on active tab */}
           {main === 'channels' ? (
             <ChannelsFeed />
+          ) : main === 'following' ? (
+            <div className="md:container md:mx-auto md:px-0 mt-4">
+              <FollowingFeed onMediaClick={handleMediaClick} />
+            </div>
           ) : (
             <div className="md:container md:mx-auto md:px-0 mt-4">
               <DiscoverContent
