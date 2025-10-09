@@ -9,6 +9,7 @@ import type { ExploreContentItem } from '@/components/explore/types';
 import CreatorHighlightShelf from '@/components/discover/CreatorHighlightShelf';
 import CreatorHighlightTile from '@/components/discover/CreatorHighlightTile';
 import { CreatorHighlight } from '@/hooks/useCreatorHighlights';
+import ShortsSuggestedProfiles from '@/components/shorts/ShortsSuggestedProfiles';
 
 interface DiscoverContentProps {
   onLike: (contentId: string) => void;
@@ -116,6 +117,26 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         hasMore={hasMore}
         onLoadMore={loadMore}
       />
+    );
+  }
+
+  // Shorts tab with suggested creators carousel
+  if (main === 'shorts') {
+    return (
+      <>
+        <ShortsSuggestedProfiles />
+        <ExploreGrid 
+          content={currentContent || []}
+          onLike={onLike}
+          onFollow={onFollow}
+          onMediaClick={onMediaClick}
+          isLoading={currentContent === null || loading}
+          hasMore={hasMore}
+          onLoadMore={loadMore}
+          activeFilter={filterType}
+          isDiscoverPage={true}
+        />
+      </>
     );
   }
 
