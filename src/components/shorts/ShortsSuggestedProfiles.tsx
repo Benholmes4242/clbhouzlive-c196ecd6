@@ -28,23 +28,23 @@ function ScrollHint({ onDismiss }: { onDismiss: () => void }) {
 
 export default function ShortsSuggestedProfiles() {
   const { data: creators, isLoading, error } = useRecommendedCreators(24);
-  const { isFirstRun, markAsSeen } = useFirstRunFlag('shorts-squircle');
+  const { hasSeen, markSeen } = useFirstRunFlag('shorts-suggested');
   const scrollRef = useRef<HTMLDivElement>(null);
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
   const [retrying, setRetrying] = useState(false);
 
   // Dismiss scroll hint on first scroll
   useEffect(() => {
-    if (!isFirstRun || !scrollRef.current) return;
+    if (hasSeen || !scrollRef.current) return;
 
     const handleScroll = () => {
-      markAsSeen();
+      markSeen();
     };
 
     const element = scrollRef.current;
     element.addEventListener('scroll', handleScroll, { once: true });
     return () => element.removeEventListener('scroll', handleScroll);
-  }, [isFirstRun, markAsSeen]);
+  }, [hasSeen, markSeen]);
 
   const handleAvatarClick = (userId: string) => {
     const creator = creators.find(c => c.id === userId);
@@ -114,7 +114,7 @@ export default function ShortsSuggestedProfiles() {
 
   return (
     <div className="relative edge-fade mt-3 px-3 mb-4">
-      {isFirstRun && <ScrollHint onDismiss={markAsSeen} />}
+      {!hasSeen && <ScrollHint onDismiss={markSeen} />}
       
       <div ref={scrollRef} className="overflow-x-auto no-scrollbar">
         <div className="flex gap-4 pr-3">

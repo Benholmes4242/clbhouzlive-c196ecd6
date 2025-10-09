@@ -1,18 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export function useFirstRunFlag(key: string) {
-  const storageKey = `first-run-${key}`;
-  const [isFirstRun, setIsFirstRun] = useState(true);
+  const storageKey = `clbhouz:firstRun:${key}`;
+  const [hasSeen, setHasSeen] = useState<boolean>(true);
 
   useEffect(() => {
-    const seen = localStorage.getItem(storageKey);
-    setIsFirstRun(!seen);
+    const raw = localStorage.getItem(storageKey);
+    setHasSeen(raw === '1');
   }, [storageKey]);
 
-  const markAsSeen = () => {
-    localStorage.setItem(storageKey, 'true');
-    setIsFirstRun(false);
-  };
+  const markSeen = useCallback(() => {
+    localStorage.setItem(storageKey, '1');
+    setHasSeen(true);
+  }, [storageKey]);
 
-  return { isFirstRun, markAsSeen };
+  const reset = useCallback(() => {
+    localStorage.removeItem(storageKey);
+    setHasSeen(false);
+  }, [storageKey]);
+
+  return { hasSeen, markSeen, reset };
 }

@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomSheet from '@/components/ui/BottomSheet';
 import { useFollow } from '@/hooks/useFollow';
+import { usePrefetchImmersiveProfile } from '@/hooks/usePrefetchImmersiveProfile';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Check, UserPlus } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toast } from 'sonner';
+import { NotInterested } from '@/stores/notInterested';
 
 type Creator = {
   id: string;
@@ -29,8 +31,24 @@ export default function Squircle({ creator, index, onAvatarClick, imageLoaded, o
   const { isFollowing, busy, toggle, ensureInitial } = useFollow(creator.id);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const cellRef = useRef<HTMLDivElement>(null);
+  const { prefetch } = usePrefetchImmersiveProfile();
 
   useEffect(() => { ensureInitial(); }, [ensureInitial]);
+
+  // Prefetch when squircle is ~80% visible
+  useEffect(() => {
+    if (!cellRef.current) return;
+    const el = cellRef.current;
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && entry.intersectionRatio > 0.8) {
+        prefetch(creator.id);
+        io.disconnect();
+      }
+    }, { threshold: [0.8] });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [creator.id, prefetch]);
 
   // long-press detection
   let pressTimer: number | undefined;
@@ -62,16 +80,9 @@ export default function Squircle({ creator, index, onAvatarClick, imageLoaded, o
     await toggle();
   };
 
-  const handleMuteCreator = () => {
-    const mutedIds = JSON.parse(localStorage.getItem('muted_creator_ids') || '[]');
-    const expiresAt = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30 days
-    const mutedData = JSON.parse(localStorage.getItem('muted_creator_data') || '{}');
-    
-    mutedData[creator.id] = expiresAt;
-    localStorage.setItem('muted_creator_ids', JSON.stringify([...mutedIds, creator.id]));
-    localStorage.setItem('muted_creator_data', JSON.stringify(mutedData));
-    
-    toast.success(`Hidden suggestions from ${creator.display_name || creator.username || 'this creator'} for 30 days`);
+  const handleNotInterested = () => {
+    NotInterested.add(creator.id, 30);
+    toast.success(`Hidden ${creator.display_name || creator.username || 'this creator'} for 30 days`);
     setMenuOpen(false);
     window.location.reload();
   };
@@ -90,7 +101,7 @@ export default function Squircle({ creator, index, onAvatarClick, imageLoaded, o
 
   return (
     <>
-      <div className="flex flex-col items-center flex-shrink-0 relative group">
+      <div ref={cellRef} className="flex flex-col items-center flex-shrink-0 relative group">
         {/* Avatar with ring for recent posts */}
         <div className="relative">
           {hasRecentPost && (
@@ -161,7 +172,7 @@ export default function Squircle({ creator, index, onAvatarClick, imageLoaded, o
             label={isFollowing === 'following' ? 'Unfollow' : 'Follow'} 
             onClick={async () => { setMenuOpen(false); await toggle(); }} 
           />
-          <SheetItem label={`Mute Suggestions from ${name}`} onClick={handleMuteCreator} />
+          <SheetItem label="Not Interested" onClick={handleNotInterested} />
           <SheetItem label="Copy Profile Link" onClick={handleCopyProfileLink} />
         </div>
       </BottomSheet>

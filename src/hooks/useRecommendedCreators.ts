@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
+import { NotInterested } from '@/stores/notInterested';
 
 export type RecommendedCreator = {
   id: string;
@@ -27,6 +28,9 @@ export function useRecommendedCreators(limit = 24) {
       try {
         // Get muted creator IDs from localStorage
         const mutedIds = JSON.parse(localStorage.getItem('muted_creator_ids') || '[]');
+        
+        // Clean up expired "not interested" entries
+        NotInterested.clearExpired();
 
         // Fetch public profiles with profile photos and display names
         let query = supabase
@@ -93,7 +97,12 @@ export function useRecommendedCreators(limit = 24) {
             })
           );
 
-          setData(profilesWithActivity);
+          // Filter out "not interested" creators
+          const filteredProfiles = profilesWithActivity.filter(
+            profile => !NotInterested.isHidden(profile.id)
+          );
+
+          setData(filteredProfiles);
         }
       } catch (err: any) {
         if (mounted) {
