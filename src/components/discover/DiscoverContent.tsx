@@ -104,7 +104,20 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     // TODO: Implement navigation to creator profile or highlight detail
   };
 
-  // Show loading while content is null
+  // Use VideosGrid for Videos tab, ExploreGrid for everything else
+  if (main === 'videos') {
+    return (
+      <VideosGrid
+        content={currentContent || []}
+        onMediaClick={onMediaClick}
+        isLoading={currentContent === null || loading}
+        hasMore={hasMore}
+        onLoadMore={loadMore}
+      />
+    );
+  }
+
+  // Show loading while content is null for other tabs
   if (currentContent === null) {
     return (
       <ExploreGrid 
@@ -117,19 +130,6 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         onLoadMore={loadMore}
         activeFilter={filterType}
         isDiscoverPage={true}
-      />
-    );
-  }
-
-  // Use VideosGrid for Videos tab, ExploreGrid for everything else
-  if (main === 'videos') {
-    return (
-      <VideosGrid
-        content={currentContent || []}
-        onMediaClick={onMediaClick}
-        isLoading={loading}
-        hasMore={hasMore}
-        onLoadMore={loadMore}
       />
     );
   }
