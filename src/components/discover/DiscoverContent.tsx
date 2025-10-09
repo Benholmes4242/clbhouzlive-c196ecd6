@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import ExploreGrid from '@/components/explore/ExploreGrid';
+import VideosGrid from '@/components/discover/VideosGrid';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { FILTER_TYPES } from '@/components/explore/types';
 import type { ExploreContentItem } from '@/components/explore/types';
@@ -116,6 +117,19 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         onLoadMore={loadMore}
         activeFilter={filterType}
         isDiscoverPage={true}
+      />
+    );
+  }
+
+  // Use VideosGrid for Videos tab, ExploreGrid for everything else
+  if (main === 'videos') {
+    return (
+      <VideosGrid
+        content={currentContent || []}
+        onMediaClick={onMediaClick}
+        isLoading={loading}
+        hasMore={hasMore}
+        onLoadMore={loadMore}
       />
     );
   }
