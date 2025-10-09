@@ -332,7 +332,7 @@ export default function EnhancedCreateMomentModalCinematic({
     <AnimatePresence>
       {isOpen && (
         <motion.div 
-          className="enhanced-create-moment-modal fixed inset-0 z-[1000] overflow-hidden touch-none overscroll-none" 
+          className="ecm-root fixed inset-0 z-[1000]" 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
           exit={{ opacity: 0 }}
@@ -347,8 +347,12 @@ export default function EnhancedCreateMomentModalCinematic({
             left: 0,
             right: 0,
             bottom: 0,
-            touchAction: 'none',
-            overscrollBehavior: 'none'
+            height: '100dvh',
+            width: '100%',
+            overflow: 'hidden',
+            overscrollBehavior: 'none',
+            WebkitOverflowScrolling: 'auto',
+            touchAction: 'none'
           }}
         >
           {/* backdrop - subtle dark with reduced opacity for liquid glass */}
@@ -365,7 +369,7 @@ export default function EnhancedCreateMomentModalCinematic({
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="relative w-full max-w-md h-[100svh] md:h-[90vh] md:rounded-3xl overflow-hidden touch-none"
+              className="relative w-full max-w-md h-[100dvh] md:h-[90vh] md:rounded-3xl overflow-hidden"
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { y: 12, opacity: 0, scale: 0.98 }}
@@ -379,19 +383,17 @@ export default function EnhancedCreateMomentModalCinematic({
                 }
               }
               onClick={(e) => e.stopPropagation()}
-              style={{
-                position: 'fixed',
-                touchAction: 'none',
-                overscrollBehavior: 'none'
-              }}
             >
               {/* Liquid glass background */}
               <LiquidGlassBackdrop isVisible={true} />
               {/* MEDIA STAGE - full-bleed, top-anchored */}
               <section 
                 id="media" 
-                className="absolute inset-x-0 top-0 overflow-hidden z-[1002]"
-                style={{ height: 'calc(100svh - var(--composer-height))' }}
+                className="absolute inset-x-0 overflow-hidden z-[1002]"
+                style={{ 
+                  top: 'env(safe-area-inset-top, 0px)',
+                  bottom: 'var(--composer-height)'
+                }}
               >
                 {/* Top scrim for badge readability */}
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/28 to-transparent z-10" 
@@ -531,7 +533,7 @@ export default function EnhancedCreateMomentModalCinematic({
 
               {/* COMPOSER PANEL - fixed height, bottom-anchored with glass effect */}
               <section 
-                className="absolute bottom-0 left-0 right-0 z-[1003] rounded-t-none border-t border-white/35"
+                className="composer absolute bottom-0 left-0 right-0 z-[1003] rounded-t-none border-t border-white/35"
                 style={{ 
                   height: 'var(--composer-height)',
                   background: 'var(--ecm-glass)',
@@ -541,8 +543,14 @@ export default function EnhancedCreateMomentModalCinematic({
                 }}
               >
                 <div 
-                  className="flex h-full flex-col px-4 pt-4 gap-4"
-                  style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
+                  className="composer-scroll flex h-full flex-col px-4 pt-4 gap-4 overflow-auto"
+                  style={{ 
+                    paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
+                    maxHeight: 'var(--composer-height)',
+                    overscrollBehavior: 'contain',
+                    WebkitOverflowScrolling: 'touch',
+                    touchAction: 'pan-y'
+                  }}
                 >
                   {/* Tab chips */}
                   <div className="flex gap-2">
@@ -602,10 +610,13 @@ export default function EnhancedCreateMomentModalCinematic({
                       <label className="block text-base font-semibold text-white mb-3">Add a caption</label>
                       
                       <textarea
-                        className="flex-1 w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 text-[15px] leading-snug resize-none placeholder:text-zinc-400 text-zinc-900 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)] transition-all duration-200"
+                        className="caption-input flex-1 w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 text-[15px] leading-snug resize-none placeholder:text-zinc-400 text-zinc-900 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)] transition-all duration-200"
                         placeholder="Write a caption…"
                         value={caption}
                         onChange={(e) => setCaption(e.target.value)}
+                        style={{
+                          overscrollBehavior: 'contain'
+                        }}
                       />
                     </motion.div>
 
