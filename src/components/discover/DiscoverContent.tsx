@@ -3,7 +3,6 @@ import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import VideosGrid from '@/components/discover/VideosGrid';
 import PhotosGrid from '@/components/discover/PhotosGrid';
-import ShortsSuggestedProfiles from '@/components/shorts/ShortsSuggestedProfiles';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { FILTER_TYPES } from '@/components/explore/types';
 import type { ExploreContentItem } from '@/components/explore/types';
@@ -149,21 +148,18 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     );
   }
 
-  // Render content with suggested profiles for Shorts tab
+  // Render content directly without Creator Spotlight injection
   return (
-    <>
-      {main === 'shorts' && <ShortsSuggestedProfiles />}
-      <ExploreGrid 
-        content={currentContent || []}
-        onLike={onLike}
-        onFollow={onFollow}
-        onMediaClick={onMediaClick}
-        isLoading={loading}
-        hasMore={hasMore}
-        onLoadMore={loadMore}
-        activeFilter={filterType}
-        isDiscoverPage={true}
-      />
-    </>
+    <ExploreGrid 
+      content={currentContent || []}
+      onLike={onLike}
+      onFollow={onFollow}
+      onMediaClick={onMediaClick}
+      isLoading={loading}
+      hasMore={hasMore}
+      onLoadMore={loadMore}
+      activeFilter={filterType}
+      isDiscoverPage={true}
+    />
   );
 }
