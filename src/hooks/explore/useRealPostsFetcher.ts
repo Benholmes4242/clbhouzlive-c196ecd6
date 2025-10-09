@@ -252,6 +252,22 @@ export const useRealPostsFetcher = () => {
         query = query.eq('post_media.media_type', MEDIA_TYPES.VIDEO);
       } else if (mediaFilter === FILTER_TYPES.PHOTOS) {
         query = query.eq('post_media.media_type', MEDIA_TYPES.IMAGE);
+        
+        // Apply Photos subfilters
+        if (subFilter === 'new') {
+          query = query.order('created_at', { ascending: false });
+        } else if (subFilter === 'popular') {
+          // For popular, we'll sort by created_at for now (engagement metrics would go here)
+          query = query.order('created_at', { ascending: false });
+        } else if (subFilter === 'courses') {
+          // Filter will happen post-processing for course-tagged posts
+        } else if (subFilter === 'portraits') {
+          // Filter for portrait orientation (aspect ratio < 0.83)
+          // This will be handled client-side if orientation field doesn't exist
+        } else if (subFilter === 'landscapes') {
+          // Filter for landscape orientation (aspect ratio > 1.2)
+          // This will be handled client-side if orientation field doesn't exist
+        }
       }
 
       const { data: postsData, error } = await query;
@@ -401,6 +417,21 @@ export const useRealPostsFetcher = () => {
             courseName.includes(keyword.toLowerCase())
           );
         });
+      }
+
+      // Apply Photos subfilters (client-side)
+      if (mediaFilter === FILTER_TYPES.PHOTOS) {
+        let filtered = formattedPosts;
+        
+        if (subFilter === 'courses') {
+          // Only show posts with golf course tags
+          filtered = filtered.filter(post => post.golfCourse !== null);
+        }
+        
+        // Note: portraits/landscapes filtering would require aspect ratio data
+        // For now, we'll skip orientation filtering until we have that data
+        
+        return filtered;
       }
 
       return formattedPosts;

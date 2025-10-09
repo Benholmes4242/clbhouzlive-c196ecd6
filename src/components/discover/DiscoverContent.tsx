@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import VideosGrid from '@/components/discover/VideosGrid';
+import PhotosGrid from '@/components/discover/PhotosGrid';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { FILTER_TYPES } from '@/components/explore/types';
 import type { ExploreContentItem } from '@/components/explore/types';
@@ -104,7 +105,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     // TODO: Implement navigation to creator profile or highlight detail
   };
 
-  // Use VideosGrid for Videos tab, ExploreGrid for everything else
+  // Use VideosGrid for Videos tab, PhotosGrid for Photos tab, ExploreGrid for everything else
   if (main === 'videos') {
     return (
       <VideosGrid
@@ -113,6 +114,18 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         isLoading={currentContent === null || loading}
         hasMore={hasMore}
         onLoadMore={loadMore}
+      />
+    );
+  }
+
+  if (main === 'photos') {
+    return (
+      <PhotosGrid
+        items={currentContent || []}
+        isLoading={currentContent === null || loading}
+        hasMore={hasMore}
+        onLoadMore={loadMore}
+        onOpenLightbox={onMediaClick}
       />
     );
   }
