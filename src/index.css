@@ -489,6 +489,44 @@ img, video, canvas {
 /* Allow gestures globally */
 html, body, #root, .app-shell { touch-action: auto; }
 
+/* Hide horizontal scrollbar but keep scrollability */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { 
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
+}
+
+/* Edge fades for horizontal carousels */
+.edge-fade {
+  position: relative;
+}
+.edge-fade::before,
+.edge-fade::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 24px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.edge-fade::before {
+  left: 0;
+  background: linear-gradient(to right, hsl(var(--background)), transparent);
+}
+.edge-fade::after {
+  right: 0;
+  background: linear-gradient(to left, hsl(var(--background)), transparent);
+}
+
+/* Dark mode edge fades */
+.dark .edge-fade::before {
+  background: linear-gradient(to right, hsl(var(--background)), transparent);
+}
+.dark .edge-fade::after {
+  background: linear-gradient(to left, hsl(var(--background)), transparent);
+}
+
 /* Global bottom navigation enhancements */
 :root {
   /* Standard navigation heights */
