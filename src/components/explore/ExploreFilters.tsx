@@ -85,7 +85,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({
         return <MdOutlinePlayCircle className="w-5 h-5" />;
       case FILTER_TYPES.PHOTOS:
         return <Camera {...iconProps} />;
-      case FILTER_TYPES.FRIENDS:
+      case FILTER_TYPES.FOLLOWING:
         return <Users {...iconProps} />;
       case FILTER_TYPES.VERIFIED_PROS:
         return <PiGolf className="w-5 h-5" />;

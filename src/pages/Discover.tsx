@@ -36,7 +36,8 @@ const Discover = () => {
       'channels': FILTER_TYPES.CHANNELS,
       'videos': FILTER_TYPES.VIDEOS,
       'photos': FILTER_TYPES.PHOTOS,
-      'friends': FILTER_TYPES.FRIENDS,
+      'following': FILTER_TYPES.FOLLOWING,
+      'friends': FILTER_TYPES.FOLLOWING, // Back-compat
       'verified-pros': FILTER_TYPES.VERIFIED_PROS,
       'hack-shack': FILTER_TYPES.HACK_SHACK,
     };

@@ -3,6 +3,7 @@ import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import VideosGrid from '@/components/discover/VideosGrid';
 import PhotosGrid from '@/components/discover/PhotosGrid';
+import FollowingFeed from '@/components/discover/FollowingFeed';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { FILTER_TYPES } from '@/components/explore/types';
 import type { ExploreContentItem } from '@/components/explore/types';
@@ -26,7 +27,8 @@ function getFilterTypeFromPills(main: string): string {
     'channels': FILTER_TYPES.CHANNELS,
     'videos': FILTER_TYPES.VIDEOS,
     'photos': FILTER_TYPES.PHOTOS,
-    'friends': FILTER_TYPES.FRIENDS,
+    'following': FILTER_TYPES.FOLLOWING,
+    'friends': FILTER_TYPES.FOLLOWING, // Back-compat
     'verified-pros': FILTER_TYPES.VERIFIED_PROS,
     'hack-shack': FILTER_TYPES.HACK_SHACK,
   };
@@ -56,6 +58,11 @@ function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): 
 export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery, selectedTags = [] }: DiscoverContentProps) {
   const { main, sub } = useDiscoverQuery();
   const [currentContent, setCurrentContent] = useState<ExploreContentItem[] | null>(null);
+  
+  // Early return for Following feed
+  if (main === 'following') {
+    return <FollowingFeed onMediaClick={onMediaClick} />;
+  }
   
   // Get the filter type based on main pill
   const filterType = getFilterTypeFromPills(main);

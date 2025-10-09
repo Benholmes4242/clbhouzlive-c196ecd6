@@ -5,7 +5,9 @@ export function useDiscoverQuery() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
 
-  const main = (params.get("main") || "shorts") as MainPill;
+  const rawMain = params.get("main") || "shorts";
+  // Map 'friends' to 'following' for back-compat
+  const main = (rawMain === "friends" ? "following" : rawMain) as MainPill;
   const sub = params.get("sub") || "";
 
   function setMain(next: MainPill) {

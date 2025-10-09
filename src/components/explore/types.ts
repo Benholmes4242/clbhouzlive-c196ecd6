@@ -53,7 +53,8 @@ export const FILTER_TYPES = {
   CHANNELS: 'Channels',
   VIDEOS: 'Videos',
   PHOTOS: 'Photos',
-  FRIENDS: 'Friends',
+  FOLLOWING: 'Following',
+  FRIENDS: 'Following', // Back-compat alias
   VERIFIED_PROS: 'Verified Pros',
   HACK_SHACK: 'Hack Shack',
   BRAIN_GAME: 'Brain Game'
@@ -69,7 +70,7 @@ export const filterOptions = [
   FILTER_TYPES.CHANNELS,
   FILTER_TYPES.VIDEOS,
   FILTER_TYPES.PHOTOS,
-  FILTER_TYPES.FRIENDS,
+  FILTER_TYPES.FOLLOWING,
   FILTER_TYPES.VERIFIED_PROS,
   FILTER_TYPES.HACK_SHACK
 ];

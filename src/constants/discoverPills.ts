@@ -3,7 +3,7 @@ export type MainPill =
   | "channels"
   | "videos"
   | "photos"
-  | "friends"
+  | "following"
   | "verified-pros"
   | "hack-shack";
 
@@ -14,7 +14,8 @@ export const FILTER_TO_MAIN_PILL: Record<string, MainPill> = {
   "Channels": "channels",
   "Videos": "videos",
   "Photos": "photos",
-  "Friends": "friends",
+  "Following": "following",
+  "Friends": "following", // Back-compat alias
   "Verified Pros": "verified-pros",
   "Hack Shack": "hack-shack",
 };
