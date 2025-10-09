@@ -14,6 +14,8 @@ import CarouselDots from "@/components/posts/CarouselDots";
 import { MediaNavigationDots } from "@/components/posts/user-post/overlays/MediaNavigationDots";
 import { openMediaPicker } from "@/utils/openMediaPicker";
 import { normalizeFilesToMediaItems } from "@/lib/mediaUtils";
+import { useStudio } from "@/hooks/useStudio";
+import StudioShelf from "@/components/studio/StudioShelf";
 
 const CAPTION_OVERLAP_PX = 16; // small, neat overlap
 
@@ -97,8 +99,21 @@ export default function EnhancedCreateMomentModalCinematic({
   const [aiLoading, setAiLoading] = useState(false);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
-  const [activeCard, setActiveCard] = useState<'caption' | 'course' | 'music'>('caption');
+  const [activeCard, setActiveCard] = useState<'caption' | 'course'>('caption');
   const prefersReducedMotion = useReducedMotion();
+  
+  // Studio hook integration
+  const {
+    studioOpen,
+    activeTool,
+    edits,
+    openStudio,
+    closeStudio,
+    setActiveTool,
+    updateEdits,
+    clearEdits,
+    hasEdits
+  } = useStudio();
 
   // Check for reduced motion preference
   const prefersReducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -552,14 +567,19 @@ export default function EnhancedCreateMomentModalCinematic({
                       Tag a course
                     </button>
                     <button
-                      onClick={() => setActiveCard('music')}
+                      onClick={openStudio}
+                      disabled={media.length === 0}
                       className={`flex-1 px-3 py-2 rounded-xl text-base font-medium transition-all duration-200 ${
-                        activeCard === 'music'
-                          ? 'bg-white border border-[rgba(255,156,64,0.35)] shadow-[0_1px_6px_rgba(0,0,0,0.06)] text-zinc-900'
+                        media.length === 0
+                          ? 'border border-zinc-200 bg-zinc-100 text-zinc-400 cursor-not-allowed'
                           : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
                       }`}
+                      title={media.length === 0 ? 'Add media to open Studio' : 'Open Studio to edit your media'}
                     >
-                      Add music
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Sparkles className="w-4 h-4" />
+                        <span>Studio</span>
+                      </div>
                     </button>
                   </div>
 
@@ -608,28 +628,6 @@ export default function EnhancedCreateMomentModalCinematic({
                         selectedCourse={course}
                       />
                     </motion.div>
-
-                    {/* MUSIC CARD */}
-                    <motion.div
-                      className="absolute inset-0 w-full"
-                      initial={{ x: '100%' }}
-                      animate={{ 
-                        x: activeCard === 'music' ? 0 : '100%',
-                        opacity: activeCard === 'music' ? 1 : 0
-                      }}
-                      transition={{ 
-                        type: "spring", 
-                        stiffness: 300, 
-                        damping: 30
-                      }}
-                    >
-                      <BackgroundMusicSelector 
-                        onMusicSelect={(music) => {
-                          console.log('Selected music:', music);
-                        }}
-                        hasVideo={media.some(item => item.type === 'video')}
-                      />
-                    </motion.div>
                   </div>
 
                   {/* Primary Share button */}
@@ -653,6 +651,19 @@ export default function EnhancedCreateMomentModalCinematic({
           />
         </motion.div>
       )}
+
+      {/* Studio Shelf */}
+      <StudioShelf
+        open={studioOpen}
+        onClose={closeStudio}
+        activeTool={activeTool}
+        setActiveTool={setActiveTool}
+        activeMediaId={media[activeIndex]?.id || ''}
+        activeMediaType={media[activeIndex]?.type || 'image'}
+        edits={edits.get(media[activeIndex]?.id || '')}
+        updateEdits={(patch) => updateEdits(media[activeIndex]?.id || '', patch)}
+        clearEdits={() => clearEdits(media[activeIndex]?.id || '')}
+      />
     </AnimatePresence>
   );
 }
