@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { Eye } from 'lucide-react';
+import golfFairway from '@/assets/video-thumbs/golf-fairway.jpg';
+import golfGreen from '@/assets/video-thumbs/golf-green.jpg';
+import golfTee from '@/assets/video-thumbs/golf-tee.jpg';
+import golfScenic from '@/assets/video-thumbs/golf-scenic.jpg';
+
+const MOCK_THUMBNAILS = [golfFairway, golfGreen, golfTee, golfScenic];
 
 interface VideoExploreCardProps {
   item: ExploreContentItem;
@@ -8,6 +14,22 @@ interface VideoExploreCardProps {
 }
 
 const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick }) => {
+  const [imgSrc, setImgSrc] = useState(item.src);
+  const [hasError, setHasError] = useState(false);
+
+  // Get a consistent mock thumbnail based on item id
+  const getMockThumbnail = () => {
+    const index = item.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % MOCK_THUMBNAILS.length;
+    return MOCK_THUMBNAILS[index];
+  };
+
+  const handleImageError = () => {
+    if (!hasError) {
+      setHasError(true);
+      setImgSrc(getMockThumbnail());
+    }
+  };
+
   // Format view count
   const formatViews = (views: number) => {
     if (views >= 1000000) {
@@ -36,10 +58,11 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick 
       {/* 16:9 Thumbnail */}
       <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
         <img
-          src={item.src}
+          src={imgSrc}
           alt={item.title}
           className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
           loading="lazy"
+          onError={handleImageError}
         />
         
         {/* Duration tag (bottom-right) */}
