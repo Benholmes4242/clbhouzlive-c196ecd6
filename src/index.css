@@ -4,6 +4,7 @@
 @import './components/ai-chat/ai-chat-fixes.css';
 @import './styles/liquid-glass.css';
 @import './styles/profile-spacing.css';
+@import './styles/squircle.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

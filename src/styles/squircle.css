@@ -1,0 +1,144 @@
+/* ========================================
+   Squircle UI Tokens (Echo/Studio styling)
+   ======================================== */
+
+:root {
+  /* sizing */
+  --sq-size:        76px;   /* outer hit area */
+  --sq-img:         64px;   /* inner image */
+  --sq-ring:        2px;    /* ring thickness */
+  --sq-gap:         6px;    /* image↔name gap */
+  --sq-pill-h:      22px;   /* follow pill height */
+
+  /* radii (superellipse vibe) */
+  --sq-radius:      20px;
+
+  /* brand colors */
+  --sq-ring-grad-a: #6e9277;     /* grey-green */
+  --sq-ring-grad-b: #a8bfb3;
+  --sq-pill-bg:     rgba(255,255,255,0.85);
+  --sq-pill-fg:     #0b0b0b;
+  --sq-name-fg:     rgba(0,0,0,0.84);
+  --sq-name-dim:    rgba(0,0,0,0.56);
+
+  /* effects */
+  --sq-glass-bg:    rgba(255,255,255,0.55);
+  --sq-glass-brd:   rgba(110,146,119,0.25);
+  --sq-shadow:      0 6px 24px rgba(0,0,0,0.08);
+  --sq-focus:       0 0 0 6px rgba(110,146,119,0.12);
+}
+
+/* ========================================
+   Base Classes
+   ======================================== */
+
+/* container for each squircle cell */
+.sq-cell {
+  width: var(--sq-size);
+  display: flex; 
+  flex-direction: column; 
+  align-items: center;
+  gap: var(--sq-gap);
+  scroll-snap-align: start;
+}
+
+/* ring + image wrapper */
+.sq-ring {
+  width: var(--sq-img); 
+  height: var(--sq-img);
+  border-radius: var(--sq-radius);
+  padding: var(--sq-ring);
+  background: linear-gradient(135deg, var(--sq-ring-grad-a), var(--sq-ring-grad-b));
+  box-shadow: var(--sq-shadow);
+  position: relative;
+}
+
+/* inner image glass */
+.sq-img {
+  width: 100%; 
+  height: 100%;
+  border-radius: calc(var(--sq-radius) - 6px);
+  background: var(--sq-glass-bg);
+  border: 1px solid var(--sq-glass-brd);
+  backdrop-filter: blur(8px);
+  object-fit: cover;
+  transition: opacity 200ms ease-out;
+}
+
+/* name + meta */
+.sq-name {
+  font-size: 12px; 
+  line-height: 1.15;
+  text-align: center; 
+  color: var(--sq-name-fg);
+  max-width: var(--sq-size); 
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis;
+}
+
+.sq-meta {
+  font-size: 11px; 
+  color: var(--sq-name-dim);
+}
+
+/* tiny follow pill */
+.sq-pill {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  height: var(--sq-pill-h);
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--sq-pill-bg);
+  color: var(--sq-pill-fg);
+  border: 1px solid var(--sq-glass-brd);
+  backdrop-filter: blur(6px);
+  display: inline-flex; 
+  align-items: center; 
+  gap: 6px;
+  font-size: 12px; 
+  font-weight: 600;
+  transition: all 200ms ease-out;
+}
+
+.sq-pill[data-state="following"] {
+  background: transparent;
+  border-style: dashed;
+  opacity: 0.85;
+}
+
+/* a11y focus */
+.sq-focusable:focus-visible {
+  outline: none; 
+  box-shadow: var(--sq-focus);
+  border-radius: calc(var(--sq-radius) + 6px);
+}
+
+/* ========================================
+   Interaction States
+   ======================================== */
+
+.sq-ring {
+  transition: transform 200ms ease-out;
+}
+
+.sq-ring:hover {
+  transform: scale(1.02);
+}
+
+.sq-ring:active {
+  transform: scale(0.98);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sq-pill-bg:     rgba(0,0,0,0.75);
+    --sq-pill-fg:     rgba(255,255,255,0.95);
+    --sq-name-fg:     rgba(255,255,255,0.90);
+    --sq-name-dim:    rgba(255,255,255,0.60);
+    --sq-glass-bg:    rgba(0,0,0,0.40);
+    --sq-glass-brd:   rgba(110,146,119,0.30);
+  }
+}

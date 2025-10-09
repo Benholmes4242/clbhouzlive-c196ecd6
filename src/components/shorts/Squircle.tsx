@@ -101,17 +101,11 @@ export default function Squircle({ creator, index, onAvatarClick, imageLoaded, o
 
   return (
     <>
-      <div ref={cellRef} className="flex flex-col items-center flex-shrink-0 relative group">
-        {/* Avatar with ring for recent posts */}
-        <div className="relative">
-          {hasRecentPost && (
-            <div 
-              className="absolute -inset-[2px] rounded-[16px] bg-gradient-to-tr from-primary via-primary/70 to-primary/40 animate-pulse"
-              style={{ borderRadius: AVATAR.radius + 2 }}
-            />
-          )}
+      <div ref={cellRef} className="sq-cell">
+        {/* Ring wrapper with optional recent-post gradient */}
+        <div className={`sq-ring sq-focusable ${hasRecentPost ? 'animate-pulse' : ''}`}>
           <button
-            className="relative overflow-hidden border border-border shadow-sm bg-background active:scale-[0.96] transition-all"
+            className="relative w-full h-full overflow-hidden"
             onClick={handleAvatarClick}
             onMouseDown={startPress}
             onMouseUp={endPress}
@@ -120,29 +114,25 @@ export default function Squircle({ creator, index, onAvatarClick, imageLoaded, o
             onTouchEnd={endPress}
             onContextMenu={(e) => { e.preventDefault(); setMenuOpen(true); }}
             aria-label={`View ${name}'s profile`}
-            style={{ width: AVATAR.size, height: AVATAR.size, borderRadius: AVATAR.radius }}
           >
             <Avatar className="w-full h-full rounded-none">
               <AvatarImage
                 src={creator.profile_photo_url || undefined}
                 alt={name}
-                className={`object-cover transition-opacity duration-200 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                className={`sq-img ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                 onLoad={onImageLoad}
               />
-              <AvatarFallback className="rounded-none text-lg font-semibold">
+              <AvatarFallback className="sq-img text-lg font-semibold flex items-center justify-center">
                 {initials}
               </AvatarFallback>
             </Avatar>
 
-            {/* Follow/Following button */}
+            {/* Follow/Following pill */}
             <button
               onClick={handleFollowToggle}
               disabled={busy}
-              className={`absolute bottom-1 right-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-all shadow-sm ${
-                isFollowing === 'following'
-                  ? 'bg-muted/90 text-muted-foreground'
-                  : 'bg-primary text-primary-foreground'
-              }`}
+              className="sq-pill"
+              data-state={isFollowing === 'following' ? 'following' : 'not-following'}
               role="button"
               aria-pressed={isFollowing === 'following'}
             >
@@ -157,7 +147,7 @@ export default function Squircle({ creator, index, onAvatarClick, imageLoaded, o
 
         <button
           onClick={handleNameClick}
-          className="text-xs text-foreground mt-1 truncate w-[70px] text-center hover:text-primary transition-colors"
+          className="sq-name hover:opacity-70 transition-opacity"
           title={name}
         >
           {name}

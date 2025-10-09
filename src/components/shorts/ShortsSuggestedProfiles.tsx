@@ -116,19 +116,20 @@ export default function ShortsSuggestedProfiles() {
     <div className="relative edge-fade mt-3 px-3 mb-4">
       {!hasSeen && <ScrollHint onDismiss={markSeen} />}
       
-      <div ref={scrollRef} className="overflow-x-auto no-scrollbar">
-        <div className="flex gap-4 pr-3">
+      <div ref={scrollRef} className="overflow-x-auto snap-x snap-mandatory no-scrollbar">
+        <div className="flex gap-3 pr-3">
           {/* + SQUIRCLE */}
-          <div className="flex flex-col items-center flex-shrink-0">
-            <button
-              onClick={handleCreateClick}
-              aria-label="Create moment"
-              className="flex items-center justify-center bg-background border border-border shadow-sm active:scale-[0.96] transition-transform"
-              style={{ width: AVATAR.size, height: AVATAR.size, borderRadius: AVATAR.radius }}
-            >
-              <span className="text-2xl leading-none text-foreground">＋</span>
-            </button>
-            <p className="text-xs text-muted-foreground mt-1 truncate w-[70px] text-center">Add</p>
+          <div className="sq-cell snap-start">
+            <div className="sq-ring">
+              <button
+                onClick={handleCreateClick}
+                aria-label="Create moment"
+                className="sq-focusable w-full h-full flex items-center justify-center bg-white/55 border border-[rgba(110,146,119,0.25)] backdrop-blur-md active:scale-[0.98] transition-transform rounded-[14px]"
+              >
+                <span className="text-2xl leading-none text-black/90">＋</span>
+              </button>
+            </div>
+            <p className="sq-name">Add</p>
           </div>
 
           {/* CREATOR SQUIRCLES */}
