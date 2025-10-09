@@ -579,39 +579,7 @@ export default function EnhancedCreateMomentModalCinematic({
                         damping: 30
                       }}
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <label className="block text-base font-semibold text-white">Add a caption</label>
-                        {/* CTAs removed - now in empty state media area */}
-                        {media.length > 0 && (
-                          <motion.div 
-                            className="flex gap-2"
-                            initial={{ opacity: 0, scale: 1.03 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.24, ease: "easeOut" }}
-                          >
-                            <button
-                              onClick={handlePickFromCamera}
-                              className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-[15px] hover:scale-[0.98] active:scale-95 focus:outline-none focus:ring-1 focus:ring-[rgba(255,156,64,0.4)] focus:border-[rgba(255,156,64,0.4)] shadow-[0_2px_6px_rgba(0,0,0,0.10)]"
-                              aria-label="Open camera"
-                            >
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-lg">📷</span>
-                                <span className="font-medium">Camera</span>
-                              </div>
-                            </button>
-                            <button
-                              onClick={handlePickFromLibrary}
-                              className="border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-xl shrink-0 transition-all duration-200 text-[15px] hover:scale-[0.98] active:scale-95 focus:outline-none focus:ring-1 focus:ring-[rgba(255,156,64,0.4)] focus:border-[rgba(255,156,64,0.4)] shadow-[0_2px_6px_rgba(0,0,0,0.10)]"
-                              aria-label="Choose photos and videos"
-                            >
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-lg">✨</span>
-                                <span className="font-medium">Photos & Videos</span>
-                              </div>
-                            </button>
-                          </motion.div>
-                        )}
-                      </div>
+                      <label className="block text-base font-semibold text-white mb-3">Add a caption</label>
                       
                       <textarea
                         className="flex-1 w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 text-[15px] leading-snug resize-none placeholder:text-zinc-400 text-zinc-900 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)] transition-all duration-200"
