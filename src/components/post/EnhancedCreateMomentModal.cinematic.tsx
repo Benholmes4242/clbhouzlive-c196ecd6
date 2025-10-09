@@ -400,9 +400,9 @@ export default function EnhancedCreateMomentModalCinematic({
                   className="h-full w-full"
                 >
                   {media.length === 0 ? (
-                    /* Empty State Panel - with CTAs centered, no generic tap */
+                    /* Empty State Panel - with CTAs centered vertically in remaining space */
                     <div
-                      className="h-full w-full flex items-center justify-center bg-transparent pointer-events-none"
+                      className="h-full w-full flex flex-col items-center justify-center bg-transparent pointer-events-none"
                     >
                       <motion.div 
                         className="text-center px-6 max-w-[520px] flex flex-col items-center"
@@ -419,33 +419,36 @@ export default function EnhancedCreateMomentModalCinematic({
                         <h2 className="text-white/90 text-[18px] font-medium leading-snug max-w-[520px]">
                           Capture your next great golf moment – add a photo or video to share with your community.
                         </h2>
-                        
-                        {/* 16px gap below text */}
-                        <div className="h-4" />
-                        
-                        {/* CTA row - re-enable pointer events only for buttons */}
-                        <div className="pointer-events-auto flex items-center justify-center gap-3 sm:gap-4 z-10">
-                          <button
-                            type="button"
-                            onClick={handlePickFromCamera}
-                            aria-label="Open Camera"
-                            className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
-                          >
-                            <Camera className="w-5 h-5" />
-                            <span className="font-medium">Camera</span>
-                          </button>
-                          
-                          <button
-                            type="button"
-                            onClick={handlePickFromLibrary}
-                            aria-label="Choose Photos and Videos"
-                            className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
-                          >
-                            <Sparkles className="w-5 h-5" />
-                            <span className="font-medium">Photos &amp; Videos</span>
-                          </button>
-                        </div>
                       </motion.div>
+                      
+                      {/* Flex spacer to center CTAs vertically in remaining space */}
+                      <div className="flex-1" />
+                      
+                      {/* CTA row - re-enable pointer events only for buttons */}
+                      <div className="pointer-events-auto flex items-center justify-center gap-3 sm:gap-4 z-10">
+                        <button
+                          type="button"
+                          onClick={handlePickFromCamera}
+                          aria-label="Open Camera"
+                          className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
+                        >
+                          <Camera className="w-5 h-5" />
+                          <span className="font-medium">Camera</span>
+                        </button>
+                        
+                        <button
+                          type="button"
+                          onClick={handlePickFromLibrary}
+                          aria-label="Choose Photos and Videos"
+                          className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
+                        >
+                          <Sparkles className="w-5 h-5" />
+                          <span className="font-medium">Photos &amp; Videos</span>
+                        </button>
+                      </div>
+                      
+                      {/* Flex spacer to center CTAs vertically in remaining space */}
+                      <div className="flex-1" />
                     </div>
                   ) : (
                     <MediaCarousel
