@@ -214,7 +214,10 @@ export const useRealPostsFetcher = () => {
             id,
             media_type,
             media_url,
-            duration_seconds
+            duration_seconds,
+            media_width,
+            media_height,
+            image_orientation
           ),
           post_tags (
             id,
@@ -262,11 +265,11 @@ export const useRealPostsFetcher = () => {
         } else if (subFilter === 'courses') {
           // Filter will happen post-processing for course-tagged posts
         } else if (subFilter === 'portraits') {
-          // Filter for portrait orientation (aspect ratio < 0.83)
-          // This will be handled client-side if orientation field doesn't exist
+          // Server-side filter for portrait orientation
+          query = query.eq('post_media.image_orientation', 'portrait');
         } else if (subFilter === 'landscapes') {
-          // Filter for landscape orientation (aspect ratio > 1.2)
-          // This will be handled client-side if orientation field doesn't exist
+          // Server-side filter for landscape orientation
+          query = query.eq('post_media.image_orientation', 'landscape');
         }
       }
 

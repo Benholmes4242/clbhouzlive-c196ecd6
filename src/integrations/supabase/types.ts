@@ -879,10 +879,14 @@ export type Database = {
           created_at: string
           duration_ms: number | null
           duration_seconds: number | null
+          exif: Json | null
           height: number | null
           id: string
+          image_orientation: string | null
+          media_height: number | null
           media_type: string
           media_url: string
+          media_width: number | null
           orientation: string | null
           post_id: string
           poster_url: string | null
@@ -894,10 +898,14 @@ export type Database = {
           created_at?: string
           duration_ms?: number | null
           duration_seconds?: number | null
+          exif?: Json | null
           height?: number | null
           id?: string
+          image_orientation?: string | null
+          media_height?: number | null
           media_type: string
           media_url: string
+          media_width?: number | null
           orientation?: string | null
           post_id: string
           poster_url?: string | null
@@ -909,10 +917,14 @@ export type Database = {
           created_at?: string
           duration_ms?: number | null
           duration_seconds?: number | null
+          exif?: Json | null
           height?: number | null
           id?: string
+          image_orientation?: string | null
+          media_height?: number | null
           media_type?: string
           media_url?: string
+          media_width?: number | null
           orientation?: string | null
           post_id?: string
           poster_url?: string | null

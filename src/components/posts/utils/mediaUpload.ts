@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
+import { getImageDimensions } from '@/utils/imageDimensions';
 
 export const uploadMultipleMediaWithRetry = async (
   files: File[], 
@@ -61,12 +62,39 @@ export const uploadMediaWithRetry = async (
       const publicUrl = uploadResult.publicUrl;
       const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
       
+      // Get image dimensions if it's an image
+      let media_width: number | null = null;
+      let media_height: number | null = null;
+      let image_orientation: 'portrait' | 'landscape' | 'square' | null = null;
+
+      if (mediaType === 'image') {
+        try {
+          const dimensions = await getImageDimensions(file);
+          media_width = dimensions.width;
+          media_height = dimensions.height;
+          
+          if (media_width && media_height) {
+            image_orientation = media_width === media_height 
+              ? 'square' 
+              : media_width > media_height 
+                ? 'landscape' 
+                : 'portrait';
+          }
+        } catch (dimError) {
+          console.warn('Failed to get image dimensions:', dimError);
+          // Continue without dimensions - backfill will handle it
+        }
+      }
+      
       const { error: mediaError } = await supabase
         .from('post_media')
         .insert({
           post_id: postId,
           media_type: mediaType,
-          media_url: publicUrl
+          media_url: publicUrl,
+          media_width,
+          media_height,
+          image_orientation
         });
 
       if (mediaError) {
