@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Search, TrendingUp, Mic, Bookmark } from 'lucide-react';
-import { DraftEdits } from '@/types/studio';
+import { StudioEdits } from '@/types/studio';
 
 type StudioPanelMusicProps = {
-  edits: DraftEdits | undefined;
-  updateEdits: (patch: Partial<DraftEdits>) => void;
+  edits: StudioEdits;
+  updateEdits: (patch: Partial<StudioEdits>) => void;
   onApply: () => void;
   onReset: () => void;
 };
@@ -18,18 +18,17 @@ const MOCK_TRACKS = [
 export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset }: StudioPanelMusicProps) {
   const [activeTab, setActiveTab] = useState<'foryou' | 'trending' | 'original' | 'saved'>('foryou');
   const [selectedTrack, setSelectedTrack] = useState(edits?.music?.trackId || '');
-  const [volume, setVolume] = useState(edits?.music?.volume ?? 100);
-  const [ducking, setDucking] = useState(edits?.music?.ducking ?? false);
+  const [volume, setVolume] = useState((edits?.music?.volume ?? 0.9) * 100);
 
   const handleSelectTrack = (track: typeof MOCK_TRACKS[0]) => {
     setSelectedTrack(track.id);
     updateEdits({
       music: {
         trackId: track.id,
-        url: track.url,
-        start: 0,
-        volume,
-        ducking
+        title: track.title,
+        artist: track.artist,
+        startAt: 0,
+        volume: volume / 100
       }
     });
   };
@@ -104,30 +103,12 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                 const v = parseInt(e.target.value);
                 setVolume(v);
                 if (edits?.music) {
-                  updateEdits({ music: { ...edits.music, volume: v } });
+                  updateEdits({ music: { ...edits.music, volume: v / 100 } });
                 }
               }}
               className="w-full"
             />
             <div className="text-xs text-zinc-500 mt-1">{volume}%</div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="ducking"
-              checked={ducking}
-              onChange={(e) => {
-                setDucking(e.target.checked);
-                if (edits?.music) {
-                  updateEdits({ music: { ...edits.music, ducking: e.target.checked } });
-                }
-              }}
-              className="rounded"
-            />
-            <label htmlFor="ducking" className="text-sm text-zinc-700">
-              Lower original audio (ducking)
-            </label>
           </div>
         </div>
       )}

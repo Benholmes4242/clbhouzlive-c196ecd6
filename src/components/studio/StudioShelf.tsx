@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
-import { DraftEdits, StudioTool } from '@/types/studio';
+import { StudioEdits, StudioTool } from '@/types/studio';
 import StudioToolRail from './StudioToolRail';
 import StudioPanelMusic from './panels/StudioPanelMusic';
 import StudioPanelText from './panels/StudioPanelText';
@@ -15,8 +15,8 @@ type StudioShelfProps = {
   setActiveTool: (tool: StudioTool) => void;
   activeMediaId: string;
   activeMediaType: 'image' | 'video';
-  edits: DraftEdits | undefined;
-  updateEdits: (patch: Partial<DraftEdits>) => void;
+  edits: StudioEdits;
+  updateEdits: (patch: Partial<StudioEdits>) => void;
   clearEdits: () => void;
 };
 
@@ -54,13 +54,13 @@ export default function StudioShelf({
   const handleReset = () => {
     // Reset current tool's edits
     if (activeTool === 'music') {
-      updateEdits({ music: undefined });
+      updateEdits({ music: null });
     } else if (activeTool === 'text') {
-      updateEdits({ text: [] });
+      updateEdits({ textOverlays: [] });
     } else if (activeTool === 'filter') {
-      updateEdits({ filter: undefined });
+      updateEdits({ filter: 'normal' });
     } else if (activeTool === 'edit') {
-      updateEdits({ edit: undefined });
+      updateEdits({ crop: undefined, rotate: 0 });
     }
   };
 

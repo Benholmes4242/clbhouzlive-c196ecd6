@@ -1,51 +1,50 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { DraftEdits, DraftTextBox } from '@/types/studio';
+import { StudioEdits, TextOverlay } from '@/types/studio';
 import { nanoid } from 'nanoid';
 
 type StudioPanelTextProps = {
-  edits: DraftEdits | undefined;
-  updateEdits: (patch: Partial<DraftEdits>) => void;
+  edits: StudioEdits;
+  updateEdits: (patch: Partial<StudioEdits>) => void;
   onApply: () => void;
   onReset: () => void;
 };
 
-const FONTS = ['Modern', 'Classic', 'Signature'] as const;
+const FONTS: TextOverlay['style'][] = ['modern', 'classic', 'signature'];
 const COLORS = ['#000000', '#FFFFFF', '#FF9C40', '#3B82F6', '#EF4444', '#10B981'];
 
 export default function StudioPanelText({ edits, updateEdits, onApply, onReset }: StudioPanelTextProps) {
-  const [textBoxes, setTextBoxes] = useState<DraftTextBox[]>(edits?.text || []);
+  const [textBoxes, setTextBoxes] = useState<TextOverlay[]>(edits?.textOverlays || []);
   const [selectedBox, setSelectedBox] = useState<string | null>(null);
 
   const addTextBox = () => {
-    const newBox: DraftTextBox = {
+    const newBox: TextOverlay = {
       id: nanoid(),
-      value: 'New text',
-      xPct: 50,
-      yPct: 50,
-      font: 'Modern',
-      size: 24,
-      color: '#FFFFFF',
-      align: 'center'
+      text: 'New text',
+      x: 0.5,
+      y: 0.5,
+      scale: 1,
+      style: 'modern',
+      color: '#FFFFFF'
     };
     const updated = [...textBoxes, newBox];
     setTextBoxes(updated);
     setSelectedBox(newBox.id);
-    updateEdits({ text: updated });
+    updateEdits({ textOverlays: updated });
   };
 
-  const updateBox = (id: string, changes: Partial<DraftTextBox>) => {
+  const updateBox = (id: string, changes: Partial<TextOverlay>) => {
     const updated = textBoxes.map(box => 
       box.id === id ? { ...box, ...changes } : box
     );
     setTextBoxes(updated);
-    updateEdits({ text: updated });
+    updateEdits({ textOverlays: updated });
   };
 
   const removeBox = (id: string) => {
     const updated = textBoxes.filter(box => box.id !== id);
     setTextBoxes(updated);
-    updateEdits({ text: updated });
+    updateEdits({ textOverlays: updated });
     if (selectedBox === id) setSelectedBox(null);
   };
 
@@ -72,7 +71,7 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="font-medium text-zinc-900 truncate">{box.value}</span>
+                <span className="font-medium text-zinc-900 truncate">{box.text}</span>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -84,7 +83,7 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
                 </button>
               </div>
               <div className="text-xs text-zinc-500 mt-1">
-                {box.font} • {box.size}px
+                {box.style} • {(box.scale * 100).toFixed(0)}%
               </div>
             </button>
           ))
@@ -98,8 +97,8 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
             <label className="block text-sm font-medium text-zinc-700 mb-2">Text</label>
             <input
               type="text"
-              value={selected.value}
-              onChange={(e) => updateBox(selected.id, { value: e.target.value })}
+              value={selected.text}
+              onChange={(e) => updateBox(selected.id, { text: e.target.value })}
               className="w-full px-3 py-2 rounded-lg border border-zinc-200 focus:outline-none focus:border-[rgba(255,156,64,0.5)]"
             />
           </div>
@@ -110,9 +109,9 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
               {FONTS.map(font => (
                 <button
                   key={font}
-                  onClick={() => updateBox(selected.id, { font })}
-                  className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-colors ${
-                    selected.font === font
+                  onClick={() => updateBox(selected.id, { style: font })}
+                  className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-colors capitalize ${
+                    selected.style === font
                       ? 'border-zinc-900 bg-zinc-900 text-white'
                       : 'border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50'
                   }`}
@@ -124,16 +123,17 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-zinc-700 mb-2">Size</label>
+            <label className="block text-sm font-medium text-zinc-700 mb-2">Scale</label>
             <input
               type="range"
-              min="12"
-              max="72"
-              value={selected.size}
-              onChange={(e) => updateBox(selected.id, { size: parseInt(e.target.value) })}
+              min="0.5"
+              max="2"
+              step="0.1"
+              value={selected.scale}
+              onChange={(e) => updateBox(selected.id, { scale: parseFloat(e.target.value) })}
               className="w-full"
             />
-            <div className="text-xs text-zinc-500 mt-1">{selected.size}px</div>
+            <div className="text-xs text-zinc-500 mt-1">{(selected.scale * 100).toFixed(0)}%</div>
           </div>
 
           <div>

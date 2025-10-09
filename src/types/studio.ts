@@ -1,44 +1,29 @@
-export type DraftTextBox = {
+export type FilterId = 'normal' | 'fade' | 'warm' | 'cool' | 'dusky' | 'mono';
+
+export type TextOverlay = {
   id: string;
-  value: string;
-  xPct: number;   // 0–100, position relative to media bounds
-  yPct: number;   // 0–100
-  font: 'Modern' | 'Classic' | 'Signature';
-  size: number;   // px
-  color: string;  // hex
-  align: 'left' | 'center' | 'right';
+  text: string;
+  x: number;        // 0..1 relative position
+  y: number;        // 0..1 relative position
+  scale: number;    // 0..1
+  style: 'modern' | 'classic' | 'signature';
+  color?: string;   // hex
 };
 
-export type DraftEdits = {
-  music?: { 
-    trackId: string; 
-    url: string; 
-    start: number; 
-    volume: number; 
-    ducking?: boolean 
-  };
-  text?: DraftTextBox[];
-  filter?: { 
-    name: 'normal' | 'fade' | 'warm' | 'cool'; 
-    intensity: number // 0–100
-  };
-  edit?: {
-    crop?: { 
-      x: number; 
-      y: number; 
-      w: number; 
-      h: number; 
-      ratio?: 'original' | '1:1' | '4:5' | '16:9' 
-    };
-    rotate?: 0 | 90 | 180 | 270;
-    trim?: { 
-      start: number; 
-      end: number  // seconds
-    };
-    speed?: 0.5 | 1 | 1.5;
-  };
+export type StudioEdits = {
+  filter?: FilterId;
+  crop?: { ratio: 'original' | '1:1' | '4:5' | '16:9' };
+  rotate?: number;  // degrees, multiples of 90
+  textOverlays?: TextOverlay[];
+  music?: {
+    trackId: string;
+    title: string;
+    artist?: string;
+    startAt?: number;  // seconds
+    volume?: number;   // 0..1
+  } | null;
 };
 
-export type DraftEditsMap = Map<string /* mediaId */, DraftEdits>;
+export type StudioState = Record<string /* mediaId */, StudioEdits>;
 
 export type StudioTool = 'music' | 'text' | 'filter' | 'edit' | null;

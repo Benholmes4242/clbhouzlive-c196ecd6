@@ -1,14 +1,33 @@
-export function cssForFilter(f?: {name: 'normal' | 'fade' | 'warm' | 'cool'; intensity: number}) {
-  if (!f || f.name === 'normal') return '';
-  const t = (f.intensity ?? 50) / 100; // 0..1
-  switch (f.name) {
-    case 'fade': 
-      return `contrast(${100 - 10*t}%) brightness(${100 + 8*t}%) saturate(${100 - 25*t}%)`;
-    case 'warm': 
-      return `saturate(${100 + 20*t}%) sepia(${15*t}%) hue-rotate(${10*t}deg)`;
-    case 'cool': 
-      return `saturate(${100 - 10*t}%) hue-rotate(${-12*t}deg)`;
-    default: 
-      return '';
+import { FilterId } from '@/types/studio';
+
+export const FILTERS: Record<FilterId, string> = {
+  normal: 'none',
+  fade:   'contrast(0.95) saturate(0.9) brightness(1.02)',
+  warm:   'contrast(1.05) saturate(1.1) sepia(0.12) hue-rotate(-8deg)',
+  cool:   'contrast(1.03) saturate(0.95) hue-rotate(8deg)',
+  dusky:  'brightness(0.95) contrast(1.1) saturate(0.85)',
+  mono:   'grayscale(1) contrast(1.05)',
+};
+
+export function cssForFilter(filterId?: FilterId): string {
+  if (!filterId) return FILTERS.normal;
+  return FILTERS[filterId] || FILTERS.normal;
+}
+
+export function cropClassFrom(crop?: { ratio: 'original' | '1:1' | '4:5' | '16:9' }): string {
+  switch (crop?.ratio) {
+    case '1:1':  return 'relative w-full aspect-square overflow-hidden rounded-xl';
+    case '4:5':  return 'relative w-full aspect-[4/5] overflow-hidden rounded-xl';
+    case '16:9': return 'relative w-full aspect-video overflow-hidden rounded-xl';
+    default:     return 'relative w-full overflow-hidden rounded-xl'; // original
+  }
+}
+
+export function fontFrom(style: 'modern' | 'classic' | 'signature'): string {
+  switch (style) {
+    case 'modern':    return 'ui-sans-serif, system-ui, sans-serif';
+    case 'classic':   return 'Georgia, "Times New Roman", serif';
+    case 'signature': return 'cursive';
+    default:          return 'ui-sans-serif, system-ui, sans-serif';
   }
 }

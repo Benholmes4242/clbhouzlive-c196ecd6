@@ -106,12 +106,13 @@ export default function EnhancedCreateMomentModalCinematic({
   const {
     studioOpen,
     activeTool,
-    edits,
+    studioState,
     openStudio,
     closeStudio,
     setActiveTool,
     updateEdits,
     clearEdits,
+    getEdits,
     hasEdits
   } = useStudio();
 
@@ -671,7 +672,7 @@ export default function EnhancedCreateMomentModalCinematic({
         setActiveTool={setActiveTool}
         activeMediaId={media[activeIndex]?.id || ''}
         activeMediaType={media[activeIndex]?.type || 'image'}
-        edits={edits.get(media[activeIndex]?.id || '')}
+        edits={getEdits(media[activeIndex]?.id || '')}
         updateEdits={(patch) => updateEdits(media[activeIndex]?.id || '', patch)}
         clearEdits={() => clearEdits(media[activeIndex]?.id || '')}
       />

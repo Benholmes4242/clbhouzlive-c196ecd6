@@ -1,32 +1,33 @@
 import { useState, useCallback } from 'react';
-import { DraftEdits, DraftEditsMap, StudioTool } from '@/types/studio';
+import { StudioEdits, StudioState, StudioTool } from '@/types/studio';
 
 export function useStudio() {
   const [studioOpen, setStudioOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
-  const [edits, setEdits] = useState<DraftEditsMap>(new Map());
+  const [studioState, setStudioState] = useState<StudioState>({});
 
-  const updateEdits = useCallback((mediaId: string, patch: Partial<DraftEdits>) => {
-    setEdits(prev => {
-      const next = new Map(prev);
-      const current = next.get(mediaId) ?? {};
-      next.set(mediaId, { ...current, ...patch });
-      return next;
-    });
+  const updateEdits = useCallback((mediaId: string, patch: Partial<StudioEdits>) => {
+    setStudioState(prev => ({
+      ...prev,
+      [mediaId]: { ...(prev[mediaId] ?? {}), ...patch }
+    }));
   }, []);
 
   const clearEdits = useCallback((mediaId: string) => {
-    setEdits(prev => {
-      const next = new Map(prev);
-      next.delete(mediaId);
-      return next;
-    });
+    setStudioState(prev => ({
+      ...prev,
+      [mediaId]: {}
+    }));
   }, []);
 
+  const getEdits = useCallback((mediaId: string): StudioEdits => {
+    return studioState[mediaId] ?? {};
+  }, [studioState]);
+
   const hasEdits = useCallback((mediaId: string) => {
-    const mediaEdits = edits.get(mediaId);
+    const mediaEdits = studioState[mediaId];
     return !!mediaEdits && Object.keys(mediaEdits).length > 0;
-  }, [edits]);
+  }, [studioState]);
 
   const openStudio = useCallback(() => {
     setStudioOpen(true);
@@ -41,12 +42,13 @@ export function useStudio() {
   return {
     studioOpen,
     activeTool,
-    edits,
+    studioState,
     openStudio,
     closeStudio,
     setActiveTool,
     updateEdits,
     clearEdits,
+    getEdits,
     hasEdits
   };
 }

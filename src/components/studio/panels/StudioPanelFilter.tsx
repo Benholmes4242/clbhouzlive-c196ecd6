@@ -1,42 +1,29 @@
 import { useState } from 'react';
-import { DraftEdits } from '@/types/studio';
+import { StudioEdits, FilterId } from '@/types/studio';
+import { FILTERS } from '@/utils/filters';
 
 type StudioPanelFilterProps = {
-  edits: DraftEdits | undefined;
-  updateEdits: (patch: Partial<DraftEdits>) => void;
+  edits: StudioEdits;
+  updateEdits: (patch: Partial<StudioEdits>) => void;
   onApply: () => void;
   onReset: () => void;
 };
 
-const FILTERS = [
-  { name: 'normal' as const, label: 'Normal' },
-  { name: 'fade' as const, label: 'Fade' },
-  { name: 'warm' as const, label: 'Warm' },
-  { name: 'cool' as const, label: 'Cool' },
+const FILTER_OPTIONS: { id: FilterId; label: string }[] = [
+  { id: 'normal', label: 'Normal' },
+  { id: 'fade', label: 'Fade' },
+  { id: 'warm', label: 'Warm' },
+  { id: 'cool', label: 'Cool' },
+  { id: 'dusky', label: 'Dusky' },
+  { id: 'mono', label: 'Mono' },
 ];
 
 export default function StudioPanelFilter({ edits, updateEdits, onApply, onReset }: StudioPanelFilterProps) {
-  const [selectedFilter, setSelectedFilter] = useState(edits?.filter?.name || 'normal');
-  const [intensity, setIntensity] = useState(edits?.filter?.intensity ?? 50);
+  const [selectedFilter, setSelectedFilter] = useState<FilterId>(edits?.filter || 'normal');
 
-  const handleSelectFilter = (name: typeof FILTERS[0]['name']) => {
-    setSelectedFilter(name);
-    updateEdits({
-      filter: {
-        name,
-        intensity
-      }
-    });
-  };
-
-  const handleIntensityChange = (value: number) => {
-    setIntensity(value);
-    updateEdits({
-      filter: {
-        name: selectedFilter,
-        intensity: value
-      }
-    });
+  const handleSelectFilter = (filterId: FilterId) => {
+    setSelectedFilter(filterId);
+    updateEdits({ filter: filterId });
   };
 
   return (
@@ -44,40 +31,27 @@ export default function StudioPanelFilter({ edits, updateEdits, onApply, onReset
       {/* Filter presets */}
       <div className="p-4 space-y-3">
         <label className="block text-sm font-medium text-zinc-700">Filter</label>
-        <div className="grid grid-cols-4 gap-3">
-          {FILTERS.map(filter => (
+        <div className="grid grid-cols-3 gap-3">
+          {FILTER_OPTIONS.map(filter => (
             <button
-              key={filter.name}
-              onClick={() => handleSelectFilter(filter.name)}
-              className={`aspect-square rounded-lg border-2 transition-all ${
-                selectedFilter === filter.name
+              key={filter.id}
+              onClick={() => handleSelectFilter(filter.id)}
+              className={`aspect-square rounded-lg border-2 transition-all overflow-hidden ${
+                selectedFilter === filter.id
                   ? 'border-zinc-900 shadow-lg'
                   : 'border-zinc-200 hover:border-zinc-300'
               }`}
             >
-              <div className="w-full h-full rounded-md bg-gradient-to-br from-zinc-100 to-zinc-300 flex items-center justify-center">
+              <div 
+                className="w-full h-full bg-gradient-to-br from-zinc-100 to-zinc-300 flex items-center justify-center"
+                style={{ filter: FILTERS[filter.id] }}
+              >
                 <span className="text-xs font-medium text-zinc-700">{filter.label}</span>
               </div>
             </button>
           ))}
         </div>
       </div>
-
-      {/* Intensity slider */}
-      {selectedFilter !== 'normal' && (
-        <div className="p-4 border-t border-zinc-200 space-y-3">
-          <label className="block text-sm font-medium text-zinc-700">Intensity</label>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={intensity}
-            onChange={(e) => handleIntensityChange(parseInt(e.target.value))}
-            className="w-full"
-          />
-          <div className="text-xs text-zinc-500 text-center">{intensity}%</div>
-        </div>
-      )}
 
       {/* Spacer */}
       <div className="flex-1" />
