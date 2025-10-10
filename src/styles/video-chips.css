@@ -30,7 +30,7 @@
 }
 
 .chip--active {
-  background: #111;
-  color: #fff;
-  border-color: #111;
+  background: rgba(0, 0, 0, 0.06);
+  color: #111;
+  border-color: rgba(0, 0, 0, 0.12);
 }
