@@ -115,8 +115,8 @@ export default function ShortsSuggestedProfiles() {
               <button
                 onClick={handleCreateClick}
                 aria-label="Create moment"
-                className="sq-focusable w-full h-full flex items-center justify-center bg-white/55 border border-[rgba(0,0,0,0.18)] backdrop-blur-md active:scale-[0.98] transition-transform"
-                style={{ borderRadius: 'calc(var(--sq-radius) - 6px)' }}
+                className="sq-focusable w-full h-full flex items-center justify-center bg-white/55 border-none backdrop-blur-md active:scale-[0.98] transition-transform"
+                style={{ borderRadius: 'inherit' }}
               >
                 <span className="text-3xl leading-none text-black/90">＋</span>
               </button>

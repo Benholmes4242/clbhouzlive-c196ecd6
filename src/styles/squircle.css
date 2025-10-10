@@ -3,15 +3,15 @@
    ======================================== */
 
 :root {
-  /* sizing - 20% larger */
-  --sq-size:        125px;  /* outer hit area (was 104px) */
-  --sq-img:         115px;  /* inner image (was 96px) */
-  --sq-ring:        3px;    /* ring thickness */
-  --sq-gap:         12px;   /* image↔name gap (was 10px) */
+  /* sizing - 10% smaller */
+  --sq-size:        112px;  /* outer hit area */
+  --sq-img:         112px;  /* same as outer - no padding */
+  --sq-ring:        0px;    /* no padding between image and border */
+  --sq-gap:         11px;   /* image↔name gap */
   --sq-pill-h:      24px;   /* follow pill height */
 
   /* radii (superellipse vibe) */
-  --sq-radius:      22px;   /* scaled up (was 18px) */
+  --sq-radius:      20px;   /* scaled down */
 
   /* glass-black border colors (no green) */
   --sq-glass-bg:    rgba(255,255,255,0.02);
@@ -46,14 +46,13 @@
   width: var(--sq-img); 
   height: var(--sq-img);
   border-radius: var(--sq-radius);
-  padding: var(--sq-ring);
-  background: var(--sq-glass-bg);
+  padding: 0;
+  background: none;
   border: 1px solid var(--sq-glass-brd);
   box-shadow: 
     inset 0 0 0 1px var(--sq-glass-inner),
     var(--sq-shadow);
-  backdrop-filter: saturate(120%) blur(2px);
-  -webkit-backdrop-filter: saturate(120%) blur(2px);
+  overflow: hidden;
   position: relative;
 }
 
@@ -61,10 +60,9 @@
 .sq-img {
   width: 100%; 
   height: 100%;
-  border-radius: calc(var(--sq-radius) - 6px);
-  background: var(--sq-glass-bg);
-  border: 1px solid var(--sq-glass-brd);
-  backdrop-filter: blur(8px);
+  border-radius: inherit;
+  background: none;
+  border: none;
   object-fit: cover;
   transition: opacity 200ms ease-out;
 }
