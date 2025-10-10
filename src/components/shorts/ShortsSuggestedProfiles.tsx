@@ -109,21 +109,6 @@ export default function ShortsSuggestedProfiles() {
     <div className="relative mt-3 px-3 mb-3">
       <div ref={scrollRef} className="overflow-x-auto snap-x snap-mandatory no-scrollbar">
         <div className="flex gap-3 pr-3">
-          {/* + SQUIRCLE */}
-          <div className="sq-cell snap-start">
-            <div className="sq-ring">
-              <button
-                onClick={handleCreateClick}
-                aria-label="Create moment"
-                className="sq-focusable w-full h-full flex items-center justify-center bg-white/55 border-none backdrop-blur-md active:scale-[0.98] transition-transform"
-                style={{ borderRadius: 'inherit' }}
-              >
-                <span className="text-3xl leading-none text-black/90">＋</span>
-              </button>
-            </div>
-            <p className="sq-name text-[13px]">Add</p>
-          </div>
-
           {/* CREATOR SQUIRCLES */}
           {creators.map((creator, index) => (
             <Squircle
