@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useRecommendedCreators } from '@/hooks/useRecommendedCreators';
+import { useMixedProfiles } from '@/hooks/useMixedProfiles';
 import { useFirstRunFlag } from '@/hooks/useFirstRunFlag';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
+import { useNavigate } from 'react-router-dom';
 import Squircle from './Squircle';
 
-const AVATAR = { size: 72, radius: 14 };
+const AVATAR = { size: 96, radius: 18 };
 
 function Skeleton() {
   return (
@@ -13,44 +15,35 @@ function Skeleton() {
         className="bg-muted animate-pulse"
         style={{ width: AVATAR.size, height: AVATAR.size, borderRadius: AVATAR.radius }}
       />
-      <div className="h-3 w-[70px] bg-muted animate-pulse mt-2 rounded" />
-    </div>
-  );
-}
-
-function ScrollHint({ onDismiss }: { onDismiss: () => void }) {
-  return (
-    <div className="absolute right-6 top-1/2 -translate-y-1/2 z-10 bg-primary text-primary-foreground px-3 py-1.5 rounded-full text-xs font-medium shadow-lg animate-pulse pointer-events-none">
-      Swipe to see more →
+      <div className="h-3 w-[80px] bg-muted animate-pulse mt-2.5 rounded" />
     </div>
   );
 }
 
 export default function ShortsSuggestedProfiles() {
-  const { data: creators, isLoading, error } = useRecommendedCreators(24);
-  const { hasSeen, markSeen } = useFirstRunFlag('shorts-suggested');
+  const { data: creators, isLoading, error } = useMixedProfiles({ 
+    limit: 24, 
+    mix: { known: 0.6, suggested: 0.4 } 
+  });
   const scrollRef = useRef<HTMLDivElement>(null);
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
   const [retrying, setRetrying] = useState(false);
-
-  // Dismiss scroll hint on first scroll
-  useEffect(() => {
-    if (hasSeen || !scrollRef.current) return;
-
-    const handleScroll = () => {
-      markSeen();
-    };
-
-    const element = scrollRef.current;
-    element.addEventListener('scroll', handleScroll, { once: true });
-    return () => element.removeEventListener('scroll', handleScroll);
-  }, [hasSeen, markSeen]);
+  const navigate = useNavigate();
+  const { openImmersive } = useImmersiveProfile('', false);
 
   const handleAvatarClick = (userId: string) => {
+    openImmersive(0); // Open immersive profile modal
+    // Navigate to profile to load the immersive view
     const creator = creators.find(c => c.id === userId);
     if (creator?.username) {
-      // Navigation will be handled by Squircle component, this opens immersive
-      window.location.assign(`/user/${creator.username}`);
+      navigate(`/user/${creator.username}`);
+    }
+  };
+
+  const handleLabelClick = (userId: string) => {
+    const creator = creators.find(c => c.id === userId);
+    if (creator?.username) {
+      navigate(`/u/${creator.username}`);
     }
   };
 
@@ -113,9 +106,7 @@ export default function ShortsSuggestedProfiles() {
   }
 
   return (
-    <div className="relative edge-fade mt-3 px-3 mb-4">
-      {!hasSeen && <ScrollHint onDismiss={markSeen} />}
-      
+    <div className="relative edge-fade mt-2 px-3 mb-4">
       <div ref={scrollRef} className="overflow-x-auto snap-x snap-mandatory no-scrollbar">
         <div className="flex gap-3 pr-3">
           {/* + SQUIRCLE */}
@@ -124,12 +115,12 @@ export default function ShortsSuggestedProfiles() {
               <button
                 onClick={handleCreateClick}
                 aria-label="Create moment"
-                className="sq-focusable w-full h-full flex items-center justify-center bg-white/55 border border-[rgba(110,146,119,0.25)] backdrop-blur-md active:scale-[0.98] transition-transform rounded-[14px]"
+                className="sq-focusable w-full h-full flex items-center justify-center bg-white/55 border border-[rgba(110,146,119,0.25)] backdrop-blur-md active:scale-[0.98] transition-transform rounded-[18px]"
               >
-                <span className="text-2xl leading-none text-black/90">＋</span>
+                <span className="text-3xl leading-none text-black/90">＋</span>
               </button>
             </div>
-            <p className="sq-name">Add</p>
+            <p className="sq-name text-[13px]">Add</p>
           </div>
 
           {/* CREATOR SQUIRCLES */}
@@ -139,6 +130,7 @@ export default function ShortsSuggestedProfiles() {
               creator={creator}
               index={index}
               onAvatarClick={handleAvatarClick}
+              onLabelClick={handleLabelClick}
               imageLoaded={loadedImages.has(creator.id)}
               onImageLoad={() => handleImageLoad(creator.id)}
             />

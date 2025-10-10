@@ -12,7 +12,6 @@ const tabs = [
   { id: 'shorts', label: 'Shorts' },
   { id: 'channels', label: 'Channels' },
   { id: 'videos', label: 'Videos' },
-  { id: 'photos', label: 'Photos' },
   { id: 'following', label: 'Following' }
 ];
 

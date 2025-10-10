@@ -21,13 +21,14 @@ type Props = {
   creator: Creator;
   index: number;
   onAvatarClick: (userId: string) => void;
+  onLabelClick?: (userId: string) => void;
   imageLoaded: boolean;
   onImageLoad: () => void;
 };
 
 const AVATAR = { size: 72, radius: 14 };
 
-export default function Squircle({ creator, index, onAvatarClick, imageLoaded, onImageLoad }: Props) {
+export default function Squircle({ creator, index, onAvatarClick, onLabelClick, imageLoaded, onImageLoad }: Props) {
   const { isFollowing, busy, toggle, ensureInitial } = useFollow(creator.id);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -70,7 +71,11 @@ export default function Squircle({ creator, index, onAvatarClick, imageLoaded, o
   const handleNameClick = () => {
     if (!creator.username) return;
     analyticsEvents.shortsSquircle.nameClick(creator.username, index);
-    navigate(`/user/${creator.username}`);
+    if (onLabelClick) {
+      onLabelClick(creator.id);
+    } else {
+      navigate(`/user/${creator.username}`);
+    }
   };
 
   const handleFollowToggle = async (e: React.MouseEvent) => {

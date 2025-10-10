@@ -6,8 +6,11 @@ export function useDiscoverQuery() {
   const navigate = useNavigate();
 
   const rawMain = params.get("main") || "shorts";
-  // Map 'friends' to 'following' for back-compat
-  const main = (rawMain === "friends" ? "following" : rawMain) as MainPill;
+  // Map legacy routes for back-compat: 'friends' -> 'following', 'photos' -> 'shorts'
+  let mappedMain = rawMain;
+  if (rawMain === "friends") mappedMain = "following";
+  if (rawMain === "photos") mappedMain = "shorts";
+  const main = mappedMain as MainPill;
   const sub = params.get("sub") || "";
 
   function setMain(next: MainPill) {

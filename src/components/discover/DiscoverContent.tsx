@@ -26,7 +26,6 @@ function getFilterTypeFromPills(main: string): string {
     'shorts': FILTER_TYPES.SHORTS,
     'channels': FILTER_TYPES.CHANNELS,
     'videos': FILTER_TYPES.VIDEOS,
-    'photos': FILTER_TYPES.PHOTOS,
     'following': FILTER_TYPES.FOLLOWING,
     'friends': FILTER_TYPES.FOLLOWING, // Back-compat
     'verified-pros': FILTER_TYPES.VERIFIED_PROS,
@@ -140,17 +139,6 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     );
   }
 
-  if (main === 'photos') {
-    return (
-      <PhotosGrid
-        items={currentContent || []}
-        isLoading={currentContent === null || loading}
-        hasMore={hasMore}
-        onLoadMore={loadMore}
-        onOpenLightbox={onMediaClick}
-      />
-    );
-  }
 
   // Show loading while content is null for other tabs
   if (currentContent === null) {

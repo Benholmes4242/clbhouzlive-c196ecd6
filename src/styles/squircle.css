@@ -4,14 +4,14 @@
 
 :root {
   /* sizing */
-  --sq-size:        76px;   /* outer hit area */
-  --sq-img:         64px;   /* inner image */
-  --sq-ring:        2px;    /* ring thickness */
-  --sq-gap:         6px;    /* image↔name gap */
-  --sq-pill-h:      22px;   /* follow pill height */
+  --sq-size:        104px;  /* outer hit area */
+  --sq-img:         96px;   /* inner image */
+  --sq-ring:        3px;    /* ring thickness */
+  --sq-gap:         10px;   /* image↔name gap */
+  --sq-pill-h:      24px;   /* follow pill height */
 
   /* radii (superellipse vibe) */
-  --sq-radius:      20px;
+  --sq-radius:      18px;
 
   /* brand colors */
   --sq-ring-grad-a: #6e9277;     /* grey-green */
@@ -67,7 +67,7 @@
 
 /* name + meta */
 .sq-name {
-  font-size: 12px; 
+  font-size: 13px; 
   line-height: 1.15;
   text-align: center; 
   color: var(--sq-name-fg);
