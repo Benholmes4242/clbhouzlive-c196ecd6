@@ -11,6 +11,7 @@ import SmartCardMedia from './media/SmartCardMedia';
 import { CardType } from './media/CardMediaTypes';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import CreatorOverlay from '@/components/discover/CreatorOverlay';
+import { devlog } from '@/utils/log';
 
 import { MediaItem } from '@/types/media';
 
@@ -131,7 +132,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
 
   // Stable event handlers that don't cause re-renders
   const handleImageLoad = useCallback(() => {
-    console.log('[MediaDisplay] handleImageLoad called', {
+    devlog('[MediaDisplay] handleImageLoad called', {
       itemId: itemId.substring(0, 8),
       src: media.media_url,
       type: media.media_type
@@ -142,7 +143,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   }, []); // No dependencies to prevent re-creation
 
   const handleImageError = useCallback(() => {
-    console.log('[MediaDisplay] handleImageError called', {
+    devlog('[MediaDisplay] handleImageError called', {
       itemId: itemId.substring(0, 8),
       src: media.media_url,
       type: media.media_type
@@ -154,7 +155,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   
   // DEBUG: Log mount/unmount
   useEffect(() => {
-    console.log('[MediaDisplay] Component mounted', {
+    devlog('[MediaDisplay] Component mounted', {
       itemId: itemId.substring(0, 8),
       src: media.media_url,
       type: media.media_type,
@@ -164,7 +165,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
     });
     
     return () => {
-      console.log('[MediaDisplay] Component unmounted', itemId.substring(0, 8));
+      devlog('[MediaDisplay] Component unmounted', itemId.substring(0, 8));
     };
   }, []);
 

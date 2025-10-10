@@ -12,6 +12,7 @@ import { MediaNavigationDots } from '@/components/posts/user-post/overlays/Media
 import { FILTER_TYPES } from './types';
 import { createMobileGridLayoutWithDeduplication, createDesktopGridLayoutWithDeduplication } from '@/utils/postPlacementUtils';
 import { PlacementConfig } from './types/PostPlacementTypes';
+import { __DEV__, devlog, devtable } from '@/utils/log';
 
 /**
  * Hook to track when the app window/tab regains focus or visibility
@@ -77,7 +78,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
   // Reset loading states on content change, tab change, route change, or visibility change
   // This ensures grey tiles are cleared on every revisit scenario
   useEffect(() => {
-    console.log('[ExploreGrid] Load state reset triggered', {
+    devlog('[ExploreGrid] Load state reset triggered', {
       contentLength: content?.length || 0,
       activeFilter,
       locationKey: location.key,
@@ -99,7 +100,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
       
       // Log first 20 items' initial state
       const first20 = Object.entries(next).slice(0, 20);
-      console.table(first20.map(([id, isLoading]) => ({ id: id.substring(0, 8), isLoading })));
+      devtable(first20.map(([id, isLoading]) => ({ id: id.substring(0, 8), isLoading })));
       
       return next;
     });
@@ -115,7 +116,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
 
   // Memoized handler to flip tiles to loaded state
   const handleTileLoaded = useCallback((id: string) => {
-    console.log('[ExploreGrid] Tile loaded:', id.substring(0, 8));
+    devlog('[ExploreGrid] Tile loaded:', id.substring(0, 8));
     setItemLoadingStates(prev => (prev[id] === false ? prev : { ...prev, [id]: false }));
   }, []);
 
@@ -251,21 +252,21 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
         itemId: item.item.id.substring(0, 8),
         section: item.sectionIndex
       }));
-      console.log('[ExploreGrid] Grid items layout (first 20):');
-      console.table(first20Keys);
+      devlog('[ExploreGrid] Grid items layout (first 20):');
+      devtable(first20Keys);
     }
   }, [gridItems]);
 
-  // ✅ Safety net: clear lingering grey skeletons after 5s timeout
+  // ✅ Safety net: clear lingering grey skeletons after 5s timeout (dev only)
   useEffect(() => {
-    if (!content.length) return;
+    if (!content.length || !__DEV__) return; // only in preview/dev
     
     const timers: number[] = [];
     content.forEach((item) => {
       const t = window.setTimeout(() => {
         setItemLoadingStates(prev => {
           if (prev[item.id] === false) return prev; // Already loaded
-          console.log('[ExploreGrid] Safety timeout: force-clearing skeleton for', item.id.substring(0, 8));
+          devlog('[ExploreGrid] Safety timeout: force-clearing skeleton for', item.id.substring(0, 8));
           return { ...prev, [item.id]: false };
         });
       }, 5000); // 5s fallback for any stuck grey tiles
@@ -446,14 +447,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                           itemTitle={item.item.title}
                            shouldAutoplay={true}
                           isLoading={itemLoadingStates[item.item.id] ?? true}
-                          onImageError={() => {
-                            console.log('[MediaDisplay] Image error:', item.item.id.substring(0, 8), item.item.src);
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
-                          onImageLoad={() => {
-                            console.log('[MediaDisplay] Image loaded:', item.item.id.substring(0, 8), item.item.src);
-                            setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
-                          }}
+                          onImageError={() => handleTileLoaded(item.item.id)}
+                          onImageLoad={() => handleTileLoaded(item.item.id)}
                           onLoaded={() => handleTileLoaded(item.item.id)}
                           itemId={item.item.id}
                           currentIndex={0}

@@ -3,6 +3,7 @@ import { Play } from 'lucide-react';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import { CardMediaProps, CardType } from './CardMediaTypes';
 import { getStreamPoster } from '@/utils/stream';
+import { devlog } from '@/utils/log';
 
 /**
  * Square Card Media Component
@@ -30,7 +31,7 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
 
   // DEBUG: Log image load attempts
   React.useEffect(() => {
-    console.log('[SquareCardMedia] Rendered with', {
+    devlog('[SquareCardMedia] Rendered with', {
       mediaId: media.id?.substring(0, 8),
       mediaType: media.media_type,
       imageUrl,
@@ -51,11 +52,11 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
         className="w-full h-full object-cover"
         isAboveTheFold={isAboveTheFold}
         onLoad={() => {
-          console.log('[SquareCardMedia] Image loaded', media.id?.substring(0, 8), imageUrl);
+          devlog('[SquareCardMedia] Image loaded', media.id?.substring(0, 8), imageUrl);
           onLoaded?.();
         }}
         onError={() => {
-          console.log('[SquareCardMedia] Image error', media.id?.substring(0, 8), imageUrl);
+          devlog('[SquareCardMedia] Image error', media.id?.substring(0, 8), imageUrl);
           onLoaded?.();
         }}
       />

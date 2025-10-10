@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getDirectImageUrl } from '@/utils/r2ImageUtils';
+import { devlog, devwarn } from '@/utils/log';
 
 interface HighQualityImageProps {
   src: string;
@@ -31,7 +32,7 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
 
   useEffect(() => {
     // Reset states when src changes
-    console.log('[HighQualityImage] Source changed', {
+    devlog('[HighQualityImage] Source changed', {
       src,
       previousSrc: imageSrc,
       isAboveTheFold
@@ -45,7 +46,7 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
   useEffect(() => {
     const el = imgRef.current;
     if (el && el.complete && el.naturalWidth > 0 && !loaded && !hasError) {
-      console.log('[HighQualityImage] Cached image detected, marking as loaded', {
+      devlog('[HighQualityImage] Cached image detected, marking as loaded', {
         src: imageSrc,
         naturalWidth: el.naturalWidth,
         naturalHeight: el.naturalHeight
@@ -56,7 +57,7 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
   }, [imageSrc, loaded, hasError]);
 
   const handleImageLoad = () => {
-    console.log('[HighQualityImage] Image loaded successfully', {
+    devlog('[HighQualityImage] Image loaded successfully', {
       src: imageSrc,
       optimizedSrc: getOptimizedImageUrl(imageSrc)
     });
@@ -70,7 +71,7 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
                        imageSrc.includes('.webm') || imageSrc.includes('cloudflarestream.com');
     
     if (isVideoFile) {
-      console.warn('🚨 VIDEO FILE PASSED TO IMAGE COMPONENT:', {
+      devwarn('🚨 VIDEO FILE PASSED TO IMAGE COMPONENT:', {
         src: imageSrc,
         optimizedSrc: getOptimizedImageUrl(imageSrc),
         message: 'Video files should be handled by video components, not image components'
@@ -83,7 +84,7 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
       return;
     }
     
-    console.log('🔴 IMAGE ERROR - Failed to load:', {
+    devlog('🔴 IMAGE ERROR - Failed to load:', {
       src: imageSrc,
       optimizedSrc: getOptimizedImageUrl(imageSrc),
       width,
@@ -93,7 +94,7 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
     
     // Try fallback to original URL if optimization failed
     if (imageSrc !== src && !hasError) {
-      console.log('🔄 IMAGE ERROR - Trying fallback to original URL:', src);
+      devlog('🔄 IMAGE ERROR - Trying fallback to original URL:', src);
       setImageSrc(src);
       return;
     }
