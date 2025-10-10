@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { Eye } from 'lucide-react';
-import golfFairway from '@/assets/video-thumbs/golf-fairway.jpg';
-import golfGreen from '@/assets/video-thumbs/golf-green.jpg';
-import golfTee from '@/assets/video-thumbs/golf-tee.jpg';
-import golfScenic from '@/assets/video-thumbs/golf-scenic.jpg';
 
-const MOCK_THUMBNAILS = [golfFairway, golfGreen, golfTee, golfScenic];
-const FALLBACK_THUMBNAIL = golfFairway;
+const FALLBACK_THUMBNAIL = '/img/video-fallback.jpg';
 
 interface VideoExploreCardProps {
   item: ExploreContentItem;
@@ -15,7 +10,15 @@ interface VideoExploreCardProps {
 }
 
 const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick }) => {
-  // Use real thumbnail if available, otherwise fallback to mock
+  // Debug: verify real poster is being passed
+  console.debug('[VideoCard] thumb check', {
+    id: item.id,
+    hasThumb: !!item.thumbnailSrc,
+    thumb: item.thumbnailSrc,
+    src: item.src
+  });
+
+  // Use real thumbnail first; fallback to branded fallback
   const initialThumbnail = item.thumbnailSrc || FALLBACK_THUMBNAIL;
   const [imgSrc, setImgSrc] = useState(initialThumbnail);
   const [hasError, setHasError] = useState(false);
