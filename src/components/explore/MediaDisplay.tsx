@@ -131,16 +131,42 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
 
   // Stable event handlers that don't cause re-renders
   const handleImageLoad = useCallback(() => {
+    console.log('[MediaDisplay] handleImageLoad called', {
+      itemId: itemId.substring(0, 8),
+      src: media.media_url,
+      type: media.media_type
+    });
     setImageLoading(false);
     setMediaLoaded(true);
     onImageLoadRef.current();
   }, []); // No dependencies to prevent re-creation
 
   const handleImageError = useCallback(() => {
+    console.log('[MediaDisplay] handleImageError called', {
+      itemId: itemId.substring(0, 8),
+      src: media.media_url,
+      type: media.media_type
+    });
     setImageLoading(false);
     setMediaLoaded(true);
     onImageErrorRef.current();
   }, []); // No dependencies to prevent re-creation
+  
+  // DEBUG: Log mount/unmount
+  useEffect(() => {
+    console.log('[MediaDisplay] Component mounted', {
+      itemId: itemId.substring(0, 8),
+      src: media.media_url,
+      type: media.media_type,
+      isLoading,
+      cardType,
+      useSmartMedia
+    });
+    
+    return () => {
+      console.log('[MediaDisplay] Component unmounted', itemId.substring(0, 8));
+    };
+  }, []);
 
   // ✅ Now safe to use conditional rendering - all hooks are called above
   // Use smart media logic if enabled

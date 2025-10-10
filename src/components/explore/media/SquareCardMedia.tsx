@@ -27,17 +27,35 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
        'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=640&h=640&fit=crop&crop=center')
     : media.media_url;
 
+  // DEBUG: Log image load attempts
+  React.useEffect(() => {
+    console.log('[SquareCardMedia] Rendered with', {
+      mediaId: media.id?.substring(0, 8),
+      mediaType: media.media_type,
+      imageUrl,
+      src: media.media_url
+    });
+  }, [media.id, imageUrl]);
+
   return (
     <div 
       className={`relative w-full h-full overflow-hidden cursor-pointer ${className}`}
       onClick={onMediaClick}
+      data-media-id={media.id}
+      data-role="square-card"
     >
       <HighQualityImage
         src={imageUrl}
         alt="Media content"
         className="w-full h-full object-cover"
-        onLoad={() => onLoaded?.()} // Call onLoaded when image loads
-        onError={() => onLoaded?.()} // Still call onLoaded even on error to clear skeleton
+        onLoad={() => {
+          console.log('[SquareCardMedia] Image loaded', media.id?.substring(0, 8), imageUrl);
+          onLoaded?.();
+        }}
+        onError={() => {
+          console.log('[SquareCardMedia] Image error', media.id?.substring(0, 8), imageUrl);
+          onLoaded?.();
+        }}
       />
       
       {/* Video play icon in bottom right for video sources */}

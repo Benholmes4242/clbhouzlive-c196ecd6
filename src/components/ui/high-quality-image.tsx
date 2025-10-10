@@ -30,12 +30,21 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
 
   useEffect(() => {
     // Reset states when src changes
+    console.log('[HighQualityImage] Source changed', {
+      src,
+      previousSrc: imageSrc,
+      isAboveTheFold
+    });
     setImageSrc(src);
     setLoaded(false);
     setHasError(false);
   }, [src]);
 
   const handleImageLoad = () => {
+    console.log('[HighQualityImage] Image loaded successfully', {
+      src: imageSrc,
+      optimizedSrc: getOptimizedImageUrl(imageSrc)
+    });
     setLoaded(true);
     onLoad?.();
   };

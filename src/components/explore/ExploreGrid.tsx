@@ -77,6 +77,13 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
   // Reset loading states on content change, tab change, route change, or visibility change
   // This ensures grey tiles are cleared on every revisit scenario
   useEffect(() => {
+    console.log('[ExploreGrid] Load state reset triggered', {
+      contentLength: content?.length || 0,
+      activeFilter,
+      locationKey: location.key,
+      visibilityTick
+    });
+    
     if (!content?.length) {
       setItemLoadingStates({});
       setMediaIndices({});
@@ -89,6 +96,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
       for (const item of content) {
         next[item.id] = true; // Always initialize to loading
       }
+      
+      // Log first 20 items' initial state
+      const first20 = Object.entries(next).slice(0, 20);
+      console.table(first20.map(([id, isLoading]) => ({ id: id.substring(0, 8), isLoading })));
+      
       return next;
     });
     
@@ -103,6 +115,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
 
   // Memoized handler to flip tiles to loaded state
   const handleTileLoaded = useCallback((id: string) => {
+    console.log('[ExploreGrid] Tile loaded:', id.substring(0, 8));
     setItemLoadingStates(prev => (prev[id] === false ? prev : { ...prev, [id]: false }));
   }, []);
 
@@ -241,6 +254,21 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
   };
 
   const gridItems = createGridLayout();
+  
+  // DEBUG: Log grid layout keys (first 20)
+  useEffect(() => {
+    if (gridItems.length > 0) {
+      const first20Keys = gridItems.slice(0, 20).map((item, idx) => ({
+        index: idx,
+        key: item.key.substring(0, 30),
+        type: item.type,
+        itemId: item.item.id.substring(0, 8),
+        section: item.sectionIndex
+      }));
+      console.log('[ExploreGrid] Grid items layout (first 20):');
+      console.table(first20Keys);
+    }
+  }, [JSON.stringify(gridItems.slice(0, 20).map(i => i.key))]);
 
   // Check if we should use TrendingVideos-style layout for Friends tab on Clubhouse
   if (isClubhousePage && activeFilter === FILTER_TYPES.FRIENDS) {
@@ -387,9 +415,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                            shouldAutoplay={true}
                           isLoading={itemLoadingStates[item.item.id] ?? true}
                           onImageError={() => {
+                            console.log('[MediaDisplay] Image error:', item.item.id.substring(0, 8), item.item.src);
                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
                           }}
                           onImageLoad={() => {
+                            console.log('[MediaDisplay] Image loaded:', item.item.id.substring(0, 8), item.item.src);
                             setItemLoadingStates(prev => ({ ...prev, [item.item.id]: false }));
                           }}
                           onLoaded={() => handleTileLoaded(item.item.id)}
