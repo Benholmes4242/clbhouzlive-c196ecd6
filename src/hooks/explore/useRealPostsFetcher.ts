@@ -205,8 +205,7 @@ export const useRealPostsFetcher = () => {
     postsPerPage: number, 
     mediaFilter?: string, 
     subFilter?: string,
-    durationFilter?: { from: number; to: number | null },
-    topicFilters?: string[]
+    durationFilter?: { from: number; to: number | null }
   ): Promise<ExploreContentItem[]> => {
     try {
       // Build the query
@@ -454,44 +453,6 @@ export const useRealPostsFetcher = () => {
         return filtered;
       }
 
-      // Apply topic filters for videos (client-side heuristic)
-      if (mediaFilter === FILTER_TYPES.VIDEOS && topicFilters && topicFilters.length > 0) {
-        const filtered = formattedPosts.filter(post => {
-          const content = post.title?.toLowerCase() || '';
-          const courseName = post.golfCourse?.name?.toLowerCase() || '';
-          
-          return topicFilters.some(topic => {
-            if (topic === 'trending') {
-              // Trending: high engagement (likes + comments)
-              return (post.likes || 0) + (post.comments || 0) > 300;
-            }
-            if (topic === 'lessons') {
-              return content.includes('lesson') || 
-                     content.includes('tip') || 
-                     content.includes('how to') ||
-                     content.includes('instruction') ||
-                     content.includes('tutorial');
-            }
-            if (topic === 'funny') {
-              return content.includes('funny') || 
-                     content.includes('lol') || 
-                     content.includes('meme') ||
-                     content.includes('blooper') ||
-                     content.includes('fail');
-            }
-            if (topic === 'protips') {
-              return content.includes('pro tip') || 
-                     content.includes('drill') || 
-                     content.includes('coach') ||
-                     content.includes('pro') ||
-                     content.includes('technique');
-            }
-            return false;
-          });
-        });
-        
-        return filtered;
-      }
 
       return formattedPosts;
     } catch (error) {

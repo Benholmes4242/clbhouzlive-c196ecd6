@@ -10,15 +10,13 @@ const PRELOAD_THRESHOLD = 2; // Reduced threshold for faster preloading
 export const useInfiniteExploreContent = (
   activeFilter?: string, 
   subFilter?: string,
-  durationFilter?: { from: number; to: number | null },
-  topicFilters?: string[]
+  durationFilter?: { from: number; to: number | null }
 ) => {
   // Fast content caching by filter type (include all filter params in cache key)
   const filterKey = [
     activeFilter || 'Friends',
     subFilter,
-    durationFilter ? `${durationFilter.from}-${durationFilter.to}` : '',
-    topicFilters?.join(',') || ''
+    durationFilter ? `${durationFilter.from}-${durationFilter.to}` : ''
   ].filter(Boolean).join('-');
   const cacheKey = filterKey;
   
@@ -57,7 +55,7 @@ export const useInfiniteExploreContent = (
       if (activeFilter === 'Friends') {
         posts = await fetchFriendsPosts(freshOffset, POSTS_PER_PAGE);
       } else {
-        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter, durationFilter, topicFilters);
+        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter, durationFilter);
       }
       
       if (posts.length > 0) {
@@ -120,7 +118,7 @@ export const useInfiniteExploreContent = (
         posts = await fetchFriendsPosts(freshOffset, POSTS_PER_PAGE);
       } else {
         // Try to fetch real posts with filter and subfilter
-        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter, durationFilter, topicFilters);
+        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter, durationFilter);
       }
       
       if (posts.length > 0) {

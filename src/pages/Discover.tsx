@@ -29,7 +29,7 @@ const Discover = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
-  const { main, sub, duration, topics, setDuration, toggleTopic } = useDiscoverQuery();
+  const { main, sub, duration, setDuration } = useDiscoverQuery();
   
 
   // Derive activeFilter from URL main param (single source of truth)
@@ -168,12 +168,10 @@ const Discover = () => {
             
             {/* Video Filters - show only on videos tab */}
             {main === 'videos' && (
-              <VideoFilters
-                duration={duration}
-                topics={topics}
-                onDurationChange={setDuration}
-                onTopicToggle={toggleTopic}
-              />
+          <VideoFilters
+            duration={duration}
+            onDurationChange={setDuration}
+          />
             )}
             
             {/* Filter Pills Row - show for non-videos tabs */}
