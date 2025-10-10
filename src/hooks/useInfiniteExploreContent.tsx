@@ -7,9 +7,20 @@ import { useMockPostsHandler } from './explore/useMockPostsHandler';
 const POSTS_PER_PAGE = 20; // Increased for better performance
 const PRELOAD_THRESHOLD = 2; // Reduced threshold for faster preloading
 
-export const useInfiniteExploreContent = (activeFilter?: string, subFilter?: string) => {
-  // Fast content caching by filter type (include subFilter in cache key)
-  const cacheKey = subFilter ? `${activeFilter}-${subFilter}` : activeFilter || 'Friends';
+export const useInfiniteExploreContent = (
+  activeFilter?: string, 
+  subFilter?: string,
+  durationFilter?: { from: number; to: number | null },
+  topicFilters?: string[]
+) => {
+  // Fast content caching by filter type (include all filter params in cache key)
+  const filterKey = [
+    activeFilter || 'Friends',
+    subFilter,
+    durationFilter ? `${durationFilter.from}-${durationFilter.to}` : '',
+    topicFilters?.join(',') || ''
+  ].filter(Boolean).join('-');
+  const cacheKey = filterKey;
   
   const [contentCache, setContentCache] = useState<Record<string, ExploreContentItem[]>>({});
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
@@ -46,7 +57,7 @@ export const useInfiniteExploreContent = (activeFilter?: string, subFilter?: str
       if (activeFilter === 'Friends') {
         posts = await fetchFriendsPosts(freshOffset, POSTS_PER_PAGE);
       } else {
-        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter);
+        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter, durationFilter, topicFilters);
       }
       
       if (posts.length > 0) {
@@ -109,7 +120,7 @@ export const useInfiniteExploreContent = (activeFilter?: string, subFilter?: str
         posts = await fetchFriendsPosts(freshOffset, POSTS_PER_PAGE);
       } else {
         // Try to fetch real posts with filter and subfilter
-        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter);
+        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter, durationFilter, topicFilters);
       }
       
       if (posts.length > 0) {

@@ -104,15 +104,6 @@ export default function Squircle({ creator, index, onAvatarClick, onLabelClick, 
   const initials = name.slice(0, 2).toUpperCase();
   const hasRecentPost = creator.has_recent_post && !JSON.parse(localStorage.getItem('seenCreatorImmersiveIds') || '[]').includes(creator.id);
 
-  // 🔍 DIAGNOSTIC LOG
-  console.log('[Squircle label check]', {
-    id: creator?.id,
-    username: creator?.username,
-    display_name: creator?.display_name,
-    name,
-    label: name,
-  });
-
   return (
     <>
       <div ref={cellRef} className="sq-cell">

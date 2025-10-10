@@ -51,5 +51,24 @@ export const analyticsEvents = {
         session_id: sessionStorage.getItem('session_id') || 'unknown'
       });
     }
+  },
+
+  // Videos tab specific events
+  videos: {
+    tabView: (duration: string, topics: string[]) => {
+      analyticsEvents.track('videos_tab_view', {
+        duration,
+        topics,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    },
+    
+    filterChange: (duration: string, topics: string[]) => {
+      analyticsEvents.track('videos_filter_change', {
+        duration,
+        topics,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    }
   }
 };

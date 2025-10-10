@@ -40,12 +40,8 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     };
   }, [hasMore, isLoading, onLoadMore]);
 
-  // Filter to only show 3-10 minute videos
-  const filteredVideos = content.filter(item => {
-    if (item.type !== 'video') return false;
-    if (!item.durationSeconds) return true; // Include if duration unknown
-    return item.durationSeconds >= 180 && item.durationSeconds <= 600;
-  });
+  // Filter to only show videos (no duration filtering anymore - that's handled by parent)
+  const filteredVideos = content.filter(item => item.type === 'video');
 
   if (filteredVideos.length === 0 && !isLoading) {
     return (
@@ -53,7 +49,7 @@ const VideosGrid: React.FC<VideosGridProps> = ({
         <div className="text-4xl mb-4">🎥</div>
         <h3 className="text-lg font-semibold text-foreground mb-2">No videos found</h3>
         <p className="text-muted-foreground max-w-md">
-          Check back later for new 3-10 minute videos.
+          No videos match these filters. Try a different duration or topic.
         </p>
       </div>
     );

@@ -4,6 +4,7 @@ import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
 import MediaSearch from '@/components/discover/MediaSearch';
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import ExploreFilters from '@/components/explore/ExploreFilters';
+import VideoFilters from '@/components/discover/VideoFilters';
 
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 // import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned'; // Stored for future use
@@ -28,21 +29,20 @@ const Discover = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
-  const { main, sub } = useDiscoverQuery();
+  const { main, sub, duration, topics, setDuration, toggleTopic } = useDiscoverQuery();
   
 
   // Derive activeFilter from URL main param (single source of truth)
   const activeFilter = React.useMemo(() => {
     const mainToFilter: Record<string, string> = {
-      'shorts': FILTER_TYPES.SHORTS,
-      'channels': FILTER_TYPES.CHANNELS,
       'videos': FILTER_TYPES.VIDEOS,
+      'channels': FILTER_TYPES.CHANNELS,
       'following': FILTER_TYPES.FOLLOWING,
       'friends': FILTER_TYPES.FOLLOWING, // Back-compat
       'verified-pros': FILTER_TYPES.VERIFIED_PROS,
       'hack-shack': FILTER_TYPES.HACK_SHACK,
     };
-    return mainToFilter[main] || FILTER_TYPES.SHORTS;
+    return mainToFilter[main] || FILTER_TYPES.VIDEOS;
   }, [main]);
 
   // Reset tags when switching main pill
@@ -155,30 +155,37 @@ const Discover = () => {
               onTabChange={() => {}} // No-op: tabs control via URL now
             />
             
-            {/* Hide Search Bar and Filter Pills on Shorts */}
-            {main !== 'shorts' && (
-              <>
-                {/* Search Bar */}
-                <div className="px-1 pt-2 pb-1 bg-white">
-                  <div className="mx-1">
-                    <MediaSearch 
-                      placeholder="Search" 
-                      onSearchChange={setSearchQuery}
-                      className="w-full border-0 rounded-full px-4 py-2 text-sm placeholder:text-gray-500 focus:shadow-sm transition-all duration-200"
-                    />
-                  </div>
-                </div>
-                
-                {/* Filter Pills Row */}
-                <div className="pt-1 pb-3 border-b border-gray-50 pl-1.5">
-                  <ExploreFilters 
-                    activeFilter={activeFilter}
-                    onFilterChange={() => {}} // No-op: pills will be subfilters
-                    main={main}
-                    sub={sub}
-                  />
-                </div>
-              </>
+            {/* Search Bar - show for all tabs */}
+            <div className="px-1 pt-2 pb-1 bg-white">
+              <div className="mx-1">
+                <MediaSearch 
+                  placeholder="Search" 
+                  onSearchChange={setSearchQuery}
+                  className="w-full border-0 rounded-full px-4 py-2 text-sm placeholder:text-gray-500 focus:shadow-sm transition-all duration-200"
+                />
+              </div>
+            </div>
+            
+            {/* Video Filters - show only on videos tab */}
+            {main === 'videos' && (
+              <VideoFilters
+                duration={duration}
+                topics={topics}
+                onDurationChange={setDuration}
+                onTopicToggle={toggleTopic}
+              />
+            )}
+            
+            {/* Filter Pills Row - show for non-videos tabs */}
+            {main !== 'videos' && (
+              <div className="pt-1 pb-3 border-b border-gray-50 pl-1.5">
+                <ExploreFilters 
+                  activeFilter={activeFilter}
+                  onFilterChange={() => {}} // No-op: pills will be subfilters
+                  main={main}
+                  sub={sub}
+                />
+              </div>
             )}
           </div>
 

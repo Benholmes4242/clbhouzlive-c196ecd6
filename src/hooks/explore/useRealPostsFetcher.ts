@@ -200,7 +200,14 @@ export const useRealPostsFetcher = () => {
     }
   };
 
-  const fetchRealPosts = async (currentOffset: number, postsPerPage: number, mediaFilter?: string, subFilter?: string): Promise<ExploreContentItem[]> => {
+  const fetchRealPosts = async (
+    currentOffset: number, 
+    postsPerPage: number, 
+    mediaFilter?: string, 
+    subFilter?: string,
+    durationFilter?: { from: number; to: number | null },
+    topicFilters?: string[]
+  ): Promise<ExploreContentItem[]> => {
     try {
       // Build the query
       let query = supabase
@@ -253,6 +260,16 @@ export const useRealPostsFetcher = () => {
         }
       } else if (mediaFilter === FILTER_TYPES.VIDEOS) {
         query = query.eq('post_media.media_type', MEDIA_TYPES.VIDEO);
+        
+        // Apply duration filters if provided
+        if (durationFilter) {
+          if (durationFilter.from > 0) {
+            query = query.gte('post_media.duration_seconds', durationFilter.from);
+          }
+          if (durationFilter.to !== null) {
+            query = query.lte('post_media.duration_seconds', durationFilter.to);
+          }
+        }
       } else if (mediaFilter === FILTER_TYPES.PHOTOS) {
         query = query.eq('post_media.media_type', MEDIA_TYPES.IMAGE);
         
@@ -433,6 +450,45 @@ export const useRealPostsFetcher = () => {
         
         // Note: portraits/landscapes filtering would require aspect ratio data
         // For now, we'll skip orientation filtering until we have that data
+        
+        return filtered;
+      }
+
+      // Apply topic filters for videos (client-side heuristic)
+      if (mediaFilter === FILTER_TYPES.VIDEOS && topicFilters && topicFilters.length > 0) {
+        const filtered = formattedPosts.filter(post => {
+          const content = post.title?.toLowerCase() || '';
+          const courseName = post.golfCourse?.name?.toLowerCase() || '';
+          
+          return topicFilters.some(topic => {
+            if (topic === 'trending') {
+              // Trending: high engagement (likes + comments)
+              return (post.likes || 0) + (post.comments || 0) > 300;
+            }
+            if (topic === 'lessons') {
+              return content.includes('lesson') || 
+                     content.includes('tip') || 
+                     content.includes('how to') ||
+                     content.includes('instruction') ||
+                     content.includes('tutorial');
+            }
+            if (topic === 'funny') {
+              return content.includes('funny') || 
+                     content.includes('lol') || 
+                     content.includes('meme') ||
+                     content.includes('blooper') ||
+                     content.includes('fail');
+            }
+            if (topic === 'protips') {
+              return content.includes('pro tip') || 
+                     content.includes('drill') || 
+                     content.includes('coach') ||
+                     content.includes('pro') ||
+                     content.includes('technique');
+            }
+            return false;
+          });
+        });
         
         return filtered;
       }

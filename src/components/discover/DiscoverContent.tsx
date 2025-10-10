@@ -23,16 +23,15 @@ interface DiscoverContentProps {
 function getFilterTypeFromPills(main: string): string {
   // Map main pill to base filter type
   const mainToFilter: Record<string, string> = {
-    'shorts': FILTER_TYPES.SHORTS,
-    'channels': FILTER_TYPES.CHANNELS,
     'videos': FILTER_TYPES.VIDEOS,
+    'channels': FILTER_TYPES.CHANNELS,
     'following': FILTER_TYPES.FOLLOWING,
     'friends': FILTER_TYPES.FOLLOWING, // Back-compat
     'verified-pros': FILTER_TYPES.VERIFIED_PROS,
     'hack-shack': FILTER_TYPES.HACK_SHACK,
   };
   
-  return mainToFilter[main] || FILTER_TYPES.SHORTS;
+  return mainToFilter[main] || FILTER_TYPES.VIDEOS;
 }
 
 
@@ -55,19 +54,26 @@ function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): 
 }
 
 export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery, selectedTags = [] }: DiscoverContentProps) {
-  const { main, sub } = useDiscoverQuery();
+  const { main, sub, duration, topics } = useDiscoverQuery();
   const [currentContent, setCurrentContent] = useState<ExploreContentItem[] | null>(null);
   
   // Get the filter type based on main pill
   const filterType = getFilterTypeFromPills(main);
   
-  // Use existing hook to fetch content - pass sub for Shorts subfiltering
+  // Prepare duration filter for Videos
+  const durationFilter = React.useMemo(() => {
+    if (main !== 'videos') return undefined;
+    const { getDurationFilter } = require('@/constants/videoFilters');
+    return getDurationFilter(duration);
+  }, [main, duration]);
+  
+  // Use existing hook to fetch content with filters
   const { 
     content, 
     loading, 
     hasMore, 
     loadMore 
-  } = useInfiniteExploreContent(filterType, sub);
+  } = useInfiniteExploreContent(filterType, sub, durationFilter, main === 'videos' ? topics : undefined);
 
   // Apply search filtering and tag filtering whenever content changes
   useEffect(() => {
@@ -119,25 +125,6 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     );
   }
 
-  // Shorts tab with suggested creators carousel
-  if (main === 'shorts') {
-    return (
-      <>
-        <ShortsSuggestedProfiles />
-        <ExploreGrid 
-          content={currentContent || []}
-          onLike={onLike}
-          onFollow={onFollow}
-          onMediaClick={onMediaClick}
-          isLoading={currentContent === null || loading}
-          hasMore={hasMore}
-          onLoadMore={loadMore}
-          activeFilter={filterType}
-          isDiscoverPage={true}
-        />
-      </>
-    );
-  }
 
 
   // Show loading while content is null for other tabs
