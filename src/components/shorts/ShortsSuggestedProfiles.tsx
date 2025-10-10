@@ -76,7 +76,7 @@ export default function ShortsSuggestedProfiles() {
   // Error state
   if (error && !retrying) {
     return (
-      <div className="mt-3 px-3 mb-4">
+      <div className="mt-3 px-3 mb-3">
         <div className="bg-muted/50 border border-border rounded-lg p-4 flex items-center justify-between">
           <p className="text-sm text-muted-foreground">Couldn't load suggestions</p>
           <button
@@ -92,7 +92,7 @@ export default function ShortsSuggestedProfiles() {
 
   if (isLoading && !creators.length) {
     return (
-      <div className="flex gap-4 overflow-x-auto no-scrollbar px-3 mt-3">
+      <div className="flex gap-4 overflow-x-auto no-scrollbar px-3 mt-3 mb-3">
         {Array.from({ length: 10 }).map((_, i) => (
           <Skeleton key={i} />
         ))}
@@ -106,7 +106,7 @@ export default function ShortsSuggestedProfiles() {
   }
 
   return (
-    <div className="relative edge-fade mt-2 px-3 mb-4">
+    <div className="relative mt-3 px-3 mb-3">
       <div ref={scrollRef} className="overflow-x-auto snap-x snap-mandatory no-scrollbar">
         <div className="flex gap-3 pr-3">
           {/* + SQUIRCLE */}
@@ -115,7 +115,8 @@ export default function ShortsSuggestedProfiles() {
               <button
                 onClick={handleCreateClick}
                 aria-label="Create moment"
-                className="sq-focusable w-full h-full flex items-center justify-center bg-white/55 border border-[rgba(110,146,119,0.25)] backdrop-blur-md active:scale-[0.98] transition-transform rounded-[18px]"
+                className="sq-focusable w-full h-full flex items-center justify-center bg-white/55 border border-[rgba(0,0,0,0.18)] backdrop-blur-md active:scale-[0.98] transition-transform"
+                style={{ borderRadius: 'calc(var(--sq-radius) - 6px)' }}
               >
                 <span className="text-3xl leading-none text-black/90">＋</span>
               </button>

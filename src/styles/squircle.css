@@ -3,29 +3,28 @@
    ======================================== */
 
 :root {
-  /* sizing */
-  --sq-size:        104px;  /* outer hit area */
-  --sq-img:         96px;   /* inner image */
+  /* sizing - 20% larger */
+  --sq-size:        125px;  /* outer hit area (was 104px) */
+  --sq-img:         115px;  /* inner image (was 96px) */
   --sq-ring:        3px;    /* ring thickness */
-  --sq-gap:         10px;   /* image↔name gap */
+  --sq-gap:         12px;   /* image↔name gap (was 10px) */
   --sq-pill-h:      24px;   /* follow pill height */
 
   /* radii (superellipse vibe) */
-  --sq-radius:      18px;
+  --sq-radius:      22px;   /* scaled up (was 18px) */
 
-  /* brand colors */
-  --sq-ring-grad-a: #6e9277;     /* grey-green */
-  --sq-ring-grad-b: #a8bfb3;
+  /* glass-black border colors (no green) */
+  --sq-glass-bg:    rgba(255,255,255,0.02);
+  --sq-glass-brd:   rgba(0,0,0,0.18);
+  --sq-glass-inner: rgba(0,0,0,0.08);
   --sq-pill-bg:     rgba(255,255,255,0.85);
   --sq-pill-fg:     #0b0b0b;
   --sq-name-fg:     rgba(0,0,0,0.84);
   --sq-name-dim:    rgba(0,0,0,0.56);
 
   /* effects */
-  --sq-glass-bg:    rgba(255,255,255,0.55);
-  --sq-glass-brd:   rgba(110,146,119,0.25);
-  --sq-shadow:      0 6px 24px rgba(0,0,0,0.08);
-  --sq-focus:       0 0 0 6px rgba(110,146,119,0.12);
+  --sq-shadow:      0 0 1px rgba(0,0,0,0.25);
+  --sq-focus:       0 0 0 6px rgba(0,0,0,0.12);
 }
 
 /* ========================================
@@ -42,14 +41,19 @@
   scroll-snap-align: start;
 }
 
-/* ring + image wrapper */
+/* ring + image wrapper - glass black border */
 .sq-ring {
   width: var(--sq-img); 
   height: var(--sq-img);
   border-radius: var(--sq-radius);
   padding: var(--sq-ring);
-  background: linear-gradient(135deg, var(--sq-ring-grad-a), var(--sq-ring-grad-b));
-  box-shadow: var(--sq-shadow);
+  background: var(--sq-glass-bg);
+  border: 1px solid var(--sq-glass-brd);
+  box-shadow: 
+    inset 0 0 0 1px var(--sq-glass-inner),
+    var(--sq-shadow);
+  backdrop-filter: saturate(120%) blur(2px);
+  -webkit-backdrop-filter: saturate(120%) blur(2px);
   position: relative;
 }
 
@@ -138,7 +142,18 @@
     --sq-pill-fg:     rgba(255,255,255,0.95);
     --sq-name-fg:     rgba(255,255,255,0.90);
     --sq-name-dim:    rgba(255,255,255,0.60);
-    --sq-glass-bg:    rgba(0,0,0,0.40);
-    --sq-glass-brd:   rgba(110,146,119,0.30);
+    --sq-glass-bg:    rgba(0,0,0,0.02);
+    --sq-glass-brd:   rgba(255,255,255,0.18);
+    --sq-glass-inner: rgba(255,255,255,0.08);
+  }
+}
+
+/* High contrast fallback */
+@media (prefers-reduced-transparency: reduce) {
+  .sq-ring {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: transparent;
+    border-color: rgba(0,0,0,0.3);
   }
 }
