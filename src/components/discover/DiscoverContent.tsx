@@ -10,6 +10,7 @@ import CreatorHighlightShelf from '@/components/discover/CreatorHighlightShelf';
 import CreatorHighlightTile from '@/components/discover/CreatorHighlightTile';
 import { CreatorHighlight } from '@/hooks/useCreatorHighlights';
 import ShortsSuggestedProfiles from '@/components/shorts/ShortsSuggestedProfiles';
+import { getDurationFilter } from '@/constants/videoFilters';
 
 interface DiscoverContentProps {
   onLike: (contentId: string) => void;
@@ -63,7 +64,6 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Prepare duration filter for Videos
   const durationFilter = React.useMemo(() => {
     if (main !== 'videos') return undefined;
-    const { getDurationFilter } = require('@/constants/videoFilters');
     return getDurationFilter(duration);
   }, [main, duration]);
   
