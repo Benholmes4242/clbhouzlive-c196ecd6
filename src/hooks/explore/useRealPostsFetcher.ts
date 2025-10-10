@@ -2,7 +2,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { ExploreContentItem, FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 import { isValidImageUrl } from './urlValidation';
 import { FEATURE_FLAGS, PORTRAIT_MAX_ASPECT_RATIO } from '@/config/featureFlags';
-import { getCloudflarePoster, addCacheBuster } from '@/utils/cfStream';
 
 export const useRealPostsFetcher = () => {
   const fetchFriendsPosts = async (currentOffset: number, postsPerPage: number): Promise<ExploreContentItem[]> => {
@@ -40,7 +39,6 @@ export const useRealPostsFetcher = () => {
             id,
             media_type,
             media_url,
-            poster_url,
             width,
             height,
             aspect_ratio,
@@ -168,20 +166,6 @@ export const useRealPostsFetcher = () => {
           ? (primaryMedia as any).duration_seconds
           : undefined;
 
-        // Generate thumbnail URL for videos
-        const thumbnailSrc = primaryMedia.media_type === 'video'
-          ? (primaryMedia as any).poster_url || getCloudflarePoster(primaryMedia.media_url, { height: 720, time: '1s' })
-          : undefined;
-
-        // Debug: Log what poster we're generating
-        if (primaryMedia.media_type === 'video') {
-          console.debug('[Mapper] video poster', {
-            id: post.id,
-            mediaUrl: primaryMedia.media_url,
-            poster: thumbnailSrc || null
-          });
-        }
-
         const formattedPost = {
           id: post.id,
           type: primaryMedia.media_type as 'video' | 'image',
@@ -192,7 +176,6 @@ export const useRealPostsFetcher = () => {
           shares: Math.floor(Math.random() * 50) + 1,
           duration: durationSeconds ? `${durationSeconds}s` : undefined,
           durationSeconds, // Store numeric value for filtering
-          thumbnailSrc, // Real Cloudflare Stream poster
           user: {
             id: post.user_id,
             name: userProfile?.display_name || userProfile?.username || 'User',
@@ -237,7 +220,6 @@ export const useRealPostsFetcher = () => {
             id,
             media_type,
             media_url,
-            poster_url,
             duration_seconds,
             media_width,
             media_height,
@@ -407,11 +389,6 @@ export const useRealPostsFetcher = () => {
           ? (primaryMedia as any).duration_seconds
           : undefined;
 
-        // Generate thumbnail URL for videos
-        const thumbnailSrc = primaryMedia.media_type === 'video'
-          ? (primaryMedia as any).poster_url || getCloudflarePoster(primaryMedia.media_url, { height: 720, time: '1s' })
-          : undefined;
-
         const formattedPost = {
           id: post.id,
           type: primaryMedia.media_type as 'video' | 'image',
@@ -422,7 +399,6 @@ export const useRealPostsFetcher = () => {
           shares: Math.floor(Math.random() * 50) + 1,
           duration: durationSeconds ? `${durationSeconds}s` : undefined,
           durationSeconds, // Store numeric value for filtering
-          thumbnailSrc, // Real Cloudflare Stream poster
           user: {
             id: post.user_id,
             name: userProfile?.display_name || userProfile?.username || 'User',

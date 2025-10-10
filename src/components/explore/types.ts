@@ -9,7 +9,6 @@ export interface ExploreContentItem {
   shares?: number;
   duration?: string;
   durationSeconds?: number; // Numeric duration for filtering (temporary until DB field added)
-  thumbnailSrc?: string; // Real poster/thumbnail URL for videos
   user?: {
     id: string;
     name: string;

@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { Eye } from 'lucide-react';
+import golfFairway from '@/assets/video-thumbs/golf-fairway.jpg';
+import golfGreen from '@/assets/video-thumbs/golf-green.jpg';
+import golfTee from '@/assets/video-thumbs/golf-tee.jpg';
+import golfScenic from '@/assets/video-thumbs/golf-scenic.jpg';
 
-const FALLBACK_THUMBNAIL = '/img/video-fallback.jpg';
+const MOCK_THUMBNAILS = [golfFairway, golfGreen, golfTee, golfScenic];
 
 interface VideoExploreCardProps {
   item: ExploreContentItem;
@@ -10,26 +14,19 @@ interface VideoExploreCardProps {
 }
 
 const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick }) => {
-  // Debug: verify real poster is being passed
-  console.debug('[VideoCard] thumb check', {
-    id: item.id,
-    src: item.src,
-    thumbnailSrc: item.thumbnailSrc ?? null,
-  });
-
-  // Use real thumbnail first; fallback to branded fallback
-  const initialThumbnail = item.thumbnailSrc || FALLBACK_THUMBNAIL;
-  const [imgSrc, setImgSrc] = useState(initialThumbnail);
+  const [imgSrc, setImgSrc] = useState(item.src);
   const [hasError, setHasError] = useState(false);
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    console.warn('[VideoCard] onError thumbnail', {
-      id: item.id,
-      tried: (e.target as HTMLImageElement).src
-    });
+  // Get a consistent mock thumbnail based on item id
+  const getMockThumbnail = () => {
+    const index = item.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % MOCK_THUMBNAILS.length;
+    return MOCK_THUMBNAILS[index];
+  };
+
+  const handleImageError = () => {
     if (!hasError) {
       setHasError(true);
-      setImgSrc(FALLBACK_THUMBNAIL);
+      setImgSrc(getMockThumbnail());
     }
   };
 
