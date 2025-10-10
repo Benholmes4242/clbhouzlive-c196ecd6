@@ -234,9 +234,14 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
     return result.gridItems;
   };
 
-  const gridItems = createGridLayout();
+  // ✅ Memoize grid items to avoid expensive re-computation and unstable deps
+  const gridItems = useMemo(() => {
+    return isMobile 
+      ? createMobileGridLayoutWithDeduplication(content, placementConfig).gridItems
+      : createDesktopGridLayoutWithDeduplication(content, placementConfig).gridItems;
+  }, [isMobile, content, placementConfig.maxSections, placementConfig.isPortraitMedia]);
   
-  // DEBUG: Log grid layout keys (first 20)
+  // DEBUG: Log grid layout keys (first 20) - stable dependency
   useEffect(() => {
     if (gridItems.length > 0) {
       const first20Keys = gridItems.slice(0, 20).map((item, idx) => ({
@@ -249,7 +254,26 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
       console.log('[ExploreGrid] Grid items layout (first 20):');
       console.table(first20Keys);
     }
-  }, [JSON.stringify(gridItems.slice(0, 20).map(i => i.key))]);
+  }, [gridItems]);
+
+  // ✅ Safety net: clear lingering grey skeletons after 5s timeout
+  useEffect(() => {
+    if (!content.length) return;
+    
+    const timers: number[] = [];
+    content.forEach((item) => {
+      const t = window.setTimeout(() => {
+        setItemLoadingStates(prev => {
+          if (prev[item.id] === false) return prev; // Already loaded
+          console.log('[ExploreGrid] Safety timeout: force-clearing skeleton for', item.id.substring(0, 8));
+          return { ...prev, [item.id]: false };
+        });
+      }, 5000); // 5s fallback for any stuck grey tiles
+      timers.push(t);
+    });
+    
+    return () => timers.forEach(clearTimeout);
+  }, [content]);
 
   // ===== ALL HOOKS ABOVE - NO EARLY RETURNS BEFORE THIS LINE =====
   
@@ -444,6 +468,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
                             // Navigate to creator profile
                             console.log('Navigate to creator:', item.item.user);
                           }}
+                          isAboveTheFold={(currentSection * 6) + idx < ABOVE_THE_FOLD_COUNT}
                         />
                         
                         {/* Multiple media indicator */}

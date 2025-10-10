@@ -185,8 +185,10 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           cardType={cardType}
           shouldAutoplay={isDiscoverPage ? discoverPreview.shouldAutoplay : shouldAutoplay}
           onMediaClick={onMediaClick}
+          onLoaded={onLoaded}
           className="w-full h-full"
           showFeaturedBadge={showFeaturedBadge}
+          isAboveTheFold={isAboveTheFold}
         />
         
         {/* Creator overlay for Discover page */}

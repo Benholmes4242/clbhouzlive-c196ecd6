@@ -17,7 +17,8 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
   media,
   onMediaClick,
   onLoaded,
-  className = ''
+  className = '',
+  isAboveTheFold = false
 }) => {
   // Always use static image for square cards - use consistent poster generation with fallbacks
   const imageUrl = media.media_type === 'video' 
@@ -48,6 +49,7 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
         src={imageUrl}
         alt="Media content"
         className="w-full h-full object-cover"
+        isAboveTheFold={isAboveTheFold}
         onLoad={() => {
           console.log('[SquareCardMedia] Image loaded', media.id?.substring(0, 8), imageUrl);
           onLoaded?.();

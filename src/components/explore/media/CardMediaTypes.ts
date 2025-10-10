@@ -21,4 +21,5 @@ export interface CardMediaProps {
   onLoaded?: () => void; // New callback for when media finishes loading
   className?: string;
   showFeaturedBadge?: boolean;
+  isAboveTheFold?: boolean; // ✅ Above-the-fold optimization
 }

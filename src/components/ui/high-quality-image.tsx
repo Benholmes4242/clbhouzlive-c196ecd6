@@ -24,6 +24,7 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
   onClick,
   isAboveTheFold = false
 }) => {
+  const imgRef = React.useRef<HTMLImageElement | null>(null);
   const [imageSrc, setImageSrc] = useState<string>(src);
   const [loaded, setLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -39,6 +40,20 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
     setLoaded(false);
     setHasError(false);
   }, [src]);
+
+  // ✅ Handle cached images that don't fire onLoad
+  useEffect(() => {
+    const el = imgRef.current;
+    if (el && el.complete && el.naturalWidth > 0 && !loaded && !hasError) {
+      console.log('[HighQualityImage] Cached image detected, marking as loaded', {
+        src: imageSrc,
+        naturalWidth: el.naturalWidth,
+        naturalHeight: el.naturalHeight
+      });
+      // Use microtask to ensure handlers are attached
+      queueMicrotask(() => handleImageLoad());
+    }
+  }, [imageSrc, loaded, hasError]);
 
   const handleImageLoad = () => {
     console.log('[HighQualityImage] Image loaded successfully', {
@@ -122,6 +137,7 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
       )}
       
       <img
+        ref={imgRef}
         src={optimizedSrc}
         alt={alt}
         className={`w-full h-full object-cover rounded-[inherit] transition-opacity duration-200 ${
