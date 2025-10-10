@@ -117,26 +117,6 @@
   border-radius: calc(var(--sq-radius) + 6px);
 }
 
-/* Disable iOS tap highlight and prevent dark overlays */
-.sq-ring,
-.sq-cell,
-.sq-ring *,
-.sq-cell * {
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Ensure no dark overlays on press/active */
-.sq-ring::after,
-.sq-cell::after {
-  display: none !important;
-  background: none !important;
-}
-
-.sq-ring:active,
-.sq-cell:active {
-  background: none !important;
-}
-
 /* ========================================
    Interaction States
    ======================================== */

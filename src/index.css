@@ -530,22 +530,6 @@ html, body, #root, .app-shell { touch-action: auto; }
   background: linear-gradient(to left, hsl(var(--background)), transparent);
 }
 
-/* Disable edge-fade on squircle carousels */
-.sq-cell,
-.sq-ring {
-  -webkit-mask-image: none !important;
-  mask-image: none !important;
-}
-
-/* Ensure squircle rail has no dark backgrounds */
-.overflow-x-auto.snap-x:has(.sq-cell) {
-  background: transparent !important;
-}
-.overflow-x-auto.snap-x:has(.sq-cell)::before,
-.overflow-x-auto.snap-x:has(.sq-cell)::after {
-  display: none !important;
-}
-
 /* Global bottom navigation enhancements */
 :root {
   /* Standard navigation heights */
