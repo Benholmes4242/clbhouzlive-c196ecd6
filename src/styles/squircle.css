@@ -77,11 +77,6 @@
   white-space: nowrap; 
   overflow: hidden; 
   text-overflow: ellipsis;
-  background: none;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  font-weight: 500;
 }
 
 .sq-meta {
