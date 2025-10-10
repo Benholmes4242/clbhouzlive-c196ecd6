@@ -7,6 +7,7 @@ import golfTee from '@/assets/video-thumbs/golf-tee.jpg';
 import golfScenic from '@/assets/video-thumbs/golf-scenic.jpg';
 
 const MOCK_THUMBNAILS = [golfFairway, golfGreen, golfTee, golfScenic];
+const FALLBACK_THUMBNAIL = golfFairway;
 
 interface VideoExploreCardProps {
   item: ExploreContentItem;
@@ -14,19 +15,15 @@ interface VideoExploreCardProps {
 }
 
 const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick }) => {
-  const [imgSrc, setImgSrc] = useState(item.src);
+  // Use real thumbnail if available, otherwise fallback to mock
+  const initialThumbnail = item.thumbnailSrc || FALLBACK_THUMBNAIL;
+  const [imgSrc, setImgSrc] = useState(initialThumbnail);
   const [hasError, setHasError] = useState(false);
-
-  // Get a consistent mock thumbnail based on item id
-  const getMockThumbnail = () => {
-    const index = item.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % MOCK_THUMBNAILS.length;
-    return MOCK_THUMBNAILS[index];
-  };
 
   const handleImageError = () => {
     if (!hasError) {
       setHasError(true);
-      setImgSrc(getMockThumbnail());
+      setImgSrc(FALLBACK_THUMBNAIL);
     }
   };
 
