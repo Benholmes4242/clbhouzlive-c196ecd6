@@ -2,10 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { MainPill } from '@/constants/discoverPills';
+import { Search } from 'lucide-react';
 
 interface SegmentedControlProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  onOpenVideoSearch?: () => void;
 }
 
 const tabs = [
@@ -16,7 +18,8 @@ const tabs = [
 
 const SegmentedControl: React.FC<SegmentedControlProps> = ({ 
   activeTab, 
-  onTabChange 
+  onTabChange,
+  onOpenVideoSearch
 }) => {
   const { main, setMain } = useDiscoverQuery();
   const [indicatorStyle, setIndicatorStyle] = useState({});
@@ -48,22 +51,35 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
       className="relative w-full bg-white border-b border-gray-200"
     >
       {/* Tab buttons */}
-      <div className="flex w-full">
-        {tabs.map((tab, index) => (
+      <div className="flex w-full items-center">
+        <div className="flex flex-1">
+          {tabs.map((tab, index) => (
+            <button
+              key={tab.id}
+              ref={el => tabRefs.current[index] = el}
+              onClick={() => handleTabClick(tab.id)}
+              className={cn(
+                "flex-1 py-3 px-4 text-center transition-all duration-200 relative z-10 text-base",
+                main === tab.id 
+                  ? "text-foreground font-bold" 
+                  : "text-muted-foreground font-medium hover:text-foreground/70"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        
+        {/* Search icon */}
+        {onOpenVideoSearch && (
           <button
-            key={tab.id}
-            ref={el => tabRefs.current[index] = el}
-            onClick={() => handleTabClick(tab.id)}
-            className={cn(
-              "flex-1 py-3 px-4 text-center transition-all duration-200 relative z-10 text-base",
-              main === tab.id 
-                ? "text-foreground font-bold" 
-                : "text-muted-foreground font-medium hover:text-foreground/70"
-            )}
+            aria-label="Search videos"
+            onClick={onOpenVideoSearch}
+            className="p-2 mr-2 hover:bg-black/5 rounded-full transition-colors"
           >
-            {tab.label}
+            <Search size={20} />
           </button>
-        ))}
+        )}
       </div>
       
       {/* Sliding underline indicator */}

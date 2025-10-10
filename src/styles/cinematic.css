@@ -1,0 +1,87 @@
+.cin-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  --cin-backdrop: rgba(255, 255, 255, var(--cin-backdrop-opacity, 0.55));
+  --cin-sheet-bg: rgba(255, 255, 255, 0.85);
+  --cin-text: rgba(0, 0, 0, 0.9);
+  --cin-radius: 16px;
+  --cin-elev: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.cin-tone-dark {
+  --cin-backdrop: rgba(0, 0, 0, 0.45);
+  --cin-sheet-bg: rgba(18, 18, 18, 0.95);
+  --cin-text: rgba(255, 255, 255, 0.92);
+}
+
+.cin-tone-light {
+  --cin-sheet-bg: #fff;
+  --cin-text: #111;
+}
+
+.cin-backdrop {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(var(--cin-blur, 14px));
+  background: var(--cin-backdrop);
+}
+
+.cin-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
+  background: var(--cin-sheet-bg);
+  color: var(--cin-text);
+  border-radius: var(--cin-radius);
+  box-shadow: var(--cin-elev);
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+}
+
+.cin-variant-sheet .cin-sheet {
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+.cin-variant-center .cin-sheet {
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(640px, 92vw);
+}
+
+.cin-size-fullscreen .cin-sheet {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+.cin-header {
+  position: sticky;
+  top: 0;
+  background: inherit;
+  padding: 12px 16px;
+}
+
+.cin-body {
+  padding: 8px 16px 16px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cin-footer {
+  padding: 12px 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.cin-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.18);
+  margin: 10px auto;
+}

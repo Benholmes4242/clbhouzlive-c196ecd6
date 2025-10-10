@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
 
-import MediaSearch from '@/components/discover/MediaSearch';
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import ExploreFilters from '@/components/explore/ExploreFilters';
-import VideoFilters from '@/components/discover/VideoFilters';
+import VideoChipRail from '@/components/videos/VideoChipRail';
+import VideoSearchOverlay from '@/components/videos/VideoSearchOverlay';
+import { useVideoLengthFilter } from '@/hooks/useVideoLengthFilter';
 
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 // import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned'; // Stored for future use
@@ -28,8 +29,10 @@ const Discover = () => {
   const [modalStartIndex, setModalStartIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [searchOpen, setSearchOpen] = useState(false);
   
-  const { main, sub, duration, setDuration } = useDiscoverQuery();
+  const { main, sub } = useDiscoverQuery();
+  const [durationFilter, setDurationFilter] = useVideoLengthFilter();
   
 
   // Derive activeFilter from URL main param (single source of truth)
@@ -147,31 +150,21 @@ const Discover = () => {
   return (
     <div className="min-h-screen bg-background text-foreground page-with-header">
       <main className="pb-20">
-          {/* Static Tabs and Search */}
+          {/* Static Tabs */}
           <div className="relative z-30 bg-white">
             {/* Segmented Control Tabs */}
             <SegmentedControl 
               activeTab={activeFilter}
               onTabChange={() => {}} // No-op: tabs control via URL now
+              onOpenVideoSearch={() => setSearchOpen(true)}
             />
             
-            {/* Search Bar - show for all tabs */}
-            <div className="px-1 pt-2 pb-1 bg-white">
-              <div className="mx-1">
-                <MediaSearch 
-                  placeholder="Search" 
-                  onSearchChange={setSearchQuery}
-                  className="w-full border-0 rounded-full px-4 py-2 text-sm placeholder:text-gray-500 focus:shadow-sm transition-all duration-200"
-                />
-              </div>
-            </div>
-            
-            {/* Video Filters - show only on videos tab */}
+            {/* Video Chip Rail - show only on videos tab */}
             {main === 'videos' && (
-          <VideoFilters
-            duration={duration}
-            onDurationChange={setDuration}
-          />
+              <VideoChipRail
+                value={durationFilter}
+                onChange={setDurationFilter}
+              />
             )}
             
             {/* Filter Pills Row - show for non-videos tabs */}
@@ -212,8 +205,16 @@ const Discover = () => {
             </div>
           )}
       </main>
-        
-        
+
+        {/* Video Search Overlay */}
+        <VideoSearchOverlay
+          open={searchOpen}
+          onClose={() => setSearchOpen(false)}
+          onPick={(q) => {
+            setSearchQuery(q);
+            setSearchOpen(false);
+          }}
+        />
 
         {/* Conditional Modal/Feed based on feature flag */}
         {USE_MODAL_DISCOVER ? (
