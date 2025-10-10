@@ -34,10 +34,10 @@
 /* container for each squircle cell */
 .sq-cell {
   width: var(--sq-size);
-  display: flex; 
+  display: inline-flex; 
   flex-direction: column; 
   align-items: center;
-  gap: var(--sq-gap);
+  gap: 6px;
   scroll-snap-align: start;
 }
 
@@ -69,14 +69,32 @@
 
 /* name + meta */
 .sq-name {
-  font-size: 13px; 
-  line-height: 1.15;
+  display: block;
+  min-height: 16px;
+  font-size: 12px; 
+  line-height: 1.2;
   text-align: center; 
-  color: var(--sq-name-fg);
-  max-width: var(--sq-size); 
+  color: var(--sq-name-fg, rgba(0,0,0,0.84));
+  max-width: var(--sq-size, 72px); 
   white-space: nowrap; 
   overflow: hidden; 
   text-overflow: ellipsis;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Hide the node cleanly when no text */
+.sq-name:empty {
+  display: none;
+}
+
+/* Dark mode color */
+.dark .sq-name {
+  color: var(--sq-name-fg-dark, rgba(255,255,255,0.92));
 }
 
 .sq-meta {
@@ -133,12 +151,25 @@
   transform: scale(0.98);
 }
 
+/* Skeleton loading state */
+.sq-name.skeleton {
+  display: block;
+  min-height: 16px;
+  border-radius: 6px;
+  background: var(--skeleton-bg, rgba(0,0,0,0.06));
+}
+
+.dark .sq-name.skeleton {
+  background: var(--skeleton-bg-dark, rgba(255,255,255,0.12));
+}
+
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   :root {
     --sq-pill-bg:     rgba(0,0,0,0.75);
     --sq-pill-fg:     rgba(255,255,255,0.95);
     --sq-name-fg:     rgba(255,255,255,0.90);
+    --sq-name-fg-dark: rgba(255,255,255,0.92);
     --sq-name-dim:    rgba(255,255,255,0.60);
     --sq-glass-bg:    rgba(0,0,0,0.02);
     --sq-glass-brd:   rgba(255,255,255,0.18);
