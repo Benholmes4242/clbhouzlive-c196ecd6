@@ -31,6 +31,17 @@ export default function ShortsSuggestedProfiles() {
   const navigate = useNavigate();
   const { openImmersive } = useImmersiveProfile('', false);
 
+  // 🔍 DIAGNOSTIC LOG
+  useEffect(() => {
+    if (creators?.length > 0) {
+      console.log('[ShortsSuggestedProfiles] Data received:', creators.map(u => ({
+        id: u.id, 
+        username: u.username, 
+        display_name: u.display_name
+      })));
+    }
+  }, [creators]);
+
   const handleAvatarClick = (userId: string) => {
     openImmersive(0); // Open immersive profile modal
     // Navigate to profile to load the immersive view
