@@ -173,6 +173,15 @@ export const useRealPostsFetcher = () => {
           ? (primaryMedia as any).poster_url || getCloudflarePoster(primaryMedia.media_url, { height: 720, time: '1s' })
           : undefined;
 
+        // Debug: Log what poster we're generating
+        if (primaryMedia.media_type === 'video') {
+          console.debug('[Mapper] video poster', {
+            id: post.id,
+            mediaUrl: primaryMedia.media_url,
+            poster: thumbnailSrc || null
+          });
+        }
+
         const formattedPost = {
           id: post.id,
           type: primaryMedia.media_type as 'video' | 'image',

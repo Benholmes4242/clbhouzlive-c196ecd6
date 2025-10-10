@@ -13,9 +13,8 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick 
   // Debug: verify real poster is being passed
   console.debug('[VideoCard] thumb check', {
     id: item.id,
-    hasThumb: !!item.thumbnailSrc,
-    thumb: item.thumbnailSrc,
-    src: item.src
+    src: item.src,
+    thumbnailSrc: item.thumbnailSrc ?? null,
   });
 
   // Use real thumbnail first; fallback to branded fallback
@@ -23,7 +22,11 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick 
   const [imgSrc, setImgSrc] = useState(initialThumbnail);
   const [hasError, setHasError] = useState(false);
 
-  const handleImageError = () => {
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    console.warn('[VideoCard] onError thumbnail', {
+      id: item.id,
+      tried: (e.target as HTMLImageElement).src
+    });
     if (!hasError) {
       setHasError(true);
       setImgSrc(FALLBACK_THUMBNAIL);
