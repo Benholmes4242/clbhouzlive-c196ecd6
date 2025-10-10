@@ -14,8 +14,8 @@
 }
 
 .chip {
-  border-radius: 999px;
-  padding: 10px 16px;
+  border-radius: 12px;
+  padding: 8px 12px;
   font-size: 14px;
   font-weight: 600;
   background: #fff;
@@ -30,7 +30,7 @@
 }
 
 .chip--active {
-  background: #000;
+  background: #111;
   color: #fff;
-  border-color: #000;
+  border-color: #111;
 }
