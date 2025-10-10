@@ -208,25 +208,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
     };
   }, [hasMore, isLoading, onLoadMore]);
 
-  // Don't show skeleton loading on initial load for any filter
-  if (isLoading && content.length === 0) {
-    return null; // No loading state shown
-  }
-
-  if (content.length === 0 && !isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="text-4xl mb-4">🏌️‍♂️</div>
-        <h3 className="text-lg font-semibold text-foreground mb-2">No content found</h3>
-        <p className="text-muted-foreground max-w-md">
-          {activeFilter === 'Hack Shack' 
-            ? "No hacks yet! Be the first to upload a hilarious golf mishit using #hackshack in your post."
-            : "Try adjusting your filters or check back later for new content."}
-        </p>
-      </div>
-    );
-  }
-
   // Helper function to determine if media is portrait (H/W >= 1.1)
   const isPortraitMedia = (item: ExploreContentItem): boolean => {
     // For demo purposes, let's treat every 3rd item as portrait to ensure we have portrait cards
@@ -270,8 +251,35 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
     }
   }, [JSON.stringify(gridItems.slice(0, 20).map(i => i.key))]);
 
+  // ===== ALL HOOKS ABOVE - NO EARLY RETURNS BEFORE THIS LINE =====
+  
+  // Check flags for conditional rendering
+  const isEmpty = content.length === 0 && !isLoading;
+  const isInitialLoading = isLoading && content.length === 0;
+  const isFriendsTabOnClubhouse = isClubhousePage && activeFilter === FILTER_TYPES.FRIENDS;
+
+  // Don't show skeleton loading on initial load for any filter
+  if (isInitialLoading) {
+    return null;
+  }
+
+  // Empty state
+  if (isEmpty) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="text-4xl mb-4">🏌️‍♂️</div>
+        <h3 className="text-lg font-semibold text-foreground mb-2">No content found</h3>
+        <p className="text-muted-foreground max-w-md">
+          {activeFilter === 'Hack Shack' 
+            ? "No hacks yet! Be the first to upload a hilarious golf mishit using #hackshack in your post."
+            : "Try adjusting your filters or check back later for new content."}
+        </p>
+      </div>
+    );
+  }
+
   // Check if we should use TrendingVideos-style layout for Friends tab on Clubhouse
-  if (isClubhousePage && activeFilter === FILTER_TYPES.FRIENDS) {
+  if (isFriendsTabOnClubhouse) {
     return (
       <>
         {/* TrendingVideos-style Layout for Friends Tab on Clubhouse */}
