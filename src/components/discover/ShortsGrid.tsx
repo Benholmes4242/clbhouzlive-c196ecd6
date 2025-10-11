@@ -164,17 +164,14 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
           // 🔍 AUDIT: Log first 6 cards in each batch for detailed tracking
           const isFirstSix = i < 6 || (i >= prevItemsCountRef.current && i < prevItemsCountRef.current + 6);
           if (AUDIT_SHORTS_AUTOPLAY && isFirstSix) {
-            React.useEffect(() => {
-              console.log(`[ShortsAudit][${item.id}] Card config`, {
-                index: i,
-                row,
-                col,
-                shouldAutoplay,
-                inView,
-                hlsUrl: item.src,
-                posterUrl: item.thumbnailSrc || item.src
-              });
-            }, []);
+            console.log(`[ShortsAudit][${item.id}] Card config`, {
+              index: i,
+              row,
+              col,
+              shouldAutoplay,
+              inView,
+              hasPoster: Boolean(item.thumbnailSrc)
+            });
           }
 
           return (
