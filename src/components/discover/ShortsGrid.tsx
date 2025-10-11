@@ -37,13 +37,13 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
       <div
         ref={gridRef}
         className="
-          grid gap-1
+          grid
           grid-cols-3
           md:grid-cols-4
           xl:grid-cols-5
-          px-4 md:px-6
           pb-4
         "
+        style={{ gap: '1px' }}
       >
         {items.map((item) => (
           <button
