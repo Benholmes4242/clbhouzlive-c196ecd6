@@ -229,30 +229,27 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
           <img
             src={currentPost.user?.avatar || '/placeholder.svg'}
             alt={currentPost.user?.name || 'User'}
-            className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
+            className="w-11 h-11 rounded-full object-cover shadow-sm"
           />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <p className="text-white font-semibold text-base truncate">
-                {currentPost.user?.name || currentPost.user?.username || 'Anonymous'}
-              </p>
-              <span className="text-white/60 text-sm">2h</span>
-            </div>
+          <div className="flex flex-col leading-tight flex-1 min-w-0">
+            <span className="text-[15px] font-medium tracking-[0.02em] text-white drop-shadow-sm truncate">
+              {currentPost.user?.name || currentPost.user?.username || 'Anonymous'}
+            </span>
             {currentPost.golfCourse && (
-              <p className="text-white/80 text-sm truncate">
+              <span className="text-[14px] text-white/85 leading-snug truncate">
                 📍 {currentPost.golfCourse.name}
-              </p>
+              </span>
             )}
           </div>
           <button className="p-2">
-            <MoreHorizontal className="w-5 h-5 text-black" />
+            <MoreHorizontal className="w-5 h-5 text-white" />
           </button>
         </div>
 
         {/* Caption */}
         {currentPost.title && (
           <div className="mb-3">
-            <p className="text-white text-sm leading-5">
+            <p className="text-[14px] text-white/85 leading-snug">
               {truncateCaption(currentPost.title)}
               {currentPost.title.length > 80 && (
                 <button className="text-white/60 ml-1">more</button>
