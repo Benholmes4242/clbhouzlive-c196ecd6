@@ -328,6 +328,20 @@ export const useRealPostsFetcher = () => {
           return null;
         }
 
+        // Client-side fallback for duration filtering (in case duration_seconds is missing)
+        const durationSeconds = primaryMedia.media_type === 'video' 
+          ? (primaryMedia as any).duration_seconds
+          : undefined;
+
+        if (durationFilter && durationSeconds != null) {
+          if (durationFilter.to !== null && durationSeconds > durationFilter.to) {
+            return null;
+          }
+          if (durationFilter.from > 0 && durationSeconds < durationFilter.from) {
+            return null;
+          }
+        }
+
         // Find golf course from post tags
         const golfCourseTag = (post.post_tags || []).find(
           tag => tag.taggable_entities?.entity_type === 'golf_club'
@@ -383,11 +397,6 @@ export const useRealPostsFetcher = () => {
           
           return tracks[Math.floor(Math.random() * tracks.length)];
         };
-
-        // Use actual duration from database
-        const durationSeconds = primaryMedia.media_type === 'video' 
-          ? (primaryMedia as any).duration_seconds
-          : undefined;
 
         const formattedPost = {
           id: post.id,

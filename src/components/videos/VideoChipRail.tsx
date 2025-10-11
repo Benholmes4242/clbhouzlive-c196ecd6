@@ -1,10 +1,11 @@
 import React from 'react';
 import '../../styles/video-chips.css';
 
-export type LengthKey = 'all' | 'under4' | '4to20' | 'over20';
+export type LengthKey = 'all' | 'shorts' | 'under4' | '4to20' | 'over20';
 
 const MAP: Record<LengthKey, string> = {
   all: 'All',
+  shorts: 'Shorts',
   under4: 'Under 4 mins',
   '4to20': '4–20 mins',
   over20: 'Over 20 mins',

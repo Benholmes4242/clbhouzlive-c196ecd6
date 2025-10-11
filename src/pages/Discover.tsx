@@ -6,6 +6,7 @@ import ExploreFilters from '@/components/explore/ExploreFilters';
 import VideoChipRail from '@/components/videos/VideoChipRail';
 import VideoSearchOverlay from '@/components/videos/VideoSearchOverlay';
 import { useVideoLengthFilter } from '@/hooks/useVideoLengthFilter';
+import { DURATION_FILTERS } from '@/constants/videoFilters';
 
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 // import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned'; // Stored for future use
@@ -34,6 +35,12 @@ const Discover = () => {
   const { main, sub } = useDiscoverQuery();
   const [durationFilter, setDurationFilter] = useVideoLengthFilter();
   
+  // Convert durationFilter key to range for API
+  const durationRange = React.useMemo(() => {
+    const filter = DURATION_FILTERS.find(f => f.key === durationFilter);
+    if (!filter || filter.key === 'all') return undefined;
+    return { from: filter.from, to: filter.to };
+  }, [durationFilter]);
 
   // Derive activeFilter from URL main param (single source of truth)
   const activeFilter = React.useMemo(() => {
@@ -59,7 +66,7 @@ const Discover = () => {
     loading, 
     hasMore, 
     loadMore 
-  } = useInfiniteExploreContent(activeFilter);
+  } = useInfiniteExploreContent(activeFilter, sub, durationRange);
 
   const { 
     isOpen: isFeedOpen, 

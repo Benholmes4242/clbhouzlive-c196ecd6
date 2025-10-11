@@ -14,7 +14,8 @@ export interface TopicFilter {
 
 export const DURATION_FILTERS: DurationFilter[] = [
   { key: 'all', label: 'All', from: 0, to: null },
-  { key: 'under4', label: 'Under 4 mins', from: 0, to: 239 },
+  { key: 'shorts', label: 'Shorts', from: 0, to: 59 },
+  { key: 'under4', label: 'Under 4 mins', from: 60, to: 239 },
   { key: '4to20', label: '4–20 mins', from: 240, to: 1200 },
   { key: 'over20', label: 'Over 20 mins', from: 1201, to: null },
 ];

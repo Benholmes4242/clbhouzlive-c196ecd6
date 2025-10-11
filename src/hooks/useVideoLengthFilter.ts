@@ -26,8 +26,10 @@ export function lengthToRange(
   key: LengthKey
 ): { min?: number; max?: number } | undefined {
   switch (key) {
+    case 'shorts':
+      return { max: 59 };
     case 'under4':
-      return { max: 239 };
+      return { min: 60, max: 239 };
     case '4to20':
       return { min: 240, max: 1200 };
     case 'over20':

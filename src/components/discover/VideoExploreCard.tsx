@@ -14,17 +14,7 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick 
   const initialThumb = item.thumbnailSrc || getStreamPoster(item.src, '1s') || FALLBACK_THUMBNAIL;
   const [imgSrc, setImgSrc] = useState<string>(initialThumb);
 
-  console.debug('[VideoCard] thumb check', {
-    id: item.id,
-    src: item.src,
-    thumbnailSrc: item.thumbnailSrc ?? null,
-  });
-
-  const handleImageError = (e?: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.warn('[VideoCard] onError thumbnail', {
-      id: item.id,
-      tried: (e?.target as HTMLImageElement | undefined)?.src
-    });
+  const handleImageError = () => {
     setImgSrc(FALLBACK_THUMBNAIL);
   };
 
