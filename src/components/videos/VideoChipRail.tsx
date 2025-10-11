@@ -31,7 +31,7 @@ export default function VideoChipRail({ value, onChange, className }: Props) {
         className={cn(
           'flex items-center gap-3',
           'overflow-x-auto overscroll-x-contain snap-x snap-mandatory',
-          'scroll-px-4 pl-1 pr-4 -mr-4',
+          'scroll-px-4 pl-2 pr-4 -mr-4',
           'no-scrollbar touch-pan-x select-none',
           'sticky top-0 z-5 py-3 bg-white/95 backdrop-blur-sm border-b border-black/[0.06]'
         )}
