@@ -113,17 +113,21 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
           </div>
 
           {/* Right Utilities */}
-          <nav className="flex items-center space-x-1 md:space-x-4">
+          <nav className="flex items-center space-x-2">
             {/* Mobile Search Button */}
             <button 
               className={cn(
-                "md:hidden p-2 md:p-3 flex-shrink-0 mt-3 transition-colors",
-                isGlassDark && "hover:bg-white/10 text-white/80 hover:text-white",
-                isSolidLight && "hover:bg-black/10 text-black/70 hover:text-black"
+                "md:hidden p-2 rounded-full transition-colors",
+                isGlassDark && "hover:bg-white/10",
+                isSolidLight && "hover:bg-black/10"
               )}
               onClick={() => setSearchOpen(true)}
             >
-              <Search className="h-5 w-5" />
+              <Search className={cn(
+                "h-5 w-5",
+                isGlassDark && "text-white",
+                isSolidLight && "text-black"
+              )} />
             </button>
             
             {/* Navigation Icons */}
