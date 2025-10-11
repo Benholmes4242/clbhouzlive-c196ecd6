@@ -9,7 +9,32 @@
 @tailwind components;
 @tailwind utilities;
 
-@import './styles/sliding-panels.css';
+/* Sliding panels animations (in utilities layer so they can be composed with classes) */
+@layer utilities {
+  .panel { will-change: transform, opacity; }
+
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); opacity: .02; }
+    to   { transform: translateX(0%);   opacity: 1; }
+  }
+  @keyframes slide-in-left {
+    from { transform: translateX(-100%); opacity: .02; }
+    to   { transform: translateX(0%);     opacity: 1; }
+  }
+  .animate-in-right { animation: slide-in-right 300ms ease both; }
+  .animate-in-left  { animation: slide-in-left  300ms ease both; }
+
+  @keyframes slide-out-left {
+    from { transform: translateX(0%);   opacity: 1; }
+    to   { transform: translateX(-20%); opacity: 0; }
+  }
+  @keyframes slide-out-right {
+    from { transform: translateX(0%);   opacity: 1; }
+    to   { transform: translateX(20%);  opacity: 0; }
+  }
+  .animate-out-left  { animation: slide-out-left  300ms ease both; }
+  .animate-out-right { animation: slide-out-right 300ms ease both; }
+}
 
 /* Hide scrollbar utility */
 .no-scrollbar {
