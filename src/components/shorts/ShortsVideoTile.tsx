@@ -1,98 +1,84 @@
 import React from 'react';
-import { useAutoplayInViewport } from '@/hooks/useAutoplayInViewport';
-import { useRowAutoplay } from './RowAutoplayProvider';
 
 type Props = {
   id: string;
-  index: number;
   hlsUrl: string;
   posterUrl?: string;
+  shouldAutoplay: boolean;
+  inView: boolean;
   onClick?: () => void;
 };
 
 export default function ShortsVideoTile({
   id,
-  index,
   hlsUrl,
   posterUrl,
+  shouldAutoplay,
+  inView,
   onClick
 }: Props) {
-  const videoRef = React.useRef<HTMLVideoElement | null>(null);
-  const [canPlay, setCanPlay] = React.useState(false);
+  const ref = React.useRef<HTMLVideoElement | null>(null);
+  const [ready, setReady] = React.useState(false);
 
-  const { cols, getRow, canPlay: rowCanPlay, claim, release } = useRowAutoplay();
-  const row = getRow(index);
-  const col = index % cols;
-  const leaderCol = row % 2 === 0 ? 0 : cols - 1;
-  const isDesignatedLeader = col === leaderCol;
+  // Preload aggressively to avoid black frames
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
 
-  // Start playback
-  const start = React.useCallback(() => {
-    const v = videoRef.current;
-    if (!v || !isDesignatedLeader) return;
+    // Ensure attributes (critical for mobile autoplay)
+    el.muted = true;
+    el.loop = true;
+    el.playsInline = true;
+    el.preload = 'auto';
 
-    v.muted = true;
-    v.loop = true;
-    v.playsInline = true;
-    v.preload = 'auto';
+    const onCanPlay = () => setReady(true);
+    el.addEventListener('canplay', onCanPlay);
 
-    const play = async () => {
-      try {
-        if (!canPlay) {
-          await new Promise<void>((res) => {
-            const on = () => { 
-              setCanPlay(true); 
-              v.removeEventListener('canplay', on); 
-              res(); 
-            };
-            v.addEventListener('canplay', on, { once: true });
-            v.load();
-          });
-        }
-        if (rowCanPlay(row, id)) {
-          await v.play();
-        }
-      } catch {
-        // Ignore autoplay rejections
-      }
-    };
+    if (el.readyState >= 2) setReady(true);
 
-    play();
-  }, [isDesignatedLeader, row, id, rowCanPlay, canPlay]);
-
-  // Stop playback
-  const stop = React.useCallback(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.pause();
+    return () => el.removeEventListener('canplay', onCanPlay);
   }, []);
 
-  // Observe viewport per-card
-  const { setNode } = useAutoplayInViewport(start, stop);
-
-  // Register as row leader if designated
+  // Visibility + alternating policy → play/pause
   React.useEffect(() => {
-    if (isDesignatedLeader) claim(row, id);
-    return () => { 
-      if (isDesignatedLeader) release(row, id); 
-    };
-  }, [isDesignatedLeader, row, id, claim, release]);
+    const el = ref.current;
+    if (!el) return;
+
+    const canPlay = ready && inView && shouldAutoplay;
+    if (canPlay) {
+      const p = el.play();
+      if (p && p.catch) p.catch(() => {});
+    } else {
+      el.pause();
+    }
+  }, [ready, inView, shouldAutoplay]);
 
   return (
     <div
-      ref={setNode}
       className="group relative aspect-[9/16] overflow-hidden rounded-xl bg-muted cursor-pointer"
       onClick={onClick}
     >
+      {/* Poster underneath as a safety net */}
+      {posterUrl && (
+        <img
+          src={posterUrl}
+          alt=""
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-150
+                      ${ready ? 'opacity-0' : 'opacity-100'}`}
+          draggable={false}
+          loading="eager"
+        />
+      )}
+
       <video
-        ref={videoRef}
-        poster={posterUrl}
+        ref={ref}
         src={hlsUrl}
+        poster={posterUrl}
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-150
+                    ${ready ? 'opacity-100' : 'opacity-0'}`}
         playsInline
         muted
         loop
-        preload="auto"
-        className="absolute inset-0 h-full w-full object-cover"
         controls={false}
       />
 
