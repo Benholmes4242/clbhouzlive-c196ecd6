@@ -5,6 +5,7 @@ import SegmentedControl from '@/components/discover/SegmentedControl';
 import ExploreFilters from '@/components/explore/ExploreFilters';
 import VideoChipRail from '@/components/videos/VideoChipRail';
 import VideoSearchOverlay from '@/components/videos/VideoSearchOverlay';
+import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useVideoLengthFilter } from '@/hooks/useVideoLengthFilter';
 import { DURATION_FILTERS } from '@/constants/videoFilters';
 
@@ -21,6 +22,8 @@ import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
+
+type MainKey = 'videos' | 'channels' | 'following';
 
 const Discover = () => {
   // Use vertical feed for consistency with Activity tab
@@ -196,24 +199,35 @@ const Discover = () => {
           </div> */}
           {/* Commented out for future use - SuggestedUsersRedesigned component is stored in /components/discover/ */}
 
-          {/* Main Content - Conditional based on active tab */}
-          {main === 'channels' ? (
-            <ChannelsFeed />
-          ) : main === 'following' ? (
-            <div className="md:container md:mx-auto md:px-0 mt-4">
-              <FollowingFeed onMediaClick={handleMediaClick} />
-            </div>
-          ) : (
-            <div className="md:container md:mx-auto md:px-0 mt-4">
-              <DiscoverContent
-                onLike={handleLike}
-                onFollow={handleFollow}
-                onMediaClick={handleMediaClick}
-                searchQuery={searchQuery}
-                selectedTags={selectedTags}
-              />
-            </div>
-          )}
+          {/* Main Content - Conditional based on active tab with slide animation */}
+          <SlidingPanels<MainKey>
+            activeKey={main as MainKey}
+            order={['videos', 'channels', 'following']}
+          >
+            {(key) => {
+              if (key === 'channels') {
+                return <ChannelsFeed />;
+              }
+              if (key === 'following') {
+                return (
+                  <div className="md:container md:mx-auto md:px-0 mt-4">
+                    <FollowingFeed onMediaClick={handleMediaClick} />
+                  </div>
+                );
+              }
+              return (
+                <div className="md:container md:mx-auto md:px-0 mt-4">
+                  <DiscoverContent
+                    onLike={handleLike}
+                    onFollow={handleFollow}
+                    onMediaClick={handleMediaClick}
+                    searchQuery={searchQuery}
+                    selectedTags={selectedTags}
+                  />
+                </div>
+              );
+            }}
+          </SlidingPanels>
       </main>
 
         {/* Video Search Overlay */}

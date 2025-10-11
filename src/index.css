@@ -9,6 +9,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './styles/sliding-panels.css';
+
 /* Hide scrollbar utility */
 .no-scrollbar {
   -ms-overflow-style: none;     /* IE/Edge */

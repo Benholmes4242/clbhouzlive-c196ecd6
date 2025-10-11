@@ -3,6 +3,8 @@ import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import VideosGrid from '@/components/discover/VideosGrid';
 import PhotosGrid from '@/components/discover/PhotosGrid';
+import ShortsGrid from '@/components/discover/ShortsGrid';
+import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { FILTER_TYPES } from '@/components/explore/types';
 import type { ExploreContentItem } from '@/components/explore/types';
@@ -11,6 +13,7 @@ import CreatorHighlightTile from '@/components/discover/CreatorHighlightTile';
 import { CreatorHighlight } from '@/hooks/useCreatorHighlights';
 import ShortsSuggestedProfiles from '@/components/shorts/ShortsSuggestedProfiles';
 import { getDurationFilter } from '@/constants/videoFilters';
+import type { LengthKey } from '@/components/videos/VideoChipRail';
 
 interface DiscoverContentProps {
   onLike: (contentId: string) => void;
@@ -115,17 +118,32 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     // TODO: Implement navigation to creator profile or highlight detail
   };
 
+  // Chip order for slide animation
+  const CHIP_ORDER = ['all', 'shorts', 'under4', '4to20', 'over20'] as const;
+
   // Use VideosGrid for Videos tab, PhotosGrid for Photos tab, ExploreGrid for everything else
   if (main === 'videos') {
     return (
-      <VideosGrid
-        content={currentContent || []}
-        onMediaClick={onMediaClick}
-        isLoading={currentContent === null || loading}
-        hasMore={hasMore}
-        onLoadMore={loadMore}
-        isShorts={isShorts}
-      />
+      <SlidingPanels<LengthKey>
+        activeKey={duration as LengthKey}
+        order={CHIP_ORDER}
+      >
+        {(key) => {
+          const itemsForKey = currentContent || [];
+          return key === 'shorts' ? (
+            <ShortsGrid items={itemsForKey} onOpen={onMediaClick} />
+          ) : (
+            <VideosGrid
+              content={itemsForKey}
+              onMediaClick={onMediaClick}
+              isLoading={currentContent === null || loading}
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+              isShorts={false}
+            />
+          );
+        }}
+      </SlidingPanels>
     );
   }
 
