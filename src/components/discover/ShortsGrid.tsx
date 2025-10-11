@@ -10,7 +10,7 @@ export default function ShortsGrid({ items, onOpen }: ShortsGridProps) {
   return (
     <div
       className="
-        grid gap-2
+        grid gap-1
         grid-cols-3
         md:grid-cols-4
         xl:grid-cols-5
