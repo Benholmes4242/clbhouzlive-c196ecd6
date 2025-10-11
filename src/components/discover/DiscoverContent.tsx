@@ -124,11 +124,11 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Use VideosGrid for Videos tab, PhotosGrid for Photos tab, ExploreGrid for everything else
   if (main === 'videos') {
     return (
-      <SlidingPanels<LengthKey>
+      <SlidingPanels
         activeKey={duration as LengthKey}
         order={CHIP_ORDER}
       >
-        {(key) => {
+        {(key: LengthKey) => {
           const itemsForKey = currentContent || [];
           return key === 'shorts' ? (
             <ShortsGrid items={itemsForKey} onOpen={onMediaClick} />

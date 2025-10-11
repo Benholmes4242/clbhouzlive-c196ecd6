@@ -200,11 +200,11 @@ const Discover = () => {
           {/* Commented out for future use - SuggestedUsersRedesigned component is stored in /components/discover/ */}
 
           {/* Main Content - Conditional based on active tab with slide animation */}
-          <SlidingPanels<MainKey>
+          <SlidingPanels
             activeKey={main as MainKey}
-            order={['videos', 'channels', 'following']}
+            order={['videos', 'channels', 'following'] as const}
           >
-            {(key) => {
+            {(key: MainKey) => {
               if (key === 'channels') {
                 return <ChannelsFeed />;
               }

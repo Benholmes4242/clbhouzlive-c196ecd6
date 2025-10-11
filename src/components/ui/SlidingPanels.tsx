@@ -2,7 +2,7 @@ import React from 'react';
 
 type Key = string;
 
-export default function SlidingPanels<T extends Key>({
+export default function SlidingPanels<T extends Key = string>({
   activeKey,
   order,
   children,
