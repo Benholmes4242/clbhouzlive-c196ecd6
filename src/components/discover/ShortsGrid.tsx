@@ -74,7 +74,7 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
       <div
         ref={gridRef}
         className="grid grid-cols-3 md:grid-cols-4 xl:grid-cols-5 pb-4"
-        style={{ gap: '4px' }}
+        style={{ gap: '3px' }}
       >
         {items.map((item, i) => {
           const row = Math.floor(i / cols);
