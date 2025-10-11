@@ -159,7 +159,7 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
           // even rows: rightmost auto-plays
           const leftmost = col === 0;
           const rightmost = col === cols - 1;
-          const shouldAutoplay = row % 2 === 0 ? leftmost : rightmost;
+          const shouldAutoplay = true;
 
           const inView = !!inViewMap.current[item.id];
 

@@ -230,7 +230,7 @@ export default function ShortsVideoTile({
     const el = ref.current;
     if (!el) return;
 
-    const canPlay = ready && inView && shouldAutoplay;
+    const canPlay = inView && shouldAutoplay;
     
     if (AUDIT_SHORTS_AUTOPLAY && inView && !timingsRef.current.ioIntersect) {
       timingsRef.current.ioIntersect = performance.now();
