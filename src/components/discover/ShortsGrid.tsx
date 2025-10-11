@@ -23,30 +23,46 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
     return () => window.removeEventListener('resize', handler);
   }, []);
 
-  // Observe visibility for all tiles
+  // Track in-view state per item
   const inViewMap = useRef<Record<string, boolean>>({});
   const [, forceUpdate] = useReducer(x => x + 1, 0);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
+  // Create observer once
   useEffect(() => {
-    const root = gridRef.current;
-    if (!root) return;
-    
-    const io = new IntersectionObserver(
+    observerRef.current = new IntersectionObserver(
       entries => {
+        let changed = false;
         for (const e of entries) {
           const id = (e.target as HTMLElement).dataset.id;
           if (!id) continue;
-          inViewMap.current[id] = e.isIntersecting && e.intersectionRatio >= 0.6;
+          const wasInView = inViewMap.current[id];
+          const nowInView = e.isIntersecting && e.intersectionRatio >= 0.6;
+          if (wasInView !== nowInView) {
+            inViewMap.current[id] = nowInView;
+            changed = true;
+          }
         }
-        forceUpdate();
+        if (changed) forceUpdate();
       },
       { root: null, threshold: [0, 0.6, 1], rootMargin: '200px 0px' }
     );
 
+    return () => {
+      observerRef.current?.disconnect();
+      observerRef.current = null;
+    };
+  }, []);
+
+  // Observe all current items whenever items or cols change
+  useEffect(() => {
+    const io = observerRef.current;
+    const root = gridRef.current;
+    if (!io || !root) return;
+
+    // Re-observe all nodes (handles new items from infinite scroll)
     const nodes = root.querySelectorAll('[data-id]');
     nodes.forEach(n => io.observe(n));
-
-    return () => io.disconnect();
   }, [items, cols]);
 
   // Infinite scroll handler
