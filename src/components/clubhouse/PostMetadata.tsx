@@ -43,16 +43,13 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
           <img
             src={user.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
             alt={user.name}
-            className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
+            className="w-11 h-11 rounded-full object-cover shadow-sm"
             onError={(e) => {
               (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
             }}
           />
           <span 
-            className={cn(
-              "font-semibold text-white",
-              isMobile ? "text-lg" : "text-xl"
-            )}
+            className="text-[15px] font-medium tracking-[0.02em] text-white drop-shadow-sm"
             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
           >
             {user.name}
@@ -78,10 +75,10 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
 
       {/* Description */}
       {description && (
-        <div className="text-white/90 pointer-events-auto">
+        <div className="text-white/85 pointer-events-auto">
           <p
             className={cn(
-              "text-sm leading-relaxed",
+              "text-[14px] leading-snug",
               !showFullDescription && "line-clamp-2"
             )}
             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
