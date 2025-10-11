@@ -1,84 +1,98 @@
 import React from 'react';
+import { useAutoplayInViewport } from '@/hooks/useAutoplayInViewport';
+import { useRowAutoplay } from './RowAutoplayProvider';
 
 type Props = {
   id: string;
+  index: number;
   hlsUrl: string;
   posterUrl?: string;
-  shouldAutoplay: boolean;
-  inView: boolean;
   onClick?: () => void;
 };
 
 export default function ShortsVideoTile({
   id,
+  index,
   hlsUrl,
   posterUrl,
-  shouldAutoplay,
-  inView,
   onClick
 }: Props) {
-  const ref = React.useRef<HTMLVideoElement | null>(null);
-  const [ready, setReady] = React.useState(false);
+  const videoRef = React.useRef<HTMLVideoElement | null>(null);
+  const [canPlay, setCanPlay] = React.useState(false);
 
-  // Preload aggressively to avoid black frames
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+  const { cols, getRow, canPlay: rowCanPlay, claim, release } = useRowAutoplay();
+  const row = getRow(index);
+  const col = index % cols;
+  const leaderCol = row % 2 === 0 ? 0 : cols - 1;
+  const isDesignatedLeader = col === leaderCol;
 
-    // Ensure attributes (critical for mobile autoplay)
-    el.muted = true;
-    el.loop = true;
-    el.playsInline = true;
-    el.preload = 'auto';
+  // Start playback
+  const start = React.useCallback(() => {
+    const v = videoRef.current;
+    if (!v || !isDesignatedLeader) return;
 
-    const onCanPlay = () => setReady(true);
-    el.addEventListener('canplay', onCanPlay);
+    v.muted = true;
+    v.loop = true;
+    v.playsInline = true;
+    v.preload = 'auto';
 
-    if (el.readyState >= 2) setReady(true);
+    const play = async () => {
+      try {
+        if (!canPlay) {
+          await new Promise<void>((res) => {
+            const on = () => { 
+              setCanPlay(true); 
+              v.removeEventListener('canplay', on); 
+              res(); 
+            };
+            v.addEventListener('canplay', on, { once: true });
+            v.load();
+          });
+        }
+        if (rowCanPlay(row, id)) {
+          await v.play();
+        }
+      } catch {
+        // Ignore autoplay rejections
+      }
+    };
 
-    return () => el.removeEventListener('canplay', onCanPlay);
+    play();
+  }, [isDesignatedLeader, row, id, rowCanPlay, canPlay]);
+
+  // Stop playback
+  const stop = React.useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.pause();
   }, []);
 
-  // Visibility + alternating policy → play/pause
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+  // Observe viewport per-card
+  const { setNode } = useAutoplayInViewport(start, stop);
 
-    const canPlay = ready && inView && shouldAutoplay;
-    if (canPlay) {
-      const p = el.play();
-      if (p && p.catch) p.catch(() => {});
-    } else {
-      el.pause();
-    }
-  }, [ready, inView, shouldAutoplay]);
+  // Register as row leader if designated
+  React.useEffect(() => {
+    if (isDesignatedLeader) claim(row, id);
+    return () => { 
+      if (isDesignatedLeader) release(row, id); 
+    };
+  }, [isDesignatedLeader, row, id, claim, release]);
 
   return (
     <div
+      ref={setNode}
       className="group relative aspect-[9/16] overflow-hidden rounded-xl bg-muted cursor-pointer"
       onClick={onClick}
     >
-      {/* Poster underneath as a safety net */}
-      {posterUrl && (
-        <img
-          src={posterUrl}
-          alt=""
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-150
-                      ${ready ? 'opacity-0' : 'opacity-100'}`}
-          draggable={false}
-          loading="eager"
-        />
-      )}
-
       <video
-        ref={ref}
-        src={hlsUrl}
+        ref={videoRef}
         poster={posterUrl}
-        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-150
-                    ${ready ? 'opacity-100' : 'opacity-0'}`}
+        src={hlsUrl}
         playsInline
         muted
         loop
+        preload="auto"
+        className="absolute inset-0 h-full w-full object-cover"
         controls={false}
       />
 
