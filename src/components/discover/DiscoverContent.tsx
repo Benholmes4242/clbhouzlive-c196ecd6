@@ -131,7 +131,13 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         {(key: LengthKey) => {
           const itemsForKey = currentContent || [];
           return key === 'shorts' ? (
-            <ShortsGrid items={itemsForKey} onOpen={onMediaClick} />
+            <ShortsGrid 
+              items={itemsForKey} 
+              onOpen={onMediaClick}
+              isLoading={loading}
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+            />
           ) : (
             <VideosGrid
               content={itemsForKey}
