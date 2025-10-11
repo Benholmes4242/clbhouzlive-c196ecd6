@@ -45,7 +45,7 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick,
       onClick={() => onMediaClick?.(item)}
     >
       {/* 16:9 Thumbnail */}
-      <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+      <div className="relative aspect-video overflow-hidden bg-muted" style={{ borderRadius: '4px' }}>
         <img
           src={imgSrc}
           alt={item.title}
@@ -99,14 +99,6 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick,
           </div>
         </div>
 
-        {/* Course tag (if available) - hidden in compact mode */}
-        {!compact && item.golfCourse && (
-          <div className="mt-2">
-            <span className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
-              🏌️ {item.golfCourse.name}
-            </span>
-          </div>
-        )}
       </div>
     </div>
   );
