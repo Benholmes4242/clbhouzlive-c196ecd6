@@ -58,6 +58,9 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   const { main, sub, duration } = useDiscoverQuery();
   const [currentContent, setCurrentContent] = useState<ExploreContentItem[] | null>(null);
   
+  // Detect Shorts mode for compact view
+  const isShorts = duration === 'shorts';
+  
   // Get the filter type based on main pill
   const filterType = getFilterTypeFromPills(main);
   
@@ -121,6 +124,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         isLoading={currentContent === null || loading}
         hasMore={hasMore}
         onLoadMore={loadMore}
+        isShorts={isShorts}
       />
     );
   }

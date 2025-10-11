@@ -42,6 +42,9 @@ const Discover = () => {
     return { from: filter.from, to: filter.to };
   }, [durationFilter]);
 
+  // Detect Shorts mode for compact view
+  const isShorts = durationFilter === 'shorts';
+
   // Derive activeFilter from URL main param (single source of truth)
   const activeFilter = React.useMemo(() => {
     const mainToFilter: Record<string, string> = {

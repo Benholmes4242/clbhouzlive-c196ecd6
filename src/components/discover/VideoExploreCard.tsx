@@ -8,9 +8,10 @@ const FALLBACK_THUMBNAIL = '/placeholder.svg';
 interface VideoExploreCardProps {
   item: ExploreContentItem;
   onMediaClick?: (item: ExploreContentItem) => void;
+  compact?: boolean;
 }
 
-const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick }) => {
+const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick, compact = false }) => {
   const initialThumb = item.thumbnailSrc || getStreamPoster(item.src, '1s') || FALLBACK_THUMBNAIL;
   const [imgSrc, setImgSrc] = useState<string>(initialThumb);
 
@@ -65,11 +66,13 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick 
       </div>
 
       {/* Meta section */}
-      <div className="mt-2 px-0.5">
-        {/* Title */}
-        <h3 className="text-foreground font-semibold text-[15px] md:text-base line-clamp-2 leading-snug mb-1.5">
-          {item.title}
-        </h3>
+      <div className={compact ? "mt-2.5 px-0.5" : "mt-2 px-0.5"}>
+        {/* Title - hidden in compact mode */}
+        {!compact && (
+          <h3 className="text-foreground font-semibold text-[15px] md:text-base line-clamp-2 leading-snug mb-1.5">
+            {item.title}
+          </h3>
+        )}
 
         {/* Creator + metadata row */}
         <div className="flex items-center gap-2 text-muted-foreground">
@@ -96,8 +99,8 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick 
           </div>
         </div>
 
-        {/* Course tag (if available) */}
-        {item.golfCourse && (
+        {/* Course tag (if available) - hidden in compact mode */}
+        {!compact && item.golfCourse && (
           <div className="mt-2">
             <span className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
               🏌️ {item.golfCourse.name}

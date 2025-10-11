@@ -8,6 +8,7 @@ interface VideosGridProps {
   isLoading: boolean;
   hasMore: boolean;
   onLoadMore: () => void;
+  isShorts?: boolean;
 }
 
 const VideosGrid: React.FC<VideosGridProps> = ({
@@ -15,7 +16,8 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   onMediaClick,
   isLoading,
   hasMore,
-  onLoadMore
+  onLoadMore,
+  isShorts = false
 }) => {
   // Intersection observer for infinite scroll
   useEffect(() => {
@@ -64,6 +66,7 @@ const VideosGrid: React.FC<VideosGridProps> = ({
             key={item.id}
             item={item}
             onMediaClick={onMediaClick}
+            compact={isShorts}
           />
         ))}
       </div>
