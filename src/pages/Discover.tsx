@@ -216,7 +216,7 @@ const Discover = () => {
                 );
               }
               return (
-                <div className="md:container md:mx-auto md:px-0 mt-4">
+                <div className="mt-4">
                   <DiscoverContent
                     onLike={handleLike}
                     onFollow={handleFollow}
