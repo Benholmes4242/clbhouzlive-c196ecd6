@@ -23,50 +23,30 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
     return () => window.removeEventListener('resize', handler);
   }, []);
 
-  // Track in-view state per item
+  // Observe visibility for all tiles
   const inViewMap = useRef<Record<string, boolean>>({});
   const [, forceUpdate] = useReducer(x => x + 1, 0);
-  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // Create observer once
   useEffect(() => {
-    observerRef.current = new IntersectionObserver(
+    const root = gridRef.current;
+    if (!root) return;
+    
+    const io = new IntersectionObserver(
       entries => {
-        let changed = false;
         for (const e of entries) {
           const id = (e.target as HTMLElement).dataset.id;
           if (!id) continue;
-          const wasInView = inViewMap.current[id];
-          const nowInView = e.isIntersecting && e.intersectionRatio >= 0.6;
-          if (wasInView !== nowInView) {
-            inViewMap.current[id] = nowInView;
-            changed = true;
-          }
+          inViewMap.current[id] = e.isIntersecting && e.intersectionRatio >= 0.6;
         }
-        if (changed) forceUpdate();
+        forceUpdate();
       },
       { root: null, threshold: [0, 0.6, 1], rootMargin: '200px 0px' }
     );
 
-    return () => {
-      observerRef.current?.disconnect();
-      observerRef.current = null;
-    };
-  }, []);
+    const nodes = root.querySelectorAll('[data-id]');
+    nodes.forEach(n => io.observe(n));
 
-  // Observe all current items whenever items or cols change
-  useEffect(() => {
-    const io = observerRef.current;
-    const root = gridRef.current;
-    if (!io || !root) return;
-
-    // Small delay to ensure DOM is ready (especially for initial render)
-    const timeoutId = setTimeout(() => {
-      const nodes = root.querySelectorAll('[data-id]');
-      nodes.forEach(n => io.observe(n));
-    }, 0);
-
-    return () => clearTimeout(timeoutId);
+    return () => io.disconnect();
   }, [items, cols]);
 
   // Infinite scroll handler
