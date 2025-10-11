@@ -9,6 +9,7 @@ export interface ExploreContentItem {
   shares?: number;
   duration?: string;
   durationSeconds?: number; // Numeric duration for filtering (temporary until DB field added)
+  thumbnailSrc?: string;
   user?: {
     id: string;
     name: string;

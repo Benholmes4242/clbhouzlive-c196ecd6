@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { Eye } from 'lucide-react';
-import golfFairway from '@/assets/video-thumbs/golf-fairway.jpg';
-import golfGreen from '@/assets/video-thumbs/golf-green.jpg';
-import golfTee from '@/assets/video-thumbs/golf-tee.jpg';
-import golfScenic from '@/assets/video-thumbs/golf-scenic.jpg';
+import { getStreamPoster } from '@/utils/stream';
 
-const MOCK_THUMBNAILS = [golfFairway, golfGreen, golfTee, golfScenic];
+const FALLBACK_THUMBNAIL = '/placeholder.svg';
 
 interface VideoExploreCardProps {
   item: ExploreContentItem;
@@ -14,20 +11,21 @@ interface VideoExploreCardProps {
 }
 
 const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick }) => {
-  const [imgSrc, setImgSrc] = useState(item.src);
-  const [hasError, setHasError] = useState(false);
+  const initialThumb = item.thumbnailSrc || getStreamPoster(item.src, '1s') || FALLBACK_THUMBNAIL;
+  const [imgSrc, setImgSrc] = useState<string>(initialThumb);
 
-  // Get a consistent mock thumbnail based on item id
-  const getMockThumbnail = () => {
-    const index = item.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % MOCK_THUMBNAILS.length;
-    return MOCK_THUMBNAILS[index];
-  };
+  console.debug('[VideoCard] thumb check', {
+    id: item.id,
+    src: item.src,
+    thumbnailSrc: item.thumbnailSrc ?? null,
+  });
 
-  const handleImageError = () => {
-    if (!hasError) {
-      setHasError(true);
-      setImgSrc(getMockThumbnail());
-    }
+  const handleImageError = (e?: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.warn('[VideoCard] onError thumbnail', {
+      id: item.id,
+      tried: (e?.target as HTMLImageElement | undefined)?.src
+    });
+    setImgSrc(FALLBACK_THUMBNAIL);
   };
 
   // Format view count
