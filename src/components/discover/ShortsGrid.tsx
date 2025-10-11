@@ -55,8 +55,8 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
     
     if (AUDIT_SHORTS_AUTOPLAY) {
       console.log(`[ShortsAudit] 🔭 Setting up IntersectionObserver`, {
-        threshold: [0, 0.6, 1],
-        rootMargin: '200px 0px',
+        threshold: [0, 0.25, 0.4, 0.6, 1],
+        rootMargin: '300px 0px (early HLS attach)',
         itemsCount: items.length,
         cols
       });
@@ -69,7 +69,8 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
           const id = (e.target as HTMLElement).dataset.id;
           if (!id) continue;
           const wasInView = inViewMap.current[id];
-          const nowInView = e.isIntersecting && e.intersectionRatio >= 0.6;
+          // Lower threshold (0.4 = 40% visible) for faster triggering
+          const nowInView = e.isIntersecting && e.intersectionRatio >= 0.4;
           if (wasInView !== nowInView) {
             changedCount++;
             if (AUDIT_SHORTS_AUTOPLAY) {
@@ -90,7 +91,8 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
           forceUpdate();
         }
       },
-      { root: null, threshold: [0, 0.6, 1], rootMargin: '200px 0px' }
+      // Generous rootMargin to attach HLS early, lower threshold for play trigger
+      { root: null, threshold: [0, 0.25, 0.4, 0.6, 1], rootMargin: '300px 0px' }
     );
 
     const nodes = root.querySelectorAll('[data-id]');
