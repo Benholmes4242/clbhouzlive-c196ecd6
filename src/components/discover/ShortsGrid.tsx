@@ -60,9 +60,13 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
     const root = gridRef.current;
     if (!io || !root) return;
 
-    // Re-observe all nodes (handles new items from infinite scroll)
-    const nodes = root.querySelectorAll('[data-id]');
-    nodes.forEach(n => io.observe(n));
+    // Small delay to ensure DOM is ready (especially for initial render)
+    const timeoutId = setTimeout(() => {
+      const nodes = root.querySelectorAll('[data-id]');
+      nodes.forEach(n => io.observe(n));
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
   }, [items, cols]);
 
   // Infinite scroll handler
