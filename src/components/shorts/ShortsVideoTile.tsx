@@ -1,12 +1,14 @@
 import React from 'react';
 import Hls from 'hls.js';
+import { 
+  MAX_ACTIVE_PLAYERS, 
+  activePlayers, 
+  attachedHls, 
+  evictFurthestHls 
+} from '@/utils/playerRegistry';
 
 // 🔍 AUDIT FLAG - Remove after diagnosis
 const AUDIT_SHORTS_AUTOPLAY = true;
-
-// Global concurrent player limit
-const MAX_ACTIVE_PLAYERS = 2;
-const activePlayers = new Set<HTMLVideoElement>();
 
 type Props = {
   id: string;
@@ -29,6 +31,7 @@ export default function ShortsVideoTile({
   const hlsRef = React.useRef<Hls | null>(null);
   const [ready, setReady] = React.useState(false);
   const [hlsAttached, setHlsAttached] = React.useState(false);
+  const rafPlayHandle = React.useRef<number | null>(null);
   const timingsRef = React.useRef({
     mounted: 0,
     raf1: 0,
@@ -82,6 +85,9 @@ export default function ShortsVideoTile({
 
     const attachHls = () => {
       if (Hls.isSupported()) {
+        // Evict furthest HLS instance if at capacity
+        evictFurthestHls(id);
+        
         const hls = new Hls({
           maxBufferLength: 10,
           backBufferLength: 5,
@@ -90,6 +96,7 @@ export default function ShortsVideoTile({
         });
         
         hlsRef.current = hls;
+        attachedHls.set(id, hls);
 
         hls.on(Hls.Events.MEDIA_ATTACHED, () => {
           hls.loadSource(hlsUrl);
@@ -111,6 +118,7 @@ export default function ShortsVideoTile({
               console.error(`[ShortsAudit][${id}] ❌ HLS fatal error:`, data.type, data.details);
             }
             hls.destroy();
+            attachedHls.delete(id);
             hlsRef.current = null;
             setHlsAttached(false);
             setReady(false);
@@ -202,11 +210,18 @@ export default function ShortsVideoTile({
       // Cleanup HLS
       if (hlsRef.current) {
         hlsRef.current.destroy();
+        attachedHls.delete(id);
         hlsRef.current = null;
       }
       
       // Remove from active players
       activePlayers.delete(el);
+      
+      // Cancel any pending play request
+      if (rafPlayHandle.current) {
+        cancelAnimationFrame(rafPlayHandle.current);
+        rafPlayHandle.current = null;
+      }
     };
   }, [id, hlsUrl, posterUrl, hlsAttached]);
 
@@ -231,60 +246,113 @@ export default function ShortsVideoTile({
       });
     }
 
-    if (canPlay) {
-      // Pause other players if we're at the limit
-      if (activePlayers.size >= MAX_ACTIVE_PLAYERS) {
-        if (AUDIT_SHORTS_AUTOPLAY) {
-          console.log(`[ShortsAudit][${id}] 🚫 Pausing ${activePlayers.size} active players (limit: ${MAX_ACTIVE_PLAYERS})`);
-        }
-        activePlayers.forEach(video => {
-          if (video !== el) {
-            video.pause();
-            activePlayers.delete(video);
+    // Helper: request play with rAF debounce to avoid thrash
+    const requestPlay = () => {
+      if (rafPlayHandle.current) cancelAnimationFrame(rafPlayHandle.current);
+      rafPlayHandle.current = requestAnimationFrame(() => {
+        rafPlayHandle.current = null;
+        
+        // Pause other players if we're at the limit
+        if (activePlayers.size >= MAX_ACTIVE_PLAYERS) {
+          if (AUDIT_SHORTS_AUTOPLAY) {
+            console.log(`[ShortsAudit][${id}] 🚫 Pausing ${activePlayers.size} active players (limit: ${MAX_ACTIVE_PLAYERS})`);
           }
-        });
-      }
-
-      timingsRef.current.playRequested = performance.now();
-      const T_IO_to_playRequest = timingsRef.current.ioIntersect > 0 
-        ? timingsRef.current.playRequested - timingsRef.current.ioIntersect 
-        : 0;
-      
-      if (AUDIT_SHORTS_AUTOPLAY) {
-        console.log(`[ShortsAudit][${id}] ▶️ play() requested`, {
-          muted: el.muted,
-          playsInline: el.playsInline,
-          preload: el.preload,
-          readyState: el.readyState,
-          T_IO_to_playRequest: T_IO_to_playRequest.toFixed(0) + 'ms'
-        });
-      }
-
-      const playPromise = el.play();
-      if (playPromise) {
-        playPromise
-          .then(() => {
-            activePlayers.add(el);
-            if (AUDIT_SHORTS_AUTOPLAY) {
-              console.log(`[ShortsAudit][${id}] ✅ play() succeeded, added to active players (${activePlayers.size}/${MAX_ACTIVE_PLAYERS})`);
-            }
-          })
-          .catch((err) => {
-            if (AUDIT_SHORTS_AUTOPLAY) {
-              console.error(`[ShortsAudit][${id}] ❌ play() rejected:`, err.name, err.message);
+          activePlayers.forEach(video => {
+            if (video !== el) {
+              video.pause();
+              const otherHls = hlsRef.current;
+              if (otherHls) otherHls.stopLoad();
+              activePlayers.delete(video);
             }
           });
+        }
+
+        timingsRef.current.playRequested = performance.now();
+        const T_IO_to_playRequest = timingsRef.current.ioIntersect > 0 
+          ? timingsRef.current.playRequested - timingsRef.current.ioIntersect 
+          : 0;
+        
+        if (AUDIT_SHORTS_AUTOPLAY) {
+          console.log(`[ShortsAudit][${id}] ▶️ play() requested`, {
+            muted: el.muted,
+            playsInline: el.playsInline,
+            preload: el.preload,
+            readyState: el.readyState,
+            T_IO_to_playRequest: T_IO_to_playRequest.toFixed(0) + 'ms'
+          });
+        }
+
+        // Start network load before playing
+        if (hlsRef.current) hlsRef.current.startLoad();
+
+        const playPromise = el.play();
+        if (playPromise) {
+          playPromise
+            .then(() => {
+              activePlayers.add(el);
+              if (AUDIT_SHORTS_AUTOPLAY) {
+                console.log(`[ShortsAudit][${id}] ✅ play() succeeded, added to active players (${activePlayers.size}/${MAX_ACTIVE_PLAYERS})`);
+              }
+            })
+            .catch((err) => {
+              if (AUDIT_SHORTS_AUTOPLAY) {
+                console.error(`[ShortsAudit][${id}] ❌ play() rejected:`, err.name, err.message);
+              }
+              // Handle autoplay policy rejection
+              if (err?.name === 'NotAllowedError') {
+                // Could show a play overlay here; for now just log
+                if (AUDIT_SHORTS_AUTOPLAY) {
+                  console.log(`[ShortsAudit][${id}] 🚫 Autoplay blocked by policy - needs user gesture`);
+                }
+              }
+            });
+        }
+      });
+    };
+
+    // Helper: request pause with cleanup
+    const requestPause = () => {
+      if (rafPlayHandle.current) {
+        cancelAnimationFrame(rafPlayHandle.current);
+        rafPlayHandle.current = null;
       }
-    } else {
       if (!el.paused) {
         el.pause();
         activePlayers.delete(el);
+        // Stop network load to save bandwidth
+        if (hlsRef.current) hlsRef.current.stopLoad();
         if (AUDIT_SHORTS_AUTOPLAY && !inView) {
           console.log(`[ShortsAudit][${id}] ⏸️ paused (out of view), removed from active players (${activePlayers.size}/${MAX_ACTIVE_PLAYERS})`);
         }
       }
+    };
+
+    if (canPlay) {
+      requestPlay();
+    } else {
+      requestPause();
     }
   }, [ready, inView, shouldAutoplay, id]);
+
+  // Handle page visibility - pause all when tab hidden
+  React.useEffect(() => {
+    const handleVisibilityChange = () => {
+      const el = ref.current;
+      if (!el) return;
+      
+      if (document.hidden) {
+        if (!el.paused) {
+          el.pause();
+          activePlayers.delete(el);
+          if (hlsRef.current) hlsRef.current.stopLoad();
+        }
+      }
+      // When visible again, let the visibility effect above handle resume
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   return (
     <div
