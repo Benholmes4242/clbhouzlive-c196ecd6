@@ -6,6 +6,7 @@ import {
   attachedHls, 
   evictFurthestHls 
 } from '@/utils/playerRegistry';
+import { safePlay } from '@/utils/safePlay';
 
 // 🔍 AUDIT FLAG - Remove after diagnosis
 const AUDIT_SHORTS_AUTOPLAY = true;
@@ -83,56 +84,74 @@ export default function ShortsVideoTile({
 
     timingsRef.current.hlsAttachStart = performance.now();
 
-    const attachHls = () => {
-      if (Hls.isSupported()) {
-        // Evict furthest HLS instance if at capacity
-        evictFurthestHls(id);
-        
-        const hls = new Hls({
-          maxBufferLength: 10,
-          backBufferLength: 5,
-          enableWorker: true,
-          lowLatencyMode: false
-        });
-        
-        hlsRef.current = hls;
-        attachedHls.set(id, hls);
+    const attachMedia = () => {
+      const isHls = /\.m3u8(\?|$)/i.test(hlsUrl);
 
-        hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-          hls.loadSource(hlsUrl);
-          timingsRef.current.hlsAttached = performance.now();
-          setHlsAttached(true);
-          
-          if (AUDIT_SHORTS_AUTOPLAY) {
-            const T_mount_to_hlsAttach = timingsRef.current.hlsAttached - timingsRef.current.mounted;
-            console.log(`[ShortsAudit][${id}] 🔌 HLS attached`, {
-              T_mount_to_hlsAttach: T_mount_to_hlsAttach.toFixed(0) + 'ms',
-              hlsUrl
-            });
-          }
-        });
+      if (isHls) {
+        if (Hls.isSupported()) {
+          // Evict furthest HLS instance if at capacity
+          evictFurthestHls(id);
 
-        hls.on(Hls.Events.ERROR, (event, data) => {
-          if (data.fatal) {
+          const hls = new Hls({
+            maxBufferLength: 10,
+            backBufferLength: 5,
+            enableWorker: true,
+            lowLatencyMode: false
+          });
+
+          hlsRef.current = hls;
+          attachedHls.set(id, hls);
+
+          hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+            hls.loadSource(hlsUrl);
+            timingsRef.current.hlsAttached = performance.now();
+            setHlsAttached(true);
+
             if (AUDIT_SHORTS_AUTOPLAY) {
-              console.error(`[ShortsAudit][${id}] ❌ HLS fatal error:`, data.type, data.details);
+              const T_mount_to_hlsAttach = timingsRef.current.hlsAttached - timingsRef.current.mounted;
+              console.log(`[ShortsAudit][${id}] 🔌 HLS attached`, {
+                T_mount_to_hlsAttach: T_mount_to_hlsAttach.toFixed(0) + 'ms',
+                hlsUrl
+              });
             }
-            hls.destroy();
-            attachedHls.delete(id);
-            hlsRef.current = null;
-            setHlsAttached(false);
-            setReady(false);
-          }
-        });
+          });
 
-        hls.attachMedia(el);
-      } else if (el.canPlayType('application/vnd.apple.mpegurl')) {
-        // Native HLS support (Safari, iOS)
+          hls.on(Hls.Events.ERROR, (event, data) => {
+            if (data.fatal) {
+              if (AUDIT_SHORTS_AUTOPLAY) {
+                console.error(`[ShortsAudit][${id}] ❌ HLS fatal error:`, data.type, data.details);
+              }
+              hls.destroy();
+              attachedHls.delete(id);
+              hlsRef.current = null;
+              setHlsAttached(false);
+              setReady(false);
+            }
+          });
+
+          hls.attachMedia(el);
+        } else if (el.canPlayType('application/vnd.apple.mpegurl')) {
+          // Native HLS support (Safari, iOS)
+          el.src = hlsUrl;
+          setHlsAttached(true);
+
+          if (AUDIT_SHORTS_AUTOPLAY) {
+            console.log(`[ShortsAudit][${id}] 🍎 Native HLS (Safari/iOS)`, { hlsUrl });
+          }
+        } else {
+          // Fallback: treat as direct source if environment can't handle HLS
+          el.src = hlsUrl;
+          setHlsAttached(true);
+          if (AUDIT_SHORTS_AUTOPLAY) {
+            console.warn(`[ShortsAudit][${id}] ⚠️ HLS not supported, set direct src`, { hlsUrl });
+          }
+        }
+      } else {
+        // Not an HLS manifest (likely MP4) → set src directly
         el.src = hlsUrl;
         setHlsAttached(true);
-        
         if (AUDIT_SHORTS_AUTOPLAY) {
-          console.log(`[ShortsAudit][${id}] 🍎 Native HLS (Safari/iOS)`, { hlsUrl });
+          console.log(`[ShortsAudit][${id}] ▶️ Using direct source (non-HLS)`, { hlsUrl });
         }
       }
     };
@@ -189,8 +208,8 @@ export default function ShortsVideoTile({
     el.addEventListener('playing', onPlaying);
     el.addEventListener('error', onError);
 
-    // Attach HLS immediately
-    attachHls();
+    // Attach media immediately
+    attachMedia();
 
     // Check if already ready (cached/preloaded)
     if (el.readyState >= 2) {
@@ -285,28 +304,24 @@ export default function ShortsVideoTile({
         // Start network load before playing
         if (hlsRef.current) hlsRef.current.startLoad();
 
-        const playPromise = el.play();
-        if (playPromise) {
-          playPromise
-            .then(() => {
+        safePlay(el)
+          .then((ok) => {
+            if (ok) {
               activePlayers.add(el);
               if (AUDIT_SHORTS_AUTOPLAY) {
-                console.log(`[ShortsAudit][${id}] ✅ play() succeeded, added to active players (${activePlayers.size}/${MAX_ACTIVE_PLAYERS})`);
+                console.log(`[ShortsAudit][${id}] ✅ safePlay succeeded, added to active players (${activePlayers.size}/${MAX_ACTIVE_PLAYERS})`);
               }
-            })
-            .catch((err) => {
+            } else {
               if (AUDIT_SHORTS_AUTOPLAY) {
-                console.error(`[ShortsAudit][${id}] ❌ play() rejected:`, err.name, err.message);
+                console.warn(`[ShortsAudit][${id}] ⚠️ safePlay returned false (autoplay may be blocked)`);
               }
-              // Handle autoplay policy rejection
-              if (err?.name === 'NotAllowedError') {
-                // Could show a play overlay here; for now just log
-                if (AUDIT_SHORTS_AUTOPLAY) {
-                  console.log(`[ShortsAudit][${id}] 🚫 Autoplay blocked by policy - needs user gesture`);
-                }
-              }
-            });
-        }
+            }
+          })
+          .catch((err) => {
+            if (AUDIT_SHORTS_AUTOPLAY) {
+              console.error(`[ShortsAudit][${id}] ❌ safePlay error:`, err?.name || err);
+            }
+          });
       });
     };
 
@@ -397,6 +412,7 @@ export default function ShortsVideoTile({
         playsInline
         muted
         loop
+        autoPlay
         controls={false}
       />
 
