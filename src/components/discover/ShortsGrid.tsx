@@ -69,8 +69,8 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
           const id = (e.target as HTMLElement).dataset.id;
           if (!id) continue;
           const wasInView = inViewMap.current[id];
-          // Lower threshold (0.4 = 40% visible) for faster triggering
-          const nowInView = e.isIntersecting && e.intersectionRatio >= 0.4;
+          // Lower threshold (0.25 = 25% visible) to match grid layout
+          const nowInView = e.isIntersecting && e.intersectionRatio >= 0.25;
           if (wasInView !== nowInView) {
             changedCount++;
             if (AUDIT_SHORTS_AUTOPLAY) {
