@@ -2,6 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ExploreContentItem, FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 import { isValidImageUrl } from './urlValidation';
 import { FEATURE_FLAGS, PORTRAIT_MAX_ASPECT_RATIO } from '@/config/featureFlags';
+import { getStreamPoster } from '@/utils/stream';
 
 export const useRealPostsFetcher = () => {
   const fetchFriendsPosts = async (currentOffset: number, postsPerPage: number): Promise<ExploreContentItem[]> => {
@@ -170,6 +171,9 @@ export const useRealPostsFetcher = () => {
           id: post.id,
           type: primaryMedia.media_type as 'video' | 'image',
           src: primaryMedia.media_url,
+          thumbnailSrc: primaryMedia.media_type === 'video' 
+            ? getStreamPoster(primaryMedia.media_url, '1s') || undefined
+            : undefined,
           title: post.content || 'Post',
           likes: Math.floor(Math.random() * 500) + 50,
           comments: Math.floor(Math.random() * 100) + 5,
@@ -402,6 +406,9 @@ export const useRealPostsFetcher = () => {
           id: post.id,
           type: primaryMedia.media_type as 'video' | 'image',
           src: primaryMedia.media_url,
+          thumbnailSrc: primaryMedia.media_type === 'video' 
+            ? getStreamPoster(primaryMedia.media_url, '1s') || undefined
+            : undefined,
           title: post.content || 'Post',
           likes: Math.floor(Math.random() * 500) + 50,
           comments: Math.floor(Math.random() * 100) + 5,
