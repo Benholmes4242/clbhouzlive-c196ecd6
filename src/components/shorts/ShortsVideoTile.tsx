@@ -55,7 +55,7 @@ export default function ShortsVideoTile({
 
   return (
     <div
-      className="group relative aspect-[9/16] overflow-hidden rounded-xl bg-muted cursor-pointer"
+      className="group relative aspect-[9/16] overflow-hidden rounded bg-muted cursor-pointer"
       onClick={onClick}
     >
       {/* Poster underneath as a safety net */}
