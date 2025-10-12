@@ -131,8 +131,8 @@ const GlobalBottomNavigation: React.FC = () => {
           <motion.div
             className={cn(
               "global-bottom-nav",
-              "fixed bottom-0 left-0 right-0 w-full",
-              "z-[100]",
+              "!fixed !bottom-0 !left-0 !right-0 w-full",
+              "!z-[100]",
               // Background extends to very bottom
               "backdrop-blur-md",
               isClubhouseRoute 
@@ -144,28 +144,17 @@ const GlobalBottomNavigation: React.FC = () => {
                 ? "before:bg-white/10" 
                 : "before:bg-border/50"
             )}
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            transition={{ 
-              type: "spring", 
-              stiffness: 300, 
-              damping: 30,
-              duration: 0.25 
-            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             style={{
-              // Force stable bottom positioning - prevents movement during swipes/scrolls
               position: 'fixed',
-              bottom: '0px',
-              left: '0px',
-              right: '0px',
-              // Prevent iOS Safari viewport issues
+              bottom: 0,
+              left: 0,
+              right: 0,
               paddingBottom: 'env(safe-area-inset-bottom)',
-              // Ensure it stays at viewport bottom with fixed positioning
               zIndex: 100,
-              // Prevent any movement or translation
-              transform: 'none',
-              touchAction: 'none',
             }}
           >
             <NavigationBar
