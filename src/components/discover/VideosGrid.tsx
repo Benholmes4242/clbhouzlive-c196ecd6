@@ -60,7 +60,7 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   return (
     <>
       {/* Cinematic grid - 2 columns mobile, 3 columns desktop */}
-      <div className="grid grid-cols-2 md:grid-cols-3" style={{ rowGap: '14px', columnGap: '14px' }}>
+      <div className="grid grid-cols-2 md:grid-cols-3" style={{ rowGap: '2px', columnGap: '14px' }}>
         {filteredVideos.map((item) => (
           <VideoExploreCard
             key={item.id}
