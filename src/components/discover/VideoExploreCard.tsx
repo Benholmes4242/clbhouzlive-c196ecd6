@@ -67,9 +67,9 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick,
 
       {/* Meta section */}
       <div className={compact ? "mt-2.5 px-0.5" : "mt-2 px-0.5"}>
-        {/* Title - hidden in compact mode */}
+        {/* Title - hidden in compact mode, fixed height for alignment */}
         {!compact && (
-          <h3 className="text-foreground font-semibold text-[15px] md:text-base line-clamp-2 leading-snug mb-1.5">
+          <h3 className="text-foreground font-semibold text-[15px] md:text-base line-clamp-2 leading-snug mb-2" style={{ minHeight: '3.2em' }}>
             {item.title}
           </h3>
         )}
