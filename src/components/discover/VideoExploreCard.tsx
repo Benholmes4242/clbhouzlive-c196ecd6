@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { Eye } from 'lucide-react';
 import { getStreamPoster } from '@/utils/stream';
+import { DurationBadge } from '@/components/VideoCard/DurationBadge';
 
 const FALLBACK_THUMBNAIL = '/placeholder.svg';
 
@@ -55,7 +56,15 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick,
         />
         
         {/* Duration tag (bottom-right) */}
-        {item.duration && (
+        {item.duration && typeof item.duration === 'number' && (
+          <div className="absolute bottom-2 right-2">
+            <DurationBadge 
+              seconds={item.duration} 
+              className="duration-badge backdrop-blur-sm"
+            />
+          </div>
+        )}
+        {item.duration && typeof item.duration === 'string' && (
           <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded text-white text-xs font-semibold">
             {item.duration}
           </div>

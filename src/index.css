@@ -84,6 +84,18 @@ html, body {
   
   /* Create Moment composer tokens */
   --composer-height: 370px;
+}
+
+/* Duration badge - ensures badge stays tight even with '1h 10m' */
+.duration-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  background: rgba(0,0,0,.6);
+  color: #fff;
   
   /* Brand accent tokens */
   --brand-orange-accent: 248 156 42; /* #f89c2a */
