@@ -43,7 +43,7 @@ export const useInfiniteExploreContent = (
 
   // Fast preload
 
-  const preloadMore = useCallback(async () => {
+  const preloadMore = useCallback(async (abortSignal?: AbortSignal) => {
     if (loading || !hasMore || preloadedContent[currentFilter]?.length > 0) {
       return;
     }
@@ -58,6 +58,9 @@ export const useInfiniteExploreContent = (
         posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter, durationFilter);
       }
       
+      // Check if aborted before setting state
+      if (abortSignal?.aborted) return;
+      
       if (posts.length > 0) {
         setPreloadedContent(prev => ({
           ...prev,
@@ -67,9 +70,9 @@ export const useInfiniteExploreContent = (
     } catch (error) {
       console.error('Error preloading content:', error);
     }
-  }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent]);
+  }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent, activeFilter, subFilter, durationFilter]);
 
-  const loadMore = useCallback(async () => {
+  const loadMore = useCallback(async (abortSignal?: AbortSignal) => {
     if (loading || !hasMore) {
       return;
     }
@@ -96,7 +99,7 @@ export const useInfiniteExploreContent = (
         [currentFilter]: []
       }));
       
-      setTimeout(() => preloadMore(), 50); // Fast preload trigger
+      setTimeout(() => preloadMore(abortSignal), 50); // Fast preload trigger
       
       if (preloaded.length < POSTS_PER_PAGE) {
         setHasMoreStates(prev => ({ ...prev, [currentFilter]: false }));
@@ -121,6 +124,12 @@ export const useInfiniteExploreContent = (
         posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, activeFilter, subFilter, durationFilter);
       }
       
+      // Check if aborted before setting state
+      if (abortSignal?.aborted) {
+        setLoadingStates(prev => ({ ...prev, [currentFilter]: false }));
+        return;
+      }
+      
       if (posts.length > 0) {
         // Update content cache for current filter
         setContentCache(prev => ({
@@ -135,7 +144,7 @@ export const useInfiniteExploreContent = (
         }));
         
         // Start preloading next batch
-        setTimeout(() => preloadMore(), 100);
+        setTimeout(() => preloadMore(abortSignal), 100);
         
         // If we got fewer posts than requested, we might be at the end
         if (posts.length < POSTS_PER_PAGE) {
@@ -151,7 +160,7 @@ export const useInfiniteExploreContent = (
     } finally {
       setLoadingStates(prev => ({ ...prev, [currentFilter]: false }));
     }
-  }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent, preloadMore]);
+  }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent, preloadMore, activeFilter, subFilter, durationFilter]);
 
   // Initialize states for new filters (but don't reset existing ones)
   useEffect(() => {
@@ -173,10 +182,13 @@ export const useInfiniteExploreContent = (
   }, [currentFilter]);
 
   // Initial load and auto-load more if viewport isn't filled
+  // Add AbortController to cancel requests on filter change
   useEffect(() => {
+    const abortController = new AbortController();
+    
     const autoLoadContent = async () => {
       if (content.length === 0 && !loading) {
-        await loadMore();
+        await loadMore(abortController.signal);
         
         // After initial load, check if we need more content to fill viewport
         setTimeout(() => {
@@ -184,15 +196,20 @@ export const useInfiniteExploreContent = (
           const contentHeight = document.body.scrollHeight;
           
           // If content doesn't fill viewport and we have more content, load more
-          if (contentHeight <= viewportHeight && hasMore && !loading) {
-            loadMore();
+          if (contentHeight <= viewportHeight && hasMore && !loading && !abortController.signal.aborted) {
+            loadMore(abortController.signal);
           }
         }, 100); // Small delay to allow DOM to update
       }
     };
     
     autoLoadContent();
-  }, [content.length, loading, hasMore, loadMore]);
+    
+    // Cancel in-flight requests when filter changes
+    return () => {
+      abortController.abort();
+    };
+  }, [currentFilter]);
 
   return {
     content,

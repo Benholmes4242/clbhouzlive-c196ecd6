@@ -146,6 +146,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
               hasMore={hasMore}
               onLoadMore={loadMore}
               isShorts={false}
+              activeTab={duration}
             />
           );
         }}

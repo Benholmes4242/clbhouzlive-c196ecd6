@@ -9,6 +9,7 @@ interface VideosGridProps {
   hasMore: boolean;
   onLoadMore: () => void;
   isShorts?: boolean;
+  activeTab?: string; // For namespacing keys
 }
 
 const VideosGrid: React.FC<VideosGridProps> = ({
@@ -17,7 +18,8 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   isLoading,
   hasMore,
   onLoadMore,
-  isShorts = false
+  isShorts = false,
+  activeTab = 'all'
 }) => {
   // Intersection observer for infinite scroll
   useEffect(() => {
@@ -63,7 +65,7 @@ const VideosGrid: React.FC<VideosGridProps> = ({
       <div className="grid grid-cols-2 md:grid-cols-3" style={{ rowGap: '18px', columnGap: '2px' }}>
         {filteredVideos.map((item) => (
           <VideoExploreCard
-            key={item.id}
+            key={`${activeTab}-${item.id}`}
             item={item}
             onMediaClick={onMediaClick}
             compact={isShorts}
