@@ -405,7 +405,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
     return (
       <>
         {/* New Grid Layout for Discover Page - Section-based with alternating portraits */}
-        <div className="grid grid-cols-4 min-h-0" style={{ rowGap: '14px', columnGap: '2px' }}>
+        <div className="grid grid-cols-4 min-h-0" style={{ rowGap: '14px', columnGap: '14px' }}>
           {(() => {
             const sections = [];
             let currentSection = 0;
@@ -713,7 +713,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = memo(({
     return (
       <>
         {/* Mobile 3-column section-based layout */}
-        <div className="grid grid-cols-3" style={{ rowGap: '14px', columnGap: '2px' }}>
+        <div className="grid grid-cols-3" style={{ rowGap: '14px', columnGap: '14px' }}>
           {(() => {
             const sections = [];
             let currentSection = 0;
