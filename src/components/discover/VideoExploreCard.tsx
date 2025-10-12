@@ -75,7 +75,7 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick,
         )}
 
         {/* Creator + metadata row */}
-        <div className="flex items-center gap-2 text-muted-foreground">
+        <div className="flex items-center gap-2 text-muted-foreground pl-0.5">
           {/* Creator avatar */}
           {item.user?.avatar && (
             <img
