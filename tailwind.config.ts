@@ -255,14 +255,6 @@ export default {
 						transform: 'rotate(360deg)'
 					}
 				},
-				'cinematic-zoom': {
-					'0%': {
-						transform: 'scale(1)'
-					},
-					'100%': {
-						transform: 'scale(1.02)'
-					}
-				},
 				'slide-in-from-right-modal': {
 					'0%': {
 						transform: 'translateX(100%)'

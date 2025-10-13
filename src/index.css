@@ -10,11 +10,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Cinematic video card styles */
-.scale-102 {
-  transform: scale(1.02);
-}
-
 /* Sliding panels animations (in utilities layer so they can be composed with classes) */
 @layer utilities {
   .panel { will-change: transform, opacity; }
