@@ -109,7 +109,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           {/* Duration Badge - Dark Glass - Bottom Left */}
           {duration > 0 && (
             <time 
-              className="absolute bottom-3 left-3 rounded-md px-2.5 py-1 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-[13px] font-medium shadow-sm z-10"
+              className="absolute bottom-3 left-3 rounded-md px-2 py-0.5 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-xs font-medium shadow-sm z-10"
               aria-label={`Duration ${formatDuration(duration)}`}
             >
               {formatDuration(duration)}

@@ -60,12 +60,12 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick,
           <div className="absolute bottom-2 right-2">
             <DurationBadge 
               seconds={item.duration} 
-              className="rounded-md px-2.5 py-1 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-[13px] font-medium shadow-sm"
+              className="rounded-md px-2 py-0.5 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-xs font-medium shadow-sm"
             />
           </div>
         )}
         {item.duration && typeof item.duration === 'string' && (
-          <div className="absolute bottom-2 right-2 rounded-md px-2.5 py-1 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-[13px] font-medium shadow-sm">
+          <div className="absolute bottom-2 right-2 rounded-md px-2 py-0.5 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-xs font-medium shadow-sm">
             {item.duration}
           </div>
         )}
