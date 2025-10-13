@@ -78,7 +78,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
   const thumbnailUrl = item.thumbnailSrc || '';
 
   return (
-    <div ref={containerRef} className="w-full mb-10">
+    <div ref={containerRef} className="w-full mb-[30px]">
       {/* Video Container */}
       <div className="relative w-full aspect-video overflow-hidden">
         <video
