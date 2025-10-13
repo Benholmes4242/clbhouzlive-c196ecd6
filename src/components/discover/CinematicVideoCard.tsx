@@ -78,11 +78,16 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
   const thumbnailUrl = item.thumbnailSrc || '';
 
   return (
-    <div ref={containerRef} className="w-full mb-[var(--gap-between-cards)]">
-      {/* Video Container with Band Wrapper */}
-      <div className="relative">
-        {/* Video (Edge-to-Edge) */}
-        <div className="relative w-full aspect-video overflow-hidden">
+    <div ref={containerRef} className="w-full mb-5 mx-2.5">
+      {/* Elevated Card Container */}
+      <div 
+        className="relative bg-white dark:bg-gray-900 rounded-2xl overflow-hidden"
+        style={{
+          boxShadow: '0px 1px 2px rgba(0,0,0,0.05), 0px 3px 8px rgba(0,0,0,0.03)'
+        }}
+      >
+        {/* Video (Edge-to-Edge inside card) */}
+        <div className="relative w-full aspect-video overflow-hidden rounded-t-2xl">
           <video
             ref={videoRef}
             src={videoUrl}
@@ -92,11 +97,11 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             onClick={() => onMediaClick?.(item)}
           />
           
-          {/* Frosted Progress Bar */}
-          <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded bg-white/30 backdrop-blur-[2px] z-10">
+          {/* Clean Progress Bar */}
+          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/30 z-10">
             <div 
               ref={setProgressFillRef}
-              className="h-[3px] rounded bg-white/80 origin-left will-change-transform"
+              className="h-[2px] rounded-sm bg-white/80 origin-left will-change-transform"
               style={{ transform: 'scaleX(0)' }}
               aria-valuenow={progress}
               aria-valuemin={0}
@@ -105,50 +110,36 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             />
           </div>
 
-          {/* Frosted Length Badge - Bottom Left */}
+          {/* Glass Duration Badge - Bottom Left */}
           {duration > 0 && (
             <time 
-              className="absolute bottom-3 left-3 px-1.5 py-1 bg-white/65 backdrop-blur-md rounded-lg text-[13px] font-medium text-black/90 z-10 shadow-sm"
+              className="absolute bottom-3 left-3 px-2 py-1 bg-white/40 border border-white/30 rounded-md text-[13px] font-medium text-white z-10"
+              style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif', fontWeight: 500 }}
               aria-label={`Duration ${formatDuration(duration)}`}
             >
               {formatDuration(duration)}
             </time>
           )}
           
-          {/* Frosted Mute/Unmute Toggle - Bottom Right */}
+          {/* Glass Mute/Unmute Toggle - Bottom Right */}
           <button
             onClick={(e) => {
               e.stopPropagation();
               toggleMute();
             }}
-            className="absolute bottom-3 right-3 w-8 h-8 bg-white/65 backdrop-blur-md rounded-full flex items-center justify-center transition-transform active:scale-95 z-10 shadow-sm"
+            className="absolute bottom-3 right-3 w-8 h-8 bg-white/40 border border-white/30 rounded-full flex items-center justify-center transition-transform active:scale-95 z-10"
             aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           >
             {isMuted ? (
-              <VolumeX className="w-5 h-5 text-black/90" strokeWidth={1.5} />
+              <VolumeX className="w-5 h-5 text-white" strokeWidth={1.5} />
             ) : (
-              <Volume2 className="w-5 h-5 text-black/90" strokeWidth={1.5} />
+              <Volume2 className="w-5 h-5 text-white" strokeWidth={1.5} />
             )}
           </button>
         </div>
 
-        {/* Gradient Fade Transition (overlapping video bottom by ~8px) */}
-        <div 
-          className="relative w-full h-[var(--fade-height)] -mt-2 z-[5] pointer-events-none"
-          style={{
-            background: 'linear-gradient(to bottom, transparent, hsl(var(--band-bg-light)))'
-          }}
-          aria-hidden="true"
-        />
-
-        {/* Soft Band (with padding, bottom radius, and optional hairline) */}
-        <div 
-          className="relative w-full bg-[hsl(var(--band-bg-light))] dark:bg-white/[0.04] px-[var(--band-pad-x)] py-[var(--band-pad-y)] rounded-b-[var(--band-radius-bottom)]"
-          style={{
-            boxShadow: '0 1px 0 rgba(0,0,0,0.04)'
-          }}
-        >
-          {/* Info Bar */}
+        {/* Caption Area */}
+        <div className="relative w-full px-4 py-3">
           <div className="flex items-start gap-3">
             <Avatar className="w-10 h-10 flex-shrink-0">
               <AvatarImage src={item.user?.avatar} alt={item.user?.username || item.user?.name} />
