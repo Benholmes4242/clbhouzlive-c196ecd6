@@ -79,13 +79,8 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
 
   return (
     <div ref={containerRef} className="w-full mb-5">
-      {/* Elevated Card Container */}
-      <div 
-        className="relative bg-white dark:bg-gray-900 overflow-hidden"
-        style={{
-          boxShadow: '0px 1px 2px rgba(0,0,0,0.05), 0px 3px 8px rgba(0,0,0,0.03)'
-        }}
-      >
+      {/* Video and Caption Container */}
+      <div className="relative overflow-hidden">
         {/* Video (Edge-to-Edge inside card) */}
         <div className="relative w-full aspect-video overflow-hidden">
           <video
