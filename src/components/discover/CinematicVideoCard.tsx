@@ -78,7 +78,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
   const thumbnailUrl = item.thumbnailSrc || '';
 
   return (
-    <div ref={containerRef} className="w-full mb-5 mx-2.5">
+    <div ref={containerRef} className="w-full mb-5">
       {/* Elevated Card Container */}
       <div 
         className="relative bg-white dark:bg-gray-900 rounded-2xl overflow-hidden"
