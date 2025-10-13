@@ -10,81 +10,30 @@ export interface ChannelSuggestion {
   isSubscribed?: boolean;
 }
 
-// Mock suggestions pool - in production, fetch from API
-const MOCK_SUGGESTIONS: ChannelSuggestion[] = [
-  {
-    id: 'sugg-1',
-    title: 'Pro Golf Tips',
-    handle: '@progolftips',
-    cover: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&q=80',
-    avatar: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=200&q=80',
-    subscriberCount: 125000,
-    isSubscribed: false
-  },
-  {
-    id: 'sugg-2',
-    title: 'Golf Course Vlogs',
-    handle: '@golfcoursevibes',
-    cover: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&q=80',
-    avatar: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=200&q=80',
-    subscriberCount: 89000,
-    isSubscribed: false
-  },
-  {
-    id: 'sugg-3',
-    title: 'Short Game Mastery',
-    handle: '@shortgamemaster',
-    cover: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=800&q=80',
-    avatar: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=200&q=80',
-    subscriberCount: 210000,
-    isSubscribed: false
-  },
-  {
-    id: 'sugg-4',
-    title: 'Golf Swing Analysis',
-    handle: '@swinganalysis',
-    cover: 'https://images.unsplash.com/photo-1596727147705-62a6c2e828d5?w=800&q=80',
-    avatar: 'https://images.unsplash.com/photo-1596727147705-62a6c2e828d5?w=200&q=80',
-    subscriberCount: 156000,
-    isSubscribed: false
-  },
-  {
-    id: 'sugg-5',
-    title: 'Golf Equipment Reviews',
-    handle: '@golfgearreview',
-    cover: 'https://images.unsplash.com/photo-1530028828-25e8270e8866?w=800&q=80',
-    avatar: 'https://images.unsplash.com/photo-1530028828-25e8270e8866?w=200&q=80',
-    subscriberCount: 98000,
-    isSubscribed: false
-  },
-  {
-    id: 'sugg-6',
-    title: 'Junior Golf Academy',
-    handle: '@juniorgolfacad',
-    cover: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=800&q=80',
-    avatar: 'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=200&q=80',
-    subscriberCount: 67000,
-    isSubscribed: false
-  },
-  {
-    id: 'sugg-7',
-    title: 'Golf Travel Adventures',
-    handle: '@golftraveladv',
-    cover: 'https://images.unsplash.com/photo-1587174489496-cc0df13e568d?w=800&q=80',
-    avatar: 'https://images.unsplash.com/photo-1587174489496-cc0df13e568d?w=200&q=80',
-    subscriberCount: 143000,
-    isSubscribed: false
-  },
-  {
-    id: 'sugg-8',
-    title: 'Golf Fitness Training',
-    handle: '@golffitness',
-    cover: 'https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=800&q=80',
-    avatar: 'https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=200&q=80',
-    subscriberCount: 102000,
-    isSubscribed: false
-  }
+// Use the same mock creators from channels.mock.ts
+const MOCK_CREATORS = [
+  { id: 'c1', name: 'Golf with Aimee', avatar: '/images/mocks/avatars/avatar-01.png', verified: true, handle: '@golfwithaimee', subscribers: 245000 },
+  { id: 'c2', name: 'Rick Shiels Golf', avatar: '/images/mocks/avatars/avatar-02.png', verified: true, handle: '@rickshielsgolf', subscribers: 312000 },
+  { id: 'c3', name: 'Peter Finch Golf', avatar: '/images/mocks/avatars/avatar-03.png', verified: true, handle: '@peterfinchgolf', subscribers: 189000 },
+  { id: 'c4', name: 'Mark Crossfield', avatar: '/images/mocks/avatars/avatar-04.png', verified: false, handle: '@markcrossfield', subscribers: 156000 },
+  { id: 'c5', name: 'Good Good Golf', avatar: '/images/mocks/avatars/avatar-05.png', verified: true, handle: '@goodgoodgolf', subscribers: 428000 },
+  { id: 'c6', name: 'Me And My Golf', avatar: '/images/mocks/avatars/avatar-06.png', verified: true, handle: '@meandmygolf', subscribers: 267000 },
+  { id: 'c7', name: 'Golfholics', avatar: '/images/mocks/avatars/avatar-07.png', verified: false, handle: '@golfholics', subscribers: 98000 },
+  { id: 'c8', name: 'The Golf Mates', avatar: '/images/mocks/avatars/avatar-08.png', verified: false, handle: '@thegolfmates', subscribers: 134000 },
 ];
+
+const banners = Array.from({ length: 6 }).map((_, i) => `/images/mocks/channels/banners/banner-0${i+1}.jpg`);
+
+// Convert mock creators to channel suggestions format
+const MOCK_SUGGESTIONS: ChannelSuggestion[] = MOCK_CREATORS.map((creator, i) => ({
+  id: creator.id,
+  title: creator.name,
+  handle: creator.handle,
+  cover: banners[i % banners.length],
+  avatar: creator.avatar,
+  subscriberCount: creator.subscribers,
+  isSubscribed: false
+}));
 
 const POOL_REFILL_THRESHOLD = 3;
 const RECENT_SET_SIZE = 20;
