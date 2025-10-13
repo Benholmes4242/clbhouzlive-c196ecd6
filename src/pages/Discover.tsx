@@ -3,7 +3,7 @@ import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
 
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import ExploreFilters from '@/components/explore/ExploreFilters';
-import VideoChipRail from '@/components/videos/VideoChipRail';
+import DiscoverVideosHeader from '@/components/discover/DiscoverVideosHeader';
 import VideoSearchOverlay from '@/components/videos/VideoSearchOverlay';
 import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useVideoLengthFilter } from '@/hooks/useVideoLengthFilter';
@@ -33,7 +33,6 @@ const Discover = () => {
   const [modalStartIndex, setModalStartIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [searchOpen, setSearchOpen] = useState(false);
   
   const { main, sub } = useDiscoverQuery();
   const [durationFilter, setDurationFilter] = useVideoLengthFilter();
@@ -169,14 +168,16 @@ const Discover = () => {
             <SegmentedControl 
               activeTab={activeFilter}
               onTabChange={() => {}} // No-op: tabs control via URL now
-              onOpenVideoSearch={() => setSearchOpen(true)}
             />
             
-            {/* Video Chip Rail - show only on videos tab */}
+            {/* Videos Header - new compact design */}
             {main === 'videos' && (
-              <VideoChipRail
-                value={durationFilter}
-                onChange={setDurationFilter}
+              <DiscoverVideosHeader
+                activeDuration={durationFilter}
+                onChangeDuration={setDurationFilter}
+                onOpenShorts={() => setDurationFilter('shorts')}
+                onSearchSubmit={(query) => setSearchQuery(query)}
+                initialQuery={searchQuery}
               />
             )}
             
@@ -230,15 +231,6 @@ const Discover = () => {
           </SlidingPanels>
       </main>
 
-        {/* Video Search Overlay */}
-        <VideoSearchOverlay
-          open={searchOpen}
-          onClose={() => setSearchOpen(false)}
-          onPick={(q) => {
-            setSearchQuery(q);
-            setSearchOpen(false);
-          }}
-        />
 
         {/* Conditional Modal/Feed based on feature flag */}
         {USE_MODAL_DISCOVER ? (
