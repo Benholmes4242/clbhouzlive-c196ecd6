@@ -180,6 +180,7 @@ export const useRealPostsFetcher = () => {
           shares: Math.floor(Math.random() * 50) + 1,
           duration: durationSeconds ? `${durationSeconds}s` : undefined,
           durationSeconds, // Store numeric value for filtering
+          createdAt: post.created_at, // Map created_at to createdAt
           user: {
             id: post.user_id,
             name: userProfile?.display_name || userProfile?.username || 'User',
@@ -415,6 +416,7 @@ export const useRealPostsFetcher = () => {
           shares: Math.floor(Math.random() * 50) + 1,
           duration: durationSeconds ? `${durationSeconds}s` : undefined,
           durationSeconds, // Store numeric value for filtering
+          createdAt: post.created_at, // Map created_at to createdAt
           user: {
             id: post.user_id,
             name: userProfile?.display_name || userProfile?.username || 'User',
