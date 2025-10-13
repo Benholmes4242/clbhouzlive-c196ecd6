@@ -124,14 +124,10 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     // TODO: Implement navigation to creator profile or highlight detail
   };
 
-  // Track rendered video count for interleaving
+  // Reset video count when tab changes (not on every content update)
   useEffect(() => {
-    if (main === 'videos' && duration === 'all' && currentContent) {
-      setRenderedVideoCount(prev => prev + currentContent.length);
-    } else {
-      setRenderedVideoCount(0);
-    }
-  }, [main, duration, currentContent]);
+    setRenderedVideoCount(0);
+  }, [main, duration]);
 
   // Chip order for slide animation
   const CHIP_ORDER = ['all', 'shorts', 'under4', '4to20', 'over20'] as const;
@@ -146,22 +142,24 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         {(key: LengthKey) => {
           const itemsForKey = currentContent || [];
           
-          // Build interleaved feed for "All" tab only
-          let interleavedFeed: InterleavedItem[] | null = null;
-          if (key === 'all') {
-            interleavedFeed = buildInterleavedFeed(
+          // Build interleaved feed for "All" tab only - memoized to prevent constant rebuilds
+          const interleavedFeed = React.useMemo(() => {
+            if (key !== 'all') return null;
+            
+            const feed = buildInterleavedFeed(
               itemsForKey,
               getNextSuggestion,
-              renderedVideoCount
+              0 // Always start from 0 for each page load
             );
             
             // Debug log
             if (import.meta.env.DEV) {
               console.debug('[Interleave] items:', itemsForKey.length,
-                'offset:', renderedVideoCount,
-                'sampleKinds:', interleavedFeed?.slice(0, 12).map(i => i.kind));
+                'sampleKinds:', feed?.slice(0, 12).map(i => i.kind));
             }
-          }
+            
+            return feed;
+          }, [key, itemsForKey, getNextSuggestion]);
           
           return key === 'shorts' ? (
             <ShortsGrid 

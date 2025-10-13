@@ -90,9 +90,10 @@ const POOL_REFILL_THRESHOLD = 3;
 const RECENT_SET_SIZE = 20;
 
 export function useChannelSuggestions() {
-  const [pool, setPool] = useState<ChannelSuggestion[]>([]);
+  const poolRef = useRef<ChannelSuggestion[]>([]);
   const recentIdsRef = useRef<Set<string>>(new Set());
   const allSuggestionsRef = useRef<ChannelSuggestion[]>([...MOCK_SUGGESTIONS]);
+  const [initialized, setInitialized] = useState(false);
 
   // Refill the pool with fresh suggestions
   const refillPool = useCallback(() => {
@@ -111,21 +112,21 @@ export function useChannelSuggestions() {
     const shuffled = [...available].sort(() => Math.random() - 0.5);
     const newSuggestions = shuffled.slice(0, 10);
     
-    setPool(prev => [...prev, ...newSuggestions]);
+    poolRef.current = [...poolRef.current, ...newSuggestions];
   }, []);
 
-  // Get the next suggestion
+  // Get the next suggestion - stable function that doesn't depend on state
   const next = useCallback((): ChannelSuggestion | null => {
     // Refill if pool is low
-    if (pool.length < POOL_REFILL_THRESHOLD) {
+    if (poolRef.current.length < POOL_REFILL_THRESHOLD) {
       refillPool();
     }
 
     // Get next suggestion from pool
-    if (pool.length === 0) return null;
+    if (poolRef.current.length === 0) return null;
 
-    const suggestion = pool[0];
-    setPool(prev => prev.slice(1));
+    const suggestion = poolRef.current[0];
+    poolRef.current = poolRef.current.slice(1);
 
     // Add to recent set
     recentIdsRef.current.add(suggestion.id);
@@ -137,14 +138,15 @@ export function useChannelSuggestions() {
     }
 
     return suggestion;
-  }, [pool, refillPool]);
+  }, [refillPool]);
 
-  // Initialize pool on first call
+  // Initialize pool once
   useEffect(() => {
-    if (pool.length === 0) {
+    if (!initialized) {
       refillPool();
+      setInitialized(true);
     }
-  }, [pool.length, refillPool]);
+  }, [initialized, refillPool]);
 
   return { next };
 }
