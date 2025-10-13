@@ -94,10 +94,10 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           />
           
           {/* Clean Progress Bar */}
-          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/30 z-10">
+          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-black/30 z-10">
             <div 
               ref={setProgressFillRef}
-              className="h-[2px] rounded-sm bg-white/80 origin-left will-change-transform"
+              className="h-full bg-white/85 origin-left will-change-transform"
               style={{ transform: 'scaleX(0)' }}
               aria-valuenow={progress}
               aria-valuemin={0}
@@ -106,30 +106,29 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             />
           </div>
 
-          {/* Glass Duration Badge - Bottom Left */}
+          {/* Duration Badge - Dark Glass - Bottom Left */}
           {duration > 0 && (
             <time 
-              className="absolute bottom-3 left-3 px-2 py-1 bg-white/40 border border-white/30 rounded-md text-[13px] font-medium text-white z-10"
-              style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif', fontWeight: 500 }}
+              className="absolute bottom-3 left-3 rounded-md px-2.5 py-1 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-[13px] font-medium shadow-sm z-10"
               aria-label={`Duration ${formatDuration(duration)}`}
             >
               {formatDuration(duration)}
             </time>
           )}
           
-          {/* Glass Mute/Unmute Toggle - Bottom Right */}
+          {/* Mute/Unmute Button - Dark Glass - Bottom Right */}
           <button
             onClick={(e) => {
               e.stopPropagation();
               toggleMute();
             }}
-            className="absolute bottom-3 right-3 w-8 h-8 bg-white/40 border border-white/30 rounded-full flex items-center justify-center transition-transform active:scale-95 z-10"
+            className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white shadow-sm transition-transform active:scale-95 z-10"
             aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           >
             {isMuted ? (
-              <VolumeX className="w-5 h-5 text-white" strokeWidth={1.5} />
+              <VolumeX className="w-4 h-4" />
             ) : (
-              <Volume2 className="w-5 h-5 text-white" strokeWidth={1.5} />
+              <Volume2 className="w-4 h-4" />
             )}
           </button>
         </div>

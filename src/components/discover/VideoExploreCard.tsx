@@ -55,17 +55,17 @@ const VideoExploreCard: React.FC<VideoExploreCardProps> = ({ item, onMediaClick,
           onError={handleImageError}
         />
         
-        {/* Duration tag (bottom-right) */}
+        {/* Duration tag (bottom-right) - Dark Glass */}
         {item.duration && typeof item.duration === 'number' && (
           <div className="absolute bottom-2 right-2">
             <DurationBadge 
               seconds={item.duration} 
-              className="duration-badge backdrop-blur-sm"
+              className="rounded-md px-2.5 py-1 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-[13px] font-medium shadow-sm"
             />
           </div>
         )}
         {item.duration && typeof item.duration === 'string' && (
-          <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded text-white text-xs font-semibold">
+          <div className="absolute bottom-2 right-2 rounded-md px-2.5 py-1 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-[13px] font-medium shadow-sm">
             {item.duration}
           </div>
         )}
