@@ -71,8 +71,8 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     );
   }
 
-  // Cinematic mode for "All" tab
-  const isCinematicMode = activeTab === 'all';
+  // Cinematic mode for all video duration tabs
+  const isCinematicMode = true;
 
   return (
     <>
