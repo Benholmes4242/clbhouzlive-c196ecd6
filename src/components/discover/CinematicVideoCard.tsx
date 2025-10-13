@@ -123,9 +123,9 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           aria-label={isMuted ? 'Unmute video' : 'Mute video'}
         >
           {isMuted ? (
-            <VolumeX className="w-5 h-5 text-black/90" />
+            <VolumeX className="w-5 h-5 text-black/90" strokeWidth={1.5} />
           ) : (
-            <Volume2 className="w-5 h-5 text-black/90" />
+            <Volume2 className="w-5 h-5 text-black/90" strokeWidth={1.5} />
           )}
         </button>
       </div>
