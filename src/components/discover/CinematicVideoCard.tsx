@@ -78,93 +78,73 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
   const thumbnailUrl = item.thumbnailSrc || '';
 
   return (
-    <div ref={containerRef} className="w-full mb-[var(--gap-between-cards)]">
-      {/* Video Container with Band Wrapper */}
-      <div className="relative">
-        {/* Video (Edge-to-Edge) */}
-        <div className="relative w-full aspect-video overflow-hidden">
-          <video
-            ref={videoRef}
-            src={videoUrl}
-            poster={thumbnailUrl}
-            playsInline
-            className="w-full h-full object-cover"
-            onClick={() => onMediaClick?.(item)}
+    <div ref={containerRef} className="w-full mb-[30px]">
+      {/* Video Container */}
+      <div className="relative w-full aspect-video overflow-hidden">
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          poster={thumbnailUrl}
+          playsInline
+          className="w-full h-full object-cover"
+          onClick={() => onMediaClick?.(item)}
+        />
+        
+        {/* Frosted Progress Bar */}
+        <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded bg-white/30 backdrop-blur-[2px] z-10">
+          <div 
+            ref={setProgressFillRef}
+            className="h-[3px] rounded bg-white/80 origin-left will-change-transform"
+            style={{ transform: 'scaleX(0)' }}
+            aria-valuenow={progress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            role="progressbar"
           />
-          
-          {/* Frosted Progress Bar */}
-          <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded bg-white/30 backdrop-blur-[2px] z-10">
-            <div 
-              ref={setProgressFillRef}
-              className="h-[3px] rounded bg-white/80 origin-left will-change-transform"
-              style={{ transform: 'scaleX(0)' }}
-              aria-valuenow={progress}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              role="progressbar"
-            />
-          </div>
-
-          {/* Frosted Length Badge - Bottom Left */}
-          {duration > 0 && (
-            <time 
-              className="absolute bottom-3 left-3 px-1.5 py-1 bg-white/65 backdrop-blur-md rounded-lg text-[13px] font-medium text-black/90 z-10 shadow-sm"
-              aria-label={`Duration ${formatDuration(duration)}`}
-            >
-              {formatDuration(duration)}
-            </time>
-          )}
-          
-          {/* Frosted Mute/Unmute Toggle - Bottom Right */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleMute();
-            }}
-            className="absolute bottom-3 right-3 w-8 h-8 bg-white/65 backdrop-blur-md rounded-full flex items-center justify-center transition-transform active:scale-95 z-10 shadow-sm"
-            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
-          >
-            {isMuted ? (
-              <VolumeX className="w-5 h-5 text-black/90" strokeWidth={1.5} />
-            ) : (
-              <Volume2 className="w-5 h-5 text-black/90" strokeWidth={1.5} />
-            )}
-          </button>
         </div>
 
-        {/* Gradient Fade Transition (overlapping video bottom by ~8px) */}
-        <div 
-          className="relative w-full h-[var(--fade-height)] -mt-2 z-[5] pointer-events-none"
-          style={{
-            background: 'linear-gradient(to bottom, transparent, hsl(var(--band-bg-light)))'
+        {/* Frosted Length Badge - Bottom Left */}
+        {duration > 0 && (
+          <time 
+            className="absolute bottom-3 left-3 px-1.5 py-1 bg-white/65 backdrop-blur-md rounded-lg text-[13px] font-medium text-black/90 z-10 shadow-sm"
+            aria-label={`Duration ${formatDuration(duration)}`}
+          >
+            {formatDuration(duration)}
+          </time>
+        )}
+        
+        {/* Frosted Mute/Unmute Toggle - Bottom Right */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleMute();
           }}
-          aria-hidden="true"
-        />
-
-        {/* Soft Band (with padding, bottom radius, and optional hairline) */}
-        <div 
-          className="relative w-full bg-[hsl(var(--band-bg-light))] dark:bg-white/[0.04] px-[var(--band-pad-x)] py-[var(--band-pad-y)] rounded-b-[var(--band-radius-bottom)]"
-          style={{
-            boxShadow: '0 1px 0 rgba(0,0,0,0.04)'
-          }}
+          className="absolute bottom-3 right-3 w-8 h-8 bg-white/65 backdrop-blur-md rounded-full flex items-center justify-center transition-transform active:scale-95 z-10 shadow-sm"
+          aria-label={isMuted ? 'Unmute video' : 'Mute video'}
         >
-          {/* Info Bar */}
-          <div className="flex items-start gap-3">
-            <Avatar className="w-10 h-10 flex-shrink-0">
-              <AvatarImage src={item.user?.avatar} alt={item.user?.username || item.user?.name} />
-              <AvatarFallback>{item.user?.name?.[0]?.toUpperCase()}</AvatarFallback>
-            </Avatar>
-            
-            <div className="flex-1 min-w-0">
-              <p className="text-base font-semibold text-foreground line-clamp-2 mb-1">
-                {item.title || 'No caption'}
-              </p>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground/70">
-                <span className="font-medium">@{item.user?.username || item.user?.name || 'unknown'}</span>
-                <span>•</span>
-                <span>{item.likes?.toLocaleString() || 0} likes</span>
-              </div>
-            </div>
+          {isMuted ? (
+            <VolumeX className="w-5 h-5 text-black/90" strokeWidth={1.5} />
+          ) : (
+            <Volume2 className="w-5 h-5 text-black/90" strokeWidth={1.5} />
+          )}
+        </button>
+      </div>
+
+      {/* Info Bar */}
+      <div className="flex items-start gap-3 pt-3 px-2">
+        <Avatar className="w-10 h-10 flex-shrink-0">
+          <AvatarImage src={item.user?.avatar} alt={item.user?.username || item.user?.name} />
+          <AvatarFallback>{item.user?.name?.[0]?.toUpperCase()}</AvatarFallback>
+        </Avatar>
+        
+        <div className="flex-1 min-w-0">
+          <p className="text-base font-semibold text-foreground line-clamp-2 mb-1">
+            {item.title || 'No caption'}
+          </p>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground/70">
+            <span className="font-medium">@{item.user?.username || item.user?.name || 'unknown'}</span>
+            <span>•</span>
+            <span>{item.likes?.toLocaleString() || 0} likes</span>
           </div>
         </div>
       </div>

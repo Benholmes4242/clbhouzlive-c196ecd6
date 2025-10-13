@@ -998,15 +998,6 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --profile-text-secondary: 215 11% 45%;
     --profile-border-card: 220 14% 93%;
     --profile-border-tile: 217 12% 94%;
-    
-    /* Cinematic Video Band Tokens */
-    --band-bg-light: 215 25% 97%; /* #F5F7FA */
-    --band-bg-dark: 0 0% 100%; /* rgba(255,255,255,0.04) will be applied with opacity */
-    --band-pad-x: 16px;
-    --band-pad-y: 12px;
-    --band-radius-bottom: 12px;
-    --gap-between-cards: 14px;
-    --fade-height: 12px;
     --profile-border-button: 220 13% 91%;
     --profile-accent: 141 15% 57%;
     
