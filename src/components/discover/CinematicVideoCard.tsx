@@ -17,7 +17,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
   const { isMuted, toggleMute } = useExclusiveVideoAudio(item.id);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState<number>(0);
-  const { progress } = useVideoProgressSync(videoRef.current);
+  const { progress, setProgressFillRef } = useVideoProgressSync(videoRef.current);
 
   // Auto-play when in view
   useEffect(() => {
@@ -91,10 +91,15 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
         />
         
         {/* Frosted Progress Bar */}
-        <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/40 backdrop-blur-sm z-10">
+        <div className="absolute bottom-0 left-0 right-0 h-[3px] rounded bg-white/30 backdrop-blur-[2px] z-10">
           <div 
-            className="h-full bg-white/90 transition-all duration-100"
-            style={{ width: `${progress}%` }}
+            ref={setProgressFillRef}
+            className="h-[3px] rounded bg-white/80 origin-left will-change-transform"
+            style={{ transform: 'scaleX(0)' }}
+            aria-valuenow={progress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            role="progressbar"
           />
         </div>
 

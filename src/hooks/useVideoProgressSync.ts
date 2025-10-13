@@ -13,6 +13,7 @@ export function useVideoProgressSync(
 ) {
   const [progress, setProgress] = useState(0);
   const [segmentProgress, setSegmentProgress] = useState<number[]>([]);
+  const progressFillRef = useRef<HTMLDivElement | null>(null);
   const rafRef = useRef<number>();
   const isActiveRef = useRef(false);
   const telemetryLoggedRef = useRef(false);
@@ -27,6 +28,14 @@ export function useVideoProgressSync(
     const duration = videoElement.duration;
 
     if (!duration || isNaN(duration) || duration === 0) return;
+
+    // Direct DOM update for visual progress bar (no React state)
+    if (progressFillRef.current) {
+      const ratio = Math.min(1, Math.max(0, currentTime / duration));
+      // Round to 3 decimal places to prevent micro-jumps
+      const roundedRatio = Math.round(ratio * 1000) / 1000;
+      progressFillRef.current.style.transform = `scaleX(${roundedRatio})`;
+    }
 
     // Use explicit segments or create equal segments
     const segmentDurations = segments || Array(totalSegments).fill(duration / totalSegments);
@@ -51,7 +60,7 @@ export function useVideoProgressSync(
 
     setSegmentProgress(newSegmentProgress);
     
-    // Overall progress for fallback
+    // Overall progress kept in state for a11y only
     const overallProgress = Math.max(0, Math.min(100, (currentTime / duration) * 100));
     setProgress(overallProgress);
   }, [videoElement, segments, totalSegments]);
@@ -134,6 +143,9 @@ export function useVideoProgressSync(
     const handleLoadStart = () => {
       // Reset progress on new source load and stop any active sync
       console.log('[VideoProgressSync] Source changed, resetting progress');
+      if (progressFillRef.current) {
+        progressFillRef.current.style.transform = 'scaleX(0)';
+      }
       setProgress(0);
       const segmentCount = segments?.length || totalSegments;
       setSegmentProgress(Array(segmentCount).fill(0));
@@ -186,6 +198,9 @@ export function useVideoProgressSync(
   return {
     progress,
     segmentProgress,
-    isActive: isActiveRef.current
+    isActive: isActiveRef.current,
+    setProgressFillRef: (ref: HTMLDivElement | null) => {
+      progressFillRef.current = ref;
+    }
   };
 }
