@@ -5,6 +5,7 @@ import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 import { Volume2, VolumeX } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { formatRelativeTime } from '@/utils/dateFormat';
 
 interface CinematicVideoCardProps {
   item: ExploreContentItem;
@@ -147,7 +148,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
               </p>
               <div className="flex items-center justify-between text-sm text-muted-foreground/70">
                 <span className="font-medium">@{item.user?.username || item.user?.name || 'unknown'}</span>
-                <span>2d ago</span>
+                <span>{item.createdAt ? formatRelativeTime(item.createdAt) : '2d ago'}</span>
                 <span>{item.likes?.toLocaleString() || 0} likes</span>
               </div>
             </div>

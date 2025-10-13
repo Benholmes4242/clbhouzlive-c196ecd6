@@ -10,6 +10,7 @@ export interface ExploreContentItem {
   duration?: string;
   durationSeconds?: number; // Numeric duration for filtering (temporary until DB field added)
   thumbnailSrc?: string;
+  createdAt?: string | Date; // Date the content was posted
   user?: {
     id: string;
     name: string;
