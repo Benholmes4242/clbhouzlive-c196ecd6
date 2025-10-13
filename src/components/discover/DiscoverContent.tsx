@@ -142,7 +142,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Track rendered video count for pagination cadence
   useEffect(() => {
     if (main === 'videos' && duration === 'all' && currentContent) {
-      setRenderedVideoCount(prev => prev + currentContent.length);
+      setRenderedVideoCount(currentContent.length);
     } else {
       setRenderedVideoCount(0);
     }
