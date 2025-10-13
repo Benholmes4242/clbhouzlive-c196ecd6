@@ -14,6 +14,11 @@ import { CreatorHighlight } from '@/hooks/useCreatorHighlights';
 import ShortsSuggestedProfiles from '@/components/shorts/ShortsSuggestedProfiles';
 import { getDurationFilter } from '@/constants/videoFilters';
 import type { LengthKey } from '@/components/videos/VideoChipRail';
+import { useChannelSuggestions } from '@/hooks/useChannelSuggestions';
+import { buildInterleavedFeed, FeedItem } from '@/utils/interleaveFeed';
+import { ChannelSuggestionCard } from '@/components/discover/ChannelSuggestionCard';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import VideoExploreCard from '@/components/discover/VideoExploreCard';
 
 interface DiscoverContentProps {
   onLike: (contentId: string) => void;
@@ -60,6 +65,11 @@ function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): 
 export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery, selectedTags = [] }: DiscoverContentProps) {
   const { main, sub, duration } = useDiscoverQuery();
   const [currentContent, setCurrentContent] = useState<ExploreContentItem[] | null>(null);
+  const [renderedVideoCount, setRenderedVideoCount] = useState(0);
+  const scrollSentinelRef = React.useRef<HTMLDivElement>(null);
+  
+  // Channel suggestions hook for "All" tab interleaving
+  const { next: nextSuggestion } = useChannelSuggestions();
   
   // Detect Shorts mode for compact view
   const isShorts = duration === 'shorts';
@@ -121,6 +131,43 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Chip order for slide animation
   const CHIP_ORDER = ['all', 'shorts', 'under4', '4to20', 'over20'] as const;
 
+  // Build interleaved feed for "All" tab
+  const interleavedFeed = React.useMemo(() => {
+    if (main === 'videos' && duration === 'all' && currentContent) {
+      return buildInterleavedFeed(currentContent, nextSuggestion, renderedVideoCount);
+    }
+    return null;
+  }, [main, duration, currentContent, nextSuggestion, renderedVideoCount]);
+
+  // Track rendered video count for pagination cadence
+  useEffect(() => {
+    if (main === 'videos' && duration === 'all' && currentContent) {
+      setRenderedVideoCount(prev => prev + currentContent.length);
+    } else {
+      setRenderedVideoCount(0);
+    }
+  }, [main, duration, currentContent]);
+
+  // Infinite scroll observer for "All" tab
+  useEffect(() => {
+    if (main !== 'videos' || duration !== 'all' || !scrollSentinelRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          loadMore();
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(scrollSentinelRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [main, duration, hasMore, loading, loadMore]);
+
   // Use VideosGrid for Videos tab, PhotosGrid for Photos tab, ExploreGrid for everything else
   if (main === 'videos') {
     return (
@@ -130,15 +177,58 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
       >
         {(key: LengthKey) => {
           const itemsForKey = currentContent || [];
-          return key === 'shorts' ? (
-            <ShortsGrid 
-              items={itemsForKey} 
-              onOpen={onMediaClick}
-              isLoading={loading}
-              hasMore={hasMore}
-              onLoadMore={loadMore}
-            />
-          ) : (
+          
+          // Shorts view
+          if (key === 'shorts') {
+            return (
+              <ShortsGrid 
+                items={itemsForKey} 
+                onOpen={onMediaClick}
+                isLoading={loading}
+                hasMore={hasMore}
+                onLoadMore={loadMore}
+              />
+            );
+          }
+          
+          // "All" tab with interleaved channel suggestions
+          if (key === 'all' && interleavedFeed) {
+            return (
+              <>
+                <div className="grid grid-cols-2 gap-2 px-2">
+                  {interleavedFeed.map((item: FeedItem) => 
+                    item.kind === 'video' ? (
+                      <VideoExploreCard
+                        key={`v_${item.id}`}
+                        item={item.data}
+                        onMediaClick={onMediaClick}
+                      />
+                    ) : (
+                      <ChannelSuggestionCard
+                        key={item.id}
+                        suggestion={item.data}
+                        onImpression={() => analyticsEvents.track('channel_suggestion_impression', { id: item.data.id })}
+                        onClick={() => analyticsEvents.track('channel_suggestion_click', { id: item.data.id })}
+                        className="col-span-2 my-1"
+                      />
+                    )
+                  )}
+                </div>
+                
+                {/* Load more sentinel */}
+                <div ref={scrollSentinelRef} className="h-4 mt-4">
+                  {loading && hasMore && (
+                    <div className="flex justify-center py-4">
+                      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  )}
+                </div>
+              </>
+            );
+          }
+          
+          // Other duration filters (under4, 4to20, over20)
+          return (
             <VideosGrid
               content={itemsForKey}
               onMediaClick={onMediaClick}
