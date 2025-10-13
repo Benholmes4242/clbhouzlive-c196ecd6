@@ -134,19 +134,17 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Build interleaved feed for "All" tab
   const interleavedFeed = React.useMemo(() => {
     if (main === 'videos' && duration === 'all' && currentContent) {
-      return buildInterleavedFeed(currentContent, nextSuggestion, renderedVideoCount);
+      const feed = buildInterleavedFeed(currentContent, nextSuggestion, 0);
+      console.debug('[Interleave] items:', currentContent?.length, 'offset:', 0, 'sampleKinds:', feed?.slice(0, 12).map(i => i.kind));
+      return feed;
     }
     return null;
-  }, [main, duration, currentContent, nextSuggestion, renderedVideoCount]);
+  }, [main, duration, currentContent, nextSuggestion]);
 
-  // Track rendered video count for pagination cadence
+  // Reset rendered video count when switching tabs
   useEffect(() => {
-    if (main === 'videos' && duration === 'all' && currentContent) {
-      setRenderedVideoCount(prev => prev + currentContent.length);
-    } else {
-      setRenderedVideoCount(0);
-    }
-  }, [main, duration, currentContent]);
+    setRenderedVideoCount(0);
+  }, [main, duration]);
 
   // Infinite scroll observer for "All" tab
   useEffect(() => {
