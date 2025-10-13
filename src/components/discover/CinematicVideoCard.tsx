@@ -65,12 +65,12 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
     } else if (seconds < 3600) {
       const mins = Math.floor(seconds / 60);
       const secs = seconds % 60;
-      return `${mins},${secs.toString().padStart(2, '0')}`;
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
     } else {
       const hours = Math.floor(seconds / 3600);
       const mins = Math.floor((seconds % 3600) / 60);
       const secs = seconds % 60;
-      return `${hours},${mins.toString().padStart(2, '0')},${secs.toString().padStart(2, '0')}`;
+      return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
   };
 
@@ -118,9 +118,9 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           aria-label={isMuted ? 'Unmute video' : 'Mute video'}
         >
           {isMuted ? (
-            <VolumeX className="w-4 h-4 text-black/90" />
+            <VolumeX className="w-5 h-5 text-black/90" />
           ) : (
-            <Volume2 className="w-4 h-4 text-black/90" />
+            <Volume2 className="w-5 h-5 text-black/90" />
           )}
         </button>
       </div>
