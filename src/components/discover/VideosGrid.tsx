@@ -72,15 +72,15 @@ const VideosGrid: React.FC<VideosGridProps> = ({
 
   return (
     <>
-      {/* Cinematic grid - 2 columns mobile, 3 columns desktop */}
-      <div className="grid grid-cols-2 md:grid-cols-3" style={{ rowGap: '18px', columnGap: '2px' }}>
+      {/* Cinematic grid - 1 column mobile (edge-to-edge), 3 columns desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-3" style={{ rowGap: '18px', columnGap: '2px' }}>
         {itemsToRender.map((item) => {
           if (item.kind === 'channel_suggestion') {
             return (
               <ChannelSuggestionCard
                 key={item.id}
                 suggestion={item.data as ChannelSuggestion}
-                className="col-span-2 md:col-span-3 my-2"
+                className="col-span-1 md:col-span-3 my-2"
               />
             );
           }
