@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import VideoExploreCard from './VideoExploreCard';
+import CinematicVideoCard from './CinematicVideoCard';
 import { ExploreContentItem } from '@/components/explore/types';
 import { InterleavedItem } from '@/utils/interleaveFeed';
 import { ChannelSuggestionCard } from './ChannelSuggestionCard';
@@ -70,31 +71,59 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     );
   }
 
+  // Check if we're in "All" tab (no duration filter or "all" duration)
+  const isCinematicMode = activeTab === 'all' || activeTab === '';
+
   return (
     <>
-      {/* Cinematic grid - 2 columns mobile, 3 columns desktop */}
-      <div className="grid grid-cols-2 md:grid-cols-3" style={{ rowGap: '18px', columnGap: '2px' }}>
-        {itemsToRender.map((item) => {
-          if (item.kind === 'channel_suggestion') {
+      {isCinematicMode ? (
+        // Cinematic single-column edge-to-edge layout for "All" tab
+        <div className="flex flex-col">
+          {itemsToRender.map((item) => {
+            if (item.kind === 'channel_suggestion') {
+              return (
+                <ChannelSuggestionCard
+                  key={item.id}
+                  suggestion={item.data as ChannelSuggestion}
+                  className="w-full my-2"
+                />
+              );
+            }
+            
             return (
-              <ChannelSuggestionCard
-                key={item.id}
-                suggestion={item.data as ChannelSuggestion}
-                className="col-span-2 md:col-span-3 my-2"
+              <CinematicVideoCard
+                key={`${activeTab}-${item.id}`}
+                item={item.data as ExploreContentItem}
+                onMediaClick={onMediaClick}
               />
             );
-          }
-          
-          return (
-            <VideoExploreCard
-              key={`${activeTab}-${item.id}`}
-              item={item.data as ExploreContentItem}
-              onMediaClick={onMediaClick}
-              compact={isShorts}
-            />
-          );
-        })}
-      </div>
+          })}
+        </div>
+      ) : (
+        // Original grid layout for other tabs (Shorts, Under 4 mins, etc.)
+        <div className="grid grid-cols-2 md:grid-cols-3" style={{ rowGap: '18px', columnGap: '2px' }}>
+          {itemsToRender.map((item) => {
+            if (item.kind === 'channel_suggestion') {
+              return (
+                <ChannelSuggestionCard
+                  key={item.id}
+                  suggestion={item.data as ChannelSuggestion}
+                  className="col-span-2 md:col-span-3 my-2"
+                />
+              );
+            }
+            
+            return (
+              <VideoExploreCard
+                key={`${activeTab}-${item.id}`}
+                item={item.data as ExploreContentItem}
+                onMediaClick={onMediaClick}
+                compact={isShorts}
+              />
+            );
+          })}
+        </div>
+      )}
 
       {/* Infinite scroll sentinel */}
       <div id="videos-scroll-sentinel" className="h-4 mt-8">
