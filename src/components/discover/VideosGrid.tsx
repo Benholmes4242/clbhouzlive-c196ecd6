@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 import VideoExploreCard from './VideoExploreCard';
 import { ExploreContentItem } from '@/components/explore/types';
+import { InterleavedItem } from '@/utils/interleaveFeed';
+import { ChannelSuggestionCard } from './ChannelSuggestionCard';
+import { ChannelSuggestion } from '@/hooks/useChannelSuggestions';
 
 interface VideosGridProps {
   content: ExploreContentItem[];
@@ -10,6 +13,7 @@ interface VideosGridProps {
   onLoadMore: () => void;
   isShorts?: boolean;
   activeTab?: string; // For namespacing keys
+  interleavedFeed?: InterleavedItem[] | null; // Optional interleaved feed with suggestions
 }
 
 const VideosGrid: React.FC<VideosGridProps> = ({
@@ -19,7 +23,8 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   hasMore,
   onLoadMore,
   isShorts = false,
-  activeTab = 'all'
+  activeTab = 'all',
+  interleavedFeed = null
 }) => {
   // Intersection observer for infinite scroll
   useEffect(() => {
@@ -44,10 +49,16 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     };
   }, [hasMore, isLoading, onLoadMore]);
 
-  // Filter to only show videos (no duration filtering anymore - that's handled by parent)
-  const filteredVideos = content.filter(item => item.type === 'video');
+  // Use interleaved feed if provided, otherwise filter videos
+  const itemsToRender = interleavedFeed 
+    ? interleavedFeed 
+    : content.filter(item => item.type === 'video').map(video => ({
+        kind: 'video' as const,
+        id: video.id,
+        data: video
+      }));
 
-  if (filteredVideos.length === 0 && !isLoading) {
+  if (itemsToRender.length === 0 && !isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <div className="text-4xl mb-4">🎥</div>
@@ -63,14 +74,26 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     <>
       {/* Cinematic grid - 2 columns mobile, 3 columns desktop */}
       <div className="grid grid-cols-2 md:grid-cols-3" style={{ rowGap: '18px', columnGap: '2px' }}>
-        {filteredVideos.map((item) => (
-          <VideoExploreCard
-            key={`${activeTab}-${item.id}`}
-            item={item}
-            onMediaClick={onMediaClick}
-            compact={isShorts}
-          />
-        ))}
+        {itemsToRender.map((item) => {
+          if (item.kind === 'channel_suggestion') {
+            return (
+              <ChannelSuggestionCard
+                key={item.id}
+                suggestion={item.data as ChannelSuggestion}
+                className="col-span-2 md:col-span-3 my-2"
+              />
+            );
+          }
+          
+          return (
+            <VideoExploreCard
+              key={`${activeTab}-${item.id}`}
+              item={item.data as ExploreContentItem}
+              onMediaClick={onMediaClick}
+              compact={isShorts}
+            />
+          );
+        })}
       </div>
 
       {/* Infinite scroll sentinel */}

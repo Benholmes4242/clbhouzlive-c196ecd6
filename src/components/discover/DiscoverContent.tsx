@@ -14,6 +14,8 @@ import { CreatorHighlight } from '@/hooks/useCreatorHighlights';
 import ShortsSuggestedProfiles from '@/components/shorts/ShortsSuggestedProfiles';
 import { getDurationFilter } from '@/constants/videoFilters';
 import type { LengthKey } from '@/components/videos/VideoChipRail';
+import { useChannelSuggestions } from '@/hooks/useChannelSuggestions';
+import { buildInterleavedFeed, InterleavedItem } from '@/utils/interleaveFeed';
 
 interface DiscoverContentProps {
   onLike: (contentId: string) => void;
@@ -60,6 +62,10 @@ function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): 
 export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery, selectedTags = [] }: DiscoverContentProps) {
   const { main, sub, duration } = useDiscoverQuery();
   const [currentContent, setCurrentContent] = useState<ExploreContentItem[] | null>(null);
+  const [renderedVideoCount, setRenderedVideoCount] = useState(0);
+  
+  // Channel suggestions hook
+  const { next: getNextSuggestion } = useChannelSuggestions();
   
   // Detect Shorts mode for compact view
   const isShorts = duration === 'shorts';
@@ -118,6 +124,15 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     // TODO: Implement navigation to creator profile or highlight detail
   };
 
+  // Track rendered video count for interleaving
+  useEffect(() => {
+    if (main === 'videos' && duration === 'all' && currentContent) {
+      setRenderedVideoCount(prev => prev + currentContent.length);
+    } else {
+      setRenderedVideoCount(0);
+    }
+  }, [main, duration, currentContent]);
+
   // Chip order for slide animation
   const CHIP_ORDER = ['all', 'shorts', 'under4', '4to20', 'over20'] as const;
 
@@ -130,6 +145,24 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
       >
         {(key: LengthKey) => {
           const itemsForKey = currentContent || [];
+          
+          // Build interleaved feed for "All" tab only
+          let interleavedFeed: InterleavedItem[] | null = null;
+          if (key === 'all') {
+            interleavedFeed = buildInterleavedFeed(
+              itemsForKey,
+              getNextSuggestion,
+              renderedVideoCount
+            );
+            
+            // Debug log
+            if (import.meta.env.DEV) {
+              console.debug('[Interleave] items:', itemsForKey.length,
+                'offset:', renderedVideoCount,
+                'sampleKinds:', interleavedFeed?.slice(0, 12).map(i => i.kind));
+            }
+          }
+          
           return key === 'shorts' ? (
             <ShortsGrid 
               items={itemsForKey} 
@@ -147,6 +180,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
               onLoadMore={loadMore}
               isShorts={false}
               activeTab={duration}
+              interleavedFeed={key === 'all' ? interleavedFeed : undefined}
             />
           );
         }}
