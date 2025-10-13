@@ -147,6 +147,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
               </p>
               <div className="flex items-center justify-between text-sm text-muted-foreground/70">
                 <span className="font-medium">@{item.user?.username || item.user?.name || 'unknown'}</span>
+                <span>2d ago</span>
                 <span>{item.likes?.toLocaleString() || 0} likes</span>
               </div>
             </div>
