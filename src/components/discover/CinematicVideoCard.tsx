@@ -91,7 +91,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
         />
         
         {/* Progress Bar */}
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-black/30 z-10">
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/15 z-10">
           <div 
             ref={setProgressFillRef}
             className="h-full bg-white/85 origin-left will-change-transform"
@@ -104,17 +104,17 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
         </div>
 
         {/* Optional gradient lift for contrast */}
-        <div className="absolute inset-x-0 bottom-0 h-24 z-[15] pointer-events-none bg-gradient-to-t from-black/30 via-black/10 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-24 z-[15] pointer-events-none bg-gradient-to-t from-black/25 via-black/10 to-transparent" />
 
-        {/* On-video dark-glass content overlay */}
+        {/* On-video dark-glass content overlay (FULL WIDTH) */}
         <div
           className={`
             absolute left-0 right-0 bottom-[10px] z-20
-            mx-3
-            rounded-xl border border-white/10
+            rounded-none
+            border-t border-white/10
             bg-black/55 backdrop-blur-md
             px-4 py-3
-            shadow-[0_2px_12px_rgba(0,0,0,0.30)]
+            shadow-[0_-6px_16px_rgba(0,0,0,0.22)]
             transition-all duration-250
             will-change-transform will-change-opacity
             pointer-events-none
@@ -136,29 +136,29 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           </div>
         </div>
 
-        {/* Duration Badge - Bottom Left */}
+        {/* Duration Badge - TOP LEFT */}
         {duration > 0 && (
           <time 
-            className="absolute bottom-3 left-3 rounded-md px-2 py-0.5 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-xs font-medium shadow-sm z-30"
+            className="absolute top-3 left-3 rounded-md px-2.5 py-1 bg-black/60 backdrop-blur-md border border-white/15 text-white text-[13px] font-medium z-30 pointer-events-none"
             aria-label={`Duration ${formatDuration(duration)}`}
           >
             {formatDuration(duration)}
           </time>
         )}
         
-        {/* Mute/Unmute Button - Bottom Right */}
+        {/* Mute/Unmute Button - TOP RIGHT */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             toggleMute();
           }}
-          className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white shadow-sm transition-transform active:scale-95 z-30"
+          className="absolute top-3 right-3 h-9 w-9 rounded-full bg-black/60 backdrop-blur-md border border-white/15 flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform active:scale-95 z-30"
           aria-label={isMuted ? 'Unmute video' : 'Mute video'}
         >
           {isMuted ? (
-            <VolumeX className="w-4 h-4" />
+            <VolumeX size={18} />
           ) : (
-            <Volume2 className="w-4 h-4" />
+            <Volume2 size={18} />
           )}
         </button>
       </div>
