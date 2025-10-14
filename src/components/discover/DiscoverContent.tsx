@@ -179,7 +179,6 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
               isShorts={false}
               activeTab={duration}
               interleavedFeed={key === 'all' ? interleavedFeed : undefined}
-              layout={key === 'all' ? 'golfStories' : 'cinematic'}
             />
           );
         }}
