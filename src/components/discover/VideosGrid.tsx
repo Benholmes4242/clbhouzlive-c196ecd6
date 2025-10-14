@@ -77,14 +77,8 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   return (
     <>
       {isCinematicMode ? (
-        // Cinematic scroll-snap vertical layout
-        <div 
-          className="flex flex-col snap-y snap-mandatory overflow-y-auto"
-          style={{
-            scrollBehavior: 'smooth',
-            height: '100vh'
-          }}
-        >
+        // Cinematic single-column edge-to-edge layout
+        <div className="flex flex-col">
           {itemsToRender.map((item) => {
             if (item.kind === 'channel_suggestion') {
               return (
