@@ -90,84 +90,58 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           src={videoUrl}
           poster={thumbnailUrl}
           playsInline
-          className="w-full h-full object-cover"
+          className={clsx(
+            "absolute inset-0 h-full w-full object-cover transition-transform duration-[400ms] ease-out",
+            isInView && isPlaying ? "scale-[1.01]" : "scale-100"
+          )}
+          style={{ willChange: isInView && isPlaying ? 'transform' : 'auto' }}
           onClick={() => onMediaClick?.(item)}
         />
 
-        {/* Subtle gradient for text readability */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/15 via-black/5 to-transparent z-[15]" />
-
-        {/* ON-VIDEO OVERLAY (BOTTOM, FULL-WIDTH, NO GAP) */}
-          <div
-          className={clsx(
-            "absolute bottom-0 left-0 right-0 z-20",
-            "bg-black/25 backdrop-blur-sm",
-            "border-t border-white/10",
-            "px-4 pt-[6px] pb-[6px]",
-            "transition-all duration-200 ease-out overflow-hidden",
-            isExpanded ? "max-h-[50vh]" : "max-h-[68px]"
-          )}
-          onClick={toggleExpanded}
-          onKeyDown={(e) => e.key === 'Enter' && toggleExpanded()}
-          role="button"
-          tabIndex={0}
-          aria-expanded={isExpanded}
-          aria-label="Video details"
+        {/* Progress bar (full-width, at glass top edge) */}
+        <div 
+          className="absolute left-0 right-0 bottom-14 h-0.5 bg-white/18 rounded-full overflow-hidden z-20"
+          role="progressbar"
+          aria-valuenow={Math.round(progress)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Video playback progress"
         >
-          {/* FULL-WIDTH progress bar at top edge of overlay */}
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/15">
-            <div
-              ref={setProgressFillRef}
-              className="h-full origin-left bg-white/85"
-              style={{ transform: 'scaleX(0)' }}
-              aria-hidden="true"
-            />
-          </div>
-
-          {/* Caption (one line) */}
-          <h3
-            className={clsx(
-              "text-white text-[17px] font-semibold leading-tight",
-              isExpanded ? "line-clamp-none" : "line-clamp-1"
-            )}
-          >
-            {item.title || 'No caption'}
-          </h3>
-
-          {/* Meta row: left = handle, center = date, right = likes */}
           <div
-            className="
-              mt-1 grid grid-cols-[auto_1fr_auto] items-center
-              text-[13px] text-white/85
-              whitespace-nowrap select-none
-            "
-          >
-            {/* Handle (truncate if long) */}
-            <span className="truncate max-w-[46vw] shrink-0">
-              @{item.user?.username || item.user?.name || 'unknown'}
-            </span>
+            ref={setProgressFillRef}
+            className="absolute left-0 top-0 h-full bg-white/90 rounded-full origin-left"
+            style={{ transform: 'scaleX(0)' }}
+          />
+        </div>
 
-            {/* Centered date */}
-            <span className="justify-self-center text-white/70 tabular-nums">
-              {item.createdAt ? formatRelativeTime(item.createdAt) : '2 days ago'}
-            </span>
-
-            {/* Likes on the right (never wraps) */}
-            <span className="justify-self-end shrink-0 tabular-nums">
-              {formatLikes(item.likes || 0)} likes
-            </span>
+        {/* Glass strip overlay */}
+        <div className="absolute inset-x-0 bottom-0 h-14 bg-[linear-gradient(180deg,rgba(18,18,18,0.08)_0%,rgba(18,18,18,0.32)_100%)] backdrop-blur-[6px] z-20">
+          <div className="absolute inset-x-0 top-0 h-px bg-white/12" />
+          <div className="h-full px-4 flex items-center justify-between gap-3">
+            <h3 className="min-w-0 truncate text-[17px] leading-[22px] font-semibold tracking-[-0.01em] text-white">
+              {item.title || 'No caption'}
+            </h3>
+            <div className="flex items-center gap-2 text-[13px] leading-[18px] shrink-0">
+              <span className="text-white/85 truncate max-w-[120px]">
+                @{item.user?.username || item.user?.name || 'unknown'}
+              </span>
+              <span className="text-white/70">•</span>
+              <span className="text-white/70 whitespace-nowrap">
+                {item.createdAt ? formatRelativeTime(item.createdAt) : '2 days ago'}
+              </span>
+              <span className="text-white/70">•</span>
+              <span className="text-white/85 tabular-nums whitespace-nowrap">
+                {formatLikes(item.likes || 0)} likes
+              </span>
+            </div>
           </div>
-
-          {/* Optional: extra gradient on expand */}
-          {isExpanded && (
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 -z-10 bg-gradient-to-t from-black/40 to-transparent" />
-          )}
         </div>
 
         {/* Duration Badge - TOP LEFT */}
         {duration > 0 && (
           <time 
-            className="absolute top-3 left-3 rounded-md px-2.5 py-1 bg-black/25 backdrop-blur-sm border border-white/10 text-white text-[13px] font-medium z-30 pointer-events-none"
+            className="absolute top-3 left-3 rounded-[10px] px-2.5 h-6 inline-flex items-center bg-neutral-950/45 backdrop-blur-[6px] border border-white/14 text-white text-[12px] leading-[16px] font-medium shadow-[0_1px_1px_rgba(0,0,0,0.25)] z-30 pointer-events-none"
+            dateTime={`PT${duration}S`}
             aria-label={`Duration ${formatDuration(duration)}`}
           >
             {formatDuration(duration)}
@@ -180,7 +154,8 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             e.stopPropagation();
             toggleMute();
           }}
-          className="absolute top-3 right-3 h-9 w-9 rounded-full bg-black/25 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform active:scale-95 z-30"
+          className="absolute top-3 right-3 h-9 w-9 rounded-full bg-neutral-950/45 backdrop-blur-[6px] border border-white/14 flex items-center justify-center text-white/90 shadow-[0_1px_1px_rgba(0,0,0,0.25)] transition-transform active:scale-95 z-30 after:content-[''] after:absolute after:-inset-2"
+          aria-pressed={isMuted ? 'true' : 'false'}
           aria-label={isMuted ? 'Unmute video' : 'Mute video'}
         >
           {isMuted ? (
