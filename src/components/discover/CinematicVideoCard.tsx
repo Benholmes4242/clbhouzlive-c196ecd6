@@ -134,15 +134,20 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             {item.title || 'No caption'}
           </h3>
 
-          {/* Meta row: handle, date, likes on same line */}
-          <div className="mt-1 flex items-center gap-3 text-white/85 text-[13px]">
+          {/* Meta row: handle left, date centered, likes right */}
+          <div className="mt-1 grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-white/85 text-[13px]">
+            {/* Left: handle */}
             <div className="truncate">
               @{item.user?.username || item.user?.name || 'unknown'}
             </div>
-            <div className="text-white/70">
+
+            {/* Middle: date — centered */}
+            <div className="justify-self-center text-white/70">
               {item.createdAt ? formatRelativeTime(item.createdAt) : '2 days ago'}
             </div>
-            <div className="ml-auto whitespace-nowrap">
+
+            {/* Right: likes — right-aligned */}
+            <div className="justify-self-end">
               {formatLikes(item.likes || 0)} likes
             </div>
           </div>
