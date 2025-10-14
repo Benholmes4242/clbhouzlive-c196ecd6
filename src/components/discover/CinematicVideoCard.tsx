@@ -127,7 +127,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           {/* Title/Caption */}
           <h3
             className={clsx(
-              "font-semibold text-white text-lg leading-snug",
+              "font-normal text-white text-lg leading-snug",
               isExpanded ? "line-clamp-none" : "line-clamp-1"
             )}
           >
