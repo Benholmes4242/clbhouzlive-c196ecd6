@@ -3,8 +3,10 @@ import { ExploreContentItem } from '@/components/explore/types';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
+import { useAmbientGlow } from '@/hooks/useAmbientGlow';
 import { Volume2, VolumeX } from 'lucide-react';
 import { formatRelativeTime } from '@/utils/dateFormat';
+import '@/styles/dark-glass.css';
 
 interface CinematicVideoCardProps {
   item: ExploreContentItem;
@@ -21,6 +23,11 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
   const [isScrollIdle, setIsScrollIdle] = useState(false);
   const [intersectionRatio, setIntersectionRatio] = useState(0);
   const { progress, setProgressFillRef } = useVideoProgressSync(videoRef.current);
+  const { applyToElement } = useAmbientGlow({
+    videoElement: videoRef.current,
+    isActive: isInView,
+    interval: 700
+  });
   const scrollIdleTimer = useRef<NodeJS.Timeout>();
 
   // Auto-play when in view
@@ -50,7 +57,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
     }
   }, [isMuted]);
 
-  // Parallax motion effect with IntersectionObserver
+  // Parallax motion effect with IntersectionObserver - refined timing
   useEffect(() => {
     const card = cardRef.current;
     if (!card) return;
@@ -59,14 +66,19 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
       ([entry]) => {
         setIntersectionRatio(entry.intersectionRatio);
         
-        // Apply parallax transform when in view
+        // Apply ambient glow to card
+        applyToElement(card);
+        
+        // Apply parallax transform when in view with refined easing
         if (entry.intersectionRatio >= 0.6) {
-          card.style.transform = 'translateY(0) scale(1.02)';
+          card.style.transition = 'transform 380ms cubic-bezier(0.22, 0.61, 0.36, 1), opacity 300ms ease, filter 300ms ease';
+          card.style.transform = 'translateY(0) scale(1.015)';
           card.style.opacity = '1';
           card.style.filter = 'blur(0)';
         } else if (entry.intersectionRatio > 0) {
-          card.style.opacity = '0.8';
-          card.style.filter = 'blur(1.5px)';
+          card.style.transition = 'transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1), opacity 240ms ease, filter 240ms ease';
+          card.style.opacity = '0.85';
+          card.style.filter = 'blur(1.2px)';
           card.style.transform = 'scale(1)';
         }
       },
@@ -78,7 +90,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
 
     observer.observe(card);
     return () => observer.disconnect();
-  }, []);
+  }, [applyToElement]);
 
   // Auto-zoom on scroll idle
   useEffect(() => {
@@ -103,13 +115,16 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
     };
   }, [isInView]);
 
-  // Apply zoom when scroll is idle
+  // Apply zoom when scroll is idle - refined scale
   useEffect(() => {
     const card = cardRef.current;
     if (!card) return;
 
     if (isScrollIdle && intersectionRatio >= 0.6) {
+      card.style.transition = 'transform 500ms ease-out';
       card.style.transform = 'translateY(0) scale(1.02)';
+    } else if (intersectionRatio >= 0.6) {
+      card.style.transform = 'translateY(0) scale(1.015)';
     }
   }, [isScrollIdle, intersectionRatio]);
 
@@ -149,12 +164,15 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
       ref={(node) => {
         containerRef.current = node;
         cardRef.current = node;
+        applyToElement(node);
       }}
-      className="w-full h-[90vh] snap-start relative overflow-hidden"
+      className="w-full h-[90vh] snap-start relative overflow-hidden ambient-glow"
       style={{
-        transition: 'transform 0.4s ease-out, filter 0.4s ease-out, opacity 0.4s ease-out',
         willChange: 'transform, filter, opacity'
       }}
+      role="article"
+      aria-live="polite"
+      aria-label={`Video in focus: ${item.title} by @${item.user?.username || item.user?.name || 'unknown'}`}
     >
       {/* Video Container */}
       <div className="relative w-full h-full">
@@ -169,21 +187,22 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
         />
           
         {/* Progress Bar */}
-        <div className="absolute left-0 right-0 bottom-0 h-[2px] bg-black/30 z-20">
+        <div className="absolute left-0 right-0 bottom-0 progress-track z-20">
           <div 
             ref={setProgressFillRef}
-            className="h-full bg-white/70 origin-left will-change-transform"
+            className="progress-fill"
             style={{ transform: 'scaleX(0)' }}
-            aria-valuenow={progress}
+            aria-valuenow={Math.round(progress)}
             aria-valuemin={0}
             aria-valuemax={100}
             role="progressbar"
+            aria-label={`Video progress: ${Math.round(progress)}%`}
           />
         </div>
 
         {/* Glass Caption Overlay - Bottom Left */}
         <div className="absolute bottom-0 left-0 right-0 px-5 pb-6 text-white z-10 pointer-events-none">
-          <div className="backdrop-blur-md bg-black/30 rounded-2xl p-3">
+          <div className="glass-caption">
             <p className="font-semibold text-lg leading-tight line-clamp-2 mb-1">
               {item.title || 'No caption'}
             </p>
@@ -200,7 +219,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
         {/* Duration Badge - Above Caption */}
         {duration > 0 && (
           <time 
-            className="absolute bottom-24 left-5 rounded-md px-2 py-1 bg-black/40 backdrop-blur-sm border border-white/10 text-white text-sm font-medium z-10"
+            className="glass-capsule absolute bottom-24 left-5 z-10"
             aria-label={`Duration ${formatDuration(duration)}`}
           >
             {formatDuration(duration)}
@@ -213,8 +232,9 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             e.stopPropagation();
             toggleMute();
           }}
-          className="absolute bottom-6 right-5 w-8 h-8 rounded-full bg-black/30 backdrop-blur-md border border-white/10 flex items-center justify-center text-white shadow-sm transition-transform active:scale-95 z-10 pointer-events-auto"
+          className="glass-round absolute bottom-6 right-5 shadow-sm transition-transform active:scale-95 z-10 pointer-events-auto"
           aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+          aria-pressed={!isMuted}
         >
           {isMuted ? (
             <VolumeX className="w-4 h-4" />
