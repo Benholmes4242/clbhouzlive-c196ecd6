@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useReducer } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
-import ShortsVideoTile from '@/components/shorts/ShortsVideoTile';
-import { getResponsiveCols } from '@/utils/layout';
+import ShortCard from '@/components/shorts/ShortCard';
+import ShortsViewer from '@/components/shorts/ShortsViewer';
 
 interface ShortsGridProps {
   items: ExploreContentItem[];
@@ -14,40 +14,18 @@ interface ShortsGridProps {
 export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMore }: ShortsGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
-  const [cols, setCols] = React.useState(getResponsiveCols());
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
-  // Update cols on resize
-  useEffect(() => {
-    const handler = () => setCols(getResponsiveCols());
-    window.addEventListener('resize', handler);
-    return () => window.removeEventListener('resize', handler);
-  }, []);
+  const handleCardClick = (item: ExploreContentItem, index: number) => {
+    setSelectedIndex(index);
+    setViewerOpen(true);
+    onOpen(item);
+  };
 
-  // Observe visibility for all tiles
-  const inViewMap = useRef<Record<string, boolean>>({});
-  const [, forceUpdate] = useReducer(x => x + 1, 0);
-
-  useEffect(() => {
-    const root = gridRef.current;
-    if (!root) return;
-    
-    const io = new IntersectionObserver(
-      entries => {
-        for (const e of entries) {
-          const id = (e.target as HTMLElement).dataset.id;
-          if (!id) continue;
-          inViewMap.current[id] = e.isIntersecting && e.intersectionRatio >= 0.6;
-        }
-        forceUpdate();
-      },
-      { root: null, threshold: [0, 0.6, 1], rootMargin: '200px 0px' }
-    );
-
-    const nodes = root.querySelectorAll('[data-id]');
-    nodes.forEach(n => io.observe(n));
-
-    return () => io.disconnect();
-  }, [items, cols]);
+  const handleCloseViewer = () => {
+    setViewerOpen(false);
+  };
 
   // Infinite scroll handler
   useEffect(() => {
@@ -73,35 +51,15 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
     <>
       <div
         ref={gridRef}
-        className="grid grid-cols-3 md:grid-cols-4 xl:grid-cols-5 pb-4"
-        style={{ gap: '2px' }}
+        className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 px-3 md:px-4 pb-4"
       >
-        {items.map((item, i) => {
-          const row = Math.floor(i / cols);
-          const col = i % cols;
-
-          // Alternating rule:
-          // odd rows (0-based even): leftmost auto-plays
-          // even rows: rightmost auto-plays
-          const leftmost = col === 0;
-          const rightmost = col === cols - 1;
-          const shouldAutoplay = row % 2 === 0 ? leftmost : rightmost;
-
-          const inView = !!inViewMap.current[item.id];
-
-          return (
-            <div key={item.id} data-id={item.id}>
-              <ShortsVideoTile
-                id={item.id}
-                hlsUrl={item.src}
-                posterUrl={item.thumbnailSrc || item.src}
-                shouldAutoplay={shouldAutoplay}
-                inView={inView}
-                onClick={() => onOpen(item)}
-              />
-            </div>
-          );
-        })}
+        {items.map((item, index) => (
+          <ShortCard
+            key={item.id}
+            item={item}
+            onClick={() => handleCardClick(item, index)}
+          />
+        ))}
       </div>
       
       {/* Loading indicator */}
@@ -110,6 +68,14 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
         </div>
       )}
+
+      {/* Full-screen Shorts Viewer */}
+      <ShortsViewer
+        items={items}
+        initialIndex={selectedIndex}
+        isOpen={viewerOpen}
+        onClose={handleCloseViewer}
+      />
     </>
   );
 }
