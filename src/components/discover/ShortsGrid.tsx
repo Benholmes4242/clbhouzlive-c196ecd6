@@ -88,7 +88,7 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
 
   return (
     <>
-      <div ref={gridRef} className="px-4 pb-4">
+      <div ref={gridRef} className="pb-4">
         {/* First Row - Pinned, Same Height */}
         {firstRow.length > 0 && (
           <div className="grid grid-cols-2 gap-2 mb-2">
