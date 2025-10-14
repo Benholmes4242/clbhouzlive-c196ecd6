@@ -124,32 +124,38 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             />
           </div>
 
-          {/* Title/Caption */}
+          {/* Caption (one line) */}
           <h3
             className={clsx(
-              "font-normal text-white text-lg leading-snug",
+              "text-white text-[17px] font-semibold leading-tight",
               isExpanded ? "line-clamp-none" : "line-clamp-1"
             )}
           >
             {item.title || 'No caption'}
           </h3>
 
-          {/* Meta row: handle left, date centered, likes right */}
-          <div className="mt-1 grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-white/85 text-[13px]">
-            {/* Left: handle */}
-            <div className="truncate">
+          {/* Meta row: left = handle, center = date, right = likes */}
+          <div
+            className="
+              mt-1 grid grid-cols-[auto_1fr_auto] items-center
+              text-[13px] text-white/85
+              whitespace-nowrap select-none
+            "
+          >
+            {/* Handle (truncate if long) */}
+            <span className="truncate max-w-[46vw] shrink-0">
               @{item.user?.username || item.user?.name || 'unknown'}
-            </div>
+            </span>
 
-            {/* Middle: date — centered */}
-            <div className="justify-self-center text-white/70">
+            {/* Centered date */}
+            <span className="justify-self-center text-white/70 tabular-nums">
               {item.createdAt ? formatRelativeTime(item.createdAt) : '2 days ago'}
-            </div>
+            </span>
 
-            {/* Right: likes — right-aligned */}
-            <div className="justify-self-end">
+            {/* Likes on the right (never wraps) */}
+            <span className="justify-self-end shrink-0 tabular-nums">
               {formatLikes(item.likes || 0)} likes
-            </div>
+            </span>
           </div>
 
           {/* Optional: extra gradient on expand */}
