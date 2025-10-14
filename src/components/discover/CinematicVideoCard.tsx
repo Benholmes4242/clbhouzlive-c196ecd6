@@ -103,7 +103,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             "absolute bottom-0 left-0 right-0 z-20",
             "bg-black/25 backdrop-blur-sm",
             "border-t border-white/10",
-            "px-4 pt-[6px] pb-[6px]",
+            "px-4 pt-[6px] pb-[8px]",
             "transition-all duration-200 ease-out overflow-hidden",
             isExpanded ? "max-h-[50vh]" : "max-h-[68px]"
           )}
