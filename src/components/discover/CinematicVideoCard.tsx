@@ -94,17 +94,17 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           onClick={() => onMediaClick?.(item)}
         />
 
-        {/* Optional gradient lift for contrast */}
-        <div className="absolute inset-x-0 bottom-0 h-24 z-[15] pointer-events-none bg-gradient-to-t from-black/20 via-black/10 to-transparent" />
+        {/* Subtle gradient for text readability */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/15 via-black/5 to-transparent z-[15]" />
 
         {/* ON-VIDEO OVERLAY (BOTTOM, FULL-WIDTH, NO GAP) */}
           <div
           className={clsx(
             "absolute bottom-0 left-0 right-0 z-20",
-            "bg-black/45 backdrop-blur-md",
+            "bg-black/25 backdrop-blur-sm",
             "border-t border-white/10",
-            "px-4 pt-2 pb-2",
-            "transition-[max-height] duration-200 ease-out overflow-hidden",
+            "px-4 pt-[6px] pb-[6px]",
+            "transition-all duration-200 ease-out overflow-hidden",
             isExpanded ? "max-h-[50vh]" : "max-h-[68px]"
           )}
           onClick={toggleExpanded}
@@ -167,7 +167,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
         {/* Duration Badge - TOP LEFT */}
         {duration > 0 && (
           <time 
-            className="absolute top-3 left-3 rounded-md px-2.5 py-1 bg-black/35 backdrop-blur-md border border-white/10 text-white text-[13px] font-medium z-30 pointer-events-none"
+            className="absolute top-3 left-3 rounded-md px-2.5 py-1 bg-black/25 backdrop-blur-sm border border-white/10 text-white text-[13px] font-medium z-30 pointer-events-none"
             aria-label={`Duration ${formatDuration(duration)}`}
           >
             {formatDuration(duration)}
@@ -180,7 +180,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             e.stopPropagation();
             toggleMute();
           }}
-          className="absolute top-3 right-3 h-9 w-9 rounded-full bg-black/35 backdrop-blur-md border border-white/10 flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform active:scale-95 z-30"
+          className="absolute top-3 right-3 h-9 w-9 rounded-full bg-black/25 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform active:scale-95 z-30"
           aria-label={isMuted ? 'Unmute video' : 'Mute video'}
         >
           {isMuted ? (
