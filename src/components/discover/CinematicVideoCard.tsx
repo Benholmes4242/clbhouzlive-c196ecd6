@@ -14,7 +14,7 @@ interface CinematicVideoCardProps {
 
 const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaClick }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { ref: containerRef, isInView } = useIntersectionObserver({ threshold: 0.5 });
+  const { ref: containerRef, isInView } = useIntersectionObserver({ threshold: 0.4, rootMargin: '0px 0px -10% 0px' });
   const { isMuted, toggleMute } = useExclusiveVideoAudio(item.id);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState<number>(0);
@@ -83,7 +83,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
       {/* Video and Caption Container */}
       <div className="relative overflow-hidden">
         {/* Video (Edge-to-Edge inside card) */}
-        <div className="relative w-full aspect-video overflow-hidden">
+        <div className="relative w-full aspect-[3/2] overflow-hidden">
           <video
             ref={videoRef}
             src={videoUrl}
@@ -109,7 +109,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           {/* Duration Badge - Dark Glass - Bottom Left */}
           {duration > 0 && (
             <time 
-              className="absolute bottom-3 left-3 rounded-md px-2 py-0.5 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-xs font-medium shadow-sm z-10"
+              className="absolute bottom-4 left-4 rounded-md px-2 py-0.5 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-xs font-medium shadow-sm z-10"
               aria-label={`Duration ${formatDuration(duration)}`}
             >
               {formatDuration(duration)}
@@ -122,7 +122,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
               e.stopPropagation();
               toggleMute();
             }}
-            className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white shadow-sm transition-transform active:scale-95 z-10"
+            className="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white shadow-sm transition-transform active:scale-95 z-10"
             aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           >
             {isMuted ? (
