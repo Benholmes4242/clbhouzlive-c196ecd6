@@ -129,20 +129,40 @@ export function useVideoProgressSync(
     }
 
     const handlePlay = () => startSyncLoop();
+    const handlePlaying = () => startSyncLoop();
     const handleCanPlay = () => startSyncLoop();
-    const handlePause = () => stopSyncLoop('paused');
-    const handleWaiting = () => stopSyncLoop('paused');
-    const handleStalled = () => stopSyncLoop('paused');
+    const handlePause = () => {
+      // Only stop if not looping (looped videos should keep the loop running)
+      if (!videoElement.loop) {
+        stopSyncLoop('paused');
+      }
+    };
+    const handleWaiting = () => {
+      // Don't stop on waiting, just let the loop catch up when playing resumes
+    };
+    const handleStalled = () => {
+      // Don't stop on stalled, it will resume
+    };
     const handleVideoEnded = () => {
-      // Force active segment to 1 to avoid visual gaps
+      // Only complete if not looping
+      if (!videoElement.loop) {
+        const segmentCount = segments?.length || totalSegments;
+        setSegmentProgress(Array(segmentCount).fill(1));
+        setProgress(100);
+        stopSyncLoop('completed');
+      }
+    };
+    const handleLoadedMetadata = () => {
+      // Reset to 0 when metadata loads
+      if (progressFillRef.current) {
+        progressFillRef.current.style.transform = 'scaleX(0)';
+      }
+      setProgress(0);
       const segmentCount = segments?.length || totalSegments;
-      setSegmentProgress(Array(segmentCount).fill(1));
-      setProgress(100);
-      stopSyncLoop('completed');
+      setSegmentProgress(Array(segmentCount).fill(0));
     };
     const handleLoadStart = () => {
       // Reset progress on new source load and stop any active sync
-      console.log('[VideoProgressSync] Source changed, resetting progress');
       if (progressFillRef.current) {
         progressFillRef.current.style.transform = 'scaleX(0)';
       }
@@ -152,23 +172,35 @@ export function useVideoProgressSync(
       stopSyncLoop();
       telemetryLoggedRef.current = false;
     };
+    const handleTimeUpdate = () => {
+      // Fallback sync on timeupdate (~4-5fps) to keep in-sync if rAF ever hiccups
+      if (!isActiveRef.current && !videoElement.paused) {
+        calculateProgress();
+      }
+    };
 
     videoElement.addEventListener('play', handlePlay);
+    videoElement.addEventListener('playing', handlePlaying);
     videoElement.addEventListener('canplay', handleCanPlay);
     videoElement.addEventListener('pause', handlePause);
     videoElement.addEventListener('waiting', handleWaiting);
     videoElement.addEventListener('stalled', handleStalled);
     videoElement.addEventListener('ended', handleVideoEnded);
+    videoElement.addEventListener('loadedmetadata', handleLoadedMetadata);
     videoElement.addEventListener('loadstart', handleLoadStart);
+    videoElement.addEventListener('timeupdate', handleTimeUpdate);
 
     return () => {
       videoElement.removeEventListener('play', handlePlay);
+      videoElement.removeEventListener('playing', handlePlaying);
       videoElement.removeEventListener('canplay', handleCanPlay);
       videoElement.removeEventListener('pause', handlePause);
       videoElement.removeEventListener('waiting', handleWaiting);
       videoElement.removeEventListener('stalled', handleStalled);
       videoElement.removeEventListener('ended', handleVideoEnded);
+      videoElement.removeEventListener('loadedmetadata', handleLoadedMetadata);
       videoElement.removeEventListener('loadstart', handleLoadStart);
+      videoElement.removeEventListener('timeupdate', handleTimeUpdate);
       stopSyncLoop();
     };
   }, [videoElement, startSyncLoop, stopSyncLoop, completeProgress]);

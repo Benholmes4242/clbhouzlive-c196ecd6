@@ -103,7 +103,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             "absolute bottom-0 left-0 right-0 z-20",
             "bg-black/60 backdrop-blur-md",
             "border-t border-white/10",
-            "px-4 pt-2 pb-3",
+            "px-4 pt-3 pb-3",
             "transition-[max-height] duration-200 ease-out overflow-hidden",
             isExpanded ? "max-h-[50vh]" : "max-h-[68px]"
           )}
@@ -114,8 +114,8 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           aria-expanded={isExpanded}
           aria-label="Video details"
         >
-          {/* Progress bar (top edge of overlay) */}
-          <div className="relative -mt-2 mb-2 h-[2px] bg-white/15 rounded-none">
+          {/* FULL-WIDTH progress bar at top edge of overlay */}
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/15">
             <div
               ref={setProgressFillRef}
               className="h-full origin-left bg-white/85"
