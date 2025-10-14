@@ -40,3 +40,10 @@ export const formatRelativeTime = (date: Date | string): string => {
   const diffInYears = Math.floor(diffInDays / 365);
   return `${diffInYears} ${diffInYears === 1 ? 'year' : 'years'} ago`;
 };
+
+export const formatLikes = (n: number): string => {
+  if (!n) return '0';
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return `${n}`;
+};

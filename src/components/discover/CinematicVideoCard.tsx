@@ -5,7 +5,7 @@ import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 import { Volume2, VolumeX } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { formatRelativeTime } from '@/utils/dateFormat';
+import { formatRelativeTime, formatLikes } from '@/utils/dateFormat';
 
 interface CinematicVideoCardProps {
   item: ExploreContentItem;
@@ -80,79 +80,87 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
 
   return (
     <div ref={containerRef} className="w-full mb-5">
-      {/* Video and Caption Container */}
-      <div className="relative overflow-hidden">
-        {/* Video (Edge-to-Edge inside card) */}
-        <div className="relative w-full aspect-[3/2] overflow-hidden">
-          <video
-            ref={videoRef}
-            src={videoUrl}
-            poster={thumbnailUrl}
-            playsInline
-            className="w-full h-full object-cover"
-            onClick={() => onMediaClick?.(item)}
+      <div className="relative w-full aspect-[3/2] overflow-hidden">
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          poster={thumbnailUrl}
+          playsInline
+          className="w-full h-full object-cover"
+          onClick={() => onMediaClick?.(item)}
+        />
+        
+        {/* Progress Bar */}
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-black/30 z-10">
+          <div 
+            ref={setProgressFillRef}
+            className="h-full bg-white/85 origin-left will-change-transform"
+            style={{ transform: 'scaleX(0)' }}
+            aria-valuenow={progress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            role="progressbar"
           />
-          
-          {/* Clean Progress Bar */}
-          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-black/30 z-10">
-            <div 
-              ref={setProgressFillRef}
-              className="h-full bg-white/85 origin-left will-change-transform"
-              style={{ transform: 'scaleX(0)' }}
-              aria-valuenow={progress}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              role="progressbar"
-            />
-          </div>
+        </div>
 
-          {/* Duration Badge - Dark Glass - Bottom Left */}
-          {duration > 0 && (
-            <time 
-              className="absolute bottom-4 left-4 rounded-md px-2 py-0.5 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-xs font-medium shadow-sm z-10"
-              aria-label={`Duration ${formatDuration(duration)}`}
-            >
-              {formatDuration(duration)}
-            </time>
-          )}
-          
-          {/* Mute/Unmute Button - Dark Glass - Bottom Right */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleMute();
-            }}
-            className="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white shadow-sm transition-transform active:scale-95 z-10"
-            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+        {/* Optional gradient lift for contrast */}
+        <div className="absolute inset-x-0 bottom-0 h-24 z-[15] pointer-events-none bg-gradient-to-t from-black/30 via-black/10 to-transparent" />
+
+        {/* On-video dark-glass content overlay */}
+        <div
+          className={`
+            absolute left-0 right-0 bottom-[10px] z-20
+            mx-3
+            rounded-xl border border-white/10
+            bg-black/55 backdrop-blur-md
+            px-4 py-3
+            shadow-[0_2px_12px_rgba(0,0,0,0.30)]
+            transition-all duration-250
+            will-change-transform will-change-opacity
+            pointer-events-none
+            ${isInView ? 'opacity-100 translate-y-0' : 'opacity-90 translate-y-[2px]'}
+          `}
+          role="group"
+          aria-label="Video details"
+        >
+          <h3 className="text-white text-lg font-semibold leading-snug line-clamp-2">
+            {item.title || 'No caption'}
+          </h3>
+
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+            <span className="text-white/85">@{item.user?.username || item.user?.name || 'unknown'}</span>
+            <span className="text-white/65">•</span>
+            <span className="text-white/75">{item.createdAt ? formatRelativeTime(item.createdAt) : '2 days ago'}</span>
+            <span className="text-white/65">•</span>
+            <span className="text-white/80">{formatLikes(item.likes || 0)} likes</span>
+          </div>
+        </div>
+
+        {/* Duration Badge - Bottom Left */}
+        {duration > 0 && (
+          <time 
+            className="absolute bottom-3 left-3 rounded-md px-2 py-0.5 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-xs font-medium shadow-sm z-30"
+            aria-label={`Duration ${formatDuration(duration)}`}
           >
-            {isMuted ? (
-              <VolumeX className="w-4 h-4" />
-            ) : (
-              <Volume2 className="w-4 h-4" />
-            )}
-          </button>
-        </div>
-
-        {/* Caption Area */}
-        <div className="relative w-full px-4 py-3">
-          <div className="flex items-start gap-3">
-            <Avatar className="w-10 h-10 flex-shrink-0">
-              <AvatarImage src={item.user?.avatar} alt={item.user?.username || item.user?.name} />
-              <AvatarFallback>{item.user?.name?.[0]?.toUpperCase()}</AvatarFallback>
-            </Avatar>
-            
-            <div className="flex-1 min-w-0">
-              <p className="text-base font-semibold text-foreground line-clamp-2 mb-1">
-                {item.title || 'No caption'}
-              </p>
-              <div className="flex items-center justify-between text-sm text-muted-foreground/70">
-                <span>@{item.user?.username || item.user?.name || 'unknown'}</span>
-                <span>{item.createdAt ? formatRelativeTime(item.createdAt) : '2 days ago'}</span>
-                <span>{item.likes?.toLocaleString() || 0} likes</span>
-              </div>
-            </div>
-          </div>
-        </div>
+            {formatDuration(duration)}
+          </time>
+        )}
+        
+        {/* Mute/Unmute Button - Bottom Right */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleMute();
+          }}
+          className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white shadow-sm transition-transform active:scale-95 z-30"
+          aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+        >
+          {isMuted ? (
+            <VolumeX className="w-4 h-4" />
+          ) : (
+            <Volume2 className="w-4 h-4" />
+          )}
+        </button>
       </div>
     </div>
   );
