@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import VideoExploreCard from './VideoExploreCard';
 import CinematicVideoCard from './CinematicVideoCard';
+import GolfStoriesGrid from './GolfStoriesGrid';
 import { ExploreContentItem } from '@/components/explore/types';
 import { InterleavedItem } from '@/utils/interleaveFeed';
 import { ChannelSuggestionCard } from './ChannelSuggestionCard';
@@ -15,6 +16,7 @@ interface VideosGridProps {
   isShorts?: boolean;
   activeTab?: string; // For namespacing keys
   interleavedFeed?: InterleavedItem[] | null; // Optional interleaved feed with suggestions
+  layout?: 'cinematic' | 'golfStories' | 'grid'; // Layout mode
 }
 
 const VideosGrid: React.FC<VideosGridProps> = ({
@@ -25,7 +27,8 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   onLoadMore,
   isShorts = false,
   activeTab = 'all',
-  interleavedFeed = null
+  interleavedFeed = null,
+  layout = 'cinematic'
 }) => {
   // Intersection observer for infinite scroll
   useEffect(() => {
@@ -71,8 +74,27 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     );
   }
 
-  // Cinematic mode for all video duration tabs
-  const isCinematicMode = true;
+  // Golf Stories layout - dynamic editorial grid
+  if (layout === 'golfStories') {
+    const videoContent = content.filter(item => item.type === 'video');
+    return (
+      <>
+        <GolfStoriesGrid content={videoContent} onMediaClick={onMediaClick} />
+        
+        {/* Infinite scroll sentinel */}
+        <div id="videos-scroll-sentinel" className="h-4 mt-8">
+          {isLoading && hasMore && (
+            <div className="flex justify-center py-4">
+              <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+            </div>
+          )}
+        </div>
+      </>
+    );
+  }
+
+  // Cinematic mode for video duration tabs
+  const isCinematicMode = layout === 'cinematic';
 
   return (
     <>
