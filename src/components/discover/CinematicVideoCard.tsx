@@ -6,6 +6,7 @@ import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 import { Volume2, VolumeX } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatRelativeTime, formatLikes } from '@/utils/dateFormat';
+import { clsx } from 'clsx';
 
 interface CinematicVideoCardProps {
   item: ExploreContentItem;
@@ -18,7 +19,10 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
   const { isMuted, toggleMute } = useExclusiveVideoAudio(item.id);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState<number>(0);
+  const [isExpanded, setIsExpanded] = useState(false);
   const { progress, setProgressFillRef } = useVideoProgressSync(videoRef.current);
+
+  const toggleExpanded = () => setIsExpanded(v => !v);
 
   // Auto-play when in view
   useEffect(() => {
@@ -89,51 +93,69 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           className="w-full h-full object-cover"
           onClick={() => onMediaClick?.(item)}
         />
-        
-        {/* Progress Bar */}
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/15 z-10">
-          <div 
-            ref={setProgressFillRef}
-            className="h-full bg-white/85 origin-left will-change-transform"
-            style={{ transform: 'scaleX(0)' }}
-            aria-valuenow={progress}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            role="progressbar"
-          />
-        </div>
 
         {/* Optional gradient lift for contrast */}
         <div className="absolute inset-x-0 bottom-0 h-24 z-[15] pointer-events-none bg-gradient-to-t from-black/25 via-black/10 to-transparent" />
 
-        {/* On-video dark-glass content overlay (FULL WIDTH) */}
+        {/* ON-VIDEO OVERLAY (BOTTOM, FULL-WIDTH, NO GAP) */}
         <div
-          className={`
-            absolute left-0 right-0 bottom-[10px] z-20
-            rounded-none
-            border-t border-white/10
-            bg-black/55 backdrop-blur-md
-            px-4 py-3
-            shadow-[0_-6px_16px_rgba(0,0,0,0.22)]
-            transition-all duration-250
-            will-change-transform will-change-opacity
-            pointer-events-none
-            ${isInView ? 'opacity-100 translate-y-0' : 'opacity-90 translate-y-[2px]'}
-          `}
-          role="group"
+          className={clsx(
+            "absolute bottom-0 left-0 right-0 z-20",
+            "bg-black/60 backdrop-blur-md",
+            "border-t border-white/10",
+            "px-4 pt-2 pb-3",
+            "transition-[max-height] duration-200 ease-out overflow-hidden",
+            isExpanded ? "max-h-[50vh]" : "max-h-[68px]"
+          )}
+          onClick={toggleExpanded}
+          onKeyDown={(e) => e.key === 'Enter' && toggleExpanded()}
+          role="button"
+          tabIndex={0}
+          aria-expanded={isExpanded}
           aria-label="Video details"
         >
-          <h3 className="text-white text-lg font-semibold leading-snug line-clamp-2">
+          {/* Progress bar (top edge of overlay) */}
+          <div className="relative -mt-2 mb-2 h-[2px] bg-white/15 rounded-none">
+            <div
+              ref={setProgressFillRef}
+              className="h-full origin-left bg-white/85"
+              style={{ transform: 'scaleX(0)' }}
+              aria-hidden="true"
+            />
+          </div>
+
+          {/* Title/Caption */}
+          <h3
+            className={clsx(
+              "font-semibold text-white text-lg leading-snug",
+              isExpanded ? "line-clamp-none" : "line-clamp-1"
+            )}
+          >
             {item.title || 'No caption'}
           </h3>
 
-          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-            <span className="text-white/85">@{item.user?.username || item.user?.name || 'unknown'}</span>
-            <span className="text-white/65">•</span>
-            <span className="text-white/75">{item.createdAt ? formatRelativeTime(item.createdAt) : '2 days ago'}</span>
-            <span className="text-white/65">•</span>
-            <span className="text-white/80">{formatLikes(item.likes || 0)} likes</span>
+          {/* Meta row: handle left, date centered, likes right */}
+          <div className="mt-1 grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-white/85 text-[13px]">
+            {/* Left: handle */}
+            <div className="truncate">
+              @{item.user?.username || item.user?.name || 'unknown'}
+            </div>
+
+            {/* Middle: date — centered */}
+            <div className="justify-self-center text-white/70">
+              {item.createdAt ? formatRelativeTime(item.createdAt) : '2 days ago'}
+            </div>
+
+            {/* Right: likes — right-aligned */}
+            <div className="justify-self-end">
+              {formatLikes(item.likes || 0)} likes
+            </div>
           </div>
+
+          {/* Optional: extra gradient on expand */}
+          {isExpanded && (
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 -z-10 bg-gradient-to-t from-black/40 to-transparent" />
+          )}
         </div>
 
         {/* Duration Badge - TOP LEFT */}
