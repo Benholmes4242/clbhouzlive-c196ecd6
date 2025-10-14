@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import ShortCard from '@/components/shorts/ShortCard';
 import ShortsViewer from '@/components/shorts/ShortsViewer';
@@ -10,6 +10,13 @@ interface ShortsGridProps {
   hasMore?: boolean;
   onLoadMore?: () => void;
 }
+
+// Deterministic height variance based on item ID
+const getHeightVariant = (id: string): number => {
+  const variants = [-10, -6, -3, 3, 6, 10]; // percentage variants
+  const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return variants[hash % variants.length];
+};
 
 export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMore }: ShortsGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
@@ -26,6 +33,37 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
   const handleCloseViewer = () => {
     setViewerOpen(false);
   };
+
+  // Masonry layout: first 2 items in a row, rest balanced between 2 columns
+  const { firstRow, leftColumn, rightColumn } = useMemo(() => {
+    if (items.length === 0) return { firstRow: [], leftColumn: [], rightColumn: [] };
+    
+    const firstRow = items.slice(0, 2);
+    const remaining = items.slice(2);
+    
+    const leftCol: Array<{ item: ExploreContentItem; index: number }> = [];
+    const rightCol: Array<{ item: ExploreContentItem; index: number }> = [];
+    
+    let leftHeight = 0;
+    let rightHeight = 0;
+    const baseHeight = 280;
+    
+    remaining.forEach((item, idx) => {
+      const actualIndex = idx + 2; // offset by first row
+      const variant = getHeightVariant(item.id);
+      const cardHeight = baseHeight * (1 + variant / 100);
+      
+      if (leftHeight <= rightHeight) {
+        leftCol.push({ item, index: actualIndex });
+        leftHeight += cardHeight + 8; // 8px gap
+      } else {
+        rightCol.push({ item, index: actualIndex });
+        rightHeight += cardHeight + 8;
+      }
+    });
+    
+    return { firstRow, leftColumn: leftCol, rightColumn: rightCol };
+  }, [items]);
 
   // Infinite scroll handler
   useEffect(() => {
@@ -47,19 +85,53 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [hasMore, isLoading, onLoadMore]);
+
   return (
     <>
-      <div
-        ref={gridRef}
-        className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 px-3 md:px-4 pb-4"
-      >
-        {items.map((item, index) => (
-          <ShortCard
-            key={item.id}
-            item={item}
-            onClick={() => handleCardClick(item, index)}
-          />
-        ))}
+      <div ref={gridRef} className="px-4 pb-4">
+        {/* First Row - Pinned, Same Height */}
+        {firstRow.length > 0 && (
+          <div className="grid grid-cols-2 gap-2 mb-2">
+            {firstRow.map((item, index) => (
+              <ShortCard
+                key={item.id}
+                item={item}
+                onClick={() => handleCardClick(item, index)}
+                height={280}
+                isPinned
+              />
+            ))}
+          </div>
+        )}
+        
+        {/* Masonry Columns - Staggered */}
+        {(leftColumn.length > 0 || rightColumn.length > 0) && (
+          <div className="grid grid-cols-2 gap-2 items-start">
+            {/* Left Column */}
+            <div className="flex flex-col gap-2">
+              {leftColumn.map(({ item, index }) => (
+                <ShortCard
+                  key={item.id}
+                  item={item}
+                  onClick={() => handleCardClick(item, index)}
+                  height={280 * (1 + getHeightVariant(item.id) / 100)}
+                />
+              ))}
+            </div>
+            
+            {/* Right Column */}
+            <div className="flex flex-col gap-2">
+              {rightColumn.map(({ item, index }) => (
+                <ShortCard
+                  key={item.id}
+                  item={item}
+                  onClick={() => handleCardClick(item, index)}
+                  height={280 * (1 + getHeightVariant(item.id) / 100)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       
       {/* Loading indicator */}

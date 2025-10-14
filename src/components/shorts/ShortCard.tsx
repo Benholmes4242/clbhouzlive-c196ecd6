@@ -5,17 +5,26 @@ import { ExploreContentItem } from '@/components/explore/types';
 interface ShortCardProps {
   item: ExploreContentItem;
   onClick: () => void;
+  height?: number;
+  isPinned?: boolean;
 }
 
-export default function ShortCard({ item, onClick }: ShortCardProps) {
+export default function ShortCard({ item, onClick, height, isPinned }: ShortCardProps) {
   return (
     <button
       onClick={onClick}
-      className="group relative w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-xl"
+      className="group relative w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-xl active:scale-[0.98] transition-transform duration-75"
       aria-label={`Play short: ${item.title || 'Video'} by ${item.user?.name || 'Unknown'}`}
     >
-      {/* 9:16 Thumbnail Container */}
-      <div className="relative aspect-[9/16] w-full overflow-hidden rounded-xl shadow-sm bg-muted">
+      {/* Thumbnail Container */}
+      <div 
+        className="relative w-full overflow-hidden rounded-xl bg-muted"
+        style={{ 
+          height: height ? `${height}px` : undefined,
+          aspectRatio: !height ? '9/16' : undefined,
+          boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 6px 16px rgba(0,0,0,0.06)'
+        }}
+      >
         {/* Thumbnail */}
         <img
           src={item.thumbnailSrc || item.src}
@@ -29,13 +38,22 @@ export default function ShortCard({ item, onClick }: ShortCardProps) {
 
         {/* Duration Badge - Top Left */}
         {item.duration && (
-          <div className="absolute top-2 left-2 z-10 px-2 py-1 rounded-lg bg-black/65 backdrop-blur-sm border border-white/10">
+          <div className="absolute top-2 left-2 z-10 px-2 py-1 rounded-lg backdrop-blur-sm border" 
+               style={{ 
+                 backgroundColor: 'rgba(18,18,18,0.48)', 
+                 borderColor: 'rgba(255,255,255,0.12)',
+                 borderRadius: '8px'
+               }}>
             <span className="text-xs font-medium text-white">{item.duration}</span>
           </div>
         )}
 
         {/* Play Icon - Top Right */}
-        <div className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-black/65 backdrop-blur-sm border border-white/10 flex items-center justify-center transition-opacity group-hover:opacity-100 opacity-90">
+        <div className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full backdrop-blur-sm border flex items-center justify-center transition-opacity group-hover:opacity-100 opacity-90"
+             style={{ 
+               backgroundColor: 'rgba(18,18,18,0.48)', 
+               borderColor: 'rgba(255,255,255,0.12)'
+             }}>
           <Play className="w-4 h-4 text-white fill-white" />
         </div>
 
