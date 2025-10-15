@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, Clock, Search } from 'lucide-react';
 
 interface SearchSuggestionsProps {
   query: string;
   onSelect: (suggestion: string) => void;
+  onClose?: () => void;
 }
 
 // Mock data - replace with real API calls
@@ -19,9 +20,11 @@ const TRENDING_SEARCHES = [
 const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
   query,
   onSelect,
+  onClose,
 }) => {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [searchResults, setSearchResults] = useState<string[]>([]);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Load recent searches from localStorage
@@ -34,6 +37,17 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
       }
     }
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        onClose?.();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [onClose]);
 
   useEffect(() => {
     if (query.trim()) {
@@ -66,12 +80,13 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
 
   return (
     <motion.div
+      ref={dropdownRef}
       id="search-suggestions"
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.15 }}
-      className="absolute top-full left-0 right-0 mt-2 rounded-xl shadow-xl ring-1 ring-black/5 bg-white overflow-hidden max-h-[50vh] overflow-y-auto"
+      className="absolute top-full left-0 right-0 mt-2 rounded-xl shadow-xl ring-1 ring-black/5 bg-white overflow-hidden max-h-[50vh] overflow-y-auto z-50"
       role="listbox"
     >
       {/* Recent Searches */}

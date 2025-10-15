@@ -139,6 +139,7 @@ const SearchActivator: React.FC<SearchActivatorProps> = ({
             <SearchSuggestions
               query={debouncedQuery}
               onSelect={handleSuggestionClick}
+              onClose={() => setShowSuggestions(false)}
             />
           )}
         </AnimatePresence>
