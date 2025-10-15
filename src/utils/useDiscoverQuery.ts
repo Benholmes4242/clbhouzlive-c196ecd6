@@ -9,10 +9,10 @@ export function useDiscoverQuery() {
 
   const rawMain = params.get("main") || "videos";
   
-  // Map legacy routes: 'friends' -> 'following', 'photos' -> 'videos', 'shorts' -> 'videos'
+  // Map legacy routes: 'friends' -> 'following', 'photos' -> 'videos'
   let mappedMain = rawMain;
   if (rawMain === "friends") mappedMain = "following";
-  if (rawMain === "photos" || rawMain === "shorts") mappedMain = "videos";
+  if (rawMain === "photos") mappedMain = "videos";
   
   const main = mappedMain as MainPill;
   const sub = params.get("sub") || "";
@@ -21,12 +21,17 @@ export function useDiscoverQuery() {
   const duration = params.get("duration") || "all";
   const topics = parseTopics(params.get("topics"));
 
-  // Redirect shorts to videos on mount
+  // Canonicalize: if duration=shorts is set, redirect to main=shorts
   useEffect(() => {
-    if (rawMain === "shorts") {
-      navigate({ search: `?main=videos` }, { replace: true });
+    const duration = params.get("duration");
+    if (duration === "shorts" && main !== "shorts") {
+      navigate({ search: `?main=shorts` }, { replace: true });
     }
-  }, [rawMain, navigate]);
+    // If on shorts tab but duration param exists, remove it
+    if (main === "shorts" && params.has("duration")) {
+      navigate({ search: `?main=shorts` }, { replace: true });
+    }
+  }, [params, main, navigate]);
 
   function setMain(next: MainPill) {
     navigate({ search: `?main=${next}` }, { replace: false });

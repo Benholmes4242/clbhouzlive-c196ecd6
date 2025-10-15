@@ -45,7 +45,7 @@ const Discover = () => {
   }, [durationFilter]);
 
   // Detect Shorts mode for compact view
-  const isShorts = durationFilter === 'shorts';
+  const isShorts = main === 'shorts' || durationFilter === 'shorts';
 
   // Derive activeFilter from URL main param (single source of truth)
   const activeFilter = React.useMemo(() => {
@@ -171,10 +171,10 @@ const Discover = () => {
               onTabChange={() => {}} // No-op: tabs control via URL now
             />
             
-            {/* Videos/Shorts Header - new compact design */}
-            {(main === 'videos' || main === 'shorts') && (
+            {/* Videos Header - only show for videos tab */}
+            {main === 'videos' && (
               <DiscoverVideosHeader
-                activeDuration={main === 'shorts' ? 'shorts' : durationFilter}
+                activeDuration={durationFilter}
                 onChangeDuration={setDurationFilter}
                 onOpenShorts={() => setDurationFilter('shorts')}
                 onSearchSubmit={(query) => setSearchQuery(query)}
