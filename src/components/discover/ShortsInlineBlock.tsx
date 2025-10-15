@@ -35,7 +35,7 @@ const ShortsInlineBlock: React.FC<ShortsInlineBlockProps> = ({ shorts, onShortCl
   }
 
   return (
-    <div ref={blockRef} className="w-full mt-4 mb-2 px-1" aria-label="Trending shorts">
+    <div ref={blockRef} className="w-full mt-4 mb-5 px-1" aria-label="Trending shorts">
       <div className="grid grid-cols-2 gap-1">
         {shorts.map((short, index) => {
           const height = getHeightVariant(short.id);
