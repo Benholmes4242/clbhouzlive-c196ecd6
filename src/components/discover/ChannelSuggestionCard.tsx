@@ -72,7 +72,7 @@ export const ChannelSuggestionCard: React.FC<ChannelSuggestionCardProps> = ({
       {/* Card */}
       <div
         onClick={handleCardClick}
-        className="relative bg-card rounded overflow-hidden cursor-pointer"
+        className="relative bg-card overflow-hidden cursor-pointer"
         style={{ aspectRatio: '3/2' }}
       >
         {/* Cover Image */}
