@@ -62,14 +62,23 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
   return (
     <div className="sticky top-[var(--header-height,0px)] z-40 bg-white border-b border-gray-100">
       <div 
-        className="relative flex items-center py-3"
+        className="flex items-center gap-3 py-3 px-4"
         style={{ 
-          paddingLeft: 'max(0rem, env(safe-area-inset-left))',
+          paddingLeft: 'max(1rem, env(safe-area-inset-left))',
           paddingRight: 'max(1rem, env(safe-area-inset-right))'
         }}
       >
-        {/* Scrollable filter chips with fade-out mask */}
-        <div className="no-scrollbar mask-fade-right flex gap-3 overflow-x-auto pl-4 pr-16 flex-1">
+        {/* Search icon on the left */}
+        <button
+          onClick={handleSearchOpen}
+          aria-label="Search videos"
+          className="grid h-9 w-9 place-items-center rounded-full hover:bg-black/5 transition-colors flex-shrink-0"
+        >
+          <Search size={20} />
+        </button>
+
+        {/* Scrollable filter chips */}
+        <div className="no-scrollbar flex gap-3 overflow-x-auto flex-1">
           {allPills.map((pill) => {
             const isActive = 
               (pill.type === 'duration' && activeDuration === pill.key) ||
@@ -106,15 +115,6 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
             );
           })}
         </div>
-        
-        {/* Search icon pinned on the right */}
-        <button
-          onClick={handleSearchOpen}
-          aria-label="Search videos"
-          className="absolute right-4 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center rounded-full hover:bg-black/5 transition-colors flex-shrink-0"
-        >
-          <Search size={20} />
-        </button>
       </div>
       
       {/* Search overlay */}
