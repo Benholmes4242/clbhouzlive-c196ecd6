@@ -22,13 +22,13 @@ interface FilterPill {
 }
 
 const featuredPills: FilterPill[] = [
+  { key: 'all', label: 'All', type: 'duration' },
   { key: 'trending', label: 'Trending', type: 'topic' },
   { key: '4-bros', label: 'fourbros', type: 'channel' },
   { key: 'bryson-dechambeau', label: 'Bryson DeChambeau', type: 'channel' },
 ];
 
 const durationPills: FilterPill[] = [
-  { key: 'all', label: 'All', type: 'duration' },
   { key: 'under4', label: 'Under 4 mins', type: 'duration' },
   { key: '4to20', label: '4–20 mins', type: 'duration' },
   { key: 'over20', label: 'Over 20 mins', type: 'duration' },
