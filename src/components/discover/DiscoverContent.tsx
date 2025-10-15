@@ -182,19 +182,6 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
               recentHistory
             );
             
-            // Update recent history (keep last 30 IDs)
-            const newHistory = new Set<string>();
-            feed.slice(-30).forEach(item => {
-              if (item.kind === 'video') {
-                newHistory.add(item.id);
-              } else if (item.kind === 'shorts_block' && Array.isArray(item.data)) {
-                item.data.forEach(short => newHistory.add(short.id));
-              } else if (item.kind === 'channel_suggestion') {
-                newHistory.add(item.id);
-              }
-            });
-            setRecentHistory(newHistory);
-            
             // Debug log
             if (import.meta.env.DEV) {
               const shortsBlocks = feed.filter(i => i.kind === 'shorts_block').length;
@@ -209,7 +196,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
             }
             
             return feed;
-          }, [key, itemsForKey.length, recentHistory.size]);
+          }, [key, itemsForKey.length, shortsContent?.length]);
           
           return (
             <VideosGrid
