@@ -121,7 +121,7 @@ export const ChannelSuggestionCard: React.FC<ChannelSuggestionCardProps> = ({
                   px-4 h-8 font-medium text-sm
                   ${isSubscribed 
                     ? 'bg-transparent text-white border-white/60 hover:bg-white/10' 
-                    : 'bg-white text-primary hover:bg-white/90'
+                    : 'bg-white text-muted-foreground hover:bg-white/90'
                   }
                 `}
                 aria-label={isSubscribed ? `Unsubscribe from ${suggestion.title}` : `Subscribe to ${suggestion.title}`}
