@@ -29,6 +29,7 @@ interface DiscoverContentProps {
 function getFilterTypeFromPills(main: string): string {
   // Map main pill to base filter type
   const mainToFilter: Record<string, string> = {
+    'shorts': FILTER_TYPES.VIDEOS,
     'videos': FILTER_TYPES.VIDEOS,
     'channels': FILTER_TYPES.CHANNELS,
     'following': FILTER_TYPES.FOLLOWING,
@@ -68,14 +69,16 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   const { next: getNextSuggestion } = useChannelSuggestions();
   
   // Detect Shorts mode for compact view
-  const isShorts = duration === 'shorts';
+  const isShorts = main === 'shorts' || duration === 'shorts';
   
   // Get the filter type based on main pill
   const filterType = getFilterTypeFromPills(main);
   
-  // Prepare duration filter for Videos
+  // Prepare duration filter for Videos/Shorts
   const durationFilter = React.useMemo(() => {
-    if (main !== 'videos') return undefined;
+    if (main !== 'videos' && main !== 'shorts') return undefined;
+    // If main is 'shorts', use shorts filter regardless of duration param
+    if (main === 'shorts') return getDurationFilter('shorts');
     return getDurationFilter(duration);
   }, [main, duration]);
   
@@ -132,8 +135,8 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Chip order for slide animation
   const CHIP_ORDER = ['all', 'shorts', 'under4', '4to20', 'over20'] as const;
 
-  // Use VideosGrid for Videos tab, PhotosGrid for Photos tab, ExploreGrid for everything else
-  if (main === 'videos') {
+  // Use VideosGrid for Videos/Shorts tab, ExploreGrid for everything else
+  if (main === 'videos' || main === 'shorts') {
     return (
       <SlidingPanels
         activeKey={duration as LengthKey}

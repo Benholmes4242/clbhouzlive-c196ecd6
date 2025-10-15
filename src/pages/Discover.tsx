@@ -23,7 +23,7 @@ import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
-type MainKey = 'videos' | 'channels' | 'following';
+type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
 
 const Discover = () => {
   // Use vertical feed for consistency with Activity tab
@@ -50,6 +50,7 @@ const Discover = () => {
   // Derive activeFilter from URL main param (single source of truth)
   const activeFilter = React.useMemo(() => {
     const mainToFilter: Record<string, string> = {
+      'shorts': FILTER_TYPES.VIDEOS,
       'videos': FILTER_TYPES.VIDEOS,
       'channels': FILTER_TYPES.CHANNELS,
       'following': FILTER_TYPES.FOLLOWING,
@@ -170,10 +171,10 @@ const Discover = () => {
               onTabChange={() => {}} // No-op: tabs control via URL now
             />
             
-            {/* Videos Header - new compact design */}
-            {main === 'videos' && (
+            {/* Videos/Shorts Header - new compact design */}
+            {(main === 'videos' || main === 'shorts') && (
               <DiscoverVideosHeader
-                activeDuration={durationFilter}
+                activeDuration={main === 'shorts' ? 'shorts' : durationFilter}
                 onChangeDuration={setDurationFilter}
                 onOpenShorts={() => setDurationFilter('shorts')}
                 onSearchSubmit={(query) => setSearchQuery(query)}
@@ -181,8 +182,8 @@ const Discover = () => {
               />
             )}
             
-            {/* Filter Pills Row - show for non-videos tabs */}
-            {main !== 'videos' && (
+            {/* Filter Pills Row - show for non-videos/shorts tabs */}
+            {main !== 'videos' && main !== 'shorts' && (
               <div className="pt-1 pb-3 border-b border-gray-50 pl-1.5">
                 <ExploreFilters 
                   activeFilter={activeFilter}
@@ -203,7 +204,7 @@ const Discover = () => {
           {/* Main Content - Conditional based on active tab with slide animation */}
           <SlidingPanels
             activeKey={main as MainKey}
-            order={['videos', 'channels', 'following'] as const}
+            order={['shorts', 'videos', 'channels', 'following'] as const}
           >
             {(key: MainKey) => {
               if (key === 'channels') {
@@ -216,6 +217,7 @@ const Discover = () => {
                   </div>
                 );
               }
+              // Both 'shorts' and 'videos' use DiscoverContent
               return (
                 <div className="md:container md:mx-auto md:px-0 mt-4">
                   <DiscoverContent

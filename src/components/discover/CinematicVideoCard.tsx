@@ -97,7 +97,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
 
         {/* Progress Bar - Bottom Edge of Video */}
         <div 
-          className="absolute bottom-0 left-0 right-0 h-[3px] bg-white/15 z-20"
+          className="pointer-events-none absolute left-0 right-0 bottom-0 h-[2px] bg-black/25 z-20"
           role="progressbar"
           aria-valuenow={progress}
           aria-valuemin={0}
@@ -106,36 +106,36 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
         >
           <div
             ref={setProgressFillRef}
-            className="h-full origin-left bg-white/85"
+            className="h-full origin-left bg-black/70"
             style={{ transform: 'scaleX(0)' }}
             aria-hidden="true"
           />
         </div>
 
-        {/* Duration Badge - Bottom Left */}
+        {/* Duration Badge - Top Left */}
         {duration > 0 && (
           <time 
-            className="absolute bottom-2.5 left-2.5 rounded-md px-2.5 py-1 bg-black/45 backdrop-blur-sm border border-white/20 text-white text-[13px] font-medium z-30 pointer-events-none"
+            className="absolute top-2 left-2 inline-flex h-6 items-center rounded-md border border-white/15 bg-black/55 px-1.5 text-[13px] font-medium text-white backdrop-blur-sm z-30 pointer-events-none"
             aria-hidden="true"
           >
             {formatDuration(duration)}
           </time>
         )}
         
-        {/* Mute/Unmute Button - Bottom Right */}
+        {/* Mute/Unmute Button - Top Right */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             toggleMute();
           }}
-          className="absolute bottom-2.5 right-2.5 h-9 w-9 rounded-md bg-black/45 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform active:scale-95 z-30"
+          className="absolute top-2 right-2 grid h-8 w-8 place-items-center rounded-full border border-white/15 bg-black/55 text-white backdrop-blur-sm shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform active:scale-95 z-30"
           aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           aria-pressed={!isMuted}
         >
           {isMuted ? (
-            <VolumeX size={18} />
+            <VolumeX size={20} />
           ) : (
-            <Volume2 size={18} />
+            <Volume2 size={20} />
           )}
         </button>
       </div>
