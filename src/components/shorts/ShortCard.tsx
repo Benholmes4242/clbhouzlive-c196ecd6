@@ -50,17 +50,6 @@ export default function ShortCard({ item, onClick, height, isPinned, autoplay }:
         {/* Gradient overlay for badges */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent" />
 
-        {/* Duration Badge - Top Left */}
-        {item.duration && (
-          <div className="absolute top-2 left-2 z-10 px-2 py-1 rounded-lg backdrop-blur-sm border" 
-               style={{ 
-                 backgroundColor: 'rgba(18,18,18,0.48)', 
-                 borderColor: 'rgba(255,255,255,0.12)',
-                 borderRadius: '8px'
-               }}>
-            <span className="text-xs font-medium text-white">{item.duration}</span>
-          </div>
-        )}
 
 
         {/* Hover Overlay */}
