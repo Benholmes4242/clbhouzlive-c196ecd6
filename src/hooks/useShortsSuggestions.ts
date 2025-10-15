@@ -56,13 +56,18 @@ export function useShortsSuggestions(shortsData: ExploreContentItem[] = []) {
     return item;
   }, [refillPool]);
 
-  // Initialize pool when data changes
+  // Initialize/reinitialize pool when data changes
   useEffect(() => {
-    if (shortsData.length > 0 && !initialized) {
+    if (shortsData.length > 0) {
+      // Reset if data changed
+      poolRef.current = [];
+      recentIdsRef.current.clear();
       refillPool();
-      setInitialized(true);
+      if (!initialized) {
+        setInitialized(true);
+      }
     }
-  }, [shortsData, initialized, refillPool]);
+  }, [shortsData.length, initialized, refillPool]);
 
   return { next };
 }
