@@ -131,22 +131,6 @@ export default function Squircle({ creator, index, onAvatarClick, onLabelClick, 
                 {initials}
               </AvatarFallback>
             </Avatar>
-
-            {/* Follow/Following pill */}
-            <button
-              onClick={handleFollowToggle}
-              disabled={busy}
-              className="sq-pill"
-              data-state={isFollowing === 'following' ? 'following' : 'not-following'}
-              role="button"
-              aria-pressed={isFollowing === 'following'}
-            >
-              {isFollowing === 'following' ? (
-                <Check className="w-3 h-3" />
-              ) : (
-                <UserPlus className="w-3 h-3" />
-              )}
-            </button>
           </button>
         </div>
 
