@@ -3,7 +3,7 @@ import { ExploreContentItem } from '@/components/explore/types';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX, Heart } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatRelativeTime, formatLikes } from '@/utils/dateFormat';
 import { clsx } from 'clsx';
@@ -165,14 +165,15 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             </span>
           </div>
 
-          {/* Centered date */}
-          <span className="justify-self-center text-muted-foreground/70 tabular-nums">
-            {item.createdAt ? formatRelativeTime(item.createdAt) : '2 days ago'}
-          </span>
+          {/* Centered likes with heart icon */}
+          <div className="justify-self-center flex items-center gap-1 tabular-nums">
+            <Heart className="w-3.5 h-3.5" />
+            <span>{formatLikes(item.likes || 0)}</span>
+          </div>
 
-          {/* Likes */}
-          <span className="justify-self-end tabular-nums">
-            {formatLikes(item.likes || 0)} likes
+          {/* Date posted */}
+          <span className="justify-self-end text-muted-foreground/70 tabular-nums">
+            {item.createdAt ? formatRelativeTime(item.createdAt) : '2 days ago'}
           </span>
         </div>
       </div>
