@@ -85,7 +85,7 @@ const VideosGrid: React.FC<VideosGridProps> = ({
                 <ChannelSuggestionCard
                   key={item.id}
                   suggestion={item.data as ChannelSuggestion}
-                  className="w-full my-[30px]"
+                  className="w-full mt-[10px] mb-[30px]"
                 />
               );
             }
