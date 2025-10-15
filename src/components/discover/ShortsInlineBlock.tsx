@@ -116,7 +116,7 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
       {/* Caption - Below Tile */}
       <div className="mt-1.5 px-1">
         {/* Title */}
-        <h3 className="text-[15px] font-semibold line-clamp-1 text-foreground leading-tight">
+        <h3 className="text-[15px] font-semibold line-clamp-1 overflow-hidden text-ellipsis whitespace-nowrap text-foreground">
           {short.title}
         </h3>
 
