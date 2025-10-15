@@ -4,6 +4,7 @@ import BottomSheet from '@/components/ui/BottomSheet';
 import { useFollow } from '@/hooks/useFollow';
 import { usePrefetchImmersiveProfile } from '@/hooks/usePrefetchImmersiveProfile';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Squircle as SquircleShape } from '@/components/ui/Squircle';
 import { Check, UserPlus } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toast } from 'sonner';
@@ -120,17 +121,19 @@ export default function Squircle({ creator, index, onAvatarClick, onLabelClick, 
             onContextMenu={(e) => { e.preventDefault(); setMenuOpen(true); }}
             aria-label={`View ${name}'s profile`}
           >
-            <Avatar className="w-full h-full rounded-none">
-              <AvatarImage
-                src={creator.profile_photo_url || undefined}
-                alt={name}
-                className={`sq-img ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-                onLoad={onImageLoad}
-              />
-              <AvatarFallback className="sq-img text-lg font-semibold flex items-center justify-center">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
+            <SquircleShape size={AVATAR.size} corner={0.56} className="overflow-hidden bg-muted shadow-sm">
+              <Avatar className="w-full h-full rounded-none">
+                <AvatarImage
+                  src={creator.profile_photo_url || undefined}
+                  alt={name}
+                  className={`sq-img ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                  onLoad={onImageLoad}
+                />
+                <AvatarFallback className="sq-img text-lg font-semibold flex items-center justify-center">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+            </SquircleShape>
           </button>
         </div>
 
