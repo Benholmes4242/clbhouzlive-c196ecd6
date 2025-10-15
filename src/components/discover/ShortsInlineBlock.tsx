@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Heart, Flame } from 'lucide-react';
-import { formatRelativeTime, formatLikes } from '@/utils/dateFormat';
+import { formatLikes } from '@/utils/dateFormat';
 import { useInView } from 'react-intersection-observer';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -68,13 +68,29 @@ interface ShortTileProps {
 }
 
 const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
-  const { ref: tileRef, inView } = useInView({ threshold: 0.5, triggerOnce: true });
+  const { ref: tileRef, inView } = useInView({ threshold: 0.3, triggerOnce: false });
+  const videoRef = useRef<HTMLVideoElement>(null);
 
+  // Handle tile impression analytics
   useEffect(() => {
     if (inView) {
       analyticsEvents.track('shorts_tile_impression', { shortId: short.id });
     }
   }, [inView, short.id]);
+
+  // Handle autoplay based on visibility
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (inView) {
+      video.play().catch((err) => {
+        console.info('Autoplay prevented:', err);
+      });
+    } else {
+      video.pause();
+    }
+  }, [inView]);
 
   return (
     <div ref={tileRef} className="flex flex-col">
@@ -89,12 +105,15 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
         }}
         aria-label={`Watch short: ${short.title}`}
       >
-        {/* Image/Video */}
-        <img
-          src={short.thumbnailSrc || short.src}
-          alt={short.title}
+        {/* Video */}
+        <video
+          ref={videoRef}
+          src={short.src}
           className="absolute inset-0 w-full h-full object-cover"
-          loading="lazy"
+          loop
+          muted
+          playsInline
+          poster={short.thumbnailSrc}
         />
 
         {/* Gradient Overlay */}
