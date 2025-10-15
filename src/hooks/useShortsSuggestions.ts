@@ -34,12 +34,21 @@ export function useShortsSuggestions(shortsData: ExploreContentItem[] = []) {
   const next = useCallback((avoidIds: Set<string> = new Set()): ExploreContentItem | null => {
     // Refill if running low
     if (poolRef.current.length < REFILL_THRESHOLD) {
+      if (import.meta.env.DEV) {
+        console.debug('[ShortsPool] Refilling pool, current size:', poolRef.current.length);
+      }
       refillPool();
     }
     
     // Find first item not in avoid list
     const index = poolRef.current.findIndex(item => !avoidIds.has(item.id));
-    if (index === -1) return null;
+    if (index === -1) {
+      if (import.meta.env.DEV) {
+        console.warn('[ShortsPool] No available shorts! Pool size:', poolRef.current.length, 
+          'avoidIds:', avoidIds.size, 'totalShorts:', shortsData.length);
+      }
+      return null;
+    }
     
     // Remove and return the item
     const [item] = poolRef.current.splice(index, 1);
@@ -53,8 +62,12 @@ export function useShortsSuggestions(shortsData: ExploreContentItem[] = []) {
       recentIdsRef.current = new Set(arr.slice(-RECENT_HISTORY_SIZE));
     }
     
+    if (import.meta.env.DEV) {
+      console.debug('[ShortsPool] Dispensed short:', item.id, 'Pool remaining:', poolRef.current.length);
+    }
+    
     return item;
-  }, [refillPool]);
+  }, [refillPool, shortsData.length]);
 
   // Initialize/reinitialize pool when data changes
   useEffect(() => {

@@ -64,7 +64,6 @@ function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): 
 export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery, selectedTags = [] }: DiscoverContentProps) {
   const { main, sub, duration } = useDiscoverQuery();
   const [currentContent, setCurrentContent] = useState<ExploreContentItem[] | null>(null);
-  const [renderedVideoCount, setRenderedVideoCount] = useState(0);
   const [recentHistory, setRecentHistory] = useState<Set<string>>(new Set());
   
   // Fetch real Shorts data for inline blocks (only when on Videos tab)
@@ -137,9 +136,9 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     // TODO: Implement navigation to creator profile or highlight detail
   };
 
-  // Reset video count when tab changes (not on every content update)
+  // Reset recent history when tab changes
   useEffect(() => {
-    setRenderedVideoCount(0);
+    setRecentHistory(new Set());
   }, [main, duration]);
 
   // Chip order for slide animation
@@ -171,7 +170,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         {(key: LengthKey) => {
           const itemsForKey = currentContent || [];
           
-          // Build interleaved feed for "All" tab only - memoized to prevent constant rebuilds
+          // Build interleaved feed for "All" tab only
           const interleavedFeed = React.useMemo(() => {
             if (key !== 'all') return null;
             
@@ -179,7 +178,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
               itemsForKey,
               getNextShort,
               getNextChannel,
-              renderedVideoCount,
+              0, // Always start from 0, the function handles global counting internally
               recentHistory
             );
             
@@ -198,12 +197,19 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
             
             // Debug log
             if (import.meta.env.DEV) {
-              console.debug('[Interleave] items:', itemsForKey.length,
-                'sampleKinds:', feed?.slice(0, 15).map(i => i.kind));
+              const shortsBlocks = feed.filter(i => i.kind === 'shorts_block').length;
+              const channelSuggs = feed.filter(i => i.kind === 'channel_suggestion').length;
+              console.debug('[Interleave]', {
+                totalVideos: itemsForKey.length,
+                shortsBlocks,
+                channelSuggs,
+                totalItems: feed.length,
+                sampleKinds: feed.slice(0, 20).map(i => i.kind)
+              });
             }
             
             return feed;
-          }, [key, itemsForKey, getNextShort, getNextChannel, renderedVideoCount]);
+          }, [key, itemsForKey.length, recentHistory.size]);
           
           return (
             <VideosGrid

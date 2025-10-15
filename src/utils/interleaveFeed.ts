@@ -19,7 +19,7 @@ const SHORTS_BLOCK_SIZE = 2;   // Two full-size shorts per block
  * @param videos - Array of video content items
  * @param getNextShort - Function to get the next short item
  * @param getNextChannel - Function to get the next channel suggestion
- * @param startIndexOffset - Global video index offset for pagination
+ * @param startIndexOffset - Global video index offset for pagination (unused, kept for compatibility)
  * @param recentHistory - Set of recently shown IDs to avoid duplicates
  */
 export function buildInterleavedFeed(
@@ -30,7 +30,7 @@ export function buildInterleavedFeed(
   recentHistory: Set<string> = new Set()
 ): InterleavedItem[] {
   const result: InterleavedItem[] = [];
-  let globalVideoIndex = startIndexOffset;
+  let globalVideoIndex = 0; // Always count from 0 for the entire array
   const localRecentIds = new Set([...recentHistory]);
 
   videos.forEach((video) => {
@@ -64,6 +64,8 @@ export function buildInterleavedFeed(
           id: `shorts_block_${globalVideoIndex}_${Date.now()}`,
           data: shorts
         });
+      } else if (shorts.length > 0 && import.meta.env.DEV) {
+        console.warn('[Interleave] Could only get', shorts.length, 'shorts at position', globalVideoIndex);
       }
     }
 
