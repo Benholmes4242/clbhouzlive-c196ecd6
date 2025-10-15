@@ -68,12 +68,6 @@ export const ChannelSuggestionCard: React.FC<ChannelSuggestionCardProps> = ({
       className={`${className}`}
       aria-label="Suggested channel"
     >
-      {/* Label */}
-      <div className="px-2 pb-1.5">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          Suggested channel
-        </p>
-      </div>
 
       {/* Card */}
       <div
