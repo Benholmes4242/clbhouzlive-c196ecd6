@@ -120,7 +120,7 @@ export default function Squircle({ creator, index, onAvatarClick, onLabelClick, 
             onContextMenu={(e) => { e.preventDefault(); setMenuOpen(true); }}
             aria-label={`View ${name}'s profile`}
           >
-            <Avatar className="w-full h-full rounded-none">
+            <Avatar className="w-full h-full rounded-full">
               <AvatarImage
                 src={creator.profile_photo_url || undefined}
                 alt={name}
