@@ -106,7 +106,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
         >
           <div
             ref={setProgressFillRef}
-            className="relative h-full origin-left will-change-transform bg-white/55 after:content-[''] after:absolute after:-right-[1px] after:top-1/2 after:-translate-y-1/2 after:w-[6px] after:h-[6px] after:rounded-full after:bg-white after:shadow-[0_0_8px_rgba(255,255,255,0.85)]"
+            className="relative h-full origin-left will-change-transform bg-white/55"
             style={{ transform: 'scaleX(0)' }}
             aria-hidden="true"
           />
