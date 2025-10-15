@@ -79,7 +79,7 @@ export const ChannelSuggestionCard: React.FC<ChannelSuggestionCardProps> = ({
       <div
         onClick={handleCardClick}
         className="relative bg-card rounded overflow-hidden cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]"
-        style={{ aspectRatio: '16/9' }}
+        style={{ aspectRatio: '3/2' }}
       >
         {/* Cover Image */}
         <div className="absolute inset-0">
