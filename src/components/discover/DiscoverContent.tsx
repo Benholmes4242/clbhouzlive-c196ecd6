@@ -15,6 +15,7 @@ import ShortsSuggestedProfiles from '@/components/shorts/ShortsSuggestedProfiles
 import { getDurationFilter } from '@/constants/videoFilters';
 import type { LengthKey } from '@/components/videos/VideoChipRail';
 import { useChannelSuggestions } from '@/hooks/useChannelSuggestions';
+import { useShortsSuggestions } from '@/hooks/useShortsSuggestions';
 import { buildInterleavedFeed, InterleavedItem } from '@/utils/interleaveFeed';
 
 interface DiscoverContentProps {
@@ -64,9 +65,11 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   const { main, sub, duration } = useDiscoverQuery();
   const [currentContent, setCurrentContent] = useState<ExploreContentItem[] | null>(null);
   const [renderedVideoCount, setRenderedVideoCount] = useState(0);
+  const [recentHistory, setRecentHistory] = useState<Set<string>>(new Set());
   
-  // Channel suggestions hook
-  const { next: getNextSuggestion } = useChannelSuggestions();
+  // Suggestions hooks
+  const { next: getNextChannel } = useChannelSuggestions();
+  const { next: getNextShort } = useShortsSuggestions();
   
   // Detect Shorts mode for compact view
   const isShorts = main === 'shorts' || duration === 'shorts';
@@ -167,18 +170,33 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
             
             const feed = buildInterleavedFeed(
               itemsForKey,
-              getNextSuggestion,
-              0 // Always start from 0 for each page load
+              getNextShort,
+              getNextChannel,
+              renderedVideoCount,
+              recentHistory
             );
+            
+            // Update recent history (keep last 30 IDs)
+            const newHistory = new Set<string>();
+            feed.slice(-30).forEach(item => {
+              if (item.kind === 'video') {
+                newHistory.add(item.id);
+              } else if (item.kind === 'shorts_block' && Array.isArray(item.data)) {
+                item.data.forEach(short => newHistory.add(short.id));
+              } else if (item.kind === 'channel_suggestion') {
+                newHistory.add(item.id);
+              }
+            });
+            setRecentHistory(newHistory);
             
             // Debug log
             if (import.meta.env.DEV) {
               console.debug('[Interleave] items:', itemsForKey.length,
-                'sampleKinds:', feed?.slice(0, 12).map(i => i.kind));
+                'sampleKinds:', feed?.slice(0, 15).map(i => i.kind));
             }
             
             return feed;
-          }, [key, itemsForKey, getNextSuggestion]);
+          }, [key, itemsForKey, getNextShort, getNextChannel, renderedVideoCount]);
           
           return (
             <VideosGrid

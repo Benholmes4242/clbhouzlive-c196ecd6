@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import VideoExploreCard from './VideoExploreCard';
 import CinematicVideoCard from './CinematicVideoCard';
 import { ExploreContentItem } from '@/components/explore/types';
 import { InterleavedItem } from '@/utils/interleaveFeed';
 import { ChannelSuggestionCard } from './ChannelSuggestionCard';
 import { ChannelSuggestion } from '@/hooks/useChannelSuggestions';
+import ShortsInlineBlock from './ShortsInlineBlock';
+import ShortsViewer from '@/components/shorts/ShortsViewer';
 
 interface VideosGridProps {
   content: ExploreContentItem[];
@@ -27,6 +29,17 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   activeTab = 'all',
   interleavedFeed = null
 }) => {
+  // State for ShortsViewer
+  const [shortsViewerOpen, setShortsViewerOpen] = useState(false);
+  const [shortsViewerItems, setShortsViewerItems] = useState<ExploreContentItem[]>([]);
+  const [shortsViewerIndex, setShortsViewerIndex] = useState(0);
+
+  const handleShortClick = (short: ExploreContentItem, allShorts: ExploreContentItem[], index: number) => {
+    setShortsViewerItems(allShorts);
+    setShortsViewerIndex(index);
+    setShortsViewerOpen(true);
+  };
+
   // Intersection observer for infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -90,6 +103,17 @@ const VideosGrid: React.FC<VideosGridProps> = ({
               );
             }
             
+            if (item.kind === 'shorts_block' && Array.isArray(item.data)) {
+              return (
+                <ShortsInlineBlock
+                  key={item.id}
+                  shorts={item.data}
+                  blockId={item.id}
+                  onShortClick={(short, index) => handleShortClick(short, item.data as ExploreContentItem[], index)}
+                />
+              );
+            }
+            
             return (
               <CinematicVideoCard
                 key={`${activeTab}-${item.id}`}
@@ -113,6 +137,18 @@ const VideosGrid: React.FC<VideosGridProps> = ({
               );
             }
             
+            if (item.kind === 'shorts_block' && Array.isArray(item.data)) {
+              return (
+                <div key={item.id} className="col-span-2 md:col-span-3">
+                  <ShortsInlineBlock
+                    shorts={item.data}
+                    blockId={item.id}
+                    onShortClick={(short, index) => handleShortClick(short, item.data as ExploreContentItem[], index)}
+                  />
+                </div>
+              );
+            }
+            
             return (
               <VideoExploreCard
                 key={`${activeTab}-${item.id}`}
@@ -133,6 +169,16 @@ const VideosGrid: React.FC<VideosGridProps> = ({
           </div>
         )}
       </div>
+
+      {/* ShortsViewer */}
+      {shortsViewerOpen && (
+        <ShortsViewer
+          items={shortsViewerItems}
+          initialIndex={shortsViewerIndex}
+          isOpen={shortsViewerOpen}
+          onClose={() => setShortsViewerOpen(false)}
+        />
+      )}
     </>
   );
 };
