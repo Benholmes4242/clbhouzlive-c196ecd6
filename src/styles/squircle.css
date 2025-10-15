@@ -11,7 +11,7 @@
   --sq-pill-h:      20px;   /* follow pill height */
 
   /* radii (superellipse vibe) */
-  --sq-radius:      20px;   /* rounded square corners */
+  --sq-radius:      40px;   /* rounded square corners */
 
   /* glass-black border colors (no green) */
   --sq-glass-bg:    rgba(255,255,255,0.02);
