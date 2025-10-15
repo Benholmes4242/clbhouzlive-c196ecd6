@@ -135,8 +135,21 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Chip order for slide animation
   const CHIP_ORDER = ['all', 'shorts', 'under4', '4to20', 'over20'] as const;
 
-  // Use VideosGrid for Videos/Shorts tab, ExploreGrid for everything else
-  if (main === 'videos' || main === 'shorts') {
+  // Handle Shorts tab directly (no sliding panels needed)
+  if (main === 'shorts') {
+    return (
+      <ShortsGrid 
+        items={currentContent || []} 
+        onOpen={onMediaClick}
+        isLoading={loading}
+        hasMore={hasMore}
+        onLoadMore={loadMore}
+      />
+    );
+  }
+
+  // Use VideosGrid with SlidingPanels for Videos tab
+  if (main === 'videos') {
     return (
       <SlidingPanels
         activeKey={duration as LengthKey}
@@ -164,15 +177,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
             return feed;
           }, [key, itemsForKey, getNextSuggestion]);
           
-          return key === 'shorts' ? (
-            <ShortsGrid 
-              items={itemsForKey} 
-              onOpen={onMediaClick}
-              isLoading={loading}
-              hasMore={hasMore}
-              onLoadMore={loadMore}
-            />
-          ) : (
+          return (
             <VideosGrid
               content={itemsForKey}
               onMediaClick={onMediaClick}
