@@ -41,17 +41,15 @@
   scroll-snap-align: start;
 }
 
-/* ring + image wrapper - glass black border */
+/* ring + image wrapper - no border */
 .sq-ring {
   width: var(--sq-img); 
   height: var(--sq-img);
   border-radius: var(--sq-radius);
   padding: 0;
   background: none;
-  border: 1px solid var(--sq-glass-brd);
-  box-shadow: 
-    inset 0 0 0 1px var(--sq-glass-inner),
-    var(--sq-shadow);
+  border: none;
+  box-shadow: none;
   overflow: hidden;
   position: relative;
 }
