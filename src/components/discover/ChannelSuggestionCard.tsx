@@ -87,7 +87,7 @@ export const ChannelSuggestionCard: React.FC<ChannelSuggestionCardProps> = ({
         </div>
 
         {/* Content Overlay */}
-        <div className="absolute inset-0 flex flex-col justify-end p-4">
+        <div className="absolute inset-0 flex flex-col justify-end pt-[10px] px-4 pb-4">
           <div className="flex items-end gap-3">
             {/* Avatar */}
             <div className="flex-shrink-0">
