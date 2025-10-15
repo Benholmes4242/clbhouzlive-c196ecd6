@@ -143,7 +143,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
       {/* Meta Block - Below Video */}
       <div className="px-4 pt-2 pb-3">
         {/* Caption (one line) */}
-        <h3 className="text-[17px] font-bold leading-tight line-clamp-1 text-foreground">
+        <h3 className="text-[17px] leading-tight line-clamp-1 text-foreground">
           {item.title || 'No caption'}
         </h3>
 
