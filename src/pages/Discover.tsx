@@ -64,11 +64,7 @@ const Discover = () => {
   // Reset tags when switching main pill
   React.useEffect(() => {
     setSelectedTags([]);
-    // Auto-set duration filter when switching to Shorts
-    if (main === 'shorts') {
-      setDurationFilter('shorts');
-    }
-  }, [main, setDurationFilter]);
+  }, [main]);
   
   // Get content for the vertical feed (we'll use the new DiscoverContent component for the grid)
   const { 
