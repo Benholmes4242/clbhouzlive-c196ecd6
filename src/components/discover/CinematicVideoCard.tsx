@@ -166,15 +166,15 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           </div>
 
           {/* Centered likes with heart icon */}
-          <div className="justify-self-center flex items-center gap-1 tabular-nums">
+          <div className="flex items-center justify-center gap-1 tabular-nums">
             <Heart className="w-3.5 h-3.5" />
             <span>{formatLikes(item.likes || 0)}</span>
           </div>
 
           {/* Date posted */}
-          <span className="justify-self-end text-muted-foreground/70 tabular-nums">
+          <div className="flex items-center justify-end text-muted-foreground/70 tabular-nums">
             {item.createdAt ? formatRelativeTime(item.createdAt) : '2 days ago'}
-          </span>
+          </div>
         </div>
       </div>
     </div>
