@@ -97,7 +97,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
 
         {/* Progress Bar - Bottom Edge of Video */}
         <div 
-          className="pointer-events-none absolute left-0 right-0 bottom-0 h-[2px] bg-black/25 z-20"
+          className="pointer-events-none absolute left-0 right-0 bottom-0 h-[2px] bg-black/35 backdrop-blur-sm z-20"
           role="progressbar"
           aria-valuenow={progress}
           aria-valuemin={0}
@@ -106,7 +106,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
         >
           <div
             ref={setProgressFillRef}
-            className="h-full origin-left bg-black/70"
+            className="relative h-full origin-left will-change-transform bg-white/55 after:content-[''] after:absolute after:-right-[1px] after:top-1/2 after:-translate-y-1/2 after:w-[6px] after:h-[6px] after:rounded-full after:bg-white after:shadow-[0_0_8px_rgba(255,255,255,0.85)]"
             style={{ transform: 'scaleX(0)' }}
             aria-hidden="true"
           />

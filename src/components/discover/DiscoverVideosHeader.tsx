@@ -3,6 +3,7 @@ import SearchActivator from './SearchActivator';
 import type { LengthKey } from '@/components/videos/VideoChipRail';
 import { cn } from '@/lib/utils';
 import { Search } from 'lucide-react';
+import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 
 interface DiscoverVideosHeaderProps {
   activeDuration: LengthKey;
@@ -12,12 +13,28 @@ interface DiscoverVideosHeaderProps {
   initialQuery?: string;
 }
 
-const filterChips: { key: LengthKey; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'under4', label: 'Under 4 mins' },
-  { key: '4to20', label: '4–20 mins' },
-  { key: 'over20', label: 'Over 20 mins' }
+type PillType = 'topic' | 'channel' | 'duration';
+
+interface FilterPill {
+  key: string;
+  label: string;
+  type: PillType;
+}
+
+const featuredPills: FilterPill[] = [
+  { key: 'trending', label: 'Trending', type: 'topic' },
+  { key: '4-bros', label: '4 Bros', type: 'channel' },
+  { key: 'bryson-dechambeau', label: 'Bryson DeChambeau', type: 'channel' },
 ];
+
+const durationPills: FilterPill[] = [
+  { key: 'all', label: 'All', type: 'duration' },
+  { key: 'under4', label: 'Under 4 mins', type: 'duration' },
+  { key: '4to20', label: '4–20 mins', type: 'duration' },
+  { key: 'over20', label: 'Over 20 mins', type: 'duration' },
+];
+
+const allPills = [...featuredPills, ...durationPills];
 
 const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
   activeDuration,
@@ -27,6 +44,7 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
   initialQuery = ''
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { topic, channel, setTopic, setChannel, setDuration } = useDiscoverQuery();
 
   const handleSearchOpen = () => {
     setIsSearchOpen(true);
@@ -44,28 +62,49 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
   return (
     <div className="sticky top-[var(--header-height,0px)] z-40 bg-white border-b border-gray-100">
       <div 
-        className="relative flex items-center px-4 py-3"
+        className="relative flex items-center py-3"
         style={{ 
-          paddingLeft: 'max(1rem, env(safe-area-inset-left))',
+          paddingLeft: 'max(0rem, env(safe-area-inset-left))',
           paddingRight: 'max(1rem, env(safe-area-inset-right))'
         }}
       >
-        {/* Scrollable filter chips */}
-        <div className="scrollbar-none -mr-2 flex snap-x snap-mandatory gap-2 overflow-x-auto pr-10 flex-1">
-          {filterChips.map((chip) => (
-            <button
-              key={chip.key}
-              onClick={() => onChangeDuration(chip.key)}
-              className={cn(
-                "h-9 rounded-full px-4 whitespace-nowrap text-sm font-medium transition-all flex-shrink-0 snap-start",
-                activeDuration === chip.key
-                  ? "bg-foreground text-background font-semibold"
-                  : "bg-neutral-100 text-foreground/80 hover:bg-neutral-200"
-              )}
-            >
-              {chip.label}
-            </button>
-          ))}
+        {/* Scrollable filter chips with fade-out mask */}
+        <div className="no-scrollbar mask-fade-right flex gap-3 overflow-x-auto pl-4 pr-16 flex-1">
+          {allPills.map((pill) => {
+            const isActive = 
+              (pill.type === 'duration' && activeDuration === pill.key) ||
+              (pill.type === 'topic' && topic === pill.key) ||
+              (pill.type === 'channel' && channel === pill.key);
+
+            const handleClick = () => {
+              if (pill.type === 'duration') {
+                setDuration(pill.key);
+                setTopic(undefined);
+                setChannel(undefined);
+              } else if (pill.type === 'topic') {
+                setTopic(pill.key);
+              } else if (pill.type === 'channel') {
+                setChannel(pill.key);
+              }
+            };
+
+            return (
+              <button
+                key={pill.key}
+                onClick={handleClick}
+                className={cn(
+                  "h-9 rounded-full px-4 whitespace-nowrap text-sm font-medium transition-all flex-shrink-0",
+                  isActive
+                    ? "bg-foreground text-background font-semibold"
+                    : "bg-neutral-100 text-foreground/80 hover:bg-neutral-200"
+                )}
+                role="tab"
+                aria-selected={isActive}
+              >
+                {pill.label}
+              </button>
+            );
+          })}
         </div>
         
         {/* Search icon pinned on the right */}

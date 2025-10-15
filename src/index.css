@@ -46,6 +46,16 @@
   display: none;                /* WebKit */
 }
 
+/* Fade mask utility for horizontal scroll rails */
+.mask-fade-right {
+  -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
 /* iOS Full-Screen Support for Edge-to-Edge Rendering */
 /* Full height baseline - extend background behind status bar */
 html, body, #root { 

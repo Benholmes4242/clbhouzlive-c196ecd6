@@ -20,6 +20,8 @@ export function useDiscoverQuery() {
   // Video-specific filters
   const duration = params.get("duration") || "all";
   const topics = parseTopics(params.get("topics"));
+  const topic = params.get("topic") || undefined;
+  const channel = params.get("channel") || undefined;
 
   // Canonicalize: if duration=shorts is set, redirect to main=shorts
   useEffect(() => {
@@ -69,15 +71,43 @@ export function useDiscoverQuery() {
     setMain(mainPill);
   }
 
+  function setTopic(topicKey: string | undefined) {
+    const newParams = new URLSearchParams(params);
+    if (topicKey) {
+      newParams.set("topic", topicKey);
+      newParams.delete("duration");
+      newParams.delete("channel");
+    } else {
+      newParams.delete("topic");
+    }
+    navigate({ search: `?${newParams.toString()}` }, { replace: true });
+  }
+
+  function setChannel(channelKey: string | undefined) {
+    const newParams = new URLSearchParams(params);
+    if (channelKey) {
+      newParams.set("channel", channelKey);
+      newParams.delete("duration");
+      newParams.delete("topic");
+    } else {
+      newParams.delete("channel");
+    }
+    navigate({ search: `?${newParams.toString()}` }, { replace: true });
+  }
+
   return { 
     main, 
     sub, 
     duration, 
-    topics, 
+    topics,
+    topic,
+    channel,
     setMain, 
     setSub, 
     setDuration, 
-    toggleTopic, 
+    toggleTopic,
+    setTopic,
+    setChannel,
     setMainFromFilter 
   };
 }
