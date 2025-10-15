@@ -138,13 +138,16 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Handle Shorts tab directly (no sliding panels needed)
   if (main === 'shorts') {
     return (
-      <ShortsGrid 
-        items={currentContent || []} 
-        onOpen={onMediaClick}
-        isLoading={loading}
-        hasMore={hasMore}
-        onLoadMore={loadMore}
-      />
+      <>
+        <ShortsSuggestedProfiles />
+        <ShortsGrid 
+          items={currentContent || []} 
+          onOpen={onMediaClick}
+          isLoading={loading}
+          hasMore={hasMore}
+          onLoadMore={loadMore}
+        />
+      </>
     );
   }
 
