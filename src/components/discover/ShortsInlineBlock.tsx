@@ -121,39 +121,33 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
         </h3>
 
         {/* Meta Row */}
-        <div className="mt-0.5 flex items-center gap-2 text-[13px] text-muted-foreground">
-          {/* Avatar */}
-          {short.user && (
-            <>
-              <Avatar className="w-5 h-5 flex-shrink-0">
-                <AvatarImage 
-                  src={short.user.avatar} 
-                  alt={short.user.name} 
-                />
-                <AvatarFallback className="text-[10px]">
-                  {short.user.name[0].toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <span className="truncate max-w-[80px]">
-                {short.user.name}
-              </span>
-            </>
-          )}
+        <div className="mt-0.5 flex items-center justify-between gap-2 text-[13px] text-muted-foreground">
+          {/* Left: Avatar + Creator Name */}
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            {short.user && (
+              <>
+                <Avatar className="w-5 h-5 flex-shrink-0">
+                  <AvatarImage 
+                    src={short.user.avatar} 
+                    alt={short.user.name} 
+                  />
+                  <AvatarFallback className="text-[10px]">
+                    {short.user.name[0].toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="truncate">
+                  {short.user.name}
+                </span>
+              </>
+            )}
+          </div>
 
-          {/* Likes */}
+          {/* Right: Likes */}
           {short.likes !== undefined && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-shrink-0">
               <Heart className="w-3.5 h-3.5" />
               <span className="tabular-nums">{formatLikes(short.likes)}</span>
             </div>
-          )}
-
-          {/* Age */}
-          {short.createdAt && (
-            <>
-              <span>•</span>
-              <span className="tabular-nums">{formatRelativeTime(short.createdAt)}</span>
-            </>
           )}
         </div>
       </div>
