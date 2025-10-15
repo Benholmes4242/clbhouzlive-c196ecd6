@@ -1,6 +1,7 @@
 import React from 'react';
-import { Play } from 'lucide-react';
+import { Play, Heart } from 'lucide-react';
 import { ExploreContentItem } from '@/components/explore/types';
+import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 
 interface ShortCardProps {
   item: ExploreContentItem;
@@ -69,13 +70,26 @@ export default function ShortCard({ item, onClick, height, isPinned }: ShortCard
         </h3>
 
         {/* Meta Row */}
-        <div className="flex items-center gap-1.5 mt-0.5 text-[13px] text-muted-foreground">
-          <span className="font-medium">{item.user?.name || 'Unknown'}</span>
+        <div className="flex items-center justify-between mt-0.5 text-[13px] text-muted-foreground">
+          {/* Left: Avatar + Username */}
+          <div className="flex items-center gap-1.5">
+            {item.user?.avatar && (
+              <OptimizedAvatar
+                src={item.user.avatar}
+                alt={item.user.name || 'User'}
+                size={16}
+                fallback={item.user.name?.[0] || 'U'}
+              />
+            )}
+            <span className="font-medium">{item.user?.name || 'Unknown'}</span>
+          </div>
+          
+          {/* Right: Heart + Count */}
           {item.likes !== undefined && (
-            <>
-              <span>•</span>
-              <span>{item.likes.toLocaleString()} likes</span>
-            </>
+            <div className="flex items-center gap-1">
+              <Heart className="w-3.5 h-3.5" />
+              <span>{item.likes.toLocaleString()}</span>
+            </div>
           )}
         </div>
       </div>
