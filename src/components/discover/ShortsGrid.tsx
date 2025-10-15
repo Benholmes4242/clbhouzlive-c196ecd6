@@ -116,7 +116,7 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
                   item={item}
                   onClick={() => handleCardClick(item, index)}
                   height={280 * (1 + getHeightVariant(item.id) / 100)}
-                  autoplay={idx % 2 === 0}
+                  autoplay={idx % 2 === 1}
                 />
               ))}
             </div>
