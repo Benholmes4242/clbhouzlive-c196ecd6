@@ -145,12 +145,12 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
           <div className="flex items-center gap-2 min-w-0 flex-1">
             {short.user && (
               <>
-                <Avatar className="w-5 h-5 flex-shrink-0">
+                <Avatar className="w-6 h-6 flex-shrink-0">
                   <AvatarImage 
                     src={short.user.avatar} 
                     alt={short.user.name} 
                   />
-                  <AvatarFallback className="text-[10px]">
+                  <AvatarFallback className="text-[11px]">
                     {short.user.name[0].toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
