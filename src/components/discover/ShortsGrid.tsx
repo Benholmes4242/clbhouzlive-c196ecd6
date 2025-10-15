@@ -99,6 +99,7 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
                 onClick={() => handleCardClick(item, index)}
                 height={280}
                 isPinned
+                autoplay={index === 0}
               />
             ))}
           </div>
@@ -109,24 +110,26 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
           <div className="grid grid-cols-2 gap-1 items-start">
             {/* Left Column */}
             <div className="flex flex-col gap-2">
-              {leftColumn.map(({ item, index }) => (
+              {leftColumn.map(({ item, index }, idx) => (
                 <ShortCard
                   key={item.id}
                   item={item}
                   onClick={() => handleCardClick(item, index)}
                   height={280 * (1 + getHeightVariant(item.id) / 100)}
+                  autoplay={idx % 2 === 0}
                 />
               ))}
             </div>
             
             {/* Right Column */}
             <div className="flex flex-col gap-2">
-              {rightColumn.map(({ item, index }) => (
+              {rightColumn.map(({ item, index }, idx) => (
                 <ShortCard
                   key={item.id}
                   item={item}
                   onClick={() => handleCardClick(item, index)}
                   height={280 * (1 + getHeightVariant(item.id) / 100)}
+                  autoplay={idx % 2 === 0}
                 />
               ))}
             </div>

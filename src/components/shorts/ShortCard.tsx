@@ -8,9 +8,11 @@ interface ShortCardProps {
   onClick: () => void;
   height?: number;
   isPinned?: boolean;
+  autoplay?: boolean;
 }
 
-export default function ShortCard({ item, onClick, height, isPinned }: ShortCardProps) {
+export default function ShortCard({ item, onClick, height, isPinned, autoplay }: ShortCardProps) {
+  const isVideo = item.type === 'video' || item.src?.includes('.mp4') || item.src?.includes('.webm');
   return (
     <button
       onClick={onClick}
@@ -26,13 +28,24 @@ export default function ShortCard({ item, onClick, height, isPinned }: ShortCard
           boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 6px 16px rgba(0,0,0,0.06)'
         }}
       >
-        {/* Thumbnail */}
-        <img
-          src={item.thumbnailSrc || item.src}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          loading="lazy"
-        />
+        {/* Thumbnail/Video */}
+        {isVideo && autoplay ? (
+          <video
+            src={item.src}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+        ) : (
+          <img
+            src={item.thumbnailSrc || item.src}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
+          />
+        )}
 
         {/* Gradient overlay for badges */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent" />
@@ -63,7 +76,7 @@ export default function ShortCard({ item, onClick, height, isPinned }: ShortCard
       </div>
 
       {/* Caption Block - Below Card */}
-      <div className="mt-2.5 px-1 text-left">
+      <div className="mt-2 px-1 text-left">
         {/* Title */}
         <h3 className="text-[15px] font-semibold line-clamp-1 text-foreground">
           {item.title || 'Untitled'}
