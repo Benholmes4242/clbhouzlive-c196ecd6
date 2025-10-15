@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 
@@ -62,14 +62,6 @@ export default function ShortCard({ item, onClick, height, isPinned, autoplay }:
           </div>
         )}
 
-        {/* Play Icon - Top Right */}
-        <div className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full backdrop-blur-sm border flex items-center justify-center transition-opacity group-hover:opacity-100 opacity-90"
-             style={{ 
-               backgroundColor: 'rgba(18,18,18,0.48)', 
-               borderColor: 'rgba(255,255,255,0.12)'
-             }}>
-          <Play className="w-4 h-4 text-white fill-white" />
-        </div>
 
         {/* Hover Overlay */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
