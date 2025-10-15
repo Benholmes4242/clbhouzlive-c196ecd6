@@ -63,7 +63,7 @@ export default function ShortCard({ item, onClick, height, isPinned }: ShortCard
       </div>
 
       {/* Caption Block - Below Card */}
-      <div className="mt-2 px-1 text-left">
+      <div className="mt-2.5 px-1 text-left">
         {/* Title */}
         <h3 className="text-[15px] font-semibold line-clamp-1 text-foreground">
           {item.title || 'Untitled'}
@@ -77,7 +77,7 @@ export default function ShortCard({ item, onClick, height, isPinned }: ShortCard
               <OptimizedAvatar
                 src={item.user.avatar}
                 alt={item.user.name || 'User'}
-                size={16}
+                size={20}
                 fallback={item.user.name?.[0] || 'U'}
               />
             )}
