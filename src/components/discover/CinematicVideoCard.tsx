@@ -149,10 +149,21 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
 
         {/* Meta row: left = handle, center = date, right = likes */}
         <div className="mt-1 grid grid-cols-[auto_1fr_auto] items-center gap-3 text-[14px] text-muted-foreground">
-          {/* Handle */}
-          <span className="truncate max-w-[35vw]">
-            @{item.user?.username || item.user?.name || 'unknown'}
-          </span>
+          {/* Avatar + Handle */}
+          <div className="flex items-center gap-2 truncate max-w-[45vw]">
+            <Avatar className="w-6 h-6 flex-shrink-0">
+              <AvatarImage 
+                src={item.user?.avatar || ''} 
+                alt={item.user?.username || item.user?.name || 'User'} 
+              />
+              <AvatarFallback className="text-xs">
+                {(item.user?.username?.[0] || item.user?.name?.[0] || 'U').toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <span className="truncate">
+              @{item.user?.username || item.user?.name || 'unknown'}
+            </span>
+          </div>
 
           {/* Centered date */}
           <span className="justify-self-center text-muted-foreground/70 tabular-nums">
