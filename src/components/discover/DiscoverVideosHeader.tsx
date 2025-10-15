@@ -23,7 +23,7 @@ interface FilterPill {
 
 const featuredPills: FilterPill[] = [
   { key: 'trending', label: 'Trending', type: 'topic' },
-  { key: '4-bros', label: '4 Bros', type: 'channel' },
+  { key: '4-bros', label: 'fourbros', type: 'channel' },
   { key: 'bryson-dechambeau', label: 'Bryson DeChambeau', type: 'channel' },
 ];
 
