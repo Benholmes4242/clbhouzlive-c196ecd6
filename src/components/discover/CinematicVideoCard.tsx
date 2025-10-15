@@ -128,14 +128,14 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             e.stopPropagation();
             toggleMute();
           }}
-          className="absolute bottom-2 right-2 grid h-8 w-8 place-items-center rounded-full border border-white/15 bg-black/55 text-white backdrop-blur-sm shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform active:scale-95 z-30"
+          className="absolute bottom-2 right-2 grid h-7 w-7 place-items-center rounded-full border border-white/15 bg-black/55 text-white backdrop-blur-sm shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform active:scale-95 z-30"
           aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           aria-pressed={!isMuted}
         >
           {isMuted ? (
-            <VolumeX size={20} />
+            <VolumeX size={18} />
           ) : (
-            <Volume2 size={20} />
+            <Volume2 size={18} />
           )}
         </button>
       </div>
