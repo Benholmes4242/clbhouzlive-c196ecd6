@@ -91,7 +91,7 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
       <div ref={gridRef} className="pb-4 px-1">
         {/* First Row - Pinned, Same Height */}
         {firstRow.length > 0 && (
-          <div className="grid grid-cols-2 gap-2 mb-2">
+          <div className="grid grid-cols-2 gap-1 mb-1">
             {firstRow.map((item, index) => (
               <ShortCard
                 key={item.id}
@@ -106,9 +106,9 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
         
         {/* Masonry Columns - Staggered */}
         {(leftColumn.length > 0 || rightColumn.length > 0) && (
-          <div className="grid grid-cols-2 gap-2 items-start">
+          <div className="grid grid-cols-2 gap-1 items-start">
             {/* Left Column */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               {leftColumn.map(({ item, index }) => (
                 <ShortCard
                   key={item.id}
@@ -120,7 +120,7 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
             </div>
             
             {/* Right Column */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               {rightColumn.map(({ item, index }) => (
                 <ShortCard
                   key={item.id}
