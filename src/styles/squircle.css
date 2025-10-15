@@ -3,15 +3,15 @@
    ======================================== */
 
 :root {
-  /* sizing - reduced */
-  --sq-size:        96px;   /* outer hit area */
-  --sq-img:         96px;   /* same as outer - no padding */
+  /* sizing - smaller */
+  --sq-size:        80px;   /* outer hit area */
+  --sq-img:         80px;   /* same as outer - no padding */
   --sq-ring:        0px;    /* no padding between image and border */
-  --sq-gap:         10px;   /* image↔name gap */
-  --sq-pill-h:      22px;   /* follow pill height */
+  --sq-gap:         8px;    /* image↔name gap */
+  --sq-pill-h:      20px;   /* follow pill height */
 
   /* radii (superellipse vibe) */
-  --sq-radius:      18px;   /* scaled down */
+  --sq-radius:      16px;   /* scaled down */
 
   /* glass-black border colors (no green) */
   --sq-glass-bg:    rgba(255,255,255,0.02);
