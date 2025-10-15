@@ -57,7 +57,7 @@ export default function ShortCard({ item, onClick, height, isPinned, autoplay }:
       </div>
 
       {/* Caption Block - Below Card */}
-      <div className="mt-2 px-1 text-left">
+      <div className="mt-1.5 px-1 text-left">
         {/* Title */}
         <h3 className="text-[15px] font-semibold line-clamp-1 text-foreground">
           {item.title || 'Untitled'}
