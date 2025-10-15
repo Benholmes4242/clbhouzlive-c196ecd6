@@ -115,7 +115,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
         {/* Duration Badge - Bottom Left */}
         {duration > 0 && (
           <time 
-            className="absolute bottom-2.5 left-2.5 rounded-md px-2 py-0.5 bg-black/45 backdrop-blur-sm border border-white/20 text-white text-[13px] font-medium z-30 pointer-events-none"
+            className="absolute bottom-2.5 left-2.5 rounded-md px-2.5 py-1 bg-black/45 backdrop-blur-sm border border-white/20 text-white text-[13px] font-medium z-30 pointer-events-none"
             aria-hidden="true"
           >
             {formatDuration(duration)}
@@ -128,7 +128,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             e.stopPropagation();
             toggleMute();
           }}
-          className="absolute bottom-2.5 right-2.5 h-9 w-9 rounded-full bg-black/45 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform active:scale-95 z-30"
+          className="absolute bottom-2.5 right-2.5 h-9 w-9 rounded-md bg-black/45 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform active:scale-95 z-30"
           aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           aria-pressed={!isMuted}
         >
