@@ -67,7 +67,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   const [recentHistory, setRecentHistory] = useState<Set<string>>(new Set());
   
   // Fetch real Shorts data for inline blocks (only when on Videos tab)
-  const { content: shortsContent } = useInfiniteExploreContent(
+  const { content: shortsContent, hasMore: hasMoreShorts, loadMore: loadMoreShorts } = useInfiniteExploreContent(
     FILTER_TYPES.VIDEOS,
     undefined,
     getDurationFilter('shorts')
@@ -75,7 +75,15 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   
   // Suggestions hooks with real data
   const { next: getNextChannel } = useChannelSuggestions();
-  const { next: getNextShort } = useShortsSuggestions(shortsContent || []);
+  const { next: getNextShort } = useShortsSuggestions(shortsContent || [], {
+    hasMore: hasMoreShorts,
+    prefetch: () => {
+      if (hasMoreShorts) {
+        // Fire and forget
+        loadMoreShorts();
+      }
+    }
+  });
   
   // Detect Shorts mode for compact view
   const isShorts = main === 'shorts' || duration === 'shorts';

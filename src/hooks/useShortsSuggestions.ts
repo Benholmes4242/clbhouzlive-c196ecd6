@@ -3,13 +3,13 @@ import { ExploreContentItem } from '@/components/explore/types';
 
 const POOL_SIZE = 16;
 const RECENT_HISTORY_SIZE = 20;
-const REFILL_THRESHOLD = 6;
+const REFILL_THRESHOLD = 10;
 
 /**
  * Hook to manage a pool of shorts suggestions from real data
  * Returns a next() function to get the next available short
  */
-export function useShortsSuggestions(shortsData: ExploreContentItem[] = []) {
+export function useShortsSuggestions(shortsData: ExploreContentItem[] = [], opts?: { prefetch?: () => void; hasMore?: boolean }) {
   const poolRef = useRef<ExploreContentItem[]>([]);
   const recentIdsRef = useRef<Set<string>>(new Set());
   const [initialized, setInitialized] = useState(false);
@@ -38,11 +38,20 @@ export function useShortsSuggestions(shortsData: ExploreContentItem[] = []) {
         console.debug('[ShortsPool] Refilling pool, current size:', poolRef.current.length);
       }
       refillPool();
+      // Proactively prefetch next page if available
+      if (opts?.hasMore) {
+        opts.prefetch?.();
+        if (import.meta.env.DEV) console.debug('[ShortsPool] Prefetch requested');
+      }
     }
     
     // Find first item not in avoid list
     const index = poolRef.current.findIndex(item => !avoidIds.has(item.id));
     if (index === -1) {
+      if (opts?.hasMore) {
+        opts.prefetch?.();
+        if (import.meta.env.DEV) console.debug('[ShortsPool] No match, prefetch requested');
+      }
       if (import.meta.env.DEV) {
         console.warn('[ShortsPool] No available shorts! Pool size:', poolRef.current.length, 
           'avoidIds:', avoidIds.size, 'totalShorts:', shortsData.length);
@@ -67,7 +76,7 @@ export function useShortsSuggestions(shortsData: ExploreContentItem[] = []) {
     }
     
     return item;
-  }, [refillPool, shortsData.length]);
+  }, [refillPool, shortsData.length, opts?.hasMore, opts?.prefetch]);
 
   // Initialize/reinitialize pool when data changes
   useEffect(() => {
