@@ -84,6 +84,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
 
   return (
     <div ref={containerRef} className="w-full mb-5">
+      {/* Video Container */}
       <div className="relative w-full aspect-[3/2] overflow-hidden">
         <video
           ref={videoRef}
@@ -94,94 +95,42 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           onClick={() => onMediaClick?.(item)}
         />
 
-        {/* Subtle gradient for text readability */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/15 via-black/5 to-transparent z-[15]" />
-
-        {/* ON-VIDEO OVERLAY (BOTTOM, FULL-WIDTH, NO GAP) */}
-          <div
-          className={clsx(
-            "absolute bottom-0 left-0 right-0 z-20",
-            "bg-black/25 backdrop-blur-sm",
-            "border-t border-white/10",
-            "px-4 pt-[6px] pb-[8px]",
-            "transition-all duration-200 ease-out overflow-hidden",
-            isExpanded ? "max-h-[50vh]" : "max-h-[68px]"
-          )}
-          onClick={toggleExpanded}
-          onKeyDown={(e) => e.key === 'Enter' && toggleExpanded()}
-          role="button"
-          tabIndex={0}
-          aria-expanded={isExpanded}
-          aria-label="Video details"
+        {/* Progress Bar - Bottom Edge of Video */}
+        <div 
+          className="absolute bottom-0 left-0 right-0 h-[3px] bg-white/15 z-20"
+          role="progressbar"
+          aria-valuenow={progress}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Video progress"
         >
-          {/* FULL-WIDTH progress bar at bottom edge of overlay */}
-          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/15">
-            <div
-              ref={setProgressFillRef}
-              className="h-full origin-left bg-white/85"
-              style={{ transform: 'scaleX(0)' }}
-              aria-hidden="true"
-            />
-          </div>
-
-          {/* Caption (one line) */}
-          <h3
-            className={clsx(
-              "text-white text-[17px] font-semibold leading-tight",
-              isExpanded ? "line-clamp-none" : "line-clamp-1"
-            )}
-          >
-            {item.title || 'No caption'}
-          </h3>
-
-          {/* Meta row: left = handle, center = date, right = likes */}
           <div
-            className="
-              mt-1 grid grid-cols-[auto_1fr_auto] items-center
-              text-[13px] text-white/85
-              whitespace-nowrap select-none
-            "
-          >
-            {/* Handle (truncate if long) */}
-            <span className="truncate max-w-[46vw] shrink-0">
-              @{item.user?.username || item.user?.name || 'unknown'}
-            </span>
-
-            {/* Centered date */}
-            <span className="justify-self-center text-white/70 tabular-nums">
-              {item.createdAt ? formatRelativeTime(item.createdAt) : '2 days ago'}
-            </span>
-
-            {/* Likes on the right (never wraps) */}
-            <span className="justify-self-end shrink-0 tabular-nums">
-              {formatLikes(item.likes || 0)} likes
-            </span>
-          </div>
-
-          {/* Optional: extra gradient on expand */}
-          {isExpanded && (
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 -z-10 bg-gradient-to-t from-black/40 to-transparent" />
-          )}
+            ref={setProgressFillRef}
+            className="h-full origin-left bg-white/85"
+            style={{ transform: 'scaleX(0)' }}
+            aria-hidden="true"
+          />
         </div>
 
-        {/* Duration Badge - TOP LEFT */}
+        {/* Duration Badge - Bottom Left */}
         {duration > 0 && (
           <time 
-            className="absolute top-3 left-3 rounded-md px-2.5 py-1 bg-black/25 backdrop-blur-sm border border-white/10 text-white text-[13px] font-medium z-30 pointer-events-none"
-            aria-label={`Duration ${formatDuration(duration)}`}
+            className="absolute bottom-2.5 left-2.5 rounded-md px-2.5 py-1 bg-black/45 backdrop-blur-sm border border-white/20 text-white text-[13px] font-medium z-30 pointer-events-none"
+            aria-hidden="true"
           >
             {formatDuration(duration)}
           </time>
         )}
         
-        {/* Mute/Unmute Button - TOP RIGHT */}
+        {/* Mute/Unmute Button - Bottom Right */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             toggleMute();
           }}
-          className="absolute top-3 right-3 h-9 w-9 rounded-full bg-black/25 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform active:scale-95 z-30"
+          className="absolute bottom-2.5 right-2.5 h-9 w-9 rounded-md bg-black/45 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform active:scale-95 z-30"
           aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+          aria-pressed={!isMuted}
         >
           {isMuted ? (
             <VolumeX size={18} />
@@ -189,6 +138,32 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             <Volume2 size={18} />
           )}
         </button>
+      </div>
+
+      {/* Meta Block - Below Video */}
+      <div className="px-4 pt-2 pb-3">
+        {/* Caption (one line) */}
+        <h3 className="text-[17px] font-bold leading-tight line-clamp-1 text-foreground">
+          {item.title || 'No caption'}
+        </h3>
+
+        {/* Meta row: left = handle, center = date, right = likes */}
+        <div className="mt-1 grid grid-cols-[auto_1fr_auto] items-center gap-3 text-[14px] text-muted-foreground">
+          {/* Handle */}
+          <span className="truncate max-w-[35vw]">
+            @{item.user?.username || item.user?.name || 'unknown'}
+          </span>
+
+          {/* Centered date */}
+          <span className="justify-self-center text-muted-foreground/70 tabular-nums">
+            {item.createdAt ? formatRelativeTime(item.createdAt) : '2 days ago'}
+          </span>
+
+          {/* Likes */}
+          <span className="justify-self-end tabular-nums">
+            {formatLikes(item.likes || 0)} likes
+          </span>
+        </div>
       </div>
     </div>
   );
