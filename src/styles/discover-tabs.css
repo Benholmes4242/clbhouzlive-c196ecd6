@@ -2,9 +2,21 @@
 
 /* Tokens */
 :root {
-  --tab-active-color: #f5a623;
-  --tab-active-gradient: linear-gradient(135deg, #f5a623, #ff8c00);
-  --tab-active-shadow: 0 2px 8px rgba(245,166,35,0.25);
+  /* Brand accent */
+  --brand-orange: #f5a623;
+  --brand-orange-2: #ffcf77;
+
+  /* Glass */
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-bg-pills: rgba(255, 255, 255, 0.55);
+  --glass-blur: 18px;
+  --glass-border: rgba(255, 255, 255, 0.35);
+  --glass-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  /* Motion */
+  --ease-spring: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --fast-1: 160ms;
+  --fast-2: 220ms;
 }
 
 /* Tab container */
@@ -18,36 +30,31 @@
 /* Base tab */
 .discover-tab {
   position: relative;
-  padding: 12px 0;
-  color: rgba(0,0,0,0.65);
+  padding: 8px 0;
+  color: rgba(0, 0, 0, 0.6);
   font-weight: 500;
-  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.discover-tab:active {
-  transform: scale(0.97);
+  transition: color var(--fast-2) var(--ease-spring), transform var(--fast-1) var(--ease-spring);
+  will-change: transform, opacity;
 }
 
 /* Active state with spring animation */
 .discover-tab.active {
-  color: #f5a623;
+  color: #111;
   font-weight: 600;
-  transform: scale(1.04);
-  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateZ(0) scale(1.02);
 }
 
-/* Active tab underline */
+/* Active tab underline with gradient glow */
 .discover-tab.active::after {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
+  left: 22%;
+  right: 22%;
+  bottom: -3px;
   height: 2px;
-  background: var(--tab-active-gradient);
-  border-radius: 999px;
-  box-shadow: var(--tab-active-shadow);
-  transform: translateZ(0);
+  background: linear-gradient(90deg, var(--brand-orange), var(--brand-orange-2));
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(245, 166, 35, 0.25);
 }
 
 /* Underline with glow (pseudo element) - REMOVED */
@@ -64,17 +71,50 @@
   transform: translateZ(0);
 } */
 
-/* Frosted glass header */
+/* Frosted glass header - unified container */
 .discover-header {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
-/* Enhanced sticky state */
-.discover-header.is-sticky {
-  background: rgba(255,255,255,0.8);
+/* Filter pills - glassy capsules */
+.filter-pill {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 500;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: var(--glass-bg-pills);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transform: translateZ(0);
+  transition: transform var(--fast-1) var(--ease-spring), background var(--fast-2) var(--ease-spring), color var(--fast-2) var(--ease-spring), box-shadow var(--fast-2) var(--ease-spring);
+  will-change: transform, opacity;
+}
+
+.filter-pill:active {
+  transform: scale(0.97);
+}
+
+.filter-pill.active {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--brand-orange), var(--brand-orange-2));
+  box-shadow: 0 4px 10px rgba(245, 166, 35, 0.25);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .discover-tab.active {
+    transform: none;
+  }
+  .filter-pill:active {
+    transform: none;
+  }
 }
