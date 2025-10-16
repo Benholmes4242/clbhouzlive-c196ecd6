@@ -53,16 +53,18 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
       className="discover-header relative w-full"
     >
       {/* Tab buttons */}
-      <div className="discover-tabs flex w-full items-center px-3 pt-2 pb-1.5">
-        <div className="flex flex-1 justify-around">
+      <div className="discover-tabs flex w-full items-center">
+        <div className="flex flex-1">
           {tabs.map((tab, index) => (
             <button
               key={tab.id}
               ref={el => tabRefs.current[index] = el}
               onClick={() => handleTabClick(tab.id)}
               className={cn(
-                "discover-tab flex-1 text-center relative z-10 text-[15px]",
-                main === tab.id && "active"
+                "discover-tab flex-1 py-3 px-4 text-center relative z-10 text-[15px]",
+                main === tab.id 
+                  ? "active" 
+                  : "hover:text-foreground/70"
               )}
             >
               {tab.label}
