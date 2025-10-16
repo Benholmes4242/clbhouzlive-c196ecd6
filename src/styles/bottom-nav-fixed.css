@@ -15,6 +15,8 @@
   z-index: 100 !important;
   padding-bottom: max(env(safe-area-inset-bottom), 0px);
   backface-visibility: hidden; /* Reduces flicker on iOS */
+  margin-bottom: 0 !important; /* Prevent any margin gaps */
+  transform: translate3d(0, 0, 0) !important; /* Force GPU compositing and prevent floating */
 }
 
 /* Ensure page content never sits under the fixed nav */
