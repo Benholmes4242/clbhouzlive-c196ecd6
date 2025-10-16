@@ -2,7 +2,6 @@ import React from 'react';
 import { Heart } from 'lucide-react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
-import { usePerfMonitor, trackImageLoad } from '@/hooks/usePerfMonitor';
 
 interface ShortCardProps {
   item: ExploreContentItem;
@@ -13,15 +12,7 @@ interface ShortCardProps {
 }
 
 export default function ShortCard({ item, onClick, height, isPinned, autoplay }: ShortCardProps) {
-  // Performance monitoring
-  usePerfMonitor('ShortCard', { id: item.id, isPinned, autoplay });
-  
   const isVideo = item.type === 'video' || item.src?.includes('.mp4') || item.src?.includes('.webm');
-  const thumbnailUrl = item.thumbnailSrc || item.src || '';
-  
-  // Track thumbnail load
-  const thumbTracking = trackImageLoad(thumbnailUrl, `ShortCard:thumb:${item.id}`);
-  
   return (
     <button
       onClick={onClick}
@@ -49,12 +40,10 @@ export default function ShortCard({ item, onClick, height, isPinned, autoplay }:
           />
         ) : (
           <img
-            src={thumbnailUrl}
+            src={item.thumbnailSrc || item.src}
             alt=""
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
-            onLoad={thumbTracking.onLoad}
-            onError={thumbTracking.onError}
           />
         )}
 

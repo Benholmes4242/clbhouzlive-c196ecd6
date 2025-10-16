@@ -17,7 +17,6 @@ import type { LengthKey } from '@/components/videos/VideoChipRail';
 import { useChannelSuggestions } from '@/hooks/useChannelSuggestions';
 import { useShortsSuggestions } from '@/hooks/useShortsSuggestions';
 import { buildInterleavedFeed, InterleavedItem } from '@/utils/interleaveFeed';
-import { usePerfMonitor } from '@/hooks/usePerfMonitor';
 
 interface DiscoverContentProps {
   onLike: (contentId: string) => void;
@@ -64,10 +63,6 @@ function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): 
 
 export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery, selectedTags = [] }: DiscoverContentProps) {
   const { main, sub, duration } = useDiscoverQuery();
-  
-  // Performance monitoring
-  usePerfMonitor('DiscoverContent', { main, duration });
-  
   const [currentContent, setCurrentContent] = useState<ExploreContentItem[] | null>(null);
   const [recentHistory, setRecentHistory] = useState<Set<string>>(new Set());
   
@@ -187,7 +182,6 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
           const interleavedFeed = React.useMemo(() => {
             if (key !== 'all') return null;
             
-            const t0 = performance.now();
             const feed = buildInterleavedFeed(
               itemsForKey,
               getNextShort,
@@ -195,9 +189,8 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
               0, // Always start from 0, the function handles global counting internally
               recentHistory
             );
-            const duration = performance.now() - t0;
             
-            // Debug log with performance data
+            // Debug log
             if (import.meta.env.DEV) {
               const shortsBlocks = feed.filter(i => i.kind === 'shorts_block').length;
               const channelSuggs = feed.filter(i => i.kind === 'channel_suggestion').length;
@@ -207,11 +200,6 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
                 channelSuggs,
                 totalItems: feed.length,
                 sampleKinds: feed.slice(0, 20).map(i => i.kind)
-              });
-              // eslint-disable-next-line no-console
-              console.debug('[perf] interleave compute', {
-                items: itemsForKey.length,
-                duration: `${duration.toFixed(2)}ms`
               });
             }
             

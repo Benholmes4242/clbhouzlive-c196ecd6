@@ -22,18 +22,10 @@ import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
-import { usePerfMonitor } from '@/hooks/usePerfMonitor';
 
 type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
 
 const Discover = () => {
-  // Performance monitoring
-  React.useEffect(() => {
-    performance.mark('discover:route:mount');
-  }, []);
-  
-  usePerfMonitor('Discover', { route: window.location.pathname + window.location.search });
-  
   // Use vertical feed for consistency with Activity tab
   const USE_MODAL_DISCOVER = false; // using DiscoverVerticalFeed for consistency
   
@@ -95,24 +87,7 @@ const Discover = () => {
 
   // Combine optimistic posts with regular content
   const allContent = React.useMemo(() => {
-    const result = [...optimisticPosts, ...(content || [])];
-    
-    // Performance mark when first content is set
-    if (result.length > 0) {
-      performance.mark('discover:data:first-set');
-      try {
-        performance.measure('discover:data:resolve', 'discover:route:mount', 'discover:data:first-set');
-        const measure = performance.getEntriesByName('discover:data:resolve')[0];
-        if (measure) {
-          // eslint-disable-next-line no-console
-          console.debug('[perf] discover:data:resolve', `${measure.duration.toFixed(2)}ms`, `items: ${result.length}`);
-        }
-      } catch (e) {
-        // Mark might not exist on first render
-      }
-    }
-    
-    return result;
+    return [...optimisticPosts, ...(content || [])];
   }, [optimisticPosts, content]);
 
   // Transform content to MediaItem[] for FullscreenMediaModal - use allContent

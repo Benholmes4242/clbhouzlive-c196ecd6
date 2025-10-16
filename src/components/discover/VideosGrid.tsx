@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import VideoExploreCard from './VideoExploreCard';
 import CinematicVideoCard from './CinematicVideoCard';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -7,8 +7,6 @@ import { ChannelSuggestionCard } from './ChannelSuggestionCard';
 import { ChannelSuggestion } from '@/hooks/useChannelSuggestions';
 import ShortsInlineBlock from './ShortsInlineBlock';
 import ShortsViewer from '@/components/shorts/ShortsViewer';
-import { preloadPosters } from '@/utils/preloadPosters';
-import { getStreamPoster } from '@/utils/stream';
 
 interface VideosGridProps {
   content: ExploreContentItem[];
@@ -73,26 +71,6 @@ const VideosGrid: React.FC<VideosGridProps> = ({
         id: video.id,
         data: video
       }));
-
-  // Extract poster URLs for the first screen to preload
-  const firstPosterUrls = useMemo(() => {
-    return itemsToRender
-      .slice(0, 6)
-      .filter(item => item.kind === 'video')
-      .map((item) => {
-        const v = item.data as ExploreContentItem;
-        // Prefer explicit thumbnail; otherwise derive from stream src
-        return v.thumbnailSrc || getStreamPoster(v.src) || null;
-      })
-      .filter(Boolean) as string[];
-  }, [itemsToRender]);
-
-  // Preload first two posters for faster initial paint
-  useEffect(() => {
-    if (firstPosterUrls.length) {
-      preloadPosters(firstPosterUrls, 2);
-    }
-  }, [firstPosterUrls]);
 
   if (itemsToRender.length === 0 && !isLoading) {
     return (

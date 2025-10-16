@@ -7,7 +7,6 @@ import { Volume2, VolumeX, Heart } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatRelativeTime, formatLikes } from '@/utils/dateFormat';
 import { clsx } from 'clsx';
-import { usePerfMonitor, trackImageLoad, trackVideoReadiness } from '@/hooks/usePerfMonitor';
 
 interface CinematicVideoCardProps {
   item: ExploreContentItem;
@@ -15,9 +14,6 @@ interface CinematicVideoCardProps {
 }
 
 const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaClick }) => {
-  // Performance monitoring
-  usePerfMonitor('CinematicVideoCard', { id: item.id });
-  
   const videoRef = useRef<HTMLVideoElement>(null);
   const { ref: containerRef, isInView } = useIntersectionObserver({ threshold: 0.4, rootMargin: '0px 0px -10% 0px' });
   const { isMuted, toggleMute } = useExclusiveVideoAudio(item.id);
@@ -65,15 +61,8 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
     };
 
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
-    
-    // Track video readiness events
-    const cleanup = trackVideoReadiness(video, item.id);
-    
-    return () => {
-      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      cleanup();
-    };
-  }, [item.id]);
+    return () => video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+  }, []);
 
   const formatDuration = (seconds: number): string => {
     if (seconds < 60) {
@@ -92,9 +81,6 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
 
   const videoUrl = item.media?.[0]?.media_url || item.src || '';
   const thumbnailUrl = item.thumbnailSrc || '';
-  
-  // Track poster image load
-  const posterTracking = trackImageLoad(thumbnailUrl, `CinematicVideoCard:poster:${item.id}`);
 
   return (
     <div ref={containerRef} className="w-full mb-2">
@@ -107,9 +93,6 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           playsInline
           className="w-full h-full object-cover"
           onClick={() => onMediaClick?.(item)}
-          onLoadStart={() => {
-            posterTracking.onLoad();
-          }}
         />
 
         {/* Progress Bar - Bottom Edge of Video */}
