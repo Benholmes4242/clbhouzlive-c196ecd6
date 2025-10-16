@@ -544,7 +544,9 @@ body.ecm-open .app-shell--with-header-padding {
   /* GPU compositing for smooth transforms */
   will-change: transform, opacity;
   transform: translateZ(0);
-  transition: transform 260ms cubic-bezier(.22,.61,.36,1), opacity 180ms ease-out;
+  transition: 
+    transform var(--chrome-trans-ms, 260ms) var(--chrome-ease, cubic-bezier(.22,.61,.36,1)), 
+    opacity var(--chrome-fade-ms, 180ms) ease-out;
 }
 
 /* Clubhouse scroll container: prevent pull-down behavior */

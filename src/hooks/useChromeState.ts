@@ -13,12 +13,19 @@ interface ScrollMetrics {
   velocity: number;
 }
 
+// Timing constants
+const TOP_GUARD_PX = Math.round(window.innerHeight * 0.5);
+const HIDE_DEBOUNCE_MS = 140;
+const REVEAL_DEBOUNCE_MS = 140;
+const REVEAL_DEBOUNCE_AT_TOP_MS = 0; // Instant reveal at top
+
 export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChromeStateOptions = {}) => {
   const [chromeState, setChromeState] = useState<ChromeState>('visible');
   const scrollMetricsRef = useRef<ScrollMetrics>({ deltaY: 0, scrollTop: 0, velocity: 0 });
   const lastScrollTop = useRef(0);
   const lastScrollTime = useRef(Date.now());
-  const debounceTimer = useRef<number | null>(null);
+  const revealTimer = useRef<number | null>(null);
+  const hideTimer = useRef<number | null>(null);
   
   // Edge swipe detection
   const edgeSwipeRef = useRef<{
@@ -53,21 +60,32 @@ export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChr
     };
   }, [chromeState, disabled]);
 
-  const hideChrome = useCallback(() => {
+  const scheduleHide = useCallback((ms: number) => {
     if (isModalOpen || disabled) return;
-    if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    debounceTimer.current = window.setTimeout(() => {
+    if (revealTimer.current) {
+      clearTimeout(revealTimer.current);
+      revealTimer.current = null;
+    }
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+    hideTimer.current = window.setTimeout(() => {
       setChromeState('hidden');
-    }, 140);
+    }, ms);
   }, [isModalOpen, disabled]);
 
-  const showChrome = useCallback(() => {
+  const scheduleReveal = useCallback((ms: number) => {
     if (disabled) return;
-    if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    debounceTimer.current = window.setTimeout(() => {
+    if (hideTimer.current) {
+      clearTimeout(hideTimer.current);
+      hideTimer.current = null;
+    }
+    if (revealTimer.current) clearTimeout(revealTimer.current);
+    revealTimer.current = window.setTimeout(() => {
       setChromeState('visible');
-    }, 120);
+    }, ms);
   }, [disabled]);
+
+  const hideChrome = useCallback(() => scheduleHide(HIDE_DEBOUNCE_MS), [scheduleHide]);
+  const showChrome = useCallback(() => scheduleReveal(REVEAL_DEBOUNCE_MS), [scheduleReveal]);
 
   const toggleChrome = useCallback(() => {
     if (isModalOpen || disabled) return;
@@ -87,22 +105,26 @@ export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChr
     lastScrollTop.current = scrollTop;
     lastScrollTime.current = now;
 
-    // Don't hide until scrolled past first post (~50% of viewport height)
-    const minScrollThreshold = window.innerHeight * 0.5;
-    if (scrollTop < minScrollThreshold) {
-      showChrome();
+    // Ignore iOS rubber-band at absolute top
+    if (scrollTop <= 0 && deltaY < 0) return;
+
+    const atTopZone = scrollTop <= TOP_GUARD_PX;
+
+    // Always show chrome in top zone
+    if (atTopZone) {
+      scheduleReveal(REVEAL_DEBOUNCE_AT_TOP_MS);
       return;
     }
 
-    // Hide on upward scroll (deltaY > 0 means scrolling down the page = content moving up)
+    // Hide on downward scroll (deltaY > 0 means scrolling down the page = content moving up)
     if (deltaY > 8 && timeDelta < 100) {
-      hideChrome();
+      scheduleHide(HIDE_DEBOUNCE_MS);
     }
-    // Reveal on downward scroll (deltaY < 0 means scrolling up the page = content moving down)
+    // Reveal on upward scroll (deltaY < 0 means scrolling up the page = content moving down)
     else if (deltaY < -6 && timeDelta < 120) {
-      showChrome();
+      scheduleReveal(REVEAL_DEBOUNCE_MS);
     }
-  }, [isModalOpen, disabled, hideChrome, showChrome]);
+  }, [isModalOpen, disabled, scheduleHide, scheduleReveal]);
 
   // Tap toggle handler
   const handleTap = useCallback((event: React.MouseEvent | React.TouchEvent) => {

@@ -1,12 +1,20 @@
 /* Clubhouse Chrome Auto-Hide Animations */
 
+/* Unified chrome transition tokens */
+:root {
+  --chrome-ease: cubic-bezier(.22,.61,.36,1);
+  --chrome-trans-ms: 260ms;
+  --chrome-fade-ms: 180ms;
+}
+
 /* Chrome elements with GPU transforms - smoother, cinematic timing */
 .chrome-header,
 .chrome-bottom-nav {
   will-change: transform, opacity;
   transform: translateZ(0);
-  transition: transform 260ms cubic-bezier(.22,.61,.36,1), 
-              opacity 180ms ease-out;
+  transition: 
+    transform var(--chrome-trans-ms) var(--chrome-ease), 
+    opacity var(--chrome-fade-ms) ease-out;
 }
 
 /* Hidden state transforms */
