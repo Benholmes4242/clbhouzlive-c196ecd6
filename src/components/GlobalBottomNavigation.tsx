@@ -167,16 +167,12 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
             className={cn(
               "global-bottom-nav bottom-nav-fixed",
               "fixed! bottom-0! left-0! right-0! w-full",
-              "z-[100]!",
-              "m-0!" // Ensure no margins
+              "z-[100]!"
             )}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
-            style={{
-              transform: 'none', // Prevent Framer Motion from adding transforms that might cause floating
-            }}
           >
             <div
               ref={navRef}

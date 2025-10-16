@@ -1,16 +1,17 @@
-/* Discover Tabs - Frosted Glass Harmony */
+/* Discover Tabs - Active Tab Underline with Subtle Depth */
 
 /* Tokens */
 :root {
   --tab-active-color: #f5a623;
-  --tab-active-gradient: linear-gradient(135deg, #f5a623, #ff8c00);
-  --tab-active-shadow: 0 2px 8px rgba(245,166,35,0.25);
+  --tab-underline-h: 2px;
+  --tab-underline-glow: 0 2px 4px rgba(245,166,35,0.25);
+  --tab-underline-gradient: linear-gradient(90deg, #f5a623 0%, #ffcd71 100%);
 }
 
-/* Tab container */
+/* Tab container should be position:relative for pseudo underline */
 .discover-tabs {
   display: flex;
-  gap: 0;
+  gap: 20px;
   position: relative;
   align-items: center;
 }
@@ -21,37 +22,16 @@
   padding: 12px 0;
   color: rgba(0,0,0,0.65);
   font-weight: 500;
-  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: color 160ms ease;
 }
 
-.discover-tab:active {
-  transform: scale(0.97);
-}
-
-/* Active state with spring animation */
+/* Active state – subtle color lift */
 .discover-tab.active {
-  color: #f5a623;
-  font-weight: 600;
-  transform: scale(1.04);
-  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  color: #111;
 }
 
-/* Active tab underline */
+/* Underline with glow (pseudo element) */
 .discover-tab.active::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  height: 2px;
-  background: var(--tab-active-gradient);
-  border-radius: 999px;
-  box-shadow: var(--tab-active-shadow);
-  transform: translateZ(0);
-}
-
-/* Underline with glow (pseudo element) - REMOVED */
-/* .discover-tab.active::after {
   content: "";
   position: absolute;
   left: 0;
@@ -62,19 +42,12 @@
   border-radius: 999px;
   box-shadow: var(--tab-underline-glow);
   transform: translateZ(0);
-} */
-
-/* Frosted glass header */
-.discover-header {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
 }
 
-/* Enhanced sticky state */
+/* Optional: sticky header translucency while scrolling */
 .discover-header.is-sticky {
-  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255,255,255,0.75);
+  transition: background 160ms ease;
 }
