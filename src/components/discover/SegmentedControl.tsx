@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { MainPill } from '@/constants/discoverPills';
 import { Search } from 'lucide-react';
+import '@/styles/discover-tabs.css';
 
 interface SegmentedControlProps {
   activeTab: string;
@@ -49,10 +50,10 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
   return (
     <div 
       ref={containerRef}
-      className="relative w-full bg-white border-b border-gray-200"
+      className="discover-header relative w-full bg-white border-b border-gray-200"
     >
       {/* Tab buttons */}
-      <div className="flex w-full items-center">
+      <div className="discover-tabs flex w-full items-center">
         <div className="flex flex-1">
           {tabs.map((tab, index) => (
             <button
@@ -60,9 +61,9 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
               ref={el => tabRefs.current[index] = el}
               onClick={() => handleTabClick(tab.id)}
               className={cn(
-                "flex-1 py-1.5 px-4 text-center transition-all duration-200 relative z-10 text-[17px] font-medium",
+                "discover-tab flex-1 py-1.5 px-4 text-center transition-all duration-200 relative z-10 text-[17px] font-medium",
                 main === tab.id 
-                  ? "text-foreground" 
+                  ? "active text-foreground" 
                   : "text-muted-foreground hover:text-foreground/70"
               )}
             >
@@ -82,12 +83,6 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
           </button>
         )}
       </div>
-      
-      {/* Sliding underline indicator */}
-      <div
-        className="absolute bottom-0 h-0.5 bg-brand-orange transition-all duration-300 ease-out"
-        style={indicatorStyle}
-      />
     </div>
   );
 };

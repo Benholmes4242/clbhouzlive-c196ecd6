@@ -1,0 +1,64 @@
+/* Echo Button Glass Styling */
+
+/* Variables */
+:root {
+  --echo-bg: rgba(255,255,255,0.65);
+  --echo-blur: 12px;
+  --echo-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  --echo-radius: 999px;
+  --echo-padding: 10px 14px;
+  --echo-gap: 8px;
+  --echo-font: 14px;
+}
+
+/* Base glass style */
+.echo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--echo-gap);
+  padding: var(--echo-padding);
+  border-radius: var(--echo-radius);
+  background: var(--echo-bg);
+  backdrop-filter: blur(var(--echo-blur));
+  -webkit-backdrop-filter: blur(var(--echo-blur));
+  box-shadow: var(--echo-shadow);
+  border: 1px solid rgba(255,255,255,0.35);
+  color: #111;
+  font-size: var(--echo-font);
+  line-height: 1;
+  transform: translateZ(0);
+  transition: transform 120ms ease, box-shadow 200ms ease, background 160ms ease;
+  min-height: 44px;
+}
+
+/* Hover/press feedback (mobile-safe) */
+.echo-btn:active,
+.echo-btn.is-pressed {
+  transform: scale(0.98);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.22);
+  background: rgba(255,255,255,0.72);
+}
+
+/* Optional tiny "alive" pulse every ~6s */
+@keyframes echoPulse {
+  0%, 98%, 100% { transform: scale(1); }
+  99% { transform: scale(1.02); }
+}
+
+.echo-btn.is-idle {
+  animation: echoPulse 6s ease-in-out infinite;
+}
+
+/* Reduced motion: remove pulse entirely */
+@media (prefers-reduced-motion: reduce) {
+  .echo-btn.is-idle { 
+    animation: none; 
+  }
+}
+
+/* Dark-context variant (if over dark video) */
+.theme-dark .echo-btn {
+  background: rgba(20,20,20,0.45);
+  color: #fff;
+  border-color: rgba(255,255,255,0.18);
+}

@@ -1,0 +1,53 @@
+/* Discover Tabs - Active Tab Underline with Subtle Depth */
+
+/* Tokens */
+:root {
+  --tab-active-color: #f5a623;
+  --tab-underline-h: 2px;
+  --tab-underline-glow: 0 2px 4px rgba(245,166,35,0.25);
+  --tab-underline-gradient: linear-gradient(90deg, #f5a623 0%, #ffcd71 100%);
+}
+
+/* Tab container should be position:relative for pseudo underline */
+.discover-tabs {
+  display: flex;
+  gap: 20px;
+  position: relative;
+  align-items: center;
+}
+
+/* Base tab */
+.discover-tab {
+  position: relative;
+  padding: 12px 0;
+  color: rgba(0,0,0,0.65);
+  font-weight: 500;
+  transition: color 160ms ease;
+}
+
+/* Active state – subtle color lift */
+.discover-tab.active {
+  color: #111;
+}
+
+/* Underline with glow (pseudo element) */
+.discover-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: var(--tab-underline-h);
+  background: var(--tab-underline-gradient);
+  border-radius: 999px;
+  box-shadow: var(--tab-underline-glow);
+  transform: translateZ(0);
+}
+
+/* Optional: sticky header translucency while scrolling */
+.discover-header.is-sticky {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255,255,255,0.75);
+  transition: background 160ms ease;
+}
