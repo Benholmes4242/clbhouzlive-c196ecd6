@@ -1542,26 +1542,36 @@ html[data-immersive="true"] .app-shell--topSpacer {
     backdrop-filter: blur(8px);
   }
 
-  /* Apple-Inspired Pill Components */
+  /* Frosted Glass Pill Components */
   .pill {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-3 py-2
-           select-none whitespace-nowrap text-sm font-medium
-           backdrop-blur-md bg-transparent text-black
-           border border-gray-300 shadow-none
-           transition-colors transition-shadow duration-150;
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-3.5 py-1.5
+           select-none whitespace-nowrap text-[15px] font-medium
+           transition-all duration-300;
     line-height: 1.2;
+    border-radius: 999px;
+    padding: 6px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: rgba(0, 0, 0, 0.7);
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 
   .pill:hover { 
-    @apply bg-gray-50 border-gray-400; 
+    background: rgba(255, 255, 255, 0.45);
+    border-color: rgba(255, 255, 255, 0.6);
   }
   
   .pill:active { 
-    @apply scale-[0.99] bg-gray-100; 
+    transform: scale(0.97);
+    transition: transform 0.1s ease;
   }
 
   .pill--active {
-    @apply bg-gray-100 text-black border-gray-400;
+    color: white;
+    background: linear-gradient(135deg, #f5a623, #ff8c00);
+    box-shadow: 0 4px 10px rgba(245, 166, 35, 0.25);
+    border: none;
   }
 
   .pill:focus-visible {
