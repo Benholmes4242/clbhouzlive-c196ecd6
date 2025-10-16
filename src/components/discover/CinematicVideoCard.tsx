@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 import { Volume2, VolumeX, Heart } from 'lucide-react';
@@ -15,49 +15,27 @@ interface CinematicVideoCardProps {
 
 const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaClick }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { ref: containerRef, isInView } = useIntersectionObserver({ threshold: 0.4, rootMargin: '0px 0px -10% 0px' });
   const { isMuted, toggleMute } = useExclusiveVideoAudio(item.id);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState<number>(0);
-  const [isExpanded, setIsExpanded] = useState(false);
   const { progress, setProgressFillRef } = useVideoProgressSync(videoRef.current);
 
-  const toggleExpanded = () => setIsExpanded(v => !v);
+  // Use robust video visibility hook with 60% threshold
+  const { containerRef, isVisible } = useVideoVisibility({
+    threshold: 0.6,
+    rootMargin: '0px',
+    videoRef,
+    shouldAutoplay: true,
+    globallyMuted: isMuted
+  });
 
-  // Auto-play when in view
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (isInView) {
-      video.muted = isMuted;
-      video.loop = true;
-      video.play().then(() => {
-        setIsPlaying(true);
-      }).catch(err => {
-        console.log('Autoplay prevented:', err);
-      });
-    } else {
-      video.pause();
-      setIsPlaying(false);
-    }
-  }, [isInView, isMuted]);
-
-  // Update mute state
-  useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.muted = isMuted;
-    }
-  }, [isMuted]);
-
-  // Capture duration once loaded
+  // Capture duration and set loop
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     const handleLoadedMetadata = () => {
       setDuration(Math.floor(video.duration));
+      video.loop = true;
     };
 
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
