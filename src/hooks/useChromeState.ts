@@ -15,7 +15,7 @@ interface ScrollMetrics {
 
 // Timing constants
 const TOP_GUARD_PX = Math.round(window.innerHeight * 0.5);
-const HIDE_DEBOUNCE_MS = 0; // Instant hide (matches tap speed)
+const HIDE_DEBOUNCE_MS = 140;
 const REVEAL_DEBOUNCE_MS = 140;
 const REVEAL_DEBOUNCE_AT_TOP_MS = 0; // Instant reveal at top
 
