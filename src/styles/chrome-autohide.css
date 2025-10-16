@@ -1,15 +1,15 @@
 /* Clubhouse Chrome Auto-Hide Animations */
 
-/* Unified chrome transition tokens */
-:root {
+/* Fast timing tokens for Clubhouse */
+.clubhouse-page {
   --chrome-ease: cubic-bezier(.22,.61,.36,1);
-  --chrome-trans-ms: 260ms;
-  --chrome-fade-ms: 180ms;
+  --chrome-trans-ms: 180ms;  /* Fast transform */
+  --chrome-fade-ms: 120ms;   /* Fast opacity */
 }
 
-/* Chrome elements with GPU transforms - smoother, cinematic timing */
-.chrome-header,
-.chrome-bottom-nav {
+/* Clubhouse chrome elements with fast GPU transforms */
+.clubhouse-page .chrome-header,
+.clubhouse-page .chrome-bottom-nav {
   will-change: transform, opacity;
   transform: translateZ(0);
   transition: 
@@ -18,13 +18,13 @@
 }
 
 /* Hidden state transforms */
-body.chrome-hidden .chrome-header {
+.clubhouse-page.chrome-hidden .chrome-header {
   transform: translateY(-100%) translateZ(0);
   opacity: 0.96;
   pointer-events: none;
 }
 
-body.chrome-hidden .chrome-bottom-nav {
+.clubhouse-page.chrome-hidden .chrome-bottom-nav {
   transform: translateY(100%) translateZ(0);
   opacity: 0.96;
   pointer-events: none;
@@ -32,22 +32,22 @@ body.chrome-hidden .chrome-bottom-nav {
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-  .chrome-header,
-  .chrome-bottom-nav {
+  .clubhouse-page .chrome-header,
+  .clubhouse-page .chrome-bottom-nav {
     transition: none !important;
   }
   
-  body.chrome-hidden .chrome-header {
+  .clubhouse-page.chrome-hidden .chrome-header {
     transform: translateY(-100%) translateZ(0);
   }
   
-  body.chrome-hidden .chrome-bottom-nav {
+  .clubhouse-page.chrome-hidden .chrome-bottom-nav {
     transform: translateY(100%) translateZ(0);
   }
 }
 
 /* Accessibility: Update aria-hidden and inert when chrome is hidden */
-body.chrome-hidden .chrome-header,
-body.chrome-hidden .chrome-bottom-nav {
+.clubhouse-page.chrome-hidden .chrome-header,
+.clubhouse-page.chrome-hidden .chrome-bottom-nav {
   /* Note: aria-hidden and inert should be set via React refs */
 }

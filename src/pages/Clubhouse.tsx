@@ -106,7 +106,7 @@ const Clubhouse = () => {
   }
 
   return (
-    <div className="h-screen bg-transparent overflow-hidden relative clubhouse-root" style={{
+    <div className={`h-screen bg-transparent overflow-hidden relative clubhouse-page ${chromeControls.isHidden ? 'chrome-hidden' : ''}`} style={{
       minHeight: '100dvh',
     }}>
       {/* Intersection sentinel for header fade-away */}

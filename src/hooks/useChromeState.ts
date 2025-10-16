@@ -13,10 +13,10 @@ interface ScrollMetrics {
   velocity: number;
 }
 
-// Timing constants
+// Timing constants - Clubhouse fast chrome
 const TOP_GUARD_PX = Math.round(window.innerHeight * 0.5);
-const HIDE_DEBOUNCE_MS = 140;
-const REVEAL_DEBOUNCE_MS = 140;
+const HIDE_DEBOUNCE_MS = 90;   // Fast hide
+const REVEAL_DEBOUNCE_MS = 90; // Fast reveal
 const REVEAL_DEBOUNCE_AT_TOP_MS = 0; // Instant reveal at top
 
 export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChromeStateOptions = {}) => {
