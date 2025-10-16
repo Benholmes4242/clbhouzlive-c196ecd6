@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSnapModal } from '@/hooks/useSnapModal';
@@ -12,6 +12,7 @@ import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
 import { cn } from '@/lib/utils';
+import { auditComponentMount, markPerformance } from '@/utils/clubhouseAudit';
 
 // Routes where bottom navigation should be hidden
 const HIDDEN_ROUTES = [
@@ -34,6 +35,7 @@ const GlobalBottomNavigation: React.FC = () => {
   const { activeTab, handleTabClick } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
   
   // Determine if current route should hide navigation
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname);
@@ -69,6 +71,17 @@ const GlobalBottomNavigation: React.FC = () => {
   // State for tags handled in CreateMomentModal
   const [localSelectedTags, setLocalSelectedTags] = React.useState<any[]>([]);
 
+  // Audit on mount
+  useEffect(() => {
+    if (isClubhouseRoute) {
+      markPerformance('bottom-nav-mount-start');
+      auditComponentMount(navRef.current, 'GlobalBottomNavigation', {
+        checkLayers: true,
+        checkA11y: true
+      });
+      markPerformance('bottom-nav-mount-end');
+    }
+  }, [isClubhouseRoute]);
 
   // Handle keyboard visibility and visual viewport changes
   useEffect(() => {
@@ -129,6 +142,7 @@ const GlobalBottomNavigation: React.FC = () => {
       <AnimatePresence>
         {showNavigation && (
           <motion.div
+            ref={navRef}
             className={cn(
               "global-bottom-nav bottom-nav-fixed",
               "fixed! bottom-0! left-0! right-0! w-full",

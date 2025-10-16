@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { useAppLogo } from '@/hooks/useAppLogo';
@@ -7,6 +7,7 @@ import { useHeader } from '@/contexts/GlobalHeaderContext';
 import SearchPill from './SearchPill';
 import HeaderNavigation from '@/components/header/HeaderNavigation';
 import { cn } from '@/lib/utils';
+import { auditComponentMount, auditSafeAreaVars, markPerformance } from '@/utils/clubhouseAudit';
 
 interface ClubhouseHeaderNewProps {
   className?: string;
@@ -20,6 +21,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
   const { variant } = useHeader();
   const isMobile = useIsMobile();
   const [searchOpen, setSearchOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
 
   // Get variant-specific styles
   const isGlassDark = variant === 'glass-dark';
@@ -33,6 +35,17 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
   const handleLogoClick = () => {
     navigate('/clubhouse');
   };
+
+  // Audit on mount
+  useEffect(() => {
+    markPerformance('header-mount-start');
+    auditSafeAreaVars();
+    auditComponentMount(headerRef.current, 'ClubhouseHeaderNew', {
+      checkLayers: true,
+      checkA11y: true
+    });
+    markPerformance('header-mount-end');
+  }, []);
 
   // Add intersection observer for fade-away behavior
   useEffect(() => {
@@ -75,6 +88,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
     <>
       {/* Main Header */}
       <header
+        ref={headerRef}
         className={cn(
           "relative z-header transition-all duration-300", // Remove sticky but keep original styling
           "h-16 md:h-18", // 64px mobile, 72px desktop

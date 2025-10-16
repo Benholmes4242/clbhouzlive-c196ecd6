@@ -26,6 +26,14 @@ import EngagementRail from './EngagementRail';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { FEATURE_FLAGS, PORTRAIT_MAX_ASPECT_RATIO } from '@/config/featureFlags';
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
+import { 
+  auditComponentMount, 
+  auditIntersectionObserver,
+  logIntersectionEvent,
+  trackScrollMetrics,
+  resetScrollMetrics,
+  markPerformance
+} from '@/utils/clubhouseAudit';
 
 interface ClubhouseVerticalFeedProps {
   posts: ExploreContentItem[];
@@ -200,11 +208,14 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
   // Setup dual intersection observers
   useEffect(() => {
+    markPerformance('feed-observer-setup-start');
+    
     nearRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           const id = e.target.getAttribute('data-postid');
           if (!id) return;
+          logIntersectionEvent('nearRef', id, e.isIntersecting, e.intersectionRatio);
           setShouldAttachMap((m) => ({ ...m, [id]: e.isIntersecting || e.intersectionRatio > 0 }));
         });
       },
@@ -216,11 +227,17 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         entries.forEach((e) => {
           const id = e.target.getAttribute('data-postid');
           if (!id) return;
+          logIntersectionEvent('playRef', id, e.isIntersecting, e.intersectionRatio);
           setAutoplayMap((m) => ({ ...m, [id]: e.intersectionRatio >= 0.65 }));
         });
       },
       { root: null, threshold: [0.0, 0.65, 1.0] }
     );
+
+    auditIntersectionObserver(nearRef.current, 'nearRef (prebuffer)');
+    auditIntersectionObserver(playRef.current, 'playRef (autoplay@65%)');
+    
+    markPerformance('feed-observer-setup-end');
 
     return () => {
       nearRef.current?.disconnect();
@@ -380,6 +397,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     const itemHeight = window.innerHeight;
     const newIndex = Math.round(scrollTop / itemHeight);
     
+    // Track scroll metrics for audit
+    trackScrollMetrics(scrollTop);
+    
     // Immediate index update for responsiveness
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < filteredPosts.length) {
       setCurrentIndex(newIndex);
@@ -508,6 +528,24 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
   const handleReactionCancel = useCallback(() => {
     setShowReactionTray(false);
+  }, []);
+
+  // Audit on mount
+  useEffect(() => {
+    markPerformance('feed-mount-start');
+    auditComponentMount(scrollViewRef.current, 'ClubhouseVerticalFeed', {
+      checkScroll: true,
+      checkLayers: true
+    });
+    markPerformance('feed-mount-end');
+    
+    if (scrollViewRef.current) {
+      markPerformance('first-scroll-ready');
+    }
+
+    return () => {
+      resetScrollMetrics();
+    };
   }, []);
 
   if (filteredPosts.length === 0) {
