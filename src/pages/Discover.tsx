@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, lazy, Suspense } from 'react';
 import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
 
 import SegmentedControl from '@/components/discover/SegmentedControl';
@@ -12,7 +12,6 @@ import { DURATION_FILTERS } from '@/constants/videoFilters';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 // import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned'; // Stored for future use
 import DiscoverContent from '@/components/discover/DiscoverContent';
-import FollowingFeed from '@/components/discover/FollowingFeed';
 import { ChannelsFeed } from '@/components/channels/ChannelsFeed';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
@@ -22,6 +21,9 @@ import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
+
+// Lazy load heavy/inactive components for better initial bundle size
+const FollowingFeed = lazy(() => import('@/components/discover/FollowingFeed'));
 
 type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
 
@@ -213,7 +215,9 @@ const Discover = () => {
               if (key === 'following') {
                 return (
                   <div className="md:container md:mx-auto md:px-0 mt-4">
-                    <FollowingFeed onMediaClick={handleMediaClick} />
+                    <Suspense fallback={null}>
+                      <FollowingFeed onMediaClick={handleMediaClick} />
+                    </Suspense>
                   </div>
                 );
               }

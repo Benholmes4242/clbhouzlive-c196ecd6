@@ -1,8 +1,10 @@
-import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback, lazy, Suspense } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import ShortCardWithObserver from '@/components/shorts/ShortCardWithObserver';
-import ShortsViewer from '@/components/shorts/ShortsViewer';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
+
+// Lazy load fullscreen viewer - only loads when user opens a short
+const ShortsViewer = lazy(() => import('@/components/shorts/ShortsViewer'));
 
 interface ShortsGridProps {
   items: ExploreContentItem[];
@@ -175,13 +177,15 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
         </div>
       )}
 
-      {/* Full-screen Shorts Viewer */}
-      <ShortsViewer
-        items={items}
-        initialIndex={selectedIndex}
-        isOpen={viewerOpen}
-        onClose={handleCloseViewer}
-      />
+      {/* Full-screen Shorts Viewer - lazy loaded */}
+      <Suspense fallback={null}>
+        <ShortsViewer
+          items={items}
+          initialIndex={selectedIndex}
+          isOpen={viewerOpen}
+          onClose={handleCloseViewer}
+        />
+      </Suspense>
     </>
   );
 }
