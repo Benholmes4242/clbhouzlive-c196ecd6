@@ -30,8 +30,8 @@
   color: #111;
 }
 
-/* Underline with glow (pseudo element) */
-.discover-tab.active::after {
+/* Underline with glow (pseudo element) - REMOVED */
+/* .discover-tab.active::after {
   content: "";
   position: absolute;
   left: 0;
@@ -42,7 +42,7 @@
   border-radius: 999px;
   box-shadow: var(--tab-underline-glow);
   transform: translateZ(0);
-}
+} */
 
 /* Optional: sticky header translucency while scrolling */
 .discover-header.is-sticky {
