@@ -57,13 +57,8 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
 
     const io = new IntersectionObserver(([e]) => {
       const visible = e.isIntersecting;
-      const currentStyle = header.getAttribute('style') || '';
-      const baseStyle = '--header-h-mobile:60px';
-      
-      header.setAttribute('style', 
-        `${baseStyle};opacity:${visible ? 1 : 0};transform:${visible ? 'translateY(0)' : 'translateY(-12px)'};pointer-events:${visible ? 'auto' : 'none'}`
-      );
-      
+      // Avoid setting inline transforms that conflict with chrome-autohide CSS
+      // We only toggle a helper class for any non-transform visuals if needed
       document.body.classList.toggle('header-hidden', !visible);
     }, { threshold: 0 });
 
