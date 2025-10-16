@@ -1,6 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
-import { useChromeState } from '@/hooks/useChromeState';
 
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import ExploreFilters from '@/components/explore/ExploreFilters';
@@ -85,18 +84,6 @@ const Discover = () => {
   } = useVerticalMediaFeed();
 
   const { optimisticPosts } = useOptimisticPostInsertion();
-
-  // Chrome auto-hide state (only active when feed is open)
-  const chromeControls = useChromeState({
-    isModalOpen: !isFeedOpen, // Chrome should hide/show when feed is open
-    disabled: !isFeedOpen  // Only enable chrome controls when feed is open
-  });
-
-  // Mark body for Discover-specific CSS overrides
-  useEffect(() => {
-    document.body.classList.add('route-discover');
-    return () => document.body.classList.remove('route-discover');
-  }, []);
 
   // Combine optimistic posts with regular content
   const allContent = React.useMemo(() => {
@@ -270,11 +257,6 @@ const Discover = () => {
               hasMore={hasMore}
               isLoadingMore={loading}
               initialItem={initialItem}
-              onScroll={chromeControls.handleScroll}
-              onTap={chromeControls.handleTap}
-              onTouchStart={chromeControls.handleTouchStart}
-              onTouchMove={chromeControls.handleTouchMove}
-              onTouchEnd={chromeControls.handleTouchEnd}
             />
           )
         )}

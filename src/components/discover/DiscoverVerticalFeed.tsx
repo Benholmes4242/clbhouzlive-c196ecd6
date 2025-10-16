@@ -37,11 +37,7 @@ interface DiscoverVerticalFeedProps {
   onLoadMore: () => void;
   hasMore: boolean;
   isLoadingMore: boolean;
-  onScroll?: (scrollTop: number) => void;
-  onTap?: (event: React.MouseEvent | React.TouchEvent) => void;
-  onTouchStart?: (event: React.TouchEvent) => void;
-  onTouchMove?: (event: React.TouchEvent) => void;
-  onTouchEnd?: (event: React.TouchEvent) => void;
+  onScroll?: (scrollDirection: 'up' | 'down') => void;
   initialItem?: ExploreContentItem;
   initialMediaIndex?: number;
 }
@@ -179,10 +175,6 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   hasMore,
   isLoadingMore,
   onScroll,
-  onTap,
-  onTouchStart,
-  onTouchMove,
-  onTouchEnd,
   initialItem,
   initialMediaIndex = 0
 }) => {
@@ -486,8 +478,6 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
     return words.slice(0, wordLimit).join(' ') + '...';
   };
 
-  const lastScrollTopRef = useRef(0);
-
   const handleScroll = useCallback((event: React.UIEvent<HTMLDivElement>) => {
     const element = event.currentTarget;
     const scrollTop = element.scrollTop;
@@ -502,11 +492,12 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
       if (currentPost && currentPost.type !== 'video') {
         setActiveVideo(null);
       }
-    }
       
-    // Call onScroll callback with scrollTop for chrome auto-hide
-    if (onScroll) {
-      onScroll(scrollTop);
+      // Call onScroll callback if provided
+      if (onScroll) {
+        const direction = newIndex > currentIndex ? 'down' : 'up';
+        onScroll(direction);
+      }
     }
 
     // Load more when near the end
@@ -570,16 +561,6 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
         ref={scrollViewRef}
         className="h-full w-full overflow-y-auto snap-y snap-mandatory"
         onScroll={handleScroll}
-        onClick={onTap}
-        onTouchStart={(e) => {
-          onTouchStart?.(e);
-        }}
-        onTouchMove={(e) => {
-          onTouchMove?.(e);
-        }}
-        onTouchEnd={(e) => {
-          onTouchEnd?.(e);
-        }}
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {posts.map((item, index) => {
