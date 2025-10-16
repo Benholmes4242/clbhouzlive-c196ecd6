@@ -1,0 +1,65 @@
+/* Clubhouse Engagement Rail Animations */
+
+/* Composited layer + smooth curve */
+.engagement-rail {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  transition: transform 260ms cubic-bezier(0.22, 0.61, 0.36, 1),
+              opacity 220ms ease-out;
+}
+
+/* Hidden (pre/post) state */
+.engagement-rail.is-hidden {
+  transform: translateY(12px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Visible (active post) state */
+.engagement-rail.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Optional: slight stagger for each button inside */
+.engagement-rail.is-visible .engagement-btn {
+  transition: transform 220ms cubic-bezier(0.22, 0.61, 0.36, 1),
+              opacity 220ms ease-out;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.engagement-rail.is-visible .engagement-btn:nth-child(1) {
+  transition-delay: 0ms;
+}
+
+.engagement-rail.is-visible .engagement-btn:nth-child(2) {
+  transition-delay: 40ms;
+}
+
+.engagement-rail.is-visible .engagement-btn:nth-child(3) {
+  transition-delay: 80ms;
+}
+
+.engagement-rail.is-visible .engagement-btn:nth-child(4) {
+  transition-delay: 120ms;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .engagement-rail,
+  .engagement-rail .engagement-btn {
+    transition: none !important;
+  }
+  
+  .engagement-rail.is-hidden {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  
+  .engagement-rail.is-visible {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

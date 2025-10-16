@@ -785,6 +785,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 }}
                 isLiked={likedPosts?.includes(item.id)}
                 isVideo={currentMedia.media_type === 'video'}
+                isActive={autoplayMap[item.id] || false}
                 onLike={() => handleLike(item.id)}
                 onComment={() => handleComment(item.id)}
                 onShare={handleShare}

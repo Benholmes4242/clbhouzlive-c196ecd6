@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import '@/styles/engagement-rail.css';
 
 interface EngagementRailProps {
   postId: string;
@@ -14,6 +15,7 @@ interface EngagementRailProps {
   };
   isLiked?: boolean;
   isVideo?: boolean; // New prop to indicate if current post is a video
+  isActive?: boolean; // Wire to active post signal
   onLike: () => void;
   onComment: () => void;
   onShare: () => void;
@@ -39,13 +41,15 @@ const EngagementButton = ({
   count, 
   isActive, 
   onClick, 
-  className 
+  className,
+  ariaLabel
 }: {
   icon: any;
   count: number;
   isActive?: boolean;
   onClick: () => void;
   className?: string;
+  ariaLabel: string;
 }) => {
   const [isPressed, setIsPressed] = useState(false);
 
@@ -56,9 +60,10 @@ const EngagementButton = ({
   };
 
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-1 engagement-btn">
       <button
         data-action="engagement"
+        aria-label={ariaLabel}
         className={cn(
           "relative w-12 h-12 rounded-full flex items-center justify-center",
           "bg-hud-bg backdrop-blur-md border border-hud-border",
@@ -100,6 +105,7 @@ const EngagementRail = ({
   stats,
   isLiked = false,
   isVideo = false,
+  isActive = false,
   onLike,
   onComment,
   onShare,
@@ -111,16 +117,33 @@ const EngagementRail = ({
   const isMobile = useIsMobile();
   const gap = isMobile ? 'gap-4' : 'gap-5'; // 16px mobile, 20px desktop
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const [railVisible, setRailVisible] = useState(false);
 
   const handleAudioToggle = () => {
     toggleGlobalMute();
   };
 
+  // Stagger entrance when post becomes active
+  useEffect(() => {
+    let timeout: number | undefined;
+    if (isActive) {
+      // 60ms delay after post becomes active so video snap/seek finishes first
+      timeout = window.setTimeout(() => setRailVisible(true), 60);
+    } else {
+      setRailVisible(false);
+    }
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [isActive]);
+
   return (
     <div 
+      data-control="action-rail"
       className={cn(
-        "fixed right-4 z-30 flex flex-col items-center",
+        "engagement-rail fixed right-4 z-30 flex flex-col items-center",
         gap,
+        railVisible ? 'is-visible' : 'is-hidden',
         className
       )}
       style={{ bottom: 'calc(var(--bottom-nav-height) + 12px)' }}
@@ -129,8 +152,9 @@ const EngagementRail = ({
       {isOwnPost && onEdit && onDelete && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-1 engagement-btn">
               <button
+                aria-label="Post options"
                 className={cn(
                   "relative w-12 h-12 rounded-full flex items-center justify-center",
                   "bg-hud-bg backdrop-blur-md border border-hud-border",
@@ -168,6 +192,7 @@ const EngagementRail = ({
           icon={isGloballyMuted ? VolumeX : Volume2}
           count={0}
           onClick={handleAudioToggle}
+          ariaLabel={isGloballyMuted ? 'Unmute' : 'Mute'}
         />
       )}
 
@@ -176,18 +201,21 @@ const EngagementRail = ({
         count={stats.likes}
         isActive={isLiked}
         onClick={onLike}
+        ariaLabel={isLiked ? 'Unlike' : 'Like'}
       />
       
       <EngagementButton
         icon={MessageCircle}
         count={stats.comments}
         onClick={onComment}
+        ariaLabel="Comments"
       />
       
       <EngagementButton
         icon={Share}
         count={stats.shares}
         onClick={onShare}
+        ariaLabel="Share"
       />
     </div>
   );
