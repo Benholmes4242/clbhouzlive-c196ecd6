@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Heart } from 'lucide-react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
+import { useAutoplayGuard } from '@/hooks/useAutoplayGuard';
+import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 
 interface ShortCardProps {
   item: ExploreContentItem;
@@ -12,7 +14,16 @@ interface ShortCardProps {
 }
 
 export default function ShortCard({ item, onClick, height, isPinned, autoplay }: ShortCardProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
   const isVideo = item.type === 'video' || item.src?.includes('.mp4') || item.src?.includes('.webm');
+  
+  // Generate poster URL from Stream ID or use existing thumbnailSrc
+  const streamId = item.src ? getStreamIdFromUrl(item.src) : null;
+  const posterUrl = item.thumbnailSrc ?? (streamId ? getStreamPoster(streamId, '0s', 720) : undefined);
+  
+  // Guard autoplay - handles browser blocking gracefully
+  const autoplayBlocked = useAutoplayGuard(videoRef, isVideo && !!autoplay);
+  
   return (
     <button
       onClick={onClick}
@@ -28,19 +39,22 @@ export default function ShortCard({ item, onClick, height, isPinned, autoplay }:
           boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 6px 16px rgba(0,0,0,0.06)'
         }}
       >
-        {/* Thumbnail/Video */}
-        {isVideo && autoplay ? (
+        {/* Video with poster fallback - always render video element for consistency */}
+        {isVideo ? (
           <video
+            ref={videoRef}
             src={item.src}
+            poster={posterUrl}
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            autoPlay
             loop
             muted
             playsInline
+            preload="metadata"
+            data-autoplay-blocked={autoplayBlocked ? '1' : '0'}
           />
         ) : (
           <img
-            src={item.thumbnailSrc || item.src}
+            src={posterUrl || item.src}
             alt=""
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"

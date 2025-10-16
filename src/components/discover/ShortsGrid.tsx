@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
-import ShortCard from '@/components/shorts/ShortCard';
+import ShortCardWithObserver from '@/components/shorts/ShortCardWithObserver';
 import ShortsViewer from '@/components/shorts/ShortsViewer';
+import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 
 interface ShortsGridProps {
   items: ExploreContentItem[];
@@ -23,6 +24,24 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
   const loadingRef = useRef(false);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
+
+  // Preload posters for first visible items on mount
+  useEffect(() => {
+    const firstItems = items.slice(0, 6);
+    firstItems.forEach(item => {
+      if (item.src) {
+        const streamId = getStreamIdFromUrl(item.src);
+        if (streamId) {
+          const posterUrl = getStreamPoster(streamId, '0s', 720);
+          if (posterUrl) {
+            const img = new Image();
+            img.src = posterUrl;
+          }
+        }
+      }
+    });
+  }, [items]);
 
   const handleCardClick = (item: ExploreContentItem, index: number) => {
     setSelectedIndex(index);
@@ -33,6 +52,18 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
   const handleCloseViewer = () => {
     setViewerOpen(false);
   };
+
+  const handleVisibilityChange = useCallback((id: string, visible: boolean) => {
+    setVisibleCards(prev => {
+      const next = new Set(prev);
+      if (visible) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
+      return next;
+    });
+  }, []);
 
   // Masonry layout: first 2 items in a row, rest balanced between 2 columns
   const { firstRow, leftColumn, rightColumn } = useMemo(() => {
@@ -93,13 +124,13 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
         {firstRow.length > 0 && (
           <div className="grid grid-cols-2 gap-1 mb-2">
             {firstRow.map((item, index) => (
-              <ShortCard
+              <ShortCardWithObserver
                 key={item.id}
                 item={item}
                 onClick={() => handleCardClick(item, index)}
                 height={280}
                 isPinned
-                autoplay={index === 0}
+                onVisibilityChange={handleVisibilityChange}
               />
             ))}
           </div>
@@ -110,26 +141,26 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
           <div className="grid grid-cols-2 gap-1 items-start">
             {/* Left Column */}
             <div className="flex flex-col gap-2">
-              {leftColumn.map(({ item, index }, idx) => (
-                <ShortCard
+              {leftColumn.map(({ item, index }) => (
+                <ShortCardWithObserver
                   key={item.id}
                   item={item}
                   onClick={() => handleCardClick(item, index)}
                   height={280 * (1 + getHeightVariant(item.id) / 100)}
-                  autoplay={idx % 2 === 1}
+                  onVisibilityChange={handleVisibilityChange}
                 />
               ))}
             </div>
             
             {/* Right Column */}
             <div className="flex flex-col gap-2">
-              {rightColumn.map(({ item, index }, idx) => (
-                <ShortCard
+              {rightColumn.map(({ item, index }) => (
+                <ShortCardWithObserver
                   key={item.id}
                   item={item}
                   onClick={() => handleCardClick(item, index)}
                   height={280 * (1 + getHeightVariant(item.id) / 100)}
-                  autoplay={idx % 2 === 0}
+                  onVisibilityChange={handleVisibilityChange}
                 />
               ))}
             </div>

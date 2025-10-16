@@ -42,9 +42,10 @@ export function getStreamIdFromUrl(url: string): string | null {
  * Generates a Cloudflare Stream poster URL
  * @param urlOrId - Either a Stream URL or Stream ID
  * @param time - Time offset for thumbnail (default: '1s')
+ * @param height - Optional height for the thumbnail
  * @returns Poster URL or null if Stream ID cannot be determined
  */
-export function getStreamPoster(urlOrId: string, time = '1s'): string | null {
+export function getStreamPoster(urlOrId: string, time = '1s', height?: number): string | null {
   if (!urlOrId) return null;
   
   const streamId = urlOrId.includes('cloudflarestream.com')
@@ -53,5 +54,6 @@ export function getStreamPoster(urlOrId: string, time = '1s'): string | null {
     
   if (!streamId) return null;
   
-  return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${streamId}/thumbnails/thumbnail.jpg?time=${time}`;
+  const heightParam = height ? `&height=${height}` : '';
+  return `https://videodelivery.net/${streamId}/thumbnails/thumbnail.jpg?time=${time}${heightParam}`;
 }
