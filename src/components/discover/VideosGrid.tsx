@@ -80,14 +80,9 @@ const VideosGrid: React.FC<VideosGridProps> = ({
       .slice(0, 6)
       .filter(item => item.kind === 'video')
       .map((item) => {
-        const video = item.data as ExploreContentItem;
-        // Try thumbnailSrc first, then extract from src if it's a stream URL
-        if (video.thumbnailSrc) return video.thumbnailSrc;
-        if (video.src) {
-          const poster = getStreamPoster(video.src);
-          if (poster) return poster;
-        }
-        return null;
+        const v = item.data as ExploreContentItem;
+        // Prefer explicit thumbnail; otherwise derive from stream src
+        return v.thumbnailSrc || getStreamPoster(v.src) || null;
       })
       .filter(Boolean) as string[];
   }, [itemsToRender]);
