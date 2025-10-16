@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import ShortCard from '@/components/shorts/ShortCard';
 import ShortsViewer from '@/components/shorts/ShortsViewer';
+import { usePerfMonitor } from '@/hooks/usePerfMonitor';
 
 interface ShortsGridProps {
   items: ExploreContentItem[];
@@ -19,6 +20,9 @@ const getHeightVariant = (id: string): number => {
 };
 
 export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMore }: ShortsGridProps) {
+  // Performance monitoring
+  usePerfMonitor('ShortsGrid', { itemCount: items.length });
+  
   const gridRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
   const [viewerOpen, setViewerOpen] = useState(false);

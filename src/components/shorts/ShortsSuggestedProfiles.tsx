@@ -5,6 +5,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import { useNavigate } from 'react-router-dom';
 import Squircle from './Squircle';
+import { usePerfMonitor } from '@/hooks/usePerfMonitor';
 
 const AVATAR = { size: 96, radius: 18 };
 
@@ -21,6 +22,9 @@ function Skeleton() {
 }
 
 export default function ShortsSuggestedProfiles() {
+  // Performance monitoring
+  usePerfMonitor('ShortsSuggestedProfiles');
+  
   const { data: creators, isLoading, error } = useMixedProfiles({ 
     limit: 24, 
     mix: { known: 0.6, suggested: 0.4 } 
@@ -30,6 +34,17 @@ export default function ShortsSuggestedProfiles() {
   const [retrying, setRetrying] = useState(false);
   const navigate = useNavigate();
   const { openImmersive } = useImmersiveProfile('', false);
+  
+  // Track when first 6 squircles are visible
+  useEffect(() => {
+    if (loadedImages.size >= 6) {
+      // eslint-disable-next-line no-console
+      console.debug('[perf] first 6 squircles visible', {
+        count: loadedImages.size,
+        timestamp: new Date().toISOString()
+      });
+    }
+  }, [loadedImages.size]);
 
   const handleAvatarClick = (userId: string) => {
     openImmersive(0); // Open immersive profile modal
