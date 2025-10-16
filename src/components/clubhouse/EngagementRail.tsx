@@ -123,17 +123,26 @@ const EngagementRail = ({
     toggleGlobalMute();
   };
 
-  // Stagger entrance when post becomes active
+  // Stagger entrance when post becomes active with debounce
   useEffect(() => {
-    let timeout: number | undefined;
+    let showTimeout: number | undefined;
+    let hideTimeout: number | undefined;
+    
     if (isActive) {
-      // 60ms delay after post becomes active so video snap/seek finishes first
-      timeout = window.setTimeout(() => setRailVisible(true), 60);
+      // Clear any pending hide
+      if (hideTimeout) clearTimeout(hideTimeout);
+      // 120ms delay after post becomes active so video snap/seek finishes first
+      showTimeout = window.setTimeout(() => setRailVisible(true), 120);
     } else {
-      setRailVisible(false);
+      // Clear any pending show
+      if (showTimeout) clearTimeout(showTimeout);
+      // Small delay before hiding to prevent flicker
+      hideTimeout = window.setTimeout(() => setRailVisible(false), 50);
     }
+    
     return () => {
-      if (timeout) clearTimeout(timeout);
+      if (showTimeout) clearTimeout(showTimeout);
+      if (hideTimeout) clearTimeout(hideTimeout);
     };
   }, [isActive]);
 
