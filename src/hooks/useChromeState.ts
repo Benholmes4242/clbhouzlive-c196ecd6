@@ -89,8 +89,24 @@ export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChr
 
   const toggleChrome = useCallback(() => {
     if (isModalOpen || disabled) return;
-    setChromeState(s => s === 'visible' ? 'hidden' : 'visible');
-  }, [isModalOpen, disabled]);
+    
+    // Clear any pending timers
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+    if (revealTimer.current) clearTimeout(revealTimer.current);
+    
+    // Schedule toggle with 140ms debounce
+    const timer = window.setTimeout(() => {
+      setChromeState(s => s === 'visible' ? 'hidden' : 'visible');
+    }, 140);
+    
+    // Store in appropriate timer ref based on current state
+    const currentState = chromeState;
+    if (currentState === 'visible') {
+      hideTimer.current = timer;
+    } else {
+      revealTimer.current = timer;
+    }
+  }, [isModalOpen, disabled, chromeState]);
 
   // Scroll handler (to be called from rAF)
   const handleScroll = useCallback((scrollTop: number) => {
