@@ -219,7 +219,7 @@ const Discover = () => {
               }
               // Both 'shorts' and 'videos' use DiscoverContent
               return (
-                <div className="md:container md:mx-auto md:px-0 mt-4">
+                <div className="md:container md:mx-auto md:px-0 mt-5">
                   <DiscoverContent
                     onLike={handleLike}
                     onFollow={handleFollow}

@@ -55,7 +55,7 @@ const StoryBar = () => {
   if (loading) {
     return (
       <div className="sticky top-16 z-40 bg-background border-b border-border">
-        <div className="px-4 py-2">
+        <div className="px-4 py-5">
           <div className="flex space-x-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex flex-col items-center space-y-1">
@@ -71,7 +71,7 @@ const StoryBar = () => {
 
   return (
     <div className="sticky top-16 z-40 bg-background border-b border-border">
-      <div className="px-4 py-2">
+      <div className="px-4 py-5">
         <Carousel
           opts={{
             align: "start",
