@@ -164,37 +164,37 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
       <AnimatePresence>
         {showNavigation && (
           <motion.div
-            ref={navRef}
             className={cn(
-              "chrome-bottom-nav", // Chrome auto-hide class
               "global-bottom-nav bottom-nav-fixed",
               "fixed! bottom-0! left-0! right-0! w-full",
-              "z-[100]!",
-              // Background extends to very bottom
-              "backdrop-blur-md",
-              isClubhouseRoute 
-                ? "bg-black/60" 
-                : "bg-background/95",
-              // Top border/shadow for separation
-              "before:absolute before:inset-x-0 before:top-0 before:h-px",
-              isClubhouseRoute 
-                ? "before:bg-white/10" 
-                : "before:bg-border/50"
+              "z-[100]!"
             )}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
-            style={{
-              // Prevent iOS Safari viewport issues
-              paddingBottom: 'env(safe-area-inset-bottom)',
-            }}
           >
-            <NavigationBar
-              activeTab={activeTab}
-              onTabClick={handleTabClickWithCamera}
-              variant={isClubhouseRoute ? 'clubhouse' : 'default'}
-            />
+            <div
+              ref={navRef}
+              className={cn(
+                "chrome-bottom-nav", // Chrome auto-hide class lives on inner element to avoid Framer inline transform conflicts
+                "backdrop-blur-md",
+                isClubhouseRoute ? "bg-black/60" : "bg-background/95",
+                // Top border/shadow for separation
+                "relative before:absolute before:inset-x-0 before:top-0 before:h-px",
+                isClubhouseRoute ? "before:bg-white/10" : "before:bg-border/50"
+              )}
+              style={{
+                // Prevent iOS Safari viewport issues
+                paddingBottom: 'env(safe-area-inset-bottom)'
+              }}
+            >
+              <NavigationBar
+                activeTab={activeTab}
+                onTabClick={handleTabClickWithCamera}
+                variant={isClubhouseRoute ? 'clubhouse' : 'default'}
+              />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
