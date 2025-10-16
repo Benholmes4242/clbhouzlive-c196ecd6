@@ -28,7 +28,11 @@ const CLUBHOUSE_ROUTES = [
   '/clubhouse'
 ];
 
-const GlobalBottomNavigation: React.FC = () => {
+interface GlobalBottomNavigationProps {
+  chromeState?: 'visible' | 'hidden';
+}
+
+const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeState = 'visible' }) => {
   const location = useLocation();
   const { isVisible } = useBottomNavigation();
   const { shouldHideBottomNav } = useModalContext();
@@ -82,6 +86,24 @@ const GlobalBottomNavigation: React.FC = () => {
       markPerformance('bottom-nav-mount-end');
     }
   }, [isClubhouseRoute]);
+
+  // Update accessibility when chrome state changes
+  useEffect(() => {
+    if (!navRef.current) return;
+    
+    const isHidden = chromeState === 'hidden';
+    navRef.current.setAttribute('aria-hidden', isHidden.toString());
+    
+    // Update tab order
+    const interactiveElements = navRef.current.querySelectorAll('button, a, input');
+    interactiveElements.forEach(el => {
+      if (isHidden) {
+        el.setAttribute('tabindex', '-1');
+      } else {
+        el.removeAttribute('tabindex');
+      }
+    });
+  }, [chromeState]);
 
   // Handle keyboard visibility and visual viewport changes
   useEffect(() => {
@@ -144,6 +166,7 @@ const GlobalBottomNavigation: React.FC = () => {
           <motion.div
             ref={navRef}
             className={cn(
+              "chrome-bottom-nav", // Chrome auto-hide class
               "global-bottom-nav bottom-nav-fixed",
               "fixed! bottom-0! left-0! right-0! w-full",
               "z-[100]!",

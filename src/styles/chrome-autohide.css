@@ -1,0 +1,45 @@
+/* Clubhouse Chrome Auto-Hide Animations */
+
+/* Chrome elements with GPU transforms */
+.chrome-header,
+.chrome-bottom-nav {
+  will-change: transform;
+  transform: translateZ(0);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hidden state transforms */
+body.chrome-hidden .chrome-header {
+  transform: translateY(-100%) translateZ(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.chrome-hidden .chrome-bottom-nav {
+  transform: translateY(100%) translateZ(0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .chrome-header,
+  .chrome-bottom-nav {
+    transition: none !important;
+  }
+  
+  body.chrome-hidden .chrome-header {
+    transform: translateY(-100%) translateZ(0);
+  }
+  
+  body.chrome-hidden .chrome-bottom-nav {
+    transform: translateY(100%) translateZ(0);
+  }
+}
+
+/* Accessibility: Update aria-hidden and inert when chrome is hidden */
+body.chrome-hidden .chrome-header,
+body.chrome-hidden .chrome-bottom-nav {
+  /* Note: aria-hidden and inert should be set via React refs */
+}

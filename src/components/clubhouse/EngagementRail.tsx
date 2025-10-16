@@ -58,6 +58,7 @@ const EngagementButton = ({
   return (
     <div className="flex flex-col items-center gap-1">
       <button
+        data-action="engagement"
         className={cn(
           "relative w-12 h-12 rounded-full flex items-center justify-center",
           "bg-hud-bg backdrop-blur-md border border-hud-border",

@@ -27,6 +27,7 @@ const ClubTagPill = ({ course, className }: ClubTagPillProps) => {
 
   return (
     <div
+      data-action="course-tag"
       className={cn(
         "absolute z-overlay cursor-pointer transition-all duration-200 club-tag-pill",
         "right-3 md:right-6",

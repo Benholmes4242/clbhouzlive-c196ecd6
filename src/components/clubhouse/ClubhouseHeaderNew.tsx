@@ -13,9 +13,10 @@ interface ClubhouseHeaderNewProps {
   className?: string;
   activeTab?: string;
   onTabChange?: (tab: string) => void;
+  chromeState?: 'visible' | 'hidden';
 }
 
-const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHeaderNewProps) => {
+const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = 'visible' }: ClubhouseHeaderNewProps) => {
   const navigate = useNavigate();
   const { currentLogo } = useAppLogo();
   const { variant } = useHeader();
@@ -84,13 +85,32 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
     }
   }, [searchOpen]);
 
+  // Update accessibility when chrome state changes
+  useEffect(() => {
+    if (!headerRef.current) return;
+    
+    const isHidden = chromeState === 'hidden';
+    headerRef.current.setAttribute('aria-hidden', isHidden.toString());
+    
+    // Update tab order
+    const interactiveElements = headerRef.current.querySelectorAll('button, a, input');
+    interactiveElements.forEach(el => {
+      if (isHidden) {
+        el.setAttribute('tabindex', '-1');
+      } else {
+        el.removeAttribute('tabindex');
+      }
+    });
+  }, [chromeState]);
+
   return (
     <>
       {/* Main Header */}
       <header
         ref={headerRef}
         className={cn(
-          "relative z-header transition-all duration-300", // Remove sticky but keep original styling
+          "chrome-header", // Chrome auto-hide class
+          "relative z-header", // Remove transition, handled by chrome-autohide.css
           "h-16 md:h-18", // 64px mobile, 72px desktop
           // Keep original variant-specific backgrounds for clubhouse
           isGlassDark && "backdrop-blur-md bg-black/60",
@@ -130,6 +150,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange }: ClubhouseHead
           <nav className="flex items-center space-x-1 md:space-x-4">
             {/* Mobile Search Button */}
             <button 
+              data-action="search"
               className={cn(
                 "md:hidden p-2 md:p-3 flex-shrink-0 mt-3 transition-colors",
                 isGlassDark && "hover:bg-white/10 text-white/80 hover:text-white",

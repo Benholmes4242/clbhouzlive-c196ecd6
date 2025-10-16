@@ -144,17 +144,17 @@ const HeaderNavigation = () => {
   if (!user) {
     return (
       <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
-        <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleNotificationsClick}>
+        <Button data-action="notifications" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleNotificationsClick}>
           <Bell className="h-5 w-5" />
         </Button>
 
-        <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleProfileClick}>
+        <Button data-action="profile" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleProfileClick}>
           <User className="h-5 w-5" />
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}>
+            <Button data-action="settings" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}>
               <Settings className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
@@ -174,7 +174,7 @@ const HeaderNavigation = () => {
 
   return (
     <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
-      <Button variant="ghost" className={cn("relative p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleNotificationsClick}>
+      <Button data-action="notifications" variant="ghost" className={cn("relative p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleNotificationsClick}>
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -185,7 +185,7 @@ const HeaderNavigation = () => {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}>
+          <Button data-action="profile" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}>
             <User className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
@@ -211,7 +211,7 @@ const HeaderNavigation = () => {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}>
+          <Button data-action="settings" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}>
             <Settings className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>

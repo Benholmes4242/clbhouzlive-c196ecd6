@@ -35,6 +35,7 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
       {/* User Profile */}
       <div className="flex items-center gap-3 mb-3 pointer-events-auto">
         <button
+          data-action="profile"
           onClick={onUserClick}
           className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           style={{ minWidth: '44px', minHeight: '44px' }}
@@ -88,6 +89,7 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
           
           {description.length > 100 && (
             <button
+              data-action="description-toggle"
               onClick={() => setShowFullDescription(!showFullDescription)}
               className="text-white/80 text-sm mt-1 hover:text-white transition-colors"
               style={{ 

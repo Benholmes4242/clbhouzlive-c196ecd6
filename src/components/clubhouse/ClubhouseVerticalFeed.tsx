@@ -42,6 +42,11 @@ interface ClubhouseVerticalFeedProps {
   hasMore: boolean;
   isLoadingMore: boolean;
   onCurrentPostChange?: (index: number) => void;
+  onScroll?: (scrollTop: number) => void;
+  onTap?: (event: React.MouseEvent | React.TouchEvent) => void;
+  onTouchStart?: (event: React.TouchEvent) => void;
+  onTouchMove?: (event: React.TouchEvent) => void;
+  onTouchEnd?: (event: React.TouchEvent) => void;
 }
 
 // VideoWithAutoplay component moved outside to prevent recreation on re-renders
@@ -104,7 +109,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onLoadMore,
   hasMore,
   isLoadingMore,
-  onCurrentPostChange
+  onCurrentPostChange,
+  onScroll,
+  onTap,
+  onTouchStart,
+  onTouchMove,
+  onTouchEnd
 }) => {
   const { user } = useSupabaseSession();
   
@@ -400,6 +410,13 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     // Track scroll metrics for audit
     trackScrollMetrics(scrollTop);
     
+    // Call chrome state handler if provided
+    if (onScroll) {
+      requestAnimationFrame(() => {
+        onScroll(scrollTop);
+      });
+    }
+    
     // Immediate index update for responsiveness
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < filteredPosts.length) {
       setCurrentIndex(newIndex);
@@ -559,6 +576,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         ref={scrollViewRef}
         className="h-full w-full overflow-y-auto snap-y snap-mandatory"
         onScroll={handleScroll}
+        onClick={onTap}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
         style={{ 
           scrollbarWidth: 'none', 
           msOverflowStyle: 'none',
@@ -705,8 +726,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 {/* Navigation Arrows - Left and Right */}
                 {hasMultipleMedia && (
                   <>
-                    {/* Left Arrow */}
+                     {/* Left Arrow */}
                     <button
+                      data-control="media-nav"
                       onClick={handlePrevMedia}
                       className={`absolute ${isMobile ? 'left-4' : 'left-4'} top-1/2 -translate-y-1/2 z-30 p-0 transition-all duration-200 w-10 h-10 flex items-center justify-center`}
                       aria-label="Previous media"
@@ -716,6 +738,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
                     {/* Right Arrow */}
                     <button
+                      data-control="media-nav"
                       onClick={handleNextMedia}
                       className={`absolute ${isMobile ? 'right-4' : 'right-4'} top-1/2 -translate-y-1/2 z-30 p-0 transition-all duration-200 w-10 h-10 flex items-center justify-center`}
                       aria-label="Next media"
