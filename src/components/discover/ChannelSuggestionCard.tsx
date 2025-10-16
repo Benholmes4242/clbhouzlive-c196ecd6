@@ -75,14 +75,30 @@ export const ChannelSuggestionCard: React.FC<ChannelSuggestionCardProps> = ({
         className="relative bg-card overflow-hidden cursor-pointer"
         style={{ aspectRatio: '3/2' }}
       >
-        {/* Cover Image */}
+        {/* Cover Image - responsive with modern formats */}
         <div className="absolute inset-0">
-          <img
-            src={suggestion.cover}
-            alt={`${suggestion.title} channel cover`}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
+          <picture>
+            {/* AVIF first - best compression */}
+            <source
+              type="image/avif"
+              srcSet={`${suggestion.cover.replace(/\.(jpg|jpeg|png|webp|avif)$/i, '')}-480.avif 480w, ${suggestion.cover.replace(/\.(jpg|jpeg|png|webp|avif)$/i, '')}-800.avif 800w, ${suggestion.cover.replace(/\.(jpg|jpeg|png|webp|avif)$/i, '')}-1200.avif 1200w`}
+              sizes="(max-width: 480px) 480px, (max-width: 1024px) 800px, 1200px"
+            />
+            {/* WebP fallback */}
+            <source
+              type="image/webp"
+              srcSet={`${suggestion.cover.replace(/\.(jpg|jpeg|png|webp|avif)$/i, '')}-480.webp 480w, ${suggestion.cover.replace(/\.(jpg|jpeg|png|webp|avif)$/i, '')}-800.webp 800w, ${suggestion.cover.replace(/\.(jpg|jpeg|png|webp|avif)$/i, '')}-1200.webp 1200w`}
+              sizes="(max-width: 480px) 480px, (max-width: 1024px) 800px, 1200px"
+            />
+            {/* JPG ultimate fallback */}
+            <img
+              src={suggestion.cover}
+              alt={`${suggestion.title} channel cover`}
+              className="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
         </div>
 
