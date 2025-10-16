@@ -775,21 +775,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               />
 
 
-              {/* Engagement Rail - Bottom Right */}
-              <EngagementRail
-                postId={item.id}
-                stats={{
-                  likes: item.likes || 0,
-                  comments: item.comments || 0,
-                  shares: item.shares || 0
-                }}
-                isLiked={likedPosts?.includes(item.id)}
-                isVideo={currentMedia.media_type === 'video'}
-                isActive={autoplayMap[item.id] || false}
-                onLike={() => handleLike(item.id)}
-                onComment={() => handleComment(item.id)}
-                onShare={handleShare}
-              />
+              {/* Engagement Rail removed - now handled by global overlay */}
             </div>
           );
         })}

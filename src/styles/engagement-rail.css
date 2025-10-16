@@ -1,22 +1,10 @@
 /* Clubhouse Engagement Rail - No entrance animations */
 
-/* Composited layer for smooth performance */
-.engagement-rail {
-  will-change: transform, opacity;
-  transform: translateZ(0);
-  opacity: 1;
-  pointer-events: auto;
-  transition: none;
-}
-
-/* Buttons render immediately in final position */
-.engagement-rail .engagement-btn {
-  transform: translateY(0);
-  opacity: 1;
-  transition: none;
-}
-
-/* Optional: micro-fade for count changes only (≤80ms) */
-.engagement-rail .engagement-btn span {
-  transition: opacity 80ms ease-out;
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  /* Ensure all transitions respect user preference */
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
