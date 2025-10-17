@@ -131,7 +131,7 @@ const Header = ({ activeTab, onTabChange }: { activeTab?: string; onTabChange?: 
             {/* Mobile Search Button */}
             <button 
               className={cn(
-                "md:hidden p-2 rounded-full transition-colors",
+                "md:hidden p-2 md:p-3 flex-shrink-0 mt-3 transition-colors",
                 isGlassDark && "hover:bg-white/10",
                 isSolidLight && "hover:bg-black/10"
               )}

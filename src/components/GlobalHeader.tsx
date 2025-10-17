@@ -173,14 +173,14 @@ const GlobalHeader: React.FC = () => {
               <nav className="flex items-center space-x-2">
                 {/* Mobile Search Button */}
                 <button 
-                  className="md:hidden p-2 rounded-full transition-colors min-h-[44px] min-w-[44px] hover:bg-white/10"
+                  className={cn(
+                    "md:hidden p-2 md:p-3 flex-shrink-0 mt-3 transition-colors",
+                    isClubhousePage ? "hover:bg-white/10 text-white/80 hover:text-white" : "hover:bg-black/10 text-black/70 hover:text-black"
+                  )}
                   onClick={() => setSearchOpen(true)}
                   aria-label="Open search"
                 >
-                  <Search className={cn(
-                    "h-5 w-5",
-                    isClubhousePage ? "text-white" : "text-black"
-                  )} />
+                  <Search className="h-5 w-5" />
                 </button>
                 
                 {/* Navigation Icons */}
