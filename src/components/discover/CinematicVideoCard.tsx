@@ -23,7 +23,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
   // Use robust video visibility hook with 50/50 threshold
   const { containerRef, isVisible } = useVideoVisibility({
     threshold: [0, 0.25, 0.5, 0.75, 1],
-    rootMargin: '0px',
+    rootMargin: '400px 0px',
     videoRef,
     shouldAutoplay: true,
     globallyMuted: isMuted,

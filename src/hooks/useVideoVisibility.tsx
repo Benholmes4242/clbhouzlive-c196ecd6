@@ -15,7 +15,7 @@ interface UseVideoVisibilityOptions {
 
 export const useVideoVisibility = ({
   threshold = [0, 0.1, 0.25, 0.5, 0.75, 1],
-  rootMargin = '0px 0px 12% 0px',
+  rootMargin = '0px',
   onEnterView,
   onExitView,
   videoRef,
