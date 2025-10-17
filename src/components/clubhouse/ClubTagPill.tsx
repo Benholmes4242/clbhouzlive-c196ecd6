@@ -29,8 +29,7 @@ const ClubTagPill = ({ course, className }: ClubTagPillProps) => {
     <div
       data-action="course-tag"
       className={cn(
-        "absolute z-overlay cursor-pointer transition-all duration-200 chrome-follow-top",
-        "right-3 md:right-6",
+        "cursor-pointer transition-all duration-200",
         className
       )}
       onClick={handleCourseClick}

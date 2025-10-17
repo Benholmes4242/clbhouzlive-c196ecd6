@@ -10,6 +10,7 @@ import { useSnapModal } from '@/hooks/useSnapModal';
 import { useChromeState } from '@/hooks/useChromeState';
 import { useChromeAnchors } from '@/hooks/useChromeAnchors';
 import { EngagementRailOverlay } from '@/components/clubhouse/EngagementRailOverlay';
+import { ClubTagPillOverlay } from '@/components/clubhouse/ClubTagPillOverlay';
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
@@ -176,7 +177,8 @@ const Clubhouse = () => {
       likes: post.likes || 0,
       comments: post.comments || 0,
       shares: post.shares || 0,
-      isVideo: currentMedia.media_type === 'video'
+      isVideo: currentMedia.media_type === 'video',
+      golfCourse: post.golfCourse
     };
   }, [posts, currentPostIndex, likedPosts]);
 
@@ -252,6 +254,9 @@ const Clubhouse = () => {
         onComment={() => activePost && handleComment(activePost.id)}
         onShare={handleShare}
       />
+
+      {/* Club Tag Pill Overlay */}
+      <ClubTagPillOverlay activePost={activePost} />
       
       {/* Post Submission Handler */}
       <PostSubmissionHandler
