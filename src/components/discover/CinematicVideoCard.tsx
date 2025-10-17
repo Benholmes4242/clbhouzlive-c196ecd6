@@ -99,7 +99,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
               name: item.golfCourse.name,
               country: item.golfCourse.country
             }}
-            className="!top-2 !right-2"
+            className="!top-2 !right-2 [&>div]:!px-2.5 [&>div]:!py-1.5 [&>div]:!text-sm [&_svg]:!w-4 [&_svg]:!h-4"
           />
         )}
 
