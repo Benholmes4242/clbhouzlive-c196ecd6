@@ -1,10 +1,8 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { Heart } from 'lucide-react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
-import { useAutoplayVisibility } from '@/hooks/useAutoplayVisibility';
-import { safePlay } from '@/utils/safePlay';
-import { requestPlay, clearIf } from '@/utils/videoBus';
+import { useAutoplayGuard } from '@/hooks/useAutoplayGuard';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 
 interface ShortCardProps {
@@ -23,24 +21,8 @@ export default function ShortCard({ item, onClick, height, isPinned, autoplay }:
   const streamId = item.src ? getStreamIdFromUrl(item.src) : null;
   const posterUrl = item.thumbnailSrc ?? (streamId ? getStreamPoster(streamId, '0s', 720) : undefined);
   
-  // Use 60% visibility threshold for autoplay
-  const shouldPlay = useAutoplayVisibility(videoRef, { playRatio: 0.6 });
-  
-  // Control playback based on visibility
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v || !isVideo) return;
-    
-    if (shouldPlay && autoplay) {
-      requestPlay(v);
-      safePlay(v);
-    } else {
-      try {
-        v.pause();
-        clearIf(v);
-      } catch {}
-    }
-  }, [shouldPlay, autoplay, isVideo]);
+  // Guard autoplay - handles browser blocking gracefully
+  const autoplayBlocked = useAutoplayGuard(videoRef, isVideo && !!autoplay);
   
   return (
     <button
@@ -68,6 +50,7 @@ export default function ShortCard({ item, onClick, height, isPinned, autoplay }:
             muted
             playsInline
             preload="metadata"
+            data-autoplay-blocked={autoplayBlocked ? '1' : '0'}
           />
         ) : (
           <img

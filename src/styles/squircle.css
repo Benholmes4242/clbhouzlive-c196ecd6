@@ -67,16 +67,14 @@
 
 /* name + meta */
 .sq-name {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2; /* clamp to two lines */
-  white-space: normal; /* allow wrapping */
+  display: block;
   min-height: 16px;
   font-size: 12px; 
   line-height: 1.2;
   text-align: center; 
   color: var(--sq-name-fg, rgba(0,0,0,0.84));
   max-width: var(--sq-size, 72px); 
+  white-space: nowrap; 
   overflow: hidden; 
   text-overflow: ellipsis;
   background: none;
@@ -85,7 +83,6 @@
   margin: 0;
   cursor: pointer;
   font-weight: 500;
-  word-break: break-word;
 }
 
 /* Hide the node cleanly when no text */
