@@ -113,6 +113,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
           className
         )}
         data-hides-on-scroll
+        data-chrome="header"
         style={{ '--header-h-mobile': '60px' } as any}
       >
         <div className="mx-auto flex h-full items-center justify-between px-4 md:px-6">

@@ -1,10 +1,22 @@
 /* Clubhouse Chrome Auto-Hide Animations */
 
-/* Unified chrome transition tokens */
+/* Unified chrome transition tokens + dynamic anchors */
 :root {
   --chrome-ease: cubic-bezier(.22,.61,.36,1);
-  --chrome-trans-ms: 260ms;
-  --chrome-fade-ms: 180ms;
+  --chrome-trans-ms: 220ms;
+  --chrome-fade-ms: 220ms;
+  
+  /* Populated from JS on mount; include safe areas */
+  --chrome-top-h: 64px;     /* header height + safe-top */
+  --chrome-bottom-h: 96px;  /* bottom-nav height + safe-bottom */
+  --chrome-top-shift: 0px;      /* 0 when visible, -var(--chrome-top-h) when hidden */
+  --chrome-bottom-shift: 0px;   /* 0 when visible,  var(--chrome-bottom-h) when hidden */
+}
+
+/* When the chrome is hidden we flip the shift amounts */
+body.chrome-hidden {
+  --chrome-top-shift: calc(-1 * var(--chrome-top-h));
+  --chrome-bottom-shift: var(--chrome-bottom-h);
 }
 
 /* Chrome elements with GPU transforms - smoother, cinematic timing */
@@ -14,7 +26,7 @@
   transform: translateZ(0);
   transition: 
     transform var(--chrome-trans-ms) var(--chrome-ease), 
-    opacity var(--chrome-fade-ms) ease-out;
+    opacity var(--chrome-trans-ms);
 }
 
 /* Hidden state transforms */
@@ -50,4 +62,41 @@ body.chrome-hidden .chrome-bottom-nav {
 body.chrome-hidden .chrome-header,
 body.chrome-hidden .chrome-bottom-nav {
   /* Note: aria-hidden and inert should be set via React refs */
+}
+
+/* ========== Dynamic Re-Anchoring for Dependent UI ========== */
+
+/* Top-anchored badge (golf club pill) */
+.club-tag-pill {
+  transform: translateY(0) translateZ(0);
+  transition: transform 220ms cubic-bezier(.22,.61,.36,1);
+  will-change: transform;
+}
+
+/* When header hides, move pill up by the header height it lost */
+body.chrome-hidden .club-tag-pill {
+  transform: translateY(var(--chrome-top-shift)) translateZ(0);
+}
+
+/* Bottom-anchored group (caption, name/avatar, carousel dots, right rail baseline) */
+.chrome-follow-bottom {
+  transform: translateY(0) translateZ(0);
+  transition: transform 220ms cubic-bezier(.22,.61,.36,1);
+  will-change: transform;
+}
+
+body.chrome-hidden .chrome-follow-bottom {
+  transform: translateY(calc(-1 * var(--chrome-bottom-shift))) translateZ(0);
+}
+
+/* Right-side engagement rail - keep centered */
+.engagement-rail {
+  transform: translateY(0) translateZ(0);
+  transition: transform 220ms cubic-bezier(.22,.61,.36,1);
+  will-change: transform;
+}
+
+body.chrome-hidden .engagement-rail {
+  /* Push it down by bottom shift, and up by top shift to keep center */
+  transform: translateY(calc((var(--chrome-top-shift)) + (-1 * var(--chrome-bottom-shift)))) translateZ(0);
 }

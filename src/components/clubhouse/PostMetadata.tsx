@@ -23,7 +23,7 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
   return (
     <div 
       className={cn(
-        "absolute z-overlay pointer-events-none",
+        "absolute z-overlay pointer-events-none chrome-follow-bottom",
         leftPadding,
         rightOffset,
         className

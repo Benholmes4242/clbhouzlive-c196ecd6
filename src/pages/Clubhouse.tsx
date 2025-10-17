@@ -8,6 +8,7 @@ import SnapToast from '@/components/snap/SnapToast';
 import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigationHandlers';
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { useChromeState } from '@/hooks/useChromeState';
+import { useChromeAnchors } from '@/hooks/useChromeAnchors';
 import { EngagementRailOverlay } from '@/components/clubhouse/EngagementRailOverlay';
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -67,6 +68,9 @@ const Clubhouse = () => {
     isModalOpen: isComposerOpen,
     disabled: false // Set to true via env var for emergency rollback
   });
+  
+  // Chrome anchors for dynamic re-positioning
+  useChromeAnchors();
 
   // Check which posts the user has liked
   const { data: likedPosts } = useQuery({

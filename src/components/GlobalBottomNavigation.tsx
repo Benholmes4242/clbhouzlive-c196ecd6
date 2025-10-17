@@ -188,6 +188,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 "relative before:absolute before:inset-x-0 before:top-0 before:h-px",
                 isClubhouseRoute ? "before:bg-white/10" : "before:bg-border/50"
               )}
+              data-chrome="bottom-nav"
             >
               <NavigationBar
                 activeTab={activeTab}
