@@ -9,7 +9,7 @@ import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigat
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { useChromeState } from '@/hooks/useChromeState';
 import { useChromeAnchors } from '@/hooks/useChromeAnchors';
-import { EngagementRailOverlay } from '@/components/clubhouse/EngagementRailOverlay';
+import { EngagementRailPortal } from '@/components/clubhouse/EngagementRailPortal';
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
@@ -245,12 +245,13 @@ const Clubhouse = () => {
         />
       </div>
 
-      {/* Global Engagement Rail Overlay */}
-      <EngagementRailOverlay
-        activePost={activePost}
-        onLike={() => activePost && handleLike(activePost.id)}
-        onComment={() => activePost && handleComment(activePost.id)}
+      {/* Global Engagement Rail Portal */}
+      <EngagementRailPortal
+        getAllCardEls={() => Array.from(document.querySelectorAll<HTMLElement>('[data-postid].clubhouse-card'))}
+        onLike={handleLike}
+        onComment={handleComment}
         onShare={handleShare}
+        likedPosts={likedPosts}
       />
       
       {/* Post Submission Handler */}

@@ -1,10 +1,33 @@
-/* Clubhouse Engagement Rail - No entrance animations */
+/* Clubhouse Engagement Rail - Portal + FLIP */
+
+/* Post-level anchor for rail portal */
+.post-rail-anchor {
+  position: absolute;
+  right: 12px;
+  bottom: calc(84px + var(--safe-bottom, 0px));
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Portal wrapper - follows chrome */
+.engagement-rail-portal {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  transform: translateY(var(--chrome-bottom-shift, 0px));
+  transition: transform var(--chrome-trans-ms, 220ms) var(--chrome-ease, cubic-bezier(.4,0,.2,1));
+  will-change: transform;
+  z-index: 12;
+}
+
+/* Surface for actual buttons */
+.engagement-rail-surface {
+  transform: translateZ(0);
+}
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-  /* Ensure all transitions respect user preference */
-  * {
+  .engagement-rail-portal {
     transition: none !important;
-    animation: none !important;
   }
 }
