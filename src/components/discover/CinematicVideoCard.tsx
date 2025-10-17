@@ -11,9 +11,10 @@ import { clsx } from 'clsx';
 interface CinematicVideoCardProps {
   item: ExploreContentItem;
   onMediaClick?: (item: ExploreContentItem) => void;
+  priority?: boolean;
 }
 
-const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaClick }) => {
+const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaClick, priority = false }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isMuted, toggleMute } = useExclusiveVideoAudio(item.id);
   const [duration, setDuration] = useState<number>(0);
@@ -29,6 +30,16 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
     playAt: 0.5,
     pauseBelow: 0.5
   });
+
+  // Priority videos: force metadata load immediately
+  useEffect(() => {
+    if (!priority || !videoRef.current) return;
+    try {
+      videoRef.current.load();
+    } catch (e) {
+      // Ignore load errors
+    }
+  }, [priority]);
 
   // Capture duration and set loop
   useEffect(() => {
@@ -63,7 +74,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
   const thumbnailUrl = item.thumbnailSrc || '';
 
   return (
-    <div ref={containerRef} className="w-full mb-2">
+    <div ref={containerRef} className={`w-full mb-2 ${priority ? 'priority' : ''}`}>
       {/* Video Container */}
       <div className="relative w-full overflow-hidden" style={{ height: '280px' }}>
         <video
@@ -71,6 +82,8 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           src={videoUrl}
           poster={thumbnailUrl}
           playsInline
+          muted
+          preload={priority ? 'metadata' : 'none'}
           className="w-full h-full object-cover"
           onClick={() => onMediaClick?.(item)}
         />
