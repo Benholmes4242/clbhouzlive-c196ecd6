@@ -603,10 +603,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
           const hasMultipleMedia = mediaItems.length > 1;
 
-          // Compute isActive / isNear for pre-rendering rails
-          const isActive = index === currentIndex;
-          const isNear = index === currentIndex - 1 || index === currentIndex + 1;
-
           // Navigation handlers for this specific item
           const handlePrevMedia = (e: React.MouseEvent) => {
             e.stopPropagation();
@@ -778,30 +774,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 }}
               />
 
-              {/* Per-Card Engagement Rail - Pre-rendered for active & near posts */}
-              <div
-                className="engagement-rail-container chrome-follow-bottom"
-                data-test="engagement-rail"
-                data-visible={isActive ? 'true' : 'false'}
-              >
-                {(isActive || isNear) && (
-                  <EngagementRail
-                    key={item.id}
-                    postId={item.id}
-                    stats={{
-                      likes: item.likes || 0,
-                      comments: item.comments || 0,
-                      shares: item.shares || 0
-                    }}
-                    isLiked={likedPosts?.includes(item.id)}
-                    isVideo={currentMedia.media_type === 'video'}
-                    isActive={isActive}
-                    onLike={() => handleLike(item.id)}
-                    onComment={() => handleComment(item.id)}
-                    onShare={handleShare}
-                  />
-                )}
-              </div>
+
+              {/* Engagement Rail removed - now handled by global overlay */}
             </div>
           );
         })}
