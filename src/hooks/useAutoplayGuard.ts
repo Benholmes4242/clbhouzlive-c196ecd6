@@ -12,11 +12,20 @@ export function useAutoplayGuard(
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !enabled) {
+    if (!video) return;
+
+    // If disabled, pause the video immediately
+    if (!enabled) {
+      try {
+        video.pause();
+      } catch (e) {
+        // Silently fail if pause is not supported
+      }
       setBlocked(false);
       return;
     }
 
+    // Try to play when enabled
     const tryPlay = async () => {
       try {
         await video.play();
@@ -38,10 +47,23 @@ export function useAutoplayGuard(
       }
     };
 
+    // Pause on page hide (tab switch, background)
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        try {
+          video.pause();
+        } catch (e) {
+          // Silently fail
+        }
+      }
+    };
+
     window.addEventListener('pointerdown', onUserInteract, { once: true });
+    document.addEventListener('visibilitychange', onVisibilityChange);
     
     return () => {
       window.removeEventListener('pointerdown', onUserInteract);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, [videoRef, enabled, blocked]);
 
