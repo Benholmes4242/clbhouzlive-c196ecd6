@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import ClubTagPill from './ClubTagPill';
 
@@ -14,6 +14,11 @@ interface ClubTagPillOverlayProps {
 }
 
 export function ClubTagPillOverlay({ activePost }: ClubTagPillOverlayProps) {
+  useEffect(() => {
+    console.log('[ClubTagPillOverlay] activePost:', activePost);
+    console.log('[ClubTagPillOverlay] golfCourse:', activePost?.golfCourse);
+  }, [activePost]);
+
   if (!activePost?.golfCourse) return null;
 
   return createPortal(
