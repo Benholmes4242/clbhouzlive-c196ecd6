@@ -83,3 +83,19 @@ body.chrome-hidden .chrome-bottom-nav {
 .chrome-follow-bottom {
   transform: translate3d(0, var(--chrome-bottom-shift), 0);
 }
+
+/* ========== Clubhouse Golf Club Pill Overlay ========== */
+
+.clubtag-overlay {
+  position: fixed;
+  right: 16px;
+  top: calc(var(--safe-top, 0px) + 8px); /* 8px below header */
+  z-index: 2200;
+  transform: translateY(var(--chrome-top-shift, 0px)); /* negative when header hides */
+  transition: transform var(--chrome-trans-ms) var(--chrome-ease);
+  pointer-events: none; /* keep overlay non-blocking; inner pill can re-enable */
+}
+
+.clubtag-overlay .clubtag-pill { 
+  pointer-events: auto; 
+}
