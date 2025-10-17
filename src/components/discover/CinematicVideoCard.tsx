@@ -7,6 +7,7 @@ import { Volume2, VolumeX, Heart } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatRelativeTime, formatLikes } from '@/utils/dateFormat';
 import { clsx } from 'clsx';
+import ClubTagPill from '@/components/clubhouse/ClubTagPill';
 
 interface CinematicVideoCardProps {
   item: ExploreContentItem;
@@ -89,6 +90,18 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             aria-hidden="true"
           />
         </div>
+
+        {/* Golf Club Tag - Top Right */}
+        {item.golfCourse && (
+          <ClubTagPill 
+            course={{
+              id: item.golfCourse.id,
+              name: item.golfCourse.name,
+              country: item.golfCourse.country
+            }}
+            className="top-2"
+          />
+        )}
 
         {/* Duration Badge - Bottom Left */}
         {duration > 0 && (
