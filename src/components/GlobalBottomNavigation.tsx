@@ -188,10 +188,6 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 "relative before:absolute before:inset-x-0 before:top-0 before:h-px",
                 isClubhouseRoute ? "before:bg-white/10" : "before:bg-border/50"
               )}
-              style={{
-                // Prevent iOS Safari viewport issues
-                paddingBottom: 'env(safe-area-inset-bottom)'
-              }}
             >
               <NavigationBar
                 activeTab={activeTab}

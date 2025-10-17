@@ -93,6 +93,10 @@ html, body {
   /* Bottom nav height for consistent spacing */
   --bottom-nav-height: 64px;
   
+  /* Nav total height calculation for proper hide animation */
+  --nav-base-h: var(--bottom-nav-height, 64px);
+  --nav-total-h: calc(var(--nav-base-h) + var(--safe-bottom));
+  
   /* Create Moment composer tokens */
   --composer-height: 370px;
 }
@@ -501,7 +505,7 @@ html, body {
 
 /* App shell applies safe-area padding and guarantees edge-to-edge */
 .app-shell {
-  min-height: 100vh;
+  min-height: 100svh;
   width: 100%; /* Fixed: Use 100% instead of 100vw to prevent iOS overflow */
   padding-top: var(--safe-top);
   padding-left: var(--safe-left);
@@ -923,9 +927,9 @@ html[data-immersive="true"] .app-shell--topSpacer {
     html {
     scroll-behavior: auto; /* Disable smooth scrolling for instant positioning */
     -webkit-overflow-scrolling: touch;
-    height: 100vh;
     height: 100svh;
     height: 100dvh;
+    height: 100vh; /* fallback last */
 
   /* Ensure no smooth scrolling on carousel containers */
   .no-smooth {
@@ -937,9 +941,9 @@ html[data-immersive="true"] .app-shell--topSpacer {
     scroll-behavior: auto;
     overscroll-behavior: none; /* Prevent bounce scrolling on iOS */
     position: relative;
-    height: 100vh;
     height: 100svh;
     height: 100dvh;
+    height: 100vh; /* fallback last */
     background: hsl(var(--background)); /* Ensure background extends behind status bar */
     /* Remove any existing top margins that might create black bars */
     margin-top: 0 !important;
@@ -948,9 +952,9 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
   #root {
     background-color: hsl(var(--background)) !important;
-    height: 100vh;
     height: 100svh;
     height: 100dvh;
+    height: 100vh; /* fallback last */
     /* Remove any margins that could create gaps */
     margin: 0 !important;
     padding: 0 !important;
@@ -1359,7 +1363,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
   /* Safe area utilities for mobile devices - Updated for edge-to-edge */
   .safe-area-full {
-    min-height: 100vh;
+    min-height: 100svh;
     /* Remove margin adjustment that could create black bars */
   }
 
