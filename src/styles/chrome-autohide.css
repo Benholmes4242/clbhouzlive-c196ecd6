@@ -66,37 +66,20 @@ body.chrome-hidden .chrome-bottom-nav {
 
 /* ========== Dynamic Re-Anchoring for Dependent UI ========== */
 
-/* Top-anchored badge (golf club pill) */
-.club-tag-pill {
-  transform: translateY(0) translateZ(0);
-  transition: transform 220ms cubic-bezier(.22,.61,.36,1);
-  will-change: transform;
-}
-
-/* When header hides, move pill up by the header height it lost */
-body.chrome-hidden .club-tag-pill {
-  transform: translateY(var(--chrome-top-shift)) translateZ(0);
-}
-
-/* Bottom-anchored group (caption, name/avatar, carousel dots, right rail baseline) */
+/* Followers */
+.chrome-follow-top,
 .chrome-follow-bottom {
-  transform: translateY(0) translateZ(0);
-  transition: transform 220ms cubic-bezier(.22,.61,.36,1);
   will-change: transform;
+  transition: transform 220ms cubic-bezier(.2,.7,.2,1);
+  transform: translate3d(0,0,0);
 }
 
-body.chrome-hidden .chrome-follow-bottom {
-  transform: translateY(calc(-1 * var(--chrome-bottom-shift))) translateZ(0);
+/* Top followers: move UP when header hides (negative shift) */
+.chrome-follow-top {
+  transform: translate3d(0, var(--chrome-top-shift), 0);
 }
 
-/* Right-side engagement rail - keep centered */
-.engagement-rail {
-  transform: translateY(0) translateZ(0);
-  transition: transform 220ms cubic-bezier(.22,.61,.36,1);
-  will-change: transform;
-}
-
-body.chrome-hidden .engagement-rail {
-  /* Push it down by bottom shift, and up by top shift to keep center */
-  transform: translateY(calc((var(--chrome-top-shift)) + (-1 * var(--chrome-bottom-shift)))) translateZ(0);
+/* Bottom followers: move DOWN when bottom nav hides (positive shift) */
+.chrome-follow-bottom {
+  transform: translate3d(0, var(--chrome-bottom-shift), 0);
 }
