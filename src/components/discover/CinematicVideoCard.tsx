@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
-import { useVideoVisibility } from '@/hooks/useVideoVisibility';
+import { useAutoplayVisibility } from '@/hooks/useAutoplayVisibility';
+import { safePlay } from '@/utils/safePlay';
+import { requestPlay, clearIf } from '@/utils/videoBus';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 import { Volume2, VolumeX, Heart } from 'lucide-react';
@@ -19,14 +21,25 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
   const [duration, setDuration] = useState<number>(0);
   const { progress, setProgressFillRef } = useVideoProgressSync(videoRef.current);
 
-  // Use robust video visibility hook with 60% threshold
-  const { containerRef, isVisible } = useVideoVisibility({
-    threshold: 0.6,
-    rootMargin: '0px',
-    videoRef,
-    shouldAutoplay: true,
-    globallyMuted: isMuted
-  });
+  // Use 60% visibility threshold for autoplay
+  const shouldPlay = useAutoplayVisibility(videoRef, { playRatio: 0.6 });
+  
+  // Control playback based on visibility
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    
+    if (shouldPlay) {
+      requestPlay(v);
+      v.muted = isMuted;
+      safePlay(v);
+    } else {
+      try {
+        v.pause();
+        clearIf(v);
+      } catch {}
+    }
+  }, [shouldPlay, isMuted]);
 
   // Capture duration and set loop
   useEffect(() => {
@@ -61,14 +74,17 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
   const thumbnailUrl = item.thumbnailSrc || '';
 
   return (
-    <div ref={containerRef} className="w-full mb-2">
+    <div className="w-full mb-2">
       {/* Video Container */}
       <div className="relative w-full overflow-hidden" style={{ height: '280px' }}>
         <video
           ref={videoRef}
           src={videoUrl}
           poster={thumbnailUrl}
+          muted
           playsInline
+          preload="metadata"
+          loop
           className="w-full h-full object-cover"
           onClick={() => onMediaClick?.(item)}
         />
