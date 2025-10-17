@@ -337,7 +337,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
         top: 0,
         left: 0,
         width: '100vw',
-        height: '100svh',
+        height: '100vh',
         zIndex: 9999
       }}
     >
@@ -487,9 +487,9 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                  if (el) itemRefs.current[index] = el;
                }}
                className="relative w-full h-screen snap-start snap-always flex items-center justify-center"
-                style={{ 
-                  minHeight: '100svh', 
-                  maxHeight: '100svh',
+               style={{ 
+                 minHeight: '100vh', 
+                 maxHeight: '100vh',
                  scrollSnapAlign: 'start',
                  scrollSnapStop: 'always'
                }}

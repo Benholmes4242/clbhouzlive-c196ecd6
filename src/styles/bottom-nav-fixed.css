@@ -11,22 +11,17 @@
   position: fixed !important;
   left: 0 !important;
   right: 0 !important;
-  bottom: 0 !important; /* Anchor flush to bottom */
+  bottom: 0 !important;
   z-index: 100 !important;
-  height: var(--nav-base-h);
-  padding-bottom: var(--safe-bottom); /* Safe area inside nav, not as offset */
-  box-sizing: content-box;
+  padding-bottom: max(env(safe-area-inset-bottom), 0px);
   backface-visibility: hidden; /* Reduces flicker on iOS */
   margin-bottom: 0 !important; /* Prevent any margin gaps */
-  will-change: transform, opacity;
-  transform: translateZ(0); /* GPU promotion without !important */
+  transform: translate3d(0, 0, 0) !important; /* Force GPU compositing and prevent floating */
 }
 
 /* Ensure page content never sits under the fixed nav */
 .app-content,
 [data-app-content],
-.page-scroll-container,
-.clubhouse-scroll,
-.discover-scroll {
-  padding-bottom: var(--nav-total-h);
+.page-scroll-container {
+  padding-bottom: calc(var(--bottom-nav-height) + max(env(safe-area-inset-bottom), 0px));
 }

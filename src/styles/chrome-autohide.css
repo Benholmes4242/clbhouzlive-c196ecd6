@@ -25,8 +25,7 @@ body.chrome-hidden .chrome-header {
 }
 
 body.chrome-hidden .chrome-bottom-nav {
-  /* Move the full distance: base height + safe-area padding */
-  transform: translateY(var(--nav-total-h)) translateZ(0);
+  transform: translateY(100%) translateZ(0);
   opacity: 0.96;
   pointer-events: none;
 }
@@ -43,7 +42,7 @@ body.chrome-hidden .chrome-bottom-nav {
   }
   
   body.chrome-hidden .chrome-bottom-nav {
-    transform: translateY(var(--nav-total-h)) translateZ(0);
+    transform: translateY(100%) translateZ(0);
   }
 }
 

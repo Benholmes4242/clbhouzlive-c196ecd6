@@ -60,9 +60,17 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
   };
 
   return (
-    <div className="sticky top-[var(--header-height,0px)] z-40 bg-white border-b border-gray-100">
+    <div 
+      className="sticky top-[var(--header-height,0px)] z-40"
+      style={{
+        background: 'rgba(255, 255, 255, 0.55)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+      }}
+    >
       <div 
-        className="flex items-center gap-3 py-3 px-4"
+        className="flex items-center gap-2 py-2 px-4"
         style={{ 
           paddingLeft: 'max(1rem, env(safe-area-inset-left))',
           paddingRight: 'max(1rem, env(safe-area-inset-right))'
@@ -78,7 +86,7 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
         </button>
 
         {/* Scrollable filter chips */}
-        <div className="no-scrollbar flex gap-3 overflow-x-auto flex-1">
+        <div className="no-scrollbar flex gap-2 overflow-x-auto flex-1">
           {allPills.map((pill) => {
             const isActive = 
               (pill.type === 'duration' && activeDuration === pill.key) ||
@@ -101,12 +109,13 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
               <button
                 key={pill.key}
                 onClick={handleClick}
-                className={cn(
-                  "h-9 rounded-full px-4 whitespace-nowrap text-sm font-medium transition-all flex-shrink-0",
-                  isActive
-                    ? "bg-foreground text-background font-semibold"
-                    : "bg-neutral-100 text-foreground/80 hover:bg-neutral-200"
-                )}
+                className="pill"
+                style={isActive ? {
+                  color: 'white',
+                  background: 'linear-gradient(135deg, #f5a623, #ff8c00)',
+                  boxShadow: '0 4px 10px rgba(245, 166, 35, 0.25)',
+                  border: 'none',
+                } : undefined}
                 role="tab"
                 aria-selected={isActive}
               >
