@@ -19,8 +19,7 @@ export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
 
   return (
     <div 
-      className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-2 z-30 pointer-events-auto chrome-follow-bottom ${className ?? ''}`}
-      style={{ bottom: bottomOffset ?? 'calc(var(--bottom-nav-height) + 4px)' }}
+      className={`absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-2 z-30 pointer-events-auto chrome-follow-bottom ${className ?? ''}`}
       role="tablist"
       aria-label="Media pagination"
     >
