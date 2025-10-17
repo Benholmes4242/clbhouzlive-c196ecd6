@@ -67,16 +67,18 @@
 
 /* name + meta */
 .sq-name {
-  display: block;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   min-height: 16px;
   font-size: 12px; 
   line-height: 1.2;
   text-align: center; 
-  color: var(--sq-name-fg, rgba(0,0,0,0.84));
+  color: #000000;
   max-width: var(--sq-size, 72px); 
-  white-space: nowrap; 
-  overflow: hidden; 
-  text-overflow: ellipsis;
+  width: 100%;
+  white-space: normal;
+  overflow: hidden;
   background: none;
   border: 0;
   padding: 0;
