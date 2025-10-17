@@ -29,12 +29,13 @@ const ClubTagPill = ({ course, className }: ClubTagPillProps) => {
     <div
       data-action="course-tag"
       className={cn(
-        "absolute z-overlay cursor-pointer transition-all duration-200 chrome-follow-top",
-        "top-2 right-3 md:right-6",
+        "fixed z-overlay cursor-pointer transition-all duration-200 chrome-follow-top",
+        "right-3 md:right-6",
         className
       )}
       onClick={handleCourseClick}
       style={{
+        top: 'calc(var(--safe-top, 0px) + 64px + 8px)',
         maxWidth: isMobile ? '52vw' : '28vw'
       }}
     >
