@@ -76,7 +76,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
 
         {/* Progress Bar - Bottom Edge of Video */}
         <div 
-          className="pointer-events-none absolute left-0 right-0 bottom-0 h-[2px] bg-black/35 backdrop-blur-sm z-20"
+          className="pointer-events-none absolute left-0 right-0 bottom-0 h-[2px] bg-hud-bg backdrop-blur-2xl z-20"
           role="progressbar"
           aria-valuenow={progress}
           aria-valuemin={0}
@@ -99,7 +99,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
               name: item.golfCourse.name,
               country: item.golfCourse.country
             }}
-            className="!top-2 !right-2 [&>div]:!px-2 [&>div]:!py-1 [&>div]:!text-[11px] [&_svg]:!w-4 [&_svg]:!h-4"
+            className="!top-2 !right-2 [&>div]:!px-1.5 [&>div]:!py-0.5 [&>div]:!text-[11px] [&_svg]:!w-4 [&_svg]:!h-4"
           />
         )}
 
