@@ -621,16 +621,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           };
 
 
-          const isLiked = likedPosts?.includes(item.id) ?? false;
-          
           return (
             <div
               key={item.id}
               data-postid={item.id}
-              data-likes={item.likes || 0}
-              data-comments={item.comments || 0}
-              data-shares={item.shares || 0}
-              data-is-video={currentMedia.media_type === 'video'}
               ref={(el) => {
                 if (el) {
                   itemRefs.current[index] = el;
@@ -638,7 +632,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   playRef.current?.observe(el);
                 }
               }}
-              className="relative w-full snap-start snap-always clubhouse-card"
+              className="relative w-full snap-start snap-always"
               style={{ 
                 height: '100svh',
                 minHeight: '100svh',
@@ -649,12 +643,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 scrollSnapStop: 'always'
               }}
             >
-              {/* Engagement Rail Anchor */}
-              <div
-                className="post-rail-anchor"
-                data-rail-anchor
-                data-postid={item.id}
-              />
               {/* Media Content */}
               <div 
                 onTouchStart={(e) => {

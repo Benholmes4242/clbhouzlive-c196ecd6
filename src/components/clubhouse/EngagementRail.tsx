@@ -117,19 +117,45 @@ const EngagementRail = ({
   const isMobile = useIsMobile();
   const gap = isMobile ? 'gap-4' : 'gap-5'; // 16px mobile, 20px desktop
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const [railVisible, setRailVisible] = useState(false);
 
   const handleAudioToggle = () => {
     toggleGlobalMute();
   };
 
+  // Stagger entrance when post becomes active with debounce
+  useEffect(() => {
+    let showTimeout: number | undefined;
+    let hideTimeout: number | undefined;
+    
+    if (isActive) {
+      // Clear any pending hide
+      if (hideTimeout) clearTimeout(hideTimeout);
+      // 120ms delay after post becomes active so video snap/seek finishes first
+      showTimeout = window.setTimeout(() => setRailVisible(true), 120);
+    } else {
+      // Clear any pending show
+      if (showTimeout) clearTimeout(showTimeout);
+      // Small delay before hiding to prevent flicker
+      hideTimeout = window.setTimeout(() => setRailVisible(false), 50);
+    }
+    
+    return () => {
+      if (showTimeout) clearTimeout(showTimeout);
+      if (hideTimeout) clearTimeout(hideTimeout);
+    };
+  }, [isActive]);
+
   return (
     <div 
       data-control="action-rail"
       className={cn(
-        "engagement-rail flex flex-col items-center",
+        "engagement-rail fixed right-4 z-30 flex flex-col items-center",
         gap,
+        railVisible ? 'is-visible' : 'is-hidden',
         className
       )}
+      style={{ bottom: 'calc(var(--bottom-nav-height) + 12px)' }}
     >
       {/* Three dots menu - only show for own posts */}
       {isOwnPost && onEdit && onDelete && (
