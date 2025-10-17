@@ -1,44 +1,10 @@
-/* Clubhouse Engagement Rail - Per-Card Rails */
-
-/* Container that lives INSIDE the card overlay */
-.engagement-rail-container {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  z-index: 12;
-  transform: translateY(var(--chrome-bottom-shift, 0px)) translateZ(0);
-  transition: transform 200ms cubic-bezier(.22,1,.36,1), opacity 120ms;
-  will-change: transform, opacity;
-  pointer-events: none; /* Let buttons opt-in */
-}
-
-/* Rail surface re-enables touch/clicks */
-.engagement-rail-container .rail-surface {
-  pointer-events: auto;
-}
-
-/* Entrance/exit micro-motion */
-.engagement-rail-container[data-visible="true"] .rail-surface {
-  transform: translateZ(0);
-  transition: transform 180ms cubic-bezier(.2,.7,.2,1), opacity 120ms;
-  opacity: 1;
-}
-
-.engagement-rail-container[data-visible="false"] .rail-surface {
-  transform: translateY(6px);
-  opacity: 0;
-}
+/* Clubhouse Engagement Rail - No entrance animations */
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-  .engagement-rail-container,
-  .engagement-rail-container .rail-surface {
+  /* Ensure all transitions respect user preference */
+  * {
     transition: none !important;
     animation: none !important;
-  }
-  
-  .engagement-rail-container[data-visible="false"] .rail-surface {
-    transform: translateY(0);
-    opacity: 0;
   }
 }
