@@ -19,11 +19,14 @@ export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
 
   return (
     <div 
-      className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-2 z-30 pointer-events-auto chrome-follow-bottom ${className ?? ''}`}
-      style={{ bottom: bottomOffset ?? 'calc(var(--bottom-nav-height) + 4px)' }}
-      role="tablist"
-      aria-label="Media pagination"
+      className={`absolute z-30 pointer-events-none chrome-follow-bottom ${className ?? ''}`}
+      style={{ bottom: bottomOffset ?? 'calc(var(--bottom-nav-height) + 4px)', left: 0, right: 0 }}
     >
+      <div
+        className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 pointer-events-auto"
+        role="tablist"
+        aria-label="Media pagination"
+      >
       {Array.from({ length: mediaCount }).map((_, index) => {
         const isActive = index === currentIndex;
         return (
@@ -41,6 +44,7 @@ export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
           />
         );
       })}
+      </div>
     </div>
   );
 };
