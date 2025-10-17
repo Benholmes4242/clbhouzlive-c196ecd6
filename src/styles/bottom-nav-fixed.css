@@ -13,7 +13,6 @@
   right: 0 !important;
   bottom: 0 !important;
   z-index: 100 !important;
-  padding-bottom: max(env(safe-area-inset-bottom), 0px);
   backface-visibility: hidden; /* Reduces flicker on iOS */
   margin-bottom: 0 !important; /* Prevent any margin gaps */
   transform: translate3d(0, 0, 0) !important; /* Force GPU compositing and prevent floating */
@@ -23,5 +22,5 @@
 .app-content,
 [data-app-content],
 .page-scroll-container {
-  padding-bottom: calc(var(--bottom-nav-height) + max(env(safe-area-inset-bottom), 0px));
+  padding-bottom: var(--bottom-nav-height);
 }
