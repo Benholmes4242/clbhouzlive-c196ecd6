@@ -260,6 +260,16 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     onCurrentPostChange?.(currentIndex);
   }, [currentIndex, onCurrentPostChange]);
 
+  // Helper to determine if a post should render its rail (current ±1)
+  const shouldRenderRail = useCallback((index: number) => {
+    return Math.abs(index - currentIndex) <= 1;
+  }, [currentIndex]);
+
+  // Helper to determine if rail is active (visible)
+  const isRailActive = useCallback((index: number) => {
+    return index === currentIndex;
+  }, [currentIndex]);
+
   // Check which posts the user has liked
   const { data: likedPosts } = useQuery({
     queryKey: ['post-likes', user?.id],
@@ -774,8 +784,30 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 }}
               />
 
-
-              {/* Engagement Rail removed - now handled by global overlay */}
+              {/* Per-Card Engagement Rail */}
+              <div
+                className="engagement-rail-container chrome-follow-bottom"
+                data-test="engagement-rail"
+                data-visible={isRailActive(index) ? 'true' : 'false'}
+              >
+                {shouldRenderRail(index) && (
+                  <EngagementRail
+                    postId={item.id}
+                    stats={{
+                      likes: item.likes || 0,
+                      comments: item.comments || 0,
+                      shares: item.shares || 0
+                    }}
+                    isLiked={likedPosts?.includes(item.id) ?? false}
+                    isVideo={currentMedia.media_type === 'video'}
+                    isActive={isRailActive(index)}
+                    onLike={() => handleLike(item.id)}
+                    onComment={() => handleComment(item.id)}
+                    onShare={handleShare}
+                    isOwnPost={item.user?.id === user?.id}
+                  />
+                )}
+              </div>
             </div>
           );
         })}
