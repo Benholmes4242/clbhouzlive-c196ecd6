@@ -615,10 +615,9 @@ html, body, #root, .app-shell { touch-action: auto; }
   /* Standard navigation heights */
   --header-height: 64px;
   --nav-height: 56px;
-  --safe-bottom: env(safe-area-inset-bottom);
   
-  /* Bottom navigation height including safe area */
-  --bottom-nav-height: calc(var(--nav-height) + var(--safe-bottom));
+  /* Bottom navigation height - no safe area */
+  --bottom-nav-height: var(--nav-height);
 }
 
 /* Global bottom navigation styling */
@@ -635,9 +634,6 @@ html, body, #root, .app-shell { touch-action: auto; }
   bottom: 0;
   left: 0;
   right: 0;
-  
-  /* Extend content to fill safe area properly */
-  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Ensure pages have bottom padding for the nav when needed */
