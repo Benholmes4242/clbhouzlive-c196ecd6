@@ -19,9 +19,9 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
   const [duration, setDuration] = useState<number>(0);
   const { progress, setProgressFillRef } = useVideoProgressSync(videoRef.current);
 
-  // Use robust video visibility hook with 60% threshold
+  // Use robust video visibility hook with 50% threshold for play/pause
   const { containerRef, isVisible } = useVideoVisibility({
-    threshold: 0.6,
+    threshold: [0, 0.25, 0.5, 0.75, 1],
     rootMargin: '0px',
     videoRef,
     shouldAutoplay: true,
