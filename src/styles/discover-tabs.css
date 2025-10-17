@@ -36,20 +36,6 @@
   transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Active tab underline */
-.discover-tab.active::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  height: 2px;
-  background: var(--tab-active-gradient);
-  border-radius: 999px;
-  box-shadow: var(--tab-active-shadow);
-  transform: translateZ(0);
-}
-
 /* Underline with glow (pseudo element) - REMOVED */
 /* .discover-tab.active::after {
   content: "";
