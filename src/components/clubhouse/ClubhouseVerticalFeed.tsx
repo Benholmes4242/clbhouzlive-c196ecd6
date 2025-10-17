@@ -749,16 +749,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* Club Tag Pill - Positioned above content */}
-              {item.golfCourse && (
-                <ClubTagPill 
-                  course={{
-                    id: item.golfCourse.id,
-                    name: item.golfCourse.name,
-                    country: item.golfCourse.country
-                  }}
-                />
-              )}
+              {/* Club Tag Pill removed: now rendered as a single viewport-level overlay */}
 
               {/* Post Metadata - Bottom Left */}
               <PostMetadata

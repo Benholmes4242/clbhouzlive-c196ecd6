@@ -96,6 +96,7 @@ body.chrome-hidden .chrome-bottom-nav {
   pointer-events: none; /* keep overlay non-blocking; inner pill can re-enable */
 }
 
-.clubtag-overlay .clubtag-pill { 
+.clubtag-overlay .clubtag-pill,
+.clubtag-overlay [data-action="course-tag"] { 
   pointer-events: auto; 
 }
