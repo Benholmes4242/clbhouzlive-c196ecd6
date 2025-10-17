@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { createPortal } from 'react-dom';
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useModalState } from '@/hooks/useModalDetector';
@@ -162,51 +161,47 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   return (
     <>
       {/* Global Fixed Bottom Navigation */}
-      {createPortal(
-        <AnimatePresence>
-          {showNavigation && (
-            <motion.div
+      <AnimatePresence>
+        {showNavigation && (
+          <motion.div
+            className={cn(
+              "global-bottom-nav bottom-nav-fixed",
+              "fixed! bottom-0! left-0! right-0! w-full",
+              "z-[100]!",
+              "m-0!" // Ensure no margins
+            )}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            style={{
+              transform: 'none', // Prevent Framer Motion from adding transforms that might cause floating
+            }}
+          >
+            <div
+              ref={navRef}
               className={cn(
-                "global-bottom-nav bottom-nav-fixed",
-                "fixed! bottom-0! left-0! right-0! w-full",
-                "z-[100]!",
-                "m-0!" // Ensure no margins
+                "chrome-bottom-nav", // Chrome auto-hide class lives on inner element to avoid Framer inline transform conflicts
+                "backdrop-blur-md",
+                isClubhouseRoute ? "bg-black/60" : "bg-background/95",
+                // Top border/shadow for separation
+                "relative before:absolute before:inset-x-0 before:top-0 before:h-px",
+                isClubhouseRoute ? "before:bg-white/10" : "before:bg-border/50"
               )}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
               style={{
-                transform: 'none', // Prevent Framer Motion from adding transforms that might cause floating
+                // Prevent iOS Safari viewport issues
+                paddingBottom: 'env(safe-area-inset-bottom)'
               }}
             >
-              <div
-                ref={navRef}
-                className={cn(
-                  "chrome-bottom-nav", // Chrome auto-hide class lives on inner element to avoid Framer inline transform conflicts
-                  "backdrop-blur-md",
-                  isClubhouseRoute ? "bg-black/60" : "bg-background/95",
-                  // Top border/shadow for separation
-                  "relative before:absolute before:inset-x-0 before:top-0 before:h-px",
-                  isClubhouseRoute ? "before:bg-white/10" : "before:bg-border/50"
-                )}
-                style={{
-                  // Prevent iOS Safari viewport issues
-                  paddingBottom: 'env(safe-area-inset-bottom)'
-                }}
-              >
-                <NavigationBar
-                  activeTab={activeTab}
-                  onTabClick={handleTabClickWithCamera}
-                  variant={isClubhouseRoute ? 'clubhouse' : 'default'}
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
-
+              <NavigationBar
+                activeTab={activeTab}
+                onTabClick={handleTabClickWithCamera}
+                variant={isClubhouseRoute ? 'clubhouse' : 'default'}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Post Submission Handler */}
       <PostSubmissionHandler
