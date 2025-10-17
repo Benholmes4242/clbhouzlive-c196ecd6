@@ -9,6 +9,8 @@ interface UseVideoVisibilityOptions {
   videoRef?: React.RefObject<HTMLVideoElement | any>;
   shouldAutoplay?: boolean;
   globallyMuted?: boolean;
+  playAt?: number;       // default 0.5
+  pauseBelow?: number;   // default same as playAt (50/50); allows hysteresis
 }
 
 export const useVideoVisibility = ({
@@ -18,11 +20,18 @@ export const useVideoVisibility = ({
   onExitView,
   videoRef,
   shouldAutoplay = true,
-  globallyMuted = true
+  globallyMuted = true,
+  playAt = 0.5,
+  pauseBelow
 }: UseVideoVisibilityOptions) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [hasBeenVisible, setHasBeenVisible] = useState(false);
+  const prevVisibleRef = useRef(false);
+  
+  // Compute effective thresholds
+  const effectivePlayAt = playAt;
+  const effectivePauseBelow = pauseBelow ?? playAt; // symmetrical by default
 
   const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
     const [entry] = entries;
@@ -48,15 +57,17 @@ export const useVideoVisibility = ({
       return;
     }
 
-    // Stricter thresholds for WebViews
-    const playThreshold = isInWebView ? 0.5 : 0.5;
-    const shouldPlay = isNowVisible && visibilityRatio >= playThreshold;
+    // Hysteresis: play at playAt threshold, pause at pauseBelow threshold
+    const shouldPlay = prevVisibleRef.current 
+      ? (isNowVisible && visibilityRatio >= effectivePauseBelow)
+      : (isNowVisible && visibilityRatio >= effectivePlayAt);
     
-    console.log(`[VideoVisibility] Should play: ${shouldPlay} (threshold: ${playThreshold}, WebView: ${isInWebView})`);
+    console.log(`[VideoVisibility] Should play: ${shouldPlay} (playAt: ${effectivePlayAt}, pauseBelow: ${effectivePauseBelow}, ratio: ${visibilityRatio.toFixed(2)}, WebView: ${isInWebView})`);
 
     if (shouldPlay) {
       // Video entered view with sufficient visibility - mark as having been visible
       setHasBeenVisible(true);
+      prevVisibleRef.current = true;
       
       // Set mute state and attempt autoplay
       if (video instanceof HTMLVideoElement) {
@@ -87,7 +98,8 @@ export const useVideoVisibility = ({
         }
       }
     } else {
-      // Video exited view - always mute and optionally pause
+      // Video exited view - always mute and pause
+      prevVisibleRef.current = false;
       if (video instanceof HTMLVideoElement) {
         video.muted = true;
         if (!video.paused) {
@@ -145,7 +157,26 @@ export const useVideoVisibility = ({
       observer.disconnect();
       clearTimeout(timeoutId);
     };
-  }, [handleIntersection, threshold]);
+  }, [handleIntersection, threshold, rootMargin]);
+
+  // Add page visibility pause
+  useEffect(() => {
+    const video = videoRef?.current;
+    if (!video) return;
+    
+    const handleVisibilityChange = () => {
+      if (document.hidden && video instanceof HTMLVideoElement) {
+        try {
+          video.pause();
+        } catch (e) {
+          // Ignore pause errors
+        }
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [videoRef]);
 
   // Update video mute state when global mute changes (only for visible videos)
   useEffect(() => {
