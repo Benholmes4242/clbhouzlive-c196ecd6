@@ -3,8 +3,8 @@ import { ExploreContentItem } from '@/components/explore/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Heart, Flame } from 'lucide-react';
 import { formatLikes } from '@/utils/dateFormat';
+import { useInView } from 'react-intersection-observer';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { useVisibilityRatio } from '@/hooks/useVisibilityRatio';
 
 interface ShortsInlineBlockProps {
   shorts: ExploreContentItem[];
@@ -20,14 +20,14 @@ function getHeightVariant(id: string): number {
 }
 
 const ShortsInlineBlock: React.FC<ShortsInlineBlockProps> = ({ shorts, onShortClick, blockId }) => {
-  const { ref: blockRef, ratio } = useVisibilityRatio<HTMLDivElement>();
+  const { ref: blockRef, inView } = useInView({ threshold: 0.3, triggerOnce: true });
 
   // Track block impression
   useEffect(() => {
-    if (ratio > 0.3) {
+    if (inView) {
       analyticsEvents.track('shorts_block_impression', { blockId, count: shorts.length });
     }
-  }, [ratio, blockId, shorts.length]);
+  }, [inView, blockId, shorts.length]);
 
   if (shorts.length !== 2) {
     console.warn('ShortsInlineBlock expects exactly 2 shorts');
@@ -68,35 +68,29 @@ interface ShortTileProps {
 }
 
 const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
+  const { ref: tileRef, inView } = useInView({ threshold: 0.3, triggerOnce: false });
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { ref: tileRef, ratio } = useVisibilityRatio<HTMLDivElement>();
-  const [enabled, setEnabled] = React.useState(false);
 
   // Handle tile impression analytics
   useEffect(() => {
-    if (ratio > 0.3) {
+    if (inView) {
       analyticsEvents.track('shorts_tile_impression', { shortId: short.id });
     }
-  }, [ratio, short.id]);
+  }, [inView, short.id]);
 
-  // Apply 50/50 hysteresis
-  useEffect(() => {
-    setEnabled(prev => (prev ? ratio >= 0.5 : ratio >= 0.5));
-  }, [ratio]);
-
-  // Handle autoplay based on enabled state
+  // Handle autoplay based on visibility
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    if (enabled) {
+    if (inView) {
       video.play().catch((err) => {
         console.info('Autoplay prevented:', err);
       });
     } else {
       video.pause();
     }
-  }, [enabled]);
+  }, [inView]);
 
   return (
     <div ref={tileRef} className="flex flex-col">

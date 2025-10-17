@@ -7,9 +7,6 @@ import { ChannelSuggestionCard } from './ChannelSuggestionCard';
 import { ChannelSuggestion } from '@/hooks/useChannelSuggestions';
 import ShortsInlineBlock from './ShortsInlineBlock';
 import ShortsViewer from '@/components/shorts/ShortsViewer';
-import { preloadPosters, getPosterUrl } from '@/utils/preloadPosters';
-
-const FIRST_VIEW_COUNT = 3; // Priority items for first screen
 
 interface VideosGridProps {
   content: ExploreContentItem[];
@@ -66,18 +63,6 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     };
   }, [hasMore, isLoading, onLoadMore]);
 
-  // Preload posters for first screen
-  useEffect(() => {
-    const videoItems = interleavedFeed 
-      ? interleavedFeed.filter(item => item.kind === 'video').map(item => item.data as ExploreContentItem)
-      : content.filter(item => item.type === 'video');
-    
-    const posterUrls = videoItems.slice(0, 6).map(getPosterUrl).filter(Boolean);
-    if (posterUrls.length > 0) {
-      preloadPosters(posterUrls, 6);
-    }
-  }, [interleavedFeed, content]);
-
   // Use interleaved feed if provided, otherwise filter videos
   const itemsToRender = interleavedFeed 
     ? interleavedFeed 
@@ -107,7 +92,7 @@ const VideosGrid: React.FC<VideosGridProps> = ({
       {isCinematicMode ? (
         // Cinematic single-column edge-to-edge layout
         <div className="flex flex-col">
-          {itemsToRender.map((item, index) => {
+          {itemsToRender.map((item) => {
             if (item.kind === 'channel_suggestion') {
               return (
                 <ChannelSuggestionCard
@@ -129,13 +114,11 @@ const VideosGrid: React.FC<VideosGridProps> = ({
               );
             }
             
-            const isPriority = index < FIRST_VIEW_COUNT;
             return (
               <CinematicVideoCard
                 key={`${activeTab}-${item.id}`}
                 item={item.data as ExploreContentItem}
                 onMediaClick={onMediaClick}
-                priority={isPriority}
               />
             );
           })}
