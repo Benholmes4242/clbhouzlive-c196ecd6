@@ -966,7 +966,7 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
                 transition={{ duration: 0.15 }}
               >
                 <div 
-                  className="text-white font-medium text-center text-xs whitespace-nowrap px-3 py-1.5 rounded-full cursor-pointer hover:scale-105 transition-transform duration-200"
+                  className="text-white font-medium text-center text-xs px-3 py-1.5 rounded-full cursor-pointer hover:scale-105 transition-transform duration-200 line-clamp-2 max-w-[140px]"
                   style={{ 
                     textShadow: '0 1px 2px rgba(0,0,0,0.5)',
                     background: 'hsl(var(--glass-dark))',
