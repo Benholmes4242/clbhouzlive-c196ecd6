@@ -108,7 +108,7 @@ export const EngagementRailOverlay: React.FC<EngagementRailOverlayProps> = ({
     <aside 
       data-control="action-rail"
       className={cn(
-        "fixed right-4 z-30 flex flex-col items-center engagement-rail",
+        "fixed right-4 z-30 flex flex-col items-center chrome-follow-bottom",
         gap
       )}
       style={{ 
