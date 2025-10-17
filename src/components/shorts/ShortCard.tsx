@@ -1,10 +1,9 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { Heart } from 'lucide-react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import { useAutoplayGuard } from '@/hooks/useAutoplayGuard';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
-import { registerPlayer } from '@/utils/videoRegistry';
 
 interface ShortCardProps {
   item: ExploreContentItem;
@@ -21,25 +20,6 @@ export default function ShortCard({ item, onClick, height, isPinned, autoplay }:
   // Generate poster URL from Stream ID or use existing thumbnailSrc
   const streamId = item.src ? getStreamIdFromUrl(item.src) : null;
   const posterUrl = item.thumbnailSrc ?? (streamId ? getStreamPoster(streamId, '0s', 720) : undefined);
-  
-  // Register video in global registry for exclusivity control
-  useEffect(() => {
-    if (!videoRef.current || !isVideo) return undefined;
-    return registerPlayer(item.id, videoRef.current);
-  }, [item.id, isVideo]);
-
-  // Cleanup: pause on unmount
-  useEffect(() => {
-    return () => {
-      if (videoRef.current) {
-        try {
-          videoRef.current.pause();
-        } catch (e) {
-          // Silently fail
-        }
-      }
-    };
-  }, []);
   
   // Guard autoplay - handles browser blocking gracefully
   const autoplayBlocked = useAutoplayGuard(videoRef, isVideo && !!autoplay);

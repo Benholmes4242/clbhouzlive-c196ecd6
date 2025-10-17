@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import ShortCard from './ShortCard';
-import { useVisibilityRatio } from '@/hooks/useVisibilityRatio';
-import { pauseAllExcept } from '@/utils/videoRegistry';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 interface ShortCardWithObserverProps {
   item: ExploreContentItem;
@@ -12,14 +11,9 @@ interface ShortCardWithObserverProps {
   onVisibilityChange?: (id: string, visible: boolean) => void;
 }
 
-const PLAY_AT = 0.6;   // Play when ≥60% visible
-const PAUSE_BELOW = 0.4; // Pause when <40% visible
-
 /**
- * Wrapper around ShortCard that uses IntersectionObserver with hysteresis to control autoplay.
- * - Play when card reaches ≥60% visible
- * - Pause when card drops <40% visible
- * - Enforces exclusivity: pauses all other videos when this one starts
+ * Wrapper around ShortCard that uses IntersectionObserver to control autoplay.
+ * Autoplay is triggered when card is ≥65% visible in viewport.
  */
 export default function ShortCardWithObserver({
   item,
@@ -28,42 +22,24 @@ export default function ShortCardWithObserver({
   isPinned,
   onVisibilityChange
 }: ShortCardWithObserverProps) {
-  const { ref, ratio } = useVisibilityRatio<HTMLDivElement>();
-  const [enabled, setEnabled] = useState(false);
-
-  // Check for reduced motion preference
-  const prefersReduced = useMemo(
-    () => typeof window !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches,
-    []
-  );
-
-  // Hysteresis: stable play/pause based on visibility ratio
-  useEffect(() => {
-    setEnabled(prev => (prev ? ratio >= PAUSE_BELOW : ratio >= PLAY_AT));
-  }, [ratio]);
-
-  // Enforce exclusivity: pause all other videos when this one starts
-  useEffect(() => {
-    if (enabled && !prefersReduced) {
-      pauseAllExcept(item.id);
-    }
-  }, [enabled, item.id, prefersReduced]);
+  const { ref, isInView } = useIntersectionObserver({
+    threshold: 0.65,
+    rootMargin: '0px'
+  });
 
   // Notify parent of visibility changes
-  useEffect(() => {
-    onVisibilityChange?.(item.id, ratio >= PAUSE_BELOW);
-  }, [ratio, item.id, onVisibilityChange]);
-
-  const effectiveEnabled = enabled && !prefersReduced;
+  React.useEffect(() => {
+    onVisibilityChange?.(item.id, isInView);
+  }, [isInView, item.id, onVisibilityChange]);
 
   return (
-    <div ref={ref} data-short-id={item.id}>
+    <div ref={ref}>
       <ShortCard
         item={item}
         onClick={onClick}
         height={height}
         isPinned={isPinned}
-        autoplay={effectiveEnabled}
+        autoplay={isInView}
       />
     </div>
   );
