@@ -12,7 +12,26 @@ type Props = {
 };
 
 export function EngagementRailPortal({ getAllCardEls, onLike, onComment, onShare, likedPosts }: Props) {
-  const cardEls = useMemo(() => getAllCardEls(), [getAllCardEls]);
+  // Keep cards in state and refresh when DOM changes so IO can attach properly
+  const [cardEls, setCardEls] = useState<HTMLElement[]>([]);
+  useEffect(() => {
+    const update = () => setCardEls(getAllCardEls());
+    update();
+
+    const root = (document.querySelector('.clubhouse-scroll') as HTMLElement) || document.body;
+    const mo = new MutationObserver(() => update());
+    mo.observe(root, { childList: true, subtree: true });
+
+    window.addEventListener('resize', update);
+    // capture scroll events from any scrollable ancestor
+    window.addEventListener('scroll', update, true);
+    return () => {
+      mo.disconnect();
+      window.removeEventListener('resize', update);
+      window.removeEventListener('scroll', update, true);
+    };
+  }, [getAllCardEls]);
+
   const activeId = useActivePostWithHysteresis(cardEls);
   const [host, setHost] = useState<HTMLElement | null>(null);
   const railRef = useRef<HTMLDivElement>(null);
