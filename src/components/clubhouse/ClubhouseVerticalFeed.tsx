@@ -749,7 +749,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* Club Tag Pill - Positioned 8px below header */}
+              {/* Club Tag Pill - Positioned above content */}
               {item.golfCourse && (
                 <ClubTagPill 
                   course={{
