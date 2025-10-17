@@ -64,21 +64,6 @@ body.chrome-hidden .chrome-bottom-nav {
   /* Note: aria-hidden and inert should be set via React refs */
 }
 
-/* ========== Club Tag Pill Overlay ========== */
-.clubtag-overlay {
-  position: fixed;
-  right: 16px;
-  top: calc(var(--safe-top, 0px) + 64px);
-  z-index: 2200;
-  transform: translateY(var(--chrome-top-shift, 0px));
-  transition: transform var(--chrome-trans-ms, 220ms) var(--chrome-ease, cubic-bezier(.4,0,.2,1));
-  pointer-events: none;
-}
-
-.clubtag-overlay > * {
-  pointer-events: auto;
-}
-
 /* ========== Dynamic Re-Anchoring for Dependent UI ========== */
 
 /* Followers */
