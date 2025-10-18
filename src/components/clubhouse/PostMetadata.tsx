@@ -44,13 +44,13 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
           <img
             src={user.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
             alt={user.name}
-            className="w-11 h-11 rounded-full object-cover shadow-sm flex-shrink-0"
+            className="w-11 h-11 rounded-full object-cover shadow-sm"
             onError={(e) => {
               (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
             }}
           />
           <span 
-            className="text-[15px] font-medium tracking-[0.02em] text-white drop-shadow-sm leading-none"
+            className="text-[15px] font-medium tracking-[0.02em] text-white drop-shadow-sm"
             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
           >
             {user.name}
