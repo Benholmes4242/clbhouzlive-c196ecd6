@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
+import { createPortal } from 'react-dom';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 
 /**
@@ -16,38 +16,36 @@ export function VideoProgressHUD({
   videoRef: React.RefObject<HTMLVideoElement | null>;
   accent?: string;
 }) {
-  // 1) Reuse existing sync hook — NO changes to logic
+  // Reuse existing sync hook — NO changes to logic
   const { setProgressFillRef, progress } = useVideoProgressSync(videoRef.current);
-
-  // 2) Bottom nav awareness (for fallback only)
-  const { isVisible, height } = useBottomNavigation();
 
   // Don't render if there's no active video
   if (!videoRef.current) {
     return null;
   }
 
-  return (
+  const progressBar = (
     <div
       aria-label="Video progress"
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={Math.round(progress * 100)}
-      // Fixed layer that anchors to nav when visible, viewport when hidden
-      className="fixed left-0 w-[100vw] z-40 pointer-events-none transition-[bottom] duration-300 ease-out"
+      // Fixed layer that anchors to nav top when visible, viewport bottom when hidden
+      className="fixed left-0 right-0 h-[2px] z-[1100] pointer-events-none"
       style={{
-        // Anchored to nav top when visible; to viewport bottom when hidden
+        // Visible: bottom = safe + h  → sits on TOP edge of navbar
+        // Hidden:  bottom = safe      → flush with viewport bottom
         bottom: `calc(
           env(safe-area-inset-bottom, 0px) +
-          max(0px, var(--chrome-bottom-height, 0px) - var(--chrome-bottom-shift, 0px))
+          max(0px, var(--chrome-bottom-h, 96px) - var(--chrome-bottom-shift, 0px))
         )`,
       }}
     >
       {/* Track (dark glass) */}
       <div
         className="
-          mx-0 h-[2px]
+          h-full
           bg-black/45 backdrop-blur-xl
           border-t border-white/10
         "
@@ -63,4 +61,7 @@ export function VideoProgressHUD({
       </div>
     </div>
   );
+
+  // Render via Portal to escape any transformed ancestors
+  return typeof window !== 'undefined' ? createPortal(progressBar, document.body) : null;
 }
