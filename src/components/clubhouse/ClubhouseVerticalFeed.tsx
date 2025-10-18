@@ -735,13 +735,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   </div>
                 )}
 
-                {/* Navigation Dots - Bottom Center */}
-                {hasMultipleMedia && (
-                  <MediaNavigationDots
-                    mediaCount={mediaItems.length}
-                    currentIndex={currentMediaIndex}
-                  />
-                )}
 
                 {/* Navigation Arrows - Left and Right */}
                 {hasMultipleMedia && (
