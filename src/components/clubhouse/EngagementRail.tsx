@@ -151,12 +151,11 @@ const EngagementRail = ({
       data-control="action-rail"
       className={cn(
         "engagement-rail fixed right-4 z-30 flex flex-col items-center",
-        "chrome-follow-bottom", // Slide down when bottom nav hides
         gap,
         railVisible ? 'is-visible' : 'is-hidden',
         className
       )}
-      style={{ bottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 20px)' }}
+      style={{ bottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 20px + var(--chrome-bottom-shift, 0px))' }}
     >
       {/* Three dots menu - only show for own posts */}
       {isOwnPost && onEdit && onDelete && (
