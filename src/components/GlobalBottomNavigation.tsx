@@ -189,6 +189,9 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 isClubhouseRoute ? "before:bg-white/10" : "before:bg-border/50"
               )}
               data-chrome="bottom-nav"
+              style={{
+                paddingBottom: 'var(--safe-bottom, 0px)'
+              }}
             >
               <NavigationBar
                 activeTab={activeTab}
