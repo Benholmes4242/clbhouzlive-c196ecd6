@@ -11,20 +11,23 @@ export function useChromeAnchors() {
     
     const setVars = () => {
       // Query for chrome elements by data attributes
-      const headerEl = document.querySelector('[data-chrome="header"]') as HTMLElement;
-      const bottomNavEl = document.querySelector('[data-chrome="bottom-nav"]') as HTMLElement;
+      const headerEl = document.querySelector('[data-chrome="header"]') as HTMLElement | null;
+      const bottomNavEl = document.querySelector('[data-chrome="bottom-nav"]') as HTMLElement | null;
       
       // Get safe area insets from CSS
       const safeTop = Number.parseInt(getComputedStyle(root).getPropertyValue('--safe-top')) || 0;
       const safeBottom = Number.parseInt(getComputedStyle(root).getPropertyValue('--safe-bottom')) || 0;
       
-      const headerH = (headerEl?.getBoundingClientRect().height ?? 0) + safeTop;
-      const navH = (bottomNavEl?.getBoundingClientRect().height ?? 0) + safeBottom;
-      
-      root.style.setProperty('--chrome-top-h', `${Math.round(headerH)}px`);
-      root.style.setProperty('--chrome-bottom-h', `${Math.round(navH)}px`);
+      // Only set variables when we have elements to measure; otherwise keep previous CSS defaults
+      if (headerEl) {
+        const headerH = headerEl.getBoundingClientRect().height + safeTop;
+        root.style.setProperty('--chrome-top-h', `${Math.round(headerH)}px`);
+      }
+      if (bottomNavEl) {
+        const navH = bottomNavEl.getBoundingClientRect().height + safeBottom;
+        root.style.setProperty('--chrome-bottom-h', `${Math.round(navH)}px`);
+      }
     };
-
     // Initial measurement
     setVars();
     
