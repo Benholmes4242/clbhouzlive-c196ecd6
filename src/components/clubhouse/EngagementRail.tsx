@@ -151,6 +151,7 @@ const EngagementRail = ({
       data-control="action-rail"
       className={cn(
         "engagement-rail fixed right-4 z-30 flex flex-col items-center",
+        "chrome-follow-bottom", // Slide down when bottom nav hides
         gap,
         railVisible ? 'is-visible' : 'is-hidden',
         className
