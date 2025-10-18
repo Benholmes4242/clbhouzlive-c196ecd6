@@ -29,7 +29,7 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
         className
       )}
       style={{
-        bottom: 'calc(6px + env(safe-area-inset-bottom, 0px))', // stays at 6px from viewport bottom regardless of nav state
+        bottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 12px - var(--chrome-bottom-shift, 0px))', // ~84px when visible, ~6px when hidden
       }}
     >
       {/* User Profile */}
