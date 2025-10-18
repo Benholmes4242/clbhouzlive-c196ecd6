@@ -35,7 +35,7 @@ export function VideoProgressHUD({
       aria-valuemax={100}
       aria-valuenow={Math.round(progress * 100)}
       // Fixed layer that anchors to nav when visible, viewport when hidden
-      className="fixed left-0 w-[100vw] z-30 pointer-events-none transition-[bottom] duration-300 ease-out"
+      className="fixed left-0 w-[100vw] z-40 pointer-events-none transition-[bottom] duration-300 ease-out"
       style={{
         // Anchored to nav top when visible; to viewport bottom when hidden
         bottom: `calc(
