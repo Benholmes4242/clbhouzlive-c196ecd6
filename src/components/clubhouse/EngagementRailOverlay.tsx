@@ -112,7 +112,7 @@ export const EngagementRailOverlay: React.FC<EngagementRailOverlayProps> = ({
         gap
       )}
       style={{ 
-        bottom: 'calc(var(--bottom-nav-height) + 12px)',
+        bottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 12px)',
         willChange: 'transform, opacity',
         transform: 'translateZ(0)'
       }}
