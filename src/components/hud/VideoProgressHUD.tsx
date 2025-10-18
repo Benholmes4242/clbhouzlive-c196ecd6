@@ -34,12 +34,9 @@ export function VideoProgressHUD({
       // Fixed layer that anchors to nav top when visible, viewport bottom when hidden
       className="fixed left-0 right-0 h-[2px] z-[1100] pointer-events-none"
       style={{
-        // Visible: bottom = safe + h  → sits on TOP edge of navbar
-        // Hidden:  bottom = safe      → flush with viewport bottom
-        bottom: `calc(
-          env(safe-area-inset-bottom, 0px) +
-          max(0px, var(--chrome-bottom-h, 96px) - var(--chrome-bottom-shift, 0px))
-        )`,
+        // Visible: bottom = chrome-h - shift = safe + h → sits on TOP edge of navbar
+        // Hidden:  bottom = safe (fallback from max) → flush with viewport bottom
+        bottom: `max(var(--safe-bottom), calc(var(--chrome-bottom-h) - var(--chrome-bottom-shift)))`,
       }}
     >
       {/* Track (dark glass) */}
