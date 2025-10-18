@@ -20,7 +20,7 @@ export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
   return (
     <div 
       className={`absolute z-30 pointer-events-none chrome-follow-bottom ${className ?? ''}`}
-      style={{ bottom: bottomOffset ?? 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 4px)', left: 0, right: 0 }}
+      style={{ bottom: bottomOffset ?? 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 8px)', left: 0, right: 0 }}
     >
       <div
         className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 pointer-events-auto"
