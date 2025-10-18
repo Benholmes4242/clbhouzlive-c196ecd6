@@ -9,7 +9,7 @@ import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigat
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { useChromeState } from '@/hooks/useChromeState';
 import { useChromeAnchors } from '@/hooks/useChromeAnchors';
-import { EngagementRailOverlay } from '@/components/clubhouse/EngagementRailOverlay';
+
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
@@ -163,23 +163,6 @@ const Clubhouse = () => {
     console.log('Share clicked');
   };
 
-  // Compute active post data for the overlay
-  const activePost = useMemo(() => {
-    const post = posts[currentPostIndex];
-    if (!post) return null;
-
-    const currentMedia = post.media?.[0] || { media_type: post.type };
-    
-    return {
-      id: post.id,
-      isLiked: likedPosts?.includes(post.id) ?? false,
-      likes: post.likes || 0,
-      comments: post.comments || 0,
-      shares: post.shares || 0,
-      isVideo: currentMedia.media_type === 'video'
-    };
-  }, [posts, currentPostIndex, likedPosts]);
-
   // Handle tab clicks including camera action
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     console.log('[DEBUG] Clubhouse: handleTabClickWithCamera called with:', tab);
@@ -244,14 +227,6 @@ const Clubhouse = () => {
           onTouchEnd={chromeControls.handleTouchEnd}
         />
       </div>
-
-      {/* Global Engagement Rail Overlay */}
-      <EngagementRailOverlay
-        activePost={activePost}
-        onLike={() => activePost && handleLike(activePost.id)}
-        onComment={() => activePost && handleComment(activePost.id)}
-        onShare={handleShare}
-      />
       
       {/* Post Submission Handler */}
       <PostSubmissionHandler

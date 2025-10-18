@@ -774,8 +774,26 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 }}
               />
 
-
-              {/* Engagement Rail removed - now handled by global overlay */}
+              {/* Per-Post Engagement Rail */}
+              <EngagementRail
+                postId={item.id}
+                stats={{
+                  likes: item.likes || 0,
+                  comments: item.comments || 0,
+                  shares: item.shares || 0
+                }}
+                isLiked={likedPosts?.includes(item.id) ?? false}
+                isVideo={item.media?.[0]?.media_type === 'video'}
+                isActive={currentIndex === index}
+                onLike={() => onLike(item.id)}
+                onComment={() => {
+                  setSelectedPostId(item.id);
+                  setCommentsModalOpen(true);
+                }}
+                onShare={() => {
+                  console.log('Share clicked for post:', item.id);
+                }}
+              />
             </div>
           );
         })}

@@ -44,14 +44,14 @@ const ClubTagPill = ({ course, className }: ClubTagPillProps) => {
     >
       <div 
         className={cn(
-          "flex items-center gap-2 rounded-full px-3 py-2",
+          "flex items-center gap-1.5 rounded-full px-2.5 py-1.5",
           "bg-hud-bg backdrop-blur-2xl border border-hud-border",
           "text-white shadow-hud",
           "hover:bg-hud-bg/80 transition-all duration-200"
         )}
       >
-        <MapPin className="w-5 h-5 flex-shrink-0" />
-        <span className="text-base font-medium truncate">
+        <MapPin className="w-4 h-4 flex-shrink-0" />
+        <span className="text-sm font-medium truncate">
           {course.name}
         </span>
       </div>
