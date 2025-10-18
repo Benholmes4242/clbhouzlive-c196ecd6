@@ -19,11 +19,6 @@ export function VideoProgressHUD({
   // Reuse existing sync hook — NO changes to logic
   const { setProgressFillRef, progress } = useVideoProgressSync(videoRef.current);
 
-  // Don't render if there's no active video
-  if (!videoRef.current) {
-    return null;
-  }
-
   // Diagnostics: capture computed CSS and environment info (temporary)
   const hudRef = React.useRef<HTMLDivElement | null>(null);
   React.useEffect(() => {
@@ -59,6 +54,11 @@ export function VideoProgressHUD({
       window.removeEventListener('orientationchange', onOrientation);
     };
   }, []);
+
+  // Don't render if there's no active video
+  if (!videoRef.current) {
+    return null;
+  }
 
   const progressBar = (
     <div
