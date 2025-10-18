@@ -13,7 +13,7 @@ export function VideoProgressHUD({
   videoRef,
   accent,
 }: {
-  videoRef: React.RefObject<HTMLVideoElement>;
+  videoRef: React.RefObject<HTMLVideoElement | null>;
   accent?: string;
 }) {
   // 1) Reuse existing sync hook — NO changes to logic
@@ -25,6 +25,11 @@ export function VideoProgressHUD({
   // 3) Computed bottom: nav-visible => sit on top edge of nav
   //    nav-hidden   => sit on viewport bottom (safe-area included in both cases)
   const bottomPx = isVisible ? height : 0;
+
+  // Don't render if there's no active video
+  if (!videoRef.current) {
+    return null;
+  }
 
   return (
     <div
