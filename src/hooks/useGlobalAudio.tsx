@@ -3,13 +3,13 @@ import { useState, useCallback, useEffect } from 'react';
 const MUTE_STATE_KEY = 'globalAudioMuted';
 
 export const useGlobalAudio = () => {
-  // Initialize from localStorage
+  // Initialize from localStorage - default to muted for autoplay
   const [isGloballyMuted, setIsGloballyMuted] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem(MUTE_STATE_KEY);
-      return saved ? JSON.parse(saved) : false;
+      return saved ? JSON.parse(saved) : true;
     }
-    return false;
+    return true;
   });
   
   // Persist to localStorage when state changes
