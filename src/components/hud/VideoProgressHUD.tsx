@@ -72,8 +72,8 @@ export function VideoProgressHUD({
       className="fixed left-0 right-0 h-[2px] z-[1100] pointer-events-none"
       style={{
         // Visible: bottom = chrome-h - shift = safe + h → sits on TOP edge of navbar
-        // Hidden:  bottom = safe (fallback from max) → flush with viewport bottom
-        bottom: `max(var(--safe-bottom), calc(var(--chrome-bottom-h) - var(--chrome-bottom-shift)))`,
+        // Hidden:  bottom = 0px (flush to viewport, may overlap home indicator)
+        bottom: `calc(var(--chrome-bottom-h) - var(--chrome-bottom-shift))`,
       }}
     >
       {/* Track (dark glass) */}
