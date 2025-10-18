@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import { MapPin, UserPlus, UserCheck, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { HeartIcon, ChatBubbleOvalLeftEllipsisIcon, PaperAirplaneIcon, SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/solid';
@@ -47,17 +47,18 @@ interface ClubhouseVerticalFeedProps {
   onTouchStart?: (event: React.TouchEvent) => void;
   onTouchMove?: (event: React.TouchEvent) => void;
   onTouchEnd?: (event: React.TouchEvent) => void;
+  onActiveVideoRefChange?: (ref: HTMLVideoElement | null) => void;
 }
 
 // VideoWithAutoplay component moved outside to prevent recreation on re-renders
-const VideoWithAutoplay: React.FC<{
+const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   src: string;
   muted: boolean;
   className: string;
   isMobile?: boolean;
   shouldAttach?: boolean;
   autoplay?: boolean;
-}> = React.memo(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false }) => {
+}>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false }, ref) => {
   // Generate HLS URL from source
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
@@ -70,6 +71,7 @@ const VideoWithAutoplay: React.FC<{
       {hlsUrl ? (
         <div className="absolute inset-0" style={{ objectPosition: 'center center' }}>
           <HLSVideoCard
+            ref={ref}
             hlsUrl={hlsUrl}
             poster={poster}
             className="absolute inset-0 w-full h-full"
@@ -99,7 +101,7 @@ const VideoWithAutoplay: React.FC<{
       />
     </div>
   );
-});
+}));
 
 VideoWithAutoplay.displayName = 'VideoWithAutoplay';
 
@@ -114,7 +116,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onTap,
   onTouchStart,
   onTouchMove,
-  onTouchEnd
+  onTouchEnd,
+  onActiveVideoRefChange
 }) => {
   const { user } = useSupabaseSession();
   
@@ -174,6 +177,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [showMiniProfile, setShowMiniProfile] = useState(false);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
+  const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
   // Removed isTextExpanded state as mouse handlers were removed to prevent re-renders
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const queryClient = useQueryClient();
@@ -442,6 +446,19 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     prevScrollTopRef.current = scrollTop;
   }, [currentIndex, filteredPosts.length, hasMore, isLoadingMore, onLoadMore]);
 
+  // Notify parent of active video ref changes
+  useEffect(() => {
+    if (!onActiveVideoRefChange) return;
+    
+    const currentPost = filteredPosts[currentIndex];
+    if (currentPost && currentPost.type === 'video') {
+      const videoRef = videoRefs.current[currentPost.id];
+      onActiveVideoRefChange(videoRef);
+    } else {
+      onActiveVideoRefChange(null);
+    }
+  }, [currentIndex, filteredPosts, onActiveVideoRefChange]);
+
   // Scroll to specific index
   const scrollToIndex = (index: number) => {
     if (!scrollViewRef.current) return;
@@ -683,6 +700,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               >
                 {currentMedia.media_type === 'video' ? (
                   <VideoWithAutoplay
+                    ref={(el) => {
+                      videoRefs.current[item.id] = el;
+                    }}
                     src={currentMedia.media_url}
                     muted={isGloballyMuted}
                     className="w-full h-full"

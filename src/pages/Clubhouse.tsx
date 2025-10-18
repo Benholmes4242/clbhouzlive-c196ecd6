@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import NavigationBar from '@/components/bottom-navigation/NavigationBar';
@@ -9,6 +9,7 @@ import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigat
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { useChromeState } from '@/hooks/useChromeState';
 import { useChromeAnchors } from '@/hooks/useChromeAnchors';
+import { VideoProgressHUD } from '@/components/hud/VideoProgressHUD';
 
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -32,6 +33,9 @@ const Clubhouse = () => {
 
   // Navigation handlers
   const { activeTab, handleTabClick } = useNavigationHandlers();
+  
+  // Track active video for progress HUD
+  const activeVideoRef = useRef<HTMLVideoElement | null>(null);
   
   // Composer state management
   const {
@@ -225,8 +229,14 @@ const Clubhouse = () => {
           onTouchStart={chromeControls.handleTouchStart}
           onTouchMove={chromeControls.handleTouchMove}
           onTouchEnd={chromeControls.handleTouchEnd}
+          onActiveVideoRefChange={(ref) => {
+            activeVideoRef.current = ref;
+          }}
         />
       </div>
+
+      {/* Video Progress HUD - Anchored to bottom nav */}
+      <VideoProgressHUD videoRef={activeVideoRef} />
       
       {/* Post Submission Handler */}
       <PostSubmissionHandler

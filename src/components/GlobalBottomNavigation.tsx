@@ -34,7 +34,7 @@ interface GlobalBottomNavigationProps {
 
 const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeState = 'visible' }) => {
   const location = useLocation();
-  const { isVisible } = useBottomNavigation();
+  const { isVisible, setNavRef } = useBottomNavigation();
   const { shouldHideBottomNav } = useModalContext();
   const { activeTab, handleTabClick } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
@@ -179,7 +179,10 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
             }}
           >
             <div
-              ref={navRef}
+              ref={(el) => {
+                navRef.current = el;
+                setNavRef(el);
+              }}
               className={cn(
                 "chrome-bottom-nav", // Chrome auto-hide class lives on inner element to avoid Framer inline transform conflicts
                 "backdrop-blur-md",

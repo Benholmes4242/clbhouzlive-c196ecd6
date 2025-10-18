@@ -1,10 +1,12 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 
 interface BottomNavigationContextType {
   isVisible: boolean;
+  height: number;
   setVisible: (visible: boolean) => void;
   hideBottomNav: () => void;
   showBottomNav: () => void;
+  setNavRef: (ref: HTMLDivElement | null) => void;
 }
 
 const BottomNavigationContext = createContext<BottomNavigationContextType | undefined>(undefined);
@@ -23,6 +25,8 @@ interface BottomNavigationProviderProps {
 
 export const BottomNavigationProvider: React.FC<BottomNavigationProviderProps> = ({ children }) => {
   const [isVisible, setIsVisible] = useState(true);
+  const [height, setHeight] = useState(0);
+  const navRef = useRef<HTMLDivElement | null>(null);
 
   const setVisible = useCallback((visible: boolean) => {
     setIsVisible(visible);
@@ -36,13 +40,34 @@ export const BottomNavigationProvider: React.FC<BottomNavigationProviderProps> =
     setIsVisible(true);
   }, []);
 
+  const setNavRef = useCallback((ref: HTMLDivElement | null) => {
+    navRef.current = ref;
+  }, []);
+
+  // Measure bottom nav height with ResizeObserver
+  useEffect(() => {
+    if (!navRef.current) return;
+    
+    const ro = new ResizeObserver((entries) => {
+      const h = entries[0]?.contentRect?.height ?? 0;
+      setHeight(h);
+      // Publish as CSS var for pure-CSS consumers
+      document.documentElement.style.setProperty('--bottom-nav-height', `${h}px`);
+    });
+    
+    ro.observe(navRef.current);
+    return () => ro.disconnect();
+  }, [navRef.current]);
+
   return (
     <BottomNavigationContext.Provider 
       value={{ 
         isVisible, 
+        height,
         setVisible, 
         hideBottomNav, 
-        showBottomNav 
+        showBottomNav,
+        setNavRef
       }}
     >
       {children}
