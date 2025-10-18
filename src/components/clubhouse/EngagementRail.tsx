@@ -155,7 +155,7 @@ const EngagementRail = ({
         railVisible ? 'is-visible' : 'is-hidden',
         className
       )}
-      style={{ bottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 18px - var(--chrome-bottom-shift, 0px))' }}
+      style={{ bottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 6px - var(--chrome-bottom-shift, 0px) + 12px)' }} // ~90px when visible, ~6px when hidden
     >
       {/* Three dots menu - only show for own posts */}
       {isOwnPost && onEdit && onDelete && (
