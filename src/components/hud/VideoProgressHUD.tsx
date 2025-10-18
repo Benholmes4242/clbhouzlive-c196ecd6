@@ -33,12 +33,11 @@ export function VideoProgressHUD({
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={Math.round(progress * 100)}
-      // Fixed layer that follows bottom nav
-      className="fixed left-0 w-[100vw] z-40 pointer-events-none"
+      // Fixed layer that follows bottom nav using chrome auto-hide system
+      className="fixed left-0 w-[100vw] z-40 pointer-events-none chrome-follow-bottom"
       style={{
-        // Animate "following" the nav with the same timing as the nav animation
+        // Base position on top of bottom nav, chrome system handles the slide
         bottom: `calc(${bottomPx}px + env(safe-area-inset-bottom))`,
-        transition: 'bottom 300ms ease-out',
       }}
     >
       {/* Track (dark glass) */}
