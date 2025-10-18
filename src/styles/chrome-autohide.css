@@ -1,4 +1,14 @@
-/* Clubhouse Chrome Auto-Hide Animations */
+/* ⚠️ CRITICAL: Clubhouse Chrome Auto-Hide System ⚠️
+ *
+ * DO NOT MODIFY these CSS variables without testing all chrome-follow-top/bottom elements
+ * 
+ * Dependencies:
+ * - useChromeAnchors hook updates --chrome-top-h and --chrome-bottom-h
+ * - ClubTagPill and other UI elements use chrome-follow-top to slide with header
+ * - Default values (64px/96px) MUST NOT be 0 - they're used before JS measures actual heights
+ * 
+ * REGRESSION WILL BREAK: Golf club pill, header auto-hide followers
+ */
 
 /* Unified chrome transition tokens + dynamic anchors */
 :root {
@@ -6,7 +16,8 @@
   --chrome-trans-ms: 220ms;
   --chrome-fade-ms: 220ms;
   
-  /* Populated from JS on mount; include safe areas */
+  /* ⚠️ CRITICAL: These defaults are used until useChromeAnchors measures actual elements
+   * DO NOT set to 0px - race conditions at mount mean followers need valid defaults */
   --chrome-top-h: 64px;     /* header height + safe-top */
   --chrome-bottom-h: 96px;  /* bottom-nav height + safe-bottom */
   --chrome-top-shift: 0px;      /* 0 when visible, -var(--chrome-top-h) when hidden */
@@ -65,6 +76,14 @@ body.chrome-hidden .chrome-bottom-nav {
 }
 
 /* ========== Dynamic Re-Anchoring for Dependent UI ========== */
+/* ⚠️ CRITICAL: Follower elements that move with chrome auto-hide ⚠️
+ * 
+ * chrome-follow-top: Elements that slide UP when header hides (e.g., ClubTagPill)
+ * chrome-follow-bottom: Elements that slide DOWN when bottom nav hides
+ * 
+ * DO NOT add transition-all or custom transform transitions to elements with these classes
+ * The transform is managed by --chrome-top-shift and --chrome-bottom-shift variables
+ */
 
 /* Followers */
 .chrome-follow-top,

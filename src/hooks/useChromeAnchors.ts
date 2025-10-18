@@ -1,9 +1,29 @@
 import { useEffect } from 'react';
 
 /**
- * Hook to keep --chrome-top-h and --chrome-bottom-h CSS variables
+ * ⚠️ CRITICAL: Chrome Anchors Synchronization Hook ⚠️
+ * 
+ * This hook keeps --chrome-top-h and --chrome-bottom-h CSS variables
  * synchronized with the actual chrome element heights.
- * Queries elements by data attributes to work across component boundaries.
+ * 
+ * DO NOT MODIFY without understanding these dependencies:
+ * 
+ * 1. ClubTagPill (and other .chrome-follow-top elements) rely on --chrome-top-shift
+ *    which is calculated from --chrome-top-h in chrome-autohide.css
+ * 
+ * 2. Setting --chrome-top-h to 0px when header is not found will BREAK all follower
+ *    elements (they won't move with the header auto-hide)
+ * 
+ * 3. The CSS defaults in chrome-autohide.css (64px/96px) MUST be preserved
+ *    when elements are not yet mounted or cannot be measured
+ * 
+ * 4. Race conditions at mount time mean we must conditionally set these variables
+ *    ONLY when elements exist, not default to 0
+ * 
+ * REGRESSION WILL BREAK: Golf club pill sliding, any chrome-follow-top/bottom elements
+ * 
+ * @see src/styles/chrome-autohide.css
+ * @see src/components/clubhouse/ClubTagPill.tsx
  */
 export function useChromeAnchors() {
   useEffect(() => {

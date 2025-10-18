@@ -29,6 +29,9 @@ const ClubTagPill = ({ course, className }: ClubTagPillProps) => {
     <div
       data-action="course-tag"
       className={cn(
+        // ⚠️ CRITICAL: chrome-follow-top makes this slide with header auto-hide
+        // DO NOT REMOVE or add conflicting transitions (transition-all, etc.)
+        // Relies on --chrome-top-shift from chrome-autohide.css
         "fixed z-overlay cursor-pointer chrome-follow-top",
         "right-3 md:right-6",
         className
