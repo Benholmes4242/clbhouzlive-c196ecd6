@@ -42,8 +42,7 @@ const EngagementButton = ({
   isActive, 
   onClick, 
   className,
-  ariaLabel,
-  showCount = true
+  ariaLabel
 }: {
   icon: any;
   count: number;
@@ -51,7 +50,6 @@ const EngagementButton = ({
   onClick: () => void;
   className?: string;
   ariaLabel: string;
-  showCount?: boolean;
 }) => {
   const [isPressed, setIsPressed] = useState(false);
 
@@ -93,7 +91,7 @@ const EngagementButton = ({
         />
       </button>
       
-      {showCount && count > 0 && (
+      {count > 0 && (
         <span className="text-white text-xs font-medium">
           {formatCount(count)}
         </span>
@@ -158,7 +156,7 @@ const EngagementRail = ({
         railVisible ? 'is-visible' : 'is-hidden',
         className
       )}
-      style={{ bottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 0px)' }}
+      style={{ bottom: 'calc(var(--bottom-nav-height, 72px) + env(safe-area-inset-bottom, 0px) + 12px)' }}
     >
       {/* Three dots menu - only show for own posts */}
       {isOwnPost && onEdit && onDelete && (
@@ -228,7 +226,6 @@ const EngagementRail = ({
         count={stats.shares}
         onClick={onShare}
         ariaLabel="Share"
-        showCount={false}
       />
     </div>
   );
