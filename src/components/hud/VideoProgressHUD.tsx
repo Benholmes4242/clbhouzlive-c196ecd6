@@ -19,12 +19,8 @@ export function VideoProgressHUD({
   // 1) Reuse existing sync hook — NO changes to logic
   const { setProgressFillRef, progress } = useVideoProgressSync(videoRef.current);
 
-  // 2) Bottom nav awareness
+  // 2) Bottom nav awareness (for fallback only)
   const { isVisible, height } = useBottomNavigation();
-
-  // 3) Computed bottom: nav-visible => sit on top edge of nav
-  //    nav-hidden   => sit on viewport bottom (safe-area included in both cases)
-  const bottomPx = isVisible ? height : 0;
 
   // Don't render if there's no active video
   if (!videoRef.current) {
@@ -38,11 +34,14 @@ export function VideoProgressHUD({
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={Math.round(progress * 100)}
-      // Fixed layer that follows bottom nav using chrome auto-hide system
-      className="fixed left-0 w-[100vw] z-40 pointer-events-none chrome-follow-bottom"
+      // Fixed layer that anchors to nav when visible, viewport when hidden
+      className="fixed left-0 w-[100vw] z-30 pointer-events-none transition-[bottom] duration-300 ease-out"
       style={{
-        // Base position on top of bottom nav, chrome system handles the slide
-        bottom: `calc(${bottomPx}px + env(safe-area-inset-bottom))`,
+        // Anchored to nav top when visible; to viewport bottom when hidden
+        bottom: `calc(
+          env(safe-area-inset-bottom, 0px) +
+          max(0px, var(--chrome-bottom-height, 0px) - var(--chrome-bottom-shift, 0px))
+        )`,
       }}
     >
       {/* Track (dark glass) */}
