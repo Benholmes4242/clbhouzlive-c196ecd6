@@ -65,7 +65,7 @@ const EngagementButton = ({
         data-action="engagement"
         aria-label={ariaLabel}
         className={cn(
-          "relative w-12 h-12 rounded-full flex items-center justify-center",
+          "relative w-10 h-10 rounded-full flex items-center justify-center",
           "bg-hud-bg backdrop-blur-md border border-hud-border",
           "text-white transition-all duration-200 overflow-hidden",
           "hover:bg-hud-bg/80 active:scale-95",
@@ -73,7 +73,7 @@ const EngagementButton = ({
           className
         )}
         onClick={handlePress}
-        style={{ minWidth: '48px', minHeight: '48px' }}
+        style={{ minWidth: '40px', minHeight: '40px' }}
       >
         {/* Ripple effect */}
         {isPressed && (
@@ -85,7 +85,7 @@ const EngagementButton = ({
         
         <Icon 
           className={cn(
-            "w-6 h-6 transition-colors duration-200",
+            "w-5 h-5 transition-colors duration-200",
             isActive ? "text-accent fill-accent" : "text-white"
           )}
         />
@@ -166,14 +166,14 @@ const EngagementRail = ({
               <button
                 aria-label="Post options"
                 className={cn(
-                  "relative w-12 h-12 rounded-full flex items-center justify-center",
+                  "relative w-10 h-10 rounded-full flex items-center justify-center",
                   "bg-hud-bg backdrop-blur-md border border-hud-border",
                   "text-white transition-all duration-200 overflow-hidden",
                   "hover:bg-hud-bg/80 active:scale-95"
                 )}
-                style={{ minWidth: '48px', minHeight: '48px' }}
+                style={{ minWidth: '40px', minHeight: '40px' }}
               >
-                <MoreHorizontal className="w-6 h-6 text-white" />
+                <MoreHorizontal className="w-5 h-5 text-white" />
               </button>
             </div>
           </DropdownMenuTrigger>
