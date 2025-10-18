@@ -24,8 +24,45 @@ export function VideoProgressHUD({
     return null;
   }
 
+  // Diagnostics: capture computed CSS and environment info (temporary)
+  const hudRef = React.useRef<HTMLDivElement | null>(null);
+  React.useEffect(() => {
+    const root = document.documentElement;
+    const metaViewport = document.querySelector('meta[name="viewport"]')?.getAttribute('content') || '';
+    const sample = (label: string) => {
+      const el = hudRef.current;
+      const cs = el ? getComputedStyle(el) : null;
+      const rs = getComputedStyle(root);
+      const values = {
+        label,
+        bottom: cs?.getPropertyValue('bottom')?.trim(),
+        zIndex: cs?.getPropertyValue('z-index')?.trim(),
+        '--safe-bottom': rs.getPropertyValue('--safe-bottom').trim(),
+        '--chrome-bottom-h': rs.getPropertyValue('--chrome-bottom-h').trim(),
+        '--chrome-bottom-shift': rs.getPropertyValue('--chrome-bottom-shift').trim(),
+        viewportMeta: metaViewport,
+        displayMode: (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || (navigator as any).standalone ? 'standalone' : 'browser',
+        ua: navigator.userAgent,
+      };
+      console.log('[VideoProgressHUD][diagnostics]', values);
+    };
+    sample('init');
+    const mo = new MutationObserver(() => sample('body-class-change'));
+    mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    const onResize = () => sample('resize');
+    const onOrientation = () => sample('orientationchange');
+    window.addEventListener('resize', onResize);
+    window.addEventListener('orientationchange', onOrientation);
+    return () => {
+      mo.disconnect();
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('orientationchange', onOrientation);
+    };
+  }, []);
+
   const progressBar = (
     <div
+      ref={hudRef}
       aria-label="Video progress"
       role="progressbar"
       aria-valuemin={0}
