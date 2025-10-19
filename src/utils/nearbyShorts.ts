@@ -1,10 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { isMockLiveEnabled } from '@/mocks/mockSwitch';
+import { MOCK_NEARBY } from '@/mocks/live_clubhouse';
+
+export type NearbyGolfer = {
+  id: string;
+  username: string;
+  display_name: string;
+  profile_photo_url: string;
+  home_club?: string | null;
+};
 
 interface NearbyResult {
   hasNearby: boolean;
   count: number;
+  list: NearbyGolfer[];
 }
 
 /**
@@ -12,12 +23,25 @@ interface NearbyResult {
  * Returns count of recent posts within ~25-50km radius
  */
 export function useNearbyShorts(): NearbyResult {
+  const mock = isMockLiveEnabled();
   const { user } = useSupabaseSession();
-  const [result, setResult] = useState<NearbyResult>({ hasNearby: false, count: 0 });
+  const [result, setResult] = useState<NearbyResult>({ hasNearby: false, count: 0, list: [] });
 
+  // MOCK PATH
+  const mockResult = useMemo(() => {
+    if (mock) {
+      const list = MOCK_NEARBY;
+      return { hasNearby: true, count: list.length, list };
+    }
+    return null;
+  }, [mock]);
+
+  if (mockResult) return mockResult;
+
+  // === REAL PATH ===
   useEffect(() => {
     if (!user) {
-      setResult({ hasNearby: false, count: 0 });
+      setResult({ hasNearby: false, count: 0, list: [] });
       return;
     }
 
@@ -31,7 +55,7 @@ export function useNearbyShorts(): NearbyResult {
           .single();
 
         if (!profile?.home_club) {
-          setResult({ hasNearby: false, count: 0 });
+          setResult({ hasNearby: false, count: 0, list: [] });
           return;
         }
 
@@ -45,11 +69,12 @@ export function useNearbyShorts(): NearbyResult {
 
         setResult({
           hasNearby: (count ?? 0) > 0,
-          count: count ?? 0
+          count: count ?? 0,
+          list: []
         });
       } catch (error) {
         console.error('Error fetching nearby shorts:', error);
-        setResult({ hasNearby: false, count: 0 });
+        setResult({ hasNearby: false, count: 0, list: [] });
       }
     })();
   }, [user?.id]);

@@ -68,12 +68,12 @@ export function LiveClubhouseStrip() {
 }
 
 function NearbyTile({ count }: { count: number }) {
-  const navigate = useNavigate();
-  
   const handleClick = () => {
     analyticsEvents.lcStrip.nearbyOpen(count);
-    // Navigate to shorts with nearby filter
-    navigate('/discover?main=shorts&nearby=true');
+    // Apply nearby filter to URL
+    const url = new URL(window.location.href);
+    url.searchParams.set('nearby', 'true');
+    window.history.replaceState({}, '', url.toString());
   };
 
   return (
@@ -169,9 +169,9 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
         {creator.home_club ? ` • ${creator.home_club}` : ''}
       </div>
 
-      {/* Now Playing peek */}
+      {/* Now Playing peek - lazy load video only when peeking */}
       <div className="lc-peek" aria-hidden={!peeking}>
-        {creator.latest_short_preview?.mp4Url ? (
+        {peeking && creator.latest_short_preview?.mp4Url ? (
           <video
             className="lc-peek-video"
             src={creator.latest_short_preview.mp4Url}

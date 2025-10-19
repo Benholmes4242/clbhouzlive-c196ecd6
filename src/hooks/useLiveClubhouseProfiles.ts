@@ -5,6 +5,9 @@ import { useSupabaseSession } from './useSupabaseSession';
 import { getLatestShortPreviewForCreators } from '@/utils/shortsPreview';
 import { NotInterested } from '@/stores/notInterested';
 import { channelManager } from '@/utils/supabaseChannelManager';
+import { isMockLiveEnabled } from '@/mocks/mockSwitch';
+import { MOCK_CREATORS } from '@/mocks/live_clubhouse';
+import { startMockPresence } from '@/mocks/mockPresenceTicker';
 
 const RECENT_MS = 24 * 60 * 60 * 1000;
 
@@ -25,7 +28,40 @@ export interface LiveCreator {
  * Maintains 60/40 known/suggested mix, includes preview data and online status
  */
 export function useLiveClubhouseProfiles() {
+  const mock = isMockLiveEnabled();
   const { user } = useSupabaseSession();
+  const [onlineMap, setOnlineMap] = useState<Record<string, boolean>>({});
+
+  // MOCK PATH
+  if (mock) {
+    useEffect(() => {
+      const stop = startMockPresence(setOnlineMap);
+      return stop;
+    }, []);
+
+    const creators: LiveCreator[] = useMemo(() => {
+      const now = Date.now();
+      return MOCK_CREATORS.map(m => {
+        const msAgo = (m.minutesAgo ?? 999) * 60_000;
+        const latest = new Date(now - msAgo).toISOString();
+        return {
+          id: m.id,
+          username: m.username,
+          display_name: m.display_name,
+          profile_photo_url: m.profile_photo_url,
+          home_club: m.home_club ?? null,
+          latest_post_at: latest,
+          latest_short_preview: { posterUrl: m.previewPoster, mp4Url: m.previewMp4 },
+          has_recent_post: msAgo <= RECENT_MS,
+          is_online: !!onlineMap[m.id],
+        };
+      });
+    }, [onlineMap]);
+
+    return { creators, isLoading: false };
+  }
+
+  // === REAL PATH ===
   
   // Fetch base creator list with 60/40 mix
   const { data: baseCreators = [], isLoading } = useQuery({
@@ -150,7 +186,6 @@ export function useLiveClubhouseProfiles() {
   }, [baseCreators]);
 
   // Presence tracking (online status)
-  const [onlineMap, setOnlineMap] = useState<Record<string, boolean>>({});
   
   useEffect(() => {
     const channelName = 'presence:creators_online';
