@@ -198,14 +198,14 @@
 /* Nearby pin — animated radar   */
 /* ============================= */
 
+/* Nearby pin circle acts as the mask */
 .lc-nearby-avatar {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;             /* keep waves inside the circle */
-  background: #f7faf7;          /* base fill under the pin */
-  font-size: 24px;
+  overflow: hidden;             /* keep waves INSIDE the circle */
+  background: #f7faf7;          /* soft base */
   color: #0b0b0b;
   border-radius: 35px;
   width: 72px;
@@ -213,42 +213,45 @@
   box-shadow: 0 1px 6px rgb(0 0 0 / 12%);
 }
 
-/* Two soft waves, fully inside the circle */
+/* Pin sits above the waves */
+.lc-nearby .lc-pin {
+  position: relative;
+  z-index: 2;
+  font-size: 24px;
+  line-height: 1;
+}
+
+/* Two soft green waves INSIDE the circle */
 .lc-nearby .lc-nearby-avatar::before,
 .lc-nearby .lc-nearby-avatar::after {
   content: "";
   position: absolute;
-  inset: 0;                      /* fill the circle */
+  inset: 0;
   border-radius: 50%;
   pointer-events: none;
+  z-index: 1;                   /* above base background, below pin */
   will-change: transform, opacity;
   background: radial-gradient(
     circle,
-    rgba(110,146,119,0.25) 0%,
-    rgba(110,146,119,0.16) 26%,
-    rgba(110,146,119,0.08) 44%,
-    transparent 60%
+    rgba(110,146,119,0.24) 0%,
+    rgba(110,146,119,0.14) 26%,
+    rgba(110,146,119,0.08) 46%,
+    transparent 62%
   );
-  transform: scale(0.65);        /* start smaller, expand out */
+  transform: scale(0.55);       /* starts tight near the pin */
   opacity: 0.55;
   animation: lcRadar 3s ease-out infinite;
 }
 
-/* Stagger second wave by 1.5s for continuous feel */
+/* Stagger the second wave for continuity */
 .lc-nearby .lc-nearby-avatar::after {
   animation-delay: 1.5s;
 }
 
-/* Keep pin emoji/SVG above the waves */
-.lc-nearby .lc-nearby-avatar > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* Animation: expand & fade, staying inside circle */
+/* Expands AWAY from the pin, fades at the edge */
 @keyframes lcRadar {
-  0%   { transform: scale(0.65); opacity: 0.55; }
-  70%  { transform: scale(1.10); opacity: 0.18; }
+  0%   { transform: scale(0.55); opacity: 0.55; }
+  70%  { transform: scale(1.05); opacity: 0.18; }
   100% { transform: scale(1.18); opacity: 0; }
 }
 
@@ -272,7 +275,7 @@
   .lc-nearby .lc-nearby-avatar::before,
   .lc-nearby .lc-nearby-avatar::after {
     animation: none;
-    opacity: 0.25;               /* subtle static ring fallback */
+    opacity: 0.22;
     transform: none;
   }
 }
