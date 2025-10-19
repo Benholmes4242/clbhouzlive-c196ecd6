@@ -208,17 +208,17 @@
   background: #fbfdfb !important;      /* lighter, more subtle */
   background-image: none !important;
   color: #0b0b0b;
-  border-radius: 35px;
-  width: 72px;
-  height: 72px;
+  border-radius: 40px;          /* Increased for larger circle */
+  width: 80px;                  /* Bigger than regular 72px avatars */
+  height: 80px;
   box-shadow: 0 1px 6px rgb(0 0 0 / 12%);
 }
 
 /* Emoji pin: native styling, centered */
 .lc-pin-emoji {
-  font-size: 22px;            /* Sized to fit without clipping */
+  font-size: 28px;            /* Full size, no clipping */
   line-height: 1;             
-  transform: translateY(0px); /* Centered vertically */
+  transform: translateY(0px);
   color: #e04949;             /* Red tone */
   display: flex;
   align-items: center;
