@@ -76,6 +76,8 @@ function NearbyTile({ count }: { count: number }) {
     window.history.replaceState({}, '', url.toString());
   };
 
+  const nearText = `${count} ${count === 1 ? 'player' : 'players'} near you`;
+
   return (
     <button 
       className="lc-tile lc-nearby" 
@@ -86,10 +88,10 @@ function NearbyTile({ count }: { count: number }) {
       <div className="lc-avatar-btn">
         <div className="lc-nearby-avatar">📍</div>
       </div>
-      <div className="lc-name" title="Nearby Golfers">
-        Nearby Golfers
+      <div className="lc-name" title="Nearby golfers">
+        Nearby golfers
       </div>
-      <div className="lc-sub">{count} new near you</div>
+      <div className="lc-sub">{nearText}</div>
     </button>
   );
 }
