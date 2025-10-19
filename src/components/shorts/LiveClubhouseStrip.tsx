@@ -12,7 +12,6 @@ export function LiveClubhouseStrip() {
   const nearby = useNearbyShorts();
   const rowRef = useRef<HTMLDivElement>(null);
   const [scrolling, setScrolling] = useState(false);
-  const [showNearbyPanel, setShowNearbyPanel] = useState(false);
 
   useEffect(() => {
     const el = rowRef.current;
@@ -55,12 +54,7 @@ export function LiveClubhouseStrip() {
         role="listbox" 
         aria-label="Suggested creators"
       >
-        {showNearby && (
-          <NearbyTile 
-            count={nearby.count} 
-            onClick={() => nearby.list.length && setShowNearbyPanel(v => !v)} 
-          />
-        )}
+        {showNearby && <NearbyTile count={nearby.count} />}
         {creators.map((c, idx) => (
           <LiveTile 
             key={c.id} 
@@ -69,53 +63,18 @@ export function LiveClubhouseStrip() {
           />
         ))}
       </div>
-
-      {showNearbyPanel && nearby.list.length > 0 && (
-        <div className="lc-nearby-sheet" role="dialog" aria-label="Nearby golfers">
-          <div className="lc-nearby-sheet-header">
-            <span>📍 Nearby golfers</span>
-            <button 
-              className="lc-sheet-close" 
-              onClick={() => setShowNearbyPanel(false)} 
-              aria-label="Close"
-            >
-              ✕
-            </button>
-          </div>
-          <div className="lc-nearby-list">
-            {nearby.list.map((p) => (
-              <div 
-                className="lc-nearby-item" 
-                key={p.id}
-                onClick={() => window.location.href = `/user/${p.username}`}
-                role="button" 
-                tabIndex={0}
-              >
-                <img 
-                  className="lc-nearby-avatar" 
-                  src={p.profile_photo_url || '/placeholder.svg'} 
-                  alt={p.display_name} 
-                />
-                <div className="lc-nearby-meta">
-                  <div className="lc-nearby-name">{p.display_name}</div>
-                  {p.home_club && <div className="lc-nearby-club">{p.home_club}</div>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
-function NearbyTile({ count, onClick }: { count: number; onClick: () => void }) {
+function NearbyTile({ count }: { count: number }) {
   const handleClick = () => {
     analyticsEvents.lcStrip.nearbyOpen(count);
-    onClick();
+    // Apply nearby filter to URL
+    const url = new URL(window.location.href);
+    url.searchParams.set('nearby', 'true');
+    window.history.replaceState({}, '', url.toString());
   };
-
-  const nearText = `${count} ${count === 1 ? 'player' : 'players'} near you`;
 
   return (
     <button 
@@ -127,10 +86,10 @@ function NearbyTile({ count, onClick }: { count: number; onClick: () => void }) 
       <div className="lc-avatar-btn">
         <div className="lc-nearby-avatar">📍</div>
       </div>
-      <div className="lc-name" title="Nearby golfers">
-        Nearby golfers
+      <div className="lc-name" title="Nearby Golfers">
+        Nearby Golfers
       </div>
-      <div className="lc-sub">{nearText}</div>
+      <div className="lc-sub">{count} new near you</div>
     </button>
   );
 }
@@ -201,10 +160,7 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
           draggable={false}
         />
         {creator.is_online && (
-          <span 
-            className={`lc-dot ${(creator as any).__pulseDot ? 'lc-dot--pulse' : ''}`}
-            aria-hidden="true" 
-          />
+          <span className="lc-dot" aria-hidden="true" />
         )}
       </button>
 

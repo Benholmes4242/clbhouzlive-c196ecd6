@@ -41,8 +41,6 @@ export function useLiveClubhouseProfiles() {
 
     const creators: LiveCreator[] = useMemo(() => {
       const now = Date.now();
-      // choose one id to pulse (stable until reload)
-      const pulseId = MOCK_CREATORS[2]?.id;
       return MOCK_CREATORS.map(m => {
         const msAgo = (m.minutesAgo ?? 999) * 60_000;
         const latest = new Date(now - msAgo).toISOString();
@@ -56,8 +54,7 @@ export function useLiveClubhouseProfiles() {
           latest_short_preview: { posterUrl: m.previewPoster, mp4Url: m.previewMp4 },
           has_recent_post: msAgo <= RECENT_MS,
           is_online: !!onlineMap[m.id],
-          __pulseDot: m.id === pulseId,
-        } as any;
+        };
       });
     }, [onlineMap]);
 

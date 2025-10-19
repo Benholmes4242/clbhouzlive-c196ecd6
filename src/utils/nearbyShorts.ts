@@ -30,7 +30,7 @@ export function useNearbyShorts(): NearbyResult {
   // MOCK PATH
   const mockResult = useMemo(() => {
     if (mock) {
-      const list = MOCK_NEARBY.slice(0, 3);
+      const list = MOCK_NEARBY;
       return { hasNearby: true, count: list.length, list };
     }
     return null;
