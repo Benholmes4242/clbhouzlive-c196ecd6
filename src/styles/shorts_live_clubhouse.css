@@ -184,6 +184,7 @@
   border: none;
   background: transparent;
   padding: 0;
+  position: relative; /* for emoji overlay positioning */
 }
 
 .lc-nearby .lc-name { 
@@ -192,6 +193,20 @@
 
 .lc-nearby .lc-sub { 
   margin-top: 2px; 
+}
+
+/* Overlay native emoji above the masked avatar to prevent clipping */
+.lc-nearby::before {
+  content: "📍";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 30px; /* larger size without clipping */
+  line-height: 1;
+  color: #e04949;
+  z-index: 3;
+  pointer-events: none;
 }
 
 /* ============================= */
