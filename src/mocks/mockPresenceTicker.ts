@@ -1,9 +1,10 @@
 import { MOCK_CREATORS } from './live_clubhouse';
 
 export function startMockPresence(onUpdate: (onlineMap: Record<string, boolean>) => void) {
-  // seed random online states
+  // seed random online states - force at least 3 online for visibility
   const online: Record<string, boolean> = {};
-  MOCK_CREATORS.forEach(c => { online[c.id] = Math.random() < 0.5; });
+  const force = new Set([MOCK_CREATORS[0]?.id, MOCK_CREATORS[1]?.id, MOCK_CREATORS[3]?.id].filter(Boolean));
+  MOCK_CREATORS.forEach(c => { online[c.id] = force.has(c.id) || Math.random() < 0.4; });
   onUpdate({ ...online });
 
   const interval = setInterval(() => {
