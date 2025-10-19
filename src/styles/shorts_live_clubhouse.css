@@ -195,70 +195,104 @@
 }
 
 /* ============================= */
-/* Nearby pin — animated radar   */
+/* Nearby pin — premium glass UI */
 /* ============================= */
 
-/* Mask: keep everything INSIDE the circle */
+/* Glass base circle with subtle depth */
 .lc-nearby-avatar {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;             /* rings stay inside */
-  background: #fbfdfb !important;      /* lighter, more subtle */
-  background-image: none !important;
-  color: #0b0b0b;
-  border-radius: 35px;
+  overflow: hidden;
   width: 72px;
   height: 72px;
-  box-shadow: 0 1px 6px rgb(0 0 0 / 12%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(110,146,119,0.04) 100%);
+  border: 1px solid rgba(110,146,119,0.15);
+  box-shadow: 
+    inset 0 0 0 1px rgba(0,0,0,0.06),
+    0 1px 2px rgba(0,0,0,0.04);
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.05));
 }
 
-/* SVG pin: consistent metrics, never clipped */
+/* Polished SVG pin with gradient and shadow */
 .lc-nearby .lc-pin-svg {
   position: relative;
-  z-index: 3;                                /* above rings */
-  width: 22px; height: 22px;                 /* +2px for clearer emphasis */
-  color: #e04949;                            /* brandy red for the pin */
+  z-index: 3;
+  width: 24px; 
+  height: 24px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
 }
 
-/* TRUE RINGS (border-only), expanding OUT to the rim */
+/* Gradient fill for pin */
+.lc-nearby .lc-pin-svg path {
+  fill: url(#pinGradient);
+}
+
+/* Pulse rings - refined echo green animation */
 .lc-nearby .lc-nearby-avatar::before,
 .lc-nearby .lc-nearby-avatar::after {
   content: "";
   position: absolute;
-  left: 50%; top: 50%;
-  /* Start smaller; end size nearly fills the circle.
-     Subtract 6px so the 2px border doesn't clip at the edge. */
-  width: calc(100% - 6px);
-  height: calc(100% - 6px);
-  transform: translate(-50%, -50%) scale(0.30);  /* start a touch wider */
+  left: 50%; 
+  top: 50%;
+  width: 80%;
+  height: 80%;
+  transform: translate(-50%, -50%) scale(1);
   border-radius: 50%;
   box-sizing: border-box;
-  border: 2px solid rgba(110,146,119,0.72);  /* brighter Echo green */
-  opacity: 0.90;
-  background: none !important;              /* ensure no fill */
-  animation: lcRing 3s ease-out infinite;
-  z-index: 2;                               /* below pin, above base */
+  border: 2px solid rgba(110,146,119,0.58);
+  opacity: 1;
+  background: none;
+  filter: blur(2px);
+  animation: lcPulse 3s ease-in-out infinite;
+  z-index: 2;
 }
 
-/* Stagger second wave */
+/* Stagger second pulse */
 .lc-nearby .lc-nearby-avatar::after {
   animation-delay: 1.5s;
-  border-color: rgba(110,146,119,0.58);  /* second ring slightly dimmer */
 }
 
-/* Expand to the rim, then fade out */
-@keyframes lcRing {
-  0%   { transform: translate(-50%,-50%) scale(0.30); opacity: .90; }
-  80%  { transform: translate(-50%,-50%) scale(1.00); opacity: .28; }  /* reaches rim */
-  100% { transform: translate(-50%,-50%) scale(1.05); opacity: 0; }    /* gentle fade past rim */
+/* Smooth pulse expansion and fade */
+@keyframes lcPulse {
+  0% { 
+    transform: translate(-50%, -50%) scale(1); 
+    opacity: 0.58; 
+  }
+  100% { 
+    transform: translate(-50%, -50%) scale(1.31); 
+    opacity: 0; 
+  }
+}
+
+/* Optional light sweep for premium touch */
+@keyframes lightSweep {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.12;
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+.lc-nearby-avatar::after {
+  animation: lightSweep 10s ease-in-out infinite;
 }
 
 @media (prefers-color-scheme: dark) {
   .lc-nearby-avatar {
-    color: #ffffff;
-    background: rgba(110, 146, 119, 0.2);
+    background: radial-gradient(circle, rgba(110,146,119,0.15) 0%, rgba(110,146,119,0.08) 100%);
+    border-color: rgba(110,146,119,0.25);
+    box-shadow: 
+      inset 0 0 0 1px rgba(255,255,255,0.06),
+      0 1px 2px rgba(0,0,0,0.15);
   }
 }
 
