@@ -184,7 +184,6 @@
   border: none;
   background: transparent;
   padding: 0;
-  position: relative; /* for emoji overlay positioning */
 }
 
 .lc-nearby .lc-name { 
@@ -193,20 +192,6 @@
 
 .lc-nearby .lc-sub { 
   margin-top: 2px; 
-}
-
-/* Overlay native emoji above the masked avatar to prevent clipping */
-.lc-nearby::before {
-  content: "📍";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 30px; /* larger size without clipping */
-  line-height: 1;
-  color: #e04949;
-  z-index: 3;
-  pointer-events: none;
 }
 
 /* ============================= */
@@ -223,17 +208,17 @@
   background: #fbfdfb !important;      /* lighter, more subtle */
   background-image: none !important;
   color: #0b0b0b;
-  border-radius: 40px;          /* Increased for larger circle */
-  width: 80px;                  /* Bigger than regular 72px avatars */
-  height: 80px;
+  border-radius: 35px;
+  width: 72px;
+  height: 72px;
   box-shadow: 0 1px 6px rgb(0 0 0 / 12%);
 }
 
 /* Emoji pin: native styling, centered */
 .lc-pin-emoji {
-  font-size: 28px;            /* Full size, no clipping */
+  font-size: 26px;            /* Slightly larger for visibility */
   line-height: 1;             
-  transform: translateY(0px);
+  transform: translateY(1px); /* Visually centers the emoji */
   color: #e04949;             /* Red tone */
   display: flex;
   align-items: center;
