@@ -216,9 +216,9 @@
 
 /* Emoji pin: native styling, centered */
 .lc-pin-emoji {
-  font-size: 26px;            /* Slightly larger for visibility */
+  font-size: 22px;            /* Sized to fit without clipping */
   line-height: 1;             
-  transform: translateY(1px); /* Visually centers the emoji */
+  transform: translateY(0px); /* Centered vertically */
   color: #e04949;             /* Red tone */
   display: flex;
   align-items: center;
