@@ -39,7 +39,6 @@
 /* Tiles */
 .lc-tile {
   width: 84px;
-  min-height: 130px;
   scroll-snap-align: start;
   position: relative;
   flex-shrink: 0;
