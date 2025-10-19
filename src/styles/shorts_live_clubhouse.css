@@ -194,34 +194,62 @@
   margin-top: 2px; 
 }
 
+/* ============================= */
+/* Nearby pin — animated radar   */
+/* ============================= */
+
 .lc-nearby-avatar {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;             /* keep waves inside the circle */
+  background: #f7faf7;          /* base fill under the pin */
   font-size: 24px;
-  background: #f7faf7;
   color: #0b0b0b;
   border-radius: 35px;
   width: 72px;
   height: 72px;
   box-shadow: 0 1px 6px rgb(0 0 0 / 12%);
-  position: relative;
 }
 
-/* Concentric radar rings around the pin (stationary) */
+/* Two soft waves, fully inside the circle */
 .lc-nearby .lc-nearby-avatar::before,
 .lc-nearby .lc-nearby-avatar::after {
   content: "";
   position: absolute;
-  inset: -6px;
-  border-radius: 40px;
-  border: 2px solid rgba(110, 146, 119, 0.35);
+  inset: 0;                      /* fill the circle */
+  border-radius: 50%;
   pointer-events: none;
+  will-change: transform, opacity;
+  background: radial-gradient(
+    circle,
+    rgba(110,146,119,0.25) 0%,
+    rgba(110,146,119,0.16) 26%,
+    rgba(110,146,119,0.08) 44%,
+    transparent 60%
+  );
+  transform: scale(0.65);        /* start smaller, expand out */
+  opacity: 0.55;
+  animation: lcRadar 3s ease-out infinite;
 }
 
+/* Stagger second wave by 1.5s for continuous feel */
 .lc-nearby .lc-nearby-avatar::after {
-  inset: -12px;
-  border-color: rgba(110, 146, 119, 0.20);
+  animation-delay: 1.5s;
+}
+
+/* Keep pin emoji/SVG above the waves */
+.lc-nearby .lc-nearby-avatar > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Animation: expand & fade, staying inside circle */
+@keyframes lcRadar {
+  0%   { transform: scale(0.65); opacity: 0.55; }
+  70%  { transform: scale(1.10); opacity: 0.18; }
+  100% { transform: scale(1.18); opacity: 0; }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -239,5 +267,12 @@
   
   .lc-peek {
     transition: none;
+  }
+
+  .lc-nearby .lc-nearby-avatar::before,
+  .lc-nearby .lc-nearby-avatar::after {
+    animation: none;
+    opacity: 0.25;               /* subtle static ring fallback */
+    transform: none;
   }
 }
