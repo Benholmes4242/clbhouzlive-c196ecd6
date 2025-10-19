@@ -166,8 +166,12 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
 
       <div className="lc-name" title={creator.display_name}>
         {creator.display_name}
-        {creator.home_club ? ` • ${creator.home_club}` : ''}
       </div>
+      {creator.home_club && (
+        <div className="lc-sub" title={creator.home_club}>
+          {creator.home_club}
+        </div>
+      )}
 
       {/* Now Playing peek - lazy load video only when peeking */}
       <div className="lc-peek" aria-hidden={!peeking}>

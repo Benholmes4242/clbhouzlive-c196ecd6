@@ -6,7 +6,13 @@
   padding: 12px 16px 10px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  background: color-mix(in srgb, rgba(255,255,255,0.06), transparent 50%);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  .live-row {
+    background: rgba(0, 0, 0, 0.08);
+  }
 }
 
 .live-row::after {
@@ -64,20 +70,36 @@
   box-shadow: 0 1px 6px rgb(0 0 0 / 12%);
   object-fit: cover;
   display: block;
+  position: relative;
 }
 
-/* Pulse for recent posts */
-@keyframes ringPulse {
+/* Pulse for recent posts - strong visible ring */
+.lc-recent .lc-avatar {
+  outline: 2px solid #6e9277 !important;
+  outline-offset: 2px;
+}
+
+.lc-recent .lc-avatar-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 40px;
+  border: 2px solid rgba(110, 146, 119, 0.45);
+  transform: scale(0.95);
+  opacity: 0.9;
+  animation: lcPulse 1.4s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes lcPulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(110, 146, 119, 0.35);
+    transform: scale(0.95);
+    opacity: 0.9;
   }
   100% {
-    box-shadow: 0 0 0 10px rgba(110, 146, 119, 0);
+    transform: scale(1.15);
+    opacity: 0;
   }
-}
-
-.lc-recent .lc-avatar {
-  animation: ringPulse 1.6s ease-out infinite;
 }
 
 /* Online dot */
@@ -90,6 +112,7 @@
   border-radius: 50%;
   background: #6e9277;
   box-shadow: 0 0 0 2px #fff;
+  z-index: 2;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -103,10 +126,10 @@
   margin-top: 6px;
   font-size: 13px;
   line-height: 1.2;
-  font-weight: 500;
-  color: rgba(0, 0, 0, 0.84);
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.92);
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-align: center;
@@ -114,15 +137,26 @@
 
 @media (prefers-color-scheme: dark) {
   .lc-name {
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.96);
   }
 }
 
 .lc-sub {
-  font-size: 11px;
-  opacity: 0.7;
+  font-size: 12px;
+  line-height: 1.2;
+  color: rgba(0, 0, 0, 0.55);
   margin-top: 2px;
   text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  .lc-sub {
+    color: rgba(255, 255, 255, 0.72);
+  }
 }
 
 /* Peek card */
@@ -187,7 +221,7 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .lc-avatar {
+  .lc-avatar-btn::after {
     animation: none !important;
   }
   
