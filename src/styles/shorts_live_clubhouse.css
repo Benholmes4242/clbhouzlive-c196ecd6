@@ -214,13 +214,12 @@
   box-shadow: 0 1px 6px rgb(0 0 0 / 12%);
 }
 
-/* Pin above the rings and not cropped */
-.lc-nearby .lc-pin {
+/* SVG pin: consistent metrics, never clipped */
+.lc-nearby .lc-pin-svg {
   position: relative;
-  z-index: 3;
-  font-size: 22px;            /* was 24px; reduce so top isn't clipped */
-  line-height: 1;
-  transform: translateY(1px); /* gentle nudge to center the emoji */
+  z-index: 3;                                /* above rings */
+  width: 20px; height: 20px;                 /* tuned for 72px circle */
+  color: #6e9277;                            /* Echo green to match theme */
 }
 
 /* TRUE RINGS (border-only), expanding OUT to the rim */
