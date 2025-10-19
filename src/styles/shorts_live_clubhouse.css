@@ -203,33 +203,25 @@
   position: relative;
   width: 72px;
   height: 72px;
-}
-
-/* Masked shell for the rings */
-.lc-nearby-shell {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #fbfdfb;
+  border-radius: 50%;
   box-shadow: 0 1px 6px rgb(0 0 0 / 12%);
-  z-index: 1;
 }
 
-/* Emoji layer – sits above the mask, cannot be clipped */
+/* Emoji layer */
 .lc-pin-emoji {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
   font-size: 24px;
   line-height: 1;
   z-index: 3;
+  position: relative;
 }
 
-/* Rings attached to the masked shell */
-.lc-nearby-shell::before,
-.lc-nearby-shell::after {
+/* Rings attached to the pin container */
+.lc-nearby-pin::before,
+.lc-nearby-pin::after {
   content: "";
   position: absolute;
   left: 50%;
@@ -246,7 +238,7 @@
   animation: lcRing 3s ease-out infinite;
 }
 
-.lc-nearby-shell::after {
+.lc-nearby-pin::after {
   animation-delay: 1.5s;
   border-color: rgba(110,146,119,.58);
 }
@@ -259,7 +251,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .lc-nearby-shell {
+  .lc-nearby-pin {
     background: rgba(110, 146, 119, 0.2);
   }
 }
@@ -274,8 +266,8 @@
     transition: none;
   }
 
-  .lc-nearby-shell::before,
-  .lc-nearby-shell::after {
+  .lc-nearby-pin::before,
+  .lc-nearby-pin::after {
     animation: none;
     opacity: .35;
     transform: translate(-50%,-50%) scale(.85);

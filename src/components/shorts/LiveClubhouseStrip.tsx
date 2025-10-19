@@ -87,7 +87,6 @@ function NearbyTile({ count }: { count: number }) {
     >
       <div className="lc-avatar-btn">
         <div className="lc-nearby-pin">
-          <div className="lc-nearby-shell" aria-hidden="true"></div>
           <div className="lc-pin-emoji" aria-hidden="true">📍</div>
         </div>
       </div>
