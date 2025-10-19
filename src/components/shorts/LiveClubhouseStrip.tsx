@@ -87,9 +87,7 @@ function NearbyTile({ count }: { count: number }) {
     >
       <div className="lc-avatar-btn">
         <div className="lc-nearby-avatar" aria-label="Nearby golfers">
-          <svg className="lc-pin-svg" viewBox="0 0 24 24" role="img" aria-hidden="true">
-            <path fill="currentColor" d="M12 2c1.66 0 3 1.34 3 3v3h2l-3 3v9h-4v-9l-3-3h2V5c0-1.66 1.34-3 3-3z"/>
-          </svg>
+          <div className="lc-pin-emoji">📍</div>
         </div>
       </div>
       <div className="lc-name" title="Nearby golfers">
