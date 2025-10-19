@@ -208,7 +208,7 @@
   background: #fbfdfb !important;      /* lighter, more subtle */
   background-image: none !important;
   color: #0b0b0b;
-  border-radius: 35px;
+  border-radius: 50%;
   width: 72px;
   height: 72px;
   box-shadow: 0 1px 6px rgb(0 0 0 / 12%);
@@ -218,7 +218,7 @@
 .lc-pin-emoji {
   font-size: 26px;            /* Slightly larger for visibility */
   line-height: 1;             
-  transform: translateY(1px); /* Visually centers the emoji */
+  transform: translateY(0);
   color: #e04949;             /* Red tone */
   display: flex;
   align-items: center;
