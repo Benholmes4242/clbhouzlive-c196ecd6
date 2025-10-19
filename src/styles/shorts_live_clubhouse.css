@@ -213,46 +213,41 @@
   box-shadow: 0 1px 6px rgb(0 0 0 / 12%);
 }
 
-/* Pin sits above the waves */
+/* Pin above the rings */
 .lc-nearby .lc-pin {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   font-size: 24px;
   line-height: 1;
 }
 
-/* Two soft green waves INSIDE the circle */
+/* TRUE RINGS: thin borders that expand & fade */
 .lc-nearby .lc-nearby-avatar::before,
 .lc-nearby .lc-nearby-avatar::after {
   content: "";
   position: absolute;
-  inset: 0;
+  left: 50%; top: 50%;
+  width: 40%; height: 40%;          /* start near the pin */
+  transform: translate(-50%, -50%) scale(0.6);
   border-radius: 50%;
-  pointer-events: none;
-  z-index: 1;                   /* above base background, below pin */
-  will-change: transform, opacity;
-  background: radial-gradient(
-    circle,
-    rgba(110,146,119,0.24) 0%,
-    rgba(110,146,119,0.14) 26%,
-    rgba(110,146,119,0.08) 46%,
-    transparent 62%
-  );
-  transform: scale(0.55);       /* starts tight near the pin */
-  opacity: 0.55;
-  animation: lcRadar 3s ease-out infinite;
+  box-sizing: border-box;
+  border: 2px solid rgba(110,146,119,0.55);  /* Echo green */
+  opacity: 0.8;
+  animation: lcRing 3s ease-out infinite;
+  z-index: 2;                        /* under the pin */
 }
 
 /* Stagger the second wave for continuity */
 .lc-nearby .lc-nearby-avatar::after {
   animation-delay: 1.5s;
+  border-color: rgba(110,146,119,0.45);
 }
 
-/* Expands AWAY from the pin, fades at the edge */
-@keyframes lcRadar {
-  0%   { transform: scale(0.55); opacity: 0.55; }
-  70%  { transform: scale(1.05); opacity: 0.18; }
-  100% { transform: scale(1.18); opacity: 0; }
+/* Expand away from the pin, remain inside circle, fade out */
+@keyframes lcRing {
+  0%   { transform: translate(-50%,-50%) scale(0.35); opacity: .9; }
+  70%  { transform: translate(-50%,-50%) scale(1.0); opacity: .25; }
+  100% { transform: translate(-50%,-50%) scale(1.2); opacity: 0; }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -275,7 +270,7 @@
   .lc-nearby .lc-nearby-avatar::before,
   .lc-nearby .lc-nearby-avatar::after {
     animation: none;
-    opacity: 0.22;
-    transform: none;
+    opacity: .35;
+    transform: translate(-50%,-50%) scale(.85);
   }
 }
