@@ -11,7 +11,7 @@ import type { ExploreContentItem } from '@/components/explore/types';
 import CreatorHighlightShelf from '@/components/discover/CreatorHighlightShelf';
 import CreatorHighlightTile from '@/components/discover/CreatorHighlightTile';
 import { CreatorHighlight } from '@/hooks/useCreatorHighlights';
-import ShortsSuggestedProfiles from '@/components/shorts/ShortsSuggestedProfiles';
+import { LiveClubhouseStrip } from '@/components/shorts/LiveClubhouseStrip';
 import { getDurationFilter } from '@/constants/videoFilters';
 import type { LengthKey } from '@/components/videos/VideoChipRail';
 import { useChannelSuggestions } from '@/hooks/useChannelSuggestions';
@@ -156,7 +156,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   if (main === 'shorts') {
     return (
       <>
-        <ShortsSuggestedProfiles />
+        <LiveClubhouseStrip />
         <ShortsGrid 
           items={currentContent || []} 
           onOpen={onMediaClick}

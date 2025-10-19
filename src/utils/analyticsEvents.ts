@@ -70,5 +70,52 @@ export const analyticsEvents = {
         session_id: sessionStorage.getItem('session_id') || 'unknown'
       });
     }
+  },
+
+  // Live Clubhouse Strip events
+  lcStrip: {
+    impression: (count: number) => {
+      analyticsEvents.track('lc_strip_impression', {
+        count,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    },
+
+    avatarClick: (id: string, index: number) => {
+      analyticsEvents.track('lc_strip_avatar_click', {
+        creator_id: id,
+        position_index: index,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    },
+
+    peekOpen: (id: string) => {
+      analyticsEvents.track('lc_strip_peek_open', {
+        creator_id: id,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    },
+
+    peekMs: (id: string, ms: number) => {
+      analyticsEvents.track('lc_strip_peek_ms', {
+        creator_id: id,
+        duration_ms: ms,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    },
+
+    nearbyOpen: (count: number) => {
+      analyticsEvents.track('lc_strip_nearby_open', {
+        count,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    },
+
+    followFromStrip: (id: string) => {
+      analyticsEvents.track('lc_strip_follow_from_strip', {
+        creator_id: id,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    }
   }
 };
