@@ -86,8 +86,10 @@ function NearbyTile({ count }: { count: number }) {
       onClick={handleClick}
     >
       <div className="lc-avatar-btn">
-        <div className="lc-nearby-pin">
-          <div className="lc-pin-emoji" aria-hidden="true">📍</div>
+        <div className="lc-nearby-avatar" aria-label="Nearby golfers">
+          <svg className="lc-pin-svg" viewBox="0 0 24 24" role="img" aria-hidden="true">
+            <path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.05 7 13 7 13s7-7.95 7-13a7 7 0 0 0-7-7zm0 10.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/>
+          </svg>
         </div>
       </div>
       <div className="lc-name" title="Nearby golfers">
