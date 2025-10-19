@@ -198,14 +198,15 @@
 /* Nearby pin — animated radar   */
 /* ============================= */
 
-/* Nearby pin circle acts as the mask */
+/* Mask: keep everything INSIDE the circle */
 .lc-nearby-avatar {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;             /* keep waves INSIDE the circle */
-  background: #f7faf7;          /* soft base */
+  overflow: hidden;             /* rings stay inside */
+  background: #f7faf7 !important;      /* nuke any old gradient */
+  background-image: none !important;
   color: #0b0b0b;
   border-radius: 35px;
   width: 72px;
@@ -213,41 +214,46 @@
   box-shadow: 0 1px 6px rgb(0 0 0 / 12%);
 }
 
-/* Pin above the rings */
+/* Pin above the rings and not cropped */
 .lc-nearby .lc-pin {
   position: relative;
   z-index: 3;
-  font-size: 24px;
+  font-size: 22px;            /* was 24px; reduce so top isn't clipped */
   line-height: 1;
+  transform: translateY(1px); /* gentle nudge to center the emoji */
 }
 
-/* TRUE RINGS: thin borders that expand & fade */
+/* TRUE RINGS (border-only), expanding OUT to the rim */
 .lc-nearby .lc-nearby-avatar::before,
 .lc-nearby .lc-nearby-avatar::after {
   content: "";
   position: absolute;
   left: 50%; top: 50%;
-  width: 40%; height: 40%;          /* start near the pin */
-  transform: translate(-50%, -50%) scale(0.6);
+  /* Start smaller; end size nearly fills the circle.
+     Subtract 6px so the 2px border doesn't clip at the edge. */
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  transform: translate(-50%, -50%) scale(0.2);
   border-radius: 50%;
   box-sizing: border-box;
-  border: 2px solid rgba(110,146,119,0.55);  /* Echo green */
-  opacity: 0.8;
+  border: 2px solid rgba(110,146,119,0.62);  /* Echo green */
+  opacity: 0.85;
+  background: none !important;              /* ensure no fill */
   animation: lcRing 3s ease-out infinite;
-  z-index: 2;                        /* under the pin */
+  z-index: 2;                               /* below pin, above base */
 }
 
-/* Stagger the second wave for continuity */
+/* Stagger second wave */
 .lc-nearby .lc-nearby-avatar::after {
   animation-delay: 1.5s;
-  border-color: rgba(110,146,119,0.45);
+  border-color: rgba(110,146,119,0.5);
 }
 
-/* Expand away from the pin, remain inside circle, fade out */
+/* Expand to the rim, then fade out */
 @keyframes lcRing {
-  0%   { transform: translate(-50%,-50%) scale(0.35); opacity: .9; }
-  70%  { transform: translate(-50%,-50%) scale(1.0); opacity: .25; }
-  100% { transform: translate(-50%,-50%) scale(1.2); opacity: 0; }
+  0%   { transform: translate(-50%,-50%) scale(0.20); opacity: .85; }
+  80%  { transform: translate(-50%,-50%) scale(1.00); opacity: .25; }
+  100% { transform: translate(-50%,-50%) scale(1.05); opacity: 0; }
 }
 
 @media (prefers-color-scheme: dark) {
