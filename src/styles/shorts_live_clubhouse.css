@@ -205,7 +205,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;             /* rings stay inside */
-  background: #f7faf7 !important;      /* nuke any old gradient */
+  background: #fbfdfb !important;      /* lighter, more subtle */
   background-image: none !important;
   color: #0b0b0b;
   border-radius: 35px;
@@ -218,8 +218,8 @@
 .lc-nearby .lc-pin-svg {
   position: relative;
   z-index: 3;                                /* above rings */
-  width: 20px; height: 20px;                 /* tuned for 72px circle */
-  color: #6e9277;                            /* Echo green to match theme */
+  width: 22px; height: 22px;                 /* +2px for clearer emphasis */
+  color: #e04949;                            /* brandy red for the pin */
 }
 
 /* TRUE RINGS (border-only), expanding OUT to the rim */
@@ -232,11 +232,11 @@
      Subtract 6px so the 2px border doesn't clip at the edge. */
   width: calc(100% - 6px);
   height: calc(100% - 6px);
-  transform: translate(-50%, -50%) scale(0.2);
+  transform: translate(-50%, -50%) scale(0.30);  /* start a touch wider */
   border-radius: 50%;
   box-sizing: border-box;
-  border: 2px solid rgba(110,146,119,0.62);  /* Echo green */
-  opacity: 0.85;
+  border: 2px solid rgba(110,146,119,0.72);  /* brighter Echo green */
+  opacity: 0.90;
   background: none !important;              /* ensure no fill */
   animation: lcRing 3s ease-out infinite;
   z-index: 2;                               /* below pin, above base */
@@ -245,14 +245,14 @@
 /* Stagger second wave */
 .lc-nearby .lc-nearby-avatar::after {
   animation-delay: 1.5s;
-  border-color: rgba(110,146,119,0.5);
+  border-color: rgba(110,146,119,0.58);  /* second ring slightly dimmer */
 }
 
 /* Expand to the rim, then fade out */
 @keyframes lcRing {
-  0%   { transform: translate(-50%,-50%) scale(0.20); opacity: .85; }
-  80%  { transform: translate(-50%,-50%) scale(1.00); opacity: .25; }
-  100% { transform: translate(-50%,-50%) scale(1.05); opacity: 0; }
+  0%   { transform: translate(-50%,-50%) scale(0.30); opacity: .90; }
+  80%  { transform: translate(-50%,-50%) scale(1.00); opacity: .28; }  /* reaches rim */
+  100% { transform: translate(-50%,-50%) scale(1.05); opacity: 0; }    /* gentle fade past rim */
 }
 
 @media (prefers-color-scheme: dark) {
