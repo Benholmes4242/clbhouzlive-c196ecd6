@@ -54,9 +54,7 @@
   background: transparent;
   cursor: pointer;
   position: relative;
-  overflow: hidden; /* Hard clip - prevent pulse from leaking */
-  border-radius: 50%; /* Ensure circular clipping */
-  isolation: isolate; /* Proper stacking/masking */
+  overflow: hidden; /* Prevent pulse border from spilling and forming stray line */
 }
 
 .lc-avatar {
@@ -75,65 +73,38 @@
   outline-offset: 2px;
 }
 
-/* Pulse INSIDE avatar container only */
-.lc-recent .lc-avatar-btn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: radial-gradient(circle at center,
-    rgba(110,146,119,.55) 0,
-    rgba(110,146,119,.55) 1px,
-    rgba(110,146,119,0) 1.5px);
-  transform: scale(.82);
-  opacity: .9;
-  animation: lcPulse 3s ease-in-out infinite;
-  z-index: 1;
-}
-
-/* Stagger second ring */
 .lc-recent .lc-avatar-btn::after {
   content: "";
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
+  inset: 6px; /* align with avatar edge (padding) */
+  border-radius: 40px;
+  border: 2px solid rgba(110, 146, 119, 0.45);
+  transform: scale(0.98);
+  opacity: 0.9;
+  animation: lcPulse 1.4s ease-out infinite;
   pointer-events: none;
-  background: radial-gradient(circle at center,
-    rgba(110,146,119,.55) 0,
-    rgba(110,146,119,.55) 1px,
-    rgba(110,146,119,0) 1.5px);
-  transform: scale(.82);
-  opacity: .9;
-  animation: lcPulse 3s ease-in-out infinite;
-  animation-delay: 1.5s;
-  z-index: 1;
 }
 
 @keyframes lcPulse {
   0% {
-    transform: scale(.82);
-    opacity: .9;
-  }
-  80% {
-    transform: scale(1.05);
-    opacity: .08;
+    transform: scale(0.95);
+    opacity: 0.9;
   }
   100% {
-    transform: scale(1.05);
+    transform: scale(1.15);
     opacity: 0;
   }
 }
 
-/* Online dot - positioned inside to avoid clipping */
+/* Online dot */
 .lc-dot {
   position: absolute;
-  right: 6px;  /* Inset from edge to stay inside mask */
-  bottom: 6px; /* Inset from edge to stay inside mask */
-  width: 12px;
-  height: 12px;
+  right: 10px;
+  bottom: 14px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: #2ecc71;
+  background: #6e9277;
   box-shadow: 0 0 0 2px #fff;
   z-index: 2;
 }
@@ -198,14 +169,13 @@
 /* Nearby pin — premium glass UI */
 /* ============================= */
 
-/* Glass base circle with subtle depth and pulse */
+/* Glass base circle with subtle depth */
 .lc-nearby-avatar {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden; /* HARD CLIP - pulse stays inside */
-  isolation: isolate; /* Proper stacking/masking */
+  overflow: hidden;
   width: 84px;
   height: 84px;
   border-radius: 50%;
@@ -215,13 +185,12 @@
     inset 0 0 0 1px rgba(0,0,0,0.06),
     0 1px 2px rgba(0,0,0,0.04);
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.05));
-  -webkit-mask-image: radial-gradient(circle, #000 98%, transparent 100%); /* Belt & braces for iOS */
 }
 
 /* Polished SVG pin with gradient and shadow */
 .lc-nearby .lc-pin-svg {
   position: relative;
-  z-index: 3; /* Above pulse rings */
+  z-index: 3;
   width: 28px; 
   height: 28px;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
@@ -232,41 +201,41 @@
   fill: url(#pinGradient);
 }
 
-/* Gentle green rings pulsing to the inner rim - NEARBY ONLY */
-.lc-nearby-avatar::before,
-.lc-nearby-avatar::after {
+/* Pulse rings - refined echo green animation */
+.lc-nearby .lc-nearby-avatar::before,
+.lc-nearby .lc-nearby-avatar::after {
   content: "";
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
+  left: 50%; 
+  top: 50%;
+  width: 80%;
+  height: 80%;
+  transform: translate(-50%, -50%) scale(1);
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 2px solid rgba(110,146,119,0.58);
+  opacity: 1;
+  background: none;
+  filter: blur(2px);
+  animation: lcPulse 3s ease-in-out infinite;
+  z-index: 2;
   pointer-events: none;
-  background: radial-gradient(circle at center,
-    rgba(110,146,119,.55) 0,
-    rgba(110,146,119,.55) 1px,     /* thin ring edge */
-    rgba(110,146,119,0) 1.5px);    /* fade immediately after edge */
-  transform: scale(.82);
-  opacity: .9;
-  animation: lcNearbyPulse 3s ease-in-out infinite;
-  z-index: 1; /* Below pin (z:3) */
 }
 
 /* Stagger second pulse */
-.lc-nearby-avatar::after {
+.lc-nearby .lc-nearby-avatar::after {
   animation-delay: 1.5s;
 }
 
-@keyframes lcNearbyPulse {
-  0% {
-    transform: scale(.82);
-    opacity: .9;
+/* Smooth pulse expansion and fade */
+@keyframes lcPulse {
+  0% { 
+    transform: translate(-50%, -50%) scale(1); 
+    opacity: 0.58; 
   }
-  80% {
-    transform: scale(1.05);
-    opacity: .08;  /* reach near inner rim */
-  }
-  100% {
-    transform: scale(1.05);
-    opacity: 0;
+  100% { 
+    transform: translate(-50%, -50%) scale(1.31); 
+    opacity: 0; 
   }
 }
 
@@ -284,10 +253,14 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .lc-nearby-avatar::before,
-  .lc-nearby-avatar::after {
+  .lc-avatar-btn::after {
+    animation: none !important;
+  }
+
+  .lc-nearby .lc-nearby-avatar::before,
+  .lc-nearby .lc-nearby-avatar::after {
     animation: none;
     opacity: .35;
-    transform: scale(.85);
+    transform: translate(-50%,-50%) scale(.85);
   }
 }

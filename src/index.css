@@ -93,10 +93,6 @@ html, body {
   /* Bottom nav height for consistent spacing */
   --bottom-nav-height: 64px;
   
-  /* Z-index layering */
-  --z-echo-fab: 1200;
-  --z-nearby-overlay: 1400;
-  
   /* Create Moment composer tokens */
   --composer-height: 370px;
 }
