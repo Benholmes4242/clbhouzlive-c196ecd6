@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, MapPin, Home } from 'lucide-react';
+import { MapPin, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NearbyGolfer } from './types';
 import { useNearbyGolfers } from './useNearbyGolfers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { VisibilityToggle } from './components/VisibilityToggle';
 import { RequestGameSheet, RequestGamePayload } from './components/RequestGameSheet';
 import { useVisibility } from './hooks/useVisibility';
 import { useGameBeacon } from './hooks/useGameBeacon';
-import { OpenToPlayButton } from './components/OpenToPlayButton';
+import { useOpenToPlay } from './hooks/useOpenToPlay';
+import { PlayersNearYouHeader } from './components/PlayersNearYouHeader';
 
 interface NearbyOverlayProps {
   isOpen: boolean;
@@ -20,8 +20,8 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   const { data: golfers = [], isLoading } = useNearbyGolfers();
   const { visible, setVisible } = useVisibility();
   const { activeBeacon, createBeacon, cancelBeacon } = useGameBeacon();
+  const { isActive: openToPlay, activate: activateOpenToPlay, cancel: cancelOpenToPlay } = useOpenToPlay();
   const [showComposer, setShowComposer] = useState(false);
-  const [filterOpenToPlay, setFilterOpenToPlay] = useState(false);
 
   const handleCreateBeacon = async (payload: RequestGamePayload) => {
     // Convert new payload format to old beacon format
@@ -71,10 +71,8 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
     }
   }, [isOpen, golfers.length]);
 
-  // Filter golfers based on Open to Play status
-  const visibleGolfers = filterOpenToPlay
-    ? golfers.filter((g) => g.isOpenToPlay === true)
-    : golfers;
+  // All golfers visible (no filtering)
+  const visibleGolfers = golfers;
 
   if (!isOpen) return null;
 
@@ -101,35 +99,19 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
         aria-labelledby="nearby-title"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 border-b border-black/10" style={{ paddingTop: '10px', paddingBottom: '10px' }}>
-          <h2 id="nearby-title" className="text-[17px] font-semibold" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
-            Players near you
-          </h2>
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 cursor-pointer" title="See golfers currently looking for a game">
-              <input
-                type="checkbox"
-                checked={filterOpenToPlay}
-                onChange={(e) => {
-                  setFilterOpenToPlay(e.target.checked);
-                  analyticsEvents.track('open2play_filter_toggle', { enabled: e.target.checked });
-                }}
-                className="w-4 h-4 rounded accent-[#6e9277]"
-              />
-              <span className="text-xs font-medium" style={{ color: 'rgba(0, 0, 0, 0.7)' }}>
-                Open to Play
-              </span>
-            </label>
-            <VisibilityToggle value={visible} onChange={setVisible} />
-            <button
-              onClick={onClose}
-              className="p-2 rounded-full hover:bg-black/5 transition-colors"
-              aria-label="Close"
-            >
-              <X className="w-5 h-5" style={{ color: 'rgba(0, 0, 0, 0.6)' }} />
-            </button>
-          </div>
-        </div>
+        <PlayersNearYouHeader
+          visibleOnline={visible}
+          openToPlay={openToPlay}
+          onToggleVisibleOnline={setVisible}
+          onToggleOpenToPlay={(next) => {
+            if (next) {
+              activateOpenToPlay();
+            } else {
+              cancelOpenToPlay();
+            }
+          }}
+          onClose={onClose}
+        />
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
@@ -149,10 +131,10 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             <div className="text-center py-12">
               <MapPin className="w-12 h-12 mx-auto mb-4" style={{ color: 'rgba(0, 0, 0, 0.3)' }} />
               <p className="font-medium mb-2" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
-                {filterOpenToPlay ? 'No golfers open to play right now' : 'No golfers nearby right now'}
+                No golfers nearby right now
               </p>
               <p className="text-sm" style={{ color: 'rgba(0, 0, 0, 0.6)' }}>
-                {filterOpenToPlay ? 'Try turning off the filter' : 'Check again later'}
+                Check again later
               </p>
             </div>
           ) : (
@@ -191,7 +173,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
 
         {/* Footer CTA */}
         {golfers.length > 0 && (
-          <div className="p-4 border-t border-black/10 space-y-3">
+          <div className="p-4 border-t border-black/10">
             <Button
               className="w-full"
               onClick={() => {
@@ -202,9 +184,6 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             >
               Create game
             </Button>
-            <div className="flex justify-center">
-              <OpenToPlayButton />
-            </div>
           </div>
         )}
       </div>
