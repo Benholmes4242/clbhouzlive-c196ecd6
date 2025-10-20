@@ -159,11 +159,11 @@
   background: var(--skeleton-bg, rgba(0,0,0,0.06));
 }
 
-.dark .sq-name.skeleton {
+/* Dark mode disabled during development */
+/* .dark .sq-name.skeleton {
   background: var(--skeleton-bg-dark, rgba(255,255,255,0.12));
 }
 
-/* Dark mode support */
 @media (prefers-color-scheme: dark) {
   :root {
     --sq-pill-bg:     rgba(0,0,0,0.75);
@@ -175,7 +175,7 @@
     --sq-glass-brd:   rgba(255,255,255,0.18);
     --sq-glass-inner: rgba(255,255,255,0.08);
   }
-}
+} */
 
 /* High contrast fallback */
 @media (prefers-reduced-transparency: reduce) {

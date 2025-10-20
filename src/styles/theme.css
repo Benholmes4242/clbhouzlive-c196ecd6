@@ -8,11 +8,12 @@
   --ecm-composer-glass: rgba(255, 255, 255, 0.25);
 }
 
-@media (prefers-color-scheme: dark) {
+/* Dark mode disabled during development */
+/* @media (prefers-color-scheme: dark) {
   :root {
     --ecm-glass-bg: rgba(90, 126, 99, 0.18);
     --ecm-glass-border: rgba(255, 255, 255, 0.2);
     --ecm-inner-glow: rgba(255, 255, 255, 0.1);
     --ecm-composer-glass: rgba(255, 255, 255, 0.2);
   }
-}
+} */
