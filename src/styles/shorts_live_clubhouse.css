@@ -166,88 +166,110 @@
 }
 
 /* ============================= */
-/* Nearby pin — premium glass UI */
+/* Nearby pin — Echo green polish */
 /* ============================= */
 
-/* Glass base circle with subtle depth */
+/* Echo green color tokens */
+:root {
+  --echo-green-1: #7CA68A;
+  --echo-green-2: #6E9277;
+  --echo-green-3: #4F7159;
+}
+
+/* Glass base circle - 72×72 with white/subtle gradient */
 .lc-nearby-avatar {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  width: 84px;
-  height: 84px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(110,146,119,0.04) 100%);
-  border: 1px solid rgba(110,146,119,0.15);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.88) 100%);
+  border: 1px solid rgba(110,146,119,0.12);
   box-shadow: 
-    inset 0 0 0 1px rgba(0,0,0,0.06),
-    0 1px 2px rgba(0,0,0,0.04);
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.05));
+    0 1px 3px rgba(0,0,0,0.08),
+    inset 0 0 0 1px rgba(255,255,255,0.4);
+  -webkit-mask-image: radial-gradient(circle, #000 98%, transparent 100%);
+  mask-image: radial-gradient(circle, #000 98%, transparent 100%);
 }
 
-/* Polished SVG pin with gradient and shadow */
-.lc-nearby .lc-pin-svg {
+/* Pin wrapper - handles animation and shadow */
+.nearby-pin-wrap {
   position: relative;
-  z-index: 3;
-  width: 28px; 
-  height: 28px;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
+  will-change: transform, opacity;
+  animation: nearbyPinPulse 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(110,146,119,0.55));
 }
 
-/* Gradient fill for pin */
-.lc-nearby .lc-pin-svg path {
-  fill: url(#pinGradient);
+/* Gentle pulse animation */
+@keyframes nearbyPinPulse {
+  0%   { transform: scale(1);   opacity: 1;   }
+  50%  { transform: scale(1.05); opacity: 0.95; }
+  100% { transform: scale(1);   opacity: 1;   }
 }
 
-/* Pulse rings - refined echo green animation */
+/* Pin icon - 54px fills ~75% of 72px circle */
+.nearby-pin-icon {
+  display: block;
+  width: 54px;
+  height: 54px;
+  transform: translateY(1px); /* micro-centering */
+}
+
+/* Platform shadow (creates grounding effect) */
+.nearby-pin-wrap::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 6px;
+  background: rgba(0,0,0,0.10);
+  border-radius: 999px;
+  filter: blur(2px);
+  z-index: -1;
+}
+
+/* Radar rings (only on Nearby tile, not creator avatars) */
 .lc-nearby .lc-nearby-avatar::before,
 .lc-nearby .lc-nearby-avatar::after {
   content: "";
   position: absolute;
-  left: 50%; 
-  top: 50%;
-  width: 80%;
-  height: 80%;
-  transform: translate(-50%, -50%) scale(1);
-  border-radius: 50%;
-  box-sizing: border-box;
-  border: 2px solid rgba(110,146,119,0.58);
-  opacity: 1;
-  background: none;
-  filter: blur(2px);
-  animation: lcPulse 3s ease-in-out infinite;
-  z-index: 2;
+  inset: 0;
+  border-radius: inherit;
   pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(110,146,119,0.5) 0,
+    rgba(110,146,119,0.5) 1px,
+    rgba(110,146,119,0) 2px
+  );
+  transform: scale(0.70);
+  opacity: 0.45;
+  animation: nearbyRings 3s ease-in-out infinite;
 }
 
-/* Stagger second pulse */
 .lc-nearby .lc-nearby-avatar::after {
   animation-delay: 1.5s;
 }
 
-/* Smooth pulse expansion and fade */
-@keyframes lcPulse {
-  0% { 
-    transform: translate(-50%, -50%) scale(1); 
-    opacity: 0.58; 
-  }
-  100% { 
-    transform: translate(-50%, -50%) scale(1.31); 
-    opacity: 0; 
-  }
+@keyframes nearbyRings {
+  0%   { transform: scale(0.70); opacity: 0.45; }
+  80%  { transform: scale(1.02); opacity: 0.06; }
+  100% { transform: scale(1.02); opacity: 0; }
 }
 
-/* Light sweep animation removed - was causing visual conflict */
-
+/* Dark mode adjustments */
 @media (prefers-color-scheme: dark) {
   .lc-nearby-avatar {
-    background: radial-gradient(circle, rgba(110,146,119,0.15) 0%, rgba(110,146,119,0.08) 100%);
+    background: radial-gradient(circle, rgba(110,146,119,0.18) 0%, rgba(110,146,119,0.12) 100%);
     border-color: rgba(110,146,119,0.25);
     box-shadow: 
-      inset 0 0 0 1px rgba(255,255,255,0.06),
-      0 1px 2px rgba(0,0,0,0.15);
+      0 1px 3px rgba(0,0,0,0.2),
+      inset 0 0 0 1px rgba(255,255,255,0.08);
   }
 }
 
@@ -257,10 +279,14 @@
     animation: none !important;
   }
 
+  .nearby-pin-wrap {
+    animation: none;
+  }
+
   .lc-nearby .lc-nearby-avatar::before,
   .lc-nearby .lc-nearby-avatar::after {
     animation: none;
-    opacity: .35;
-    transform: translate(-50%,-50%) scale(.85);
+    opacity: 0.35;
+    transform: scale(0.85);
   }
 }
