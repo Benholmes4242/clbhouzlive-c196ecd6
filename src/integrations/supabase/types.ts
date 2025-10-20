@@ -809,6 +809,135 @@ export type Database = {
         }
         Relationships: []
       }
+      ping_matches: {
+        Row: {
+          created_at: string
+          dm_thread_id: string | null
+          id: string
+          participant_ids: string[]
+          ping_id: string
+        }
+        Insert: {
+          created_at?: string
+          dm_thread_id?: string | null
+          id?: string
+          participant_ids: string[]
+          ping_id: string
+        }
+        Update: {
+          created_at?: string
+          dm_thread_id?: string | null
+          id?: string
+          participant_ids?: string[]
+          ping_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ping_matches_ping_id_fkey"
+            columns: ["ping_id"]
+            isOneToOne: false
+            referencedRelation: "pings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ping_responses: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          ping_id: string
+          responder_id: string
+          state: Database["public"]["Enums"]["ping_response_state"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          ping_id: string
+          responder_id: string
+          state?: Database["public"]["Enums"]["ping_response_state"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          ping_id?: string
+          responder_id?: string
+          state?: Database["public"]["Enums"]["ping_response_state"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ping_responses_ping_id_fkey"
+            columns: ["ping_id"]
+            isOneToOne: false
+            referencedRelation: "pings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pings: {
+        Row: {
+          club_id: string | null
+          created_at: string
+          creator_id: string
+          expires_at: string
+          format: Database["public"]["Enums"]["ping_format"]
+          id: string
+          is_anonymous: boolean
+          lat: number | null
+          lng: number | null
+          note: string | null
+          players_needed: number
+          status: Database["public"]["Enums"]["ping_status"]
+          updated_at: string
+          visibility: Database["public"]["Enums"]["ping_visibility"]
+        }
+        Insert: {
+          club_id?: string | null
+          created_at?: string
+          creator_id: string
+          expires_at: string
+          format: Database["public"]["Enums"]["ping_format"]
+          id?: string
+          is_anonymous?: boolean
+          lat?: number | null
+          lng?: number | null
+          note?: string | null
+          players_needed?: number
+          status?: Database["public"]["Enums"]["ping_status"]
+          updated_at?: string
+          visibility: Database["public"]["Enums"]["ping_visibility"]
+        }
+        Update: {
+          club_id?: string | null
+          created_at?: string
+          creator_id?: string
+          expires_at?: string
+          format?: Database["public"]["Enums"]["ping_format"]
+          id?: string
+          is_anonymous?: boolean
+          lat?: number | null
+          lng?: number | null
+          note?: string | null
+          players_needed?: number
+          status?: Database["public"]["Enums"]["ping_status"]
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["ping_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pings_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_comments: {
         Row: {
           content: string
@@ -2242,6 +2371,10 @@ export type Database = {
         Args: { params?: Json; query: string }
         Returns: Json
       }
+      expire_pings: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       fetch_social_feed_posts: {
         Args: {
           current_offset: number
@@ -2363,6 +2496,10 @@ export type Database = {
         | "Asia"
         | "Africa"
         | "Oceania"
+      ping_format: "NINE" | "EIGHTEEN" | "RANGE" | "CASUAL"
+      ping_response_state: "PENDING" | "ACCEPTED" | "DECLINED" | "EXPIRED"
+      ping_status: "ACTIVE" | "MATCHING" | "CLOSED"
+      ping_visibility: "FRIENDS" | "NEARBY" | "ALL"
       user_type:
         | "individual"
         | "club"
@@ -2515,6 +2652,10 @@ export const Constants = {
         "Africa",
         "Oceania",
       ],
+      ping_format: ["NINE", "EIGHTEEN", "RANGE", "CASUAL"],
+      ping_response_state: ["PENDING", "ACCEPTED", "DECLINED", "EXPIRED"],
+      ping_status: ["ACTIVE", "MATCHING", "CLOSED"],
+      ping_visibility: ["FRIENDS", "NEARBY", "ALL"],
       user_type: [
         "individual",
         "club",
