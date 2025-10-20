@@ -147,9 +147,9 @@ export function RequestGameSheet({
 
   return (
     <BottomSheet open={open} onClose={onClose} zIndexBase={1500} ariaLabelledBy="request-game-title">
-      <div className="flex flex-col h-full">
+      <div className="max-h-[78vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.12]" style={{ padding: '12px 20px' }}>
+        <div className="flex items-center justify-between shrink-0" style={{ padding: '12px 20px' }}>
           <h2 id="request-game-title" className="text-[18px] font-semibold">Request a game</h2>
           <button
             onClick={onClose}
@@ -159,8 +159,8 @@ export function RequestGameSheet({
           </button>
         </div>
 
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto" style={{ padding: '0 16px 12px' }}>
+        {/* Scrollable content */}
+        <div className="px-4 pb-2 grow overflow-y-auto overscroll-contain"  style={{ paddingTop: '12px' }}>
           {/* When */}
           <div className="mb-6">
             <label className="block text-[13px] font-semibold text-black/[0.56] dark:text-white/[0.64] mb-2.5">
@@ -324,15 +324,9 @@ export function RequestGameSheet({
           </div>
         </div>
 
-        {/* Footer */}
-        <div
-          className="border-t border-black/[0.06] dark:border-white/[0.12]"
-          style={{
-            padding: '12px 16px 16px',
-            backdropFilter: 'blur(12px)',
-            background: 'linear-gradient(180deg, rgba(255,255,255,0.64), #fff 48%)',
-          }}
-        >
+        {/* Sticky footer */}
+        <footer className="px-4 pt-2 pb-4 shrink-0 sticky bottom-0 bg-white/85 dark:bg-black/85 backdrop-blur-sm">
+          <div style={{ paddingBottom: 'max(0px, env(safe-area-inset-bottom))' }}>
           {error && (
             <div className="mb-3 text-sm text-red-600 dark:text-red-400">{error}</div>
           )}
@@ -361,7 +355,8 @@ export function RequestGameSheet({
           >
             Save preset
           </button>
-        </div>
+          </div>
+        </footer>
       </div>
     </BottomSheet>
   );
