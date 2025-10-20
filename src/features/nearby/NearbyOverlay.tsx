@@ -48,11 +48,8 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
 
   return createPortal(
     <div 
-      className="nearby-overlay-backdrop fixed inset-0 flex items-center justify-center p-4"
+      className="nearby-overlay-backdrop fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 'var(--z-nearby-overlay)',
         background: 'rgba(18, 18, 18, 0.32)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
@@ -61,11 +58,6 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       <div 
         className="nearby-overlay-sheet w-full max-w-[440px] md:max-w-[640px] max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
         style={{
-          position: 'fixed',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 'calc(var(--z-nearby-overlay) + 1)',
           background: 'rgba(255, 255, 255, 0.86)',
           boxShadow: '0 6px 18px rgba(0, 0, 0, 0.12)',
         }}
@@ -76,9 +68,12 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
         {/* Header */}
         <div className="flex items-start justify-between p-6 pb-4 border-b border-black/10">
           <div>
-            <h2 id="nearby-title" className="text-[17px] font-semibold" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
+            <h2 id="nearby-title" className="text-xl font-semibold" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
               Players near you
             </h2>
+            <p className="text-sm mt-1" style={{ color: 'rgba(0, 0, 0, 0.6)' }}>
+              Approximate distance • live
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -226,7 +221,7 @@ function GolferRow({ golfer, index }: GolferRowProps) {
               }}
             >
               <Home className="w-3 h-3" />
-              Same home club
+              Same club
             </span>
           )}
         </div>
