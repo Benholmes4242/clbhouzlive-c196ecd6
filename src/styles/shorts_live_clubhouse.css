@@ -125,15 +125,15 @@
   }
 }
 
-/* Online dot */
+/* Online dot - positioned inside to avoid clipping */
 .lc-dot {
   position: absolute;
-  right: 10px;
-  bottom: 14px;
-  width: 10px;
-  height: 10px;
+  right: 6px;  /* Inset from edge to stay inside mask */
+  bottom: 6px; /* Inset from edge to stay inside mask */
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: #6e9277;
+  background: #2ecc71;
   box-shadow: 0 0 0 2px #fff;
   z-index: 2;
 }
@@ -198,13 +198,13 @@
 /* Nearby pin — premium glass UI */
 /* ============================= */
 
-/* Glass base circle with subtle depth */
+/* Glass base circle with subtle depth and pulse */
 .lc-nearby-avatar {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden; /* HARD CLIP */
+  overflow: hidden; /* HARD CLIP - pulse stays inside */
   isolation: isolate; /* Proper stacking/masking */
   width: 84px;
   height: 84px;
@@ -221,7 +221,7 @@
 /* Polished SVG pin with gradient and shadow */
 .lc-nearby .lc-pin-svg {
   position: relative;
-  z-index: 3;
+  z-index: 3; /* Above pulse rings */
   width: 28px; 
   height: 28px;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
@@ -232,9 +232,9 @@
   fill: url(#pinGradient);
 }
 
-/* Pulse rings INSIDE the nearby avatar only - constrained to bounds */
-.lc-nearby .lc-nearby-avatar::before,
-.lc-nearby .lc-nearby-avatar::after {
+/* Gentle green rings pulsing to the inner rim - NEARBY ONLY */
+.lc-nearby-avatar::before,
+.lc-nearby-avatar::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -242,17 +242,32 @@
   pointer-events: none;
   background: radial-gradient(circle at center,
     rgba(110,146,119,.55) 0,
-    rgba(110,146,119,.55) 1px,
-    rgba(110,146,119,0) 1.5px);
+    rgba(110,146,119,.55) 1px,     /* thin ring edge */
+    rgba(110,146,119,0) 1.5px);    /* fade immediately after edge */
   transform: scale(.82);
   opacity: .9;
-  animation: lcPulse 3s ease-in-out infinite;
-  z-index: 1;
+  animation: lcNearbyPulse 3s ease-in-out infinite;
+  z-index: 1; /* Below pin (z:3) */
 }
 
 /* Stagger second pulse */
-.lc-nearby .lc-nearby-avatar::after {
+.lc-nearby-avatar::after {
   animation-delay: 1.5s;
+}
+
+@keyframes lcNearbyPulse {
+  0% {
+    transform: scale(.82);
+    opacity: .9;
+  }
+  80% {
+    transform: scale(1.05);
+    opacity: .08;  /* reach near inner rim */
+  }
+  100% {
+    transform: scale(1.05);
+    opacity: 0;
+  }
 }
 
 /* Light sweep animation removed - was causing visual conflict */
@@ -269,14 +284,10 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .lc-avatar-btn::after {
-    animation: none !important;
-  }
-
-  .lc-nearby .lc-nearby-avatar::before,
-  .lc-nearby .lc-nearby-avatar::after {
+  .lc-nearby-avatar::before,
+  .lc-nearby-avatar::after {
     animation: none;
     opacity: .35;
-    transform: translate(-50%,-50%) scale(.85);
+    transform: scale(.85);
   }
 }
