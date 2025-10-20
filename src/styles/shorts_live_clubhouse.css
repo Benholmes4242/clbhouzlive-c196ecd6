@@ -37,37 +37,42 @@
   display: none;
 }
 
-/* Tiles */
+/* Tiles - keep tap target same size for all */
 .lc-tile {
   width: 96px;
   scroll-snap-align: start;
   position: relative;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .lc-avatar-btn {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 96px;
   height: 96px;
-  padding: 6px;
+  padding: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
   position: relative;
-  overflow: hidden; /* Prevent pulse border from spilling and forming stray line */
 }
 
+/* Creator avatars (regular size) */
 .lc-avatar {
-  width: 84px;
-  height: 84px;
-  border-radius: 42px;
+  width: var(--lc-avatar-size);
+  height: var(--lc-avatar-size);
+  border-radius: 50%;
   box-shadow: 0 1px 6px rgb(0 0 0 / 12%);
   object-fit: cover;
   display: block;
   position: relative;
 }
 
-/* Pulse for recent posts - strong visible ring */
+/* Pulse for recent posts - strong visible ring ONLY on creator avatars */
 .lc-recent .lc-avatar {
   outline: 2px solid #6e9277 !important;
   outline-offset: 2px;
@@ -76,13 +81,18 @@
 .lc-recent .lc-avatar-btn::after {
   content: "";
   position: absolute;
-  inset: 6px; /* align with avatar edge (padding) */
-  border-radius: 40px;
+  inset: 6px;
+  border-radius: 50%;
   border: 2px solid rgba(110, 146, 119, 0.45);
   transform: scale(0.98);
   opacity: 0.9;
   animation: lcPulse 1.4s ease-out infinite;
   pointer-events: none;
+}
+
+/* Ensure pulse doesn't apply to nearby tile */
+.lc-nearby .lc-avatar-btn::after {
+  display: none;
 }
 
 @keyframes lcPulse {
@@ -96,15 +106,15 @@
   }
 }
 
-/* Online dot */
+/* Online dot - positioned to avoid clipping */
 .lc-dot {
   position: absolute;
-  right: 10px;
-  bottom: 14px;
-  width: 10px;
-  height: 10px;
+  right: 6px;
+  bottom: 6px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: #6e9277;
+  background: #3CB371;
   box-shadow: 0 0 0 2px #fff;
   z-index: 2;
 }
@@ -118,7 +128,7 @@
 
 /* Labels */
 .lc-name {
-  margin-top: 4px;
+  margin-top: 6px;
   font-size: 13px;
   line-height: 1.2;
   font-weight: 600;
@@ -140,6 +150,11 @@
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Nearby label spacing adjusted for smaller circle */
+.lc-nearby .lc-label {
+  margin-top: 8px;
 }
 
 /* Intentionally keep labels black in both modes for this row */
@@ -170,61 +185,67 @@
 /* Nearby pin — Echo green polish */
 /* ============================= */
 
-/* Echo green color tokens */
+/* Echo green color tokens + sizing */
 :root {
   --lc-green-1: #6e9277;       /* Echo green */
   --lc-green-2: #7CAD89;       /* lighter blend */
   --lc-green-3: #557A61;       /* darker blend */
-  --lc-av-size: 72px;          /* avatar circle */
-  --lc-ring: 2px;              /* outer stroke width */
+  --lc-avatar-size: 84px;      /* creator avatar size (matches .lc-avatar) */
+  --lc-nearby-scale: 0.92;     /* 92% of avatar size */
+  --lc-nearby-size: calc(var(--lc-avatar-size) * var(--lc-nearby-scale));
+  --lc-nearby-border: 2px;     /* outer ring thickness for nearby tile */
+  --lc-nearby-inset: 3px;      /* inner padding for checker/pin */
 }
 
-/* Avatar container (hard mask + soft background) */
+/* Avatar container (hard mask + soft background) - smaller than creator avatars */
 .lc-nearby-avatar {
   position: relative;
-  width: var(--lc-av-size);
-  height: var(--lc-av-size);
+  width: var(--lc-nearby-size);
+  height: var(--lc-nearby-size);
   border-radius: 50%;
   overflow: hidden; /* ensures all effects stay inside */
-  background: radial-gradient(60% 60% at 50% 40%, rgba(110,146,119,.08) 0%, rgba(110,146,119,.02) 100%), #ffffff;
-  border: var(--lc-ring) solid rgba(110,146,119,.25);
-  box-shadow: 0 1px 0 rgba(0,0,0,.02) inset, 0 8px 18px rgba(0,0,0,.08);
+  background: radial-gradient(60% 60% at 50% 40%, rgba(110,146,119,.08) 0%, rgba(110,146,119,.02) 100%), #f6faf7;
+  box-shadow: 
+    0 0 0 var(--lc-nearby-border) rgba(110,146,119,.18),
+    0 4px 12px rgba(0,0,0,.08);
+  isolation: isolate;
   -webkit-mask-image: radial-gradient(circle, #000 98%, transparent 100%); /* iOS belt & braces */
 }
 
-/* subtle checker sits under the pin */
-.lc-nearby-avatar .lc-checker {
+/* Center all inner elements with uniform inset */
+.lc-nearby-avatar > * {
   position: absolute;
-  inset: 0;
-  opacity: .7; /* pattern stops control final darkness; leave this modest */
+  inset: var(--lc-nearby-inset);
 }
 
-/* Leaf pin icon */
+/* subtle checker sits under the pin - scales proportionally */
+.lc-nearby-avatar .lc-checker {
+  border-radius: 50%;
+  opacity: 0.8;
+}
+
+/* Leaf pin icon - scales with container */
 .lc-nearby-avatar .lc-leaf-pin {
-  position: absolute;
-  width: 60%; /* tune visual weight */
-  height: 60%;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -52%); /* tiny bias upward for balance */
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   filter: drop-shadow(0 1px 0 rgba(255,255,255,.35)) drop-shadow(0 6px 12px rgba(0,0,0,.12));
 }
 
-/* Inner radar pulse (inside only) */
+/* Inner radar pulse (inside only) - ONLY on nearby tile */
 .lc-nearby-avatar .lc-nearby-pulse {
-  position: absolute;
-  inset: 8%; /* start well inside rim */
   border-radius: 50%;
   pointer-events: none;
   background: radial-gradient(circle, rgba(110,146,119,.65) 0 1px, rgba(110,146,119,0) 1.5px);
   animation: lcPulseIn 3s ease-in-out infinite;
-  opacity: .85;
+  opacity: 0.85;
+  z-index: 1;
 }
 
 @keyframes lcPulseIn {
-  0% { transform: scale(.78); opacity: .85; }
-  80% { transform: scale(1.02); opacity: .08; } /* reach near inner rim */
-  100% { transform: scale(1.02); opacity: 0; }
+  0% { transform: scale(0.78); opacity: 0.85; }
+  80% { transform: scale(1.06); opacity: 0.08; }
+  100% { transform: scale(1.06); opacity: 0; }
 }
 
 /* Dark mode disabled during development */
