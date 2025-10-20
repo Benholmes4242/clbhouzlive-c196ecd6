@@ -9,7 +9,8 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
       avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Anna', 
       is_online: true, 
       distance_km: 0.4, 
-      same_club: false 
+      same_club: false,
+      isOpenToPlay: true
     },
     { 
       id: 'm2', 
@@ -18,7 +19,8 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
       avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tom', 
       is_online: true, 
       distance_km: 1.2, 
-      same_club: false 
+      same_club: false,
+      isOpenToPlay: false
     },
     { 
       id: 'm3', 
@@ -27,7 +29,8 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
       avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mia', 
       is_online: false, 
       distance_km: 2.1, 
-      same_club: false 
+      same_club: false,
+      isOpenToPlay: false
     },
     { 
       id: 'm4', 
@@ -36,7 +39,8 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
       avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ben', 
       is_online: true, 
       distance_km: 0.7, 
-      same_club: true 
+      same_club: true,
+      isOpenToPlay: true
     },
     { 
       id: 'm5', 
@@ -45,7 +49,8 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
       avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Classic', 
       is_online: false, 
       distance_km: 3.8, 
-      same_club: false 
+      same_club: false,
+      isOpenToPlay: false
     },
   ];
   return base.slice(0, count);

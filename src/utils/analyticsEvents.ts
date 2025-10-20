@@ -149,5 +149,43 @@ export const analyticsEvents = {
         session_id: sessionStorage.getItem('session_id') || 'unknown'
       });
     }
+  },
+
+  // Open to Play events
+  openToPlay: {
+    activate: (duration: number) => {
+      analyticsEvents.track('open2play_tap_activate', {
+        duration,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    },
+
+    cancel: (elapsed: number) => {
+      analyticsEvents.track('open2play_cancel', {
+        elapsed,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    },
+
+    expire: (elapsed: number) => {
+      analyticsEvents.track('open2play_expire', {
+        elapsed,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    },
+
+    filterToggle: (enabled: boolean) => {
+      analyticsEvents.track('open2play_filter_toggle', {
+        enabled,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    },
+
+    profileDisplayed: (remainingMinutes: number) => {
+      analyticsEvents.track('profile_open2play_displayed', {
+        remainingMinutes,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    }
   }
 };

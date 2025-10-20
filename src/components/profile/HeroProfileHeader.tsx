@@ -55,6 +55,7 @@ import ProfileModalRouter from './ProfileModalRouter';
 import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useProfileAnalytics } from '@/hooks/useProfileAnalytics';
+import { ProfileOpenToPlayStatus } from '@/features/nearby/components/ProfileOpenToPlayStatus';
 
 interface Course {
   id: string;
@@ -840,6 +841,7 @@ const HeroProfileHeader = ({
                         <span className="name-first">{first}</span>
                         <span className="name-last">{last}</span>
                         <div className="handle">@{username}</div>
+                        {isOwnProfile && <ProfileOpenToPlayStatus />}
                       </>
                     );
                   })()}
