@@ -196,8 +196,9 @@
   opacity: 0.8;
 }
 
-/* Leaf pin icon - scales with container */
+/* Leaf pin icon - centered in container */
 .lc-nearby-avatar .lc-leaf-pin {
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
