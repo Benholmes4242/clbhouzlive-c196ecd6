@@ -54,6 +54,7 @@
   background: transparent;
   cursor: pointer;
   position: relative;
+  overflow: hidden; /* Prevent pulse border from spilling and forming stray line */
 }
 
 .lc-avatar {
@@ -75,10 +76,10 @@
 .lc-recent .lc-avatar-btn::after {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: 6px; /* align with avatar edge (padding) */
   border-radius: 40px;
   border: 2px solid rgba(110, 146, 119, 0.45);
-  transform: scale(0.95);
+  transform: scale(0.98);
   opacity: 0.9;
   animation: lcPulse 1.4s ease-out infinite;
   pointer-events: none;
