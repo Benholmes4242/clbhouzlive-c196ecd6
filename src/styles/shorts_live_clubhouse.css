@@ -67,40 +67,51 @@
   position: relative;
 }
 
-/* Green ring for recent posts - no pulse */
+/* Pulse for recent posts - strong visible ring */
 .lc-recent .lc-avatar {
   outline: 2px solid #6e9277 !important;
   outline-offset: 2px;
 }
 
-/* Hard stop: kill all pulses on regular avatars */
-.sq-ring::before,
-.sq-ring::after,
-.lc-avatar::before,
-.lc-avatar::after,
-.lc-avatar-btn::before,
-.lc-avatar-btn::after {
-  content: none !important;
-  background: none !important;
-  animation: none !important;
+.lc-recent .lc-avatar-btn::after {
+  content: "";
+  position: absolute;
+  inset: 6px; /* align with avatar edge (padding) */
+  border-radius: 40px;
+  border: 2px solid rgba(110, 146, 119, 0.45);
+  transform: scale(0.98);
+  opacity: 0.9;
+  animation: lcPulse 1.4s ease-out infinite;
+  pointer-events: none;
 }
 
-/* Online dot - positioned inside to prevent clipping */
+@keyframes lcPulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+}
+
+/* Online dot */
 .lc-dot {
   position: absolute;
-  right: 6px;
-  bottom: 6px;
-  width: 12px;
-  height: 12px;
+  right: 10px;
+  bottom: 14px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: #2ecc71;
-  border: 2px solid #fff;
+  background: #6e9277;
+  box-shadow: 0 0 0 2px #fff;
   z-index: 2;
 }
 
 @media (prefers-color-scheme: dark) {
   .lc-dot {
-    border-color: #0b0b0b;
+    box-shadow: 0 0 0 2px #0b0b0b;
   }
 }
 
@@ -174,7 +185,6 @@
     inset 0 0 0 1px rgba(0,0,0,0.06),
     0 1px 2px rgba(0,0,0,0.04);
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.05));
-  isolation: isolate;
 }
 
 /* Polished SVG pin with gradient and shadow */
@@ -191,43 +201,40 @@
   fill: url(#pinGradient);
 }
 
-/* Pulse rings - ONLY on Nearby golfers circle */
-.lc-nearby-avatar::before,
-.lc-nearby-avatar::after {
-  content: "" !important;
+/* Pulse rings - refined echo green animation */
+.lc-nearby .lc-nearby-avatar::before,
+.lc-nearby .lc-nearby-avatar::after {
+  content: "";
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
+  left: 50%; 
+  top: 50%;
+  width: 80%;
+  height: 80%;
+  transform: translate(-50%, -50%) scale(1);
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 2px solid rgba(110,146,119,0.58);
+  opacity: 1;
+  background: none;
+  filter: blur(2px);
+  animation: lcPulse 3s ease-in-out infinite;
+  z-index: 2;
   pointer-events: none;
-  background: radial-gradient(
-    circle at center,
-    rgba(110, 146, 119, 0.55) 0,
-    rgba(110, 146, 119, 0.55) 1px,
-    rgba(110, 146, 119, 0) 1.5px
-  ) !important;
-  transform: scale(0.82);
-  opacity: 0.9;
-  animation: lcNearbyPulse 3s ease-in-out infinite !important;
-  z-index: 1;
 }
 
 /* Stagger second pulse */
-.lc-nearby-avatar::after {
+.lc-nearby .lc-nearby-avatar::after {
   animation-delay: 1.5s;
 }
 
 /* Smooth pulse expansion and fade */
-@keyframes lcNearbyPulse {
+@keyframes lcPulse {
   0% { 
-    transform: scale(0.82); 
-    opacity: 0.9; 
-  }
-  80% { 
-    transform: scale(1.05); 
-    opacity: 0.08; 
+    transform: translate(-50%, -50%) scale(1); 
+    opacity: 0.58; 
   }
   100% { 
-    transform: scale(1.05); 
+    transform: translate(-50%, -50%) scale(1.31); 
     opacity: 0; 
   }
 }
@@ -246,10 +253,14 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .lc-nearby-avatar::before,
-  .lc-nearby-avatar::after {
+  .lc-avatar-btn::after {
     animation: none !important;
-    opacity: 0.35;
-    transform: scale(0.85);
+  }
+
+  .lc-nearby .lc-nearby-avatar::before,
+  .lc-nearby .lc-nearby-avatar::after {
+    animation: none;
+    opacity: .35;
+    transform: translate(-50%,-50%) scale(.85);
   }
 }
