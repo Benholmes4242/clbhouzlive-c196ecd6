@@ -37,31 +37,41 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
     });
   };
 
+  const openRequestFromNearby = () => {
+    // Close nearby overlay first, then open request sheet after brief delay
+    onClose();
+    setTimeout(() => setShowComposer(true), 50);
+  };
+
   useEffect(() => {
     if (!isOpen) return;
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (showComposer) {
-        setShowComposer(false);
-      } else if (e.key === 'Escape') {
+      if (e.key === 'Escape') {
         onClose();
       }
     };
 
     const handleBackdropClick = (e: MouseEvent) => {
-      if (!showComposer && (e.target as HTMLElement).classList.contains('nearby-overlay-backdrop')) {
+      if ((e.target as HTMLElement).classList.contains('nearby-overlay-backdrop')) {
         onClose();
       }
     };
 
     document.addEventListener('keydown', handleEscape);
     document.addEventListener('click', handleBackdropClick);
-    document.body.style.overflow = 'hidden';
+    
+    // Only lock scroll when this overlay is visible (not when request sheet is open)
+    if (!showComposer) {
+      document.body.style.overflow = 'hidden';
+    }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
       document.removeEventListener('click', handleBackdropClick);
-      document.body.style.overflow = '';
+      if (!showComposer) {
+        document.body.style.overflow = '';
+      }
     };
   }, [isOpen, onClose, showComposer]);
 
@@ -79,26 +89,27 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   if (!isOpen) return null;
 
   return createPortal(
-    <div 
-      className="nearby-overlay-backdrop fixed inset-0 flex items-center justify-center p-4"
-      style={{
-        background: 'rgba(18, 18, 18, 0.32)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        zIndex: 'var(--z-nearby-overlay)',
-      }}
-    >
+    <>
       <div 
-        className="nearby-overlay-sheet w-full max-w-[440px] md:max-w-[640px] max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+        className="nearby-overlay-backdrop fixed inset-0 flex items-center justify-center p-4"
         style={{
-          background: 'rgba(255, 255, 255, 0.86)',
-          boxShadow: '0 6px 18px rgba(0, 0, 0, 0.12)',
-          zIndex: 'calc(var(--z-nearby-overlay) + 1)',
+          background: 'rgba(18, 18, 18, 0.32)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          zIndex: 1400,
         }}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="nearby-title"
       >
+        <div 
+          className="nearby-overlay-sheet w-full max-w-[440px] md:max-w-[640px] max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+          style={{
+            background: 'rgba(255, 255, 255, 0.86)',
+            boxShadow: '0 6px 18px rgba(0, 0, 0, 0.12)',
+            zIndex: 1401,
+          }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="nearby-title"
+        >
         {/* Header */}
         <div className="flex items-center justify-between px-6 border-b border-black/10" style={{ paddingTop: '10px', paddingBottom: '10px' }}>
           <h2 id="nearby-title" className="text-[17px] font-semibold" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
@@ -195,7 +206,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               className="w-full"
               onClick={() => {
                 analyticsEvents.track('beacon_open_composer');
-                setShowComposer(true);
+                openRequestFromNearby();
               }}
               style={{ background: '#6e9277', color: 'white' }}
             >
@@ -208,15 +219,19 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
         )}
       </div>
 
-      {/* Request Game Sheet */}
-      <RequestGameSheet
-        open={showComposer}
-        onClose={() => setShowComposer(false)}
-        defaultAudience="nearby"
-        defaultWhen="now"
-        onSubmit={handleCreateBeacon}
-      />
-    </div>,
+      </div>
+      
+      {/* Request Game Sheet - renders separately, portaled */}
+      {showComposer && (
+        <RequestGameSheet
+          open={showComposer}
+          onClose={() => setShowComposer(false)}
+          defaultAudience="nearby"
+          defaultWhen="now"
+          onSubmit={handleCreateBeacon}
+        />
+      )}
+    </>,
     document.body
   );
 }

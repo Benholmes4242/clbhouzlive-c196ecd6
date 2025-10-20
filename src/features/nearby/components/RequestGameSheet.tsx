@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -159,22 +160,30 @@ export function RequestGameSheet({
   useEffect(() => {
     if (open) {
       document.addEventListener('keydown', handleKeyDown as any);
-      return () => document.removeEventListener('keydown', handleKeyDown as any);
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown as any);
+        document.body.style.overflow = '';
+      };
     }
   }, [open]);
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-[1400] flex items-end justify-center bg-black/40"
+      className="fixed inset-0 flex items-end justify-center bg-black/40"
+      style={{ zIndex: 1500 }}
       onClick={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
     >
       <div
         className="w-full max-w-2xl bg-white dark:bg-[#141414] rounded-t-3xl shadow-2xl flex flex-col max-h-[90vh] md:rounded-b-3xl md:max-h-[85vh] md:mb-8"
         style={{
           backdropFilter: 'blur(16px)',
           backgroundColor: 'rgba(255, 255, 255, 0.96)',
+          zIndex: 1501,
         }}
       >
         {/* Header */}
@@ -391,6 +400,7 @@ export function RequestGameSheet({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
