@@ -6,7 +6,7 @@ import { NearbyGolfer } from './types';
 import { useNearbyGolfers } from './useNearbyGolfers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { VisibilityToggle } from './components/VisibilityToggle';
-import { GameBeaconComposer } from './components/GameBeaconComposer';
+import { RequestGameSheet, RequestGamePayload } from './components/RequestGameSheet';
 import { useVisibility } from './hooks/useVisibility';
 import { useGameBeacon } from './hooks/useGameBeacon';
 import { OpenToPlayButton } from './components/OpenToPlayButton';
@@ -23,9 +23,18 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   const [showComposer, setShowComposer] = useState(false);
   const [filterOpenToPlay, setFilterOpenToPlay] = useState(false);
 
-  const handleCreateBeacon = async (draft: any) => {
-    await createBeacon(draft);
-    setShowComposer(false);
+  const handleCreateBeacon = async (payload: RequestGamePayload) => {
+    // Convert new payload format to old beacon format
+    await createBeacon({
+      when: 'now',
+      whereClubId: payload.club_id,
+      playersNeeded: payload.players_needed,
+      formats: [payload.format.replace('_', '') as any],
+      notes: payload.notes,
+      audience: payload.audience === 'all' ? 'nearby' : payload.audience,
+      visibilityWindowMin: 120,
+      sendPush: payload.push,
+    });
   };
 
   useEffect(() => {
@@ -199,14 +208,14 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
         )}
       </div>
 
-      {/* Composer */}
-      {showComposer && (
-        <GameBeaconComposer
-          onSubmit={handleCreateBeacon}
-          onCancel={() => setShowComposer(false)}
-          initialDraft={activeBeacon || undefined}
-        />
-      )}
+      {/* Request Game Sheet */}
+      <RequestGameSheet
+        open={showComposer}
+        onClose={() => setShowComposer(false)}
+        defaultAudience="nearby"
+        defaultWhen="now"
+        onSubmit={handleCreateBeacon}
+      />
     </div>,
     document.body
   );
