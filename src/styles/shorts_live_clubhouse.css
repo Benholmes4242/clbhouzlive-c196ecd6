@@ -248,6 +248,7 @@
   filter: blur(2px);
   animation: lcPulse 3s ease-in-out infinite;
   z-index: 2;
+  pointer-events: none;
 }
 
 /* Stagger second pulse */
@@ -267,24 +268,7 @@
   }
 }
 
-/* Optional light sweep for premium touch */
-@keyframes lightSweep {
-  0% {
-    transform: translateX(-100%) translateY(-100%) rotate(45deg);
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.12;
-  }
-  100% {
-    transform: translateX(100%) translateY(100%) rotate(45deg);
-    opacity: 0;
-  }
-}
-
-.lc-nearby-avatar::after {
-  animation: lightSweep 10s ease-in-out infinite;
-}
+/* Light sweep animation removed - was causing visual conflict */
 
 @media (prefers-color-scheme: dark) {
   .lc-nearby-avatar {
