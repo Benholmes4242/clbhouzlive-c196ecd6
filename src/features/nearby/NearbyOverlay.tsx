@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { X, MapPin, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NearbyGolfer } from './types';
@@ -10,6 +9,7 @@ import { RequestGameSheet, RequestGamePayload } from './components/RequestGameSh
 import { useVisibility } from './hooks/useVisibility';
 import { useGameBeacon } from './hooks/useGameBeacon';
 import { OpenToPlayButton } from './components/OpenToPlayButton';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 
 interface NearbyOverlayProps {
   isOpen: boolean;
@@ -36,33 +36,10 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
     });
   };
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (showComposer) {
-        setShowComposer(false);
-      } else if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    const handleBackdropClick = (e: MouseEvent) => {
-      if (!showComposer && (e.target as HTMLElement).classList.contains('nearby-overlay-backdrop')) {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    document.addEventListener('click', handleBackdropClick);
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.removeEventListener('click', handleBackdropClick);
-      document.body.style.overflow = '';
-    };
-  }, [isOpen, onClose, showComposer]);
+  // Close Golfers sheet when Request sheet closes if needed
+  const handleRequestClose = () => {
+    setShowComposer(false);
+  };
 
   useEffect(() => {
     if (isOpen && golfers.length > 0) {
@@ -70,50 +47,29 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
     }
   }, [isOpen, golfers.length]);
 
-
-  if (!isOpen) return null;
-
-  return createPortal(
-    <div 
-      className="nearby-overlay-backdrop fixed inset-0 flex items-center justify-center p-4"
-      style={{
-        background: 'rgba(18, 18, 18, 0.32)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        zIndex: 'var(--z-nearby-overlay)',
-        pointerEvents: showComposer ? 'none' : 'auto',
-      }}
-    >
-      <div 
-        className="nearby-overlay-sheet w-full max-w-[440px] md:max-w-[640px] max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
-        style={{
-          background: 'rgba(255, 255, 255, 0.86)',
-          boxShadow: '0 6px 18px rgba(0, 0, 0, 0.12)',
-          zIndex: 'calc(var(--z-nearby-overlay) + 1)',
-        }}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="nearby-title"
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 border-b border-black/10" style={{ paddingTop: '10px', paddingBottom: '10px' }}>
-          <h2 id="nearby-title" className="text-[17px] font-semibold" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
-            Golfers near you
-          </h2>
-          <div className="flex items-center gap-3">
-            <VisibilityToggle value={visible} onChange={setVisible} />
-            <button
-              onClick={onClose}
-              className="p-2 rounded-full hover:bg-black/5 transition-colors"
-              aria-label="Close"
-            >
-              <X className="w-5 h-5" style={{ color: 'rgba(0, 0, 0, 0.6)' }} />
-            </button>
+  return (
+    <>
+      <BottomSheet open={isOpen} onClose={onClose} zIndexBase={1400} ariaLabelledBy="nearby-title">
+        <div className={`flex flex-col h-full ${showComposer ? 'sheet-dim' : ''}`}>
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-black/10" style={{ padding: '12px 20px' }}>
+            <h2 id="nearby-title" className="text-[18px] font-semibold" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
+              Golfers near you
+            </h2>
+            <div className="flex items-center gap-3">
+              <VisibilityToggle value={visible} onChange={setVisible} />
+              <button
+                onClick={onClose}
+                className="p-2 rounded-full hover:bg-black/5 transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" style={{ color: 'rgba(0, 0, 0, 0.6)' }} />
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4">
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto" style={{ padding: '0 16px 12px' }}>
           {isLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
@@ -143,11 +99,11 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               ))}
             </div>
           )}
-        </div>
+          </div>
 
-        {/* Active Beacon Summary */}
-        {activeBeacon && (
-          <div className="px-4 py-3 border-b border-black/10" style={{ background: 'rgba(110, 146, 119, 0.1)' }}>
+          {/* Active Beacon Summary */}
+          {activeBeacon && (
+            <div className="border-b border-black/10" style={{ padding: '12px 16px', background: 'rgba(110, 146, 119, 0.1)' }}>
             <div className="text-sm font-medium mb-2" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
               Beacon sent — {activeBeacon.playersNeeded} player{activeBeacon.playersNeeded > 1 ? 's' : ''} notified
             </div>
@@ -166,13 +122,13 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               >
                 Cancel beacon
               </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Footer CTA */}
-        {golfers.length > 0 && (
-          <div className="p-4 border-t border-black/10 space-y-3">
+          {/* Footer CTA */}
+          {golfers.length > 0 && (
+            <div className="border-t border-black/10 space-y-3" style={{ padding: '12px 16px 16px' }}>
             <Button
               className="w-full"
               onClick={() => {
@@ -183,23 +139,23 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             >
               Create game
             </Button>
-            <div className="flex justify-center">
-              <OpenToPlayButton />
+              <div className="flex justify-center">
+                <OpenToPlayButton />
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </BottomSheet>
 
-      {/* Request Game Sheet */}
+      {/* Request Game Sheet - stacked above */}
       <RequestGameSheet
         open={showComposer}
-        onClose={() => setShowComposer(false)}
+        onClose={handleRequestClose}
         defaultAudience="nearby"
         defaultWhen="now"
         onSubmit={handleCreateBeacon}
       />
-    </div>,
-    document.body
+    </>
   );
 }
 

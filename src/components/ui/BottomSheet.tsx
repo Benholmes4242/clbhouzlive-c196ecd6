@@ -1,55 +1,66 @@
-import React, { useEffect, useRef } from 'react';
-import clsx from 'clsx';
+import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
-type BottomSheetProps = {
-  isOpen: boolean;
+interface BottomSheetProps {
+  open: boolean;
   onClose: () => void;
+  zIndexBase?: number;
   children: React.ReactNode;
-  title?: string;
-};
+  className?: string;
+  ariaLabelledBy?: string;
+}
 
-export default function BottomSheet({ isOpen, onClose, children, title }: BottomSheetProps) {
-  const ref = useRef<HTMLDivElement>(null);
-
+export function BottomSheet({
+  open,
+  onClose,
+  zIndexBase = 1400,
+  children,
+  className = '',
+  ariaLabelledBy,
+}: BottomSheetProps) {
+  // Scroll lock
   useEffect(() => {
-    function onKey(e: KeyboardEvent) { if (e.key === 'Escape') onClose(); }
-    if (isOpen) document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [isOpen, onClose]);
+    if (!open) return;
+    const { body } = document;
+    const prev = body.style.overflow;
+    body.style.overflow = 'hidden';
+    return () => {
+      body.style.overflow = prev;
+    };
+  }, [open]);
 
-  return (
-    <div className={clsx(
-      'fixed inset-0 z-[999]',
-      isOpen ? 'pointer-events-auto' : 'pointer-events-none'
-    )}>
-      {/* scrim */}
+  // ESC key handling
+  useEffect(() => {
+    if (!open) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return createPortal(
+    <>
       <div
-        className={clsx(
-          'absolute inset-0 transition-opacity',
-          isOpen ? 'bg-black/40 opacity-100' : 'opacity-0'
-        )}
+        className="sheet-backdrop"
+        style={{ zIndex: zIndexBase }}
         onClick={onClose}
+        aria-hidden="true"
       />
-      {/* sheet */}
       <div
-        ref={ref}
-        className={clsx(
-          'absolute left-0 right-0 bottom-0 rounded-t-2xl bg-background',
-          'border-t border-border',
-          'shadow-[0_-12px_40px_rgba(0,0,0,0.2)]',
-          'transition-transform will-change-transform',
-          isOpen ? 'translate-y-0' : 'translate-y-full'
-        )}
-        style={{ minHeight: 140 }}
+        className={`sheet sheet-enter ${className}`}
+        style={{ zIndex: zIndexBase + 1 }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={ariaLabelledBy}
       >
-        {title && (
-          <div className="px-4 pt-3 pb-2 text-sm font-medium text-muted-foreground">
-            {title}
-          </div>
-        )}
-        <div className="p-2">{children}</div>
-        <div className="h-4" />
+        {children}
       </div>
-    </div>
+    </>,
+    document.body
   );
 }

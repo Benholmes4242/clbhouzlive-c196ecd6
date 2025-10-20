@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { X, Calendar, Clock } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 
 interface RequestGameSheetProps {
   open: boolean;
@@ -145,43 +145,12 @@ export function RequestGameSheet({
     }
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Escape' && open) {
-      onClose();
-    }
-  };
-
-  useEffect(() => {
-    if (open) {
-      document.addEventListener('keydown', handleKeyDown as any);
-      return () => document.removeEventListener('keydown', handleKeyDown as any);
-    }
-  }, [open]);
-
-  if (!open) return null;
-
-  return createPortal(
-    <div
-      className="fixed inset-0 flex items-end justify-center bg-black/40"
-      style={{ zIndex: 'var(--z-modal)' }}
-      onClick={handleBackdropClick}
-    >
-      <div
-        className="w-full max-w-2xl bg-white dark:bg-[#141414] rounded-t-3xl shadow-2xl flex flex-col max-h-[90vh] md:rounded-b-3xl md:max-h-[85vh] md:mb-8"
-        style={{
-          backdropFilter: 'blur(16px)',
-          backgroundColor: 'rgba(255, 255, 255, 0.96)',
-        }}
-      >
+  return (
+    <BottomSheet open={open} onClose={onClose} zIndexBase={1500} ariaLabelledBy="request-game-title">
+      <div className="flex flex-col h-full">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3.5 border-b border-black/[0.06] dark:border-white/[0.12]">
-          <h2 className="text-lg font-bold tracking-[0.2px]">Request a game</h2>
+        <div className="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.12]" style={{ padding: '12px 20px' }}>
+          <h2 id="request-game-title" className="text-[18px] font-semibold">Request a game</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors"
@@ -191,7 +160,7 @@ export function RequestGameSheet({
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-4 py-3">
+        <div className="flex-1 overflow-y-auto" style={{ padding: '0 16px 12px' }}>
           {/* When */}
           <div className="mb-6">
             <label className="block text-[13px] font-semibold text-black/[0.56] dark:text-white/[0.64] mb-2.5">
@@ -357,8 +326,9 @@ export function RequestGameSheet({
 
         {/* Footer */}
         <div
-          className="sticky bottom-0 px-4 py-3 border-t border-black/[0.06] dark:border-white/[0.12]"
+          className="border-t border-black/[0.06] dark:border-white/[0.12]"
           style={{
+            padding: '12px 16px 16px',
             backdropFilter: 'blur(12px)',
             background: 'linear-gradient(180deg, rgba(255,255,255,0.64), #fff 48%)',
           }}
@@ -393,7 +363,6 @@ export function RequestGameSheet({
           </button>
         </div>
       </div>
-    </div>,
-    document.body
+    </BottomSheet>
   );
 }

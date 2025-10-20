@@ -91,6 +91,19 @@ html, body {
   --z-nearby-overlay: var(--z-overlay);
   --z-modal: 1500;
   --z-popover: 1600;
+
+  /* Modal primitives */
+  --modal-max-w: 640px;
+  --modal-radius: 20px;
+  --modal-shadow: 0 12px 40px -8px rgba(0,0,0,.18);
+  --modal-backdrop: rgba(0,0,0,.36);
+  --modal-backdrop-blur: 12px;
+
+  /* Motion */
+  --modal-enter-ms: 200ms;
+  --modal-exit-ms: 160ms;
+  --modal-ease-out: cubic-bezier(.22,.61,.36,1);
+  --modal-ease-in: cubic-bezier(.4,0,.2,1);
   
   --safe-top: 0px; 
   --safe-bottom: 0px; 
@@ -102,6 +115,56 @@ html, body {
   
   /* Create Moment composer tokens */
   --composer-height: 370px;
+}
+
+/* Sheet animations */
+@keyframes sheet-in {
+  from { transform: translateY(16px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+@keyframes sheet-out {
+  from { transform: translateY(0);     opacity: 1; }
+  to   { transform: translateY(16px);  opacity: 0; }
+}
+
+/* Sheet component styles */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--modal-backdrop);
+  backdrop-filter: blur(var(--modal-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--modal-backdrop-blur));
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0 auto;
+  max-width: var(--modal-max-w);
+  border-radius: var(--modal-radius) var(--modal-radius) 0 0;
+  box-shadow: var(--modal-shadow);
+  background: #fff;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sheet-enter {
+  animation: sheet-in var(--modal-enter-ms) var(--modal-ease-out) both;
+}
+
+.sheet-exit {
+  animation: sheet-out var(--modal-exit-ms) var(--modal-ease-in) both;
+}
+
+/* Dim/scale effect for underlying sheet when stacking */
+.sheet-dim {
+  opacity: .92;
+  transform: scale(.99);
+  transition: opacity 120ms var(--modal-ease-out), transform 120ms var(--modal-ease-out);
 }
 
 /* Duration badge - ensures badge stays tight even with '1h 10m' */

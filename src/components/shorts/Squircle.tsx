@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import BottomSheet from '@/components/ui/BottomSheet';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useFollow } from '@/hooks/useFollow';
 import { usePrefetchImmersiveProfile } from '@/hooks/usePrefetchImmersiveProfile';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -144,8 +144,9 @@ export default function Squircle({ creator, index, onAvatarClick, onLabelClick, 
       </div>
 
       {/* Bottom sheet menu */}
-      <BottomSheet isOpen={menuOpen} onClose={() => setMenuOpen(false)} title={name}>
-        <div className="flex flex-col">
+      <BottomSheet open={menuOpen} onClose={() => setMenuOpen(false)} ariaLabelledBy={`menu-${creator.id}`}>
+        <div className="flex flex-col p-4">
+          <h3 id={`menu-${creator.id}`} className="text-lg font-semibold mb-4">{name}</h3>
           <SheetItem label="View Profile" onClick={() => { setMenuOpen(false); handleAvatarClick(); }} />
           <SheetItem 
             label={isFollowing === 'following' ? 'Unfollow' : 'Follow'} 
