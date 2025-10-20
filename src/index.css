@@ -117,6 +117,10 @@ html, body {
   --echo-composer-h: 84px; /* includes padding/safe-area */
   --echo-top: 56px; /* header height on mobile */
 
+  /* Z-index layers */
+  --z-echo-fab: 1200;
+  --z-nearby-overlay: 1400;
+
   /* Message bubble tokens */
   --bubble-max: 92vw;             /* prevents edge-to-edge balloons on phones */
   --bubble-max-md: 720px;         /* cap on larger screens */
