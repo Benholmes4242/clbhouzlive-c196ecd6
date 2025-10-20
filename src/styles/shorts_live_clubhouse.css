@@ -7,7 +7,18 @@
   background: transparent;
 }
 
-/* Divider line removed */
+.live-row::after {
+  content: "";
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, rgba(110, 146, 119, 0.5), transparent);
+  opacity: var(--scrolling, 0.25);
+  transition: opacity 0.25s ease;
+}
 
 /* Horizontal scroll track */
 .live-scroll {
@@ -46,11 +57,6 @@
   overflow: hidden; /* Prevent pulse border from spilling and forming stray line */
 }
 
-/* Ensure no stray pseudo-element renders on any avatar button */
-.lc-avatar-btn::after {
-  content: none !important;
-}
-
 .lc-avatar {
   width: 84px;
   height: 84px;
@@ -61,18 +67,22 @@
   position: relative;
 }
 
-/* Pulse for recent posts disabled to avoid stray radar lines */
-.lc-recent .lc-avatar { 
-  outline: none !important; 
-  outline-offset: 0; 
+/* Pulse for recent posts - strong visible ring */
+.lc-recent .lc-avatar {
+  outline: 2px solid #6e9277 !important;
+  outline-offset: 2px;
 }
 
-.lc-recent .lc-avatar-btn::after { 
-  content: none !important; 
-  animation: none !important; 
-  border: 0 !important; 
-  opacity: 0 !important; 
-  pointer-events: none; 
+.lc-recent .lc-avatar-btn::after {
+  content: "";
+  position: absolute;
+  inset: 6px; /* align with avatar edge (padding) */
+  border-radius: 40px;
+  border: 2px solid rgba(110, 146, 119, 0.45);
+  transform: scale(0.98);
+  opacity: 0.9;
+  animation: lcPulse 1.4s ease-out infinite;
+  pointer-events: none;
 }
 
 @keyframes lcPulse {
@@ -145,12 +155,6 @@
   border: none;
   background: transparent;
   padding: 0;
-  overflow: hidden;
-}
-
-/* Nearby tile uses default overflow clipping */
-.lc-nearby .lc-avatar-btn {
-  overflow: hidden;
 }
 
 .lc-nearby .lc-name { 
@@ -197,17 +201,43 @@
   fill: url(#pinGradient);
 }
 
-/* Pulse rings disabled on nearby avatar */
+/* Pulse rings - refined echo green animation */
 .lc-nearby .lc-nearby-avatar::before,
 .lc-nearby .lc-nearby-avatar::after {
-  content: none !important;
-  animation: none !important;
-  border: 0 !important;
+  content: "";
+  position: absolute;
+  left: 50%; 
+  top: 50%;
+  width: 80%;
+  height: 80%;
+  transform: translate(-50%, -50%) scale(1);
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 2px solid rgba(110,146,119,0.58);
+  opacity: 1;
+  background: none;
+  filter: blur(2px);
+  animation: lcPulse 3s ease-in-out infinite;
+  z-index: 2;
+  pointer-events: none;
 }
 
-/* Stagger removed as pulse disabled */
+/* Stagger second pulse */
+.lc-nearby .lc-nearby-avatar::after {
+  animation-delay: 1.5s;
+}
 
-/* lcPulse variant for nearby removed to avoid conflicts */
+/* Smooth pulse expansion and fade */
+@keyframes lcPulse {
+  0% { 
+    transform: translate(-50%, -50%) scale(1); 
+    opacity: 0.58; 
+  }
+  100% { 
+    transform: translate(-50%, -50%) scale(1.31); 
+    opacity: 0; 
+  }
+}
 
 /* Light sweep animation removed - was causing visual conflict */
 
