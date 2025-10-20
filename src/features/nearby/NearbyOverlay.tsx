@@ -174,13 +174,11 @@ function GolferRow({ golfer, index }: GolferRowProps) {
     >
       {/* Avatar */}
       <div className="relative flex-shrink-0">
-        <div className="nearby-golfer-avatar-wrapper">
-          <img
-            src={golfer.avatar_url || '/placeholder.svg'}
-            alt={golfer.display_name}
-            className="w-12 h-12 rounded-2xl object-cover"
-          />
-        </div>
+        <img
+          src={golfer.avatar_url || '/placeholder.svg'}
+          alt={golfer.display_name}
+          className="w-12 h-12 rounded-2xl object-cover"
+        />
         {golfer.is_online && (
           <span
             className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white"

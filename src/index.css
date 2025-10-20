@@ -7,7 +7,6 @@
 @import './styles/squircle.css';
 @import './styles/bottom-nav-fixed.css';
 @import './styles/chrome-autohide.css';
-@import './styles/nearby-overlay.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
