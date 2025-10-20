@@ -126,7 +126,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
 
   // Update played courses set when data changes
   useEffect(() => {
-    const playedSet = new Set(userPlayedCourses.map(pc => pc.course_id));
+    const playedSet = new Set<string>(userPlayedCourses.map(pc => pc.course_id));
     setPlayedCourses(playedSet);
   }, [userPlayedCourses]);
 
