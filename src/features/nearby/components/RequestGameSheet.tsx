@@ -167,7 +167,8 @@ export function RequestGameSheet({
 
   return (
     <div
-      className="fixed inset-0 z-[1400] flex items-end justify-center bg-black/40"
+      className="fixed inset-0 flex items-end justify-center bg-black/40"
+      style={{ zIndex: 'var(--z-modal)' }}
       onClick={handleBackdropClick}
     >
       <div

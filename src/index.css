@@ -88,6 +88,8 @@ html, body {
   /* Z-index layers */
   --z-echo-fab: 1200;
   --z-nearby-overlay: 1400;
+  --z-modal: 1500;
+  --z-popover: 1600;
   
   --safe-top: 0px; 
   --safe-bottom: 0px; 
