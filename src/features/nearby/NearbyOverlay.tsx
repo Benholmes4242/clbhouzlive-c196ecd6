@@ -86,6 +86,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
         zIndex: 'var(--z-nearby-overlay)',
+        pointerEvents: showComposer ? 'none' : 'auto',
       }}
     >
       <div 

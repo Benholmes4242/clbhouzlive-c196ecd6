@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -165,7 +166,7 @@ export function RequestGameSheet({
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 flex items-end justify-center bg-black/40"
       style={{ zIndex: 'var(--z-modal)' }}
@@ -392,6 +393,7 @@ export function RequestGameSheet({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
