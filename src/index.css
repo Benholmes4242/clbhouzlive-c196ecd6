@@ -515,12 +515,54 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Clubhouse specific: remove global safe-area top padding and hide standard header */
+/* Clubhouse: full-bleed edge-to-edge */
+body.route-clubhouse {
+  overflow: hidden; /* prevent body scroll behind the stage */
+}
+
 body.route-clubhouse .app-shell {
   padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
+
 body.route-clubhouse .global-header {
   display: none !important;
+}
+
+/* Root stage that must exactly fill the visible viewport */
+.clubhouse-root {
+  position: fixed;
+  inset: 0;
+  height: 100svh;
+  width: 100vw;
+  background: #000;
+  overflow: hidden;
+}
+
+/* Fallbacks for older browsers */
+@supports (height: 100dvh) {
+  .clubhouse-root { height: 100dvh; }
+}
+@supports not (height: 100svh) {
+  .clubhouse-root { height: 100vh; }
+}
+
+/* Video fills container like TikTok/IG */
+.clubhouse-root .clubhouse-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Bottom rails: keep clear of home indicator only at the bottom */
+.clubhouse-engagement-rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 8px 12px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
 }
 
 /* Hide global header when EnhancedCreateMoment modal is active - CRITICAL RULE */
