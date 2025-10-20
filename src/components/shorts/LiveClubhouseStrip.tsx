@@ -88,15 +88,15 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
   };
 
   const nearText = count > 0 
-    ? (count > 9 ? '9+ players near you' : `${count} ${count === 1 ? 'player' : 'players'} near you`)
-    : 'Check who\'s close';
+    ? (count > 9 ? '9+ golfers near you' : `${count} ${count === 1 ? 'golfer' : 'golfers'} near you`)
+    : "Check who's close";
 
   return (
     <button 
       type="button"
       className="lc-tile lc-nearby" 
       role="option" 
-      aria-label={`Nearby golfers, ${count} ${count === 1 ? 'player' : 'players'} near you`}
+      aria-label={`Nearby golfers, ${count} ${count === 1 ? 'golfer' : 'golfers'} near you`}
       onClick={handleClick}
     >
       <div className="lc-avatar-btn">
