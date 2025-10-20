@@ -11,7 +11,7 @@ import { useChromeState } from '@/hooks/useChromeState';
 import { useChromeAnchors } from '@/hooks/useChromeAnchors';
 import { VideoProgressHUD } from '@/components/hud/VideoProgressHUD';
 
-import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
+import { useInfiniteClubhouseShorts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,13 +23,14 @@ const Clubhouse = () => {
   // Set header variant for clubhouse (glass-dark)
   useHeaderVariant('glass-dark');
   
+  // Clubhouse: explore feed with short videos only (<120s)
   const {
     posts,
     isLoading,
     hasMore,
     loadMore,
     isLoadingMore
-  } = useInfiniteFollowedPosts();
+  } = useInfiniteClubhouseShorts();
 
   // Navigation handlers
   const { activeTab, handleTabClick } = useNavigationHandlers();

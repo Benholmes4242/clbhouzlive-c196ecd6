@@ -143,11 +143,20 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     return false;
   }, []);
 
-  // Client-side filtering for portrait-only mode
+  // Client-side defensive filtering: ensure only short videos
   const filteredPosts = useMemo(() => {
-    if (!FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY) return posts;
+    // First: defensive guard for shorts-only (should be server-filtered already)
+    const shortsOnly = posts.filter(post => {
+      if (post.type !== 'video') return false;
+      if (typeof post.durationSeconds !== 'number') return false;
+      if (post.durationSeconds >= 120) return false;
+      return true;
+    });
+
+    // Second: portrait filter if enabled
+    if (!FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY) return shortsOnly;
     
-    const filtered = posts.filter(post => {
+    const filtered = shortsOnly.filter(post => {
       const media = post.media?.[0];
       if (!media) return false;
       

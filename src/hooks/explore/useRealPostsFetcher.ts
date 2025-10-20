@@ -479,5 +479,167 @@ export const useRealPostsFetcher = () => {
     }
   };
 
-  return { fetchRealPosts, fetchFriendsPosts };
+  // NEW: Clubhouse explore feed — short videos only (<120s, first media gating)
+  const fetchClubhouseExploreShorts = async (
+    limit: number = 30,
+    cursor: string | null = null
+  ): Promise<ExploreContentItem[]> => {
+    try {
+      let query = supabase
+        .from('posts')
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id,
+          post_media!inner (
+            id,
+            media_type,
+            media_url,
+            duration_seconds,
+            aspect_ratio,
+            orientation,
+            width,
+            height,
+            poster_url,
+            created_at
+          ),
+          post_tags (
+            id,
+            tagged_entity_id,
+            taggable_entities (
+              id,
+              entity_type,
+              entity_id,
+              name
+            )
+          )
+        `)
+        .order('created_at', { ascending: true, foreignTable: 'post_media' })
+        .order('created_at', { ascending: false })
+        .limit(1, { foreignTable: 'post_media' });
+
+      // Filter: video only + duration < 120s
+      query = query
+        .eq('post_media.media_type', 'video')
+        .lte('post_media.duration_seconds', 119); // < 120
+
+      // Cursor-based pagination
+      if (cursor) {
+        query = query.lt('created_at', cursor);
+      }
+
+      query = query.limit(limit);
+
+      const { data: postsData, error } = await query;
+
+      if (error) {
+        console.error('[clubhouse] Error fetching explore shorts:', error);
+        return [];
+      }
+
+      if (!postsData || postsData.length === 0) {
+        return [];
+      }
+
+      // Defensive filter: ensure first media is video <120s
+      const validPosts = postsData.filter(post => {
+        const firstMedia = post.post_media?.[0];
+        return (
+          firstMedia &&
+          firstMedia.media_type === 'video' &&
+          typeof firstMedia.duration_seconds === 'number' &&
+          firstMedia.duration_seconds < 120
+        );
+      });
+
+      // Get unique user IDs
+      const userIds = [...new Set(validPosts.map(post => post.user_id))];
+      
+      // Get user profiles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .in('id', userIds);
+
+      if (profilesError) {
+        console.error('[clubhouse] Error fetching profiles:', profilesError);
+        return [];
+      }
+
+      // Format posts
+      const formattedPosts = validPosts.map(post => {
+        const userProfile = profiles?.find(profile => profile.id === post.user_id);
+        const firstMedia = post.post_media[0];
+
+        // Find golf course from tags
+        const golfCourseTag = (post.post_tags || []).find(
+          tag => tag.taggable_entities?.entity_type === 'golf_club'
+        );
+
+        let golfCourse = null;
+        if (golfCourseTag?.taggable_entities) {
+          golfCourse = {
+            id: golfCourseTag.taggable_entities.entity_id,
+            name: golfCourseTag.taggable_entities.name,
+            country: 'Unknown'
+          };
+        }
+
+        const durationSeconds = firstMedia.duration_seconds;
+
+        return {
+          id: post.id,
+          type: 'video' as const,
+          src: firstMedia.media_url,
+          thumbnailSrc: firstMedia.poster_url || getStreamPoster(firstMedia.media_url, '1s') || undefined,
+          title: post.content || 'Video',
+          likes: Math.floor(Math.random() * 500) + 50,
+          comments: Math.floor(Math.random() * 100) + 5,
+          shares: Math.floor(Math.random() * 50) + 1,
+          duration: `${durationSeconds}s`,
+          durationSeconds,
+          createdAt: post.created_at,
+          user: {
+            id: post.user_id,
+            name: userProfile?.display_name || userProfile?.username || 'User',
+            username: userProfile?.username,
+            avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+            verified: Math.random() > 0.7
+          },
+          golfCourse,
+          label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
+          isFollowing: Math.random() > 0.5,
+          media: [{
+            id: firstMedia.id,
+            media_type: firstMedia.media_type as 'video' | 'image',
+            media_url: firstMedia.media_url
+          }],
+          audioTrack: Math.random() > 0.6 ? {
+            title: ["Eye of the Tiger", "The Final Countdown", "Original Audio"][Math.floor(Math.random() * 3)],
+            artist: Math.random() > 0.5 ? "Survivor" : undefined,
+            isOriginal: Math.random() > 0.5
+          } : undefined
+        };
+      });
+
+      // Dev logging
+      if (process.env.NODE_ENV !== 'production') {
+        const stats = formattedPosts.reduce((acc, p) => {
+          if (p.type === 'video' && p.durationSeconds && p.durationSeconds < 120) acc.short++;
+          else if (p.type === 'video') acc.long++;
+          else if (p.type === 'image') acc.photos++;
+          return acc;
+        }, { short: 0, long: 0, photos: 0 });
+        console.log('[clubhouse] page summary:', { total: formattedPosts.length, ...stats });
+      }
+
+      return formattedPosts;
+    } catch (error) {
+      console.error('[clubhouse] Error in fetchClubhouseExploreShorts:', error);
+      return [];
+    }
+  };
+
+  return { fetchRealPosts, fetchFriendsPosts, fetchClubhouseExploreShorts };
 };
