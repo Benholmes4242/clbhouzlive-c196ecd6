@@ -108,34 +108,10 @@ function NearbyTile({ count }: { count: number }) {
 
 function LiveTile({ creator, index }: { creator: any; index: number }) {
   const navigate = useNavigate();
-  const [peeking, setPeeking] = useState(false);
-  const [pressTimer, setPressTimer] = useState<any>(null);
-  const peekStartTime = useRef<number>(0);
 
   const seenIds = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]') as string[];
   const hasSeen = seenIds.includes(creator.id);
   const recentPulse = creator.has_recent_post && !hasSeen;
-
-  const startPress = () => {
-    peekStartTime.current = Date.now();
-    const timer = setTimeout(() => {
-      setPeeking(true);
-      analyticsEvents.lcStrip.peekOpen(creator.id);
-    }, 450);
-    setPressTimer(timer);
-  };
-
-  const endPress = () => {
-    clearTimeout(pressTimer);
-    setPressTimer(null);
-    
-    if (peeking) {
-      const duration = Date.now() - peekStartTime.current;
-      analyticsEvents.lcStrip.peekMs(creator.id, duration);
-    }
-    
-    setPeeking(false);
-  };
 
   const onAvatarClick = () => {
     // Mark as seen
@@ -150,14 +126,8 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
 
   return (
     <div
-      className={`lc-tile ${peeking ? 'is-peeking' : ''} ${recentPulse ? 'lc-recent' : ''}`}
+      className={`lc-tile ${recentPulse ? 'lc-recent' : ''}`}
       role="option"
-      onMouseDown={startPress}
-      onMouseUp={endPress}
-      onMouseLeave={endPress}
-      onTouchStart={startPress}
-      onTouchEnd={endPress}
-      onTouchCancel={endPress}
     >
       <button 
         className="lc-avatar-btn" 
@@ -184,26 +154,6 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
           {creator.home_club}
         </div>
       )}
-
-      {/* Now Playing peek - lazy load video only when peeking */}
-      <div className="lc-peek" aria-hidden={!peeking}>
-        {peeking && creator.latest_short_preview?.mp4Url ? (
-          <video
-            className="lc-peek-video"
-            src={creator.latest_short_preview.mp4Url}
-            muted
-            playsInline
-            autoPlay
-            loop
-          />
-        ) : creator.latest_short_preview?.posterUrl ? (
-          <img 
-            className="lc-peek-poster" 
-            src={creator.latest_short_preview.posterUrl} 
-            alt="" 
-          />
-        ) : null}
-      </div>
     </div>
   );
 }

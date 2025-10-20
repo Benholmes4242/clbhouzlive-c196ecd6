@@ -147,37 +147,7 @@
   color: #000 !important; 
 }
 
-/* Peek card */
-.lc-peek {
-  position: absolute;
-  left: 6px;
-  right: 6px;
-  bottom: 6px;
-  translate: 0 8px;
-  opacity: 0;
-  border-radius: 14px;
-  overflow: hidden;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  background: rgba(0, 0, 0, 0.24);
-  pointer-events: none;
-  transition: opacity 0.18s ease, translate 0.18s ease;
-  min-height: 56px;
-  max-height: 120px;
-}
-
-.lc-peek-video,
-.lc-peek-poster {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.lc-tile.is-peeking .lc-peek {
-  opacity: 1;
-  translate: 0 0;
-}
+/* Peek card styles removed - feature disabled */
 
 /* Nearby bubble styling */
 .lc-nearby {
@@ -285,10 +255,6 @@
 @media (prefers-reduced-motion: reduce) {
   .lc-avatar-btn::after {
     animation: none !important;
-  }
-  
-  .lc-peek {
-    transition: none;
   }
 
   .lc-nearby .lc-nearby-avatar::before,
