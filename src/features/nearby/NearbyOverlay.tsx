@@ -1,10 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, MapPin, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NearbyGolfer } from './types';
 import { useNearbyGolfers } from './useNearbyGolfers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { VisibilityToggle } from './components/VisibilityToggle';
+import { GameBeaconComposer } from './components/GameBeaconComposer';
+import { useVisibility } from './hooks/useVisibility';
+import { useGameBeacon } from './hooks/useGameBeacon';
 
 interface NearbyOverlayProps {
   isOpen: boolean;
@@ -13,16 +17,28 @@ interface NearbyOverlayProps {
 
 export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   const { data: golfers = [], isLoading } = useNearbyGolfers();
+  const { visible, setVisible } = useVisibility();
+  const { activeBeacon, createBeacon, cancelBeacon, sendQuickPing } = useGameBeacon();
+  const [showComposer, setShowComposer] = useState(false);
+
+  const handleCreateBeacon = async (draft: any) => {
+    await createBeacon(draft);
+    setShowComposer(false);
+  };
 
   useEffect(() => {
     if (!isOpen) return;
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (showComposer) {
+        setShowComposer(false);
+      } else if (e.key === 'Escape') {
+        onClose();
+      }
     };
 
     const handleBackdropClick = (e: MouseEvent) => {
-      if ((e.target as HTMLElement).classList.contains('nearby-overlay-backdrop')) {
+      if (!showComposer && (e.target as HTMLElement).classList.contains('nearby-overlay-backdrop')) {
         onClose();
       }
     };
@@ -36,7 +52,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       document.removeEventListener('click', handleBackdropClick);
       document.body.style.overflow = '';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, showComposer]);
 
   useEffect(() => {
     if (isOpen && golfers.length > 0) {
@@ -68,19 +84,20 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
         aria-labelledby="nearby-title"
       >
         {/* Header */}
-        <div className="flex items-start justify-between p-6 pb-4 border-b border-black/10">
-          <div>
-            <h2 id="nearby-title" className="text-[17px] font-semibold" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
-              Players near you
-            </h2>
+        <div className="flex items-center justify-between px-6 border-b border-black/10" style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+          <h2 id="nearby-title" className="text-[17px] font-semibold" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
+            Players near you
+          </h2>
+          <div className="flex items-center gap-3">
+            <VisibilityToggle value={visible} onChange={setVisible} />
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-black/5 transition-colors"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" style={{ color: 'rgba(0, 0, 0, 0.6)' }} />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-black/5 transition-colors"
-            aria-label="Close"
-          >
-            <X className="w-5 h-5" style={{ color: 'rgba(0, 0, 0, 0.6)' }} />
-          </button>
         </div>
 
         {/* Content */}
@@ -116,23 +133,63 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           )}
         </div>
 
+        {/* Active Beacon Summary */}
+        {activeBeacon && (
+          <div className="px-4 py-3 border-b border-black/10" style={{ background: 'rgba(110, 146, 119, 0.1)' }}>
+            <div className="text-sm font-medium mb-2" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
+              Beacon sent — {activeBeacon.playersNeeded} player{activeBeacon.playersNeeded > 1 ? 's' : ''} notified
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowComposer(true)}
+                className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+                style={{ background: 'rgba(255, 255, 255, 0.9)', color: 'rgba(0, 0, 0, 0.88)' }}
+              >
+                Manage beacon
+              </button>
+              <button
+                onClick={() => cancelBeacon(activeBeacon.id)}
+                className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+                style={{ color: '#dc2626' }}
+              >
+                Cancel beacon
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Footer CTA */}
         {golfers.length > 0 && (
-          <div className="p-4 border-t border-black/10">
+          <div className="p-4 border-t border-black/10 space-y-2">
             <Button
-              variant="outline"
               className="w-full"
               onClick={() => {
-                analyticsEvents.track('nearby_playnow_clicked');
-                // TODO: Open message composer with template
-                console.log('Play now clicked');
+                analyticsEvents.track('beacon_open_composer');
+                setShowComposer(true);
               }}
+              style={{ background: '#6e9277', color: 'white' }}
             >
-              Play now
+              Create game
             </Button>
+            <button
+              onClick={sendQuickPing}
+              className="w-full py-2 text-sm font-medium rounded-lg transition-colors"
+              style={{ color: 'rgba(0, 0, 0, 0.7)' }}
+            >
+              Quick ping
+            </button>
           </div>
         )}
       </div>
+
+      {/* Composer */}
+      {showComposer && (
+        <GameBeaconComposer
+          onSubmit={handleCreateBeacon}
+          onCancel={() => setShowComposer(false)}
+          initialDraft={activeBeacon || undefined}
+        />
+      )}
     </div>,
     document.body
   );
