@@ -141,8 +141,8 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
       </div>
 
       <div className="lc-label">
-        <div className="lc-name" title="Nearby golfers">
-          Nearby golfers
+        <div className="lc-name" title="Nearby Golfers">
+          Nearby Golfers
         </div>
         <div className="lc-sub">{nearText}</div>
       </div>
