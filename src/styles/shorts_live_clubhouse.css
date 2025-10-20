@@ -195,104 +195,72 @@
 }
 
 /* ============================= */
-/* Nearby pin — premium glass UI */
+/* Nearby pin — animated radar   */
 /* ============================= */
 
-/* Glass base circle with subtle depth */
-.lc-nearby-avatar {
+/* Outer container – the "tile" footprint */
+.lc-nearby-pin {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
   width: 72px;
   height: 72px;
+}
+
+/* Masked shell for the rings */
+.lc-nearby-shell {
+  position: absolute;
+  inset: 0;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(110,146,119,0.04) 100%);
-  border: 1px solid rgba(110,146,119,0.15);
-  box-shadow: 
-    inset 0 0 0 1px rgba(0,0,0,0.06),
-    0 1px 2px rgba(0,0,0,0.04);
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.05));
+  overflow: hidden;
+  background: #fbfdfb;
+  box-shadow: 0 1px 6px rgb(0 0 0 / 12%);
+  z-index: 1;
 }
 
-/* Polished SVG pin with gradient and shadow */
-.lc-nearby .lc-pin-svg {
-  position: relative;
+/* Emoji layer – sits above the mask, cannot be clipped */
+.lc-pin-emoji {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  line-height: 1;
   z-index: 3;
-  width: 24px; 
-  height: 24px;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
 }
 
-/* Gradient fill for pin */
-.lc-nearby .lc-pin-svg path {
-  fill: url(#pinGradient);
-}
-
-/* Pulse rings - refined echo green animation */
-.lc-nearby .lc-nearby-avatar::before,
-.lc-nearby .lc-nearby-avatar::after {
+/* Rings attached to the masked shell */
+.lc-nearby-shell::before,
+.lc-nearby-shell::after {
   content: "";
   position: absolute;
-  left: 50%; 
+  left: 50%;
   top: 50%;
-  width: 80%;
-  height: 80%;
-  transform: translate(-50%, -50%) scale(1);
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  transform: translate(-50%, -50%) scale(.30);
   border-radius: 50%;
   box-sizing: border-box;
-  border: 2px solid rgba(110,146,119,0.58);
-  opacity: 1;
-  background: none;
-  filter: blur(2px);
-  animation: lcPulse 3s ease-in-out infinite;
+  border: 2px solid rgba(110,146,119,.72);
+  opacity: .9;
   z-index: 2;
+  background: none;
+  animation: lcRing 3s ease-out infinite;
 }
 
-/* Stagger second pulse */
-.lc-nearby .lc-nearby-avatar::after {
+.lc-nearby-shell::after {
   animation-delay: 1.5s;
+  border-color: rgba(110,146,119,.58);
 }
 
-/* Smooth pulse expansion and fade */
-@keyframes lcPulse {
-  0% { 
-    transform: translate(-50%, -50%) scale(1); 
-    opacity: 0.58; 
-  }
-  100% { 
-    transform: translate(-50%, -50%) scale(1.31); 
-    opacity: 0; 
-  }
-}
-
-/* Optional light sweep for premium touch */
-@keyframes lightSweep {
-  0% {
-    transform: translateX(-100%) translateY(-100%) rotate(45deg);
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.12;
-  }
-  100% {
-    transform: translateX(100%) translateY(100%) rotate(45deg);
-    opacity: 0;
-  }
-}
-
-.lc-nearby-avatar::after {
-  animation: lightSweep 10s ease-in-out infinite;
+/* Expand to the rim, then fade out */
+@keyframes lcRing {
+  0%   { transform: translate(-50%,-50%) scale(0.30); opacity: .90; }
+  80%  { transform: translate(-50%,-50%) scale(1.00); opacity: .28; }  /* reaches rim */
+  100% { transform: translate(-50%,-50%) scale(1.05); opacity: 0; }    /* gentle fade past rim */
 }
 
 @media (prefers-color-scheme: dark) {
-  .lc-nearby-avatar {
-    background: radial-gradient(circle, rgba(110,146,119,0.15) 0%, rgba(110,146,119,0.08) 100%);
-    border-color: rgba(110,146,119,0.25);
-    box-shadow: 
-      inset 0 0 0 1px rgba(255,255,255,0.06),
-      0 1px 2px rgba(0,0,0,0.15);
+  .lc-nearby-shell {
+    background: rgba(110, 146, 119, 0.2);
   }
 }
 
@@ -306,8 +274,8 @@
     transition: none;
   }
 
-  .lc-nearby .lc-nearby-avatar::before,
-  .lc-nearby .lc-nearby-avatar::after {
+  .lc-nearby-shell::before,
+  .lc-nearby-shell::after {
     animation: none;
     opacity: .35;
     transform: translate(-50%,-50%) scale(.85);

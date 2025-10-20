@@ -86,16 +86,9 @@ function NearbyTile({ count }: { count: number }) {
       onClick={handleClick}
     >
       <div className="lc-avatar-btn">
-        <div className="lc-nearby-avatar" aria-label="Nearby golfers">
-          <svg className="lc-pin-svg" viewBox="0 0 24 24" role="img" aria-hidden="true">
-            <defs>
-              <linearGradient id="pinGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#EB4D4D" />
-                <stop offset="100%" stopColor="#FF6C6C" />
-              </linearGradient>
-            </defs>
-            <path d="M12 2a7 7 0 0 0-7 7c0 5.05 7 13 7 13s7-7.95 7-13a7 7 0 0 0-7-7zm0 10.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/>
-          </svg>
+        <div className="lc-nearby-pin">
+          <div className="lc-nearby-shell" aria-hidden="true"></div>
+          <div className="lc-pin-emoji" aria-hidden="true">📍</div>
         </div>
       </div>
       <div className="lc-name" title="Nearby golfers">
