@@ -171,105 +171,75 @@
 
 /* Echo green color tokens */
 :root {
-  --echo-green-1: #7CA68A;
-  --echo-green-2: #6E9277;
-  --echo-green-3: #4F7159;
+  --lc-green-1: #6e9277;       /* Echo green */
+  --lc-green-2: #7CAD89;       /* lighter blend */
+  --lc-green-3: #557A61;       /* darker blend */
+  --lc-av-size: 72px;          /* avatar circle */
+  --lc-ring: 2px;              /* outer stroke width */
 }
 
-/* Glass base circle - 72×72 with white/subtle gradient */
+/* Avatar container (hard mask + soft background) */
 .lc-nearby-avatar {
   position: relative;
-  width: 72px;
-  height: 72px;
+  width: var(--lc-av-size);
+  height: var(--lc-av-size);
   border-radius: 50%;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-  isolation: isolate;
-  background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.88) 100%);
-  border: 1px solid rgba(110,146,119,0.12);
-  box-shadow: 
-    0 1px 3px rgba(0,0,0,0.08),
-    inset 0 0 0 1px rgba(255,255,255,0.4);
-  -webkit-mask-image: radial-gradient(circle, #000 98%, transparent 100%);
-  mask-image: radial-gradient(circle, #000 98%, transparent 100%);
+  overflow: hidden; /* ensures all effects stay inside */
+  background: radial-gradient(60% 60% at 50% 40%, rgba(110,146,119,.08) 0%, rgba(110,146,119,.02) 100%), #ffffff;
+  border: var(--lc-ring) solid rgba(110,146,119,.25);
+  box-shadow: 0 1px 0 rgba(0,0,0,.02) inset, 0 8px 18px rgba(0,0,0,.08);
+  -webkit-mask-image: radial-gradient(circle, #000 98%, transparent 100%); /* iOS belt & braces */
 }
 
-/* Pin wrapper - handles animation and shadow */
-.nearby-pin-wrap {
-  position: relative;
-  will-change: transform, opacity;
-  animation: nearbyPinPulse 3s ease-in-out infinite;
-  filter: drop-shadow(0 0 6px rgba(110,146,119,0.55));
-}
-
-/* Gentle pulse animation */
-@keyframes nearbyPinPulse {
-  0%   { transform: scale(1);   opacity: 1;   }
-  50%  { transform: scale(1.05); opacity: 0.95; }
-  100% { transform: scale(1);   opacity: 1;   }
-}
-
-/* Pin icon - 54px fills ~75% of 72px circle */
-.nearby-pin-icon {
-  display: block;
-  width: 54px;
-  height: 54px;
-  transform: translateY(1px); /* micro-centering */
-}
-
-/* Platform shadow (creates grounding effect) */
-.nearby-pin-wrap::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 10px;
-  transform: translateX(-50%);
-  width: 24px;
-  height: 6px;
-  background: rgba(0,0,0,0.10);
-  border-radius: 999px;
-  filter: blur(2px);
-  z-index: -1;
-}
-
-/* Radar rings (only on Nearby tile, not creator avatars) */
-.lc-nearby .lc-nearby-avatar::before,
-.lc-nearby .lc-nearby-avatar::after {
-  content: "";
+/* subtle checker sits under the pin */
+.lc-nearby-avatar .lc-checker {
   position: absolute;
   inset: 0;
-  border-radius: inherit;
+  opacity: .7; /* pattern stops control final darkness; leave this modest */
+}
+
+/* Leaf pin icon */
+.lc-nearby-avatar .lc-leaf-pin {
+  position: absolute;
+  width: 60%; /* tune visual weight */
+  height: 60%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -52%); /* tiny bias upward for balance */
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,.35)) drop-shadow(0 6px 12px rgba(0,0,0,.12));
+}
+
+/* Inner radar pulse (inside only) */
+.lc-nearby-avatar .lc-nearby-pulse {
+  position: absolute;
+  inset: 8%; /* start well inside rim */
+  border-radius: 50%;
   pointer-events: none;
-  background: radial-gradient(
-    circle,
-    rgba(110,146,119,0.5) 0,
-    rgba(110,146,119,0.5) 1px,
-    rgba(110,146,119,0) 2px
-  );
-  transform: scale(0.70);
-  opacity: 0.45;
-  animation: nearbyRings 3s ease-in-out infinite;
+  background: radial-gradient(circle, rgba(110,146,119,.65) 0 1px, rgba(110,146,119,0) 1.5px);
+  animation: lcPulseIn 3s ease-in-out infinite;
+  opacity: .85;
 }
 
-.lc-nearby .lc-nearby-avatar::after {
-  animation-delay: 1.5s;
-}
-
-@keyframes nearbyRings {
-  0%   { transform: scale(0.70); opacity: 0.45; }
-  80%  { transform: scale(1.02); opacity: 0.06; }
+@keyframes lcPulseIn {
+  0% { transform: scale(.78); opacity: .85; }
+  80% { transform: scale(1.02); opacity: .08; } /* reach near inner rim */
   100% { transform: scale(1.02); opacity: 0; }
 }
 
-/* Dark mode adjustments */
+/* Dark mode polish */
 @media (prefers-color-scheme: dark) {
   .lc-nearby-avatar {
-    background: radial-gradient(circle, rgba(110,146,119,0.18) 0%, rgba(110,146,119,0.12) 100%);
-    border-color: rgba(110,146,119,0.25);
-    box-shadow: 
-      0 1px 3px rgba(0,0,0,0.2),
-      inset 0 0 0 1px rgba(255,255,255,0.08);
+    background: radial-gradient(60% 60% at 50% 40%, rgba(110,146,119,.12) 0%, rgba(110,146,119,.05) 100%), #111214;
+    border-color: rgba(110,146,119,.35);
+    box-shadow: 0 8px 18px rgba(0,0,0,.45);
+  }
+  
+  .lc-name {
+    color: rgba(255,255,255,.92);
+  }
+  
+  .lc-sub {
+    color: rgba(255,255,255,.72);
   }
 }
 
@@ -279,12 +249,7 @@
     animation: none !important;
   }
 
-  .nearby-pin-wrap {
-    animation: none;
-  }
-
-  .lc-nearby .lc-nearby-avatar::before,
-  .lc-nearby .lc-nearby-avatar::after {
+  .lc-nearby-avatar .lc-nearby-pulse {
     animation: none;
     opacity: 0.35;
     transform: scale(0.85);

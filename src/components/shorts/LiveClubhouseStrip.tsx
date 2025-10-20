@@ -87,36 +87,67 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
     onOpen();
   };
 
-  const nearText = count > 9 
-    ? '9+ players near you'
-    : `${count} ${count === 1 ? 'player' : 'players'} near you`;
+  const nearText = count > 0 
+    ? (count > 9 ? '9+ players near you' : `${count} ${count === 1 ? 'player' : 'players'} near you`)
+    : 'Check who\'s close';
 
   return (
     <button 
+      type="button"
       className="lc-tile lc-nearby" 
       role="option" 
-      aria-label="Nearby golfers"
+      aria-label={`Nearby golfers, ${count} ${count === 1 ? 'player' : 'players'} near you`}
       onClick={handleClick}
     >
       <div className="lc-avatar-btn">
-        <div className="lc-nearby-avatar" role="img" aria-label="Nearby golfers">
-          <div className="nearby-pin-wrap">
-            <svg className="nearby-pin-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <defs>
-                <linearGradient id="nearbyPinGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#7CA68A" />
-                  <stop offset="100%" stopColor="#4F7159" />
-                </linearGradient>
-              </defs>
-              <path d="M12 2a7 7 0 0 0-7 7c0 5.05 7 13 7 13s7-7.95 7-13a7 7 0 0 0-7-7zm0 10.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="url(#nearbyPinGradient)" />
-            </svg>
-          </div>
+        <div className="lc-nearby-avatar">
+          {/* faint checker pattern */}
+          <svg aria-hidden="true" className="lc-checker" viewBox="0 0 12 12" preserveAspectRatio="none">
+            <defs>
+              <pattern id="lcCheck" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
+                <rect width="6" height="6" fill="rgba(110,146,119,.05)"/>
+                <rect width="3" height="3" fill="rgba(110,146,119,.08)"/>
+                <rect x="3" y="3" width="3" height="3" fill="rgba(110,146,119,.08)"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#lcCheck)" />
+          </svg>
+
+          {/* leaf pin */}
+          <svg aria-hidden="true" className="lc-leaf-pin" viewBox="0 0 64 64">
+            <defs>
+              <radialGradient id="leafGlow" cx="50%" cy="35%" r="70%">
+                <stop offset="0%" stopColor="rgba(110,146,119,.28)"/>
+                <stop offset="100%" stopColor="rgba(110,146,119,0)"/>
+              </radialGradient>
+              <linearGradient id="leafBody" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#7CAD89"/>
+                <stop offset="100%" stopColor="#557A61"/>
+              </linearGradient>
+            </defs>
+
+            {/* glow behind pin (stays inside mask) */}
+            <circle cx="32" cy="35" r="22" fill="url(#leafGlow)" />
+
+            {/* pin (leaf marker) */}
+            <path
+              d="M32 14c-8.8 0-16 7.2-16 16 0 11.4 16 24 16 24s16-12.6 16-24c0-8.8-7.2-16-16-16z"
+              fill="url(#leafBody)"
+            />
+            <circle cx="32" cy="30" r="6.5" fill="#fff" />
+          </svg>
+
+          {/* inner pulse ring – INSIDE only */}
+          <span className="lc-nearby-pulse" aria-hidden="true" />
         </div>
       </div>
-      <div className="lc-name" title="Nearby golfers">
-        Nearby golfers
+
+      <div className="lc-label">
+        <div className="lc-name" title="Nearby golfers">
+          Nearby golfers
+        </div>
+        <div className="lc-sub">{nearText}</div>
       </div>
-      <div className="lc-sub">{nearText}</div>
     </button>
   );
 }
