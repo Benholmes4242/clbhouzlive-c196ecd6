@@ -137,8 +137,6 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
             <circle cx="32" cy="30" r="6.5" fill="#fff" />
           </svg>
 
-          {/* inner pulse ring – INSIDE only */}
-          <span className="lc-nearby-pulse" aria-hidden="true" />
         </div>
       </div>
 

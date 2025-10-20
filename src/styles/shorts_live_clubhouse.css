@@ -72,38 +72,10 @@
   position: relative;
 }
 
-/* Pulse for recent posts - strong visible ring ONLY on creator avatars */
+/* Solid outline for recent posts - no pulse animation */
 .lc-recent .lc-avatar {
   outline: 2px solid #6e9277 !important;
   outline-offset: 2px;
-}
-
-.lc-recent .lc-avatar-btn::after {
-  content: "";
-  position: absolute;
-  inset: 6px;
-  border-radius: 50%;
-  border: 2px solid rgba(110, 146, 119, 0.45);
-  transform: scale(0.98);
-  opacity: 0.9;
-  animation: lcPulse 1.4s ease-out infinite;
-  pointer-events: none;
-}
-
-/* Ensure pulse doesn't apply to nearby tile */
-.lc-nearby .lc-avatar-btn::after {
-  display: none;
-}
-
-@keyframes lcPulse {
-  0% {
-    transform: scale(0.95);
-    opacity: 0.9;
-  }
-  100% {
-    transform: scale(1.15);
-    opacity: 0;
-  }
 }
 
 /* Online dot - positioned to avoid clipping */
@@ -232,21 +204,7 @@
   filter: drop-shadow(0 1px 0 rgba(255,255,255,.35)) drop-shadow(0 6px 12px rgba(0,0,0,.12));
 }
 
-/* Inner radar pulse (inside only) - ONLY on nearby tile */
-.lc-nearby-avatar .lc-nearby-pulse {
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(circle, rgba(110,146,119,.65) 0 1px, rgba(110,146,119,0) 1.5px);
-  animation: lcPulseIn 3s ease-in-out infinite;
-  opacity: 0.85;
-  z-index: 1;
-}
-
-@keyframes lcPulseIn {
-  0% { transform: scale(0.78); opacity: 0.85; }
-  80% { transform: scale(1.06); opacity: 0.08; }
-  100% { transform: scale(1.06); opacity: 0; }
-}
+/* Pulse animation removed - keeping static design only */
 
 /* Dark mode disabled during development */
 /* @media (prefers-color-scheme: dark) {
@@ -265,15 +223,7 @@
   }
 } */
 
-/* Reduced motion */
+/* Reduced motion - no animations to disable */
 @media (prefers-reduced-motion: reduce) {
-  .lc-avatar-btn::after {
-    animation: none !important;
-  }
-
-  .lc-nearby-avatar .lc-nearby-pulse {
-    animation: none;
-    opacity: 0.35;
-    transform: scale(0.85);
-  }
+  /* All animations removed - static design only */
 }
