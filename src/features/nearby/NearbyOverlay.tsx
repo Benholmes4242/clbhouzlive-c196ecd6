@@ -50,9 +50,9 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   return (
     <>
       <BottomSheet open={isOpen} onClose={onClose} zIndexBase={1400} ariaLabelledBy="nearby-title">
-        <div className={`flex flex-col h-full ${showComposer ? 'sheet-dim' : ''}`}>
+        <div className={`max-h-[78vh] flex flex-col ${showComposer ? 'sheet-dim' : ''}`}>
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-black/10" style={{ padding: '12px 20px' }}>
+          <div className="flex items-center justify-between border-b border-black/10 shrink-0" style={{ padding: '12px 20px' }}>
             <h2 id="nearby-title" className="text-[18px] font-semibold" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
               Golfers near you
             </h2>
@@ -68,8 +68,8 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             </div>
           </div>
 
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto" style={{ padding: '0 16px 12px' }}>
+          {/* Scrollable Content */}
+          <div className="grow overflow-y-auto overscroll-contain" style={{ padding: '0 16px 12px' }}>
           {isLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
@@ -126,9 +126,9 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             </div>
           )}
 
-          {/* Footer CTA */}
+          {/* Sticky Footer */}
           {golfers.length > 0 && (
-            <div className="border-t border-black/10 space-y-3" style={{ padding: '12px 16px 16px' }}>
+            <div className="border-t border-black/10 space-y-3 shrink-0 sticky bottom-0 bg-white/75 backdrop-blur-sm" style={{ padding: '12px 16px 16px' }}>
             <Button
               className="w-full"
               onClick={() => {
@@ -186,54 +186,35 @@ function GolferRow({ golfer, index }: GolferRowProps) {
     : null;
 
   return (
-    <div
-      className="flex items-center gap-4 p-4 rounded-xl transition-all hover:shadow-sm active:scale-[0.98]"
-      style={{
-        background: 'rgba(255, 255, 255, 0.6)',
-        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
-      }}
+    <article
+      className="rounded-2xl bg-white shadow-sm ring-1 ring-black/5 px-4 py-3 mb-3"
+      aria-label={`${golfer.display_name}, ${golfer.home_club || 'No home club'}, ${distanceText || 'Distance unknown'}`}
     >
-      {/* Avatar */}
-      <div className="relative flex-shrink-0">
-        <img
-          src={golfer.avatar_url || '/placeholder.svg'}
-          alt={golfer.display_name}
-          className="w-12 h-12 rounded-2xl object-cover"
-        />
-        {golfer.is_online && (
-          <span
-            className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white"
-            style={{ background: '#6e9277' }}
-            aria-label="Online"
+      <div className="grid grid-cols-[56px_1fr] gap-3 items-center">
+        {/* Avatar - spans 3 rows */}
+        <div className="row-span-3 relative">
+          <img
+            src={golfer.avatar_url || '/placeholder.svg'}
+            alt={golfer.display_name}
+            className="w-14 h-14 rounded-2xl object-cover"
           />
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className="font-semibold text-[15px] mb-0.5" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
-          {golfer.display_name}
-        </div>
-        {golfer.home_club && (
-          <div className="text-[13px] mb-1" style={{ color: 'rgba(0, 0, 0, 0.6)' }}>
-            {golfer.home_club}
-          </div>
-        )}
-        <div className="flex items-center gap-2 flex-wrap">
-          {golfer.isOpenToPlay && (
-            <span 
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-              style={{ 
-                background: '#6e9277',
-                color: 'white'
-              }}
-            >
-              🟢 Open to Play
-            </span>
+          {golfer.is_online && (
+            <span
+              className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white"
+              style={{ background: '#6e9277' }}
+              aria-label="Online"
+            />
           )}
+        </div>
+
+        {/* Row 1: Name + Distance */}
+        <div className="flex items-center justify-between min-w-0 gap-2">
+          <h3 className="font-semibold text-[16px] truncate" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
+            {golfer.display_name}
+          </h3>
           {distanceText && (
             <span 
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
               style={{ 
                 background: 'rgba(0, 0, 0, 0.08)',
                 color: 'rgba(0, 0, 0, 0.7)'
@@ -243,9 +224,18 @@ function GolferRow({ golfer, index }: GolferRowProps) {
               {distanceText}
             </span>
           )}
+        </div>
+
+        {/* Row 2: Club + Same home club pill */}
+        <div className="flex items-center justify-between min-w-0 gap-2">
+          {golfer.home_club && (
+            <p className="text-[13px] truncate" style={{ color: 'rgba(0, 0, 0, 0.6)' }}>
+              {golfer.home_club}
+            </p>
+          )}
           {golfer.same_club && (
             <span 
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
               style={{ 
                 background: 'rgba(110, 146, 119, 0.2)',
                 color: '#6e9277'
@@ -256,40 +246,57 @@ function GolferRow({ golfer, index }: GolferRowProps) {
             </span>
           )}
         </div>
-      </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <Button
-          size="sm"
-          variant={isFollowing ? 'outline' : 'default'}
-          onClick={handleFollow}
-          className="h-7 px-3 text-xs font-bold"
-          style={!isFollowing ? { 
-            background: '#6e9277',
-            color: 'white',
-            border: 'none'
-          } : {
-            borderColor: '#6e9277',
-            color: '#6e9277'
-          }}
-          aria-pressed={isFollowing}
-        >
-          {isFollowing ? 'Following ✓' : 'Follow'}
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleMessage}
-          className="h-7 px-3 text-xs"
-          style={{
-            borderColor: '#6e9277',
-            color: '#6e9277'
-          }}
-        >
-          Message
-        </Button>
+        {/* Row 3: Open to Play pill + Follow/Message buttons */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center">
+            {golfer.isOpenToPlay && (
+              <span 
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+                style={{ 
+                  background: '#6e9277',
+                  color: 'white'
+                }}
+              >
+                🟢 Open to Play
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              size="sm"
+              variant={isFollowing ? 'outline' : 'default'}
+              onClick={handleFollow}
+              className="h-7 px-3 text-xs font-semibold"
+              style={!isFollowing ? { 
+                background: '#6e9277',
+                color: 'white',
+                border: 'none'
+              } : {
+                borderColor: '#6e9277',
+                color: '#6e9277',
+                background: 'white'
+              }}
+              aria-pressed={isFollowing}
+            >
+              {isFollowing ? 'Following' : 'Follow'}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleMessage}
+              className="h-7 px-3 text-xs font-semibold"
+              style={{
+                borderColor: '#6e9277',
+                color: '#6e9277',
+                background: 'white'
+              }}
+            >
+              Message
+            </Button>
+          </div>
+        </div>
       </div>
-    </div>
+    </article>
   );
 }
