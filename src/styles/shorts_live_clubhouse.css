@@ -7,18 +7,7 @@
   background: transparent;
 }
 
-.live-row::after {
-  content: "";
-  position: absolute;
-  left: 16px;
-  right: 16px;
-  bottom: 0;
-  height: 2px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, transparent, rgba(110, 146, 119, 0.5), transparent);
-  opacity: var(--scrolling, 0.25);
-  transition: opacity 0.25s ease;
-}
+/* Divider line removed */
 
 /* Horizontal scroll track */
 .live-scroll {
