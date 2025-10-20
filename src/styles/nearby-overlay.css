@@ -1,0 +1,60 @@
+/* Nearby Overlay Styles */
+
+/* Avatar wrapper with pulse animation */
+.nearby-golfer-avatar-wrapper {
+  position: relative;
+  display: block;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Pulse rings INSIDE avatar only */
+.nearby-golfer-avatar-wrapper::before,
+.nearby-golfer-avatar-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at center,
+    rgba(110,146,119,.55) 0,
+    rgba(110,146,119,.55) 1px,
+    rgba(110,146,119,0) 1.5px);
+  transform: scale(.82);
+  opacity: .9;
+  animation: nearbyPulse 3s ease-in-out infinite;
+  z-index: 1;
+}
+
+/* Stagger second ring */
+.nearby-golfer-avatar-wrapper::after {
+  animation-delay: 1.5s;
+}
+
+@keyframes nearbyPulse {
+  0% {
+    transform: scale(.82);
+    opacity: .9;
+  }
+  80% {
+    transform: scale(1.05);
+    opacity: .08;
+  }
+  100% {
+    transform: scale(1.05);
+    opacity: 0;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .nearby-golfer-avatar-wrapper::before,
+  .nearby-golfer-avatar-wrapper::after {
+    animation: none;
+    opacity: .35;
+    transform: scale(.85);
+  }
+}
