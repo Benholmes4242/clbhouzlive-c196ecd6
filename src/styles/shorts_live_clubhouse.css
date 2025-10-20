@@ -144,6 +144,11 @@
   border: none;
   background: transparent;
   padding: 0;
+  overflow: hidden;
+}
+
+.lc-nearby .lc-avatar-btn {
+  overflow: visible; /* Allow pulse to show within tile bounds */
 }
 
 .lc-nearby .lc-name { 
