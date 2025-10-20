@@ -69,7 +69,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           </div>
 
           {/* Scrollable Content */}
-          <div className="grow overflow-y-auto overscroll-contain" style={{ padding: '0 16px 12px' }}>
+          <div className="px-4 pt-4 pb-3 grow overflow-y-auto overscroll-contain">
           {isLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
