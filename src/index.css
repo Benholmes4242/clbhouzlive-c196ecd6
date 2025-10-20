@@ -85,6 +85,10 @@ html, body {
 
 /* Enhanced safe area inset support */
 :root {
+  /* Z-index layers */
+  --z-echo-fab: 1200;
+  --z-nearby-overlay: 1400;
+  
   --safe-top: 0px; 
   --safe-bottom: 0px; 
   --safe-left: 0px; 
