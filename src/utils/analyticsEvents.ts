@@ -117,5 +117,37 @@ export const analyticsEvents = {
         session_id: sessionStorage.getItem('session_id') || 'unknown'
       });
     }
+  },
+
+  // Nearby overlay events
+  nearby: {
+    opened: (count: number) => {
+      analyticsEvents.track('nearby_opened', {
+        count,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    },
+
+    followClicked: (golferId: string, position: number) => {
+      analyticsEvents.track('nearby_follow_clicked', {
+        golfer_id: golferId,
+        position,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    },
+
+    messageClicked: (golferId: string, position: number) => {
+      analyticsEvents.track('nearby_message_clicked', {
+        golfer_id: golferId,
+        position,
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    },
+
+    playNowClicked: () => {
+      analyticsEvents.track('nearby_playnow_clicked', {
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    }
   }
 };

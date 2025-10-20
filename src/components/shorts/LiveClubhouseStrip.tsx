@@ -3,6 +3,7 @@ import { useLiveClubhouseProfiles } from '@/hooks/useLiveClubhouseProfiles';
 import { useNearbyShorts } from '@/utils/nearbyShorts';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
+import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
 import '@/styles/shorts_live_clubhouse.css';
 
 const SEEN_KEY = 'seenCreatorImmersiveIds';
@@ -12,6 +13,7 @@ export function LiveClubhouseStrip() {
   const nearby = useNearbyShorts();
   const rowRef = useRef<HTMLDivElement>(null);
   const [scrolling, setScrolling] = useState(false);
+  const [nearbyOverlayOpen, setNearbyOverlayOpen] = useState(false);
 
   useEffect(() => {
     const el = rowRef.current;
@@ -47,36 +49,47 @@ export function LiveClubhouseStrip() {
   const showNearby = nearby.hasNearby;
   
   return (
-    <div className="live-row">
-      <div 
-        className="live-scroll" 
-        ref={rowRef} 
-        role="listbox" 
-        aria-label="Suggested creators"
-      >
-        {showNearby && <NearbyTile count={nearby.count} />}
-        {creators.map((c, idx) => (
-          <LiveTile 
-            key={c.id} 
-            creator={c} 
-            index={showNearby ? idx + 1 : idx} 
-          />
-        ))}
+    <>
+      <div className="live-row">
+        <div 
+          className="live-scroll" 
+          ref={rowRef} 
+          role="listbox" 
+          aria-label="Suggested creators"
+        >
+          {showNearby && (
+            <NearbyTile 
+              count={nearby.count} 
+              onOpen={() => setNearbyOverlayOpen(true)} 
+            />
+          )}
+          {creators.map((c, idx) => (
+            <LiveTile 
+              key={c.id} 
+              creator={c} 
+              index={showNearby ? idx + 1 : idx} 
+            />
+          ))}
+        </div>
       </div>
-    </div>
+
+      <NearbyOverlay 
+        isOpen={nearbyOverlayOpen} 
+        onClose={() => setNearbyOverlayOpen(false)} 
+      />
+    </>
   );
 }
 
-function NearbyTile({ count }: { count: number }) {
+function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
   const handleClick = () => {
     analyticsEvents.lcStrip.nearbyOpen(count);
-    // Apply nearby filter to URL
-    const url = new URL(window.location.href);
-    url.searchParams.set('nearby', 'true');
-    window.history.replaceState({}, '', url.toString());
+    onOpen();
   };
 
-  const nearText = `${count} ${count === 1 ? 'player' : 'players'} near you`;
+  const nearText = count > 9 
+    ? '9+ players near you'
+    : `${count} ${count === 1 ? 'player' : 'players'} near you`;
 
   return (
     <button 
