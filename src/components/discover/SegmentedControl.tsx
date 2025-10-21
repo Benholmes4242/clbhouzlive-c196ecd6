@@ -54,7 +54,13 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
     >
       {/* Tab buttons */}
       <div className="discover-tabs flex w-full items-center">
-        <div className="flex flex-1">
+        <div className="flex flex-1 relative">
+          {/* Floating grey pill indicator */}
+          <div
+            className="absolute pill-indicator transition-all duration-300 ease-out"
+            style={indicatorStyle}
+          />
+          
           {tabs.map((tab, index) => (
             <button
               key={tab.id}

@@ -1,10 +1,11 @@
-/* Discover Tabs - Frosted Glass Harmony */
+/* Discover Tabs - Subtle Grey Pill */
 
 /* Tokens */
 :root {
-  --tab-active-color: #f5a623;
-  --tab-active-gradient: linear-gradient(135deg, #f5a623, #ff8c00);
-  --tab-active-shadow: 0 2px 8px rgba(245,166,35,0.25);
+  --tab-active-color: #000000;
+  --tab-inactive-color: rgba(0, 0, 0, 0.5);
+  --pill-bg: rgba(0, 0, 0, 0.06);
+  --divider-color: rgba(0, 0, 0, 0.1);
 }
 
 /* Tab container */
@@ -15,52 +16,36 @@
   align-items: center;
 }
 
+/* Floating grey pill indicator */
+.pill-indicator {
+  position: absolute;
+  height: 36px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--pill-bg);
+  border-radius: 20px;
+  z-index: 0;
+  pointer-events: none;
+}
+
 /* Base tab */
 .discover-tab {
   position: relative;
   padding: 12px 0;
-  color: rgba(0,0,0,0.65);
+  color: var(--tab-inactive-color);
   font-weight: 500;
-  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: color 0.2s ease;
 }
 
-.discover-tab:active {
-  transform: scale(0.97);
-}
-
-/* Active state with spring animation */
+/* Active state */
 .discover-tab.active {
-  color: #f5a623;
+  color: var(--tab-active-color);
   font-weight: 600;
-  transform: scale(1.04);
-  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Underline with glow (pseudo element) - REMOVED */
-/* .discover-tab.active::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  height: var(--tab-underline-h);
-  background: var(--tab-underline-gradient);
-  border-radius: 999px;
-  box-shadow: var(--tab-underline-glow);
-  transform: translateZ(0);
-} */
-
-/* Frosted glass header */
+/* Header with thin divider lines */
 .discover-header {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-/* Enhanced sticky state */
-.discover-header.is-sticky {
-  background: rgba(255,255,255,0.8);
+  background: #ffffff;
+  border-top: 1px solid var(--divider-color);
+  border-bottom: 1px solid var(--divider-color);
 }
