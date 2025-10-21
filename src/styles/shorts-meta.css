@@ -95,11 +95,11 @@
   transform: translateY(1px);
 }
 
-/* Likes centered under name, equal gap, large tap target */
+/* Likes aligned with name start, large tap target */
 .scm__likeCenter {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 6px;
   min-width: 44px;
   min-height: 44px;
