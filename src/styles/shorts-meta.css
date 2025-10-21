@@ -56,6 +56,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--gap);
+  width: 100%;
 }
 
 /* Name row centered, full name (no fade), black text */
