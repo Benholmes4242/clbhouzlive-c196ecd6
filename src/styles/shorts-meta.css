@@ -10,7 +10,7 @@
 /* Container with left padding for avatar */
 .scm.scm--center { 
   position: relative;
-  padding: 8px 8px 10px 44px;
+  padding: 4px 8px 4px 44px;
   user-select: none; 
 }
 
