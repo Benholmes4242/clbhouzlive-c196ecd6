@@ -71,6 +71,11 @@
   width: 100%;
 }
 
+/* Shift row slightly right so name text appears centered (badge adds ~10px to right) */
+.scm__nameRow:has(.scm__verified) {
+  transform: translateX(10px);
+}
+
 .scm__name {
   font-weight: 600;
   font-size: 14px;
