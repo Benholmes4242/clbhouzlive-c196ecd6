@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import VideosGrid from '@/components/discover/VideosGrid';
@@ -17,6 +18,7 @@ import type { LengthKey } from '@/components/videos/VideoChipRail';
 import { useChannelSuggestions } from '@/hooks/useChannelSuggestions';
 import { useShortsSuggestions } from '@/hooks/useShortsSuggestions';
 import { buildInterleavedFeed, InterleavedItem } from '@/utils/interleaveFeed';
+import { toast } from 'sonner';
 
 interface DiscoverContentProps {
   onLike: (contentId: string) => void;
@@ -62,9 +64,11 @@ function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): 
 }
 
 export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery, selectedTags = [] }: DiscoverContentProps) {
+  const navigate = useNavigate();
   const { main, sub, duration } = useDiscoverQuery();
   const [currentContent, setCurrentContent] = useState<ExploreContentItem[] | null>(null);
   const [recentHistory, setRecentHistory] = useState<Set<string>>(new Set());
+  const [likedItems, setLikedItems] = useState<Record<string, boolean>>({});
   
   // Fetch real Shorts data for inline blocks (only when on Videos tab)
   const { content: shortsContent, hasMore: hasMoreShorts, loadMore: loadMoreShorts } = useInfiniteExploreContent(
@@ -128,15 +132,81 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         filtered = applyTagFilter(filtered, selectedTags);
       }
       
-      // Remove duplicates
+      // Remove duplicates and enrich with like state
       const unique = filtered.filter((item, index, self) => 
         index === self.findIndex(t => t.src === item.src)
-      );
+      ).map(item => ({
+        ...item,
+        isLiked: likedItems[item.id] ?? false
+      }));
+      
       setCurrentContent(unique);
     } else {
       setCurrentContent(null);
     }
-  }, [content, main, searchQuery, selectedTags]);
+  }, [content, main, searchQuery, selectedTags, likedItems]);
+
+  // Handle like toggle with optimistic updates
+  const handleLikeToggle = useCallback((itemId: string) => {
+    if (!currentContent) return;
+
+    const item = currentContent.find(i => i.id === itemId);
+    if (!item) return;
+
+    const currentlyLiked = likedItems[itemId] ?? false;
+    const newLikedState = !currentlyLiked;
+
+    // Optimistic update
+    setLikedItems(prev => ({ ...prev, [itemId]: newLikedState }));
+    setCurrentContent(prev => 
+      prev?.map(i =>
+        i.id === itemId
+          ? {
+              ...i,
+              isLiked: newLikedState,
+              likes: newLikedState ? (i.likes ?? 0) + 1 : Math.max(0, (i.likes ?? 0) - 1)
+            }
+          : i
+      ) ?? null
+    );
+
+    // Haptics on mobile
+    if ('vibrate' in navigator) {
+      navigator.vibrate(10);
+    }
+
+    // Call parent handler if exists
+    onLike?.(itemId);
+
+    // TODO: Replace with actual API call
+    // Simulate API with timeout for demo
+    setTimeout(() => {
+      const success = Math.random() > 0.05; // 95% success rate
+      
+      if (!success) {
+        // Rollback on failure
+        setLikedItems(prev => ({ ...prev, [itemId]: currentlyLiked }));
+        setCurrentContent(prev =>
+          prev?.map(i =>
+            i.id === itemId
+              ? {
+                  ...i,
+                  isLiked: currentlyLiked,
+                  likes: currentlyLiked ? (i.likes ?? 0) + 1 : Math.max(0, (i.likes ?? 0) - 1)
+                }
+              : i
+          ) ?? null
+        );
+        toast.error('Failed to update like. Please try again.');
+      }
+    }, 300);
+  }, [currentContent, likedItems, onLike]);
+
+  // Handle profile navigation
+  const handleAuthorClick = useCallback((authorId: string) => {
+    if (!authorId) return;
+    navigate(`/u/${authorId}`);
+  }, [navigate]);
 
 
   const handleCreatorClick = (creator: CreatorHighlight) => {
@@ -163,6 +233,8 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
           isLoading={loading}
           hasMore={hasMore}
           onLoadMore={loadMore}
+          onLike={handleLikeToggle}
+          onAuthorClick={handleAuthorClick}
         />
       </>
     );

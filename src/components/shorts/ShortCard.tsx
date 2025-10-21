@@ -1,9 +1,9 @@
 import React, { useRef } from 'react';
-import { Heart } from 'lucide-react';
 import { ExploreContentItem } from '@/components/explore/types';
-import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import { useAutoplayGuard } from '@/hooks/useAutoplayGuard';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
+import ShortsCardMeta from './ShortsCardMeta';
+import '@/styles/shorts-meta.css';
 
 interface ShortCardProps {
   item: ExploreContentItem;
@@ -11,9 +11,21 @@ interface ShortCardProps {
   height?: number;
   isPinned?: boolean;
   autoplay?: boolean;
+  onLike?: (itemId: string) => void;
+  onAuthorClick?: (authorId: string) => void;
+  currentUserId?: string;
 }
 
-export default function ShortCard({ item, onClick, height, isPinned, autoplay }: ShortCardProps) {
+export default React.memo(function ShortCard({ 
+  item, 
+  onClick, 
+  height, 
+  isPinned, 
+  autoplay,
+  onLike,
+  onAuthorClick,
+  currentUserId
+}: ShortCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const isVideo = item.type === 'video' || item.src?.includes('.mp4') || item.src?.includes('.webm');
   
@@ -70,37 +82,21 @@ export default function ShortCard({ item, onClick, height, isPinned, autoplay }:
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
       </div>
 
-      {/* Caption Block - Below Card */}
-      <div className="mt-1.5 px-1 text-left">
-        {/* Title */}
-        <h3 className="text-[15px] font-semibold line-clamp-1 text-foreground">
-          {item.title || 'Untitled'}
-        </h3>
-
-        {/* Meta Row */}
-        <div className="flex items-center justify-between mt-0.5 text-[13px] text-muted-foreground">
-          {/* Left: Avatar + Username */}
-          <div className="flex items-center gap-1.5">
-            {item.user?.avatar && (
-              <OptimizedAvatar
-                src={item.user.avatar}
-                alt={item.user.name || 'User'}
-                size={20}
-                fallback={item.user.name?.[0] || 'U'}
-              />
-            )}
-            <span className="font-medium">{item.user?.name || 'Unknown'}</span>
-          </div>
-          
-          {/* Right: Heart + Count */}
-          {item.likes !== undefined && (
-            <div className="flex items-center gap-1">
-              <Heart className="w-3.5 h-3.5" />
-              <span>{item.likes.toLocaleString()}</span>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Creator-First Meta Block */}
+      <ShortsCardMeta
+        author={{
+          id: item.user?.id ?? '',
+          name: item.user?.name ?? 'Unknown',
+          avatar: item.user?.avatar ?? '/img/avatar-fallback.png',
+          verified: item.user?.verified,
+          isSelf: item.user?.id === currentUserId
+        }}
+        caption={item.title ?? ''}
+        likeCount={item.likes ?? 0}
+        isLiked={false} // Wire in PR2 with real state
+        onLikeToggle={() => onLike?.(item.id)}
+        onAuthorClick={(id) => onAuthorClick?.(id)}
+      />
     </button>
   );
-}
+});

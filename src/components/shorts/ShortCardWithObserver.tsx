@@ -9,6 +9,9 @@ interface ShortCardWithObserverProps {
   height?: number;
   isPinned?: boolean;
   onVisibilityChange?: (id: string, visible: boolean) => void;
+  onLike?: (itemId: string) => void;
+  onAuthorClick?: (authorId: string) => void;
+  currentUserId?: string;
 }
 
 /**
@@ -20,7 +23,10 @@ export default function ShortCardWithObserver({
   onClick,
   height,
   isPinned,
-  onVisibilityChange
+  onVisibilityChange,
+  onLike,
+  onAuthorClick,
+  currentUserId
 }: ShortCardWithObserverProps) {
   const { ref, isInView } = useIntersectionObserver({
     threshold: 0.65,
@@ -40,6 +46,9 @@ export default function ShortCardWithObserver({
         height={height}
         isPinned={isPinned}
         autoplay={isInView}
+        onLike={onLike}
+        onAuthorClick={onAuthorClick}
+        currentUserId={currentUserId}
       />
     </div>
   );

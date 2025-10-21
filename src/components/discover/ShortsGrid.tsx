@@ -12,6 +12,9 @@ interface ShortsGridProps {
   isLoading?: boolean;
   hasMore?: boolean;
   onLoadMore?: () => void;
+  onLike?: (itemId: string) => void;
+  onAuthorClick?: (authorId: string) => void;
+  currentUserId?: string;
 }
 
 // Deterministic height variance based on item ID
@@ -21,7 +24,16 @@ const getHeightVariant = (id: string): number => {
   return variants[hash % variants.length];
 };
 
-export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMore }: ShortsGridProps) {
+export default function ShortsGrid({ 
+  items, 
+  onOpen, 
+  isLoading, 
+  hasMore, 
+  onLoadMore,
+  onLike,
+  onAuthorClick,
+  currentUserId
+}: ShortsGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
   const [viewerOpen, setViewerOpen] = useState(false);
@@ -133,6 +145,9 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
                 height={280}
                 isPinned
                 onVisibilityChange={handleVisibilityChange}
+                onLike={onLike}
+                onAuthorClick={onAuthorClick}
+                currentUserId={currentUserId}
               />
             ))}
           </div>
@@ -150,6 +165,9 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
                   onClick={() => handleCardClick(item, index)}
                   height={280 * (1 + getHeightVariant(item.id) / 100)}
                   onVisibilityChange={handleVisibilityChange}
+                  onLike={onLike}
+                  onAuthorClick={onAuthorClick}
+                  currentUserId={currentUserId}
                 />
               ))}
             </div>
@@ -163,6 +181,9 @@ export default function ShortsGrid({ items, onOpen, isLoading, hasMore, onLoadMo
                   onClick={() => handleCardClick(item, index)}
                   height={280 * (1 + getHeightVariant(item.id) / 100)}
                   onVisibilityChange={handleVisibilityChange}
+                  onLike={onLike}
+                  onAuthorClick={onAuthorClick}
+                  currentUserId={currentUserId}
                 />
               ))}
             </div>
