@@ -30,30 +30,28 @@ export default function ShortsCardMeta({
 }: Props) {
   return (
     <div className={`scm scm--center ${className ?? ''}`}>
-      {/* Avatar stays on the left */}
-      <button 
-        className="scm__avatarWrap" 
-        onClick={(e) => {
-          e.stopPropagation();
-          onAuthorClick(author.id);
-        }}
-        aria-label={`Open ${author.name}'s profile`}
-      >
-        <img 
-          className={`scm__avatar${author.isSelf ? ' ring' : ''}`}
-          src={author.avatar} 
-          alt={`${author.name} avatar`} 
-          loading="lazy" 
-          decoding="async"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = '/img/avatar-fallback.png';
-          }}
-        />
-      </button>
-
-      {/* Centered stack: name → likes → caption */}
+      {/* Centered stack: avatar + name + verified → likes → caption */}
       <div className="scm__stack">
         <div className="scm__nameRow">
+          <button 
+            className="scm__avatarWrap" 
+            onClick={(e) => {
+              e.stopPropagation();
+              onAuthorClick(author.id);
+            }}
+            aria-label={`Open ${author.name}'s profile`}
+          >
+            <img 
+              className={`scm__avatar${author.isSelf ? ' ring' : ''}`}
+              src={author.avatar} 
+              alt={`${author.name} avatar`} 
+              loading="lazy" 
+              decoding="async"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/img/avatar-fallback.png';
+              }}
+            />
+          </button>
           <span className="scm__name scm__name--black">{author.name}</span>
           {author.verified && (
             <BadgeCheck 
