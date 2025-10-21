@@ -167,6 +167,12 @@
   --lc-nearby-size: calc(var(--lc-avatar-size) * var(--lc-nearby-scale));
   --lc-nearby-border: 2px;     /* outer ring thickness for nearby tile */
   --lc-nearby-inset: 3px;      /* inner padding for checker/pin */
+  
+  /* Nearby tile polish tokens */
+  --presence-green: #6E9277;
+  --nearby-border: rgba(255,255,255,.26);   /* light, glassy */
+  --nearby-glow-inset: rgba(255,255,255,.12);
+  --nearby-shadow: rgba(0,0,0,.10);
 }
 
 /* Avatar container (hard mask + soft background) - smaller than creator avatars */
@@ -175,11 +181,12 @@
   width: var(--lc-nearby-size);
   height: var(--lc-nearby-size);
   border-radius: 50%;
-  overflow: hidden; /* ensures all effects stay inside */
+  overflow: hidden; /* HARD CLIP - ensures all effects stay inside */
   background: radial-gradient(60% 60% at 50% 40%, rgba(110,146,119,.08) 0%, rgba(110,146,119,.02) 100%), #f6faf7;
+  border: 1.5px solid var(--nearby-border); /* glassy rim */
   box-shadow: 
-    0 0 0 var(--lc-nearby-border) rgba(110,146,119,.18),
-    0 4px 12px rgba(0,0,0,.08);
+    inset 0 0 8px var(--nearby-glow-inset), /* soft inner glow */
+    0 2px 8px var(--nearby-shadow);         /* subtle depth */
   isolation: isolate;
   -webkit-mask-image: radial-gradient(circle, #000 98%, transparent 100%); /* iOS belt & braces */
 }
@@ -202,29 +209,36 @@
   width: 76%;
   height: 76%;
   object-fit: contain;
-  filter: drop-shadow(0 1px 0 rgba(255,255,255,.35)) drop-shadow(0 6px 12px rgba(0,0,0,.12));
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.25)); /* tactile shadow */
 }
 
-/* Pulse animation removed - keeping static design only */
+/* Gentle pulse animation for nearby tile when active */
+@keyframes nearbyPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(110,146,119,.40); }
+  50%      { box-shadow: 0 0 0 6px rgba(110,146,119,0); }
+}
+
+.lc-nearby-avatar.is-active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: nearbyPulse 3s ease-out infinite;
+  /* stays inside due to overflow:hidden on the container */
+}
 
 /* Dark mode disabled during development */
-/* @media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
+  /* TEMP: don't force dark backgrounds for nearby tile while building light mode */
   .lc-nearby-avatar {
-    background: radial-gradient(60% 60% at 50% 40%, rgba(110,146,119,.12) 0%, rgba(110,146,119,.05) 100%), #111214;
-    border-color: rgba(110,146,119,.35);
-    box-shadow: 0 8px 18px rgba(0,0,0,.45);
+    background-color: inherit;
   }
-  
-  .lc-name {
-    color: rgba(255,255,255,.92);
-  }
-  
-  .lc-sub {
-    color: rgba(255,255,255,.72);
-  }
-} */
+}
 
-/* Reduced motion - no animations to disable */
+/* Reduced motion - disable pulse animation */
 @media (prefers-reduced-motion: reduce) {
-  /* All animations removed - static design only */
+  .lc-nearby-avatar.is-active::after {
+    animation: none;
+  }
 }
