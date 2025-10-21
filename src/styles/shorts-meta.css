@@ -145,8 +145,9 @@
 
 .scm__caption--center {
   text-align: left;
-  width: calc(100% - 8px); /* 4px gap on each side */
-  align-self: stretch; /* override parent's align-items: center */
+  width: 100%;
+  padding: 0 4px; /* 4px gap on each side */
+  box-sizing: border-box;
 }
 
 .scm__caption::after {
