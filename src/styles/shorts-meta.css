@@ -158,9 +158,7 @@
 .scm__caption--full {
   text-align: left;
   position: relative;
-  left: -36px;
-  width: calc(100% + 36px);
-  padding-right: 4px;
+  width: 100%;
 }
 
 .scm__caption::after {
