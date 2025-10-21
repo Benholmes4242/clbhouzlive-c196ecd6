@@ -165,7 +165,7 @@
   --lc-avatar-size: 84px;      /* creator avatar size (matches .lc-avatar) */
   --lc-nearby-scale: 0.92;     /* 92% of avatar size */
   --lc-nearby-size: calc(var(--lc-avatar-size) * var(--lc-nearby-scale));
-  --lc-nearby-border: 3px;     /* outer ring thickness for nearby tile (increased for visibility) */
+  --lc-nearby-border: 2px;     /* inset green ring thickness - DO NOT CHANGE */
   --lc-nearby-inset: 3px;      /* inner padding for checker/pin */
 }
 
