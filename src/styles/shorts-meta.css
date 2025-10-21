@@ -131,7 +131,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Caption expanded horizontally, 2-line clamp + gradient fade */
+/* Caption centered, 2-line clamp + gradient fade */
 .scm__caption {
   font-size: 13px;
   line-height: 1.25;
@@ -144,10 +144,7 @@
 }
 
 .scm__caption--center {
-  text-align: left;
-  width: 100%;
-  padding: 0 4px; /* 4px gap on each side */
-  box-sizing: border-box;
+  text-align: center;
 }
 
 .scm__caption::after {
@@ -155,7 +152,7 @@
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 28%;
+  width: 36%;
   height: 1.15em;
   background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,1));
   pointer-events: none;
