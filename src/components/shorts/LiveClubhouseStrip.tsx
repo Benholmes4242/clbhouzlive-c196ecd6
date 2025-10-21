@@ -100,7 +100,7 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
       onClick={handleClick}
     >
       <div className="lc-avatar-btn">
-        <div className={`lc-nearby-avatar ${count > 0 ? 'is-active' : ''}`}>
+        <div className="lc-nearby-avatar">
           {/* faint checker pattern */}
           <svg aria-hidden="true" className="lc-checker" viewBox="0 0 12 12" preserveAspectRatio="none">
             <defs>
