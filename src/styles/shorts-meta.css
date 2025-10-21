@@ -66,6 +66,8 @@
   justify-content: center;
   gap: 6px;
   margin-top: 0;
+  margin-bottom: 0;
+  line-height: 1;
   position: relative;
   left: -22px;
   width: 100%;
@@ -80,6 +82,7 @@
   font-weight: 600;
   font-size: 14px;
   text-align: center;
+  line-height: 1;
 }
 
 .scm__name--black {
