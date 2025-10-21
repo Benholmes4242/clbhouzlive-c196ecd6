@@ -1,10 +1,12 @@
-/* Discover Tabs - Floating Pill Indicator */
+/* Discover Tabs */
 
 :root { 
-  --tabs-active-color: #f5a623; /* brand accent for active tab text */
+  --tabs-active-color: #f5a623;
 }
 
-.tab-active { color: var(--tabs-active-color) !important; }
+.tab-active { 
+  color: var(--tabs-active-color) !important;
+}
 
 
 /* Hide scrollbar */
@@ -16,17 +18,10 @@
   scrollbar-width: none; 
 }
 
-/* Frosted glass header */
+/* Header */
 .discover-header {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-/* Enhanced sticky state */
-.discover-header.is-sticky {
-  background: rgba(255,255,255,0.8);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }

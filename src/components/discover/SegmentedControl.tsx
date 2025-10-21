@@ -77,14 +77,8 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
         ref={containerRef}
         role="tablist"
         aria-label="Discover sections"
-        className="discover-tabs relative flex items-center gap-3 px-4 py-2 overflow-x-auto no-scrollbar"
+        className="discover-tabs relative flex items-center gap-8 px-4 py-3 overflow-x-auto no-scrollbar"
       >
-        {/* Floating pill indicator */}
-        <div
-          style={pillStyle}
-          className="absolute top-1/2 -translate-y-1/2 h-[32px] rounded-full bg-white shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-[transform,width] duration-200 ease-out will-change-transform z-0"
-        />
-        
         {/* Tab buttons */}
         {tabs.map((tab, index) => {
           const active = main === tab.id;
@@ -101,8 +95,8 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
               data-analytics="discover_tab_click"
               data-tab={tab.id}
               className={cn(
-                "relative z-10 text-[16px] font-medium px-4 py-1.5 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-black/15 whitespace-nowrap",
-                active ? "tab-active" : "text-black/60 hover:text-black/85"
+                "relative text-[17px] font-semibold transition-colors focus:outline-none whitespace-nowrap",
+                active ? "tab-active" : "text-neutral-400 hover:text-neutral-600"
               )}
             >
               {tab.label}
