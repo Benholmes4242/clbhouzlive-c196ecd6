@@ -24,24 +24,8 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
   onOpenVideoSearch
 }) => {
   const { main, setMain } = useDiscoverQuery();
-  const [indicatorStyle, setIndicatorStyle] = useState({});
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const activeIndex = tabs.findIndex(tab => tab.id === main);
-    const activeTabElement = tabRefs.current[activeIndex];
-    
-    if (activeTabElement && containerRef.current) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const tabRect = activeTabElement.getBoundingClientRect();
-      
-      setIndicatorStyle({
-        width: `${tabRect.width}px`,
-        left: `${tabRect.left - containerRect.left}px`,
-      });
-    }
-  }, [main]);
 
   const handleTabClick = (tabId: string) => {
     setMain(tabId as MainPill);
@@ -54,13 +38,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
     >
       {/* Tab buttons */}
       <div className="discover-tabs flex w-full items-center">
-        <div className="flex flex-1 relative">
-          {/* Floating grey pill indicator */}
-          <div
-            className="absolute pill-indicator transition-all duration-300 ease-out"
-            style={indicatorStyle}
-          />
-          
+        <div className="flex flex-1">
           {tabs.map((tab, index) => (
             <button
               key={tab.id}

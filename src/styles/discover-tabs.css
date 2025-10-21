@@ -16,18 +16,6 @@
   align-items: center;
 }
 
-/* Floating grey pill indicator */
-.pill-indicator {
-  position: absolute;
-  height: 36px;
-  top: 6px;
-  background: var(--pill-bg);
-  border-radius: 20px;
-  z-index: 0;
-  pointer-events: none;
-  transition: all 0.3s ease-out;
-}
-
 /* Base tab */
 .discover-tab {
   position: relative;
