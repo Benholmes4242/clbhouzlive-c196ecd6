@@ -7,15 +7,18 @@
   --gap: 0px;
 }
 
-/* Container */
+/* Container with left padding for avatar */
 .scm.scm--center { 
   position: relative;
-  padding: 4px 8px;
+  padding: 4px 8px 4px 44px;
   user-select: none; 
 }
 
-/* Avatar inline with name */
+/* Avatar stays left, aligned to the name row */
 .scm__avatarWrap {
+  position: absolute;
+  left: 8px;
+  top: 8px;
   width: 28px;
   height: 28px;
   border: 0;
@@ -23,7 +26,6 @@
   background: transparent;
   cursor: pointer;
   transition: opacity 0.15s ease;
-  flex-shrink: 0;
 }
 
 .scm__avatarWrap:hover {
@@ -57,7 +59,7 @@
   width: 100%;
 }
 
-/* Name row centered with avatar, name, and badge */
+/* Name row centered, full name (no fade), black text */
 .scm__nameRow {
   display: flex;
   align-items: center;
@@ -66,7 +68,14 @@
   margin-top: 0;
   margin-bottom: 0;
   line-height: 1;
+  position: relative;
+  left: -22px;
   width: 100%;
+}
+
+/* Shift row slightly right so name text appears centered (badge adds ~10px to right) */
+.scm__nameRow:has(.scm__verified) {
+  transform: translateX(10px);
 }
 
 .scm__name {
@@ -100,6 +109,8 @@
   border-radius: 10px;
   cursor: pointer;
   transition: transform 0.12s ease, background-color 0.15s ease;
+  position: relative;
+  left: -22px;
 }
 
 .scm__likeCenter:hover {
@@ -154,10 +165,12 @@
 /* Full-width, centered caption with 4px insets */
 .scm__caption--full {
   text-align: center;
+  position: relative;
+  left: -40px;
+  width: calc(100% + 44px);
   margin: 0 auto;
   padding-left: 4px;
   padding-right: 4px;
-  width: 100%;
 }
 
 .scm__caption::after {
