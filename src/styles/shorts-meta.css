@@ -4,7 +4,7 @@
   --clb-green: #6e9277;
   --meta-fg: #111;
   --meta-dim: rgba(0,0,0,.58);
-  --gap: -6px;
+  --gap: 0px;
 }
 
 /* Container with left padding for avatar */
@@ -65,7 +65,7 @@
   align-items: center;
   justify-content: flex-start;
   gap: 6px;
-  margin-top: 4px;
+  margin-top: 0;
   margin-bottom: 0;
   line-height: 1;
   width: 100%;
