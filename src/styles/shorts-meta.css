@@ -147,20 +147,19 @@
   -webkit-line-clamp: 2;
   overflow: hidden;
   position: relative;
+  text-align: left;
 }
 
 .scm__caption--center {
   text-align: left;
 }
 
-/* Full-width, centered caption with 4px insets */
+/* Full-width caption aligned with avatar left edge */
 .scm__caption--full {
-  text-align: center;
+  text-align: left;
   position: relative;
-  left: -40px;
-  width: calc(100% + 44px);
-  margin: 0 auto;
-  padding-left: 4px;
+  left: -36px;
+  width: calc(100% + 36px);
   padding-right: 4px;
 }
 
