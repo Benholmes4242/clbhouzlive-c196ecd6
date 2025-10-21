@@ -61,8 +61,9 @@
 
 /* Name row centered, full name (no fade), black text */
 .scm__nameRow {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   margin-top: 0;
   max-width: 92%;
@@ -86,8 +87,9 @@
 
 /* Likes centered under name, equal gap, large tap target */
 .scm__likeCenter {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   min-width: 44px;
   min-height: 44px;
