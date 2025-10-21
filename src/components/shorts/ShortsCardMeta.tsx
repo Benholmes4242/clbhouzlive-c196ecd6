@@ -65,6 +65,7 @@ export default function ShortsCardMeta({
           className={`scm-like${isLiked ? ' liked' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
+            if ('vibrate' in navigator) navigator.vibrate(10);
             onLikeToggle();
           }}
           aria-label={`${isLiked ? 'Unlike' : 'Like'} post by ${author.name}, ${formatLikes(likeCount)} likes`}

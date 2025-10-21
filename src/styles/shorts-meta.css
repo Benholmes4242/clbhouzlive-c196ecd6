@@ -62,24 +62,25 @@
   display: inline-block; 
   white-space: nowrap; 
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(90deg, #000 80%, rgba(0,0,0,0));
-  mask-image: linear-gradient(90deg, #000 80%, rgba(0,0,0,0));
+  -webkit-mask-image: linear-gradient(90deg, #000 78%, rgba(0,0,0,0));
+  mask-image: linear-gradient(90deg, #000 78%, rgba(0,0,0,0));
 }
 
 .scm-verified { 
   flex-shrink: 0;
   margin-left: 4px; 
   color: #6e9277;
+  transform: translateY(1px);
 }
 
 .scm-like { 
   display: flex; 
   align-items: center; 
-  gap: 0.375rem; 
+  gap: 6px; 
   min-width: 44px; 
   min-height: 44px;
-  padding: 0.25rem 0.5rem; 
-  border-radius: 0.625rem; 
+  padding: 6px 8px; 
+  border-radius: 10px; 
   border: 0; 
   background: transparent; 
   cursor: pointer;
@@ -104,6 +105,7 @@
   color: rgba(0,0,0,0.55);
   transition: color 0.15s ease;
   flex-shrink: 0;
+  transform: translateY(1px);
 }
 
 .scm-like.liked .scm-heart {
@@ -118,10 +120,11 @@
   line-height: 1;
   min-width: 24px;
   text-align: left;
+  font-variant-numeric: tabular-nums;
 }
 
 .scm-caption {
-  margin-top: 0.375rem; 
+  margin-top: 6px; 
   font-size: 13px; 
   line-height: 1.25; 
   color: rgba(0,0,0,0.82);
@@ -138,15 +141,15 @@
   right: 0; 
   bottom: 0; 
   width: 36%; 
-  height: 1.1em;
+  height: 1.15em;
   background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,1));
   pointer-events: none;
 }
 
 @keyframes like-pop { 
-  0% { transform: scale(1); } 
-  50% { transform: scale(1.18); } 
-  100% { transform: scale(1); } 
+  0% { transform: scale(1) translateY(1px); } 
+  50% { transform: scale(1.18) translateY(1px); } 
+  100% { transform: scale(1) translateY(1px); } 
 }
 
 /* Dark theme overrides */
