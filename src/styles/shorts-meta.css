@@ -59,23 +59,16 @@
   width: 100%;
 }
 
-/* Name row centered, full name (no fade), black text */
+/* Name row left-aligned, 4px from avatar */
 .scm__nameRow {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 6px;
   margin-top: 0;
   margin-bottom: 0;
   line-height: 1;
-  position: relative;
-  left: -22px;
   width: 100%;
-}
-
-/* Shift row slightly right so name text appears centered (badge adds ~10px to right) */
-.scm__nameRow:has(.scm__verified) {
-  transform: translateX(10px);
 }
 
 .scm__name {
@@ -95,7 +88,7 @@
   transform: translateY(1px);
 }
 
-/* Likes aligned with name start, large tap target */
+/* Likes left-aligned with name, large tap target */
 .scm__likeCenter {
   display: flex;
   align-items: center;
@@ -109,8 +102,6 @@
   border-radius: 10px;
   cursor: pointer;
   transition: transform 0.12s ease, background-color 0.15s ease;
-  position: relative;
-  left: -22px;
 }
 
 .scm__likeCenter:hover {
