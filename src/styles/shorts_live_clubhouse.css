@@ -3,7 +3,7 @@
 /* Row container - transparent background */
 .live-row {
   position: relative;
-  padding: 22.5px 16px 24px;
+  padding: 22.5px 16px 22.5px;
   background: transparent;
 }
 
