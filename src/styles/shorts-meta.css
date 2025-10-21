@@ -1,44 +1,35 @@
-/* Profile-First Row Layout - Shorts Card Meta Styles */
+/* Creator-First Shorts Card Meta Styles - Centered Stack */
 
 :root {
   --clb-green: #6e9277;
   --meta-fg: #111;
   --meta-dim: rgba(0,0,0,.58);
+  --gap: 0px;
 }
 
-/* Container */
-.scm.scm--profile-first { 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  padding: 6px 8px 10px;
+/* Container with left padding for avatar */
+.scm.scm--center { 
+  position: relative;
+  padding: 4px 8px 4px 44px;
   user-select: none; 
 }
 
-/* Creator Row: Avatar + Username + Likes */
-.scm__creatorRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 92%;
-  margin-bottom: 4px;
-}
-
-/* Avatar */
+/* Avatar stays left, aligned to the name row */
 .scm__avatarWrap {
-  width: 40px;
-  height: 40px;
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  width: 28px;
+  height: 28px;
   border: 0;
   padding: 0;
   background: transparent;
   cursor: pointer;
-  transition: transform 0.15s ease;
-  flex-shrink: 0;
+  transition: opacity 0.15s ease;
 }
 
 .scm__avatarWrap:hover {
-  transform: scale(1.05);
+  opacity: 0.8;
 }
 
 .scm__avatarWrap:focus-visible {
@@ -48,66 +39,89 @@
 }
 
 .scm__avatar { 
-  width: 40px; 
-  height: 40px; 
+  width: 28px; 
+  height: 28px; 
   border-radius: 9999px; 
   object-fit: cover;
   display: block;
-  border: 1px solid var(--clb-green);
 }
 
 .scm__avatar.ring { 
-  box-shadow: 0 0 0 2px var(--clb-green); 
+  box-shadow: 0 0 0 1px var(--clb-green); 
 }
 
-/* Username + Verified Badge */
-.scm__nameGroup {
-  flex: 1;
+/* Centered vertical stack */
+.scm__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap);
+  width: 100%;
+}
+
+/* Name row centered, full name (no fade), black text */
+.scm__nameRow {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  margin-left: 10px;
-  min-width: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 1;
+  position: relative;
+  left: -22px;
+  width: 100%;
+}
+
+/* Shift row slightly right so name text appears centered (badge adds ~10px to right) */
+.scm__nameRow:has(.scm__verified) {
+  transform: translateX(10px);
 }
 
 .scm__name {
   font-weight: 600;
-  font-size: 15px;
-  color: var(--meta-fg);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 14px;
+  text-align: center;
   line-height: 1;
+}
+
+.scm__name--black {
+  color: var(--meta-fg);
 }
 
 .scm__verified { 
   flex-shrink: 0;
   color: var(--clb-green);
+  transform: translateY(1px);
 }
 
-/* Likes Button */
-.scm__likesBtn {
+/* Likes centered under name, equal gap, large tap target */
+.scm__likeCenter {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 8px;
+  justify-content: center;
+  gap: 6px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0px 10px;
   border: 0;
   background: transparent;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   transition: transform 0.12s ease, background-color 0.15s ease;
-  flex-shrink: 0;
+  position: relative;
+  left: -22px;
 }
 
-.scm__likesBtn:hover {
+.scm__likeCenter:hover {
   background-color: rgba(0,0,0,0.04);
 }
 
-.scm__likesBtn:active { 
+.scm__likeCenter:active { 
   transform: scale(0.96); 
 }
 
-.scm__likesBtn:focus-visible {
+.scm__likeCenter:focus-visible {
   outline: 2px solid var(--clb-green);
   outline-offset: 2px;
 }
@@ -116,29 +130,27 @@
   color: var(--meta-dim);
   transition: color 0.15s ease;
   flex-shrink: 0;
+  transform: translateY(1px);
 }
 
-.scm__likesBtn.is-liked .scm__heart {
+.scm__likeCenter.is-liked .scm__heart {
   color: var(--clb-green);
   animation: like-pop 0.12s ease-out;
 }
 
-.scm__likeCount { 
+.scm__likes { 
   color: var(--meta-dim);
   font-weight: 500; 
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
-/* Caption Row */
+/* Caption centered, 2-line clamp + gradient fade */
 .scm__caption {
-  font-size: 14px;
-  line-height: 1.3;
-  color: var(--meta-dim);
-  text-align: center;
-  padding: 0 12px;
-  max-width: 90%;
+  font-size: 13px;
+  line-height: 1.25;
+  color: rgba(0,0,0,0.82);
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -146,15 +158,35 @@
   position: relative;
 }
 
+.scm__caption--center {
+  text-align: center;
+}
+
+/* Full-width, centered caption with 4px insets */
+.scm__caption--full {
+  text-align: center;
+  position: relative;
+  left: -40px;
+  width: calc(100% + 44px);
+  margin: 0 auto;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
 .scm__caption::after {
   content: "";
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 30%;
-  height: 1.2em;
+  width: 36%;
+  height: 1.15em;
   background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,1));
   pointer-events: none;
+}
+
+.scm__caption--full::after {
+  right: 4px;
+  width: 28%;
 }
 
 @keyframes like-pop { 
@@ -164,12 +196,8 @@
 }
 
 /* Dark theme overrides */
-[data-theme="dark"] .scm__avatar {
-  border-color: rgba(255,255,255,0.5);
-}
-
-[data-theme="dark"] .scm__name {
-  color: #fff;
+[data-theme="dark"] .scm__name--black {
+  color: var(--meta-fg);
 }
 
 [data-theme="dark"] .scm__verified {
@@ -180,11 +208,11 @@
   color: rgba(255,255,255,0.65);
 }
 
-[data-theme="dark"] .scm__likesBtn.is-liked .scm__heart {
+[data-theme="dark"] .scm__likeCenter.is-liked .scm__heart {
   color: #8ab491;
 }
 
-[data-theme="dark"] .scm__likeCount { 
+[data-theme="dark"] .scm__likes { 
   color: rgba(255,255,255,0.65); 
 }
 
@@ -196,6 +224,10 @@
   background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,1));
 }
 
-[data-theme="dark"] .scm__likesBtn:hover {
+[data-theme="dark"] .scm__caption--full::after {
+  background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,1));
+}
+
+[data-theme="dark"] .scm__likeCenter:hover {
   background-color: rgba(255,255,255,0.08);
 }

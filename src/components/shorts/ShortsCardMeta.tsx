@@ -29,42 +29,43 @@ export default function ShortsCardMeta({
   className
 }: Props) {
   return (
-    <div className={`scm scm--profile-first ${className ?? ''}`}>
-      {/* Creator Row: Avatar + Username + Verified + Likes */}
-      <div className="scm__creatorRow">
-        <button 
-          className="scm__avatarWrap" 
-          onClick={(e) => {
-            e.stopPropagation();
-            onAuthorClick(author.id);
+    <div className={`scm scm--center ${className ?? ''}`}>
+      {/* Avatar stays on the left */}
+      <button 
+        className="scm__avatarWrap" 
+        onClick={(e) => {
+          e.stopPropagation();
+          onAuthorClick(author.id);
+        }}
+        aria-label={`Open ${author.name}'s profile`}
+      >
+        <img 
+          className={`scm__avatar${author.isSelf ? ' ring' : ''}`}
+          src={author.avatar} 
+          alt={`${author.name} avatar`} 
+          loading="lazy" 
+          decoding="async"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/img/avatar-fallback.png';
           }}
-          aria-label={`Open ${author.name}'s profile`}
-        >
-          <img 
-            className={`scm__avatar${author.isSelf ? ' ring' : ''}`}
-            src={author.avatar} 
-            alt={`${author.name} avatar`} 
-            loading="lazy" 
-            decoding="async"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = '/img/avatar-fallback.png';
-            }}
-          />
-        </button>
+        />
+      </button>
 
-        <div className="scm__nameGroup">
-          <span className="scm__name">{author.name}</span>
+      {/* Centered stack: name → likes → caption */}
+      <div className="scm__stack">
+        <div className="scm__nameRow">
+          <span className="scm__name scm__name--black">{author.name}</span>
           {author.verified && (
             <BadgeCheck 
               className="scm__verified" 
               aria-label="Verified" 
-              size={13}
+              size={14}
             />
           )}
         </div>
 
         <button
-          className={`scm__likesBtn${isLiked ? ' is-liked' : ''}`}
+          className={`scm__likeCenter${isLiked ? ' is-liked' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
             if ('vibrate' in navigator) navigator.vibrate(10);
@@ -78,12 +79,11 @@ export default function ShortsCardMeta({
             fill={isLiked ? '#6e9277' : 'none'}
             aria-hidden="true"
           />
-          <span className="scm__likeCount">{formatLikes(likeCount)}</span>
+          <span className="scm__likes">{formatLikes(likeCount)}</span>
         </button>
-      </div>
 
-      {/* Caption Row */}
-      <p className="scm__caption">{caption}</p>
+        <p className="scm__caption scm__caption--full">{caption}</p>
+      </div>
     </div>
   );
 }
