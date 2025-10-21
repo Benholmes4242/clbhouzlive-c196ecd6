@@ -165,7 +165,7 @@
   --lc-avatar-size: 84px;      /* creator avatar size (matches .lc-avatar) */
   --lc-nearby-scale: 0.92;     /* 92% of avatar size */
   --lc-nearby-size: calc(var(--lc-avatar-size) * var(--lc-nearby-scale));
-  --lc-nearby-border: 2px;     /* outer ring thickness for nearby tile */
+  --lc-nearby-border: 3px;     /* outer ring thickness for nearby tile (increased for visibility) */
   --lc-nearby-inset: 3px;      /* inner padding for checker/pin */
 }
 
@@ -196,11 +196,11 @@
     0 3px 8px rgba(0, 0, 0, 0.12);
 }
 
-/* Center all inner elements with uniform inset */
-.lc-nearby-avatar > * {
-  position: absolute;
-  inset: var(--lc-nearby-inset);
-}
+/* Center all inner elements with uniform inset (exclude the centered pin) */
+  .lc-nearby-avatar > :not(.lc-leaf-pin) {
+    position: absolute;
+    inset: var(--lc-nearby-inset);
+  }
 
 /* subtle checker sits under the pin - scales proportionally */
 .lc-nearby-avatar .lc-checker {
@@ -218,6 +218,7 @@
   height: 76%;
   object-fit: contain;
   filter: drop-shadow(0 1px 0 rgba(255,255,255,.35)) drop-shadow(0 6px 12px rgba(0,0,0,.12));
+  pointer-events: none; /* ensure clicks go to parent */
 }
 
 /* Pulse animation removed - keeping static design only */
