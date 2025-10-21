@@ -2,38 +2,63 @@
 
 /* Tokens */
 :root {
-  --tab-active-color: #f5a623;
-  --tab-active-gradient: linear-gradient(135deg, #f5a623, #ff8c00);
-  --tab-active-shadow: 0 2px 8px rgba(245,166,35,0.25);
+  --tab-active-bg: #FFFFFF;
+  --tab-active-text: #000000;
+  --tab-active-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  --tab-inactive-text: rgba(0,0,0,0.6);
 }
 
 /* Tab container */
 .discover-tabs {
   display: flex;
-  gap: 0;
+  gap: 12px;
   position: relative;
   align-items: center;
+  padding: 0 16px 8px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-/* Base tab */
+.discover-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Base tab - Inactive */
 .discover-tab {
   position: relative;
-  padding: 12px 0;
-  color: rgba(0,0,0,0.65);
+  padding: 6px 16px;
+  background: transparent;
+  color: var(--tab-inactive-text);
   font-weight: 500;
-  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  font-size: 15px;
+  letter-spacing: 0.1px;
+  border-radius: 9999px;
+  transition: all 0.25s ease-in-out;
+  white-space: nowrap;
+}
+
+.discover-tab:hover {
+  transform: translateY(-1px);
+  color: rgba(0,0,0,0.8);
 }
 
 .discover-tab:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
-/* Active state with spring animation */
+/* Active tab - White pill */
 .discover-tab.active {
-  color: #f5a623;
+  background: var(--tab-active-bg);
+  color: var(--tab-active-text);
   font-weight: 600;
-  transform: scale(1.04);
-  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: var(--tab-active-shadow);
+  transform: scale(1);
+  transition: all 0.25s ease-in-out;
+}
+
+.discover-tab.active:hover {
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
 }
 
 /* Underline with glow (pseudo element) - REMOVED */
@@ -50,17 +75,9 @@
   transform: translateZ(0);
 } */
 
-/* Frosted glass header */
+/* Header container */
 .discover-header {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  background: transparent;
+  border-bottom: none;
   transition: all 0.3s ease;
-}
-
-/* Enhanced sticky state */
-.discover-header.is-sticky {
-  background: rgba(255,255,255,0.8);
 }
