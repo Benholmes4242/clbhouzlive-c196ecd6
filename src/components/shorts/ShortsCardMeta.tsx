@@ -29,59 +29,61 @@ export default function ShortsCardMeta({
   className
 }: Props) {
   return (
-    <div className={`scm ${className ?? ''}`}>
-      {/* Row 1: avatar + name (left) | like (right) */}
-      <div className="scm-row1">
-        <button 
-          className="scm-author" 
-          onClick={(e) => {
-            e.stopPropagation();
-            onAuthorClick(author.id);
+    <div className={`scm scm--center ${className ?? ''}`}>
+      {/* Avatar stays on the left */}
+      <button 
+        className="scm__avatarWrap" 
+        onClick={(e) => {
+          e.stopPropagation();
+          onAuthorClick(author.id);
+        }}
+        aria-label={`Open ${author.name}'s profile`}
+      >
+        <img 
+          className={`scm__avatar${author.isSelf ? ' ring' : ''}`}
+          src={author.avatar} 
+          alt={`${author.name} avatar`} 
+          loading="lazy" 
+          decoding="async"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/img/avatar-fallback.png';
           }}
-          aria-label={`View ${author.name}'s profile`}
-        >
-          <span className={`scm-avatar${author.isSelf ? ' ring' : ''}`}>
-            <img 
-              src={author.avatar} 
-              alt={`${author.name} avatar`} 
-              loading="lazy" 
-              decoding="async"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/img/avatar-fallback.png';
-              }}
-            />
-          </span>
-          <span className="scm-name">{author.name}</span>
+        />
+      </button>
+
+      {/* Centered stack: name → likes → caption */}
+      <div className="scm__stack">
+        <div className="scm__nameRow">
+          <span className="scm__name scm__name--black">{author.name}</span>
           {author.verified && (
             <BadgeCheck 
-              className="scm-verified" 
+              className="scm__verified" 
               aria-label="Verified" 
               size={14}
             />
           )}
-        </button>
+        </div>
 
         <button
-          className={`scm-like${isLiked ? ' liked' : ''}`}
+          className={`scm__likeCenter${isLiked ? ' is-liked' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
             if ('vibrate' in navigator) navigator.vibrate(10);
             onLikeToggle();
           }}
-          aria-label={`${isLiked ? 'Unlike' : 'Like'} post by ${author.name}, ${formatLikes(likeCount)} likes`}
+          aria-label={`${isLiked ? 'Unlike' : 'Like'} post by ${author.name}`}
         >
           <Heart 
-            className="scm-heart" 
+            className="scm__heart" 
             size={18}
             fill={isLiked ? '#6e9277' : 'none'}
             aria-hidden="true"
           />
-          <span className="scm-likes">{formatLikes(likeCount)}</span>
+          <span className="scm__likes">{formatLikes(likeCount)}</span>
         </button>
-      </div>
 
-      {/* Row 2: caption (2-line clamp + fade) */}
-      <p className="scm-caption">{caption}</p>
+        <p className="scm__caption scm__caption--center">{caption}</p>
+      </div>
     </div>
   );
 }
