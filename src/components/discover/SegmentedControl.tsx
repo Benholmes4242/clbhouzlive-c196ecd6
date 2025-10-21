@@ -50,30 +50,34 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
   return (
     <div 
       ref={containerRef}
-      className="discover-header relative w-full bg-white/95 backdrop-blur-sm pt-2"
+      className="discover-header relative w-full"
     >
-      {/* Tab buttons rail */}
-      <div className="discover-tabs flex items-center">
-        {tabs.map((tab, index) => (
-          <button
-            key={tab.id}
-            ref={el => tabRefs.current[index] = el}
-            onClick={() => handleTabClick(tab.id)}
-            className={cn(
-              "discover-tab",
-              main === tab.id && "active"
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
+      {/* Tab buttons */}
+      <div className="discover-tabs flex w-full items-center">
+        <div className="flex flex-1">
+          {tabs.map((tab, index) => (
+            <button
+              key={tab.id}
+              ref={el => tabRefs.current[index] = el}
+              onClick={() => handleTabClick(tab.id)}
+              className={cn(
+                "discover-tab flex-1 py-3 px-4 text-center relative z-10 text-[16px]",
+                main === tab.id 
+                  ? "active" 
+                  : "hover:text-foreground/70"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
         
         {/* Search icon */}
         {onOpenVideoSearch && (
           <button
             aria-label="Search videos"
             onClick={onOpenVideoSearch}
-            className="ml-auto p-2 mr-2 hover:bg-black/5 rounded-full transition-colors flex-shrink-0"
+            className="p-2 mr-2 hover:bg-black/5 rounded-full transition-colors"
           >
             <Search size={20} />
           </button>
