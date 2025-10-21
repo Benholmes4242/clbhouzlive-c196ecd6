@@ -150,7 +150,7 @@
   --lc-green-2: #7CAD89;       /* lighter blend */
   --lc-green-3: #557A61;       /* darker blend */
   --lc-avatar-size: 84px;      /* creator avatar size (matches .lc-avatar) */
-  --lc-nearby-scale: 0.92;     /* 92% of avatar size */
+  --lc-nearby-scale: 1.0;      /* 100% of avatar size - matches creator avatars */
   --lc-nearby-size: calc(var(--lc-avatar-size) * var(--lc-nearby-scale));
   --lc-nearby-border: 2px;     /* inset green ring thickness - DO NOT CHANGE */
   --lc-nearby-inset: 3px;      /* inner padding for checker/pin */
