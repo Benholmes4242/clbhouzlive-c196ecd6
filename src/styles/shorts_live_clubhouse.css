@@ -72,9 +72,13 @@
   position: relative;
 }
 
-/* Recent post indicator moved to inset ring above */
+/* Solid outline for recent posts - no pulse animation */
+.lc-recent .lc-avatar {
+  outline: 2px solid #6e9277 !important;
+  outline-offset: 2px;
+}
 
-/* Online dot - inset ring to stay within circle */
+/* Online dot - positioned to avoid clipping */
 .lc-dot {
   position: absolute;
   right: 6px;
@@ -85,15 +89,6 @@
   background: #3CB371;
   box-shadow: 0 0 0 2px #fff;
   z-index: 2;
-}
-
-/* Inset presence ring for creator avatars */
-.lc-avatar {
-  box-shadow: inset 0 0 0 2px transparent;
-}
-
-.lc-recent .lc-avatar {
-  box-shadow: inset 0 0 0 2px #6e9277;
 }
 
 /* Dark mode disabled during development */
@@ -170,12 +165,8 @@
   --lc-avatar-size: 84px;      /* creator avatar size (matches .lc-avatar) */
   --lc-nearby-scale: 0.92;     /* 92% of avatar size */
   --lc-nearby-size: calc(var(--lc-avatar-size) * var(--lc-nearby-scale));
+  --lc-nearby-border: 2px;     /* outer ring thickness for nearby tile */
   --lc-nearby-inset: 3px;      /* inner padding for checker/pin */
-  
-  /* Nearby golfers glassy border tokens */
-  --nearby-border: rgba(255, 255, 255, 0.26);
-  --nearby-glow-inset: rgba(255, 255, 255, 0.12);
-  --nearby-shadow: rgba(0, 0, 0, 0.10);
 }
 
 /* Avatar container (hard mask + soft background) - smaller than creator avatars */
@@ -184,13 +175,12 @@
   width: var(--lc-nearby-size);
   height: var(--lc-nearby-size);
   border-radius: 50%;
-  overflow: hidden; /* HARD CLIP - ensures nothing bleeds outside */
-  isolation: isolate;
+  overflow: hidden; /* ensures all effects stay inside */
   background: radial-gradient(60% 60% at 50% 40%, rgba(110,146,119,.08) 0%, rgba(110,146,119,.02) 100%), #f6faf7;
-  border: 1.5px solid var(--nearby-border); /* glassy rim */
   box-shadow: 
-    inset 0 0 8px var(--nearby-glow-inset), /* soft inner glow */
-    0 2px 8px var(--nearby-shadow); /* subtle depth */
+    0 0 0 var(--lc-nearby-border) rgba(110,146,119,.18),
+    0 4px 12px rgba(0,0,0,.08);
+  isolation: isolate;
   -webkit-mask-image: radial-gradient(circle, #000 98%, transparent 100%); /* iOS belt & braces */
 }
 
