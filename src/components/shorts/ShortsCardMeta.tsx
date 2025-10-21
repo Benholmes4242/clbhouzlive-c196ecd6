@@ -55,13 +55,6 @@ export default function ShortsCardMeta({
       <div className="scm__stack">
         <div className="scm__nameRow">
           <span className="scm__name scm__name--black">{author.name}</span>
-          {author.verified && (
-            <BadgeCheck 
-              className="scm__verified" 
-              aria-label="Verified" 
-              size={14}
-            />
-          )}
         </div>
 
         <button
