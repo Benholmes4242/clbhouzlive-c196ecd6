@@ -210,7 +210,10 @@
 
 /* Leaf pin icon - centered and slightly smaller */
 .lc-nearby-avatar .lc-leaf-pin {
-  inset: 12%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 76%;
   height: 76%;
   object-fit: contain;
