@@ -37,8 +37,8 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
       const tabRect = activeTabElement.getBoundingClientRect();
       
       setIndicatorStyle({
-        width: tabRect.width,
-        transform: `translateX(${tabRect.left - containerRect.left}px)`,
+        width: `${tabRect.width}px`,
+        left: `${tabRect.left - containerRect.left}px`,
       });
     }
   }, [main]);

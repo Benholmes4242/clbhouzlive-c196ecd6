@@ -20,12 +20,12 @@
 .pill-indicator {
   position: absolute;
   height: 36px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 6px;
   background: var(--pill-bg);
   border-radius: 20px;
   z-index: 0;
   pointer-events: none;
+  transition: all 0.3s ease-out;
 }
 
 /* Base tab */
