@@ -169,31 +169,19 @@
   --lc-nearby-inset: 3px;      /* inner padding for checker/pin */
 }
 
-/* === Nearby Golfers Circle Finish === */
+/* Avatar container (hard mask + soft background) - smaller than creator avatars */
 .lc-nearby-avatar {
   position: relative;
   width: var(--lc-nearby-size);
   height: var(--lc-nearby-size);
   border-radius: 50%;
-  overflow: hidden;                              /* ensures inner elements don't bleed */
-  border: 1.8px solid rgba(255, 255, 255, 0.32); /* soft, glassy light border */
-  box-shadow:
-    0 0 0 2px rgba(255, 255, 255, 0.15) inset,   /* inner glow rim */
-    0 2px 6px rgba(0, 0, 0, 0.08);               /* subtle depth shadow */
+  overflow: hidden; /* ensures all effects stay inside */
   background: radial-gradient(60% 60% at 50% 40%, rgba(110,146,119,.08) 0%, rgba(110,146,119,.02) 100%), #f6faf7;
-  background-clip: padding-box;
-  backdrop-filter: blur(3px);                    /* gentle light diffusion */
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 
+    0 0 0 var(--lc-nearby-border) rgba(110,146,119,.18),
+    0 4px 12px rgba(0,0,0,.08);
   isolation: isolate;
   -webkit-mask-image: radial-gradient(circle, #000 98%, transparent 100%); /* iOS belt & braces */
-}
-
-/* Optional: slight hover or active feedback (adds liveliness) */
-.lc-nearby-avatar:hover {
-  border-color: rgba(255, 255, 255, 0.5);
-  box-shadow:
-    0 0 0 2px rgba(255, 255, 255, 0.25) inset,
-    0 3px 8px rgba(0, 0, 0, 0.12);
 }
 
 /* Center all inner elements with uniform inset */
