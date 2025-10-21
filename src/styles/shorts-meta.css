@@ -151,8 +151,10 @@
 /* Full-width, centered caption with 4px insets */
 .scm__caption--full {
   text-align: center;
-  width: calc(100% - 8px);
-  margin: 0 auto;
+  position: relative;
+  left: calc(-1 * (44px - 4px));
+  width: calc(100% - 8px + 44px);
+  margin: 0;
   padding-inline: 4px;
 }
 
