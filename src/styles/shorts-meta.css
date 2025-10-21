@@ -67,6 +67,9 @@
   gap: 6px;
   margin-top: 0;
   max-width: 92%;
+  position: relative;
+  left: -44px;
+  width: calc(100% + 44px);
 }
 
 .scm__name {
@@ -99,6 +102,10 @@
   border-radius: 10px;
   cursor: pointer;
   transition: transform 0.12s ease, background-color 0.15s ease;
+  position: relative;
+  left: -44px;
+  margin-left: calc(50% + 22px);
+  transform: translateX(-50%);
 }
 
 .scm__likeCenter:hover {
