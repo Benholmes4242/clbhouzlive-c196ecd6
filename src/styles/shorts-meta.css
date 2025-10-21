@@ -145,7 +145,7 @@
 
 .scm__caption--center {
   text-align: left;
-  width: calc(100% - 22px); /* expand to avatar midpoint: 28px/2 + 8px margin */
+  width: calc(100% - 8px); /* 4px gap on each side */
   align-self: stretch; /* override parent's align-items: center */
 }
 
