@@ -10,7 +10,7 @@
 /* Container with left padding for avatar */
 .scm.scm--center { 
   position: relative;
-  padding: 4px 8px 4px 48px;
+  padding: 4px 8px 4px 52px;
   user-select: none; 
 }
 
@@ -19,8 +19,8 @@
   position: absolute;
   left: 8px;
   top: 8px;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border: 0;
   padding: 0;
   background: transparent;
@@ -39,8 +39,8 @@
 }
 
 .scm__avatar { 
-  width: 32px; 
-  height: 32px; 
+  width: 36px; 
+  height: 36px; 
   border-radius: 9999px; 
   object-fit: cover;
   display: block;
@@ -159,8 +159,8 @@
 .scm__caption--full {
   text-align: left;
   position: relative;
-  left: -40px;
-  width: calc(100% + 40px);
+  left: -44px;
+  width: calc(100% + 44px);
   padding-left: 0px;
   padding-right: 8px;
 }
