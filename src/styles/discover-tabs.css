@@ -1,5 +1,12 @@
 /* Discover Tabs - Floating Pill Indicator */
 
+:root { 
+  --tabs-active-color: #f5a623; /* brand accent for active tab text */
+}
+
+.tab-active { color: var(--tabs-active-color) !important; }
+
+
 /* Hide scrollbar */
 .no-scrollbar::-webkit-scrollbar { 
   display: none; 

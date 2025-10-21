@@ -102,7 +102,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
               data-tab={tab.id}
               className={cn(
                 "relative z-10 text-[16px] font-medium px-4 py-1.5 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-black/15 whitespace-nowrap",
-                active ? "text-black" : "text-black/60 hover:text-black/85"
+                active ? "tab-active" : "text-black/60 hover:text-black/85"
               )}
             >
               {tab.label}
