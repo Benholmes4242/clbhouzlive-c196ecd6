@@ -14,12 +14,11 @@
   user-select: none; 
 }
 
-/* Avatar stays left, centered on top edge */
+/* Avatar stays left, aligned to the name row */
 .scm__avatarWrap {
   position: absolute;
   left: 8px;
-  top: 0;
-  transform: translateY(-50%);
+  top: 8px;
   width: 28px;
   height: 28px;
   border: 0;
