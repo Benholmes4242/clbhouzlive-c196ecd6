@@ -73,9 +73,9 @@
   width: 100%;
 }
 
-/* Center the badge with the name text */
+/* Shift row slightly right so name text appears centered (badge adds ~10px to right) */
 .scm__nameRow:has(.scm__verified) {
-  transform: translateX(5px);
+  transform: translateX(10px);
 }
 
 .scm__name {
