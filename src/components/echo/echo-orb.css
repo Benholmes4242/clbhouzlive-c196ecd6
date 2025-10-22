@@ -29,7 +29,7 @@
 .echo-orb {
   position: fixed;
   right: clamp(12px, 2.8vw, 20px);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(12px, 2.8vw, 20px));
+  bottom: calc(var(--bottom-nav-height, 72px) + 8px + env(safe-area-inset-bottom, 0px));
   z-index: 40;
 
   width: var(--echo-size);
