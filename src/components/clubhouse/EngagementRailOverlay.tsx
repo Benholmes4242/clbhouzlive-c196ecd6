@@ -3,6 +3,7 @@ import { Heart, MessageCircle, Share, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { Squircle } from '@/components/ui/squircle';
 
 interface EngagementRailOverlayProps {
   activePost: {
@@ -57,30 +58,32 @@ const EngagementButton = ({
         data-action="engagement"
         aria-label={ariaLabel}
         className={cn(
-          "relative w-12 h-12 rounded-full flex items-center justify-center",
-          "bg-hud-bg backdrop-blur-md border border-hud-border",
-          "text-white transition-all duration-200 overflow-hidden",
-          "hover:bg-hud-bg/80 active:scale-95",
+          "relative transition-all duration-200",
+          "hover:opacity-80 active:scale-95",
           isPressed && "animate-bounce",
           className
         )}
         onClick={handlePress}
-        style={{ minWidth: '48px', minHeight: '48px' }}
+        style={{ minWidth: '48px', minHeight: '48px', padding: 0, border: 'none', background: 'transparent' }}
       >
-        {/* Ripple effect */}
-        {isPressed && (
-          <div 
-            className="absolute inset-0 bg-white/20 rounded-full animate-ping"
-            style={{ animationDuration: '250ms' }}
-          />
-        )}
-        
-        <Icon 
-          className={cn(
-            "w-6 h-6 transition-colors duration-200",
-            isActive ? "text-accent fill-accent" : "text-white"
-          )}
-        />
+        <Squircle width={48} height={48}>
+          <div className="w-full h-full flex items-center justify-center bg-hud-bg backdrop-blur-md border border-hud-border overflow-hidden relative">
+            {/* Ripple effect */}
+            {isPressed && (
+              <div 
+                className="absolute inset-0 bg-white/20 animate-ping"
+                style={{ animationDuration: '250ms' }}
+              />
+            )}
+            
+            <Icon 
+              className={cn(
+                "w-6 h-6 transition-colors duration-200 relative z-10",
+                isActive ? "text-accent fill-accent" : "text-white"
+              )}
+            />
+          </div>
+        </Squircle>
       </button>
       
       {count > 0 && (
