@@ -29,6 +29,7 @@ export default function EchoOrb({
       onClick={onClick}
     >
       <span className="echo-orb__wordmark">echo</span>
+      <span className="echo-orb__ripple" aria-hidden="true" />
     </button>
   );
 }

@@ -42,7 +42,9 @@
   justify-content: center;
 
   /* glass base (transparent so blur works with content beneath) */
-  background: transparent;
+  background: transparent !important;
+  background-image: none !important;
+  background-color: rgba(255,255,255,0.001);
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
 
@@ -131,7 +133,16 @@
   60%  { box-shadow: 0 0 0 16px rgba(248,156,42,.10), 0 0 0 28px rgba(110,146,119,.08); }
   100% { box-shadow: 0 0 0 34px rgba(248,156,42,0), 0 0 0 48px rgba(110,146,119,0); }
 }
-.echo-orb.e--glass.is-listening::after{ animation: echo-ripple 1.8s ease-out infinite; }
+/* Child ripple element to avoid ::after conflicts */
+.echo-orb__ripple{ position:absolute; inset:-6px; border-radius:999px; pointer-events:none; z-index:1; }
+
+/* Disable old ::after ripple */
+.echo-orb.e--glass.is-listening::after{ animation: none !important; }
+
+/* Apply ripple to child when listening */
+.echo-orb.e--glass.is-listening .echo-orb__ripple{ animation: echo-ripple 1.8s ease-out infinite; }
+
+/* Keep listening breathe */
 .echo-orb.e--glass.is-listening{ animation: echo-breathe 4.2s ease-in-out infinite; }
 
 /* Accessibility: reduce motion */
