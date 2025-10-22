@@ -105,14 +105,29 @@ export const usePostSubmission = () => {
                   
                   console.log(`Successfully uploaded video to Cloudflare Stream: ${hlsUrl}`);
                   
-                  // Create media record for video
+                  // Create media record for video with dimensions for vertical-only filtering
+                  const mediaRecord: any = {
+                    post_id: postData.id,
+                    media_type: 'video',
+                    media_url: hlsUrl,
+                    stream_id: streamData.videoId,
+                  };
+
+                  // Include dimensions if available (enables vertical-only gate immediately)
+                  if (streamData.width && streamData.height) {
+                    mediaRecord.width = streamData.width;
+                    mediaRecord.height = streamData.height;
+                    mediaRecord.aspect_ratio = streamData.aspect_ratio || (streamData.width / streamData.height);
+                    console.log(`📐 Storing dimensions: ${streamData.width}x${streamData.height}, AR=${mediaRecord.aspect_ratio.toFixed(4)}`);
+                  }
+
+                  if (streamData.duration_seconds) {
+                    mediaRecord.duration_seconds = streamData.duration_seconds;
+                  }
+
                   const { error: mediaError } = await supabase
                     .from('post_media')
-                    .insert({
-                      post_id: postData.id,
-                      media_type: 'video',
-                      media_url: hlsUrl
-                    });
+                    .insert(mediaRecord);
 
                   if (mediaError) throw mediaError;
                   return { success: true, fileName: file.name };

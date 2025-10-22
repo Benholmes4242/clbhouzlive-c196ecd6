@@ -29,6 +29,11 @@ interface CloudflareStreamResponse {
     status: {
       state: string;
     };
+    input?: {
+      width?: number;
+      height?: number;
+    };
+    duration?: number;
   };
   errors?: Array<{
     code: number;
@@ -116,6 +121,13 @@ serve(async (req) => {
         const video = uploadResult.result;
         console.log('✅ Video uploaded successfully:', video.uid);
 
+        // Calculate aspect ratio if dimensions available
+        let aspectRatio: number | undefined;
+        if (video.input?.width && video.input?.height) {
+          aspectRatio = video.input.width / video.input.height;
+          console.log(`📐 Video dimensions: ${video.input.width}x${video.input.height}, AR=${aspectRatio.toFixed(4)}`);
+        }
+
         return new Response(
           JSON.stringify({
             success: true,
@@ -124,6 +136,10 @@ serve(async (req) => {
             playback: video.playback,
             preview: video.preview,
             status: video.status.state,
+            width: video.input?.width,
+            height: video.input?.height,
+            aspect_ratio: aspectRatio,
+            duration_seconds: video.duration ? Math.round(video.duration) : undefined,
             urls: {
               hls: video.playback.hls,
               dash: video.playback.dash,
