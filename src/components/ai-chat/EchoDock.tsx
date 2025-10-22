@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { PiWaveform } from 'react-icons/pi';
 import { openAIOverlay } from '@/controllers/aiOverlayController';
-import { Squircle } from '@/components/ui/squircle';
+import EchoOrb from '@/components/echo/EchoOrb';
 
 interface EchoDockProps {
   onClick: () => void;
@@ -95,15 +95,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
 
   function handlePointerDown() {
     const id = window.setTimeout(() => {
-      // Dock ripple animation
-      if (btnRef.current) {
-        btnRef.current.style.animation = 'echo-ripple 0.3s ease-out';
-        setTimeout(() => {
-          if (btnRef.current) {
-            btnRef.current.style.animation = '';
-          }
-        }, 300);
-      }
+      // EchoOrb handles its own animations
       setPanelOpen(true);
       try { (navigator as any).vibrate?.(10); } catch {}
     }, 600);
@@ -160,22 +152,18 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
         </div>
       )}
 
-      <button
-        ref={btnRef}
-        aria-label="Open Echo assistant"
-        className={`echoDoc-btn ${panelOpen ? 'is-panel-open' : ''}`}
+      <div 
+        ref={btnRef as any}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
-        onClick={handleClick}
-        style={{ padding: 0, overflow: 'visible', border: 'none', background: 'transparent' }}
       >
-        <Squircle width={isDesktop ? 64 : 56} height={isDesktop ? 64 : 56}>
-          <div className="echoDoc-inner">
-            <span className="echoDoc-label">echo</span>
-          </div>
-        </Squircle>
-      </button>
+        <EchoOrb 
+          onClick={handleClick}
+          state={panelOpen ? "listening" : "idle"}
+          label="Open Echo assistant"
+        />
+      </div>
 
       {panelOpen && <RadialFan onItemClick={(tab) => { setPanelOpen(false); openAIChatOverlay(tab); }} />}
     </>
@@ -218,8 +206,8 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
     const computedStyle = getComputedStyle(document.documentElement);
     const safeTop = parseFloat(computedStyle.getPropertyValue('--safe-area-inset-top') || '0');
     
-    // Find dock element to get its position
-    const dockElement = document.querySelector('.echoDoc-btn') as HTMLElement;
+    // Find orb element to get its position
+    const dockElement = document.querySelector('.echo-orb') as HTMLElement;
     if (!dockElement) return;
     
     const dockRect = dockElement.getBoundingClientRect();
