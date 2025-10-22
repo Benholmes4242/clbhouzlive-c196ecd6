@@ -399,7 +399,7 @@ html, body {
 /* Mobile profile layout utilities */
 .mini-card {
   position: absolute;
-  right: 8px;
+  right: 50px; /* Moved left from 8px */
   top: calc(var(--mini-h) * var(--mini-overhang) * -1);
   width: var(--mini-w);
   height: var(--mini-h);
