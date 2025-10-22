@@ -303,6 +303,8 @@
   background: linear-gradient(145deg, #F89C2A 0%, #A6D1A5 65%, #8BBE8C 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  border-radius: 30%;
+  overflow: hidden;
 }
 
 /* Subtle idle "halo" - breathes gently with Fairway Glow pulse */
