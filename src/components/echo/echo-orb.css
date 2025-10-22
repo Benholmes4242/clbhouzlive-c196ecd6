@@ -1,43 +1,37 @@
-/* src/components/echo/echo-orb.css */
+/* Echo Orb 2.0 — Glass Gradient Hybrid */
 
-/* ---------- Tokens ---------- */
-:root {
+/* ===== tokens ===== */
+:root{
   --echo-orange: #f89c2a;
   --echo-green:  #6e9277;
   --echo-white:  #ffffff;
 
-  --echo-size: 64px;
+  --echo-size: 64px;                 /* auto downsizes on small screens */
   --echo-radius: 999px;
 
-  --echo-shadow: 0 6px 18px rgba(110, 146, 119, 0.28);
-  --echo-shadow-hover: 0 10px 28px rgba(110, 146, 119, 0.35);
-  --echo-shadow-active: 0 14px 36px rgba(248, 156, 42, 0.38);
-
-  --echo-bg: linear-gradient(145deg, var(--echo-orange) 0%, var(--echo-green) 100%);
-  --echo-gloss: radial-gradient(120% 120% at 20% 10%, rgba(255,255,255,.45) 0%, rgba(255,255,255,0) 55%);
+  --echo-shadow:        0 6px 18px rgba(0,0,0,.16);
+  --echo-shadow-hover:  0 10px 28px rgba(0,0,0,.2);
+  --echo-shadow-active: 0 14px 36px rgba(0,0,0,.24);
 }
 
-/* Responsive size refinement */
-@media (max-width: 400px) {
-  :root {
-    --echo-size: 56px;
+/* compact phones */
+@media (max-width: 400px){
+  :root{ --echo-size: 56px; }
+}
+
+/* dark mode shadows */
+@media (prefers-color-scheme: dark){
+  :root{
+    --echo-shadow: 0 10px 28px rgba(0,0,0,.45);
   }
 }
 
-/* Optional dark theme tune-up */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --echo-shadow: 0 8px 22px rgba(0,0,0,.45);
-    --echo-shadow-hover: 0 12px 34px rgba(0,0,0,.55);
-  }
-}
-
-/* ---------- Button ---------- */
-.echo-orb {
+/* ===== container ===== */
+.echo-orb{
   position: fixed;
   right: 8px;
-  bottom: calc(var(--bottom-nav-height, 72px) + 8px + env(safe-area-inset-bottom, 0px));
-  z-index: 101;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+  z-index: 40;
 
   width: var(--echo-size);
   height: var(--echo-size);
@@ -47,102 +41,113 @@
   align-items: center;
   justify-content: center;
 
-  background: var(--echo-bg);
+  /* glass base (transparent so blur works with content beneath) */
+  background: transparent;
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+
   box-shadow: var(--echo-shadow);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: none;
   outline: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-
-  /* Subtle glassy depth */
-  isolation: isolate;           /* ensures pseudo elements layer correctly */
+  isolation: isolate;
   overflow: hidden;
-  backdrop-filter: saturate(120%) blur(6px);
-  -webkit-backdrop-filter: saturate(120%) blur(6px);
 
   transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
 }
 
-/* Inner gloss highlight */
-.echo-orb::before {
+/* ===== layers ===== */
+
+/* Under-glass brand gradient disc */
+.echo-orb::before{
   content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--echo-gloss);
-  pointer-events: none;
-  mix-blend-mode: screen;
-  opacity: .9;
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(120% 120% at 25% 20%, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 55%),
+              linear-gradient(145deg, var(--echo-orange) 0%, var(--echo-green) 100%);
+  filter: saturate(110%);
+  z-index: 0;
 }
 
-/* Listening ripples (hidden by default) */
-.echo-orb::after {
+/* Glass skin: gloss + tint + tiny noise to avoid flatness */
+.echo-orb::after{
   content: "";
-  position: absolute;
-  inset: -6px;                 /* start slightly inside for softness */
-  border-radius: var(--echo-radius);
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background:
+    /* top gloss sweep */
+    linear-gradient(180deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,0) 55%),
+    /* subtle greenish glass tint */
+    linear-gradient(0deg, rgba(110,146,119,.12), rgba(110,146,119,.12)),
+    /* microscopic noise */
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='table' tableValues='0 0.015'/></feComponentTransfer></filter><rect width='64' height='64' filter='url(%23n)'/></svg>");
+  background-blend-mode: normal, normal, soft-light;
   pointer-events: none;
-  opacity: 0;
+  z-index: 1;
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,.55), /* inner highlight edge */
+    0 0 0 1px rgba(255,255,255,.35);       /* hairline rim */
 }
 
-.echo-orb:is(:hover, :focus-visible) {
+/* Wordmark */
+.echo-orb__wordmark{
+  position: relative;
+  z-index: 2;
+  color: var(--echo-white);
+  font-weight: 650;
+  font-size: 20px;                 /* slightly larger for confidence */
+  letter-spacing: .2px;
+  text-transform: lowercase;
+  user-select: none;
+
+  /* subtle etched feel for glass */
+  text-shadow:
+    0 1px 0 rgba(0,0,0,.10),
+    0 6px 18px rgba(0,0,0,.12);
+}
+
+/* ===== interactions ===== */
+.echo-orb:is(:hover, :focus-visible){
   transform: translateY(-2px) scale(1.04);
   box-shadow: var(--echo-shadow-hover);
 }
 
-.echo-orb:active {
+.echo-orb:active{
   transform: translateY(0) scale(.97);
   box-shadow: var(--echo-shadow-active);
 }
 
-/* Text */
-.echo-orb__text {
-  font-family: inherit;
-  font-weight: 650;
-  font-size: 20px;
-  letter-spacing: .2px;
-  color: var(--echo-white);
-  text-transform: lowercase;
-  user-select: none;
+/* Idle: gentle breathe + float (slow, non-distracting) */
+@keyframes echo-breathe{
+  0%,100% { transform: translateY(0) scale(1); filter: brightness(1); }
+  50%     { transform: translateY(-1px) scale(1.02); filter: brightness(1.03); }
+}
+.is-idle{ animation: echo-breathe 5s ease-in-out infinite; }
+
+/* Listening: add soft outward ripples */
+@keyframes echo-ripple{
+  0%   { box-shadow: 0 0 0 0 rgba(248,156,42,.30), 0 0 0 0 rgba(110,146,119,.00); }
+  60%  { box-shadow: 0 0 0 16px rgba(248,156,42,.10), 0 0 0 28px rgba(110,146,119,.08); }
+  100% { box-shadow: 0 0 0 34px rgba(248,156,42,0), 0 0 0 48px rgba(110,146,119,0); }
+}
+.is-listening::after{ animation: echo-ripple 1.8s ease-out infinite; }
+.is-listening{ animation: echo-breathe 4.2s ease-in-out infinite; }
+
+/* Accessibility: reduce motion */
+@media (prefers-reduced-motion: reduce){
+  .is-idle, .is-listening, .is-listening::after{ animation: none !important; }
+  .echo-orb{ transition: none !important; }
 }
 
-/* ---------- Motion ---------- */
-@keyframes echo-breathe {
-  0%, 100% { transform: translateY(0) scale(1);    filter: brightness(1); }
-  50%      { transform: translateY(-1px) scale(1.02); filter: brightness(1.04); }
-}
-
-@keyframes echo-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
-}
-
-@keyframes echo-ripple {
-  0%   { box-shadow:
-           0 0 0 0 rgba(248, 156, 42, .28),
-           0 0 0 6px rgba(255,255,255,0); }
-  70%  { box-shadow:
-           0 0 0 14px rgba(110,146,119,.18),
-           0 0 0 28px rgba(255,255,255,0); }
-  100% { box-shadow:
-           0 0 0 34px rgba(255,255,255,0),
-           0 0 0 48px rgba(255,255,255,0); }
-}
-
-/* Idle: subtle breathing every ~3s */
-.is-idle {
-  animation: echo-breathe 3.2s ease-in-out infinite, echo-float 6s ease-in-out infinite;
-}
-
-/* Listening: add pulsing ripple */
-.is-listening::after {
-  opacity: 1;
-  animation: echo-ripple 1.8s ease-out infinite;
-}
-
-/* Accessibility: respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .is-idle,
-  .is-listening::after {
-    animation: none !important;
+/* Dark theme tune */
+@media (prefers-color-scheme: dark){
+  .echo-orb::after{
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.20) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(0deg, rgba(110,146,119,.18), rgba(110,146,119,.18));
+    box-shadow:
+      inset 0 1px 2px rgba(255,255,255,.35),
+      0 0 0 1px rgba(255,255,255,.22);
   }
 }

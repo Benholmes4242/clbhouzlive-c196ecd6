@@ -10,8 +10,8 @@ type EchoOrbProps = {
 };
 
 export default function EchoOrb({
-  onClick,
   state = "idle",
+  onClick,
   label = "Open Echo — your AI golf assistant",
   className = "",
 }: EchoOrbProps) {
@@ -27,7 +27,7 @@ export default function EchoOrb({
       ].join(" ")}
       onClick={onClick}
     >
-      <span className="echo-orb__text">echo</span>
+      <span className="echo-orb__wordmark">echo</span>
     </button>
   );
 }
