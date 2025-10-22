@@ -57,10 +57,10 @@
 }
 
 .icon-pin {
-  fill: #EF4444;
+  fill: #F87171;
   width: 60%;
   height: 60%;
-  filter: drop-shadow(0 2px 4px rgba(239, 68, 68, 0.35)) drop-shadow(0 0 8px rgba(239, 68, 68, 0.2));
+  filter: drop-shadow(0 2px 3px rgba(248, 113, 113, 0.25)) drop-shadow(0 0 6px rgba(248, 113, 113, 0.15));
   pointer-events: none;
   position: relative;
   z-index: 1;
