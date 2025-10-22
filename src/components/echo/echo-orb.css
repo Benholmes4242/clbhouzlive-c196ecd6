@@ -30,8 +30,8 @@
   .echo-orb.e--glass{
   position: fixed;
   right: 8px;
-  bottom: calc(var(--nav-height, var(--bottom-nav-height, 72px)) + 8px + env(safe-area-inset-bottom, 0px));
-  z-index: 101;
+  bottom: calc(var(--nav-height, var(--bottom-nav-height, 72px)) + 16px + env(safe-area-inset-bottom, 0px));
+  z-index: 9999;
 
   width: var(--echo-size);
   height: var(--echo-size);
