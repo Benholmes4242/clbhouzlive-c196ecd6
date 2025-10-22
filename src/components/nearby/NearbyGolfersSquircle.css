@@ -1,54 +1,79 @@
 /* Glass Elevate Design - Nearby Golfers Squircle Only */
 
 .nearby-golfers-squircle {
+  position: relative;
   width: 84px;
   height: 84px;
   border-radius: 22%;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-
-  background: 
-    linear-gradient(0deg, rgba(110, 146, 119, 0.15), rgba(110, 146, 119, 0.15)),
-    rgba(255, 255, 255, 0.18);
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 60%);
+  isolation: isolate;
+  cursor: pointer;
+  
+  /* Keep base transparent so blur works when content scrolls under */
+  background: transparent;
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-
-  box-shadow:
-    inset 0 1px 3px rgba(255, 255, 255, 0.55),
-    0 4px 12px rgba(0, 0, 0, 0.10);
-
+  
+  /* Subtle elevation regardless of background */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   animation: glass-breathe 4s ease-in-out infinite alternate;
-  cursor: pointer;
-
+  
   /* Prevent tap highlight on mobile */
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Visible glass skin (always shows, even on white) */
+.nearby-golfers-squircle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  
+  /* Top gloss sweep + green tint + ultra-faint noise */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.00) 55%),
+    linear-gradient(0deg, rgba(110, 146, 119, 0.16), rgba(110, 146, 119, 0.16)),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='table' tableValues='0 0.015'/></feComponentTransfer></filter><rect width='64' height='64' filter='url(%23n)' /></svg>");
+  background-blend-mode: normal, normal, soft-light;
+}
+
+/* Edge definition + inner highlight (sells the glass on white) */
+.nearby-golfers-squircle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  
+  /* Outer hairline + inner highlight ring */
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.35);
 }
 
 .icon-pin {
   fill: #FFFFFF;
   width: 60%;
   height: 60%;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.22));
   pointer-events: none;
+  position: relative;
+  z-index: 1;
 }
 
 /* Hover / Active States */
 .nearby-golfers-squircle:hover {
-  background-color: rgba(110, 146, 119, 0.22);
   transform: translateY(-1px) scale(1.03);
-  filter: brightness(1.05);
-  box-shadow:
-    inset 0 1px 3px rgba(255, 255, 255, 0.55),
-    0 4px 10px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
 }
 
 .nearby-golfers-squircle:active {
-  transform: translateY(-1px) scale(1.01);
+  transform: translateY(0) scale(0.985);
   transition: all 0.1s ease;
 }
 
@@ -68,6 +93,21 @@
 .nearby-golfers-squircle:focus-visible {
   outline: 2px solid rgba(110, 146, 119, 0.6);
   outline-offset: 4px;
+}
+
+/* Optional dark mode: deepen tint and edge */
+@media (prefers-color-scheme: dark) {
+  .nearby-golfers-squircle::before {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.00) 55%),
+      linear-gradient(0deg, rgba(110, 146, 119, 0.22), rgba(110, 146, 119, 0.22));
+  }
+  
+  .nearby-golfers-squircle::after {
+    box-shadow:
+      inset 0 1px 2px rgba(255, 255, 255, 0.35),
+      0 0 0 1px rgba(255, 255, 255, 0.24);
+  }
 }
 
 /* Reduced motion */
