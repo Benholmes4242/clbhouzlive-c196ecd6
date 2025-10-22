@@ -4,6 +4,7 @@ import { useNearbyShorts } from '@/utils/nearbyShorts';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
+import { Squircle } from '@/components/ui/squircle';
 import '@/styles/shorts_live_clubhouse.css';
 
 const SEEN_KEY = 'seenCreatorImmersiveIds';
@@ -100,44 +101,46 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
       onClick={handleClick}
     >
       <div className="lc-avatar-btn">
-        <div className="lc-nearby-avatar">
-          {/* faint checker pattern */}
-          <svg aria-hidden="true" className="lc-checker" viewBox="0 0 12 12" preserveAspectRatio="none">
-            <defs>
-              <pattern id="lcCheck" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
-                <rect width="6" height="6" fill="rgba(110,146,119,.05)"/>
-                <rect width="3" height="3" fill="rgba(110,146,119,.08)"/>
-                <rect x="3" y="3" width="3" height="3" fill="rgba(110,146,119,.08)"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#lcCheck)" />
-          </svg>
+        <Squircle width={84} height={84}>
+          <div className="lc-nearby-avatar">
+            {/* faint checker pattern */}
+            <svg aria-hidden="true" className="lc-checker" viewBox="0 0 12 12" preserveAspectRatio="none">
+              <defs>
+                <pattern id="lcCheck" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
+                  <rect width="6" height="6" fill="rgba(110,146,119,.05)"/>
+                  <rect width="3" height="3" fill="rgba(110,146,119,.08)"/>
+                  <rect x="3" y="3" width="3" height="3" fill="rgba(110,146,119,.08)"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#lcCheck)" />
+            </svg>
 
-          {/* leaf pin */}
-          <svg aria-hidden="true" className="lc-leaf-pin" viewBox="0 0 64 64">
-            <defs>
-              <radialGradient id="leafGlow" cx="50%" cy="35%" r="70%">
-                <stop offset="0%" stopColor="rgba(110,146,119,.28)"/>
-                <stop offset="100%" stopColor="rgba(110,146,119,0)"/>
-              </radialGradient>
-              <linearGradient id="leafBody" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#7CAD89"/>
-                <stop offset="100%" stopColor="#557A61"/>
-              </linearGradient>
-            </defs>
+            {/* leaf pin */}
+            <svg aria-hidden="true" className="lc-leaf-pin" viewBox="0 0 64 64">
+              <defs>
+                <radialGradient id="leafGlow" cx="50%" cy="35%" r="70%">
+                  <stop offset="0%" stopColor="rgba(110,146,119,.28)"/>
+                  <stop offset="100%" stopColor="rgba(110,146,119,0)"/>
+                </radialGradient>
+                <linearGradient id="leafBody" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#7CAD89"/>
+                  <stop offset="100%" stopColor="#557A61"/>
+                </linearGradient>
+              </defs>
 
-            {/* glow behind pin (stays inside mask) */}
-            <circle cx="32" cy="35" r="22" fill="url(#leafGlow)" />
+              {/* glow behind pin (stays inside mask) */}
+              <circle cx="32" cy="35" r="22" fill="url(#leafGlow)" />
 
-            {/* pin (leaf marker) */}
-            <path
-              d="M32 14c-8.8 0-16 7.2-16 16 0 11.4 16 24 16 24s16-12.6 16-24c0-8.8-7.2-16-16-16z"
-              fill="url(#leafBody)"
-            />
-            <circle cx="32" cy="30" r="6.5" fill="#fff" />
-          </svg>
+              {/* pin (leaf marker) */}
+              <path
+                d="M32 14c-8.8 0-16 7.2-16 16 0 11.4 16 24 16 24s16-12.6 16-24c0-8.8-7.2-16-16-16z"
+                fill="url(#leafBody)"
+              />
+              <circle cx="32" cy="30" r="6.5" fill="#fff" />
+            </svg>
 
-        </div>
+          </div>
+        </Squircle>
       </div>
 
       <div className="lc-label">
@@ -178,13 +181,16 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
         onClick={onAvatarClick} 
         aria-label={creator.display_name}
       >
-        <img
-          className="lc-avatar"
-          src={creator.profile_photo_url || '/placeholder.svg'}
-          alt={creator.display_name}
-          loading="lazy"
-          draggable={false}
-        />
+        <Squircle width={84} height={84}>
+          <img
+            className="lc-avatar"
+            src={creator.profile_photo_url || '/placeholder.svg'}
+            alt={creator.display_name}
+            loading="lazy"
+            draggable={false}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        </Squircle>
         {creator.is_online && (
           <span className="lc-dot" aria-hidden="true" />
         )}
