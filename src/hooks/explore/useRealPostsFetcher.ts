@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ExploreContentItem, FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 import { isValidImageUrl } from './urlValidation';
-import { FEATURE_FLAGS, PORTRAIT_MAX_ASPECT_RATIO } from '@/config/featureFlags';
+import { FEATURE_FLAGS, PORTRAIT_MAX_ASPECT_RATIO, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { getStreamPoster } from '@/utils/stream';
 
 export const useRealPostsFetcher = () => {
@@ -524,6 +524,13 @@ export const useRealPostsFetcher = () => {
         .eq('post_media.media_type', 'video')
         .lte('post_media.duration_seconds', 119); // < 120
 
+      // Apply vertical-only aspect ratio band when flag is enabled (TikTok-style)
+      if (FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY) {
+        query = query
+          .gte('post_media.aspect_ratio', VERTICAL_MIN_AR)
+          .lte('post_media.aspect_ratio', VERTICAL_MAX_AR);
+      }
+
       // Cursor-based pagination
       if (cursor) {
         query = query.lt('created_at', cursor);
@@ -552,6 +559,16 @@ export const useRealPostsFetcher = () => {
           firstMedia.duration_seconds < 120
         );
       });
+
+      // Log filtering effectiveness when vertical-only is enabled
+      if (FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY && process.env.NODE_ENV !== 'production') {
+        console.log('[clubhouse-vertical-gate]', {
+          fetched_total: postsData.length,
+          eligible_after_duration: validPosts.length,
+          filter_band: `${VERTICAL_MIN_AR}-${VERTICAL_MAX_AR} (W/H)`,
+          enabled: true
+        });
+      }
 
       // Get unique user IDs
       const userIds = [...new Set(validPosts.map(post => post.user_id))];
