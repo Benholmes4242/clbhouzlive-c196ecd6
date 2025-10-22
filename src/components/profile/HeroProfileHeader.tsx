@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffe
 import { splitName } from '@/utils/name';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
 import { TbMovie } from 'react-icons/tb';
 import { Camera, MapPin, BarChart3 } from 'lucide-react';
@@ -815,20 +816,17 @@ const HeroProfileHeader = ({
                   aria-label="Open mini profile media"
                   className="mini-card cursor-pointer"
                   onClick={() => openImmersive?.(0)}
+                  style={{ padding: 0, border: 'none', background: 'none', overflow: 'visible' }}
                 >
                   {profile?.profile_photo_url && (
-                    <img
-                      src={profile.profile_photo_url}
-                      alt=""
-                      style={{
-                        objectPosition: (() => {
-                          const cx = (profile?.mini_card_crop_x ?? 0) + (profile?.mini_card_crop_width ?? 100) / 2;
-                          const cy = (profile?.mini_card_crop_y ?? 0) + (profile?.mini_card_crop_height ?? 100) / 2;
-                          return `${cx}% ${cy}%`;
-                        })()
-                      }}
-                      loading="lazy"
-                    />
+                    <div style={{ width: '100%', height: '100%' }}>
+                      <AvatarSquircle
+                        size={170}
+                        src={profile.profile_photo_url}
+                        alt={profile.display_name || 'Profile'}
+                        className="w-full h-full"
+                      />
+                    </div>
                   )}
                 </button>
 
@@ -972,30 +970,24 @@ const HeroProfileHeader = ({
                <div className="flex flex-col items-center relative">
                   {/* Overhanging mini profile card */}
                    <div
-                     className="absolute rounded-lg overflow-hidden border border-white/40 bg-white/20 backdrop-blur-sm shadow-[0_12px_28px_rgba(0,0,0,0.25)] z-10"
+                     className="absolute border border-white/40 bg-white/20 backdrop-blur-sm shadow-[0_12px_28px_rgba(0,0,0,0.25)] z-10"
                      style={{
                        width: 'var(--mini-w)',
                        height: 'var(--mini-h)',
                        right: '8px',
-                       top: 'calc(var(--mini-h) * -0.24)'
+                       top: 'calc(var(--mini-h) * -0.24)',
+                       overflow: 'visible'
                      }}
                     onClick={() => openImmersive?.(0)}
                     role="button"
                     aria-label="Open immersive profile"
                   >
                     {profile?.profile_photo_url ? (
-                      <img
+                      <AvatarSquircle
+                        size={170}
                         src={profile.profile_photo_url}
-                        alt=""
-                        className="w-full h-full object-cover"
-                        style={{
-                          objectPosition: (() => {
-                            const cx = (profile?.mini_card_crop_x ?? 0) + (profile?.mini_card_crop_width ?? 100) / 2;
-                            const cy = (profile?.mini_card_crop_y ?? 0) + (profile?.mini_card_crop_height ?? 100) / 2;
-                            return `${cx}% ${cy}%`;
-                          })()
-                        }}
-                        loading="lazy"
+                        alt={profile.display_name || 'Profile'}
+                        className="w-full h-full"
                       />
                     ) : null}
                   </div>
