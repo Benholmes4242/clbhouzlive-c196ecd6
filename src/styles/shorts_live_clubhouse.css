@@ -26,7 +26,7 @@
 
 /* Tiles - keep tap target same size for all */
 .lc-tile {
-  width: 96px;
+  width: 84px;
   scroll-snap-align: start;
   position: relative;
   flex-shrink: 0;
@@ -39,8 +39,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 96px;
-  height: 96px;
+  width: 84px;
+  height: 84px;
   padding: 0;
   border: 0;
   background: transparent;
