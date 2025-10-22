@@ -149,9 +149,6 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
             </linearGradient>
           </defs>
 
-          {/* ring matching the squircle path */}
-          <path d={d} fill="none" stroke="#6e9277" strokeWidth={2} />
-
           {/* Safari-safe clipped content */}
           <g clipPath={`url(#${clipId})`}>
             <rect width="100%" height="100%" fill="#f6faf7" />
