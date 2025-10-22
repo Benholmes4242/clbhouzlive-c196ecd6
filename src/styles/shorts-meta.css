@@ -10,7 +10,7 @@
 /* Container with left padding for avatar */
 .scm.scm--center { 
   position: relative;
-  padding: 4px 8px 4px 56px;
+  padding: 4px 8px 6px 56px;
   user-select: none; 
 }
 
@@ -145,6 +145,7 @@
   text-align: left;
   width: calc(100% + 8px);
   margin-right: -8px;
+  margin-top: 2px;
 }
 
 .scm__caption--center {
