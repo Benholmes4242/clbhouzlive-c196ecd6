@@ -17,6 +17,13 @@
   --echo-gloss: radial-gradient(120% 120% at 20% 10%, rgba(255,255,255,.45) 0%, rgba(255,255,255,0) 55%);
 }
 
+/* Responsive size refinement */
+@media (max-width: 400px) {
+  :root {
+    --echo-size: 56px;
+  }
+}
+
 /* Optional dark theme tune-up */
 @media (prefers-color-scheme: dark) {
   :root {
@@ -42,7 +49,7 @@
 
   background: var(--echo-bg);
   box-shadow: var(--echo-shadow);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   outline: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -90,8 +97,8 @@
 /* Text */
 .echo-orb__text {
   font-family: inherit;
-  font-weight: 600;
-  font-size: 18px;
+  font-weight: 650;
+  font-size: 20px;
   letter-spacing: .2px;
   color: var(--echo-white);
   text-transform: lowercase;
@@ -102,6 +109,11 @@
 @keyframes echo-breathe {
   0%, 100% { transform: translateY(0) scale(1);    filter: brightness(1); }
   50%      { transform: translateY(-1px) scale(1.02); filter: brightness(1.04); }
+}
+
+@keyframes echo-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
 }
 
 @keyframes echo-ripple {
@@ -118,7 +130,7 @@
 
 /* Idle: subtle breathing every ~3s */
 .is-idle {
-  animation: echo-breathe 3.2s ease-in-out infinite;
+  animation: echo-breathe 3.2s ease-in-out infinite, echo-float 6s ease-in-out infinite;
 }
 
 /* Listening: add pulsing ripple */
