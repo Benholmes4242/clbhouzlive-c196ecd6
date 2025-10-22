@@ -1,6 +1,6 @@
 import React from "react";
 
-function superellipsePath(w: number, h: number, n = 5, steps = 200) {
+function superellipsePath(w: number, h: number, n = 4.2, steps = 220) {
   const a = w / 2, b = h / 2, m = 2 / n;
   const pts: string[] = [];
   for (let i = 0; i < steps; i++) {
@@ -31,7 +31,7 @@ export default function SquircleImage({
   className
 }: Props) {
   const id = React.useId();
-  const d = superellipsePath(size, size, 5, 220);
+  const d = superellipsePath(size, size, 4.2, 240);
 
   return (
     <svg
