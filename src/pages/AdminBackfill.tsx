@@ -7,9 +7,12 @@ import { Loader2, PlayCircle, CheckCircle2, XCircle } from 'lucide-react';
 
 interface BackfillResult {
   success: boolean;
-  processed: number;
-  failed: number;
-  total: number;
+  processed?: number;
+  failed?: number;
+  total?: number;
+  successCount?: number;
+  failureCount?: number;
+  message?: string;
   dry_run?: boolean;
   failures?: Array<{ id: string; url: string; error: string }>;
 }
@@ -18,15 +21,21 @@ export default function AdminBackfill() {
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<BackfillResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [backfillType, setBackfillType] = useState<'duration' | 'metadata' | null>(null);
 
-  const runBackfill = async (dryRun: boolean) => {
+  const runBackfill = async (type: 'duration' | 'metadata') => {
     setIsRunning(true);
     setError(null);
     setResult(null);
+    setBackfillType(type);
 
     try {
+      const functionName = type === 'duration' 
+        ? 'backfill-video-durations' 
+        : 'backfill-video-metadata';
+      
       const { data, error: invokeError } = await supabase.functions.invoke(
-        'backfill-video-durations',
+        functionName,
         {
           body: {},
           method: 'POST',
@@ -53,24 +62,24 @@ export default function AdminBackfill() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Backfill Controls</CardTitle>
+          <CardTitle>Duration Backfill</CardTitle>
           <CardDescription>
-            This will fetch duration metadata from Cloudflare Stream API and update post_media records
+            Populate duration_seconds for videos missing this data
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-3">
             <Button
-              onClick={() => runBackfill(false)}
+              onClick={() => runBackfill('duration')}
               disabled={isRunning}
               className="flex items-center gap-2"
             >
-              {isRunning ? (
+              {isRunning && backfillType === 'duration' ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <PlayCircle className="h-4 w-4" />
               )}
-              Run Backfill
+              Run Duration Backfill
             </Button>
           </div>
 
@@ -81,33 +90,70 @@ export default function AdminBackfill() {
             </Alert>
           )}
 
-          {result && (
+          {result && backfillType === 'duration' && (
             <Alert variant={result.success ? 'default' : 'destructive'}>
               <CheckCircle2 className="h-4 w-4" />
               <AlertDescription>
                 <div className="space-y-2">
                   <div className="font-semibold">
-                    {result.success ? 'Backfill Complete' : 'Backfill Failed'}
+                    {result.success ? 'Duration Backfill Complete' : 'Duration Backfill Failed'}
                   </div>
                   <div className="text-sm space-y-1">
                     <div>Total videos found: {result.total}</div>
                     <div>Successfully processed: {result.processed}</div>
                     <div>Failed: {result.failed}</div>
-                    {result.dry_run && <div className="text-yellow-600">DRY RUN - No changes made</div>}
                   </div>
-                  {result.failures && result.failures.length > 0 && (
-                    <div className="mt-3">
-                      <div className="font-semibold text-sm mb-1">Failures:</div>
-                      <div className="text-xs space-y-1 max-h-40 overflow-y-auto">
-                        {result.failures.map((f, i) => (
-                          <div key={i} className="p-2 bg-background/50 rounded">
-                            <div className="font-mono">{f.id}</div>
-                            <div className="text-muted-foreground">{f.error}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Metadata Backfill</CardTitle>
+          <CardDescription>
+            Populate width, height, aspect_ratio, duration, and poster_url from Cloudflare Stream API
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-3">
+            <Button
+              onClick={() => runBackfill('metadata')}
+              disabled={isRunning}
+              className="flex items-center gap-2"
+            >
+              {isRunning && backfillType === 'metadata' ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <PlayCircle className="h-4 w-4" />
+              )}
+              Run Metadata Backfill
+            </Button>
+          </div>
+
+          {error && (
+            <Alert variant="destructive">
+              <XCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {result && backfillType === 'metadata' && (
+            <Alert variant={result.success ? 'default' : 'destructive'}>
+              <CheckCircle2 className="h-4 w-4" />
+              <AlertDescription>
+                <div className="space-y-2">
+                  <div className="font-semibold">
+                    {result.success ? 'Metadata Backfill Complete' : 'Metadata Backfill Failed'}
+                  </div>
+                  {result.message && <div className="text-sm">{result.message}</div>}
+                  <div className="text-sm space-y-1">
+                    <div>Total videos: {result.total || 0}</div>
+                    <div>Successfully updated: {result.successCount || 0}</div>
+                    <div>Failed: {result.failureCount || 0}</div>
+                  </div>
                 </div>
               </AlertDescription>
             </Alert>
