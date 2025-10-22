@@ -48,11 +48,11 @@
   position: relative;
 }
 
-/* Creator avatars (regular size) */
+/* Creator avatars (regular size) - squircle shape */
 .lc-avatar {
   width: var(--lc-avatar-size);
   height: var(--lc-avatar-size);
-  border-radius: 50%;
+  border-radius: 22px;
   box-shadow: 0 1px 6px rgb(0 0 0 / 12%);
   object-fit: cover;
   display: block;
@@ -156,12 +156,12 @@
   --lc-nearby-inset: 3px;      /* inner padding for checker/pin */
 }
 
-/* Avatar container (hard mask + soft background) - smaller than creator avatars */
+/* Avatar container (hard mask + soft background) - squircle shape */
 .lc-nearby-avatar {
   position: relative;
   width: var(--lc-nearby-size);
   height: var(--lc-nearby-size);
-  border-radius: 50%;
+  border-radius: 22px;
   overflow: hidden; /* ensures all effects stay inside */
   background: radial-gradient(60% 60% at 50% 40%, rgba(110,146,119,.08) 0%, rgba(110,146,119,.02) 100%), #f6faf7;
   border: 1.8px solid rgba(255, 255, 255, 0.32); /* glassy light border */
@@ -169,7 +169,6 @@
     inset 0 0 0 var(--lc-nearby-border) var(--lc-green-1), /* inset green ring */
     0 2px 6px rgba(0, 0, 0, 0.08); /* subtle depth */
   isolation: isolate;
-  -webkit-mask-image: radial-gradient(circle, #000 98%, transparent 100%); /* iOS belt & braces */
   background-clip: padding-box;
   backdrop-filter: blur(3px);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -191,7 +190,7 @@
 
 /* subtle checker sits under the pin - scales proportionally */
 .lc-nearby-avatar .lc-checker {
-  border-radius: 50%;
+  border-radius: 18px;
   opacity: 0.8;
 }
 
