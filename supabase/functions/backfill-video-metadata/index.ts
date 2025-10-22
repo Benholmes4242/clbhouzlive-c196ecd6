@@ -71,6 +71,92 @@ function extractStreamId(mediaUrl: string): string | null {
   return null;
 }
 
+// Helper: build absolute URL from possibly relative path
+function toAbsoluteUrl(base: string, path: string) {
+  try {
+    return new URL(path, base).href;
+  } catch (_) {
+    return path;
+  }
+}
+
+// Helper: extract customer domain from a media URL
+function getCustomerHostname(mediaUrl: string): string | null {
+  try {
+    const u = new URL(mediaUrl);
+    return u.hostname || null;
+  } catch (_) {
+    return null;
+  }
+}
+
+// Fallback: parse HLS playlists to infer width/height and duration
+async function fetchHLSMetadata(mediaUrl: string, streamId: string): Promise<{ width: number; height: number; durationSeconds: number | null; posterUrl: string | null } | null> {
+  try {
+    // Master playlist URL
+    const masterUrl = mediaUrl.includes('/manifest/')
+      ? mediaUrl
+      : `https://${getCustomerHostname(mediaUrl) ?? 'customer.cloudflarestream.com'}/${streamId}/manifest/video.m3u8`;
+
+    const masterRes = await fetch(masterUrl);
+    if (!masterRes.ok) {
+      console.warn(`[backfill][HLS] Failed to fetch master m3u8 for ${streamId}: ${masterRes.status}`);
+      return null;
+    }
+    const masterText = await masterRes.text();
+    const lines = masterText.split(/\r?\n/);
+
+    type Variant = { width: number; height: number; url: string };
+    const variants: Variant[] = [];
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.startsWith('#EXT-X-STREAM-INF:')) {
+        const next = lines[i + 1] || '';
+        const resMatch = line.match(/RESOLUTION=(\d+)x(\d+)/i);
+        if (resMatch) {
+          const w = parseInt(resMatch[1], 10);
+          const h = parseInt(resMatch[2], 10);
+          const variantUrl = toAbsoluteUrl(masterUrl, next.trim());
+          variants.push({ width: w, height: h, url: variantUrl });
+        }
+      }
+    }
+
+    if (variants.length === 0) {
+      console.warn(`[backfill][HLS] No variants found in master for ${streamId}`);
+      return null;
+    }
+
+    // Pick the highest width variant
+    variants.sort((a, b) => b.width - a.width);
+    const chosen = variants[0];
+
+    // Sum durations from variant playlist
+    let durationSeconds: number | null = null;
+    try {
+      const varRes = await fetch(chosen.url);
+      if (varRes.ok) {
+        const varText = await varRes.text();
+        const durMatches = varText.match(/#EXTINF:([0-9.]+)/g) || [];
+        const total = durMatches.reduce((acc, m) => acc + parseFloat(m.split(':')[1]), 0);
+        durationSeconds = Math.round(total);
+      }
+    } catch (e) {
+      console.warn(`[backfill][HLS] Failed to parse variant durations for ${streamId}:`, e);
+    }
+
+    const hostname = getCustomerHostname(mediaUrl);
+    const posterUrl = hostname 
+      ? `https://${hostname}/${streamId}/thumbnails/thumbnail.jpg?time=1s&height=720`
+      : null;
+
+    return { width: chosen.width, height: chosen.height, durationSeconds, posterUrl };
+  } catch (e) {
+    console.error('[backfill][HLS] Unexpected error:', e);
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -147,18 +233,35 @@ serve(async (req) => {
       // Fetch metadata from Cloudflare
       const metadata = await fetchStreamMetadata(streamId, cfAccountId, cfApiToken);
 
-      if (!metadata?.input?.width || !metadata?.input?.height) {
-        console.warn(`[backfill] No dimensions for video ${video.id} (stream: ${streamId})`);
+      let width: number | undefined;
+      let height: number | undefined;
+      let durationSeconds: number | null = null;
+      let posterUrl: string | null = null;
+
+      if (metadata?.input?.width && metadata?.input?.height) {
+        width = metadata.input.width;
+        height = metadata.input.height;
+        durationSeconds = metadata.duration ? Math.round(metadata.duration) : null;
+        posterUrl = metadata.preview || null;
+      } else {
+        // Fallback to HLS manifest parsing
+        const hlsMeta = await fetchHLSMetadata(video.media_url, streamId);
+        if (hlsMeta) {
+          width = hlsMeta.width;
+          height = hlsMeta.height;
+          durationSeconds = hlsMeta.durationSeconds;
+          posterUrl = hlsMeta.posterUrl;
+        }
+      }
+
+      if (!width || !height) {
+        console.warn(`[backfill] No dimensions for video ${video.id} (stream: ${streamId}) via CF or HLS`);
         failureCount++;
-        results.push({ id: video.id, status: 'failed', reason: 'No dimensions from CF' });
+        results.push({ id: video.id, status: 'failed', reason: 'No dimensions from CF/HLS' });
         continue;
       }
 
-      const width = metadata.input.width;
-      const height = metadata.input.height;
       const aspectRatio = parseFloat((width / height).toFixed(4));
-      const durationSeconds = metadata.duration ? Math.round(metadata.duration) : null;
-      const posterUrl = metadata.preview || null;
 
       // Update database
       const { error: updateError } = await supabase
