@@ -1,4 +1,5 @@
 import React from 'react';
+import AvatarSquircle from '../ui/AvatarSquircle';
 import { Heart } from 'lucide-react';
 import { BadgeCheck } from 'lucide-react';
 
@@ -39,15 +40,12 @@ export default function ShortsCardMeta({
         }}
         aria-label={`Open ${author.name}'s profile`}
       >
-        <img 
-          className={`scm__avatar${author.isSelf ? ' ring' : ''}`}
+        <AvatarSquircle 
+          size={40} 
           src={author.avatar} 
-          alt={`${author.name} avatar`} 
-          loading="lazy" 
-          decoding="async"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = '/img/avatar-fallback.png';
-          }}
+          alt={author.name}
+          ringColor={author.isSelf ? 'hsl(var(--primary))' : undefined}
+          ringWidth={author.isSelf ? 2 : 0}
         />
       </button>
 

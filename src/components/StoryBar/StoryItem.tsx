@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Plus, User } from 'lucide-react';
 import { StoryUser } from './types';
-import HighQualityImage from '@/components/ui/high-quality-image';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 
 interface StoryItemProps {
   story: StoryUser;
@@ -29,21 +28,21 @@ const StoryItem: React.FC<StoryItemProps> = ({
             type="button"
             onClick={onYourProfileClick}
             aria-label="View your profile"
-            className="focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded-full"
+            className="focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
           >
             {hasProfile && story.avatar ? (
               // User has a profile photo - show with subtle ring
-              <div className="w-20 h-20 rounded-full p-0.5 bg-gradient-to-tr from-gray-200 to-gray-300 hover:opacity-80 transition-opacity">
-                <HighQualityImage
+              <div className="hover:opacity-80 transition-opacity">
+                <AvatarSquircle
+                  size={80}
                   src={story.avatar}
                   alt={story.user}
-                  className="w-full h-full rounded-full border border-background"
-                  width={80}
-                  height={80}
+                  ringColor="rgb(229, 231, 235)"
+                  ringWidth={2}
                 />
               </div>
             ) : (
-              // User doesn't have a profile photo - show plus icon with subtle ring
+              // User doesn't have a profile photo - show plus icon with circular ring
               <div className="w-20 h-20 rounded-full p-0.5 bg-gradient-to-tr from-gray-200 to-gray-300 hover:opacity-80 transition-opacity flex items-center justify-center">
                 <div className="w-full h-full bg-muted border border-dashed border-gray-300 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors">
                   <Plus className="h-6 w-6 text-muted-foreground" />
@@ -56,30 +55,25 @@ const StoryItem: React.FC<StoryItemProps> = ({
             type="button"
             onClick={() => onOtherProfileClick(story.username)}
             aria-label={`View ${story.user}'s profile`}
-            className="focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-full"
+            className="focus:outline-none focus:ring-2 focus:ring-offset-2"
             style={{ '--tw-ring-color': '#6e9277' } as React.CSSProperties}
           >
-            <div 
-              className="w-20 h-20 rounded-full p-0.5 hover:opacity-80 transition-opacity"
-              style={{ background: 'linear-gradient(to top right, #9ca3af, #d1d5db)' }}
-            >
+            <div className="hover:opacity-80 transition-opacity">
               {story.avatar ? (
-                <HighQualityImage
+                <AvatarSquircle
+                  size={80}
                   src={story.avatar}
                   alt={story.user}
-                  className="w-full h-full rounded-full border border-background"
-                  width={80}
-                  height={80}
-                  onError={(e) => {
-                    // Image load error handled silently
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                  }}
+                  ringColor="rgb(209, 213, 219)"
+                  ringWidth={2}
                 />
-              ) : null}
-              <div className={`w-full h-full bg-muted rounded-full flex items-center justify-center border border-background ${story.avatar ? 'hidden' : ''}`}>
-                <User className="h-8 w-8 text-muted-foreground" />
-              </div>
+              ) : (
+                <div className="w-20 h-20 rounded-full p-0.5 bg-gradient-to-tr from-gray-400 to-gray-300">
+                  <div className="w-full h-full bg-muted rounded-full flex items-center justify-center border border-background">
+                    <User className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                </div>
+              )}
             </div>
           </button>
         )}
