@@ -970,7 +970,7 @@ const HeroProfileHeader = ({
                <div className="flex flex-col items-center relative">
                   {/* Overhanging mini profile card */}
                    <div
-                     className="absolute border border-white/40 bg-white/20 backdrop-blur-sm shadow-[0_12px_28px_rgba(0,0,0,0.25)] z-10"
+                     className="absolute z-10"
                      style={{
                        width: 'var(--mini-w)',
                        height: 'var(--mini-h)',
