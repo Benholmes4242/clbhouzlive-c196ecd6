@@ -4,7 +4,8 @@ import { useNearbyShorts } from '@/utils/nearbyShorts';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Squircle } from '@/components/ui/squircle';
+import SquircleImage from '@/components/ui/SquircleImage';
 import '@/styles/shorts_live_clubhouse.css';
 
 const SEEN_KEY = 'seenCreatorImmersiveIds';
@@ -91,7 +92,7 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
   const nearText = count > 0 
     ? (count > 9 ? '9+ golfers near you' : `${count} ${count === 1 ? 'golfer' : 'golfers'} near you`)
     : "Check who's close";
- 
+
   return (
     <button 
       type="button"
@@ -101,15 +102,10 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
       onClick={handleClick}
     >
       <div className="lc-avatar-btn">
-        <AvatarSquircle size={84} src="/placeholder.svg" alt="Nearby Golfers" ringColor="#6e9277" ringWidth={2}>
-          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-            {/* Background + checker */}
-            <div style={{ 
-              position: 'absolute', 
-              inset: 0, 
-              background: 'radial-gradient(60% 60% at 50% 40%, rgba(110,146,119,.08) 0%, rgba(110,146,119,.02) 100%), #f6faf7'
-            }} />
-            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} viewBox="0 0 12 12" preserveAspectRatio="none" opacity={0.8}>
+        <Squircle width={84} height={84}>
+          <div className="lc-nearby-avatar">
+            {/* faint checker pattern */}
+            <svg aria-hidden="true" className="lc-checker" viewBox="0 0 12 12" preserveAspectRatio="none">
               <defs>
                 <pattern id="lcCheck" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
                   <rect width="6" height="6" fill="rgba(110,146,119,.05)"/>
@@ -119,17 +115,9 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
               </defs>
               <rect width="100%" height="100%" fill="url(#lcCheck)" />
             </svg>
-            
-            {/* Leaf pin */}
-            <svg style={{ 
-              position: 'absolute', 
-              top: '50%', 
-              left: '50%', 
-              transform: 'translate(-50%, -50%)',
-              width: '76%',
-              height: '76%',
-              filter: 'drop-shadow(0 1px 0 rgba(255,255,255,.35)) drop-shadow(0 6px 12px rgba(0,0,0,.12))'
-            }} viewBox="0 0 64 64">
+
+            {/* leaf pin */}
+            <svg aria-hidden="true" className="lc-leaf-pin" viewBox="0 0 64 64">
               <defs>
                 <radialGradient id="leafGlow" cx="50%" cy="35%" r="70%">
                   <stop offset="0%" stopColor="rgba(110,146,119,.28)"/>
@@ -140,12 +128,20 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
                   <stop offset="100%" stopColor="#557A61"/>
                 </linearGradient>
               </defs>
+
+              {/* glow behind pin (stays inside mask) */}
               <circle cx="32" cy="35" r="22" fill="url(#leafGlow)" />
-              <path d="M32 14c-8.8 0-16 7.2-16 16 0 11.4 16 24 16 24s16-12.6 16-24c0-8.8-7.2-16-16-16z" fill="url(#leafBody)" />
+
+              {/* pin (leaf marker) */}
+              <path
+                d="M32 14c-8.8 0-16 7.2-16 16 0 11.4 16 24 16 24s16-12.6 16-24c0-8.8-7.2-16-16-16z"
+                fill="url(#leafBody)"
+              />
               <circle cx="32" cy="30" r="6.5" fill="#fff" />
             </svg>
+
           </div>
-        </AvatarSquircle>
+        </Squircle>
       </div>
 
       <div className="lc-label">
@@ -186,12 +182,12 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
         onClick={onAvatarClick} 
         aria-label={creator.display_name}
       >
-        <AvatarSquircle
+        <SquircleImage
           size={84}
           src={creator.profile_photo_url || '/placeholder.svg'}
           alt={creator.display_name}
-          ringColor="#6e9277"
-          ringWidth={2}
+          ringColor={recentPulse ? '#6e9277' : undefined}
+          ringWidth={recentPulse ? 2 : 0}
         />
         {creator.is_online && (
           <span className="lc-dot" aria-hidden="true" />
