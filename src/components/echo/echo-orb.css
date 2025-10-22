@@ -6,7 +6,7 @@
   --echo-green:  #6e9277;
   --echo-white:  #ffffff;
 
-  --echo-size: 56px;
+  --echo-size: 64px;
   --echo-radius: 999px;
 
   --echo-shadow: 0 6px 18px rgba(110, 146, 119, 0.28);
@@ -20,7 +20,7 @@
 /* Responsive size refinement */
 @media (max-width: 400px) {
   :root {
-    --echo-size: 48px;
+    --echo-size: 56px;
   }
 }
 
