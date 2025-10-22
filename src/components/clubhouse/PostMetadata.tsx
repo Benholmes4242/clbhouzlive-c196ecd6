@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 
 interface PostMetadataProps {
   title?: string;
@@ -41,13 +42,11 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
           style={{ minWidth: '44px', minHeight: '44px' }}
           aria-label={`View ${user.name}'s profile`}
         >
-          <img
+          <AvatarSquircle
+            size={44}
             src={user.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
             alt={user.name}
-            className="w-11 h-11 rounded-full object-cover shadow-sm flex-shrink-0"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
-            }}
+            className="flex-shrink-0 shadow-sm"
           />
           <span 
             className="text-[15px] font-medium tracking-[0.02em] text-white drop-shadow-sm leading-none"
