@@ -36,7 +36,7 @@
 .echo-orb {
   position: fixed;
   right: 8px;
-  bottom: calc(var(--bottom-nav-height, 72px) + 8px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--bottom-nav-height, var(--chrome-bottom-h, var(--nav-height, 72px))) + 8px + env(safe-area-inset-bottom, 0px));
   z-index: 101;
 
   width: var(--echo-size);
