@@ -659,8 +659,11 @@ export const useRealPostsFetcher = () => {
           media: [{
             id: firstMedia.id,
             media_type: firstMedia.media_type as 'video' | 'image',
-            media_url: firstMedia.media_url
-          }],
+            media_url: firstMedia.media_url,
+            width: firstMedia.width,
+            height: firstMedia.height,
+            aspect_ratio: firstMedia.aspect_ratio
+          } as any],
           audioTrack: Math.random() > 0.6 ? {
             title: ["Eye of the Tiger", "The Final Countdown", "Original Audio"][Math.floor(Math.random() * 3)],
             artist: Math.random() > 0.5 ? "Survivor" : undefined,
