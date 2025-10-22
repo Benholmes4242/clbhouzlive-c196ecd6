@@ -3,12 +3,12 @@ import { Squircle } from "./squircle";
 
 type Props = {
   size: number;               // e.g., 32, 40, 48, 64, 80
-  src: string;
+  src?: string;               // optional - if not provided, only children will be rendered
   alt?: string;
   ringColor?: string;         // optional border ring
   ringWidth?: number;         // default 0 = no ring
   className?: string;         // extra positioning classes
-  children?: React.ReactNode; // badges (e.g., status dot)
+  children?: React.ReactNode; // badges (e.g., status dot) or full content if no src
   onLoad?: () => void;        // callback when image loads
 };
 
@@ -28,22 +28,24 @@ export default function AvatarSquircle({
 }: Props) {
   const inner = (
     <>
-      <img
-        src={src}
-        alt={alt}
-        style={{ 
-          width: "100%", 
-          height: "100%", 
-          objectFit: "cover", 
-          display: "block" 
-        }}
-        loading="lazy"
-        onLoad={onLoad}
-        onError={(e) => {
-          // Silently handle error - fallback will be shown via children
-          console.warn('Avatar image failed to load:', src);
-        }}
-      />
+      {src && (
+        <img
+          src={src}
+          alt={alt}
+          style={{ 
+            width: "100%", 
+            height: "100%", 
+            objectFit: "cover", 
+            display: "block" 
+          }}
+          loading="lazy"
+          onLoad={onLoad}
+          onError={(e) => {
+            // Silently handle error - fallback will be shown via children
+            console.warn('Avatar image failed to load:', src);
+          }}
+        />
+      )}
       {children}
     </>
   );

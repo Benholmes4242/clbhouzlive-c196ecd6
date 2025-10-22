@@ -4,7 +4,7 @@ import { useNearbyShorts } from '@/utils/nearbyShorts';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
-import { Squircle } from '@/components/ui/squircle';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import SquircleImage from '@/components/ui/SquircleImage';
 import '@/styles/shorts_live_clubhouse.css';
 
@@ -102,7 +102,7 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
       onClick={handleClick}
     >
       <div className="lc-avatar-btn">
-        <Squircle width={84} height={84}>
+        <AvatarSquircle size={84} ringColor="#6e9277" ringWidth={2}>
           <div className="lc-nearby-avatar">
             {/* faint checker pattern */}
             <svg aria-hidden="true" className="lc-checker" viewBox="0 0 12 12" preserveAspectRatio="none">
@@ -141,7 +141,7 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
             </svg>
 
           </div>
-        </Squircle>
+        </AvatarSquircle>
       </div>
 
       <div className="lc-label">
