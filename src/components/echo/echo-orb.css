@@ -28,7 +28,7 @@
 /* ---------- Button ---------- */
 .echo-orb {
   position: fixed;
-  right: clamp(12px, 2.8vw, 20px);
+  right: 8px;
   bottom: calc(var(--bottom-nav-height, 72px) + 8px + env(safe-area-inset-bottom, 0px));
   z-index: 101;
 
