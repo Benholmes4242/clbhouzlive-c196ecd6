@@ -20,6 +20,17 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
   const [pressTimer, setPressTimer] = useState<number | null>(null);
   const dismissTimerRef = useRef<NodeJS.Timeout | null>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  // Detect desktop size for responsive squircle
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 768px)');
+    setIsDesktop(mediaQuery.matches);
+    
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
 
   // Check for first-time onboarding (only first 3 sessions) - SSR safe
   useEffect(() => {
@@ -157,20 +168,13 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
         onClick={handleClick}
-        style={{ padding: 0, overflow: 'visible' }}
+        style={{ padding: 0, overflow: 'visible', border: 'none', background: 'transparent' }}
       >
-        <div className="echoDoc-squircle-wrapper">
-          <Squircle width={56} height={56} className="md:hidden">
-            <div className="echoDoc-inner">
-              <span className="echoDoc-label">echo</span>
-            </div>
-          </Squircle>
-          <Squircle width={64} height={64} className="hidden md:block">
-            <div className="echoDoc-inner">
-              <span className="echoDoc-label">echo</span>
-            </div>
-          </Squircle>
-        </div>
+        <Squircle width={isDesktop ? 64 : 56} height={isDesktop ? 64 : 56}>
+          <div className="echoDoc-inner">
+            <span className="echoDoc-label">echo</span>
+          </div>
+        </Squircle>
       </button>
 
       {panelOpen && <RadialFan onItemClick={(tab) => { setPanelOpen(false); openAIChatOverlay(tab); }} />}
