@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { PiWaveform } from 'react-icons/pi';
 import { openAIOverlay } from '@/controllers/aiOverlayController';
+import { Squircle } from '@/components/ui/squircle';
 
 interface EchoDockProps {
   onClick: () => void;
@@ -156,8 +157,20 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
         onClick={handleClick}
+        style={{ padding: 0, overflow: 'visible' }}
       >
-        <span className="echoDoc-label">echo</span>
+        <div className="echoDoc-squircle-wrapper">
+          <Squircle width={56} height={56} className="md:hidden">
+            <div className="echoDoc-inner">
+              <span className="echoDoc-label">echo</span>
+            </div>
+          </Squircle>
+          <Squircle width={64} height={64} className="hidden md:block">
+            <div className="echoDoc-inner">
+              <span className="echoDoc-label">echo</span>
+            </div>
+          </Squircle>
+        </div>
       </button>
 
       {panelOpen && <RadialFan onItemClick={(tab) => { setPanelOpen(false); openAIChatOverlay(tab); }} />}
