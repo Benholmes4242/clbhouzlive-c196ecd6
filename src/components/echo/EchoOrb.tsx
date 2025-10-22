@@ -22,6 +22,7 @@ export default function EchoOrb({
       title="Echo"
       className={[
         "echo-orb",
+        "e--glass",
         state === "listening" ? "is-listening" : "is-idle",
         className,
       ].join(" ")}

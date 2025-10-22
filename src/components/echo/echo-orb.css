@@ -27,10 +27,10 @@
 }
 
 /* ===== container ===== */
-.echo-orb{
+  .echo-orb.e--glass{
   position: fixed;
   right: 8px;
-  bottom: calc(var(--bottom-nav-height, 72px) + 8px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--nav-height, var(--bottom-nav-height, 72px)) + 8px + env(safe-area-inset-bottom, 0px));
   z-index: 101;
 
   width: var(--echo-size);
@@ -55,12 +55,14 @@
   overflow: hidden;
 
   transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
+  /* TEMP: verification outline - remove after confirming */
+  outline: 2px solid magenta !important;
 }
 
 /* ===== layers ===== */
 
 /* Under-glass brand gradient disc */
-.echo-orb::before{
+.echo-orb.e--glass::before{
   content: "";
   position: absolute; inset: 0;
   border-radius: inherit;
@@ -71,7 +73,7 @@
 }
 
 /* Glass skin: gloss + tint + tiny noise to avoid flatness */
-.echo-orb::after{
+.echo-orb.e--glass::after{
   content: "";
   position: absolute; inset: 0;
   border-radius: inherit;
@@ -91,7 +93,7 @@
 }
 
 /* Wordmark */
-.echo-orb__wordmark{
+.echo-orb.e--glass .echo-orb__wordmark{
   position: relative;
   z-index: 2;
   color: var(--echo-white);
@@ -108,12 +110,12 @@
 }
 
 /* ===== interactions ===== */
-.echo-orb:is(:hover, :focus-visible){
+.echo-orb.e--glass:is(:hover, :focus-visible){
   transform: translateY(-2px) scale(1.04);
   box-shadow: var(--echo-shadow-hover);
 }
 
-.echo-orb:active{
+.echo-orb.e--glass:active{
   transform: translateY(0) scale(.97);
   box-shadow: var(--echo-shadow-active);
 }
@@ -123,7 +125,7 @@
   0%,100% { transform: translateY(0) scale(1); filter: brightness(1); }
   50%     { transform: translateY(-1px) scale(1.02); filter: brightness(1.03); }
 }
-.is-idle{ animation: echo-breathe 5s ease-in-out infinite; }
+.echo-orb.e--glass.is-idle{ animation: echo-breathe 5s ease-in-out infinite; }
 
 /* Listening: add soft outward ripples */
 @keyframes echo-ripple{
@@ -131,18 +133,18 @@
   60%  { box-shadow: 0 0 0 16px rgba(248,156,42,.10), 0 0 0 28px rgba(110,146,119,.08); }
   100% { box-shadow: 0 0 0 34px rgba(248,156,42,0), 0 0 0 48px rgba(110,146,119,0); }
 }
-.is-listening::after{ animation: echo-ripple 1.8s ease-out infinite; }
-.is-listening{ animation: echo-breathe 4.2s ease-in-out infinite; }
+.echo-orb.e--glass.is-listening::after{ animation: echo-ripple 1.8s ease-out infinite; }
+.echo-orb.e--glass.is-listening{ animation: echo-breathe 4.2s ease-in-out infinite; }
 
 /* Accessibility: reduce motion */
 @media (prefers-reduced-motion: reduce){
-  .is-idle, .is-listening, .is-listening::after{ animation: none !important; }
-  .echo-orb{ transition: none !important; }
+  .echo-orb.e--glass.is-idle, .echo-orb.e--glass.is-listening, .echo-orb.e--glass.is-listening::after{ animation: none !important; }
+  .echo-orb.e--glass{ transition: none !important; }
 }
 
 /* Dark theme tune */
 @media (prefers-color-scheme: dark){
-  .echo-orb::after{
+  .echo-orb.e--glass::after{
     background:
       linear-gradient(180deg, rgba(255,255,255,.20) 0%, rgba(255,255,255,0) 55%),
       linear-gradient(0deg, rgba(110,146,119,.18), rgba(110,146,119,.18));
