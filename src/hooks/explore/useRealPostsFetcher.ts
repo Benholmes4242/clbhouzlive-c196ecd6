@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ExploreContentItem, FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 import { isValidImageUrl } from './urlValidation';
-import { FEATURE_FLAGS, PORTRAIT_MAX_ASPECT_RATIO, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
+import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { getStreamPoster } from '@/utils/stream';
 
 export const useRealPostsFetcher = () => {
@@ -62,9 +62,14 @@ export const useRealPostsFetcher = () => {
         .range(currentOffset, currentOffset + postsPerPage - 1)
         .limit(postsPerPage);
 
-      // Apply portrait filtering when flag is enabled
-      if (FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY) {
-        query = query.filter('post_media.aspect_ratio', 'lte', PORTRAIT_MAX_ASPECT_RATIO);
+      // Apply vertical-only filtering when flag is enabled
+      if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
+        query = query
+          .not('post_media.width', 'is', null)
+          .not('post_media.height', 'is', null)
+          .not('post_media.aspect_ratio', 'is', null)
+          .gte('post_media.aspect_ratio', VERTICAL_MIN_AR)
+          .lte('post_media.aspect_ratio', VERTICAL_MAX_AR);
       }
 
       const { data: postsData, error } = await query;
@@ -526,7 +531,7 @@ export const useRealPostsFetcher = () => {
 
       // Apply vertical-only aspect ratio band when flag is enabled (TikTok-style)
       // Guards: require complete metadata (no NULLs) + width/height band 0.56-0.60
-      if (FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY) {
+      if (FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
         query = query
           .not('post_media.width', 'is', null)
           .not('post_media.height', 'is', null)
@@ -584,7 +589,7 @@ export const useRealPostsFetcher = () => {
         eligible_vertical: verticalInBand, // Accurate: in 0.56-0.60 band
         missing_metadata: missingMetadata.length,
         filter_band: `${VERTICAL_MIN_AR}-${VERTICAL_MAX_AR} (W/H)`,
-        enabled: FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY
+        enabled: FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY
       });
 
       // Log sample IDs for backfill targeting

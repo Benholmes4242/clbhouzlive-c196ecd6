@@ -152,11 +152,11 @@ serve(async (req) => {
             const video = uploadResult.result;
             console.log('✅ Video uploaded successfully:', video.uid);
 
-            // Calculate aspect ratio if dimensions available
+            // Calculate aspect ratio if dimensions available (clamped to 4 decimals)
             let aspectRatio: number | undefined;
             if (video.input?.width && video.input?.height) {
-              aspectRatio = video.input.width / video.input.height;
-              console.log(`📐 Video dimensions: ${video.input.width}x${video.input.height}, AR=${aspectRatio.toFixed(4)}`);
+              aspectRatio = parseFloat((video.input.width / video.input.height).toFixed(4));
+              console.log(`📐 Video dimensions: ${video.input.width}x${video.input.height}, AR=${aspectRatio}`);
             } else {
               console.warn('⚠️ Video uploaded but dimensions not available yet - may need backfill');
             }

@@ -24,7 +24,7 @@ import { AudioStrip } from './AudioStrip';
 import PostMetadata from './PostMetadata';
 import EngagementRail from './EngagementRail';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { FEATURE_FLAGS, PORTRAIT_MAX_ASPECT_RATIO } from '@/config/featureFlags';
+import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
 import { 
   auditComponentMount, 
@@ -154,7 +154,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     });
 
     // Second: portrait filter if enabled
-    if (!FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY) return shortsOnly;
+    if (!FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) return shortsOnly;
     
     const filtered = shortsOnly.filter(post => {
       const media = post.media?.[0];

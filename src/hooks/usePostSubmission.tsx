@@ -114,11 +114,14 @@ export const usePostSubmission = () => {
                   };
 
                   // Include dimensions if available (enables vertical-only gate immediately)
+                  // AR = width / height, clamped to 4 decimals
                   if (streamData.width && streamData.height) {
                     mediaRecord.width = streamData.width;
                     mediaRecord.height = streamData.height;
-                    mediaRecord.aspect_ratio = streamData.aspect_ratio || (streamData.width / streamData.height);
-                    console.log(`📐 Storing dimensions: ${streamData.width}x${streamData.height}, AR=${mediaRecord.aspect_ratio.toFixed(4)}`);
+                    mediaRecord.aspect_ratio = streamData.aspect_ratio 
+                      ? parseFloat(streamData.aspect_ratio.toFixed(4))
+                      : parseFloat((streamData.width / streamData.height).toFixed(4));
+                    console.log(`📐 Storing dimensions: ${streamData.width}x${streamData.height}, AR=${mediaRecord.aspect_ratio}`);
                   } else {
                     console.warn('⚠️ Video uploaded but dimensions missing - will need backfill for Clubhouse eligibility');
                   }
