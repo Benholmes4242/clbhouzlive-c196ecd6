@@ -75,12 +75,15 @@ const EngagementButton = ({
         style={{ minWidth: '40px', minHeight: '40px', padding: 0, border: 'none', background: 'transparent' }}
       >
         <Squircle width={40} height={40}>
-          <div className="w-full h-full flex items-center justify-center bg-hud-bg backdrop-blur-md border border-hud-border overflow-hidden relative">
+          <div 
+            className="w-full h-full flex items-center justify-center bg-hud-bg backdrop-blur-md border border-hud-border overflow-hidden relative"
+            style={{ borderRadius: '30%' }}
+          >
             {/* Ripple effect */}
             {isPressed && (
               <div 
                 className="absolute inset-0 bg-white/20 animate-ping"
-                style={{ animationDuration: '250ms' }}
+                style={{ animationDuration: '250ms', borderRadius: '30%' }}
               />
             )}
             
@@ -176,7 +179,10 @@ const EngagementRail = ({
                 style={{ minWidth: '40px', minHeight: '40px', padding: 0, border: 'none', background: 'transparent' }}
               >
                 <Squircle width={40} height={40}>
-                  <div className="w-full h-full flex items-center justify-center bg-hud-bg backdrop-blur-md border border-hud-border overflow-hidden">
+                  <div 
+                    className="w-full h-full flex items-center justify-center bg-hud-bg backdrop-blur-md border border-hud-border overflow-hidden"
+                    style={{ borderRadius: '30%' }}
+                  >
                     <MoreHorizontal className="w-5 h-5 text-white" />
                   </div>
                 </Squircle>

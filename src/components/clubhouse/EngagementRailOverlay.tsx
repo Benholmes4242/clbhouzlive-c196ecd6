@@ -67,12 +67,15 @@ const EngagementButton = ({
         style={{ minWidth: '48px', minHeight: '48px', padding: 0, border: 'none', background: 'transparent' }}
       >
         <Squircle width={48} height={48}>
-          <div className="w-full h-full flex items-center justify-center bg-hud-bg backdrop-blur-md border border-hud-border overflow-hidden relative">
+          <div 
+            className="w-full h-full flex items-center justify-center bg-hud-bg backdrop-blur-md border border-hud-border overflow-hidden relative"
+            style={{ borderRadius: '30%' }}
+          >
             {/* Ripple effect */}
             {isPressed && (
               <div 
                 className="absolute inset-0 bg-white/20 animate-ping"
-                style={{ animationDuration: '250ms' }}
+                style={{ animationDuration: '250ms', borderRadius: '30%' }}
               />
             )}
             
