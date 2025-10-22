@@ -10,8 +10,8 @@
   --sq-gap:         8px;    /* image↔name gap */
   --sq-pill-h:      20px;   /* follow pill height */
 
-  /* radii (superellipse vibe) */
-  --sq-radius:      35px;   /* rounded square corners */
+  /* radii - removed, handled by AvatarSquircle SVG */
+  --sq-radius:      0px;
 
   /* glass-black border colors (no green) */
   --sq-glass-bg:    rgba(255,255,255,0.02);
@@ -41,24 +41,24 @@
   scroll-snap-align: start;
 }
 
-/* ring + image wrapper - no border */
+/* ring + image wrapper - no border, AvatarSquircle handles shape */
 .sq-ring {
   width: var(--sq-img); 
   height: var(--sq-img);
-  border-radius: var(--sq-radius);
+  border-radius: 0;
   padding: 0;
   background: none;
   border: none;
   box-shadow: none;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
 }
 
-/* inner image glass */
+/* inner image glass - no borders */
 .sq-img {
   width: 100%; 
   height: 100%;
-  border-radius: inherit;
+  border-radius: 0;
   background: none;
   border: none;
   object-fit: cover;
@@ -128,11 +128,11 @@
   opacity: 0.85;
 }
 
-/* a11y focus */
+/* a11y focus - no border radius */
 .sq-focusable:focus-visible {
   outline: none; 
   box-shadow: var(--sq-focus);
-  border-radius: calc(var(--sq-radius) + 6px);
+  border-radius: 0;
 }
 
 /* ========================================

@@ -4,8 +4,7 @@ import { useNearbyShorts } from '@/utils/nearbyShorts';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
-import { Squircle } from '@/components/ui/squircle';
-import SquircleImage from '@/components/ui/SquircleImage';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import '@/styles/shorts_live_clubhouse.css';
 
 const SEEN_KEY = 'seenCreatorImmersiveIds';
@@ -92,22 +91,6 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
   const nearText = count > 0 
     ? (count > 9 ? '9+ golfers near you' : `${count} ${count === 1 ? 'golfer' : 'golfers'} near you`)
     : "Check who's close";
-
-  // Local superellipse path generator (Safari-safe, matches iOS continuous corners)
-  function superellipsePath(w: number, h: number, n = 4.2, steps = 240) {
-    const a = w / 2, b = h / 2, m = 2 / n;
-    const pts: string[] = [];
-    for (let i = 0; i < steps; i++) {
-      const t = (i / steps) * Math.PI * 2;
-      const ct = Math.cos(t), st = Math.sin(t);
-      const x = Math.sign(ct) * a * Math.pow(Math.abs(ct), m) + a;
-      const y = Math.sign(st) * b * Math.pow(Math.abs(st), m) + b;
-      pts.push(`${x},${y}`);
-    }
-    return `M ${pts.join(" L ")} Z`;
-  }
-  const size = 84;
-  const d = superellipsePath(size, size, 4.2, 240);
  
   return (
     <button 
@@ -118,39 +101,51 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
       onClick={handleClick}
     >
       <div className="lc-avatar-btn">
-        {/* Safari-safe squircle with ring + clipped contents */}
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: 'block' }}>
-          <defs>
-            <clipPath id="nearbyClip" clipPathUnits="userSpaceOnUse">
-              <path d={d} />
-            </clipPath>
-            <radialGradient id="leafGlow" cx="50%" cy="35%" r="70%">
-              <stop offset="0%" stopColor="rgba(110,146,119,.28)"/>
-              <stop offset="100%" stopColor="rgba(110,146,119,0)"/>
-            </radialGradient>
-            <linearGradient id="leafBody" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#7CAD89"/>
-              <stop offset="100%" stopColor="#557A61"/>
-            </linearGradient>
-            <pattern id="lcCheck" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
-              <rect width="6" height="6" fill="rgba(110,146,119,.05)"/>
-              <rect width="3" height="3" fill="rgba(110,146,119,.08)"/>
-              <rect x="3" y="3" width="3" height="3" fill="rgba(110,146,119,.08)"/>
-            </pattern>
-          </defs>
-
-          {/* Ring on the same squircle path */}
-          <path d={d} fill="none" stroke="#6e9277" strokeWidth={2} />
-
-          {/* Clipped content */}
-          <g clipPath="url(#nearbyClip)">
-            <rect width={size} height={size} fill="#f6faf7" />
-            <rect width={size} height={size} fill="url(#lcCheck)" />
-            <circle cx={size/2} cy={35} r={22} fill="url(#leafGlow)" />
-            <path d="M32 14c-8.8 0-16 7.2-16 16 0 11.4 16 24 16 24s16-12.6 16-24c0-8.8-7.2-16-16-16z" fill="url(#leafBody)" />
-            <circle cx={32} cy={30} r={6.5} fill="#fff" />
-          </g>
-        </svg>
+        <AvatarSquircle size={84} src="/placeholder.svg" alt="Nearby Golfers" ringColor="#6e9277" ringWidth={2}>
+          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+            {/* Background + checker */}
+            <div style={{ 
+              position: 'absolute', 
+              inset: 0, 
+              background: 'radial-gradient(60% 60% at 50% 40%, rgba(110,146,119,.08) 0%, rgba(110,146,119,.02) 100%), #f6faf7'
+            }} />
+            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} viewBox="0 0 12 12" preserveAspectRatio="none" opacity={0.8}>
+              <defs>
+                <pattern id="lcCheck" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
+                  <rect width="6" height="6" fill="rgba(110,146,119,.05)"/>
+                  <rect width="3" height="3" fill="rgba(110,146,119,.08)"/>
+                  <rect x="3" y="3" width="3" height="3" fill="rgba(110,146,119,.08)"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#lcCheck)" />
+            </svg>
+            
+            {/* Leaf pin */}
+            <svg style={{ 
+              position: 'absolute', 
+              top: '50%', 
+              left: '50%', 
+              transform: 'translate(-50%, -50%)',
+              width: '76%',
+              height: '76%',
+              filter: 'drop-shadow(0 1px 0 rgba(255,255,255,.35)) drop-shadow(0 6px 12px rgba(0,0,0,.12))'
+            }} viewBox="0 0 64 64">
+              <defs>
+                <radialGradient id="leafGlow" cx="50%" cy="35%" r="70%">
+                  <stop offset="0%" stopColor="rgba(110,146,119,.28)"/>
+                  <stop offset="100%" stopColor="rgba(110,146,119,0)"/>
+                </radialGradient>
+                <linearGradient id="leafBody" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#7CAD89"/>
+                  <stop offset="100%" stopColor="#557A61"/>
+                </linearGradient>
+              </defs>
+              <circle cx="32" cy="35" r="22" fill="url(#leafGlow)" />
+              <path d="M32 14c-8.8 0-16 7.2-16 16 0 11.4 16 24 16 24s16-12.6 16-24c0-8.8-7.2-16-16-16z" fill="url(#leafBody)" />
+              <circle cx="32" cy="30" r="6.5" fill="#fff" />
+            </svg>
+          </div>
+        </AvatarSquircle>
       </div>
 
       <div className="lc-label">
@@ -191,7 +186,7 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
         onClick={onAvatarClick} 
         aria-label={creator.display_name}
       >
-        <SquircleImage
+        <AvatarSquircle
           size={84}
           src={creator.profile_photo_url || '/placeholder.svg'}
           alt={creator.display_name}

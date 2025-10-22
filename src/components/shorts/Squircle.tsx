@@ -124,7 +124,7 @@ export default function Squircle({ creator, index, onAvatarClick, onLabelClick, 
               size={AVATAR.size}
               src={creator.profile_photo_url || ''}
               alt={name}
-              className={`sq-img ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+              className={imageLoaded ? 'opacity-100' : 'opacity-0'}
               onLoad={onImageLoad}
             >
               {!imageLoaded && !creator.profile_photo_url && (
