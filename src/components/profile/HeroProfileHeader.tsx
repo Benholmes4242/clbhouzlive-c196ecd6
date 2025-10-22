@@ -821,7 +821,7 @@ const HeroProfileHeader = ({
                   {profile?.profile_photo_url && (
                     <div style={{ width: '100%', height: '100%' }}>
                       <AvatarSquircle
-                        size={170}
+                        size={255}
                         src={profile.profile_photo_url}
                         alt={profile.display_name || 'Profile'}
                         className="w-full h-full"
@@ -984,7 +984,7 @@ const HeroProfileHeader = ({
                   >
                     {profile?.profile_photo_url ? (
                       <AvatarSquircle
-                        size={170}
+                        size={255}
                         src={profile.profile_photo_url}
                         alt={profile.display_name || 'Profile'}
                         className="w-full h-full"
