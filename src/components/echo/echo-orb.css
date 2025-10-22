@@ -55,8 +55,6 @@
   overflow: hidden;
 
   transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
-  /* TEMP: verification outline - remove after confirming */
-  outline: 2px solid magenta !important;
 }
 
 /* ===== layers ===== */
