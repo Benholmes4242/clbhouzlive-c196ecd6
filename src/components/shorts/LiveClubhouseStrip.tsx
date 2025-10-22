@@ -212,8 +212,6 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
           size={84}
           src={creator.profile_photo_url || '/placeholder.svg'}
           alt={creator.display_name}
-          ringColor={recentPulse ? '#6e9277' : undefined}
-          ringWidth={recentPulse ? 2 : 0}
         />
         {creator.is_online && (
           <span className="lc-dot" aria-hidden="true" />
