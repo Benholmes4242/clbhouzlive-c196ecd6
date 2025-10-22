@@ -42,7 +42,8 @@ async function fetchStreamMetadata(streamId: string, accountId: string, token: s
     }
 
     if (!response.ok) {
-      console.error(`[backfill] CF Stream API error for ${streamId}:`, response.status);
+      const errorText = await response.text().catch(() => '');
+      console.error(`[backfill] CF Stream API error for ${streamId}:`, response.status, errorText);
       return null;
     }
 
@@ -79,13 +80,13 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const cfAccountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID');
-    const cfApiToken = Deno.env.get('CLOUDFLARE_API_TOKEN');
+    const cfApiToken = Deno.env.get('CLOUDFLARE_API_TOKEN') || Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN');
 
     if (!cfAccountId || !cfApiToken) {
       return new Response(
         JSON.stringify({ 
           error: 'Missing Cloudflare credentials',
-          message: 'Please configure CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN secrets'
+          message: 'Please configure CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN (or CLOUDFLARE_STREAM_API_TOKEN) secrets'
         }),
         { 
           status: 500,
