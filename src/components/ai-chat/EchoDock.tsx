@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { PiWaveform } from 'react-icons/pi';
 import { openAIOverlay } from '@/controllers/aiOverlayController';
-import EchoOrb from '@/components/echo/EchoOrb';
+import EchoOrbGlass from '@/components/echo/EchoOrbGlass';
 
 interface EchoDockProps {
   onClick: () => void;
@@ -158,7 +158,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
       >
-        <EchoOrb 
+        <EchoOrbGlass 
           onClick={handleClick}
           state={panelOpen ? "listening" : "idle"}
           label="Open Echo assistant"
