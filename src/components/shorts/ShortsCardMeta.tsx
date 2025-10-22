@@ -41,8 +41,8 @@ export default function ShortsCardMeta({
         aria-label={`Open ${author.name}'s profile`}
       >
         <AvatarSquircle 
-          size={40} 
-          src={author.avatar} 
+          size={34} 
+          src={author.avatar}
           alt={author.name}
           ringColor={author.isSelf ? 'hsl(var(--primary))' : undefined}
           ringWidth={author.isSelf ? 2 : 0}

@@ -26,7 +26,7 @@ type Props = {
   onImageLoad: () => void;
 };
 
-const AVATAR = { size: 72, radius: 14 };
+const AVATAR = { size: 62, radius: 14 };
 
 export default function Squircle({ creator, index, onAvatarClick, onLabelClick, imageLoaded, onImageLoad }: Props) {
   const { isFollowing, busy, toggle, ensureInitial } = useFollow(creator.id);

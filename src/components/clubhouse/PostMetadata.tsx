@@ -43,7 +43,7 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
           aria-label={`View ${user.name}'s profile`}
         >
           <AvatarSquircle
-            size={44}
+            size={38}
             src={user.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
             alt={user.name}
             className="flex-shrink-0 shadow-sm"

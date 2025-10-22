@@ -26,8 +26,8 @@ export default function StoriesRow({ items }: { items: StoryRing[] }) {
               aria-label={`Open ${s.displayName}'s handicap story`}
             >
               <AvatarSquircle 
-                size={64} 
-                src={s.avatarUrl} 
+                size={56} 
+                src={s.avatarUrl}
                 alt={s.displayName}
                 ringColor={
                   s.deltaIndex < 0 ? 'rgb(34, 197, 94)' :
