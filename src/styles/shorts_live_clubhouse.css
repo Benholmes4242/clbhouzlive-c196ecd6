@@ -55,12 +55,14 @@
   object-fit: cover;
   display: block;
   position: relative;
+  border-radius: 0 !important; /* ensure no rounding conflicts with squircle */
 }
 
 /* Solid outline for recent posts - applied to Squircle wrapper */
-.lc-recent svg {
+.lc-recent .lc-avatar-btn > div {
   outline: 2px solid #6e9277 !important;
   outline-offset: 2px;
+  border-radius: 0 !important;
 }
 
 /* Online dot - positioned to avoid clipping */
@@ -160,11 +162,18 @@
   width: 100%;
   height: 100%;
   background: radial-gradient(60% 60% at 50% 40%, rgba(110,146,119,.08) 0%, rgba(110,146,119,.02) 100%), #f6faf7;
-  border: 1.8px solid rgba(255, 255, 255, 0.32);
+  /* Border removed - would conflict with squircle clipping */
   box-shadow:
-    inset 0 0 0 var(--lc-nearby-border) var(--lc-green-1),
     0 2px 6px rgba(0, 0, 0, 0.08);
   isolation: isolate;
+  border-radius: 0 !important; /* ensure no rounding conflicts with squircle */
+}
+
+/* Green ring for nearby tile - applied as outline on wrapper to follow squircle shape */
+.lc-nearby .lc-avatar-btn > div {
+  outline: 2px solid var(--lc-green-1) !important;
+  outline-offset: -2px; /* inset to match previous border effect */
+  border-radius: 0 !important;
 }
 
 /* Center all inner elements with uniform inset */
