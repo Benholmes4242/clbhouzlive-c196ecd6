@@ -34,7 +34,7 @@ const StoryItem: React.FC<StoryItemProps> = ({
               // User has a profile photo - show with subtle ring
               <div className="hover:opacity-80 transition-opacity">
                 <AvatarSquircle
-                  size={68}
+                  size={80}
                   src={story.avatar}
                   alt={story.user}
                   ringColor="rgb(229, 231, 235)"
@@ -61,7 +61,7 @@ const StoryItem: React.FC<StoryItemProps> = ({
             <div className="hover:opacity-80 transition-opacity">
               {story.avatar ? (
                 <AvatarSquircle
-                  size={68}
+                  size={80}
                   src={story.avatar}
                   alt={story.user}
                   ringColor="rgb(209, 213, 219)"
