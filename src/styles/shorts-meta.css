@@ -7,10 +7,10 @@
   --gap: 8px;
 }
 
-/* Container with left padding for avatar */
+/* Container with right-positioned avatar */
 .scm.scm--center { 
   position: relative;
-  padding: 6px 8px 10px 8px;
+  padding: 6px 32px 10px 8px; /* right padding for avatar */
   user-select: none;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   background: rgba(255, 255, 255, 0.98);
@@ -23,8 +23,11 @@
   box-shadow: 0 3px 8px rgba(0,0,0,0.08);
 }
 
-/* Avatar inline with name */
+/* Avatar positioned on right, centered with username */
 .scm__avatarWrap {
+  position: absolute;
+  right: 8px;
+  top: 6px;
   width: 20px;
   height: 20px;
   border: 0;
