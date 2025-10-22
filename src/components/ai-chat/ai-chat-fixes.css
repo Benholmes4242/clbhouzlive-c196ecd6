@@ -269,7 +269,7 @@
   }
   
   .echoDoc-label {
-    font-size: 22px;
+    font-size: 24px;
   }
 }
 
@@ -284,7 +284,7 @@
 
 /* Echo label styling */
 .echoDoc-label {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
   letter-spacing: 0.2px;
   color: #ffffff;
