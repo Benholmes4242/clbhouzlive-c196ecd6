@@ -149,6 +149,8 @@
   overflow: hidden;
   position: relative;
   text-align: left;
+  width: calc(100% + 8px);
+  margin-right: -8px;
 }
 
 .scm__caption--center {
@@ -160,9 +162,9 @@
   text-align: left;
   position: relative;
   left: -48px;
-  width: calc(100% + 48px);
+  width: calc(100% + 56px);
   padding-left: 0px;
-  padding-right: 8px;
+  padding-right: 0px;
 }
 
 @keyframes like-pop { 
