@@ -5,6 +5,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
 import { Squircle } from '@/components/ui/squircle';
+import SquircleImage from '@/components/ui/SquircleImage';
 import '@/styles/shorts_live_clubhouse.css';
 
 const SEEN_KEY = 'seenCreatorImmersiveIds';
@@ -181,16 +182,13 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
         onClick={onAvatarClick} 
         aria-label={creator.display_name}
       >
-        <Squircle width={84} height={84}>
-          <img
-            className="lc-avatar"
-            src={creator.profile_photo_url || '/placeholder.svg'}
-            alt={creator.display_name}
-            loading="lazy"
-            draggable={false}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        </Squircle>
+        <SquircleImage
+          size={84}
+          src={creator.profile_photo_url || '/placeholder.svg'}
+          alt={creator.display_name}
+          ringColor={recentPulse ? '#6e9277' : undefined}
+          ringWidth={recentPulse ? 2 : 0}
+        />
         {creator.is_online && (
           <span className="lc-dot" aria-hidden="true" />
         )}
