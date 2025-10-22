@@ -41,11 +41,11 @@ export default function ShortsCardMeta({
         aria-label={`Open ${author.name}'s profile`}
       >
         <AvatarSquircle 
-          size={40} 
+          size={20} 
           src={author.avatar} 
           alt={author.name}
           ringColor={author.isSelf ? 'hsl(var(--primary))' : undefined}
-          ringWidth={author.isSelf ? 2 : 0}
+          ringWidth={author.isSelf ? 1 : 0}
         />
       </button>
 
@@ -73,7 +73,7 @@ export default function ShortsCardMeta({
         >
           <Heart 
             className="scm__heart" 
-            size={18}
+            size={14}
             fill={isLiked ? '#6e9277' : 'none'}
             aria-hidden="true"
           />
