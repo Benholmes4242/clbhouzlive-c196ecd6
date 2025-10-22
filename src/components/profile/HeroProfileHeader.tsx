@@ -974,7 +974,7 @@ const HeroProfileHeader = ({
                      style={{
                        width: 'var(--mini-w)',
                        height: 'var(--mini-h)',
-                       right: '50px',
+                       right: '80px',
                        top: 'calc(var(--mini-h) * -0.24)',
                        overflow: 'visible'
                      }}
