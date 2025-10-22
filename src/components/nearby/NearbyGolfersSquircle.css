@@ -1,0 +1,80 @@
+/* Glass Elevate Design - Nearby Golfers Squircle Only */
+
+.nearby-golfers-squircle {
+  width: 84px;
+  height: 84px;
+  border-radius: 22%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  background: rgba(255, 255, 255, 0.25);
+  background-color: rgba(110, 146, 119, 0.18);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.45),
+    0 2px 8px rgba(0, 0, 0, 0.12);
+
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: glass-breathe 4s ease-in-out infinite alternate;
+  cursor: pointer;
+
+  /* Prevent tap highlight on mobile */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.icon-pin {
+  fill: #FFFFFF;
+  width: 60%;
+  height: 60%;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+  pointer-events: none;
+}
+
+/* Hover / Active States */
+.nearby-golfers-squircle:hover {
+  transform: translateY(-2px) scale(1.03);
+  filter: brightness(1.05);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.45),
+    0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+.nearby-golfers-squircle:active {
+  transform: translateY(-1px) scale(1.01);
+  transition: all 0.1s ease;
+}
+
+/* Glass Breathe Animation */
+@keyframes glass-breathe {
+  0% { 
+    opacity: 0.92; 
+    transform: translateY(0) scale(1); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(-1px) scale(1.02); 
+  }
+}
+
+/* Accessibility */
+.nearby-golfers-squircle:focus-visible {
+  outline: 2px solid rgba(110, 146, 119, 0.6);
+  outline-offset: 4px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .nearby-golfers-squircle {
+    animation: none;
+    transition: none;
+  }
+  
+  .nearby-golfers-squircle:hover {
+    transform: none;
+  }
+}
