@@ -4,7 +4,6 @@ import { useNearbyShorts } from '@/utils/nearbyShorts';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import SquircleImage from '@/components/ui/SquircleImage';
 import '@/styles/shorts_live_clubhouse.css';
 
@@ -122,53 +121,51 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
       aria-label={`Nearby golfers, ${count} ${count === 1 ? 'golfer' : 'golfers'} near you`}
       onClick={handleClick}
     >
-      <div className="lc-avatar-btn">
-        <svg
-          width={SIZE}
-          height={SIZE}
-          viewBox={`0 0 ${SIZE} ${SIZE}`}
-          style={{ display: 'block' }}
-          aria-hidden="true"
-        >
-          <defs>
-            <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
-              <path d={d} />
-            </clipPath>
-            <pattern id={checkId} x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
-              <rect width="6" height="6" fill="rgba(110,146,119,.05)"/>
-              <rect width="3" height="3" fill="rgba(110,146,119,.08)"/>
-              <rect x="3" y="3" width="3" height="3" fill="rgba(110,146,119,.08)"/>
-            </pattern>
-            <radialGradient id={glowId} cx="50%" cy="35%" r="70%">
-              <stop offset="0%" stopColor="rgba(110,146,119,.28)"/>
-              <stop offset="100%" stopColor="rgba(110,146,119,0)"/>
-            </radialGradient>
-            <linearGradient id={bodyId} x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#7CAD89"/>
-              <stop offset="100%" stopColor="#557A61"/>
-            </linearGradient>
-          </defs>
+      <svg
+        width={SIZE}
+        height={SIZE}
+        viewBox={`0 0 ${SIZE} ${SIZE}`}
+        style={{ display: 'block' }}
+        aria-hidden="true"
+      >
+        <defs>
+          <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+            <path d={d} />
+          </clipPath>
+          <pattern id={checkId} x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
+            <rect width="6" height="6" fill="rgba(110,146,119,.05)"/>
+            <rect width="3" height="3" fill="rgba(110,146,119,.08)"/>
+            <rect x="3" y="3" width="3" height="3" fill="rgba(110,146,119,.08)"/>
+          </pattern>
+          <radialGradient id={glowId} cx="50%" cy="35%" r="70%">
+            <stop offset="0%" stopColor="rgba(110,146,119,.28)"/>
+            <stop offset="100%" stopColor="rgba(110,146,119,0)"/>
+          </radialGradient>
+          <linearGradient id={bodyId} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#7CAD89"/>
+            <stop offset="100%" stopColor="#557A61"/>
+          </linearGradient>
+        </defs>
 
-          {/* ring matching the squircle path */}
-          <path d={d} fill="none" stroke="#6e9277" strokeWidth={2} />
+        {/* ring matching the squircle path */}
+        <path d={d} fill="none" stroke="#6e9277" strokeWidth={2} />
 
-          {/* Safari-safe clipped content */}
-          <g clipPath={`url(#${clipId})`}>
-            <rect width="100%" height="100%" fill="#f6faf7" />
-            <rect width="100%" height="100%" fill={`url(#${checkId})`} />
+        {/* Safari-safe clipped content */}
+        <g clipPath={`url(#${clipId})`}>
+          <rect width="100%" height="100%" fill="#f6faf7" />
+          <rect width="100%" height="100%" fill={`url(#${checkId})`} />
 
-            {/* Centered leaf pin */}
-            <g transform={`translate(${(SIZE - 64) / 2} ${(SIZE - 64) / 2})`}>
-              <circle cx="32" cy="35" r="22" fill={`url(#${glowId})`} />
-              <path
-                d="M32 14c-8.8 0-16 7.2-16 16 0 11.4 16 24 16 24s16-12.6 16-24c0-8.8-7.2-16-16-16z"
-                fill={`url(#${bodyId})`}
-              />
-              <circle cx="32" cy="30" r="6.5" fill="#fff" />
-            </g>
+          {/* Centered leaf pin */}
+          <g transform={`translate(${(SIZE - 64) / 2} ${(SIZE - 64) / 2})`}>
+            <circle cx="32" cy="35" r="22" fill={`url(#${glowId})`} />
+            <path
+              d="M32 14c-8.8 0-16 7.2-16 16 0 11.4 16 24 16 24s16-12.6 16-24c0-8.8-7.2-16-16-16z"
+              fill={`url(#${bodyId})`}
+            />
+            <circle cx="32" cy="30" r="6.5" fill="#fff" />
           </g>
-        </svg>
-      </div>
+        </g>
+      </svg>
 
       <div className="lc-label">
         <div className="lc-name" title="Nearby Golfers">
