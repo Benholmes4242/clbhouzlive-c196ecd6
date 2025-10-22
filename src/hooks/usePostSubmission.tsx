@@ -119,6 +119,8 @@ export const usePostSubmission = () => {
                     mediaRecord.height = streamData.height;
                     mediaRecord.aspect_ratio = streamData.aspect_ratio || (streamData.width / streamData.height);
                     console.log(`📐 Storing dimensions: ${streamData.width}x${streamData.height}, AR=${mediaRecord.aspect_ratio.toFixed(4)}`);
+                  } else {
+                    console.warn('⚠️ Video uploaded but dimensions missing - will need backfill for Clubhouse eligibility');
                   }
 
                   if (streamData.duration_seconds) {

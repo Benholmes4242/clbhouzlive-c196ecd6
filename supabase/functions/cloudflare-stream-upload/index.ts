@@ -92,62 +92,111 @@ serve(async (req) => {
           uploadFormData.append('meta', JSON.stringify({ name: metadata.title }));
         }
 
-        // Upload to Cloudflare Stream
-        const uploadResponse = await fetch(
-          `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream`,
-          {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${streamToken}`,
-            },
-            body: uploadFormData,
-          }
-        );
+        // Retry logic with exponential backoff for CF Stream API
+        const maxRetries = 5;
+        let lastError: Error | null = null;
+        
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+          try {
+            console.log(`📤 Upload attempt ${attempt}/${maxRetries} for ${file.name}`);
+            
+            // Upload to Cloudflare Stream
+            const uploadResponse = await fetch(
+              `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream`,
+              {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${streamToken}`,
+                },
+                body: uploadFormData,
+              }
+            );
 
-        const uploadResult: CloudflareStreamResponse = await uploadResponse.json();
-        console.log('📥 Cloudflare Stream response:', { success: uploadResult.success, errors: uploadResult.errors });
-
-        if (!uploadResult.success || !uploadResult.result) {
-          console.error('❌ Upload failed:', uploadResult.errors);
-          return new Response(
-            JSON.stringify({ 
-              error: 'Upload failed', 
-              details: uploadResult.errors 
-            }),
-            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-
-        const video = uploadResult.result;
-        console.log('✅ Video uploaded successfully:', video.uid);
-
-        // Calculate aspect ratio if dimensions available
-        let aspectRatio: number | undefined;
-        if (video.input?.width && video.input?.height) {
-          aspectRatio = video.input.width / video.input.height;
-          console.log(`📐 Video dimensions: ${video.input.width}x${video.input.height}, AR=${aspectRatio.toFixed(4)}`);
-        }
-
-        return new Response(
-          JSON.stringify({
-            success: true,
-            videoId: video.uid,
-            thumbnail: video.thumbnail,
-            playback: video.playback,
-            preview: video.preview,
-            status: video.status.state,
-            width: video.input?.width,
-            height: video.input?.height,
-            aspect_ratio: aspectRatio,
-            duration_seconds: video.duration ? Math.round(video.duration) : undefined,
-            urls: {
-              hls: video.playback.hls,
-              dash: video.playback.dash,
-              thumbnail: video.thumbnail
+            const uploadResult: CloudflareStreamResponse = await uploadResponse.json();
+            
+            // Handle rate limiting (429) or server errors (5xx)
+            if (uploadResponse.status === 429 || uploadResponse.status >= 500) {
+              const retryAfter = uploadResponse.headers.get('retry-after');
+              const backoffMs = retryAfter 
+                ? parseInt(retryAfter) * 1000 
+                : Math.min(1000 * Math.pow(2, attempt - 1) + Math.random() * 1000, 10000);
+              
+              console.warn(`⚠️ Rate limited or server error (${uploadResponse.status}), retrying after ${backoffMs}ms...`);
+              lastError = new Error(`HTTP ${uploadResponse.status}: ${uploadResult.errors?.[0]?.message || 'Server error'}`);
+              
+              if (attempt < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, backoffMs));
+                continue;
+              }
             }
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+
+            // Check for success
+            if (!uploadResult.success || !uploadResult.result) {
+              console.error('❌ Upload failed:', uploadResult.errors);
+              lastError = new Error(uploadResult.errors?.[0]?.message || 'Upload failed');
+              
+              // Don't retry on client errors (4xx except 429)
+              if (uploadResponse.status >= 400 && uploadResponse.status < 500 && uploadResponse.status !== 429) {
+                break;
+              }
+              
+              if (attempt < maxRetries) {
+                const backoffMs = Math.min(1000 * Math.pow(2, attempt - 1) + Math.random() * 1000, 10000);
+                await new Promise(resolve => setTimeout(resolve, backoffMs));
+                continue;
+              }
+              break;
+            }
+
+            // Success!
+            const video = uploadResult.result;
+            console.log('✅ Video uploaded successfully:', video.uid);
+
+            // Calculate aspect ratio if dimensions available
+            let aspectRatio: number | undefined;
+            if (video.input?.width && video.input?.height) {
+              aspectRatio = video.input.width / video.input.height;
+              console.log(`📐 Video dimensions: ${video.input.width}x${video.input.height}, AR=${aspectRatio.toFixed(4)}`);
+            } else {
+              console.warn('⚠️ Video uploaded but dimensions not available yet - may need backfill');
+            }
+
+            return new Response(
+              JSON.stringify({
+                success: true,
+                videoId: video.uid,
+                thumbnail: video.thumbnail,
+                playback: video.playback,
+                preview: video.preview,
+                status: video.status.state,
+                width: video.input?.width,
+                height: video.input?.height,
+                aspect_ratio: aspectRatio,
+                duration_seconds: video.duration ? Math.round(video.duration) : undefined,
+                urls: {
+                  hls: video.playback.hls,
+                  dash: video.playback.dash,
+                  thumbnail: video.thumbnail
+                }
+              }),
+              { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+            
+          } catch (fetchError) {
+            lastError = fetchError as Error;
+            console.error(`❌ Attempt ${attempt} failed:`, fetchError);
+            
+            if (attempt < maxRetries) {
+              const backoffMs = Math.min(1000 * Math.pow(2, attempt - 1) + Math.random() * 1000, 10000);
+              await new Promise(resolve => setTimeout(resolve, backoffMs));
+              continue;
+            }
+          }
+        }
+        
+        // All retries exhausted
+        throw lastError || new Error('Upload failed after all retries');
+        
       } catch (error) {
         console.error('❌ Error uploading to Cloudflare Stream:', error);
         return new Response(
