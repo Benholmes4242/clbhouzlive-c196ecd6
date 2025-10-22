@@ -300,7 +300,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(145deg, #F89C2A 0%, #9EC8A0 100%);
+  background: linear-gradient(145deg, #F89C2A 0%, #A6D1A5 65%, #8BBE8C 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
