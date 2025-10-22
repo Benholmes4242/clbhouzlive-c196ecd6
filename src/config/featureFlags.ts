@@ -3,8 +3,8 @@
  */
 
 // Clubhouse vertical-only filtering (TikTok-style)
-// TEMPORARILY DISABLED: aspect_ratio metadata missing from DB - needs backfill first
-export const CLUBHOUSE_PORTRAIT_ONLY = false; // Enable after backfilling aspect_ratio
+// ON by default - set to false to revert to previous behavior
+export const CLUBHOUSE_PORTRAIT_ONLY = true; // Vertical 9:16±7% only, full-bleed
 
 // Existing feature flags
 export const USE_SAFE_AUTOPLAY_V2 = true;
