@@ -525,8 +525,10 @@ export const useRealPostsFetcher = () => {
         .lte('post_media.duration_seconds', 119); // < 120
 
       // Apply vertical-only aspect ratio band when flag is enabled (TikTok-style)
+      // NOTE: Only filter if aspect_ratio metadata exists (not NULL)
       if (FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY) {
         query = query
+          .not('post_media.aspect_ratio', 'is', null)
           .gte('post_media.aspect_ratio', VERTICAL_MIN_AR)
           .lte('post_media.aspect_ratio', VERTICAL_MAX_AR);
       }
@@ -560,13 +562,21 @@ export const useRealPostsFetcher = () => {
         );
       });
 
+      // Check for missing aspect ratio metadata
+      const missingMetadata = validPosts.filter(p => {
+        const m = p.post_media?.[0];
+        return !m?.aspect_ratio && !m?.width && !m?.height;
+      });
+
       // Log filtering effectiveness when vertical-only is enabled
-      if (FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY && process.env.NODE_ENV !== 'production') {
-        console.log('[clubhouse-vertical-gate]', {
+      if (FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY) {
+        console.warn('[clubhouse-vertical-gate]', {
           fetched_total: postsData.length,
           eligible_after_duration: validPosts.length,
+          missing_ar_metadata: missingMetadata.length,
           filter_band: `${VERTICAL_MIN_AR}-${VERTICAL_MAX_AR} (W/H)`,
-          enabled: true
+          enabled: true,
+          warning: missingMetadata.length > 0 ? 'Some videos lack aspect ratio metadata - backfill needed!' : null
         });
       }
 
