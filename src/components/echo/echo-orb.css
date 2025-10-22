@@ -1,0 +1,136 @@
+/* src/components/echo/echo-orb.css */
+
+/* ---------- Tokens ---------- */
+:root {
+  --echo-orange: #f89c2a;
+  --echo-green:  #6e9277;
+  --echo-white:  #ffffff;
+
+  --echo-size: 64px;
+  --echo-radius: 999px;
+
+  --echo-shadow: 0 6px 18px rgba(110, 146, 119, 0.28);
+  --echo-shadow-hover: 0 10px 28px rgba(110, 146, 119, 0.35);
+  --echo-shadow-active: 0 14px 36px rgba(248, 156, 42, 0.38);
+
+  --echo-bg: linear-gradient(145deg, var(--echo-orange) 0%, var(--echo-green) 100%);
+  --echo-gloss: radial-gradient(120% 120% at 20% 10%, rgba(255,255,255,.45) 0%, rgba(255,255,255,0) 55%);
+}
+
+/* Optional dark theme tune-up */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --echo-shadow: 0 8px 22px rgba(0,0,0,.45);
+    --echo-shadow-hover: 0 12px 34px rgba(0,0,0,.55);
+  }
+}
+
+/* ---------- Button ---------- */
+.echo-orb {
+  position: fixed;
+  right: clamp(12px, 2.8vw, 20px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(12px, 2.8vw, 20px));
+  z-index: 40;
+
+  width: var(--echo-size);
+  height: var(--echo-size);
+  border-radius: var(--echo-radius);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--echo-bg);
+  box-shadow: var(--echo-shadow);
+  border: none;
+  outline: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  /* Subtle glassy depth */
+  isolation: isolate;           /* ensures pseudo elements layer correctly */
+  overflow: hidden;
+  backdrop-filter: saturate(120%) blur(6px);
+  -webkit-backdrop-filter: saturate(120%) blur(6px);
+
+  transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
+}
+
+/* Inner gloss highlight */
+.echo-orb::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--echo-gloss);
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: .9;
+}
+
+/* Listening ripples (hidden by default) */
+.echo-orb::after {
+  content: "";
+  position: absolute;
+  inset: -6px;                 /* start slightly inside for softness */
+  border-radius: var(--echo-radius);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.echo-orb:is(:hover, :focus-visible) {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: var(--echo-shadow-hover);
+}
+
+.echo-orb:active {
+  transform: translateY(0) scale(.97);
+  box-shadow: var(--echo-shadow-active);
+}
+
+/* Text */
+.echo-orb__text {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: .2px;
+  color: var(--echo-white);
+  text-transform: lowercase;
+  user-select: none;
+}
+
+/* ---------- Motion ---------- */
+@keyframes echo-breathe {
+  0%, 100% { transform: translateY(0) scale(1);    filter: brightness(1); }
+  50%      { transform: translateY(-1px) scale(1.02); filter: brightness(1.04); }
+}
+
+@keyframes echo-ripple {
+  0%   { box-shadow:
+           0 0 0 0 rgba(248, 156, 42, .28),
+           0 0 0 6px rgba(255,255,255,0); }
+  70%  { box-shadow:
+           0 0 0 14px rgba(110,146,119,.18),
+           0 0 0 28px rgba(255,255,255,0); }
+  100% { box-shadow:
+           0 0 0 34px rgba(255,255,255,0),
+           0 0 0 48px rgba(255,255,255,0); }
+}
+
+/* Idle: subtle breathing every ~3s */
+.is-idle {
+  animation: echo-breathe 3.2s ease-in-out infinite;
+}
+
+/* Listening: add pulsing ripple */
+.is-listening::after {
+  opacity: 1;
+  animation: echo-ripple 1.8s ease-out infinite;
+}
+
+/* Accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .is-idle,
+  .is-listening::after {
+    animation: none !important;
+  }
+}
