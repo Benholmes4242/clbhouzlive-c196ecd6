@@ -292,7 +292,7 @@
   font-size: 20px;
   font-weight: 600;
   letter-spacing: 0.2px;
-  color: rgba(17, 24, 39, 0.90);
+  color: rgba(17, 24, 39, 0.95);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -304,7 +304,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(315deg, hsla(32, 88%, 51%, 1) 0%, hsla(0, 0%, 100%, 1) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
