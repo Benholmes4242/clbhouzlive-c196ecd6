@@ -208,6 +208,14 @@ const Clubhouse = () => {
       {/* Intersection sentinel for header fade-away */}
       <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
       
+      {/* Temporary Admin Backfill Button */}
+      <button
+        onClick={() => window.location.href = '/admin-backfill'}
+        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-primary text-primary-foreground px-6 py-3 rounded-lg shadow-lg font-semibold hover:bg-primary/90 transition-colors"
+      >
+        Run Backfill
+      </button>
+      
       <ClubhouseHeaderNew 
         activeTab={headerActiveTab} 
         onTabChange={setHeaderActiveTab}
