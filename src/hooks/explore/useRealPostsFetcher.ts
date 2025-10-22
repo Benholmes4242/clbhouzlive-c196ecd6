@@ -564,13 +564,15 @@ export const useRealPostsFetcher = () => {
         );
       });
 
-      // Telemetry: track filtering effectiveness
+      // Telemetry: track filtering effectiveness (corrected naming)
+      const durationOnly = validPosts.length; // Passed <120s check
+
       const missingMetadata = validPosts.filter(p => {
         const m = p.post_media?.[0];
         return !m?.aspect_ratio || !m?.width || !m?.height;
       });
 
-      const verticalCount = validPosts.filter(p => {
+      const verticalInBand = validPosts.filter(p => {
         const m = p.post_media?.[0];
         if (!m?.aspect_ratio) return false;
         return m.aspect_ratio >= VERTICAL_MIN_AR && m.aspect_ratio <= VERTICAL_MAX_AR;
@@ -578,13 +580,19 @@ export const useRealPostsFetcher = () => {
 
       console.info('[clubhouse-vertical-gate]', {
         fetched_total: postsData.length,
-        eligible_vertical: validPosts.length,
-        vertical_in_band: verticalCount,
+        eligible_after_duration: durationOnly,
+        eligible_vertical: verticalInBand, // Accurate: in 0.56-0.60 band
         missing_metadata: missingMetadata.length,
         filter_band: `${VERTICAL_MIN_AR}-${VERTICAL_MAX_AR} (W/H)`,
-        enabled: FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY,
-        note: missingMetadata.length > 0 ? `${missingMetadata.length} videos need backfill` : 'All videos have metadata ✓'
+        enabled: FEATURE_FLAGS.CLUBHOUSE_PORTRAIT_ONLY
       });
+
+      // Log sample IDs for backfill targeting
+      if (missingMetadata.length > 0) {
+        const sampleIds = missingMetadata.slice(0, 5).map(p => p.id);
+        console.warn('[clubhouse-vertical-gate] Missing metadata - sample IDs:', sampleIds);
+        console.warn(`⚠️ ${missingMetadata.length} videos need backfill. Run: import('/src/utils/runBackfillDimensions').then(m => m.runFullBackfill())`);
+      }
 
       // Get unique user IDs
       const userIds = [...new Set(validPosts.map(post => post.user_id))];
