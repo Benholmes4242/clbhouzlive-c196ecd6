@@ -35,7 +35,7 @@
 .scm__avatarWrap:focus-visible {
   outline: 2px solid var(--clb-green);
   outline-offset: 2px;
-  border-radius: 0; /* removed - using squircle shape */
+  border-radius: 9999px;
 }
 
 /* Avatar now uses Squircle via AvatarSquircle; no local rounding here */

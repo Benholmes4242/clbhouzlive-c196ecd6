@@ -10,8 +10,8 @@
   --sq-gap:         8px;    /* image↔name gap */
   --sq-pill-h:      20px;   /* follow pill height */
 
-  /* radii - removed to use true squircle component */
-  /* --sq-radius:      35px; */   /* OLD: rounded square corners - now using SVG superellipse */
+  /* radii (superellipse vibe) */
+  --sq-radius:      35px;   /* rounded square corners */
 
   /* glass-black border colors (no green) */
   --sq-glass-bg:    rgba(255,255,255,0.02);
@@ -41,24 +41,24 @@
   scroll-snap-align: start;
 }
 
-/* ring + image wrapper - no border-radius (using SVG squircle) */
+/* ring + image wrapper - no border */
 .sq-ring {
   width: var(--sq-img); 
   height: var(--sq-img);
-  border-radius: 0; /* removed - now using true squircle SVG clipPath */
+  border-radius: var(--sq-radius);
   padding: 0;
   background: none;
   border: none;
   box-shadow: none;
-  overflow: visible; /* changed from hidden to allow squircle SVG */
+  overflow: hidden;
   position: relative;
 }
 
-/* inner image - no border-radius (clipped by parent squircle) */
+/* inner image glass */
 .sq-img {
   width: 100%; 
   height: 100%;
-  border-radius: 0; /* removed - clipping handled by Squircle component */
+  border-radius: inherit;
   background: none;
   border: none;
   object-fit: cover;
@@ -128,11 +128,11 @@
   opacity: 0.85;
 }
 
-/* a11y focus - removed radius since using SVG squircle */
+/* a11y focus */
 .sq-focusable:focus-visible {
   outline: none; 
   box-shadow: var(--sq-focus);
-  border-radius: 0;
+  border-radius: calc(var(--sq-radius) + 6px);
 }
 
 /* ========================================
