@@ -19,7 +19,7 @@ interface ShortsGridProps {
 }
 
 // Single source of truth for spacing
-const GUTTER_PX = 4 as const;
+const GUTTER_PX = 2 as const;
 const CARD_ASPECT = 0.52; // width / height (slightly wider than 9:16)
 const PORTRAITS_PER_LANDSCAPE = 6; // Insert landscape after every 6 portraits
 const LOOKAHEAD_WINDOW = 20; // Lookahead window for landscape candidate search
