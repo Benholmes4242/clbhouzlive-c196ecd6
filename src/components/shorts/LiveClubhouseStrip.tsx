@@ -158,7 +158,7 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
         aria-label={creator.display_name}
       >
         <SquircleImage
-          size={75}
+          size={80}
           src={creator.profile_photo_url || '/placeholder.svg'}
           alt={creator.display_name}
         />
