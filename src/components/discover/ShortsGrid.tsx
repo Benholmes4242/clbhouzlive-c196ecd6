@@ -19,7 +19,7 @@ interface ShortsGridProps {
 
 // Single source of truth for spacing
 const GUTTER_PX = 4 as const;
-const CARD_ASPECT = 0.75; // width / height (3:4)
+const CARD_ASPECT = 2.0; // width / height (2:1 - EXTREME TEST)
 
 // Deterministic height variance based on item ID
 const getHeightVariant = (id: string): number => {
