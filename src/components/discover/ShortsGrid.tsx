@@ -339,6 +339,8 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                   width: '100%',
                   maxWidth: '100%',
                   boxSizing: 'border-box',
+                  marginLeft: `-${GUTTER_PX}px`,
+                  marginRight: `-${GUTTER_PX}px`,
                   marginBottom: `${GUTTER_PX}px` 
                 }}
               >
