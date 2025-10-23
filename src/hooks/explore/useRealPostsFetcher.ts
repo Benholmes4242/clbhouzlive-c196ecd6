@@ -239,6 +239,9 @@ export const useRealPostsFetcher = () => {
             media_type,
             media_url,
             duration_seconds,
+            width,
+            height,
+            aspect_ratio,
             media_width,
             media_height,
             image_orientation
