@@ -10,7 +10,7 @@
 /* Horizontal scroll track */
 .live-scroll {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x proximity;
