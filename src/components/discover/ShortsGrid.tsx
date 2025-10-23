@@ -100,10 +100,10 @@ export default function ShortsGrid({
       
       if (leftHeight <= rightHeight) {
         leftCol.push({ item, index: actualIndex });
-        leftHeight += cardHeight + 4; // 4px gap
+        leftHeight += cardHeight + 8; // 8px gap
       } else {
         rightCol.push({ item, index: actualIndex });
-        rightHeight += cardHeight + 4;
+        rightHeight += cardHeight + 8;
       }
     });
     
@@ -157,7 +157,7 @@ export default function ShortsGrid({
         {(leftColumn.length > 0 || rightColumn.length > 0) && (
           <div className="grid grid-cols-2 items-start" style={{ gap: '4px' }}>
             {/* Left Column */}
-            <div className="flex flex-col" style={{ gap: '4px' }}>
+            <div className="flex flex-col gap-2">
               {leftColumn.map(({ item, index }) => (
                 <ShortCardWithObserver
                   key={item.id}
@@ -173,7 +173,7 @@ export default function ShortsGrid({
             </div>
             
             {/* Right Column */}
-            <div className="flex flex-col" style={{ gap: '4px' }}>
+            <div className="flex flex-col gap-2">
               {rightColumn.map(({ item, index }) => (
                 <ShortCardWithObserver
                   key={item.id}
