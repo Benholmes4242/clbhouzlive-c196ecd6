@@ -94,6 +94,18 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
     });
   }, [items]);
 
+  // Diagnostic log for item metadata (first load only)
+  useEffect(() => {
+    if (items && items.length > 0) {
+      console.log('[shorts] meta',
+        items.slice(0, 60).map(i => ({
+          id: i.id, t: i.type, dur: i.durationSeconds,
+          w: (i as any).width, h: (i as any).height, ar: (i as any).aspectRatio
+        }))
+      );
+    }
+  }, [items.length > 0 && items[0]?.id]); // Only log when first item changes
+
   const handleCardClick = (item: ExploreContentItem, index: number) => {
     setSelectedIndex(index);
     setViewerOpen(true);
@@ -149,9 +161,17 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
       // Check if we should try to insert a landscape card
       if (portraitCount > 0 && portraitCount % PORTRAITS_PER_LANDSCAPE === 0) {
         const start = itemIndex;
-        const windowItems = items.slice(start, start + LOOKAHEAD_WINDOW).map((it, idx) => ({ item: it, index: start + idx }));
-        const eligibleInWindow = windowItems.filter(({ item, index }) => !usedIndexes.has(index) && isLandscapeEligible(item)).length;
-        console.log('[shorts] try landscape at portraitCount=', portraitCount, { start, used: usedIndexes.size, eligibleInWindow });
+        const windowItems = items.slice(start, start + LOOKAHEAD_WINDOW)
+          .map((it, idx) => ({ item: it, index: start + idx }));
+        const eligibleInWindow = windowItems.filter(({ item, index }) =>
+          !usedIndexes.has(index) && isLandscapeEligible(item)
+        ).length;
+
+        console.log('[shorts] landscape check', {
+          portraitCount,
+          startIndex: start,
+          eligibleInWindow
+        });
 
         // Try to find a landscape candidate within a limited lookahead window
         const landscapeCandidate = selectLandscapeCandidate(items, usedIndexes, start, LOOKAHEAD_WINDOW);
@@ -159,7 +179,9 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
         if (landscapeCandidate) {
           // Preload the landscape card's poster
           preloadLandscapePoster(landscapeCandidate.item);
-          console.log('[shorts] inserted landscape at portraitCount=', portraitCount, { candidateIndex: landscapeCandidate.index });
+          console.log('[shorts] inserted landscape after portraits=', portraitCount, {
+            candidateIndex: landscapeCandidate.index
+          });
           
           result.push({
             item: landscapeCandidate.item,
@@ -328,7 +350,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
         {/* Sections: Masonry blocks interspersed with landscape cards */}
         {sections.map((section, sectionIndex) => {
           if (section.type === 'landscape' && section.landscapeItem) {
-            console.log('[shorts] render landscape full-width at section', sectionIndex);
+            console.log('[shorts] render full-width landscape section');
             return (
               <div key={`landscape-${sectionIndex}`} style={{ marginBottom: `${GUTTER_PX}px` }}>
                 <ShortCardWithObserver
