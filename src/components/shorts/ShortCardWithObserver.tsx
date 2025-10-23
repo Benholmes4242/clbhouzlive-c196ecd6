@@ -39,7 +39,7 @@ export default function ShortCardWithObserver({
   }, [isInView, item.id, onVisibilityChange]);
 
   return (
-    <div ref={ref} className="w-full">
+    <div ref={ref}>
       <ShortCard
         item={item}
         onClick={onClick}
