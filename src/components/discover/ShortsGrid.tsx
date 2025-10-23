@@ -19,6 +19,7 @@ interface ShortsGridProps {
 
 // Single source of truth for spacing
 const GUTTER_PX = 4 as const;
+const CARD_ASPECT = 0.75; // width / height (3:4)
 
 // Deterministic height variance based on item ID
 const getHeightVariant = (id: string): number => {
@@ -41,7 +42,30 @@ export default function ShortsGrid({
   const loadingRef = useRef(false);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
+const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
+
+  // Track column width to compute pixel-perfect height from aspect ratio
+  const [columnWidth, setColumnWidth] = useState(0);
+
+  const updateColumnWidth = useCallback(() => {
+    const el = gridRef.current;
+    if (!el) return;
+    const containerWidth = el.clientWidth; // includes padding
+    const inner = containerWidth - GUTTER_PX * 2; // remove left/right padding
+    const col = (inner - GUTTER_PX) / 2; // remove inter-column gap, then split
+    setColumnWidth(col);
+  }, []);
+
+  useEffect(() => {
+    updateColumnWidth();
+    window.addEventListener('resize', updateColumnWidth);
+    return () => window.removeEventListener('resize', updateColumnWidth);
+  }, [updateColumnWidth]);
+
+  const baseHeightPx = useMemo(() => {
+    if (columnWidth <= 0) return 280;
+    return Math.round(columnWidth / CARD_ASPECT); // height = width / (w/h)
+  }, [columnWidth]);
 
   // Preload posters for first visible items on mount
   useEffect(() => {
@@ -94,7 +118,7 @@ export default function ShortsGrid({
     
     let leftHeight = 0;
     let rightHeight = 0;
-    const baseHeight = 280;
+    const baseHeight = baseHeightPx;
     
     remaining.forEach((item, idx) => {
       const actualIndex = idx + 2; // offset by first row
@@ -111,7 +135,7 @@ export default function ShortsGrid({
     });
     
     return { firstRow, leftColumn: leftCol, rightColumn: rightCol };
-  }, [items]);
+  }, [items, baseHeightPx]);
 
   // Infinite scroll handler
   useEffect(() => {
