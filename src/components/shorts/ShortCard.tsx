@@ -54,7 +54,7 @@ export default React.memo(function ShortCard({
           width: '100%',
           maxWidth: '100%',
           height: height ? `${height}px` : undefined,
-          aspectRatio: isLandscape ? '16/10.433' : (!height ? '9/16' : undefined),
+          aspectRatio: isLandscape ? '16/13.041' : (!height ? '9/16' : undefined),
           boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 6px 16px rgba(0,0,0,0.06)',
           borderRadius: isLandscape ? '16px' : '18px',
           WebkitMaskImage: isLandscape ? 'url("/ui/shorts-squircle-16x9.svg")' : 'url("/ui/shorts-squircle-9x16.svg")',
