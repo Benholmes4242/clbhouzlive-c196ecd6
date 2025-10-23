@@ -39,16 +39,26 @@ export default React.memo(function ShortCard({
   return (
     <button
       onClick={onClick}
-      className="group relative w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-xl active:scale-[0.98] transition-transform duration-75"
+      className="shortsCard group relative w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.98] transition-transform duration-75"
+      style={{ margin: 0 }}
       aria-label={`Play short: ${item.title || 'Video'} by ${item.user?.name || 'Unknown'}`}
     >
       {/* Thumbnail Container */}
       <div 
-        className="relative w-full overflow-hidden rounded-xl bg-muted mb-2"
+        className="relative w-full overflow-hidden bg-muted mb-2"
         style={{ 
           height: height ? `${height}px` : undefined,
           aspectRatio: !height ? '9/16' : undefined,
-          boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 6px 16px rgba(0,0,0,0.06)'
+          boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 6px 16px rgba(0,0,0,0.06)',
+          borderRadius: '18px',
+          WebkitMaskImage: 'url("/ui/shorts-squircle-9x16.svg")',
+          maskImage: 'url("/ui/shorts-squircle-9x16.svg")',
+          WebkitMaskSize: '100% 100%',
+          maskSize: '100% 100%',
+          WebkitMaskRepeat: 'no-repeat',
+          maskRepeat: 'no-repeat',
+          WebkitMaskPosition: 'center',
+          maskPosition: 'center'
         }}
       >
         {/* Video with poster fallback - always render video element for consistency */}

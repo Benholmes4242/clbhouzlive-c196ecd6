@@ -17,6 +17,9 @@ interface ShortsGridProps {
   currentUserId?: string;
 }
 
+// Single source of truth for spacing
+const GUTTER_PX = 4 as const;
+
 // Deterministic height variance based on item ID
 const getHeightVariant = (id: string): number => {
   const variants = [-10, -6, -3, 3, 6, 10]; // percentage variants
@@ -100,10 +103,10 @@ export default function ShortsGrid({
       
       if (leftHeight <= rightHeight) {
         leftCol.push({ item, index: actualIndex });
-        leftHeight += cardHeight + 8; // 8px gap
+        leftHeight += cardHeight + GUTTER_PX;
       } else {
         rightCol.push({ item, index: actualIndex });
-        rightHeight += cardHeight + 8;
+        rightHeight += cardHeight + GUTTER_PX;
       }
     });
     
@@ -133,10 +136,21 @@ export default function ShortsGrid({
 
   return (
     <>
-      <div ref={gridRef} className="pb-4 px-1">
+      <div 
+        ref={gridRef} 
+        className="shortsGrid pb-4"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: `${GUTTER_PX}px`,
+          paddingLeft: `${GUTTER_PX}px`,
+          paddingRight: `${GUTTER_PX}px`,
+          boxSizing: 'border-box'
+        }}
+      >
         {/* First Row - Pinned, Same Height */}
         {firstRow.length > 0 && (
-          <div className="grid grid-cols-2 gap-1 mb-2">
+          <div className="col-span-2 grid grid-cols-2" style={{ gap: `${GUTTER_PX}px`, marginBottom: `${GUTTER_PX}px` }}>
             {firstRow.map((item, index) => (
               <ShortCardWithObserver
                 key={item.id}
@@ -154,10 +168,8 @@ export default function ShortsGrid({
         )}
         
         {/* Masonry Columns - Staggered */}
-        {(leftColumn.length > 0 || rightColumn.length > 0) && (
-          <div className="grid grid-cols-2 gap-1 items-start">
-            {/* Left Column */}
-            <div className="flex flex-col gap-2">
+        {leftColumn.length > 0 && (
+          <div className="shortsCol shortsCol--left" style={{ display: 'grid', rowGap: `${GUTTER_PX}px` }}>
               {leftColumn.map(({ item, index }) => (
                 <ShortCardWithObserver
                   key={item.id}
@@ -170,10 +182,11 @@ export default function ShortsGrid({
                   currentUserId={currentUserId}
                 />
               ))}
-            </div>
+          </div>
+        )}
             
-            {/* Right Column */}
-            <div className="flex flex-col gap-2">
+        {rightColumn.length > 0 && (
+          <div className="shortsCol shortsCol--right" style={{ display: 'grid', rowGap: `${GUTTER_PX}px` }}>
               {rightColumn.map(({ item, index }) => (
                 <ShortCardWithObserver
                   key={item.id}
@@ -186,7 +199,6 @@ export default function ShortsGrid({
                   currentUserId={currentUserId}
                 />
               ))}
-            </div>
           </div>
         )}
       </div>
