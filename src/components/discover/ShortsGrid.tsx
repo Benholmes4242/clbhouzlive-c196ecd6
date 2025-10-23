@@ -143,12 +143,13 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
     const usedIndexes = new Set<number>();
     let portraitCount = 0;
     let itemIndex = 0;
+    let insertedLandscapeThisBoundary = false;
     
     while (itemIndex < items.length) {
       const item = items[itemIndex];
       
       // Check if we should try to insert a landscape card
-      if (portraitCount > 0 && portraitCount % PORTRAITS_PER_LANDSCAPE === 0) {
+      if (portraitCount > 0 && portraitCount % PORTRAITS_PER_LANDSCAPE === 0 && !insertedLandscapeThisBoundary) {
         const start = itemIndex;
 
         // Try to find a landscape candidate within a limited lookahead window
@@ -165,6 +166,10 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
             variant: 'landscape'
           });
           usedIndexes.add(landscapeCandidate.index);
+          
+          // Reset counter to start a new block and prevent double inserts
+          portraitCount = 0;
+          insertedLandscapeThisBoundary = true;
           
           // Do NOT advance itemIndex here since we didn't consume items[itemIndex]
           continue;
@@ -185,6 +190,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
         });
         usedIndexes.add(itemIndex);
         portraitCount++;
+        insertedLandscapeThisBoundary = false;
       }
       
       itemIndex++;
