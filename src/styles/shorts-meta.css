@@ -13,7 +13,7 @@
   padding: 6px 36px 10px 8px; /* right padding for avatar (28px + 8px gap) */
   user-select: none;
   background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 6px 16px rgba(0,0,0,0.06);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   border-radius: 16px;
   -webkit-mask-image: url("/ui/shorts-meta-squircle.svg");
@@ -196,7 +196,7 @@
 /* Dark theme overrides */
 [data-theme="dark"] .scm.scm--center {
   background: rgba(30, 30, 30, 0.9);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2), 0 6px 16px rgba(0,0,0,0.15);
 }
 
 [data-theme="dark"] .scm__name--black {
