@@ -14,6 +14,7 @@ interface ShortCardProps {
   onLike?: (itemId: string) => void;
   onAuthorClick?: (authorId: string) => void;
   currentUserId?: string;
+  variant?: 'portrait' | 'landscape'; // New: Support landscape cards
 }
 
 export default React.memo(function ShortCard({ 
@@ -24,7 +25,8 @@ export default React.memo(function ShortCard({
   autoplay,
   onLike,
   onAuthorClick,
-  currentUserId
+  currentUserId,
+  variant = 'portrait'
 }: ShortCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const isVideo = item.type === 'video' || item.src?.includes('.mp4') || item.src?.includes('.webm');
@@ -35,6 +37,8 @@ export default React.memo(function ShortCard({
   
   // Guard autoplay - handles browser blocking gracefully
   const autoplayBlocked = useAutoplayGuard(videoRef, isVideo && !!autoplay);
+  
+  const isLandscape = variant === 'landscape';
   
   return (
     <button
@@ -48,17 +52,18 @@ export default React.memo(function ShortCard({
         className="relative w-full overflow-hidden bg-muted"
         style={{ 
           height: height ? `${height}px` : undefined,
-          aspectRatio: !height ? '9/16' : undefined,
+          aspectRatio: isLandscape ? '16/9' : (!height ? '9/16' : undefined),
+          width: isLandscape ? 'calc(100vw - 8px)' : undefined,
           boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 6px 16px rgba(0,0,0,0.06)',
           borderRadius: '18px',
-          WebkitMaskImage: 'url("/ui/shorts-squircle-9x16.svg")',
-          maskImage: 'url("/ui/shorts-squircle-9x16.svg")',
-          WebkitMaskSize: '100% 100%',
-          maskSize: '100% 100%',
-          WebkitMaskRepeat: 'no-repeat',
-          maskRepeat: 'no-repeat',
-          WebkitMaskPosition: 'center',
-          maskPosition: 'center'
+          WebkitMaskImage: isLandscape ? undefined : 'url("/ui/shorts-squircle-9x16.svg")',
+          maskImage: isLandscape ? undefined : 'url("/ui/shorts-squircle-9x16.svg")',
+          WebkitMaskSize: isLandscape ? undefined : '100% 100%',
+          maskSize: isLandscape ? undefined : '100% 100%',
+          WebkitMaskRepeat: isLandscape ? undefined : 'no-repeat',
+          maskRepeat: isLandscape ? undefined : 'no-repeat',
+          WebkitMaskPosition: isLandscape ? undefined : 'center',
+          maskPosition: isLandscape ? undefined : 'center'
         }}
       >
         {/* Video with poster fallback - always render video element for consistency */}

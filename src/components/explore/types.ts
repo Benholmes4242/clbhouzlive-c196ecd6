@@ -38,6 +38,10 @@ export interface ExploreContentItem {
     artist?: string;
     isOriginal?: boolean;
   };
+  // Landscape card flags
+  isFeatured?: boolean; // Priority 1 for landscape slots
+  landscapeSuitable?: boolean; // Priority 2 for landscape slots
+  aspectRatio?: number; // Video aspect ratio (width/height) for eligibility checking
 }
 
 export interface CTAContentItem {

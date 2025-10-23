@@ -12,6 +12,7 @@ interface ShortCardWithObserverProps {
   onLike?: (itemId: string) => void;
   onAuthorClick?: (authorId: string) => void;
   currentUserId?: string;
+  variant?: 'portrait' | 'landscape'; // Support landscape cards
 }
 
 /**
@@ -26,7 +27,8 @@ export default function ShortCardWithObserver({
   onVisibilityChange,
   onLike,
   onAuthorClick,
-  currentUserId
+  currentUserId,
+  variant
 }: ShortCardWithObserverProps) {
   const { ref, isInView } = useIntersectionObserver({
     threshold: 0.65,
@@ -49,6 +51,7 @@ export default function ShortCardWithObserver({
         onLike={onLike}
         onAuthorClick={onAuthorClick}
         currentUserId={currentUserId}
+        variant={variant}
       />
     </div>
   );
