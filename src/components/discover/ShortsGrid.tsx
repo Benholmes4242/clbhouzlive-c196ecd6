@@ -163,7 +163,8 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
           });
           usedIndexes.add(landscapeCandidate.index);
           
-          // Don't increment itemIndex - we still need to process the current item as a portrait
+          // Continue with portraits after landscape card
+          itemIndex++;
           continue;
         }
       }

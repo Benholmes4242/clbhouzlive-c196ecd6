@@ -172,15 +172,6 @@ export const useRealPostsFetcher = () => {
           ? (primaryMedia as any).duration_seconds
           : undefined;
 
-        // Compute video aspect ratio from encoded dimensions
-        const aspectRatioCalc = primaryMedia.media_type === 'video'
-          ? ((primaryMedia as any).aspect_ratio ?? (
-              ((primaryMedia as any).width && (primaryMedia as any).height)
-                ? (primaryMedia as any).width / (primaryMedia as any).height
-                : undefined
-            ))
-          : undefined;
-
         const formattedPost = {
           id: post.id,
           type: primaryMedia.media_type as 'video' | 'image',
@@ -194,7 +185,6 @@ export const useRealPostsFetcher = () => {
           shares: Math.floor(Math.random() * 50) + 1,
           duration: durationSeconds ? `${durationSeconds}s` : undefined,
           durationSeconds, // Store numeric value for filtering
-          aspectRatio: aspectRatioCalc,
           createdAt: post.created_at, // Map created_at to createdAt
           user: {
             id: post.user_id,
@@ -418,13 +408,6 @@ export const useRealPostsFetcher = () => {
           return tracks[Math.floor(Math.random() * tracks.length)];
         };
 
-        // Compute video aspect ratio from encoded dimensions (not container rotation)
-        const aspectRatioCalc = primaryMedia.media_type === 'video'
-          ? (((primaryMedia as any).media_width && (primaryMedia as any).media_height)
-              ? (primaryMedia as any).media_width / (primaryMedia as any).media_height
-              : undefined)
-          : undefined;
-
         const formattedPost = {
           id: post.id,
           type: primaryMedia.media_type as 'video' | 'image',
@@ -438,7 +421,6 @@ export const useRealPostsFetcher = () => {
           shares: Math.floor(Math.random() * 50) + 1,
           duration: durationSeconds ? `${durationSeconds}s` : undefined,
           durationSeconds, // Store numeric value for filtering
-          aspectRatio: aspectRatioCalc,
           createdAt: post.created_at, // Map created_at to createdAt
           user: {
             id: post.user_id,
