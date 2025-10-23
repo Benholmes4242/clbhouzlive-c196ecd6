@@ -184,15 +184,17 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: `${GUTTER_PX}px`,
+          columnGap: `${GUTTER_PX}px`,
+          rowGap: `${GUTTER_PX}px`,
           paddingLeft: `${GUTTER_PX}px`,
           paddingRight: `${GUTTER_PX}px`,
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          margin: 0
         }}
       >
         {/* First Row - Pinned, Same Height */}
         {firstRow.length > 0 && (
-          <div className="col-span-2 grid grid-cols-2" style={{ gap: `${GUTTER_PX}px`, marginBottom: `${GUTTER_PX}px` }}>
+          <div className="col-span-2 grid grid-cols-2" style={{ columnGap: `${GUTTER_PX}px`, marginBottom: `${GUTTER_PX}px`, margin: 0, padding: 0 }}>
             {firstRow.map((item, index) => (
               <ShortCardWithObserver
                 key={item.id}
@@ -211,7 +213,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
         
         {/* Masonry Columns - Staggered */}
         {leftColumn.length > 0 && (
-          <div className="shortsCol shortsCol--left" style={{ display: 'grid', rowGap: `${GUTTER_PX}px` }}>
+          <div className="shortsCol shortsCol--left" style={{ display: 'grid', rowGap: `${GUTTER_PX}px`, margin: 0, padding: 0 }}>
               {leftColumn.map(({ item, index }) => (
                 <ShortCardWithObserver
                   key={item.id}
@@ -228,7 +230,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
         )}
             
         {rightColumn.length > 0 && (
-          <div className="shortsCol shortsCol--right" style={{ display: 'grid', rowGap: `${GUTTER_PX}px` }}>
+          <div className="shortsCol shortsCol--right" style={{ display: 'grid', rowGap: `${GUTTER_PX}px`, margin: 0, padding: 0 }}>
               {rightColumn.map(({ item, index }) => (
                 <ShortCardWithObserver
                   key={item.id}
