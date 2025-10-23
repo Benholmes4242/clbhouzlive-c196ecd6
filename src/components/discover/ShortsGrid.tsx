@@ -19,7 +19,7 @@ interface ShortsGridProps {
 }
 
 // Single source of truth for spacing
-const GUTTER_PX = 0 as const;
+const GUTTER_PX = 4 as const;
 const CARD_ASPECT = 0.52; // width / height (slightly wider than 9:16)
 const HEIGHT_SCALE = 0.8 as const; // 20% shorter for both portrait and landscape
 const PORTRAITS_PER_LANDSCAPE = 6; // Insert landscape after every 6 portraits
@@ -305,10 +305,8 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
         ref={gridRef} 
         className="shortsGrid pb-4"
         style={{
-          paddingLeft: 0,
-          paddingRight: 0,
-          marginLeft: '-2px',
-          marginRight: '-2px',
+          paddingLeft: `${GUTTER_PX}px`,
+          paddingRight: `${GUTTER_PX}px`,
           boxSizing: 'border-box'
         }}
       >
