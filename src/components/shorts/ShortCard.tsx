@@ -48,7 +48,7 @@ export default React.memo(function ShortCard({
         className="relative w-full overflow-hidden bg-muted"
         style={{ 
           height: height ? `${height}px` : undefined,
-          aspectRatio: !height ? '3/4' : undefined,
+          aspectRatio: !height ? '9/16' : undefined,
           boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 6px 16px rgba(0,0,0,0.06)',
           borderRadius: '18px',
           WebkitMaskImage: 'url("/ui/shorts-squircle-9x16.svg")',
