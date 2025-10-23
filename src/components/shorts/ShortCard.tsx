@@ -15,6 +15,7 @@ interface ShortCardProps {
   onAuthorClick?: (authorId: string) => void;
   currentUserId?: string;
   variant?: 'portrait' | 'landscape'; // New: Support landscape cards
+  showMeta?: boolean; // Control metadata visibility
 }
 
 export default React.memo(function ShortCard({ 
@@ -26,7 +27,8 @@ export default React.memo(function ShortCard({
   onLike,
   onAuthorClick,
   currentUserId,
-  variant = 'portrait'
+  variant = 'portrait',
+  showMeta = true
 }: ShortCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const isVideo = item.type === 'video' || item.src?.includes('.mp4') || item.src?.includes('.webm');
@@ -54,7 +56,7 @@ export default React.memo(function ShortCard({
           width: '100%',
           maxWidth: '100%',
           height: height ? `${height}px` : undefined,
-          aspectRatio: isLandscape ? '16/11.592' : (!height ? '9/16' : undefined),
+          aspectRatio: isLandscape ? '16/10.4328' : (!height ? '9/16' : undefined),
           boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 6px 16px rgba(0,0,0,0.06)',
           borderRadius: isLandscape ? '16px' : '18px',
           WebkitMaskImage: isLandscape ? 'url("/ui/shorts-squircle-16x9.svg")' : 'url("/ui/shorts-squircle-9x16.svg")',
@@ -99,20 +101,22 @@ export default React.memo(function ShortCard({
       </div>
 
       {/* Creator-First Meta Block */}
-      <ShortsCardMeta
-        author={{
-          id: item.user?.id ?? '',
-          name: item.user?.name ?? 'Unknown',
-          avatar: item.user?.avatar ?? '/img/avatar-fallback.png',
-          verified: item.user?.verified,
-          isSelf: item.user?.id === currentUserId
-        }}
-        caption={item.title ?? ''}
-        likeCount={item.likes ?? 0}
-        isLiked={false} // Wire in PR2 with real state
-        onLikeToggle={() => onLike?.(item.id)}
-        onAuthorClick={(id) => onAuthorClick?.(id)}
-      />
+      {showMeta && (
+        <ShortsCardMeta
+          author={{
+            id: item.user?.id ?? '',
+            name: item.user?.name ?? 'Unknown',
+            avatar: item.user?.avatar ?? '/img/avatar-fallback.png',
+            verified: item.user?.verified,
+            isSelf: item.user?.id === currentUserId
+          }}
+          caption={item.title ?? ''}
+          likeCount={item.likes ?? 0}
+          isLiked={false} // Wire in PR2 with real state
+          onLikeToggle={() => onLike?.(item.id)}
+          onAuthorClick={(id) => onAuthorClick?.(id)}
+        />
+      )}
     </button>
   );
 });
