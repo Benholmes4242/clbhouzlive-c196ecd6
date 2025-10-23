@@ -73,8 +73,8 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   }, [updateColumnWidth]);
 
   const baseHeightPx = useMemo(() => {
-    if (columnWidth <= 0) return 280;
-    return Math.round(columnWidth / CARD_ASPECT); // height = width / (w/h)
+    if (columnWidth <= 0) return 280 * 0.9;
+    return Math.round((columnWidth / CARD_ASPECT) * 0.9); // height = width / (w/h), reduced by 10%
   }, [columnWidth]);
 
   // Preload posters for first visible items on mount
