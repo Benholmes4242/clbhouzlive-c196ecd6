@@ -67,7 +67,7 @@ export default React.memo(function ShortCard({
             ref={videoRef}
             src={item.src}
             poster={posterUrl}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="absolute inset-0 h-full w-full object-cover"
             loop
             muted
             playsInline
@@ -78,7 +78,7 @@ export default React.memo(function ShortCard({
           <img
             src={posterUrl || item.src}
             alt=""
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="absolute inset-0 h-full w-full object-cover"
             loading="lazy"
           />
         )}
