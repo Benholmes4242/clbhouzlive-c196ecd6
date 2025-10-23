@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useMemo, useCallback, lazy, Suspens
 import { ExploreContentItem } from '@/components/explore/types';
 import ShortCardWithObserver from '@/components/shorts/ShortCardWithObserver';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
+import { selectLandscapeCandidate, preloadLandscapePoster } from '@/utils/landscapeEligibility';
 
 // Lazy load fullscreen viewer - only loads when user opens a short
 const ShortsViewer = lazy(() => import('@/components/shorts/ShortsViewer'));
@@ -20,6 +21,7 @@ interface ShortsGridProps {
 // Single source of truth for spacing
 const GUTTER_PX = 4 as const;
 const CARD_ASPECT = 0.5625; // width / height (9:16 portrait)
+const PORTRAITS_PER_LANDSCAPE = 6; // Insert landscape after every 6 portraits
 
 // Deterministic height variance based on item ID
 const getHeightVariant = (id: string): number => {
@@ -27,6 +29,14 @@ const getHeightVariant = (id: string): number => {
   const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   return variants[hash % variants.length];
 };
+
+interface LayoutItem {
+  item: ExploreContentItem;
+  index: number;
+  type: 'portrait' | 'landscape';
+  height?: number;
+  variant?: 'portrait' | 'landscape';
+}
 
 export default function ShortsGrid({ 
   items, 
@@ -124,36 +134,140 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
     };
   }, [updateColumnWidth]);
 
-  // Masonry layout: first 2 items in a row, rest balanced between 2 columns
-  const { firstRow, leftColumn, rightColumn } = useMemo(() => {
-    if (items.length === 0) return { firstRow: [], leftColumn: [], rightColumn: [] };
+  // Layout with landscape cards: Portrait cards organized in blocks of 6, with landscape cards inserted after each block
+  const layout = useMemo(() => {
+    if (items.length === 0) return [];
     
-    const firstRow = items.slice(0, 2);
-    const remaining = items.slice(2);
+    const result: LayoutItem[] = [];
+    const usedIndexes = new Set<number>();
+    let portraitCount = 0;
+    let itemIndex = 0;
     
-    const leftCol: Array<{ item: ExploreContentItem; index: number }> = [];
-    const rightCol: Array<{ item: ExploreContentItem; index: number }> = [];
-    
-    let leftHeight = 0;
-    let rightHeight = 0;
-    const baseHeight = baseHeightPx;
-    
-    remaining.forEach((item, idx) => {
-      const actualIndex = idx + 2; // offset by first row
-      const variant = getHeightVariant(item.id);
-      const cardHeight = baseHeight * (1 + variant / 100);
+    while (itemIndex < items.length) {
+      const item = items[itemIndex];
       
-      if (leftHeight <= rightHeight) {
-        leftCol.push({ item, index: actualIndex });
-        leftHeight += cardHeight + GUTTER_PX;
+      // Check if we should try to insert a landscape card
+      if (portraitCount > 0 && portraitCount % PORTRAITS_PER_LANDSCAPE === 0) {
+        // Try to find a landscape candidate
+        const landscapeCandidate = selectLandscapeCandidate(items, usedIndexes);
+        
+        if (landscapeCandidate) {
+          // Preload the landscape card's poster
+          preloadLandscapePoster(landscapeCandidate.item);
+          
+          result.push({
+            item: landscapeCandidate.item,
+            index: landscapeCandidate.index,
+            type: 'landscape',
+            variant: 'landscape'
+          });
+          usedIndexes.add(landscapeCandidate.index);
+          
+          // Continue with portraits after landscape card
+          itemIndex++;
+          continue;
+        }
+      }
+      
+      // Add portrait card if not already used
+      if (!usedIndexes.has(itemIndex)) {
+        const variant = getHeightVariant(item.id);
+        const cardHeight = baseHeightPx * (1 + variant / 100);
+        
+        result.push({
+          item,
+          index: itemIndex,
+          type: 'portrait',
+          height: cardHeight,
+          variant: 'portrait'
+        });
+        usedIndexes.add(itemIndex);
+        portraitCount++;
+      }
+      
+      itemIndex++;
+    }
+    
+    return result;
+  }, [items, baseHeightPx]);
+
+  // Organize layout into rows: first 2 portraits, then masonry columns with landscape breaks
+  const { firstRow, sections } = useMemo(() => {
+    if (layout.length === 0) return { firstRow: [], sections: [] };
+    
+    const firstRow = layout.slice(0, 2).filter(item => item.type === 'portrait');
+    const remaining = layout.slice(2);
+    
+    const sections: Array<{
+      type: 'masonry' | 'landscape';
+      items?: Array<{ item: ExploreContentItem; index: number; height: number; column: 'left' | 'right' }>;
+      landscapeItem?: { item: ExploreContentItem; index: number };
+    }> = [];
+    
+    let currentMasonry: LayoutItem[] = [];
+    
+    remaining.forEach((layoutItem) => {
+      if (layoutItem.type === 'landscape') {
+        // Flush current masonry section
+        if (currentMasonry.length > 0) {
+          const leftCol: Array<{ item: ExploreContentItem; index: number; height: number; column: 'left' | 'right' }> = [];
+          const rightCol: Array<{ item: ExploreContentItem; index: number; height: number; column: 'left' | 'right' }> = [];
+          let leftHeight = 0;
+          let rightHeight = 0;
+          
+          currentMasonry.forEach((portItem) => {
+            if (leftHeight <= rightHeight) {
+              leftCol.push({ item: portItem.item, index: portItem.index, height: portItem.height!, column: 'left' });
+              leftHeight += portItem.height! + GUTTER_PX;
+            } else {
+              rightCol.push({ item: portItem.item, index: portItem.index, height: portItem.height!, column: 'right' });
+              rightHeight += portItem.height! + GUTTER_PX;
+            }
+          });
+          
+          sections.push({
+            type: 'masonry',
+            items: [...leftCol, ...rightCol]
+          });
+          
+          currentMasonry = [];
+        }
+        
+        // Add landscape section
+        sections.push({
+          type: 'landscape',
+          landscapeItem: { item: layoutItem.item, index: layoutItem.index }
+        });
       } else {
-        rightCol.push({ item, index: actualIndex });
-        rightHeight += cardHeight + GUTTER_PX;
+        currentMasonry.push(layoutItem);
       }
     });
     
-    return { firstRow, leftColumn: leftCol, rightColumn: rightCol };
-  }, [items, baseHeightPx]);
+    // Flush remaining masonry items
+    if (currentMasonry.length > 0) {
+      const leftCol: Array<{ item: ExploreContentItem; index: number; height: number; column: 'left' | 'right' }> = [];
+      const rightCol: Array<{ item: ExploreContentItem; index: number; height: number; column: 'left' | 'right' }> = [];
+      let leftHeight = 0;
+      let rightHeight = 0;
+      
+      currentMasonry.forEach((portItem) => {
+        if (leftHeight <= rightHeight) {
+          leftCol.push({ item: portItem.item, index: portItem.index, height: portItem.height!, column: 'left' });
+          leftHeight += portItem.height! + GUTTER_PX;
+        } else {
+          rightCol.push({ item: portItem.item, index: portItem.index, height: portItem.height!, column: 'right' });
+          rightHeight += portItem.height! + GUTTER_PX;
+        }
+      });
+      
+      sections.push({
+        type: 'masonry',
+        items: [...leftCol, ...rightCol]
+      });
+    }
+    
+    return { firstRow, sections };
+  }, [layout]);
 
   // Infinite scroll handler
   useEffect(() => {
@@ -182,9 +296,6 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
         ref={gridRef} 
         className="shortsGrid pb-4"
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: `${GUTTER_PX}px`,
           paddingLeft: `${GUTTER_PX}px`,
           paddingRight: `${GUTTER_PX}px`,
           boxSizing: 'border-box'
@@ -192,12 +303,12 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
       >
         {/* First Row - Pinned, Same Height */}
         {firstRow.length > 0 && (
-          <div className="col-span-2 grid grid-cols-2" style={{ gap: `${GUTTER_PX}px`, marginBottom: `${GUTTER_PX}px` }}>
-            {firstRow.map((item, index) => (
+          <div className="grid grid-cols-2" style={{ gap: `${GUTTER_PX}px`, marginBottom: `${GUTTER_PX}px` }}>
+            {firstRow.map((layoutItem) => (
               <ShortCardWithObserver
-                key={item.id}
-                item={item}
-                onClick={() => handleCardClick(item, index)}
+                key={layoutItem.item.id}
+                item={layoutItem.item}
+                onClick={() => handleCardClick(layoutItem.item, layoutItem.index)}
                 height={baseHeightPx}
                 isPinned
                 onVisibilityChange={handleVisibilityChange}
@@ -209,40 +320,68 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
           </div>
         )}
         
-        {/* Masonry Columns - Staggered */}
-        {leftColumn.length > 0 && (
-          <div className="shortsCol shortsCol--left" style={{ display: 'grid', rowGap: `${GUTTER_PX}px` }}>
-              {leftColumn.map(({ item, index }) => (
+        {/* Sections: Masonry blocks interspersed with landscape cards */}
+        {sections.map((section, sectionIndex) => {
+          if (section.type === 'landscape' && section.landscapeItem) {
+            return (
+              <div key={`landscape-${sectionIndex}`} style={{ marginBottom: `${GUTTER_PX}px` }}>
                 <ShortCardWithObserver
-                  key={item.id}
-                  item={item}
-                  onClick={() => handleCardClick(item, index)}
-                  height={baseHeightPx * (1 + getHeightVariant(item.id) / 100)}
+                  item={section.landscapeItem.item}
+                  onClick={() => handleCardClick(section.landscapeItem.item, section.landscapeItem.index)}
                   onVisibilityChange={handleVisibilityChange}
                   onLike={onLike}
                   onAuthorClick={onAuthorClick}
                   currentUserId={currentUserId}
+                  variant="landscape"
                 />
-              ))}
-          </div>
-        )}
+              </div>
+            );
+          }
+          
+          if (section.type === 'masonry' && section.items) {
+            const leftItems = section.items.filter(item => item.column === 'left');
+            const rightItems = section.items.filter(item => item.column === 'right');
             
-        {rightColumn.length > 0 && (
-          <div className="shortsCol shortsCol--right" style={{ display: 'grid', rowGap: `${GUTTER_PX}px` }}>
-              {rightColumn.map(({ item, index }) => (
-                <ShortCardWithObserver
-                  key={item.id}
-                  item={item}
-                  onClick={() => handleCardClick(item, index)}
-                  height={baseHeightPx * (1 + getHeightVariant(item.id) / 100)}
-                  onVisibilityChange={handleVisibilityChange}
-                  onLike={onLike}
-                  onAuthorClick={onAuthorClick}
-                  currentUserId={currentUserId}
-                />
-              ))}
-          </div>
-        )}
+            return (
+              <div 
+                key={`masonry-${sectionIndex}`} 
+                className="grid grid-cols-2" 
+                style={{ gap: `${GUTTER_PX}px`, marginBottom: `${GUTTER_PX}px` }}
+              >
+                <div style={{ display: 'grid', rowGap: `${GUTTER_PX}px` }}>
+                  {leftItems.map(({ item, index, height }) => (
+                    <ShortCardWithObserver
+                      key={item.id}
+                      item={item}
+                      onClick={() => handleCardClick(item, index)}
+                      height={height}
+                      onVisibilityChange={handleVisibilityChange}
+                      onLike={onLike}
+                      onAuthorClick={onAuthorClick}
+                      currentUserId={currentUserId}
+                    />
+                  ))}
+                </div>
+                <div style={{ display: 'grid', rowGap: `${GUTTER_PX}px` }}>
+                  {rightItems.map(({ item, index, height }) => (
+                    <ShortCardWithObserver
+                      key={item.id}
+                      item={item}
+                      onClick={() => handleCardClick(item, index)}
+                      height={height}
+                      onVisibilityChange={handleVisibilityChange}
+                      onLike={onLike}
+                      onAuthorClick={onAuthorClick}
+                      currentUserId={currentUserId}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          }
+          
+          return null;
+        })}
       </div>
       
       {/* Loading indicator */}
