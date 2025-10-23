@@ -180,7 +180,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                 key={item.id}
                 item={item}
                 onClick={() => handleCardClick(item, index)}
-                height={280}
+                height={baseHeightPx}
                 isPinned
                 onVisibilityChange={handleVisibilityChange}
                 onLike={onLike}
@@ -199,7 +199,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                   key={item.id}
                   item={item}
                   onClick={() => handleCardClick(item, index)}
-                  height={280 * (1 + getHeightVariant(item.id) / 100)}
+                  height={baseHeightPx * (1 + getHeightVariant(item.id) / 100)}
                   onVisibilityChange={handleVisibilityChange}
                   onLike={onLike}
                   onAuthorClick={onAuthorClick}
@@ -216,7 +216,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                   key={item.id}
                   item={item}
                   onClick={() => handleCardClick(item, index)}
-                  height={280 * (1 + getHeightVariant(item.id) / 100)}
+                  height={baseHeightPx * (1 + getHeightVariant(item.id) / 100)}
                   onVisibilityChange={handleVisibilityChange}
                   onLike={onLike}
                   onAuthorClick={onAuthorClick}
