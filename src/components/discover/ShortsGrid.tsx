@@ -21,7 +21,6 @@ interface ShortsGridProps {
 // Single source of truth for spacing
 const GUTTER_PX = 4 as const;
 const CARD_ASPECT = 0.52; // width / height (slightly wider than 9:16)
-const HEIGHT_SCALE = 0.8 as const; // 20% shorter for both portrait and landscape
 const PORTRAITS_PER_LANDSCAPE = 6; // Insert landscape after every 6 portraits
 const LOOKAHEAD_WINDOW = 20; // Lookahead window for landscape candidate search
 // Deterministic height variance based on item ID
@@ -74,8 +73,8 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   }, [updateColumnWidth]);
 
   const baseHeightPx = useMemo(() => {
-    if (columnWidth <= 0) return 280 * HEIGHT_SCALE;
-    return Math.round((columnWidth / CARD_ASPECT) * HEIGHT_SCALE); // 10% shorter
+    if (columnWidth <= 0) return 280 * 0.9;
+    return Math.round((columnWidth / CARD_ASPECT) * 0.9); // height = width / (w/h), reduced by 10%
   }, [columnWidth]);
 
   // Preload posters for first visible items on mount
@@ -324,7 +323,6 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                 onLike={onLike}
                 onAuthorClick={onAuthorClick}
                 currentUserId={currentUserId}
-                showMeta={false}
               />
             ))}
           </div>
@@ -352,7 +350,6 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                   onAuthorClick={onAuthorClick}
                   currentUserId={currentUserId}
                   variant="landscape"
-                  showMeta={false}
                 />
               </div>
             );
@@ -379,7 +376,6 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                       onLike={onLike}
                       onAuthorClick={onAuthorClick}
                       currentUserId={currentUserId}
-                      showMeta={false}
                     />
                   ))}
                 </div>
@@ -394,7 +390,6 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                       onLike={onLike}
                       onAuthorClick={onAuthorClick}
                       currentUserId={currentUserId}
-                      showMeta={false}
                     />
                   ))}
                 </div>
