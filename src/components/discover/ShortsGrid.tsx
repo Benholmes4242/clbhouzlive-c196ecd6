@@ -159,7 +159,7 @@ export default function ShortsGrid({
         {(leftColumn.length > 0 || rightColumn.length > 0) && (
           <div className="shortsGrid items-start" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: `${GUTTER_PX}px`, paddingLeft: `${GUTTER_PX}px`, paddingRight: `${GUTTER_PX}px`, boxSizing: 'border-box' }}>
             {/* Left Column */}
-            <div className="shortsCol shortsCol--left" style={{ display: 'grid', rowGap: `${GUTTER_PX}px` }}>
+            <div className="shortsCol shortsCol--left" style={{ display: 'grid', rowGap: `${GUTTER_PX}px`, justifyItems: 'stretch' }}>
               {leftColumn.map(({ item, index }) => (
                 <ShortCardWithObserver
                   key={item.id}
@@ -175,7 +175,7 @@ export default function ShortsGrid({
             </div>
             
             {/* Right Column */}
-            <div className="shortsCol shortsCol--right" style={{ display: 'grid', rowGap: `${GUTTER_PX}px` }}>
+            <div className="shortsCol shortsCol--right" style={{ display: 'grid', rowGap: `${GUTTER_PX}px`, justifyItems: 'stretch' }}>
               {rightColumn.map(({ item, index }) => (
                 <ShortCardWithObserver
                   key={item.id}
