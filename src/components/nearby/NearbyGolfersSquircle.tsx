@@ -24,6 +24,7 @@ export default function NearbyGolfersSquircle({
         }
       }}
     >
+      <div className="heartbeat-pulse" aria-hidden="true" />
       <svg
         className="icon-pin"
         xmlns="http://www.w3.org/2000/svg"
