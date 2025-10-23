@@ -106,6 +106,24 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
     });
   }, []);
 
+  // Keep columnWidth accurate on mount, resize and container size changes
+  useEffect(() => {
+    updateColumnWidth();
+    window.addEventListener('resize', updateColumnWidth);
+
+    const el = gridRef.current;
+    let ro: ResizeObserver | undefined;
+    if (el && 'ResizeObserver' in window) {
+      ro = new ResizeObserver(() => updateColumnWidth());
+      ro.observe(el);
+    }
+
+    return () => {
+      window.removeEventListener('resize', updateColumnWidth);
+      ro?.disconnect();
+    };
+  }, [updateColumnWidth]);
+
   // Masonry layout: first 2 items in a row, rest balanced between 2 columns
   const { firstRow, leftColumn, rightColumn } = useMemo(() => {
     if (items.length === 0) return { firstRow: [], leftColumn: [], rightColumn: [] };

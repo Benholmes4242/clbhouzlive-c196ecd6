@@ -45,7 +45,7 @@ export default React.memo(function ShortCard({
     >
       {/* Thumbnail Container */}
       <div 
-        className="relative w-full overflow-hidden bg-muted mb-2"
+        className="relative w-full overflow-hidden bg-muted"
         style={{ 
           height: height ? `${height}px` : undefined,
           aspectRatio: !height ? '3/4' : undefined,
