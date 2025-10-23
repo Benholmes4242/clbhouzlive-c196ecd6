@@ -336,11 +336,10 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                 key={`landscape-${sectionIndex}`} 
                 className="shortsLandscapeRow"
                 style={{ 
-                  gridColumn: '1 / -1',
-                  display: 'grid',
-                  gridTemplateColumns: '1fr',
-                  paddingLeft: `${GUTTER_PX}px`,
-                  paddingRight: `${GUTTER_PX}px`,
+                  width: '100%',
+                  maxWidth: '100%',
+                  overflow: 'hidden',
+                  boxSizing: 'border-box',
                   marginBottom: `${GUTTER_PX}px` 
                 }}
               >
