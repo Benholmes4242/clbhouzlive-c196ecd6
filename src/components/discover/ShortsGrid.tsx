@@ -140,8 +140,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
     
     remaining.forEach((item, idx) => {
       const actualIndex = idx + 2; // offset by first row
-      const variant = getHeightVariant(item.id);
-      const cardHeight = baseHeight * (1 + variant / 100);
+      const cardHeight = baseHeight; // All cards same height for uniform spacing
       
       if (leftHeight <= rightHeight) {
         leftCol.push({ item, index: actualIndex });
@@ -219,7 +218,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                   key={item.id}
                   item={item}
                   onClick={() => handleCardClick(item, index)}
-                  height={baseHeightPx * (1 + getHeightVariant(item.id) / 100)}
+                  height={baseHeightPx}
                   onVisibilityChange={handleVisibilityChange}
                   onLike={onLike}
                   onAuthorClick={onAuthorClick}
@@ -236,7 +235,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                   key={item.id}
                   item={item}
                   onClick={() => handleCardClick(item, index)}
-                  height={baseHeightPx * (1 + getHeightVariant(item.id) / 100)}
+                  height={baseHeightPx}
                   onVisibilityChange={handleVisibilityChange}
                   onLike={onLike}
                   onAuthorClick={onAuthorClick}
