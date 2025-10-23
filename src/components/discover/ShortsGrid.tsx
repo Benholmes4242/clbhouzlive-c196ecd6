@@ -352,7 +352,16 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
           if (section.type === 'landscape' && section.landscapeItem) {
             console.log('[shorts] render full-width landscape section');
             return (
-              <div key={`landscape-${sectionIndex}`} style={{ marginBottom: `${GUTTER_PX}px` }}>
+              <div 
+                key={`landscape-${sectionIndex}`} 
+                className="shortsLandscapeRow"
+                style={{ 
+                  gridColumn: '1 / -1',
+                  display: 'grid',
+                  gridTemplateColumns: '1fr',
+                  marginBottom: `${GUTTER_PX}px` 
+                }}
+              >
                 <ShortCardWithObserver
                   item={section.landscapeItem.item}
                   onClick={() => handleCardClick(section.landscapeItem.item, section.landscapeItem.index)}

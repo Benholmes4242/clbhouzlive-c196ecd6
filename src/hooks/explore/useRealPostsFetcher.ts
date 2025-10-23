@@ -172,10 +172,24 @@ export const useRealPostsFetcher = () => {
           ? (primaryMedia as any).duration_seconds
           : undefined;
 
-        // Dimensions and aspect ratio
-        const width = (primaryMedia as any).width ?? (primaryMedia as any).media_width;
-        const height = (primaryMedia as any).height ?? (primaryMedia as any).media_height;
-        const aspectRatio = (primaryMedia as any).aspect_ratio ?? (width && height ? width / height : undefined);
+        // Normalize dimensions and aspect ratio (handle strings, nulls, rotation)
+        const toNum = (v: any): number | undefined => {
+          const n = typeof v === 'string' ? parseFloat(v) : v;
+          return Number.isFinite(n) ? n : undefined;
+        };
+
+        let width = toNum(primaryMedia.width) ?? toNum((primaryMedia as any).media_width);
+        let height = toNum(primaryMedia.height) ?? toNum((primaryMedia as any).media_height);
+        let aspectRatio = toNum((primaryMedia as any).aspect_ratio);
+
+        // Handle rotated videos (90° or 270° rotation swaps dimensions)
+        const rotation = toNum((primaryMedia as any).rotation);
+        if (rotation && (rotation % 180) !== 0 && width && height) {
+          [width, height] = [height, width]; // Swap for rotated video
+          aspectRatio = width / height;
+        } else if (!aspectRatio && width && height && height > 0) {
+          aspectRatio = width / height;
+        }
 
         const formattedPost = {
           id: post.id,
@@ -419,10 +433,24 @@ export const useRealPostsFetcher = () => {
           return tracks[Math.floor(Math.random() * tracks.length)];
         };
 
-        // Dimensions and aspect ratio
-        const width = (primaryMedia as any).media_width ?? (primaryMedia as any).width;
-        const height = (primaryMedia as any).media_height ?? (primaryMedia as any).height;
-        const aspectRatio = (primaryMedia as any).aspect_ratio ?? (width && height ? width / height : undefined);
+        // Normalize dimensions and aspect ratio (handle strings, nulls, rotation)
+        const toNum = (v: any): number | undefined => {
+          const n = typeof v === 'string' ? parseFloat(v) : v;
+          return Number.isFinite(n) ? n : undefined;
+        };
+
+        let width = toNum((primaryMedia as any).media_width) ?? toNum((primaryMedia as any).width);
+        let height = toNum((primaryMedia as any).media_height) ?? toNum((primaryMedia as any).height);
+        let aspectRatio = toNum((primaryMedia as any).aspect_ratio);
+
+        // Handle rotated videos (90° or 270° rotation swaps dimensions)
+        const rotation = toNum((primaryMedia as any).rotation);
+        if (rotation && (rotation % 180) !== 0 && width && height) {
+          [width, height] = [height, width]; // Swap for rotated video
+          aspectRatio = width / height;
+        } else if (!aspectRatio && width && height && height > 0) {
+          aspectRatio = width / height;
+        }
 
         const formattedPost = {
           id: post.id,
