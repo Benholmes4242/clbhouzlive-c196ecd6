@@ -305,8 +305,10 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
         ref={gridRef} 
         className="shortsGrid pb-4"
         style={{
-          paddingLeft: `${GUTTER_PX}px`,
-          paddingRight: `${GUTTER_PX}px`,
+          paddingLeft: 0,
+          paddingRight: 0,
+          marginLeft: '-2px',
+          marginRight: '-2px',
           boxSizing: 'border-box'
         }}
       >
