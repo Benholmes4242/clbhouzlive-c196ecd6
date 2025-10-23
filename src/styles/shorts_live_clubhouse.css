@@ -26,7 +26,7 @@
 
 /* Tiles - keep tap target same size for all */
 .lc-tile {
-  width: 96px;
+  width: 86px;
   scroll-snap-align: start;
   position: relative;
   flex-shrink: 0;
@@ -39,8 +39,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 96px;
-  height: 96px;
+  width: 86px;
+  height: 86px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -147,7 +147,7 @@
   --lc-green-1: #6e9277;       /* Echo green */
   --lc-green-2: #7CAD89;       /* lighter blend */
   --lc-green-3: #557A61;       /* darker blend */
-  --lc-avatar-size: 84px;      /* creator avatar size (matches .lc-avatar) */
+  --lc-avatar-size: 75px;      /* creator avatar size (matches .lc-avatar) */
   --lc-nearby-scale: 1.0;      /* 100% of avatar size - matches creator avatars */
   --lc-nearby-size: calc(var(--lc-avatar-size) * var(--lc-nearby-scale));
   --lc-nearby-border: 2px;     /* inset green ring thickness - DO NOT CHANGE */
