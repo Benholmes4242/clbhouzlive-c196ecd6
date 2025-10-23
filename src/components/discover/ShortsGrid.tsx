@@ -133,10 +133,10 @@ export default function ShortsGrid({
 
   return (
     <>
-      <div ref={gridRef} className="pb-4 px-1">
+      <div ref={gridRef} className="pb-4" style={{ paddingLeft: '4px', paddingRight: '4px' }}>
         {/* First Row - Pinned, Same Height */}
         {firstRow.length > 0 && (
-          <div className="grid grid-cols-2 gap-1 mb-2">
+          <div className="grid grid-cols-2 mb-2" style={{ gap: '4px' }}>
             {firstRow.map((item, index) => (
               <ShortCardWithObserver
                 key={item.id}
@@ -155,7 +155,7 @@ export default function ShortsGrid({
         
         {/* Masonry Columns - Staggered */}
         {(leftColumn.length > 0 || rightColumn.length > 0) && (
-          <div className="grid grid-cols-2 gap-1 items-start">
+          <div className="grid grid-cols-2 items-start" style={{ gap: '4px' }}>
             {/* Left Column */}
             <div className="flex flex-col gap-2">
               {leftColumn.map(({ item, index }) => (
