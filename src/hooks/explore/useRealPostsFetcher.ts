@@ -172,6 +172,11 @@ export const useRealPostsFetcher = () => {
           ? (primaryMedia as any).duration_seconds
           : undefined;
 
+        // Dimensions and aspect ratio
+        const width = (primaryMedia as any).width ?? (primaryMedia as any).media_width;
+        const height = (primaryMedia as any).height ?? (primaryMedia as any).media_height;
+        const aspectRatio = (primaryMedia as any).aspect_ratio ?? (width && height ? width / height : undefined);
+
         const formattedPost = {
           id: post.id,
           type: primaryMedia.media_type as 'video' | 'image',
@@ -185,6 +190,9 @@ export const useRealPostsFetcher = () => {
           shares: Math.floor(Math.random() * 50) + 1,
           duration: durationSeconds ? `${durationSeconds}s` : undefined,
           durationSeconds, // Store numeric value for filtering
+          aspectRatio,
+          width,
+          height,
           createdAt: post.created_at, // Map created_at to createdAt
           user: {
             id: post.user_id,
@@ -408,6 +416,11 @@ export const useRealPostsFetcher = () => {
           return tracks[Math.floor(Math.random() * tracks.length)];
         };
 
+        // Dimensions and aspect ratio
+        const width = (primaryMedia as any).media_width ?? (primaryMedia as any).width;
+        const height = (primaryMedia as any).media_height ?? (primaryMedia as any).height;
+        const aspectRatio = (primaryMedia as any).aspect_ratio ?? (width && height ? width / height : undefined);
+
         const formattedPost = {
           id: post.id,
           type: primaryMedia.media_type as 'video' | 'image',
@@ -421,6 +434,9 @@ export const useRealPostsFetcher = () => {
           shares: Math.floor(Math.random() * 50) + 1,
           duration: durationSeconds ? `${durationSeconds}s` : undefined,
           durationSeconds, // Store numeric value for filtering
+          aspectRatio,
+          width,
+          height,
           createdAt: post.created_at, // Map created_at to createdAt
           user: {
             id: post.user_id,

@@ -24,18 +24,13 @@ export const isLandscapeEligible = (item: ExploreContentItem): boolean => {
     return false;
   }
   
-  // Check aspect ratio if available
-  // Note: In real implementation, we'd need actual video dimensions
-  // For now, we check if the item is explicitly marked or has landscape metadata
-  const aspectRatio = item.aspectRatio;
-  
-  if (aspectRatio) {
-    return aspectRatio >= LANDSCAPE_AR_MIN && aspectRatio <= LANDSCAPE_AR_MAX;
+  // Compute aspect ratio from provided metadata
+  let ar = item.aspectRatio;
+  if (!ar && typeof item.width === 'number' && typeof item.height === 'number' && item.height > 0) {
+    ar = item.width / item.height;
   }
   
-  // If no AR data, use flags as fallback
-  return false;
-};
+  return !!ar && ar >= LANDSCAPE_AR_MIN && ar <= LANDSCAPE_AR_MAX;
 
 /**
  * Select the best landscape candidate from available items
@@ -46,25 +41,28 @@ export const isLandscapeEligible = (item: ExploreContentItem): boolean => {
  */
 export const selectLandscapeCandidate = (
   items: ExploreContentItem[],
-  usedIndexes: Set<number>
+  usedIndexes: Set<number>,
+  startIndex: number = 0,
+  lookahead: number = 20
 ): { item: ExploreContentItem; index: number } | null => {
-  const eligibleItems = items
-    .map((item, index) => ({ item, index }))
+  const windowItems = items
+    .slice(startIndex, startIndex + lookahead)
+    .map((item, idx) => ({ item, index: startIndex + idx }))
     .filter(({ index }) => !usedIndexes.has(index))
     .filter(({ item }) => isLandscapeEligible(item));
   
-  if (eligibleItems.length === 0) return null;
+  if (windowItems.length === 0) return null;
   
   // Priority 1: Featured items
-  const featured = eligibleItems.find(({ item }) => item.isFeatured);
+  const featured = windowItems.find(({ item }) => item.isFeatured);
   if (featured) return featured;
   
   // Priority 2: Landscape-suitable items
-  const landscapeSuitable = eligibleItems.find(({ item }) => item.landscapeSuitable);
+  const landscapeSuitable = windowItems.find(({ item }) => item.landscapeSuitable);
   if (landscapeSuitable) return landscapeSuitable;
   
   // Priority 3: Any eligible item
-  return eligibleItems[0];
+  return windowItems[0];
 };
 
 /**

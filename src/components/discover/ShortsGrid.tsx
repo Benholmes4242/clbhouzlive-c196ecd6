@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo, useCallback, lazy, Suspens
 import { ExploreContentItem } from '@/components/explore/types';
 import ShortCardWithObserver from '@/components/shorts/ShortCardWithObserver';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
-import { selectLandscapeCandidate, preloadLandscapePoster } from '@/utils/landscapeEligibility';
+import { selectLandscapeCandidate, preloadLandscapePoster, isLandscapeEligible } from '@/utils/landscapeEligibility';
 
 // Lazy load fullscreen viewer - only loads when user opens a short
 const ShortsViewer = lazy(() => import('@/components/shorts/ShortsViewer'));
@@ -22,7 +22,7 @@ interface ShortsGridProps {
 const GUTTER_PX = 4 as const;
 const CARD_ASPECT = 0.5625; // width / height (9:16 portrait)
 const PORTRAITS_PER_LANDSCAPE = 6; // Insert landscape after every 6 portraits
-
+const LOOKAHEAD_WINDOW = 20; // Lookahead window for landscape candidate search
 // Deterministic height variance based on item ID
 const getHeightVariant = (id: string): number => {
   const variants = [-10, -6, -3, 3, 6, 10]; // percentage variants
@@ -148,12 +148,18 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
       
       // Check if we should try to insert a landscape card
       if (portraitCount > 0 && portraitCount % PORTRAITS_PER_LANDSCAPE === 0) {
-        // Try to find a landscape candidate
-        const landscapeCandidate = selectLandscapeCandidate(items, usedIndexes);
+        const start = itemIndex;
+        const windowItems = items.slice(start, start + LOOKAHEAD_WINDOW).map((it, idx) => ({ item: it, index: start + idx }));
+        const eligibleInWindow = windowItems.filter(({ item, index }) => !usedIndexes.has(index) && isLandscapeEligible(item)).length;
+        console.log('[shorts] try landscape at portraitCount=', portraitCount, { start, used: usedIndexes.size, eligibleInWindow });
+
+        // Try to find a landscape candidate within a limited lookahead window
+        const landscapeCandidate = selectLandscapeCandidate(items, usedIndexes, start, LOOKAHEAD_WINDOW);
         
         if (landscapeCandidate) {
           // Preload the landscape card's poster
           preloadLandscapePoster(landscapeCandidate.item);
+          console.log('[shorts] inserted landscape at portraitCount=', portraitCount, { candidateIndex: landscapeCandidate.index });
           
           result.push({
             item: landscapeCandidate.item,
@@ -163,8 +169,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
           });
           usedIndexes.add(landscapeCandidate.index);
           
-          // Continue with portraits after landscape card
-          itemIndex++;
+          // Do NOT advance itemIndex here since we didn't consume items[itemIndex]
           continue;
         }
       }
@@ -323,6 +328,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
         {/* Sections: Masonry blocks interspersed with landscape cards */}
         {sections.map((section, sectionIndex) => {
           if (section.type === 'landscape' && section.landscapeItem) {
+            console.log('[shorts] render landscape full-width at section', sectionIndex);
             return (
               <div key={`landscape-${sectionIndex}`} style={{ marginBottom: `${GUTTER_PX}px` }}>
                 <ShortCardWithObserver

@@ -42,6 +42,8 @@ export interface ExploreContentItem {
   isFeatured?: boolean; // Priority 1 for landscape slots
   landscapeSuitable?: boolean; // Priority 2 for landscape slots
   aspectRatio?: number; // Video aspect ratio (width/height) for eligibility checking
+  width?: number; // Encoded media width
+  height?: number; // Encoded media height
 }
 
 export interface CTAContentItem {
