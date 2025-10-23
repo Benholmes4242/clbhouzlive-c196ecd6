@@ -49,11 +49,11 @@ export default React.memo(function ShortCard({
     >
       {/* Thumbnail Container */}
       <div 
-        className="relative w-full overflow-hidden bg-muted"
+        className="relative overflow-hidden bg-muted"
         style={{ 
+          width: isLandscape ? 'calc(100vw - 8px)' : '100%',
           height: height ? `${height}px` : undefined,
           aspectRatio: isLandscape ? '16/9' : (!height ? '9/16' : undefined),
-          width: isLandscape ? 'calc(100vw - 8px)' : undefined,
           boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 6px 16px rgba(0,0,0,0.06)',
           borderRadius: '18px',
           WebkitMaskImage: isLandscape ? undefined : 'url("/ui/shorts-squircle-9x16.svg")',
