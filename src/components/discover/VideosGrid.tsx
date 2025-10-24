@@ -91,7 +91,7 @@ const VideosGrid: React.FC<VideosGridProps> = ({
     <>
       {isCinematicMode ? (
         // Landscape cards layout matching shorts page
-        <div className="flex flex-col pb-4" style={{ gap: '4px' }}>
+        <div className="flex flex-col gap-3 pb-4">
           {itemsToRender.map((item) => {
             if (item.kind === 'channel_suggestion') {
               return (
@@ -115,23 +115,12 @@ const VideosGrid: React.FC<VideosGridProps> = ({
             }
             
             return (
-              <div
+              <ShortCard
                 key={`${activeTab}-${item.id}`}
-                style={{
-                  width: '100vw',
-                  maxWidth: '100vw',
-                  boxSizing: 'border-box',
-                  marginLeft: '-4px',
-                  position: 'relative',
-                  left: 0
-                }}
-              >
-                <ShortCard
-                  item={item.data as ExploreContentItem}
-                  onClick={() => onMediaClick?.(item.data as ExploreContentItem)}
-                  variant="landscape"
-                />
-              </div>
+                item={item.data as ExploreContentItem}
+                onClick={() => onMediaClick?.(item.data as ExploreContentItem)}
+                variant="landscape"
+              />
             );
           })}
         </div>
