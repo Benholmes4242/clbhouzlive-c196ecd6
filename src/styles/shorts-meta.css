@@ -10,17 +10,17 @@
 /* Container with right-positioned avatar */
 .scm.scm--center { 
   position: relative;
-  padding: 6px 36px 10px 8px; /* right padding for avatar (28px + 8px gap) */
+  padding: 6px 44px 10px 8px; /* right padding for avatar (36px + 8px gap) */
   user-select: none;
 }
 
-/* Avatar positioned on right, centered with username */
+/* Avatar positioned on right, aligned with name top */
 .scm__avatarWrap {
   position: absolute;
   right: 8px;
   top: 6px;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   border: 0;
   padding: 0;
   background: transparent;
