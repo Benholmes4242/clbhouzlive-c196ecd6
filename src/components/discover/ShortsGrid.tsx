@@ -76,6 +76,13 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
     return Math.round((columnWidth / CARD_ASPECT) * 0.729); // height = width / (w/h), reduced by 27.1%
   }, [columnWidth]);
 
+  // Landscape card height (10% reduction)
+  const landscapeHeightPx = useMemo(() => {
+    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 375;
+    const aspectRatio = 16 / 11.592;
+    return Math.round((viewportWidth / aspectRatio) * 0.9); // 10% reduction
+  }, []);
+
   // Preload posters for first visible items on mount
   useEffect(() => {
     const firstItems = items.slice(0, 6);
@@ -315,6 +322,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                 <ShortCardWithObserver
                   item={section.landscapeItem.item}
                   onClick={() => handleCardClick(section.landscapeItem.item, section.landscapeItem.index)}
+                  height={landscapeHeightPx}
                   onVisibilityChange={handleVisibilityChange}
                   onLike={onLike}
                   onAuthorClick={onAuthorClick}
