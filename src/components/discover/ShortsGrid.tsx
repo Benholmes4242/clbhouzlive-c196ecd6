@@ -196,7 +196,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
     return result;
   }, [items, baseHeightPx]);
 
-  // Organize layout into rows: first 2 portraits, then masonry columns with landscape breaks
+  // Organize layout into rows: 2x2 portrait grids with landscape breaks
   const { firstRow, sections } = useMemo(() => {
     if (layout.length === 0) return { firstRow: [], sections: [] };
     
@@ -204,38 +204,22 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
     const remaining = layout.slice(2);
     
     const sections: Array<{
-      type: 'masonry' | 'landscape';
-      items?: Array<{ item: ExploreContentItem; index: number; height: number; column: 'left' | 'right' }>;
+      type: 'portrait-grid' | 'landscape';
+      items?: Array<{ item: ExploreContentItem; index: number; height: number }>;
       landscapeItem?: { item: ExploreContentItem; index: number };
     }> = [];
     
-    let currentMasonry: LayoutItem[] = [];
+    let currentPortraits: LayoutItem[] = [];
     
     remaining.forEach((layoutItem) => {
       if (layoutItem.type === 'landscape') {
-        // Flush current masonry section
-        if (currentMasonry.length > 0) {
-          const leftCol: Array<{ item: ExploreContentItem; index: number; height: number; column: 'left' | 'right' }> = [];
-          const rightCol: Array<{ item: ExploreContentItem; index: number; height: number; column: 'left' | 'right' }> = [];
-          let leftHeight = 0;
-          let rightHeight = 0;
-          
-          currentMasonry.forEach((portItem) => {
-            if (leftHeight <= rightHeight) {
-              leftCol.push({ item: portItem.item, index: portItem.index, height: portItem.height!, column: 'left' });
-              leftHeight += portItem.height! + GUTTER_PX;
-            } else {
-              rightCol.push({ item: portItem.item, index: portItem.index, height: portItem.height!, column: 'right' });
-              rightHeight += portItem.height! + GUTTER_PX;
-            }
-          });
-          
+        // Flush current portrait section
+        if (currentPortraits.length > 0) {
           sections.push({
-            type: 'masonry',
-            items: [...leftCol, ...rightCol]
+            type: 'portrait-grid',
+            items: currentPortraits.map(p => ({ item: p.item, index: p.index, height: p.height! }))
           });
-          
-          currentMasonry = [];
+          currentPortraits = [];
         }
         
         // Add landscape section
@@ -244,30 +228,15 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
           landscapeItem: { item: layoutItem.item, index: layoutItem.index }
         });
       } else {
-        currentMasonry.push(layoutItem);
+        currentPortraits.push(layoutItem);
       }
     });
     
-    // Flush remaining masonry items
-    if (currentMasonry.length > 0) {
-      const leftCol: Array<{ item: ExploreContentItem; index: number; height: number; column: 'left' | 'right' }> = [];
-      const rightCol: Array<{ item: ExploreContentItem; index: number; height: number; column: 'left' | 'right' }> = [];
-      let leftHeight = 0;
-      let rightHeight = 0;
-      
-      currentMasonry.forEach((portItem) => {
-        if (leftHeight <= rightHeight) {
-          leftCol.push({ item: portItem.item, index: portItem.index, height: portItem.height!, column: 'left' });
-          leftHeight += portItem.height! + GUTTER_PX;
-        } else {
-          rightCol.push({ item: portItem.item, index: portItem.index, height: portItem.height!, column: 'right' });
-          rightHeight += portItem.height! + GUTTER_PX;
-        }
-      });
-      
+    // Flush remaining portrait items
+    if (currentPortraits.length > 0) {
       sections.push({
-        type: 'masonry',
-        items: [...leftCol, ...rightCol]
+        type: 'portrait-grid',
+        items: currentPortraits.map(p => ({ item: p.item, index: p.index, height: p.height! }))
       });
     }
     
@@ -354,44 +323,25 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
             );
           }
           
-          if (section.type === 'masonry' && section.items) {
-            const leftItems = section.items.filter(item => item.column === 'left');
-            const rightItems = section.items.filter(item => item.column === 'right');
-            
+          if (section.type === 'portrait-grid' && section.items) {
             return (
               <div 
-                key={`masonry-${sectionIndex}`} 
+                key={`portrait-grid-${sectionIndex}`} 
                 className="grid grid-cols-2" 
                 style={{ gap: `${GUTTER_PX}px`, marginBottom: `${GUTTER_PX}px` }}
               >
-                <div style={{ display: 'grid', rowGap: `${GUTTER_PX}px` }}>
-                  {leftItems.map(({ item, index, height }) => (
-                    <ShortCardWithObserver
-                      key={item.id}
-                      item={item}
-                      onClick={() => handleCardClick(item, index)}
-                      height={height}
-                      onVisibilityChange={handleVisibilityChange}
-                      onLike={onLike}
-                      onAuthorClick={onAuthorClick}
-                      currentUserId={currentUserId}
-                    />
-                  ))}
-                </div>
-                <div style={{ display: 'grid', rowGap: `${GUTTER_PX}px` }}>
-                  {rightItems.map(({ item, index, height }) => (
-                    <ShortCardWithObserver
-                      key={item.id}
-                      item={item}
-                      onClick={() => handleCardClick(item, index)}
-                      height={height}
-                      onVisibilityChange={handleVisibilityChange}
-                      onLike={onLike}
-                      onAuthorClick={onAuthorClick}
-                      currentUserId={currentUserId}
-                    />
-                  ))}
-                </div>
+                {section.items.map(({ item, index, height }) => (
+                  <ShortCardWithObserver
+                    key={item.id}
+                    item={item}
+                    onClick={() => handleCardClick(item, index)}
+                    height={baseHeightPx}
+                    onVisibilityChange={handleVisibilityChange}
+                    onLike={onLike}
+                    onAuthorClick={onAuthorClick}
+                    currentUserId={currentUserId}
+                  />
+                ))}
               </div>
             );
           }
