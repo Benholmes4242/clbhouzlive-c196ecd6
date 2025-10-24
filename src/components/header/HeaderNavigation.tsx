@@ -37,9 +37,9 @@ const HeaderNavigation = () => {
   const getIconColorClass = () => {
     const isClubhousePage = location.pathname === '/clubhouse' || location.pathname === '/';
     
-    // White icons only on clubhouse page
-    if (isClubhousePage) {
-      return 'text-white/80 hover:text-white';
+    // White icons on clubhouse and discover pages
+    if (isClubhousePage || isDiscoverPage) {
+      return 'text-white/70 hover:text-white transition-colors';
     }
     
     // Black icons on all other pages
