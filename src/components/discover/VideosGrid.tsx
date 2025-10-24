@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import VideoExploreCard from './VideoExploreCard';
-import CinematicVideoCard from './CinematicVideoCard';
+import ShortCard from '@/components/shorts/ShortCard';
 import { ExploreContentItem } from '@/components/explore/types';
 import { InterleavedItem } from '@/utils/interleaveFeed';
 import { ChannelSuggestionCard } from './ChannelSuggestionCard';
@@ -90,8 +90,8 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   return (
     <>
       {isCinematicMode ? (
-        // Cinematic single-column edge-to-edge layout
-        <div className="flex flex-col">
+        // Landscape cards layout matching shorts page
+        <div className="flex flex-col gap-3 pb-4">
           {itemsToRender.map((item) => {
             if (item.kind === 'channel_suggestion') {
               return (
@@ -115,10 +115,11 @@ const VideosGrid: React.FC<VideosGridProps> = ({
             }
             
             return (
-              <CinematicVideoCard
+              <ShortCard
                 key={`${activeTab}-${item.id}`}
                 item={item.data as ExploreContentItem}
-                onMediaClick={onMediaClick}
+                onClick={() => onMediaClick?.(item.data as ExploreContentItem)}
+                variant="landscape"
               />
             );
           })}
