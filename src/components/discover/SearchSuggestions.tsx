@@ -86,23 +86,36 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.15 }}
-      className="absolute top-full left-0 right-0 mt-2 rounded-xl shadow-xl ring-1 ring-black/5 bg-white overflow-hidden max-h-[50vh] overflow-y-auto z-50"
+      className="absolute top-full left-0 right-0 mt-2 rounded-2xl overflow-hidden max-h-[50vh] overflow-y-auto z-50"
+      style={{
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        backdropFilter: 'blur(16px)',
+        border: '1px solid rgba(255,255,255,0.12)',
+        boxShadow: '0 24px 48px rgba(0,0,0,0.9)',
+      }}
       role="listbox"
     >
       {/* Recent Searches */}
       {showRecent && (
         <div className="p-2">
-          <div className="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
+          <div className="px-3 py-2 text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: 500, letterSpacing: '0.03em' }}>
             Recent
           </div>
           {recentSearches.map((search, index) => (
             <button
               key={`recent-${index}`}
               onClick={() => handleSelect(search)}
-              className="flex items-center gap-3 w-full px-3 py-2 text-sm rounded-lg hover:bg-neutral-100 transition-colors text-left"
+              className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-left transition-colors duration-120"
+              style={{
+                color: '#FFFFFF',
+                fontSize: '0.95rem',
+                fontWeight: 400,
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               role="option"
             >
-              <Clock className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <Clock className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.7)' }} />
               <span>{search}</span>
             </button>
           ))}
@@ -112,17 +125,24 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
       {/* Search Results */}
       {showResults && (
         <div className="p-2">
-          <div className="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
+          <div className="px-3 py-2 text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: 500, letterSpacing: '0.03em' }}>
             Suggestions
           </div>
           {searchResults.map((result, index) => (
             <button
               key={`result-${index}`}
               onClick={() => handleSelect(result)}
-              className="flex items-center gap-3 w-full px-3 py-2 text-sm rounded-lg hover:bg-neutral-100 transition-colors text-left"
+              className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-left transition-colors duration-120"
+              style={{
+                color: '#FFFFFF',
+                fontSize: '0.95rem',
+                fontWeight: 400,
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               role="option"
             >
-              <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <Search className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.7)' }} />
               <span>{result}</span>
             </button>
           ))}
@@ -131,18 +151,25 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
 
       {/* Trending */}
       {showTrending && (
-        <div className="p-2 border-t border-gray-100">
-          <div className="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
+        <div className="p-2" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="px-3 py-2 text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.8rem', fontWeight: 500, letterSpacing: '0.03em' }}>
             Trending
           </div>
           {TRENDING_SEARCHES.map((trend, index) => (
             <button
               key={`trend-${index}`}
               onClick={() => handleSelect(trend)}
-              className="flex items-center gap-3 w-full px-3 py-2 text-sm rounded-lg hover:bg-neutral-100 transition-colors text-left"
+              className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-left transition-colors duration-120"
+              style={{
+                color: '#FFFFFF',
+                fontSize: '0.95rem',
+                fontWeight: 400,
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               role="option"
             >
-              <TrendingUp className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <TrendingUp className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.7)' }} />
               <span>{trend}</span>
             </button>
           ))}

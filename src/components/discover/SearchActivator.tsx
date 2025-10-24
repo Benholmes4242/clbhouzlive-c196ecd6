@@ -84,10 +84,15 @@ const SearchActivator: React.FC<SearchActivatorProps> = ({
     return (
       <button
         onClick={onOpen}
-        className="ml-auto w-10 h-10 rounded-full bg-neutral-100 hover:bg-neutral-200 active:bg-neutral-200/80 flex items-center justify-center transition-colors shadow-sm"
+        className="ml-auto w-10 h-10 rounded-full flex items-center justify-center transition-all duration-120"
+        style={{
+          backgroundColor: 'rgba(255,255,255,0.08)',
+          border: '1px solid rgba(255,255,255,0.12)',
+          backdropFilter: 'blur(12px)',
+        }}
         aria-label="Search videos"
       >
-        <Search className="w-5 h-5 text-gray-700" />
+        <Search className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.7)' }} />
       </button>
     );
   }
@@ -105,7 +110,7 @@ const SearchActivator: React.FC<SearchActivatorProps> = ({
       >
         <form onSubmit={handleSubmit} className="relative">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-            <Search className="w-5 h-5 text-gray-400" />
+            <Search className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.7)' }} />
           </div>
           <input
             ref={inputRef}
@@ -115,18 +120,42 @@ const SearchActivator: React.FC<SearchActivatorProps> = ({
             onKeyDown={handleKeyDown}
             onFocus={() => setShowSuggestions(true)}
             placeholder="Search videos…"
-            className="w-full h-10 pl-10 pr-10 rounded-full bg-neutral-100 shadow-sm ring-1 ring-black/5 focus:outline-none focus:ring-2 focus:ring-black/10 text-sm"
+            className="w-full h-10 pl-10 pr-10 rounded-full text-sm outline-none"
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              backdropFilter: 'blur(12px)',
+              color: '#FFFFFF',
+              transition: 'background-color 120ms ease, border-color 120ms ease',
+            }}
+            onFocusCapture={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.12)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+            }}
+            onBlurCapture={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
+            }}
             role="combobox"
             aria-expanded={showSuggestions}
             aria-controls="search-suggestions"
             aria-autocomplete="list"
             enterKeyHint="search"
           />
+          <style>{`
+            input[type="search"]::placeholder {
+              color: rgba(255,255,255,0.65);
+              font-weight: 400;
+            }
+          `}</style>
           {query && (
             <button
               type="button"
               onClick={() => setQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center"
+              style={{ color: 'rgba(255,255,255,0.7)' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'rgba(255,255,255,1)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
               aria-label="Clear search"
             >
               <X className="w-4 h-4" />
