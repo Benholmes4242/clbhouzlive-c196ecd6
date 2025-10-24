@@ -13,7 +13,6 @@ interface ShortCardWithObserverProps {
   onAuthorClick?: (authorId: string) => void;
   currentUserId?: string;
   variant?: 'portrait' | 'landscape'; // Support landscape cards
-  showMeta?: boolean; // Control metadata visibility (default: true)
 }
 
 /**
@@ -29,8 +28,7 @@ export default function ShortCardWithObserver({
   onLike,
   onAuthorClick,
   currentUserId,
-  variant,
-  showMeta
+  variant
 }: ShortCardWithObserverProps) {
   const { ref, isInView } = useIntersectionObserver({
     threshold: 0.65,
@@ -54,7 +52,6 @@ export default function ShortCardWithObserver({
         onAuthorClick={onAuthorClick}
         currentUserId={currentUserId}
         variant={variant}
-        showMeta={showMeta}
       />
     </div>
   );

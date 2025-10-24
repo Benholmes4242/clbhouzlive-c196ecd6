@@ -20,11 +20,7 @@ interface ShortsGridProps {
 
 // Single source of truth for spacing
 const GUTTER_PX = 4 as const;
-const PORTRAIT_AR = 9 / 16; // width / height for portrait cards
-const PORTRAIT_HEIGHT_SCALE = 0.9; // 10% shorter
-const LANDSCAPE_AR = 16 / 9; // width / height for landscape cards
-const LANDSCAPE_HEIGHT_SCALE = 0.9; // 10% shorter
-const CARD_ASPECT = 0.52; // width / height (slightly wider than 9:16) - legacy
+const CARD_ASPECT = 0.52; // width / height (slightly wider than 9:16)
 const PORTRAITS_PER_LANDSCAPE = 4; // Insert landscape after every 4 portraits (2 rows)
 const LOOKAHEAD_WINDOW = 20; // Lookahead window for landscape candidate search
 // Deterministic height variance based on item ID
@@ -77,20 +73,9 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   }, [updateColumnWidth]);
 
   const baseHeightPx = useMemo(() => {
-    if (columnWidth <= 0) return 280 * PORTRAIT_HEIGHT_SCALE;
-    const exact = Math.round(columnWidth / PORTRAIT_AR);
-    return Math.round(exact * PORTRAIT_HEIGHT_SCALE);
+    if (columnWidth <= 0) return 280 * 0.9;
+    return Math.round((columnWidth / CARD_ASPECT) * 0.9); // height = width / (w/h), reduced by 10%
   }, [columnWidth]);
-
-  // Calculate landscape height based on container width
-  const landscapeHeight = useMemo(() => {
-    const el = gridRef.current;
-    if (!el) return 200;
-    const containerWidth = el.clientWidth;
-    const rowWidth = containerWidth - GUTTER_PX * 2; // remove left/right padding
-    const exact = Math.round(rowWidth / LANDSCAPE_AR);
-    return Math.round(exact * LANDSCAPE_HEIGHT_SCALE);
-  }, [columnWidth]); // Re-calc when columnWidth changes (which means container resized)
 
   // Preload posters for first visible items on mount
   useEffect(() => {
@@ -304,7 +289,6 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                 onLike={onLike}
                 onAuthorClick={onAuthorClick}
                 currentUserId={currentUserId}
-                showMeta={false}
               />
             ))}
           </div>
@@ -323,8 +307,6 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                   boxSizing: 'border-box',
                   marginLeft: `-${GUTTER_PX}px`,
                   marginBottom: `${GUTTER_PX}px`,
-                  paddingLeft: `${GUTTER_PX}px`,
-                  paddingRight: `${GUTTER_PX}px`,
                   position: 'relative',
                   left: 0
                 }}
@@ -332,13 +314,11 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                 <ShortCardWithObserver
                   item={section.landscapeItem.item}
                   onClick={() => handleCardClick(section.landscapeItem.item, section.landscapeItem.index)}
-                  height={landscapeHeight}
                   onVisibilityChange={handleVisibilityChange}
                   onLike={onLike}
                   onAuthorClick={onAuthorClick}
                   currentUserId={currentUserId}
                   variant="landscape"
-                  showMeta={false}
                 />
               </div>
             );
@@ -361,7 +341,6 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                     onLike={onLike}
                     onAuthorClick={onAuthorClick}
                     currentUserId={currentUserId}
-                    showMeta={false}
                   />
                 ))}
               </div>
