@@ -44,7 +44,13 @@ export default React.memo(function ShortCard({
     <button
       onClick={onClick}
       className="shortsCard group relative w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.98] transition-transform duration-75"
-      style={{ margin: 0 }}
+      style={isLandscape ? {
+        margin: 0,
+        marginLeft: 'calc(-1 * var(--page-padding, 16px))',
+        marginRight: 'calc(-1 * var(--page-padding, 16px))',
+        width: '100vw',
+        maxWidth: '100vw'
+      } : { margin: 0 }}
       aria-label={`Play short: ${item.title || 'Video'} by ${item.user?.name || 'Unknown'}`}
     >
       {/* Thumbnail Container */}
