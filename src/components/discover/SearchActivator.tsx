@@ -110,7 +110,7 @@ const SearchActivator: React.FC<SearchActivatorProps> = ({
       >
         <form onSubmit={handleSubmit} className="relative">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-            <Search className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.85)' }} />
+            <Search className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.75)' }} />
           </div>
           <input
             ref={inputRef}
