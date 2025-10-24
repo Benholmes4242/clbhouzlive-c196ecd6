@@ -13,7 +13,6 @@
   gap: 8px;
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 6px;
   scrollbar-width: none;
@@ -27,7 +26,6 @@
 /* Tiles - keep tap target same size for all */
 .lc-tile {
   width: 96px;
-  scroll-snap-align: start;
   position: relative;
   flex-shrink: 0;
   display: flex;
