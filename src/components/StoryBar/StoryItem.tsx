@@ -78,7 +78,7 @@ const StoryItem: React.FC<StoryItemProps> = ({
           </button>
         )}
       </div>
-      <span className="text-xs text-center text-muted-foreground max-w-20 truncate">
+      <span className="text-xs text-center text-white max-w-20 truncate">
         {story.user}
       </span>
     </div>
