@@ -79,8 +79,6 @@ export default function ShortsCardMeta({
           />
           <span className="scm__likes">{formatLikes(likeCount)}</span>
         </button>
-
-        <p className="scm__caption scm__caption--full">{caption}</p>
       </div>
     </div>
   );
