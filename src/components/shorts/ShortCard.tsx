@@ -56,17 +56,7 @@ export default React.memo(function ShortCard({
           height: height ? `${height}px` : undefined,
           aspectRatio: isLandscape ? '16/11.592' : (!height ? '9/16' : undefined),
           boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 6px 16px rgba(0,0,0,0.06)',
-          borderRadius: isLandscape ? '0' : '18px',
-          ...(isLandscape ? {} : {
-            WebkitMaskImage: 'url("/ui/shorts-squircle-9x16.svg")',
-            maskImage: 'url("/ui/shorts-squircle-9x16.svg")',
-            WebkitMaskSize: '100% 100%',
-            maskSize: '100% 100%',
-            WebkitMaskRepeat: 'no-repeat',
-            maskRepeat: 'no-repeat',
-            WebkitMaskPosition: 'center',
-            maskPosition: 'center'
-          })
+          borderRadius: '0'
         }}
       >
         {/* Video with poster fallback - always render video element for consistency */}
