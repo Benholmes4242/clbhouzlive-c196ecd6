@@ -276,7 +276,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
       >
         {/* First Row - Pinned, Same Height */}
         {firstRow.length > 0 && (
-          <div className="grid grid-cols-2" style={{ gap: `${GUTTER_PX}px`, marginBottom: `${GUTTER_PX}px` }}>
+          <div className="grid grid-cols-2" style={{ gap: `${GUTTER_PX}px`, marginBottom: 0 }}>
             {firstRow.map((layoutItem) => (
               <ShortCardWithObserver
                 key={layoutItem.item.id}
@@ -305,7 +305,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                   maxWidth: '100vw',
                   boxSizing: 'border-box',
                   marginLeft: 0,
-                  marginBottom: `${GUTTER_PX}px`,
+                  marginBottom: 0,
                   position: 'relative',
                   left: 0,
                   paddingLeft: 0,
@@ -330,7 +330,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
               <div 
                 key={`portrait-grid-${sectionIndex}`} 
                 className="grid grid-cols-2" 
-                style={{ gap: `${GUTTER_PX}px`, marginBottom: `${GUTTER_PX}px` }}
+                style={{ gap: `${GUTTER_PX}px`, marginBottom: 0 }}
               >
                 {section.items.map(({ item, index, height }) => (
                   <ShortCardWithObserver
