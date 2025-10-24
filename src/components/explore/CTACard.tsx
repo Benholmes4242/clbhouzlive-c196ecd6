@@ -11,13 +11,17 @@ interface CTACardProps {
 const CTACard: React.FC<CTACardProps> = ({ item }) => {
   return (
     <div 
-      className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-2 border-dashed border-amber-200 dark:border-amber-800 p-6 text-center"
-      style={{ borderRadius: '8px' }}
+      className="border-2 border-dashed p-6 text-center"
+      style={{ 
+        borderRadius: '8px',
+        background: 'var(--bg-card)',
+        borderColor: 'var(--border-hairline)'
+      }}
     >
-      <Plus className="h-8 w-8 mx-auto mb-3 text-amber-600" />
-      <h3 className="font-semibold text-lg mb-2">{item.ctaTitle || item.title}</h3>
-      <p className="text-muted-foreground text-sm mb-4">{item.ctaDescription || 'Share your golf moments'}</p>
-      <Button size="sm" className="bg-[#2a2626] text-white hover:bg-[#2a2626]/90">
+      <Plus className="h-8 w-8 mx-auto mb-3" style={{ color: 'var(--accent-primary)' }} />
+      <h3 className="font-semibold text-lg mb-2" style={{ color: 'var(--text-primary)' }}>{item.ctaTitle || item.title}</h3>
+      <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>{item.ctaDescription || 'Share your golf moments'}</p>
+      <Button size="sm" style={{ background: 'var(--accent-primary)', color: 'var(--text-primary)' }} className="hover:opacity-90">
         <Plus className="h-4 w-4 mr-2" />
         {item.ctaButton || 'Create Post'}
       </Button>
