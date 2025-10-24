@@ -302,8 +302,13 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                 key={`landscape-${sectionIndex}`} 
                 className="shortsLandscapeRow"
                 style={{ 
-                  marginBottom: `12px`,
-                  paddingRight: `${GUTTER_PX}px`
+                  width: '100vw',
+                  maxWidth: '100vw',
+                  boxSizing: 'border-box',
+                  marginLeft: `-${GUTTER_PX}px`,
+                  marginBottom: `${GUTTER_PX}px`,
+                  position: 'relative',
+                  left: 0
                 }}
               >
                 <ShortCardWithObserver
