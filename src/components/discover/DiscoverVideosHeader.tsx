@@ -123,7 +123,13 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
       
       {/* Search overlay */}
       {isSearchOpen && (
-        <div className="absolute inset-0 z-50 bg-white">
+        <div 
+          className="absolute inset-0 z-[100] transition-all duration-150"
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.92)',
+            backdropFilter: 'blur(20px)',
+          }}
+        >
           <SearchActivator
             isOpen={isSearchOpen}
             onOpen={handleSearchOpen}

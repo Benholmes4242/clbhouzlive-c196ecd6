@@ -86,19 +86,19 @@ const SearchActivator: React.FC<SearchActivatorProps> = ({
         onClick={onOpen}
         className="ml-auto w-10 h-10 rounded-full flex items-center justify-center transition-all duration-120"
         style={{
-          backgroundColor: 'rgba(255,255,255,0.08)',
-          border: '1px solid rgba(255,255,255,0.12)',
+          backgroundColor: 'rgba(255,255,255,0.12)',
+          border: '1px solid rgba(255,255,255,0.18)',
           backdropFilter: 'blur(12px)',
         }}
         aria-label="Search videos"
       >
-        <Search className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.7)' }} />
+        <Search className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.85)' }} />
       </button>
     );
   }
 
   return (
-    <div ref={containerRef} className="absolute inset-x-3 z-50">
+    <div ref={containerRef} className="absolute inset-x-3 z-[150]">
       <motion.div
         initial={{ width: 40, borderRadius: 9999 }}
         animate={{ width: 'calc(100% - 24px)', borderRadius: 9999 }}
@@ -110,7 +110,7 @@ const SearchActivator: React.FC<SearchActivatorProps> = ({
       >
         <form onSubmit={handleSubmit} className="relative">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-            <Search className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.7)' }} />
+            <Search className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.85)' }} />
           </div>
           <input
             ref={inputRef}
@@ -122,19 +122,20 @@ const SearchActivator: React.FC<SearchActivatorProps> = ({
             placeholder="Search videos…"
             className="w-full h-10 pl-10 pr-10 rounded-full text-sm outline-none"
             style={{
-              backgroundColor: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              backgroundColor: 'rgba(255,255,255,0.12)',
+              border: '1px solid rgba(255,255,255,0.18)',
               backdropFilter: 'blur(12px)',
               color: '#FFFFFF',
-              transition: 'background-color 120ms ease, border-color 120ms ease',
+              boxShadow: '0 0 12px rgba(255,255,255,0.05)',
+              transition: 'background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease',
             }}
             onFocusCapture={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.12)';
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.16)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)';
             }}
             onBlurCapture={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)';
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
+              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.12)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)';
             }}
             role="combobox"
             aria-expanded={showSuggestions}
@@ -144,7 +145,7 @@ const SearchActivator: React.FC<SearchActivatorProps> = ({
           />
           <style>{`
             input[type="search"]::placeholder {
-              color: rgba(255,255,255,0.65);
+              color: rgba(255,255,255,0.75);
               font-weight: 400;
             }
           `}</style>
@@ -153,9 +154,9 @@ const SearchActivator: React.FC<SearchActivatorProps> = ({
               type="button"
               onClick={() => setQuery('')}
               className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center"
-              style={{ color: 'rgba(255,255,255,0.7)' }}
+              style={{ color: 'rgba(255,255,255,0.85)' }}
               onMouseEnter={(e) => e.currentTarget.style.color = 'rgba(255,255,255,1)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255,255,255,0.85)'}
               aria-label="Clear search"
             >
               <X className="w-4 h-4" />

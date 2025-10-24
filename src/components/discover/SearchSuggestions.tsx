@@ -86,7 +86,7 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.15 }}
-      className="absolute top-full left-0 right-0 mt-2 rounded-2xl overflow-hidden max-h-[50vh] overflow-y-auto z-50"
+      className="absolute top-full left-0 right-0 mt-2 rounded-2xl overflow-hidden max-h-[50vh] overflow-y-auto z-[150]"
       style={{
         backgroundColor: 'rgba(0,0,0,0.8)',
         backdropFilter: 'blur(16px)',
