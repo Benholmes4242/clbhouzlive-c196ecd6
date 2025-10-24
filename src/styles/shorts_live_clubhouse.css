@@ -114,10 +114,10 @@
   margin-top: 6px;
 }
 
-/* Intentionally keep labels black in both modes for this row */
+/* White labels for both nearby golfers and creators */
 .live-row .lc-name, 
 .live-row .lc-sub { 
-  color: #000 !important; 
+  color: #fff !important; 
 }
 
 /* Peek card styles removed - feature disabled */
