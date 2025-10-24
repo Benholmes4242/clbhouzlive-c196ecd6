@@ -33,10 +33,17 @@ const HeaderNavigation = () => {
   // Use adaptive text color for profile page, fallback to existing logic for other pages
   const shouldUseDarkText = useAdaptiveTextColor(navigationRef);
   
-  // Get variant-specific icon colors - always white for glass-dark headers
+  // Get variant-specific icon colors
   const getIconColorClass = () => {
-    // All headers now use glass-dark style with white icons
-    return 'text-white/80 hover:text-white';
+    const isClubhousePage = location.pathname === '/clubhouse' || location.pathname === '/';
+    
+    // White icons only on clubhouse page
+    if (isClubhousePage) {
+      return 'text-white/80 hover:text-white';
+    }
+    
+    // Black icons on all other pages
+    return 'text-black/70 hover:text-black';
   };
 
   // Check if user is admin or limited admin

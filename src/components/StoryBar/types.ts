@@ -7,5 +7,4 @@ export type StoryUser = {
   avatar: string;
   hasStory?: boolean;
   display_name?: string;
-  homeClub?: string;
 };

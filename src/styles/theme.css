@@ -1,9 +1,19 @@
 :root {
-  /* ECM Liquid Glass effect - using dark-only system */
-  --ecm-glass-bg: var(--glass-bg);
-  --ecm-glass-blur: var(--glass-blur);
+  /* Liquid Glass effect - semi-transparent with blur */
+  --ecm-glass-bg: rgba(110, 146, 119, 0.15);
+  --ecm-glass-blur: 32px;
   --ecm-glass-saturate: 180%;
-  --ecm-glass-border: var(--border-hairline);
-  --ecm-inner-glow: rgba(255, 255, 255, 0.1);
-  --ecm-composer-glass: var(--bg-modal);
+  --ecm-glass-border: rgba(255, 255, 255, 0.3);
+  --ecm-inner-glow: rgba(255, 255, 255, 0.15);
+  --ecm-composer-glass: rgba(255, 255, 255, 0.25);
 }
+
+/* Dark mode disabled during development */
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --ecm-glass-bg: rgba(90, 126, 99, 0.18);
+    --ecm-glass-border: rgba(255, 255, 255, 0.2);
+    --ecm-inner-glow: rgba(255, 255, 255, 0.1);
+    --ecm-composer-glass: rgba(255, 255, 255, 0.2);
+  }
+} */

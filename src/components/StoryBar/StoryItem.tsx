@@ -78,16 +78,9 @@ const StoryItem: React.FC<StoryItemProps> = ({
           </button>
         )}
       </div>
-      <div className="text-center max-w-20">
-        <div className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>
-          {story.user}
-        </div>
-        {story.homeClub && (
-          <div className="text-[10px] truncate" style={{ color: 'var(--text-primary)' }}>
-            {story.homeClub}
-          </div>
-        )}
-      </div>
+      <span className="text-xs text-center text-muted-foreground max-w-20 truncate">
+        {story.user}
+      </span>
     </div>
   );
 };

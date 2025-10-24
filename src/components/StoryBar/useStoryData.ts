@@ -42,7 +42,7 @@ export const useStoryData = () => {
         const followedIds = followedUsers.map(f => f.following_id);
         const { data: profiles } = await supabase
           .from('user_profiles')
-          .select('id, username, display_name, profile_photo_url, home_club')
+          .select('id, username, display_name, profile_photo_url')
           .in('id', followedIds);
 
         if (profiles && profiles.length > 0) {
@@ -54,7 +54,6 @@ export const useStoryData = () => {
               username: profile.username || profile.id,
               avatar: profile.profile_photo_url || '',
               hasStory: false,
-              homeClub: profile.home_club || ''
             });
           });
         }

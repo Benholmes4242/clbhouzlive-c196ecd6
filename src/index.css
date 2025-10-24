@@ -75,12 +75,12 @@ body {
   overscroll-behavior-y: contain; /* Stop rubber-band from pulling fixed elements */
 }
 
-/* Prevent rubber-band overscroll gaps revealing black */
+/* Prevent rubber-band overscroll gaps revealing white */
 html, body { 
   overscroll-behavior: none;
   overscroll-behavior-y: contain;
   overflow-x: clip; /* Prevent horizontal overflow on iOS */
-  background: var(--bg-page); /* Pure black extends behind status bar */
+  background: hsl(var(--background)); /* Ensure background extends behind status bar */
 }
 
 /* Enhanced safe area inset support */
@@ -145,7 +145,7 @@ html, body {
   max-width: var(--modal-max-w);
   border-radius: var(--modal-radius) var(--modal-radius) 0 0;
   box-shadow: var(--modal-shadow);
-  background: var(--bg-modal);
+  background: #fff;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -507,7 +507,7 @@ html, body {
 }
 
 .stat + .stat {
-  border-left: 1px solid var(--border-hairline);
+  border-left: 1px solid rgba(0,0,0,.08);
 }
 
 .stat-value {
@@ -531,7 +531,7 @@ html, body {
   align-items: center;
   gap: var(--sp-8);
   padding: var(--sp-16) 0 var(--sp-8);
-  border-bottom: 1px solid var(--border-hairline);
+  border-bottom: 1px solid rgba(0,0,0,.06);
   margin-top: var(--sp-24);
 }
 
@@ -600,7 +600,7 @@ body.route-clubhouse .global-header {
   inset: 0;
   height: 100svh;
   width: 100vw;
-  background: var(--bg-page);
+  background: #000;
   overflow: hidden;
 }
 
@@ -1047,14 +1047,14 @@ html[data-immersive="true"] .app-shell--topSpacer {
     height: 100vh;
     height: 100svh;
     height: 100dvh;
-    background: var(--bg-page); /* Pure black background */
+    background: hsl(var(--background)); /* Ensure background extends behind status bar */
     /* Remove any existing top margins that might create black bars */
     margin-top: 0 !important;
     padding-top: 0 !important;
   }
 
   #root {
-    background-color: var(--bg-page) !important;
+    background-color: hsl(var(--background)) !important;
     height: 100vh;
     height: 100svh;
     height: 100dvh;
@@ -1070,59 +1070,34 @@ html[data-immersive="true"] .app-shell--topSpacer {
     }
   }
   :root {
-    /* ========================================
-       DARK-ONLY THEME SYSTEM
-       ======================================== */
+    /* Brand Colors - More subtle orange */
+    --brand-orange: 28 85 65; /* More subtle orange: #e67e22 */
+    --brand-orange-hover: 25 80 60; /* Darker subtle hover */
+    --brand-orange-light: 30 90 70; /* Lighter subtle variant */
+    --discover-orange: 28 85 65; /* Match subtle orange */
+    --discover-orange-dark: 25 80 60; /* Darker subtle hover */
     
-    /* Core Surfaces */
-    --bg-page: #000000;        /* Full-screen/root backgrounds */
-    --bg-surface: #0F0F0F;     /* Scrollable panels on page */
-    --bg-card: #141414;        /* Cards/tiles/media containers */
-    --bg-modal: #1A1A1A;       /* Sheets/pop-ups/modals */
-    
-    /* Overlays & Translucency */
-    --overlay-scrim: rgba(0,0,0,0.36);  /* Modal backdrop */
-    --glass-bg: rgba(20,20,20,0.6);     /* All HUDs/floating glass */
-    --glass-blur: 12px;                  /* Standard blur value */
-    
-    /* Borders & Hairlines */
-    --border-hairline: rgba(255,255,255,0.08);  /* All dividers/borders */
-    
-    /* Text Hierarchy */
-    --text-primary: #FFFFFF;
-    --text-secondary: #8A8A8A;
-    
-    /* Accent */
-    --accent-primary: #6e9277;  /* Echo button, CTAs, focus rings */
-    
-    /* Legacy token mapping to new system */
-    --background: 0 0% 0%;           /* Pure black */
-    --foreground: 0 0% 100%;         /* White text */
-    --card: 0 0% 7.8%;               /* #141414 */
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 10.2%;           /* #1A1A1A */
-    --popover-foreground: 0 0% 100%;
+    /* Design System Colors */
+    --background: 0 0% 100%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
     --primary: 262.1 83.3% 57.8%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 5.9%;          /* #0F0F0F */
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 7.8%;              /* #141414 for loading states */
-    --muted-foreground: 0 0% 54.1%;  /* #8A8A8A */
-    --accent: 144 15% 57%;           /* Echo green */
-    --accent-foreground: 0 0% 100%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
+    --accent: 32 93% 54%;
+    --accent-foreground: 210 20% 98%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 100% / 0.08;      /* rgba(255,255,255,0.08) */
-    --input: 0 0% 100% / 0.08;
-    --ring: 0 0% 100% / 0.08;
+    --destructive-foreground: 210 20% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 220 13% 91%;
     --radius: 0.5rem;
-    
-    /* Brand Colors */
-    --brand-orange: 28 85 65%;
-    --brand-orange-hover: 25 80 60%;
-    --brand-orange-light: 30 90 70%;
-    --discover-orange: 28 85 65%;
-    --discover-orange-dark: 25 80 60%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -1130,8 +1105,8 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --chart-5: 27 87% 67%;
     
     /* Clubhouse Design Tokens */
-    --hud-bg: var(--glass-bg);
-    --hud-border: var(--border-hairline);
+    --hud-bg: rgba(0, 0, 0, 0.45);
+    --hud-border: rgba(255, 255, 255, 0.18);
     --hud-shadow: 0 6px 30px rgba(0, 0, 0, 0.35);
     
     /* Header Heights */
@@ -1211,25 +1186,28 @@ html[data-immersive="true"] .app-shell--topSpacer {
     display: none;
   }
 
-  /* Liquid Glass Effect - Dark Only */
+  /* Liquid Glass Effect for Suggested Users */
   .liquid-glass {
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    background: var(--glass-bg);
-    border: 1px solid var(--border-hairline);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .dark .liquid-glass {
+    background: rgba(0, 0, 0, 0.24);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .liquid-glass-button {
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    background: var(--bg-card);
-    border: 1px solid var(--border-hairline);
-    color: var(--text-primary);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.5);
   }
 
   .liquid-glass-button:hover {
-    background: var(--bg-modal);
-    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 1);
   }
 
   /* Recent Posts Scroll Container */
@@ -1358,12 +1336,12 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
 
   .liquid-glass-button.following {
-    background: rgba(110, 146, 119, 0.2);
-    border: 1px solid rgba(110, 146, 119, 0.3);
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
   }
 
   .liquid-glass-button.following:hover {
-    background: rgba(110, 146, 119, 0.25);
+    background: rgba(255, 255, 255, 0.3);
   }
 
   :root {
@@ -1397,7 +1375,33 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --trend-icon: #FF6A00;
   }
 
-  /* DARK MODE CLASS REMOVED - App is dark-only now */
+  .dark {
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 20% 98%;
+    --card: 224 71.4% 4.1%;
+    --card-foreground: 210 20% 98%;
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 263.4 70% 50.4%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+    --accent: 32 93% 54%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 215 27.9% 16.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --media-loading: 0 0% 0%;
+  }
 
 /* Scrollbar hiding utility */
 .scrollbar-hide {
@@ -1422,7 +1426,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
   html, body {
     @apply text-foreground;
-    background-color: var(--bg-page) !important;
+    background-color: hsl(var(--background)) !important;
     font-family: 'League Spartan', system-ui, sans-serif;
     overflow-x: hidden;
     width: 100vw;

@@ -10,15 +10,8 @@ interface ViewToggleProps {
 const ViewToggle: React.FC<ViewToggleProps> = ({ currentView, onViewChange }) => {
   return (
     <div 
-      className="flex items-center p-0.5 h-10" 
-      style={{ 
-        background: 'var(--glass-bg)',
-        backdropFilter: `blur(var(--glass-blur)) saturate(180%)`,
-        WebkitBackdropFilter: `blur(var(--glass-blur)) saturate(180%)`,
-        border: '1px solid var(--border-hairline)',
-        borderRadius: '8px',
-        boxShadow: '0 0 20px rgba(0,0,0,0.2)'
-      }}
+      className="flex items-center bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] p-0.5 h-10" 
+      style={{ backdropFilter: 'blur(40px) saturate(180%)', borderRadius: '8px' }}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
       <Button
@@ -27,14 +20,10 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ currentView, onViewChange }) =>
         onClick={() => onViewChange('cards')}
         className={`relative px-1.5 py-1 text-base font-medium transition-all ${
           currentView === 'cards'
-            ? 'backdrop-blur-sm'
-            : 'hover:bg-white/10'
+            ? 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
+            : 'text-white/70 hover:text-white hover:bg-white/10'
         }`}
-        style={{ 
-          borderRadius: '6px',
-          background: currentView === 'cards' ? 'rgba(255,255,255,0.15)' : 'transparent',
-          color: currentView === 'cards' ? 'var(--text-primary)' : 'rgba(255,255,255,0.7)'
-        }}
+        style={{ borderRadius: '6px' }}
       >
         <Grid3X3 className="h-3 w-3 mr-0.5" />
         Cards
@@ -45,14 +34,10 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ currentView, onViewChange }) =>
         onClick={() => onViewChange('list')}
         className={`relative px-1.5 py-1 text-base font-medium transition-all ${
           currentView === 'list'
-            ? 'backdrop-blur-sm'
-            : 'hover:bg-white/10'
+            ? 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
+            : 'text-white/70 hover:text-white hover:bg-white/10'
         }`}
-        style={{ 
-          borderRadius: '6px',
-          background: currentView === 'list' ? 'rgba(255,255,255,0.15)' : 'transparent',
-          color: currentView === 'list' ? 'var(--text-primary)' : 'rgba(255,255,255,0.7)'
-        }}
+        style={{ borderRadius: '6px' }}
       >
         <List className="h-3 w-3 mr-0.5" />
         List
