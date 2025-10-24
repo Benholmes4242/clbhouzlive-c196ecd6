@@ -1,8 +1,8 @@
 /* Liquid Glass Utility Classes */
 .liquid-glass {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(32px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-hairline);
 }
 
 .liquid-glass--elevated {
@@ -12,7 +12,7 @@
 /* Fallback for browsers without backdrop-filter support */
 @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
   .liquid-glass {
-    background-color: rgba(20, 20, 20, 0.45); /* darker translucent fallback */
+    background-color: var(--bg-card);
   }
 }
 
@@ -22,17 +22,17 @@
 }
 
 .liquid-glass--interactive:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: var(--bg-modal);
+  border-color: var(--border-hairline);
 }
 
 .liquid-glass--interactive:focus-within {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+  background: var(--bg-modal);
+  border-color: var(--border-hairline);
+  box-shadow: 0 0 0 2px var(--border-hairline);
 }
 
 /* Dropdown specific styling */
 .liquid-glass--dropdown {
-  backdrop-filter: blur(32px) saturate(150%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
 }

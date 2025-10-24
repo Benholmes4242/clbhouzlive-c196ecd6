@@ -114,10 +114,8 @@ const GlobalHeader: React.FC = () => {
     window.location.href = '/clubhouse';
   };
 
-  // Use white logo only on clubhouse page, black logo everywhere else
-  const logoSrc = isClubhousePage 
-    ? "/assets/clbhouz-white-logo.png"
-    : "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png";
+  // Use white logo on all pages now (dark theme everywhere)
+  const logoSrc = "/assets/clbhouz-white-logo.png";
 
   return (
     <>
@@ -131,12 +129,14 @@ const GlobalHeader: React.FC = () => {
               "z-40", // Layer above content
               "h-16 md:h-18", // 64px mobile, 72px desktop
               "transition-colors duration-300",
-              // Determine background based on page
-              location.pathname === '/clubhouse' ? 
-                "liquid-glass liquid-glass--elevated" : // Keep glass effect for clubhouse
+              // All headers use glass effect now
+              "backdrop-blur-[12px]",
+              "border-b",
+              location.pathname === '/clubhouse' || location.pathname === '/' ? 
+                "bg-[var(--glass-bg)] border-[var(--border-hairline)]" : // Clubhouse glass
                 location.pathname.startsWith('/profile') ?
-                "bg-white/10 backdrop-blur-2xl border border-white/20" : // Profile specific styling
-                "bg-white shadow-none" // Pure white for all other pages
+                "bg-[var(--glass-bg)] border-[var(--border-hairline)]" : // Profile glass
+                "bg-[var(--glass-bg)] border-[var(--border-hairline)]" // All pages use dark glass
             )}
             style={{
               // Safe area support
@@ -153,7 +153,7 @@ const GlobalHeader: React.FC = () => {
                   onClick={handleLogoClick}
                 />
                 <img
-                  src={logoSrc}
+                  src="/assets/clbhouz-white-logo.png"
                   alt="clbhouz Logo"
                   className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity"
                   onClick={handleLogoClick}
@@ -173,10 +173,7 @@ const GlobalHeader: React.FC = () => {
               <nav className="flex items-center space-x-2">
                 {/* Mobile Search Button */}
                 <button 
-                  className={cn(
-                    "md:hidden p-2 md:p-3 flex-shrink-0 mt-3 transition-colors",
-                    isClubhousePage ? "hover:bg-white/10 text-white/80 hover:text-white" : "hover:bg-black/10 text-black/70 hover:text-black"
-                  )}
+                  className="md:hidden p-2 md:p-3 flex-shrink-0 mt-3 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
                   onClick={() => setSearchOpen(true)}
                   aria-label="Open search"
                 >
@@ -213,7 +210,7 @@ const GlobalHeader: React.FC = () => {
           >
             {/* Background overlay */}
             <div 
-              className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+              className="absolute inset-0 bg-[var(--overlay-scrim)] backdrop-blur-sm"
               onClick={() => setSearchOpen(false)}
             />
             
