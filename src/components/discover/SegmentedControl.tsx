@@ -61,8 +61,12 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
           <button
             aria-label="Search videos"
             onClick={onOpenVideoSearch}
-            className="p-2 mr-2 hover:bg-white/10 rounded-full transition-colors"
-            style={{ color: 'rgba(255,255,255,0.7)' }}
+            className="p-2 mr-2 rounded-full transition-all"
+            style={{ 
+              color: 'rgba(255,255,255,0.7)',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'rgba(255,255,255,1)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
           >
             <Search size={20} />
           </button>

@@ -78,8 +78,10 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
         <button
           onClick={handleSearchOpen}
           aria-label="Search videos"
-          className="grid h-9 w-9 place-items-center rounded-full hover:bg-white/10 transition-colors flex-shrink-0"
+          className="grid h-9 w-9 place-items-center rounded-full transition-all flex-shrink-0"
           style={{ color: 'rgba(255,255,255,0.7)' }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'rgba(255,255,255,1)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
         >
           <Search size={20} />
         </button>
