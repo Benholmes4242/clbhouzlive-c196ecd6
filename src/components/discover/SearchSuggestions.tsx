@@ -86,12 +86,14 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.15 }}
-      className="absolute top-full left-0 right-0 mt-2 rounded-2xl overflow-hidden max-h-[50vh] overflow-y-auto z-[150]"
+      className="absolute top-full left-0 right-0 mt-2 rounded-2xl overflow-hidden max-h-[50vh] overflow-y-auto no-scrollbar z-[150]"
       style={{
         backgroundColor: 'rgba(0,0,0,0.8)',
         backdropFilter: 'blur(16px)',
         border: '1px solid rgba(255,255,255,0.12)',
         boxShadow: '0 24px 48px rgba(0,0,0,0.9)',
+        scrollBehavior: 'smooth',
+        overscrollBehavior: 'contain',
       }}
       role="listbox"
     >
