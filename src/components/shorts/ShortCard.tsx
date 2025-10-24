@@ -15,6 +15,7 @@ interface ShortCardProps {
   onAuthorClick?: (authorId: string) => void;
   currentUserId?: string;
   variant?: 'portrait' | 'landscape'; // New: Support landscape cards
+  showMeta?: boolean; // Control metadata visibility (default: true)
 }
 
 export default React.memo(function ShortCard({ 
@@ -26,7 +27,8 @@ export default React.memo(function ShortCard({
   onLike,
   onAuthorClick,
   currentUserId,
-  variant = 'portrait'
+  variant = 'portrait',
+  showMeta = true
 }: ShortCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const isVideo = item.type === 'video' || item.src?.includes('.mp4') || item.src?.includes('.webm');
@@ -98,22 +100,24 @@ export default React.memo(function ShortCard({
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
 
         {/* Creator-First Meta Block - Overlaid at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-2">
-          <ShortsCardMeta
-            author={{
-              id: item.user?.id ?? '',
-              name: item.user?.name ?? 'Unknown',
-              avatar: item.user?.avatar ?? '/img/avatar-fallback.png',
-              verified: item.user?.verified,
-              isSelf: item.user?.id === currentUserId
-            }}
-            caption={item.title ?? ''}
-            likeCount={item.likes ?? 0}
-            isLiked={false} // Wire in PR2 with real state
-            onLikeToggle={() => onLike?.(item.id)}
-            onAuthorClick={(id) => onAuthorClick?.(id)}
-          />
-        </div>
+        {showMeta && (
+          <div className="absolute bottom-0 left-0 right-0 p-2">
+            <ShortsCardMeta
+              author={{
+                id: item.user?.id ?? '',
+                name: item.user?.name ?? 'Unknown',
+                avatar: item.user?.avatar ?? '/img/avatar-fallback.png',
+                verified: item.user?.verified,
+                isSelf: item.user?.id === currentUserId
+              }}
+              caption={item.title ?? ''}
+              likeCount={item.likes ?? 0}
+              isLiked={false} // Wire in PR2 with real state
+              onLikeToggle={() => onLike?.(item.id)}
+              onAuthorClick={(id) => onAuthorClick?.(id)}
+            />
+          </div>
+        )}
       </div>
     </button>
   );
