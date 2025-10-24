@@ -60,9 +60,8 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   const updateColumnWidth = useCallback(() => {
     const el = gridRef.current;
     if (!el) return;
-    const containerWidth = el.clientWidth; // includes padding
-    const inner = containerWidth - GUTTER_PX * 2; // remove left/right padding
-    const col = (inner - GUTTER_PX) / 2; // remove inter-column gap, then split
+    const containerWidth = el.clientWidth;
+    const col = (containerWidth - GUTTER_PX) / 2; // remove inter-column gap, then split
     setColumnWidth(col);
   }, []);
 
@@ -270,7 +269,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
         ref={gridRef} 
         className="shortsGrid pb-4"
         style={{
-          paddingLeft: `${GUTTER_PX}px`,
+          paddingLeft: 0,
           paddingRight: 0,
           boxSizing: 'border-box'
         }}
@@ -305,7 +304,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                   width: '100vw',
                   maxWidth: '100vw',
                   boxSizing: 'border-box',
-                  marginLeft: `-${GUTTER_PX}px`,
+                  marginLeft: 0,
                   marginBottom: `${GUTTER_PX}px`,
                   position: 'relative',
                   left: 0,
