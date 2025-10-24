@@ -90,8 +90,8 @@ const VideosGrid: React.FC<VideosGridProps> = ({
   return (
     <>
       {isCinematicMode ? (
-        // Landscape cards layout matching shorts page
-        <div className="flex flex-col gap-3 pb-4">
+        // Landscape cards layout - full width edge to edge
+        <div className="flex flex-col gap-3 pb-4" style={{ margin: '0 -4px' }}>
           {itemsToRender.map((item) => {
             if (item.kind === 'channel_suggestion') {
               return (
