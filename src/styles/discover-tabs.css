@@ -1,11 +1,12 @@
-/* Discover Tabs - Subtle Grey Pill */
+/* Discover Tabs - Dark Mode */
 
 /* Tokens */
 :root {
-  --tab-active-color: #000000;
-  --tab-inactive-color: rgba(0, 0, 0, 0.5);
-  --pill-bg: rgba(0, 0, 0, 0.06);
-  --divider-color: rgba(0, 0, 0, 0.1);
+  --tab-active-color: var(--text-tab-active);
+  --tab-inactive-color: var(--text-tab-inactive);
+  --tab-hover-color: var(--text-tab-hover);
+  --tab-underline-color: var(--accent-clbhouz);
+  --divider-color: rgba(255, 255, 255, 0.08);
 }
 
 /* Tab container */
@@ -22,7 +23,11 @@
   padding: 12px 0;
   color: var(--tab-inactive-color);
   font-weight: 500;
-  transition: color 0.2s ease;
+  transition: color 120ms ease;
+}
+
+.discover-tab:hover {
+  color: var(--tab-hover-color);
 }
 
 /* Active state */
@@ -31,9 +36,22 @@
   font-weight: 600;
 }
 
+/* Active tab underline indicator */
+.discover-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  height: 2px;
+  background-color: var(--tab-underline-color);
+  border-radius: 1px;
+}
+
 /* Header with thin divider lines */
 .discover-header {
-  background: #ffffff;
+  background: var(--bg-header);
   border-top: 1px solid var(--divider-color);
   border-bottom: 1px solid var(--divider-color);
 }

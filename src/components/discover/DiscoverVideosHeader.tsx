@@ -63,10 +63,8 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
     <div 
       className="sticky top-[var(--header-height,0px)] z-40"
       style={{
-        background: 'rgba(255, 255, 255, 0.55)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+        background: 'var(--bg-header)',
+        borderBottom: '1px solid var(--border-hairline)',
       }}
     >
       <div 
@@ -80,7 +78,8 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
         <button
           onClick={handleSearchOpen}
           aria-label="Search videos"
-          className="grid h-9 w-9 place-items-center rounded-full hover:bg-black/5 transition-colors flex-shrink-0"
+          className="grid h-9 w-9 place-items-center rounded-full hover:bg-white/10 transition-colors flex-shrink-0"
+          style={{ color: 'rgba(255,255,255,0.7)' }}
         >
           <Search size={20} />
         </button>
@@ -109,13 +108,7 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
               <button
                 key={pill.key}
                 onClick={handleClick}
-                className="pill"
-                style={isActive ? {
-                  color: 'white',
-                  background: 'linear-gradient(135deg, #f5a623, #ff8c00)',
-                  boxShadow: '0 4px 10px rgba(245, 166, 35, 0.25)',
-                  border: 'none',
-                } : undefined}
+                className={cn("pill", isActive && "pill--active")}
                 role="tab"
                 aria-selected={isActive}
               >

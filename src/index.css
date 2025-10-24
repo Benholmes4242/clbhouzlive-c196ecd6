@@ -109,6 +109,30 @@ html, body {
   
   /* Accent */
   --accent-primary: #6e9277;
+  --accent-clbhouz: #6E9277;
+
+  /* Dark Mode Discover Navigation Tokens */
+  --bg-app: #000000;
+  --bg-header: #000000;
+  
+  /* Tab text colors */
+  --text-tab-active: #ffffff;
+  --text-tab-inactive: rgba(255,255,255,0.55);
+  --text-tab-hover: rgba(255,255,255,0.85);
+  
+  /* Pill text colors */
+  --text-pill-active: #ffffff;
+  --text-pill-inactive: rgba(255,255,255,0.65);
+  --text-pill-hover: rgba(255,255,255,0.85);
+  
+  /* Pill backgrounds */
+  --pill-bg-inactive: rgba(255,255,255,0.08);
+  --pill-bg-hover: rgba(255,255,255,0.15);
+  --pill-bg-active: #6E9277;
+  
+  /* Shadows / lift */
+  --pill-shadow-hover: 0 0 10px rgba(255,255,255,0.05), 0 8px 24px rgba(0,0,0,0.8);
+  --card-shadow: 0 0 10px rgba(255,255,255,0.05);
 
   /* Z-index layers */
   --z-echo-fab: 1200;
@@ -1668,35 +1692,36 @@ html[data-immersive="true"] .app-shell--topSpacer {
     backdrop-filter: blur(8px);
   }
 
-  /* Frosted Glass Pill Components */
+  /* Frosted Glass Pill Components - Dark Mode */
   .pill {
     @apply inline-flex items-center justify-center gap-2 rounded-full px-3.5 py-1.5
-           select-none whitespace-nowrap text-[15px] font-medium
-           transition-all duration-300;
+           select-none whitespace-nowrap text-[15px] font-semibold
+           transition-all;
     line-height: 1.2;
     border-radius: 999px;
     padding: 6px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    color: rgba(0, 0, 0, 0.7);
-    background: rgba(255, 255, 255, 0.35);
+    border: none;
+    color: var(--text-pill-inactive);
+    background: var(--pill-bg-inactive);
+    transition: background-color 120ms ease, color 120ms ease;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
   }
 
   .pill:hover { 
-    background: rgba(255, 255, 255, 0.45);
-    border-color: rgba(255, 255, 255, 0.6);
+    background: var(--pill-bg-hover);
+    color: var(--text-pill-hover);
   }
   
   .pill:active { 
     transform: scale(0.97);
     transition: transform 0.1s ease;
+    box-shadow: var(--pill-shadow-hover);
   }
 
   .pill--active {
-    color: white;
-    background: linear-gradient(135deg, #f5a623, #ff8c00);
-    box-shadow: 0 4px 10px rgba(245, 166, 35, 0.25);
+    color: var(--text-pill-active);
+    background: var(--pill-bg-active);
     border: none;
   }
 
