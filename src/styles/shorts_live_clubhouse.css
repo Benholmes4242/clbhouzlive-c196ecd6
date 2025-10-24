@@ -138,30 +138,29 @@
 }
 
 /* ============================= */
-/* Nearby pin — Echo green polish */
+/* Nearby pin — Frosted white glass (dark mode) */
 /* ============================= */
 
-/* Echo green color tokens + sizing */
+/* Sizing tokens */
 :root {
-  --lc-green-1: #6e9277;       /* Echo green */
-  --lc-green-2: #7CAD89;       /* lighter blend */
-  --lc-green-3: #557A61;       /* darker blend */
   --lc-avatar-size: 84px;      /* creator avatar size (matches .lc-avatar) */
   --lc-nearby-scale: 1.0;      /* 100% of avatar size - matches creator avatars */
   --lc-nearby-size: calc(var(--lc-avatar-size) * var(--lc-nearby-scale));
-  --lc-nearby-border: 2px;     /* inset green ring thickness - DO NOT CHANGE */
+  --lc-nearby-border: 2px;     /* inset ring thickness - DO NOT CHANGE */
   --lc-nearby-inset: 3px;      /* inner padding for checker/pin */
 }
 
-/* Avatar container styling for nearby - adjust size to fill parent */
+/* Avatar container styling for nearby - frosted white glass */
 .lc-nearby-avatar {
   position: relative;
   width: 100%;
   height: 100%;
-  background: radial-gradient(60% 60% at 50% 40%, rgba(110,146,119,.08) 0%, rgba(110,146,119,.02) 100%), #f6faf7;
-  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 0 !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
+  transition: all 0.25s ease;
   isolation: isolate;
 }
 
@@ -178,7 +177,7 @@
   height: 100%;
 }
 
-/* Leaf pin icon - centered and slightly smaller */
+/* Leaf pin icon - centered with improved contrast */
 .lc-nearby-avatar .lc-leaf-pin {
   position: absolute;
   top: 50%;
@@ -187,7 +186,7 @@
   width: 76%;
   height: 76%;
   object-fit: contain;
-  filter: drop-shadow(0 1px 0 rgba(255,255,255,.35)) drop-shadow(0 6px 12px rgba(0,0,0,.12));
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
   pointer-events: none; /* ensure clicks go to parent */
 }
 
