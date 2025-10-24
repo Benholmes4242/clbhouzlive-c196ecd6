@@ -115,12 +115,22 @@ const VideosGrid: React.FC<VideosGridProps> = ({
             }
             
             return (
-              <ShortCard
+              <div
                 key={`${activeTab}-${item.id}`}
-                item={item.data as ExploreContentItem}
-                onClick={() => onMediaClick?.(item.data as ExploreContentItem)}
-                variant="landscape"
-              />
+                style={{
+                  marginLeft: 'calc(-1 * var(--page-padding, 16px))',
+                  marginRight: 'calc(-1 * var(--page-padding, 16px))',
+                  marginBottom: '12px',
+                  width: '100vw',
+                  maxWidth: '100vw'
+                }}
+              >
+                <ShortCard
+                  item={item.data as ExploreContentItem}
+                  onClick={() => onMediaClick?.(item.data as ExploreContentItem)}
+                  variant="landscape"
+                />
+              </div>
             );
           })}
         </div>
