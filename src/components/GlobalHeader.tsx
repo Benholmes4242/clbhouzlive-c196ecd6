@@ -114,34 +114,21 @@ const GlobalHeader: React.FC = () => {
     window.location.href = '/clubhouse';
   };
 
-  // Use white logo only on clubhouse page, black logo everywhere else
-  const logoSrc = isClubhousePage 
-    ? "/assets/clbhouz-white-logo.png"
-    : "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png";
-
   return (
     <>
-      {/* Global Fixed Header */}
+      {/* Global Fixed Header - Using Clubhouse Style */}
       <AnimatePresence>
         {showHeader && (
           <header
             className={cn(
-              "global-header",
-              "w-full relative", // Normal document flow positioning
-              "z-40", // Layer above content
+              "chrome-header", // Chrome auto-hide class
+              "relative z-header",
               "h-16 md:h-18", // 64px mobile, 72px desktop
-              "transition-colors duration-300",
-              // Determine background based on page
-              location.pathname === '/clubhouse' ? 
-                "liquid-glass liquid-glass--elevated" : // Keep glass effect for clubhouse
-                location.pathname.startsWith('/profile') ?
-                "bg-white/10 backdrop-blur-2xl border border-white/20" : // Profile specific styling
-                "bg-white shadow-none" // Pure white for all other pages
+              "backdrop-blur-md bg-black/60" // Clubhouse glass-dark style everywhere
             )}
-            style={{
-              // Safe area support
-              paddingTop: 'max(env(safe-area-inset-top, 0px), 4px)',
-            }}
+            data-hides-on-scroll
+            data-chrome="header"
+            style={{ '--header-h-mobile': '60px' } as any}
           >
             <div className="mx-auto flex h-full items-center justify-between px-4 md:px-6">
               {/* Logo */}
@@ -153,7 +140,7 @@ const GlobalHeader: React.FC = () => {
                   onClick={handleLogoClick}
                 />
                 <img
-                  src={logoSrc}
+                  src="/assets/clbhouz-white-logo.png"
                   alt="clbhouz Logo"
                   className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity"
                   onClick={handleLogoClick}
@@ -165,20 +152,17 @@ const GlobalHeader: React.FC = () => {
                 <SearchPill 
                   className="w-full max-w-xl" 
                   variant="glass-dark"
-                  isClubhousePage={isClubhousePage}
+                  isClubhousePage={true}
                 />
               </div>
 
               {/* Right Utilities */}
-              <nav className="flex items-center space-x-2">
+              <nav className="flex items-center space-x-1 md:space-x-4">
                 {/* Mobile Search Button */}
                 <button 
-                  className={cn(
-                    "md:hidden p-2 md:p-3 flex-shrink-0 mt-3 transition-colors",
-                    isClubhousePage ? "hover:bg-white/10 text-white/80 hover:text-white" : "hover:bg-black/10 text-black/70 hover:text-black"
-                  )}
+                  data-action="search"
+                  className="md:hidden p-2 md:p-3 flex-shrink-0 mt-3 transition-colors hover:bg-white/10 text-white/80 hover:text-white"
                   onClick={() => setSearchOpen(true)}
-                  aria-label="Open search"
                 >
                   <Search className="h-5 w-5" />
                 </button>
@@ -202,43 +186,28 @@ const GlobalHeader: React.FC = () => {
       )}
 
       {/* Mobile Search Overlay */}
-      <AnimatePresence>
-        {searchOpen && (
-          <motion.div
-            className="fixed inset-0 z-[300]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {/* Background overlay */}
-            <div 
-              className="absolute inset-0 bg-black/20 backdrop-blur-sm"
-              onClick={() => setSearchOpen(false)}
-            />
-            
-            {/* Search pill overlay */}
-            <motion.div 
-              className="absolute inset-x-0 top-0 p-3 z-[320]"
-              initial={{ y: -100 }}
-              animate={{ y: 0 }}
-              exit={{ y: -100 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              style={{
-                paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)',
-              }}
-            >
+      {searchOpen && (
+        <>
+          {/* Background overlay */}
+          <div 
+            className="fixed inset-0 z-[70] bg-black/20 backdrop-blur-sm"
+            onClick={() => setSearchOpen(false)}
+          />
+          
+          {/* Search pill overlay */}
+          <div className="fixed inset-x-0 top-0 z-[70] p-3">
+            <div className="rounded-full backdrop-blur-2xl border shadow-hud bg-hud-bg border-hud-border">
               <SearchPill 
                 autoFocus 
                 onClose={() => setSearchOpen(false)}
                 placeholder="Search clbhouz..."
                 variant="glass-dark"
-                isClubhousePage={isClubhousePage}
+                isClubhousePage={true}
               />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 };
