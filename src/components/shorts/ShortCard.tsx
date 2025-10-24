@@ -43,7 +43,7 @@ export default React.memo(function ShortCard({
   return (
     <button
       onClick={onClick}
-      className="shortsCard group relative w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.98] transition-transform duration-75"
+      className="shortsCard group relative block w-full p-0 border-0 bg-transparent leading-none focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.98] transition-transform duration-75"
       style={{ margin: 0 }}
       aria-label={`Play short: ${item.title || 'Video'} by ${item.user?.name || 'Unknown'}`}
     >
@@ -82,7 +82,7 @@ export default React.memo(function ShortCard({
         )}
 
         {/* Gradient overlay for badges */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
 
 
