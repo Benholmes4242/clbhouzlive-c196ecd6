@@ -282,7 +282,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
         {/* First Row - Pinned, Same Height */}
         {firstRow.length > 0 && (
           <div className="grid grid-cols-2" style={{ gap: `${GUTTER_PX}px`, marginBottom: '2px' }}>
-            {firstRow.map((layoutItem) => (
+            {firstRow.map((layoutItem, posInRow) => (
               <ShortCardWithObserver
                 key={layoutItem.item.id}
                 item={layoutItem.item}
@@ -293,6 +293,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                 onLike={onLike}
                 onAuthorClick={onAuthorClick}
                 currentUserId={currentUserId}
+                gridPosition={posInRow}
               />
             ))}
           </div>
@@ -338,18 +339,31 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                 className="grid grid-cols-2" 
                 style={{ gap: `${GUTTER_PX}px`, marginBottom: '2px' }}
               >
-                {section.items.map(({ item, index, height }) => (
-                  <ShortCardWithObserver
-                    key={item.id}
-                    item={item}
-                    onClick={() => handleCardClick(item, index)}
-                    height={baseHeightPx}
-                    onVisibilityChange={handleVisibilityChange}
-                    onLike={onLike}
-                    onAuthorClick={onAuthorClick}
-                    currentUserId={currentUserId}
-                  />
-                ))}
+                {section.items.map(({ item, index, height }, posInGrid) => {
+                  // Calculate global grid position accounting for first row and previous sections
+                  const basePosition = firstRow.length; // Start after first row
+                  let previousPortraits = 0;
+                  for (let i = 0; i < sectionIndex; i++) {
+                    if (sections[i].type === 'portrait-grid' && sections[i].items) {
+                      previousPortraits += sections[i].items!.length;
+                    }
+                  }
+                  const gridPosition = basePosition + previousPortraits + posInGrid;
+                  
+                  return (
+                    <ShortCardWithObserver
+                      key={item.id}
+                      item={item}
+                      onClick={() => handleCardClick(item, index)}
+                      height={baseHeightPx}
+                      onVisibilityChange={handleVisibilityChange}
+                      onLike={onLike}
+                      onAuthorClick={onAuthorClick}
+                      currentUserId={currentUserId}
+                      gridPosition={gridPosition}
+                    />
+                  );
+                })}
               </div>
             );
           }
