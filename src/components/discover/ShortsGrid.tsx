@@ -21,7 +21,7 @@ interface ShortsGridProps {
 // Single source of truth for spacing
 const GUTTER_PX = 4 as const;
 const CARD_ASPECT = 0.52; // width / height (slightly wider than 9:16)
-const PORTRAITS_PER_LANDSCAPE = 6; // Insert landscape after every 6 portraits
+const PORTRAITS_PER_LANDSCAPE = 4; // Insert landscape after every 4 portraits (2 rows)
 const LOOKAHEAD_WINDOW = 20; // Lookahead window for landscape candidate search
 // Deterministic height variance based on item ID
 const getHeightVariant = (id: string): number => {
@@ -176,16 +176,13 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
         }
       }
       
-      // Add portrait card if not already used
+      // Add portrait card if not already used - all use base height (no variant)
       if (!usedIndexes.has(itemIndex)) {
-        const variant = getHeightVariant(item.id);
-        const cardHeight = baseHeightPx * (1 + variant / 100);
-        
         result.push({
           item,
           index: itemIndex,
           type: 'portrait',
-          height: cardHeight,
+          height: baseHeightPx, // All portraits same size
           variant: 'portrait'
         });
         usedIndexes.add(itemIndex);
