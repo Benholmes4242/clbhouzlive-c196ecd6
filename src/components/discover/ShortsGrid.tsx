@@ -306,9 +306,12 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                   maxWidth: '100vw',
                   boxSizing: 'border-box',
                   marginLeft: `-${GUTTER_PX}px`,
+                  marginRight: `-${GUTTER_PX}px`,
                   marginBottom: `${GUTTER_PX}px`,
                   position: 'relative',
-                  left: 0
+                  left: 0,
+                  paddingLeft: 0,
+                  paddingRight: 0
                 }}
               >
                 <ShortCardWithObserver
