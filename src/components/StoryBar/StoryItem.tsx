@@ -78,7 +78,7 @@ const StoryItem: React.FC<StoryItemProps> = ({
           </button>
         )}
       </div>
-      <span className="text-xs text-center text-white max-w-20 truncate">
+      <span className="text-xs text-center max-w-20 truncate" style={{ color: 'var(--text-primary)' }}>
         {story.user}
       </span>
     </div>
