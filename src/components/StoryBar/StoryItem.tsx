@@ -78,9 +78,16 @@ const StoryItem: React.FC<StoryItemProps> = ({
           </button>
         )}
       </div>
-      <span className="text-xs text-center text-muted-foreground max-w-20 truncate">
-        {story.user}
-      </span>
+      <div className="flex flex-col items-center space-y-0 max-w-20">
+        <span className="text-xs text-center text-white truncate w-full">
+          {story.user}
+        </span>
+        {story.homeClub && (
+          <span className="text-xs text-center text-white truncate w-full">
+            {story.homeClub}
+          </span>
+        )}
+      </div>
     </div>
   );
 };
