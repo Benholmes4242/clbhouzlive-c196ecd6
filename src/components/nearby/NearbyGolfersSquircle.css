@@ -1,4 +1,4 @@
-/* Glass Elevate Design - Nearby Golfers Squircle Only */
+/* Glass Elevate Design - Nearby Golfers Squircle (matching Echo Orb) */
 
 .nearby-golfers-squircle {
   position: relative;
@@ -11,7 +11,7 @@
   isolation: isolate;
   cursor: pointer;
   
-  /* Keep base transparent so blur works when content scrolls under */
+  /* Glass styling matching echo orb */
   background: transparent;
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
@@ -19,7 +19,7 @@
   /* Glassy green border */
   border: 1px solid rgba(110, 146, 119, 0.4);
   
-  /* Subtle elevation regardless of background */
+  /* Subtle elevation */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
