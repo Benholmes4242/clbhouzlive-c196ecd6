@@ -71,17 +71,15 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
     return () => window.removeEventListener('resize', updateColumnWidth);
   }, [updateColumnWidth]);
 
-  const baseHeightPx = useMemo(() => {
-    if (columnWidth <= 0) return 280 * 0.729;
-    return Math.round((columnWidth / CARD_ASPECT) * 0.729); // height = width / (w/h), reduced by 27.1%
-  }, [columnWidth]);
-
   // Landscape card height (10% reduction)
   const landscapeHeightPx = useMemo(() => {
     const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 375;
     const aspectRatio = 16 / 11.592;
     return Math.round((viewportWidth / aspectRatio) * 0.9); // 10% reduction
   }, []);
+
+  // Portrait cards match landscape card height
+  const baseHeightPx = landscapeHeightPx;
 
   // Preload posters for first visible items on mount
   useEffect(() => {
