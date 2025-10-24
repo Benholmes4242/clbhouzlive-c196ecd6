@@ -37,7 +37,7 @@ export default function ShortCardWithObserver({
   gridPosition = 0
 }: ShortCardWithObserverProps) {
   const { ref, isInView } = useIntersectionObserver({
-    threshold: 0.65,
+    threshold: 0.1, // Trigger as soon as card starts entering/exiting view
     rootMargin: '0px'
   });
 
