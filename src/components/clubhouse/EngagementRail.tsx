@@ -76,7 +76,7 @@ const EngagementButton = ({
       >
         <Squircle width={40} height={40}>
           <div 
-            className="w-full h-full flex items-center justify-center bg-black/20 backdrop-blur-2xl border border-black/30 overflow-hidden relative"
+            className="w-full h-full flex items-center justify-center bg-black/20 backdrop-blur-2xl overflow-hidden relative"
             style={{ borderRadius: '30%' }}
           >
             {/* Ripple effect */}
@@ -181,7 +181,7 @@ const EngagementRail = ({
               >
                 <Squircle width={40} height={40}>
                   <div 
-                    className="w-full h-full flex items-center justify-center bg-black/20 backdrop-blur-2xl border border-black/30 overflow-hidden"
+                    className="w-full h-full flex items-center justify-center bg-black/20 backdrop-blur-2xl overflow-hidden"
                     style={{ borderRadius: '30%' }}
                   >
                     <MoreHorizontal className="w-5 h-5 text-white/90" />
