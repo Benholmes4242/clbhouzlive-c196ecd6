@@ -20,21 +20,23 @@ export function VideoProgressVerticalHUD({
   // Bind to the video element even if it appears after initial render
   const [attachedVideo, setAttachedVideo] = React.useState<HTMLVideoElement | null>(null);
   React.useEffect(() => {
+    // Initial grab or late mount
     if (videoRef.current) {
       setAttachedVideo(videoRef.current);
-      return;
     }
-    // Poll briefly to catch the first video becoming available without user interaction
+    // Light polling to detect when the feed switches to a new video element
+    // (the ref object stays stable while .current changes)
+    let last: HTMLVideoElement | null = null;
     const iv = window.setInterval(() => {
-      if (videoRef.current) {
-        setAttachedVideo(videoRef.current);
-        window.clearInterval(iv);
+      const cur = videoRef.current;
+      if (cur && cur !== last) {
+        last = cur;
+        setAttachedVideo(cur);
       }
-    }, 50);
-    const to = window.setTimeout(() => window.clearInterval(iv), 800);
+    }, 120);
+
     return () => {
       window.clearInterval(iv);
-      window.clearTimeout(to);
     };
   }, [videoRef]);
 
@@ -225,18 +227,28 @@ export function VideoProgressVerticalHUD({
         
         mainVideo.currentTime = newTime;
         
-        // Wait a brief moment for the frame to update, then draw
-        requestAnimationFrame(() => {
-          if (mainVideo.readyState >= 2) { // HAVE_CURRENT_DATA
+        // Wait for a rendered frame before drawing to canvas
+        const draw = () => {
+          if (mainVideo.readyState >= 2) {
             ctx.drawImage(mainVideo, 0, 0, canvas.width, canvas.height);
           }
-          
           // Restore original playback state
           mainVideo.currentTime = originalTime;
           if (!originalPaused) {
             mainVideo.play().catch(() => {});
           }
-        });
+        };
+
+        const rvfc = (mainVideo as any).requestVideoFrameCallback;
+        if (typeof rvfc === 'function') {
+          try {
+            rvfc(() => draw());
+          } catch {
+            requestAnimationFrame(draw);
+          }
+        } else {
+          requestAnimationFrame(draw);
+        }
       }
     }
   }, [clamp01]);
