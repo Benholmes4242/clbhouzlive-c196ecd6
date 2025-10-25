@@ -33,25 +33,27 @@ serve(async (req) => {
   console.log('📋 Processing POST request for R2 upload');
 
   try {
-    // Get R2 credentials
+    // Get R2 credentials (S3-compatible)
     console.log('🔧 Checking R2 credentials');
     const r2AccountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID');
-    const r2ApiToken = Deno.env.get('CLOUDFLARE_API_TOKEN') || Deno.env.get('CLOUDFLARE_R2_API_TOKEN');
+    const r2AccessKeyId = Deno.env.get('R2_ACCESS_KEY_ID');
+    const r2SecretAccessKey = Deno.env.get('R2_SECRET_ACCESS_KEY');
     const r2Bucket = Deno.env.get('R2_BUCKET') || 'clbhouz-media';
     const r2PublicBaseUrl = Deno.env.get('R2_PUBLIC_BASE_URL') || 'https://media.clbhouz.co.uk';
 
     console.log('🔧 R2 credential check results:', {
       hasAccountId: !!r2AccountId,
-      hasApiToken: !!r2ApiToken,
+      hasAccessKeyId: !!r2AccessKeyId,
+      hasSecretAccessKey: !!r2SecretAccessKey,
       bucket: r2Bucket,
       publicBaseUrl: r2PublicBaseUrl
     });
 
-    if (!r2AccountId || !r2ApiToken) {
+    if (!r2AccountId || !r2AccessKeyId || !r2SecretAccessKey) {
       console.error('❌ Missing required R2 credentials');
       return new Response(JSON.stringify({ 
         success: false,
-        error: 'R2 credentials not configured. Need CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN'
+        error: 'R2 credentials not configured. Need CLOUDFLARE_ACCOUNT_ID, R2_ACCESS_KEY_ID, and R2_SECRET_ACCESS_KEY'
       }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -119,14 +121,80 @@ serve(async (req) => {
     const fileContent = await file.arrayBuffer();
     console.log('✅ File content prepared, size:', fileContent.byteLength);
 
-    // Upload to R2 using Cloudflare API
-    console.log('🚀 Starting R2 upload via Cloudflare API');
-    const uploadUrl = `https://api.cloudflare.com/client/v4/accounts/${r2AccountId}/r2/buckets/${r2Bucket}/objects/${encodeURIComponent(fullPath)}`;
+    // Upload to R2 using S3-compatible API
+    console.log('🚀 Starting R2 upload via S3-compatible API');
+    const uploadUrl = `https://${r2AccountId}.r2.cloudflarestorage.com/${r2Bucket}/${fullPath}`;
     
+    // Generate AWS Signature Version 4
+    const timestamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
+    const dateStamp = timestamp.slice(0, 8);
+    const region = 'auto';
+    const service = 's3';
+    
+    // Create signing key
+    const encoder = new TextEncoder();
+    const getSignatureKey = async (key: string, dateStamp: string, regionName: string, serviceName: string) => {
+      const kDate = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(`AWS4${key}`),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign']
+      );
+      const kDateSig = await crypto.subtle.sign('HMAC', kDate, encoder.encode(dateStamp));
+      
+      const kRegion = await crypto.subtle.importKey('raw', kDateSig, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+      const kRegionSig = await crypto.subtle.sign('HMAC', kRegion, encoder.encode(regionName));
+      
+      const kService = await crypto.subtle.importKey('raw', kRegionSig, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+      const kServiceSig = await crypto.subtle.sign('HMAC', kService, encoder.encode(serviceName));
+      
+      const kSigning = await crypto.subtle.importKey('raw', kServiceSig, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+      const kSigningSig = await crypto.subtle.sign('HMAC', kSigning, encoder.encode('aws4_request'));
+      
+      return kSigningSig;
+    };
+
+    // Calculate content hash
+    const contentHash = await crypto.subtle.digest('SHA-256', fileContent);
+    const contentHashHex = Array.from(new Uint8Array(contentHash))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+
+    // Build canonical request
+    const canonicalUri = `/${r2Bucket}/${fullPath}`;
+    const canonicalQueryString = '';
+    const canonicalHeaders = `host:${r2AccountId}.r2.cloudflarestorage.com\nx-amz-content-sha256:${contentHashHex}\nx-amz-date:${timestamp}\n`;
+    const signedHeaders = 'host;x-amz-content-sha256;x-amz-date';
+    const canonicalRequest = `PUT\n${canonicalUri}\n${canonicalQueryString}\n${canonicalHeaders}\n${signedHeaders}\n${contentHashHex}`;
+
+    // Create string to sign
+    const canonicalRequestHash = await crypto.subtle.digest('SHA-256', encoder.encode(canonicalRequest));
+    const canonicalRequestHashHex = Array.from(new Uint8Array(canonicalRequestHash))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+    
+    const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
+    const stringToSign = `AWS4-HMAC-SHA256\n${timestamp}\n${credentialScope}\n${canonicalRequestHashHex}`;
+
+    // Generate signature
+    const signingKey = await getSignatureKey(r2SecretAccessKey, dateStamp, region, service);
+    const signatureKey = await crypto.subtle.importKey('raw', signingKey, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    const signatureBuffer = await crypto.subtle.sign('HMAC', signatureKey, encoder.encode(stringToSign));
+    const signature = Array.from(new Uint8Array(signatureBuffer))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+
+    // Build authorization header
+    const authorizationHeader = `AWS4-HMAC-SHA256 Credential=${r2AccessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+
     const uploadResponse = await fetch(uploadUrl, {
       method: 'PUT',
       headers: {
-        'Authorization': `Bearer ${r2ApiToken}`,
+        'Host': `${r2AccountId}.r2.cloudflarestorage.com`,
+        'x-amz-content-sha256': contentHashHex,
+        'x-amz-date': timestamp,
+        'Authorization': authorizationHeader,
         'Content-Type': file.type || 'application/octet-stream',
       },
       body: fileContent,
