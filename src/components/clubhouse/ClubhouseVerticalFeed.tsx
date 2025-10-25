@@ -462,7 +462,23 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     const currentPost = filteredPosts[currentIndex];
     if (currentPost && currentPost.type === 'video') {
       const videoRef = videoRefs.current[currentPost.id];
-      onActiveVideoRefChange(videoRef);
+      
+      // If video ref isn't available yet, wait a bit for it to mount
+      if (!videoRef) {
+        const checkRef = setInterval(() => {
+          const ref = videoRefs.current[currentPost.id];
+          if (ref) {
+            onActiveVideoRefChange(ref);
+            clearInterval(checkRef);
+          }
+        }, 50); // Check every 50ms
+        
+        // Clean up after 500ms if ref still not found
+        setTimeout(() => clearInterval(checkRef), 500);
+        return () => clearInterval(checkRef);
+      } else {
+        onActiveVideoRefChange(videoRef);
+      }
     } else {
       onActiveVideoRefChange(null);
     }
@@ -711,6 +727,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   <VideoWithAutoplay
                     ref={(el) => {
                       videoRefs.current[item.id] = el;
+                      // If this is the current post, notify parent immediately
+                      if (index === currentIndex && el && onActiveVideoRefChange) {
+                        onActiveVideoRefChange(el);
+                      }
                     }}
                     src={currentMedia.media_url}
                     muted={isGloballyMuted}
