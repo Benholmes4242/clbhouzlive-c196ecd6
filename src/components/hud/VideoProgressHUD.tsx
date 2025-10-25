@@ -84,15 +84,12 @@ export function VideoProgressHUD({
           border-t border-white/10
         "
       >
-        {/* Fill (GPU-friendly scaleX with gradient shimmer) */}
+        {/* Fill (GPU-friendly scaleX) */}
         <div
           ref={setProgressFillRef}
-          className="h-full origin-left will-change-transform relative overflow-hidden animate-shimmer-bg"
+          className="h-full origin-left will-change-transform"
           style={{
-            background: accent ?? 'linear-gradient(90deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.2) 100%)',
-            backgroundSize: '200% 100%',
-            backdropFilter: 'blur(3px) saturate(180%)',
-            boxShadow: '0 1px 4px rgba(255, 255, 255, 0.08)',
+            background: accent ?? 'rgba(255,255,255,0.6)',
           }}
         />
       </div>
