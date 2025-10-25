@@ -123,8 +123,7 @@ const EngagementRail = ({
   const isMobile = useIsMobile();
   const gap = isMobile ? 'gap-4' : 'gap-5'; // 16px mobile, 20px desktop
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
-  // Initialize as visible if already active (fixes first post on page load)
-  const [railVisible, setRailVisible] = useState(isActive);
+  const [railVisible, setRailVisible] = useState(false);
 
   const handleAudioToggle = () => {
     toggleGlobalMute();

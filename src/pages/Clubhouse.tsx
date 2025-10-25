@@ -61,7 +61,6 @@ const Clubhouse = () => {
 
   const [headerActiveTab, setHeaderActiveTab] = useState('Following');
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
-  const [hudBump, setHudBump] = useState(0);
   const [localSelectedTags, setLocalSelectedTags] = useState<any[]>([]);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
@@ -231,15 +230,12 @@ const Clubhouse = () => {
           onTouchEnd={chromeControls.handleTouchEnd}
           onActiveVideoRefChange={(ref) => {
             activeVideoRef.current = ref;
-            // Force re-render so HUD sees the new video element immediately
-            setHudBump((v) => v + 1);
           }}
         />
       </div>
 
       {/* Video Progress Vertical HUD - Pulse Line beside engagement icons */}
       <VideoProgressVerticalHUD 
-        key={hudBump}
         videoRef={activeVideoRef}
         accent="linear-gradient(to top, rgba(110,146,119,1) 0%, rgba(255,255,255,0.6) 60%)"
       />
