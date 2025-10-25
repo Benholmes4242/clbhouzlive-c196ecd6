@@ -184,31 +184,32 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     };
   }, []);
 
-  // Autoplay effect - same simple logic as Clubhouse
+  // Play only when autoplay && ready && attached, then fade overlay
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
 
     if (autoplay && attached) {
       const start = async () => {
+        if (!ready) return;
+        console.log('[OpenFlow]', 'attemptPlay', performance.now());
         try {
-          const playPromise = v.play();
-          if (playPromise !== undefined) {
-            await playPromise;
-            setOverlayHidden(true);
-            onPlay?.();
-          }
+          await v.play();
+          console.log('[OpenFlow]', 'playSucceeded', performance.now());
+          setOverlayHidden(true);
+          onPlay?.();
         } catch (err) {
-          console.log('[HLSVideoCard]', 'Autoplay blocked', err);
+          console.log('[OpenFlow]', 'playFailed', performance.now(), err);
+          // ignore autoplay promise errors
         }
       };
       start();
-    } else if (!autoplay) {
+    } else {
       v.pause();
-      setOverlayHidden(false);
+      if (!ready) setOverlayHidden(false);
       onPause?.();
     }
-  }, [autoplay, attached, onPlay, onPause]);
+  }, [autoplay, attached, ready, onPlay, onPause]);
 
   // Intersection observer for autoplay - only when NOT externally managed
   useEffect(() => {
@@ -296,8 +297,6 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
         ref={videoRef}
         className={`videoEl absolute inset-0 w-full h-full ${videoFitClass}`}
         playsInline
-        webkit-playsinline="true"
-        autoPlay={autoplay}
         muted={isMuted}
         loop={loop}
         controls={showControls}
