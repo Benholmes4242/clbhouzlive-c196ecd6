@@ -337,13 +337,13 @@ export function VideoProgressVerticalHUD({
         height: railBox ? `${railBox.height}px` : '168px',
       }}
     >
-      {/* Invisible hit area for comfortable scrubbing - 55px wide */}
+      {/* Invisible hit area for comfortable scrubbing - 50px wide */}
       <div
         className="relative"
         style={{
           pointerEvents: 'auto',
           touchAction: 'none',
-          width: '55px',
+          width: '50px',
           height: '100%',
         }}
         onMouseDown={handleScrubStart}
