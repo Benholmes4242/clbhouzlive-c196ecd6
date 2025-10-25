@@ -41,6 +41,50 @@ export function VideoProgressVerticalHUD({
   // Helper: clamp [0..1]
   const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
 
+  // Measure Engagement Rail and align HUD to it
+  const [railBox, setRailBox] = React.useState<{ top: number; height: number; right: number } | null>(null);
+
+  const recalcRailBox = React.useCallback(() => {
+    const rail = document.querySelector('.engagement-rail.is-visible[data-control="action-rail"]') as HTMLElement | null;
+    if (!rail) {
+      setRailBox(null);
+      return;
+    }
+    const buttons = Array.from(rail.querySelectorAll('button[data-action="engagement"]')) as HTMLElement[];
+    if (buttons.length === 0) {
+      setRailBox(null);
+      return;
+    }
+    const topRect = buttons[0].getBoundingClientRect();
+    const bottomRect = buttons[buttons.length - 1].getBoundingClientRect();
+    const railRect = rail.getBoundingClientRect();
+    const top = topRect.top;
+    const bottom = bottomRect.bottom;
+    const height = Math.max(0, bottom - top);
+    const right = Math.max(8, window.innerWidth - railRect.left + 8); // 8px gap to the left of rail
+    setRailBox({ top, height, right });
+  }, []);
+
+  React.useLayoutEffect(() => {
+    recalcRailBox();
+    const onResize = () => recalcRailBox();
+    window.addEventListener('resize', onResize);
+    window.addEventListener('scroll', onResize, true);
+
+    const rail = document.querySelector('.engagement-rail.is-visible[data-control="action-rail"]') as HTMLElement | null;
+    const ro = new ResizeObserver(onResize);
+    if (rail) ro.observe(rail);
+
+    const mo = new MutationObserver(onResize);
+    mo.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['class'] });
+
+    return () => {
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('scroll', onResize, true);
+      ro.disconnect();
+      mo.disconnect();
+    };
+  }, [recalcRailBox]);
   const handleScrubStart = React.useCallback((e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -187,9 +231,9 @@ export function VideoProgressVerticalHUD({
     <div
       className="pointer-events-none fixed z-[29] flex items-stretch justify-end"
       style={{
-        right: 'calc(env(safe-area-inset-right, 0px) + 64px)', // 16px (right-4) + 40px (button width) + 8px gap = 64px from right edge
-        bottom: 'calc(env(safe-area-inset-bottom, 0px) + clamp(6px, var(--bottom-nav-height, 72px) + 18px - var(--chrome-bottom-shift, 0px), calc(var(--bottom-nav-height, 72px) + 18px)))',
-        height: 'auto',
+        right: railBox ? `${railBox.right}px` : 'calc(env(safe-area-inset-right, 0px) + 64px)',
+        top: railBox ? `${railBox.top}px` : '25%',
+        height: railBox ? `${railBox.height}px` : '168px',
       }}
     >
       {/* Track - aligned from bottom of share icon to top of mute icon */}
@@ -208,9 +252,7 @@ export function VideoProgressVerticalHUD({
           pointerEvents: 'auto',
           touchAction: 'none',
           width: isScrubbing ? '8px' : '6px',
-          // Height calculation: 3 buttons spacing (share -> comment -> heart) 
-          // Each button is 40px tall with 16-20px gap = ~168px total
-          height: '168px',
+          height: '100%',
           transition: 'width 120ms ease, opacity 120ms ease',
         }}
         onMouseDown={handleScrubStart}
