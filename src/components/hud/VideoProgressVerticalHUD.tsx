@@ -185,14 +185,14 @@ export function VideoProgressVerticalHUD({
 
   const progressBar = (
     <div
-      className="pointer-events-none fixed z-[1100] flex items-stretch justify-end"
+      className="pointer-events-none fixed z-[29] flex items-stretch justify-end"
       style={{
-        right: 'calc(env(safe-area-inset-right, 0px) + 8px)',
-        top: '25%',
-        bottom: '25%',
+        right: 'calc(env(safe-area-inset-right, 0px) + 64px)', // 16px (right-4) + 40px (button width) + 8px gap = 64px from right edge
+        bottom: 'calc(env(safe-area-inset-bottom, 0px) + clamp(6px, var(--bottom-nav-height, 72px) + 18px - var(--chrome-bottom-shift, 0px), calc(var(--bottom-nav-height, 72px) + 18px)))',
+        height: 'auto',
       }}
     >
-      {/* Track */}
+      {/* Track - aligned from bottom of share icon to top of mute icon */}
       <div
         ref={trackRef}
         className={`
@@ -208,6 +208,9 @@ export function VideoProgressVerticalHUD({
           pointerEvents: 'auto',
           touchAction: 'none',
           width: isScrubbing ? '8px' : '6px',
+          // Height calculation: 3 buttons spacing (share -> comment -> heart) 
+          // Each button is 40px tall with 16-20px gap = ~168px total
+          height: '168px',
           transition: 'width 120ms ease, opacity 120ms ease',
         }}
         onMouseDown={handleScrubStart}
