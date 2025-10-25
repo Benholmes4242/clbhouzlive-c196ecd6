@@ -22,11 +22,11 @@ interface ShortCardWithObserverProps {
  * - Near observer (300px margin): Prebuffers video when approaching viewport
  * - Play observer (0.1 threshold): Triggers autoplay when in view
  * 
- * Autoplay follows 3-row repeating pattern:
- * - Row 1 (first portrait row): LEFT card autoplays, right paused
- * - Row 2 (second portrait row): RIGHT card autoplays, left paused
- * - Row 3 (landscape): Always autoplays
- * Pattern repeats: Row1 → Row2 → Row3 → Row1 → Row2 → Row3...
+ * Autoplay follows pattern:
+ * - Row 1: Left card plays (position 0), right paused (position 1)
+ * - Row 2: Right card plays (position 3), left paused (position 2)
+ * - Landscape: Always plays
+ * Pattern repeats every 4 portrait cards
  */
 export default function ShortCardWithObserver({
   item,
@@ -80,25 +80,18 @@ export default function ShortCardWithObserver({
       return;
     }
 
-    // Landscape cards always autoplay when in view (Row 3 in 3-row cycle)
+    // Landscape cards always autoplay when in view
     if (variant === 'landscape') {
       setShouldAutoplay(true);
       return;
     }
     
-    // Portrait cards follow 3-row repeating pattern:
-    // Calculate which row in the 3-row cycle (0, 1, or 2)
-    // gridPosition for portraits counts only portrait cards (0, 1, 2, 3, 4, 5...)
-    // Every 4 portraits = 2 rows, then landscape interrupts
-    // So we need to map: 0,1 -> row0, 2,3 -> row1, then repeat
-    
-    const positionInRow = gridPosition % 2; // 0 = left, 1 = right
-    const pairIndex = Math.floor(gridPosition / 2); // which pair of portraits (0, 1, 2, 3...)
-    const rowInCycle = pairIndex % 2; // alternates between 0 and 1 (row 1 and row 2)
-    
-    // Row 0 (first portrait row): LEFT plays (positionInRow === 0)
-    // Row 1 (second portrait row): RIGHT plays (positionInRow === 1)
-    const shouldPlay = (rowInCycle === 0 && positionInRow === 0) || (rowInCycle === 1 && positionInRow === 1);
+    // Portrait cards follow alternating pattern
+    // Row 1 (positions 0-1): position 0 plays
+    // Row 2 (positions 2-3): position 3 plays
+    // Pattern repeats every 4 positions
+    const positionInPattern = gridPosition % 4;
+    const shouldPlay = positionInPattern === 0 || positionInPattern === 3;
     
     setShouldAutoplay(shouldPlay);
   }, [isInView, variant, gridPosition]);
