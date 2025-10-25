@@ -287,8 +287,10 @@ export function VideoProgressVerticalHUD({
               height: '100%',
               background: accent ?? 'linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%)',
               boxShadow: '0 0 6px rgba(255,255,255,0.4)',
-              // Use scrubRatio when scrubbing for immediate visual feedback, otherwise use synced progress
-              transform: `scaleY(${isScrubbing ? scrubRatio : progress / 100})`,
+              // During scrubbing, transform is set directly in handleScrubMoveInternal for smooth updates
+              // Otherwise use synced progress from the hook
+              transform: isScrubbing ? undefined : `scaleY(${progress / 100})`,
+              transition: isScrubbing ? 'none' : 'transform 60ms linear',
             }}
           />
         </div>
