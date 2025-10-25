@@ -71,20 +71,26 @@ export function VideoProgressVerticalHUD({
       fillRef.current.style.transform = `scaleY(${ratio})`;
     }
     
-    // Update preview video frame and force it to pause on that frame
-    if (previewVideoRef.current) {
-      previewVideoRef.current.currentTime = newTime;
-      
-      // Force the preview to show the frame by pausing after seeking
+    // Update preview video frame
+    if (previewVideoRef.current && videoRef.current) {
       const pv = previewVideoRef.current;
-      if (pv.readyState >= 2) { // HAVE_CURRENT_DATA
-        pv.pause();
+      
+      // Ensure the preview video has the correct source
+      if (pv.src !== videoRef.current.currentSrc) {
+        pv.src = videoRef.current.currentSrc || '';
+        pv.load();
+      }
+      
+      // Seek to the preview time
+      if (pv.readyState >= 1) { // HAVE_METADATA
+        pv.currentTime = newTime;
       } else {
-        const onSeeked = () => {
-          pv.pause();
-          pv.removeEventListener('seeked', onSeeked);
+        // Wait for metadata to load before seeking
+        const onLoadedMetadata = () => {
+          pv.currentTime = newTime;
+          pv.removeEventListener('loadedmetadata', onLoadedMetadata);
         };
-        pv.addEventListener('seeked', onSeeked);
+        pv.addEventListener('loadedmetadata', onLoadedMetadata);
       }
     }
   }, [videoRef, clamp01]);
@@ -205,10 +211,9 @@ export function VideoProgressVerticalHUD({
           {/* Frame preview */}
           <video
             ref={previewVideoRef}
-            src={videoRef.current?.currentSrc}
             muted
             playsInline
-            preload="auto"
+            preload="metadata"
             className="w-full h-full object-cover"
             style={{ backgroundColor: "#000" }}
           />
