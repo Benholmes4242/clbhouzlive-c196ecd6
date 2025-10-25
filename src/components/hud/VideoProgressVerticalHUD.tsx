@@ -17,7 +17,28 @@ export function VideoProgressVerticalHUD({
   videoRef: React.RefObject<HTMLVideoElement | null>;
   accent?: string;
 }) {
-  const { setProgressFillRef, progress, pauseSync, resumeSync } = useVideoProgressSync(videoRef.current);
+  // Bind to the video element even if it appears after initial render
+  const [attachedVideo, setAttachedVideo] = React.useState<HTMLVideoElement | null>(null);
+  React.useEffect(() => {
+    if (videoRef.current) {
+      setAttachedVideo(videoRef.current);
+      return;
+    }
+    // Poll briefly to catch the first video becoming available without user interaction
+    const iv = window.setInterval(() => {
+      if (videoRef.current) {
+        setAttachedVideo(videoRef.current);
+        window.clearInterval(iv);
+      }
+    }, 50);
+    const to = window.setTimeout(() => window.clearInterval(iv), 800);
+    return () => {
+      window.clearInterval(iv);
+      window.clearTimeout(to);
+    };
+  }, [videoRef]);
+
+  const { setProgressFillRef, progress, pauseSync, resumeSync } = useVideoProgressSync(attachedVideo);
   const trackRef = React.useRef<HTMLDivElement | null>(null);
   const fillRef = React.useRef<HTMLDivElement | null>(null);
   const previewCanvasRef = React.useRef<HTMLCanvasElement | null>(null);
@@ -39,6 +60,29 @@ export function VideoProgressVerticalHUD({
       fillRef.current.style.transformOrigin = 'bottom';
     }
   }, [setProgressFillRef]);
+
+  // Briefly activate bar on attach/play to ensure visibility on first video
+  React.useEffect(() => {
+    if (!attachedVideo) return;
+    setIsBarActive(true);
+    if (activeTimeoutRef.current) {
+      clearTimeout(activeTimeoutRef.current);
+    }
+    activeTimeoutRef.current = window.setTimeout(() => {
+      setIsBarActive(false);
+      activeTimeoutRef.current = null;
+    }, 1200);
+    const onPlay = () => {
+      setIsBarActive(true);
+      if (activeTimeoutRef.current) clearTimeout(activeTimeoutRef.current);
+      activeTimeoutRef.current = window.setTimeout(() => {
+        setIsBarActive(false);
+        activeTimeoutRef.current = null;
+      }, 1200);
+    };
+    attachedVideo.addEventListener('playing', onPlay);
+    return () => attachedVideo.removeEventListener('playing', onPlay);
+  }, [attachedVideo]);
 
   // Helper: clamp [0..1]
   const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
@@ -124,13 +168,13 @@ export function VideoProgressVerticalHUD({
   }, [pauseSync]);
 
   const handleScrubMoveInternal = React.useCallback((clientY: number) => {
-    if (!trackRef.current || !videoRef.current) return;
+    if (!trackRef.current || !attachedVideo) return;
     
     const rect = trackRef.current.getBoundingClientRect();
     const relativeY = clientY - rect.top;
     const ratio = clamp01(1 - (relativeY / rect.height));
     
-    const newTime = (videoRef.current.duration || 0) * ratio;
+    const newTime = (attachedVideo?.duration || 0) * ratio;
     setPreviewTime(newTime);
     setPreviewPosPx(relativeY);
     setScrubRatio(ratio);
@@ -141,7 +185,7 @@ export function VideoProgressVerticalHUD({
     }
     
     // Approach 1: Try direct frame capture from main video (fastest, works if currentTime can be set)
-    const mainVideo = videoRef.current;
+    const mainVideo = attachedVideo;
     const canvas = previewCanvasRef.current;
     
     if (canvas && mainVideo) {
@@ -177,11 +221,11 @@ export function VideoProgressVerticalHUD({
         });
       }
     }
-  }, [videoRef, clamp01]);
+  }, [attachedVideo, clamp01]);
 
   const handleScrubEnd = React.useCallback(() => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = previewTime;
+    if (attachedVideo) {
+      attachedVideo.currentTime = previewTime;
     }
     setIsScrubbing(false);
     
@@ -209,7 +253,7 @@ export function VideoProgressVerticalHUD({
       setIsBarActive(false);
       activeTimeoutRef.current = null;
     }, 1500);
-  }, [previewTime, videoRef, resumeSync]);
+  }, [previewTime, attachedVideo, resumeSync]);
 
   // Touch event handlers
   React.useEffect(() => {
@@ -250,11 +294,11 @@ export function VideoProgressVerticalHUD({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const duration = videoRef.current?.duration || 0;
+  const duration = attachedVideo?.duration || 0;
 
-  const progressBar = (!videoRef.current) ? null : (
+  const progressBar = (!attachedVideo) ? null : (
     <div
-      className="pointer-events-none fixed z-[29] flex items-stretch justify-end"
+      className="pointer-events-none fixed z-[1100] flex items-stretch justify-end"
       style={{
         right: railBox ? `${railBox.right}px` : 'calc(env(safe-area-inset-right, 0px) + 64px)',
         top: railBox ? `${railBox.top}px` : '25%',
