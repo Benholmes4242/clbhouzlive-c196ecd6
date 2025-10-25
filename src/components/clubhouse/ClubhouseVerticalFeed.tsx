@@ -711,6 +711,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   <VideoWithAutoplay
                     ref={(el) => {
                       videoRefs.current[item.id] = el;
+                      if (onActiveVideoRefChange && index === currentIndex) {
+                        onActiveVideoRefChange(el);
+                      }
                     }}
                     src={currentMedia.media_url}
                     muted={isGloballyMuted}
