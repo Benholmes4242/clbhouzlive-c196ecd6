@@ -28,16 +28,30 @@ export function VideoProgressVerticalHUD({
   // Initialize sync hook with the real video element
   const { setProgressFillRef, pauseSync, resumeSync } = useVideoProgressSync(playerEl);
 
-  // Update playerEl when videoRef.current becomes available
+  // AUDIT: Update playerEl when videoRef.current becomes available
   React.useEffect(() => {
+    console.log('[HUD Audit] videoRef check:', {
+      videoRefCurrent: videoRef.current,
+      currentPlayerEl: playerEl,
+      areSame: videoRef.current === playerEl
+    });
+    
     if (videoRef.current && videoRef.current !== playerEl) {
+      console.log('[HUD Audit] Setting new playerEl:', videoRef.current);
       setPlayerEl(videoRef.current);
     }
   }, [videoRef.current, playerEl]);
 
-  // Wire up fillRef to sync hook with vertical orientation once both are ready
+  // AUDIT: Wire up fillRef to sync hook with vertical orientation once both are ready
   React.useEffect(() => {
+    console.log('[HUD Audit] fillRef registration check:', {
+      fillRefCurrent: fillRef.current,
+      playerEl: playerEl,
+      transformOrigin: fillRef.current?.style.transformOrigin
+    });
+    
     if (fillRef.current && playerEl) {
+      console.log('[HUD Audit] Registering fillRef with sync hook');
       setProgressFillRef(fillRef.current);
       fillRef.current.style.transformOrigin = 'bottom';
       fillRef.current.style.transform = 'scaleY(0)';

@@ -40,6 +40,18 @@ export function useVideoProgressSync(
       const isVertical = progressFillRef.current.style.transformOrigin === 'bottom' ||
                          progressFillRef.current.style.transformOrigin?.includes('bottom');
       
+      // AUDIT: Log sync loop activity (throttle to avoid spam)
+      if (Math.random() < 0.05) { // ~5% of frames
+        console.log('[Sync Audit] rAF loop:', {
+          currentTime,
+          duration,
+          ratio: roundedRatio,
+          isVertical,
+          transformOrigin: progressFillRef.current.style.transformOrigin,
+          progressFillRef: progressFillRef.current
+        });
+      }
+      
       progressFillRef.current.style.transform = isVertical 
         ? `scaleY(${roundedRatio})` 
         : `scaleX(${roundedRatio})`;
@@ -97,6 +109,14 @@ export function useVideoProgressSync(
   // rAF sync loop
   const startSyncLoop = useCallback(() => {
     if (!USE_VIDEO_PROGRESS_SYNC_V1 || isActiveRef.current) return;
+    
+    console.log('[Sync Audit] Starting sync loop:', {
+      videoElement,
+      hasVideoElement: !!videoElement,
+      duration: videoElement?.duration,
+      currentTime: videoElement?.currentTime,
+      progressFillRef: progressFillRef.current
+    });
     
     isActiveRef.current = true;
     
