@@ -18,47 +18,71 @@ export function VideoProgressVerticalHUD({
 }) {
   const { setProgressFillRef, progress } = useVideoProgressSync(videoRef.current);
   const trackRef = React.useRef<HTMLDivElement | null>(null);
+  const fillRef = React.useRef<HTMLDivElement | null>(null);
   const previewVideoRef = React.useRef<HTMLVideoElement | null>(null);
   
   const [isScrubbing, setIsScrubbing] = React.useState(false);
   const [previewTime, setPreviewTime] = React.useState(0);
-  const [previewPosition, setPreviewPosition] = React.useState(0);
+  const [previewPosPx, setPreviewPosPx] = React.useState(0);
 
-  // Scrubbing handler
+  // Expose fillRef to sync hook with vertical orientation
+  React.useEffect(() => {
+    if (fillRef.current) {
+      setProgressFillRef(fillRef.current);
+      fillRef.current.style.transformOrigin = 'bottom';
+    }
+  }, [setProgressFillRef]);
+
+  // Helper: clamp [0..1]
+  const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
+
   const handleScrubStart = React.useCallback((e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsScrubbing(true);
+
+    // Immediately update preview to press point
+    const clientY = 'touches' in e && e.touches.length > 0
+      ? e.touches[0].clientY
+      : 'clientY' in e
+      ? e.clientY
+      : 0;
+    handleScrubMoveInternal(clientY);
   }, []);
 
-  const handleScrubMove = React.useCallback((clientY: number) => {
+  const handleScrubMoveInternal = React.useCallback((clientY: number) => {
     if (!trackRef.current || !videoRef.current) return;
     
     const rect = trackRef.current.getBoundingClientRect();
     const relativeY = clientY - rect.top;
-    const ratio = Math.max(0, Math.min(1, 1 - (relativeY / rect.height)));
+    const ratio = clamp01(1 - (relativeY / rect.height));
     
-    const newTime = videoRef.current.duration * ratio;
+    const newTime = (videoRef.current.duration || 0) * ratio;
     setPreviewTime(newTime);
-    setPreviewPosition(relativeY);
+    setPreviewPosPx(relativeY);
     
-    // Update preview video frame if available
+    // Drive fill immediately for visual feedback
+    if (fillRef.current) {
+      fillRef.current.style.transform = `scaleY(${ratio})`;
+    }
+    
+    // Update preview video frame
     if (previewVideoRef.current) {
       previewVideoRef.current.currentTime = newTime;
     }
-  }, [videoRef]);
+  }, [videoRef, clamp01]);
 
   const handleScrubEnd = React.useCallback(() => {
-    if (!videoRef.current) return;
-    
-    videoRef.current.currentTime = previewTime;
+    if (videoRef.current) {
+      videoRef.current.currentTime = previewTime;
+    }
     setIsScrubbing(false);
     
-    // Haptic feedback on iOS
+    // Haptic feedback on capable devices
     if ('vibrate' in navigator) {
       navigator.vibrate(10);
     }
-  }, [videoRef, previewTime]);
+  }, [previewTime, videoRef]);
 
   // Touch event handlers
   React.useEffect(() => {
@@ -66,12 +90,12 @@ export function VideoProgressVerticalHUD({
 
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches.length > 0) {
-        handleScrubMove(e.touches[0].clientY);
+        handleScrubMoveInternal(e.touches[0].clientY);
       }
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      handleScrubMove(e.clientY);
+      handleScrubMoveInternal(e.clientY);
     };
 
     const handleEnd = () => {
@@ -89,7 +113,7 @@ export function VideoProgressVerticalHUD({
       document.removeEventListener('touchend', handleEnd);
       document.removeEventListener('mouseup', handleEnd);
     };
-  }, [isScrubbing, handleScrubMove, handleScrubEnd]);
+  }, [isScrubbing, handleScrubMoveInternal, handleScrubEnd]);
 
   // Format time display
   const formatTime = (seconds: number) => {
@@ -108,59 +132,67 @@ export function VideoProgressVerticalHUD({
 
   const progressBar = (
     <div
-      ref={trackRef}
-      aria-label="Video progress"
-      role="progressbar"
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={Math.round(progress)}
-      className="absolute right-[calc(env(safe-area-inset-right,0px)+16px)] top-1/4 bottom-1/4 w-[3px] z-[1100] select-none"
+      className="pointer-events-none fixed z-[1100] flex items-stretch justify-end"
       style={{
-        touchAction: 'none',
+        right: 'calc(env(safe-area-inset-right, 0px) + 8px)',
+        top: '25%',
+        bottom: '25%',
       }}
-      onTouchStart={handleScrubStart}
-      onMouseDown={handleScrubStart}
     >
-      {/* Track (frosted glass) */}
-      <div className="h-full w-full bg-white/10 backdrop-blur-sm rounded-full overflow-hidden relative">
-        {/* Fill (gradient pulse - bottom origin for scaleY) */}
+      {/* Track */}
+      <div
+        ref={trackRef}
+        className={`
+          relative
+          rounded-full
+          bg-white/10
+          backdrop-blur-sm
+          border border-white/20
+          overflow-hidden
+          ${isScrubbing ? 'opacity-100' : 'opacity-80'}
+        `}
+        style={{
+          pointerEvents: 'auto',
+          touchAction: 'none',
+          width: isScrubbing ? '8px' : '6px',
+          transition: 'width 120ms ease, opacity 120ms ease',
+        }}
+        onMouseDown={handleScrubStart}
+        onTouchStart={handleScrubStart}
+      >
+        {/* Fill */}
         <div
-          ref={setProgressFillRef}
-          className="w-full origin-bottom will-change-transform transition-transform duration-75"
+          ref={fillRef}
+          className="absolute bottom-0 left-0 w-full origin-bottom will-change-transform"
           style={{
-            position: 'absolute',
-            bottom: 0,
             height: '100%',
-            background: accent ?? 'linear-gradient(to top, #6E9277, rgba(255,255,255,0.6))',
-            transform: 'scaleY(0)', // Will be updated by sync hook
+            background: accent ?? 'linear-gradient(to top, rgba(110,146,119,1) 0%, rgba(255,255,255,0.6) 60%)',
+            boxShadow: '0 0 8px rgba(110,146,119,0.6), 0 0 24px rgba(110,146,119,0.2)',
+            transform: `scaleY(${progress / 100})`,
           }}
         />
       </div>
 
-      {/* Thumbnail Preview - appears during scrubbing */}
+      {/* Thumbnail Preview */}
       {isScrubbing && (
         <div
-          className="absolute right-full mr-3 rounded-lg overflow-hidden shadow-lg bg-black/80 border border-white/10 w-[80px] h-[140px] flex items-center justify-center animate-fade-in"
+          className="absolute right-full mr-2 w-[80px] h-[140px] rounded-xl bg-black/80 border border-white/15 shadow-xl overflow-hidden flex items-center justify-center"
           style={{
-            top: `${previewPosition}px`,
-            transform: 'translateY(-50%)',
+            top: `calc(${previewPosPx}px - 70px)`,
           }}
         >
-          {/* Preview video frame */}
+          {/* Frame preview */}
           <video
             ref={previewVideoRef}
-            src={videoRef.current.src}
-            className="w-full h-full object-cover"
+            src={videoRef.current?.currentSrc}
             muted
             playsInline
+            className="w-full h-full object-cover"
           />
           
-          {/* Time display */}
-          <div className="absolute bottom-1 left-1 right-1 text-center">
-            <span className="text-[10px] text-white/90 font-medium drop-shadow-lg">
-              {formatTime(previewTime)}
-            </span>
-            <span className="text-[9px] text-white/60"> / {formatTime(duration)}</span>
+          {/* Time overlay */}
+          <div className="absolute bottom-1 left-1 right-1 text-[10px] text-white/80 font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            {formatTime(previewTime)} / {formatTime(duration)}
           </div>
         </div>
       )}

@@ -36,10 +36,9 @@ export function useVideoProgressSync(
       // Round to 3 decimal places to prevent micro-jumps
       const roundedRatio = Math.round(ratio * 1000) / 1000;
       
-      // Detect orientation based on transformOrigin or style attribute
-      const isVertical = progressFillRef.current.style.transformOrigin?.includes('bottom') ||
-                         progressFillRef.current.style.bottom === '0' ||
-                         progressFillRef.current.style.bottom === '0px';
+      // Detect orientation based on transformOrigin
+      const isVertical = progressFillRef.current.style.transformOrigin === 'bottom' ||
+                         progressFillRef.current.style.transformOrigin?.includes('bottom');
       
       progressFillRef.current.style.transform = isVertical 
         ? `scaleY(${roundedRatio})` 
@@ -164,9 +163,8 @@ export function useVideoProgressSync(
     const handleLoadedMetadata = () => {
       // Reset to 0 when metadata loads
       if (progressFillRef.current) {
-        const isVertical = progressFillRef.current.style.transformOrigin?.includes('bottom') ||
-                           progressFillRef.current.style.bottom === '0' ||
-                           progressFillRef.current.style.bottom === '0px';
+        const isVertical = progressFillRef.current.style.transformOrigin === 'bottom' ||
+                           progressFillRef.current.style.transformOrigin?.includes('bottom');
         progressFillRef.current.style.transform = isVertical ? 'scaleY(0)' : 'scaleX(0)';
       }
       setProgress(0);
@@ -176,9 +174,8 @@ export function useVideoProgressSync(
     const handleLoadStart = () => {
       // Reset progress on new source load and stop any active sync
       if (progressFillRef.current) {
-        const isVertical = progressFillRef.current.style.transformOrigin?.includes('bottom') ||
-                           progressFillRef.current.style.bottom === '0' ||
-                           progressFillRef.current.style.bottom === '0px';
+        const isVertical = progressFillRef.current.style.transformOrigin === 'bottom' ||
+                           progressFillRef.current.style.transformOrigin?.includes('bottom');
         progressFillRef.current.style.transform = isVertical ? 'scaleY(0)' : 'scaleX(0)';
       }
       setProgress(0);

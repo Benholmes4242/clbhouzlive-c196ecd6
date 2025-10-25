@@ -235,7 +235,10 @@ const Clubhouse = () => {
       </div>
 
       {/* Video Progress Vertical HUD - Pulse Line beside engagement icons */}
-      <VideoProgressVerticalHUD videoRef={activeVideoRef} />
+      <VideoProgressVerticalHUD 
+        videoRef={activeVideoRef}
+        accent="linear-gradient(to top, rgba(110,146,119,1) 0%, rgba(255,255,255,0.6) 60%)"
+      />
       
       {/* Post Submission Handler */}
       <PostSubmissionHandler
