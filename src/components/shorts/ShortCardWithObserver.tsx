@@ -82,6 +82,7 @@ export default function ShortCardWithObserver({
 
     // Landscape cards always autoplay when in view
     if (variant === 'landscape') {
+      console.log('[Autoplay] Landscape card at position', gridPosition, 'should autoplay');
       setShouldAutoplay(true);
       return;
     }
@@ -98,6 +99,13 @@ export default function ShortCardWithObserver({
     // Row 0 (positions 0-1): left plays
     // Row 1 (positions 2-3): right plays
     const shouldPlay = (rowInCycle === 0 && isLeftCard) || (rowInCycle === 1 && !isLeftCard);
+    
+    console.log('[Autoplay] Portrait card at position', gridPosition, 
+      '| positionInPattern:', positionInPattern,
+      '| rowInCycle:', rowInCycle,
+      '| isLeftCard:', isLeftCard,
+      '| shouldPlay:', shouldPlay
+    );
     
     setShouldAutoplay(shouldPlay);
   }, [isInView, variant, gridPosition]);
