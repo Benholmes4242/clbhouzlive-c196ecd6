@@ -77,30 +77,12 @@ export default function ShortCardWithObserver({
   React.useEffect(() => {
     if (!isInView) {
       setShouldAutoplay(false);
-      if (import.meta.env.DEV) {
-        const effectiveAutoplay = false;
-        console.log('[Shorts autoplay check]', {
-          shouldAutoplayVisible: isInView,
-          shouldAutoplayByRule: false,
-          shouldAttach,
-          effectiveAutoplay
-        });
-      }
       return;
     }
 
     // Landscape cards always autoplay when in view (Row 3 in 3-row cycle)
     if (variant === 'landscape') {
       setShouldAutoplay(true);
-      if (import.meta.env.DEV) {
-        const effectiveAutoplay = isInView && true && shouldAttach;
-        console.log('[Shorts autoplay check]', {
-          shouldAutoplayVisible: isInView,
-          shouldAutoplayByRule: true,
-          shouldAttach,
-          effectiveAutoplay
-        });
-      }
       return;
     }
     
@@ -119,17 +101,7 @@ export default function ShortCardWithObserver({
     const shouldPlay = (rowInCycle === 0 && positionInRow === 0) || (rowInCycle === 1 && positionInRow === 1);
     
     setShouldAutoplay(shouldPlay);
-
-    if (import.meta.env.DEV) {
-      const effectiveAutoplay = isInView && shouldPlay && shouldAttach;
-      console.log('[Shorts autoplay check]', {
-        shouldAutoplayVisible: isInView,
-        shouldAutoplayByRule: shouldPlay,
-        shouldAttach,
-        effectiveAutoplay
-      });
-    }
-  }, [isInView, variant, gridPosition, shouldAttach]);
+  }, [isInView, variant, gridPosition]);
 
   // Notify parent of visibility changes
   React.useEffect(() => {
