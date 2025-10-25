@@ -264,8 +264,8 @@ export function VideoProgressVerticalHUD({
           className="absolute bottom-0 left-0 w-full origin-bottom will-change-transform"
           style={{
             height: '100%',
-            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.25) 100%)',
-            boxShadow: '0 0 4px rgba(255, 255, 255, 0.2)',
+            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.15) 100%)',
+            boxShadow: '0 0 3px rgba(255, 255, 255, 0.15)',
             // Use scrubRatio when scrubbing for immediate visual feedback, otherwise use synced progress
             transform: `scaleY(${isScrubbing ? scrubRatio : progress / 100})`,
           }}
