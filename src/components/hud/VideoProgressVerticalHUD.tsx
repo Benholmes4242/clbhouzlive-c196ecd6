@@ -242,9 +242,9 @@ export function VideoProgressVerticalHUD({
         className={`
           relative
           rounded-full
-          bg-black/20
+          bg-white/10
           backdrop-blur-2xl
-          border border-black/30
+          border border-white/20
           overflow-hidden
           ${isScrubbing ? 'opacity-100' : 'opacity-80'}
         `}
