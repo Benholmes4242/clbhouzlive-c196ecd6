@@ -97,11 +97,12 @@ const EngagementButton = ({
         </Squircle>
       </button>
       
-      {count > 0 && (
-        <span className="text-white/90 text-xs font-medium">
-          {formatCount(count)}
-        </span>
-      )}
+      <span className={cn(
+        "text-white/90 text-xs font-medium",
+        count === 0 && "invisible"
+      )}>
+        {count > 0 ? formatCount(count) : '0'}
+      </span>
     </div>
   );
 };
