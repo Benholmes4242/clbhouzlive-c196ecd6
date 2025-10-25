@@ -23,6 +23,7 @@ import { useVideoManager } from '@/contexts/VideoManagerContext';
 import { AudioStrip } from './AudioStrip';
 import PostMetadata from './PostMetadata';
 import EngagementRail from './EngagementRail';
+import { VideoProgressVerticalHUD } from '@/components/hud/VideoProgressVerticalHUD';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
@@ -796,26 +797,40 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 }}
               />
 
-              {/* Per-Post Engagement Rail */}
-              <EngagementRail
-                postId={item.id}
-                stats={{
-                  likes: item.likes || 0,
-                  comments: item.comments || 0,
-                  shares: item.shares || 0
-                }}
-                isLiked={likedPosts?.includes(item.id) ?? false}
-                isVideo={item.media?.[0]?.media_type === 'video'}
-                isActive={currentIndex === index}
-                onLike={() => onLike(item.id)}
-                onComment={() => {
-                  setSelectedPostId(item.id);
-                  setCommentsModalOpen(true);
-                }}
-                onShare={() => {
-                  console.log('Share clicked for post:', item.id);
-                }}
-              />
+              {/* Engagement Rail + Progress Bar Container */}
+              <div className="absolute right-[calc(env(safe-area-inset-right,0px)+8px)] bottom-[calc(env(safe-area-inset-bottom,0px)+var(--chrome-bottom-h,0px)+16px)] flex flex-row items-stretch gap-2 z-[1100]">
+                {/* Video Progress Vertical HUD - Pulse Line */}
+                {item.media?.[0]?.media_type === 'video' && currentIndex === index && (() => {
+                  const videoRef = { current: videoRefs.current[item.id] || null };
+                  return (
+                    <VideoProgressVerticalHUD
+                      videoRef={videoRef}
+                      accent="linear-gradient(to top, rgba(110,146,119,1) 0%, rgba(255,255,255,0.6) 60%)"
+                    />
+                  );
+                })()}
+                
+                {/* Per-Post Engagement Rail */}
+                <EngagementRail
+                  postId={item.id}
+                  stats={{
+                    likes: item.likes || 0,
+                    comments: item.comments || 0,
+                    shares: item.shares || 0
+                  }}
+                  isLiked={likedPosts?.includes(item.id) ?? false}
+                  isVideo={item.media?.[0]?.media_type === 'video'}
+                  isActive={currentIndex === index}
+                  onLike={() => onLike(item.id)}
+                  onComment={() => {
+                    setSelectedPostId(item.id);
+                    setCommentsModalOpen(true);
+                  }}
+                  onShare={() => {
+                    console.log('Share clicked for post:', item.id);
+                  }}
+                />
+              </div>
             </div>
           );
         })}

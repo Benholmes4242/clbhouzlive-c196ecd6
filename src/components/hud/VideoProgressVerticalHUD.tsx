@@ -58,7 +58,8 @@ export function VideoProgressVerticalHUD({
     if (!trackRef.current || !videoRef.current) return;
     
     const rect = trackRef.current.getBoundingClientRect();
-    const relativeY = clientY - rect.top;
+    // Clamp relative position first for stability
+    const relativeY = Math.min(Math.max(0, clientY - rect.top), rect.height);
     const ratio = clamp01(1 - (relativeY / rect.height));
     
     const newTime = (videoRef.current.duration || 0) * ratio;
@@ -151,14 +152,8 @@ export function VideoProgressVerticalHUD({
   const duration = videoRef.current.duration || 0;
 
   const progressBar = (
-    <div
-      className="pointer-events-none fixed z-[1100] flex items-stretch justify-end"
-      style={{
-        right: 'calc(env(safe-area-inset-right, 0px) + 8px)',
-        top: '25%',
-        bottom: '25%',
-      }}
-    >
+    <div className="pointer-events-none flex items-stretch h-full">
+      {/* Container matches engagement rail height */}
       {/* Track */}
       <div
         ref={trackRef}
@@ -222,6 +217,6 @@ export function VideoProgressVerticalHUD({
     </div>
   );
 
-  // Render via Portal to escape any transformed ancestors
-  return typeof window !== 'undefined' ? createPortal(progressBar, document.body) : null;
+  // Render directly (no portal needed since we're in the engagement rail container)
+  return progressBar;
 }
