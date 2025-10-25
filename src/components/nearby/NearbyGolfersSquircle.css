@@ -13,8 +13,8 @@
   
   /* Glass styling matching echo orb */
   background: transparent;
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: blur(8px) saturate(180%);
+  -webkit-backdrop-filter: blur(8px) saturate(180%);
   
   /* Glassy white border */
   border: 1px solid rgba(255, 255, 255, 0.4);
@@ -40,7 +40,7 @@
   /* Top gloss sweep + white tint + ultra-faint noise */
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.00) 55%),
-    linear-gradient(0deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08)),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.04)),
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='table' tableValues='0 0.015'/></feComponentTransfer></filter><rect width='64' height='64' filter='url(%23n)' /></svg>");
   background-blend-mode: normal, normal, soft-light;
 }
@@ -103,7 +103,7 @@
   .nearby-golfers-squircle::before {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.00) 55%),
-      linear-gradient(0deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12));
+      linear-gradient(0deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06));
   }
   
   .nearby-golfers-squircle::after {
