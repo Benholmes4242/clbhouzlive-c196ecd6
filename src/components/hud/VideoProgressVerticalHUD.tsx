@@ -43,6 +43,7 @@ export function VideoProgressVerticalHUD({
   }, [videoRef.current, playerEl]);
 
   // AUDIT: Wire up fillRef to sync hook with vertical orientation once both are ready
+  const lastRegistered = React.useRef<{ fill: HTMLDivElement | null; player: HTMLVideoElement | null }>({ fill: null, player: null });
   React.useEffect(() => {
     console.log('[HUD Audit] fillRef registration check:', {
       fillRefCurrent: fillRef.current,
@@ -51,10 +52,14 @@ export function VideoProgressVerticalHUD({
     });
     
     if (fillRef.current && playerEl) {
-      console.log('[HUD Audit] Registering fillRef with sync hook');
-      setProgressFillRef(fillRef.current);
-      fillRef.current.style.transformOrigin = 'bottom';
-      fillRef.current.style.transform = 'scaleY(0)';
+      const needsRegister = (lastRegistered.current.fill !== fillRef.current) || (lastRegistered.current.player !== playerEl);
+      if (needsRegister) {
+        console.log('[HUD Audit] Registering fillRef with sync hook');
+        setProgressFillRef(fillRef.current);
+        fillRef.current.style.transformOrigin = 'bottom';
+        // Do NOT force transform here repeatedly to avoid fighting rAF updates
+        lastRegistered.current = { fill: fillRef.current, player: playerEl };
+      }
     }
   }, [setProgressFillRef, playerEl]);
 
