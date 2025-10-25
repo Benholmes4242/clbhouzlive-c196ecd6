@@ -1,7 +1,6 @@
 import React from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import ShortCard from './ShortCard';
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 interface ShortCardWithObserverProps {
   item: ExploreContentItem;
@@ -43,30 +42,36 @@ export default function ShortCardWithObserver({
   // State for dual-observer pattern
   const [shouldAttach, setShouldAttach] = React.useState(false);
   const [shouldAutoplay, setShouldAutoplay] = React.useState(false);
+  const [isNear, setIsNear] = React.useState(false);
+  const [isInView, setIsInView] = React.useState(false);
   
-  // Container ref to share between both observers
   const containerRef = React.useRef<HTMLDivElement>(null);
 
-  // Near observer - prebuffer when approaching viewport (300px margin)
-  const { ref: nearRef, isInView: isNear } = useIntersectionObserver({
-    threshold: 0,
-    rootMargin: '300px 0px 300px 0px'
-  });
+  // Setup intersection observers manually to ensure proper element attachment
+  React.useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
 
-  // Play observer - trigger autoplay when actually in view (20% threshold)
-  const { ref: playRef, isInView } = useIntersectionObserver({
-    threshold: 0.2,
-    rootMargin: '0px'
-  });
+    // Near observer - prebuffer when approaching viewport (300px margin)
+    const nearObserver = new IntersectionObserver(
+      ([entry]) => setIsNear(entry.isIntersecting),
+      { threshold: 0, rootMargin: '300px 0px 300px 0px' }
+    );
 
-  // Combined ref to attach both observers synchronously (works in mobile)
-  const combinedRef = React.useCallback((el: HTMLDivElement | null) => {
-    containerRef.current = el;
-    if (el) {
-      nearRef.current = el;
-      playRef.current = el;
-    }
-  }, [nearRef, playRef]);
+    // Play observer - trigger autoplay when actually in view (20% threshold)
+    const playObserver = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0.2, rootMargin: '0px' }
+    );
+
+    nearObserver.observe(element);
+    playObserver.observe(element);
+
+    return () => {
+      nearObserver.disconnect();
+      playObserver.disconnect();
+    };
+  }, []);
 
   // Update attach state when near
   React.useEffect(() => {
@@ -102,7 +107,7 @@ export default function ShortCardWithObserver({
   }, [isInView, item.id, onVisibilityChange]);
 
   return (
-    <div ref={combinedRef}>
+    <div ref={containerRef}>
       <ShortCard
         item={item}
         onClick={onClick}
