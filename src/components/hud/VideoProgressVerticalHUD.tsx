@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { createPortal } from 'react-dom';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 
 /**
@@ -152,8 +151,8 @@ export function VideoProgressVerticalHUD({
   const duration = videoRef.current.duration || 0;
 
   const progressBar = (
-    <div className="pointer-events-none flex items-stretch h-full">
-      {/* Container matches engagement rail height */}
+    <div className="relative flex flex-col items-center h-full pointer-events-auto">
+      {/* Bar sized to match engagement rail height */}
       {/* Track */}
       <div
         ref={trackRef}
@@ -217,6 +216,6 @@ export function VideoProgressVerticalHUD({
     </div>
   );
 
-  // Render directly (no portal needed since we're in the engagement rail container)
+  // Render directly inline (no portal - parent wrapper handles positioning)
   return progressBar;
 }
