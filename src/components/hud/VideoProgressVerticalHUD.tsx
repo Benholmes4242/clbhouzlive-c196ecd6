@@ -286,9 +286,7 @@ export function VideoProgressVerticalHUD({
             width: isScrubbing ? '6px' : '3px',
             height: '100%',
             opacity: isScrubbing || isBarActive ? 1 : 0.4,
-            transition: isScrubbing 
-              ? 'opacity 120ms ease, width 0ms' 
-              : 'opacity 150ms ease, width 0ms',
+            transition: 'opacity 120ms ease, width 150ms cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         >
           {/* Fill */}
