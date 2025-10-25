@@ -76,43 +76,30 @@ const EngagementButton = ({
       >
         <Squircle width={40} height={40}>
           <div 
-            className={`
-              w-full h-full flex items-center justify-center overflow-hidden relative
-              transition-all duration-[120ms] ease-out
-            `}
-            style={{ 
-              borderRadius: '30%',
-              backgroundColor: 'rgba(0, 0, 0, 0.3)',
-              backdropFilter: 'blur(14px)',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
-              boxShadow: isPressed ? '0 0 10px rgba(255, 255, 255, 0.15)' : 'none',
-            }}
+            className="w-full h-full flex items-center justify-center bg-black/20 backdrop-blur-2xl border border-black/30 overflow-hidden relative"
+            style={{ borderRadius: '30%' }}
           >
             {/* Ripple effect */}
             {isPressed && (
               <div 
-                className="absolute inset-0 bg-white/15 animate-ping"
+                className="absolute inset-0 bg-white/20 animate-ping"
                 style={{ animationDuration: '250ms', borderRadius: '30%' }}
               />
             )}
             
             <Icon 
               className={cn(
-                "w-5 h-5 transition-colors duration-[120ms] relative z-10",
-                isActive ? "text-white/90" : "text-white/65"
+                "w-5 h-5 transition-colors duration-200 relative z-10",
+                isActive ? "text-accent fill-accent" : "text-white/90"
               )}
-              style={{
-                filter: isActive ? 'brightness(1.1)' : 'none'
-              }}
             />
           </div>
         </Squircle>
       </button>
       
       <span className={cn(
-        "text-xs font-normal transition-colors duration-[120ms]",
-        count === 0 && "invisible",
-        isActive ? "text-white/75" : "text-white/55"
+        "text-white/90 text-xs font-medium",
+        count === 0 && "invisible"
       )}>
         {count > 0 ? formatCount(count) : '0'}
       </span>
@@ -194,15 +181,10 @@ const EngagementRail = ({
               >
                 <Squircle width={40} height={40}>
                   <div 
-                    className="w-full h-full flex items-center justify-center overflow-hidden"
-                    style={{ 
-                      borderRadius: '30%',
-                      backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                      backdropFilter: 'blur(14px)',
-                      border: '1px solid rgba(255, 255, 255, 0.06)',
-                    }}
+                    className="w-full h-full flex items-center justify-center bg-black/20 backdrop-blur-2xl border border-black/30 overflow-hidden"
+                    style={{ borderRadius: '30%' }}
                   >
-                    <MoreHorizontal className="w-5 h-5 text-white/65" />
+                    <MoreHorizontal className="w-5 h-5 text-white/90" />
                   </div>
                 </Squircle>
               </button>
