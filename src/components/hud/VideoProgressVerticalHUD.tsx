@@ -20,21 +20,23 @@ export function VideoProgressVerticalHUD({
   // Bind to the video element even if it appears after initial render
   const [attachedVideo, setAttachedVideo] = React.useState<HTMLVideoElement | null>(null);
   React.useEffect(() => {
+    // Initial grab or late mount
     if (videoRef.current) {
       setAttachedVideo(videoRef.current);
-      return;
     }
-    // Poll briefly to catch the first video becoming available without user interaction
+    // Light polling to detect when the feed switches to a new video element
+    // (the ref object stays stable while .current changes)
+    let last: HTMLVideoElement | null = null;
     const iv = window.setInterval(() => {
-      if (videoRef.current) {
-        setAttachedVideo(videoRef.current);
-        window.clearInterval(iv);
+      const cur = videoRef.current;
+      if (cur && cur !== last) {
+        last = cur;
+        setAttachedVideo(cur);
       }
-    }, 50);
-    const to = window.setTimeout(() => window.clearInterval(iv), 800);
+    }, 120);
+
     return () => {
       window.clearInterval(iv);
-      window.clearTimeout(to);
     };
   }, [videoRef]);
 
@@ -44,6 +46,20 @@ export function VideoProgressVerticalHUD({
   const previewCanvasRef = React.useRef<HTMLCanvasElement | null>(null);
   const offscreenVideoRef = React.useRef<HTMLVideoElement | null>(null);
   const offscreenHlsRef = React.useRef<Hls | null>(null);
+  
+  // Store the current attachedVideo in a ref to ensure callbacks always use the latest value
+  const attachedVideoRef = React.useRef<HTMLVideoElement | null>(null);
+  
+  React.useEffect(() => {
+    attachedVideoRef.current = attachedVideo;
+    
+    // Clear canvas when video changes to prevent showing stale thumbnails
+    const canvas = previewCanvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      ctx?.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }, [attachedVideo]);
   
 
   const [isScrubbing, setIsScrubbing] = React.useState(false);
@@ -168,13 +184,17 @@ export function VideoProgressVerticalHUD({
   }, [pauseSync]);
 
   const handleScrubMoveInternal = React.useCallback((clientY: number) => {
-    if (!trackRef.current || !attachedVideo) return;
+    if (!trackRef.current) return;
+    
+    // Use the ref to ensure we always have the latest video element
+    const currentVideo = attachedVideoRef.current;
+    if (!currentVideo) return;
     
     const rect = trackRef.current.getBoundingClientRect();
     const relativeY = clientY - rect.top;
     const ratio = clamp01(1 - (relativeY / rect.height));
     
-    const newTime = (attachedVideo?.duration || 0) * ratio;
+    const newTime = (currentVideo?.duration || 0) * ratio;
     setPreviewTime(newTime);
     setPreviewPosPx(relativeY);
     setScrubRatio(ratio);
@@ -184,8 +204,8 @@ export function VideoProgressVerticalHUD({
       fillRef.current.style.transform = `scaleY(${ratio})`;
     }
     
-    // Approach 1: Try direct frame capture from main video (fastest, works if currentTime can be set)
-    const mainVideo = attachedVideo;
+    // Capture frame from the current active video
+    const mainVideo = currentVideo;
     const canvas = previewCanvasRef.current;
     
     if (canvas && mainVideo) {
@@ -207,25 +227,37 @@ export function VideoProgressVerticalHUD({
         
         mainVideo.currentTime = newTime;
         
-        // Wait a brief moment for the frame to update, then draw
-        requestAnimationFrame(() => {
-          if (mainVideo.readyState >= 2) { // HAVE_CURRENT_DATA
+        // Wait for a rendered frame before drawing to canvas
+        const draw = () => {
+          if (mainVideo.readyState >= 2) {
             ctx.drawImage(mainVideo, 0, 0, canvas.width, canvas.height);
           }
-          
           // Restore original playback state
           mainVideo.currentTime = originalTime;
           if (!originalPaused) {
             mainVideo.play().catch(() => {});
           }
-        });
+        };
+
+        const rvfc = (mainVideo as any).requestVideoFrameCallback;
+        if (typeof rvfc === 'function') {
+          try {
+            rvfc(() => draw());
+          } catch {
+            requestAnimationFrame(draw);
+          }
+        } else {
+          requestAnimationFrame(draw);
+        }
       }
     }
-  }, [attachedVideo, clamp01]);
+  }, [clamp01]);
 
   const handleScrubEnd = React.useCallback(() => {
-    if (attachedVideo) {
-      attachedVideo.currentTime = previewTime;
+    // Use the ref to ensure we seek the correct video
+    const currentVideo = attachedVideoRef.current;
+    if (currentVideo) {
+      currentVideo.currentTime = previewTime;
     }
     setIsScrubbing(false);
     
@@ -253,7 +285,7 @@ export function VideoProgressVerticalHUD({
       setIsBarActive(false);
       activeTimeoutRef.current = null;
     }, 1500);
-  }, [previewTime, attachedVideo, resumeSync]);
+  }, [previewTime, resumeSync]);
 
   // Touch event handlers
   React.useEffect(() => {
@@ -305,13 +337,13 @@ export function VideoProgressVerticalHUD({
         height: railBox ? `${railBox.height}px` : '168px',
       }}
     >
-      {/* Invisible hit area for comfortable scrubbing - 55px wide */}
+      {/* Invisible hit area for comfortable scrubbing - 50px wide */}
       <div
         className="relative"
         style={{
           pointerEvents: 'auto',
           touchAction: 'none',
-          width: '55px',
+          width: '50px',
           height: '100%',
         }}
         onMouseDown={handleScrubStart}
@@ -328,16 +360,14 @@ export function VideoProgressVerticalHUD({
             transition: 'opacity 120ms ease, width 150ms cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         >
-          {/* Fill with gradient shimmer */}
+          {/* Fill */}
           <div
             ref={fillRef}
-            className="absolute bottom-0 left-0 w-full origin-bottom will-change-transform animate-shimmer-bg"
+            className="absolute bottom-0 left-0 w-full origin-bottom will-change-transform"
             style={{
               height: '100%',
-              background: accent ?? 'linear-gradient(to top, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.2) 100%)',
-              backgroundSize: '100% 200%',
-              backdropFilter: 'blur(3px) saturate(180%)',
-              boxShadow: isScrubbing || isBarActive ? '0 0 6px rgba(255,255,255,0.4)' : '0 0 4px rgba(255,255,255,0.2)',
+              background: accent ?? 'linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%)',
+              boxShadow: '0 0 6px rgba(255,255,255,0.4)',
               // During scrubbing, transform is set directly in handleScrubMoveInternal for smooth updates
               // Otherwise use synced progress from the hook
               transform: isScrubbing ? undefined : `scaleY(${progress / 100})`,

@@ -247,14 +247,6 @@ export default {
 						transform: 'translateX(100%)'
 					}
 				},
-				'shimmer-bg': {
-					'0%': {
-						backgroundPosition: '-200% 0'
-					},
-					'100%': {
-						backgroundPosition: '200% 0'
-					}
-				},
 				'slow-spin': {
 					'0%': {
 						transform: 'rotate(0deg)'
@@ -294,7 +286,6 @@ export default {
 				'fade-in': 'fade-in 0.3s ease-out',
 				'shake': 'shake 0.6s ease-in-out',
 				'shimmer': 'shimmer 2s infinite',
-				'shimmer-bg': 'shimmer-bg 3s linear infinite',
 				'slow-spin': 'slow-spin 20s linear infinite',
 				'slide-in-from-right-modal': 'slide-in-from-right-modal 250ms ease-out',
 				'slide-out-to-right-modal': 'slide-out-to-right-modal 250ms ease-out'
