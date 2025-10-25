@@ -168,9 +168,9 @@ const EngagementRail = ({
     >
       {/* Three dots menu - only show for own posts */}
       {isOwnPost && onEdit && onDelete && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <div className="flex flex-col items-center gap-1 engagement-btn">
+        <div className="flex flex-col items-center gap-1 engagement-btn">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <button
                 aria-label="Post options"
                 className={cn(
@@ -188,25 +188,28 @@ const EngagementRail = ({
                   </div>
                 </Squircle>
               </button>
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            align="end" 
-            className="w-48 bg-white/95 dark:bg-neutral-800/95 backdrop-blur-sm border border-white/10 shadow-xl z-[1000000]"
-          >
-            <DropdownMenuItem onClick={onEdit}>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit Post
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={onDelete}
-              className="text-destructive focus:text-destructive"
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              align="end" 
+              className="w-48 bg-white/95 dark:bg-neutral-800/95 backdrop-blur-sm border border-white/10 shadow-xl z-[1000000]"
             >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete Post
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <DropdownMenuItem onClick={onEdit}>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit Post
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={onDelete}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Post
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
+          {/* Invisible count span to maintain consistent spacing */}
+          <span className="text-white/90 text-xs font-medium invisible">0</span>
+        </div>
       )}
 
       {/* Only show audio control for video posts */}
