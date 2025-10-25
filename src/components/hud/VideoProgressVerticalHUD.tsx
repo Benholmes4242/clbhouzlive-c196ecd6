@@ -30,7 +30,17 @@ export function VideoProgressVerticalHUD({
   const [previewPosPx, setPreviewPosPx] = React.useState(0);
   const [scrubRatio, setScrubRatio] = React.useState(0);
   const [isBarActive, setIsBarActive] = React.useState(false);
+  const [hasVideo, setHasVideo] = React.useState(false);
   const activeTimeoutRef = React.useRef<number | null>(null);
+
+  // Track when video becomes available to force re-render
+  React.useEffect(() => {
+    if (videoRef?.current) {
+      setHasVideo(true);
+    } else {
+      setHasVideo(false);
+    }
+  }, [videoRef]);
 
   // Expose fillRef to sync hook with vertical orientation
   React.useEffect(() => {
@@ -241,7 +251,7 @@ export function VideoProgressVerticalHUD({
   };
 
   // Don't render if there's no active video
-  if (!videoRef.current) {
+  if (!hasVideo || !videoRef.current) {
     return null;
   }
 
