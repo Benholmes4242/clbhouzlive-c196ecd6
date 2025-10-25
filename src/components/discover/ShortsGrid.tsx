@@ -328,7 +328,6 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                   onAuthorClick={onAuthorClick}
                   currentUserId={currentUserId}
                   variant="landscape"
-                  gridPosition={section.landscapeItem.index}
                 />
               </div>
             );
