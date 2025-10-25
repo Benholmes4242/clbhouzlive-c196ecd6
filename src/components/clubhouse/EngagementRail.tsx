@@ -90,7 +90,7 @@ const EngagementButton = ({
             <Icon 
               className={cn(
                 "w-5 h-5 transition-colors duration-200 relative z-10",
-                isActive ? "text-accent fill-accent" : "text-white"
+                isActive ? "text-accent fill-accent" : "text-white/90"
               )}
             />
           </div>
@@ -98,7 +98,7 @@ const EngagementButton = ({
       </button>
       
       {count > 0 && (
-        <span className="text-white text-xs font-medium">
+        <span className="text-white/90 text-xs font-medium">
           {formatCount(count)}
         </span>
       )}
@@ -183,7 +183,7 @@ const EngagementRail = ({
                     className="w-full h-full flex items-center justify-center bg-black/20 backdrop-blur-2xl border border-black/30 overflow-hidden"
                     style={{ borderRadius: '30%' }}
                   >
-                    <MoreHorizontal className="w-5 h-5 text-white" />
+                    <MoreHorizontal className="w-5 h-5 text-white/90" />
                   </div>
                 </Squircle>
               </button>
