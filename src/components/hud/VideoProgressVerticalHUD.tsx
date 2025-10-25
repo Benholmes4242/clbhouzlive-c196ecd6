@@ -85,6 +85,23 @@ export function VideoProgressVerticalHUD({
       mo.disconnect();
     };
   }, [recalcRailBox]);
+  const handleScrubStart = React.useCallback((e: React.TouchEvent | React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Pause the sync loop so manual scrubbing takes priority
+    pauseSync?.();
+    setIsScrubbing(true);
+
+    // Immediately update preview to press point
+    const clientY = 'touches' in e && e.touches.length > 0
+      ? e.touches[0].clientY
+      : 'clientY' in e
+      ? e.clientY
+      : 0;
+    handleScrubMoveInternal(clientY);
+  }, [pauseSync]);
+
   const handleScrubMoveInternal = React.useCallback((clientY: number) => {
     if (!trackRef.current || !videoRef.current) return;
     
@@ -140,26 +157,6 @@ export function VideoProgressVerticalHUD({
       }
     }
   }, [videoRef, clamp01]);
-
-  const handleScrubStart = React.useCallback((e: React.TouchEvent | React.MouseEvent) => {
-    console.log('🎯 Scrub start triggered:', 'touches' in e ? 'TOUCH' : 'MOUSE');
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Pause the sync loop so manual scrubbing takes priority
-    pauseSync?.();
-    setIsScrubbing(true);
-
-    // Immediately update preview to press point
-    const clientY = 'touches' in e && e.touches.length > 0
-      ? e.touches[0].clientY
-      : 'clientY' in e
-      ? e.clientY
-      : 0;
-    console.log('🎯 Starting scrub at clientY:', clientY);
-    handleScrubMoveInternal(clientY);
-  }, [pauseSync, handleScrubMoveInternal]);
-
 
   const handleScrubEnd = React.useCallback(() => {
     if (videoRef.current) {
@@ -253,18 +250,12 @@ export function VideoProgressVerticalHUD({
         style={{
           pointerEvents: 'auto',
           touchAction: 'none',
-          WebkitTouchCallout: 'none',
-          WebkitUserSelect: 'none',
-          userSelect: 'none',
           width: isScrubbing ? '8px' : '6px',
           height: '100%',
           transition: 'width 120ms ease, opacity 120ms ease',
         }}
         onMouseDown={handleScrubStart}
         onTouchStart={handleScrubStart}
-        onTouchStartCapture={(e) => {
-          console.log('🎯 Touch start captured on track');
-        }}
       >
         {/* Fill */}
         <div
