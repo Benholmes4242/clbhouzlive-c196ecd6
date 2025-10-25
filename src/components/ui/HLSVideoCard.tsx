@@ -203,7 +203,16 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
           }
         } catch (err) {
           console.log('[OpenFlow]', 'playFailed', performance.now(), err);
-          // Silently handle mobile autoplay blocks
+          // Silently handle mobile autoplay blocks and retry once shortly after
+          setTimeout(() => {
+            const el = videoRef.current;
+            if (!el) return;
+            if (!(autoplay && attached && ready)) return;
+            el.play().then(() => {
+              setOverlayHidden(true);
+              onPlay?.();
+            }).catch(() => {});
+          }, 100);
         }
       };
       start();
