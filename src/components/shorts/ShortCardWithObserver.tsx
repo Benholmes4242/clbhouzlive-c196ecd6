@@ -18,6 +18,10 @@ interface ShortCardWithObserverProps {
 
 /**
  * Wrapper around ShortCard that uses IntersectionObserver to control autoplay.
+ * Uses dual-observer pattern like Clubhouse for optimal performance:
+ * - Near observer (300px margin): Prebuffers video when approaching viewport
+ * - Play observer (0.1 threshold): Triggers autoplay when in view
+ * 
  * Autoplay follows pattern:
  * - Row 1: Left card plays (position 0), right paused (position 1)
  * - Row 2: Right card plays (position 3), left paused (position 2)
@@ -36,15 +40,51 @@ export default function ShortCardWithObserver({
   variant,
   gridPosition = 0
 }: ShortCardWithObserverProps) {
-  const { ref, isInView } = useIntersectionObserver({
-    threshold: 0.1, // Trigger as soon as card starts entering/exiting view
+  // State for dual-observer pattern
+  const [shouldAttach, setShouldAttach] = React.useState(false);
+  const [shouldAutoplay, setShouldAutoplay] = React.useState(false);
+  
+  // Container ref to share between both observers
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  // Near observer - prebuffer when approaching viewport (300px margin)
+  const { ref: nearRef, isInView: isNear } = useIntersectionObserver({
+    threshold: 0,
+    rootMargin: '300px 0px 300px 0px'
+  });
+
+  // Play observer - trigger autoplay when actually in view
+  const { ref: playRef, isInView } = useIntersectionObserver({
+    threshold: 0.1,
     rootMargin: '0px'
   });
 
-  // Determine if this card should autoplay based on grid position
-  const shouldAutoplay = React.useMemo(() => {
+  // Assign the same element to both observers
+  React.useEffect(() => {
+    const element = containerRef.current;
+    if (element) {
+      nearRef.current = element;
+      playRef.current = element;
+    }
+  }, [nearRef, playRef]);
+
+  // Update attach state when near
+  React.useEffect(() => {
+    setShouldAttach(isNear);
+  }, [isNear]);
+
+  // Determine if this card should autoplay based on grid position and visibility
+  React.useEffect(() => {
+    if (!isInView) {
+      setShouldAutoplay(false);
+      return;
+    }
+
     // Landscape cards always autoplay when in view
-    if (variant === 'landscape') return isInView;
+    if (variant === 'landscape') {
+      setShouldAutoplay(true);
+      return;
+    }
     
     // Portrait cards follow alternating pattern
     // Row 1 (positions 0-1): position 0 plays
@@ -53,7 +93,7 @@ export default function ShortCardWithObserver({
     const positionInPattern = gridPosition % 4;
     const shouldPlay = positionInPattern === 0 || positionInPattern === 3;
     
-    return isInView && shouldPlay;
+    setShouldAutoplay(shouldPlay);
   }, [isInView, variant, gridPosition]);
 
   // Notify parent of visibility changes
@@ -62,12 +102,13 @@ export default function ShortCardWithObserver({
   }, [isInView, item.id, onVisibilityChange]);
 
   return (
-    <div ref={ref}>
+    <div ref={containerRef}>
       <ShortCard
         item={item}
         onClick={onClick}
         height={height}
         isPinned={isPinned}
+        shouldAttach={shouldAttach}
         autoplay={shouldAutoplay}
         onLike={onLike}
         onAuthorClick={onAuthorClick}

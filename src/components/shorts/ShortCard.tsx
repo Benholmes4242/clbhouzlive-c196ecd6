@@ -1,8 +1,9 @@
 import React, { useRef } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
-import { useAutoplayGuard } from '@/hooks/useAutoplayGuard';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import ShortsCardMeta from './ShortsCardMeta';
+import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import '@/styles/shorts-meta.css';
 
 interface ShortCardProps {
@@ -10,33 +11,33 @@ interface ShortCardProps {
   onClick: () => void;
   height?: number;
   isPinned?: boolean;
+  shouldAttach?: boolean; // Prebuffer when near viewport
   autoplay?: boolean;
   onLike?: (itemId: string) => void;
   onAuthorClick?: (authorId: string) => void;
   currentUserId?: string;
-  variant?: 'portrait' | 'landscape'; // New: Support landscape cards
+  variant?: 'portrait' | 'landscape'; // Support landscape cards
 }
 
 export default React.memo(function ShortCard({ 
   item, 
   onClick, 
   height, 
-  isPinned, 
-  autoplay,
+  isPinned,
+  shouldAttach = false,
+  autoplay = false,
   onLike,
   onAuthorClick,
   currentUserId,
   variant = 'portrait'
 }: ShortCardProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const isVideo = item.type === 'video' || item.src?.includes('.mp4') || item.src?.includes('.webm');
   
-  // Generate poster URL from Stream ID or use existing thumbnailSrc
+  // Generate HLS URL and poster from Stream ID
+  const uid = item.src ? uidFromNode({ src: item.src }) : null;
+  const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : item.src;
   const streamId = item.src ? getStreamIdFromUrl(item.src) : null;
   const posterUrl = item.thumbnailSrc ?? (streamId ? getStreamPoster(streamId, '0s', 720) : undefined);
-  
-  // Guard autoplay - handles browser blocking gracefully
-  const autoplayBlocked = useAutoplayGuard(videoRef, isVideo && !!autoplay);
   
   const isLandscape = variant === 'landscape';
   
@@ -49,7 +50,7 @@ export default React.memo(function ShortCard({
     >
       {/* Thumbnail Container */}
       <div 
-        className="relative overflow-hidden bg-muted"
+        className="relative overflow-hidden bg-black"
         style={{ 
           width: '100%',
           maxWidth: '100%',
@@ -59,18 +60,20 @@ export default React.memo(function ShortCard({
           borderRadius: '0'
         }}
       >
-        {/* Video with poster fallback - always render video element for consistency */}
-        {isVideo ? (
-          <video
-            ref={videoRef}
-            src={item.src}
+        {/* Video with HLSVideoCard for optimal performance */}
+        {isVideo && hlsUrl ? (
+          <HLSVideoCard
+            hlsUrl={hlsUrl}
             poster={posterUrl}
-            className="absolute inset-0 h-full w-full object-cover"
-            loop
-            muted
-            playsInline
-            preload="metadata"
-            data-autoplay-blocked={autoplayBlocked ? '1' : '0'}
+            className="absolute inset-0 w-full h-full"
+            aspectRatio={isLandscape ? '16/11.592' : '9/16'}
+            muted={true}
+            loop={true}
+            shouldAttach={shouldAttach}
+            autoplay={autoplay}
+            showMuteButton={false}
+            externallyManaged={true}
+            fit="cover"
           />
         ) : (
           <img
