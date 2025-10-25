@@ -35,11 +35,18 @@ export function VideoProgressVerticalHUD({
 
   // Track when video becomes available to force re-render
   React.useEffect(() => {
-    if (videoRef?.current) {
-      setHasVideo(true);
-    } else {
-      setHasVideo(false);
-    }
+    let raf = 0;
+    const check = () => {
+      if (videoRef?.current) {
+        setHasVideo(true);
+        return;
+      }
+      raf = requestAnimationFrame(check);
+    };
+    check();
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, [videoRef]);
 
   // Expose fillRef to sync hook with vertical orientation
