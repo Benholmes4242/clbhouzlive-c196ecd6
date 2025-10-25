@@ -181,20 +181,21 @@ export function VideoProgressVerticalHUD({
       {/* Track */}
       <div
         ref={trackRef}
-        className={`
+        className="
           relative
+          h-full
           rounded-full
           bg-white/10
-          backdrop-blur-sm
           border border-white/20
+          backdrop-blur-sm
           overflow-hidden
-          ${isScrubbing ? 'opacity-100' : 'opacity-80'}
-        `}
+        "
         style={{
           pointerEvents: 'auto',
           touchAction: 'none',
           width: isScrubbing ? '8px' : '6px',
           transition: 'width 120ms ease, opacity 120ms ease',
+          opacity: isScrubbing ? 1 : 0.8,
         }}
         onMouseDown={handleScrubStart}
         onTouchStart={handleScrubStart}
@@ -202,13 +203,19 @@ export function VideoProgressVerticalHUD({
         {/* Fill */}
         <div
           ref={fillRef}
-          className="absolute bottom-0 left-0 w-full origin-bottom will-change-transform"
+          className="
+            absolute
+            bottom-0
+            left-0
+            w-full
+            h-full
+            will-change-transform
+          "
           style={{
-            height: '100%',
-            background: accent ?? 'linear-gradient(to top, rgba(110,146,119,1) 0%, rgba(255,255,255,0.6) 60%)',
-            boxShadow: '0 0 8px rgba(110,146,119,0.6), 0 0 24px rgba(110,146,119,0.2)',
-            transform: 'scaleY(0)',
             transformOrigin: 'bottom',
+            transform: 'scaleY(0)',
+            background: accent ?? 'linear-gradient(to top, #6E9277 0%, rgba(255,255,255,0.6) 60%)',
+            boxShadow: '0 0 8px rgba(110,146,119,0.6), 0 0 24px rgba(110,146,119,0.2)',
           }}
         />
       </div>
