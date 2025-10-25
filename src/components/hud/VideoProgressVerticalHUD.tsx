@@ -29,6 +29,8 @@ export function VideoProgressVerticalHUD({
   const [previewTime, setPreviewTime] = React.useState(0);
   const [previewPosPx, setPreviewPosPx] = React.useState(0);
   const [scrubRatio, setScrubRatio] = React.useState(0);
+  const [isBarActive, setIsBarActive] = React.useState(false);
+  const activeTimeoutRef = React.useRef<number | null>(null);
 
   // Expose fillRef to sync hook with vertical orientation
   React.useEffect(() => {
@@ -88,6 +90,15 @@ export function VideoProgressVerticalHUD({
   const handleScrubStart = React.useCallback((e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // Clear any pending fade timeout
+    if (activeTimeoutRef.current) {
+      clearTimeout(activeTimeoutRef.current);
+      activeTimeoutRef.current = null;
+    }
+    
+    // Activate bar
+    setIsBarActive(true);
     
     // Pause the sync loop so manual scrubbing takes priority
     pauseSync?.();
@@ -179,6 +190,15 @@ export function VideoProgressVerticalHUD({
       try { offscreenHlsRef.current.destroy(); } catch {}
       offscreenHlsRef.current = null;
     }
+    
+    // Keep bar active for 1.5s after scrubbing ends
+    if (activeTimeoutRef.current) {
+      clearTimeout(activeTimeoutRef.current);
+    }
+    activeTimeoutRef.current = window.setTimeout(() => {
+      setIsBarActive(false);
+      activeTimeoutRef.current = null;
+    }, 1500);
   }, [previewTime, videoRef, resumeSync]);
 
   // Touch event handlers
@@ -236,40 +256,42 @@ export function VideoProgressVerticalHUD({
         height: railBox ? `${railBox.height}px` : '168px',
       }}
     >
-      {/* Track - aligned from bottom of share icon to top of mute icon */}
+      {/* Invisible hit area for comfortable scrubbing */}
       <div
-        ref={trackRef}
-        className={`
-          relative
-          rounded-full
-          bg-black/20
-          backdrop-blur-2xl
-          overflow-hidden
-          ${isScrubbing ? 'opacity-100' : 'opacity-80'}
-        `}
+        className="relative"
         style={{
           pointerEvents: 'auto',
           touchAction: 'none',
-          width: isScrubbing ? '8px' : '6px',
+          width: '32px',
           height: '100%',
-          transition: 'width 120ms ease, opacity 120ms ease',
         }}
         onMouseDown={handleScrubStart}
         onTouchStart={handleScrubStart}
       >
-        {/* Fill */}
+        {/* Visual track - slim and positioned to the right */}
         <div
-          ref={fillRef}
-          className="absolute bottom-0 left-0 w-full origin-bottom will-change-transform"
+          ref={trackRef}
+          className="absolute right-0 top-0 rounded-full bg-white/7 backdrop-blur-sm overflow-hidden"
           style={{
+            width: '3px',
             height: '100%',
-            background: accent ?? 'linear-gradient(to top, rgba(110,146,119,0.35) 0%, rgba(110,146,119,0.10) 65%, rgba(255,255,255,0) 100%)',
-            boxShadow: '0 0 6px rgba(110,146,119,0.18)',
-            opacity: isScrubbing ? 0.95 : 0.8,
-            // Use scrubRatio when scrubbing for immediate visual feedback, otherwise use synced progress
-            transform: `scaleY(${isScrubbing ? scrubRatio : progress / 100})`,
+            opacity: isScrubbing || isBarActive ? 1 : 0.4,
+            transition: isScrubbing || isBarActive ? 'opacity 120ms ease' : 'opacity 150ms ease',
           }}
-        />
+        >
+          {/* Fill */}
+          <div
+            ref={fillRef}
+            className="absolute bottom-0 left-0 w-full origin-bottom will-change-transform"
+            style={{
+              height: '100%',
+              background: accent ?? 'linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%)',
+              boxShadow: '0 0 6px rgba(255,255,255,0.4)',
+              // Use scrubRatio when scrubbing for immediate visual feedback, otherwise use synced progress
+              transform: `scaleY(${isScrubbing ? scrubRatio : progress / 100})`,
+            }}
+          />
+        </div>
       </div>
 
       {/* Thumbnail Preview */}
