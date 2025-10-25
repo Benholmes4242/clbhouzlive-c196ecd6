@@ -242,11 +242,8 @@ export function VideoProgressVerticalHUD({
         className={`
           relative
           rounded-full
-          bg-black/20
-          backdrop-blur-2xl
-          border border-black/30
           overflow-hidden
-          ${isScrubbing ? 'opacity-100' : 'opacity-80'}
+          ${isScrubbing ? 'opacity-100' : 'opacity-90'}
         `}
         style={{
           pointerEvents: 'auto',
@@ -254,6 +251,9 @@ export function VideoProgressVerticalHUD({
           width: isScrubbing ? '8px' : '6px',
           height: '100%',
           transition: 'width 120ms ease, opacity 120ms ease',
+          backgroundColor: 'rgba(255, 255, 255, 0.07)', // Almost invisible track
+          backdropFilter: 'blur(14px)',
+          border: '1px solid rgba(255, 255, 255, 0.06)',
         }}
         onMouseDown={handleScrubStart}
         onTouchStart={handleScrubStart}
@@ -264,8 +264,8 @@ export function VideoProgressVerticalHUD({
           className="absolute bottom-0 left-0 w-full origin-bottom will-change-transform"
           style={{
             height: '100%',
-            background: accent ?? 'linear-gradient(to top, rgba(110,146,119,1) 0%, rgba(255,255,255,0.6) 60%)',
-            boxShadow: '0 0 8px rgba(110,146,119,0.6), 0 0 24px rgba(110,146,119,0.2)',
+            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%)',
+            boxShadow: '0 0 6px rgba(255, 255, 255, 0.4)',
             // Use scrubRatio when scrubbing for immediate visual feedback, otherwise use synced progress
             transform: `scaleY(${isScrubbing ? scrubRatio : progress / 100})`,
           }}
