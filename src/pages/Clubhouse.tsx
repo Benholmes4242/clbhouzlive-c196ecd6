@@ -229,7 +229,6 @@ const Clubhouse = () => {
           onTouchMove={chromeControls.handleTouchMove}
           onTouchEnd={chromeControls.handleTouchEnd}
           onActiveVideoRefChange={(ref) => {
-            console.log('[ProgressBar Debug] Parent received video ref:', !!ref);
             activeVideoRef.current = ref;
           }}
         />

@@ -250,14 +250,9 @@ export function VideoProgressVerticalHUD({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Don't render if there's no active video
-  if (!videoRef.current) {
-    return null;
-  }
+  const duration = videoRef.current?.duration || 0;
 
-  const duration = videoRef.current.duration || 0;
-
-  const progressBar = (
+  const progressBar = (!videoRef.current) ? null : (
     <div
       className="pointer-events-none fixed z-[29] flex items-stretch justify-end"
       style={{

@@ -460,36 +460,27 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     if (!onActiveVideoRefChange) return;
     
     const currentPost = filteredPosts[currentIndex];
-    console.log('[ProgressBar Debug] Current index:', currentIndex, 'Post type:', currentPost?.type, 'Post ID:', currentPost?.id);
     
     if (currentPost && currentPost.type === 'video') {
       const videoRef = videoRefs.current[currentPost.id];
-      console.log('[ProgressBar Debug] Video ref exists:', !!videoRef, 'for post:', currentPost.id);
       
       // If video ref isn't available yet, wait a bit for it to mount
       if (!videoRef) {
-        console.log('[ProgressBar Debug] Video ref not available yet, polling...');
         const checkRef = setInterval(() => {
           const ref = videoRefs.current[currentPost.id];
           if (ref) {
-            console.log('[ProgressBar Debug] Video ref found via polling, notifying parent');
             onActiveVideoRefChange(ref);
             clearInterval(checkRef);
           }
         }, 50); // Check every 50ms
         
         // Clean up after 500ms if ref still not found
-        setTimeout(() => {
-          console.log('[ProgressBar Debug] Polling timeout reached');
-          clearInterval(checkRef);
-        }, 500);
+        setTimeout(() => clearInterval(checkRef), 500);
         return () => clearInterval(checkRef);
       } else {
-        console.log('[ProgressBar Debug] Video ref available immediately, notifying parent');
         onActiveVideoRefChange(videoRef);
       }
     } else {
-      console.log('[ProgressBar Debug] Not a video post, clearing ref');
       onActiveVideoRefChange(null);
     }
   }, [currentIndex, filteredPosts, onActiveVideoRefChange]);
@@ -737,16 +728,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   <VideoWithAutoplay
                     ref={(el) => {
                       videoRefs.current[item.id] = el;
-                      console.log('[ProgressBar Debug] Video ref callback fired:', {
-                        postId: item.id,
-                        index,
-                        currentIndex,
-                        hasElement: !!el,
-                        isCurrentPost: index === currentIndex
-                      });
                       // If this is the current post, notify parent immediately
                       if (index === currentIndex && el && onActiveVideoRefChange) {
-                        console.log('[ProgressBar Debug] Notifying parent from ref callback');
                         onActiveVideoRefChange(el);
                       }
                     }}
