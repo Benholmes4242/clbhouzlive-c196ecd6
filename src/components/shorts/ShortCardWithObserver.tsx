@@ -86,12 +86,18 @@ export default function ShortCardWithObserver({
       return;
     }
     
-    // Portrait cards follow alternating pattern
-    // Row 1 (positions 0-1): position 0 plays
-    // Row 2 (positions 2-3): position 3 plays
-    // Pattern repeats every 4 positions
+    // Portrait cards follow staggered autoplay pattern:
+    // Row 1 (positions 0-1): LEFT plays (position 0 in row)
+    // Row 2 (positions 2-3): RIGHT plays (position 1 in row)
+    // This creates the pattern: 0L / 2R / 0L / 2R...
+    // Pattern repeats every 4 portrait positions (2 rows)
     const positionInPattern = gridPosition % 4;
-    const shouldPlay = positionInPattern === 0 || positionInPattern === 3;
+    const isLeftCard = positionInPattern % 2 === 0; // even positions are left (0, 2)
+    const rowInCycle = Math.floor(positionInPattern / 2); // 0 for first row, 1 for second row
+    
+    // Row 0 (positions 0-1): left plays
+    // Row 1 (positions 2-3): right plays
+    const shouldPlay = (rowInCycle === 0 && isLeftCard) || (rowInCycle === 1 && !isLeftCard);
     
     setShouldAutoplay(shouldPlay);
   }, [isInView, variant, gridPosition]);
