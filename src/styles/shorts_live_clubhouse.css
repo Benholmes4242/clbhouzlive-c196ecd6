@@ -57,7 +57,7 @@
   border-radius: 0 !important; /* Let Squircle component handle the shape */
 }
 
-/* Recent posts indicator - removed per user request */
+/* Recent posts indicator removed */
 
 /* Online dot - positioned to avoid clipping */
 .lc-dot {

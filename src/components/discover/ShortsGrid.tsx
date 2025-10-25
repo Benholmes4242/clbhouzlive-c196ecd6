@@ -294,6 +294,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                 onAuthorClick={onAuthorClick}
                 currentUserId={currentUserId}
                 gridPosition={posInRow}
+                variant="portrait"
               />
             ))}
           </div>
@@ -327,6 +328,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                   onAuthorClick={onAuthorClick}
                   currentUserId={currentUserId}
                   variant="landscape"
+                  gridPosition={section.landscapeItem.index}
                 />
               </div>
             );
@@ -361,6 +363,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                       onAuthorClick={onAuthorClick}
                       currentUserId={currentUserId}
                       gridPosition={gridPosition}
+                      variant="portrait"
                     />
                   );
                 })}

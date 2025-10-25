@@ -184,27 +184,39 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     };
   }, []);
 
-  // Play only when autoplay && ready && attached, then fade overlay
+  // Play when autoplay && ready && attached, retry on all changes (critical for mobile)
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
 
-    if (autoplay && attached) {
+    // Mobile Safari requires all conditions to be true before allowing play()
+    if (autoplay && attached && ready) {
       const start = async () => {
-        if (!ready) return;
         console.log('[OpenFlow]', 'attemptPlay', performance.now());
         try {
-          await v.play();
-          console.log('[OpenFlow]', 'playSucceeded', performance.now());
-          setOverlayHidden(true);
-          onPlay?.();
+          const playPromise = v.play();
+          if (playPromise) {
+            await playPromise;
+            console.log('[OpenFlow]', 'playSucceeded', performance.now());
+            setOverlayHidden(true);
+            onPlay?.();
+          }
         } catch (err) {
           console.log('[OpenFlow]', 'playFailed', performance.now(), err);
-          // ignore autoplay promise errors
+          // Silently handle mobile autoplay blocks and retry once shortly after
+          setTimeout(() => {
+            const el = videoRef.current;
+            if (!el) return;
+            if (!(autoplay && attached && ready)) return;
+            el.play().then(() => {
+              setOverlayHidden(true);
+              onPlay?.();
+            }).catch(() => {});
+          }, 100);
         }
       };
       start();
-    } else {
+    } else if (!autoplay) {
       v.pause();
       if (!ready) setOverlayHidden(false);
       onPause?.();
@@ -297,6 +309,8 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
         ref={videoRef}
         className={`videoEl absolute inset-0 w-full h-full ${videoFitClass}`}
         playsInline
+        webkit-playsinline="true"
+        autoPlay={autoplay}
         muted={isMuted}
         loop={loop}
         controls={showControls}
