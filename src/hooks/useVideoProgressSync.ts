@@ -30,11 +30,20 @@ export function useVideoProgressSync(
     if (!duration || isNaN(duration) || duration === 0) return;
 
     // Direct DOM update for visual progress bar (no React state)
+    // Support both horizontal (scaleX) and vertical (scaleY) transforms
     if (progressFillRef.current) {
       const ratio = Math.min(1, Math.max(0, currentTime / duration));
       // Round to 3 decimal places to prevent micro-jumps
       const roundedRatio = Math.round(ratio * 1000) / 1000;
-      progressFillRef.current.style.transform = `scaleX(${roundedRatio})`;
+      
+      // Detect orientation based on transformOrigin or style attribute
+      const isVertical = progressFillRef.current.style.transformOrigin?.includes('bottom') ||
+                         progressFillRef.current.style.bottom === '0' ||
+                         progressFillRef.current.style.bottom === '0px';
+      
+      progressFillRef.current.style.transform = isVertical 
+        ? `scaleY(${roundedRatio})` 
+        : `scaleX(${roundedRatio})`;
     }
 
     // Use explicit segments or create equal segments
@@ -155,7 +164,10 @@ export function useVideoProgressSync(
     const handleLoadedMetadata = () => {
       // Reset to 0 when metadata loads
       if (progressFillRef.current) {
-        progressFillRef.current.style.transform = 'scaleX(0)';
+        const isVertical = progressFillRef.current.style.transformOrigin?.includes('bottom') ||
+                           progressFillRef.current.style.bottom === '0' ||
+                           progressFillRef.current.style.bottom === '0px';
+        progressFillRef.current.style.transform = isVertical ? 'scaleY(0)' : 'scaleX(0)';
       }
       setProgress(0);
       const segmentCount = segments?.length || totalSegments;
@@ -164,7 +176,10 @@ export function useVideoProgressSync(
     const handleLoadStart = () => {
       // Reset progress on new source load and stop any active sync
       if (progressFillRef.current) {
-        progressFillRef.current.style.transform = 'scaleX(0)';
+        const isVertical = progressFillRef.current.style.transformOrigin?.includes('bottom') ||
+                           progressFillRef.current.style.bottom === '0' ||
+                           progressFillRef.current.style.bottom === '0px';
+        progressFillRef.current.style.transform = isVertical ? 'scaleY(0)' : 'scaleX(0)';
       }
       setProgress(0);
       const segmentCount = segments?.length || totalSegments;
