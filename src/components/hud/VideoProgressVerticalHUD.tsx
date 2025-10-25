@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 
 /**
@@ -15,53 +16,23 @@ export function VideoProgressVerticalHUD({
   videoRef: React.RefObject<HTMLVideoElement | null>;
   accent?: string;
 }) {
+  const { setProgressFillRef, progress, pauseSync, resumeSync } = useVideoProgressSync(videoRef.current);
   const trackRef = React.useRef<HTMLDivElement | null>(null);
   const fillRef = React.useRef<HTMLDivElement | null>(null);
   const previewVideoRef = React.useRef<HTMLVideoElement | null>(null);
   
-  const [playerEl, setPlayerEl] = React.useState<HTMLVideoElement | null>(null);
   const [isScrubbing, setIsScrubbing] = React.useState(false);
   const [previewTime, setPreviewTime] = React.useState(0);
   const [previewPosPx, setPreviewPosPx] = React.useState(0);
   const [scrubRatio, setScrubRatio] = React.useState(0);
 
-  // Initialize sync hook with the real video element
-  const { setProgressFillRef, pauseSync, resumeSync } = useVideoProgressSync(playerEl);
-
-  // AUDIT: Update playerEl when videoRef.current becomes available
+  // Expose fillRef to sync hook with vertical orientation
   React.useEffect(() => {
-    console.log('[HUD Audit] videoRef check:', {
-      videoRefCurrent: videoRef.current,
-      currentPlayerEl: playerEl,
-      areSame: videoRef.current === playerEl
-    });
-    
-    if (videoRef.current && videoRef.current !== playerEl) {
-      console.log('[HUD Audit] Setting new playerEl:', videoRef.current);
-      setPlayerEl(videoRef.current);
+    if (fillRef.current) {
+      setProgressFillRef(fillRef.current);
+      fillRef.current.style.transformOrigin = 'bottom';
     }
-  }, [videoRef.current, playerEl]);
-
-  // AUDIT: Wire up fillRef to sync hook with vertical orientation once both are ready
-  const lastRegistered = React.useRef<{ fill: HTMLDivElement | null; player: HTMLVideoElement | null }>({ fill: null, player: null });
-  React.useEffect(() => {
-    console.log('[HUD Audit] fillRef registration check:', {
-      fillRefCurrent: fillRef.current,
-      playerEl: playerEl,
-      transformOrigin: fillRef.current?.style.transformOrigin
-    });
-    
-    if (fillRef.current && playerEl) {
-      const needsRegister = (lastRegistered.current.fill !== fillRef.current) || (lastRegistered.current.player !== playerEl);
-      if (needsRegister) {
-        console.log('[HUD Audit] Registering fillRef with sync hook');
-        setProgressFillRef(fillRef.current);
-        fillRef.current.style.transformOrigin = 'bottom';
-        // Do NOT force transform here repeatedly to avoid fighting rAF updates
-        lastRegistered.current = { fill: fillRef.current, player: playerEl };
-      }
-    }
-  }, [setProgressFillRef, playerEl]);
+  }, [setProgressFillRef]);
 
   // Helper: clamp [0..1]
   const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
@@ -84,14 +55,13 @@ export function VideoProgressVerticalHUD({
   }, [pauseSync]);
 
   const handleScrubMoveInternal = React.useCallback((clientY: number) => {
-    if (!trackRef.current || !playerEl) return;
+    if (!trackRef.current || !videoRef.current) return;
     
     const rect = trackRef.current.getBoundingClientRect();
-    // Clamp relative position first for stability
-    const relativeY = Math.min(Math.max(0, clientY - rect.top), rect.height);
+    const relativeY = clientY - rect.top;
     const ratio = clamp01(1 - (relativeY / rect.height));
     
-    const newTime = (playerEl.duration || 0) * ratio;
+    const newTime = (videoRef.current.duration || 0) * ratio;
     setPreviewTime(newTime);
     setPreviewPosPx(relativeY);
     setScrubRatio(ratio);
@@ -117,11 +87,11 @@ export function VideoProgressVerticalHUD({
         pv.addEventListener('seeked', onSeeked);
       }
     }
-  }, [playerEl, clamp01]);
+  }, [videoRef, clamp01]);
 
   const handleScrubEnd = React.useCallback(() => {
-    if (playerEl) {
-      playerEl.currentTime = previewTime;
+    if (videoRef.current) {
+      videoRef.current.currentTime = previewTime;
     }
     setIsScrubbing(false);
     
@@ -132,7 +102,7 @@ export function VideoProgressVerticalHUD({
     if ('vibrate' in navigator) {
       navigator.vibrate(10);
     }
-  }, [previewTime, playerEl, resumeSync]);
+  }, [previewTime, videoRef, resumeSync]);
 
   // Touch event handlers
   React.useEffect(() => {
@@ -174,33 +144,38 @@ export function VideoProgressVerticalHUD({
   };
 
   // Don't render if there's no active video
-  if (!playerEl) {
+  if (!videoRef.current) {
     return null;
   }
 
-  const duration = playerEl.duration || 0;
+  const duration = videoRef.current.duration || 0;
 
   const progressBar = (
-    <div className="relative flex flex-col items-center h-full pointer-events-auto">
-      {/* Bar sized to match engagement rail height */}
+    <div
+      className="pointer-events-none fixed z-[1100] flex items-stretch justify-end"
+      style={{
+        right: 'calc(env(safe-area-inset-right, 0px) + 8px)',
+        top: '25%',
+        bottom: '25%',
+      }}
+    >
       {/* Track */}
       <div
         ref={trackRef}
-        className="
+        className={`
           relative
-          h-full
           rounded-full
           bg-white/10
-          border border-white/20
           backdrop-blur-sm
+          border border-white/20
           overflow-hidden
-        "
+          ${isScrubbing ? 'opacity-100' : 'opacity-80'}
+        `}
         style={{
           pointerEvents: 'auto',
           touchAction: 'none',
           width: isScrubbing ? '8px' : '6px',
           transition: 'width 120ms ease, opacity 120ms ease',
-          opacity: isScrubbing ? 1 : 0.8,
         }}
         onMouseDown={handleScrubStart}
         onTouchStart={handleScrubStart}
@@ -208,19 +183,13 @@ export function VideoProgressVerticalHUD({
         {/* Fill */}
         <div
           ref={fillRef}
-          className="
-            absolute
-            bottom-0
-            left-0
-            w-full
-            h-full
-            will-change-transform
-          "
+          className="absolute bottom-0 left-0 w-full origin-bottom will-change-transform"
           style={{
-            transformOrigin: 'bottom',
-            transform: 'scaleY(0)',
-            background: accent ?? 'linear-gradient(to top, #6E9277 0%, rgba(255,255,255,0.6) 60%)',
+            height: '100%',
+            background: accent ?? 'linear-gradient(to top, rgba(110,146,119,1) 0%, rgba(255,255,255,0.6) 60%)',
             boxShadow: '0 0 8px rgba(110,146,119,0.6), 0 0 24px rgba(110,146,119,0.2)',
+            // Use scrubRatio when scrubbing for immediate visual feedback, otherwise use synced progress
+            transform: `scaleY(${isScrubbing ? scrubRatio : progress / 100})`,
           }}
         />
       </div>
@@ -236,7 +205,7 @@ export function VideoProgressVerticalHUD({
           {/* Frame preview */}
           <video
             ref={previewVideoRef}
-            src={playerEl.currentSrc}
+            src={videoRef.current?.currentSrc}
             muted
             playsInline
             preload="auto"
@@ -253,6 +222,6 @@ export function VideoProgressVerticalHUD({
     </div>
   );
 
-  // Render directly inline (no portal - parent wrapper handles positioning)
-  return progressBar;
+  // Render via Portal to escape any transformed ancestors
+  return typeof window !== 'undefined' ? createPortal(progressBar, document.body) : null;
 }
