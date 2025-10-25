@@ -283,12 +283,12 @@ export function VideoProgressVerticalHUD({
           ref={trackRef}
           className="absolute right-0 top-0 rounded-full bg-white/7 backdrop-blur-sm overflow-hidden"
           style={{
-            width: isScrubbing || isBarActive ? '6px' : '3px',
+            width: isScrubbing ? '6px' : '3px',
             height: '100%',
             opacity: isScrubbing || isBarActive ? 1 : 0.4,
-            transition: isScrubbing || isBarActive 
-              ? 'opacity 120ms ease, width 120ms ease' 
-              : 'opacity 150ms ease, width 200ms ease',
+            transition: isScrubbing 
+              ? 'opacity 120ms ease, width 0ms' 
+              : 'opacity 150ms ease, width 0ms',
           }}
         >
           {/* Fill */}
