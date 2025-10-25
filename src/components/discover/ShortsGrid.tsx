@@ -293,6 +293,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                 onLike={onLike}
                 onAuthorClick={onAuthorClick}
                 currentUserId={currentUserId}
+                variant="portrait"
                 gridPosition={posInRow}
               />
             ))}
@@ -360,6 +361,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                       onLike={onLike}
                       onAuthorClick={onAuthorClick}
                       currentUserId={currentUserId}
+                      variant="portrait"
                       gridPosition={gridPosition}
                     />
                   );
