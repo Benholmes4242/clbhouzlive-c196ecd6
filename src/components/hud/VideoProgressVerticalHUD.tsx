@@ -88,6 +88,16 @@ export function VideoProgressVerticalHUD({
     };
   }, [recalcRailBox]);
   const handleScrubStart = React.useCallback((e: React.TouchEvent | React.MouseEvent) => {
+    // Check if initial touch is on an engagement rail button - if so, let it handle the event
+    const target = e.target as HTMLElement;
+    const isEngagementButton = target.closest('button[data-action="engagement"]') || 
+                                target.closest('.engagement-rail');
+    
+    if (isEngagementButton) {
+      // Don't prevent default or stop propagation - let the button handle it
+      return;
+    }
+    
     e.preventDefault();
     e.stopPropagation();
     
@@ -256,27 +266,29 @@ export function VideoProgressVerticalHUD({
         height: railBox ? `${railBox.height}px` : '168px',
       }}
     >
-      {/* Invisible hit area for comfortable scrubbing */}
+      {/* Invisible hit area for comfortable scrubbing - 44px wide */}
       <div
         className="relative"
         style={{
           pointerEvents: 'auto',
           touchAction: 'none',
-          width: '32px',
+          width: '44px',
           height: '100%',
         }}
         onMouseDown={handleScrubStart}
         onTouchStart={handleScrubStart}
       >
-        {/* Visual track - slim and positioned to the right */}
+        {/* Visual track - slim and positioned to the right, expands when active */}
         <div
           ref={trackRef}
           className="absolute right-0 top-0 rounded-full bg-white/7 backdrop-blur-sm overflow-hidden"
           style={{
-            width: '3px',
+            width: isScrubbing || isBarActive ? '6px' : '3px',
             height: '100%',
             opacity: isScrubbing || isBarActive ? 1 : 0.4,
-            transition: isScrubbing || isBarActive ? 'opacity 120ms ease' : 'opacity 150ms ease',
+            transition: isScrubbing || isBarActive 
+              ? 'opacity 120ms ease, width 120ms ease' 
+              : 'opacity 150ms ease, width 200ms ease',
           }}
         >
           {/* Fill */}
