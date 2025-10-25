@@ -249,10 +249,10 @@ export default {
 				},
 				'shimmer-bg': {
 					'0%': {
-						backgroundPosition: '-200% 0'
+						backgroundPosition: '0 -200%'
 					},
 					'100%': {
-						backgroundPosition: '200% 0'
+						backgroundPosition: '0 200%'
 					}
 				},
 				'slow-spin': {
