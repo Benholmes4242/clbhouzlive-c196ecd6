@@ -53,9 +53,9 @@ export default function ShortCardWithObserver({
     rootMargin: '300px 0px 300px 0px'
   });
 
-  // Play observer - trigger autoplay when actually in view (20% threshold)
+  // Play observer - trigger autoplay when entering viewport (0% threshold)
   const { ref: playRef, isInView } = useIntersectionObserver({
-    threshold: 0.2,
+    threshold: 0,
     rootMargin: '0px'
   });
 
