@@ -73,6 +73,27 @@ export function useVideoProgressSync(
     setProgress(overallProgress);
   }, [videoElement, segments, totalSegments]);
 
+  // Pause/resume controls for external scrubbing
+  const pauseSync = useCallback(() => {
+    if (!USE_VIDEO_PROGRESS_SYNC_V1) return;
+    isActiveRef.current = false;
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = undefined;
+    }
+  }, []);
+
+  const resumeSync = useCallback(() => {
+    if (!USE_VIDEO_PROGRESS_SYNC_V1 || isActiveRef.current) return;
+    isActiveRef.current = true;
+    const loop = () => {
+      if (!isActiveRef.current) return;
+      calculateProgress();
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    rafRef.current = requestAnimationFrame(loop);
+  }, [calculateProgress]);
+
   // rAF sync loop
   const startSyncLoop = useCallback(() => {
     if (!USE_VIDEO_PROGRESS_SYNC_V1 || isActiveRef.current) return;
@@ -245,6 +266,8 @@ export function useVideoProgressSync(
     isActive: isActiveRef.current,
     setProgressFillRef: (ref: HTMLDivElement | null) => {
       progressFillRef.current = ref;
-    }
+    },
+    pauseSync,
+    resumeSync
   };
 }

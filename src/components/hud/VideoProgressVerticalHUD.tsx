@@ -16,7 +16,7 @@ export function VideoProgressVerticalHUD({
   videoRef: React.RefObject<HTMLVideoElement | null>;
   accent?: string;
 }) {
-  const { setProgressFillRef, progress } = useVideoProgressSync(videoRef.current);
+  const { setProgressFillRef, progress, pauseSync, resumeSync } = useVideoProgressSync(videoRef.current);
   const trackRef = React.useRef<HTMLDivElement | null>(null);
   const fillRef = React.useRef<HTMLDivElement | null>(null);
   const previewVideoRef = React.useRef<HTMLVideoElement | null>(null);
@@ -24,6 +24,7 @@ export function VideoProgressVerticalHUD({
   const [isScrubbing, setIsScrubbing] = React.useState(false);
   const [previewTime, setPreviewTime] = React.useState(0);
   const [previewPosPx, setPreviewPosPx] = React.useState(0);
+  const [scrubRatio, setScrubRatio] = React.useState(0);
 
   // Expose fillRef to sync hook with vertical orientation
   React.useEffect(() => {
@@ -39,6 +40,9 @@ export function VideoProgressVerticalHUD({
   const handleScrubStart = React.useCallback((e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // Pause the sync loop so manual scrubbing takes priority
+    pauseSync?.();
     setIsScrubbing(true);
 
     // Immediately update preview to press point
@@ -48,7 +52,7 @@ export function VideoProgressVerticalHUD({
       ? e.clientY
       : 0;
     handleScrubMoveInternal(clientY);
-  }, []);
+  }, [pauseSync]);
 
   const handleScrubMoveInternal = React.useCallback((clientY: number) => {
     if (!trackRef.current || !videoRef.current) return;
@@ -60,15 +64,28 @@ export function VideoProgressVerticalHUD({
     const newTime = (videoRef.current.duration || 0) * ratio;
     setPreviewTime(newTime);
     setPreviewPosPx(relativeY);
+    setScrubRatio(ratio);
     
     // Drive fill immediately for visual feedback
     if (fillRef.current) {
       fillRef.current.style.transform = `scaleY(${ratio})`;
     }
     
-    // Update preview video frame
+    // Update preview video frame and force it to pause on that frame
     if (previewVideoRef.current) {
       previewVideoRef.current.currentTime = newTime;
+      
+      // Force the preview to show the frame by pausing after seeking
+      const pv = previewVideoRef.current;
+      if (pv.readyState >= 2) { // HAVE_CURRENT_DATA
+        pv.pause();
+      } else {
+        const onSeeked = () => {
+          pv.pause();
+          pv.removeEventListener('seeked', onSeeked);
+        };
+        pv.addEventListener('seeked', onSeeked);
+      }
     }
   }, [videoRef, clamp01]);
 
@@ -78,11 +95,14 @@ export function VideoProgressVerticalHUD({
     }
     setIsScrubbing(false);
     
+    // Resume the sync loop
+    resumeSync?.();
+    
     // Haptic feedback on capable devices
     if ('vibrate' in navigator) {
       navigator.vibrate(10);
     }
-  }, [previewTime, videoRef]);
+  }, [previewTime, videoRef, resumeSync]);
 
   // Touch event handlers
   React.useEffect(() => {
@@ -168,7 +188,8 @@ export function VideoProgressVerticalHUD({
             height: '100%',
             background: accent ?? 'linear-gradient(to top, rgba(110,146,119,1) 0%, rgba(255,255,255,0.6) 60%)',
             boxShadow: '0 0 8px rgba(110,146,119,0.6), 0 0 24px rgba(110,146,119,0.2)',
-            transform: `scaleY(${progress / 100})`,
+            // Use scrubRatio when scrubbing for immediate visual feedback, otherwise use synced progress
+            transform: `scaleY(${isScrubbing ? scrubRatio : progress / 100})`,
           }}
         />
       </div>
@@ -187,7 +208,9 @@ export function VideoProgressVerticalHUD({
             src={videoRef.current?.currentSrc}
             muted
             playsInline
+            preload="auto"
             className="w-full h-full object-cover"
+            style={{ backgroundColor: "#000" }}
           />
           
           {/* Time overlay */}
