@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { createPortal } from 'react-dom';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
+import Hls from 'hls.js';
 
 /**
  * VideoProgressVerticalHUD - Vertical Pulse Line progress indicator with scrubbing
@@ -20,7 +21,10 @@ export function VideoProgressVerticalHUD({
   const trackRef = React.useRef<HTMLDivElement | null>(null);
   const fillRef = React.useRef<HTMLDivElement | null>(null);
   const previewVideoRef = React.useRef<HTMLVideoElement | null>(null);
+  const previewHlsRef = React.useRef<Hls | null>(null);
+  const previewReadyRef = React.useRef(false);
   
+
   const [isScrubbing, setIsScrubbing] = React.useState(false);
   const [previewTime, setPreviewTime] = React.useState(0);
   const [previewPosPx, setPreviewPosPx] = React.useState(0);
@@ -71,26 +75,77 @@ export function VideoProgressVerticalHUD({
       fillRef.current.style.transform = `scaleY(${ratio})`;
     }
     
-    // Update preview video frame
-    if (previewVideoRef.current && videoRef.current) {
-      const pv = previewVideoRef.current;
-      
-      // Ensure the preview video has the correct source
-      if (pv.src !== videoRef.current.currentSrc) {
-        pv.src = videoRef.current.currentSrc || '';
-        pv.load();
-      }
-      
-      // Seek to the preview time
-      if (pv.readyState >= 1) { // HAVE_METADATA
-        pv.currentTime = newTime;
-      } else {
-        // Wait for metadata to load before seeking
-        const onLoadedMetadata = () => {
+    // Update preview video frame with support for HLS
+    const pv = previewVideoRef.current;
+    const srcEl = videoRef.current;
+    if (!pv || !srcEl) return;
+
+    const src = srcEl.currentSrc || srcEl.src || '';
+    pv.muted = true;
+    pv.setAttribute('playsinline', '');
+
+    const isM3U8 = src.includes('.m3u8');
+
+    if (isM3U8) {
+      const canNativeHls = pv.canPlayType('application/vnd.apple.mpegurl') !== '';
+      if (canNativeHls) {
+        if (pv.src !== src) {
+          pv.src = src;
+          pv.load();
+          previewReadyRef.current = false;
+          const onLM = () => {
+            previewReadyRef.current = true;
+            pv.currentTime = newTime;
+            pv.pause();
+            pv.removeEventListener('loadedmetadata', onLM);
+          };
+          pv.addEventListener('loadedmetadata', onLM);
+        } else if (pv.readyState >= 1) { // HAVE_METADATA
           pv.currentTime = newTime;
-          pv.removeEventListener('loadedmetadata', onLoadedMetadata);
+          pv.pause();
+        }
+      } else if (Hls.isSupported()) {
+        if (!previewHlsRef.current) {
+          const hls = new Hls({
+            autoStartLoad: true,
+            enableWorker: true,
+            lowLatencyMode: true,
+          });
+          previewHlsRef.current = hls;
+          hls.attachMedia(pv);
+          hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+            hls.loadSource(src);
+          });
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            previewReadyRef.current = true;
+            pv.currentTime = newTime;
+            pv.pause();
+          });
+          // Optional: ignore errors for preview
+          hls.on(Hls.Events.ERROR, () => {});
+        } else {
+          if (previewReadyRef.current || pv.readyState >= 1) {
+            pv.currentTime = newTime;
+            pv.pause();
+          }
+        }
+      } else {
+        // No HLS support available; keep poster/black fallback
+      }
+    } else {
+      // MP4 or other natively supported
+      if (pv.src !== src) {
+        pv.src = src;
+        pv.load();
+        const onLM = () => {
+          pv.currentTime = newTime;
+          pv.pause();
+          pv.removeEventListener('loadedmetadata', onLM);
         };
-        pv.addEventListener('loadedmetadata', onLoadedMetadata);
+        pv.addEventListener('loadedmetadata', onLM);
+      } else if (pv.readyState >= 1) {
+        pv.currentTime = newTime;
+        pv.pause();
       }
     }
   }, [videoRef, clamp01]);
@@ -103,11 +158,13 @@ export function VideoProgressVerticalHUD({
     
     // Resume the sync loop
     resumeSync?.();
-    
-    // Haptic feedback on capable devices
-    if ('vibrate' in navigator) {
-      navigator.vibrate(10);
+
+    // Cleanup preview resources
+    if (previewHlsRef.current) {
+      try { previewHlsRef.current.destroy(); } catch {}
+      previewHlsRef.current = null;
     }
+    previewReadyRef.current = false;
   }, [previewTime, videoRef, resumeSync]);
 
   // Touch event handlers
