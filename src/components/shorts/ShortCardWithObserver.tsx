@@ -59,12 +59,12 @@ export default function ShortCardWithObserver({
     rootMargin: '0px'
   });
 
-  // Assign the same element to both observers
-  React.useEffect(() => {
-    const element = containerRef.current;
-    if (element) {
-      nearRef.current = element;
-      playRef.current = element;
+  // Combined ref to attach both observers synchronously (works in mobile)
+  const combinedRef = React.useCallback((el: HTMLDivElement | null) => {
+    containerRef.current = el;
+    if (el) {
+      nearRef.current = el;
+      playRef.current = el;
     }
   }, [nearRef, playRef]);
 
@@ -102,7 +102,7 @@ export default function ShortCardWithObserver({
   }, [isInView, item.id, onVisibilityChange]);
 
   return (
-    <div ref={containerRef}>
+    <div ref={combinedRef}>
       <ShortCard
         item={item}
         onClick={onClick}
