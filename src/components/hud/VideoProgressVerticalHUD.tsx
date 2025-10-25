@@ -328,14 +328,16 @@ export function VideoProgressVerticalHUD({
             transition: 'opacity 120ms ease, width 150ms cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         >
-          {/* Fill */}
+          {/* Fill with gradient shimmer */}
           <div
             ref={fillRef}
-            className="absolute bottom-0 left-0 w-full origin-bottom will-change-transform"
+            className="absolute bottom-0 left-0 w-full origin-bottom will-change-transform animate-shimmer-bg"
             style={{
               height: '100%',
-              background: accent ?? 'linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%)',
-              boxShadow: '0 0 6px rgba(255,255,255,0.4)',
+              background: accent ?? 'linear-gradient(to top, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.2) 100%)',
+              backgroundSize: '100% 200%',
+              backdropFilter: 'blur(3px) saturate(180%)',
+              boxShadow: isScrubbing || isBarActive ? '0 0 6px rgba(255,255,255,0.4)' : '0 0 4px rgba(255,255,255,0.2)',
               // During scrubbing, transform is set directly in handleScrubMoveInternal for smooth updates
               // Otherwise use synced progress from the hook
               transform: isScrubbing ? undefined : `scaleY(${progress / 100})`,
