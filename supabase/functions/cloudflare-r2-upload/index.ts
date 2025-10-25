@@ -126,8 +126,8 @@ serve(async (req) => {
     const uploadUrl = `https://${r2AccountId}.r2.cloudflarestorage.com/${r2Bucket}/${fullPath}`;
     
     // Generate AWS Signature Version 4
-    const timestamp = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
-    const dateStamp = timestamp.slice(0, 8);
+    const amzDateTime = new Date().toISOString().replace(/[:-]|\.\d{3}/g, ''); // YYYYMMDDTHHMMSSZ
+    const dateStamp = amzDateTime.slice(0, 8); // YYYYMMDD
     const region = 'auto';
     const service = 's3';
     
@@ -164,7 +164,7 @@ serve(async (req) => {
     // Build canonical request
     const canonicalUri = `/${r2Bucket}/${fullPath}`;
     const canonicalQueryString = '';
-    const canonicalHeaders = `host:${r2AccountId}.r2.cloudflarestorage.com\nx-amz-content-sha256:${contentHashHex}\nx-amz-date:${timestamp}\n`;
+    const canonicalHeaders = `host:${r2AccountId}.r2.cloudflarestorage.com\nx-amz-content-sha256:${contentHashHex}\nx-amz-date:${amzDateTime}\n`;
     const signedHeaders = 'host;x-amz-content-sha256;x-amz-date';
     const canonicalRequest = `PUT\n${canonicalUri}\n${canonicalQueryString}\n${canonicalHeaders}\n${signedHeaders}\n${contentHashHex}`;
 
@@ -175,7 +175,7 @@ serve(async (req) => {
       .join('');
     
     const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
-    const stringToSign = `AWS4-HMAC-SHA256\n${timestamp}\n${credentialScope}\n${canonicalRequestHashHex}`;
+    const stringToSign = `AWS4-HMAC-SHA256\n${amzDateTime}\n${credentialScope}\n${canonicalRequestHashHex}`;
 
     // Generate signature
     const signingKey = await getSignatureKey(r2SecretAccessKey, dateStamp, region, service);
@@ -191,9 +191,8 @@ serve(async (req) => {
     const uploadResponse = await fetch(uploadUrl, {
       method: 'PUT',
       headers: {
-        'Host': `${r2AccountId}.r2.cloudflarestorage.com`,
         'x-amz-content-sha256': contentHashHex,
-        'x-amz-date': timestamp,
+        'x-amz-date': amzDateTime,
         'Authorization': authorizationHeader,
         'Content-Type': file.type || 'application/octet-stream',
       },
