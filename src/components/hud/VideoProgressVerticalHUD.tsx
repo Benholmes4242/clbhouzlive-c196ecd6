@@ -15,7 +15,6 @@ export function VideoProgressVerticalHUD({
   videoRef: React.RefObject<HTMLVideoElement | null>;
   accent?: string;
 }) {
-  const { setProgressFillRef, progress, pauseSync, resumeSync } = useVideoProgressSync(videoRef.current);
   const trackRef = React.useRef<HTMLDivElement | null>(null);
   const fillRef = React.useRef<HTMLDivElement | null>(null);
   const previewVideoRef = React.useRef<HTMLVideoElement | null>(null);
@@ -25,7 +24,10 @@ export function VideoProgressVerticalHUD({
   const [previewPosPx, setPreviewPosPx] = React.useState(0);
   const [scrubRatio, setScrubRatio] = React.useState(0);
 
-  // Expose fillRef to sync hook with vertical orientation
+  // Initialize sync hook
+  const { setProgressFillRef, progress, pauseSync, resumeSync } = useVideoProgressSync(videoRef.current);
+
+  // Wire up fillRef to sync hook with vertical orientation
   React.useEffect(() => {
     if (fillRef.current) {
       setProgressFillRef(fillRef.current);
