@@ -184,44 +184,31 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     };
   }, []);
 
-  // Play when autoplay && ready && attached, retry on all changes (critical for mobile)
+  // Autoplay effect - same simple logic as Clubhouse
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
 
-    // Mobile Safari requires all conditions to be true before allowing play()
-    if (autoplay && attached && ready) {
+    if (autoplay && attached) {
       const start = async () => {
-        console.log('[OpenFlow]', 'attemptPlay', performance.now());
         try {
           const playPromise = v.play();
-          if (playPromise) {
+          if (playPromise !== undefined) {
             await playPromise;
-            console.log('[OpenFlow]', 'playSucceeded', performance.now());
             setOverlayHidden(true);
             onPlay?.();
           }
         } catch (err) {
-          console.log('[OpenFlow]', 'playFailed', performance.now(), err);
-          // Silently handle mobile autoplay blocks and retry once shortly after
-          setTimeout(() => {
-            const el = videoRef.current;
-            if (!el) return;
-            if (!(autoplay && attached && ready)) return;
-            el.play().then(() => {
-              setOverlayHidden(true);
-              onPlay?.();
-            }).catch(() => {});
-          }, 100);
+          console.log('[HLSVideoCard]', 'Autoplay blocked', err);
         }
       };
       start();
     } else if (!autoplay) {
       v.pause();
-      if (!ready) setOverlayHidden(false);
+      setOverlayHidden(false);
       onPause?.();
     }
-  }, [autoplay, attached, ready, onPlay, onPause]);
+  }, [autoplay, attached, onPlay, onPause]);
 
   // Intersection observer for autoplay - only when NOT externally managed
   useEffect(() => {
