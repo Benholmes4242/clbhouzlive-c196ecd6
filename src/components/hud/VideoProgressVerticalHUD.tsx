@@ -20,9 +20,9 @@ export function VideoProgressVerticalHUD({
   const { setProgressFillRef, progress, pauseSync, resumeSync } = useVideoProgressSync(videoRef.current);
   const trackRef = React.useRef<HTMLDivElement | null>(null);
   const fillRef = React.useRef<HTMLDivElement | null>(null);
-  const previewVideoRef = React.useRef<HTMLVideoElement | null>(null);
-  const previewHlsRef = React.useRef<Hls | null>(null);
-  const previewReadyRef = React.useRef(false);
+  const previewCanvasRef = React.useRef<HTMLCanvasElement | null>(null);
+  const offscreenVideoRef = React.useRef<HTMLVideoElement | null>(null);
+  const offscreenHlsRef = React.useRef<Hls | null>(null);
   
 
   const [isScrubbing, setIsScrubbing] = React.useState(false);
@@ -75,77 +75,41 @@ export function VideoProgressVerticalHUD({
       fillRef.current.style.transform = `scaleY(${ratio})`;
     }
     
-    // Update preview video frame with support for HLS
-    const pv = previewVideoRef.current;
-    const srcEl = videoRef.current;
-    if (!pv || !srcEl) return;
-
-    const src = srcEl.currentSrc || srcEl.src || '';
-    pv.muted = true;
-    pv.setAttribute('playsinline', '');
-
-    const isM3U8 = src.includes('.m3u8');
-
-    if (isM3U8) {
-      const canNativeHls = pv.canPlayType('application/vnd.apple.mpegurl') !== '';
-      if (canNativeHls) {
-        if (pv.src !== src) {
-          pv.src = src;
-          pv.load();
-          previewReadyRef.current = false;
-          const onLM = () => {
-            previewReadyRef.current = true;
-            pv.currentTime = newTime;
-            pv.pause();
-            pv.removeEventListener('loadedmetadata', onLM);
-          };
-          pv.addEventListener('loadedmetadata', onLM);
-        } else if (pv.readyState >= 1) { // HAVE_METADATA
-          pv.currentTime = newTime;
-          pv.pause();
-        }
-      } else if (Hls.isSupported()) {
-        if (!previewHlsRef.current) {
-          const hls = new Hls({
-            autoStartLoad: true,
-            enableWorker: true,
-            lowLatencyMode: true,
-          });
-          previewHlsRef.current = hls;
-          hls.attachMedia(pv);
-          hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-            hls.loadSource(src);
-          });
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            previewReadyRef.current = true;
-            pv.currentTime = newTime;
-            pv.pause();
-          });
-          // Optional: ignore errors for preview
-          hls.on(Hls.Events.ERROR, () => {});
+    // Approach 1: Try direct frame capture from main video (fastest, works if currentTime can be set)
+    const mainVideo = videoRef.current;
+    const canvas = previewCanvasRef.current;
+    
+    if (canvas && mainVideo) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        // Set canvas dimensions to match aspect ratio
+        const aspectRatio = mainVideo.videoWidth / mainVideo.videoHeight;
+        if (aspectRatio && isFinite(aspectRatio)) {
+          canvas.width = 80;
+          canvas.height = Math.round(80 / aspectRatio);
         } else {
-          if (previewReadyRef.current || pv.readyState >= 1) {
-            pv.currentTime = newTime;
-            pv.pause();
-          }
+          canvas.width = 80;
+          canvas.height = 140;
         }
-      } else {
-        // No HLS support available; keep poster/black fallback
-      }
-    } else {
-      // MP4 or other natively supported
-      if (pv.src !== src) {
-        pv.src = src;
-        pv.load();
-        const onLM = () => {
-          pv.currentTime = newTime;
-          pv.pause();
-          pv.removeEventListener('loadedmetadata', onLM);
-        };
-        pv.addEventListener('loadedmetadata', onLM);
-      } else if (pv.readyState >= 1) {
-        pv.currentTime = newTime;
-        pv.pause();
+        
+        // Temporarily seek main video to preview time, capture frame, then restore
+        const originalTime = mainVideo.currentTime;
+        const originalPaused = mainVideo.paused;
+        
+        mainVideo.currentTime = newTime;
+        
+        // Wait a brief moment for the frame to update, then draw
+        requestAnimationFrame(() => {
+          if (mainVideo.readyState >= 2) { // HAVE_CURRENT_DATA
+            ctx.drawImage(mainVideo, 0, 0, canvas.width, canvas.height);
+          }
+          
+          // Restore original playback state
+          mainVideo.currentTime = originalTime;
+          if (!originalPaused) {
+            mainVideo.play().catch(() => {});
+          }
+        });
       }
     }
   }, [videoRef, clamp01]);
@@ -158,13 +122,19 @@ export function VideoProgressVerticalHUD({
     
     // Resume the sync loop
     resumeSync?.();
-
-    // Cleanup preview resources
-    if (previewHlsRef.current) {
-      try { previewHlsRef.current.destroy(); } catch {}
-      previewHlsRef.current = null;
+    
+    // Clear canvas
+    const canvas = previewCanvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      ctx?.clearRect(0, 0, canvas.width, canvas.height);
     }
-    previewReadyRef.current = false;
+    
+    // Cleanup offscreen resources if any
+    if (offscreenHlsRef.current) {
+      try { offscreenHlsRef.current.destroy(); } catch {}
+      offscreenHlsRef.current = null;
+    }
   }, [previewTime, videoRef, resumeSync]);
 
   // Touch event handlers
@@ -265,18 +235,15 @@ export function VideoProgressVerticalHUD({
             top: `calc(${previewPosPx}px - 70px)`,
           }}
         >
-          {/* Frame preview */}
-          <video
-            ref={previewVideoRef}
-            muted
-            playsInline
-            preload="metadata"
-            className="w-full h-full object-cover"
+          {/* Frame preview using canvas */}
+          <canvas
+            ref={previewCanvasRef}
+            className="w-full h-full object-cover rounded-lg"
             style={{ backgroundColor: "#000" }}
           />
           
           {/* Time overlay */}
-          <div className="absolute bottom-1 left-1 right-1 text-[10px] text-white/80 font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          <div className="absolute bottom-1 left-1 right-1 text-center text-[10px] text-white/90 font-medium bg-black/60 rounded px-1 py-0.5">
             {formatTime(previewTime)} / {formatTime(duration)}
           </div>
         </div>
