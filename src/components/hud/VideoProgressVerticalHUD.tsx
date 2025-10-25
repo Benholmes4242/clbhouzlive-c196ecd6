@@ -19,21 +19,30 @@ export function VideoProgressVerticalHUD({
   const fillRef = React.useRef<HTMLDivElement | null>(null);
   const previewVideoRef = React.useRef<HTMLVideoElement | null>(null);
   
+  const [playerEl, setPlayerEl] = React.useState<HTMLVideoElement | null>(null);
   const [isScrubbing, setIsScrubbing] = React.useState(false);
   const [previewTime, setPreviewTime] = React.useState(0);
   const [previewPosPx, setPreviewPosPx] = React.useState(0);
   const [scrubRatio, setScrubRatio] = React.useState(0);
 
-  // Initialize sync hook
-  const { setProgressFillRef, progress, pauseSync, resumeSync } = useVideoProgressSync(videoRef.current);
+  // Initialize sync hook with the real video element
+  const { setProgressFillRef, pauseSync, resumeSync } = useVideoProgressSync(playerEl);
 
-  // Wire up fillRef to sync hook with vertical orientation
+  // Update playerEl when videoRef.current becomes available
   React.useEffect(() => {
-    if (fillRef.current) {
+    if (videoRef.current && videoRef.current !== playerEl) {
+      setPlayerEl(videoRef.current);
+    }
+  }, [videoRef.current, playerEl]);
+
+  // Wire up fillRef to sync hook with vertical orientation once both are ready
+  React.useEffect(() => {
+    if (fillRef.current && playerEl) {
       setProgressFillRef(fillRef.current);
       fillRef.current.style.transformOrigin = 'bottom';
+      fillRef.current.style.transform = 'scaleY(0)';
     }
-  }, [setProgressFillRef]);
+  }, [setProgressFillRef, playerEl]);
 
   // Helper: clamp [0..1]
   const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
@@ -56,14 +65,14 @@ export function VideoProgressVerticalHUD({
   }, [pauseSync]);
 
   const handleScrubMoveInternal = React.useCallback((clientY: number) => {
-    if (!trackRef.current || !videoRef.current) return;
+    if (!trackRef.current || !playerEl) return;
     
     const rect = trackRef.current.getBoundingClientRect();
     // Clamp relative position first for stability
     const relativeY = Math.min(Math.max(0, clientY - rect.top), rect.height);
     const ratio = clamp01(1 - (relativeY / rect.height));
     
-    const newTime = (videoRef.current.duration || 0) * ratio;
+    const newTime = (playerEl.duration || 0) * ratio;
     setPreviewTime(newTime);
     setPreviewPosPx(relativeY);
     setScrubRatio(ratio);
@@ -89,11 +98,11 @@ export function VideoProgressVerticalHUD({
         pv.addEventListener('seeked', onSeeked);
       }
     }
-  }, [videoRef, clamp01]);
+  }, [playerEl, clamp01]);
 
   const handleScrubEnd = React.useCallback(() => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = previewTime;
+    if (playerEl) {
+      playerEl.currentTime = previewTime;
     }
     setIsScrubbing(false);
     
@@ -104,7 +113,7 @@ export function VideoProgressVerticalHUD({
     if ('vibrate' in navigator) {
       navigator.vibrate(10);
     }
-  }, [previewTime, videoRef, resumeSync]);
+  }, [previewTime, playerEl, resumeSync]);
 
   // Touch event handlers
   React.useEffect(() => {
@@ -146,11 +155,11 @@ export function VideoProgressVerticalHUD({
   };
 
   // Don't render if there's no active video
-  if (!videoRef.current) {
+  if (!playerEl) {
     return null;
   }
 
-  const duration = videoRef.current.duration || 0;
+  const duration = playerEl.duration || 0;
 
   const progressBar = (
     <div className="relative flex flex-col items-center h-full pointer-events-auto">
@@ -184,8 +193,8 @@ export function VideoProgressVerticalHUD({
             height: '100%',
             background: accent ?? 'linear-gradient(to top, rgba(110,146,119,1) 0%, rgba(255,255,255,0.6) 60%)',
             boxShadow: '0 0 8px rgba(110,146,119,0.6), 0 0 24px rgba(110,146,119,0.2)',
-            // Use scrubRatio when scrubbing for immediate visual feedback, otherwise use synced progress
-            transform: `scaleY(${isScrubbing ? scrubRatio : progress / 100})`,
+            transform: 'scaleY(0)',
+            transformOrigin: 'bottom',
           }}
         />
       </div>
@@ -201,7 +210,7 @@ export function VideoProgressVerticalHUD({
           {/* Frame preview */}
           <video
             ref={previewVideoRef}
-            src={videoRef.current?.currentSrc}
+            src={playerEl.currentSrc}
             muted
             playsInline
             preload="auto"
