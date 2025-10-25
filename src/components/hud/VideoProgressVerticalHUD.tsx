@@ -45,6 +45,20 @@ export function VideoProgressVerticalHUD({
   const offscreenVideoRef = React.useRef<HTMLVideoElement | null>(null);
   const offscreenHlsRef = React.useRef<Hls | null>(null);
   
+  // Store the current attachedVideo in a ref to ensure callbacks always use the latest value
+  const attachedVideoRef = React.useRef<HTMLVideoElement | null>(null);
+  
+  React.useEffect(() => {
+    attachedVideoRef.current = attachedVideo;
+    
+    // Clear canvas when video changes to prevent showing stale thumbnails
+    const canvas = previewCanvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      ctx?.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }, [attachedVideo]);
+  
 
   const [isScrubbing, setIsScrubbing] = React.useState(false);
   const [previewTime, setPreviewTime] = React.useState(0);
@@ -168,13 +182,17 @@ export function VideoProgressVerticalHUD({
   }, [pauseSync]);
 
   const handleScrubMoveInternal = React.useCallback((clientY: number) => {
-    if (!trackRef.current || !attachedVideo) return;
+    if (!trackRef.current) return;
+    
+    // Use the ref to ensure we always have the latest video element
+    const currentVideo = attachedVideoRef.current;
+    if (!currentVideo) return;
     
     const rect = trackRef.current.getBoundingClientRect();
     const relativeY = clientY - rect.top;
     const ratio = clamp01(1 - (relativeY / rect.height));
     
-    const newTime = (attachedVideo?.duration || 0) * ratio;
+    const newTime = (currentVideo?.duration || 0) * ratio;
     setPreviewTime(newTime);
     setPreviewPosPx(relativeY);
     setScrubRatio(ratio);
@@ -184,8 +202,8 @@ export function VideoProgressVerticalHUD({
       fillRef.current.style.transform = `scaleY(${ratio})`;
     }
     
-    // Approach 1: Try direct frame capture from main video (fastest, works if currentTime can be set)
-    const mainVideo = attachedVideo;
+    // Capture frame from the current active video
+    const mainVideo = currentVideo;
     const canvas = previewCanvasRef.current;
     
     if (canvas && mainVideo) {
@@ -221,11 +239,13 @@ export function VideoProgressVerticalHUD({
         });
       }
     }
-  }, [attachedVideo, clamp01]);
+  }, [clamp01]);
 
   const handleScrubEnd = React.useCallback(() => {
-    if (attachedVideo) {
-      attachedVideo.currentTime = previewTime;
+    // Use the ref to ensure we seek the correct video
+    const currentVideo = attachedVideoRef.current;
+    if (currentVideo) {
+      currentVideo.currentTime = previewTime;
     }
     setIsScrubbing(false);
     
@@ -253,7 +273,7 @@ export function VideoProgressVerticalHUD({
       setIsBarActive(false);
       activeTimeoutRef.current = null;
     }, 1500);
-  }, [previewTime, attachedVideo, resumeSync]);
+  }, [previewTime, resumeSync]);
 
   // Touch event handlers
   React.useEffect(() => {
