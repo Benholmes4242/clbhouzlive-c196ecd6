@@ -124,11 +124,22 @@ export default function ShortsGrid({
     setViewerOpen(false);
   };
 
-  // Register card ref for shared observer
+  // Register card ref for shared observer - observe immediately on registration
   const registerCardRef = useCallback((id: string, element: HTMLDivElement | null) => {
     if (element) {
       cardRefsMap.current.set(id, element);
+      
+      // NEW: Observe immediately when card registers, not in separate effect
+      if (observerRef.current) {
+        observerRef.current.observe(element);
+        console.log('[Shorts] Registered and observing card:', id);
+      }
     } else {
+      // Unregister
+      const existing = cardRefsMap.current.get(id);
+      if (existing && observerRef.current) {
+        observerRef.current.unobserve(existing);
+      }
       cardRefsMap.current.delete(id);
     }
   }, []);
@@ -270,30 +281,34 @@ export default function ShortsGrid({
     return result;
   }, [items, baseHeightPx]);
 
-  // Observe all registered cards (depends on layout)
-  useEffect(() => {
-    const observer = observerRef.current;
-    if (!observer) return;
-
-    cardRefsMap.current.forEach((element, id) => {
-      observer.observe(element);
-    });
-
-    return () => {
-      cardRefsMap.current.forEach((element) => {
-        observer?.unobserve(element);
-      });
-    };
-  }, [layout]);
+  // REMOVED: Observer registration now happens in registerCardRef callback
+  // This useEffect was running before cards mounted, causing observer to never attach
 
   // Mark initial above-the-fold cards for immediate attachment & autoplay
+  // FIX: Retry until refs are actually registered before checking viewport
   useEffect(() => {
     if (layout.length === 0) return;
     
     console.log('[Shorts] Detecting initial viewport cards');
     
-    // Use RAF to ensure layout has settled
-    requestAnimationFrame(() => {
+    let tries = 0;
+    const maxTries = 10; // Max 10 RAF attempts (~160ms max)
+    
+    function attemptInitialAutoplay() {
+      // Check if we have refs for the first cards yet
+      const firstIds = layout.slice(0, 4).map(l => l.item.id);
+      const registeredCount = firstIds.filter(id => cardRefsMap.current.has(id)).length;
+      
+      console.log('[Shorts] Attempt', tries + 1, '- Registered refs:', registeredCount, '/', firstIds.length);
+      
+      // If we don't have all refs yet and haven't exceeded max tries, retry
+      if (registeredCount < firstIds.length && tries < maxTries) {
+        tries += 1;
+        requestAnimationFrame(attemptInitialAutoplay);
+        return;
+      }
+      
+      // Now we have refs (or gave up) - run the existing logic
       const initialAutoplay: Record<string, boolean> = {};
       let count = 0;
       
@@ -324,8 +339,12 @@ export default function ShortsGrid({
       if (count > 0) {
         console.log('[Shorts] Marking', count, 'initial cards for immediate autoplay');
         setAutoplayMap(prev => ({ ...prev, ...initialAutoplay }));
+      } else {
+        console.log('[Shorts] No initial cards found in viewport after', tries, 'attempts');
       }
-    });
+    }
+    
+    requestAnimationFrame(attemptInitialAutoplay);
   }, [layout]);
 
   // Organize layout into rows: 2x2 portrait grids with landscape breaks
