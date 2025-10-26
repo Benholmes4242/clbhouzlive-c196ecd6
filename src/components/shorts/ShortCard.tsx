@@ -95,7 +95,7 @@ export default React.memo(function ShortCard({
         {/* Conditional Meta based on variant */}
         {isLandscape ? (
           /* Unified glass panel + avatar for landscape videos */
-          <div className="absolute bottom-3 right-0 z-10 pointer-events-none">
+          <div className="absolute bottom-2 right-0 z-10 pointer-events-none">
             {/* Glass panel - flush to right edge */}
             <div
               className="flex flex-col min-w-[180px] max-w-[240px] px-3 py-2 rounded-l-xl rounded-r-none backdrop-blur-md transition-transform duration-200 group-hover:scale-[1.02]"
@@ -124,7 +124,7 @@ export default React.memo(function ShortCard({
 
             {/* Avatar squircle - positioned 14px from right edge, 95% overlaps panel, 5% extends above */}
             <div
-              className="absolute right-[14px] bottom-3 w-[56px] h-[56px] rounded-[14px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
+              className="absolute right-[14px] bottom-2 w-[56px] h-[56px] rounded-[14px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
               style={{
                 boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
               }}
