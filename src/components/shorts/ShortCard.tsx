@@ -95,62 +95,60 @@ export default React.memo(function ShortCard({
         {/* Conditional Meta based on variant */}
         {isLandscape ? (
           /* Unified glass panel + avatar for landscape videos */
-          <div className="absolute bottom-3 right-3 z-10 flex items-end pointer-events-none">
-            <div className="relative flex items-end">
-              {/* Glass panel */}
-              <div
-                className="flex flex-col min-w-[180px] max-w-[240px] px-3 py-2 rounded-xl backdrop-blur-md transition-transform duration-200 group-hover:scale-[1.02]"
-                style={{
-                  borderRadius: '12px',
-                  background: 'rgba(20, 20, 20, 0.55)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6)'
-                }}
-              >
-                {/* Creator name */}
-                <div className="text-white font-semibold text-[15px] leading-tight flex items-center gap-2">
-                  <span className="truncate">
-                    {item.user?.name || 'Unknown'}
-                  </span>
-                </div>
-
-                {/* Divider line */}
-                <div className="mt-1 h-px w-full bg-white/20" />
-
-                {/* Likes row */}
-                <div className="flex items-center gap-2 text-white/90 text-[13px] leading-none mt-1">
-                  <Heart className="w-3.5 h-3.5" />
-                  <span className="tracking-[-0.02em]">{item.likes || 0} likes</span>
-                </div>
+          <div className="absolute bottom-3 right-0 z-10 pointer-events-none">
+            {/* Glass panel - flush to right edge */}
+            <div
+              className="flex flex-col min-w-[180px] max-w-[240px] px-3 py-2 rounded-xl backdrop-blur-md transition-transform duration-200 group-hover:scale-[1.02]"
+              style={{
+                borderRadius: '12px',
+                background: 'rgba(20, 20, 20, 0.55)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6)'
+              }}
+            >
+              {/* Creator name */}
+              <div className="text-white font-semibold text-[15px] leading-tight flex items-center gap-2">
+                <span className="truncate">
+                  {item.user?.name || 'Unknown'}
+                </span>
               </div>
 
-              {/* Avatar squircle - overlaps panel on right edge */}
-              <div
-                className="absolute right-[-8px] bottom-[8px] w-[56px] h-[56px] rounded-[14px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
-                style={{
-                  boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
-                }}
-              >
-                <img
-                  src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                  alt={item.user?.name || 'Unknown'}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              {/* Divider line */}
+              <div className="mt-1 h-px w-full bg-white/20" />
 
-              {/* Duration badge - attached to squircle */}
-              {item.duration && typeof item.duration === 'number' && (
-                <div 
-                  className="absolute right-[-8px] bottom-[-8px] text-[13px] font-medium leading-none px-1.5 py-0.5 rounded-[6px] text-white/90 border border-white/25 z-10"
-                  style={{
-                    background: 'rgba(0, 0, 0, 0.6)',
-                    backdropFilter: 'blur(8px)'
-                  }}
-                >
-                  {Math.floor(item.duration / 60)}:{String(Math.floor(item.duration % 60)).padStart(2, '0')}
-                </div>
-              )}
+              {/* Likes row */}
+              <div className="flex items-center gap-2 text-white/90 text-[13px] leading-none mt-1">
+                <Heart className="w-3.5 h-3.5" />
+                <span className="tracking-[-0.02em]">{item.likes || 0} likes</span>
+              </div>
             </div>
+
+            {/* Avatar squircle - positioned 8px from right edge, overlaps LEFT edge of panel */}
+            <div
+              className="absolute right-2 bottom-[8px] w-[56px] h-[56px] rounded-[14px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
+              style={{
+                boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
+              }}
+            >
+              <img
+                src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                alt={item.user?.name || 'Unknown'}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Duration badge - attached to squircle */}
+            {item.duration && typeof item.duration === 'number' && (
+              <div 
+                className="absolute right-2 bottom-[-8px] text-[13px] font-medium leading-none px-1.5 py-0.5 rounded-[6px] text-white/90 border border-white/25 z-10"
+                style={{
+                  background: 'rgba(0, 0, 0, 0.6)',
+                  backdropFilter: 'blur(8px)'
+                }}
+              >
+                {Math.floor(item.duration / 60)}:{String(Math.floor(item.duration % 60)).padStart(2, '0')}
+              </div>
+            )}
           </div>
         ) : (
           /* Original portrait meta */
