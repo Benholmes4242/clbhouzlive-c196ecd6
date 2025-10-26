@@ -12,8 +12,9 @@ export function VisibilityToggle({ value, onChange }: VisibilityToggleProps) {
       onClick={() => onChange(!value)}
       className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full transition-colors"
       style={{
-        backgroundColor: value ? 'var(--accent-green-bg)' : 'var(--pill-inactive-bg)',
-        color: value ? 'var(--accent-green-text)' : 'var(--pill-inactive-text)',
+        backgroundColor: 'var(--accent-frost-bg)',
+        border: '1px solid var(--accent-frost-border)',
+        color: 'var(--accent-frost-text)',
       }}
       aria-label={value ? 'Visible online' : 'Hidden'}
     >

@@ -113,8 +113,12 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowComposer(true)}
-                  className="rounded-md px-3 py-1.5 text-xs font-medium"
-                  style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border-low)' }}
+                  className="rounded-md px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[var(--accent-frost-hover)]"
+                  style={{
+                    backgroundColor: 'var(--accent-frost-bg)',
+                    color: 'var(--accent-frost-text)',
+                    border: '1px solid var(--accent-frost-border)',
+                  }}
                 >
                   Manage beacon
                 </button>
@@ -142,12 +146,16 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               }}
             >
               <button
-                className="w-full h-12 font-bold rounded-xl"
+                className="w-full h-12 font-bold rounded-xl transition-colors hover:bg-[var(--accent-frost-hover)]"
                 onClick={() => {
                   analyticsEvents.track('beacon_open_composer');
                   setShowComposer(true);
                 }}
-                style={{ backgroundColor: 'var(--accent-green-bg)', color: 'var(--accent-green-text)' }}
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.12)',
+                  color: 'white',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                }}
               >
                 Create game
               </button>
@@ -283,15 +291,11 @@ function GolferRow({ golfer, index }: GolferRowProps) {
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={handleFollow}
-              className="h-7 px-3 text-xs font-semibold rounded-md"
-              style={!isFollowing ? { 
-                backgroundColor: 'var(--accent-green-bg)',
-                color: 'var(--accent-green-text)',
-                border: '1px solid var(--accent-green-bg)'
-              } : {
-                backgroundColor: 'transparent',
-                color: 'var(--accent-green-bg)',
-                border: '1px solid var(--accent-green-bg)'
+              className="h-7 px-3 text-xs font-semibold rounded-md transition-colors hover:bg-[var(--accent-frost-hover)]"
+              style={{
+                backgroundColor: 'var(--accent-frost-bg)',
+                color: 'var(--accent-frost-text)',
+                border: '1px solid var(--accent-frost-border)',
               }}
               aria-pressed={isFollowing}
             >
@@ -299,11 +303,11 @@ function GolferRow({ golfer, index }: GolferRowProps) {
             </button>
             <button
               onClick={handleMessage}
-              className="h-7 px-3 text-xs font-semibold rounded-md"
+              className="h-7 px-3 text-xs font-semibold rounded-md transition-colors hover:bg-[var(--accent-frost-hover)]"
               style={{
-                backgroundColor: 'transparent',
-                color: 'var(--accent-green-bg)',
-                border: '1px solid var(--accent-green-bg)'
+                backgroundColor: 'var(--accent-frost-bg)',
+                color: 'var(--accent-frost-text)',
+                border: '1px solid var(--accent-frost-border)',
               }}
             >
               Message

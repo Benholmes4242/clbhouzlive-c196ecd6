@@ -182,10 +182,9 @@ export function RequestGameSheet({
                   aria-pressed={when === option.value}
                   className="flex-1 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all"
                   style={when === option.value ? {
-                    backgroundColor: 'rgba(110,146,119,0.18)',
-                    border: '1px solid rgba(110,146,119,0.45)',
-                    boxShadow: '0 0 0 3px rgba(110,146,119,0.28)',
-                    color: 'var(--accent-green-text)',
+                    backgroundColor: 'rgba(255,255,255,0.12)',
+                    border: '1px solid rgba(255,255,255,0.25)',
+                    color: 'var(--text-primary)',
                     fontWeight: 600,
                   } : {
                     backgroundColor: 'var(--bg-card)',
@@ -235,10 +234,9 @@ export function RequestGameSheet({
                   aria-pressed={playersNeeded === n}
                   className="flex-1 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all"
                   style={playersNeeded === n ? {
-                    backgroundColor: 'rgba(110,146,119,0.18)',
-                    border: '1px solid rgba(110,146,119,0.45)',
-                    boxShadow: '0 0 0 3px rgba(110,146,119,0.28)',
-                    color: 'var(--accent-green-text)',
+                    backgroundColor: 'rgba(255,255,255,0.12)',
+                    border: '1px solid rgba(255,255,255,0.25)',
+                    color: 'var(--text-primary)',
                     fontWeight: 600,
                   } : {
                     backgroundColor: 'var(--bg-card)',
@@ -264,10 +262,9 @@ export function RequestGameSheet({
                   onClick={() => setFormat(option.value)}
                   className="px-3 py-2 rounded-full text-xs font-medium transition-all"
                   style={format === option.value ? {
-                    backgroundColor: 'rgba(110,146,119,0.18)',
-                    border: '1px solid rgba(110,146,119,0.45)',
-                    boxShadow: '0 0 0 3px rgba(110,146,119,0.28)',
-                    color: 'var(--accent-green-text)',
+                    backgroundColor: 'rgba(255,255,255,0.12)',
+                    border: '1px solid rgba(255,255,255,0.25)',
+                    color: 'var(--text-primary)',
                     fontWeight: 600,
                   } : {
                     backgroundColor: 'var(--bg-card)',
@@ -313,10 +310,9 @@ export function RequestGameSheet({
                   aria-pressed={audience === option.value}
                   className="flex-1 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all"
                   style={audience === option.value ? {
-                    backgroundColor: 'rgba(110,146,119,0.18)',
-                    border: '1px solid rgba(110,146,119,0.45)',
-                    boxShadow: '0 0 0 3px rgba(110,146,119,0.28)',
-                    color: 'var(--accent-green-text)',
+                    backgroundColor: 'rgba(255,255,255,0.12)',
+                    border: '1px solid rgba(255,255,255,0.25)',
+                    color: 'var(--text-primary)',
                     fontWeight: 600,
                   } : {
                     backgroundColor: 'var(--bg-card)',
@@ -369,10 +365,12 @@ export function RequestGameSheet({
           <button
             onClick={handleSubmit}
             disabled={!isValid || isSubmitting}
-            className="w-full h-12 rounded-2xl font-bold mb-2"
+            className="w-full h-12 rounded-2xl font-bold mb-2 transition-colors"
             style={{
-              backgroundColor: isValid && !isSubmitting ? 'var(--accent-green-bg)' : 'rgba(110,146,119,0.4)',
-              color: 'var(--accent-green-text)',
+              backgroundColor: isValid && !isSubmitting ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)',
+              color: 'white',
+              border: isValid && !isSubmitting ? '1px solid rgba(255,255,255,0.25)' : '1px solid rgba(255,255,255,0.12)',
+              backdropFilter: 'blur(12px)',
               cursor: isValid && !isSubmitting ? 'pointer' : 'not-allowed',
             }}
           >
@@ -383,11 +381,11 @@ export function RequestGameSheet({
               // TODO: Implement save preset
               console.log('Save preset');
             }}
-            className="w-full h-10 rounded-xl text-sm font-medium"
+            className="w-full h-10 rounded-xl text-sm font-medium transition-colors hover:bg-[var(--accent-frost-hover)]"
             style={{
               backgroundColor: 'transparent',
-              border: '1px solid var(--border-mid)',
-              color: 'var(--text-primary)',
+              border: '1px solid rgba(255,255,255,0.25)',
+              color: 'white',
             }}
           >
             Save preset
