@@ -286,7 +286,12 @@ export default function ShortsGrid({
 
   // Fast-path: Pre-mark first eligible card for instant autoplay (before viewport detection)
   useEffect(() => {
-    if (layout.length === 0) return;
+    console.log('[Shorts] Fast-path effect running, layout.length =', layout.length);
+    
+    if (layout.length === 0) {
+      console.log('[Shorts] Fast-path skipped - layout empty');
+      return;
+    }
     
     // Find the first card that matches our autoplay cadence
     const firstEligible = layout.find((layoutItem, idx) => {
@@ -301,8 +306,10 @@ export default function ShortsGrid({
         [firstEligible.item.id]: true,
       }));
       console.log('[Shorts] Fast-path pre-autoplay for', firstEligible.item.id);
+    } else {
+      console.log('[Shorts] Fast-path found no eligible card');
     }
-  }, []); // Run only once on mount
+  }, [layout]); // FIX: Must depend on layout so it runs when data loads
 
   // Mark initial above-the-fold cards for immediate attachment & autoplay
   // FIX: Retry until refs are actually registered before checking viewport

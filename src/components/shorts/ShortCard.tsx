@@ -43,6 +43,9 @@ export default React.memo(function ShortCard({
   
   const isLandscape = variant === 'landscape';
   
+  // Diagnostic log
+  console.log('[Shorts] ShortCard render', item.id.slice(0, 8), 'autoplay=', autoplay);
+  
   return (
     <div
       role="button"
