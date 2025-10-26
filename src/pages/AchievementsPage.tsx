@@ -15,7 +15,7 @@ const AchievementsPage: React.FC = () => {
           {/* Glowing header */}
           <div className="relative inline-block">
             <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent blur-xl opacity-30 animate-pulse" />
-            <h1 className="relative text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <h1 className="relative font-display text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Achievements
             </h1>
           </div>

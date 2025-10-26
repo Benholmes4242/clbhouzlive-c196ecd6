@@ -1,6 +1,5 @@
-
-@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100;200;300;400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+/* SF Pro fonts are used via system font stack - native on Apple devices, fallbacks on others */
+/* No external font loading needed - improves performance */
 @import './components/ai-chat/ai-chat-fixes.css';
 @import './styles/liquid-glass.css';
 @import './styles/profile-spacing.css';

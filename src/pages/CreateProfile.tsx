@@ -131,7 +131,7 @@ const CreateProfile = () => {
       case 1:
         return (
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Personal Profile</h2>
+            <h2 className="font-display text-xl font-semibold">Personal Profile</h2>
             <p className="text-muted-foreground">
               Create your personal golf profile to connect with other golfers and track your journey.
             </p>
@@ -140,7 +140,7 @@ const CreateProfile = () => {
       case 2:
         return (
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Basic Information</h2>
+            <h2 className="font-display text-xl font-semibold">Basic Information</h2>
             <BasicInfoForm formData={formData} onChange={handleInputChange} />
             {/* Show selected username as read-only */}
             {formData.username && (

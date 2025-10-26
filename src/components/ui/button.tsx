@@ -27,9 +27,9 @@ const buttonVariants = cva(
         "chip-active":
           "bg-gradient-to-b from-emerald-50 to-emerald-100 border border-emerald-300 text-emerald-700 font-medium hover:from-emerald-100 hover:to-emerald-200 transition-all duration-150 rounded-full",
         glass:
-          "rounded-full bg-white/90 backdrop-blur-md border border-black/10 shadow-sm text-gray-900 hover:bg-white active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/25 disabled:opacity-60 disabled:cursor-not-allowed",
+          "rounded-full bg-white/90 backdrop-blur-md border border-black/10 shadow-sm text-gray-900 font-medium hover:bg-white active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/25 disabled:opacity-60 disabled:cursor-not-allowed",
         "glass-outline":
-          "rounded-full bg-white/70 backdrop-blur-md border border-black/15 shadow text-gray-900 hover:bg-white/80 active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/25",
+          "rounded-full bg-white/70 backdrop-blur-md border border-black/15 shadow text-gray-900 font-medium hover:bg-white/80 active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/25",
       },
       size: {
         default: "h-10 px-4 py-2",

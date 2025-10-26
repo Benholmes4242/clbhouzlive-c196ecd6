@@ -790,7 +790,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           <div className="flex justify-between items-center">
             {/* Left side - Title and subtitle */}
             <div className="text-left">
-              <DialogTitle className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
+              <DialogTitle className={`font-display ${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
                 Achievements
               </DialogTitle>
               <DialogDescription className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>

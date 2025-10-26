@@ -12,8 +12,8 @@ const GlobalTop100 = () => {
         <div className="max-w-6xl mx-auto">
           {/* Page Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-foreground mb-3">Global Top 100</h1>
-            <h2 className="text-xl text-muted-foreground">Follow the Clubhouse Community through the World's Top 100 Courses</h2>
+            <h1 className="font-display text-4xl font-bold text-foreground mb-3">Global Top 100</h1>
+            <h2 className="font-display text-xl text-muted-foreground">Follow the Clubhouse Community through the World's Top 100 Courses</h2>
           </div>
           
           <GlobalTop100Content />

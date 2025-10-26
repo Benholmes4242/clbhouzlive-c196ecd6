@@ -24,7 +24,7 @@ export const TopTenCarousel: React.FC<TopTenCarouselProps> = ({
     return (
       <div className="w-full">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-semibold">Top 10 Rated by You</h3>
+          <h3 className="font-display text-xl font-semibold">Top 10 Rated by You</h3>
         </div>
         <div className="flex items-center justify-center py-8">
           <div className="text-muted-foreground">Loading your top 10...</div>
@@ -40,7 +40,7 @@ export const TopTenCarousel: React.FC<TopTenCarouselProps> = ({
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-semibold">
+        <h3 className="font-display text-xl font-semibold">
           Top 10 Rated by You
           {hasAnyCourses && (
             <span className="text-sm text-muted-foreground ml-2">

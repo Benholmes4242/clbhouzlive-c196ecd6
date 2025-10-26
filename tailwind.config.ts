@@ -29,7 +29,28 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'sans': ['League Spartan', 'system-ui', 'sans-serif'],
+				// SF Pro Text - For body text, buttons, labels, forms
+				'sans': [
+					'-apple-system',
+					'BlinkMacSystemFont',
+					'"SF Pro Text"',
+					'"Segoe UI"',
+					'Roboto',
+					'"Helvetica Neue"',
+					'Arial',
+					'sans-serif',
+				],
+				// SF Pro Display - For headings and large text (text-xl and above)
+				'display': [
+					'-apple-system',
+					'BlinkMacSystemFont',
+					'"SF Pro Display"',
+					'"Segoe UI"',
+					'Roboto',
+					'"Helvetica Neue"',
+					'Arial',
+					'sans-serif',
+				],
 			},
 			colors: {
 				border: 'hsl(var(--border))',

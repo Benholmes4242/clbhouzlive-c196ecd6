@@ -68,7 +68,7 @@ const MessagesPage = () => {
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
-            <h1 className="text-2xl font-bold">Messages</h1>
+            <h1 className="font-display text-2xl font-bold">Messages</h1>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
