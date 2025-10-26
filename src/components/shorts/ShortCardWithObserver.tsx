@@ -14,6 +14,7 @@ interface ShortCardWithObserverProps {
   currentUserId?: string;
   variant?: 'portrait' | 'landscape'; // Support landscape cards
   gridPosition?: number; // Position in the grid (0-based) for autoplay pattern
+  useGlassPanel?: boolean; // Use glass panel layout for landscape cards (default true)
 }
 
 /**
@@ -38,7 +39,8 @@ export default function ShortCardWithObserver({
   onAuthorClick,
   currentUserId,
   variant,
-  gridPosition = 0
+  gridPosition = 0,
+  useGlassPanel
 }: ShortCardWithObserverProps) {
   // State for dual-observer pattern
   const [shouldAttach, setShouldAttach] = React.useState(false);
@@ -114,6 +116,7 @@ export default function ShortCardWithObserver({
         onAuthorClick={onAuthorClick}
         currentUserId={currentUserId}
         variant={variant}
+        useGlassPanel={useGlassPanel}
       />
     </div>
   );

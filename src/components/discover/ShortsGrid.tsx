@@ -327,6 +327,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                   onAuthorClick={onAuthorClick}
                   currentUserId={currentUserId}
                   variant="landscape"
+                  useGlassPanel={false}
                 />
               </div>
             );

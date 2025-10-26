@@ -19,6 +19,7 @@ interface ShortCardProps {
   onAuthorClick?: (authorId: string) => void;
   currentUserId?: string;
   variant?: 'portrait' | 'landscape'; // Support landscape cards
+  useGlassPanel?: boolean; // Use glass panel layout for landscape cards (default true)
 }
 
 export default React.memo(function ShortCard({ 
@@ -31,7 +32,8 @@ export default React.memo(function ShortCard({
   onLike,
   onAuthorClick,
   currentUserId,
-  variant = 'portrait'
+  variant = 'portrait',
+  useGlassPanel = true
 }: ShortCardProps) {
   const isVideo = item.type === 'video' || item.src?.includes('.mp4') || item.src?.includes('.webm');
   
@@ -93,7 +95,7 @@ export default React.memo(function ShortCard({
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
 
         {/* Conditional Meta based on variant */}
-        {isLandscape ? (
+        {isLandscape && useGlassPanel ? (
           /* Unified glass panel + avatar for landscape videos */
           <div className="absolute bottom-2 right-0 z-10 pointer-events-none">
             {/* Glass panel - flush to right edge */}
