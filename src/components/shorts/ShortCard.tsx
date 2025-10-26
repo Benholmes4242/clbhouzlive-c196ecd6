@@ -44,17 +44,9 @@ export default React.memo(function ShortCard({
   const isLandscape = variant === 'landscape';
   
   return (
-    <div
-      role="button"
-      tabIndex={0}
+    <button
       onClick={onClick}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick();
-        }
-      }}
-      className="shortsCard group relative block w-full p-0 border-0 bg-transparent leading-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-transform duration-75"
+      className="shortsCard group relative block w-full p-0 border-0 bg-transparent leading-none focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-transform duration-75"
       style={{ margin: 0 }}
       aria-label={`Play short: ${item.title || 'Video'} by ${item.user?.name || 'Unknown'}`}
     >
@@ -193,6 +185,6 @@ export default React.memo(function ShortCard({
           </div>
         )}
       </div>
-    </div>
+    </button>
   );
 });

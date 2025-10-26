@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback, lazy, Suspense } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
-import ShortCard from '@/components/shorts/ShortCard';
+import ShortCardWithObserver from '@/components/shorts/ShortCardWithObserver';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { selectLandscapeCandidate, preloadLandscapePoster, isLandscapeEligible } from '@/utils/landscapeEligibility';
 
@@ -52,11 +52,7 @@ export default function ShortsGrid({
   const loadingRef = useRef(false);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
-  
-  // Shared autoplay state managed by single IntersectionObserver
-  const [autoplayMap, setAutoplayMap] = useState<Record<string, boolean>>({});
-  const observerRef = useRef<IntersectionObserver | null>(null);
+const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
 
   // Track column width to compute pixel-perfect height from aspect ratio
   const [columnWidth, setColumnWidth] = useState(0);
@@ -113,59 +109,16 @@ export default function ShortsGrid({
     setViewerOpen(false);
   };
 
-  // Register card ref for shared observer - observe immediately on registration
-  const registerCardRef = useCallback((id: string, element: HTMLDivElement | null) => {
-    if (element) {
-      // Observe immediately when card registers
-      if (observerRef.current) {
-        observerRef.current.observe(element);
+  const handleVisibilityChange = useCallback((id: string, visible: boolean) => {
+    setVisibleCards(prev => {
+      const next = new Set(prev);
+      if (visible) {
+        next.add(id);
+      } else {
+        next.delete(id);
       }
-    } else {
-      // Unregister
-      const existing = document.querySelector(`[data-card-id="${id}"]`);
-      if (existing && observerRef.current) {
-        observerRef.current.unobserve(existing);
-      }
-    }
-  }, []);
-
-  // Create single shared IntersectionObserver on mount:
-  // Autoplay any card when ≥10% visible; pause when below.
-  useEffect(() => {
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const target = entry.target as HTMLElement;
-          const cardId = target.getAttribute('data-card-id');
-          if (!cardId) return;
-
-          const variant = target.getAttribute('data-variant');
-          const gridPosition = parseInt(target.getAttribute('data-grid-position') || '0', 10);
-
-          const inView = entry.isIntersecting && entry.intersectionRatio >= 0.1;
-
-          const shouldAutoplay = inView;
-
-          setAutoplayMap((prev) => (prev[cardId] === shouldAutoplay ? prev : { ...prev, [cardId]: shouldAutoplay }));
-        });
-      },
-      {
-        threshold: [0, 0.1, 1.0],
-        rootMargin: '0px'
-      }
-    );
-
-    // Observe any existing cards already rendered
-    const container = gridRef.current;
-    if (container) {
-      const nodes = container.querySelectorAll('[data-card-id]');
-      nodes.forEach((node) => observerRef.current?.observe(node));
-    }
-
-    return () => {
-      observerRef.current?.disconnect();
-      observerRef.current = null;
-    };
+      return next;
+    });
   }, []);
 
   // Keep columnWidth accurate on mount, resize and container size changes
@@ -246,7 +199,6 @@ export default function ShortsGrid({
     
     return result;
   }, [items, baseHeightPx]);
-
 
   // Organize layout into rows: 2x2 portrait grids with landscape breaks
   const { firstRow, sections } = useMemo(() => {
@@ -331,25 +283,18 @@ export default function ShortsGrid({
         {firstRow.length > 0 && (
           <div className="grid grid-cols-2" style={{ gap: `${GUTTER_PX}px`, marginBottom: '2px' }}>
             {firstRow.map((layoutItem, posInRow) => (
-              <div 
+              <ShortCardWithObserver
                 key={layoutItem.item.id}
-                ref={(el) => registerCardRef(layoutItem.item.id, el)}
-                data-card-id={layoutItem.item.id}
-                data-grid-position={posInRow}
-                data-variant="portrait"
-              >
-                <ShortCard
-                  item={layoutItem.item}
-                  onClick={() => handleCardClick(layoutItem.item, layoutItem.index)}
-                  height={baseHeightPx}
-                  isPinned
-                  shouldAttach={true}
-                  autoplay={autoplayMap[layoutItem.item.id] || false}
-                  onLike={onLike}
-                  onAuthorClick={onAuthorClick}
-                  currentUserId={currentUserId}
-                />
-              </div>
+                item={layoutItem.item}
+                onClick={() => handleCardClick(layoutItem.item, layoutItem.index)}
+                height={baseHeightPx}
+                isPinned
+                onVisibilityChange={handleVisibilityChange}
+                onLike={onLike}
+                onAuthorClick={onAuthorClick}
+                currentUserId={currentUserId}
+                gridPosition={posInRow}
+              />
             ))}
           </div>
         )}
@@ -360,10 +305,6 @@ export default function ShortsGrid({
             return (
               <div 
                 key={`landscape-${sectionIndex}`} 
-                ref={(el) => registerCardRef(section.landscapeItem.item.id, el)}
-                data-card-id={section.landscapeItem.item.id}
-                data-grid-position={0}
-                data-variant="landscape"
                 className="shortsLandscapeRow"
                 style={{ 
                   width: '100vw',
@@ -377,12 +318,11 @@ export default function ShortsGrid({
                   paddingRight: 0
                 }}
               >
-                <ShortCard
+                <ShortCardWithObserver
                   item={section.landscapeItem.item}
                   onClick={() => handleCardClick(section.landscapeItem.item, section.landscapeItem.index)}
                   height={landscapeHeightPx}
-                  shouldAttach={true}
-                  autoplay={autoplayMap[section.landscapeItem.item.id] || false}
+                  onVisibilityChange={handleVisibilityChange}
                   onLike={onLike}
                   onAuthorClick={onAuthorClick}
                   currentUserId={currentUserId}
@@ -411,24 +351,17 @@ export default function ShortsGrid({
                   const gridPosition = basePosition + previousPortraits + posInGrid;
                   
                   return (
-                    <div
+                    <ShortCardWithObserver
                       key={item.id}
-                      ref={(el) => registerCardRef(item.id, el)}
-                      data-card-id={item.id}
-                      data-grid-position={gridPosition}
-                      data-variant="portrait"
-                    >
-                      <ShortCard
-                        item={item}
-                        onClick={() => handleCardClick(item, index)}
-                        height={baseHeightPx}
-                        shouldAttach={true}
-                        autoplay={autoplayMap[item.id] || false}
-                        onLike={onLike}
-                        onAuthorClick={onAuthorClick}
-                        currentUserId={currentUserId}
-                      />
-                    </div>
+                      item={item}
+                      onClick={() => handleCardClick(item, index)}
+                      height={baseHeightPx}
+                      onVisibilityChange={handleVisibilityChange}
+                      onLike={onLike}
+                      onAuthorClick={onAuthorClick}
+                      currentUserId={currentUserId}
+                      gridPosition={gridPosition}
+                    />
                   );
                 })}
               </div>
