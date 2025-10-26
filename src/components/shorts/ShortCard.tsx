@@ -113,7 +113,7 @@ export default React.memo(function ShortCard({
               </div>
 
               {/* Divider line */}
-              <div className="mt-1 h-px w-full bg-white/20" />
+              <div className="mt-1 h-px w-[calc(100%-4px)] bg-white/20" />
 
               {/* Likes row */}
               <div className="flex items-center gap-2 text-white/90 text-[13px] leading-none mt-1">
