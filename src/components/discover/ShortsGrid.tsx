@@ -135,35 +135,41 @@ export default function ShortsGrid({
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const cardId = entry.target.getAttribute('data-card-id');
+          const target = entry.target as HTMLElement;
+          const cardId = target.getAttribute('data-card-id');
           if (!cardId) return;
-          
-          const variant = entry.target.getAttribute('data-variant');
-          const gridPosition = parseInt(entry.target.getAttribute('data-grid-position') || '0', 10);
-          const colIndex = gridPosition % 2; // 0 = left, 1 = right
-          
-          // Simple rule: autoplay if visible AND (landscape OR left card OR second-row+ right card)
+
+          const variant = target.getAttribute('data-variant');
+          const gridPosition = parseInt(target.getAttribute('data-grid-position') || '0', 10);
+
+          const inView = entry.isIntersecting && entry.intersectionRatio >= 0.5;
+
           let shouldAutoplay = false;
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+          if (inView) {
             if (variant === 'landscape') {
               shouldAutoplay = true;
             } else {
-              // Portrait: left column (0) OR right column position 3+ (second row onwards)
-              shouldAutoplay = colIndex === 0 || gridPosition >= 3;
+              // Alternating portrait pattern: play positions 0 (row 1 left) and 3 (row 2 right), repeats every 4
+              const positionInPattern = gridPosition % 4;
+              shouldAutoplay = positionInPattern === 0 || positionInPattern === 3;
             }
           }
-          
-          setAutoplayMap(prev => {
-            if (prev[cardId] === shouldAutoplay) return prev;
-            return { ...prev, [cardId]: shouldAutoplay };
-          });
+
+          setAutoplayMap((prev) => (prev[cardId] === shouldAutoplay ? prev : { ...prev, [cardId]: shouldAutoplay }));
         });
       },
       {
-        threshold: [0, 0.5, 1.0],
-        rootMargin: '100px'
+        threshold: 0.5,
+        rootMargin: '0px'
       }
     );
+
+    // Observe any existing cards already rendered
+    const container = gridRef.current;
+    if (container) {
+      const nodes = container.querySelectorAll('[data-card-id]');
+      nodes.forEach((node) => observerRef.current?.observe(node));
+    }
 
     return () => {
       observerRef.current?.disconnect();
