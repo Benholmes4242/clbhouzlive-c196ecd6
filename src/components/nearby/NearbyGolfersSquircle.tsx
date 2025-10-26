@@ -24,23 +24,14 @@ export default function NearbyGolfersSquircle({
         }
       }}
     >
-      {/* Proximity pulse ring 1 */}
-      <div className="proximity-pulse-ring" aria-hidden="true" />
-      
-      {/* Proximity pulse ring 2 (staggered) */}
-      <div className="proximity-pulse-ring proximity-pulse-ring-delayed" aria-hidden="true" />
-      
-      {/* Orange glowing pin icon */}
+      <div className="heartbeat-pulse" aria-hidden="true" />
       <svg
         className="icon-pin"
         xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
         viewBox="0 0 24 24"
-        fill="#FF9F0A"
         aria-hidden="true"
       >
-        <path d="M12 2C8.686 2 6 4.686 6 8c0 4.2 4.8 9.6 5.02 9.84.26.28.7.28.96 0C13.2 17.6 18 12.2 18 8c0-3.314-2.686-6-6-6zm0 8.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/>
+        <path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7zm0 9.5c-1.4 0-2.5-1.1-2.5-2.5S10.6 6.5 12 6.5 14.5 7.6 14.5 9 13.4 11.5 12 11.5z" />
       </svg>
     </div>
   );
