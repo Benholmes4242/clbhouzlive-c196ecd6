@@ -149,22 +149,22 @@ export default React.memo(function ShortCard({
           <div className="absolute inset-x-0 bottom-0 z-10 pointer-events-none">
             {/* Text content - bottom left */}
             <div className="absolute left-3 bottom-3 flex flex-col gap-1 max-w-[calc(100%-80px)]">
-              {/* Title/Creator name */}
+              {/* User name */}
               <div className="text-white font-bold text-[15px] leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
                 <span className="truncate block">
-                  {item.title || item.user?.name || 'Unknown'}
+                  {item.user?.name || 'Unknown'}
                 </span>
               </div>
 
               {/* Likes row */}
               <div className="flex items-center gap-1.5 text-white text-[14px] leading-none font-medium" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
-                <Heart className="w-4 h-4" fill="white" />
+                <Heart className="w-4 h-4" />
                 <span>{item.likes || 0}</span>
               </div>
             </div>
 
-            {/* Avatar - bottom right, circular */}
-            <div className="absolute right-3 bottom-3 w-[48px] h-[48px] rounded-full overflow-hidden border-2 border-white/40 bg-black/40 backdrop-blur-sm shadow-xl">
+            {/* Avatar - bottom right, squircle */}
+            <div className="absolute right-3 bottom-3 w-[48px] h-[48px] rounded-[10px] overflow-hidden border-2 border-white/40 bg-black/40 backdrop-blur-sm shadow-xl">
               <img
                 src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
                 alt={item.user?.name || 'Unknown'}
