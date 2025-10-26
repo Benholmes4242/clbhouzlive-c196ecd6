@@ -335,7 +335,8 @@ export function RequestGameSheet({
               onClick={() => setPush(!push)}
               className="w-11 h-6 rounded-full transition-colors relative"
               style={{
-                backgroundColor: push ? '#6E9277' : 'rgba(255,255,255,0.12)',
+                backgroundColor: push ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.12)',
+                border: push ? '1px solid rgba(255,255,255,0.25)' : '1px solid rgba(255,255,255,0.12)',
               }}
             >
               <div

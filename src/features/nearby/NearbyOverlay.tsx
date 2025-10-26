@@ -262,9 +262,9 @@ function GolferRow({ golfer, index }: GolferRowProps) {
             <span 
               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
               style={{ 
-                backgroundColor: 'rgba(110,146,119,0.16)',
-                border: '1px solid rgba(110,146,119,0.4)',
-                color: 'var(--accent-green-bg)'
+                backgroundColor: 'var(--accent-frost-bg)',
+                border: '1px solid var(--accent-frost-border)',
+                color: 'var(--accent-frost-text)'
               }}
             >
               <Home className="w-3 h-3" />
@@ -280,8 +280,9 @@ function GolferRow({ golfer, index }: GolferRowProps) {
               <span 
                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
                 style={{ 
-                  background: '#6e9277',
-                  color: 'white'
+                  backgroundColor: 'var(--accent-frost-bg)',
+                  border: '1px solid var(--accent-frost-border)',
+                  color: 'var(--accent-frost-text)'
                 }}
               >
                 🟢 Open to Play
