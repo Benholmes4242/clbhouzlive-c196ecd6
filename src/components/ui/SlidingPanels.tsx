@@ -13,7 +13,7 @@ export default function SlidingPanels<T extends Key = string>({
 }) {
   return (
     <div style={{ position: 'relative', minHeight: '1px' }}>
-      <AnimatePresence mode="wait" initial={false}>
+      <AnimatePresence mode="popLayout" initial={false}>
         <motion.div
           key={String(activeKey)}
           initial={{ opacity: 0, x: 24 }}

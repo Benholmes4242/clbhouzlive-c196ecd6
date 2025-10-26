@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback, lazy, Suspense } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
-import ShortCardWithObserver from '@/components/shorts/ShortCardWithObserver';
+import ShortCard from '@/components/shorts/ShortCard';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { selectLandscapeCandidate, preloadLandscapePoster, isLandscapeEligible } from '@/utils/landscapeEligibility';
 
@@ -52,10 +52,25 @@ export default function ShortsGrid({
   const loadingRef = useRef(false);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
+  const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
+  
+  // Shared autoplay state managed by single IntersectionObserver
+  const [autoplayMap, setAutoplayMap] = useState<Record<string, boolean>>({});
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const cardRefsMap = useRef<Map<string, HTMLDivElement>>(new Map());
 
   // Track column width to compute pixel-perfect height from aspect ratio
   const [columnWidth, setColumnWidth] = useState(0);
+  
+  // Performance timing
+  const mountTimeRef = useRef<number>(0);
+
+  // Start performance timing
+  useEffect(() => {
+    mountTimeRef.current = performance.now();
+    console.time('[shorts-autoplay-first-frame]');
+    console.log('[Shorts] Component mounted at', mountTimeRef.current);
+  }, []);
 
   const updateColumnWidth = useCallback(() => {
     const el = gridRef.current;
@@ -109,16 +124,71 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
     setViewerOpen(false);
   };
 
-  const handleVisibilityChange = useCallback((id: string, visible: boolean) => {
-    setVisibleCards(prev => {
-      const next = new Set(prev);
-      if (visible) {
-        next.add(id);
-      } else {
-        next.delete(id);
+  // Register card ref for shared observer
+  const registerCardRef = useCallback((id: string, element: HTMLDivElement | null) => {
+    if (element) {
+      cardRefsMap.current.set(id, element);
+    } else {
+      cardRefsMap.current.delete(id);
+    }
+  }, []);
+
+  // Create single shared IntersectionObserver on mount
+  useEffect(() => {
+    if (observerRef.current) return;
+
+    console.log('[Shorts] Creating shared IntersectionObserver');
+    
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        const updates: Record<string, boolean> = {};
+        let firstPlayTriggered = false;
+        
+        entries.forEach((entry) => {
+          const cardId = entry.target.getAttribute('data-card-id');
+          if (!cardId) return;
+          
+          const isVisible = entry.isIntersecting && entry.intersectionRatio >= 0.2;
+          
+          if (isVisible) {
+            // Determine if this card should autoplay based on position
+            const gridPosition = parseInt(entry.target.getAttribute('data-grid-position') || '0', 10);
+            const variant = entry.target.getAttribute('data-variant');
+            
+            let shouldAutoplay = false;
+            if (variant === 'landscape') {
+              shouldAutoplay = true;
+            } else {
+              // Portrait cards: position 0 or 3 in repeating pattern of 4
+              const positionInPattern = gridPosition % 4;
+              shouldAutoplay = positionInPattern === 0 || positionInPattern === 3;
+            }
+            
+            updates[cardId] = shouldAutoplay;
+            
+            // Track first successful autoplay for telemetry
+            if (shouldAutoplay && !firstPlayTriggered) {
+              firstPlayTriggered = true;
+              console.timeEnd('[shorts-autoplay-first-frame]');
+              console.log('[Shorts] First video autoplaying at', performance.now() - mountTimeRef.current, 'ms after mount');
+            }
+          } else {
+            updates[cardId] = false;
+          }
+        });
+        
+        setAutoplayMap(prev => ({ ...prev, ...updates }));
+      },
+      {
+        threshold: [0, 0.2, 0.5, 1.0],
+        rootMargin: '0px'
       }
-      return next;
-    });
+    );
+
+    return () => {
+      observerRef.current?.disconnect();
+      observerRef.current = null;
+    };
   }, []);
 
   // Keep columnWidth accurate on mount, resize and container size changes
@@ -199,6 +269,64 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
     
     return result;
   }, [items, baseHeightPx]);
+
+  // Observe all registered cards (depends on layout)
+  useEffect(() => {
+    const observer = observerRef.current;
+    if (!observer) return;
+
+    cardRefsMap.current.forEach((element, id) => {
+      observer.observe(element);
+    });
+
+    return () => {
+      cardRefsMap.current.forEach((element) => {
+        observer?.unobserve(element);
+      });
+    };
+  }, [layout]);
+
+  // Mark initial above-the-fold cards for immediate attachment & autoplay
+  useEffect(() => {
+    if (layout.length === 0) return;
+    
+    console.log('[Shorts] Detecting initial viewport cards');
+    
+    // Use RAF to ensure layout has settled
+    requestAnimationFrame(() => {
+      const initialAutoplay: Record<string, boolean> = {};
+      let count = 0;
+      
+      // Check first 4 cards (likely above fold)
+      layout.slice(0, 4).forEach((layoutItem, idx) => {
+        const element = cardRefsMap.current.get(layoutItem.item.id);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+          
+          if (isInViewport) {
+            // Apply same autoplay pattern logic
+            if (layoutItem.variant === 'landscape') {
+              initialAutoplay[layoutItem.item.id] = true;
+              count++;
+            } else {
+              const positionInPattern = idx % 4;
+              const shouldAutoplay = positionInPattern === 0 || positionInPattern === 3;
+              if (shouldAutoplay) {
+                initialAutoplay[layoutItem.item.id] = true;
+                count++;
+              }
+            }
+          }
+        }
+      });
+      
+      if (count > 0) {
+        console.log('[Shorts] Marking', count, 'initial cards for immediate autoplay');
+        setAutoplayMap(prev => ({ ...prev, ...initialAutoplay }));
+      }
+    });
+  }, [layout]);
 
   // Organize layout into rows: 2x2 portrait grids with landscape breaks
   const { firstRow, sections } = useMemo(() => {
@@ -283,18 +411,25 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
         {firstRow.length > 0 && (
           <div className="grid grid-cols-2" style={{ gap: `${GUTTER_PX}px`, marginBottom: '2px' }}>
             {firstRow.map((layoutItem, posInRow) => (
-              <ShortCardWithObserver
+              <div 
                 key={layoutItem.item.id}
-                item={layoutItem.item}
-                onClick={() => handleCardClick(layoutItem.item, layoutItem.index)}
-                height={baseHeightPx}
-                isPinned
-                onVisibilityChange={handleVisibilityChange}
-                onLike={onLike}
-                onAuthorClick={onAuthorClick}
-                currentUserId={currentUserId}
-                gridPosition={posInRow}
-              />
+                ref={(el) => registerCardRef(layoutItem.item.id, el)}
+                data-card-id={layoutItem.item.id}
+                data-grid-position={posInRow}
+                data-variant="portrait"
+              >
+                <ShortCard
+                  item={layoutItem.item}
+                  onClick={() => handleCardClick(layoutItem.item, layoutItem.index)}
+                  height={baseHeightPx}
+                  isPinned
+                  shouldAttach={true}
+                  autoplay={autoplayMap[layoutItem.item.id] || false}
+                  onLike={onLike}
+                  onAuthorClick={onAuthorClick}
+                  currentUserId={currentUserId}
+                />
+              </div>
             ))}
           </div>
         )}
@@ -305,6 +440,10 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
             return (
               <div 
                 key={`landscape-${sectionIndex}`} 
+                ref={(el) => registerCardRef(section.landscapeItem.item.id, el)}
+                data-card-id={section.landscapeItem.item.id}
+                data-grid-position={0}
+                data-variant="landscape"
                 className="shortsLandscapeRow"
                 style={{ 
                   width: '100vw',
@@ -318,11 +457,12 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                   paddingRight: 0
                 }}
               >
-                <ShortCardWithObserver
+                <ShortCard
                   item={section.landscapeItem.item}
                   onClick={() => handleCardClick(section.landscapeItem.item, section.landscapeItem.index)}
                   height={landscapeHeightPx}
-                  onVisibilityChange={handleVisibilityChange}
+                  shouldAttach={true}
+                  autoplay={autoplayMap[section.landscapeItem.item.id] || false}
                   onLike={onLike}
                   onAuthorClick={onAuthorClick}
                   currentUserId={currentUserId}
@@ -351,17 +491,24 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
                   const gridPosition = basePosition + previousPortraits + posInGrid;
                   
                   return (
-                    <ShortCardWithObserver
+                    <div
                       key={item.id}
-                      item={item}
-                      onClick={() => handleCardClick(item, index)}
-                      height={baseHeightPx}
-                      onVisibilityChange={handleVisibilityChange}
-                      onLike={onLike}
-                      onAuthorClick={onAuthorClick}
-                      currentUserId={currentUserId}
-                      gridPosition={gridPosition}
-                    />
+                      ref={(el) => registerCardRef(item.id, el)}
+                      data-card-id={item.id}
+                      data-grid-position={gridPosition}
+                      data-variant="portrait"
+                    >
+                      <ShortCard
+                        item={item}
+                        onClick={() => handleCardClick(item, index)}
+                        height={baseHeightPx}
+                        shouldAttach={true}
+                        autoplay={autoplayMap[item.id] || false}
+                        onLike={onLike}
+                        onAuthorClick={onAuthorClick}
+                        currentUserId={currentUserId}
+                      />
+                    </div>
                   );
                 })}
               </div>
