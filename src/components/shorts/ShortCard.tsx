@@ -152,11 +152,11 @@ export default React.memo(function ShortCard({
             )}
           </div>
         ) : (
-          /* Portrait meta - unified glass panel + avatar */
+          /* Portrait meta - unified glass panel + avatar (30% smaller than landscape) */
           <div className="absolute bottom-2 right-0 z-10 pointer-events-none">
             {/* Glass panel - flush to right edge */}
             <div
-              className="flex flex-col min-w-[180px] max-w-[240px] px-3 py-2 rounded-l-xl rounded-r-none backdrop-blur-md transition-transform duration-200 group-hover:scale-[1.02]"
+              className="flex flex-col min-w-[126px] max-w-[168px] px-2 py-1.5 rounded-l-lg rounded-r-none backdrop-blur-md transition-transform duration-200 group-hover:scale-[1.02]"
               style={{
                 background: 'rgba(20, 20, 20, 0.55)',
                 borderTop: '1px solid rgba(255, 255, 255, 0.2)',
@@ -166,25 +166,25 @@ export default React.memo(function ShortCard({
               }}
             >
               {/* Creator name */}
-              <div className="text-white font-semibold text-[15px] leading-tight flex items-center gap-2">
+              <div className="text-white font-semibold text-[13px] leading-tight flex items-center gap-1.5">
                 <span className="truncate">
                   {item.user?.name || 'Unknown'}
                 </span>
               </div>
 
               {/* Divider line */}
-              <div className="mt-1 mb-1.5 h-px w-[calc(100%-4px)] bg-white/20" />
+              <div className="mt-0.5 mb-1 h-px w-[calc(100%-4px)] bg-white/20" />
 
               {/* Likes row */}
-              <div className="flex items-center gap-2 text-white/90 text-[13px] leading-none">
-                <Heart className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-1.5 text-white/90 text-[11px] leading-none">
+                <Heart className="w-3 h-3" />
                 <span className="tracking-[-0.02em]">{item.likes || 0} likes</span>
               </div>
             </div>
 
-            {/* Avatar squircle - positioned 12px from right edge, 90% overlaps panel, 10% extends above */}
+            {/* Avatar squircle - 30% smaller (40px instead of 56px) */}
             <div
-              className="absolute right-[12px] bottom-[14px] w-[56px] h-[56px] rounded-[14px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
+              className="absolute right-[8px] bottom-[10px] w-[40px] h-[40px] rounded-[10px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
               style={{
                 boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
               }}
@@ -199,7 +199,7 @@ export default React.memo(function ShortCard({
             {/* Duration badge - attached to squircle */}
             {item.duration && typeof item.duration === 'number' && (
               <div 
-                className="absolute right-2 bottom-[-8px] text-[13px] font-medium leading-none px-1.5 py-0.5 rounded-[6px] text-white/90 border border-white/25 z-10"
+                className="absolute right-1.5 bottom-[-6px] text-[11px] font-medium leading-none px-1 py-0.5 rounded-[5px] text-white/90 border border-white/25 z-10"
                 style={{
                   background: 'rgba(0, 0, 0, 0.6)',
                   backdropFilter: 'blur(8px)'
