@@ -52,15 +52,14 @@ export default React.memo(function ShortCard({
     >
       {/* Thumbnail Container */}
       <div 
-        className="relative bg-black"
+        className="relative overflow-hidden bg-black"
         style={{ 
           width: '100%',
           maxWidth: '100%',
           height: height ? `${height}px` : undefined,
           aspectRatio: isLandscape ? '16/11.592' : (!height ? '9/16' : undefined),
-          boxShadow: isLandscape ? 'none' : '0 1px 2px rgba(0,0,0,0.08), 0 6px 16px rgba(0,0,0,0.06)',
-          borderRadius: '0',
-          overflow: isLandscape ? 'visible' : 'hidden'
+          boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 6px 16px rgba(0,0,0,0.06)',
+          borderRadius: '0'
         }}
       >
         {/* Video with HLSVideoCard for optimal performance */}
@@ -96,73 +95,65 @@ export default React.memo(function ShortCard({
         {/* Conditional Meta based on variant */}
         {isLandscape ? (
           /* Dark glass overlay metadata card for landscape videos */
-          <div className="absolute bottom-4 right-4 pointer-events-none" style={{ overflow: 'visible' }}>
-            {/* Glass panel - content-width, right-anchored */}
+          <div className="absolute bottom-0 left-0 right-0 px-3 pb-3 pointer-events-none">
             <div 
-              className="relative z-10 flex flex-col rounded-[11px] px-4 py-3 max-w-[60vw] transition-transform duration-200 group-hover:scale-[1.02]"
+              className="relative backdrop-blur-[12px] rounded-[6px] overflow-hidden transition-transform duration-200 group-hover:scale-[1.05]"
               style={{
-                background: 'rgba(20, 20, 20, 0.55)',
-                backdropFilter: 'blur(12px) saturate(160%)',
-                border: '1px solid rgba(255, 255, 255, 0.22)',
-                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.4) inset',
-                overflow: 'visible'
+                background: 'rgba(25, 25, 25, 0.6)',
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)'
               }}
             >
-              {/* Creator name */}
-              <div 
-                className="font-medium text-[14px] leading-tight"
-                style={{ color: 'rgba(255, 255, 255, 0.92)' }}
-              >
-                {item.user?.name || 'Unknown'}
-              </div>
-              
-              {/* Divider line */}
-              <div 
-                className="w-full h-[1px] my-1"
-                style={{ background: 'rgba(255, 255, 255, 0.28)' }}
-              />
-              
-              {/* Like count */}
-              <div className="flex items-center gap-1.5">
-                <Heart className="w-4 h-4" style={{ color: 'rgba(255, 255, 255, 0.75)' }} />
-                <span 
-                  className="text-[14px] font-normal"
-                  style={{ color: 'rgba(255, 255, 255, 0.75)' }}
-                >
-                  {item.likes || 0} likes
-                </span>
+              {/* Metadata content */}
+              <div className="px-4 pt-3 pb-3">
+                {/* Username */}
+                <div className="text-white font-medium text-[14px] leading-tight mb-2">
+                  {item.user?.name || 'Unknown'}
+                </div>
+                
+                {/* Divider line */}
+                <div 
+                  className="w-full h-[1px] mb-2"
+                  style={{ background: 'rgba(255, 255, 255, 0.15)' }}
+                />
+                
+                {/* Like count */}
+                <div className="flex items-center gap-1.5">
+                  <Heart className="w-4 h-4" style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+                  <span 
+                    className="text-[14px] font-normal"
+                    style={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                  >
+                    {item.likes || 0} likes
+                  </span>
+                </div>
               </div>
 
-              {/* Squircle profile thumbnail - overlapping top-right of glass panel */}
+              {/* Squircle profile thumbnail - overlapping top-right */}
               <div 
-                className="absolute -top-6 -right-2 z-20"
+                className="absolute -top-4 right-3"
                 style={{
                   filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4))'
                 }}
               >
-                <Squircle width={48} height={48}>
+                <Squircle width={56} height={56}>
                   <img
                     src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
                     alt={item.user?.name || 'Unknown'}
                     className="w-full h-full object-cover"
                   />
                 </Squircle>
-                
-                {/* Duration badge - below squircle */}
-                {item.duration && typeof item.duration === 'number' && (
-                  <div 
-                    className="absolute -bottom-5 left-1/2 -translate-x-1/2 rounded px-1.5 py-0.5 text-white text-[12px] font-medium whitespace-nowrap"
-                    style={{ 
-                      background: 'rgba(0, 0, 0, 0.6)',
-                      border: '1px solid rgba(255, 255, 255, 0.25)',
-                      backdropFilter: 'blur(8px)'
-                    }}
-                  >
-                    {Math.floor(item.duration / 60)}:{String(Math.floor(item.duration % 60)).padStart(2, '0')}
-                  </div>
-                )}
               </div>
             </div>
+
+            {/* Duration badge - below squircle, right-aligned */}
+            {item.duration && typeof item.duration === 'number' && (
+              <div 
+                className="absolute -bottom-[22px] right-3 rounded px-2 py-1 text-white text-[12px] font-medium"
+                style={{ background: 'rgba(0, 0, 0, 0.6)' }}
+              >
+                {Math.floor(item.duration / 60)}:{String(Math.floor(item.duration % 60)).padStart(2, '0')}
+              </div>
+            )}
           </div>
         ) : (
           /* Original portrait meta */
