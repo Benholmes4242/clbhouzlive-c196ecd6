@@ -96,10 +96,10 @@ export default React.memo(function ShortCard({
         {/* Conditional Meta based on variant */}
         {isLandscape ? (
           /* Dark glass overlay metadata card for landscape videos */
-          <div className="absolute bottom-4 right-0 pointer-events-none flex items-end gap-2" style={{ overflow: 'visible' }}>
+          <div className="absolute bottom-4 right-4 pointer-events-none" style={{ overflow: 'visible' }}>
             {/* Glass panel - content-width, right-anchored */}
             <div 
-              className="z-10 flex flex-col rounded-[11px] px-4 py-3 max-w-[60%] transition-transform duration-200 group-hover:scale-[1.02]"
+              className="relative z-10 flex flex-col rounded-[11px] px-4 py-3 max-w-[60vw] transition-transform duration-200 group-hover:scale-[1.02]"
               style={{
                 background: 'rgba(20, 20, 20, 0.55)',
                 backdropFilter: 'blur(12px) saturate(160%)',
@@ -132,37 +132,36 @@ export default React.memo(function ShortCard({
                   {item.likes || 0} likes
                 </span>
               </div>
-            </div>
 
-            {/* Squircle profile thumbnail with duration - overlapping glass panel */}
-            <div 
-              className="z-20 relative mr-4"
-              style={{
-                filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4))',
-                overflow: 'visible'
-              }}
-            >
-              <Squircle width={48} height={48}>
-                <img
-                  src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                  alt={item.user?.name || 'Unknown'}
-                  className="w-full h-full object-cover"
-                />
-              </Squircle>
-              
-              {/* Duration badge - below squircle */}
-              {item.duration && typeof item.duration === 'number' && (
-                <div 
-                  className="absolute -bottom-5 left-1/2 -translate-x-1/2 rounded px-1.5 py-0.5 text-white text-[12px] font-medium whitespace-nowrap"
-                  style={{ 
-                    background: 'rgba(0, 0, 0, 0.6)',
-                    border: '1px solid rgba(255, 255, 255, 0.25)',
-                    backdropFilter: 'blur(8px)'
-                  }}
-                >
-                  {Math.floor(item.duration / 60)}:{String(Math.floor(item.duration % 60)).padStart(2, '0')}
-                </div>
-              )}
+              {/* Squircle profile thumbnail - overlapping top-right of glass panel */}
+              <div 
+                className="absolute -top-6 -right-2 z-20"
+                style={{
+                  filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4))'
+                }}
+              >
+                <Squircle width={48} height={48}>
+                  <img
+                    src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                    alt={item.user?.name || 'Unknown'}
+                    className="w-full h-full object-cover"
+                  />
+                </Squircle>
+                
+                {/* Duration badge - below squircle */}
+                {item.duration && typeof item.duration === 'number' && (
+                  <div 
+                    className="absolute -bottom-5 left-1/2 -translate-x-1/2 rounded px-1.5 py-0.5 text-white text-[12px] font-medium whitespace-nowrap"
+                    style={{ 
+                      background: 'rgba(0, 0, 0, 0.6)',
+                      border: '1px solid rgba(255, 255, 255, 0.25)',
+                      backdropFilter: 'blur(8px)'
+                    }}
+                  >
+                    {Math.floor(item.duration / 60)}:{String(Math.floor(item.duration % 60)).padStart(2, '0')}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ) : (
