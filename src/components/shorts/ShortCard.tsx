@@ -163,8 +163,13 @@ export default React.memo(function ShortCard({
               </div>
             </div>
 
-            {/* Avatar - bottom right, squircle */}
-            <div className="absolute right-3 bottom-3 w-[48px] h-[48px] rounded-[10px] overflow-hidden border-2 border-white/40 bg-black/40 backdrop-blur-sm shadow-xl">
+            {/* Avatar - bottom right, squircle (matching landscape style) */}
+            <div
+              className="absolute right-3 bottom-3 w-[48px] h-[48px] rounded-[12px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
+              style={{
+                boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
+              }}
+            >
               <img
                 src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
                 alt={item.user?.name || 'Unknown'}
