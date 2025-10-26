@@ -98,14 +98,7 @@ export default React.memo(function ShortCard({
           <div className="absolute bottom-2 right-0 z-10 pointer-events-none">
             {/* Glass panel - flush to right edge */}
             <div
-              className="flex flex-col min-w-[180px] max-w-[240px] px-3 py-2 rounded-l-xl rounded-r-none backdrop-blur-md transition-transform duration-200 group-hover:scale-[1.02]"
-              style={{
-                background: 'rgba(20, 20, 20, 0.55)',
-                borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-                borderLeft: '1px solid rgba(255, 255, 255, 0.2)',
-                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6)'
-              }}
+              className="liquid-glass liquid-glass--elevated flex flex-col min-w-[180px] max-w-[240px] px-3 py-2 rounded-l-xl rounded-r-none transition-transform duration-200 group-hover:scale-[1.02] border-r-0"
             >
               {/* Creator name */}
               <div className="text-white font-semibold text-[15px] leading-tight flex items-center gap-2">
@@ -156,14 +149,7 @@ export default React.memo(function ShortCard({
           <div className="absolute bottom-2 right-0 z-10 pointer-events-none">
             {/* Glass panel - flush to right edge */}
             <div
-              className="flex flex-col min-w-[126px] max-w-[168px] px-2 py-1.5 rounded-l-lg rounded-r-none backdrop-blur-md transition-transform duration-200 group-hover:scale-[1.02]"
-              style={{
-                background: 'rgba(20, 20, 20, 0.55)',
-                borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-                borderLeft: '1px solid rgba(255, 255, 255, 0.2)',
-                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6)'
-              }}
+              className="liquid-glass liquid-glass--elevated flex flex-col min-w-[126px] max-w-[168px] px-2 py-1.5 rounded-l-lg rounded-r-none transition-transform duration-200 group-hover:scale-[1.02] border-r-0"
             >
               {/* Creator name */}
               <div className="text-white font-semibold text-[13px] leading-tight flex items-center gap-1.5">
