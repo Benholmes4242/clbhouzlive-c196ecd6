@@ -98,7 +98,7 @@ export default React.memo(function ShortCard({
           <div className="absolute bottom-2 right-0 z-10 pointer-events-none">
             {/* Glass panel - flush to right edge */}
             <div
-              className="liquid-glass liquid-glass--elevated flex flex-col min-w-[180px] max-w-[240px] px-3 py-2 rounded-l-xl rounded-r-none transition-transform duration-200 group-hover:scale-[1.02] border-r-0"
+              className="liquid-glass liquid-glass--elevated flex flex-col min-w-[180px] max-w-[240px] px-3 py-1.5 rounded-l-xl rounded-r-none transition-transform duration-200 group-hover:scale-[1.02] border-r-0"
             >
               {/* Creator name */}
               <div className="text-white font-semibold text-[15px] leading-tight flex items-center gap-2">
