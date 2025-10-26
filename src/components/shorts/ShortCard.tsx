@@ -145,50 +145,32 @@ export default React.memo(function ShortCard({
             )}
           </div>
         ) : (
-          /* Portrait meta - avatar bottom left + text on left side */
+          /* Portrait meta - text bottom left + avatar bottom right */
           <div className="absolute inset-x-0 bottom-0 z-10 pointer-events-none">
-            {/* Avatar squircle - bottom left */}
-            <div
-              className="absolute left-2 bottom-2 w-[40px] h-[40px] rounded-[10px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
-              style={{
-                boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
-              }}
-            >
+            {/* Text content - bottom left */}
+            <div className="absolute left-3 bottom-3 flex flex-col gap-1 max-w-[calc(100%-80px)]">
+              {/* Title/Creator name */}
+              <div className="text-white font-bold text-[15px] leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+                <span className="truncate block">
+                  {item.title || item.user?.name || 'Unknown'}
+                </span>
+              </div>
+
+              {/* Likes row */}
+              <div className="flex items-center gap-1.5 text-white text-[14px] leading-none font-medium" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+                <Heart className="w-4 h-4" fill="white" />
+                <span>{item.likes || 0}</span>
+              </div>
+            </div>
+
+            {/* Avatar - bottom right, circular */}
+            <div className="absolute right-3 bottom-3 w-[48px] h-[48px] rounded-full overflow-hidden border-2 border-white/40 bg-black/40 backdrop-blur-sm shadow-xl">
               <img
                 src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
                 alt={item.user?.name || 'Unknown'}
                 className="w-full h-full object-cover"
               />
             </div>
-
-            {/* Text content - left side */}
-            <div className="absolute left-14 bottom-2 flex flex-col gap-1 max-w-[calc(100%-72px)]">
-              {/* Creator name */}
-              <div className="text-white font-semibold text-[13px] leading-tight drop-shadow-lg">
-                <span className="truncate block">
-                  {item.user?.name || 'Unknown'}
-                </span>
-              </div>
-
-              {/* Likes row */}
-              <div className="flex items-center gap-1.5 text-white/90 text-[11px] leading-none drop-shadow-lg">
-                <Heart className="w-3 h-3" />
-                <span className="tracking-[-0.02em]">{item.likes || 0} likes</span>
-              </div>
-            </div>
-
-            {/* Duration badge - bottom right corner */}
-            {item.duration && typeof item.duration === 'number' && (
-              <div 
-                className="absolute right-2 bottom-2 text-[11px] font-medium leading-none px-1.5 py-0.5 rounded-[5px] text-white/90 border border-white/25 z-10"
-                style={{
-                  background: 'rgba(0, 0, 0, 0.6)',
-                  backdropFilter: 'blur(8px)'
-                }}
-              >
-                {Math.floor(item.duration / 60)}:{String(Math.floor(item.duration % 60)).padStart(2, '0')}
-              </div>
-            )}
           </div>
         )}
       </div>
