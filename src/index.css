@@ -1495,7 +1495,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
   html, body {
     @apply text-foreground;
     background-color: var(--bg-page) !important;
-    font-family: 'League Spartan', system-ui, sans-serif;
+    /* SF Pro Text applied via system font stack in tailwind.config.ts */
     overflow-x: hidden;
     width: 100vw;
     max-width: 100%;

@@ -16,7 +16,7 @@ const TourCentral = () => {
       
       <div className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-center">Tour Central</h1>
+          <h1 className="font-display text-3xl font-bold text-center">Tour Central</h1>
           <p className="text-muted-foreground text-center mt-2">
             Your hub for global golf competitions and live events
           </p>

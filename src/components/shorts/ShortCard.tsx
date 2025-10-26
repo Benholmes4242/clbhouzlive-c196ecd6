@@ -113,7 +113,7 @@ export default React.memo(function ShortCard({
               <div className="mt-1 mb-1.5 h-px w-[calc(100%-4px)] bg-white/20" />
 
               {/* Likes row */}
-              <div className="flex items-center gap-2 text-white/90 text-[13px] leading-none">
+              <div className="flex items-center gap-2 text-white/90 text-[13px] font-medium leading-none">
                 <Heart className="w-3.5 h-3.5" />
                 <span className="tracking-[-0.02em]">{item.likes || 0} likes</span>
               </div>

@@ -41,7 +41,7 @@ const News = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4">
-        <h1 className="text-3xl font-bold text-center sm:text-left">Golf News</h1>
+        <h1 className="font-display text-3xl font-bold text-center sm:text-left">Golf News</h1>
         <Button onClick={() => refetch()} variant="outline" size="sm">
           <RefreshCw className="h-4 w-4 mr-2" />
           Refresh News

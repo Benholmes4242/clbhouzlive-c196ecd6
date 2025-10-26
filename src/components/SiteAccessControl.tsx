@@ -146,7 +146,7 @@ const SiteAccessControl: React.FC<SiteAccessControlProps> = ({ children }) => {
             </div>
             
             <div>
-              <h2 className="text-xl font-semibold mb-2">Secure Access Required</h2>
+              <h2 className="font-display text-xl font-semibold mb-2">Secure Access Required</h2>
               <p className="text-muted-foreground text-center leading-relaxed">
                 Enter your access code to continue to clubhouz
               </p>

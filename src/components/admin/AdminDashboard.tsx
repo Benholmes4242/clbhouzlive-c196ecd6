@@ -67,7 +67,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onRoleChange, us
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Course Import</h2>
+              <h2 className="font-display text-2xl font-bold mb-2">Course Import</h2>
               <p className="text-muted-foreground">Upload and import golf course data from Excel/CSV files</p>
             </div>
             <Card>

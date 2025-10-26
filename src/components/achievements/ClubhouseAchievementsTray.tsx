@@ -263,7 +263,7 @@ const ClubhouseAchievementsTray: React.FC<ClubhouseAchievementsTrayProps> = ({
         <div className="space-y-6">
           {/* Header */}
           <div>
-            <h3 className="text-xl font-bold text-foreground">Clubhouse Achievements</h3>
+            <h3 className="font-display text-xl font-bold text-foreground">Clubhouse Achievements</h3>
             <p className="text-sm text-muted-foreground">
               {earnedAchievements.length} of {achievements.length} achievements earned
             </p>

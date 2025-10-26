@@ -23,7 +23,7 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({ users }) => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Admin Overview</h2>
+        <h2 className="font-display text-2xl font-bold mb-2">Admin Overview</h2>
         <p className="text-muted-foreground">Monitor your platform's key metrics</p>
       </div>
       
@@ -34,7 +34,7 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({ users }) => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalUsers}</div>
+            <div className="font-display text-2xl font-bold">{totalUsers}</div>
             <p className="text-xs text-muted-foreground">
               All registered users
             </p>
@@ -47,7 +47,7 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({ users }) => {
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{activeUsers}</div>
+            <div className="font-display text-2xl font-bold">{activeUsers}</div>
             <p className="text-xs text-muted-foreground">
               Users who have signed in
             </p>
@@ -60,7 +60,7 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({ users }) => {
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{adminUsers}</div>
+            <div className="font-display text-2xl font-bold">{adminUsers}</div>
             <p className="text-xs text-muted-foreground">
               Admins and limited admins
             </p>
@@ -73,7 +73,7 @@ const AdminOverview: React.FC<AdminOverviewProps> = ({ users }) => {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{recentUsers}</div>
+            <div className="font-display text-2xl font-bold">{recentUsers}</div>
             <p className="text-xs text-muted-foreground">
               Users registered in last 7 days
             </p>

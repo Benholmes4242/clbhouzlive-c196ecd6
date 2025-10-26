@@ -78,7 +78,7 @@ const Settings = () => {
     <div className="min-h-screen bg-background pb-28">
       
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-        <h1 className="text-2xl font-bold mb-6">Settings</h1>
+        <h1 className="font-display text-2xl font-bold mb-6">Settings</h1>
         
         <NotificationSettings />
         
