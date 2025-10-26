@@ -4,6 +4,8 @@ import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import ShortsCardMeta from './ShortsCardMeta';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { Squircle } from '@/components/ui/squircle';
+import { Heart } from 'lucide-react';
 import '@/styles/shorts-meta.css';
 
 interface ShortCardProps {
@@ -87,28 +89,91 @@ export default React.memo(function ShortCard({
         {/* Gradient overlay for badges */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-
-
         {/* Hover Overlay */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
 
-        {/* Creator-First Meta Block - Overlaid at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-2">
-          <ShortsCardMeta
-            author={{
-              id: item.user?.id ?? '',
-              name: item.user?.name ?? 'Unknown',
-              avatar: item.user?.avatar ?? '/img/avatar-fallback.png',
-              verified: item.user?.verified,
-              isSelf: item.user?.id === currentUserId
-            }}
-            caption={item.title ?? ''}
-            likeCount={item.likes ?? 0}
-            isLiked={false} // Wire in PR2 with real state
-            onLikeToggle={() => onLike?.(item.id)}
-            onAuthorClick={(id) => onAuthorClick?.(id)}
-          />
-        </div>
+        {/* Conditional Meta based on variant */}
+        {isLandscape ? (
+          /* Dark glass overlay metadata card for landscape videos */
+          <div className="absolute bottom-0 left-0 right-0 px-3 pb-3 pointer-events-none">
+            <div 
+              className="relative backdrop-blur-[12px] rounded-[6px] overflow-hidden transition-transform duration-200 group-hover:scale-[1.05]"
+              style={{
+                background: 'rgba(25, 25, 25, 0.6)',
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)'
+              }}
+            >
+              {/* Metadata content */}
+              <div className="px-4 pt-3 pb-3">
+                {/* Username */}
+                <div className="text-white font-medium text-[14px] leading-tight mb-2">
+                  {item.user?.name || 'Unknown'}
+                </div>
+                
+                {/* Divider line */}
+                <div 
+                  className="w-full h-[1px] mb-2"
+                  style={{ background: 'rgba(255, 255, 255, 0.15)' }}
+                />
+                
+                {/* Like count */}
+                <div className="flex items-center gap-1.5">
+                  <Heart className="w-4 h-4" style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+                  <span 
+                    className="text-[14px] font-normal"
+                    style={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                  >
+                    {item.likes || 0} likes
+                  </span>
+                </div>
+              </div>
+
+              {/* Squircle profile thumbnail - overlapping top-right */}
+              <div 
+                className="absolute -top-4 right-3"
+                style={{
+                  filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4))'
+                }}
+              >
+                <Squircle width={56} height={56}>
+                  <img
+                    src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                    alt={item.user?.name || 'Unknown'}
+                    className="w-full h-full object-cover"
+                  />
+                </Squircle>
+              </div>
+            </div>
+
+            {/* Duration badge - below squircle, right-aligned */}
+            {item.duration && typeof item.duration === 'number' && (
+              <div 
+                className="absolute -bottom-[22px] right-3 rounded px-2 py-1 text-white text-[12px] font-medium"
+                style={{ background: 'rgba(0, 0, 0, 0.6)' }}
+              >
+                {Math.floor(item.duration / 60)}:{String(Math.floor(item.duration % 60)).padStart(2, '0')}
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Original portrait meta */
+          <div className="absolute bottom-0 left-0 right-0 p-2">
+            <ShortsCardMeta
+              author={{
+                id: item.user?.id ?? '',
+                name: item.user?.name ?? 'Unknown',
+                avatar: item.user?.avatar ?? '/img/avatar-fallback.png',
+                verified: item.user?.verified,
+                isSelf: item.user?.id === currentUserId
+              }}
+              caption={item.title ?? ''}
+              likeCount={item.likes ?? 0}
+              isLiked={false} // Wire in PR2 with real state
+              onLikeToggle={() => onLike?.(item.id)}
+              onAuthorClick={(id) => onAuthorClick?.(id)}
+            />
+          </div>
+        )}
       </div>
     </button>
   );
