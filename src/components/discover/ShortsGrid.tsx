@@ -129,8 +129,8 @@ export default function ShortsGrid({
     }
   }, []);
 
-  // Create single shared IntersectionObserver on mount with simple rule:
-  // Left cards (col 0), second-row right cards (col 1, row 2+), and landscape cards autoplay when in view
+  // Create single shared IntersectionObserver on mount:
+  // Autoplay any card when ≥10% visible; pause when below.
   useEffect(() => {
     observerRef.current = new IntersectionObserver(
       (entries) => {
@@ -142,24 +142,15 @@ export default function ShortsGrid({
           const variant = target.getAttribute('data-variant');
           const gridPosition = parseInt(target.getAttribute('data-grid-position') || '0', 10);
 
-          const inView = entry.isIntersecting && entry.intersectionRatio >= 0.5;
+          const inView = entry.isIntersecting && entry.intersectionRatio >= 0.1;
 
-          let shouldAutoplay = false;
-          if (inView) {
-            if (variant === 'landscape') {
-              shouldAutoplay = true;
-            } else {
-              // Alternating portrait pattern: play positions 0 (row 1 left) and 3 (row 2 right), repeats every 4
-              const positionInPattern = gridPosition % 4;
-              shouldAutoplay = positionInPattern === 0 || positionInPattern === 3;
-            }
-          }
+          const shouldAutoplay = inView;
 
           setAutoplayMap((prev) => (prev[cardId] === shouldAutoplay ? prev : { ...prev, [cardId]: shouldAutoplay }));
         });
       },
       {
-        threshold: 0.5,
+        threshold: [0, 0.1, 1.0],
         rootMargin: '0px'
       }
     );
