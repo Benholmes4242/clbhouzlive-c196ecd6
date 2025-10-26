@@ -94,67 +94,77 @@ export default React.memo(function ShortCard({
 
         {/* Conditional Meta based on variant */}
         {isLandscape ? (
-          /* Dark glass overlay metadata card for landscape videos */
-          <div className="absolute bottom-0 left-0 right-0 px-3 pb-3 pointer-events-none">
+          /* Frosted glass metadata panel for landscape videos */
+          <>
+            {/* Glass panel - bottom left, auto-width */}
             <div 
-              className="relative backdrop-blur-[12px] rounded-[6px] overflow-hidden transition-transform duration-200 group-hover:scale-[1.05]"
+              className="absolute bottom-4 left-4 z-10 flex flex-col rounded-[10px] px-4 py-3 max-w-[80%] pointer-events-none transition-transform duration-200 group-hover:scale-[1.02]"
               style={{
-                background: 'rgba(25, 25, 25, 0.6)',
-                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)'
+                background: 'rgba(20, 20, 20, 0.55)',
+                backdropFilter: 'blur(12px) saturate(160%)',
+                border: '1px solid rgba(255, 255, 255, 0.22)',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.4) inset'
               }}
             >
-              {/* Metadata content */}
-              <div className="px-4 pt-3 pb-3">
-                {/* Username */}
-                <div className="text-white font-medium text-[14px] leading-tight mb-2">
-                  {item.user?.name || 'Unknown'}
-                </div>
-                
-                {/* Divider line */}
-                <div 
-                  className="w-full h-[1px] mb-2"
-                  style={{ background: 'rgba(255, 255, 255, 0.15)' }}
-                />
-                
-                {/* Like count */}
-                <div className="flex items-center gap-1.5">
-                  <Heart className="w-4 h-4" style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
-                  <span 
-                    className="text-[14px] font-normal"
-                    style={{ color: 'rgba(255, 255, 255, 0.7)' }}
-                  >
-                    {item.likes || 0} likes
-                  </span>
-                </div>
-              </div>
-
-              {/* Squircle profile thumbnail - overlapping top-right */}
+              {/* Creator name */}
               <div 
-                className="absolute -top-4 right-3"
-                style={{
-                  filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4))'
-                }}
+                className="text-[14px] font-medium leading-tight mb-1"
+                style={{ color: 'rgba(255, 255, 255, 0.92)' }}
               >
-                <Squircle width={56} height={56}>
-                  <img
-                    src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                    alt={item.user?.name || 'Unknown'}
-                    className="w-full h-full object-cover"
-                  />
-                </Squircle>
+                {item.user?.name || 'Unknown'}
+              </div>
+              
+              {/* Divider line */}
+              <div 
+                className="w-full h-[1px] mb-1.5"
+                style={{ background: 'rgba(255, 255, 255, 0.28)' }}
+              />
+              
+              {/* Like count */}
+              <div className="flex items-center gap-1.5">
+                <Heart className="w-3.5 h-3.5" style={{ color: 'rgba(255, 255, 255, 0.75)' }} />
+                <span 
+                  className="text-[13px] font-normal leading-none"
+                  style={{ color: 'rgba(255, 255, 255, 0.75)' }}
+                >
+                  {item.likes || 0} likes
+                </span>
               </div>
             </div>
 
-            {/* Duration badge - below squircle, right-aligned */}
-            {item.duration && typeof item.duration === 'number' && (
-              <div 
-                className="absolute -bottom-[22px] right-3 rounded px-2 py-1 text-white text-[12px] font-medium"
-                style={{ background: 'rgba(0, 0, 0, 0.6)' }}
-              >
-                {Math.floor(item.duration / 60)}:{String(Math.floor(item.duration % 60)).padStart(2, '0')}
+            {/* Creator squircle badge - bottom right, overlapping glass panel */}
+            <div className="absolute bottom-4 right-4 z-20 pointer-events-none">
+              <div className="relative">
+                <div 
+                  className="rounded-[12px] ring-1 ring-white/30"
+                  style={{
+                    filter: 'drop-shadow(0 20px 30px rgba(0, 0, 0, 0.6))'
+                  }}
+                >
+                  <Squircle width={48} height={48}>
+                    <img
+                      src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                      alt={item.user?.name || 'Unknown'}
+                      className="w-full h-full object-cover"
+                    />
+                  </Squircle>
+                </div>
+                
+                {/* Duration badge - attached to squircle */}
+                {item.duration && typeof item.duration === 'number' && (
+                  <div 
+                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[13px] font-medium leading-none px-1.5 py-0.5 rounded-[6px] text-white/90 border border-white/25"
+                    style={{
+                      background: 'rgba(0, 0, 0, 0.6)',
+                      backdropFilter: 'blur(8px)'
+                    }}
+                  >
+                    {Math.floor(item.duration / 60)}:{String(Math.floor(item.duration % 60)).padStart(2, '0')}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          </>
         ) : (
           /* Original portrait meta */
           <div className="absolute bottom-0 left-0 right-0 p-2">
