@@ -101,7 +101,9 @@ export default React.memo(function ShortCard({
               className="flex flex-col min-w-[180px] max-w-[240px] px-3 py-2 rounded-l-xl rounded-r-none backdrop-blur-md transition-transform duration-200 group-hover:scale-[1.02]"
               style={{
                 background: 'rgba(20, 20, 20, 0.55)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+                borderLeft: '1px solid rgba(255, 255, 255, 0.2)',
                 boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6)'
               }}
             >
@@ -122,9 +124,9 @@ export default React.memo(function ShortCard({
               </div>
             </div>
 
-            {/* Avatar squircle - positioned 14px from right edge, 90% overlaps panel, 10% extends above */}
+            {/* Avatar squircle - positioned 12px from right edge, 90% overlaps panel, 10% extends above */}
             <div
-              className="absolute right-[14px] bottom-[14px] w-[56px] h-[56px] rounded-[14px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
+              className="absolute right-[12px] bottom-[14px] w-[56px] h-[56px] rounded-[14px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
               style={{
                 boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
               }}
@@ -150,22 +152,62 @@ export default React.memo(function ShortCard({
             )}
           </div>
         ) : (
-          /* Original portrait meta */
-          <div className="absolute bottom-0 left-0 right-0 p-2">
-            <ShortsCardMeta
-              author={{
-                id: item.user?.id ?? '',
-                name: item.user?.name ?? 'Unknown',
-                avatar: item.user?.avatar ?? '/img/avatar-fallback.png',
-                verified: item.user?.verified,
-                isSelf: item.user?.id === currentUserId
+          /* Portrait meta - unified glass panel + avatar */
+          <div className="absolute bottom-2 right-0 z-10 pointer-events-none">
+            {/* Glass panel - flush to right edge */}
+            <div
+              className="flex flex-col min-w-[180px] max-w-[240px] px-3 py-2 rounded-l-xl rounded-r-none backdrop-blur-md transition-transform duration-200 group-hover:scale-[1.02]"
+              style={{
+                background: 'rgba(20, 20, 20, 0.55)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+                borderLeft: '1px solid rgba(255, 255, 255, 0.2)',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6)'
               }}
-              caption={item.title ?? ''}
-              likeCount={item.likes ?? 0}
-              isLiked={false} // Wire in PR2 with real state
-              onLikeToggle={() => onLike?.(item.id)}
-              onAuthorClick={(id) => onAuthorClick?.(id)}
-            />
+            >
+              {/* Creator name */}
+              <div className="text-white font-semibold text-[15px] leading-tight flex items-center gap-2">
+                <span className="truncate">
+                  {item.user?.name || 'Unknown'}
+                </span>
+              </div>
+
+              {/* Divider line */}
+              <div className="mt-1 mb-1.5 h-px w-[calc(100%-4px)] bg-white/20" />
+
+              {/* Likes row */}
+              <div className="flex items-center gap-2 text-white/90 text-[13px] leading-none">
+                <Heart className="w-3.5 h-3.5" />
+                <span className="tracking-[-0.02em]">{item.likes || 0} likes</span>
+              </div>
+            </div>
+
+            {/* Avatar squircle - positioned 12px from right edge, 90% overlaps panel, 10% extends above */}
+            <div
+              className="absolute right-[12px] bottom-[14px] w-[56px] h-[56px] rounded-[14px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
+              style={{
+                boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
+              }}
+            >
+              <img
+                src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                alt={item.user?.name || 'Unknown'}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Duration badge - attached to squircle */}
+            {item.duration && typeof item.duration === 'number' && (
+              <div 
+                className="absolute right-2 bottom-[-8px] text-[13px] font-medium leading-none px-1.5 py-0.5 rounded-[6px] text-white/90 border border-white/25 z-10"
+                style={{
+                  background: 'rgba(0, 0, 0, 0.6)',
+                  backdropFilter: 'blur(8px)'
+                }}
+              >
+                {Math.floor(item.duration / 60)}:{String(Math.floor(item.duration % 60)).padStart(2, '0')}
+              </div>
+            )}
           </div>
         )}
       </div>
