@@ -98,13 +98,13 @@ export default React.memo(function ShortCard({
           <div className="absolute bottom-2 right-0 z-10 pointer-events-none">
             {/* Glass panel - flush to right edge */}
             <div
-              className="flex flex-col min-w-[180px] max-w-[320px] px-3 py-2 rounded-l-xl rounded-r-none backdrop-blur-md transition-transform duration-200 group-hover:scale-[1.02]"
+              className="flex flex-col min-w-[180px] max-w-[240px] px-3 py-2 rounded-l-xl rounded-r-none backdrop-blur-md transition-transform duration-200 group-hover:scale-[1.02]"
               style={{
-                background: 'rgba(255, 255, 255, 0.15)',
-                borderTop: '1px solid rgba(255, 255, 255, 0.3)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.3)',
-                borderLeft: '1px solid rgba(255, 255, 255, 0.3)',
-                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4)'
+                background: 'rgba(20, 20, 20, 0.55)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+                borderLeft: '1px solid rgba(255, 255, 255, 0.2)',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6)'
               }}
             >
               {/* Creator name */}
@@ -158,11 +158,11 @@ export default React.memo(function ShortCard({
             <div
               className="flex flex-col min-w-[126px] max-w-[168px] px-2 py-1.5 rounded-l-lg rounded-r-none backdrop-blur-md transition-transform duration-200 group-hover:scale-[1.02]"
               style={{
-                background: 'rgba(255, 255, 255, 0.15)',
-                borderTop: '1px solid rgba(255, 255, 255, 0.3)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.3)',
-                borderLeft: '1px solid rgba(255, 255, 255, 0.3)',
-                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4)'
+                background: 'rgba(20, 20, 20, 0.55)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+                borderLeft: '1px solid rgba(255, 255, 255, 0.2)',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6)'
               }}
             >
               {/* Creator name */}
