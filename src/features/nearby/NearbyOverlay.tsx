@@ -10,6 +10,7 @@ import { useVisibility } from './hooks/useVisibility';
 import { useGameBeacon } from './hooks/useGameBeacon';
 import { OpenToPlayButton } from './components/OpenToPlayButton';
 import { BottomSheet } from '@/components/ui/BottomSheet';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 
 interface NearbyOverlayProps {
   isOpen: boolean;
@@ -218,18 +219,19 @@ function GolferRow({ golfer, index }: GolferRowProps) {
       <div className="grid grid-cols-[56px_1fr] gap-3 items-center">
         {/* Avatar - spans 3 rows */}
         <div className="row-span-3 relative">
-          <img
+          <AvatarSquircle
+            size={56}
             src={golfer.avatar_url || '/placeholder.svg'}
             alt={golfer.display_name}
-            className="w-14 h-14 rounded-2xl object-cover"
-          />
-          {golfer.is_online && (
-            <span
-              className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2"
-              style={{ background: '#6e9277', borderColor: '#1a1a1a' }}
-              aria-label="Online"
-            />
-          )}
+          >
+            {golfer.is_online && (
+              <span
+                className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2"
+                style={{ background: '#6e9277', borderColor: '#1a1a1a' }}
+                aria-label="Online"
+              />
+            )}
+          </AvatarSquircle>
         </div>
 
         {/* Row 1: Name + Distance */}
