@@ -284,6 +284,26 @@ export default function ShortsGrid({
   // REMOVED: Observer registration now happens in registerCardRef callback
   // This useEffect was running before cards mounted, causing observer to never attach
 
+  // Fast-path: Pre-mark first eligible card for instant autoplay (before viewport detection)
+  useEffect(() => {
+    if (layout.length === 0) return;
+    
+    // Find the first card that matches our autoplay cadence
+    const firstEligible = layout.find((layoutItem, idx) => {
+      if (layoutItem.variant === 'landscape') return true;
+      const positionInPattern = idx % 4;
+      return positionInPattern === 0 || positionInPattern === 3;
+    });
+    
+    if (firstEligible) {
+      setAutoplayMap(prev => ({
+        ...prev,
+        [firstEligible.item.id]: true,
+      }));
+      console.log('[Shorts] Fast-path pre-autoplay for', firstEligible.item.id);
+    }
+  }, []); // Run only once on mount
+
   // Mark initial above-the-fold cards for immediate attachment & autoplay
   // FIX: Retry until refs are actually registered before checking viewport
   useEffect(() => {
