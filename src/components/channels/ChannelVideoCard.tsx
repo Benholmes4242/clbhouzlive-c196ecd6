@@ -1,24 +1,10 @@
 import React, { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { MoreVertical, CheckCircle2 } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ChannelVideo } from '@/hooks/channels/useChannelsFeed';
 import { getStreamPoster } from '@/utils/stream';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Squircle } from '@/components/ui/squircle';
 
 const FALLBACK_THUMBNAIL = 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=1280&q=60&auto=format';
 
@@ -106,101 +92,82 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
   const timeAgo = formatDistanceToNow(new Date(video.created_at), { addSuffix: true });
 
   const content = (
-    <>
-      {/* Thumbnail */}
-      <div className="relative w-full md:w-80 md:flex-shrink-0 aspect-video bg-muted rounded-lg overflow-hidden">
-        {!imageLoaded && (
-          <div className="absolute inset-0 animate-pulse bg-muted rounded-lg pointer-events-none" />
-        )}
-        <img 
-          src={thumbnailUrl}
-          alt={title}
-          className="w-full h-full aspect-video object-cover rounded-lg"
-          loading="lazy"
-          onLoad={() => setImageLoaded(true)}
-          onError={() => setThumbnailUrl(FALLBACK_THUMBNAIL)}
-        />
-        {/* Duration overlay */}
+    <div className="relative w-full aspect-video bg-muted rounded-lg overflow-hidden group">
+      {/* Video thumbnail */}
+      {!imageLoaded && (
+        <div className="absolute inset-0 animate-pulse bg-muted rounded-lg pointer-events-none" />
+      )}
+      <img 
+        src={thumbnailUrl}
+        alt={title}
+        className="w-full h-full object-cover rounded-lg"
+        loading="lazy"
+        onLoad={() => setImageLoaded(true)}
+        onError={() => setThumbnailUrl(FALLBACK_THUMBNAIL)}
+      />
+
+      {/* Dark glass overlay metadata card at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 px-3 pb-3 pointer-events-none">
+        <div 
+          className="relative backdrop-blur-[12px] rounded-[6px] overflow-hidden transition-transform duration-200 group-hover:scale-[1.05]"
+          style={{
+            background: 'rgba(25, 25, 25, 0.6)',
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)'
+          }}
+        >
+          {/* Metadata content */}
+          <div className="px-4 pt-3 pb-3">
+            {/* Username */}
+            <div className="text-white font-medium text-[14px] leading-tight mb-2">
+              {creatorName}
+            </div>
+            
+            {/* Divider line */}
+            <div 
+              className="w-full h-[1px] mb-2"
+              style={{ background: 'rgba(255, 255, 255, 0.15)' }}
+            />
+            
+            {/* Like count */}
+            <div className="flex items-center gap-1.5">
+              <Heart className="w-4 h-4" style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+              <span 
+                className="text-[14px] font-normal"
+                style={{ color: 'rgba(255, 255, 255, 0.7)' }}
+              >
+                {formatViews(video.views_count)}
+              </span>
+            </div>
+          </div>
+
+          {/* Squircle profile thumbnail - overlapping top-right */}
+          <div 
+            className="absolute -top-4 right-3"
+            style={{
+              filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4))'
+            }}
+          >
+            <Squircle width={56} height={56}>
+              <img
+                src={creator?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                alt={creatorName}
+                className="w-full h-full object-cover"
+              />
+            </Squircle>
+          </div>
+        </div>
+
+        {/* Duration badge - below squircle, right-aligned */}
         {duration && (
           <div 
-            className="absolute bottom-2 right-2 rounded-md bg-[rgba(0,0,0,0.65)] text-white text-xs px-2 py-1 font-medium"
-            aria-label={`duration ${Math.floor(duration / 60)} minutes ${Math.floor(duration % 60)} seconds`}
+            className="absolute -bottom-[22px] right-3 rounded px-2 py-1 text-white text-[12px] font-medium"
+            style={{ background: 'rgba(0, 0, 0, 0.6)' }}
           >
             {formatDuration(duration)}
           </div>
         )}
       </div>
-
-      {/* Content */}
-      <div className="flex-1 flex flex-col justify-start gap-1 min-w-0">
-        {/* Title row with menu */}
-        <div className="flex items-start gap-2">
-          <h3 className="flex-1 font-semibold text-base leading-tight line-clamp-2 text-foreground min-w-0">
-            {title}
-          </h3>
-          
-          {/* Actions menu */}
-          <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="p-2 hover:bg-muted rounded-full transition-colors">
-                <MoreVertical className="w-5 h-5 text-muted-foreground" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem 
-                  onClick={() => handleMenuAction('save')}
-                  disabled={isMock}
-                >
-                  Save to playlist
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => handleMenuAction('share')}
-                  disabled={isMock}
-                >
-                  Share
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => handleMenuAction('report')}
-                  disabled={isMock}
-                  className="text-destructive"
-                >
-                  Report
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-
-        {/* Creator row */}
-        <div className="flex items-center gap-2 mt-1">
-          <Avatar className="w-6 h-6">
-            <AvatarImage src={creator?.profile_photo_url || undefined} alt={creatorName} />
-            <AvatarFallback className="text-xs">
-              {creatorName.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-            <span className="font-medium">{creatorName}</span>
-            {creator?.is_verified && (
-              <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-            )}
-          </div>
-        </div>
-
-        {/* Metadata row with course chip */}
-        <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <span>{formatViews(video.views_count)}</span>
-            <span>•</span>
-            <span>{timeAgo}</span>
-          </div>
-          {courseName && (
-            <span className="bg-muted px-2.5 py-1 rounded-full text-xs shrink-0">
-              🏌️ {courseName}
-            </span>
-          )}
-        </div>
-      </div>
-    </>
+    </div>
   );
 
   return (
@@ -208,7 +175,7 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
       {isMock ? (
         <Link
           to={`/channel/mock-${mockIndex}`}
-          className="group flex flex-col md:flex-row gap-3 md:gap-4 cursor-pointer rounded-lg p-2 md:p-3 transition-colors"
+          className="block cursor-pointer rounded-lg p-2 transition-colors"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
@@ -216,7 +183,7 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
         </Link>
       ) : (
         <div
-          className="group flex flex-col md:flex-row gap-3 md:gap-4 cursor-pointer rounded-lg p-2 md:p-3 transition-colors"
+          className="cursor-pointer rounded-lg p-2 transition-colors"
           onClick={handleClick}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
@@ -224,7 +191,6 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
           {content}
         </div>
       )}
-
     </>
   );
 };
