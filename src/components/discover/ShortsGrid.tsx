@@ -57,20 +57,9 @@ export default function ShortsGrid({
   // Shared autoplay state managed by single IntersectionObserver
   const [autoplayMap, setAutoplayMap] = useState<Record<string, boolean>>({});
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const cardRefsMap = useRef<Map<string, HTMLDivElement>>(new Map());
 
   // Track column width to compute pixel-perfect height from aspect ratio
   const [columnWidth, setColumnWidth] = useState(0);
-  
-  // Performance timing
-  const mountTimeRef = useRef<number>(0);
-
-  // Start performance timing
-  useEffect(() => {
-    mountTimeRef.current = performance.now();
-    console.time('[shorts-autoplay-first-frame]');
-    console.log('[Shorts] Component mounted at', mountTimeRef.current);
-  }, []);
 
   const updateColumnWidth = useCallback(() => {
     const el = gridRef.current;
@@ -127,72 +116,52 @@ export default function ShortsGrid({
   // Register card ref for shared observer - observe immediately on registration
   const registerCardRef = useCallback((id: string, element: HTMLDivElement | null) => {
     if (element) {
-      cardRefsMap.current.set(id, element);
-      
-      // NEW: Observe immediately when card registers, not in separate effect
+      // Observe immediately when card registers
       if (observerRef.current) {
         observerRef.current.observe(element);
-        console.log('[Shorts] Registered and observing card:', id);
       }
     } else {
       // Unregister
-      const existing = cardRefsMap.current.get(id);
+      const existing = document.querySelector(`[data-card-id="${id}"]`);
       if (existing && observerRef.current) {
         observerRef.current.unobserve(existing);
       }
-      cardRefsMap.current.delete(id);
     }
   }, []);
 
-  // Create single shared IntersectionObserver on mount
+  // Create single shared IntersectionObserver on mount with simple rule:
+  // Left cards (col 0), second-row right cards (col 1, row 2+), and landscape cards autoplay when in view
   useEffect(() => {
-    if (observerRef.current) return;
-
-    console.log('[Shorts] Creating shared IntersectionObserver');
-    
     observerRef.current = new IntersectionObserver(
       (entries) => {
-        const updates: Record<string, boolean> = {};
-        let firstPlayTriggered = false;
-        
         entries.forEach((entry) => {
           const cardId = entry.target.getAttribute('data-card-id');
           if (!cardId) return;
           
-          const isVisible = entry.isIntersecting && entry.intersectionRatio >= 0.2;
+          const variant = entry.target.getAttribute('data-variant');
+          const gridPosition = parseInt(entry.target.getAttribute('data-grid-position') || '0', 10);
+          const colIndex = gridPosition % 2; // 0 = left, 1 = right
           
-          if (isVisible) {
-            // Determine if this card should autoplay based on position
-            const gridPosition = parseInt(entry.target.getAttribute('data-grid-position') || '0', 10);
-            const variant = entry.target.getAttribute('data-variant');
-            
-            let shouldAutoplay = false;
+          // Simple rule: autoplay if visible AND (landscape OR left card OR second-row+ right card)
+          let shouldAutoplay = false;
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
             if (variant === 'landscape') {
               shouldAutoplay = true;
             } else {
-              // Portrait cards: position 0 or 3 in repeating pattern of 4
-              const positionInPattern = gridPosition % 4;
-              shouldAutoplay = positionInPattern === 0 || positionInPattern === 3;
+              // Portrait: left column (0) OR right column position 3+ (second row onwards)
+              shouldAutoplay = colIndex === 0 || gridPosition >= 3;
             }
-            
-            updates[cardId] = shouldAutoplay;
-            
-            // Track first successful autoplay for telemetry
-            if (shouldAutoplay && !firstPlayTriggered) {
-              firstPlayTriggered = true;
-              console.timeEnd('[shorts-autoplay-first-frame]');
-              console.log('[Shorts] First video autoplaying at', performance.now() - mountTimeRef.current, 'ms after mount');
-            }
-          } else {
-            updates[cardId] = false;
           }
+          
+          setAutoplayMap(prev => {
+            if (prev[cardId] === shouldAutoplay) return prev;
+            return { ...prev, [cardId]: shouldAutoplay };
+          });
         });
-        
-        setAutoplayMap(prev => ({ ...prev, ...updates }));
       },
       {
-        threshold: [0, 0.2, 0.5, 1.0],
-        rootMargin: '0px'
+        threshold: [0, 0.5, 1.0],
+        rootMargin: '100px'
       }
     );
 
@@ -281,98 +250,6 @@ export default function ShortsGrid({
     return result;
   }, [items, baseHeightPx]);
 
-  // REMOVED: Observer registration now happens in registerCardRef callback
-  // This useEffect was running before cards mounted, causing observer to never attach
-
-  // Fast-path: Pre-mark first eligible card for instant autoplay (before viewport detection)
-  useEffect(() => {
-    console.log('[Shorts] Fast-path effect running, layout.length =', layout.length);
-    
-    if (layout.length === 0) {
-      console.log('[Shorts] Fast-path skipped - layout empty');
-      return;
-    }
-    
-    // Find the first card that matches our autoplay cadence
-    const firstEligible = layout.find((layoutItem, idx) => {
-      if (layoutItem.variant === 'landscape') return true;
-      const positionInPattern = idx % 4;
-      return positionInPattern === 0 || positionInPattern === 3;
-    });
-    
-    if (firstEligible) {
-      setAutoplayMap(prev => ({
-        ...prev,
-        [firstEligible.item.id]: true,
-      }));
-      console.log('[Shorts] Fast-path pre-autoplay for', firstEligible.item.id);
-    } else {
-      console.log('[Shorts] Fast-path found no eligible card');
-    }
-  }, [layout]); // FIX: Must depend on layout so it runs when data loads
-
-  // Mark initial above-the-fold cards for immediate attachment & autoplay
-  // FIX: Retry until refs are actually registered before checking viewport
-  useEffect(() => {
-    if (layout.length === 0) return;
-    
-    console.log('[Shorts] Detecting initial viewport cards');
-    
-    let tries = 0;
-    const maxTries = 10; // Max 10 RAF attempts (~160ms max)
-    
-    function attemptInitialAutoplay() {
-      // Check if we have refs for the first cards yet
-      const firstIds = layout.slice(0, 4).map(l => l.item.id);
-      const registeredCount = firstIds.filter(id => cardRefsMap.current.has(id)).length;
-      
-      console.log('[Shorts] Attempt', tries + 1, '- Registered refs:', registeredCount, '/', firstIds.length);
-      
-      // If we don't have all refs yet and haven't exceeded max tries, retry
-      if (registeredCount < firstIds.length && tries < maxTries) {
-        tries += 1;
-        requestAnimationFrame(attemptInitialAutoplay);
-        return;
-      }
-      
-      // Now we have refs (or gave up) - run the existing logic
-      const initialAutoplay: Record<string, boolean> = {};
-      let count = 0;
-      
-      // Check first 4 cards (likely above fold)
-      layout.slice(0, 4).forEach((layoutItem, idx) => {
-        const element = cardRefsMap.current.get(layoutItem.item.id);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
-          
-          if (isInViewport) {
-            // Apply same autoplay pattern logic
-            if (layoutItem.variant === 'landscape') {
-              initialAutoplay[layoutItem.item.id] = true;
-              count++;
-            } else {
-              const positionInPattern = idx % 4;
-              const shouldAutoplay = positionInPattern === 0 || positionInPattern === 3;
-              if (shouldAutoplay) {
-                initialAutoplay[layoutItem.item.id] = true;
-                count++;
-              }
-            }
-          }
-        }
-      });
-      
-      if (count > 0) {
-        console.log('[Shorts] Marking', count, 'initial cards for immediate autoplay');
-        setAutoplayMap(prev => ({ ...prev, ...initialAutoplay }));
-      } else {
-        console.log('[Shorts] No initial cards found in viewport after', tries, 'attempts');
-      }
-    }
-    
-    requestAnimationFrame(attemptInitialAutoplay);
-  }, [layout]);
 
   // Organize layout into rows: 2x2 portrait grids with landscape breaks
   const { firstRow, sections } = useMemo(() => {
