@@ -122,9 +122,9 @@ export default React.memo(function ShortCard({
               </div>
             </div>
 
-            {/* Avatar squircle - positioned 16px from right edge, overlaps LEFT edge of panel */}
+            {/* Avatar squircle - positioned 16px from right edge, 80% overlaps panel, 20% extends above */}
             <div
-              className="absolute right-4 bottom-[8px] w-[48px] h-[48px] rounded-[12px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
+              className="absolute right-4 bottom-[22px] w-[48px] h-[48px] rounded-[12px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
               style={{
                 boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
               }}
