@@ -92,7 +92,9 @@ html, body {
   /* Core surfaces */
   --bg-page: #000000;
   --bg-surface: #0F0F0F;
-  --bg-card: #141414;
+  --bg-card: rgba(255,255,255,0.06);
+  --bg-card-hover: rgba(255,255,255,0.08);
+  --bg-card-subtle: rgba(255,255,255,0.03);
   --bg-modal: #1A1A1A;
   
   /* Overlays / translucency */
@@ -102,14 +104,26 @@ html, body {
   
   /* Borders / hairlines / separators */
   --border-hairline: rgba(255,255,255,0.08);
+  --border-low: rgba(255,255,255,0.07);
+  --border-mid: rgba(255,255,255,0.12);
   
   /* Text */
-  --text-primary: #FFFFFF;
-  --text-secondary: #8A8A8A;
+  --text-primary: rgba(255,255,255,0.88);
+  --text-secondary: rgba(255,255,255,0.64);
+  --text-tertiary: rgba(255,255,255,0.44);
   
   /* Accent */
   --accent-primary: #6e9277;
   --accent-clbhouz: #6E9277;
+  --accent-green-bg: #6e9277;
+  --accent-green-text: #ffffff;
+  
+  /* Pills */
+  --pill-inactive-bg: rgba(255,255,255,0.06);
+  --pill-inactive-text: rgba(255,255,255,0.88);
+  
+  /* Overlays */
+  --hover-overlay: rgba(255,255,255,0.05);
 
   /* Dark Mode Discover Navigation Tokens */
   --bg-app: #000000;

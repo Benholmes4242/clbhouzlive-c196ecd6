@@ -149,21 +149,29 @@ export function RequestGameSheet({
     <BottomSheet open={open} onClose={onClose} zIndexBase={1500} ariaLabelledBy="request-game-title">
       <div className="max-h-[78vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between shrink-0" style={{ padding: '12px 20px' }}>
-          <h2 id="request-game-title" className="text-[18px] font-semibold">Request a game</h2>
+        <header
+          className="flex items-center justify-between border-b shrink-0"
+          style={{ padding: '12px 20px', borderColor: 'var(--border-mid)' }}
+        >
+          <h2 id="request-game-title" className="text-[18px] font-semibold" style={{ color: 'var(--text-primary)' }}>
+            Request a game
+          </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors"
+            className="rounded-full p-2"
+            style={{ background: 'transparent' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hover-overlay)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
           >
-            <X size={20} />
+            <X className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
           </button>
-        </div>
+        </header>
 
         {/* Scrollable content */}
         <div className="px-4 pb-2 grow overflow-y-auto overscroll-contain"  style={{ paddingTop: '12px' }}>
           {/* When */}
           <div className="mb-6">
-            <label className="block text-[13px] font-semibold text-black/[0.56] dark:text-white/[0.64] mb-2.5">
+            <label className="block text-[13px] font-semibold mb-2.5" style={{ color: 'var(--text-secondary)' }}>
               When
             </label>
             <div className="flex gap-2">
@@ -172,13 +180,18 @@ export function RequestGameSheet({
                   key={option.value}
                   onClick={() => setWhen(option.value)}
                   aria-pressed={when === option.value}
-                  className={cn(
-                    'flex-1 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all',
-                    'border',
-                    when === option.value
-                      ? 'bg-[#E7EFEA] border-[#D2E1D7] text-[#0b0b0b] shadow-[0_0_0_3px_rgba(110,146,119,0.28)]'
-                      : 'bg-[#F4F6F5] dark:bg-white/[0.06] border-transparent text-black/[0.72] dark:text-white/[0.88]'
-                  )}
+                  className="flex-1 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all"
+                  style={when === option.value ? {
+                    backgroundColor: 'rgba(110,146,119,0.18)',
+                    border: '1px solid rgba(110,146,119,0.45)',
+                    boxShadow: '0 0 0 3px rgba(110,146,119,0.28)',
+                    color: 'var(--accent-green-text)',
+                    fontWeight: 600,
+                  } : {
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-mid)',
+                    color: 'var(--text-primary)',
+                  }}
                 >
                   {option.label}
                 </button>
@@ -188,7 +201,7 @@ export function RequestGameSheet({
 
           {/* Where */}
           <div className="mb-6">
-            <label className="block text-[13px] font-semibold text-black/[0.56] dark:text-white/[0.64] mb-2.5">
+            <label className="block text-[13px] font-semibold mb-2.5" style={{ color: 'var(--text-secondary)' }}>
               Where
             </label>
             <input
@@ -200,18 +213,18 @@ export function RequestGameSheet({
                 // For now, use the name as ID (TODO: implement proper autocomplete)
                 setClubId(e.target.value);
               }}
-              className={cn(
-                'w-full px-3.5 py-3 rounded-2xl text-sm',
-                'bg-[#F4F6F5] dark:bg-white/[0.06]',
-                'border border-black/[0.06] dark:border-white/[0.12]',
-                'focus:outline-none focus:ring-2 focus:ring-[#6E9277]/30'
-              )}
+              className="w-full px-3.5 py-3 rounded-2xl text-sm placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#6E9277]/30"
+              style={{
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--border-mid)',
+                color: 'var(--text-primary)',
+              }}
             />
           </div>
 
           {/* Players needed */}
           <div className="mb-6">
-            <label className="block text-[13px] font-semibold text-black/[0.56] dark:text-white/[0.64] mb-2.5">
+            <label className="block text-[13px] font-semibold mb-2.5" style={{ color: 'var(--text-secondary)' }}>
               Players needed
             </label>
             <div className="flex gap-2">
@@ -220,13 +233,18 @@ export function RequestGameSheet({
                   key={n}
                   onClick={() => setPlayersNeeded(n as 1 | 2 | 3)}
                   aria-pressed={playersNeeded === n}
-                  className={cn(
-                    'flex-1 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all',
-                    'border',
-                    playersNeeded === n
-                      ? 'bg-[#E7EFEA] border-[#D2E1D7] text-[#0b0b0b] shadow-[0_0_0_3px_rgba(110,146,119,0.28)]'
-                      : 'bg-[#F4F6F5] dark:bg-white/[0.06] border-transparent text-black/[0.72] dark:text-white/[0.88]'
-                  )}
+                  className="flex-1 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all"
+                  style={playersNeeded === n ? {
+                    backgroundColor: 'rgba(110,146,119,0.18)',
+                    border: '1px solid rgba(110,146,119,0.45)',
+                    boxShadow: '0 0 0 3px rgba(110,146,119,0.28)',
+                    color: 'var(--accent-green-text)',
+                    fontWeight: 600,
+                  } : {
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-mid)',
+                    color: 'var(--text-primary)',
+                  }}
                 >
                   {n}
                 </button>
@@ -236,7 +254,7 @@ export function RequestGameSheet({
 
           {/* Format */}
           <div className="mb-6">
-            <label className="block text-[13px] font-semibold text-black/[0.56] dark:text-white/[0.64] mb-2.5">
+            <label className="block text-[13px] font-semibold mb-2.5" style={{ color: 'var(--text-secondary)' }}>
               Format
             </label>
             <div className="flex flex-wrap gap-2">
@@ -244,13 +262,18 @@ export function RequestGameSheet({
                 <button
                   key={option.value}
                   onClick={() => setFormat(option.value)}
-                  className={cn(
-                    'px-3 py-2 rounded-full text-xs font-medium transition-all',
-                    'border',
-                    format === option.value
-                      ? 'bg-[#E7EFEA] border-[#D2E1D7] text-[#0b0b0b]'
-                      : 'bg-white dark:bg-white/[0.06] border-black/[0.06] dark:border-white/[0.12] text-black/[0.72] dark:text-white/[0.88]'
-                  )}
+                  className="px-3 py-2 rounded-full text-xs font-medium transition-all"
+                  style={format === option.value ? {
+                    backgroundColor: 'rgba(110,146,119,0.18)',
+                    border: '1px solid rgba(110,146,119,0.45)',
+                    boxShadow: '0 0 0 3px rgba(110,146,119,0.28)',
+                    color: 'var(--accent-green-text)',
+                    fontWeight: 600,
+                  } : {
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-mid)',
+                    color: 'var(--text-primary)',
+                  }}
                 >
                   {option.label}
                 </button>
@@ -260,7 +283,7 @@ export function RequestGameSheet({
 
           {/* Notes */}
           <div className="mb-6">
-            <label className="block text-[13px] font-semibold text-black/[0.56] dark:text-white/[0.64] mb-2.5">
+            <label className="block text-[13px] font-semibold mb-2.5" style={{ color: 'var(--text-secondary)' }}>
               Notes (optional)
             </label>
             <Textarea
@@ -268,18 +291,18 @@ export function RequestGameSheet({
               onChange={(e) => setNotes(e.target.value.slice(0, 240))}
               placeholder="Add details about the game…"
               maxLength={240}
-              className={cn(
-                'w-full min-h-[92px] px-3.5 py-3 rounded-2xl text-sm resize-none',
-                'bg-[#F4F6F5] dark:bg-white/[0.06]',
-                'border border-black/[0.06] dark:border-white/[0.12]',
-                'focus:outline-none focus:ring-2 focus:ring-[#6E9277]/30'
-              )}
+              className="w-full min-h-[92px] px-3.5 py-3 rounded-2xl text-sm resize-none placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#6E9277]/30"
+              style={{
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--border-mid)',
+                color: 'var(--text-primary)',
+              }}
             />
           </div>
 
           {/* Audience */}
           <div className="mb-6">
-            <label className="block text-[13px] font-semibold text-black/[0.56] dark:text-white/[0.64] mb-2.5">
+            <label className="block text-[13px] font-semibold mb-2.5" style={{ color: 'var(--text-secondary)' }}>
               Audience
             </label>
             <div className="flex gap-2">
@@ -288,13 +311,18 @@ export function RequestGameSheet({
                   key={option.value}
                   onClick={() => setAudience(option.value)}
                   aria-pressed={audience === option.value}
-                  className={cn(
-                    'flex-1 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all',
-                    'border',
-                    audience === option.value
-                      ? 'bg-[#E7EFEA] border-[#D2E1D7] text-[#0b0b0b] shadow-[0_0_0_3px_rgba(110,146,119,0.28)]'
-                      : 'bg-[#F4F6F5] dark:bg-white/[0.06] border-transparent text-black/[0.72] dark:text-white/[0.88]'
-                  )}
+                  className="flex-1 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all"
+                  style={audience === option.value ? {
+                    backgroundColor: 'rgba(110,146,119,0.18)',
+                    border: '1px solid rgba(110,146,119,0.45)',
+                    boxShadow: '0 0 0 3px rgba(110,146,119,0.28)',
+                    color: 'var(--accent-green-text)',
+                    fontWeight: 600,
+                  } : {
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-mid)',
+                    color: 'var(--text-primary)',
+                  }}
                 >
                   {option.label}
                 </button>
@@ -304,15 +332,15 @@ export function RequestGameSheet({
 
           {/* Push notification toggle */}
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-black/[0.72] dark:text-white/[0.88]">
+            <label className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
               Send push notification
             </label>
             <button
               onClick={() => setPush(!push)}
-              className={cn(
-                'w-11 h-6 rounded-full transition-colors relative',
-                push ? 'bg-[#6E9277]' : 'bg-black/[0.12] dark:bg-white/[0.12]'
-              )}
+              className="w-11 h-6 rounded-full transition-colors relative"
+              style={{
+                backgroundColor: push ? '#6E9277' : 'rgba(255,255,255,0.12)',
+              }}
             >
               <div
                 className={cn(
@@ -325,37 +353,45 @@ export function RequestGameSheet({
         </div>
 
         {/* Sticky footer */}
-        <footer className="px-4 pt-2 pb-4 shrink-0 sticky bottom-0 bg-white/85 dark:bg-black/85 backdrop-blur-sm">
-          <div style={{ paddingBottom: 'max(0px, env(safe-area-inset-bottom))' }}>
+        <footer
+          className="px-4 pt-2 pb-4 shrink-0 sticky bottom-0"
+          style={{
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            borderTop: '1px solid var(--border-mid)',
+            paddingBottom: 'calc(16px + env(safe-area-inset-bottom))',
+          }}
+        >
           {error && (
-            <div className="mb-3 text-sm text-red-600 dark:text-red-400">{error}</div>
+            <div className="mb-3 text-sm text-red-400">{error}</div>
           )}
-          <Button
+          <button
             onClick={handleSubmit}
             disabled={!isValid || isSubmitting}
-            className={cn(
-              'w-full h-12 rounded-2xl font-bold text-white mb-2',
-              'bg-[#6E9277] hover:bg-[#6E9277]/90',
-              'disabled:opacity-40'
-            )}
+            className="w-full h-12 rounded-2xl font-bold mb-2"
+            style={{
+              backgroundColor: isValid && !isSubmitting ? 'var(--accent-green-bg)' : 'rgba(110,146,119,0.4)',
+              color: 'var(--accent-green-text)',
+              cursor: isValid && !isSubmitting ? 'pointer' : 'not-allowed',
+            }}
           >
             {isSubmitting ? 'Sending…' : 'Send request'}
-          </Button>
+          </button>
           <button
             onClick={() => {
               // TODO: Implement save preset
               console.log('Save preset');
             }}
-            className={cn(
-              'w-full h-10 rounded-xl text-sm font-medium',
-              'bg-transparent border border-black/[0.06] dark:border-white/[0.12]',
-              'text-black/[0.72] dark:text-white/[0.88]',
-              'hover:bg-black/5 dark:hover:bg-white/5'
-            )}
+            className="w-full h-10 rounded-xl text-sm font-medium"
+            style={{
+              backgroundColor: 'transparent',
+              border: '1px solid var(--border-mid)',
+              color: 'var(--text-primary)',
+            }}
           >
             Save preset
           </button>
-          </div>
         </footer>
       </div>
     </BottomSheet>

@@ -52,20 +52,23 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       <BottomSheet open={isOpen} onClose={onClose} zIndexBase={1400} ariaLabelledBy="nearby-title">
         <div className={`max-h-[78vh] flex flex-col ${showComposer ? 'sheet-dim' : ''}`}>
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-black/10 shrink-0" style={{ padding: '12px 20px' }}>
-            <h2 id="nearby-title" className="text-[18px] font-semibold" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
-              Golfers near you
-            </h2>
+          <div className="flex items-start justify-between border-b shrink-0" style={{ padding: '12px 20px', borderColor: 'var(--border-mid)' }}>
             <div className="flex items-center gap-3">
+              <h2 id="nearby-title" className="text-[18px] font-semibold" style={{ color: 'var(--text-primary)' }}>
+                Golfers near you
+              </h2>
               <VisibilityToggle value={visible} onChange={setVisible} />
-              <button
-                onClick={onClose}
-                className="p-2 rounded-full hover:bg-black/5 transition-colors"
-                aria-label="Close"
-              >
-                <X className="w-5 h-5" style={{ color: 'rgba(0, 0, 0, 0.6)' }} />
-              </button>
             </div>
+            <button
+              onClick={onClose}
+              className="rounded-full p-2"
+              style={{ background: 'transparent' }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hover-overlay)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />
+            </button>
           </div>
 
           {/* Scrollable Content */}
@@ -73,22 +76,22 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           {isLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="animate-pulse flex items-center gap-4 p-4 rounded-xl bg-black/5">
-                  <div className="w-12 h-12 rounded-2xl bg-black/10" />
+                <div key={i} className="animate-pulse flex items-center gap-4 p-4 rounded-xl" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
+                  <div className="w-12 h-12 rounded-2xl" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-black/10 rounded w-1/3" />
-                    <div className="h-3 bg-black/10 rounded w-1/2" />
+                    <div className="h-4 rounded w-1/3" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                    <div className="h-3 rounded w-1/2" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
                   </div>
                 </div>
               ))}
             </div>
           ) : golfers.length === 0 ? (
             <div className="text-center py-12">
-              <MapPin className="w-12 h-12 mx-auto mb-4" style={{ color: 'rgba(0, 0, 0, 0.3)' }} />
-              <p className="font-medium mb-2" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
+              <MapPin className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--text-tertiary)' }} />
+              <p className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                 No golfers nearby right now
               </p>
-              <p className="text-sm" style={{ color: 'rgba(0, 0, 0, 0.6)' }}>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                 Check again later
               </p>
             </div>
@@ -103,46 +106,55 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
 
           {/* Active Beacon Summary */}
           {activeBeacon && (
-            <div className="border-b border-black/10" style={{ padding: '12px 16px', background: 'rgba(110, 146, 119, 0.1)' }}>
-            <div className="text-sm font-medium mb-2" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
-              Beacon sent — {activeBeacon.playersNeeded} player{activeBeacon.playersNeeded > 1 ? 's' : ''} notified
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowComposer(true)}
-                className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
-                style={{ background: 'rgba(255, 255, 255, 0.9)', color: 'rgba(0, 0, 0, 0.88)' }}
-              >
-                Manage beacon
-              </button>
-              <button
-                onClick={() => cancelBeacon(activeBeacon.id)}
-                className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
-                style={{ color: '#dc2626' }}
-              >
-                Cancel beacon
-              </button>
+            <div className="flex items-start justify-between" style={{ backgroundColor: 'var(--bg-card-subtle)', borderBottom: '1px solid var(--border-mid)', padding: '12px 16px' }}>
+              <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                You're currently "Open to Play"
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowComposer(true)}
+                  className="rounded-md px-3 py-1.5 text-xs font-medium"
+                  style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border-low)' }}
+                >
+                  Manage beacon
+                </button>
+                <button
+                  onClick={() => cancelBeacon(activeBeacon.id)}
+                  className="rounded-md px-3 py-1.5 text-xs font-medium text-red-400"
+                  style={{ backgroundColor: 'transparent', border: '1px solid rgba(244,63,94,0.4)' }}
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           )}
 
           {/* Sticky Footer */}
           {golfers.length > 0 && (
-            <div className="border-t border-black/10 space-y-3 shrink-0 sticky bottom-0 bg-white/75 backdrop-blur-sm" style={{ padding: '12px 16px 16px' }}>
-            <Button
-              className="w-full"
-              onClick={() => {
-                analyticsEvents.track('beacon_open_composer');
-                setShowComposer(true);
+            <footer
+              className="sticky bottom-0 space-y-3 shrink-0"
+              style={{
+                backgroundColor: 'rgba(0,0,0,0.6)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                borderTop: '1px solid var(--border-mid)',
+                padding: '12px 16px 16px',
               }}
-              style={{ background: '#6e9277', color: 'white' }}
             >
-              Create game
-            </Button>
+              <button
+                className="w-full h-12 font-bold rounded-xl"
+                onClick={() => {
+                  analyticsEvents.track('beacon_open_composer');
+                  setShowComposer(true);
+                }}
+                style={{ backgroundColor: 'var(--accent-green-bg)', color: 'var(--accent-green-text)' }}
+              >
+                Create game
+              </button>
               <div className="flex justify-center">
                 <OpenToPlayButton />
               </div>
-            </div>
+            </footer>
           )}
         </div>
       </BottomSheet>
@@ -187,7 +199,12 @@ function GolferRow({ golfer, index }: GolferRowProps) {
 
   return (
     <article
-      className="rounded-2xl bg-white shadow-sm ring-1 ring-black/5 px-4 py-3 mb-3"
+      className="rounded-2xl px-4 py-3 mb-3"
+      style={{
+        backgroundColor: 'var(--bg-card)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
+        border: '1px solid var(--border-low)',
+      }}
       aria-label={`${golfer.display_name}, ${golfer.home_club || 'No home club'}, ${distanceText || 'Distance unknown'}`}
     >
       <div className="grid grid-cols-[56px_1fr] gap-3 items-center">
@@ -200,8 +217,8 @@ function GolferRow({ golfer, index }: GolferRowProps) {
           />
           {golfer.is_online && (
             <span
-              className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white"
-              style={{ background: '#6e9277' }}
+              className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2"
+              style={{ background: '#6e9277', borderColor: '#1a1a1a' }}
               aria-label="Online"
             />
           )}
@@ -209,15 +226,15 @@ function GolferRow({ golfer, index }: GolferRowProps) {
 
         {/* Row 1: Name + Distance */}
         <div className="flex items-center justify-between min-w-0 gap-2">
-          <h3 className="font-semibold text-[16px] truncate" style={{ color: 'rgba(0, 0, 0, 0.88)' }}>
+          <h3 className="font-semibold text-[16px] truncate" style={{ color: 'var(--text-primary)' }}>
             {golfer.display_name}
           </h3>
           {distanceText && (
             <span 
               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
               style={{ 
-                background: 'rgba(0, 0, 0, 0.08)',
-                color: 'rgba(0, 0, 0, 0.7)'
+                background: 'var(--pill-inactive-bg)',
+                color: 'var(--pill-inactive-text)'
               }}
             >
               <MapPin className="w-3 h-3" />
@@ -229,7 +246,7 @@ function GolferRow({ golfer, index }: GolferRowProps) {
         {/* Row 2: Club + Same home club pill */}
         <div className="flex items-center justify-between min-w-0 gap-2">
           {golfer.home_club && (
-            <p className="text-[13px] truncate" style={{ color: 'rgba(0, 0, 0, 0.6)' }}>
+            <p className="text-[13px] truncate" style={{ color: 'var(--text-secondary)' }}>
               {golfer.home_club}
             </p>
           )}
@@ -237,8 +254,9 @@ function GolferRow({ golfer, index }: GolferRowProps) {
             <span 
               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
               style={{ 
-                background: 'rgba(110, 146, 119, 0.2)',
-                color: '#6e9277'
+                backgroundColor: 'rgba(110,146,119,0.16)',
+                border: '1px solid rgba(110,146,119,0.4)',
+                color: 'var(--accent-green-bg)'
               }}
             >
               <Home className="w-3 h-3" />
@@ -263,37 +281,33 @@ function GolferRow({ golfer, index }: GolferRowProps) {
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <Button
-              size="sm"
-              variant={isFollowing ? 'outline' : 'default'}
+            <button
               onClick={handleFollow}
-              className="h-7 px-3 text-xs font-semibold"
+              className="h-7 px-3 text-xs font-semibold rounded-md"
               style={!isFollowing ? { 
-                background: '#6e9277',
-                color: 'white',
-                border: 'none'
+                backgroundColor: 'var(--accent-green-bg)',
+                color: 'var(--accent-green-text)',
+                border: '1px solid var(--accent-green-bg)'
               } : {
-                borderColor: '#6e9277',
-                color: '#6e9277',
-                background: 'white'
+                backgroundColor: 'transparent',
+                color: 'var(--accent-green-bg)',
+                border: '1px solid var(--accent-green-bg)'
               }}
               aria-pressed={isFollowing}
             >
               {isFollowing ? 'Following' : 'Follow'}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
+            </button>
+            <button
               onClick={handleMessage}
-              className="h-7 px-3 text-xs font-semibold"
+              className="h-7 px-3 text-xs font-semibold rounded-md"
               style={{
-                borderColor: '#6e9277',
-                color: '#6e9277',
-                background: 'white'
+                backgroundColor: 'transparent',
+                color: 'var(--accent-green-bg)',
+                border: '1px solid var(--accent-green-bg)'
               }}
             >
               Message
-            </Button>
+            </button>
           </div>
         </div>
       </div>

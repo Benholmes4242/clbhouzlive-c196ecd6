@@ -49,11 +49,12 @@ export function OpenToPlayButton() {
           fontSize: '15px',
           position: 'relative',
           overflow: 'visible',
-          background: isActive ? '#6e9277' : '#eef2f2',
-          color: isActive ? '#fff' : '#2b2f2e',
-          border: 'none',
+          background: isActive ? 'var(--accent-green-bg)' : 'var(--pill-inactive-bg)',
+          color: isActive ? 'var(--accent-green-text)' : 'var(--pill-inactive-text)',
+          border: isActive ? '1px solid var(--accent-green-bg)' : '1px solid var(--border-low)',
           cursor: 'pointer',
           transition: 'all 0.2s ease',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
         }}
       >
         {isActive && (
@@ -75,7 +76,7 @@ export function OpenToPlayButton() {
         className="tooltip-subtext"
         style={{
           fontSize: '12px',
-          color: 'rgba(0,0,0,0.6)',
+          color: 'var(--text-secondary)',
           textAlign: 'center',
           lineHeight: '1.3',
           maxWidth: '240px',
