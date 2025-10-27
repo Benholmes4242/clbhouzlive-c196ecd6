@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useEffect, useMemo, useState } from 'react';
-import { getMockNearby } from '@/features/nearby/mockNearbyGolfers';
-import { isMockLiveEnabled } from '@/mocks/mockSwitch';
+import { useEffect, useState, useMemo } from 'react';
 import { channelManager } from '@/utils/supabaseChannelManager';
+import { getMockNearby } from '@/features/nearby/mockNearbyGolfers';
+import { calculateDistance, formatDistance } from '@/features/nearby/distance';
+import { NEARBY_RADIUS_METERS } from '@/features/nearby/config';
+import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
 
-type ActiveGolfer = {
+export type ActiveGolfer = {
   id: string;
   display_name: string;
   username?: string;
@@ -13,64 +15,76 @@ type ActiveGolfer = {
   avatar_url?: string;
   is_online: boolean;
   isMock: boolean;
+  distance_km?: number;
+  distanceText?: string;
   isOpenToPlay?: boolean;
-  same_club?: boolean;
 };
 
-/**
- * Fetches and blends real + mock "active golfers" similar to LiveClubhouseProfiles
- * Phase 1: Shows online status honestly, no proximity/distance yet
- */
 export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number; mockCount?: number } = {}) {
   const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set());
-  const forceMock = isMockLiveEnabled();
+  const { currentLocation, requestPermission } = useLocationPermission();
 
-  // Fetch real user profiles (known + suggested mix)
+  // Fetch nearby users with location and visibility
   const { data: realProfiles = [], isLoading } = useQuery({
-    queryKey: ['activeGolfers', 'realProfiles', limit],
+    queryKey: ['activeGolfers', limit, currentLocation?.lat, currentLocation?.lng],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
 
-      // Get known users (following + followers)
-      const { data: knownUsers = [] } = await supabase
+      let userLat = currentLocation?.lat;
+      let userLng = currentLocation?.lng;
+
+      if (!userLat || !userLng) {
+        const location = await requestPermission();
+        if (!location) return [];
+        userLat = location.lat;
+        userLng = location.lng;
+      }
+
+      const { data: nearbyStatuses } = await supabase
+        .from('user_nearby_status')
+        .select('user_id, lat, lng, visible_nearby')
+        .eq('visible_nearby', true)
+        .not('lat', 'is', null)
+        .not('lng', 'is', null)
+        .neq('user_id', user.id);
+
+      if (!nearbyStatuses?.length) return [];
+
+      const nearbyUsers = nearbyStatuses
+        .map(status => ({
+          user_id: status.user_id,
+          distance_meters: calculateDistance(userLat!, userLng!, status.lat!, status.lng!),
+        }))
+        .filter(u => u.distance_meters <= NEARBY_RADIUS_METERS)
+        .sort((a, b) => a.distance_meters - b.distance_meters);
+
+      if (!nearbyUsers.length) return [];
+
+      const { data: profiles } = await supabase
         .from('user_profiles')
-        .select('id, display_name, username, home_club, profile_photo_url')
-        .or(`id.in.(select following_id from user_follows where follower_id eq ${user.id}),id.in.(select follower_id from user_follows where following_id eq ${user.id})`)
-        .eq('is_public', true)
-        .limit(Math.ceil(limit * 0.6));
+        .select('id, display_name, username, profile_photo_url, home_club')
+        .in('id', nearbyUsers.map(u => u.user_id))
+        .eq('is_public', true);
 
-      // Get suggested users (public profiles, excluding known)
-      const knownIds = knownUsers.map(u => u.id);
-      const { data: suggestedUsers = [] } = await supabase
-        .from('user_profiles')
-        .select('id, display_name, username, home_club, profile_photo_url')
-        .eq('is_public', true)
-        .not('id', 'in', `(${[user.id, ...knownIds].join(',')})`)
-        .limit(Math.ceil(limit * 0.4));
-
-      // Combine and format
-      const combined = [...knownUsers, ...suggestedUsers].map(u => ({
-        id: u.id,
-        display_name: u.display_name || u.username || 'Golfer',
-        username: u.username,
-        home_club: u.home_club || undefined,
-        avatar_url: u.profile_photo_url || undefined,
-        is_online: false, // Will be updated by presence
-        isMock: false,
-        isOpenToPlay: false,
-        same_club: false,
-      }));
-
-      return combined.slice(0, limit);
+      return profiles?.map(profile => {
+        const userData = nearbyUsers.find(u => u.user_id === profile.id);
+        return {
+          id: profile.id,
+          display_name: profile.display_name || profile.username || 'Anonymous',
+          username: profile.username,
+          avatar_url: profile.profile_photo_url,
+          home_club: profile.home_club,
+          distance_km: userData ? userData.distance_meters / 1000 : 0,
+          distanceText: userData ? formatDistance(userData.distance_meters) : undefined,
+        };
+      }).slice(0, limit) || [];
     },
-    staleTime: 30_000,
-    enabled: !forceMock,
+    staleTime: 15_000,
   });
 
-  // Subscribe to presence for online status
   useEffect(() => {
-    if (forceMock || realProfiles.length === 0) return;
+    if (realProfiles.length === 0) return;
 
     const channelName = 'presence:creators_online';
     const channel = channelManager.createChannel(channelName);
@@ -80,74 +94,45 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
         const state = channel.presenceState();
         const onlineIds = new Set<string>();
         Object.values(state).forEach((presences: any) => {
-          presences.forEach((presence: any) => {
-            if (presence.user_id) {
-              onlineIds.add(presence.user_id);
-            }
+          presences.forEach((p: any) => {
+            if (p.user_id) onlineIds.add(p.user_id);
           });
         });
         setOnlineUserIds(onlineIds);
       })
       .subscribe();
 
-    return () => {
-      channelManager.removeChannel(channelName);
-    };
-  }, [forceMock, realProfiles.length]);
+    return () => channelManager.removeChannel(channelName);
+  }, [realProfiles.length]);
 
-  // Blend real + mock data
   const golfers = useMemo<ActiveGolfer[]>(() => {
-    if (forceMock) {
-      // Force 100% mock for dev testing
-      return getMockNearby(mockCount).map(m => ({
-        id: m.id,
-        display_name: m.display_name,
-        home_club: m.home_club,
-        avatar_url: m.avatar_url,
-        is_online: false, // Never show mock as online
-        isMock: true,
-        isOpenToPlay: false,
-        same_club: false,
-      }));
-    }
-
-    // Update real profiles with online status
-    const realWithStatus = realProfiles.map(p => ({
+    const realWithOnline: ActiveGolfer[] = realProfiles.map(p => ({
       ...p,
       is_online: onlineUserIds.has(p.id),
+      isMock: false,
+      isOpenToPlay: true,
     }));
 
-    // Get mock profiles (never online)
-    const mockProfiles = getMockNearby(mockCount).map(m => ({
-      id: m.id,
-      display_name: m.display_name,
-      home_club: m.home_club,
-      avatar_url: m.avatar_url,
-      is_online: false, // Never show mock as online
+    const mockProfiles: ActiveGolfer[] = getMockNearby(mockCount).map(m => ({
+      ...m,
+      is_online: false,
       isMock: true,
       isOpenToPlay: false,
-      same_club: false,
     }));
 
-    // Interleave real and mock
     const blended: ActiveGolfer[] = [];
-    const maxLength = Math.max(realWithStatus.length, mockProfiles.length);
+    const maxLength = Math.max(realWithOnline.length, mockProfiles.length);
     for (let i = 0; i < maxLength; i++) {
-      if (i < realWithStatus.length) blended.push(realWithStatus[i]);
+      if (i < realWithOnline.length) blended.push(realWithOnline[i]);
       if (i < mockProfiles.length) blended.push(mockProfiles[i]);
     }
 
     return blended;
-  }, [realProfiles, mockCount, onlineUserIds, forceMock]);
+  }, [realProfiles, mockCount, onlineUserIds]);
 
-  // Calculate real online count (for display)
   const realOnlineCount = useMemo(() => {
     return golfers.filter(g => !g.isMock && g.is_online).length;
   }, [golfers]);
 
-  return {
-    golfers,
-    realOnlineCount,
-    isLoading,
-  };
+  return { golfers, realOnlineCount, isLoading };
 }

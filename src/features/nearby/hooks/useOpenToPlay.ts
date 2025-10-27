@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const STORAGE_KEY = 'clb_open_to_play';
 const DURATION_MS = 20 * 60 * 1000; // 20 minutes
@@ -11,6 +13,7 @@ export interface OpenToPlayState {
 }
 
 export function useOpenToPlay() {
+  const { user } = useSupabaseSession();
   const [state, setState] = useState<OpenToPlayState>(() => {
     if (typeof window === 'undefined') return { active: false, startedAt: null, expiresAt: null };
     
@@ -47,6 +50,15 @@ export function useOpenToPlay() {
 
   // Activate Open to Play
   const activate = useCallback(async () => {
+    if (!user?.id) {
+      toast({
+        title: 'Error',
+        description: 'You must be logged in to activate Open to Play',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const now = Date.now();
     const newState: OpenToPlayState = {
       active: true,
@@ -57,40 +69,108 @@ export function useOpenToPlay() {
     setState(newState);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
 
-    // Nearby features not yet implemented - using mock behavior
-    console.log('Mock Open to Play activated', newState);
+    try {
+      // Get current location
+      let lat: number | null = null;
+      let lng: number | null = null;
 
-    toast({
-      title: 'Open to Play activated',
-      description: "We've let nearby golfers know you're available.",
-    });
+      if ('geolocation' in navigator) {
+        try {
+          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true,
+              timeout: 5000,
+              maximumAge: 0,
+            });
+          });
+          lat = position.coords.latitude;
+          lng = position.coords.longitude;
+        } catch (geoError) {
+          console.error('Error getting location:', geoError);
+          // Continue without location - we'll still set visible_nearby = true
+        }
+      }
 
-    // Track analytics
-    if (typeof window !== 'undefined' && (window as any).analyticsEvents) {
-      (window as any).analyticsEvents.track('open2play_tap_activate', { duration: 20 });
+      // Persist to database
+      const { error } = await supabase
+        .from('user_nearby_status')
+        .upsert(
+          {
+            user_id: user.id,
+            visible_nearby: true,
+            lat,
+            lng,
+            last_location_update: new Date().toISOString(),
+          },
+          { onConflict: 'user_id' }
+        );
+
+      if (error) {
+        console.error('Error activating Open to Play:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to activate Open to Play',
+          variant: 'destructive',
+        });
+        setState({ active: false, startedAt: null, expiresAt: null });
+        localStorage.removeItem(STORAGE_KEY);
+        return;
+      }
+
+      toast({
+        title: 'Open to Play activated',
+        description: "We've let nearby golfers know you're available.",
+      });
+
+      // Track analytics
+      if (typeof window !== 'undefined' && (window as any).analyticsEvents) {
+        (window as any).analyticsEvents.track('open2play_tap_activate', { duration: 20 });
+      }
+    } catch (err) {
+      console.error('Error activating Open to Play:', err);
+      setState({ active: false, startedAt: null, expiresAt: null });
+      localStorage.removeItem(STORAGE_KEY);
     }
-  }, [toast]);
+  }, [user?.id, toast]);
 
   // Cancel Open to Play
   const cancel = useCallback(async () => {
+    if (!user?.id) return;
+
     const elapsed = state.startedAt ? Math.round((Date.now() - state.startedAt) / 60000) : 0;
 
     setState({ active: false, startedAt: null, expiresAt: null });
     localStorage.removeItem(STORAGE_KEY);
 
-    // Nearby features not yet implemented - using mock behavior
-    console.log('Mock Open to Play cancelled');
+    try {
+      // Update database to set visible_nearby = false
+      const { error } = await supabase
+        .from('user_nearby_status')
+        .upsert(
+          {
+            user_id: user.id,
+            visible_nearby: false,
+          },
+          { onConflict: 'user_id' }
+        );
 
-    toast({
-      title: 'Open to Play cancelled',
-      description: 'Your availability ping has been stopped.',
-    });
+      if (error) {
+        console.error('Error cancelling Open to Play:', error);
+      }
 
-    // Track analytics
-    if (typeof window !== 'undefined' && (window as any).analyticsEvents) {
-      (window as any).analyticsEvents.track('open2play_cancel', { elapsed });
+      toast({
+        title: 'Open to Play cancelled',
+        description: 'Your availability ping has been stopped.',
+      });
+
+      // Track analytics
+      if (typeof window !== 'undefined' && (window as any).analyticsEvents) {
+        (window as any).analyticsEvents.track('open2play_cancel', { elapsed });
+      }
+    } catch (err) {
+      console.error('Error cancelling Open to Play:', err);
     }
-  }, [state.startedAt, toast]);
+  }, [user?.id, state.startedAt, toast]);
 
   // Auto-expire when timer runs out
   useEffect(() => {

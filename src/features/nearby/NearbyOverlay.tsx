@@ -85,7 +85,14 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                 </div>
               ))}
             </div>
-          ) : golfers.length === 0 ? (
+          ) : (
+            <div className="space-y-2">
+              {golfers.map((golfer, index) => (
+                <GolferRow key={golfer.id} golfer={golfer} index={index} />
+              ))}
+            </div>
+          )}
+          {golfers.length === 0 && !isLoading && (
             <div className="text-center py-12">
               <MapPin className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--text-tertiary)' }} />
               <p className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
@@ -188,8 +195,8 @@ interface GolferRowProps {
     avatar_url?: string;
     is_online: boolean;
     isMock: boolean;
+    distanceText?: string;
     isOpenToPlay?: boolean;
-    same_club?: boolean;
   };
   index: number;
 }
@@ -244,24 +251,21 @@ function GolferRow({ golfer, index }: GolferRowProps) {
           </h3>
         </div>
 
-        {/* Row 2: Club + Same home club pill */}
-        <div className="flex items-center justify-between min-w-0 gap-2">
+        {/* Row 2: Distance + Club */}
+        <div className="flex items-center gap-2 min-w-0">
+          {!golfer.isMock && golfer.distanceText && (
+            <span className="text-[13px]" style={{ color: 'var(--text-secondary)' }}>
+              {golfer.distanceText}
+            </span>
+          )}
           {golfer.home_club && (
             <p className="text-[13px] truncate" style={{ color: 'var(--text-secondary)' }}>
               {golfer.home_club}
             </p>
           )}
-          {golfer.same_club && (
-            <span 
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
-              style={{ 
-                backgroundColor: 'var(--accent-frost-bg)',
-                border: '1px solid var(--accent-frost-border)',
-                color: 'var(--accent-frost-text)'
-              }}
-            >
-              <Home className="w-3 h-3" />
-              Same home club
+          {!golfer.isMock && golfer.isOpenToPlay && (
+            <span className="text-xs" style={{ color: '#6e9277' }}>
+              🟢 Open to play
             </span>
           )}
         </div>

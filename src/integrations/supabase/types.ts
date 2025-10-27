@@ -1985,6 +1985,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_nearby_status: {
+        Row: {
+          created_at: string
+          id: string
+          last_location_update: string | null
+          lat: number | null
+          lng: number | null
+          updated_at: string
+          user_id: string
+          visible_nearby: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_location_update?: string | null
+          lat?: number | null
+          lng?: number | null
+          updated_at?: string
+          user_id: string
+          visible_nearby?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_location_update?: string | null
+          lat?: number | null
+          lng?: number | null
+          updated_at?: string
+          user_id?: string
+          visible_nearby?: boolean
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           background_image_url: string | null

@@ -101,7 +101,7 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
 
   const nearText = count > 0 
     ? (count > 9 ? '9+ active now' : `${count} active now`)
-    : "No one active";
+    : "See who's playing";
 
   return (
     <div 
