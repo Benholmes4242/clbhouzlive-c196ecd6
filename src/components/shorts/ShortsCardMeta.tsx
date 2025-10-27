@@ -74,7 +74,7 @@ export default function ShortsCardMeta({
           <Heart 
             className="scm__heart" 
             size={14}
-            fill={isLiked ? '#6e9277' : 'none'}
+            fill={isLiked ? '#ef4444' : 'none'}
             aria-hidden="true"
           />
           <span className="scm__likes">{formatLikes(likeCount)}</span>
