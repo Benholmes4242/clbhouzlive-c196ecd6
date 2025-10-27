@@ -109,7 +109,7 @@ export function CreateGameModal({
       />
       
       {/* Modal */}
-      <div className="relative w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
+      <div className="relative w-full max-w-md bg-neutral-900/95 border border-neutral-700/60 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden min-h-[65vh] max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-neutral-800">
           <div>
@@ -179,7 +179,7 @@ export function CreateGameModal({
                       onClick={() => setGameType(type.value)}
                       className={`py-3 px-4 rounded-xl font-medium transition-all backdrop-blur ${
                         gameType === type.value
-                          ? 'bg-white/15 text-white border border-white/22 shadow-[0_12px_32px_rgba(0,0,0,0.8),_0_0_16px_rgba(255,255,255,0.45),_0_0_40px_rgba(255,255,255,0.25)] active:bg-white/20'
+                          ? 'bg-white/11 text-white border border-white/22 shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.22)_inset] active:bg-white/16 active:shadow-[0_24px_48px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.28)_inset]'
                           : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
                       }`}
                     >
@@ -229,7 +229,7 @@ export function CreateGameModal({
                       onClick={() => setDuration(option.value)}
                       className={`py-2 px-3 rounded-lg text-sm font-medium transition-all backdrop-blur ${
                         duration === option.value
-                          ? 'bg-white/15 text-white border border-white/22 shadow-[0_12px_32px_rgba(0,0,0,0.8),_0_0_16px_rgba(255,255,255,0.45),_0_0_40px_rgba(255,255,255,0.25)] active:bg-white/20'
+                          ? 'bg-white/11 text-white border border-white/22 shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.22)_inset] active:bg-white/16 active:shadow-[0_24px_48px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.28)_inset]'
                           : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
                       }`}
                     >
@@ -242,7 +242,7 @@ export function CreateGameModal({
               <button
                 onClick={handleSubmit}
                 disabled={!gameType || isSubmitting}
-                className="w-full py-3 px-4 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 px-4 bg-white/11 hover:bg-white/16 active:bg-white/16 text-white rounded-xl font-medium backdrop-blur border border-white/22 shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.22)_inset] active:shadow-[0_24px_48px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.28)_inset] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Creating...' : 'Start Game'}
               </button>
