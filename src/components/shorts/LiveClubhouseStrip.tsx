@@ -62,8 +62,6 @@ export function LiveClubhouseStrip() {
   if (isLoading) return null;
   if (!creators.length) return null;
 
-  const showNearby = nearby.hasNearby;
-  
   return (
     <>
       <div className="live-row">
@@ -73,17 +71,15 @@ export function LiveClubhouseStrip() {
           role="listbox" 
           aria-label="Suggested creators"
         >
-          {showNearby && (
-            <NearbyTile 
-              count={nearby.count} 
-              onOpen={() => setNearbyOverlayOpen(true)} 
-            />
-          )}
+          <NearbyTile 
+            count={nearby.count} 
+            onOpen={() => setNearbyOverlayOpen(true)} 
+          />
           {creators.map((c, idx) => (
             <LiveTile 
               key={c.id} 
               creator={c} 
-              index={showNearby ? idx + 1 : idx} 
+              index={idx + 1} 
             />
           ))}
         </div>
