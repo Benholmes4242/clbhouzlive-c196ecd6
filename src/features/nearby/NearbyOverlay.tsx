@@ -117,37 +117,39 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           </header>
 
           {/* Row B: 2-card grid (Visibility + Open to Play) */}
-          <div className="grid grid-cols-2 gap-2 px-4 py-4">
+          <div className="grid grid-cols-2 gap-3 px-4 py-4">
             {/* Visibility card */}
             <button
               onClick={cycleVisibility}
               disabled={visibilityLoading}
-              className="flex flex-col items-center justify-center text-center rounded-xl px-4 py-3 backdrop-blur"
+              className="flex flex-col items-center justify-center text-center rounded-xl px-3 py-4 transition-all duration-200 ease-in-out"
               style={{
                 minHeight: '110px',
-                flex: 1,
-                background: 'rgba(255,255,255,0.07)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                boxShadow: '0 40px 120px rgba(0,0,0,0.8), 0 0 40px rgba(255,255,255,0.12) inset',
+                minWidth: 'calc(50% - 8px)',
+                backdropFilter: 'blur(10px)',
+                ...(visibilityMode === 'friends' || visibilityMode === 'all' 
+                  ? {
+                      background: 'radial-gradient(circle at 20% 20%, rgba(110, 200, 125, 0.18) 0%, rgba(0, 0, 0, 0.35) 60%)',
+                      border: '1px solid rgba(110, 200, 125, 0.4)',
+                      boxShadow: '0 24px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(110, 200, 125, 0.28)',
+                    }
+                  : {
+                      background: 'radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.12) 0%, rgba(0, 0, 0, 0.3) 60%)',
+                      border: '1px solid rgba(255, 255, 255, 0.22)',
+                      boxShadow: '0 24px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(255, 255, 255, 0.07) inset',
+                    }
+                ),
               }}
             >
-              <div className="text-white/70 text-[13px] font-medium mb-1.5">
+              <div className="text-white/70 text-[15px] font-medium mb-1">
                 Visibility
               </div>
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <span
-                  className="inline-block w-2 h-2 rounded-full"
-                  style={{
-                    backgroundColor: visibilityMode === 'hidden' ? '#666' : '#22c55e',
-                  }}
-                />
-                <span className="text-white text-base font-medium leading-tight">
-                  {visibilityMode === 'all' && 'Everyone'}
-                  {visibilityMode === 'friends' && 'Friends'}
-                  {visibilityMode === 'hidden' && 'Hidden'}
-                </span>
+              <div className="text-white text-[17px] font-semibold mb-2 leading-tight">
+                {visibilityMode === 'all' && 'Visible to Everyone'}
+                {visibilityMode === 'friends' && 'Visible to Friends'}
+                {visibilityMode === 'hidden' && 'Hidden'}
               </div>
-              <div className="text-white/50 text-[12px] leading-snug max-w-[220px]">
+              <div className="text-white/60 text-[14px] leading-snug max-w-[220px]">
                 Choose your visibility to other golfers
               </div>
             </button>
@@ -155,38 +157,36 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             {/* Open to Play card */}
             <button
               onClick={handleOpenToPlayToggle}
-              className="flex flex-col items-center justify-center text-center rounded-xl px-4 py-3 backdrop-blur"
+              className="flex flex-col items-center justify-center text-center rounded-xl px-3 py-4 transition-all duration-200 ease-in-out"
               style={{
                 minHeight: '110px',
-                flex: 1,
-                background: 'rgba(255,255,255,0.07)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                boxShadow: '0 40px 120px rgba(0,0,0,0.8), 0 0 40px rgba(255,255,255,0.12) inset',
+                minWidth: 'calc(50% - 8px)',
+                backdropFilter: 'blur(10px)',
+                ...(isOpenToPlay
+                  ? {
+                      background: 'radial-gradient(circle at 20% 20%, rgba(110, 200, 125, 0.18) 0%, rgba(0, 0, 0, 0.35) 60%)',
+                      border: '1px solid rgba(110, 200, 125, 0.4)',
+                      boxShadow: '0 24px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(110, 200, 125, 0.28)',
+                    }
+                  : {
+                      background: 'radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.12) 0%, rgba(0, 0, 0, 0.3) 60%)',
+                      border: '1px solid rgba(255, 255, 255, 0.22)',
+                      boxShadow: '0 24px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(255, 255, 255, 0.07) inset',
+                    }
+                ),
               }}
             >
-              <div className="text-white/70 text-[13px] font-medium mb-1.5">
-                Open to Play
+              <div className="text-white text-[17px] font-semibold mb-1 leading-tight">
+                {isOpenToPlay ? 'Open to Play' : 'Open to Play ?'}
               </div>
-              <div className="flex items-center justify-center gap-2 mb-2">
-                {isOpenToPlay ? (
-                  <>
-                    <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
-                    <span className="text-white text-base font-medium leading-tight">
-                      Open to Play
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.4)' }} />
-                    <span className="text-white text-base font-medium leading-tight">
-                      Tap to say you're free
-                    </span>
-                  </>
-                )}
-              </div>
-              <div className="text-white/50 text-[12px] leading-snug max-w-[220px]">
+              <div className="text-white/80 text-[15px] font-medium mb-2 leading-tight">
                 {isOpenToPlay
-                  ? `${remainingText} left · Tap to stop`
+                  ? `Active – ${remainingText}`
+                  : "Tap to say you're free"}
+              </div>
+              <div className="text-white/60 text-[14px] leading-snug max-w-[220px]">
+                {isOpenToPlay
+                  ? 'Tap to stop'
                   : "Tell golfers you're free to join up"}
               </div>
             </button>
