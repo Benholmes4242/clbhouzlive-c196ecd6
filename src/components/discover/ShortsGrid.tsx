@@ -4,8 +4,6 @@ import ShortCardWithObserver from '@/components/shorts/ShortCardWithObserver';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { selectLandscapeCandidate, preloadLandscapePoster, isLandscapeEligible } from '@/utils/landscapeEligibility';
 
-// Lazy load fullscreen viewer - only loads when user opens a short
-const ShortsViewer = lazy(() => import('@/components/shorts/ShortsViewer'));
 
 interface ShortsGridProps {
   items: ExploreContentItem[];
@@ -50,9 +48,8 @@ export default function ShortsGrid({
 }: ShortsGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
-  const [viewerOpen, setViewerOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
+  const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
 
   // Track column width to compute pixel-perfect height from aspect ratio
   const [columnWidth, setColumnWidth] = useState(0);
@@ -101,13 +98,9 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
 
   const handleCardClick = (item: ExploreContentItem, index: number) => {
     setSelectedIndex(index);
-    setViewerOpen(true);
-    // Don't call onOpen(item) - ShortsGrid has its own integrated ShortsViewer
+    onOpen(item); // Open DiscoverVerticalFeed modal
   };
 
-  const handleCloseViewer = () => {
-    setViewerOpen(false);
-  };
 
   const handleVisibilityChange = useCallback((id: string, visible: boolean) => {
     setVisibleCards(prev => {
@@ -379,16 +372,6 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
         </div>
       )}
-
-      {/* Full-screen Shorts Viewer - lazy loaded */}
-      <Suspense fallback={null}>
-        <ShortsViewer
-          items={items}
-          initialIndex={selectedIndex}
-          isOpen={viewerOpen}
-          onClose={handleCloseViewer}
-        />
-      </Suspense>
     </>
   );
 }
