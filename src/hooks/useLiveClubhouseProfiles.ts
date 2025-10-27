@@ -21,53 +21,23 @@ export interface LiveCreator {
   latest_short_preview?: { posterUrl?: string; mp4Url?: string } | null;
   has_recent_post: boolean;
   is_online: boolean;
+  isMock: boolean; // Flag to indicate if this is mock data (for future tuning)
 }
 
 /**
- * Hook for fetching Live Clubhouse profiles with realtime presence
- * Maintains 60/40 known/suggested mix, includes preview data and online status
+ * Hook for fetching Live Clubhouse profiles with 50/50 mock + real blend
+ * Real profiles: from user_profiles (following/followers + suggested, 60/40 mix)
+ * Mock profiles: from MOCK_CREATORS array
+ * Online status: driven by Supabase Realtime presence (real users only)
  */
 export function useLiveClubhouseProfiles() {
-  const mock = isMockLiveEnabled();
+  const forceMock = isMockLiveEnabled(); // Dev override only
   const { user } = useSupabaseSession();
   const [onlineMap, setOnlineMap] = useState<Record<string, boolean>>({});
 
-  // MOCK PATH - Set up mock presence (only runs when mock is true)
-  useEffect(() => {
-    if (!mock) return;
-    const stop = startMockPresence(setOnlineMap);
-    return stop;
-  }, [mock]);
-
-  // MOCK PATH - Build mock creators (memoized)
-  const mockCreators: LiveCreator[] = useMemo(() => {
-    if (!mock) return [];
-    const now = Date.now();
-    return MOCK_CREATORS.map(m => {
-      const msAgo = (m.minutesAgo ?? 999) * 60_000;
-      const latest = new Date(now - msAgo).toISOString();
-      return {
-        id: m.id,
-        username: m.username,
-        display_name: m.display_name,
-        profile_photo_url: m.profile_photo_url,
-        home_club: m.home_club ?? null,
-        latest_post_at: latest,
-        latest_short_preview: { posterUrl: m.previewPoster, mp4Url: m.previewMp4 },
-        has_recent_post: msAgo <= RECENT_MS,
-        is_online: !!onlineMap[m.id],
-      };
-    });
-  }, [mock, onlineMap]);
-
-  // Early return for mock data
-  if (mock) {
-    return { creators: mockCreators, isLoading: false };
-  }
-
-  // === REAL PATH ===
+  // === REAL DATA PATH ===
   
-  // Fetch base creator list with 60/40 mix
+  // Fetch base creator list with 60/40 mix (always runs unless forceMock override)
   const { data: baseCreators = [], isLoading } = useQuery({
     queryKey: ['liveClubhouseBase', user?.id],
     queryFn: async () => {
@@ -87,9 +57,10 @@ export function useLiveClubhouseProfiles() {
         (followers?.data ?? []).forEach(r => knownIds.add(r.follower_id));
       }
 
-      const limit = 24;
-      const targetKnown = Math.ceil(limit * 0.6);
-      const targetSuggested = Math.ceil(limit * 0.4);
+      // Target 50% of final list = 12 real profiles (out of 24 total)
+      const targetRealProfiles = 12;
+      const targetKnown = Math.ceil(targetRealProfiles * 0.6); // ~7 known
+      const targetSuggested = Math.ceil(targetRealProfiles * 0.4); // ~5 suggested
       
       let knownProfiles: any[] = [];
       
@@ -166,32 +137,33 @@ export function useLiveClubhouseProfiles() {
       const k = [...knownProfiles];
       const s = [...suggestedProfiles];
 
-      while (interleaved.length < limit && (k.length || s.length)) {
+      while (interleaved.length < targetRealProfiles && (k.length || s.length)) {
         if (k.length) interleaved.push(k.shift()!);
-        if (s.length && interleaved.length < limit) interleaved.push(s.shift()!);
+        if (s.length && interleaved.length < targetRealProfiles) interleaved.push(s.shift()!);
       }
 
       return interleaved.filter(profile => !NotInterested.isHidden(profile.id));
     },
     staleTime: 60_000,
-    enabled: !!user,
+    enabled: !!user && !forceMock,
   });
 
-  // Batch fetch previews
+  // Batch fetch previews for real profiles
   const [previews, setPreviews] = useState<Record<string, { posterUrl?: string; mp4Url?: string }>>({});
   
   useEffect(() => {
-    if (!baseCreators.length) return;
+    if (!baseCreators.length || forceMock) return;
     
     (async () => {
       const previewData = await getLatestShortPreviewForCreators(baseCreators.map(c => c.id));
       setPreviews(previewData);
     })();
-  }, [baseCreators]);
+  }, [baseCreators, forceMock]);
 
-  // Presence tracking (online status)
-  
+  // Presence tracking (online status) - real users only
   useEffect(() => {
+    if (forceMock) return;
+    
     const channelName = 'presence:creators_online';
     const channel = channelManager.createChannel(channelName);
 
@@ -214,12 +186,35 @@ export function useLiveClubhouseProfiles() {
     return () => {
       channelManager.removeChannel(channelName);
     };
-  }, [user?.id]);
+  }, [user?.id, forceMock]);
 
-  // Combine all data
+  // === BLEND LOGIC: 50% real + 50% mock ===
   const creators = useMemo(() => {
+    if (forceMock) {
+      // Dev override: 100% mock
+      const now = Date.now();
+      return MOCK_CREATORS.map(m => {
+        const msAgo = (m.minutesAgo ?? 999) * 60_000;
+        const latest = new Date(now - msAgo).toISOString();
+        return {
+          id: m.id,
+          username: m.username,
+          display_name: m.display_name,
+          profile_photo_url: m.profile_photo_url,
+          home_club: m.home_club ?? null,
+          latest_post_at: latest,
+          latest_short_preview: { posterUrl: m.previewPoster, mp4Url: m.previewMp4 },
+          has_recent_post: msAgo <= RECENT_MS,
+          is_online: false, // Never show green dot for mock
+          isMock: true,
+        };
+      });
+    }
+
     const now = Date.now();
-    return baseCreators.map((c: any): LiveCreator => {
+    
+    // Real profiles (from DB)
+    const realProfiles: LiveCreator[] = baseCreators.map((c: any) => {
       const latest = c.latest_post_at ? new Date(c.latest_post_at).getTime() : 0;
       return {
         id: c.id,
@@ -230,10 +225,40 @@ export function useLiveClubhouseProfiles() {
         latest_post_at: c.latest_post_at ?? null,
         latest_short_preview: previews[c.id] ?? null,
         has_recent_post: !!latest && (now - latest) < RECENT_MS,
-        is_online: !!onlineMap[c.id],
+        is_online: !!onlineMap[c.id], // Green dot only if in presence channel
+        isMock: false,
       };
     });
-  }, [baseCreators, previews, onlineMap]);
 
-  return { creators, isLoading };
+    // Mock profiles (from static data)
+    const mockProfiles: LiveCreator[] = MOCK_CREATORS.slice(0, 12).map(m => {
+      const msAgo = (m.minutesAgo ?? 999) * 60_000;
+      const latest = new Date(now - msAgo).toISOString();
+      return {
+        id: m.id,
+        username: m.username,
+        display_name: m.display_name,
+        profile_photo_url: m.profile_photo_url,
+        home_club: m.home_club ?? null,
+        latest_post_at: latest,
+        latest_short_preview: { posterUrl: m.previewPoster, mp4Url: m.previewMp4 },
+        has_recent_post: msAgo <= RECENT_MS,
+        is_online: false, // Never show green dot for mock profiles
+        isMock: true,
+      };
+    });
+
+    // Interleave: real, mock, real, mock, ...
+    const blended: LiveCreator[] = [];
+    const maxLength = Math.max(realProfiles.length, mockProfiles.length);
+    
+    for (let i = 0; i < maxLength; i++) {
+      if (i < realProfiles.length) blended.push(realProfiles[i]);
+      if (i < mockProfiles.length) blended.push(mockProfiles[i]);
+    }
+
+    return blended;
+  }, [baseCreators, previews, onlineMap, forceMock]);
+
+  return { creators, isLoading: forceMock ? false : isLoading };
 }

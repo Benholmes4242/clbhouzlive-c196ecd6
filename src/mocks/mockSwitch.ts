@@ -1,25 +1,21 @@
 /**
- * ⚠️ MOCK DATA ENABLED FOR DEVELOPMENT ⚠️
+ * ✅ REAL DATA ENABLED (50/50 BLEND WITH MOCK)
  * 
- * This function currently returns TRUE to show mock data for:
+ * This function controls whether to force 100% mock data for:
  * - Live Clubhouse Strip creators
  * - Nearby Golfers circle
  * 
- * DO NOT CHANGE THIS UNTIL EXPLICITLY INSTRUCTED TO SWITCH TO REAL DATA.
- * 
- * When ready to go live, uncomment the toggle logic below and remove the "return true".
+ * Default: false (real + mock blend)
+ * Override: Set ?mockLive=1 in URL or localStorage.setItem('mockLive','1')
  */
 export function isMockLiveEnabled(): boolean {
   if (typeof window === 'undefined') return false;
   
-  // ✅ KEEP THIS ENABLED UNTIL GO-LIVE
-  return true;
-  
-  // 🔽 UNCOMMENT BELOW WHEN SWITCHING TO REAL DATA:
-  // const url = new URL(window.location.href);
-  // const q = url.searchParams.get('mockLive');
-  // if (q === '1' || q === 'true') return true;
-  // const ls = window.localStorage.getItem('mockLive');
-  // return ls === '1' || ls === 'true';
+  // Check for dev override to force 100% mock
+  const url = new URL(window.location.href);
+  const q = url.searchParams.get('mockLive');
+  if (q === '1' || q === 'true') return true;
+  const ls = window.localStorage.getItem('mockLive');
+  return ls === '1' || ls === 'true';
 }
 // Quick toggle from console: localStorage.setItem('mockLive','1'); location.reload()

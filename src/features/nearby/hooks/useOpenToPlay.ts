@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { LIVE_CLUBHOUSE_DATA } from '../config';
 import { useToast } from '@/hooks/use-toast';
 
 const STORAGE_KEY = 'clb_open_to_play';
@@ -58,12 +57,8 @@ export function useOpenToPlay() {
     setState(newState);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
 
-    if (LIVE_CLUBHOUSE_DATA) {
-      // TODO: POST /presence/open2play
-      console.log('POST /presence/open2play', { active: true, expiresAt: newState.expiresAt });
-    } else {
-      console.log('Mock Open to Play activated', newState);
-    }
+    // Nearby features not yet implemented - using mock behavior
+    console.log('Mock Open to Play activated', newState);
 
     toast({
       title: 'Open to Play activated',
@@ -83,12 +78,8 @@ export function useOpenToPlay() {
     setState({ active: false, startedAt: null, expiresAt: null });
     localStorage.removeItem(STORAGE_KEY);
 
-    if (LIVE_CLUBHOUSE_DATA) {
-      // TODO: POST /presence/open2play
-      console.log('POST /presence/open2play', { active: false });
-    } else {
-      console.log('Mock Open to Play cancelled');
-    }
+    // Nearby features not yet implemented - using mock behavior
+    console.log('Mock Open to Play cancelled');
 
     toast({
       title: 'Open to Play cancelled',

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { GameBeacon, GameBeaconDraft } from '../types';
-import { LIVE_CLUBHOUSE_DATA } from '../config';
 import { useToast } from '@/hooks/use-toast';
 import { nanoid } from 'nanoid';
 
@@ -21,13 +20,9 @@ export function useGameBeacon() {
       status: 'active',
     };
 
-    if (LIVE_CLUBHOUSE_DATA) {
-      // TODO: POST /beacons
-      console.log('POST /beacons', beacon);
-    } else {
-      mockBeacons.push(beacon);
-      console.log('Mock beacon created:', beacon);
-    }
+    // Nearby features not yet implemented - using mock behavior
+    mockBeacons.push(beacon);
+    console.log('Mock beacon created:', beacon);
 
     setActiveBeacon(beacon);
     toast({
@@ -39,13 +34,9 @@ export function useGameBeacon() {
   };
 
   const cancelBeacon = async (beaconId: string) => {
-    if (LIVE_CLUBHOUSE_DATA) {
-      // TODO: POST /beacons/:id/cancel
-      console.log('POST /beacons/:id/cancel', beaconId);
-    } else {
-      mockBeacons = mockBeacons.filter((b) => b.id !== beaconId);
-      console.log('Mock beacon cancelled:', beaconId);
-    }
+    // Nearby features not yet implemented - using mock behavior
+    mockBeacons = mockBeacons.filter((b) => b.id !== beaconId);
+    console.log('Mock beacon cancelled:', beaconId);
 
     setActiveBeacon(null);
     toast({
@@ -69,12 +60,8 @@ export function useGameBeacon() {
 
     setLastQuickPing(now);
     
-    if (LIVE_CLUBHOUSE_DATA) {
-      // TODO: POST /beacons/:id/notify
-      console.log('POST quick ping');
-    } else {
-      console.log('Mock quick ping sent');
-    }
+    // Nearby features not yet implemented - using mock behavior
+    console.log('Mock quick ping sent');
 
     toast({
       title: 'Quick ping sent',
