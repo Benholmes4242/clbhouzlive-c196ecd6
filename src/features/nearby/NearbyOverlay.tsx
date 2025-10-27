@@ -55,7 +55,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       />
       
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-neutral-900/95 border border-neutral-700/60 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden min-h-[65vh] max-h-[80vh] flex flex-col z-10">
+      <div className="relative w-full max-w-lg bg-neutral-900/95 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col z-10">
         {/* Header */}
         <div className="border-b border-neutral-800/60">
           <div className="flex items-center justify-between px-4 py-4">
@@ -65,7 +65,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsCreateGameOpen(true)}
-                className="p-2 rounded-full bg-white/11 hover:bg-white/16 active:bg-white/16 backdrop-blur border border-white/22 transition-all shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.22)_inset] active:shadow-[0_24px_48px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.28)_inset]"
+                className="p-2 rounded-full bg-white/8 hover:bg-white/12 active:bg-white/12 backdrop-blur border border-white/22 transition-all shadow-[0_16px_32px_rgba(0,0,0,0.9),_0_0_18px_rgba(255,255,255,0.18)_inset] active:shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.24)_inset]"
                 title="Create a game"
               >
                 <Plus className="w-5 h-5 text-white" />

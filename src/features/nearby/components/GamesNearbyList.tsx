@@ -75,7 +75,7 @@ export function GamesNearbyList({
         </div>
         <button
           onClick={onCreateGame}
-          className="mt-4 px-6 py-2 bg-white/11 hover:bg-white/16 active:bg-white/16 text-white rounded-xl font-medium backdrop-blur border border-white/22 shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.22)_inset] active:shadow-[0_24px_48px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.28)_inset] transition-all"
+          className="mt-4 px-6 py-2 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all"
         >
           Create a Game
         </button>
@@ -159,7 +159,7 @@ export function GamesNearbyList({
                   ) : (
                     <button
                       onClick={() => onJoinBeacon(beacon.id)}
-                      className="px-4 py-1.5 bg-white/11 hover:bg-white/16 active:bg-white/16 text-white rounded-lg text-sm font-medium backdrop-blur border border-white/22 shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.22)_inset] active:shadow-[0_24px_48px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.28)_inset] transition-all"
+                      className="px-4 py-1.5 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-lg text-sm font-medium backdrop-blur border border-white/28 shadow-[0_16px_32px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.2)] active:shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.3)] transition-all"
                     >
                       I'm in
                     </button>
