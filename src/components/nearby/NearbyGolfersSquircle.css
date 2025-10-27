@@ -129,15 +129,15 @@
 
 @keyframes energyPulse {
   0% {
-    transform: translate(-50%, -50%) scale(0.5);
+    transform: translate(-50%, -50%) scale(0.8);
     opacity: 0.6;
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.8);
-    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(2.2);
+    opacity: 0.4;
   }
   100% {
-    transform: translate(-50%, -50%) scale(2.4);
+    transform: translate(-50%, -50%) scale(3.5);
     opacity: 0;
   }
 }
