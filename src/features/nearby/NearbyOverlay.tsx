@@ -176,10 +176,10 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                 ),
               }}
             >
-              <div className="text-white text-[17px] font-semibold mb-1 leading-tight">
-                {isOpenToPlay ? 'Open to Play' : 'Open to Play ?'}
+              <div className="text-white/70 text-[15px] font-medium mb-1">
+                Open to Play?
               </div>
-              <div className="text-white/80 text-[15px] font-medium mb-2 leading-tight">
+              <div className="text-white text-[17px] font-semibold mb-2 leading-tight">
                 {isOpenToPlay
                   ? `Active – ${remainingText}`
                   : "Tap to say you're free"}
