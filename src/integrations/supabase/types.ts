@@ -608,6 +608,48 @@ export type Database = {
           },
         ]
       }
+      game_beacons: {
+        Row: {
+          course_name: string | null
+          created_at: string
+          expires_at: string
+          game_type: string
+          host_user_id: string
+          id: string
+          is_active: boolean
+          lat: number | null
+          lng: number | null
+          note: string | null
+          participants: string[] | null
+        }
+        Insert: {
+          course_name?: string | null
+          created_at?: string
+          expires_at: string
+          game_type: string
+          host_user_id: string
+          id?: string
+          is_active?: boolean
+          lat?: number | null
+          lng?: number | null
+          note?: string | null
+          participants?: string[] | null
+        }
+        Update: {
+          course_name?: string | null
+          created_at?: string
+          expires_at?: string
+          game_type?: string
+          host_user_id?: string
+          id?: string
+          is_active?: boolean
+          lat?: number | null
+          lng?: number | null
+          note?: string | null
+          participants?: string[] | null
+        }
+        Relationships: []
+      }
       golf_courses: {
         Row: {
           continent: Database["public"]["Enums"]["continent"]
