@@ -55,7 +55,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       />
       
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-neutral-900/95 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col z-10">
+      <div className="relative w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden min-h-[65vh] max-h-[85vh] flex flex-col z-10">
         {/* Header */}
         <div className="border-b border-neutral-800/60">
           <div className="flex items-center justify-between px-4 py-4">
