@@ -148,7 +148,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                 </span>
               </div>
               <div className="text-white/50 text-[12px] leading-snug max-w-[220px]">
-                Tap to change who can see you're here
+                Choose your visibility to other golfers
               </div>
             </button>
 
@@ -187,7 +187,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               <div className="text-white/50 text-[12px] leading-snug max-w-[220px]">
                 {isOpenToPlay
                   ? `${remainingText} left · Tap to stop`
-                  : "Let nearby golfers know you're available. Lasts 30 mins"}
+                  : "Tell golfers you're free to join up"}
               </div>
             </button>
           </div>
