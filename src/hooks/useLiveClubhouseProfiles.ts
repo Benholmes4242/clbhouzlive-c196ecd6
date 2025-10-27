@@ -32,33 +32,37 @@ export function useLiveClubhouseProfiles() {
   const { user } = useSupabaseSession();
   const [onlineMap, setOnlineMap] = useState<Record<string, boolean>>({});
 
-  // MOCK PATH
+  // MOCK PATH - Set up mock presence (only runs when mock is true)
+  useEffect(() => {
+    if (!mock) return;
+    const stop = startMockPresence(setOnlineMap);
+    return stop;
+  }, [mock]);
+
+  // MOCK PATH - Build mock creators (memoized)
+  const mockCreators: LiveCreator[] = useMemo(() => {
+    if (!mock) return [];
+    const now = Date.now();
+    return MOCK_CREATORS.map(m => {
+      const msAgo = (m.minutesAgo ?? 999) * 60_000;
+      const latest = new Date(now - msAgo).toISOString();
+      return {
+        id: m.id,
+        username: m.username,
+        display_name: m.display_name,
+        profile_photo_url: m.profile_photo_url,
+        home_club: m.home_club ?? null,
+        latest_post_at: latest,
+        latest_short_preview: { posterUrl: m.previewPoster, mp4Url: m.previewMp4 },
+        has_recent_post: msAgo <= RECENT_MS,
+        is_online: !!onlineMap[m.id],
+      };
+    });
+  }, [mock, onlineMap]);
+
+  // Early return for mock data
   if (mock) {
-    useEffect(() => {
-      const stop = startMockPresence(setOnlineMap);
-      return stop;
-    }, []);
-
-    const creators: LiveCreator[] = useMemo(() => {
-      const now = Date.now();
-      return MOCK_CREATORS.map(m => {
-        const msAgo = (m.minutesAgo ?? 999) * 60_000;
-        const latest = new Date(now - msAgo).toISOString();
-        return {
-          id: m.id,
-          username: m.username,
-          display_name: m.display_name,
-          profile_photo_url: m.profile_photo_url,
-          home_club: m.home_club ?? null,
-          latest_post_at: latest,
-          latest_short_preview: { posterUrl: m.previewPoster, mp4Url: m.previewMp4 },
-          has_recent_post: msAgo <= RECENT_MS,
-          is_online: !!onlineMap[m.id],
-        };
-      });
-    }, [onlineMap]);
-
-    return { creators, isLoading: false };
+    return { creators: mockCreators, isLoading: false };
   }
 
   // === REAL PATH ===
