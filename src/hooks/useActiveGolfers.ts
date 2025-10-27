@@ -140,7 +140,6 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
       ...p,
       is_online: onlineUserIds.has(p.id),
       isMock: false,
-      isOpenToPlay: true,
     }));
 
     const mockProfiles: ActiveGolfer[] = getMockNearby(mockCount).map(m => ({
