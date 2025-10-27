@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { GameBeacon } from '../hooks/useGameBeacon';
 
@@ -41,6 +41,17 @@ export function CreateGameModal({
   const [note, setNote] = useState('');
   const [duration, setDuration] = useState(120);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
