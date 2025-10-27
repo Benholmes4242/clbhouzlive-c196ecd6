@@ -67,27 +67,54 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-end sm:items-center sm:justify-center pointer-events-auto">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-md"
-        onClick={handleClose}
-      />
-      
+    <div 
+      className="fixed inset-0 z-[9999] flex items-end sm:items-center sm:justify-center"
+      style={{
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        WebkitBackdropFilter: 'blur(8px)',
+        backdropFilter: 'blur(8px)',
+        overscrollBehavior: 'none',
+        touchAction: 'none',
+      }}
+      onClick={handleClose}
+    >
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden min-h-[65vh] max-h-[85vh] flex flex-col z-10">
+      <div 
+        className="relative w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col"
+        style={{
+          maxHeight: '80vh',
+          touchAction: 'auto',
+          overscrollBehavior: 'contain',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="border-b border-neutral-800/60">
           {/* Row A: Title + Close */}
-          <div className="flex items-center justify-between px-4 pt-5 pb-4">
-            <h2 className="text-lg font-semibold text-white">Nearby</h2>
-            <button
-              onClick={handleClose}
-              className="p-2 text-white/60 hover:text-white/90"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+          <header className="px-4 pt-4 pb-3" style={{ userSelect: 'none' }}>
+            <div className="grid grid-cols-3 items-center">
+              {/* Left spacer */}
+              <div />
+              
+              {/* Title */}
+              <div className="text-center">
+                <h2 className="text-white text-[18px] font-semibold leading-none">
+                  NearbyGolfersNG
+                </h2>
+              </div>
+              
+              {/* Close button */}
+              <div className="flex justify-end">
+                <button
+                  onClick={handleClose}
+                  className="text-white/70 active:scale-95 transition-transform"
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </header>
 
           {/* Row B: 2-card grid (Visibility + Open to Play) */}
           <div className="grid grid-cols-2 gap-2 px-4 pb-4">
@@ -95,17 +122,19 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             <button
               onClick={cycleVisibility}
               disabled={visibilityLoading}
-              className="flex flex-col items-center justify-center text-center rounded-xl px-2 py-3 backdrop-blur"
+              className="flex flex-col items-center justify-center text-center rounded-xl px-4 py-3 backdrop-blur"
               style={{
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.18)',
-                boxShadow: '0 24px 32px rgba(0,0,0,0.9), 0 0 24px rgba(255,255,255,0.12) inset',
+                minHeight: '110px',
+                flex: 1,
+                background: 'rgba(255,255,255,0.07)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                boxShadow: '0 40px 120px rgba(0,0,0,0.8), 0 0 40px rgba(255,255,255,0.12) inset',
               }}
             >
-              <div className="text-[13px] text-white/60 font-medium mb-1">
+              <div className="text-white/70 text-[13px] font-medium mb-1">
                 Visibility
               </div>
-              <div className="flex items-center gap-2 text-[14px] text-white font-semibold mb-1.5">
+              <div className="flex items-center gap-2 text-white text-[15px] font-semibold leading-tight mb-2">
                 <span
                   className="inline-block w-2 h-2 rounded-full"
                   style={{
@@ -118,7 +147,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                   {visibilityMode === 'hidden' && 'Hidden'}
                 </span>
               </div>
-              <div className="text-[11px] text-white/40 leading-snug">
+              <div className="text-white/50 text-[12px] leading-snug max-w-[220px]">
                 Tap to change who can see you're here
               </div>
             </button>
@@ -126,17 +155,19 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             {/* Open to Play card */}
             <button
               onClick={handleOpenToPlayToggle}
-              className="flex flex-col items-center justify-center text-center rounded-xl px-2 py-3 backdrop-blur"
+              className="flex flex-col items-center justify-center text-center rounded-xl px-4 py-3 backdrop-blur"
               style={{
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.18)',
-                boxShadow: '0 24px 32px rgba(0,0,0,0.9), 0 0 24px rgba(255,255,255,0.12) inset',
+                minHeight: '110px',
+                flex: 1,
+                background: 'rgba(255,255,255,0.07)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                boxShadow: '0 40px 120px rgba(0,0,0,0.8), 0 0 40px rgba(255,255,255,0.12) inset',
               }}
             >
-              <div className="text-[13px] text-white/60 font-medium mb-1">
+              <div className="text-white/70 text-[13px] font-medium mb-1">
                 Open to Play
               </div>
-              <div className="flex items-center gap-2 text-[14px] text-white font-semibold mb-1.5">
+              <div className="flex items-center gap-2 text-white text-[15px] font-semibold leading-tight mb-2">
                 {isOpenToPlay ? (
                   <>
                     <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
@@ -149,7 +180,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                   </>
                 )}
               </div>
-              <div className="text-[11px] text-white/40 leading-snug">
+              <div className="text-white/50 text-[12px] leading-snug max-w-[220px]">
                 {isOpenToPlay
                   ? "You're letting golfers nearby know you can join now"
                   : "Let nearby golfers know you're available. Lasts 30 mins"}
@@ -158,7 +189,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           </div>
 
           {/* Row C: Tabs */}
-          <div className="flex px-4">
+          <div className="flex px-4 mt-4">
             <button
               onClick={() => setActiveTab('golfers')}
               className={`flex-1 py-3 text-sm font-medium border-b-2 transition-all duration-150 ${
@@ -187,7 +218,13 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
         </div>
 
         {/* Scrollable Content */}
-        <div className="px-4 pt-4 pb-3 grow overflow-y-auto overscroll-contain">
+        <div 
+          className="px-4 pt-4 pb-3 flex-1 overflow-y-auto"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain',
+          }}
+        >
           {activeTab === 'golfers' ? (
             isLoading ? (
               <div className="py-12 text-center text-sm text-neutral-500">
