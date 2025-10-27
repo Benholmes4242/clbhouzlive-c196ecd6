@@ -179,7 +179,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                   <>
                     <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.4)' }} />
                     <span className="text-white text-base font-medium leading-tight">
-                      Tap to ping
+                      Tap to say you're free
                     </span>
                   </>
                 )}
