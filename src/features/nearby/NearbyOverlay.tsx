@@ -52,10 +52,10 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsCreateGameOpen(true)}
-                className="p-2 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors"
+                className="p-2 rounded-full bg-white/12 hover:bg-white/18 backdrop-blur border border-white/22 transition-all shadow-[0_16px_32px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.2)] active:shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.3)]"
                 title="Create a game"
               >
-                <Plus className="w-5 h-5 text-primary" />
+                <Plus className="w-5 h-5 text-white" />
               </button>
               <button
                 onClick={handleClose}
@@ -70,24 +70,24 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           <div className="flex px-4">
             <button
               onClick={() => setActiveTab('golfers')}
-              className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
+              className={`flex-1 py-3 text-sm font-medium border-b-2 transition-all duration-150 ${
                 activeTab === 'golfers'
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-neutral-400 hover:text-neutral-300'
+                  ? 'border-white/90 text-white/90'
+                  : 'border-transparent text-white/40 hover:text-white/60'
               }`}
             >
               Golfers
             </button>
             <button
               onClick={() => setActiveTab('games')}
-              className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
+              className={`flex-1 py-3 text-sm font-medium border-b-2 transition-all duration-150 ${
                 activeTab === 'games'
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-neutral-400 hover:text-neutral-300'
+                  ? 'border-white/90 text-white/90'
+                  : 'border-transparent text-white/40 hover:text-white/60'
               }`}
             >
               Games {nearbyBeacons.length > 0 && (
-                <span className="ml-1.5 px-1.5 py-0.5 bg-primary/20 text-primary text-xs rounded-full">
+                <span className="ml-1.5 px-1.5 py-0.5 bg-white/15 text-white text-xs rounded-full">
                   {nearbyBeacons.length}
                 </span>
               )}

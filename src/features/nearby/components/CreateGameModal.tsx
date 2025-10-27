@@ -141,7 +141,7 @@ export function CreateGameModal({
                 )}
                 <div className="flex items-center justify-between pt-2 border-t border-neutral-700/50">
                   <span className="text-sm text-neutral-400">Expires in</span>
-                  <span className="text-sm font-medium text-primary">{getTimeRemaining(myBeacon.expires_at)}</span>
+                  <span className="text-sm font-medium text-white/90">{getTimeRemaining(myBeacon.expires_at)}</span>
                 </div>
               </div>
               
@@ -158,7 +158,7 @@ export function CreateGameModal({
             <>
               {/* Game Type */}
               <div className="space-y-3">
-                <label className="block text-sm font-medium text-neutral-300">
+                <label className="block text-sm font-medium text-white/90">
                   Game type *
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -166,10 +166,10 @@ export function CreateGameModal({
                     <button
                       key={type.value}
                       onClick={() => setGameType(type.value)}
-                      className={`py-3 px-4 rounded-xl font-medium transition-all ${
+                      className={`py-3 px-4 rounded-xl font-medium transition-all backdrop-blur ${
                         gameType === type.value
-                          ? 'bg-primary text-white'
-                          : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                          ? 'bg-white/15 text-white border border-white/22 shadow-[0_12px_32px_rgba(0,0,0,0.8),_0_0_16px_rgba(255,255,255,0.45),_0_0_40px_rgba(255,255,255,0.25)] active:bg-white/20'
+                          : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
                       }`}
                     >
                       {type.label}
@@ -180,7 +180,7 @@ export function CreateGameModal({
 
               {/* Location */}
               <div className="space-y-3">
-                <label className="block text-sm font-medium text-neutral-300">
+                <label className="block text-sm font-medium text-white/60">
                   Where
                 </label>
                 <input
@@ -188,13 +188,13 @@ export function CreateGameModal({
                   placeholder="Course / club / bay"
                   value={courseName}
                   onChange={(e) => setCourseName(e.target.value)}
-                  className="w-full py-3 px-4 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full py-3 px-4 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20"
                 />
               </div>
 
               {/* Note */}
               <div className="space-y-3">
-                <label className="block text-sm font-medium text-neutral-300">
+                <label className="block text-sm font-medium text-white/60">
                   Note
                 </label>
                 <textarea
@@ -202,13 +202,13 @@ export function CreateGameModal({
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   rows={2}
-                  className="w-full py-3 px-4 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                  className="w-full py-3 px-4 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20 resize-none"
                 />
               </div>
 
               {/* Duration */}
               <div className="space-y-3">
-                <label className="block text-sm font-medium text-neutral-300">
+                <label className="block text-sm font-medium text-white/60">
                   How long are you available?
                 </label>
                 <div className="grid grid-cols-4 gap-2">
@@ -216,10 +216,10 @@ export function CreateGameModal({
                     <button
                       key={option.value}
                       onClick={() => setDuration(option.value)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-all backdrop-blur ${
                         duration === option.value
-                          ? 'bg-primary text-white'
-                          : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                          ? 'bg-white/15 text-white border border-white/22 shadow-[0_12px_32px_rgba(0,0,0,0.8),_0_0_16px_rgba(255,255,255,0.45),_0_0_40px_rgba(255,255,255,0.25)] active:bg-white/20'
+                          : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
                       }`}
                     >
                       {option.label}
@@ -231,7 +231,7 @@ export function CreateGameModal({
               <button
                 onClick={handleSubmit}
                 disabled={!gameType || isSubmitting}
-                className="w-full py-3 px-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 px-4 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Creating...' : 'Start Game'}
               </button>

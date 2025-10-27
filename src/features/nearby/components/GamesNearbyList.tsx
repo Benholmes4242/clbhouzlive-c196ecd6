@@ -75,7 +75,7 @@ export function GamesNearbyList({
         </div>
         <button
           onClick={onCreateGame}
-          className="mt-4 px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-xl font-medium transition-colors"
+          className="mt-4 px-6 py-2 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all"
         >
           Create a Game
         </button>
@@ -117,7 +117,7 @@ export function GamesNearbyList({
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-neutral-100 truncate">{hostName}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-primary/20 text-primary text-xs font-medium">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white/15 text-white text-xs font-medium backdrop-blur border border-white/22">
                         {beacon.game_type}
                       </span>
                       {beacon.distanceText && (
@@ -159,7 +159,7 @@ export function GamesNearbyList({
                   ) : (
                     <button
                       onClick={() => onJoinBeacon(beacon.id)}
-                      className="px-4 py-1.5 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-medium transition-colors"
+                      className="px-4 py-1.5 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-lg text-sm font-medium backdrop-blur border border-white/28 shadow-[0_16px_32px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.2)] active:shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.3)] transition-all"
                     >
                       I'm in
                     </button>
