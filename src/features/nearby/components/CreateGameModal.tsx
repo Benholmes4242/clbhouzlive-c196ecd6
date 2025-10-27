@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, ChevronDown } from 'lucide-react';
 import { GameBeacon } from '../hooks/useGameBeacon';
+import { useCourseSearch } from '../hooks/useCourseSearch';
+import { DateTimePicker } from './DateTimePicker';
+import { format } from 'date-fns';
 
 interface CreateGameModalProps {
   isOpen: boolean;
@@ -18,16 +21,18 @@ interface CreateGameModalProps {
 const GAME_TYPES = [
   { value: '9 holes', label: '9 holes' },
   { value: '18 holes', label: '18 holes' },
-  { value: 'Range', label: 'Range' },
+  { value: 'Casual golf', label: 'Casual golf' },
   { value: 'Practice', label: 'Practice' },
 ];
 
-const DURATION_OPTIONS = [
-  { value: 30, label: '30 mins' },
-  { value: 60, label: '1 hour' },
-  { value: 120, label: '2 hours' },
-  { value: 240, label: '4 hours' },
+const TIMING_OPTIONS = [
+  { value: 'now', label: 'Now' },
+  { value: '30', label: 'In 30 mins' },
+  { value: '60', label: 'In 1 hour' },
+  { value: 'choose', label: 'Choose' },
 ];
+
+const PLAYERS_OPTIONS = [1, 2, 3];
 
 export function CreateGameModal({
   isOpen,
@@ -38,9 +43,17 @@ export function CreateGameModal({
 }: CreateGameModalProps) {
   const [gameType, setGameType] = useState<string>('9 holes');
   const [courseName, setCourseName] = useState('');
+  const [courseSearchTerm, setCourseSearchTerm] = useState('');
+  const [showCourseDropdown, setShowCourseDropdown] = useState(false);
   const [note, setNote] = useState('');
-  const [duration, setDuration] = useState(120);
+  const [timing, setTiming] = useState<string>('now');
+  const [customDateTime, setCustomDateTime] = useState<Date | null>(null);
+  const [showDateTimePicker, setShowDateTimePicker] = useState(false);
+  const [playersNeeded, setPlayersNeeded] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const courseInputRef = useRef<HTMLInputElement>(null);
+  
+  const { courses } = useCourseSearch(courseSearchTerm);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -58,23 +71,61 @@ export function CreateGameModal({
   const handleSubmit = async () => {
     if (!gameType) return;
 
+    // Calculate duration based on timing selection
+    let durationMinutes = 120; // default
+    if (timing === 'now') {
+      durationMinutes = 120;
+    } else if (timing === '30') {
+      durationMinutes = 150; // 30 mins from now + 2 hours
+    } else if (timing === '60') {
+      durationMinutes = 180; // 1 hour from now + 2 hours
+    } else if (timing === 'choose' && customDateTime) {
+      const now = new Date();
+      const diffMs = customDateTime.getTime() - now.getTime();
+      const diffMins = Math.floor(diffMs / 60000);
+      durationMinutes = diffMins + 120; // time until + 2 hours
+    }
+
     setIsSubmitting(true);
     try {
       await onCreateBeacon({
         game_type: gameType,
         course_name: courseName || undefined,
         note: note || undefined,
-        durationMinutes: duration,
+        durationMinutes,
       });
       onClose();
       // Reset form
       setGameType('9 holes');
       setCourseName('');
+      setCourseSearchTerm('');
       setNote('');
-      setDuration(120);
+      setTiming('now');
+      setCustomDateTime(null);
+      setPlayersNeeded(null);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleTimingChange = (value: string) => {
+    setTiming(value);
+    if (value === 'choose') {
+      setShowDateTimePicker(true);
+    }
+  };
+
+  const handleCourseSelect = (course: { name: string }) => {
+    setCourseName(course.name);
+    setCourseSearchTerm(course.name);
+    setShowCourseDropdown(false);
+  };
+
+  const getTimingDisplay = () => {
+    if (timing === 'choose' && customDateTime) {
+      return format(customDateTime, "MMM d 'at' h:mm a");
+    }
+    return TIMING_OPTIONS.find(opt => opt.value === timing)?.label || 'Now';
   };
 
   const handleCancel = async () => {
@@ -111,25 +162,29 @@ export function CreateGameModal({
       {/* Modal */}
       <div className="relative w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-neutral-800">
-          <div>
-            <h2 className="text-xl font-semibold text-neutral-100">
-              {myBeacon ? 'Your Game' : 'Create a Game'}
-            </h2>
-            <p className="text-sm text-neutral-400 mt-1">
-              {myBeacon ? 'Currently hosting' : 'Let nearby golfers know you\'re looking to play'}
-            </p>
-          </div>
+        <div className="relative p-6 border-b border-neutral-800 text-center">
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-neutral-800 transition-colors"
+            className="absolute top-3 right-4 p-2 rounded-full hover:bg-neutral-800 transition-colors opacity-80"
           >
             <X className="w-5 h-5 text-neutral-400" />
           </button>
+          <h2 className="text-lg font-semibold text-white">
+            {myBeacon ? 'Your Game' : 'Create a Game'}
+          </h2>
+          <p className="text-[15px] text-white/70 mt-1">
+            {myBeacon ? 'Currently hosting' : 'Let nearby golfers know you\'re looking to play'}
+          </p>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-6"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px'
+          }}
+        >
           {myBeacon ? (
             // Show existing beacon
             <div className="space-y-4">
@@ -190,17 +245,46 @@ export function CreateGameModal({
               </div>
 
               {/* Location */}
-              <div className="space-y-3">
+              <div className="space-y-3 relative">
                 <label className="block text-sm font-medium text-white/60">
                   Where
                 </label>
                 <input
+                  ref={courseInputRef}
                   type="text"
-                  placeholder="Course / club / bay"
-                  value={courseName}
-                  onChange={(e) => setCourseName(e.target.value)}
+                  placeholder="Course ...."
+                  value={courseSearchTerm}
+                  onChange={(e) => {
+                    setCourseSearchTerm(e.target.value);
+                    setShowCourseDropdown(true);
+                  }}
+                  onFocus={() => setShowCourseDropdown(true)}
                   className="w-full py-3 px-4 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20"
                 />
+                {showCourseDropdown && courses.length > 0 && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-10"
+                      onClick={() => setShowCourseDropdown(false)}
+                    />
+                    <div className="absolute z-20 w-full mt-1 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto backdrop-blur-xl">
+                      {courses.map((course) => (
+                        <button
+                          key={course.id}
+                          onClick={() => handleCourseSelect(course)}
+                          className="w-full text-left px-4 py-3 hover:bg-neutral-800 transition-colors border-b border-neutral-800 last:border-b-0"
+                        >
+                          <div className="text-white text-sm font-medium">{course.name}</div>
+                          {course.region && (
+                            <div className="text-white/60 text-xs mt-0.5">
+                              {course.region}, {course.country}
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Note */}
@@ -217,23 +301,50 @@ export function CreateGameModal({
                 />
               </div>
 
-              {/* Duration */}
+              {/* Timing */}
               <div className="space-y-3">
                 <label className="block text-sm font-medium text-white/60">
-                  How long are you available?
+                  When
                 </label>
                 <div className="grid grid-cols-4 gap-2">
-                  {DURATION_OPTIONS.map(option => (
+                  {TIMING_OPTIONS.map(option => (
                     <button
                       key={option.value}
-                      onClick={() => setDuration(option.value)}
+                      onClick={() => handleTimingChange(option.value)}
                       className={`py-2 px-3 rounded-lg text-sm font-medium transition-all backdrop-blur ${
-                        duration === option.value
+                        timing === option.value
                           ? 'bg-white/11 text-white border border-white/22 shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.22)_inset] active:bg-white/16 active:shadow-[0_24px_48px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.28)_inset]'
                           : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
                       }`}
                     >
                       {option.label}
+                    </button>
+                  ))}
+                </div>
+                {timing === 'choose' && customDateTime && (
+                  <div className="text-sm text-white/80 text-center mt-2">
+                    {getTimingDisplay()}
+                  </div>
+                )}
+              </div>
+
+              {/* Players Needed */}
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-white/60">
+                  Players Needed
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {PLAYERS_OPTIONS.map(num => (
+                    <button
+                      key={num}
+                      onClick={() => setPlayersNeeded(playersNeeded === num ? null : num)}
+                      className={`py-3 px-4 rounded-xl font-medium transition-all backdrop-blur ${
+                        playersNeeded === num
+                          ? 'bg-white/11 text-white border border-white/22 shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.22)_inset] active:bg-white/16 active:shadow-[0_24px_48px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.28)_inset]'
+                          : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
+                      }`}
+                    >
+                      {num}
                     </button>
                   ))}
                 </div>
@@ -250,6 +361,15 @@ export function CreateGameModal({
           )}
         </div>
       </div>
+
+      {showDateTimePicker && (
+        <DateTimePicker
+          value={customDateTime}
+          onChange={setCustomDateTime}
+          onClose={() => setShowDateTimePicker(false)}
+        />
+      )}
     </div>
   );
 }
+
