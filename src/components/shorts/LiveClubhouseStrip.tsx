@@ -161,7 +161,7 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
           size={84}
           src={creator.profile_photo_url || '/placeholder.svg'}
           alt={creator.display_name}
-          ringColor="#f7931e"
+          ringColor="#ffffff"
           ringWidth={1.5}
         />
         {creator.is_online && (
