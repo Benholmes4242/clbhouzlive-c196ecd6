@@ -78,47 +78,24 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       <div className="relative w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden min-h-[65vh] max-h-[85vh] flex flex-col z-10">
         {/* Header */}
         <div className="border-b border-neutral-800/60">
-          {/* Row A: Title + Start Game + Close */}
-          <div className="flex items-start justify-between px-4 pt-4 pb-3">
+          {/* Row A: Title + Close */}
+          <div className="flex items-center justify-between px-4 pt-5 pb-4">
             <h2 className="text-lg font-semibold text-white">Nearby</h2>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIsCreateGameOpen(true)}
-                className="flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-white/90 backdrop-blur"
-                style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.22)',
-                  boxShadow: '0 16px 32px rgba(0,0,0,0.9), 0 0 18px rgba(255,255,255,0.18) inset',
-                }}
-              >
-                <span
-                  className="flex items-center justify-center w-5 h-5 rounded-full text-white/90 text-sm leading-none"
-                  style={{
-                    background: 'rgba(255,255,255,0.15)',
-                    boxShadow: '0 8px 16px rgba(0,0,0,0.8), 0 0 8px rgba(255,255,255,0.2) inset',
-                    border: '1px solid rgba(255,255,255,0.3)',
-                  }}
-                >
-                  +
-                </span>
-                <span>Start game</span>
-              </button>
-              <button
-                onClick={handleClose}
-                className="p-2 text-white/60 hover:text-white/90"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+            <button
+              onClick={handleClose}
+              className="p-2 text-white/60 hover:text-white/90"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
           {/* Row B: 2-card grid (Visibility + Open to Play) */}
-          <div className="grid grid-cols-2 gap-3 px-4 pb-4">
+          <div className="grid grid-cols-2 gap-2 px-4 pb-4">
             {/* Visibility card */}
             <button
               onClick={cycleVisibility}
               disabled={visibilityLoading}
-              className="flex flex-col rounded-xl px-3 py-2.5 text-left backdrop-blur"
+              className="flex flex-col items-center justify-center text-center rounded-xl px-2 py-3 backdrop-blur"
               style={{
                 background: 'rgba(255,255,255,0.06)',
                 border: '1px solid rgba(255,255,255,0.18)',
@@ -149,7 +126,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             {/* Open to Play card */}
             <button
               onClick={handleOpenToPlayToggle}
-              className="flex flex-col rounded-xl px-3 py-2.5 text-left backdrop-blur"
+              className="flex flex-col items-center justify-center text-center rounded-xl px-2 py-3 backdrop-blur"
               style={{
                 background: 'rgba(255,255,255,0.06)',
                 border: '1px solid rgba(255,255,255,0.18)',
