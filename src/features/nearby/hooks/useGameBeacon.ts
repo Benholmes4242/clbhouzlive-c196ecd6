@@ -270,13 +270,17 @@ export function useGameBeacon() {
         return;
       }
 
-      // Optimistically update local state
+      // Optimistically update local state so UI updates instantly
       setMyBeacon(null);
+      setNearbyBeacons(prev => prev.filter(b => b.id !== beaconId));
 
       toast({
         title: 'Game cancelled',
         description: 'Other golfers can no longer see this game',
       });
+
+      // Refetch to ensure we're synced
+      await fetchBeacons();
     } catch (error) {
       console.error('Error in cancelBeacon:', error);
     }

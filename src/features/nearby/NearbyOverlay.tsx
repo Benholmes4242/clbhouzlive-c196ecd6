@@ -78,77 +78,109 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       <div className="relative w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden min-h-[65vh] max-h-[85vh] flex flex-col z-10">
         {/* Header */}
         <div className="border-b border-neutral-800/60">
-          {/* Row 1: Title + Actions */}
-          <div className="flex items-center justify-between px-4 py-4">
-            <h2 className="text-lg font-semibold text-neutral-100">
-              Nearby
-            </h2>
+          {/* Row A: Title + Start Game + Close */}
+          <div className="flex items-start justify-between px-4 pt-4 pb-3">
+            <h2 className="text-lg font-semibold text-white">Nearby</h2>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsCreateGameOpen(true)}
-                className="p-2 rounded-full backdrop-blur border transition-all"
+                className="flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-white/90 backdrop-blur"
                 style={{
                   background: 'rgba(255,255,255,0.08)',
-                  borderColor: 'rgba(255,255,255,0.22)',
+                  border: '1px solid rgba(255,255,255,0.22)',
                   boxShadow: '0 16px 32px rgba(0,0,0,0.9), 0 0 18px rgba(255,255,255,0.18) inset',
                 }}
-                title="Create a game"
               >
-                <Plus className="w-5 h-5 text-white" />
+                <span
+                  className="flex items-center justify-center w-5 h-5 rounded-full text-white/90 text-sm leading-none"
+                  style={{
+                    background: 'rgba(255,255,255,0.15)',
+                    boxShadow: '0 8px 16px rgba(0,0,0,0.8), 0 0 8px rgba(255,255,255,0.2) inset',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                  }}
+                >
+                  +
+                </span>
+                <span>Start game</span>
               </button>
               <button
                 onClick={handleClose}
-                className="p-2 rounded-full hover:bg-neutral-800/60 transition-colors"
+                className="p-2 text-white/60 hover:text-white/90"
               >
-                <X className="w-5 h-5 text-neutral-400" />
+                <X className="w-5 h-5" />
               </button>
             </div>
           </div>
-          
-          {/* Row 2: Visibility pill */}
-          <div className="px-4 pb-2">
+
+          {/* Row B: 2-card grid (Visibility + Open to Play) */}
+          <div className="grid grid-cols-2 gap-3 px-4 pb-4">
+            {/* Visibility card */}
             <button
               onClick={cycleVisibility}
               disabled={visibilityLoading}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur border transition-all"
+              className="flex flex-col rounded-xl px-3 py-2.5 text-left backdrop-blur"
               style={{
-                background: visibilityMode !== 'hidden' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
-                borderColor: visibilityMode !== 'hidden' ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.14)',
-                boxShadow: '0 0 16px rgba(255,255,255,0.12) inset',
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                boxShadow: '0 24px 32px rgba(0,0,0,0.9), 0 0 24px rgba(255,255,255,0.12) inset',
               }}
             >
-              <span 
-                className="w-2 h-2 rounded-full"
-                style={{ 
-                  background: visibilityMode !== 'hidden' ? '#4ade80' : 'rgba(255,255,255,0.4)' 
-                }}
-              />
-              <span className="text-xs font-medium text-white/90">
-                {visibilityMode === 'all' && 'Visible to: Everyone'}
-                {visibilityMode === 'friends' && 'Visible to: Friends'}
-                {visibilityMode === 'hidden' && 'Hidden'}
-              </span>
+              <div className="text-[13px] text-white/60 font-medium mb-1">
+                Visibility
+              </div>
+              <div className="flex items-center gap-2 text-[14px] text-white font-semibold mb-1.5">
+                <span
+                  className="inline-block w-2 h-2 rounded-full"
+                  style={{
+                    backgroundColor: visibilityMode === 'hidden' ? '#666' : '#22c55e',
+                  }}
+                />
+                <span>
+                  {visibilityMode === 'all' && 'Everyone'}
+                  {visibilityMode === 'friends' && 'Friends'}
+                  {visibilityMode === 'hidden' && 'Hidden'}
+                </span>
+              </div>
+              <div className="text-[11px] text-white/40 leading-snug">
+                Tap to change who can see you're here
+              </div>
+            </button>
+
+            {/* Open to Play card */}
+            <button
+              onClick={handleOpenToPlayToggle}
+              className="flex flex-col rounded-xl px-3 py-2.5 text-left backdrop-blur"
+              style={{
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                boxShadow: '0 24px 32px rgba(0,0,0,0.9), 0 0 24px rgba(255,255,255,0.12) inset',
+              }}
+            >
+              <div className="text-[13px] text-white/60 font-medium mb-1">
+                Open to Play
+              </div>
+              <div className="flex items-center gap-2 text-[14px] text-white font-semibold mb-1.5">
+                {isOpenToPlay ? (
+                  <>
+                    <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
+                    <span>Active · {remainingText}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="inline-block w-2 h-2 rounded-full bg-white/30" />
+                    <span>Tap to ping</span>
+                  </>
+                )}
+              </div>
+              <div className="text-[11px] text-white/40 leading-snug">
+                {isOpenToPlay
+                  ? "You're letting golfers nearby know you can join now"
+                  : "Let nearby golfers know you're available. Lasts 30 mins"}
+              </div>
             </button>
           </div>
 
-          {/* Row 3: Open to Play pill */}
-          <div className="px-4 pb-3">
-            <button
-              onClick={handleOpenToPlayToggle}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur border transition-all"
-              style={{
-                background: isOpenToPlay ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.03)',
-                borderColor: isOpenToPlay ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.14)',
-                boxShadow: '0 0 16px rgba(255,255,255,0.12) inset',
-              }}
-            >
-              <span className="text-xs font-medium text-white/90">
-                {isOpenToPlay ? `Open to Play · ${remainingText}` : 'Open to Play'}
-              </span>
-            </button>
-          </div>
-          
-          {/* Row 4: Tabs */}
+          {/* Row C: Tabs */}
           <div className="flex px-4">
             <button
               onClick={() => setActiveTab('golfers')}
