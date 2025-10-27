@@ -90,8 +90,9 @@ const EngagementButton = ({
             <Icon 
               className={cn(
                 "w-5 h-5 transition-colors duration-200 relative z-10",
-                isActive ? "text-red-500 fill-red-500" : "text-white/90"
+                isActive ? "text-red-500 fill-red-500 stroke-red-500" : "text-white/90"
               )}
+              strokeWidth={isActive ? 0 : 2}
             />
           </div>
         </Squircle>

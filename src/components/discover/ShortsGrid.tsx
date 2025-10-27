@@ -34,6 +34,7 @@ interface LayoutItem {
   type: 'portrait' | 'landscape';
   height?: number;
   variant?: 'portrait' | 'landscape';
+  isTrending?: boolean;
 }
 
 export default function ShortsGrid({ 
@@ -133,6 +134,7 @@ export default function ShortsGrid({
   }, [updateColumnWidth]);
 
   // Layout with landscape cards: Portrait cards organized in blocks of 6, with landscape cards inserted after each block
+  // Also applies trending logic: first portrait, first landscape, then mock distribution
   const layout = useMemo(() => {
     if (items.length === 0) return [];
     
@@ -141,6 +143,8 @@ export default function ShortsGrid({
     let portraitCount = 0;
     let itemIndex = 0;
     let insertedLandscapeThisBoundary = false;
+    let firstPortraitMarked = false;
+    let firstLandscapeMarked = false;
     
     while (itemIndex < items.length) {
       const item = items[itemIndex];
@@ -160,8 +164,14 @@ export default function ShortsGrid({
             item: landscapeCandidate.item,
             index: landscapeCandidate.index,
             type: 'landscape',
-            variant: 'landscape'
+            variant: 'landscape',
+            isTrending: !firstLandscapeMarked // First landscape is always trending
           });
+          
+          if (!firstLandscapeMarked) {
+            firstLandscapeMarked = true;
+          }
+          
           usedIndexes.add(landscapeCandidate.index);
           
           // Reset counter to start a new block and prevent double inserts
@@ -175,13 +185,28 @@ export default function ShortsGrid({
       
       // Add portrait card if not already used - all use base height (no variant)
       if (!usedIndexes.has(itemIndex)) {
+        const isTrending = !firstPortraitMarked || (
+          firstPortraitMarked && 
+          firstLandscapeMarked && 
+          result.length > 5 && // After the two anchors are placed
+          (item.likes ?? 0) > 50 && // Mock "high engagement"
+          !result[result.length - 1]?.isTrending && // Not adjacent
+          result.length % 5 === 0 // Roughly every 5th card after anchors
+        );
+        
         result.push({
           item,
           index: itemIndex,
           type: 'portrait',
           height: baseHeightPx, // All portraits same size
-          variant: 'portrait'
+          variant: 'portrait',
+          isTrending
         });
+        
+        if (!firstPortraitMarked && isTrending) {
+          firstPortraitMarked = true;
+        }
+        
         usedIndexes.add(itemIndex);
         portraitCount++;
         insertedLandscapeThisBoundary = false;
@@ -202,8 +227,8 @@ export default function ShortsGrid({
     
     const sections: Array<{
       type: 'portrait-grid' | 'landscape';
-      items?: Array<{ item: ExploreContentItem; index: number; height: number }>;
-      landscapeItem?: { item: ExploreContentItem; index: number };
+      items?: Array<{ item: ExploreContentItem; index: number; height: number; isTrending?: boolean }>;
+      landscapeItem?: { item: ExploreContentItem; index: number; isTrending?: boolean };
     }> = [];
     
     let currentPortraits: LayoutItem[] = [];
@@ -214,7 +239,7 @@ export default function ShortsGrid({
         if (currentPortraits.length > 0) {
           sections.push({
             type: 'portrait-grid',
-            items: currentPortraits.map(p => ({ item: p.item, index: p.index, height: p.height! }))
+            items: currentPortraits.map(p => ({ item: p.item, index: p.index, height: p.height!, isTrending: p.isTrending }))
           });
           currentPortraits = [];
         }
@@ -222,7 +247,7 @@ export default function ShortsGrid({
         // Add landscape section
         sections.push({
           type: 'landscape',
-          landscapeItem: { item: layoutItem.item, index: layoutItem.index }
+          landscapeItem: { item: layoutItem.item, index: layoutItem.index, isTrending: layoutItem.isTrending }
         });
       } else {
         currentPortraits.push(layoutItem);
@@ -233,7 +258,7 @@ export default function ShortsGrid({
     if (currentPortraits.length > 0) {
       sections.push({
         type: 'portrait-grid',
-        items: currentPortraits.map(p => ({ item: p.item, index: p.index, height: p.height! }))
+        items: currentPortraits.map(p => ({ item: p.item, index: p.index, height: p.height!, isTrending: p.isTrending }))
       });
     }
     
@@ -287,6 +312,7 @@ export default function ShortsGrid({
                 onAuthorClick={onAuthorClick}
                 currentUserId={currentUserId}
                 gridPosition={posInRow}
+                isTrending={layoutItem.isTrending}
               />
             ))}
           </div>
@@ -321,6 +347,7 @@ export default function ShortsGrid({
                   currentUserId={currentUserId}
                   variant="landscape"
                   useGlassPanel={false}
+                  isTrending={section.landscapeItem.isTrending}
                 />
               </div>
             );
@@ -333,7 +360,7 @@ export default function ShortsGrid({
                 className="grid grid-cols-2" 
                 style={{ gap: `${GUTTER_PX}px`, marginBottom: '2px' }}
               >
-                {section.items.map(({ item, index, height }, posInGrid) => {
+                {section.items.map(({ item, index, height, isTrending }, posInGrid) => {
                   // Calculate global grid position accounting for first row and previous sections
                   const basePosition = firstRow.length; // Start after first row
                   let previousPortraits = 0;
@@ -355,6 +382,7 @@ export default function ShortsGrid({
                       onAuthorClick={onAuthorClick}
                       currentUserId={currentUserId}
                       gridPosition={gridPosition}
+                      isTrending={isTrending}
                     />
                   );
                 })}

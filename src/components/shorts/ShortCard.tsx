@@ -6,6 +6,7 @@ import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { Squircle } from '@/components/ui/squircle';
 import { Heart } from 'lucide-react';
+import TrendingBadge from '@/components/discover/TrendingBadge';
 import '@/styles/shorts-meta.css';
 
 interface ShortCardProps {
@@ -20,6 +21,7 @@ interface ShortCardProps {
   currentUserId?: string;
   variant?: 'portrait' | 'landscape'; // Support landscape cards
   useGlassPanel?: boolean; // Use glass panel layout for landscape cards (default true)
+  isTrending?: boolean; // Show trending badge
 }
 
 export default React.memo(function ShortCard({ 
@@ -33,7 +35,8 @@ export default React.memo(function ShortCard({
   onAuthorClick,
   currentUserId,
   variant = 'portrait',
-  useGlassPanel = true
+  useGlassPanel = true,
+  isTrending = false
 }: ShortCardProps) {
   const isVideo = item.type === 'video' || item.src?.includes('.mp4') || item.src?.includes('.webm');
   
@@ -90,6 +93,11 @@ export default React.memo(function ShortCard({
 
         {/* Gradient overlay for badges */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+
+        {/* Trending Badge - Top Right */}
+        {isTrending && (
+          <TrendingBadge className="absolute top-1.5 right-1.5" />
+        )}
 
         {/* Hover Overlay */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
