@@ -13,11 +13,13 @@ export interface GameBeacon {
   game_type: string;
   lat: number | null;
   lng: number | null;
+  start_time: string;
   created_at: string;
   expires_at: string;
-  is_active: boolean;
+  status: string;
   participants: string[];
   note: string | null;
+  players_needed: number | null;
   distance_meters?: number;
   distanceText?: string;
   isHost?: boolean;
@@ -27,7 +29,8 @@ interface CreateBeaconInput {
   game_type: string;
   course_name?: string;
   note?: string;
-  durationMinutes?: number;
+  start_time?: string;
+  players_needed?: number;
 }
 
 export function useGameBeacon() {
@@ -63,8 +66,9 @@ export function useGameBeacon() {
       const { data: beacons, error } = await supabase
         .from('game_beacons')
         .select('*')
-        .eq('is_active', true)
-        .gt('expires_at', new Date().toISOString());
+        .eq('status', 'active')
+        .gt('expires_at', new Date().toISOString())
+        .order('start_time', { ascending: true });
 
       if (error) {
         console.error('Error fetching beacons:', error);
@@ -203,8 +207,9 @@ export function useGameBeacon() {
         }
       }
 
-      const durationMinutes = input.durationMinutes || 120;
-      const expiresAt = new Date(Date.now() + durationMinutes * 60000).toISOString();
+      // Calculate start_time and expires_at
+      const startTime = input.start_time ? new Date(input.start_time) : new Date();
+      const expiresAt = new Date(startTime.getTime() + 2 * 60 * 60 * 1000); // 2 hours after start
 
       const { data: newBeacon, error } = await supabase
         .from('game_beacons')
@@ -215,8 +220,10 @@ export function useGameBeacon() {
           note: input.note || null,
           lat: userLat,
           lng: userLng,
-          expires_at: expiresAt,
-          is_active: true,
+          start_time: startTime.toISOString(),
+          expires_at: expiresAt.toISOString(),
+          status: 'active',
+          players_needed: input.players_needed || null,
           participants: [],
         })
         .select()
@@ -267,7 +274,10 @@ export function useGameBeacon() {
 
       const { error } = await supabase
         .from('game_beacons')
-        .update({ is_active: false })
+        .update({ 
+          status: 'canceled',
+          updated_at: new Date().toISOString()
+        })
         .eq('id', beaconId)
         .eq('host_user_id', user.user.id);
 

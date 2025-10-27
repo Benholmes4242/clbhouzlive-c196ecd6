@@ -3,6 +3,17 @@ import { MapPin, Users } from 'lucide-react';
 import { GameBeacon } from '../hooks/useGameBeacon';
 import { supabase } from '@/integrations/supabase/client';
 
+// Format game type for display
+function formatGameType(gameType: string): string {
+  const typeMap: Record<string, string> = {
+    '9_holes': '9 holes',
+    '18_holes': '18 holes',
+    'casual_golf': 'Casual golf',
+    'practice': 'Practice',
+  };
+  return typeMap[gameType] || gameType;
+}
+
 interface GamesNearbyListProps {
   beacons: GameBeacon[];
   isLoading: boolean;
@@ -118,7 +129,7 @@ export function GamesNearbyList({
                     <p className="font-medium text-neutral-100 truncate">{hostName}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white/15 text-white text-xs font-medium backdrop-blur border border-white/22">
-                        {beacon.game_type}
+                        {formatGameType(beacon.game_type)}
                       </span>
                       {beacon.distanceText && (
                         <span className="text-xs text-neutral-400">
@@ -145,8 +156,8 @@ export function GamesNearbyList({
                 {/* CTA Button */}
                 <div className="flex items-center justify-between">
                   <div className="text-xs text-neutral-500">
-                    {beacon.participants.length > 0 && (
-                      <span>{beacon.participants.length} joined</span>
+                    {beacon.players_needed && (
+                      <span>Needs {beacon.players_needed} player{beacon.players_needed > 1 ? 's' : ''}</span>
                     )}
                   </div>
                   {beacon.isHost ? (

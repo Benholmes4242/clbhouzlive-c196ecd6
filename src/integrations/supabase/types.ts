@@ -621,6 +621,10 @@ export type Database = {
           lng: number | null
           note: string | null
           participants: string[] | null
+          players_needed: number | null
+          start_time: string
+          status: string
+          updated_at: string | null
         }
         Insert: {
           course_name?: string | null
@@ -634,6 +638,10 @@ export type Database = {
           lng?: number | null
           note?: string | null
           participants?: string[] | null
+          players_needed?: number | null
+          start_time?: string
+          status?: string
+          updated_at?: string | null
         }
         Update: {
           course_name?: string | null
@@ -647,6 +655,10 @@ export type Database = {
           lng?: number | null
           note?: string | null
           participants?: string[] | null
+          players_needed?: number | null
+          start_time?: string
+          status?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

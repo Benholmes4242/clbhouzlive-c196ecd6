@@ -5,6 +5,17 @@ import { useCourseSearch } from '../hooks/useCourseSearch';
 import { DateTimePicker } from './DateTimePicker';
 import { format } from 'date-fns';
 
+// Format game type for display
+function formatGameTypeDisplay(gameType: string): string {
+  const typeMap: Record<string, string> = {
+    '9_holes': '9 holes',
+    '18_holes': '18 holes',
+    'casual_golf': 'Casual golf',
+    'practice': 'Practice',
+  };
+  return typeMap[gameType] || gameType;
+}
+
 interface CreateGameModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -12,17 +23,18 @@ interface CreateGameModalProps {
     game_type: string;
     course_name?: string;
     note?: string;
-    durationMinutes?: number;
+    start_time?: string;
+    players_needed?: number;
   }) => Promise<void>;
   onCancelBeacon: (beaconId: string) => Promise<void>;
   myBeacon: GameBeacon | null;
 }
 
 const GAME_TYPES = [
-  { value: '9 holes', label: '9 holes' },
-  { value: '18 holes', label: '18 holes' },
-  { value: 'Casual golf', label: 'Casual golf' },
-  { value: 'Practice', label: 'Practice' },
+  { value: '9_holes', label: '9 holes' },
+  { value: '18_holes', label: '18 holes' },
+  { value: 'casual_golf', label: 'Casual golf' },
+  { value: 'practice', label: 'Practice' },
 ];
 
 const TIMING_OPTIONS = [
@@ -41,7 +53,7 @@ export function CreateGameModal({
   onCancelBeacon,
   myBeacon,
 }: CreateGameModalProps) {
-  const [gameType, setGameType] = useState<string>('9 holes');
+  const [gameType, setGameType] = useState<string>('9_holes');
   const [courseName, setCourseName] = useState('');
   const [courseSearchTerm, setCourseSearchTerm] = useState('');
   const [showCourseDropdown, setShowCourseDropdown] = useState(false);
@@ -71,19 +83,18 @@ export function CreateGameModal({
   const handleSubmit = async () => {
     if (!gameType) return;
 
-    // Calculate duration based on timing selection
-    let durationMinutes = 120; // default
+    // Calculate start_time based on timing selection
+    let startTime: Date;
     if (timing === 'now') {
-      durationMinutes = 120;
+      startTime = new Date();
     } else if (timing === '30') {
-      durationMinutes = 150; // 30 mins from now + 2 hours
+      startTime = new Date(Date.now() + 30 * 60 * 1000);
     } else if (timing === '60') {
-      durationMinutes = 180; // 1 hour from now + 2 hours
+      startTime = new Date(Date.now() + 60 * 60 * 1000);
     } else if (timing === 'choose' && customDateTime) {
-      const now = new Date();
-      const diffMs = customDateTime.getTime() - now.getTime();
-      const diffMins = Math.floor(diffMs / 60000);
-      durationMinutes = diffMins + 120; // time until + 2 hours
+      startTime = customDateTime;
+    } else {
+      startTime = new Date();
     }
 
     setIsSubmitting(true);
@@ -92,11 +103,12 @@ export function CreateGameModal({
         game_type: gameType,
         course_name: courseName || undefined,
         note: note || undefined,
-        durationMinutes,
+        start_time: startTime.toISOString(),
+        players_needed: playersNeeded || undefined,
       });
       onClose();
       // Reset form
-      setGameType('9 holes');
+      setGameType('9_holes');
       setCourseName('');
       setCourseSearchTerm('');
       setNote('');
@@ -191,7 +203,7 @@ export function CreateGameModal({
               <div className="bg-neutral-800/50 rounded-xl p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-neutral-400">Game type</span>
-                  <span className="text-sm font-medium text-neutral-200">{myBeacon.game_type}</span>
+                  <span className="text-sm font-medium text-neutral-200">{formatGameTypeDisplay(myBeacon.game_type)}</span>
                 </div>
                 {myBeacon.course_name && (
                   <div className="flex items-center justify-between">
