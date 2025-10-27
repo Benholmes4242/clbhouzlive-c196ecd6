@@ -74,38 +74,19 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           {/* Scrollable Content */}
           <div className="px-4 pt-4 pb-3 grow overflow-y-auto overscroll-contain">
           {isLoading ? (
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="animate-pulse flex items-center gap-4 p-4 rounded-xl" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
-                  <div className="w-12 h-12 rounded-2xl" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 rounded w-1/3" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
-                    <div className="h-3 rounded w-1/2" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
-                  </div>
-                </div>
-              ))}
+            <div className="py-12 text-center text-sm text-neutral-500">
+              <div className="font-medium text-neutral-300">Loading active golfers…</div>
+              <div className="text-neutral-500">Checking who's nearby</div>
+            </div>
+          ) : golfers.length === 0 ? (
+            <div className="py-12 text-center text-sm text-neutral-500">
+              <div className="font-medium text-neutral-300">No active golfers right now</div>
+              <div className="text-neutral-500">Check back soon</div>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="flex flex-col divide-y divide-neutral-800/60">
               {golfers.map((golfer, index) => (
-                <GolferRow key={golfer.id} golfer={golfer} index={index} />
-              ))}
-            </div>
-          )}
-          {golfers.length === 0 && !isLoading && (
-            <div className="text-center py-12">
-              <MapPin className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--text-tertiary)' }} />
-              <p className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-                No active golfers right now
-              </p>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                Check back soon
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {golfers.map((golfer, index) => (
-                <GolferRow key={golfer.id} golfer={golfer} index={index} />
+                <GolferRow key={golfer.id ?? index} golfer={golfer} index={index} />
               ))}
             </div>
           )}
