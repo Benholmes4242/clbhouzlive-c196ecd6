@@ -102,7 +102,7 @@ const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   const handleCardClick = (item: ExploreContentItem, index: number) => {
     setSelectedIndex(index);
     setViewerOpen(true);
-    onOpen(item);
+    // Don't call onOpen(item) - ShortsGrid has its own integrated ShortsViewer
   };
 
   const handleCloseViewer = () => {
