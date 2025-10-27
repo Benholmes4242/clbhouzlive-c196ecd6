@@ -118,8 +118,8 @@
   position: absolute;
   inset: 50%;
   transform: translate(-50%, -50%);
-  width: 28px;
-  height: 28px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background: rgba(242, 92, 92, 0.8);
   pointer-events: none;
@@ -129,15 +129,15 @@
 
 @keyframes energyPulse {
   0% {
-    transform: translate(-50%, -50%) scale(2);
+    transform: translate(-50%, -50%) scale(1);
     opacity: 0.6;
   }
   50% {
-    transform: translate(-50%, -50%) scale(2.6);
+    transform: translate(-50%, -50%) scale(1.15);
     opacity: 0.3;
   }
   100% {
-    transform: translate(-50%, -50%) scale(3.2);
+    transform: translate(-50%, -50%) scale(1.3);
     opacity: 0;
   }
 }
