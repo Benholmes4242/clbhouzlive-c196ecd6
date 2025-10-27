@@ -1,226 +1,179 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
+import { useToast } from '@/hooks/use-toast';
 
-const STORAGE_KEY = 'clb_open_to_play';
-const DURATION_MS = 20 * 60 * 1000; // 20 minutes
+const DURATION_MINUTES = 30;
+const STORAGE_KEY = 'open_to_play_state_v2';
 
-export interface OpenToPlayState {
+type OpenState = {
   active: boolean;
-  startedAt: number | null;
-  expiresAt: number | null;
-}
+  expiresAt: number | null; // ms timestamp
+};
 
 export function useOpenToPlay() {
   const { user } = useSupabaseSession();
-  const [state, setState] = useState<OpenToPlayState>(() => {
-    if (typeof window === 'undefined') return { active: false, startedAt: null, expiresAt: null };
-    
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return { active: false, startedAt: null, expiresAt: null };
-    
+  const { getCurrentLocation } = useLocationPermission();
+  const { toast } = useToast();
+
+  // local cache so UI can render instantly
+  const [state, setState] = useState<OpenState>(() => {
+    if (typeof window === 'undefined') {
+      return { active: false, expiresAt: null };
+    }
     try {
-      const parsed = JSON.parse(stored) as OpenToPlayState;
-      // Check if expired
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return { active: false, expiresAt: null };
+      const parsed = JSON.parse(raw) as OpenState;
       if (parsed.expiresAt && Date.now() > parsed.expiresAt) {
-        localStorage.removeItem(STORAGE_KEY);
-        return { active: false, startedAt: null, expiresAt: null };
+        return { active: false, expiresAt: null };
       }
       return parsed;
     } catch {
-      return { active: false, startedAt: null, expiresAt: null };
+      return { active: false, expiresAt: null };
     }
   });
 
-  const { toast } = useToast();
+  // helper to persist local cache
+  const persistLocal = (next: OpenState) => {
+    setState(next);
+    if (next.active) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  };
 
-  // Calculate remaining time in minutes
-  const getRemainingMinutes = useCallback(() => {
-    if (!state.active || !state.expiresAt) return 0;
-    const remaining = Math.max(0, state.expiresAt - Date.now());
-    return Math.ceil(remaining / 60000);
-  }, [state.active, state.expiresAt]);
-
-  // Calculate remaining milliseconds for progress
-  const getRemainingMs = useCallback(() => {
-    if (!state.active || !state.expiresAt) return 0;
-    return Math.max(0, state.expiresAt - Date.now());
-  }, [state.active, state.expiresAt]);
-
-  // Activate Open to Play
+  // Activate broadcast
   const activate = useCallback(async () => {
-    if (!user?.id) {
+    if (!user?.id) return;
+
+    // get current position
+    const loc = await getCurrentLocation();
+    if (!loc) {
+    toast({
+      title: 'Location needed',
+      description: 'Enable location to let nearby golfers know you are available.',
+      variant: 'destructive',
+    });
+      return;
+    }
+
+    const expiresAtMs = Date.now() + DURATION_MINUTES * 60_000;
+    const expiresAtISO = new Date(expiresAtMs).toISOString();
+
+    // upsert user_nearby_status: mark open_to_play_active=true, set expiry/time, refresh lat/lng
+    const { error } = await supabase
+      .from('user_nearby_status')
+      .upsert(
+        {
+          user_id: user.id,
+          // do not change visibility_mode here (user controls that separately)
+          open_to_play_active: true,
+          open_to_play_expires_at: expiresAtISO,
+          lat: loc.lat,
+          lng: loc.lng,
+          last_location_update: new Date().toISOString(),
+        },
+        { onConflict: 'user_id' }
+      );
+
+    if (error) {
+      console.error('OpenToPlay activate error', error);
       toast({
         title: 'Error',
-        description: 'You must be logged in to activate Open to Play',
+        description: 'Could not set Open to Play.',
         variant: 'destructive',
       });
       return;
     }
 
-    const now = Date.now();
-    const newState: OpenToPlayState = {
+    persistLocal({
       active: true,
-      startedAt: now,
-      expiresAt: now + DURATION_MS,
-    };
+      expiresAt: expiresAtMs,
+    });
 
-    setState(newState);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+    toast({
+      title: 'Open to Play Active',
+      description: 'Nearby golfers can see you are available for the next 30 mins.',
+    });
+  }, [user?.id, getCurrentLocation, toast]);
 
-    try {
-      // Get current location
-      let lat: number | null = null;
-      let lng: number | null = null;
-
-      if ('geolocation' in navigator) {
-        try {
-          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject, {
-              enableHighAccuracy: true,
-              timeout: 5000,
-              maximumAge: 0,
-            });
-          });
-          lat = position.coords.latitude;
-          lng = position.coords.longitude;
-        } catch (geoError) {
-          console.error('Error getting location:', geoError);
-          // Continue without location - we'll still set visible_nearby = true
-        }
-      }
-
-      // Persist to database
-      const { error } = await supabase
-        .from('user_nearby_status')
-        .upsert(
-          {
-            user_id: user.id,
-            visible_nearby: true,
-            lat,
-            lng,
-            last_location_update: new Date().toISOString(),
-          },
-          { onConflict: 'user_id' }
-        );
-
-      if (error) {
-        console.error('Error activating Open to Play:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to activate Open to Play',
-          variant: 'destructive',
-        });
-        setState({ active: false, startedAt: null, expiresAt: null });
-        localStorage.removeItem(STORAGE_KEY);
-        return;
-      }
-
-      toast({
-        title: 'Open to Play activated',
-        description: "We've let nearby golfers know you're available.",
-      });
-
-      // Track analytics
-      if (typeof window !== 'undefined' && (window as any).analyticsEvents) {
-        (window as any).analyticsEvents.track('open2play_tap_activate', { duration: 20 });
-      }
-    } catch (err) {
-      console.error('Error activating Open to Play:', err);
-      setState({ active: false, startedAt: null, expiresAt: null });
-      localStorage.removeItem(STORAGE_KEY);
-    }
-  }, [user?.id, toast]);
-
-  // Cancel Open to Play
+  // Cancel broadcast
   const cancel = useCallback(async () => {
     if (!user?.id) return;
 
-    const elapsed = state.startedAt ? Math.round((Date.now() - state.startedAt) / 60000) : 0;
+    const { error } = await supabase
+      .from('user_nearby_status')
+      .upsert(
+        {
+          user_id: user.id,
+          open_to_play_active: false,
+          open_to_play_expires_at: null,
+        },
+        { onConflict: 'user_id' }
+      );
 
-    setState({ active: false, startedAt: null, expiresAt: null });
-    localStorage.removeItem(STORAGE_KEY);
-
-    try {
-      // Update database to set visible_nearby = false
-      const { error } = await supabase
-        .from('user_nearby_status')
-        .upsert(
-          {
-            user_id: user.id,
-            visible_nearby: false,
-          },
-          { onConflict: 'user_id' }
-        );
-
-      if (error) {
-        console.error('Error cancelling Open to Play:', error);
-      }
-
+    if (error) {
+      console.error('OpenToPlay cancel error', error);
       toast({
-        title: 'Open to Play cancelled',
-        description: 'Your availability ping has been stopped.',
+        title: 'Error',
+        description: 'Could not clear Open to Play.',
+        variant: 'destructive',
       });
-
-      // Track analytics
-      if (typeof window !== 'undefined' && (window as any).analyticsEvents) {
-        (window as any).analyticsEvents.track('open2play_cancel', { elapsed });
-      }
-    } catch (err) {
-      console.error('Error cancelling Open to Play:', err);
-    }
-  }, [user?.id, state.startedAt, toast]);
-
-  // Auto-expire when timer runs out
-  useEffect(() => {
-    if (!state.active || !state.expiresAt) return;
-
-    const remaining = state.expiresAt - Date.now();
-    if (remaining <= 0) {
-      // Already expired
-      const elapsed = state.startedAt ? Math.round((Date.now() - state.startedAt) / 60000) : 0;
-      setState({ active: false, startedAt: null, expiresAt: null });
-      localStorage.removeItem(STORAGE_KEY);
-      
-      toast({
-        title: 'Open to Play expired',
-        description: 'Your availability ping has ended.',
-      });
-
-      // Track analytics
-      if (typeof window !== 'undefined' && (window as any).analyticsEvents) {
-        (window as any).analyticsEvents.track('open2play_expire', { elapsed });
-      }
       return;
     }
 
-    // Set timeout for expiry
-    const timeout = setTimeout(() => {
-      const elapsed = state.startedAt ? Math.round((Date.now() - state.startedAt) / 60000) : 0;
-      setState({ active: false, startedAt: null, expiresAt: null });
-      localStorage.removeItem(STORAGE_KEY);
-      
-      toast({
-        title: 'Open to Play expired',
-        description: 'Your availability ping has ended.',
-      });
+    persistLocal({
+      active: false,
+      expiresAt: null,
+    });
 
-      // Track analytics
-      if (typeof window !== 'undefined' && (window as any).analyticsEvents) {
-        (window as any).analyticsEvents.track('open2play_expire', { elapsed });
-      }
-    }, remaining);
+    toast({
+      title: 'Open to Play off',
+      description: 'You are no longer broadcasting availability.',
+    });
+  }, [user?.id, toast]);
 
-    return () => clearTimeout(timeout);
-  }, [state.active, state.expiresAt, state.startedAt, toast]);
+  // Auto-expire locally and in DB when the timer runs out
+  useEffect(() => {
+    if (!state.active || !state.expiresAt) return;
+    const msLeft = state.expiresAt - Date.now();
+    if (msLeft <= 0) {
+      cancel();
+      return;
+    }
+    const t = setTimeout(() => {
+      cancel();
+    }, msLeft);
+    return () => clearTimeout(t);
+  }, [state.active, state.expiresAt, cancel]);
+
+  // Helper for UI label like "18m left"
+  const remainingText = (() => {
+    if (!state.active || !state.expiresAt) return null;
+    const diffMs = state.expiresAt - Date.now();
+    const mins = Math.max(0, Math.floor(diffMs / 60000));
+    return `${mins}m left`;
+  })();
 
   return {
-    isActive: state.active,
+    isOpen: state.active,
+    remainingText,
     activate,
     cancel,
-    getRemainingMinutes,
-    getRemainingMs,
-    durationMs: DURATION_MS,
+    // legacy compat
+    isActive: state.active,
+    getRemainingMinutes: () => {
+      if (!state.active || !state.expiresAt) return 0;
+      const diffMs = state.expiresAt - Date.now();
+      return Math.max(0, Math.floor(diffMs / 60000));
+    },
+    getRemainingMs: () => {
+      if (!state.active || !state.expiresAt) return 0;
+      return Math.max(0, state.expiresAt - Date.now());
+    },
+    durationMs: DURATION_MINUTES * 60_000,
   };
 }

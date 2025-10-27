@@ -41,22 +41,51 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
         userLng = location.lng;
       }
 
+      const STALE_THRESHOLD_MINUTES = 20;
+      const staleThreshold = new Date(Date.now() - STALE_THRESHOLD_MINUTES * 60 * 1000).toISOString();
+
+      // Fetch from user_nearby_status with new visibility_mode and open_to_play fields
       const { data: nearbyStatuses } = await supabase
         .from('user_nearby_status')
-        .select('user_id, lat, lng, visible_nearby')
-        .eq('visible_nearby', true)
+        .select('user_id, lat, lng, visibility_mode, last_location_update, open_to_play_active, open_to_play_expires_at')
+        .neq('visibility_mode', 'hidden')
         .not('lat', 'is', null)
         .not('lng', 'is', null)
-        .neq('user_id', user.id);
+        .neq('user_id', user.id)
+        .gte('last_location_update', staleThreshold);
 
       if (!nearbyStatuses?.length) return [];
 
+      const now = new Date();
+
       const nearbyUsers = nearbyStatuses
-        .map(status => ({
-          user_id: status.user_id,
-          distance_meters: calculateDistance(userLat!, userLng!, status.lat!, status.lng!),
-        }))
-        .filter(u => u.distance_meters <= NEARBY_RADIUS_METERS)
+        .map(status => {
+          const distance_meters = calculateDistance(userLat!, userLng!, status.lat!, status.lng!);
+          const isOpenToPlay = 
+            status.open_to_play_active && 
+            status.open_to_play_expires_at && 
+            new Date(status.open_to_play_expires_at) > now;
+          
+          return {
+            user_id: status.user_id,
+            distance_meters,
+            visibility_mode: status.visibility_mode,
+            isOpenToPlay,
+          };
+        })
+        .filter(u => {
+          // Distance filter
+          if (u.distance_meters > NEARBY_RADIUS_METERS) return false;
+          
+          // For 'friends' mode, we skip for now (client-side stub)
+          // TODO: check mutual friendship via user_follows or user_friends table
+          if (u.visibility_mode === 'friends') {
+            // Stub: allow for now, will implement proper friends check later
+            return true;
+          }
+          
+          return true;
+        })
         .sort((a, b) => a.distance_meters - b.distance_meters);
 
       if (!nearbyUsers.length) return [];
@@ -77,6 +106,7 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
           home_club: profile.home_club,
           distance_km: userData ? userData.distance_meters / 1000 : 0,
           distanceText: userData ? formatDistance(userData.distance_meters) : undefined,
+          isOpenToPlay: userData?.isOpenToPlay || false,
         };
       }).slice(0, limit) || [];
     },

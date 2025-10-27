@@ -62,22 +62,24 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
           </h3>
         </div>
 
-        {/* Row 2: Distance + Club */}
-        <div className="flex items-center gap-2 min-w-0">
-          {!golfer.isMock && golfer.distanceText && (
-            <span className="text-[13px] text-neutral-400">
-              {golfer.distanceText}
-            </span>
-          )}
-          {golfer.home_club && (
-            <p className="text-[13px] truncate text-neutral-400">
-              {golfer.home_club}
-            </p>
-          )}
+        {/* Row 2: Distance + Club + Open to Play */}
+        <div className="flex flex-col gap-0.5 min-w-0">
+          <div className="flex items-center gap-2">
+            {!golfer.isMock && golfer.distanceText && (
+              <span className="text-[13px] text-neutral-400">
+                {golfer.distanceText}
+              </span>
+            )}
+            {golfer.home_club && (
+              <p className="text-[13px] truncate text-neutral-400">
+                {golfer.home_club}
+              </p>
+            )}
+          </div>
           {!golfer.isMock && golfer.isOpenToPlay && (
-            <span className="text-xs" style={{ color: '#6e9277' }}>
+            <div className="text-xs" style={{ color: '#4ade80' }}>
               🟢 Open to play
-            </span>
+            </div>
           )}
         </div>
 

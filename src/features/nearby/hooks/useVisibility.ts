@@ -1,125 +1,115 @@
-import { useState, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
+import { useToast } from '@/hooks/use-toast';
+
+export type VisibilityMode = 'all' | 'friends' | 'hidden';
 
 export function useVisibility() {
   const { user } = useSupabaseSession();
-  const [visible, setVisible] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const { getCurrentLocation } = useLocationPermission();
   const { toast } = useToast();
 
-  // Fetch initial visibility status from database
+  const [mode, setMode] = useState<VisibilityMode>('hidden');
+  const [loading, setLoading] = useState(true);
+
+  // Load current visibility state from DB
   useEffect(() => {
-    if (!user?.id) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchStatus = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('user_nearby_status')
-          .select('visible_nearby')
-          .eq('user_id', user.id)
-          .single();
-
-        if (error && error.code !== 'PGRST116') {
-          console.error('Error fetching visibility status:', error);
-        } else if (data) {
-          setVisible(data.visible_nearby);
-        }
-      } catch (err) {
-        console.error('Error loading visibility:', err);
-      } finally {
+    const load = async () => {
+      if (!user?.id) {
         setLoading(false);
+        return;
       }
+
+      const { data, error } = await supabase
+        .from('user_nearby_status')
+        .select('visibility_mode')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!error && data?.visibility_mode) {
+        setMode(data.visibility_mode as VisibilityMode);
+      }
+
+      setLoading(false);
     };
 
-    fetchStatus();
+    load();
   }, [user?.id]);
 
-  const updateVisibility = async (newValue: boolean) => {
-    if (!user?.id) {
-      toast({
-        title: 'Error',
-        description: 'You must be logged in to update visibility',
-        variant: 'destructive',
-      });
-      return;
-    }
+  // Update mode in DB
+  const updateMode = useCallback(
+    async (newMode: VisibilityMode) => {
+      if (!user?.id) return;
 
-    setVisible(newValue);
-
-    try {
       let lat: number | null = null;
       let lng: number | null = null;
 
-      // If turning visibility ON, get current location
-      if (newValue && 'geolocation' in navigator) {
-        try {
-          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject, {
-              enableHighAccuracy: true,
-              timeout: 5000,
-              maximumAge: 0,
-            });
-          });
-          lat = position.coords.latitude;
-          lng = position.coords.longitude;
-        } catch (geoError) {
-          console.error('Error getting location:', geoError);
+      if (newMode === 'all' || newMode === 'friends') {
+        // must have a location in these modes
+        const loc = await getCurrentLocation();
+        if (!loc) {
           toast({
-            title: 'Location unavailable',
-            description: 'Unable to get your location. You may need to enable location permissions.',
+            title: 'Location needed',
+            description: 'Enable location to be visible to nearby golfers.',
             variant: 'destructive',
           });
-          setVisible(false);
           return;
         }
+        lat = loc.lat;
+        lng = loc.lng;
       }
 
-      // Upsert visibility status
+      // If hidden, we deliberately blank coords
       const { error } = await supabase
         .from('user_nearby_status')
         .upsert(
           {
             user_id: user.id,
-            visible_nearby: newValue,
-            lat: newValue ? lat : null,
-            lng: newValue ? lng : null,
-            last_location_update: newValue ? new Date().toISOString() : null,
+            visibility_mode: newMode,
+            lat: newMode === 'hidden' ? null : lat,
+            lng: newMode === 'hidden' ? null : lng,
+            last_location_update:
+              newMode === 'hidden' ? null : new Date().toISOString(),
           },
           { onConflict: 'user_id' }
         );
 
       if (error) {
-        console.error('Error updating visibility:', error);
-        setVisible(!newValue); // Revert on error
+        console.error('updateMode error', error);
         toast({
           title: 'Error',
-          description: 'Failed to update visibility status',
+          description: 'Could not update visibility.',
           variant: 'destructive',
         });
         return;
       }
 
-      toast({
-        title: 'Online visibility updated',
-        description: newValue
-          ? 'You are now visible to nearby players'
-          : 'You are now hidden from nearby players',
-      });
-    } catch (err) {
-      console.error('Error updating visibility:', err);
-      setVisible(!newValue);
-      toast({
-        title: 'Error',
-        description: 'An unexpected error occurred',
-        variant: 'destructive',
-      });
-    }
-  };
+      setMode(newMode);
 
-  return { visible, setVisible: updateVisibility, loading };
+      toast({
+        title:
+          newMode === 'hidden'
+            ? 'Hidden'
+            : newMode === 'friends'
+            ? 'Visible to friends'
+            : 'Visible to everyone',
+        description:
+          newMode === 'hidden'
+            ? 'You are hidden from Nearby.'
+            : 'Nearby golfers can now see you.',
+      });
+    },
+    [user?.id, getCurrentLocation, toast]
+  );
+
+  return {
+    visibilityMode: mode,
+    setVisibilityMode: updateMode,
+    loading,
+    // legacy compat
+    visible: mode !== 'hidden',
+    setVisible: (v: boolean) => updateMode(v ? 'all' : 'hidden'),
+  };
 }

@@ -7,6 +7,7 @@ import { useGameBeacon } from './hooks/useGameBeacon';
 import { CreateGameModal } from './components/CreateGameModal';
 import { GamesNearbyList } from './components/GamesNearbyList';
 import { useVisibility } from './hooks/useVisibility';
+import { useOpenToPlay } from './hooks/useOpenToPlay';
 
 interface NearbyOverlayProps {
   isOpen: boolean;
@@ -23,7 +24,8 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
     cancelBeacon,
     joinBeacon,
   } = useGameBeacon();
-  const { visible, setVisible, loading: visibilityLoading } = useVisibility();
+  const { visibilityMode, setVisibilityMode, loading: visibilityLoading } = useVisibility();
+  const { isOpen: isOpenToPlay, remainingText, activate: activateOpen, cancel: cancelOpen } = useOpenToPlay();
   
   const [activeTab, setActiveTab] = useState<'golfers' | 'games'>('golfers');
   const [isCreateGameOpen, setIsCreateGameOpen] = useState(false);
@@ -40,8 +42,26 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   }, [isOpen]);
 
   const handleClose = () => {
-    analyticsEvents.nearby.opened(golfers.length); // Track close as a re-open event
+    analyticsEvents.nearby.opened(golfers.length);
     onClose();
+  };
+
+  const cycleVisibility = () => {
+    if (visibilityMode === 'all') {
+      setVisibilityMode('friends');
+    } else if (visibilityMode === 'friends') {
+      setVisibilityMode('hidden');
+    } else {
+      setVisibilityMode('all');
+    }
+  };
+
+  const handleOpenToPlayToggle = () => {
+    if (isOpenToPlay) {
+      cancelOpen();
+    } else {
+      activateOpen();
+    }
   };
 
   if (!isOpen) return null;
@@ -58,6 +78,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       <div className="relative w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden min-h-[65vh] max-h-[85vh] flex flex-col z-10">
         {/* Header */}
         <div className="border-b border-neutral-800/60">
+          {/* Row 1: Title + Actions */}
           <div className="flex items-center justify-between px-4 py-4">
             <h2 className="text-lg font-semibold text-neutral-100">
               Nearby
@@ -65,7 +86,12 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsCreateGameOpen(true)}
-                className="p-2 rounded-full bg-white/8 hover:bg-white/12 active:bg-white/12 backdrop-blur border border-white/22 transition-all shadow-[0_16px_32px_rgba(0,0,0,0.9),_0_0_18px_rgba(255,255,255,0.18)_inset] active:shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.24)_inset]"
+                className="p-2 rounded-full backdrop-blur border transition-all"
+                style={{
+                  background: 'rgba(255,255,255,0.08)',
+                  borderColor: 'rgba(255,255,255,0.22)',
+                  boxShadow: '0 16px 32px rgba(0,0,0,0.9), 0 0 18px rgba(255,255,255,0.18) inset',
+                }}
                 title="Create a game"
               >
                 <Plus className="w-5 h-5 text-white" />
@@ -79,25 +105,50 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             </div>
           </div>
           
-          {/* Availability Toggle */}
+          {/* Row 2: Visibility pill */}
+          <div className="px-4 pb-2">
+            <button
+              onClick={cycleVisibility}
+              disabled={visibilityLoading}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur border transition-all"
+              style={{
+                background: visibilityMode !== 'hidden' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
+                borderColor: visibilityMode !== 'hidden' ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.14)',
+                boxShadow: '0 0 16px rgba(255,255,255,0.12) inset',
+              }}
+            >
+              <span 
+                className="w-2 h-2 rounded-full"
+                style={{ 
+                  background: visibilityMode !== 'hidden' ? '#4ade80' : 'rgba(255,255,255,0.4)' 
+                }}
+              />
+              <span className="text-xs font-medium text-white/90">
+                {visibilityMode === 'all' && 'Visible to: Everyone'}
+                {visibilityMode === 'friends' && 'Visible to: Friends'}
+                {visibilityMode === 'hidden' && 'Hidden'}
+              </span>
+            </button>
+          </div>
+
+          {/* Row 3: Open to Play pill */}
           <div className="px-4 pb-3">
             <button
-              onClick={() => setVisible(!visible)}
-              disabled={visibilityLoading}
-              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur border transition-all ${
-                visible
-                  ? 'bg-white/8 border-white/22 text-white/90'
-                  : 'bg-white/3 border-white/14 text-white/60'
-              }`}
+              onClick={handleOpenToPlayToggle}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur border transition-all"
+              style={{
+                background: isOpenToPlay ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.03)',
+                borderColor: isOpenToPlay ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.14)',
+                boxShadow: '0 0 16px rgba(255,255,255,0.12) inset',
+              }}
             >
-              <span className={`w-2 h-2 rounded-full ${visible ? 'bg-green-400' : 'bg-white/40'}`} />
-              <span className="text-xs font-medium">
-                {visible ? 'Visible to nearby golfers' : 'Hidden from nearby golfers'}
+              <span className="text-xs font-medium text-white/90">
+                {isOpenToPlay ? `Open to Play · ${remainingText}` : 'Open to Play'}
               </span>
             </button>
           </div>
           
-          {/* Tabs */}
+          {/* Row 4: Tabs */}
           <div className="flex px-4">
             <button
               onClick={() => setActiveTab('golfers')}

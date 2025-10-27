@@ -2034,8 +2034,11 @@ export type Database = {
           last_location_update: string | null
           lat: number | null
           lng: number | null
+          open_to_play_active: boolean | null
+          open_to_play_expires_at: string | null
           updated_at: string
           user_id: string
+          visibility_mode: string | null
           visible_nearby: boolean
         }
         Insert: {
@@ -2044,8 +2047,11 @@ export type Database = {
           last_location_update?: string | null
           lat?: number | null
           lng?: number | null
+          open_to_play_active?: boolean | null
+          open_to_play_expires_at?: string | null
           updated_at?: string
           user_id: string
+          visibility_mode?: string | null
           visible_nearby?: boolean
         }
         Update: {
@@ -2054,8 +2060,11 @@ export type Database = {
           last_location_update?: string | null
           lat?: number | null
           lng?: number | null
+          open_to_play_active?: boolean | null
+          open_to_play_expires_at?: string | null
           updated_at?: string
           user_id?: string
+          visibility_mode?: string | null
           visible_nearby?: boolean
         }
         Relationships: []
