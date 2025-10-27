@@ -118,8 +118,8 @@
   position: absolute;
   inset: 50%;
   transform: translate(-50%, -50%);
-  width: 32px;
-  height: 32px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: rgba(242, 92, 92, 0.8);
   pointer-events: none;
