@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState, useId } from 'react';
 import { useLiveClubhouseProfiles } from '@/hooks/useLiveClubhouseProfiles';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
-import { useVisibility } from '@/features/nearby/hooks/useVisibility';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
@@ -95,7 +94,6 @@ export function LiveClubhouseStrip() {
 }
 
 function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
-  const { visible } = useVisibility();
   const { isLoading } = useActiveGolfers();
 
   const handleClick = () => {
@@ -104,11 +102,7 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
   };
 
   let captionText = "...";
-  if (!visible) {
-    captionText = "Hidden";
-  } else if (isLoading) {
-    captionText = "...";
-  } else {
+  if (!isLoading) {
     captionText = `${count ?? 0} nearby`;
   }
 
@@ -128,7 +122,7 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
         <div className="lc-name" title="Active Golfers">
           Active Golfers
         </div>
-        <div className="lc-sub" style={count > 0 && visible ? { color: 'rgba(74, 222, 128, 0.8)' } : undefined}>
+        <div className="lc-sub" style={count > 0 ? { color: 'rgba(74, 222, 128, 0.8)' } : undefined}>
           {captionText}
         </div>
       </div>
