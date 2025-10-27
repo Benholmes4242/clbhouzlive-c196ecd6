@@ -179,7 +179,7 @@ export function CreateGameModal({
                       onClick={() => setGameType(type.value)}
                       className={`py-3 px-4 rounded-xl font-medium transition-all backdrop-blur ${
                         gameType === type.value
-                          ? 'bg-white/15 text-white border border-white/22 shadow-[0_12px_32px_rgba(0,0,0,0.8),_0_0_16px_rgba(255,255,255,0.45),_0_0_40px_rgba(255,255,255,0.25)] active:bg-white/20'
+                          ? 'bg-white/11 text-white border border-white/22 shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.22)_inset] active:bg-white/16 active:shadow-[0_24px_48px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.28)_inset]'
                           : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
                       }`}
                     >
@@ -229,7 +229,7 @@ export function CreateGameModal({
                       onClick={() => setDuration(option.value)}
                       className={`py-2 px-3 rounded-lg text-sm font-medium transition-all backdrop-blur ${
                         duration === option.value
-                          ? 'bg-white/15 text-white border border-white/22 shadow-[0_12px_32px_rgba(0,0,0,0.8),_0_0_16px_rgba(255,255,255,0.45),_0_0_40px_rgba(255,255,255,0.25)] active:bg-white/20'
+                          ? 'bg-white/11 text-white border border-white/22 shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.22)_inset] active:bg-white/16 active:shadow-[0_24px_48px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.28)_inset]'
                           : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
                       }`}
                     >
