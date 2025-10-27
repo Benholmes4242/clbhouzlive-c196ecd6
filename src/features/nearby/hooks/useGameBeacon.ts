@@ -255,10 +255,21 @@ export function useGameBeacon() {
 
   const cancelBeacon = async (beaconId: string) => {
     try {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) {
+        toast({
+          title: 'Not authenticated',
+          description: 'Please sign in to cancel a game',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('game_beacons')
         .update({ is_active: false })
-        .eq('id', beaconId);
+        .eq('id', beaconId)
+        .eq('host_user_id', user.user.id);
 
       if (error) {
         console.error('Error cancelling beacon:', error);
@@ -276,7 +287,7 @@ export function useGameBeacon() {
 
       toast({
         title: 'Game cancelled',
-        description: 'Other golfers can no longer see this game',
+        description: 'Your game is no longer visible',
       });
 
       // Refetch to ensure we're synced

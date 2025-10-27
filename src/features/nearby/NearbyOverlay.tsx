@@ -99,7 +99,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               {/* Title */}
               <div className="text-center">
                 <h2 className="text-white text-[18px] font-semibold leading-none">
-                  NearbyGolfersNG
+                  Nearby Golfers
                 </h2>
               </div>
               
@@ -117,7 +117,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           </header>
 
           {/* Row B: 2-card grid (Visibility + Open to Play) */}
-          <div className="grid grid-cols-2 gap-2 px-4 pb-4">
+          <div className="grid grid-cols-2 gap-2 px-4 py-4">
             {/* Visibility card */}
             <button
               onClick={cycleVisibility}
@@ -131,17 +131,17 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                 boxShadow: '0 40px 120px rgba(0,0,0,0.8), 0 0 40px rgba(255,255,255,0.12) inset',
               }}
             >
-              <div className="text-white/70 text-[13px] font-medium mb-1">
+              <div className="text-white/70 text-[13px] font-medium mb-1.5">
                 Visibility
               </div>
-              <div className="flex items-center gap-2 text-white text-[15px] font-semibold leading-tight mb-2">
+              <div className="flex items-center justify-center gap-2 mb-2">
                 <span
                   className="inline-block w-2 h-2 rounded-full"
                   style={{
                     backgroundColor: visibilityMode === 'hidden' ? '#666' : '#22c55e',
                   }}
                 />
-                <span>
+                <span className="text-white text-base font-medium leading-tight">
                   {visibilityMode === 'all' && 'Everyone'}
                   {visibilityMode === 'friends' && 'Friends'}
                   {visibilityMode === 'hidden' && 'Hidden'}
@@ -164,32 +164,36 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                 boxShadow: '0 40px 120px rgba(0,0,0,0.8), 0 0 40px rgba(255,255,255,0.12) inset',
               }}
             >
-              <div className="text-white/70 text-[13px] font-medium mb-1">
+              <div className="text-white/70 text-[13px] font-medium mb-1.5">
                 Open to Play
               </div>
-              <div className="flex items-center gap-2 text-white text-[15px] font-semibold leading-tight mb-2">
+              <div className="flex items-center justify-center gap-2 mb-2">
                 {isOpenToPlay ? (
                   <>
                     <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
-                    <span>Active · {remainingText}</span>
+                    <span className="text-white text-base font-medium leading-tight">
+                      Open to Play
+                    </span>
                   </>
                 ) : (
                   <>
-                    <span className="inline-block w-2 h-2 rounded-full bg-white/30" />
-                    <span>Tap to ping</span>
+                    <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.4)' }} />
+                    <span className="text-white text-base font-medium leading-tight">
+                      Tap to ping
+                    </span>
                   </>
                 )}
               </div>
               <div className="text-white/50 text-[12px] leading-snug max-w-[220px]">
                 {isOpenToPlay
-                  ? "You're letting golfers nearby know you can join now"
+                  ? `${remainingText} left · Tap to stop`
                   : "Let nearby golfers know you're available. Lasts 30 mins"}
               </div>
             </button>
           </div>
 
           {/* Row C: Tabs */}
-          <div className="flex px-4 mt-4">
+          <div className="flex px-4">
             <button
               onClick={() => setActiveTab('golfers')}
               className={`flex-1 py-3 text-sm font-medium border-b-2 transition-all duration-150 ${
