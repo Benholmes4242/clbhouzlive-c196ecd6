@@ -44,21 +44,25 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
       const STALE_THRESHOLD_MINUTES = 20;
       const staleThreshold = new Date(Date.now() - STALE_THRESHOLD_MINUTES * 60 * 1000).toISOString();
 
-      // Fetch from user_nearby_status with new visibility_mode and open_to_play fields
-      const { data: nearbyStatuses } = await supabase
+      // Fetch from user_nearby_status with visibility_mode and open_to_play fields
+      const { data: nearbyStatuses, error: statusErr } = await supabase
         .from('user_nearby_status')
         .select('user_id, lat, lng, visibility_mode, last_location_update, open_to_play_active, open_to_play_expires_at')
-        .neq('visibility_mode', 'hidden')
         .not('lat', 'is', null)
         .not('lng', 'is', null)
         .neq('user_id', user.id)
         .gte('last_location_update', staleThreshold);
 
+      if (statusErr) {
+        console.error('nearbyStatuses error', statusErr);
+        return [];
+      }
+
       if (!nearbyStatuses?.length) return [];
 
       const now = new Date();
 
-      const nearbyUsers = nearbyStatuses
+      const candidates = nearbyStatuses
         .map(status => {
           const distance_meters = calculateDistance(userLat!, userLng!, status.lat!, status.lng!);
           const isOpenToPlay = 
@@ -73,42 +77,54 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
             isOpenToPlay,
           };
         })
-        .filter(u => {
-          // Distance filter
-          if (u.distance_meters > NEARBY_RADIUS_METERS) return false;
+        .filter(row => {
+          // Distance limit
+          if (row.distance_meters > NEARBY_RADIUS_METERS) return false;
           
-          // For 'friends' mode, we skip for now (client-side stub)
-          // TODO: check mutual friendship via user_follows or user_friends table
-          if (u.visibility_mode === 'friends') {
-            // Stub: allow for now, will implement proper friends check later
+          // Visibility rules
+          if (row.visibility_mode === 'hidden') return false;
+          
+          if (row.visibility_mode === 'friends') {
+            // TODO: enforce "friends only" when we have friend graph
+            // For now allow them so people can test the mode
             return true;
           }
           
+          // 'all'
           return true;
         })
         .sort((a, b) => a.distance_meters - b.distance_meters);
 
-      if (!nearbyUsers.length) return [];
+      if (!candidates.length) return [];
 
-      const { data: profiles } = await supabase
+      // Pull profiles for remaining user_ids
+      const { data: profiles, error: profilesErr } = await supabase
         .from('user_profiles')
         .select('id, display_name, username, profile_photo_url, home_club')
-        .in('id', nearbyUsers.map(u => u.user_id))
+        .in('id', candidates.map(c => c.user_id))
         .eq('is_public', true);
 
-      return profiles?.map(profile => {
-        const userData = nearbyUsers.find(u => u.user_id === profile.id);
+      if (profilesErr) {
+        console.error('profilesErr', profilesErr);
+        return [];
+      }
+
+      // Shape final list
+      const enriched = (profiles || []).map(p => {
+        const match = candidates.find(c => c.user_id === p.id);
         return {
-          id: profile.id,
-          display_name: profile.display_name || profile.username || 'Anonymous',
-          username: profile.username,
-          avatar_url: profile.profile_photo_url,
-          home_club: profile.home_club,
-          distance_km: userData ? userData.distance_meters / 1000 : 0,
-          distanceText: userData ? formatDistance(userData.distance_meters) : undefined,
-          isOpenToPlay: userData?.isOpenToPlay || false,
+          id: p.id,
+          display_name: p.display_name || p.username || 'Anonymous',
+          username: p.username,
+          avatar_url: p.profile_photo_url,
+          home_club: p.home_club,
+          distance_km: match ? match.distance_meters / 1000 : 0,
+          distanceText: match ? formatDistance(match.distance_meters) : undefined,
+          isOpenToPlay: match?.isOpenToPlay || false,
         };
-      }).slice(0, limit) || [];
+      });
+
+      return enriched.slice(0, limit);
     },
     staleTime: 15_000,
   });
