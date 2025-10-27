@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { X, MapPin, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NearbyGolfer } from './types';
-import { useNearbyGolfers } from './useNearbyGolfers';
+import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { VisibilityToggle } from './components/VisibilityToggle';
 import { RequestGameSheet, RequestGamePayload } from './components/RequestGameSheet';
@@ -18,7 +17,7 @@ interface NearbyOverlayProps {
 }
 
 export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
-  const { data: golfers = [], isLoading } = useNearbyGolfers();
+  const { golfers, isLoading } = useActiveGolfers({ limit: 20, mockCount: 5 });
   const { visible, setVisible } = useVisibility();
   const { activeBeacon, createBeacon, cancelBeacon } = useGameBeacon();
   const [showComposer, setShowComposer] = useState(false);
@@ -56,7 +55,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           <div className="flex items-start justify-between border-b shrink-0" style={{ padding: '12px 20px', borderColor: 'var(--border-mid)' }}>
             <div className="flex items-center gap-3">
               <h2 id="nearby-title" className="text-[18px] font-semibold" style={{ color: 'var(--text-primary)' }}>
-                Golfers near you
+                Active Golfers
               </h2>
               <VisibilityToggle value={visible} onChange={setVisible} />
             </div>
@@ -90,10 +89,10 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             <div className="text-center py-12">
               <MapPin className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--text-tertiary)' }} />
               <p className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-                No golfers nearby right now
+                No active golfers right now
               </p>
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                Check again later
+                Check back soon
               </p>
             </div>
           ) : (
@@ -181,7 +180,17 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
 }
 
 interface GolferRowProps {
-  golfer: NearbyGolfer;
+  golfer: {
+    id: string;
+    display_name: string;
+    username?: string;
+    home_club?: string;
+    avatar_url?: string;
+    is_online: boolean;
+    isMock: boolean;
+    isOpenToPlay?: boolean;
+    same_club?: boolean;
+  };
   index: number;
 }
 
@@ -200,12 +209,6 @@ function GolferRow({ golfer, index }: GolferRowProps) {
     console.log('Message clicked for', golfer.display_name);
   };
 
-  const distanceText = golfer.distance_km 
-    ? golfer.distance_km < 1.6 
-      ? `${(golfer.distance_km * 0.621371).toFixed(1)} mi`
-      : `${golfer.distance_km.toFixed(1)} km`
-    : null;
-
   return (
     <article
       className="rounded-2xl px-4 py-3 mb-3"
@@ -214,7 +217,7 @@ function GolferRow({ golfer, index }: GolferRowProps) {
         boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
         border: '1px solid var(--border-low)',
       }}
-      aria-label={`${golfer.display_name}, ${golfer.home_club || 'No home club'}, ${distanceText || 'Distance unknown'}`}
+      aria-label={`${golfer.display_name}, ${golfer.home_club || 'No home club'}`}
     >
       <div className="grid grid-cols-[56px_1fr] gap-3 items-center">
         {/* Avatar - spans 3 rows */}
@@ -224,7 +227,7 @@ function GolferRow({ golfer, index }: GolferRowProps) {
             src={golfer.avatar_url || '/placeholder.svg'}
             alt={golfer.display_name}
           >
-            {golfer.is_online && (
+            {golfer.is_online && !golfer.isMock && (
               <span
                 className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2"
                 style={{ background: '#6e9277', borderColor: '#1a1a1a' }}
@@ -234,23 +237,11 @@ function GolferRow({ golfer, index }: GolferRowProps) {
           </AvatarSquircle>
         </div>
 
-        {/* Row 1: Name + Distance */}
+        {/* Row 1: Name */}
         <div className="flex items-center justify-between min-w-0 gap-2">
           <h3 className="font-semibold text-[16px] truncate" style={{ color: 'var(--text-primary)' }}>
             {golfer.display_name}
           </h3>
-          {distanceText && (
-            <span 
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
-              style={{ 
-                background: 'var(--pill-inactive-bg)',
-                color: 'var(--pill-inactive-text)'
-              }}
-            >
-              <MapPin className="w-3 h-3" />
-              {distanceText}
-            </span>
-          )}
         </div>
 
         {/* Row 2: Club + Same home club pill */}
@@ -275,23 +266,9 @@ function GolferRow({ golfer, index }: GolferRowProps) {
           )}
         </div>
 
-        {/* Row 3: Open to Play pill + Follow/Message buttons */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center">
-            {golfer.isOpenToPlay && (
-              <span 
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
-                style={{ 
-                  backgroundColor: 'var(--accent-frost-bg)',
-                  border: '1px solid var(--accent-frost-border)',
-                  color: 'var(--accent-frost-text)'
-                }}
-              >
-                🟢 Open to Play
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
+        {/* Row 3: Follow/Message buttons (Open to Play hidden for Phase 1) */}
+        <div className="flex items-center justify-end gap-2">
+          <div className="flex items-center gap-2">
             <button
               onClick={handleFollow}
               className="h-7 px-3 text-xs font-semibold rounded-md transition-colors hover:bg-[var(--accent-frost-hover)]"

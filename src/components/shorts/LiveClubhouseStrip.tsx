@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useId } from 'react';
 import { useLiveClubhouseProfiles } from '@/hooks/useLiveClubhouseProfiles';
-import { useNearbyShorts } from '@/utils/nearbyShorts';
+import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
@@ -26,7 +26,7 @@ function superellipsePath(w: number, h: number, n = 4.2, steps = 240) {
 
 export function LiveClubhouseStrip() {
   const { creators, isLoading } = useLiveClubhouseProfiles();
-  const nearby = useNearbyShorts();
+  const { realOnlineCount } = useActiveGolfers();
   const rowRef = useRef<HTMLDivElement>(null);
   const [scrolling, setScrolling] = useState(false);
   const [nearbyOverlayOpen, setNearbyOverlayOpen] = useState(false);
@@ -72,7 +72,7 @@ export function LiveClubhouseStrip() {
           aria-label="Suggested creators"
         >
           <NearbyTile 
-            count={nearby.count} 
+            count={realOnlineCount} 
             onOpen={() => setNearbyOverlayOpen(true)} 
           />
           {creators.map((c, idx) => (
@@ -100,8 +100,8 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
   };
 
   const nearText = count > 0 
-    ? (count > 9 ? '9+ golfers near you' : `${count} ${count === 1 ? 'golfer' : 'golfers'} near you`)
-    : "Check who's close";
+    ? (count > 9 ? '9+ active now' : `${count} active now`)
+    : "No one active";
 
   return (
     <div 
@@ -111,13 +111,13 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
       <div className="lc-avatar-btn">
         <NearbyGolfersSquircle 
           onClick={handleClick}
-          ariaLabel={`Nearby golfers, ${count} ${count === 1 ? 'golfer' : 'golfers'} near you`}
+          ariaLabel={`Active golfers, ${count} ${count === 1 ? 'golfer' : 'golfers'} active now`}
         />
       </div>
 
       <div className="lc-label">
-        <div className="lc-name" title="Nearby Golfers">
-          Nearby Golfers
+        <div className="lc-name" title="Active Golfers">
+          Active Golfers
         </div>
         <div className="lc-sub">{nearText}</div>
       </div>
