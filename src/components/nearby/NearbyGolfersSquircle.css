@@ -132,11 +132,19 @@
     transform: translate(-50%, -50%) scale(0.8);
     opacity: 0.6;
   }
-  50% {
+  10% {
     transform: translate(-50%, -50%) scale(2.2);
     opacity: 0.4;
   }
-  100% {
+  20% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.6;
+  }
+  30% {
+    transform: translate(-50%, -50%) scale(2.2);
+    opacity: 0.4;
+  }
+  40%, 100% {
     transform: translate(-50%, -50%) scale(3.5);
     opacity: 0;
   }
