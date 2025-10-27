@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useId } from 'react';
 import { useLiveClubhouseProfiles } from '@/hooks/useLiveClubhouseProfiles';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
+import { useVisibility } from '@/features/nearby/hooks/useVisibility';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
@@ -94,14 +95,22 @@ export function LiveClubhouseStrip() {
 }
 
 function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
+  const { visible } = useVisibility();
+  const { isLoading } = useActiveGolfers();
+
   const handleClick = () => {
     analyticsEvents.lcStrip.nearbyOpen(count);
     onOpen();
   };
 
-  const nearText = count > 0 
-    ? (count > 9 ? '9+ active now' : `${count} active now`)
-    : "See who's playing";
+  let captionText = "...";
+  if (!visible) {
+    captionText = "Hidden";
+  } else if (isLoading) {
+    captionText = "...";
+  } else {
+    captionText = `${count ?? 0} nearby`;
+  }
 
   return (
     <div 
@@ -111,7 +120,7 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
       <div className="lc-avatar-btn">
         <NearbyGolfersSquircle 
           onClick={handleClick}
-          ariaLabel={`Active golfers, ${count} ${count === 1 ? 'golfer' : 'golfers'} active now`}
+          ariaLabel={`Active golfers, ${count} ${count === 1 ? 'golfer' : 'golfers'} nearby`}
         />
       </div>
 
@@ -119,7 +128,9 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
         <div className="lc-name" title="Active Golfers">
           Active Golfers
         </div>
-        <div className="lc-sub">{nearText}</div>
+        <div className="lc-sub" style={count > 0 && visible ? { color: 'rgba(74, 222, 128, 0.8)' } : undefined}>
+          {captionText}
+        </div>
       </div>
     </div>
   );
