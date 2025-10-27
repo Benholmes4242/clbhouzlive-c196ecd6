@@ -61,8 +61,8 @@
 
 .icon-pin {
   fill: #F25C5C;
-  width: 70%;
-  height: 70%;
+  width: 80%;
+  height: 80%;
   filter: drop-shadow(0 2px 3px rgba(242, 92, 92, 0.28)) drop-shadow(0 0 6px rgba(242, 92, 92, 0.18));
   pointer-events: none;
   position: relative;
