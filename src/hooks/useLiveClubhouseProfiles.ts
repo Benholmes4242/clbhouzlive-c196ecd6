@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
@@ -10,6 +10,82 @@ import { MOCK_CREATORS } from '@/mocks/live_clubhouse';
 import { startMockPresence } from '@/mocks/mockPresenceTicker';
 
 const RECENT_MS = 24 * 60 * 60 * 1000;
+const LIVE_STRIP_SESSION_KEY = 'liveStripSession';
+const SESSION_TTL_MS = 2 * 60 * 60 * 1000; // 2h
+
+// Session tracking utilities
+function getExistingSession(): {
+  id: string;
+  startedAt: number;
+  seenCreatorIds: string[];
+} | null {
+  if (typeof window === 'undefined') return null;
+  const raw = localStorage.getItem(LIVE_STRIP_SESSION_KEY);
+  if (!raw) return null;
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed.id || !parsed.startedAt) return null;
+
+    // expire stale session
+    if (Date.now() - parsed.startedAt > SESSION_TTL_MS) {
+      return null;
+    }
+
+    return {
+      id: parsed.id,
+      startedAt: parsed.startedAt,
+      seenCreatorIds: Array.isArray(parsed.seenCreatorIds)
+        ? parsed.seenCreatorIds
+        : [],
+    };
+  } catch {
+    return null;
+  }
+}
+
+function startNewSession(): {
+  id: string;
+  startedAt: number;
+  seenCreatorIds: string[];
+} {
+  const fresh = {
+    id: (crypto?.randomUUID?.() || `s_${Date.now()}`),
+    startedAt: Date.now(),
+    seenCreatorIds: [],
+  };
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(LIVE_STRIP_SESSION_KEY, JSON.stringify(fresh));
+  }
+  return fresh;
+}
+
+function saveSession(session: {
+  id: string;
+  startedAt: number;
+  seenCreatorIds: string[];
+}) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(LIVE_STRIP_SESSION_KEY, JSON.stringify(session));
+}
+
+function shuffleStableForSession<T>(arr: T[], seedString: string): T[] {
+  // convert seed string → numeric seed
+  let seed = 0;
+  for (let i = 0; i < seedString.length; i++) {
+    seed = (seed + seedString.charCodeAt(i) * (i + 1)) % 2147483647;
+  }
+
+  // Fisher-Yates with deterministic PRNG based on seed
+  const out = [...arr];
+  for (let i = out.length - 1; i > 0; i--) {
+    // simple LCG-ish step
+    seed = (seed * 48271) % 2147483647;
+    const j = seed % (i + 1);
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
 
 export interface LiveCreator {
   id: string;
@@ -34,6 +110,18 @@ export function useLiveClubhouseProfiles() {
   const forceMock = isMockLiveEnabled(); // Dev override only
   const { user } = useSupabaseSession();
   const [onlineMap, setOnlineMap] = useState<Record<string, boolean>>({});
+  
+  // Session tracking for freshness
+  const sessionRef = useRef<{
+    id: string;
+    startedAt: number;
+    seenCreatorIds: string[];
+  } | null>(null);
+
+  if (!sessionRef.current) {
+    const existing = getExistingSession();
+    sessionRef.current = existing ?? startNewSession();
+  }
 
   // === REAL DATA PATH ===
   
@@ -214,7 +302,7 @@ export function useLiveClubhouseProfiles() {
     const now = Date.now();
     
     // Real profiles (from DB)
-    const realProfiles: LiveCreator[] = baseCreators.map((c: any) => {
+    const allRealProfiles: LiveCreator[] = baseCreators.map((c: any) => {
       const latest = c.latest_post_at ? new Date(c.latest_post_at).getTime() : 0;
       return {
         id: c.id,
@@ -230,8 +318,44 @@ export function useLiveClubhouseProfiles() {
       };
     });
 
+    // Session freshness: prefer creators not yet seen this session
+    const seenSet = new Set(sessionRef.current?.seenCreatorIds || []);
+    const newReal = allRealProfiles.filter(p => !seenSet.has(p.id));
+    const seenReal = allRealProfiles.filter(p => seenSet.has(p.id));
+
+    // Pick our target set of real creators (12 max)
+    const TARGET_REAL = 12;
+    const pickedReal: LiveCreator[] = [];
+
+    // Fill first with new faces
+    for (const p of newReal) {
+      if (pickedReal.length >= TARGET_REAL) break;
+      pickedReal.push(p);
+    }
+
+    // Then top up with previously-seen faces
+    for (const p of seenReal) {
+      if (pickedReal.length >= TARGET_REAL) break;
+      pickedReal.push(p);
+    }
+
+    // Update session with seen IDs
+    const updatedSeen = Array.from(
+      new Set([
+        ...(sessionRef.current?.seenCreatorIds || []),
+        ...pickedReal.map(p => p.id),
+      ])
+    );
+
+    sessionRef.current = {
+      ...sessionRef.current!,
+      seenCreatorIds: updatedSeen,
+    };
+
+    saveSession(sessionRef.current);
+
     // Mock profiles (from static data)
-    const mockProfiles: LiveCreator[] = MOCK_CREATORS.slice(0, 12).map(m => {
+    const mockProfiles: LiveCreator[] = MOCK_CREATORS.slice(0, pickedReal.length).map(m => {
       const msAgo = (m.minutesAgo ?? 999) * 60_000;
       const latest = new Date(now - msAgo).toISOString();
       return {
@@ -249,15 +373,19 @@ export function useLiveClubhouseProfiles() {
     });
 
     // Interleave: real, mock, real, mock, ...
-    const blended: LiveCreator[] = [];
-    const maxLength = Math.max(realProfiles.length, mockProfiles.length);
+    const interleaved: LiveCreator[] = [];
+    const maxLength = Math.max(pickedReal.length, mockProfiles.length);
     
     for (let i = 0; i < maxLength; i++) {
-      if (i < realProfiles.length) blended.push(realProfiles[i]);
-      if (i < mockProfiles.length) blended.push(mockProfiles[i]);
+      if (i < pickedReal.length) interleaved.push(pickedReal[i]);
+      if (i < mockProfiles.length) interleaved.push(mockProfiles[i]);
     }
 
-    return blended;
+    // Apply deterministic shuffle based on session ID
+    const sessionId = sessionRef.current!.id;
+    const sessionOrdered = shuffleStableForSession(interleaved, sessionId);
+
+    return sessionOrdered;
   }, [baseCreators, previews, onlineMap, forceMock]);
 
   return { creators, isLoading: forceMock ? false : isLoading };
