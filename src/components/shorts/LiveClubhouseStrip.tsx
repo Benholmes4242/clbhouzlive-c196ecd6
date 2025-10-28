@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
 import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import SquircleImage from '@/components/ui/SquircleImage';
-import EchoScanButton from '@/components/nearby/EchoScanButton';
+import NearbyGolfersSquircle from '@/components/nearby/NearbyGolfersSquircle';
 import '@/styles/shorts_live_clubhouse.css';
 
 const SEEN_KEY = 'seenCreatorImmersiveIds';
@@ -112,9 +112,9 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
       role="option"
     >
       <div className="lc-avatar-btn">
-        <EchoScanButton 
+        <NearbyGolfersSquircle 
           onClick={handleClick}
-          ariaLabel={`Find golfers and games, ${count} ${count === 1 ? 'golfer' : 'golfers'} nearby`}
+          ariaLabel={`Active golfers, ${count} ${count === 1 ? 'golfer' : 'golfers'} nearby`}
         />
       </div>
 
