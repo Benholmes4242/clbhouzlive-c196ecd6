@@ -19,6 +19,7 @@ import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
 import AIChat from "@/components/ai-chat/AIChat";
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
+import { usePresenceTracker } from '@/hooks/usePresenceTracker';
 import { TopTenProvider } from '@/context/TopTenContext';
 import { UIProvider } from '@/contexts/UIContext';
 import { ModalProvider } from '@/contexts/ModalContext';
@@ -104,6 +105,9 @@ const App: React.FC = () => {
   
   // Monitor global memory usage
   useGlobalMemoryMonitor(60000); // Check every minute
+  
+  // Track user presence for nearby golfers feature
+  usePresenceTracker();
   
   // Initialize recent media listener for SnapModal thumbnails
   useEffect(() => {
