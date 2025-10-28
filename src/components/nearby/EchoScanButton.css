@@ -29,6 +29,10 @@
   
   /* Prevent tap highlight on mobile */
   -webkit-tap-highlight-color: transparent;
+  
+  /* Scale to 85% of standard squircle */
+  transform: scale(0.85);
+  transform-origin: center;
 }
 
 /* Breathing glow animation */
@@ -50,20 +54,24 @@
   }
 }
 
-/* Search icon - magnifying glass */
+/* EchoScan icon - unified ring and handle */
 .icon-search {
   width: 60%;
   height: 60%;
   color: #CFE2FF;
-  filter: drop-shadow(0 1px 2px rgba(75, 93, 255, 0.2));
+  /* Soft electric blue glow */
+  filter: drop-shadow(0 0 8px rgba(75, 93, 255, 0.25));
   pointer-events: none;
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 1;
 }
 
 /* Hover / Active States */
 .echo-scan-button:hover {
-  transform: translateY(-1px) scale(1.02);
+  transform: scale(0.85) translateY(-1px);
   box-shadow: 
     0 0 18px rgba(75, 93, 255, 0.4),
     inset 0 0 8px rgba(75, 93, 255, 0.35);
@@ -71,7 +79,7 @@
 }
 
 .echo-scan-button:active {
-  transform: translateY(0) scale(0.96);
+  transform: scale(0.82);
   transition: all 0.08s ease;
   box-shadow: 
     0 0 14px rgba(75, 93, 255, 0.5),
