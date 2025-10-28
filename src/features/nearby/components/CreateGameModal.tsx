@@ -164,16 +164,29 @@ export function CreateGameModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center sm:justify-center">
+    <div 
+      className="fixed inset-0 flex items-end sm:items-center sm:justify-center"
+      style={{ 
+        zIndex: 10000, // Above NearbyOverlay's z-9999
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+      }}
+    >
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0"
         onClick={onClose}
       />
       
       {/* Modal */}
       <div 
-        className="relative w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col"
+        className="relative w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+        style={{ 
+          maxHeight: '80vh', // Match NearbyOverlay
+          touchAction: 'auto',
+          overscrollBehavior: 'contain',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -193,11 +206,14 @@ export function CreateGameModal({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6"
+        <div 
+          className="flex-1 overflow-y-auto p-6"
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '16px'
+            gap: '16px',
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain',
           }}
         >
           {myBeacon ? (

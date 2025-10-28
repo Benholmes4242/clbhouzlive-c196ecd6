@@ -67,8 +67,9 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="fixed inset-0 z-[9999] flex items-end sm:items-center sm:justify-center"
+    <>
+      <div
+        className="fixed inset-0 z-[9999] flex items-end sm:items-center sm:justify-center"
       style={{
         backgroundColor: 'rgba(0,0,0,0.4)',
         WebkitBackdropFilter: 'blur(8px)',
@@ -258,15 +259,24 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           )}
         </div>
       </div>
-      
-      {/* Create Game Modal */}
-      <CreateGameModal
-        isOpen={isCreateGameOpen}
-        onClose={() => setIsCreateGameOpen(false)}
-        onCreateBeacon={createBeacon}
-        onCancelBeacon={cancelBeacon}
-        myBeacon={myBeacon}
-      />
     </div>
+      
+      {/* Create Game Modal - Rendered outside NearbyOverlay but at higher z-index */}
+      {isCreateGameOpen && (
+        <CreateGameModal
+          isOpen={true}
+          onClose={() => {
+            setIsCreateGameOpen(false);
+            setActiveTab('games'); // Switch to Games tab after creating game
+          }}
+          onCreateBeacon={async (input) => {
+            await createBeacon(input);
+            setActiveTab('games'); // Show Games tab to see "Your Game"
+          }}
+          onCancelBeacon={cancelBeacon}
+          myBeacon={myBeacon}
+        />
+      )}
+    </>
   );
 }
