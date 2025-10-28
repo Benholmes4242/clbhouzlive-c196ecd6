@@ -172,7 +172,10 @@ export function CreateGameModal({
       />
       
       {/* Modal */}
-      <div className="relative w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
+      <div 
+        className="relative w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="relative p-6 border-b border-neutral-800 text-center">
           <button
@@ -264,7 +267,7 @@ export function CreateGameModal({
                 <input
                   ref={courseInputRef}
                   type="text"
-                  placeholder="Course ...."
+                  placeholder="Golf course …"
                   value={courseSearchTerm}
                   onChange={(e) => {
                     setCourseSearchTerm(e.target.value);
