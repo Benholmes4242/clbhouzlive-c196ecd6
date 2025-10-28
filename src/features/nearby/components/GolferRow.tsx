@@ -113,7 +113,9 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
       {/* Row 2: Pills */}
       {(golfer.sameHomeClub || golfer.isOpenToPlay) && (
         <div className="px-3 pb-3">
-          <div className="flex flex-row items-center justify-center gap-2">
+          <div className={`flex flex-row items-center gap-2 ${
+            golfer.sameHomeClub && golfer.isOpenToPlay ? 'justify-center' : 'justify-start'
+          }`}>
             {golfer.sameHomeClub && (
               <span className="px-2 py-1 rounded-full text-[12px] font-medium bg-white/10 text-white/80 border border-white/20 flex items-center gap-1">
                 <span className="inline-block">🏠</span>
