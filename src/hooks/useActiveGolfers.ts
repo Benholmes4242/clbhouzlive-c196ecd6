@@ -173,13 +173,21 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
       isMock: false,
     }));
 
-    const mockProfiles: ActiveGolfer[] = getMockNearby(mockCount).map(m => ({
-      ...m,
-      is_online: false,
-      isMock: true,
-      isOpenToPlay: false,
-      sameHomeClub: false,
-    }));
+    const mockProfiles: ActiveGolfer[] = getMockNearby(mockCount).map(m => {
+      const distanceText = m.distance_km ? formatDistance(m.distance_km * 1000) : undefined;
+      return {
+        id: m.id,
+        display_name: m.display_name,
+        home_club: m.home_club,
+        avatar_url: m.avatar_url,
+        is_online: m.is_online,
+        isMock: true,
+        distance_km: m.distance_km,
+        distanceText,
+        isOpenToPlay: m.isOpenToPlay,
+        sameHomeClub: m.same_club,
+      };
+    });
 
     const blended: ActiveGolfer[] = [];
     const maxLength = Math.max(realWithOnline.length, mockProfiles.length);

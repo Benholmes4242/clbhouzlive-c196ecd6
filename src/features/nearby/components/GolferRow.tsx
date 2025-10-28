@@ -80,7 +80,7 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
             src={golfer.avatar_url || '/placeholder.svg'}
             alt={golfer.display_name}
           >
-            {golfer.is_online && !golfer.isMock && (
+            {golfer.is_online && (
               <div className="lc-dot" aria-label="Online" />
             )}
           </AvatarSquircle>
@@ -97,7 +97,7 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
         <div className="flex flex-col gap-1 min-w-0">
           {/* Distance and Home Club */}
           <div className="flex items-center gap-2">
-            {!golfer.isMock && golfer.distanceText && (
+            {golfer.distanceText && (
               <span className="text-[13px] text-neutral-400">
                 {golfer.distanceText}
               </span>
@@ -111,13 +111,13 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
           
           {/* Pills row */}
           <div className="flex items-center gap-2 flex-wrap">
-            {!golfer.isMock && golfer.isOpenToPlay && (
+            {golfer.isOpenToPlay && (
               <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20">
                 <span className="text-[10px]">🟢</span>
                 <span className="text-xs font-medium text-green-500">Open to play</span>
               </div>
             )}
-            {!golfer.isMock && golfer.sameHomeClub && (
+            {golfer.sameHomeClub && (
               <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
                 <Home className="w-3 h-3 text-white/70" />
                 <span className="text-xs font-medium text-white/70">Same home club</span>
@@ -136,10 +136,10 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
             {isFollowing ? 'Following' : 'Follow'}
           </button>
           
-          {!golfer.isMock && golfer.isOpenToPlay ? (
+          {golfer.isOpenToPlay ? (
             <button
               onClick={handlePing}
-              disabled={isSendingPing}
+              disabled={isSendingPing || golfer.isMock}
               className="h-7 px-3 text-xs font-semibold rounded-md transition-colors bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSendingPing ? 'Sending...' : 'Ping'}
