@@ -21,7 +21,7 @@ export function usePresenceTracker() {
       const channelName = 'presence:creators_online';
       console.log('[Presence] Creating channel:', channelName);
 
-      channel = channelManager.createChannel(channelName);
+      channel = channelManager.createChannel(channelName, { config: { presence: { key: user.id }}});
 
       channel.subscribe(async (status: string) => {
         console.log('[Presence] Channel status:', status);

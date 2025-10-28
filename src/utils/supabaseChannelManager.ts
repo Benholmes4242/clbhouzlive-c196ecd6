@@ -14,15 +14,16 @@ class SupabaseChannelManager {
     return SupabaseChannelManager.instance;
   }
 
-  createChannel(channelName: string): RealtimeChannel {
-    // If channel already exists, remove it first
-    if (this.channels.has(channelName)) {
-      console.log(`Removing existing channel: ${channelName}`);
-      this.removeChannel(channelName);
+  createChannel(channelName: string, options?: any): RealtimeChannel {
+    // Reuse existing channel if it exists to prevent unsubscribing other listeners
+    const existing = this.channels.get(channelName);
+    if (existing) {
+      console.log(`Reusing existing channel: ${channelName}`);
+      return existing;
     }
 
     console.log(`Creating new channel: ${channelName}`);
-    const channel = supabase.channel(channelName);
+    const channel = supabase.channel(channelName, options as any);
     this.channels.set(channelName, channel);
     return channel;
   }
