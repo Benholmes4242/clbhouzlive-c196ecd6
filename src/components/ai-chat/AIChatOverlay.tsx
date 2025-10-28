@@ -520,7 +520,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             </div>
             {/* hairline highlight */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/08"></div>
+            <div className="h-[1px] bg-white/10"></div>
           </header>
 
           {/* Segmented Tabs */}
@@ -592,8 +592,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 <div>
                     {messages.length === 0 ? (
                       <div className="flex flex-col items-center justify-center text-center px-6 py-20 sm:py-28 space-y-6">
-                        <div className="h-20 w-20 rounded-3xl bg-white/08 backdrop-blur border border-white/12 shadow-sm grid place-items-center">
-                          <Bot className="h-9 w-9 text-white/60" />
+                        <div className="h-20 w-20 rounded-3xl bg-black/40 backdrop-blur border border-white/20 shadow-[0_30px_120px_rgba(0,0,0,1),0_0_60px_rgba(255,255,255,0.08)] grid place-items-center">
+                          <Bot className="h-9 w-9 text-white/80" />
                         </div>
                         <div className="text-[17px] font-semibold text-white">
                           Start a conversation with Echo
@@ -685,7 +685,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 {showScrollToBottom && (
                   <button
                     onClick={scrollToBottom}
-                    className="fixed md:absolute bottom-[88px] right-3 md:right-4 z-[2] h-10 px-3.5 rounded-full bg-white/08 backdrop-blur border border-white/12 shadow-[0_6px_20px_rgba(0,0,0,0.6)] text-[13px] text-white flex items-center gap-2 hover:bg-white/12 hover:border-white/20 active:shadow-sm transition will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                    className="fixed md:absolute bottom-[88px] right-3 md:right-4 z-[2] h-10 px-3.5 rounded-full bg-white/08 backdrop-blur border border-white/12 shadow-[0_6px_20px_rgba(0,0,0,0.6)] text-[13px] text-white flex items-center gap-2 hover:bg-white/12 hover:border-white/20 active:shadow-sm transition will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                     aria-label="Jump to latest"
                     type="button"
                     data-visible="true"
@@ -762,7 +762,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     <div className="rounded-2xl border border-white/12 bg-white/05 backdrop-blur px-3 py-2.5 grid grid-cols-3 gap-2">
                       {/* Photo tile */}
                       <button 
-                        className="h-20 rounded-xl bg-white/05 border border-white/12 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                        className="h-20 rounded-xl bg-white/05 border border-white/12 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                         aria-label="Photo"
                         type="button"
                       >
@@ -772,7 +772,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       
                       {/* File tile */}
                       <button 
-                        className="h-20 rounded-xl bg-white/05 border border-white/12 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                        className="h-20 rounded-xl bg-white/05 border border-white/12 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                         aria-label="File"
                         type="button"
                       >
@@ -782,7 +782,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       
                       {/* Link tile */}
                       <button 
-                        className="h-20 rounded-xl bg-white/05 border border-white/12 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                        className="h-20 rounded-xl bg-white/05 border border-white/12 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                         aria-label="Link"
                         type="button"
                       >
@@ -822,14 +822,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           <button
                             type="button"
                             aria-label="Attach"
-                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-white/08 active:bg-white/12 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-white/08 active:bg-white/12 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                           >
                             <Paperclip className="h-[18px] w-[18px] text-white/60" />
                           </button>
                           <button
                             type="button"
                             aria-label="Voice"
-                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-white/08 active:bg-white/12 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-white/08 active:bg-white/12 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                             onMouseDown={!isProcessing ? startRecording : undefined}
                             onMouseUp={!isProcessing ? stopRecording : undefined}
                             onMouseLeave={!isProcessing ? stopRecording : undefined}
@@ -861,7 +861,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         autoCapitalize="sentences"
                         rows={1}
                         className="w-full bg-transparent outline-none text-[15px] leading-[1.4] 
-                                   placeholder:text-white/40 text-white font-medium 
+                                   placeholder:text-white/60 text-white font-medium 
                                    resize-none focus-visible:outline-none"
                       />
                     </div>
@@ -876,7 +876,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           disabled={isLoading || isProcessing}
                           className={cn(
                             "h-10 px-4 rounded-full bg-white text-black shadow-[0_8px_24px_rgba(0,0,0,0.8)] border border-white hover:bg-white/90 active:scale-[0.98] transition",
-                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40",
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
                             "disabled:opacity-60 disabled:cursor-not-allowed font-medium"
                           )}
                         >
@@ -912,25 +912,25 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         >
           <div className="mx-auto w-full max-w-[720px] rounded-2xl bg-white/95 backdrop-blur border border-black/10 shadow-lg p-2 grid grid-cols-4 gap-2">
             <button 
-              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               type="button"
             >
               Copy
             </button>
             <button 
-              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               type="button"
             >
               Retry
             </button>
             <button 
-              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               type="button"
             >
               Share
             </button>
             <button 
-              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               type="button"
             >
               Save

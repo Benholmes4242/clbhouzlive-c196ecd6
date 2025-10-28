@@ -90,7 +90,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           {/* Avatar - only show for AI on first message in group (positioned outside flow) */}
           {!isUser && isFirstInGroup && (
             <div className="absolute -left-9 top-2 h-7 w-7 rounded-full grid place-items-center bg-white/06 backdrop-blur border border-white/08">
-              <Bot className="h-[14px] w-[14px] text-[#2A9D8F]" />
+              <Bot className="h-[14px] w-[14px] text-white/80" />
             </div>
           )}
           
@@ -121,10 +121,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             role="group"
             aria-label={`Message from ${isUser ? 'You' : 'Echo'} at ${time}`}
             className={cn(
-              "rounded-2xl text-[15px] overflow-hidden",
+              "text-[15px] overflow-hidden",
               isUser 
-                ? "rounded-br-md bg-[#2A9D8F]/15 border border-[#2A9D8F]/40 text-white shadow-[0_6px_18px_rgba(42,157,143,0.2)]" 
-                : "rounded-bl-md bg-white/06 backdrop-blur border border-white/08 text-white shadow-[0_10px_28px_rgba(0,0,0,0.4)]",
+                ? "inline-block max-w-[82%] md:max-w-[70%] rounded-[16px] bg-white/10 backdrop-blur-md border border-white/30 text-white shadow-[0_12px_32px_rgba(0,0,0,0.8),0_0_40px_rgba(255,255,255,0.18)]" 
+                : "inline-block max-w-[82%] md:max-w-[70%] rounded-[16px] bg-white/04 backdrop-blur-md border border-white/12 text-white shadow-[0_12px_32px_rgba(0,0,0,0.9)]",
               isUser ? "leading-[1.5]" : "leading-[1.55]"
             )}
           >
@@ -168,15 +168,15 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                           {...props} 
                           target="_blank" 
                           rel="noopener noreferrer" 
-                          className="underline decoration-[#2A9D8F]/50 underline-offset-2 hover:decoration-[#2A9D8F] text-[#2A9D8F] break-words focus:outline-none focus:ring-2 focus:ring-[#2A9D8F]/40 rounded"
+                          className="underline decoration-white/50 underline-offset-2 hover:decoration-white text-white break-words focus:outline-none focus:ring-2 focus:ring-white/30 rounded"
                         />
                       ),
                       h1: ({ children }) => <h3 className="text-[16px] font-semibold mb-2 mt-3 first:mt-0 text-white">{children}</h3>,
                       h2: ({ children }) => <h4 className="text-[15.5px] font-semibold mb-2 mt-3 text-white">{children}</h4>,
                       h3: ({ children }) => <h4 className="text-[15px] font-semibold mb-2 mt-2 text-white">{children}</h4>,
                       p: ({ children }) => <p className="my-2 first:mt-0 last:mb-0 break-words">{children}</p>,
-                      ul: ({ children }) => <ul className="list-disc pl-5 space-y-1.5 my-2 marker:text-gray-500">{children}</ul>,
-                      ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1.5 my-2 marker:text-gray-500">{children}</ol>,
+                      ul: ({ children }) => <ul className="list-disc pl-5 space-y-1.5 my-2 marker:text-white/60">{children}</ul>,
+                      ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1.5 my-2 marker:text-white/60">{children}</ol>,
                       li: ({ children }) => <li className="leading-[1.5]">{children}</li>,
                       strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
                       code: ({ inline, children, ...props }: any) => 
@@ -191,13 +191,13 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                         <div 
                           role="region" 
                           aria-label="Code snippet"
-                          className="mt-2 overflow-x-auto rounded-xl bg-gray-900 text-gray-100 border border-black/20 shadow-inner"
+                          className="mt-2 overflow-x-auto rounded-[10px] bg-black/70 text-white border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,1)]"
                         >
                           <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10">
                             <span className="text-[11px] text-white/60 font-medium">Code</span>
                             <button
                               aria-label="Copy code"
-                              className="text-[11px] text-white/60 hover:text-white/90 px-2 py-0.5 rounded hover:bg-white/5 transition-colors focus:outline-none focus:ring-2 focus:ring-white/20"
+                              className="text-[11px] text-white/60 hover:text-white/90 px-2 py-0.5 rounded hover:bg-white/5 transition-colors focus:outline-none focus:ring-2 focus:ring-white/30"
                             >
                               Copy
                             </button>

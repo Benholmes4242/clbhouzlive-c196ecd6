@@ -242,7 +242,7 @@ interface AIChatHistoryProps {
                   onToggleExpand();
                 }}
                 aria-label="Collapse"
-                className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/08 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 text-white/80"
+                className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/08 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 text-white/80"
               >
                 <Minimize2 className="h-4 w-4" />
               </button>
@@ -254,7 +254,7 @@ interface AIChatHistoryProps {
                   }
                 }}
                 aria-label="Delete"
-                className="h-8 w-8 grid place-items-center rounded-full hover:bg-red-900/20 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                className="h-8 w-8 grid place-items-center rounded-full hover:bg-red-900/20 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               >
                 <Trash2 className="h-4 w-4 text-red-400" />
               </button>
@@ -388,7 +388,7 @@ const ErrorState: React.FC<{
     </div>
     <button
       onClick={onRetry}
-      className="mt-2 h-10 px-5 rounded-full bg-white/08 border border-white/12 text-white font-medium hover:bg-white/12 hover:border-white/20 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+      className="mt-2 h-10 px-5 rounded-full bg-white/08 border border-white/12 text-white font-medium hover:bg-white/12 hover:border-white/20 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
     >
       Retry
     </button>
@@ -725,7 +725,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
                   {/* Filter button (UI placeholder) */}
                   <button
-                    className="h-11 px-4 rounded-xl bg-white/06 backdrop-blur border border-white/12 hover:bg-white/08 hover:border-white/20 text-[14px] font-medium text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 flex items-center gap-1.5"
+                    className="h-11 px-4 rounded-xl bg-white/06 backdrop-blur border border-white/12 hover:bg-white/08 hover:border-white/20 text-[14px] font-medium text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 flex items-center gap-1.5"
                     aria-label="Open filters"
                   >
                     <Filter className="h-4 w-4 text-white/60" />
@@ -739,8 +739,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     type="button"
                     onClick={() => setActiveTab('chat')}
                     className={cn(
-                      "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40",
-                      activeTab === 'chat' 
+                      "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
+                      activeTab === 'chat'
                         ? "bg-white/05 text-white shadow-[0_0_16px_rgba(255,255,255,0.18)] ring-1 ring-inset ring-white/20" 
                         : "text-white/60 hover:bg-white/05 hover:ring-1 hover:ring-inset hover:ring-white/10"
                     )}
@@ -751,8 +751,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     type="button"
                     onClick={() => setActiveTab('swing')}
                     className={cn(
-                      "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40",
-                      activeTab === 'swing' 
+                      "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
+                      activeTab === 'swing'
                         ? "bg-white/05 text-white shadow-[0_0_16px_rgba(255,255,255,0.18)] ring-1 ring-inset ring-white/20" 
                         : "text-white/60 hover:bg-white/05 hover:ring-1 hover:ring-inset hover:ring-white/10"
                     )}
@@ -819,7 +819,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                             </div>
                             <div className="mt-4 flex items-center justify-center gap-2">
                               <button 
-                                className="h-10 px-4 rounded-full bg-white/08 border border-white/12 hover:bg-white/12 hover:border-white/20 shadow-sm text-[14px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 text-white"
+                                className="h-10 px-4 rounded-full bg-white/08 border border-white/12 hover:bg-white/12 hover:border-white/20 shadow-sm text-[14px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 text-white"
                                 onClick={() => setSearchQuery('')}
                               >
                                 Clear search
@@ -881,7 +881,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                   setExpandedCard(null);
                                 }}
                                 aria-label="Collapse" 
-                                className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/08 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 text-white/80"
+                                className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/08 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 text-white/80"
                               >
                                              <ChevronUp className="h-4 w-4" />
                                            </button>
@@ -910,7 +910,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                                  onClose();
                                                }
                                              }}
-                                              className="text-sm font-medium text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
+                                              className="text-sm font-medium text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 rounded"
                                             >
                                              Use this response
                                            </button>
@@ -994,9 +994,9 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                                e.stopPropagation();
                                                setExpandedCard(null);
                                              }}
-                                             aria-label="Collapse" 
-                                             className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/08 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 text-white/80"
-                                           >
+                                              aria-label="Collapse" 
+                                              className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/08 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 text-white/80"
+                                            >
                                              <ChevronUp className="h-4 w-4" />
                                            </button>
                                          </div>
@@ -1023,9 +1023,9 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                                  onSelectMessage(lastUserMessage.content);
                                                  onClose();
                                                }
-                                             }}
-                                             className="text-sm font-medium text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
-                                           >
+                                              }}
+                                              className="text-sm font-medium text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 rounded"
+                                            >
                                              Use this response
                                            </button>
                                          </div>
@@ -1108,9 +1108,9 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                                e.stopPropagation();
                                                setExpandedCard(null);
                                              }}
-                                             aria-label="Collapse" 
-                                             className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/08 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 text-white/80"
-                                           >
+                                              aria-label="Collapse" 
+                                              className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/08 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 text-white/80"
+                                            >
                                              <ChevronUp className="h-4 w-4" />
                                            </button>
                                          </div>
@@ -1137,9 +1137,9 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                                  onSelectMessage(lastUserMessage.content);
                                                  onClose();
                                                }
-                                             }}
-                                             className="text-sm font-medium text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
-                                           >
+                                              }}
+                                              className="text-sm font-medium text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 rounded"
+                                            >
                                              Use this response
                                            </button>
                                          </div>
@@ -1226,8 +1226,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               Try a different search term or clear filters.
                             </div>
                             <div className="mt-4 flex items-center justify-center gap-2">
-                              <button 
-                                className="h-10 px-4 rounded-full bg-white border border-black/10 hover:bg-gray-50 shadow-sm text-[14px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                             <button 
+                                className="h-10 px-4 rounded-full bg-white border border-black/10 hover:bg-gray-50 shadow-sm text-[14px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                                 onClick={() => setSearchQuery('')}
                               >
                                 Clear search

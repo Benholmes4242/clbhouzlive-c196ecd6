@@ -23,25 +23,26 @@ export function OverlayFooter({
       )}
     >
       <div className="space-y-2">
-        {/* Recent history - de-emphasized secondary control */}
+        {/* Recent history - frosted white pill with black text */}
         <button
           onClick={onOpen}
           aria-label="Open recent history"
-          className="w-full rounded-xl border border-white/12 bg-white/06 backdrop-blur
-                     px-3 py-2 text-sm text-white
-                     hover:bg-white/08 hover:border-white/16 shadow-[0_4px_16px_rgba(0,0,0,0.3)]
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60
-                     transition-colors"
+          className="w-full flex items-center justify-between rounded-[14px] bg-white/80 backdrop-blur-md
+                     border border-white/60 shadow-[0_8px_24px_rgba(0,0,0,0.4)]
+                     px-3 py-3
+                     active:scale-[0.99]
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30
+                     transition-transform"
         >
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-white/60" aria-hidden="true" />
-            <span className="flex-1 text-left">Recent history</span>
-            <ChevronDown className="h-4 w-4 text-white/60" aria-hidden="true" />
-          </div>
+          <span className="flex items-center gap-2 text-[15px] font-medium text-black">
+            <Clock className="h-4 w-4 text-black/70" aria-hidden="true" />
+            Recent history
+          </span>
+          <ChevronDown className="h-4 w-4 text-black/70" aria-hidden="true" />
         </button>
 
-        {/* Caption - tighter spacing */}
-        <p className="text-[12px] leading-4 text-white/60 text-center mt-1">
+        {/* Caption - stays subtle white on dark */}
+        <p className="mt-2 text-[12px] leading-[16px] text-white/60 text-center">
           {caption}
         </p>
       </div>
