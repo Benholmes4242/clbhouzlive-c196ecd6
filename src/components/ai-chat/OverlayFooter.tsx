@@ -41,8 +41,8 @@ export function OverlayFooter({
           <ChevronDown className="h-4 w-4 text-black/70" aria-hidden="true" />
         </button>
 
-        {/* Caption - stays subtle white on dark */}
-        <p className="mt-2 text-[12px] leading-[16px] text-white/60 text-center">
+        {/* Caption - black text on frosted white background */}
+        <p className="mt-2 text-[12px] leading-[16px] text-black/60 text-center">
           {caption}
         </p>
       </div>

@@ -121,12 +121,18 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             role="group"
             aria-label={`Message from ${isUser ? 'You' : 'Echo'} at ${time}`}
             className={cn(
-              "text-[15px] overflow-hidden",
+              "text-[15px] relative",
               isUser 
-                ? "inline-block max-w-[82%] md:max-w-[70%] rounded-[16px] bg-white/10 backdrop-blur-md border border-white/30 text-white shadow-[0_12px_32px_rgba(0,0,0,0.8),0_0_40px_rgba(255,255,255,0.18)]" 
-                : "inline-block max-w-[82%] md:max-w-[70%] rounded-[16px] bg-white/04 backdrop-blur-md border border-white/12 text-white shadow-[0_12px_32px_rgba(0,0,0,0.9)]",
+                ? "inline-block max-w-[82%] md:max-w-[70%] rounded-[16px] bg-white/10 backdrop-blur-md border border-white/30 text-white shadow-[0_12px_32px_rgba(0,0,0,0.8)] overflow-hidden" 
+                : "inline-block max-w-[82%] md:max-w-[70%] rounded-[16px] bg-white/04 backdrop-blur-md border border-white/12 text-white shadow-[0_12px_32px_rgba(0,0,0,0.9)] overflow-hidden",
               isUser ? "leading-[1.5]" : "leading-[1.55]"
             )}
+            style={{
+              ...(isUser && {
+                '--glow-inset': 'inset 0 0 40px rgba(255,255,255,0.18)',
+                boxShadow: '0 12px 32px rgba(0,0,0,0.8), var(--glow-inset)',
+              } as React.CSSProperties)
+            }}
           >
             {/* Edge-to-edge media at top if provided */}
             {mediaTop}
@@ -137,7 +143,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             ) : (
               <div className="px-3.5 py-2.5 first:mt-0 last:mb-0">
                 {isUser ? (
-                  <div className="break-words">{message.content}</div>
+                  <div className="break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{message.content}</div>
                 ) : swingAnalysisData ? (
                 <div className="mt-2 rounded-2xl overflow-hidden bg-white/06 backdrop-blur border border-white/08 shadow-[0_10px_30px_rgba(0,0,0,0.4)]" data-swing-card>
                   <SwingReview

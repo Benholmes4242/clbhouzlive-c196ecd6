@@ -813,8 +813,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           Recording…
                         </div>
                       ) : isProcessing ? (
-                        <div className="h-7 px-2.5 rounded-full bg-white/05 border border-white/12 text-[12px] text-white/80 inline-flex items-center gap-1.5">
-                          <span className="h-3 w-3 border-2 border-white/60 border-t-transparent rounded-full animate-spin"></span>
+                        <div className="h-7 px-2.5 rounded-full bg-black/05 border border-black/12 text-[12px] text-black/80 inline-flex items-center gap-1.5">
+                          <span className="h-3 w-3 border-2 border-black/60 border-t-transparent rounded-full animate-spin"></span>
                           Processing…
                         </div>
                       ) : (
@@ -822,21 +822,21 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           <button
                             type="button"
                             aria-label="Attach"
-                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-white/08 active:bg-white/12 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/08 active:bg-black/12 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30"
                           >
-                            <Paperclip className="h-[18px] w-[18px] text-white/60" />
+                            <Paperclip className="h-[18px] w-[18px] text-black/70" />
                           </button>
                           <button
                             type="button"
                             aria-label="Voice"
-                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-white/08 active:bg-white/12 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/08 active:bg-black/12 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30"
                             onMouseDown={!isProcessing ? startRecording : undefined}
                             onMouseUp={!isProcessing ? stopRecording : undefined}
                             onMouseLeave={!isProcessing ? stopRecording : undefined}
                             onTouchStart={!isProcessing ? startRecording : undefined}
                             onTouchEnd={!isProcessing ? stopRecording : undefined}
                           >
-                            <Mic className="h-[18px] w-[18px] text-white/60" />
+                            <Mic className="h-[18px] w-[18px] text-black/70" />
                           </button>
                         </>
                       )}
@@ -861,7 +861,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         autoCapitalize="sentences"
                         rows={1}
                         className="w-full bg-transparent outline-none text-[15px] leading-[1.4] 
-                                   placeholder:text-white/60 text-white font-medium 
+                                   placeholder:text-black/60 text-black font-medium 
                                    resize-none focus-visible:outline-none"
                       />
                     </div>
