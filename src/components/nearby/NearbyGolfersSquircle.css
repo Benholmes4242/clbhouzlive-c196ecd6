@@ -13,8 +13,8 @@
   
   /* Glass styling matching echo orb */
   background: transparent;
-  backdrop-filter: blur(8px) saturate(180%);
-  -webkit-backdrop-filter: blur(8px) saturate(180%);
+  backdrop-filter: blur(4px) saturate(180%);
+  -webkit-backdrop-filter: blur(4px) saturate(180%);
   
   /* Glassy white border */
   border: 1px solid rgba(255, 255, 255, 0.4);
