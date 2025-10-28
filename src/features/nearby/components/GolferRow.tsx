@@ -112,7 +112,9 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
 
       {/* Row 2: Pills */}
       {(golfer.sameHomeClub || golfer.isOpenToPlay) && (
-        <div className="px-3 pb-3">
+        <div className={`px-3 pb-3 ${
+          golfer.sameHomeClub && golfer.isOpenToPlay ? '' : 'pl-[68px]'
+        }`}>
           <div className={`flex flex-row items-center gap-2 ${
             golfer.sameHomeClub && golfer.isOpenToPlay ? 'justify-center' : 'justify-start'
           }`}>
