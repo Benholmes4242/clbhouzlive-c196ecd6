@@ -24,14 +24,9 @@ export default function EchoScanButton({
         }
       }}
     >
-      {/* Scan rings */}
-      <div className="scan-ring scan-ring-1" aria-hidden="true" />
-      <div className="scan-ring scan-ring-2" aria-hidden="true" />
-      <div className="scan-ring scan-ring-3" aria-hidden="true" />
-      
-      {/* Radar icon */}
+      {/* Search icon - magnifying glass with outer ring */}
       <svg
-        className="icon-radar"
+        className="icon-search"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         fill="none"
@@ -41,12 +36,12 @@ export default function EchoScanButton({
         strokeLinejoin="round"
         aria-hidden="true"
       >
-        {/* Radar dish/antenna */}
-        <circle cx="12" cy="12" r="10" />
-        <circle cx="12" cy="12" r="6" />
-        <circle cx="12" cy="12" r="2" />
-        {/* Scanning beam */}
-        <path d="M12 2 L12 12 L20 8" />
+        {/* Outer ring */}
+        <circle cx="11" cy="11" r="8" />
+        {/* Inner magnifying glass circle */}
+        <circle cx="11" cy="11" r="5" />
+        {/* Handle */}
+        <path d="m21 21-4.35-4.35" />
       </svg>
     </div>
   );

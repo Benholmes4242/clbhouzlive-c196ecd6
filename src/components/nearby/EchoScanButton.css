@@ -1,4 +1,4 @@
-/* EchoScan Button - Apple-level proximity detection interface */
+/* EchoScan Button - Apple-level search interface */
 
 .echo-scan-button {
   position: relative;
@@ -11,19 +11,18 @@
   isolation: isolate;
   cursor: pointer;
   
-  /* Enhanced depth gradient */
+  /* Deep gradient matching reference */
   background: radial-gradient(circle at 30% 30%, #111 0%, #000 80%);
   
-  /* Echo-blue outer stroke with increased visibility */
-  border: 1px solid rgba(75, 93, 255, 0.7);
+  /* Subtle blue border */
+  border: 1px solid rgba(75, 93, 255, 0.5);
   
-  /* Enhanced depth and glow */
+  /* Soft glow for depth */
   box-shadow: 
     0 0 12px rgba(75, 93, 255, 0.25),
-    0 2px 8px rgba(0, 0, 0, 0.3),
     inset 0 0 6px rgba(75, 93, 255, 0.3);
   
-  /* Passive breathing glow animation */
+  /* Calm breathing animation */
   animation: echoPulse 3s infinite ease-in-out;
   
   transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
@@ -37,69 +36,26 @@
   0% { 
     box-shadow: 
       0 0 10px rgba(75, 93, 255, 0.2),
-      0 2px 8px rgba(0, 0, 0, 0.3),
-      inset 0 0 6px rgba(75, 93, 255, 0.25);
+      inset 0 0 6px rgba(75, 93, 255, 0.3);
   }
   50% { 
     box-shadow: 
       0 0 16px rgba(75, 93, 255, 0.4),
-      0 2px 8px rgba(0, 0, 0, 0.3),
-      inset 0 0 8px rgba(75, 93, 255, 0.4);
+      inset 0 0 6px rgba(75, 93, 255, 0.3);
   }
   100% { 
     box-shadow: 
       0 0 10px rgba(75, 93, 255, 0.2),
-      0 2px 8px rgba(0, 0, 0, 0.3),
-      inset 0 0 6px rgba(75, 93, 255, 0.25);
+      inset 0 0 6px rgba(75, 93, 255, 0.3);
   }
 }
 
-/* Scan rings - concentric blue rings that pulse */
-.scan-ring {
-  position: absolute;
-  border-radius: inherit;
-  border: 2px solid rgba(75, 93, 255, 0.7);
-  pointer-events: none;
-  filter: blur(2px);
-  animation: scanPulse 3s ease-out infinite;
-}
-
-.scan-ring-1 {
-  inset: -4px;
-  animation-delay: 0s;
-}
-
-.scan-ring-2 {
-  inset: -8px;
-  animation-delay: 1s;
-}
-
-.scan-ring-3 {
-  inset: -12px;
-  animation-delay: 2s;
-}
-
-@keyframes scanPulse {
-  0% {
-    opacity: 0.3;
-    transform: scale(0.95);
-  }
-  50% {
-    opacity: 0.15;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.1);
-  }
-}
-
-/* Radar icon */
-.icon-radar {
+/* Search icon - magnifying glass */
+.icon-search {
   width: 60%;
   height: 60%;
   color: #CFE2FF;
-  filter: drop-shadow(0 2px 4px rgba(75, 93, 255, 0.3));
+  filter: drop-shadow(0 1px 2px rgba(75, 93, 255, 0.2));
   pointer-events: none;
   position: relative;
   z-index: 1;
@@ -109,20 +65,17 @@
 .echo-scan-button:hover {
   transform: translateY(-1px) scale(1.02);
   box-shadow: 
-    0 0 18px rgba(75, 93, 255, 0.5),
-    0 4px 12px rgba(0, 0, 0, 0.4),
-    inset 0 0 10px rgba(75, 93, 255, 0.4);
-  border-color: rgba(75, 93, 255, 0.8);
+    0 0 18px rgba(75, 93, 255, 0.4),
+    inset 0 0 8px rgba(75, 93, 255, 0.35);
+  border-color: rgba(75, 93, 255, 0.6);
 }
 
 .echo-scan-button:active {
   transform: translateY(0) scale(0.96);
   transition: all 0.08s ease;
-}
-
-/* Brighten scan rings on tap */
-.echo-scan-button:active .scan-ring {
-  border-color: rgba(75, 93, 255, 0.9);
+  box-shadow: 
+    0 0 14px rgba(75, 93, 255, 0.5),
+    inset 0 0 8px rgba(75, 93, 255, 0.4);
 }
 
 /* Accessibility */
