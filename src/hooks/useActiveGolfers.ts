@@ -158,6 +158,10 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
       isMock: false,
     }));
 
+    console.log('🔍 [useActiveGolfers] realProfiles:', realProfiles.length, realProfiles.map(p => p.display_name));
+    console.log('🔍 [useActiveGolfers] onlineUserIds:', Array.from(onlineUserIds));
+    console.log('🔍 [useActiveGolfers] realWithOnline:', realWithOnline.map(p => ({ name: p.display_name, online: p.is_online })));
+
     const mockProfiles: ActiveGolfer[] = getMockNearby(mockCount).map(m => ({
       ...m,
       is_online: false,
@@ -176,7 +180,9 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
   }, [realProfiles, mockCount, onlineUserIds]);
 
   const realOnlineCount = useMemo(() => {
-    return golfers.filter(g => !g.isMock && g.is_online).length;
+    const count = golfers.filter(g => !g.isMock && g.is_online).length;
+    console.log('🔍 [useActiveGolfers] realOnlineCount:', count);
+    return count;
   }, [golfers]);
 
   return { golfers, realOnlineCount, isLoading };
