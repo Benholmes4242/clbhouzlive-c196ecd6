@@ -74,16 +74,9 @@
   height: 16px;
   border-radius: 50%;
   background: #3CB371;
-  box-shadow: 0 0 0 2px #fff;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.8);
   z-index: 2;
 }
-
-/* Dark mode disabled during development */
-/* @media (prefers-color-scheme: dark) {
-  .lc-dot {
-    box-shadow: 0 0 0 2px #0b0b0b;
-  }
-} */
 
 /* Labels */
 .lc-name {
