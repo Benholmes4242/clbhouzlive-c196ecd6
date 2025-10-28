@@ -1,6 +1,4 @@
 import React from 'react';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
-import SquircleImage from '@/components/ui/SquircleImage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -75,14 +73,17 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
     >
       {/* Row 1: Header - Avatar + Name/Distance + Club */}
       <div className="flex flex-row gap-3 p-3 pb-2">
-        {/* Avatar block */}
-        <div className="relative shrink-0">
-          <SquircleImage
-            size={56}
+        {/* Avatar block - matching shorts card style */}
+        <div 
+          className="relative shrink-0 w-[56px] h-[56px] rounded-[14px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
+          style={{
+            boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
+          }}
+        >
+          <img
             src={golfer.avatar_url || '/placeholder.svg'}
             alt={golfer.display_name}
-            ringColor="#ffffff"
-            ringWidth={1.5}
+            className="w-full h-full object-cover"
           />
         </div>
 
