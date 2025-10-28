@@ -72,8 +72,8 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
       className="rounded-xl bg-white/5 backdrop-blur-md border border-white/10 text-white"
       aria-label={`${golfer.display_name}, ${golfer.home_club || 'No home club'}`}
     >
-      {/* Row 1: Header - Avatar + Name + Distance + Club */}
-      <div className="flex flex-row gap-3 p-3 pb-2">
+      {/* Row 1: Header - Avatar + Name + Distance */}
+      <div className="flex flex-row gap-3 p-3 pb-1">
         {/* Avatar block */}
         <div className="relative shrink-0">
           <img
@@ -85,10 +85,10 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
           <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 ring-2 ring-black" />
         </div>
 
-        {/* Name + Distance (same line) + Club (centered below) */}
+        {/* Name + Distance (same line) */}
         <div className="flex flex-col justify-center min-w-0 flex-1">
           {/* Name and Distance on same line */}
-          <div className="flex flex-row items-center justify-between gap-2 mb-0.5">
+          <div className="flex flex-row items-center justify-between gap-2">
             <div className="text-[15px] font-semibold leading-tight text-white truncate">
               {golfer.display_name}
             </div>
@@ -96,11 +96,13 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
               {golfer.distanceText || '0.2 mi'} away
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Force-render home club centered */}
-          <div className="text-[13px] leading-tight text-white/70 text-center truncate w-full">
-            {golfer.home_club || 'Sundridge Park Golf Club'}
-          </div>
+      {/* Row 1.5: Home Club - Centered across full width */}
+      <div className="px-3 pb-2">
+        <div className="text-[13px] leading-tight text-white/70 text-center truncate w-full">
+          {golfer.home_club || 'Sundridge Park Golf Club'}
         </div>
       </div>
 
