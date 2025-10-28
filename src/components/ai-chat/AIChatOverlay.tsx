@@ -645,20 +645,22 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       </div>
                     );
                   })}
-                   {isLoading && (
-                     <div className="flex items-end gap-2 mt-4">
-                       <div className="shrink-0 h-7 w-7 rounded-full grid place-items-center bg-white/06 backdrop-blur border border-white/08"></div>
-                       <div className="max-w-full flex-1">
-                         <div className="rounded-2xl rounded-bl-md bg-white/05 backdrop-blur border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2">
-                           <div className="flex items-center gap-1.5">
-                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
-                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce"></span>
-                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
-                           </div>
-                         </div>
-                       </div>
-                     </div>
-                    )}
+                    {isLoading && (
+                      <div className="flex items-end gap-2 mt-4">
+                        <div className="shrink-0">
+                          <EchoAvatar state="processing" size={28} />
+                        </div>
+                        <div className="max-w-full flex-1">
+                          <div className="rounded-2xl rounded-bl-md bg-white/05 backdrop-blur border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2">
+                            <div className="flex items-center gap-1.5">
+                              <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
+                              <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce"></span>
+                              <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                     )}
                          </div>
                        )}
 
