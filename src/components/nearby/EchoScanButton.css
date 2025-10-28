@@ -1,0 +1,127 @@
+/* EchoScan Button - Apple-level proximity detection interface */
+
+.echo-scan-button {
+  position: relative;
+  width: 72px;  /* 85% of 84px base size */
+  height: 72px;
+  border-radius: 22%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+  cursor: pointer;
+  
+  /* Dark gradient background */
+  background: radial-gradient(circle at center, #1a1a1a 0%, #000000 80%);
+  
+  /* Echo-blue outer stroke */
+  border: 1px solid rgba(75, 93, 255, 0.5);
+  
+  /* Subtle elevation */
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 1px rgba(75, 93, 255, 0.1);
+  
+  transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Prevent tap highlight on mobile */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Scan rings - concentric blue rings that pulse */
+.scan-ring {
+  position: absolute;
+  border-radius: inherit;
+  border: 1px solid rgba(75, 93, 255, 0.3);
+  pointer-events: none;
+  animation: scanPulse 3s ease-out infinite;
+}
+
+.scan-ring-1 {
+  inset: -4px;
+  animation-delay: 0s;
+}
+
+.scan-ring-2 {
+  inset: -8px;
+  animation-delay: 1s;
+}
+
+.scan-ring-3 {
+  inset: -12px;
+  animation-delay: 2s;
+}
+
+@keyframes scanPulse {
+  0% {
+    opacity: 0.2;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+
+/* Radar icon */
+.icon-radar {
+  width: 60%;
+  height: 60%;
+  color: #CFE2FF;
+  filter: drop-shadow(0 2px 4px rgba(75, 93, 255, 0.3));
+  pointer-events: none;
+  position: relative;
+  z-index: 1;
+}
+
+/* Hover / Active States */
+.echo-scan-button:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(75, 93, 255, 0.15);
+  border-color: rgba(75, 93, 255, 0.6);
+}
+
+.echo-scan-button:active {
+  transform: translateY(0) scale(0.96);
+  transition: all 0.08s ease;
+}
+
+/* Brighten scan rings on tap */
+.echo-scan-button:active .scan-ring {
+  border-color: rgba(75, 93, 255, 0.5);
+}
+
+/* Accessibility */
+.echo-scan-button:focus-visible {
+  outline: 2px solid rgba(75, 93, 255, 0.8);
+  outline-offset: 4px;
+}
+
+/* Optional dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .echo-scan-button {
+    background: radial-gradient(circle at center, #0f0f0f 0%, #000000 90%);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .echo-scan-button {
+    transition: none;
+  }
+  
+  .echo-scan-button:hover {
+    transform: none;
+  }
+  
+  .scan-ring {
+    animation: none;
+    opacity: 0.1;
+  }
+}
