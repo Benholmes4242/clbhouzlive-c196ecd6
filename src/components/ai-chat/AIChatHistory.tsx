@@ -171,7 +171,7 @@ interface AIChatHistoryProps {
       className={cn(
         "group relative block overflow-hidden rounded-2xl bg-white/06 backdrop-blur border border-white/08 hover:border-white/12",
         "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] active:translate-y-0 cursor-pointer shadow-[0_4px_16px_rgba(0,0,0,0.3)]",
-        "focus-visible:outline-none focus-within:ring-2 focus-within:ring-[#2A9D8F]/30",
+        "focus-visible:outline-none focus-within:ring-2 focus-within:ring-white/20",
         isExpanded && "shadow-lg"
       )}
       onClick={!isExpanded ? onToggleExpand : undefined}
@@ -242,7 +242,7 @@ interface AIChatHistoryProps {
                   onToggleExpand();
                 }}
                 aria-label="Collapse"
-                className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/08 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 text-white/80"
+                className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/08 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 text-white/80"
               >
                 <Minimize2 className="h-4 w-4" />
               </button>
@@ -254,7 +254,7 @@ interface AIChatHistoryProps {
                   }
                 }}
                 aria-label="Delete"
-                className="h-8 w-8 grid place-items-center rounded-full hover:bg-red-900/20 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                className="h-8 w-8 grid place-items-center rounded-full hover:bg-red-900/20 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
               >
                 <Trash2 className="h-4 w-4 text-red-400" />
               </button>
@@ -388,7 +388,7 @@ const ErrorState: React.FC<{
     </div>
     <button
       onClick={onRetry}
-      className="mt-2 h-10 px-5 rounded-full bg-white/08 border border-white/12 text-white font-medium hover:bg-white/12 hover:border-white/20 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+      className="mt-2 h-10 px-5 rounded-full bg-white/08 border border-white/12 text-white font-medium hover:bg-white/12 hover:border-white/20 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
     >
       Retry
     </button>
@@ -725,7 +725,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
                   {/* Filter button (UI placeholder) */}
                   <button
-                    className="h-11 px-4 rounded-xl bg-white/06 backdrop-blur border border-white/12 hover:bg-white/08 hover:border-white/20 text-[14px] font-medium text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 flex items-center gap-1.5"
+                    className="h-11 px-4 rounded-xl bg-white/06 backdrop-blur border border-white/12 hover:bg-white/08 hover:border-white/20 text-[14px] font-medium text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 flex items-center gap-1.5"
                     aria-label="Open filters"
                   >
                     <Filter className="h-4 w-4 text-white/60" />
@@ -739,10 +739,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     type="button"
                     onClick={() => setActiveTab('chat')}
                     className={cn(
-                      "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+                      "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40",
                       activeTab === 'chat' 
-                        ? "bg-white/12 text-white shadow-[0_0_12px_rgba(42,157,143,0.3)]" 
-                        : "text-white/60 hover:bg-white/08"
+                        ? "bg-white/05 text-white shadow-[0_0_16px_rgba(255,255,255,0.18)] ring-1 ring-inset ring-white/20" 
+                        : "text-white/60 hover:bg-white/05 hover:ring-1 hover:ring-inset hover:ring-white/10"
                     )}
                   >
                     Chat {filteredConversations.length > 0 && <span className="ml-1 opacity-70">({filteredConversations.length})</span>}
@@ -751,10 +751,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     type="button"
                     onClick={() => setActiveTab('swing')}
                     className={cn(
-                      "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40",
+                      "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40",
                       activeTab === 'swing' 
-                        ? "bg-white/12 text-white shadow-[0_0_12px_rgba(42,157,143,0.3)]" 
-                        : "text-white/60 hover:bg-white/08"
+                        ? "bg-white/05 text-white shadow-[0_0_16px_rgba(255,255,255,0.18)] ring-1 ring-inset ring-white/20" 
+                        : "text-white/60 hover:bg-white/05 hover:ring-1 hover:ring-inset hover:ring-white/10"
                     )}
                   >
                     Swing {filteredSwingAnalyses.length > 0 && <span className="ml-1 opacity-70">({filteredSwingAnalyses.length})</span>}
@@ -809,17 +809,17 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     ) : filteredConversations.length === 0 ? (
                       searchQuery ? (
                         <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-10">
-                          <div className="rounded-2xl bg-white/80 backdrop-blur border border-black/10 text-center px-6 py-10">
-                            <div className="mx-auto mb-3 h-12 w-12 rounded-full grid place-items-center bg-white border border-black/10 shadow-sm text-gray-700">
+                          <div className="rounded-2xl bg-white/06 backdrop-blur border border-white/08 text-center px-6 py-10">
+                            <div className="mx-auto mb-3 h-12 w-12 rounded-full grid place-items-center bg-white/08 border border-white/12 shadow-sm text-white/60">
                               <Search className="h-6 w-6" />
                             </div>
-                            <div className="text-[17px] font-semibold text-gray-900">No matches</div>
-                            <div className="mt-1.5 text-[13px] text-gray-600/90">
+                            <div className="text-[17px] font-semibold text-white">No matches</div>
+                            <div className="mt-1.5 text-[13px] text-white/60">
                               Try a different search term or clear filters.
                             </div>
                             <div className="mt-4 flex items-center justify-center gap-2">
                               <button 
-                                className="h-10 px-4 rounded-full bg-white border border-black/10 hover:bg-gray-50 shadow-sm text-[14px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                                className="h-10 px-4 rounded-full bg-white/08 border border-white/12 hover:bg-white/12 hover:border-white/20 shadow-sm text-[14px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 text-white"
                                 onClick={() => setSearchQuery('')}
                               >
                                 Clear search
@@ -854,7 +854,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                  {last7Days.map((conversation) => (
                                    <article 
                                      key={conversation.id} 
-                                     className="group relative rounded-2xl bg-white/06 backdrop-blur border border-white/08 hover:border-white/12 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] active:translate-y-0 focus-within:ring-2 focus-within:ring-[#2A9D8F]/30 px-4 py-3 sm:px-5 sm:py-4 cursor-pointer shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+                                     className="group relative rounded-2xl bg-white/06 backdrop-blur border border-white/08 hover:border-white/12 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] active:translate-y-0 focus-within:ring-2 focus-within:ring-white/20 px-4 py-3 sm:px-5 sm:py-4 cursor-pointer shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
                                      onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
                                      role="button"
                                      tabIndex={0}
@@ -875,14 +875,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                            <h3 className="text-[17px] font-semibold text-white">
                                              {conversation.customTitle || conversation.title}
                                            </h3>
-                                           <button 
-                                             onClick={(e) => {
-                                               e.stopPropagation();
-                                               setExpandedCard(null);
-                                             }}
-                                             aria-label="Collapse" 
-                                             className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/08 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 text-white/80"
-                                           >
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpandedCard(null);
+                                }}
+                                aria-label="Collapse" 
+                                className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/08 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 text-white/80"
+                              >
                                              <ChevronUp className="h-4 w-4" />
                                            </button>
                                          </div>
@@ -910,8 +910,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                                  onClose();
                                                }
                                              }}
-                                             className="text-sm font-medium text-[#2A9D8F] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40 rounded"
-                                           >
+                                              className="text-sm font-medium text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
+                                            >
                                              Use this response
                                            </button>
                                          </div>
@@ -966,37 +966,97 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               </h3>
                               <div className="space-y-4 sm:space-y-5">
                                 {thisMonth.map((conversation) => (
-                                  <article 
-                                    key={conversation.id} 
-                                    className="group relative rounded-2xl bg-white/06 backdrop-blur border border-white/08 hover:border-white/12 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] active:translate-y-0 focus-within:ring-2 focus-within:ring-[#2A9D8F]/30 px-4 py-3 sm:px-5 sm:py-4 cursor-pointer shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
-                                    onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
-                                    role="button"
-                                    tabIndex={0}
-                                    aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
-                                  >
-                                    <div className="flex items-start gap-2">
-                                      <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-md text-[11px] font-medium bg-white/08 backdrop-blur border border-white/12 text-white/80">
-                                        Chat
-                                      </span>
-                                      <div className="min-w-0 flex-1">
-                                        <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-white">
-                                          {conversation.customTitle || conversation.title}
-                                        </div>
-                                        <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-white/60">
-                                          <span className="truncate">
-                                            {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
-                                          </span>
-                                          <span className="mx-1 h-1 w-1 rounded-full bg-white/20 shrink-0"></span>
-                                          <time className="shrink-0 text-white/40">{conversation.timestamp.toLocaleDateString()}</time>
-                                          <span className="hidden sm:inline text-white/40 shrink-0">• {conversation.messages.length} msgs</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    
-                                    {/* Hover affordance stripe */}
-                                    <div className="pointer-events-none absolute inset-x-0 -bottom-px h-8 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
-                                      <div className="mx-4 h-px bg-gradient-to-r from-transparent via-white/06 to-transparent"></div>
-                                    </div>
+                                   <article 
+                                     key={conversation.id} 
+                                     className="group relative rounded-2xl bg-white/06 backdrop-blur border border-white/08 hover:border-white/12 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] active:translate-y-0 focus-within:ring-2 focus-within:ring-white/20 px-4 py-3 sm:px-5 sm:py-4 cursor-pointer shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+                                     onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
+                                     role="button"
+                                     tabIndex={0}
+                                     aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
+                                     onKeyDown={(e) => {
+                                       if (e.key === 'Enter' || e.key === ' ') {
+                                         e.preventDefault();
+                                         if (!(expandedCard?.type === 'chat' && expandedCard?.id === conversation.id)) {
+                                           handleExpansion('chat', conversation.id);
+                                         }
+                                       }
+                                     }}
+                                   >
+                                     
+                                     {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? (
+                                       <>
+                                         <div className="flex justify-between items-center mb-3">
+                                           <h3 className="text-[17px] font-semibold text-white">
+                                             {conversation.customTitle || conversation.title}
+                                           </h3>
+                                           <button 
+                                             onClick={(e) => {
+                                               e.stopPropagation();
+                                               setExpandedCard(null);
+                                             }}
+                                             aria-label="Collapse" 
+                                             className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/08 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 text-white/80"
+                                           >
+                                             <ChevronUp className="h-4 w-4" />
+                                           </button>
+                                         </div>
+
+                                         <div className="space-y-3 max-h-80 overflow-y-auto">
+                                           {conversation.messages.map((message) => (
+                                             <div key={message.id} className="w-full">
+                                               <ChatMessage
+                                                 message={message}
+                                                 showActions={false}
+                                                 isFirstInGroup={false}
+                                                 showHeading={false}
+                                               />
+                                             </div>
+                                           ))}
+                                         </div>
+
+                                         <div className="mt-3 flex justify-end">
+                                           <button 
+                                             onClick={(e) => {
+                                               e.stopPropagation();
+                                               const lastUserMessage = conversation.messages.filter(m => m.type === 'user').pop();
+                                               if (lastUserMessage) {
+                                                 onSelectMessage(lastUserMessage.content);
+                                                 onClose();
+                                               }
+                                             }}
+                                             className="text-sm font-medium text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
+                                           >
+                                             Use this response
+                                           </button>
+                                         </div>
+                                       </>
+                                     ) : (
+                                       <>
+                                         <div className="flex items-start gap-2">
+                                           <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-md text-[11px] font-medium bg-white/08 backdrop-blur border border-white/12 text-white/80">
+                                             Chat
+                                           </span>
+                                           <div className="min-w-0 flex-1">
+                                             <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-white">
+                                               {conversation.customTitle || conversation.title}
+                                             </div>
+                                             <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-white/60">
+                                               <span className="truncate">
+                                                 {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
+                                               </span>
+                                               <span className="mx-1 h-1 w-1 rounded-full bg-white/20 shrink-0"></span>
+                                               <time className="shrink-0 text-white/40">{conversation.timestamp.toLocaleDateString()}</time>
+                                               <span className="hidden sm:inline text-white/40 shrink-0">• {conversation.messages.length} msgs</span>
+                                             </div>
+                                           </div>
+                                         </div>
+                                         
+                                         {/* Hover affordance stripe */}
+                                         <div className="pointer-events-none absolute inset-x-0 -bottom-px h-8 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
+                                           <div className="mx-4 h-px bg-gradient-to-r from-transparent via-white/06 to-transparent"></div>
+                                         </div>
+                                       </>
+                                     )}
                                    </article>
                                 ))}
                               </div>
@@ -1020,38 +1080,98 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               </h3>
                               <div className="space-y-4 sm:space-y-5">
                                 {older.map((conversation) => (
-                                  <article 
-                                    key={conversation.id} 
-                                    className="group relative rounded-2xl bg-white/06 backdrop-blur border border-white/08 hover:border-white/12 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] active:translate-y-0 focus-within:ring-2 focus-within:ring-[#2A9D8F]/30 px-4 py-3 sm:px-5 sm:py-4 cursor-pointer shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
-                                    onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
-                                    role="button"
-                                    tabIndex={0}
-                                    aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
-                                  >
-                                    <div className="flex items-start gap-2">
-                                      <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-md text-[11px] font-medium bg-white/08 backdrop-blur border border-white/12 text-white/80">
-                                        Chat
-                                      </span>
-                                      <div className="min-w-0 flex-1">
-                                        <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-white">
-                                          {conversation.customTitle || conversation.title}
-                                        </div>
-                                        <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-white/60">
-                                          <span className="truncate">
-                                            {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
-                                          </span>
-                                          <span className="mx-1 h-1 w-1 rounded-full bg-white/20 shrink-0"></span>
-                                          <time className="shrink-0 text-white/40">{conversation.timestamp.toLocaleDateString()}</time>
-                                          <span className="hidden sm:inline text-white/40 shrink-0">• {conversation.messages.length} msgs</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    
-                                    {/* Hover affordance stripe */}
-                                    <div className="pointer-events-none absolute inset-x-0 -bottom-px h-8 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
-                                      <div className="mx-4 h-px bg-gradient-to-r from-transparent via-white/06 to-transparent"></div>
-                                    </div>
-                                  </article>
+                                   <article 
+                                     key={conversation.id} 
+                                     className="group relative rounded-2xl bg-white/06 backdrop-blur border border-white/08 hover:border-white/12 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] active:translate-y-0 focus-within:ring-2 focus-within:ring-white/20 px-4 py-3 sm:px-5 sm:py-4 cursor-pointer shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+                                     onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
+                                     role="button"
+                                     tabIndex={0}
+                                     aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
+                                     onKeyDown={(e) => {
+                                       if (e.key === 'Enter' || e.key === ' ') {
+                                         e.preventDefault();
+                                         if (!(expandedCard?.type === 'chat' && expandedCard?.id === conversation.id)) {
+                                           handleExpansion('chat', conversation.id);
+                                         }
+                                       }
+                                     }}
+                                   >
+                                     
+                                     {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? (
+                                       <>
+                                         <div className="flex justify-between items-center mb-3">
+                                           <h3 className="text-[17px] font-semibold text-white">
+                                             {conversation.customTitle || conversation.title}
+                                           </h3>
+                                           <button 
+                                             onClick={(e) => {
+                                               e.stopPropagation();
+                                               setExpandedCard(null);
+                                             }}
+                                             aria-label="Collapse" 
+                                             className="h-8 w-8 grid place-items-center rounded-full hover:bg-white/08 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 text-white/80"
+                                           >
+                                             <ChevronUp className="h-4 w-4" />
+                                           </button>
+                                         </div>
+
+                                         <div className="space-y-3 max-h-80 overflow-y-auto">
+                                           {conversation.messages.map((message) => (
+                                             <div key={message.id} className="w-full">
+                                               <ChatMessage
+                                                 message={message}
+                                                 showActions={false}
+                                                 isFirstInGroup={false}
+                                                 showHeading={false}
+                                               />
+                                             </div>
+                                           ))}
+                                         </div>
+
+                                         <div className="mt-3 flex justify-end">
+                                           <button 
+                                             onClick={(e) => {
+                                               e.stopPropagation();
+                                               const lastUserMessage = conversation.messages.filter(m => m.type === 'user').pop();
+                                               if (lastUserMessage) {
+                                                 onSelectMessage(lastUserMessage.content);
+                                                 onClose();
+                                               }
+                                             }}
+                                             className="text-sm font-medium text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
+                                           >
+                                             Use this response
+                                           </button>
+                                         </div>
+                                       </>
+                                     ) : (
+                                       <>
+                                         <div className="flex items-start gap-2">
+                                           <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-md text-[11px] font-medium bg-white/08 backdrop-blur border border-white/12 text-white/80">
+                                             Chat
+                                           </span>
+                                           <div className="min-w-0 flex-1">
+                                             <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-white">
+                                               {conversation.customTitle || conversation.title}
+                                             </div>
+                                             <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-white/60">
+                                               <span className="truncate">
+                                                 {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
+                                               </span>
+                                               <span className="mx-1 h-1 w-1 rounded-full bg-white/20 shrink-0"></span>
+                                               <time className="shrink-0 text-white/40">{conversation.timestamp.toLocaleDateString()}</time>
+                                               <span className="hidden sm:inline text-white/40 shrink-0">• {conversation.messages.length} msgs</span>
+                                             </div>
+                                           </div>
+                                         </div>
+                                         
+                                         {/* Hover affordance stripe */}
+                                         <div className="pointer-events-none absolute inset-x-0 -bottom-px h-8 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
+                                           <div className="mx-4 h-px bg-gradient-to-r from-transparent via-white/06 to-transparent"></div>
+                                         </div>
+                                       </>
+                                     )}
+                                   </article>
                                 ))}
                               </div>
                             </div>

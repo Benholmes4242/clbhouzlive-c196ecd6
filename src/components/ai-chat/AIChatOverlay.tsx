@@ -482,7 +482,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 aria-label="Generating response"
               >
                 <div 
-                  className="h-full bg-gradient-to-r from-[#2A9D8F] via-[#79C4BD] to-[#2A9D8F]"
+                  className="h-full bg-gradient-to-r from-white/40 via-white/60 to-white/40"
                   style={{
                     backgroundSize: '200% 100%',
                     animation: 'shimmer 1.6s linear infinite'
@@ -532,8 +532,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   <TabsTrigger
                     value="chat"
                     className="flex-1 rounded-full px-4 text-[14px] font-medium 
-                               data-[state=active]:bg-white/12 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(42,157,143,0.3)]
-                               data-[state=inactive]:text-white/60 data-[state=inactive]:hover:bg-white/08
+                               data-[state=active]:bg-white/05 data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_rgba(255,255,255,0.18)] data-[state=active]:ring-1 data-[state=active]:ring-inset data-[state=active]:ring-white/20
+                               data-[state=inactive]:text-white/60 data-[state=inactive]:hover:bg-white/05 data-[state=inactive]:hover:ring-1 data-[state=inactive]:hover:ring-inset data-[state=inactive]:hover:ring-white/10
                                transition-all"
                   >
                     Chat
@@ -541,8 +541,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   <TabsTrigger
                     value="swing"
                     className="flex-1 rounded-full px-4 text-[14px] font-medium 
-                               data-[state=active]:bg-white/12 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(42,157,143,0.3)]
-                               data-[state=inactive]:text-white/60 data-[state=inactive]:hover:bg-white/08
+                               data-[state=active]:bg-white/05 data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_rgba(255,255,255,0.18)] data-[state=active]:ring-1 data-[state=active]:ring-inset data-[state=active]:ring-white/20
+                               data-[state=inactive]:text-white/60 data-[state=inactive]:hover:bg-white/05 data-[state=inactive]:hover:ring-1 data-[state=inactive]:hover:ring-inset data-[state=inactive]:hover:ring-white/10
                                transition-all"
                   >
                     Swing Coach
@@ -592,13 +592,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 <div>
                     {messages.length === 0 ? (
                       <div className="flex flex-col items-center justify-center text-center px-6 py-20 sm:py-28 space-y-6">
-                        <div className="h-20 w-20 rounded-3xl bg-white/80 backdrop-blur border border-black/10 shadow-sm grid place-items-center">
-                          <Bot className="h-9 w-9 text-[#9ED6C2]" />
+                        <div className="h-20 w-20 rounded-3xl bg-white/08 backdrop-blur border border-white/12 shadow-sm grid place-items-center">
+                          <Bot className="h-9 w-9 text-white/60" />
                         </div>
-                        <div className="text-[17px] font-semibold text-gray-900">
+                        <div className="text-[17px] font-semibold text-white">
                           Start a conversation with Echo
                         </div>
-                        <div className="text-[14px] text-gray-600 max-w-[280px]">
+                        <div className="text-[14px] text-white/60 max-w-[280px]">
                           Ask about your swing, your stats, or just chat golf — Echo's always here.
                         </div>
                       </div>
@@ -647,13 +647,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   })}
                    {isLoading && (
                      <div className="flex items-end gap-2 mt-4">
-                       <div className="shrink-0 h-7 w-7 rounded-full grid place-items-center bg-white/80 backdrop-blur border border-black/10"></div>
+                       <div className="shrink-0 h-7 w-7 rounded-full grid place-items-center bg-white/06 backdrop-blur border border-white/08"></div>
                        <div className="max-w-full flex-1">
-                         <div className="rounded-2xl rounded-bl-md bg-white/92 backdrop-blur border border-black/10 shadow-[0_10px_28px_rgba(0,0,0,0.08)] px-3 py-2">
+                         <div className="rounded-2xl rounded-bl-md bg-white/05 backdrop-blur border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2">
                            <div className="flex items-center gap-1.5">
-                             <span className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
-                             <span className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce"></span>
-                             <span className="h-1.5 w-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
+                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce"></span>
+                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
                            </div>
                          </div>
                        </div>
@@ -685,19 +685,19 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 {showScrollToBottom && (
                   <button
                     onClick={scrollToBottom}
-                    className="fixed md:absolute bottom-[88px] right-3 md:right-4 z-[2] h-10 px-3.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-[0_6px_20px_rgba(0,0,0,0.12)] text-[13px] text-gray-800 flex items-center gap-2 hover:shadow-md active:shadow-sm transition will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                    className="fixed md:absolute bottom-[88px] right-3 md:right-4 z-[2] h-10 px-3.5 rounded-full bg-white/08 backdrop-blur border border-white/12 shadow-[0_6px_20px_rgba(0,0,0,0.6)] text-[13px] text-white flex items-center gap-2 hover:bg-white/12 hover:border-white/20 active:shadow-sm transition will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                     aria-label="Jump to latest"
                     type="button"
                     data-visible="true"
                   >
                     {/* Down chevron icon */}
-                    <span className="inline-block h-4 w-4 rounded-full grid place-items-center bg-black/5">
+                    <span className="inline-block h-4 w-4 rounded-full grid place-items-center bg-white/08">
                       <ChevronDown className="h-3 w-3" />
                     </span>
                     <span>Newer messages</span>
                     {/* Optional unread count badge */}
                     {newMessageCount > 0 && (
-                      <span className="ml-0.5 rounded-full bg-[#2A9D8F]/10 text-[#2A9D8F] px-2 py-0.5 text-[11px] font-medium">
+                      <span className="ml-0.5 rounded-full bg-white/20 text-white px-2 py-0.5 text-[11px] font-medium">
                         {newMessageCount}
                       </span>
                     )}
@@ -741,8 +741,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         >
             {/* Upload progress bar (shown during processing) */}
             {(isLoading || isProcessing) && (
-              <div className="absolute left-0 right-0 top-0 h-[2px] bg-[#2A9D8F]/20 overflow-hidden">
-                <div className="h-full bg-[#2A9D8F] animate-[shimmer_1.6s_linear_infinite] w-1/3" />
+              <div className="absolute left-0 right-0 top-0 h-[2px] bg-white/20 overflow-hidden">
+                <div className="h-full bg-white/60 animate-[shimmer_1.6s_linear_infinite] w-1/3" />
               </div>
             )}
             
@@ -759,37 +759,37 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     data-open="false"
                     id="attachmentsTray"
                   >
-                    <div className="rounded-2xl border border-black/10 bg-white/90 backdrop-blur px-3 py-2.5 grid grid-cols-3 gap-2">
+                    <div className="rounded-2xl border border-white/12 bg-white/05 backdrop-blur px-3 py-2.5 grid grid-cols-3 gap-2">
                       {/* Photo tile */}
                       <button 
-                        className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        className="h-20 rounded-xl bg-white/05 border border-white/12 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                         aria-label="Photo"
                         type="button"
                       >
-                        <Camera className="h-5 w-5 text-gray-700" />
-                        <span className="text-[11px] text-gray-600">Photo</span>
+                        <Camera className="h-5 w-5 text-white/80" />
+                        <span className="text-[11px] text-white/60">Photo</span>
                       </button>
                       
                       {/* File tile */}
                       <button 
-                        className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        className="h-20 rounded-xl bg-white/05 border border-white/12 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                         aria-label="File"
                         type="button"
                       >
-                        <Paperclip className="h-5 w-5 text-gray-700" />
-                        <span className="text-[11px] text-gray-600">File</span>
+                        <Paperclip className="h-5 w-5 text-white/80" />
+                        <span className="text-[11px] text-white/60">File</span>
                       </button>
                       
                       {/* Link tile */}
                       <button 
-                        className="h-20 rounded-xl bg-white border border-black/10 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/40"
+                        className="h-20 rounded-xl bg-white/05 border border-white/12 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                         aria-label="Link"
                         type="button"
                       >
-                        <svg className="h-5 w-5 text-gray-700" viewBox="0 0 20 20" fill="currentColor">
+                        <svg className="h-5 w-5 text-white/80" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd" />
                         </svg>
-                        <span className="text-[11px] text-gray-600">Link</span>
+                        <span className="text-[11px] text-white/60">Link</span>
                       </button>
                     </div>
                   </div>
@@ -798,9 +798,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   <div 
                     className={cn(
                       "group/input rounded-[24px] px-4 py-3",
-                      "bg-white/80 backdrop-blur-md border border-transparent",
-                      "[background-clip:padding-box] shadow-[0_6px_24px_rgba(0,0,0,0.06)]",
-                      "ring-1 ring-inset ring-emerald-400/50",
+                      "bg-white/05 backdrop-blur-md border border-white/12",
+                      "[background-clip:padding-box] shadow-[0_8px_24px_rgba(0,0,0,0.6)]",
+                      "ring-1 ring-inset ring-white/20 focus-within:ring-white/40 focus-within:bg-white/08",
                       "active:scale-[0.99] transition",
                       "grid grid-cols-[auto,1fr,auto] items-center gap-2 min-h-[56px]"
                     )}
@@ -808,13 +808,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     {/* Left tools */}
                     <div className="flex items-center gap-1.5">
                       {isRecording ? (
-                        <div className="h-7 px-2.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-700 text-[12px] inline-flex items-center gap-1.5">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                        <div className="h-7 px-2.5 rounded-full bg-red-900/20 border border-red-500/30 text-red-400 text-[12px] inline-flex items-center gap-1.5">
+                          <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse"></span>
                           Recording…
                         </div>
                       ) : isProcessing ? (
-                        <div className="h-7 px-2.5 rounded-full bg-black/5 border border-black/10 text-[12px] text-gray-700 inline-flex items-center gap-1.5">
-                          <span className="h-3 w-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></span>
+                        <div className="h-7 px-2.5 rounded-full bg-white/05 border border-white/12 text-[12px] text-white/80 inline-flex items-center gap-1.5">
+                          <span className="h-3 w-3 border-2 border-white/60 border-t-transparent rounded-full animate-spin"></span>
                           Processing…
                         </div>
                       ) : (
@@ -822,21 +822,21 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           <button
                             type="button"
                             aria-label="Attach"
-                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-emerald-500/10 active:bg-emerald-500/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60"
+                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-white/08 active:bg-white/12 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                           >
-                            <Paperclip className="h-[18px] w-[18px] text-emerald-700/80" />
+                            <Paperclip className="h-[18px] w-[18px] text-white/60" />
                           </button>
                           <button
                             type="button"
                             aria-label="Voice"
-                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-emerald-500/10 active:bg-emerald-500/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60"
+                            className="h-9 w-9 grid place-items-center rounded-full hover:bg-white/08 active:bg-white/12 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                             onMouseDown={!isProcessing ? startRecording : undefined}
                             onMouseUp={!isProcessing ? stopRecording : undefined}
                             onMouseLeave={!isProcessing ? stopRecording : undefined}
                             onTouchStart={!isProcessing ? startRecording : undefined}
                             onTouchEnd={!isProcessing ? stopRecording : undefined}
                           >
-                            <Mic className="h-[18px] w-[18px] text-emerald-700/80" />
+                            <Mic className="h-[18px] w-[18px] text-white/60" />
                           </button>
                         </>
                       )}
@@ -861,7 +861,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         autoCapitalize="sentences"
                         rows={1}
                         className="w-full bg-transparent outline-none text-[15px] leading-[1.4] 
-                                   placeholder:text-emerald-900/50 text-emerald-950 font-medium 
+                                   placeholder:text-white/40 text-white font-medium 
                                    resize-none focus-visible:outline-none"
                       />
                     </div>
@@ -875,9 +875,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           aria-label="Send"
                           disabled={isLoading || isProcessing}
                           className={cn(
-                            "h-10 px-4 rounded-full bg-emerald-600 text-white shadow hover:shadow-md hover:bg-emerald-700 active:bg-emerald-800 transition",
-                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60",
-                            "disabled:opacity-60 disabled:cursor-not-allowed"
+                            "h-10 px-4 rounded-full bg-white text-black shadow-[0_8px_24px_rgba(0,0,0,0.8)] border border-white hover:bg-white/90 active:scale-[0.98] transition",
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40",
+                            "disabled:opacity-60 disabled:cursor-not-allowed font-medium"
                           )}
                         >
                           {isLoading || isProcessing ? (
