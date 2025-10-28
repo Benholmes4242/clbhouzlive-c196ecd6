@@ -36,12 +36,12 @@ export default function EchoScanButton({
         strokeLinejoin="round"
         aria-hidden="true"
       >
-        {/* Outer ring */}
-        <circle cx="11" cy="11" r="8" />
-        {/* Inner magnifying glass circle */}
-        <circle cx="11" cy="11" r="5" />
-        {/* Handle */}
-        <path d="m21 21-4.35-4.35" />
+        {/* Magnifying glass lens */}
+        <circle cx="11" cy="11" r="6" />
+        {/* Outer ring wrapping around magnifying glass (arc with gap for handle) */}
+        <path d="M 4.5 15.5 A 10 10 0 1 1 15.5 4.5" />
+        {/* Handle extending from the gap */}
+        <line x1="15.5" y1="15.5" x2="21" y2="21" />
       </svg>
     </div>
   );
