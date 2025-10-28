@@ -88,7 +88,7 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
         {/* Name + Distance (same line) + Club (centered below) */}
         <div className="flex flex-col justify-center min-w-0 flex-1">
           {/* Name and Distance on same line */}
-          <div className="flex flex-row items-center justify-between gap-2 mb-0.5">
+          <div className="flex flex-row items-baseline justify-between gap-2 mb-0.5">
             <div className="text-[15px] font-semibold leading-tight text-white truncate">
               {golfer.display_name}
             </div>
@@ -97,8 +97,8 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
             </div>
           </div>
 
-          {/* Force-render home club centered */}
-          <div className="text-[13px] leading-tight text-white/70 text-center truncate">
+          {/* Force-render home club centered under name */}
+          <div className="text-[13px] leading-tight text-white/70 truncate self-center">
             {golfer.home_club || 'Sundridge Park Golf Club'}
           </div>
         </div>
