@@ -81,8 +81,6 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
             alt={golfer.display_name}
             className="h-14 w-14 rounded-full object-cover"
           />
-          {/* Force-render online dot for visual QA */}
-          <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 ring-2 ring-black" />
         </div>
 
         {/* Name + Club + Distance */}

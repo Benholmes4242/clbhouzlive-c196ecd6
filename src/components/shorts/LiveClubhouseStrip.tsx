@@ -31,8 +31,8 @@ export function LiveClubhouseStrip() {
   const [scrolling, setScrolling] = useState(false);
   const [nearbyOverlayOpen, setNearbyOverlayOpen] = useState(false);
   
-  // Filter for nearby online golfers only (real users, not mock)
-  const nearbyOnlineGolfers = golfers.filter(g => !g.isMock && g.is_online);
+  // Filter for nearby golfers (real users, not mock)
+  const nearbyOnlineGolfers = golfers.filter(g => !g.isMock);
 
   useEffect(() => {
     const el = rowRef.current;
@@ -87,7 +87,7 @@ export function LiveClubhouseStrip() {
                 display_name: golfer.display_name,
                 profile_photo_url: golfer.avatar_url || null,
                 home_club: golfer.home_club || null,
-                is_online: true, // Already filtered for online
+                is_online: false,
                 has_recent_post: false,
                 isMock: false,
               }} 
@@ -184,9 +184,6 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
           ringColor="#ffffff"
           ringWidth={1.5}
         />
-        {creator.is_online && (
-          <span className="lc-dot" aria-hidden="true" />
-        )}
       </button>
 
       <div className="lc-name" title={creator.display_name}>

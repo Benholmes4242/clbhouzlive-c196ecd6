@@ -144,32 +144,33 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
     staleTime: 15_000,
   });
 
-  useEffect(() => {
-    if (realProfiles.length === 0) return;
+  // Presence tracking disabled - no longer tracking online status
+  // useEffect(() => {
+  //   if (realProfiles.length === 0) return;
 
-    const channelName = 'presence:creators_online';
-    const channel = channelManager.createChannel(channelName);
+  //   const channelName = 'presence:creators_online';
+  //   const channel = channelManager.createChannel(channelName);
 
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
-        const onlineIds = new Set<string>();
-        Object.values(state).forEach((presences: any) => {
-          presences.forEach((p: any) => {
-            if (p.user_id) onlineIds.add(p.user_id);
-          });
-        });
-        setOnlineUserIds(onlineIds);
-      })
-      .subscribe();
+  //   channel
+  //     .on('presence', { event: 'sync' }, () => {
+  //       const state = channel.presenceState();
+  //       const onlineIds = new Set<string>();
+  //       Object.values(state).forEach((presences: any) => {
+  //         presences.forEach((p: any) => {
+  //           if (p.user_id) onlineIds.add(p.user_id);
+  //         });
+  //       });
+  //       setOnlineUserIds(onlineIds);
+  //     })
+  //     .subscribe();
 
-    return () => channelManager.removeChannel(channelName);
-  }, [realProfiles.length]);
+  //   return () => channelManager.removeChannel(channelName);
+  // }, [realProfiles.length]);
 
   const golfers = useMemo<ActiveGolfer[]>(() => {
     const realWithOnline: ActiveGolfer[] = realProfiles.map(p => ({
       ...p,
-      is_online: onlineUserIds.has(p.id),
+      is_online: false, // No longer tracking online status
       isMock: false,
     }));
 
@@ -200,7 +201,7 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
   }, [realProfiles, mockCount, onlineUserIds]);
 
   const realOnlineCount = useMemo(() => {
-    return golfers.filter(g => !g.isMock && g.is_online).length;
+    return golfers.filter(g => !g.isMock).length; // Count all real golfers, not just online
   }, [golfers]);
 
   return { golfers, realOnlineCount, isLoading };
