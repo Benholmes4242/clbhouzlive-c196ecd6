@@ -47,8 +47,8 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
           >
             {golfer.is_online && !golfer.isMock && (
               <span
-                className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-neutral-900"
-                style={{ background: '#6e9277' }}
+                className="absolute bottom-0 right-0 rounded-full border-2 border-neutral-900"
+                style={{ background: '#6e9277', width: '14px', height: '14px' }}
                 aria-label="Online"
               />
             )}
