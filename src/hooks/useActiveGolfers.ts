@@ -175,10 +175,11 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
 
     const mockProfiles: ActiveGolfer[] = getMockNearby(mockCount).map(m => ({
       ...m,
-      is_online: false,
+      distanceText: m.distance_km ? `${m.distance_km.toFixed(1)}km` : undefined,
+      is_online: m.is_online,
       isMock: true,
-      isOpenToPlay: false,
-      sameHomeClub: false,
+      isOpenToPlay: m.isOpenToPlay || false,
+      sameHomeClub: m.same_club || false,
     }));
 
     const blended: ActiveGolfer[] = [];
