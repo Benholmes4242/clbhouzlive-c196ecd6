@@ -118,13 +118,22 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           </header>
 
           {/* Row B: Glass tiles (Visibility + Open to Play) */}
-          <div className="flex gap-3 px-4 py-2">
+          <div className="flex gap-3 px-4 py-4">
             {/* Visibility tile */}
             <button
               onClick={cycleVisibility}
               disabled={visibilityLoading}
               className="relative flex-1 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 px-3 py-3 flex flex-row items-center gap-3 min-h-[72px] active:bg-white/10 active:border-white/20 transition-colors"
             >
+              {/* Accent bar at top - based on visibility mode */}
+              {visibilityMode === 'all' && (
+                <div className="absolute inset-x-0 top-0 h-[2px] rounded-t-xl bg-white/40" />
+              )}
+              {visibilityMode === 'friends' && (
+                <div className="absolute inset-x-0 top-0 h-[2px] rounded-t-xl bg-white/25" />
+              )}
+              {/* Hidden = no bar */}
+
               {/* Icon bubble */}
               <div 
                 className={`h-9 w-9 rounded-lg flex items-center justify-center text-[14px] font-medium shadow-[0_16px_32px_rgba(0,0,0,0.8)] ${
@@ -158,6 +167,11 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               onClick={handleOpenToPlayToggle}
               className="relative flex-1 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 px-3 py-3 flex flex-row items-center gap-3 min-h-[72px] active:bg-white/10 active:border-white/20 transition-colors"
             >
+              {/* Accent bar at top - green when active */}
+              {isOpenToPlay && (
+                <div className="absolute inset-x-0 top-0 h-[2px] rounded-t-xl bg-green-500/60" />
+              )}
+
               {/* Icon bubble */}
               <div 
                 className={`h-9 w-9 rounded-lg flex items-center justify-center text-[14px] font-medium shadow-[0_16px_32px_rgba(0,0,0,0.8)] ${

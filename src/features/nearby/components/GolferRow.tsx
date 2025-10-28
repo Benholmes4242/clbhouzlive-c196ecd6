@@ -94,40 +94,32 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
             <div className="text-[15px] font-semibold leading-tight text-white truncate">
               {golfer.display_name}
             </div>
-            {golfer.distanceText && (
-              <div className="text-[12px] leading-tight text-white/60 whitespace-nowrap">
-                {golfer.distanceText} away
-              </div>
-            )}
+            <div className="text-[12px] leading-tight text-white/60 whitespace-nowrap">
+              {golfer.distanceText || '0.2 mi'} away
+            </div>
           </div>
 
-          {golfer.home_club && (
-            <div className="text-[13px] leading-tight text-white/70 truncate">
-              {golfer.home_club}
-            </div>
-          )}
+          {/* Force-render home club with placeholder for visual QA */}
+          <div className="text-[13px] leading-tight text-white/70 truncate">
+            {golfer.home_club || 'Sundridge Park Golf Club'}
+          </div>
         </div>
       </div>
 
-      {/* Row 2: Pills (conditional) */}
-      {(golfer.sameHomeClub || golfer.isOpenToPlay) && (
-        <div className="px-3 pb-3">
-          <div className="flex flex-row items-center justify-center gap-2">
-            {golfer.sameHomeClub && (
-              <span className="px-2 py-1 rounded-full text-[12px] font-medium bg-white/10 text-white/80 border border-white/20 flex items-center gap-1">
-                <span className="inline-block">🏠</span>
-                <span>Same home club</span>
-              </span>
-            )}
+      {/* Row 2: Pills centered under home club */}
+      <div className="px-3 pb-3">
+        {/* Pills row - Force-render BOTH pills for visual QA, centered */}
+        <div className="flex flex-row items-center justify-center gap-2">
+          <span className="px-2 py-1 rounded-full text-[12px] font-medium bg-white/10 text-white/80 border border-white/20 flex items-center gap-1">
+            <span className="inline-block">🏠</span>
+            <span>Same home club</span>
+          </span>
 
-            {golfer.isOpenToPlay && (
-              <span className="px-2 py-1 rounded-full text-[12px] font-medium bg-green-500/15 text-green-400 border border-green-500/30">
-                🟢 Open to play
-              </span>
-            )}
-          </div>
+          <span className="px-2 py-1 rounded-full text-[12px] font-medium bg-green-500/15 text-green-400 border border-green-500/30">
+            🟢 Open to play
+          </span>
         </div>
-      )}
+      </div>
 
       {/* Row 3: Action Bar */}
       <div className="flex flex-row gap-2 border-t border-white/10 px-3 py-3">
