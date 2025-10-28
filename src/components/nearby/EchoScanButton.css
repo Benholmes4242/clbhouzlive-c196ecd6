@@ -11,16 +11,20 @@
   isolation: isolate;
   cursor: pointer;
   
-  /* Dark gradient background */
-  background: radial-gradient(circle at center, #1a1a1a 0%, #000000 80%);
+  /* Enhanced depth gradient */
+  background: radial-gradient(circle at 30% 30%, #111 0%, #000 80%);
   
-  /* Echo-blue outer stroke */
-  border: 1px solid rgba(75, 93, 255, 0.5);
+  /* Echo-blue outer stroke with increased visibility */
+  border: 1px solid rgba(75, 93, 255, 0.7);
   
-  /* Subtle elevation */
+  /* Enhanced depth and glow */
   box-shadow: 
+    0 0 12px rgba(75, 93, 255, 0.25),
     0 2px 8px rgba(0, 0, 0, 0.3),
-    inset 0 1px 1px rgba(75, 93, 255, 0.1);
+    inset 0 0 6px rgba(75, 93, 255, 0.3);
+  
+  /* Passive breathing glow animation */
+  animation: echoPulse 3s infinite ease-in-out;
   
   transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
   
@@ -28,12 +32,35 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Breathing glow animation */
+@keyframes echoPulse {
+  0% { 
+    box-shadow: 
+      0 0 10px rgba(75, 93, 255, 0.2),
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      inset 0 0 6px rgba(75, 93, 255, 0.25);
+  }
+  50% { 
+    box-shadow: 
+      0 0 16px rgba(75, 93, 255, 0.4),
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      inset 0 0 8px rgba(75, 93, 255, 0.4);
+  }
+  100% { 
+    box-shadow: 
+      0 0 10px rgba(75, 93, 255, 0.2),
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      inset 0 0 6px rgba(75, 93, 255, 0.25);
+  }
+}
+
 /* Scan rings - concentric blue rings that pulse */
 .scan-ring {
   position: absolute;
   border-radius: inherit;
-  border: 1px solid rgba(75, 93, 255, 0.3);
+  border: 2px solid rgba(75, 93, 255, 0.7);
   pointer-events: none;
+  filter: blur(2px);
   animation: scanPulse 3s ease-out infinite;
 }
 
@@ -54,16 +81,16 @@
 
 @keyframes scanPulse {
   0% {
-    opacity: 0.2;
+    opacity: 0.3;
     transform: scale(0.95);
   }
   50% {
-    opacity: 0.1;
+    opacity: 0.15;
     transform: scale(1);
   }
   100% {
     opacity: 0;
-    transform: scale(1.05);
+    transform: scale(1.1);
   }
 }
 
@@ -82,9 +109,10 @@
 .echo-scan-button:hover {
   transform: translateY(-1px) scale(1.02);
   box-shadow: 
+    0 0 18px rgba(75, 93, 255, 0.5),
     0 4px 12px rgba(0, 0, 0, 0.4),
-    inset 0 1px 1px rgba(75, 93, 255, 0.15);
-  border-color: rgba(75, 93, 255, 0.6);
+    inset 0 0 10px rgba(75, 93, 255, 0.4);
+  border-color: rgba(75, 93, 255, 0.8);
 }
 
 .echo-scan-button:active {
@@ -94,7 +122,7 @@
 
 /* Brighten scan rings on tap */
 .echo-scan-button:active .scan-ring {
-  border-color: rgba(75, 93, 255, 0.5);
+  border-color: rgba(75, 93, 255, 0.9);
 }
 
 /* Accessibility */
@@ -114,6 +142,7 @@
 @media (prefers-reduced-motion: reduce) {
   .echo-scan-button {
     transition: none;
+    animation: none;
   }
   
   .echo-scan-button:hover {
@@ -122,6 +151,6 @@
   
   .scan-ring {
     animation: none;
-    opacity: 0.1;
+    opacity: 0.15;
   }
 }
