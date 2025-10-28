@@ -117,78 +117,86 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             </div>
           </header>
 
-          {/* Row B: 2-card grid (Visibility + Open to Play) */}
-          <div className="grid grid-cols-2 gap-3 px-4 py-4">
-            {/* Visibility card */}
+          {/* Row B: Glass tiles (Visibility + Open to Play) */}
+          <div className="flex gap-3 px-4 py-4">
+            {/* Visibility tile */}
             <button
               onClick={cycleVisibility}
               disabled={visibilityLoading}
-              className="flex flex-col items-center justify-center text-center rounded-xl px-3 py-4 transition-all duration-200 ease-in-out"
-              style={{
-                minHeight: '110px',
-                minWidth: 'calc(50% - 8px)',
-                backdropFilter: 'blur(10px)',
-                ...(visibilityMode === 'friends' || visibilityMode === 'all' 
-                  ? {
-                      background: 'radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.18) 0%, rgba(0, 0, 0, 0.35) 60%)',
-                      border: '1px solid rgba(255, 255, 255, 0.4)',
-                      boxShadow: '0 24px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(255, 255, 255, 0.28)',
-                    }
-                  : {
-                      background: 'radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.12) 0%, rgba(0, 0, 0, 0.3) 60%)',
-                      border: '1px solid rgba(255, 255, 255, 0.22)',
-                      boxShadow: '0 24px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(255, 255, 255, 0.07) inset',
-                    }
-                ),
-              }}
+              className="relative flex-1 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 px-3 py-3 flex flex-row items-center gap-3 min-h-[72px] active:bg-white/10 active:border-white/20 transition-colors"
             >
-              <div className="text-white/70 text-[15px] font-medium mb-1">
-                Visibility
+              {/* Accent bar at top - based on visibility mode */}
+              {visibilityMode === 'all' && (
+                <div className="absolute inset-x-0 top-0 h-[2px] rounded-t-xl bg-white/40" />
+              )}
+              {visibilityMode === 'friends' && (
+                <div className="absolute inset-x-0 top-0 h-[2px] rounded-t-xl bg-white/25" />
+              )}
+              {/* Hidden = no bar */}
+
+              {/* Icon bubble */}
+              <div 
+                className={`h-9 w-9 rounded-lg flex items-center justify-center text-[14px] font-medium shadow-[0_16px_32px_rgba(0,0,0,0.8)] ${
+                  visibilityMode === 'hidden'
+                    ? 'bg-white/5 border border-white/10 text-white/40'
+                    : 'bg-white/10 border border-white/20 text-white'
+                }`}
+              >
+                👁️
               </div>
-              <div className="text-white text-[17px] font-semibold mb-2 leading-tight">
-                {visibilityMode === 'all' && 'Visible to Everyone'}
-                {visibilityMode === 'friends' && 'Visible to Friends'}
-                {visibilityMode === 'hidden' && 'Hidden'}
-              </div>
-              <div className="text-white/60 text-[14px] leading-snug max-w-[220px]">
-                Choose your visibility to other golfers
+
+              {/* Text block */}
+              <div className="flex flex-col min-w-0 text-left">
+                <div className={`text-[13px] font-semibold leading-tight ${
+                  visibilityMode === 'hidden' ? 'text-white/70' : 'text-white'
+                }`}>
+                  Visibility
+                </div>
+                <div className={`text-[12px] leading-tight truncate ${
+                  visibilityMode === 'hidden' ? 'text-white/40' : 'text-white/70'
+                }`}>
+                  {visibilityMode === 'all' && 'Visible to Everyone'}
+                  {visibilityMode === 'friends' && 'Visible to Friends'}
+                  {visibilityMode === 'hidden' && 'Hidden'}
+                </div>
               </div>
             </button>
 
-            {/* Open to Play card */}
+            {/* Open to Play tile */}
             <button
               onClick={handleOpenToPlayToggle}
-              className="flex flex-col items-center justify-center text-center rounded-xl px-3 py-4 transition-all duration-200 ease-in-out"
-              style={{
-                minHeight: '110px',
-                minWidth: 'calc(50% - 8px)',
-                backdropFilter: 'blur(10px)',
-                ...(isOpenToPlay
-                  ? {
-                      background: 'radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.18) 0%, rgba(0, 0, 0, 0.35) 60%)',
-                      border: '1px solid rgba(255, 255, 255, 0.4)',
-                      boxShadow: '0 24px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(255, 255, 255, 0.28)',
-                    }
-                  : {
-                      background: 'radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.12) 0%, rgba(0, 0, 0, 0.3) 60%)',
-                      border: '1px solid rgba(255, 255, 255, 0.22)',
-                      boxShadow: '0 24px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(255, 255, 255, 0.07) inset',
-                    }
-                ),
-              }}
+              className="relative flex-1 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 px-3 py-3 flex flex-row items-center gap-3 min-h-[72px] active:bg-white/10 active:border-white/20 transition-colors"
             >
-              <div className="text-white/70 text-[15px] font-medium mb-1">
-                Open to Play?
+              {/* Accent bar at top - green when active */}
+              {isOpenToPlay && (
+                <div className="absolute inset-x-0 top-0 h-[2px] rounded-t-xl bg-green-500/60" />
+              )}
+
+              {/* Icon bubble */}
+              <div 
+                className={`h-9 w-9 rounded-lg flex items-center justify-center text-[14px] font-medium shadow-[0_16px_32px_rgba(0,0,0,0.8)] ${
+                  isOpenToPlay
+                    ? 'bg-green-500/20 border border-green-500/40 text-green-400'
+                    : 'bg-white/10 border border-white/20 text-white'
+                }`}
+              >
+                🏌️‍♂️
               </div>
-              <div className="text-white text-[17px] font-semibold mb-2 leading-tight">
-                {isOpenToPlay
-                  ? `Active – ${remainingText}`
-                  : "Tap to ping golfers"}
-              </div>
-              <div className="text-white/60 text-[14px] leading-snug max-w-[220px]">
-                {isOpenToPlay
-                  ? 'Tap to stop'
-                  : "Tell golfers you're free to join up"}
+
+              {/* Text block */}
+              <div className="flex flex-col min-w-0 text-left">
+                <div className={`text-[13px] font-semibold leading-tight ${
+                  isOpenToPlay ? 'text-white' : 'text-white/80'
+                }`}>
+                  Open to Play
+                </div>
+                <div className={`text-[12px] leading-tight truncate ${
+                  isOpenToPlay ? 'text-white/70' : 'text-white/50'
+                }`}>
+                  {isOpenToPlay
+                    ? `${remainingText} remaining`
+                    : 'Tap to let golfers join up'}
+                </div>
               </div>
             </button>
           </div>
