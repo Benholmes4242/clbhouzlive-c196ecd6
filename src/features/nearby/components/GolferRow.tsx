@@ -69,90 +69,80 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
 
   return (
     <article
-      className="rounded-2xl px-4 py-3 bg-neutral-800/40 border border-neutral-700/50"
+      className="rounded-xl bg-white/5 backdrop-blur-md border border-white/10 text-white"
       aria-label={`${golfer.display_name}, ${golfer.home_club || 'No home club'}`}
     >
-      <div className="grid grid-cols-[56px_1fr] gap-3 items-center">
-        {/* Avatar - spans 3 rows */}
-        <div className="row-span-3 relative">
-          <AvatarSquircle
-            size={56}
+      {/* Row 1: Header - Avatar + Name + Club */}
+      <div className="flex flex-row gap-3 p-3 pb-2">
+        {/* Avatar block */}
+        <div className="relative shrink-0">
+          <img
             src={golfer.avatar_url || '/placeholder.svg'}
             alt={golfer.display_name}
-          >
-            {golfer.is_online && (
-              <div className="lc-dot" aria-label="Online" />
-            )}
-          </AvatarSquircle>
-        </div>
-
-        {/* Row 1: Name */}
-        <div className="flex items-center justify-between min-w-0 gap-2">
-          <h3 className="font-semibold text-[16px] truncate text-neutral-100">
-            {golfer.display_name}
-          </h3>
-        </div>
-
-        {/* Row 2: Distance + Club + Pills */}
-        <div className="flex flex-col gap-1 min-w-0">
-          {/* Distance and Home Club */}
-          <div className="flex items-center gap-2">
-            {golfer.distanceText && (
-              <span className="text-[13px] text-neutral-400">
-                {golfer.distanceText}
-              </span>
-            )}
-            {golfer.home_club && (
-              <p className="text-[13px] truncate text-neutral-400">
-                {golfer.home_club}
-              </p>
-            )}
-          </div>
-          
-          {/* Pills row */}
-          <div className="flex items-center gap-2 flex-wrap">
-            {golfer.isOpenToPlay && (
-              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/20">
-                <span className="text-[10px]">🟢</span>
-                <span className="text-xs font-medium text-green-500">Open to play</span>
-              </div>
-            )}
-            {golfer.sameHomeClub && (
-              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
-                <Home className="w-3 h-3 text-white/70" />
-                <span className="text-xs font-medium text-white/70">Same home club</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Row 3: Action buttons */}
-        <div className="flex items-center justify-end gap-2">
-          <button
-            onClick={handleFollow}
-            className="h-7 px-3 text-xs font-semibold rounded-md transition-colors bg-neutral-700 hover:bg-neutral-600 text-neutral-200"
-            aria-pressed={isFollowing}
-          >
-            {isFollowing ? 'Following' : 'Follow'}
-          </button>
-          
-          {golfer.isOpenToPlay ? (
-            <button
-              onClick={handlePing}
-              disabled={isSendingPing || golfer.isMock}
-              className="h-7 px-3 text-xs font-semibold rounded-md transition-colors bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSendingPing ? 'Sending...' : 'Ping'}
-            </button>
-          ) : (
-            <button
-              onClick={handleMessage}
-              className="h-7 px-3 text-xs font-semibold rounded-md transition-colors bg-neutral-700 hover:bg-neutral-600 text-neutral-200"
-            >
-              Message
-            </button>
+            className="h-14 w-14 rounded-full object-cover"
+          />
+          {golfer.is_online && !golfer.isMock && (
+            <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 ring-2 ring-black" />
           )}
         </div>
+
+        {/* Name + Club */}
+        <div className="flex flex-col justify-center min-w-0">
+          <div className="text-[15px] font-semibold leading-tight text-white truncate">
+            {golfer.display_name}
+          </div>
+
+          {golfer.home_club && (
+            <div className="text-[13px] leading-tight text-white/70 truncate">
+              {golfer.home_club}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Row 2: Meta / Status */}
+      <div className="px-3 pb-3">
+        {/* Pills row */}
+        <div className="flex flex-row flex-wrap items-center gap-2 mb-1">
+          {golfer.isOpenToPlay && !golfer.isMock && (
+            <span className="px-2 py-1 rounded-full text-[12px] font-medium bg-green-500/15 text-green-400 border border-green-500/30">
+              🟢 Open to play
+            </span>
+          )}
+
+          {golfer.sameHomeClub && (
+            <span className="px-2 py-1 rounded-full text-[12px] font-medium bg-white/10 text-white/80 border border-white/20 flex items-center gap-1">
+              <Home className="inline-block w-3 h-3" />
+              <span>Same home club</span>
+            </span>
+          )}
+        </div>
+
+        {/* Distance line */}
+        {golfer.distanceText && (
+          <div className="text-[12px] leading-tight text-white/50">
+            {golfer.distanceText} away
+          </div>
+        )}
+      </div>
+
+      {/* Row 3: Action Bar */}
+      <div className="flex flex-row gap-2 border-t border-white/10 px-3 py-3">
+        <button
+          onClick={handleFollow}
+          className="flex-1 rounded-lg border border-white/25 text-white text-[13px] font-medium py-2 hover:bg-white/5 transition-colors"
+          aria-pressed={isFollowing}
+        >
+          {isFollowing ? 'Following' : 'Follow'}
+        </button>
+
+        <button
+          onClick={handleMessage}
+          disabled={golfer.isMock}
+          className="flex-1 rounded-lg bg-white/10 text-white/90 text-[13px] font-medium py-2 hover:bg-white/15 transition-colors disabled:opacity-50"
+        >
+          Message
+        </button>
       </div>
     </article>
   );
