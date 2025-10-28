@@ -267,10 +267,11 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           isOpen={true}
           onClose={() => {
             setIsCreateGameOpen(false);
-            setActiveTab('games'); // Switch to Games tab after creating game
+            // Don't change activeTab - stay on current tab (likely 'games')
           }}
           onCreateBeacon={async (input) => {
             await createBeacon(input);
+            setIsCreateGameOpen(false);
             setActiveTab('games'); // Show Games tab to see "Your Game"
           }}
           onCancelBeacon={cancelBeacon}

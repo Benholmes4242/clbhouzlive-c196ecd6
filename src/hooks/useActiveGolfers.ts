@@ -18,6 +18,7 @@ export type ActiveGolfer = {
   distance_km?: number;
   distanceText?: string;
   isOpenToPlay?: boolean;
+  sameHomeClub?: boolean;
 };
 
 export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number; mockCount?: number } = {}) {
@@ -30,6 +31,13 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
+
+      // Get current user's home club
+      const { data: currentUserProfile } = await supabase
+        .from('user_profiles')
+        .select('home_club')
+        .eq('id', user.id)
+        .single();
 
       let userLat = currentLocation?.lat;
       let userLng = currentLocation?.lng;
@@ -112,6 +120,12 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
       // Shape final list
       const enriched = (profiles || []).map(p => {
         const match = candidates.find(c => c.user_id === p.id);
+        const sameHomeClub = !!(
+          p.home_club && 
+          currentUserProfile?.home_club && 
+          p.home_club.trim().toLowerCase() === currentUserProfile.home_club.trim().toLowerCase()
+        );
+        
         return {
           id: p.id,
           display_name: p.display_name || p.username || 'Anonymous',
@@ -121,6 +135,7 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
           distance_km: match ? match.distance_meters / 1000 : 0,
           distanceText: match ? formatDistance(match.distance_meters) : undefined,
           isOpenToPlay: match?.isOpenToPlay || false,
+          sameHomeClub,
         };
       });
 
@@ -163,6 +178,7 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
       is_online: false,
       isMock: true,
       isOpenToPlay: false,
+      sameHomeClub: false,
     }));
 
     const blended: ActiveGolfer[] = [];

@@ -2081,6 +2081,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_pings: {
+        Row: {
+          created_at: string
+          id: string
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           background_image_url: string | null
@@ -2540,6 +2561,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      send_user_ping: { Args: { p_recipient_id: string }; Returns: undefined }
       update_mobile_crop_data: {
         Args: {
           p_crop_height: number

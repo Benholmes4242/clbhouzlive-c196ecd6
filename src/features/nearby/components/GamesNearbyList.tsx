@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { MapPin, Users } from 'lucide-react';
 import { GameBeacon } from '../hooks/useGameBeacon';
 import { supabase } from '@/integrations/supabase/client';
+import { useActiveGolfers } from '@/hooks/useActiveGolfers';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 
 // Format game type for display
 function formatGameType(gameType: string): string {
@@ -37,8 +39,12 @@ export function GamesNearbyList({
   onCreateGame,
 }: GamesNearbyListProps) {
   const [hostProfiles, setHostProfiles] = useState<Record<string, HostProfile>>({});
+  const { golfers } = useActiveGolfers({ limit: 20, mockCount: 0 });
+  
+  // Filter for golfers who are OpenToPlay
+  const openToPlayGolfers = golfers.filter(g => !g.isMock && g.isOpenToPlay);
 
-  // Fetch host profiles
+  // Fetch host profiles for game beacons
   useEffect(() => {
     const fetchHostProfiles = async () => {
       const hostIds = [...new Set(beacons.map(b => b.host_user_id))];
@@ -76,7 +82,9 @@ export function GamesNearbyList({
     );
   }
 
-  if (beacons.length === 0) {
+  const hasGames = beacons.length > 0 || openToPlayGolfers.length > 0;
+
+  if (!hasGames) {
     return (
       <div className="py-12 text-center space-y-4">
         <MapPin className="w-12 h-12 mx-auto text-neutral-600" />
@@ -96,91 +104,167 @@ export function GamesNearbyList({
 
   return (
     <div className="space-y-3 pb-4">
-      {beacons.map(beacon => {
-        const host = hostProfiles[beacon.host_user_id];
-        const hostName = host?.display_name || host?.username || 'Golfer';
-        const hostAvatar = host?.profile_photo_url;
+      {/* OpenToPlay golfers section */}
+      {openToPlayGolfers.length > 0 && (
+        <>
+          <div className="text-xs font-medium text-white/50 px-2 pt-2">
+            Open to Play Now
+          </div>
+          {openToPlayGolfers.map((golfer) => (
+            <div
+              key={`open-${golfer.id}`}
+              className="rounded-2xl px-4 py-3 bg-neutral-800/40 border border-neutral-700/50"
+            >
+              <div className="flex items-start gap-3">
+                {/* Avatar */}
+                <div className="relative flex-shrink-0">
+                  <AvatarSquircle
+                    size={48}
+                    src={golfer.avatar_url || '/placeholder.svg'}
+                    alt={golfer.display_name}
+                  >
+                    {golfer.is_online && (
+                      <div className="lc-dot" aria-label="Online" />
+                    )}
+                  </AvatarSquircle>
+                </div>
 
-        return (
-          <div
-            key={beacon.id}
-            className="bg-neutral-800/40 rounded-xl p-4 border border-neutral-700/50 hover:border-neutral-600/50 transition-all"
-          >
-            <div className="flex items-start gap-4">
-              {/* Host Avatar */}
-              <div className="flex-shrink-0">
-                {hostAvatar ? (
-                  <img
-                    src={hostAvatar}
-                    alt={hostName}
-                    className="w-12 h-12 rounded-xl object-cover"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-xl bg-neutral-700 flex items-center justify-center">
-                    <Users className="w-6 h-6 text-neutral-400" />
+                {/* Content */}
+                <div className="flex-1 min-w-0 space-y-2">
+                  {/* Header */}
+                  <div>
+                    <h3 className="font-semibold text-[15px] text-white truncate">
+                      {golfer.display_name}
+                    </h3>
+                    {golfer.home_club && (
+                      <p className="text-xs text-white/60 truncate">
+                        {golfer.home_club}
+                      </p>
+                    )}
                   </div>
-                )}
-              </div>
 
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-3 mb-2">
+                  {/* Details */}
+                  <div className="flex items-center gap-3 text-xs text-white/70">
+                    <span className="inline-flex items-center gap-1">
+                      🟢 Open to play now
+                    </span>
+                    {golfer.distanceText && (
+                      <span>• {golfer.distanceText}</span>
+                    )}
+                  </div>
+
+                  {/* Action button */}
+                  <button
+                    onClick={() => {
+                      // TODO: Open message composer or invite flow
+                      console.log('Request to join:', golfer.id);
+                    }}
+                    className="w-full px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
+                  >
+                    Request to Join
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+
+      {/* Game beacons section */}
+      {beacons.length > 0 && (
+        <>
+          {openToPlayGolfers.length > 0 && (
+            <div className="text-xs font-medium text-white/50 px-2 pt-4">
+              Scheduled Games
+            </div>
+          )}
+          {beacons.map(beacon => {
+            const host = hostProfiles[beacon.host_user_id];
+            const hostName = host?.display_name || host?.username || 'Golfer';
+            const hostAvatar = host?.profile_photo_url;
+
+            return (
+              <div
+                key={beacon.id}
+                className="bg-neutral-800/40 rounded-xl p-4 border border-neutral-700/50 hover:border-neutral-600/50 transition-all"
+              >
+                <div className="flex items-start gap-4">
+                  {/* Host Avatar */}
+                  <div className="flex-shrink-0">
+                    {hostAvatar ? (
+                      <img
+                        src={hostAvatar}
+                        alt={hostName}
+                        className="w-12 h-12 rounded-xl object-cover"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-xl bg-neutral-700 flex items-center justify-center">
+                        <Users className="w-6 h-6 text-neutral-400" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-neutral-100 truncate">{hostName}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white/15 text-white text-xs font-medium backdrop-blur border border-white/22">
-                        {formatGameType(beacon.game_type)}
-                      </span>
-                      {beacon.distanceText && (
-                        <span className="text-xs text-neutral-400">
-                          {beacon.distanceText} away
-                        </span>
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-neutral-100 truncate">{hostName}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white/15 text-white text-xs font-medium backdrop-blur border border-white/22">
+                            {formatGameType(beacon.game_type)}
+                          </span>
+                          {beacon.distanceText && (
+                            <span className="text-xs text-neutral-400">
+                              {beacon.distanceText} away
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {beacon.course_name && (
+                      <p className="text-sm text-neutral-300 mb-1 flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-neutral-500" />
+                        {beacon.course_name}
+                      </p>
+                    )}
+
+                    {beacon.note && (
+                      <p className="text-sm text-neutral-400 mb-3 line-clamp-1">
+                        {beacon.note}
+                      </p>
+                    )}
+
+                    {/* CTA Button */}
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs text-neutral-500">
+                        {beacon.players_needed && (
+                          <span>Needs {beacon.players_needed} player{beacon.players_needed > 1 ? 's' : ''}</span>
+                        )}
+                      </div>
+                      {beacon.isHost ? (
+                        <button
+                          onClick={() => onCancelBeacon(beacon.id)}
+                          className="px-4 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg text-sm font-medium transition-colors"
+                        >
+                          Cancel Game
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => onJoinBeacon(beacon.id)}
+                          className="px-4 py-1.5 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-lg text-sm font-medium backdrop-blur border border-white/28 shadow-[0_16px_32px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.2)] active:shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.3)] transition-all"
+                        >
+                          I'm in
+                        </button>
                       )}
                     </div>
                   </div>
                 </div>
-
-                {beacon.course_name && (
-                  <p className="text-sm text-neutral-300 mb-1 flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-neutral-500" />
-                    {beacon.course_name}
-                  </p>
-                )}
-
-                {beacon.note && (
-                  <p className="text-sm text-neutral-400 mb-3 line-clamp-1">
-                    {beacon.note}
-                  </p>
-                )}
-
-                {/* CTA Button */}
-                <div className="flex items-center justify-between">
-                  <div className="text-xs text-neutral-500">
-                    {beacon.players_needed && (
-                      <span>Needs {beacon.players_needed} player{beacon.players_needed > 1 ? 's' : ''}</span>
-                    )}
-                  </div>
-                  {beacon.isHost ? (
-                    <button
-                      onClick={() => onCancelBeacon(beacon.id)}
-                      className="px-4 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg text-sm font-medium transition-colors"
-                    >
-                      Cancel Game
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => onJoinBeacon(beacon.id)}
-                      className="px-4 py-1.5 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-lg text-sm font-medium backdrop-blur border border-white/28 shadow-[0_16px_32px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.2)] active:shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.3)] transition-all"
-                    >
-                      I'm in
-                    </button>
-                  )}
-                </div>
               </div>
-            </div>
-          </div>
-        );
-      })}
+            );
+          })}
+        </>
+      )}
     </div>
   );
 }
