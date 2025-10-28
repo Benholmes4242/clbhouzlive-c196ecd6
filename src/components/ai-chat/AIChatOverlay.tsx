@@ -446,9 +446,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         ariaLabel="Echo AI chat interface"
         backdrop="blurred"
       >
-      {/* Panel shell - gradient background inside */}
+      {/* Panel shell - dark gradient background */}
       <div 
-        className="relative h-full bg-gradient-to-b from-white/70 to-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/50 flex flex-col"
+        className="relative h-full bg-gradient-to-b from-black via-[#0A0A0A] to-black backdrop-blur-xl flex flex-col"
         onWheel={(e) => {
           // Allow scrolling within the modal, but prevent it from bubbling up
           const target = e.currentTarget;
@@ -471,7 +471,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
       >
         {/* Header */}
         <header
-          className="sticky top-0 z-[2] border-b border-white/20 bg-gradient-to-b from-white/70 to-white/40 backdrop-blur-xl"
+          className="sticky top-0 z-[2] border-b border-white/08 bg-gradient-to-b from-black/95 to-black/60 backdrop-blur"
           data-echo-topbar
         >
             {/* Top progress bar when loading */}
@@ -498,17 +498,17 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   type="button"
                   aria-label="Close"
                   onClick={handleClose}
-                  className="h-9 w-9 grid place-items-center rounded-full hover:bg-black/5 active:bg-black/10 transition"
+                  className="h-9 w-9 grid place-items-center rounded-md hover:bg-white/08 transition"
                 >
-                  <X className="h-5 w-5 text-gray-700" />
+                  <X className="h-5 w-5 text-white/80" />
                 </button>
 
                 {/* Center: title/meta */}
                 <div className="min-w-0 text-center">
-                  <div className="truncate text-[17px] sm:text-[18px] font-semibold text-gray-900">
+                  <div className="truncate text-[17px] sm:text-[18px] font-semibold text-white">
                     Echo
                   </div>
-                  <div className="truncate text-[12px] sm:text-[13px] text-gray-600/90 leading-tight">
+                  <div className="truncate text-[12px] sm:text-[13px] text-white/60 leading-tight">
                     {isLoading ? "Echo is typing…" : "Chat • Private & secure"}
                   </div>
                 </div>
@@ -520,20 +520,20 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             </div>
             {/* hairline highlight */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/30"></div>
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/08"></div>
           </header>
 
           {/* Segmented Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
             {/* Tabs under header */}
-            <div className="sticky top-[56px] sm:top-[64px] z-[1] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm border-b border-white/10">
+            <div className="sticky top-[56px] sm:top-[64px] z-[1] bg-gradient-to-b from-black/60 to-transparent backdrop-blur-sm border-b border-white/08">
               <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-2">
-                <TabsList className="h-11 w-full rounded-full bg-white/85 backdrop-blur border border-white/30 shadow-sm flex p-1">
+                <TabsList className="h-11 w-full rounded-full bg-white/06 backdrop-blur border border-white/12 flex p-1">
                   <TabsTrigger
                     value="chat"
                     className="flex-1 rounded-full px-4 text-[14px] font-medium 
-                               data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
-                               data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-white/60
+                               data-[state=active]:bg-white/12 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(42,157,143,0.3)]
+                               data-[state=inactive]:text-white/60 data-[state=inactive]:hover:bg-white/08
                                transition-all"
                   >
                     Chat
@@ -541,8 +541,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   <TabsTrigger
                     value="swing"
                     className="flex-1 rounded-full px-4 text-[14px] font-medium 
-                               data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[state=active]:ring-1 data-[state=active]:ring-black/5
-                               data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-white/60
+                               data-[state=active]:bg-white/12 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(42,157,143,0.3)]
+                               data-[state=inactive]:text-white/60 data-[state=inactive]:hover:bg-white/08
                                transition-all"
                   >
                     Swing Coach
@@ -561,7 +561,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 onScroll={handleChatScroll}
               >
                 {/* Top fade - Phase 52 */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-white/60 to-transparent z-10" />
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-black/90 to-transparent z-10" />
                 {/* Bottom fade - Phase 52 */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white/60 to-transparent z-10" />
                 
