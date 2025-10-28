@@ -98,10 +98,8 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
           </div>
 
           {/* Force-render home club centered */}
-          <div className="flex justify-center w-full">
-            <div className="text-[13px] leading-tight text-white/70 truncate">
-              {golfer.home_club || 'Sundridge Park Golf Club'}
-            </div>
+          <div className="text-[13px] leading-tight text-white/70 text-center truncate w-full">
+            {golfer.home_club || 'Sundridge Park Golf Club'}
           </div>
         </div>
       </div>
