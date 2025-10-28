@@ -73,10 +73,8 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #4ade80;
-  box-shadow: 
-    0 0 0 2px rgba(0, 0, 0, 0.8),
-    0 0 8px rgba(0, 0, 0, 0.8);
+  background: #3CB371;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.8);
   z-index: 2;
 }
 

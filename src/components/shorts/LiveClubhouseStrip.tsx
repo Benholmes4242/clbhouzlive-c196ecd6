@@ -33,10 +33,6 @@ export function LiveClubhouseStrip() {
   
   // Filter for nearby online golfers only (real users, not mock)
   const nearbyOnlineGolfers = golfers.filter(g => !g.isMock && g.is_online);
-  
-  console.log('🔍 [LiveStrip] Total golfers:', golfers.length);
-  console.log('🔍 [LiveStrip] nearbyOnlineGolfers:', nearbyOnlineGolfers.map(g => ({ name: g.display_name, online: g.is_online, mock: g.isMock })));
-  console.log('🔍 [LiveStrip] realOnlineCount:', realOnlineCount);
 
   useEffect(() => {
     const el = rowRef.current;

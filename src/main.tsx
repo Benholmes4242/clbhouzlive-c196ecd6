@@ -8,16 +8,7 @@ import './styles/theme.css'
 import { initializePerformanceMonitoring } from './utils/performanceInit'
 import { initWebVitals, sendToAnalytics, initPerformanceObserver } from './analytics/webVitals'
 import './utils/echoDocNavHeight'
-import eruda from 'eruda'
 // Chunk recovery moved to index.html for earlier error handling
-
-// Initialize mobile console for debugging on physical devices
-// Access via ?debug=true in URL or automatically in dev mode
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('debug') === 'true' || import.meta.env.DEV) {
-  eruda.init();
-  console.log('📱 Mobile console enabled - tap the icon in bottom-right corner');
-}
 
 const container = document.getElementById("root");
 if (!container) {
