@@ -119,11 +119,11 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
       </div>
 
       <div className="lc-label">
-        <div className="lc-name" title="EchoScan">
-          EchoScan
+        <div className="lc-name" title="Active Golfers">
+          Active Golfers
         </div>
-        <div className="lc-sub">
-          Search for nearby golfers
+        <div className="lc-sub" style={count > 0 ? { color: 'rgba(74, 222, 128, 0.8)' } : undefined}>
+          {captionText}
         </div>
       </div>
     </div>

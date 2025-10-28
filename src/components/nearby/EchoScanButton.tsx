@@ -24,7 +24,7 @@ export default function EchoScanButton({
         }
       }}
     >
-      {/* EchoScan icon - unified ring that flows into handle */}
+      {/* Search icon - magnifying glass with outer ring */}
       <svg
         className="icon-search"
         xmlns="http://www.w3.org/2000/svg"
@@ -36,12 +36,12 @@ export default function EchoScanButton({
         strokeLinejoin="round"
         aria-hidden="true"
       >
-        {/* Inner circle (lens) */}
+        {/* Outer ring */}
+        <circle cx="11" cy="11" r="8" />
+        {/* Inner magnifying glass circle */}
         <circle cx="11" cy="11" r="5" />
-        {/* Outer arc that flows into handle - sweeps from bottom-left, around top, to bottom-right */}
-        <path d="M 6 16.5 A 8 8 0 1 1 16.5 16" />
-        {/* Handle extending from where the arc ends */}
-        <line x1="16.5" y1="16" x2="21" y2="20.5" />
+        {/* Handle */}
+        <path d="m21 21-4.35-4.35" />
       </svg>
     </div>
   );
