@@ -130,9 +130,9 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                 backdropFilter: 'blur(10px)',
                 ...(visibilityMode === 'friends' || visibilityMode === 'all' 
                   ? {
-                      background: 'radial-gradient(circle at 20% 20%, rgba(110, 200, 125, 0.18) 0%, rgba(0, 0, 0, 0.35) 60%)',
-                      border: '1px solid rgba(110, 200, 125, 0.4)',
-                      boxShadow: '0 24px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(110, 200, 125, 0.28)',
+                      background: 'radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.18) 0%, rgba(0, 0, 0, 0.35) 60%)',
+                      border: '1px solid rgba(255, 255, 255, 0.4)',
+                      boxShadow: '0 24px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(255, 255, 255, 0.28)',
                     }
                   : {
                       background: 'radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.12) 0%, rgba(0, 0, 0, 0.3) 60%)',
@@ -165,9 +165,9 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                 backdropFilter: 'blur(10px)',
                 ...(isOpenToPlay
                   ? {
-                      background: 'radial-gradient(circle at 20% 20%, rgba(110, 200, 125, 0.18) 0%, rgba(0, 0, 0, 0.35) 60%)',
-                      border: '1px solid rgba(110, 200, 125, 0.4)',
-                      boxShadow: '0 24px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(110, 200, 125, 0.28)',
+                      background: 'radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.18) 0%, rgba(0, 0, 0, 0.35) 60%)',
+                      border: '1px solid rgba(255, 255, 255, 0.4)',
+                      boxShadow: '0 24px 48px rgba(0, 0, 0, 0.9), 0 0 24px rgba(255, 255, 255, 0.28)',
                     }
                   : {
                       background: 'radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.12) 0%, rgba(0, 0, 0, 0.3) 60%)',
