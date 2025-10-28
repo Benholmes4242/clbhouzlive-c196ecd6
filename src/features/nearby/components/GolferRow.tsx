@@ -81,9 +81,8 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
             alt={golfer.display_name}
             className="h-14 w-14 rounded-full object-cover"
           />
-          {golfer.is_online && !golfer.isMock && (
-            <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 ring-2 ring-black" />
-          )}
+          {/* Force-render online dot for visual QA */}
+          <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 ring-2 ring-black" />
         </div>
 
         {/* Name + Club */}
@@ -92,38 +91,31 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
             {golfer.display_name}
           </div>
 
-          {golfer.home_club && (
-            <div className="text-[13px] leading-tight text-white/70 truncate">
-              {golfer.home_club}
-            </div>
-          )}
+          {/* Force-render home club with placeholder for visual QA */}
+          <div className="text-[13px] leading-tight text-white/70 truncate">
+            {golfer.home_club || 'Sundridge Park Golf Club'}
+          </div>
         </div>
       </div>
 
       {/* Row 2: Meta / Status */}
       <div className="px-3 pb-3">
-        {/* Pills row */}
+        {/* Pills row - Force-render BOTH pills for visual QA */}
         <div className="flex flex-row flex-wrap items-center gap-2 mb-1">
-          {golfer.isOpenToPlay && !golfer.isMock && (
-            <span className="px-2 py-1 rounded-full text-[12px] font-medium bg-green-500/15 text-green-400 border border-green-500/30">
-              🟢 Open to play
-            </span>
-          )}
+          <span className="px-2 py-1 rounded-full text-[12px] font-medium bg-green-500/15 text-green-400 border border-green-500/30">
+            🟢 Open to play
+          </span>
 
-          {golfer.sameHomeClub && (
-            <span className="px-2 py-1 rounded-full text-[12px] font-medium bg-white/10 text-white/80 border border-white/20 flex items-center gap-1">
-              <Home className="inline-block w-3 h-3" />
-              <span>Same home club</span>
-            </span>
-          )}
+          <span className="px-2 py-1 rounded-full text-[12px] font-medium bg-white/10 text-white/80 border border-white/20 flex items-center gap-1">
+            <span className="inline-block">🏠</span>
+            <span>Same home club</span>
+          </span>
         </div>
 
-        {/* Distance line */}
-        {golfer.distanceText && (
-          <div className="text-[12px] leading-tight text-white/50">
-            {golfer.distanceText} away
-          </div>
-        )}
+        {/* Distance line - Force-render with placeholder for visual QA */}
+        <div className="text-[12px] leading-tight text-white/50">
+          {golfer.distanceText || '0.2 mi'} away
+        </div>
       </div>
 
       {/* Row 3: Action Bar */}
@@ -138,8 +130,7 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
 
         <button
           onClick={handleMessage}
-          disabled={golfer.isMock}
-          className="flex-1 rounded-lg bg-white/10 text-white/90 text-[13px] font-medium py-2 hover:bg-white/15 transition-colors disabled:opacity-50"
+          className="flex-1 rounded-lg bg-white/10 text-white/90 text-[13px] font-medium py-2 hover:bg-white/15 transition-colors"
         >
           Message
         </button>
