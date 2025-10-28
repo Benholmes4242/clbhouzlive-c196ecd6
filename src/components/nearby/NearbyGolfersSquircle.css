@@ -121,7 +121,7 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.5);
   pointer-events: none;
   z-index: 0;
   animation: energyPulse 3s ease-out infinite;
