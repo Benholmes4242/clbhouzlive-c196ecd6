@@ -29,6 +29,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   
   const [activeTab, setActiveTab] = useState<'golfers' | 'games'>('golfers');
   const [isCreateGameOpen, setIsCreateGameOpen] = useState(false);
+  const [prefilledClub, setPrefilledClub] = useState<{ id: string; name: string } | undefined>();
 
   // Lock body scroll when overlay is open
   useEffect(() => {
@@ -248,7 +249,12 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               isLoading={beaconsLoading}
               onJoinBeacon={joinBeacon}
               onCancelBeacon={cancelBeacon}
-              onCreateGame={() => setIsCreateGameOpen(true)}
+              onCreateGame={(clubData) => {
+                if (clubData) {
+                  setPrefilledClub(clubData);
+                }
+                setIsCreateGameOpen(true);
+              }}
             />
           )}
         </div>
@@ -261,15 +267,17 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           isOpen={true}
           onClose={() => {
             setIsCreateGameOpen(false);
-            // Don't change activeTab - stay on current tab (likely 'games')
+            setPrefilledClub(undefined);
           }}
           onCreateBeacon={async (input) => {
             await createBeacon(input);
             setIsCreateGameOpen(false);
+            setPrefilledClub(undefined);
             setActiveTab('games'); // Show Games tab to see "Your Game"
           }}
           onCancelBeacon={cancelBeacon}
           myBeacon={myBeacon}
+          prefilledClub={prefilledClub}
         />
       )}
     </>

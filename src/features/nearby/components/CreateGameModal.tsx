@@ -28,6 +28,7 @@ interface CreateGameModalProps {
   }) => Promise<void>;
   onCancelBeacon: (beaconId: string) => Promise<void>;
   myBeacon: GameBeacon | null;
+  prefilledClub?: { id: string; name: string };
 }
 
 const GAME_TYPES = [
@@ -52,6 +53,7 @@ export function CreateGameModal({
   onCreateBeacon,
   onCancelBeacon,
   myBeacon,
+  prefilledClub,
 }: CreateGameModalProps) {
   const [gameType, setGameType] = useState<string>('9_holes');
   const [courseName, setCourseName] = useState('');
@@ -66,6 +68,14 @@ export function CreateGameModal({
   const courseInputRef = useRef<HTMLInputElement>(null);
   
   const { courses } = useCourseSearch(courseSearchTerm);
+
+  // Pre-fill club if provided
+  useEffect(() => {
+    if (prefilledClub && !courseName) {
+      setCourseName(prefilledClub.name);
+      setCourseSearchTerm(prefilledClub.name);
+    }
+  }, [prefilledClub, courseName]);
 
   // Lock body scroll when modal is open
   useEffect(() => {

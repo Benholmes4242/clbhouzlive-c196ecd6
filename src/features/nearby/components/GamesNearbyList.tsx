@@ -3,8 +3,8 @@ import { MapPin, Users, Clock } from 'lucide-react';
 import { GameBeacon } from '../hooks/useGameBeacon';
 import { supabase } from '@/integrations/supabase/client';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { Badge } from '@/components/ui/badge';
+import { ClubSearchInput } from './ClubSearchInput';
 
 // Format game type for display
 function formatGameType(gameType: string): string {
@@ -44,7 +44,7 @@ interface GamesNearbyListProps {
   isLoading: boolean;
   onJoinBeacon: (beaconId: string) => void;
   onCancelBeacon: (beaconId: string) => void;
-  onCreateGame: () => void;
+  onCreateGame: (clubData?: { id: string; name: string }) => void;
 }
 
 interface HostProfile {
@@ -62,17 +62,60 @@ export function GamesNearbyList({
   onCreateGame,
 }: GamesNearbyListProps) {
   const [hostProfiles, setHostProfiles] = useState<Record<string, HostProfile>>({});
+  const [selectedClub, setSelectedClub] = useState<{ id: string; name: string } | null>(null);
+  const [clubGames, setClubGames] = useState<GameBeacon[]>([]);
+  const [isLoadingClubGames, setIsLoadingClubGames] = useState(false);
   const { golfers } = useActiveGolfers({ limit: 20, mockCount: 0 });
   
   // Filter for golfers who are OpenToPlay
   const openToPlayGolfers = golfers.filter(g => !g.isMock && g.isOpenToPlay);
 
+  // Fetch games at selected club
+  useEffect(() => {
+    if (!selectedClub) {
+      setClubGames([]);
+      return;
+    }
+
+    const fetchClubGames = async () => {
+      setIsLoadingClubGames(true);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        const currentUserId = user?.id;
+
+        const { data, error } = await supabase
+          .from('game_beacons')
+          .select('*')
+          .eq('course_name', selectedClub.name)
+          .eq('is_active', true)
+          .gte('expires_at', new Date().toISOString());
+
+        if (error) throw error;
+
+        const gamesWithHostFlag = (data || []).map(beacon => ({
+          ...beacon,
+          isHost: beacon.host_user_id === currentUserId,
+        }));
+
+        setClubGames(gamesWithHostFlag);
+      } catch (error) {
+        console.error('Error fetching club games:', error);
+        setClubGames([]);
+      } finally {
+        setIsLoadingClubGames(false);
+      }
+    };
+
+    fetchClubGames();
+  }, [selectedClub]);
+
   // Fetch host profiles for game beacons
   useEffect(() => {
-    const fetchHostProfiles = async () => {
-      const hostIds = [...new Set(beacons.map(b => b.host_user_id))];
-      if (hostIds.length === 0) return;
+    const allGames = selectedClub ? clubGames : beacons;
+    const hostIds = [...new Set(allGames.map(b => b.host_user_id))];
+    if (hostIds.length === 0) return;
 
+    const fetchHostProfiles = async () => {
       const { data, error } = await supabase
         .from('user_profiles')
         .select('id, display_name, username, profile_photo_url')
@@ -91,44 +134,97 @@ export function GamesNearbyList({
     };
 
     fetchHostProfiles();
-  }, [beacons]);
+  }, [beacons, clubGames, selectedClub]);
+
+  const handleClubSelect = (club: { id: string; name: string; country: string; region?: string }) => {
+    setSelectedClub({ id: club.id, name: club.name });
+  };
+
+  const handleClearSearch = () => {
+    setSelectedClub(null);
+    setClubGames([]);
+  };
 
   if (isLoading) {
     return (
-      <div className="py-12 text-center">
-        <div className="animate-pulse space-y-4">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="bg-neutral-800/30 rounded-xl p-4 h-24" />
-          ))}
+      <>
+        <ClubSearchInput
+          onClubSelect={handleClubSelect}
+          onClear={handleClearSearch}
+          selectedClub={selectedClub}
+        />
+        <div className="py-12 text-center">
+          <div className="animate-pulse space-y-4">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="bg-neutral-800/30 rounded-xl p-4 h-24" />
+            ))}
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
-  const hasGames = beacons.length > 0 || openToPlayGolfers.length > 0;
+  const displayGames = selectedClub ? clubGames : beacons;
+  const hasGames = displayGames.length > 0 || (!selectedClub && openToPlayGolfers.length > 0);
 
-  if (!hasGames) {
+  if (!hasGames && !selectedClub) {
     return (
-      <div className="py-12 text-center space-y-4">
-        <MapPin className="w-12 h-12 mx-auto text-neutral-600" />
-        <div>
-          <p className="font-medium text-neutral-300 mb-1">No games nearby</p>
-          <p className="text-sm text-neutral-500">Start one and see who joins</p>
+      <div className="space-y-4">
+        <div className="py-12 text-center space-y-4">
+          <MapPin className="w-12 h-12 mx-auto text-neutral-600" />
+          <div>
+            <p className="font-medium text-neutral-300 mb-1">No games nearby</p>
+            <p className="text-sm text-neutral-500">Start one and see who joins</p>
+          </div>
+          <button
+            onClick={() => onCreateGame()}
+            className="mt-4 px-6 py-2 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all"
+          >
+            Create a Game
+          </button>
         </div>
-        <button
-          onClick={onCreateGame}
-          className="mt-4 px-6 py-2 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all"
-        >
-          Create a Game
-        </button>
+        <ClubSearchInput
+          onClubSelect={handleClubSelect}
+          onClear={handleClearSearch}
+          selectedClub={selectedClub}
+        />
       </div>
     );
   }
 
   return (
     <div className="space-y-3 pb-4">
-      {/* OpenToPlay golfers section */}
-      {openToPlayGolfers.length > 0 && (
+      {/* Club Search */}
+      <ClubSearchInput
+        onClubSelect={handleClubSelect}
+        onClear={handleClearSearch}
+        selectedClub={selectedClub}
+      />
+
+      {/* Show loading state for club games */}
+      {isLoadingClubGames ? (
+        <div className="py-8 text-center">
+          <div className="animate-pulse space-y-3">
+            {[1, 2].map(i => (
+              <div key={i} className="bg-neutral-800/30 rounded-xl p-4 h-24" />
+            ))}
+          </div>
+        </div>
+      ) : selectedClub && clubGames.length === 0 ? (
+        <div className="py-8 text-center space-y-3">
+          <p className="text-sm text-neutral-300">No active games at {selectedClub.name}</p>
+          <p className="text-xs text-neutral-500">Be the first to start one!</p>
+          <button
+            onClick={() => onCreateGame(selectedClub)}
+            className="mt-2 px-6 py-2 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl text-sm font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] transition-all"
+          >
+            Create a Game
+          </button>
+        </div>
+      ) : null}
+
+      {/* OpenToPlay golfers section - only show when not searching */}
+      {!selectedClub && openToPlayGolfers.length > 0 && (
         <>
           <div className="text-xs font-medium text-white/50 px-2 pt-2">
             Open to Play Now
@@ -140,16 +236,21 @@ export function GamesNearbyList({
             >
               <div className="flex items-start gap-3">
                 {/* Avatar */}
-                <div className="relative flex-shrink-0">
-                  <AvatarSquircle
-                    size={48}
+                <div 
+                  className="relative shrink-0 w-12 h-12 rounded-[14px] overflow-hidden border border-white/30 bg-black/40"
+                  style={{ boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)' }}
+                >
+                  <img
                     src={golfer.avatar_url || '/placeholder.svg'}
                     alt={golfer.display_name}
-                  >
-                    {golfer.is_online && (
-                      <div className="lc-dot" aria-label="Online" />
-                    )}
-                  </AvatarSquircle>
+                    className="w-full h-full object-cover"
+                  />
+                  {golfer.is_online && (
+                    <div 
+                      className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-neutral-900 rounded-full"
+                      aria-label="Online"
+                    />
+                  )}
                 </div>
 
                 {/* Content */}
@@ -193,15 +294,20 @@ export function GamesNearbyList({
         </>
       )}
 
-      {/* Unified games list (user's games + nearby games) */}
-      {beacons.length > 0 && (
+      {/* Unified games list */}
+      {displayGames.length > 0 && (
         <>
-          {openToPlayGolfers.length > 0 && (
+          {!selectedClub && openToPlayGolfers.length > 0 && (
             <div className="text-xs font-medium text-white/50 px-2 pt-4">
               Games
             </div>
           )}
-          {beacons.map(beacon => {
+          {selectedClub && (
+            <div className="text-xs font-medium text-white/50 px-2 pt-2">
+              Games at {selectedClub.name}
+            </div>
+          )}
+          {displayGames.map(beacon => {
             const host = hostProfiles[beacon.host_user_id];
             const hostName = host?.display_name || host?.username || 'Golfer';
 
@@ -228,24 +334,16 @@ export function GamesNearbyList({
                 {/* Row 2: Meta info (time + players) */}
                 <div className="flex items-center gap-3 text-xs text-white/60 mb-2">
                   <span className="inline-flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5" />
-                    {formatWhen(beacon.start_time)}
+                    🕒 {formatWhen(beacon.start_time)}
                   </span>
                   {beacon.players_needed && (
                     <>
                       <span>•</span>
                       <span className="inline-flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5" />
-                        {beacon.players_needed === 1 
+                        👤 {beacon.players_needed === 1 
                           ? 'Need 1 more'
                           : `${beacon.players_needed} spots free`}
                       </span>
-                    </>
-                  )}
-                  {beacon.distanceText && !beacon.isHost && (
-                    <>
-                      <span>•</span>
-                      <span>{beacon.distanceText} away</span>
                     </>
                   )}
                 </div>
@@ -258,23 +356,16 @@ export function GamesNearbyList({
                 )}
 
                 {/* Action button */}
-                <div className="flex items-center justify-end gap-2 pt-1">
-                  {beacon.isHost ? (
-                    <button
-                      onClick={() => onCancelBeacon(beacon.id)}
-                      className="px-4 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg text-sm font-medium transition-colors"
-                    >
-                      Cancel Game
-                    </button>
-                  ) : (
+                {!beacon.isHost && (
+                  <div className="flex items-center justify-end pt-1">
                     <button
                       onClick={() => onJoinBeacon(beacon.id)}
-                      className="px-4 py-1.5 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-lg text-sm font-medium backdrop-blur border border-white/28 shadow-[0_16px_32px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.2)] active:shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.3)] transition-all"
+                      className="px-4 py-1.5 rounded-lg bg-neutral-800/60 border border-white/20 text-white text-sm font-medium hover:bg-neutral-800 transition-colors"
                     >
-                      I'm in
+                      Request to Join
                     </button>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             );
           })}
