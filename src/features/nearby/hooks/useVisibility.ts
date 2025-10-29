@@ -43,21 +43,15 @@ export function useVisibility() {
     async (newMode: VisibilityMode) => {
       if (!user?.id) return;
 
-      // Store previous mode for rollback
-      const previousMode = mode;
-
-      // OPTIMISTIC: Update UI immediately
-      setMode(newMode);
-
       let lat: number | null = null;
       let lng: number | null = null;
 
+      // STEP 1: Check location FIRST before any UI update
       if (newMode === 'all' || newMode === 'friends') {
         // must have a location in these modes
         const loc = await getCurrentLocation();
         if (!loc) {
-          // REVERT on failure
-          setMode(previousMode);
+          // Block immediately - no optimistic update
           toast({
             title: 'Location needed',
             description: 'Turn on location to appear to golfers nearby.',
@@ -68,6 +62,12 @@ export function useVisibility() {
         lat = loc.lat;
         lng = loc.lng;
       }
+
+      // Store previous mode for rollback
+      const previousMode = mode;
+
+      // STEP 2: Now do optimistic UI update (location is OK or mode is 'hidden')
+      setMode(newMode);
 
       // If hidden, we deliberately blank coords
       const { error } = await supabase

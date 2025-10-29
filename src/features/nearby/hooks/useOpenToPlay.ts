@@ -49,22 +49,10 @@ export function useOpenToPlay() {
   const activate = useCallback(async () => {
     if (!user?.id) return;
 
-    const expiresAtMs = Date.now() + DURATION_MINUTES * 60_000;
-
-    // OPTIMISTIC: Update UI immediately
-    persistLocal({
-      active: true,
-      expiresAt: expiresAtMs,
-    });
-
-    // get current position
+    // STEP 1: Check location FIRST before any UI update
     const loc = await getCurrentLocation();
     if (!loc) {
-      // REVERT on failure
-      persistLocal({
-        active: false,
-        expiresAt: null,
-      });
+      // Block immediately - no optimistic update
       toast({
         title: 'Location needed',
         description: 'Turn on location to go Open to Play.',
@@ -72,6 +60,14 @@ export function useOpenToPlay() {
       });
       return;
     }
+
+    const expiresAtMs = Date.now() + DURATION_MINUTES * 60_000;
+
+    // STEP 2: Now do optimistic UI update (location is OK)
+    persistLocal({
+      active: true,
+      expiresAt: expiresAtMs,
+    });
 
     const expiresAtISO = new Date(expiresAtMs).toISOString();
 
