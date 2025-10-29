@@ -30,7 +30,7 @@ export function VisibilitySegmentedControl({ value, onChange }: VisibilitySegmen
   return (
     <div className="w-full">
       <div className="mb-1 text-[15px] font-semibold text-white/90 text-center">Visibility</div>
-      <div className="text-[13px] text-white/60 mb-3 text-center leading-relaxed">Control who can see you nearby</div>
+      <div className="text-[13px] text-white/60 mb-4 text-center leading-relaxed">Control who can see you nearby</div>
       
       <div className="flex gap-0 w-full p-1 rounded-full bg-white/[0.05] border border-white/[0.12]">
         {segments.map((segment) => {

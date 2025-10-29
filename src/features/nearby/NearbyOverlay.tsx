@@ -121,10 +121,10 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             </div>
 
             {/* Divider */}
-            <div className="w-full mt-[18px] mb-2" style={{ height: '1px', background: 'rgba(255,255,255,0.08)' }} />
+            <div className="w-full mt-3 mb-3" style={{ height: '1px', background: 'rgba(255,255,255,0.08)' }} />
 
             {/* Open to Play toggle pill */}
-            <div className="flex flex-col items-center gap-2.5">
+            <div className="flex flex-col items-center gap-1">
               <button
                 onClick={handleOpenToPlayToggle}
                 className={`
@@ -165,7 +165,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           </div>
 
           {/* Tabs */}
-          <div className="flex px-5 mt-6 border-b border-white/[0.06]">
+          <div className="flex px-5 mt-3 border-b border-white/[0.06]">
 
             <button
               onClick={() => setActiveTab('golfers')}
