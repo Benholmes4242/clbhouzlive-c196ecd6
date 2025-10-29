@@ -159,10 +159,10 @@ export default function ShortsGrid({
           // Preload the landscape card's poster
           preloadLandscapePoster(landscapeCandidate.item);
           
-          // Assign badge type - mix of suggested and trending
+          // Assign badge type - random mix of suggested and trending
           let badgeType: 'trending' | 'suggested' | undefined;
           if (badgeCount < 6) { // Show badges on first 6 eligible items
-            badgeType = badgeCount % 2 === 0 ? 'trending' : 'suggested';
+            badgeType = Math.random() > 0.5 ? 'trending' : 'suggested';
             badgeCount++;
           }
           
@@ -187,10 +187,10 @@ export default function ShortsGrid({
       
       // Add portrait card if not already used
       if (!usedIndexes.has(itemIndex)) {
-        // Assign badge type - mix of suggested and trending for first several items
+        // Assign badge type - random mix of suggested and trending for first several items
         let badgeType: 'trending' | 'suggested' | undefined;
         if (badgeCount < 8) { // Show badges on first 8 eligible items
-          badgeType = badgeCount % 2 === 0 ? 'suggested' : 'trending';
+          badgeType = Math.random() > 0.5 ? 'trending' : 'suggested';
           badgeCount++;
         }
         
