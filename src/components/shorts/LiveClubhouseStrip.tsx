@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useId } from 'react';
 import { useLiveClubhouseProfiles } from '@/hooks/useLiveClubhouseProfiles';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
+import { useNearbyGolfersCount } from '@/hooks/useNearbyGolfersCount';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
@@ -27,6 +28,7 @@ function superellipsePath(w: number, h: number, n = 4.2, steps = 240) {
 export function LiveClubhouseStrip() {
   const { creators, isLoading } = useLiveClubhouseProfiles();
   const { golfers } = useActiveGolfers();
+  const { count: nearbyCount, isLoading: nearbyCountLoading } = useNearbyGolfersCount();
   const rowRef = useRef<HTMLDivElement>(null);
   const [scrolling, setScrolling] = useState(false);
   const [nearbyOverlayOpen, setNearbyOverlayOpen] = useState(false);
@@ -62,7 +64,28 @@ export function LiveClubhouseStrip() {
     }
   }, [isLoading, creators.length]);
 
-  if (isLoading) return null;
+  // Show skeleton while loading instead of null
+  if (isLoading) {
+    return (
+      <div className="live-row">
+        <div className="live-scroll" role="listbox" aria-label="Loading suggested creators">
+          {/* Skeleton tiles */}
+          {[...Array(6)].map((_, idx) => (
+            <div key={idx} className="lc-tile" role="option">
+              <div className="lc-avatar-btn">
+                <div className="w-[84px] h-[84px] rounded-[20px] bg-muted animate-pulse" />
+              </div>
+              <div className="lc-label">
+                <div className="h-4 w-20 bg-muted animate-pulse rounded mb-1" />
+                <div className="h-3 w-16 bg-muted animate-pulse rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (!creators.length) return null;
 
   return (
@@ -75,7 +98,8 @@ export function LiveClubhouseStrip() {
           aria-label="Suggested creators"
         >
           <NearbyTile 
-            count={nearbyOnlineGolfers.length} 
+            count={nearbyCount}
+            isLoading={nearbyCountLoading}
             onOpen={() => setNearbyOverlayOpen(true)} 
           />
           {nearbyOnlineGolfers.map((golfer, idx) => (
@@ -112,9 +136,7 @@ export function LiveClubhouseStrip() {
   );
 }
 
-function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
-  const { isLoading } = useActiveGolfers();
-
+function NearbyTile({ count, isLoading, onOpen }: { count: number; isLoading: boolean; onOpen: () => void }) {
   const handleClick = () => {
     analyticsEvents.lcStrip.nearbyOpen(count);
     onOpen();

@@ -152,73 +152,78 @@ export function useLiveClubhouseProfiles() {
       
       let knownProfiles: any[] = [];
       
-      // Fetch known profiles
-      if (knownIds.size > 0 && targetKnown > 0) {
-        const { data: profiles } = await supabase
-          .from('user_profiles')
-          .select('id, username, display_name, profile_photo_url, home_club')
-          .in('id', [...knownIds])
-          .eq('is_public', true)
-          .not('profile_photo_url', 'is', null)
-          .not('display_name', 'is', null)
-          .limit(targetKnown);
+      // Fetch known and suggested profiles in parallel
+      const [knownProfilesResult, suggestedProfilesResult] = await Promise.all([
+        // Fetch known profiles
+        (async () => {
+          if (knownIds.size === 0 || targetKnown === 0) return [];
+          
+          const { data: profiles } = await supabase
+            .from('user_profiles')
+            .select('id, username, display_name, profile_photo_url, home_club')
+            .in('id', [...knownIds])
+            .eq('is_public', true)
+            .not('profile_photo_url', 'is', null)
+            .not('display_name', 'is', null)
+            .limit(targetKnown);
 
-        if (profiles) {
-          knownProfiles = await Promise.all(
-            profiles.map(async (profile) => {
-              const { data: posts } = await supabase
-                .from('posts')
-                .select('created_at')
-                .eq('user_id', profile.id)
-                .order('created_at', { ascending: false })
-                .limit(1);
+          return profiles || [];
+        })(),
+        
+        // Fetch suggested profiles
+        (async () => {
+          const excludeIds = [...knownIds, ...(user ? [user.id] : []), ...mutedIds];
+          
+          let suggestedQuery = supabase
+            .from('user_profiles')
+            .select('id, username, display_name, profile_photo_url, home_club')
+            .eq('is_public', true)
+            .not('profile_photo_url', 'is', null)
+            .not('display_name', 'is', null);
 
-              return {
-                ...profile,
-                latest_post_at: posts?.[0]?.created_at || null,
-              };
-            })
-          );
+          if (excludeIds.length > 0) {
+            suggestedQuery = suggestedQuery.not('id', 'in', `(${excludeIds.join(',')})`);
+          }
+
+          const { data: suggestedRaw } = await suggestedQuery
+            .order('created_at', { ascending: false })
+            .limit(targetSuggested);
+
+          return suggestedRaw || [];
+        })()
+      ]);
+
+      // Batch fetch latest posts for all profiles in ONE query
+      const allProfileIds = [...knownProfilesResult.map(p => p.id), ...suggestedProfilesResult.map(p => p.id)];
+      
+      const latestPostsMap: Record<string, string> = {};
+      if (allProfileIds.length > 0) {
+        const { data: latestPosts } = await supabase
+          .from('posts')
+          .select('user_id, created_at')
+          .in('user_id', allProfileIds)
+          .order('created_at', { ascending: false });
+
+        // Group by user_id and take the first (latest) post for each user
+        if (latestPosts) {
+          latestPosts.forEach(post => {
+            if (!latestPostsMap[post.user_id]) {
+              latestPostsMap[post.user_id] = post.created_at;
+            }
+          });
         }
       }
 
-      // Fetch suggested profiles
-      const excludeIds = [...knownIds, ...(user ? [user.id] : []), ...mutedIds];
-      
-      let suggestedQuery = supabase
-        .from('user_profiles')
-        .select('id, username, display_name, profile_photo_url, home_club')
-        .eq('is_public', true)
-        .not('profile_photo_url', 'is', null)
-        .not('display_name', 'is', null);
+      // Enrich profiles with latest_post_at
+      knownProfiles = knownProfilesResult.map(profile => ({
+        ...profile,
+        latest_post_at: latestPostsMap[profile.id] || null,
+      }));
 
-      if (excludeIds.length > 0) {
-        suggestedQuery = suggestedQuery.not('id', 'in', `(${excludeIds.join(',')})`);
-      }
-
-      const { data: suggestedRaw } = await suggestedQuery
-        .order('created_at', { ascending: false })
-        .limit(targetSuggested);
-
-      let suggestedProfiles: any[] = [];
-      
-      if (suggestedRaw) {
-        suggestedProfiles = await Promise.all(
-          suggestedRaw.map(async (profile) => {
-            const { data: posts } = await supabase
-              .from('posts')
-              .select('created_at')
-              .eq('user_id', profile.id)
-              .order('created_at', { ascending: false })
-              .limit(1);
-
-            return {
-              ...profile,
-              latest_post_at: posts?.[0]?.created_at || null,
-            };
-          })
-        );
-      }
+      let suggestedProfiles = suggestedProfilesResult.map(profile => ({
+        ...profile,
+        latest_post_at: latestPostsMap[profile.id] || null,
+      }));
 
       // Interleave known and suggested
       const interleaved: any[] = [];
@@ -236,15 +241,19 @@ export function useLiveClubhouseProfiles() {
     enabled: !!user && !forceMock,
   });
 
-  // Batch fetch previews for real profiles
-  const [previews, setPreviews] = useState<Record<string, { posterUrl?: string; mp4Url?: string }>>({});
+  // Batch fetch previews and presence data in parallel to reduce re-renders
+  const [enrichmentData, setEnrichmentData] = useState<{
+    previews: Record<string, { posterUrl?: string; mp4Url?: string }>;
+    onlineMap: Record<string, boolean>;
+  }>({ previews: {}, onlineMap: {} });
   
   useEffect(() => {
     if (!baseCreators.length || forceMock) return;
     
+    // Fetch previews
     (async () => {
       const previewData = await getLatestShortPreviewForCreators(baseCreators.map(c => c.id));
-      setPreviews(previewData);
+      setEnrichmentData(prev => ({ ...prev, previews: previewData }));
     })();
   }, [baseCreators, forceMock]);
 
@@ -261,7 +270,7 @@ export function useLiveClubhouseProfiles() {
       Object.keys(state).forEach((uid) => {
         map[uid] = (state[uid]?.length ?? 0) > 0;
       });
-      setOnlineMap(map);
+      setEnrichmentData(prev => ({ ...prev, onlineMap: map }));
     });
 
     channel.subscribe(async (status) => {
@@ -278,6 +287,8 @@ export function useLiveClubhouseProfiles() {
 
   // === BLEND LOGIC: 50% real + 50% mock ===
   const creators = useMemo(() => {
+    const { previews, onlineMap } = enrichmentData;
+    
     if (forceMock) {
       // Dev override: 100% mock
       const now = Date.now();
@@ -386,7 +397,7 @@ export function useLiveClubhouseProfiles() {
     const sessionOrdered = shuffleStableForSession(interleaved, sessionId);
 
     return sessionOrdered;
-  }, [baseCreators, previews, onlineMap, forceMock]);
+  }, [baseCreators, enrichmentData, forceMock]);
 
   return { creators, isLoading: forceMock ? false : isLoading };
 }

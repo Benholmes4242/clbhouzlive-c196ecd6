@@ -199,7 +199,8 @@ const Clubhouse = () => {
     return () => document.body.classList.remove('route-clubhouse');
   }, []);
 
-  if (isLoading) {
+  // Show loading state only for initial posts fetch
+  if (isLoading && posts.length === 0) {
     return <ClubhouzLoading />;
   }
 
@@ -216,22 +217,32 @@ const Clubhouse = () => {
 
       {/* Main Content - Fullscreen Vertical Feed */}
       <div className="clubhouse-scroll">
-        <ClubhouseVerticalFeed
-          posts={posts}
-          onLike={handleLike}
-          onLoadMore={loadMore}
-          hasMore={hasMore}
-          isLoadingMore={isLoadingMore}
-          onCurrentPostChange={handleCurrentPostChange}
-          onScroll={chromeControls.handleScroll}
-          onTap={chromeControls.handleTap}
-          onTouchStart={chromeControls.handleTouchStart}
-          onTouchMove={chromeControls.handleTouchMove}
-          onTouchEnd={chromeControls.handleTouchEnd}
-          onActiveVideoRefChange={(ref) => {
-            activeVideoRef.current = ref;
-          }}
-        />
+        {posts.length > 0 ? (
+          <ClubhouseVerticalFeed
+            posts={posts}
+            onLike={handleLike}
+            onLoadMore={loadMore}
+            hasMore={hasMore}
+            isLoadingMore={isLoadingMore}
+            onCurrentPostChange={handleCurrentPostChange}
+            onScroll={chromeControls.handleScroll}
+            onTap={chromeControls.handleTap}
+            onTouchStart={chromeControls.handleTouchStart}
+            onTouchMove={chromeControls.handleTouchMove}
+            onTouchEnd={chromeControls.handleTouchEnd}
+            onActiveVideoRefChange={(ref) => {
+              activeVideoRef.current = ref;
+            }}
+          />
+        ) : isLoading ? (
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="animate-pulse text-muted-foreground">Loading posts...</div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center min-h-screen text-muted-foreground">
+            No posts available
+          </div>
+        )}
       </div>
 
       {/* Video Progress Vertical HUD - Pulse Line beside engagement icons */}
