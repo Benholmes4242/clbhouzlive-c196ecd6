@@ -167,34 +167,9 @@ export function GamesNearbyList({
   const displayGames = selectedClub ? clubGames : beacons;
   const hasGames = displayGames.length > 0 || (!selectedClub && openToPlayGolfers.length > 0);
 
-  if (!hasGames && !selectedClub) {
-    return (
-      <div className="space-y-4">
-        <div className="py-12 text-center space-y-4">
-          <MapPin className="w-12 h-12 mx-auto text-neutral-600" />
-          <div>
-            <p className="font-medium text-neutral-300 mb-1">No games nearby</p>
-            <p className="text-sm text-neutral-500">Start one and see who joins</p>
-          </div>
-          <button
-            onClick={() => onCreateGame()}
-            className="mt-4 px-6 py-2 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all"
-          >
-            Create a Game
-          </button>
-        </div>
-        <ClubSearchInput
-          onClubSelect={handleClubSelect}
-          onClear={handleClearSearch}
-          selectedClub={selectedClub}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-3 pb-4">
-      {/* Club Search */}
+      {/* Club Search - Always at top */}
       <ClubSearchInput
         onClubSelect={handleClubSelect}
         onClear={handleClearSearch}
@@ -217,6 +192,20 @@ export function GamesNearbyList({
           <button
             onClick={() => onCreateGame(selectedClub)}
             className="mt-2 px-6 py-2 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl text-sm font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] transition-all"
+          >
+            Create a Game
+          </button>
+        </div>
+      ) : !hasGames && !selectedClub ? (
+        <div className="py-8 text-center space-y-4">
+          <MapPin className="w-12 h-12 mx-auto text-neutral-600" />
+          <div>
+            <p className="font-medium text-neutral-300 mb-1">No games nearby</p>
+            <p className="text-sm text-neutral-500">Start one and see who joins</p>
+          </div>
+          <button
+            onClick={() => onCreateGame()}
+            className="mt-4 px-6 py-2 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all"
           >
             Create a Game
           </button>

@@ -62,6 +62,9 @@ export function ClubSearchInput({ onClubSelect, onClear, selectedClub }: ClubSea
           <Search className="w-4 h-4 text-white/50" />
           <span className="text-sm text-white/50">Search golf club...</span>
         </button>
+        <div className="text-xs text-white/60 px-2 mt-1.5">
+          Search a golf club to find active games or golfers looking for a match.
+        </div>
 
         {showDropdown && (
           <>
