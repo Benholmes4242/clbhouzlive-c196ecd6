@@ -34,7 +34,7 @@ interface LayoutItem {
   type: 'portrait' | 'landscape';
   height?: number;
   variant?: 'portrait' | 'landscape';
-  isTrending?: boolean;
+  badgeType?: 'trending' | 'suggested';
 }
 
 export default function ShortsGrid({ 
@@ -134,7 +134,7 @@ export default function ShortsGrid({
   }, [updateColumnWidth]);
 
   // Layout with landscape cards: Portrait cards organized in blocks of 6, with landscape cards inserted after each block
-  // Also applies trending logic: first portrait, first landscape, then mock distribution
+  // Mix of "Suggested" and "Trending" badges
   const layout = useMemo(() => {
     if (items.length === 0) return [];
     
@@ -143,8 +143,7 @@ export default function ShortsGrid({
     let portraitCount = 0;
     let itemIndex = 0;
     let insertedLandscapeThisBoundary = false;
-    let firstPortraitMarked = false;
-    let firstLandscapeMarked = false;
+    let badgeCount = 0; // Track badge assignments
     
     while (itemIndex < items.length) {
       const item = items[itemIndex];
@@ -160,17 +159,20 @@ export default function ShortsGrid({
           // Preload the landscape card's poster
           preloadLandscapePoster(landscapeCandidate.item);
           
+          // Assign badge type - mix of suggested and trending
+          let badgeType: 'trending' | 'suggested' | undefined;
+          if (badgeCount < 6) { // Show badges on first 6 eligible items
+            badgeType = badgeCount % 2 === 0 ? 'trending' : 'suggested';
+            badgeCount++;
+          }
+          
           result.push({
             item: landscapeCandidate.item,
             index: landscapeCandidate.index,
             type: 'landscape',
             variant: 'landscape',
-            isTrending: !firstLandscapeMarked // First landscape is always trending
+            badgeType
           });
-          
-          if (!firstLandscapeMarked) {
-            firstLandscapeMarked = true;
-          }
           
           usedIndexes.add(landscapeCandidate.index);
           
@@ -183,16 +185,14 @@ export default function ShortsGrid({
         }
       }
       
-      // Add portrait card if not already used - all use base height (no variant)
+      // Add portrait card if not already used
       if (!usedIndexes.has(itemIndex)) {
-        const isTrending = !firstPortraitMarked || (
-          firstPortraitMarked && 
-          firstLandscapeMarked && 
-          result.length > 5 && // After the two anchors are placed
-          (item.likes ?? 0) > 50 && // Mock "high engagement"
-          !result[result.length - 1]?.isTrending && // Not adjacent
-          result.length % 5 === 0 // Roughly every 5th card after anchors
-        );
+        // Assign badge type - mix of suggested and trending for first several items
+        let badgeType: 'trending' | 'suggested' | undefined;
+        if (badgeCount < 8) { // Show badges on first 8 eligible items
+          badgeType = badgeCount % 2 === 0 ? 'suggested' : 'trending';
+          badgeCount++;
+        }
         
         result.push({
           item,
@@ -200,12 +200,8 @@ export default function ShortsGrid({
           type: 'portrait',
           height: baseHeightPx, // All portraits same size
           variant: 'portrait',
-          isTrending
+          badgeType
         });
-        
-        if (!firstPortraitMarked && isTrending) {
-          firstPortraitMarked = true;
-        }
         
         usedIndexes.add(itemIndex);
         portraitCount++;
@@ -227,8 +223,8 @@ export default function ShortsGrid({
     
     const sections: Array<{
       type: 'portrait-grid' | 'landscape';
-      items?: Array<{ item: ExploreContentItem; index: number; height: number; isTrending?: boolean }>;
-      landscapeItem?: { item: ExploreContentItem; index: number; isTrending?: boolean };
+      items?: Array<{ item: ExploreContentItem; index: number; height: number; badgeType?: 'trending' | 'suggested' }>;
+      landscapeItem?: { item: ExploreContentItem; index: number; badgeType?: 'trending' | 'suggested' };
     }> = [];
     
     let currentPortraits: LayoutItem[] = [];
@@ -239,7 +235,7 @@ export default function ShortsGrid({
         if (currentPortraits.length > 0) {
           sections.push({
             type: 'portrait-grid',
-            items: currentPortraits.map(p => ({ item: p.item, index: p.index, height: p.height!, isTrending: p.isTrending }))
+            items: currentPortraits.map(p => ({ item: p.item, index: p.index, height: p.height!, badgeType: p.badgeType }))
           });
           currentPortraits = [];
         }
@@ -247,7 +243,7 @@ export default function ShortsGrid({
         // Add landscape section
         sections.push({
           type: 'landscape',
-          landscapeItem: { item: layoutItem.item, index: layoutItem.index, isTrending: layoutItem.isTrending }
+          landscapeItem: { item: layoutItem.item, index: layoutItem.index, badgeType: layoutItem.badgeType }
         });
       } else {
         currentPortraits.push(layoutItem);
@@ -258,7 +254,7 @@ export default function ShortsGrid({
     if (currentPortraits.length > 0) {
       sections.push({
         type: 'portrait-grid',
-        items: currentPortraits.map(p => ({ item: p.item, index: p.index, height: p.height!, isTrending: p.isTrending }))
+        items: currentPortraits.map(p => ({ item: p.item, index: p.index, height: p.height!, badgeType: p.badgeType }))
       });
     }
     
@@ -312,7 +308,7 @@ export default function ShortsGrid({
                 onAuthorClick={onAuthorClick}
                 currentUserId={currentUserId}
                 gridPosition={posInRow}
-                isTrending={layoutItem.isTrending}
+                badgeType={layoutItem.badgeType}
               />
             ))}
           </div>
@@ -347,7 +343,7 @@ export default function ShortsGrid({
                   currentUserId={currentUserId}
                   variant="landscape"
                   useGlassPanel={false}
-                  isTrending={section.landscapeItem.isTrending}
+                  badgeType={section.landscapeItem.badgeType}
                 />
               </div>
             );
@@ -360,7 +356,7 @@ export default function ShortsGrid({
                 className="grid grid-cols-2" 
                 style={{ gap: `${GUTTER_PX}px`, marginBottom: '2px' }}
               >
-                {section.items.map(({ item, index, height, isTrending }, posInGrid) => {
+                {section.items.map(({ item, index, height, badgeType }, posInGrid) => {
                   // Calculate global grid position accounting for first row and previous sections
                   const basePosition = firstRow.length; // Start after first row
                   let previousPortraits = 0;
@@ -382,7 +378,7 @@ export default function ShortsGrid({
                       onAuthorClick={onAuthorClick}
                       currentUserId={currentUserId}
                       gridPosition={gridPosition}
-                      isTrending={isTrending}
+                      badgeType={badgeType}
                     />
                   );
                 })}
