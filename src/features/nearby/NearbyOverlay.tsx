@@ -148,7 +148,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                 )}
               </button>
               <div className="text-[12px] text-white/60 text-center">
-                Tap to let golfers join up
+                Tap to let golfers know you're up for a game
               </div>
             </div>
           </div>

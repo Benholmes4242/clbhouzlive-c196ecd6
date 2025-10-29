@@ -9,9 +9,9 @@ interface VisibilitySegmentedControlProps {
 export function VisibilitySegmentedControl({ value, onChange }: VisibilitySegmentedControlProps) {
 
   const segments: { mode: VisibilityMode; label: string; icon: string }[] = [
-    { mode: 'all', label: 'Everyone', icon: '🌍' },
+    { mode: 'all', label: 'Everyone', icon: '✅' },
     { mode: 'friends', label: 'Friends', icon: '👥' },
-    { mode: 'hidden', label: 'Hidden', icon: '🙈' },
+    { mode: 'hidden', label: 'Hidden', icon: '⛔️' },
   ];
 
   const getStatusText = () => {
@@ -21,7 +21,7 @@ export function VisibilitySegmentedControl({ value, onChange }: VisibilitySegmen
       case 'friends':
         return "Only friends can see you 👥";
       case 'hidden':
-        return "You're hidden right now 🙈";
+        return "You're hidden right now ⛔️";
     }
   };
 
