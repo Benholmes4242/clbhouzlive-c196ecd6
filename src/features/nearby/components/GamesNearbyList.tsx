@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { MapPin, Users } from 'lucide-react';
+import { MapPin, Users, Clock } from 'lucide-react';
 import { GameBeacon } from '../hooks/useGameBeacon';
 import { supabase } from '@/integrations/supabase/client';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Badge } from '@/components/ui/badge';
 
 // Format game type for display
 function formatGameType(gameType: string): string {
@@ -14,6 +15,28 @@ function formatGameType(gameType: string): string {
     'practice': 'Practice',
   };
   return typeMap[gameType] || gameType;
+}
+
+// Format when/time for display
+function formatWhen(startTime: string): string {
+  const now = new Date();
+  const start = new Date(startTime);
+  const diffMinutes = Math.floor((start.getTime() - now.getTime()) / (1000 * 60));
+
+  if (diffMinutes <= 5) return 'Now';
+  if (diffMinutes <= 30) return 'In 30 mins';
+  if (diffMinutes <= 60) return 'In 1 hour';
+  
+  // Check if today
+  const isToday = start.toDateString() === now.toDateString();
+  const isTomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000).toDateString() === start.toDateString();
+  
+  const timeStr = start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: false });
+  
+  if (isToday) return `Today ${timeStr}`;
+  if (isTomorrow) return `Tomorrow ${timeStr}`;
+  
+  return start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
 
 interface GamesNearbyListProps {
@@ -170,95 +193,87 @@ export function GamesNearbyList({
         </>
       )}
 
-      {/* Game beacons section */}
+      {/* Unified games list (user's games + nearby games) */}
       {beacons.length > 0 && (
         <>
           {openToPlayGolfers.length > 0 && (
             <div className="text-xs font-medium text-white/50 px-2 pt-4">
-              Scheduled Games
+              Games
             </div>
           )}
           {beacons.map(beacon => {
             const host = hostProfiles[beacon.host_user_id];
             const hostName = host?.display_name || host?.username || 'Golfer';
-            const hostAvatar = host?.profile_photo_url;
 
             return (
               <div
                 key={beacon.id}
-                className="bg-neutral-800/40 rounded-xl p-4 border border-neutral-700/50 hover:border-neutral-600/50 transition-all"
+                className="rounded-xl px-3 py-3 bg-neutral-800/60 border border-neutral-700/60 hover:border-neutral-600/60 transition-all"
               >
-                <div className="flex items-start gap-4">
-                  {/* Host Avatar */}
-                  <div className="flex-shrink-0">
-                    {hostAvatar ? (
-                      <img
-                        src={hostAvatar}
-                        alt={hostName}
-                        className="w-12 h-12 rounded-xl object-cover"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-xl bg-neutral-700 flex items-center justify-center">
-                        <Users className="w-6 h-6 text-neutral-400" />
-                      </div>
-                    )}
-                  </div>
+                {/* Row 1: Location + Me pill */}
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <h3 className="font-medium text-[15px] text-white/95 truncate flex-1">
+                    {beacon.course_name || 'Golf Course'}
+                  </h3>
+                  {beacon.isHost && (
+                    <Badge 
+                      variant="outline" 
+                      className="bg-white/20 text-neutral-900 border-white/30 backdrop-blur-md hover:bg-white/30 font-semibold px-2 py-0.5 text-xs rounded-full"
+                    >
+                      Me
+                    </Badge>
+                  )}
+                </div>
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-neutral-100 truncate">{hostName}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white/15 text-white text-xs font-medium backdrop-blur border border-white/22">
-                            {formatGameType(beacon.game_type)}
-                          </span>
-                          {beacon.distanceText && (
-                            <span className="text-xs text-neutral-400">
-                              {beacon.distanceText} away
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                {/* Row 2: Meta info (time + players) */}
+                <div className="flex items-center gap-3 text-xs text-white/60 mb-2">
+                  <span className="inline-flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" />
+                    {formatWhen(beacon.start_time)}
+                  </span>
+                  {beacon.players_needed && (
+                    <>
+                      <span>•</span>
+                      <span className="inline-flex items-center gap-1">
+                        <Users className="w-3.5 h-3.5" />
+                        {beacon.players_needed === 1 
+                          ? 'Need 1 more'
+                          : `${beacon.players_needed} spots free`}
+                      </span>
+                    </>
+                  )}
+                  {beacon.distanceText && !beacon.isHost && (
+                    <>
+                      <span>•</span>
+                      <span>{beacon.distanceText} away</span>
+                    </>
+                  )}
+                </div>
 
-                    {beacon.course_name && (
-                      <p className="text-sm text-neutral-300 mb-1 flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-neutral-500" />
-                        {beacon.course_name}
-                      </p>
-                    )}
+                {/* Row 3: Note/description */}
+                {beacon.note && (
+                  <p className="text-sm text-white/80 mb-3 line-clamp-2">
+                    {beacon.note}
+                  </p>
+                )}
 
-                    {beacon.note && (
-                      <p className="text-sm text-neutral-400 mb-3 line-clamp-1">
-                        {beacon.note}
-                      </p>
-                    )}
-
-                    {/* CTA Button */}
-                    <div className="flex items-center justify-between">
-                      <div className="text-xs text-neutral-500">
-                        {beacon.players_needed && (
-                          <span>Needs {beacon.players_needed} player{beacon.players_needed > 1 ? 's' : ''}</span>
-                        )}
-                      </div>
-                      {beacon.isHost ? (
-                        <button
-                          onClick={() => onCancelBeacon(beacon.id)}
-                          className="px-4 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg text-sm font-medium transition-colors"
-                        >
-                          Cancel Game
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => onJoinBeacon(beacon.id)}
-                          className="px-4 py-1.5 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-lg text-sm font-medium backdrop-blur border border-white/28 shadow-[0_16px_32px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.2)] active:shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.3)] transition-all"
-                        >
-                          I'm in
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                {/* Action button */}
+                <div className="flex items-center justify-end gap-2 pt-1">
+                  {beacon.isHost ? (
+                    <button
+                      onClick={() => onCancelBeacon(beacon.id)}
+                      className="px-4 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      Cancel Game
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => onJoinBeacon(beacon.id)}
+                      className="px-4 py-1.5 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-lg text-sm font-medium backdrop-blur border border-white/28 shadow-[0_16px_32px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.2)] active:shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.3)] transition-all"
+                    >
+                      I'm in
+                    </button>
+                  )}
                 </div>
               </div>
             );

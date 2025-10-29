@@ -42,7 +42,7 @@ export function useGameBeacon() {
 
   const currentUserId = supabase.auth.getUser().then(u => u.data.user?.id);
 
-  // Fetch and filter beacons
+  // Fetch and filter beacons - now includes user's own games in the unified list
   const fetchBeacons = async () => {
     try {
       const { data: user } = await supabase.auth.getUser();
@@ -81,11 +81,10 @@ export function useGameBeacon() {
         return;
       }
 
-      // Separate my beacon from others
+      // Separate my beacon from others for backward compatibility
       const myBeaconData = beacons.find(b => b.host_user_id === userId);
-      const otherBeacons = beacons.filter(b => b.host_user_id !== userId);
-
-      // Set my beacon
+      
+      // Set my beacon for other components that may need it
       if (myBeaconData) {
         setMyBeacon({
           ...myBeaconData,
@@ -96,10 +95,24 @@ export function useGameBeacon() {
         setMyBeacon(null);
       }
 
-      // Filter and annotate nearby beacons
+      // Create unified list including user's own games AND nearby games
       if (userLat && userLng) {
-        const annotated = otherBeacons
+        const allGames = beacons
           .map(beacon => {
+            const isHost = beacon.host_user_id === userId;
+            
+            // For user's own games, no distance filtering
+            if (isHost) {
+              return {
+                ...beacon,
+                participants: beacon.participants || [],
+                distance_meters: 0,
+                distanceText: undefined,
+                isHost: true,
+              };
+            }
+
+            // For other games, apply distance filtering
             if (!beacon.lat || !beacon.lng) return null;
 
             const distanceMeters = calculateDistance(
@@ -119,12 +132,25 @@ export function useGameBeacon() {
               isHost: false,
             };
           })
-          .filter((b): b is NonNullable<typeof b> => b !== null && b.distance_meters !== undefined)
-          .sort((a, b) => (a.distance_meters || 0) - (b.distance_meters || 0));
+          .filter((b): b is NonNullable<typeof b> => b !== null)
+          .sort((a, b) => {
+            // User's games first, then by distance
+            if (a.isHost && !b.isHost) return -1;
+            if (!a.isHost && b.isHost) return 1;
+            return (a.distance_meters || 0) - (b.distance_meters || 0);
+          });
 
-        setNearbyBeacons(annotated);
+        setNearbyBeacons(allGames);
       } else {
-        setNearbyBeacons([]);
+        // No location - only show user's own games
+        const myGames = beacons
+          .filter(b => b.host_user_id === userId)
+          .map(beacon => ({
+            ...beacon,
+            participants: beacon.participants || [],
+            isHost: true,
+          }));
+        setNearbyBeacons(myGames);
       }
     } catch (error) {
       console.error('Error in fetchBeacons:', error);
