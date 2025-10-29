@@ -38,10 +38,16 @@ export function useVisibility() {
     load();
   }, [user?.id]);
 
-  // Update mode in DB
+  // Update mode in DB with optimistic UI
   const updateMode = useCallback(
     async (newMode: VisibilityMode) => {
       if (!user?.id) return;
+
+      // Store previous mode for rollback
+      const previousMode = mode;
+
+      // OPTIMISTIC: Update UI immediately
+      setMode(newMode);
 
       let lat: number | null = null;
       let lng: number | null = null;
@@ -50,9 +56,11 @@ export function useVisibility() {
         // must have a location in these modes
         const loc = await getCurrentLocation();
         if (!loc) {
+          // REVERT on failure
+          setMode(previousMode);
           toast({
             title: 'Location needed',
-            description: 'Enable location to be visible to nearby golfers.',
+            description: 'Turn on location to appear to golfers nearby.',
             variant: 'destructive',
           });
           return;
@@ -78,6 +86,8 @@ export function useVisibility() {
 
       if (error) {
         console.error('updateMode error', error);
+        // REVERT on failure
+        setMode(previousMode);
         toast({
           title: 'Error',
           description: 'Could not update visibility.',
@@ -86,8 +96,7 @@ export function useVisibility() {
         return;
       }
 
-      setMode(newMode);
-
+      // Success toast
       toast({
         title:
           newMode === 'hidden'
@@ -101,7 +110,7 @@ export function useVisibility() {
             : 'Nearby golfers can now see you.',
       });
     },
-    [user?.id, getCurrentLocation, toast]
+    [user?.id, mode, getCurrentLocation, toast]
   );
 
   return {

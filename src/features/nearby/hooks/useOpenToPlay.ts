@@ -45,22 +45,34 @@ export function useOpenToPlay() {
     }
   };
 
-  // Activate broadcast
+  // Activate broadcast with optimistic UI
   const activate = useCallback(async () => {
     if (!user?.id) return;
+
+    const expiresAtMs = Date.now() + DURATION_MINUTES * 60_000;
+
+    // OPTIMISTIC: Update UI immediately
+    persistLocal({
+      active: true,
+      expiresAt: expiresAtMs,
+    });
 
     // get current position
     const loc = await getCurrentLocation();
     if (!loc) {
-    toast({
-      title: 'Location needed',
-      description: 'Enable location to let nearby golfers know you are available.',
-      variant: 'destructive',
-    });
+      // REVERT on failure
+      persistLocal({
+        active: false,
+        expiresAt: null,
+      });
+      toast({
+        title: 'Location needed',
+        description: 'Turn on location to go Open to Play.',
+        variant: 'destructive',
+      });
       return;
     }
 
-    const expiresAtMs = Date.now() + DURATION_MINUTES * 60_000;
     const expiresAtISO = new Date(expiresAtMs).toISOString();
 
     // upsert user_nearby_status: mark open_to_play_active=true, set expiry/time, refresh lat/lng
@@ -81,6 +93,11 @@ export function useOpenToPlay() {
 
     if (error) {
       console.error('OpenToPlay activate error', error);
+      // REVERT on failure
+      persistLocal({
+        active: false,
+        expiresAt: null,
+      });
       toast({
         title: 'Error',
         description: 'Could not set Open to Play.',
@@ -89,20 +106,25 @@ export function useOpenToPlay() {
       return;
     }
 
-    persistLocal({
-      active: true,
-      expiresAt: expiresAtMs,
-    });
-
+    // Success toast
     toast({
       title: 'Open to Play Active',
       description: 'Nearby golfers can see you are available for the next 30 mins.',
     });
   }, [user?.id, getCurrentLocation, toast]);
 
-  // Cancel broadcast
+  // Cancel broadcast with optimistic UI
   const cancel = useCallback(async () => {
     if (!user?.id) return;
+
+    // Store previous state for rollback
+    const previousState = { ...state };
+
+    // OPTIMISTIC: Update UI immediately
+    persistLocal({
+      active: false,
+      expiresAt: null,
+    });
 
     const { error } = await supabase
       .from('user_nearby_status')
@@ -117,6 +139,8 @@ export function useOpenToPlay() {
 
     if (error) {
       console.error('OpenToPlay cancel error', error);
+      // REVERT on failure
+      persistLocal(previousState);
       toast({
         title: 'Error',
         description: 'Could not clear Open to Play.',
@@ -125,16 +149,12 @@ export function useOpenToPlay() {
       return;
     }
 
-    persistLocal({
-      active: false,
-      expiresAt: null,
-    });
-
+    // Success toast
     toast({
       title: 'Open to Play off',
       description: 'You are no longer broadcasting availability.',
     });
-  }, [user?.id, toast]);
+  }, [user?.id, state, toast]);
 
   // Auto-expire locally and in DB when the timer runs out
   useEffect(() => {
