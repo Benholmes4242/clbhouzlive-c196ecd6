@@ -67,8 +67,8 @@ export function GamesNearbyList({
   const [isLoadingClubGames, setIsLoadingClubGames] = useState(false);
   const { golfers } = useActiveGolfers({ limit: 20, mockCount: 0 });
   
-  // Filter for golfers who are OpenToPlay
-  const openToPlayGolfers = golfers.filter(g => !g.isMock && g.isOpenToPlay);
+  // Filter for golfers who are Open to Play (all golfers are now real)
+  const openToPlayGolfers = golfers.filter(g => g.isOpenToPlay);
 
   // Fetch games at selected club
   useEffect(() => {

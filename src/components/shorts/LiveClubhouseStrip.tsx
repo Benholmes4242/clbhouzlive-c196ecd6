@@ -26,13 +26,13 @@ function superellipsePath(w: number, h: number, n = 4.2, steps = 240) {
 
 export function LiveClubhouseStrip() {
   const { creators, isLoading } = useLiveClubhouseProfiles();
-  const { golfers, realOnlineCount } = useActiveGolfers();
+  const { golfers } = useActiveGolfers();
   const rowRef = useRef<HTMLDivElement>(null);
   const [scrolling, setScrolling] = useState(false);
   const [nearbyOverlayOpen, setNearbyOverlayOpen] = useState(false);
   
-  // Filter for nearby golfers (real users, not mock)
-  const nearbyOnlineGolfers = golfers.filter(g => !g.isMock);
+  // All golfers are now real (no mocks), so we can use the full list
+  const nearbyOnlineGolfers = golfers;
 
   useEffect(() => {
     const el = rowRef.current;
@@ -75,7 +75,7 @@ export function LiveClubhouseStrip() {
           aria-label="Suggested creators"
         >
           <NearbyTile 
-            count={realOnlineCount} 
+            count={nearbyOnlineGolfers.length} 
             onOpen={() => setNearbyOverlayOpen(true)} 
           />
           {nearbyOnlineGolfers.map((golfer, idx) => (

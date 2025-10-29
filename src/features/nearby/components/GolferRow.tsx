@@ -47,7 +47,7 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
   };
 
   const handlePing = async () => {
-    if (isSendingPing || golfer.isMock) return;
+    if (isSendingPing) return;
 
     setIsSendingPing(true);
     analyticsEvents.track('nearby_ping_clicked', { golfer_id: golfer.id, position: index });

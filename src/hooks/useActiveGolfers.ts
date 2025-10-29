@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState, useMemo } from 'react';
 import { channelManager } from '@/utils/supabaseChannelManager';
-import { getMockNearby } from '@/features/nearby/mockNearbyGolfers';
 import { calculateDistance, formatDistance } from '@/features/nearby/distance';
 import { NEARBY_RADIUS_METERS } from '@/features/nearby/config';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
@@ -21,7 +20,7 @@ export type ActiveGolfer = {
   sameHomeClub?: boolean;
 };
 
-export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number; mockCount?: number } = {}) {
+export function useActiveGolfers({ limit = 20, mockCount = 0 }: { limit?: number; mockCount?: number } = {}) {
   const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set());
   const { currentLocation, requestPermission } = useLocationPermission();
 
@@ -168,40 +167,19 @@ export function useActiveGolfers({ limit = 20, mockCount = 5 }: { limit?: number
   // }, [realProfiles.length]);
 
   const golfers = useMemo<ActiveGolfer[]>(() => {
+    // Only return real golfers - no mock data
     const realWithOnline: ActiveGolfer[] = realProfiles.map(p => ({
       ...p,
       is_online: false, // No longer tracking online status
       isMock: false,
     }));
 
-    const mockProfiles: ActiveGolfer[] = getMockNearby(mockCount).map(m => {
-      const distanceText = m.distance_km ? formatDistance(m.distance_km * 1000) : undefined;
-      return {
-        id: m.id,
-        display_name: m.display_name,
-        home_club: m.home_club,
-        avatar_url: m.avatar_url,
-        is_online: m.is_online,
-        isMock: true,
-        distance_km: m.distance_km,
-        distanceText,
-        isOpenToPlay: m.isOpenToPlay,
-        sameHomeClub: m.same_club,
-      };
-    });
-
-    const blended: ActiveGolfer[] = [];
-    const maxLength = Math.max(realWithOnline.length, mockProfiles.length);
-    for (let i = 0; i < maxLength; i++) {
-      if (i < realWithOnline.length) blended.push(realWithOnline[i]);
-      if (i < mockProfiles.length) blended.push(mockProfiles[i]);
-    }
-
-    return blended;
-  }, [realProfiles, mockCount, onlineUserIds]);
+    return realWithOnline;
+  }, [realProfiles]);
 
   const realOnlineCount = useMemo(() => {
-    return golfers.filter(g => !g.isMock).length; // Count all real golfers, not just online
+    // All golfers are real now - return the total count
+    return golfers.length;
   }, [golfers]);
 
   return { golfers, realOnlineCount, isLoading };
