@@ -120,38 +120,35 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               />
             </div>
 
-            {/* Open to Play tile */}
-            <button
-              onClick={handleOpenToPlayToggle}
-              className="w-full rounded-xl bg-white/5 backdrop-blur-md border border-white/10 px-3 py-3 flex flex-row items-center gap-3 min-h-[72px] active:bg-white/10 active:border-white/20 transition-colors"
-            >
-              {/* Icon bubble */}
-              <div 
-                className={`h-9 w-9 rounded-lg flex items-center justify-center text-[14px] font-medium shadow-[0_16px_32px_rgba(0,0,0,0.8)] ${
-                  isOpenToPlay
-                    ? 'bg-green-500/20 border border-green-500/40 text-green-400'
-                    : 'bg-white/10 border border-white/20 text-white'
-                }`}
+            {/* Open to Play compact pill */}
+            <div className="flex justify-center">
+              <button
+                onClick={handleOpenToPlayToggle}
+                className={`
+                  inline-flex items-center gap-2.5 rounded-xl px-4 py-2.5 backdrop-blur-md transition-all duration-150
+                  ${isOpenToPlay 
+                    ? 'bg-white/[0.07] border border-green-500/30 shadow-[0_0_12px_rgba(110,146,119,0.25)]' 
+                    : 'bg-white/5 border border-white/10 hover:bg-white/[0.08]'
+                  }
+                `}
               >
-                🏌️‍♂️
-              </div>
-
-              {/* Text block */}
-              <div className="flex flex-col min-w-0 text-left">
-                <div className={`text-[13px] font-semibold leading-tight ${
-                  isOpenToPlay ? 'text-white' : 'text-white/80'
-                }`}>
-                  Open to Play
+                <span className="text-[16px]">🏌️‍♂️</span>
+                <div className="flex flex-col items-start">
+                  <div className={`text-[13px] font-semibold leading-tight ${
+                    isOpenToPlay ? 'text-white' : 'text-white/80'
+                  }`}>
+                    Open to Play
+                  </div>
+                  <div className={`text-[11px] leading-tight ${
+                    isOpenToPlay ? 'text-white/60' : 'text-white/50'
+                  }`}>
+                    {isOpenToPlay
+                      ? `${remainingText} remaining`
+                      : 'Tap to let golfers join up'}
+                  </div>
                 </div>
-                <div className={`text-[12px] leading-tight truncate ${
-                  isOpenToPlay ? 'text-white/70' : 'text-white/50'
-                }`}>
-                  {isOpenToPlay
-                    ? `${remainingText} remaining`
-                    : 'Tap to let golfers join up'}
-                </div>
-              </div>
-            </button>
+              </button>
+            </div>
           </div>
 
           {/* Row C: Tabs */}
