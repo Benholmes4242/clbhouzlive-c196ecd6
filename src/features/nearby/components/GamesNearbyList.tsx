@@ -147,20 +147,33 @@ export function GamesNearbyList({
 
   if (isLoading) {
     return (
-      <>
-        <ClubSearchInput
-          onClubSelect={handleClubSelect}
-          onClear={handleClearSearch}
-          selectedClub={selectedClub}
-        />
-        <div className="py-12 text-center">
-          <div className="animate-pulse space-y-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="bg-neutral-800/30 rounded-xl p-4 h-24" />
-            ))}
+      <div className="space-y-5 pb-4">
+        {/* SECTION 1: Find a Game */}
+        <div>
+          <ClubSearchInput
+            onClubSelect={handleClubSelect}
+            onClear={handleClearSearch}
+            selectedClub={selectedClub}
+          />
+        </div>
+
+        {/* Divider */}
+        <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+        {/* SECTION 2: Games Near You - Loading state */}
+        <div className="space-y-3">
+          <div className="px-2">
+            <h3 className="text-sm font-semibold text-white/95">Games Near You</h3>
+          </div>
+          <div className="py-6 text-center">
+            <div className="animate-pulse space-y-3">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="bg-neutral-800/30 rounded-xl p-4 h-24" />
+              ))}
+            </div>
           </div>
         </div>
-      </>
+      </div>
     );
   }
 
@@ -168,56 +181,56 @@ export function GamesNearbyList({
   const hasGames = displayGames.length > 0 || (!selectedClub && openToPlayGolfers.length > 0);
 
   return (
-    <div className="space-y-3 pb-4">
-      {/* Club Search - Always at top */}
-      <ClubSearchInput
-        onClubSelect={handleClubSelect}
-        onClear={handleClearSearch}
-        selectedClub={selectedClub}
-      />
+    <div className="space-y-5 pb-4">
+      {/* SECTION 1: Find a Game (Search) */}
+      <div>
+        <ClubSearchInput
+          onClubSelect={handleClubSelect}
+          onClear={handleClearSearch}
+          selectedClub={selectedClub}
+        />
+      </div>
 
-      {/* Show loading state for club games */}
-      {isLoadingClubGames ? (
-        <div className="py-8 text-center">
-          <div className="animate-pulse space-y-3">
-            {[1, 2].map(i => (
-              <div key={i} className="bg-neutral-800/30 rounded-xl p-4 h-24" />
-            ))}
-          </div>
-        </div>
-      ) : selectedClub && clubGames.length === 0 ? (
-        <div className="py-8 text-center space-y-3">
-          <p className="text-sm text-neutral-300">No active games at {selectedClub.name}</p>
-          <p className="text-xs text-neutral-500">Be the first to start one!</p>
-          <button
-            onClick={() => onCreateGame(selectedClub)}
-            className="mt-2 px-6 py-2 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl text-sm font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] transition-all"
-          >
-            Create a Game
-          </button>
-        </div>
-      ) : !hasGames && !selectedClub ? (
-        <div className="py-8 text-center space-y-4">
-          <MapPin className="w-12 h-12 mx-auto text-neutral-600" />
-          <div>
-            <p className="font-medium text-neutral-300 mb-1">No games nearby</p>
-            <p className="text-sm text-neutral-500">Start one and see who joins</p>
-          </div>
-          <button
-            onClick={() => onCreateGame()}
-            className="mt-4 px-6 py-2 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all"
-          >
-            Create a Game
-          </button>
-        </div>
-      ) : null}
+      {/* Subtle divider */}
+      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-      {/* OpenToPlay golfers section - only show when not searching */}
-      {!selectedClub && openToPlayGolfers.length > 0 && (
-        <>
-          <div className="text-xs font-medium text-white/50 px-2 pt-2">
-            Open to Play Now
+      {/* SECTION 2: Games Near You / Club Games */}
+      <div className="space-y-3">
+        {/* Section Header */}
+        <div className="px-2">
+          <h3 className="text-sm font-semibold text-white/95">
+            {selectedClub ? `Games at ${selectedClub.name}` : 'Games Near You'}
+          </h3>
+        </div>
+
+        {/* Loading state */}
+        {isLoadingClubGames ? (
+          <div className="py-6 text-center">
+            <div className="animate-pulse space-y-3">
+              {[1, 2].map(i => (
+                <div key={i} className="bg-neutral-800/30 rounded-xl p-4 h-24" />
+              ))}
+            </div>
           </div>
+        ) : selectedClub && clubGames.length === 0 ? (
+          // Empty state for searched club
+          <div className="py-6 text-center space-y-2">
+            <MapPin className="w-10 h-10 mx-auto text-neutral-600" />
+            <p className="text-sm text-neutral-300">No active games at {selectedClub.name}</p>
+            <p className="text-xs text-neutral-500">Be the first to start one!</p>
+          </div>
+        ) : !hasGames && !selectedClub ? (
+          // Empty state for nearby games
+          <div className="py-6 text-center space-y-2">
+            <MapPin className="w-10 h-10 mx-auto text-neutral-600" />
+            <p className="text-sm font-medium text-neutral-300">No games nearby</p>
+            <p className="text-xs text-neutral-500">Start one and see who joins</p>
+          </div>
+        ) : null}
+
+        {/* OpenToPlay golfers - only show when not searching */}
+        {!selectedClub && openToPlayGolfers.length > 0 && (
+          <>
           {openToPlayGolfers.map((golfer) => (
             <div
               key={`open-${golfer.id}`}
@@ -283,19 +296,9 @@ export function GamesNearbyList({
         </>
       )}
 
-      {/* Unified games list */}
+      {/* Game beacons list */}
       {displayGames.length > 0 && (
         <>
-          {!selectedClub && openToPlayGolfers.length > 0 && (
-            <div className="text-xs font-medium text-white/50 px-2 pt-4">
-              Games
-            </div>
-          )}
-          {selectedClub && (
-            <div className="text-xs font-medium text-white/50 px-2 pt-2">
-              Games at {selectedClub.name}
-            </div>
-          )}
           {displayGames.map(beacon => {
             const host = hostProfiles[beacon.host_user_id];
             const hostName = host?.display_name || host?.username || 'Golfer';
@@ -359,7 +362,24 @@ export function GamesNearbyList({
             );
           })}
         </>
-      )}
+        )}
+      </div>
+
+      {/* Subtle divider before CTA */}
+      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+      {/* SECTION 3: Create a Game CTA */}
+      <div className="text-center space-y-3 py-2">
+        <p className="text-xs text-white/60">
+          Can't find a game that suits you?
+        </p>
+        <button
+          onClick={() => onCreateGame(selectedClub)}
+          className="px-6 py-2.5 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all"
+        >
+          Create a Game
+        </button>
+      </div>
     </div>
   );
 }
