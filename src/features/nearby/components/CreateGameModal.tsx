@@ -214,12 +214,14 @@ export function CreateGameModal({
 
   return (
     <div 
-      className="fixed inset-0 flex items-end sm:items-center sm:justify-center"
+      className="fixed inset-0 flex items-end sm:items-center sm:justify-center animate-fade-in"
       style={{ 
         zIndex: 10000, // Above NearbyOverlay's z-9999
         backgroundColor: 'rgba(0,0,0,0.4)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
+        overscrollBehavior: 'none',
+        touchAction: 'none',
       }}
     >
       {/* Backdrop */}
@@ -230,33 +232,59 @@ export function CreateGameModal({
       
       {/* Modal */}
       <div 
-        className="relative w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+        className="relative w-full max-w-lg flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-200"
         style={{ 
-          maxHeight: '80vh', // Match NearbyOverlay
+          height: 'calc(100vh - env(safe-area-inset-top))',
+          maxHeight: '100vh',
           touchAction: 'auto',
           overscrollBehavior: 'contain',
+          background: 'rgba(15, 15, 15, 0.6)',
+          backdropFilter: 'blur(40px)',
+          WebkitBackdropFilter: 'blur(40px)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '20px 20px 0 0',
+          boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="relative p-6 border-b border-neutral-800 text-center">
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-4 p-2 rounded-full hover:bg-neutral-800 transition-colors opacity-80"
-          >
-            <X className="w-5 h-5 text-neutral-400" />
-          </button>
-          <h2 className="text-lg font-semibold text-white">
-            {myBeacon ? 'Your Game' : 'Create a Game'}
-          </h2>
-          <p className="text-[15px] text-white/70 mt-1">
+        <div className="px-5 pt-4 pb-4">
+          {/* Title + Close */}
+          <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
+            {/* Left spacer */}
+            <div />
+            
+            {/* Title */}
+            <div className="text-center">
+              <h2 className="text-white text-[17px] font-semibold">
+                {myBeacon ? 'Your Game' : 'Create a Game'}
+              </h2>
+            </div>
+            
+            {/* Close button */}
+            <div className="flex justify-end">
+              <button
+                onClick={onClose}
+                className="text-white/60 hover:text-white/90 transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+          
+          {/* Subtitle */}
+          <p className="text-[15px] text-white/70 text-center">
             {myBeacon ? 'Currently hosting' : 'Let nearby golfers know you\'re looking to play'}
           </p>
         </div>
 
+        {/* Divider */}
+        <div className="w-full" style={{ height: '1px', background: 'rgba(255,255,255,0.08)' }} />
+
         {/* Content */}
         <div 
-          className="flex-1 overflow-y-auto p-6"
+          className="flex-1 overflow-y-auto px-5 pt-4 pb-6"
           style={{
             display: 'flex',
             flexDirection: 'column',

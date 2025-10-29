@@ -76,12 +76,15 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
         <div 
           className="relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200"
           style={{
-            height: '80vh',
+            height: 'calc(100vh - env(safe-area-inset-top))',
+            maxHeight: '100vh',
             touchAction: 'auto',
             overscrollBehavior: 'contain',
-            background: 'rgba(10, 10, 10, 0.88)',
-            border: '1px solid rgba(255, 255, 255, 0.07)',
-            borderRadius: '20px 20px 12px 12px',
+            background: 'rgba(15, 15, 15, 0.6)',
+            backdropFilter: 'blur(40px)',
+            WebkitBackdropFilter: 'blur(40px)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '20px 20px 0 0',
             boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9)',
           }}
           onClick={(e) => e.stopPropagation()}
