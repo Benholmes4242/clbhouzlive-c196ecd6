@@ -62,37 +62,40 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   return (
     <>
       <div
-        className="fixed inset-0 z-[9999] flex items-end sm:items-center sm:justify-center"
-      style={{
-        backgroundColor: 'rgba(0,0,0,0.4)',
-        WebkitBackdropFilter: 'blur(8px)',
-        backdropFilter: 'blur(8px)',
-        overscrollBehavior: 'none',
-        touchAction: 'none',
-      }}
-      onClick={handleClose}
-    >
-      {/* Modal */}
-      <div 
-        className="relative w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col"
+        className="fixed inset-0 z-[9999] flex items-end sm:items-center sm:justify-center animate-fade-in"
         style={{
-          height: '80vh',
-          touchAction: 'auto',
-          overscrollBehavior: 'contain',
+          backgroundColor: 'rgba(0,0,0,0.4)',
+          WebkitBackdropFilter: 'blur(8px)',
+          backdropFilter: 'blur(8px)',
+          overscrollBehavior: 'none',
+          touchAction: 'none',
         }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={handleClose}
       >
-        {/* Header */}
-        <div className="border-b border-neutral-800/60">
-          {/* Row A: Title + Close */}
-          <header className="px-4 pt-4 pb-3" style={{ userSelect: 'none' }}>
-            <div className="grid grid-cols-3 items-center">
+        {/* Modal */}
+        <div 
+          className="relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200"
+          style={{
+            height: '80vh',
+            touchAction: 'auto',
+            overscrollBehavior: 'contain',
+            background: 'rgba(10, 10, 10, 0.88)',
+            border: '1px solid rgba(255, 255, 255, 0.07)',
+            borderRadius: '20px 20px 12px 12px',
+            boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9)',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="px-5 pt-6 pb-5">
+            {/* Title + Close */}
+            <div className="grid grid-cols-3 items-center mb-5" style={{ userSelect: 'none' }}>
               {/* Left spacer */}
               <div />
               
               {/* Title */}
               <div className="text-center">
-                <h2 className="text-white text-[18px] font-semibold leading-none whitespace-nowrap">
+                <h2 className="text-white text-[17px] font-semibold">
                   Nearby Golfers
                 </h2>
               </div>
@@ -101,18 +104,15 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               <div className="flex justify-end">
                 <button
                   onClick={handleClose}
-                  className="text-white/70 active:scale-95 transition-transform"
+                  className="text-white/60 hover:text-white/90 transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
                   aria-label="Close"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
-          </header>
 
-          {/* Row B: Visibility Control + Open to Play */}
-          <div className="px-4 py-3 space-y-4">
-            {/* Visibility Segmented Control */}
+            {/* Visibility Control */}
             <div className="w-full">
               <VisibilitySegmentedControl 
                 value={visibilityMode}
@@ -120,57 +120,72 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               />
             </div>
 
-            {/* Open to Play compact pill */}
-            <div className="flex flex-col items-center gap-1.5">
+            {/* Open to Play toggle pill */}
+            <div className="flex flex-col items-center gap-2.5 pt-4">
               <button
                 onClick={handleOpenToPlayToggle}
                 className={`
-                  inline-flex items-center gap-2 rounded-full px-4 py-2 transition-all duration-150 active:scale-[0.98]
+                  relative inline-flex items-center gap-2 rounded-full px-3.5 py-2 font-semibold text-white
+                  transition-all duration-200 active:scale-[0.96]
                   ${isOpenToPlay 
-                    ? 'bg-[rgba(110,146,119,0.22)] border border-[rgba(110,146,119,0.5)] shadow-[0_0_8px_rgba(110,146,119,0.5)] text-white' 
-                    : 'bg-white/[0.07] border border-white/[0.18] hover:bg-white/[0.1] text-white/80'
+                    ? 'border' 
+                    : 'bg-white/[0.07] border border-white/20 hover:bg-white/[0.1]'
                   }
                 `}
+                style={isOpenToPlay ? {
+                  background: 'rgba(110, 146, 119, 0.28)',
+                  borderColor: 'rgba(110, 146, 119, 0.5)',
+                  boxShadow: '0 0 16px rgba(110, 146, 119, 0.45)',
+                } : undefined}
               >
                 <span className="relative text-[14px]">
-                  🏌️‍♂️
+                  🏌
                   {isOpenToPlay && (
-                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-400 rounded-full border border-white/20" />
+                    <span 
+                      className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-green-400 rounded-full border border-white/30 animate-in fade-in scale-in duration-200" 
+                    />
                   )}
                 </span>
-                <span className="text-[13px] font-semibold">
+                <span className="text-[13px]">
                   Open to Play
                 </span>
-                {isOpenToPlay && (
+                {isOpenToPlay && remainingText && (
                   <span className="text-[11px] text-white/70">
-                    • {remainingText} left
+                    • {remainingText}
                   </span>
                 )}
               </button>
-              <div className="text-[12px] text-white/60 text-center">
+              <div className="text-[13px] text-white/60 text-center max-w-[260px] leading-relaxed">
                 Tap to let golfers know you're up for a game
               </div>
             </div>
           </div>
 
-          {/* Row C: Tabs */}
-          <div className="flex px-4">
+          {/* Tabs */}
+          <div className="flex px-5 mt-6 border-b border-white/[0.06]">
+
             <button
               onClick={() => setActiveTab('golfers')}
-              className={`flex-1 py-3 text-sm font-medium border-b-2 transition-all duration-150 ${
+              className={`flex-1 py-3.5 text-sm font-medium relative transition-all duration-150 ${
                 activeTab === 'golfers'
-                  ? 'border-white/90 text-white/90'
-                  : 'border-transparent text-white/40 hover:text-white/60'
+                  ? 'text-white'
+                  : 'text-white/55 hover:text-white/75'
               }`}
             >
               Golfers
+              {activeTab === 'golfers' && (
+                <div 
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-white/90 rounded-full transition-all duration-150"
+                  style={{ width: '48px' }}
+                />
+              )}
             </button>
             <button
               onClick={() => setActiveTab('games')}
-              className={`flex-1 py-3 text-sm font-medium border-b-2 transition-all duration-150 ${
+              className={`flex-1 py-3.5 text-sm font-medium relative transition-all duration-150 ${
                 activeTab === 'games'
-                  ? 'border-white/90 text-white/90'
-                  : 'border-transparent text-white/40 hover:text-white/60'
+                  ? 'text-white'
+                  : 'text-white/55 hover:text-white/75'
               }`}
             >
               Games {nearbyBeacons.length > 0 && (
@@ -178,13 +193,18 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                   {nearbyBeacons.length}
                 </span>
               )}
+              {activeTab === 'games' && (
+                <div 
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-white/90 rounded-full transition-all duration-150"
+                  style={{ width: '48px' }}
+                />
+              )}
             </button>
           </div>
-        </div>
 
         {/* Scrollable Content */}
         <div 
-          className="px-4 pt-4 pb-3 flex-1 overflow-y-auto"
+          className="px-5 pt-4 pb-6 flex-1 overflow-y-auto"
           style={{
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',
@@ -192,14 +212,14 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
         >
           {activeTab === 'golfers' ? (
             isLoading ? (
-              <div className="py-12 text-center text-sm text-neutral-500">
-                <div className="font-medium text-neutral-300">Loading active golfers…</div>
-                <div className="text-neutral-500">Checking who's nearby</div>
+              <div className="py-12 text-center flex flex-col items-center justify-center min-h-[240px]">
+                <div className="text-[15px] font-medium text-white/90">Loading active golfers…</div>
+                <div className="text-[13px] text-white/60 mt-1">Checking who's nearby</div>
               </div>
             ) : golfers.length === 0 ? (
-              <div className="py-12 text-center text-sm text-neutral-500">
-                <div className="font-medium text-neutral-300">No active golfers right now</div>
-                <div className="text-neutral-500">Check back soon</div>
+              <div className="py-12 text-center flex flex-col items-center justify-center min-h-[240px]">
+                <div className="text-[15px] font-medium text-white/90">No active golfers right now</div>
+                <div className="text-[13px] text-white/60 mt-1">Check back soon</div>
               </div>
             ) : (
               <div className="space-y-2">
