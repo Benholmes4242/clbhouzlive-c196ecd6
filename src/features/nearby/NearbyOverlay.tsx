@@ -87,7 +87,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="px-5 pt-4 pb-3">
+          <div className="px-5 pt-4">
             {/* Title + Close */}
             <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
               {/* Left spacer */}
