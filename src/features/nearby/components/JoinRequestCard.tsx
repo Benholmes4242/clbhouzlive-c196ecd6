@@ -23,8 +23,8 @@ export function JoinRequestCard({ request, onAccept, onDecline }: JoinRequestCar
   };
 
   return (
-    <div className="rounded-xl bg-white/5 backdrop-blur-md border border-white/10 p-3">
-      <div className="flex items-start gap-3">
+    <div className="rounded-lg bg-white/5 border border-white/10 p-3">
+      <div className="flex items-start gap-3 mb-3">
         {/* Avatar */}
         <div className="h-12 w-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white text-sm font-medium overflow-hidden flex-shrink-0">
           {profile.profile_photo_url ? (
@@ -40,19 +40,19 @@ export function JoinRequestCard({ request, onAccept, onDecline }: JoinRequestCar
 
         {/* Profile Info */}
         <div className="flex-1 min-w-0">
-          <div className="font-semibold text-base text-white">
+          <div className="text-[14px] font-semibold text-white mb-0.5">
             {profile.display_name}
           </div>
           
           {profile.home_club && (
-            <div className="flex items-center gap-1 text-sm text-white/60 mt-0.5">
-              <MapPin className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-1 text-[13px] text-white/70 mb-0.5">
+              <MapPin className="w-3 h-3" />
               <span className="truncate">{profile.home_club}</span>
             </div>
           )}
           
           {profile.eg_handicap_index !== null && (
-            <div className="text-sm text-white/60 mt-0.5">
+            <div className="text-[12px] text-white/60">
               Handicap {profile.eg_handicap_index}
             </div>
           )}
@@ -60,16 +60,16 @@ export function JoinRequestCard({ request, onAccept, onDecline }: JoinRequestCar
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-2 mt-4">
+      <div className="flex gap-2">
         <button
           onClick={() => onDecline(request.id)}
-          className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-white/80 text-[13px] font-medium border border-white/20 transition-all"
+          className="flex-1 rounded-lg bg-white/5 border border-white/20 text-white/70 text-[13px] font-medium py-2 hover:bg-white/10 transition-all"
         >
           Decline
         </button>
         <button
           onClick={() => onAccept(request.id, request.game_id)}
-          className="flex-1 py-2 rounded-lg bg-green-600/20 hover:bg-green-600/30 text-green-400 text-[13px] font-medium border border-green-500/40 transition-all"
+          className="flex-1 rounded-lg bg-green-500/20 border border-green-500/40 text-green-400 text-[13px] font-medium py-2 hover:bg-green-500/30 transition-all"
         >
           Accept
         </button>

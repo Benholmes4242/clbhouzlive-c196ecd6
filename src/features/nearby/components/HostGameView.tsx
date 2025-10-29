@@ -40,50 +40,61 @@ export function HostGameView({ game, onCancelBeacon }: HostGameViewProps) {
     return labels[type] || type;
   };
 
+  const playersNeeded = game.players_needed || 0;
+
   return (
     <div className="space-y-4">
       {/* Your Game Card */}
       <div className="rounded-xl bg-white/5 backdrop-blur-md border border-white/10 p-3">
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <div className="text-xs font-semibold text-green-400 uppercase tracking-wide mb-2">
-              Your Game
+        <div className="space-y-3">
+          {/* Header */}
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="text-[15px] font-semibold text-white mb-0.5">
+                {game.course_name || 'Course TBD'}
+              </div>
+              <div className="text-[13px] text-white/70">
+                {formatTeeTime(game.tee_time)}
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-              <MapPin className="w-4 h-4" />
-              <span className="font-medium text-white/80">{game.course_name || 'Course TBD'}</span>
-            </div>
-            <div className="flex items-center gap-2 text-white text-base font-semibold mb-2">
-              <Clock className="w-4 h-4" />
-              <span>{formatTeeTime(game.tee_time)}</span>
-            </div>
-            <div className="flex items-center gap-3 text-sm text-white/60">
-              <span>{getGameTypeLabel(game.game_type)}</span>
-              {game.players_needed !== null && game.players_needed > 0 && (
-                <>
-                  <span>•</span>
-                  <span className="text-green-400 font-medium">
-                    Looking for {game.players_needed} more
-                  </span>
-                </>
-              )}
+            
+            <div className="rounded-full bg-white/10 border border-white/20 text-white/80 text-[12px] font-medium px-2 py-1 whitespace-nowrap ml-2">
+              {getGameTypeLabel(game.game_type)}
             </div>
           </div>
-        </div>
 
-        <button
-          onClick={() => onCancelBeacon(game.id)}
-          className="w-full py-2 rounded-lg bg-white/10 hover:bg-white/15 text-white/80 text-sm font-medium border border-white/20 transition-all"
-        >
-          Cancel Game
-        </button>
+          {/* Game info */}
+          <div className="space-y-1">
+            {playersNeeded > 0 && (
+              <div className="text-[13px] text-green-400 font-medium">
+                {playersNeeded} spot{playersNeeded === 1 ? '' : 's'} open
+              </div>
+            )}
+            <div className="text-[12px] text-white/50">
+              You're hosting this round
+            </div>
+          </div>
+
+          {/* Cancel button */}
+          <button
+            onClick={() => onCancelBeacon(game.id)}
+            className="w-full rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-[12px] font-medium px-3 py-2 hover:bg-red-500/15 transition-all"
+          >
+            Cancel Game
+          </button>
+        </div>
       </div>
 
       {/* Join Requests Section */}
       {requests.length > 0 && (
         <div className="space-y-3">
-          <div className="text-sm font-semibold text-white/90">
-            Requests to Join ({requests.length})
+          <div className="flex items-center gap-2">
+            <span className="text-[14px] font-semibold text-white/90">
+              Join requests
+            </span>
+            <div className="bg-white/10 border border-white/20 text-white/80 text-[12px] rounded-full px-2 py-[2px]">
+              {requests.length}
+            </div>
           </div>
           
           {requests.map((request) => (

@@ -27,7 +27,7 @@ export function GamesNearbyList({
   const [isLoadingClubGames, setIsLoadingClubGames] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [requestedGames, setRequestedGames] = useState<Set<string>>(new Set());
-  const { createRequest } = useGameJoinRequests();
+  const { createRequest, acceptedGameIds } = useGameJoinRequests();
 
   // Get current user ID
   useEffect(() => {
@@ -199,9 +199,11 @@ export function GamesNearbyList({
                   players_needed: game.players_needed,
                   host_handicap: game.host_handicap || null,
                   other_player_handicaps: game.other_player_handicaps || null,
+                  host_user_id: game.host_user_id,
                 }}
                 onRequestJoin={handleRequestJoin}
                 hasRequested={requestedGames.has(game.id)}
+                isAccepted={acceptedGameIds.has(game.id)}
               />
             ))}
           </div>

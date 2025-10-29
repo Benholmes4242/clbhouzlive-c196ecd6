@@ -20,7 +20,32 @@ export interface GameJoinRequest {
 export function useGameJoinRequests(gameId?: string) {
   const [requests, setRequests] = useState<GameJoinRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [acceptedGameIds, setAcceptedGameIds] = useState<Set<string>>(new Set());
   const { toast } = useToast();
+
+  // Fetch user's accepted game requests on mount
+  useEffect(() => {
+    const fetchUserAcceptedRequests = async () => {
+      try {
+        const { data: user } = await supabase.auth.getUser();
+        if (!user.user) return;
+
+        const { data } = await supabase
+          .from('game_join_requests')
+          .select('game_id')
+          .eq('requester_user_id', user.user.id)
+          .eq('status', 'accepted');
+
+        if (data) {
+          setAcceptedGameIds(new Set(data.map(r => r.game_id)));
+        }
+      } catch (error) {
+        console.error('Error fetching accepted requests:', error);
+      }
+    };
+
+    fetchUserAcceptedRequests();
+  }, []);
 
   useEffect(() => {
     if (!gameId) {
@@ -188,8 +213,8 @@ export function useGameJoinRequests(gameId?: string) {
       }
 
       toast({
-        title: "Request accepted",
-        description: "Player added to your game.",
+        title: "They're in 👍",
+        description: "We've notified them they're added to your game.",
       });
 
       fetchRequests();
@@ -230,8 +255,8 @@ export function useGameJoinRequests(gameId?: string) {
       }
 
       toast({
-        title: "Request declined",
-        description: "Player has been notified.",
+        title: "We've let them know the round is full",
+        description: "Request declined.",
       });
 
       fetchRequests();
@@ -251,5 +276,6 @@ export function useGameJoinRequests(gameId?: string) {
     createRequest,
     acceptRequest,
     declineRequest,
+    acceptedGameIds,
   };
 }
