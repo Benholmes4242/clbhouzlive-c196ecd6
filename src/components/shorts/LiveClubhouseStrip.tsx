@@ -181,8 +181,7 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
           size={84}
           src={creator.profile_photo_url || '/placeholder.svg'}
           alt={creator.display_name}
-          ringColor="#ffffff"
-          ringWidth={1.5}
+          ringWidth={0}
         />
       </button>
 
