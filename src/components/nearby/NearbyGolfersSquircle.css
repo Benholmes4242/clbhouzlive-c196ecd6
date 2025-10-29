@@ -12,13 +12,15 @@
   cursor: pointer;
   overflow: hidden;
   
-  /* Transparent background to show the radar's glass edges */
-  background: transparent;
-  
-  /* No backdrop blur on container - let the radar icon handle its own glass effect */
+  /* Glass background with warm orange tint */
+  background: linear-gradient(135deg, rgba(255, 167, 38, 0.15) 0%, rgba(251, 140, 0, 0.1) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   
   /* Subtle elevation matching profile tiles */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.12),
+    inset 0 1px 2px rgba(255, 213, 79, 0.2);
   
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   
@@ -26,13 +28,39 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Glass overlay for depth */
+.nearby-golfers-squircle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 224, 130, 0.15) 0%, rgba(255, 224, 130, 0) 50%);
+  border: 1px solid rgba(255, 183, 77, 0.2);
+}
+
 .radar-icon {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  width: 90%;
+  height: 90%;
   pointer-events: none;
   position: relative;
   z-index: 1;
+  filter: drop-shadow(0 2px 4px rgba(255, 143, 0, 0.3));
+}
+
+/* Radar sweep animation */
+.radar-sweep {
+  animation: radarSweep 3s linear infinite;
+  transform-origin: 50px 50px;
+}
+
+@keyframes radarSweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Hover / Active States */
@@ -60,5 +88,9 @@
   
   .nearby-golfers-squircle:hover {
     transform: none;
+  }
+  
+  .radar-sweep {
+    animation: none;
   }
 }
