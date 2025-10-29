@@ -21,7 +21,7 @@ interface ShortCardProps {
   currentUserId?: string;
   variant?: 'portrait' | 'landscape'; // Support landscape cards
   useGlassPanel?: boolean; // Use glass panel layout for landscape cards (default true)
-  badgeType?: 'trending' | 'suggested'; // Badge type to show
+  isTrending?: boolean; // Show trending badge
 }
 
 export default React.memo(function ShortCard({ 
@@ -36,7 +36,7 @@ export default React.memo(function ShortCard({
   currentUserId,
   variant = 'portrait',
   useGlassPanel = true,
-  badgeType
+  isTrending = false
 }: ShortCardProps) {
   const isVideo = item.type === 'video' || item.src?.includes('.mp4') || item.src?.includes('.webm');
   
@@ -94,9 +94,9 @@ export default React.memo(function ShortCard({
         {/* Gradient overlay for badges */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-        {/* Badge - Top Right */}
-        {badgeType && (
-          <TrendingBadge type={badgeType} className="absolute top-1.5 right-1.5" />
+        {/* Trending Badge - Top Right */}
+        {isTrending && (
+          <TrendingBadge className="absolute top-1.5 right-1.5" />
         )}
 
         {/* Hover Overlay */}
