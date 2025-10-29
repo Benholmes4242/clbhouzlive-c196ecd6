@@ -102,9 +102,9 @@ export default React.memo(function ShortCard({
           <TrendingBadge className="absolute top-1.5 right-1.5" />
         )}
 
-        {/* Suggested Badge - Top Left */}
+        {/* Suggested Badge - Top Right */}
         {isSuggested && (
-          <SuggestedBadge className="absolute top-1.5 left-1.5" />
+          <SuggestedBadge className="absolute top-1.5 right-1.5" />
         )}
 
         {/* Hover Overlay */}
