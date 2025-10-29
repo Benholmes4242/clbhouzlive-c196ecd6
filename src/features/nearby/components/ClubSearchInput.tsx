@@ -28,7 +28,7 @@ export function ClubSearchInput({ onClubSelect, onClear, selectedClub }: ClubSea
 
   if (selectedClub) {
     return (
-      <div className="rounded-xl bg-white/5 backdrop-blur-md border border-white/10 px-4 py-3">
+      <div className="max-w-md mx-auto rounded-xl bg-white/5 backdrop-blur-md border border-white/10 px-4 py-3">
         <div className="flex items-center justify-between">
           <div>
             <div className="text-xs text-white/50 mb-1">Viewing games at</div>
@@ -48,16 +48,16 @@ export function ClubSearchInput({ onClubSelect, onClear, selectedClub }: ClubSea
 
   return (
     <div className="space-y-3">
-      {/* Section Header */}
-      <div className="px-2 space-y-1">
+      {/* Section Header - Centered */}
+      <div className="px-2 space-y-1 text-center">
         <h3 className="text-sm font-semibold text-white/95">Find a Game</h3>
         <p className="text-[13px] text-white/60">
           Search a golf club or browse games nearby.
         </p>
       </div>
       
-      {/* Search Input */}
-      <div className="relative">
+      {/* Search Input - Centered */}
+      <div className="relative max-w-md mx-auto">
         <button
           onClick={() => {
             setShowDropdown(!showDropdown);
@@ -68,7 +68,7 @@ export function ClubSearchInput({ onClubSelect, onClear, selectedClub }: ClubSea
           <Search className="w-4 h-4 text-white/50" />
           <span className="text-sm text-white/50">Search golf club...</span>
         </button>
-        <div className="text-xs text-white/60 px-2 mt-1.5">
+        <div className="text-xs text-white/60 text-center mt-1.5">
           Find active games or golfers looking for a match.
         </div>
 

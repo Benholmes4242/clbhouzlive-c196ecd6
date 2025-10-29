@@ -162,7 +162,7 @@ export function GamesNearbyList({
 
         {/* SECTION 2: Games Near You - Loading state */}
         <div className="space-y-3">
-          <div className="px-2">
+          <div className="px-2 text-center">
             <h3 className="text-sm font-semibold text-white/95">Games Near You</h3>
           </div>
           <div className="py-6 text-center">
@@ -196,8 +196,8 @@ export function GamesNearbyList({
 
       {/* SECTION 2: Games Near You / Club Games */}
       <div className="space-y-3">
-        {/* Section Header */}
-        <div className="px-2">
+        {/* Section Header - Centered */}
+        <div className="px-2 text-center">
           <h3 className="text-sm font-semibold text-white/95">
             {selectedClub ? `Games at ${selectedClub.name}` : 'Games Near You'}
           </h3>
@@ -368,8 +368,8 @@ export function GamesNearbyList({
       {/* Subtle divider before CTA */}
       <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-      {/* SECTION 3: Create a Game CTA */}
-      <div className="text-center space-y-3 py-2">
+      {/* SECTION 3: Create a Game CTA - Centered */}
+      <div className="text-center space-y-3 py-2 flex flex-col items-center">
         <p className="text-xs text-white/60">
           Can't find a game that suits you?
         </p>
