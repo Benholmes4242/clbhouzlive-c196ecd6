@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { MapPin, Users, Clock, ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { format, parseISO } from 'date-fns';
 
 interface AnonymousGameCardProps {
@@ -71,22 +69,22 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested }: Anonymo
   const playersNeeded = game.players_needed || 0;
 
   return (
-    <Card className="p-4 bg-card border-border">
+    <div className="rounded-xl bg-white/5 backdrop-blur-md border border-white/10 p-3">
       {/* Main Info */}
       <div className="space-y-2">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
+            <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
               <MapPin className="w-4 h-4" />
-              <span className="font-medium">{game.course_name || 'Course TBD'}</span>
+              <span className="font-medium text-white/80">{game.course_name || 'Course TBD'}</span>
             </div>
             
-            <div className="flex items-center gap-2 text-foreground text-base font-semibold mb-2">
+            <div className="flex items-center gap-2 text-white text-base font-semibold mb-2">
               <Clock className="w-4 h-4" />
               <span>{formatTeeTime(game.tee_time)}</span>
             </div>
             
-            <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
+            <div className="flex items-center gap-3 text-sm text-white/60 flex-wrap">
               <span className="flex items-center gap-1">
                 <Users className="w-4 h-4" />
                 {playerInfo.count} {playerInfo.count === 1 ? 'player' : 'players'} so far
@@ -100,12 +98,12 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested }: Anonymo
               )}
             </div>
             
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+            <div className="flex items-center gap-2 text-sm text-white/60 mt-1">
               <span>{getGameTypeLabel(game.game_type)}</span>
               {playersNeeded > 0 && (
                 <>
                   <span>•</span>
-                  <span className="text-primary font-medium">
+                  <span className="text-green-400 font-medium">
                     Needs {playersNeeded} more
                   </span>
                 </>
@@ -115,30 +113,30 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested }: Anonymo
           
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1 hover:bg-muted rounded-full transition-colors"
+            className="p-1 hover:bg-white/10 rounded-full transition-colors"
           >
             {isExpanded ? (
-              <ChevronUp className="w-5 h-5 text-muted-foreground" />
+              <ChevronUp className="w-5 h-5 text-white/60" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-muted-foreground" />
+              <ChevronDown className="w-5 h-5 text-white/60" />
             )}
           </button>
         </div>
 
         {/* Expanded Details */}
         {isExpanded && (
-          <div className="pt-3 border-t border-border space-y-1 text-sm text-muted-foreground">
+          <div className="pt-3 mt-3 border-t border-white/10 space-y-1 text-[13px] text-white/70">
             <div>
-              <span className="font-medium">Host handicap:</span> {game.host_handicap || 'N/A'}
+              <span className="font-medium text-white/80">Host handicap:</span> {game.host_handicap || 'N/A'}
             </div>
             <div>
-              <span className="font-medium">Playing with:</span> {Math.max(0, playerInfo.count - 1)} other {playerInfo.count - 1 === 1 ? 'member' : 'members'}
+              <span className="font-medium text-white/80">Playing with:</span> {Math.max(0, playerInfo.count - 1)} other {playerInfo.count - 1 === 1 ? 'member' : 'members'}
             </div>
             <div>
-              <span className="font-medium">Course:</span> {game.course_name || 'TBD'}
+              <span className="font-medium text-white/80">Course:</span> {game.course_name || 'TBD'}
             </div>
             <div>
-              <span className="font-medium">Looking for:</span> {playersNeeded} more
+              <span className="font-medium text-white/80">Looking for:</span> {playersNeeded} more
             </div>
           </div>
         )}
@@ -146,21 +144,23 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested }: Anonymo
         {/* CTA Button */}
         <div className="pt-3">
           {playersNeeded > 0 ? (
-            <Button
+            <button
               onClick={() => onRequestJoin(game.id)}
               disabled={hasRequested}
-              className="w-full"
-              size="lg"
+              className="w-full py-2.5 rounded-lg bg-white/20 hover:bg-white/30 disabled:bg-white/5 disabled:text-white/40 text-white text-[15px] font-medium border border-white/20 backdrop-blur transition-all"
             >
               {hasRequested ? 'Requested' : 'Request to Join'}
-            </Button>
+            </button>
           ) : (
-            <Button disabled className="w-full" size="lg">
+            <button 
+              disabled 
+              className="w-full py-2.5 rounded-lg bg-white/5 text-white/40 text-[15px] font-medium border border-white/10"
+            >
               Full
-            </Button>
+            </button>
           )}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

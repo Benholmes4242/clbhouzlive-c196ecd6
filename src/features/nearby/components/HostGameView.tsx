@@ -2,10 +2,8 @@ import React from 'react';
 import { GameBeacon } from '../hooks/useGameBeacon';
 import { useGameJoinRequests } from '../hooks/useGameJoinRequests';
 import { JoinRequestCard } from './JoinRequestCard';
-import { Card } from '@/components/ui/card';
-import { MapPin, Clock, Users } from 'lucide-react';
+import { MapPin, Clock } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
-import { Button } from '@/components/ui/button';
 
 interface HostGameViewProps {
   game: GameBeacon;
@@ -45,26 +43,26 @@ export function HostGameView({ game, onCancelBeacon }: HostGameViewProps) {
   return (
     <div className="space-y-4">
       {/* Your Game Card */}
-      <Card className="p-4 bg-card border-border">
+      <div className="rounded-xl bg-white/5 backdrop-blur-md border border-white/10 p-3">
         <div className="flex items-start justify-between mb-3">
           <div>
-            <div className="text-xs font-semibold text-primary uppercase tracking-wide mb-2">
+            <div className="text-xs font-semibold text-green-400 uppercase tracking-wide mb-2">
               Your Game
             </div>
-            <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
+            <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
               <MapPin className="w-4 h-4" />
-              <span className="font-medium">{game.course_name || 'Course TBD'}</span>
+              <span className="font-medium text-white/80">{game.course_name || 'Course TBD'}</span>
             </div>
-            <div className="flex items-center gap-2 text-foreground text-base font-semibold mb-2">
+            <div className="flex items-center gap-2 text-white text-base font-semibold mb-2">
               <Clock className="w-4 h-4" />
               <span>{formatTeeTime(game.tee_time)}</span>
             </div>
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+            <div className="flex items-center gap-3 text-sm text-white/60">
               <span>{getGameTypeLabel(game.game_type)}</span>
               {game.players_needed !== null && game.players_needed > 0 && (
                 <>
                   <span>•</span>
-                  <span className="text-primary font-medium">
+                  <span className="text-green-400 font-medium">
                     Looking for {game.players_needed} more
                   </span>
                 </>
@@ -73,20 +71,18 @@ export function HostGameView({ game, onCancelBeacon }: HostGameViewProps) {
           </div>
         </div>
 
-        <Button
-          variant="outline"
+        <button
           onClick={() => onCancelBeacon(game.id)}
-          className="w-full"
-          size="sm"
+          className="w-full py-2 rounded-lg bg-white/10 hover:bg-white/15 text-white/80 text-sm font-medium border border-white/20 transition-all"
         >
           Cancel Game
-        </Button>
-      </Card>
+        </button>
+      </div>
 
       {/* Join Requests Section */}
       {requests.length > 0 && (
         <div className="space-y-3">
-          <div className="text-sm font-semibold text-foreground">
+          <div className="text-sm font-semibold text-white/90">
             Requests to Join ({requests.length})
           </div>
           
