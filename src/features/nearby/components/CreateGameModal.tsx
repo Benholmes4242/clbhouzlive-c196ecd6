@@ -4,6 +4,7 @@ import { GameBeacon } from '../hooks/useGameBeacon';
 import { useCourseSearch } from '../hooks/useCourseSearch';
 import { DateTimePicker } from './DateTimePicker';
 import { format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
 
 // Format game type for display
 function formatGameTypeDisplay(gameType: string): string {
@@ -25,6 +26,9 @@ interface CreateGameModalProps {
     note?: string;
     start_time?: string;
     players_needed?: number;
+    host_handicap?: number;
+    other_player_handicaps?: number[];
+    tee_time?: string;
   }) => Promise<void>;
   onCancelBeacon: (beaconId: string) => Promise<void>;
   myBeacon: GameBeacon | null;
@@ -64,10 +68,34 @@ export function CreateGameModal({
   const [customDateTime, setCustomDateTime] = useState<Date | null>(null);
   const [showDateTimePicker, setShowDateTimePicker] = useState(false);
   const [playersNeeded, setPlayersNeeded] = useState<number | null>(null);
+  const [hostHandicap, setHostHandicap] = useState<string>('');
+  const [otherHandicaps, setOtherHandicaps] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const courseInputRef = useRef<HTMLInputElement>(null);
   
   const { courses } = useCourseSearch(courseSearchTerm);
+
+  // Pre-fill host handicap from user profile
+  useEffect(() => {
+    const fetchUserHandicap = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('eg_handicap_index')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.eg_handicap_index !== null) {
+        setHostHandicap(profile.eg_handicap_index.toString());
+      }
+    };
+
+    if (isOpen) {
+      fetchUserHandicap();
+    }
+  }, [isOpen]);
 
   // Pre-fill club if provided
   useEffect(() => {
@@ -107,6 +135,12 @@ export function CreateGameModal({
       startTime = new Date();
     }
 
+    // Parse other handicaps if provided
+    const otherHandicapsArray = otherHandicaps
+      .split(',')
+      .map(h => parseFloat(h.trim()))
+      .filter(h => !isNaN(h));
+
     setIsSubmitting(true);
     try {
       await onCreateBeacon({
@@ -114,7 +148,10 @@ export function CreateGameModal({
         course_name: courseName || undefined,
         note: note || undefined,
         start_time: startTime.toISOString(),
+        tee_time: startTime.toISOString(), // Use same time as start_time
         players_needed: playersNeeded || undefined,
+        host_handicap: hostHandicap ? parseFloat(hostHandicap) : undefined,
+        other_player_handicaps: otherHandicapsArray.length > 0 ? otherHandicapsArray : undefined,
       });
       onClose();
       // Reset form
@@ -125,6 +162,8 @@ export function CreateGameModal({
       setTiming('now');
       setCustomDateTime(null);
       setPlayersNeeded(null);
+      setHostHandicap('');
+      setOtherHandicaps('');
     } finally {
       setIsSubmitting(false);
     }
@@ -389,6 +428,38 @@ export function CreateGameModal({
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Your Handicap */}
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-white/60">
+                  Your Handicap
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  placeholder="e.g. 5.2"
+                  value={hostHandicap}
+                  onChange={(e) => setHostHandicap(e.target.value)}
+                  className="w-full py-3 px-4 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20"
+                />
+              </div>
+
+              {/* Other Players' Handicaps */}
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-white/60">
+                  Other Players' Handicaps (optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. 3, 4.5, 6"
+                  value={otherHandicaps}
+                  onChange={(e) => setOtherHandicaps(e.target.value)}
+                  className="w-full py-3 px-4 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20"
+                />
+                <p className="text-xs text-neutral-500">
+                  Comma-separated handicaps of players already in your group
+                </p>
               </div>
 
               <button

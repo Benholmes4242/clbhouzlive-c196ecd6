@@ -614,16 +614,19 @@ export type Database = {
           created_at: string
           expires_at: string
           game_type: string
+          host_handicap: number | null
           host_user_id: string
           id: string
           is_active: boolean
           lat: number | null
           lng: number | null
           note: string | null
+          other_player_handicaps: number[] | null
           participants: string[] | null
           players_needed: number | null
           start_time: string
           status: string
+          tee_time: string | null
           updated_at: string | null
         }
         Insert: {
@@ -631,16 +634,19 @@ export type Database = {
           created_at?: string
           expires_at: string
           game_type: string
+          host_handicap?: number | null
           host_user_id: string
           id?: string
           is_active?: boolean
           lat?: number | null
           lng?: number | null
           note?: string | null
+          other_player_handicaps?: number[] | null
           participants?: string[] | null
           players_needed?: number | null
           start_time?: string
           status?: string
+          tee_time?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -648,19 +654,57 @@ export type Database = {
           created_at?: string
           expires_at?: string
           game_type?: string
+          host_handicap?: number | null
           host_user_id?: string
           id?: string
           is_active?: boolean
           lat?: number | null
           lng?: number | null
           note?: string | null
+          other_player_handicaps?: number[] | null
           participants?: string[] | null
           players_needed?: number | null
           start_time?: string
           status?: string
+          tee_time?: string | null
           updated_at?: string | null
         }
         Relationships: []
+      }
+      game_join_requests: {
+        Row: {
+          created_at: string
+          game_id: string
+          id: string
+          requester_user_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          game_id: string
+          id?: string
+          requester_user_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          game_id?: string
+          id?: string
+          requester_user_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_join_requests_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "game_beacons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       golf_courses: {
         Row: {

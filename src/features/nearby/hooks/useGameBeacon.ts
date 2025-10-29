@@ -23,6 +23,9 @@ export interface GameBeacon {
   distance_meters?: number;
   distanceText?: string;
   isHost?: boolean;
+  host_handicap?: number | null;
+  other_player_handicaps?: number[] | null;
+  tee_time?: string | null;
 }
 
 interface CreateBeaconInput {
@@ -31,6 +34,9 @@ interface CreateBeaconInput {
   note?: string;
   start_time?: string;
   players_needed?: number;
+  host_handicap?: number;
+  other_player_handicaps?: number[];
+  tee_time?: string;
 }
 
 export function useGameBeacon() {
@@ -251,6 +257,9 @@ export function useGameBeacon() {
           status: 'active',
           players_needed: input.players_needed || null,
           participants: [],
+          host_handicap: input.host_handicap || null,
+          other_player_handicaps: input.other_player_handicaps || [],
+          tee_time: input.tee_time || startTime.toISOString(),
         })
         .select()
         .single();
