@@ -91,10 +91,10 @@ export function useVisibility() {
       toast({
         title:
           newMode === 'hidden'
-            ? 'Hidden'
+            ? 'Hidden from nearby golfers 🙈'
             : newMode === 'friends'
-            ? 'Visible to friends'
-            : 'Visible to everyone',
+            ? 'Visible to friends only 👥'
+            : 'Visible to everyone 👀',
         description:
           newMode === 'hidden'
             ? 'You are hidden from Nearby.'

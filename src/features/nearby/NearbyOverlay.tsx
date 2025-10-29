@@ -8,6 +8,7 @@ import { CreateGameModal } from './components/CreateGameModal';
 import { GamesNearbyList } from './components/GamesNearbyList';
 import { useVisibility } from './hooks/useVisibility';
 import { useOpenToPlay } from './hooks/useOpenToPlay';
+import { VisibilitySegmentedControl } from './components/VisibilitySegmentedControl';
 
 interface NearbyOverlayProps {
   isOpen: boolean;
@@ -47,15 +48,6 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
     onClose();
   };
 
-  const cycleVisibility = () => {
-    if (visibilityMode === 'all') {
-      setVisibilityMode('friends');
-    } else if (visibilityMode === 'friends') {
-      setVisibilityMode('hidden');
-    } else {
-      setVisibilityMode('all');
-    }
-  };
 
   const handleOpenToPlayToggle = () => {
     if (isOpenToPlay) {
@@ -118,46 +110,20 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             </div>
           </header>
 
-          {/* Row B: Glass tiles (Visibility + Open to Play) */}
-          <div className="flex gap-3 px-4 py-2">
-            {/* Visibility tile */}
-            <button
-              onClick={cycleVisibility}
-              disabled={visibilityLoading}
-              className="relative flex-1 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 px-3 py-3 flex flex-row items-center gap-3 min-h-[72px] active:bg-white/10 active:border-white/20 transition-colors"
-            >
-              {/* Icon bubble */}
-              <div 
-                className={`h-9 w-9 rounded-lg flex items-center justify-center text-[14px] font-medium shadow-[0_16px_32px_rgba(0,0,0,0.8)] ${
-                  visibilityMode === 'hidden'
-                    ? 'bg-white/5 border border-white/10 text-white/40'
-                    : 'bg-white/10 border border-white/20 text-white'
-                }`}
-              >
-                👁️
-              </div>
-
-              {/* Text block */}
-              <div className="flex flex-col min-w-0 text-left">
-                <div className={`text-[13px] font-semibold leading-tight ${
-                  visibilityMode === 'hidden' ? 'text-white/70' : 'text-white'
-                }`}>
-                  Visibility
-                </div>
-                <div className={`text-[12px] leading-tight truncate ${
-                  visibilityMode === 'hidden' ? 'text-white/40' : 'text-white/70'
-                }`}>
-                  {visibilityMode === 'all' && 'Visible to Everyone'}
-                  {visibilityMode === 'friends' && 'Visible to Friends'}
-                  {visibilityMode === 'hidden' && 'Hidden'}
-                </div>
-              </div>
-            </button>
+          {/* Row B: Visibility Control + Open to Play */}
+          <div className="px-4 py-3 space-y-3">
+            {/* Visibility Segmented Control */}
+            <div className="w-full">
+              <VisibilitySegmentedControl 
+                value={visibilityMode}
+                onChange={setVisibilityMode}
+              />
+            </div>
 
             {/* Open to Play tile */}
             <button
               onClick={handleOpenToPlayToggle}
-              className="relative flex-1 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 px-3 py-3 flex flex-row items-center gap-3 min-h-[72px] active:bg-white/10 active:border-white/20 transition-colors"
+              className="w-full rounded-xl bg-white/5 backdrop-blur-md border border-white/10 px-3 py-3 flex flex-row items-center gap-3 min-h-[72px] active:bg-white/10 active:border-white/20 transition-colors"
             >
               {/* Icon bubble */}
               <div 
