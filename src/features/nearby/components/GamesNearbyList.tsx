@@ -85,7 +85,12 @@ export function GamesNearbyList({
   };
 
   const handleRequestJoin = async (gameId: string) => {
-    setRequestedGames(prev => new Set(prev).add(gameId));
+    // Optimistic update
+    setRequestedGames(prev => {
+      const next = new Set(prev);
+      next.add(gameId);
+      return next;
+    });
     await createRequest(gameId);
   };
 

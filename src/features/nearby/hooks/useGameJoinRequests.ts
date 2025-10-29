@@ -27,13 +27,13 @@ export function useGameJoinRequests(gameId?: string) {
   useEffect(() => {
     const fetchUserAcceptedRequests = async () => {
       try {
-        const { data: user } = await supabase.auth.getUser();
-        if (!user.user) return;
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
 
         const { data } = await supabase
           .from('game_join_requests')
           .select('game_id')
-          .eq('requester_user_id', user.user.id)
+          .eq('requester_user_id', user.id)
           .eq('status', 'accepted');
 
         if (data) {
@@ -41,10 +41,40 @@ export function useGameJoinRequests(gameId?: string) {
         }
       } catch (error) {
         console.error('Error fetching accepted requests:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchUserAcceptedRequests();
+  }, []);
+
+  // Realtime listener for instant "You're in 👋" updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('user-game-joins')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'game_join_requests',
+        },
+        (payload: any) => {
+          if (payload.new?.status === 'accepted') {
+            setAcceptedGameIds(prev => {
+              const next = new Set(prev);
+              next.add(payload.new.game_id);
+              return next;
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
@@ -119,15 +149,15 @@ export function useGameJoinRequests(gameId?: string) {
 
   const createRequest = async (gameId: string) => {
     try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) throw new Error('Not authenticated');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
 
       // Check if user already has a pending request
       const { data: existing } = await supabase
         .from('game_join_requests')
         .select('id, status')
         .eq('game_id', gameId)
-        .eq('requester_user_id', user.user.id)
+        .eq('requester_user_id', user.id)
         .single();
 
       if (existing) {
@@ -144,7 +174,7 @@ export function useGameJoinRequests(gameId?: string) {
         .from('game_join_requests')
         .insert({
           game_id: gameId,
-          requester_user_id: user.user.id,
+          requester_user_id: user.id,
           status: 'pending',
         });
 
