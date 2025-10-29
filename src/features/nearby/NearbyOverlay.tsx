@@ -89,7 +89,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           {/* Header */}
           <div className="px-5 pt-4 pb-3">
             {/* Title + Close */}
-            <div className="grid grid-cols-3 items-center mb-5" style={{ userSelect: 'none' }}>
+            <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
               {/* Left spacer */}
               <div />
               
@@ -121,7 +121,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             </div>
 
             {/* Divider */}
-            <div className="w-full my-3" style={{ height: '1px', background: 'rgba(255,255,255,0.08)' }} />
+            <div className="w-full mt-[18px] mb-2" style={{ height: '1px', background: 'rgba(255,255,255,0.08)' }} />
 
             {/* Open to Play toggle pill */}
             <div className="flex flex-col items-center gap-2.5">
