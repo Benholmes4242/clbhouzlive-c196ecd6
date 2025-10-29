@@ -69,36 +69,61 @@ export function useActiveGolfers({ limit = 20, mockCount = 0 }: { limit?: number
 
       const now = new Date();
 
-      const candidates = nearbyStatuses
+      // Build base candidates with distance and flags
+      const baseCandidates = nearbyStatuses
         .map(status => {
           const distance_meters = calculateDistance(userLat!, userLng!, status.lat!, status.lng!);
-          const isOpenToPlay = 
-            status.open_to_play_active && 
-            status.open_to_play_expires_at && 
+          const isOpenToPlay =
+            status.open_to_play_active &&
+            status.open_to_play_expires_at &&
             new Date(status.open_to_play_expires_at) > now;
-          
+
           return {
-            user_id: status.user_id,
+            user_id: status.user_id as string,
             distance_meters,
-            visibility_mode: status.visibility_mode,
+            visibility_mode: status.visibility_mode as 'all' | 'friends' | 'hidden',
             isOpenToPlay,
           };
         })
+        .filter(row => row.distance_meters <= NEARBY_RADIUS_METERS);
+
+      if (!baseCandidates.length) return [];
+
+      // Enforce friends-only visibility: require mutual follow
+      const friendOnlyIds = baseCandidates
+        .filter(r => r.visibility_mode === 'friends')
+        .map(r => r.user_id);
+
+      let allowedFriendIds = new Set<string>();
+      if (friendOnlyIds.length) {
+        // viewer -> candidate
+        const { data: followsA } = await supabase
+          .from('user_follows')
+          .select('following_id')
+          .eq('follower_id', user.id)
+          .in('following_id', friendOnlyIds);
+
+        // candidate -> viewer
+        const { data: followsB } = await supabase
+          .from('user_follows')
+          .select('follower_id')
+          .eq('following_id', user.id)
+          .in('follower_id', friendOnlyIds);
+
+        const aSet = new Set((followsA || []).map(r => r.following_id as string));
+        (followsB || []).forEach(r => {
+          const id = r.follower_id as string;
+          if (aSet.has(id)) allowedFriendIds.add(id);
+        });
+      }
+
+      const candidates = baseCandidates
         .filter(row => {
-          // Distance limit
-          if (row.distance_meters > NEARBY_RADIUS_METERS) return false;
-          
-          // Visibility rules
           if (row.visibility_mode === 'hidden') return false;
-          
           if (row.visibility_mode === 'friends') {
-            // TODO: enforce "friends only" when we have friend graph
-            // For now allow them so people can test the mode
-            return true;
+            return allowedFriendIds.has(row.user_id);
           }
-          
-          // 'all'
-          return true;
+          return true; // 'all'
         })
         .sort((a, b) => a.distance_meters - b.distance_meters);
 
