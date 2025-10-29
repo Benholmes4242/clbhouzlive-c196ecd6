@@ -85,8 +85,8 @@ export function GamesNearbyList({
   };
 
   const handleRequestJoin = async (gameId: string) => {
-    await createRequest(gameId);
     setRequestedGames(prev => new Set(prev).add(gameId));
+    await createRequest(gameId);
   };
 
   if (isLoading) {

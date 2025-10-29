@@ -29,12 +29,17 @@ export function JoinRequestCard({ request, onAccept, onDecline }: JoinRequestCar
     <Card className="p-4 bg-card border-border">
       <div className="flex items-start gap-3">
         {/* Avatar */}
-        <Avatar className="w-12 h-12">
-          <AvatarImage src={profile.profile_photo_url || undefined} />
-          <AvatarFallback className="bg-primary/10 text-primary">
-            {getInitials(profile.display_name)}
-          </AvatarFallback>
-        </Avatar>
+        <div className="h-12 w-12 rounded-full bg-primary/10 border border-border flex items-center justify-center text-primary text-sm font-medium overflow-hidden flex-shrink-0">
+          {profile.profile_photo_url ? (
+            <img 
+              src={profile.profile_photo_url} 
+              alt={profile.display_name}
+              className="h-full w-full object-cover rounded-full" 
+            />
+          ) : (
+            getInitials(profile.display_name)
+          )}
+        </div>
 
         {/* Profile Info */}
         <div className="flex-1 min-w-0">

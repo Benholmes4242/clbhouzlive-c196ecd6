@@ -25,6 +25,7 @@ export function useGameJoinRequests(gameId?: string) {
   useEffect(() => {
     if (!gameId) {
       setIsLoading(false);
+      setRequests([]);
       return;
     }
 

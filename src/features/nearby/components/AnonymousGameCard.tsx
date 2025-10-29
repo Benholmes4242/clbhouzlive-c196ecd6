@@ -106,7 +106,7 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested }: Anonymo
                 <>
                   <span>•</span>
                   <span className="text-primary font-medium">
-                    Needs {playersNeeded} {playersNeeded === 1 ? 'more' : 'more'}
+                    Needs {playersNeeded} more
                   </span>
                 </>
               )}
@@ -132,13 +132,13 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested }: Anonymo
               <span className="font-medium">Host handicap:</span> {game.host_handicap || 'N/A'}
             </div>
             <div>
-              <span className="font-medium">Playing with:</span> {playerInfo.count - 1} other {playerInfo.count - 1 === 1 ? 'member' : 'members'}
+              <span className="font-medium">Playing with:</span> {Math.max(0, playerInfo.count - 1)} other {playerInfo.count - 1 === 1 ? 'member' : 'members'}
             </div>
             <div>
               <span className="font-medium">Course:</span> {game.course_name || 'TBD'}
             </div>
             <div>
-              <span className="font-medium">Looking for:</span> {playersNeeded} {playersNeeded === 1 ? 'more player' : 'more players'}
+              <span className="font-medium">Looking for:</span> {playersNeeded} more
             </div>
           </div>
         )}

@@ -57,7 +57,7 @@ export function HostGameView({ game, onCancelBeacon }: HostGameViewProps) {
             </div>
             <div className="flex items-center gap-2 text-foreground text-base font-semibold mb-2">
               <Clock className="w-4 h-4" />
-              <span>{formatTeeTime(game.start_time)}</span>
+              <span>{formatTeeTime(game.tee_time)}</span>
             </div>
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <span>{getGameTypeLabel(game.game_type)}</span>
@@ -65,7 +65,7 @@ export function HostGameView({ game, onCancelBeacon }: HostGameViewProps) {
                 <>
                   <span>•</span>
                   <span className="text-primary font-medium">
-                    Looking for {game.players_needed} {game.players_needed === 1 ? 'more' : 'more'}
+                    Looking for {game.players_needed} more
                   </span>
                 </>
               )}
