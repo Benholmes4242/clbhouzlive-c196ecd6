@@ -165,7 +165,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           </div>
 
           {/* Tabs */}
-          <div className="flex px-5 mt-[18px] border-b border-white/[0.06]">
+          <div className="flex px-5 mt-6 border-b border-white/[0.06]">
 
             <button
               onClick={() => setActiveTab('golfers')}
