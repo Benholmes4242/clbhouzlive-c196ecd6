@@ -45,7 +45,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
               ref={el => tabRefs.current[index] = el}
               onClick={() => handleTabClick(tab.id)}
               className={cn(
-                "discover-tab flex-1 py-[10px] px-4 text-center relative z-10 text-[18px] font-medium leading-tight",
+                "discover-tab flex-1 py-[10px] px-4 text-center relative z-10 text-[17px] font-medium leading-tight",
                 main === tab.id 
                   ? "active" 
                   : "hover:text-foreground/70"
