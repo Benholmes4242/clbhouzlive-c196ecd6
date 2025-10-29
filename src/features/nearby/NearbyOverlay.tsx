@@ -111,7 +111,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           </header>
 
           {/* Row B: Visibility Control + Open to Play */}
-          <div className="px-4 py-3 space-y-3">
+          <div className="px-4 py-3 space-y-4">
             {/* Visibility Segmented Control */}
             <div className="w-full">
               <VisibilitySegmentedControl 
@@ -121,33 +121,35 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             </div>
 
             {/* Open to Play compact pill */}
-            <div className="flex justify-center">
+            <div className="flex flex-col items-center gap-1.5">
               <button
                 onClick={handleOpenToPlayToggle}
                 className={`
-                  inline-flex items-center gap-2.5 rounded-xl px-4 py-2.5 backdrop-blur-md transition-all duration-150
+                  inline-flex items-center gap-2 rounded-full px-4 py-2 transition-all duration-150 active:scale-[0.98]
                   ${isOpenToPlay 
-                    ? 'bg-white/[0.07] border border-green-500/30 shadow-[0_0_12px_rgba(110,146,119,0.25)]' 
-                    : 'bg-white/5 border border-white/10 hover:bg-white/[0.08]'
+                    ? 'bg-[rgba(110,146,119,0.22)] border border-[rgba(110,146,119,0.5)] shadow-[0_0_8px_rgba(110,146,119,0.5)] text-white' 
+                    : 'bg-white/[0.07] border border-white/[0.18] hover:bg-white/[0.1] text-white/80'
                   }
                 `}
               >
-                <span className="text-[16px]">🏌️‍♂️</span>
-                <div className="flex flex-col items-start">
-                  <div className={`text-[13px] font-semibold leading-tight ${
-                    isOpenToPlay ? 'text-white' : 'text-white/80'
-                  }`}>
-                    Open to Play
-                  </div>
-                  <div className={`text-[11px] leading-tight ${
-                    isOpenToPlay ? 'text-white/60' : 'text-white/50'
-                  }`}>
-                    {isOpenToPlay
-                      ? `${remainingText} remaining`
-                      : 'Tap to let golfers join up'}
-                  </div>
-                </div>
+                <span className="relative text-[14px]">
+                  🏌️‍♂️
+                  {isOpenToPlay && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-400 rounded-full border border-white/20" />
+                  )}
+                </span>
+                <span className="text-[13px] font-semibold">
+                  Open to Play
+                </span>
+                {isOpenToPlay && (
+                  <span className="text-[11px] text-white/70">
+                    • {remainingText} left
+                  </span>
+                )}
               </button>
+              <div className="text-[12px] text-white/60 text-center">
+                Tap to let golfers join up
+              </div>
             </div>
           </div>
 
