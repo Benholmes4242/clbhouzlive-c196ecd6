@@ -133,13 +133,13 @@ function NearbyTile({ count, onOpen }: { count: number; onOpen: () => void }) {
       <div className="lc-avatar-btn">
         <NearbyGolfersSquircle 
           onClick={handleClick}
-          ariaLabel={`Active golfers, ${count} ${count === 1 ? 'golfer' : 'golfers'} nearby`}
+          ariaLabel={`Nearby golfers, ${count} ${count === 1 ? 'golfer' : 'golfers'} nearby`}
         />
       </div>
 
       <div className="lc-label">
-        <div className="lc-name" title="Active Golfers">
-          Active Golfers
+        <div className="lc-name" title="Nearby Golfers">
+          Nearby Golfers
         </div>
         <div className="lc-sub" style={count > 0 ? { color: 'rgba(74, 222, 128, 0.8)' } : undefined}>
           {captionText}
