@@ -83,7 +83,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       <div 
         className="relative w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col"
         style={{
-          maxHeight: '80vh',
+          height: '80vh',
           touchAction: 'auto',
           overscrollBehavior: 'contain',
         }}
