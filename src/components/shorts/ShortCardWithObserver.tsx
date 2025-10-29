@@ -16,6 +16,7 @@ interface ShortCardWithObserverProps {
   gridPosition?: number; // Position in the grid (0-based) for autoplay pattern
   useGlassPanel?: boolean; // Use glass panel layout for landscape cards (default true)
   isTrending?: boolean; // Show trending badge
+  isSuggested?: boolean; // Show suggested badge
 }
 
 /**
@@ -42,7 +43,8 @@ export default function ShortCardWithObserver({
   variant,
   gridPosition = 0,
   useGlassPanel,
-  isTrending
+  isTrending,
+  isSuggested
 }: ShortCardWithObserverProps) {
   // State for dual-observer pattern
   const [shouldAttach, setShouldAttach] = React.useState(false);
@@ -120,6 +122,7 @@ export default function ShortCardWithObserver({
         variant={variant}
         useGlassPanel={useGlassPanel}
         isTrending={isTrending}
+        isSuggested={isSuggested}
       />
     </div>
   );

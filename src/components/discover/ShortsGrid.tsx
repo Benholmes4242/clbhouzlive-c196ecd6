@@ -35,6 +35,7 @@ interface LayoutItem {
   height?: number;
   variant?: 'portrait' | 'landscape';
   isTrending?: boolean;
+  isSuggested?: boolean;
 }
 
 export default function ShortsGrid({ 
@@ -194,13 +195,20 @@ export default function ShortsGrid({
           result.length % 5 === 0 // Roughly every 5th card after anchors
         );
         
+        // Suggested logic: every 8th card (after initial cards), not adjacent to trending
+        const isSuggested = !isTrending && 
+          result.length >= 8 && 
+          result.length % 8 === 0 &&
+          !result[result.length - 1]?.isTrending;
+        
         result.push({
           item,
           index: itemIndex,
           type: 'portrait',
           height: baseHeightPx, // All portraits same size
           variant: 'portrait',
-          isTrending
+          isTrending,
+          isSuggested
         });
         
         if (!firstPortraitMarked && isTrending) {
@@ -227,7 +235,7 @@ export default function ShortsGrid({
     
     const sections: Array<{
       type: 'portrait-grid' | 'landscape';
-      items?: Array<{ item: ExploreContentItem; index: number; height: number; isTrending?: boolean }>;
+      items?: Array<{ item: ExploreContentItem; index: number; height: number; isTrending?: boolean; isSuggested?: boolean }>;
       landscapeItem?: { item: ExploreContentItem; index: number; isTrending?: boolean };
     }> = [];
     
@@ -239,7 +247,7 @@ export default function ShortsGrid({
         if (currentPortraits.length > 0) {
           sections.push({
             type: 'portrait-grid',
-            items: currentPortraits.map(p => ({ item: p.item, index: p.index, height: p.height!, isTrending: p.isTrending }))
+            items: currentPortraits.map(p => ({ item: p.item, index: p.index, height: p.height!, isTrending: p.isTrending, isSuggested: p.isSuggested }))
           });
           currentPortraits = [];
         }
@@ -258,7 +266,7 @@ export default function ShortsGrid({
     if (currentPortraits.length > 0) {
       sections.push({
         type: 'portrait-grid',
-        items: currentPortraits.map(p => ({ item: p.item, index: p.index, height: p.height!, isTrending: p.isTrending }))
+        items: currentPortraits.map(p => ({ item: p.item, index: p.index, height: p.height!, isTrending: p.isTrending, isSuggested: p.isSuggested }))
       });
     }
     
@@ -313,6 +321,7 @@ export default function ShortsGrid({
                 currentUserId={currentUserId}
                 gridPosition={posInRow}
                 isTrending={layoutItem.isTrending}
+                isSuggested={layoutItem.isSuggested}
               />
             ))}
           </div>
@@ -360,7 +369,7 @@ export default function ShortsGrid({
                 className="grid grid-cols-2" 
                 style={{ gap: `${GUTTER_PX}px`, marginBottom: '2px' }}
               >
-                {section.items.map(({ item, index, height, isTrending }, posInGrid) => {
+                {section.items.map(({ item, index, height, isTrending, isSuggested }, posInGrid) => {
                   // Calculate global grid position accounting for first row and previous sections
                   const basePosition = firstRow.length; // Start after first row
                   let previousPortraits = 0;
@@ -383,6 +392,7 @@ export default function ShortsGrid({
                       currentUserId={currentUserId}
                       gridPosition={gridPosition}
                       isTrending={isTrending}
+                      isSuggested={isSuggested}
                     />
                   );
                 })}

@@ -7,6 +7,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { Squircle } from '@/components/ui/squircle';
 import { Heart } from 'lucide-react';
 import TrendingBadge from '@/components/discover/TrendingBadge';
+import SuggestedBadge from '@/components/discover/SuggestedBadge';
 import '@/styles/shorts-meta.css';
 
 interface ShortCardProps {
@@ -22,6 +23,7 @@ interface ShortCardProps {
   variant?: 'portrait' | 'landscape'; // Support landscape cards
   useGlassPanel?: boolean; // Use glass panel layout for landscape cards (default true)
   isTrending?: boolean; // Show trending badge
+  isSuggested?: boolean; // Show suggested badge
 }
 
 export default React.memo(function ShortCard({ 
@@ -36,7 +38,8 @@ export default React.memo(function ShortCard({
   currentUserId,
   variant = 'portrait',
   useGlassPanel = true,
-  isTrending = false
+  isTrending = false,
+  isSuggested = false
 }: ShortCardProps) {
   const isVideo = item.type === 'video' || item.src?.includes('.mp4') || item.src?.includes('.webm');
   
@@ -97,6 +100,11 @@ export default React.memo(function ShortCard({
         {/* Trending Badge - Top Right */}
         {isTrending && (
           <TrendingBadge className="absolute top-1.5 right-1.5" />
+        )}
+
+        {/* Suggested Badge - Top Left */}
+        {isSuggested && (
+          <SuggestedBadge className="absolute top-1.5 left-1.5" />
         )}
 
         {/* Hover Overlay */}
