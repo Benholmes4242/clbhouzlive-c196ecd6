@@ -1,6 +1,6 @@
 import React from "react";
 import "./NearbyGolfersSquircle.css";
-import radarIcon from "@/assets/radar-icon.png";
+import radarIcon from "@/assets/radar-icon-gold.png";
 
 interface NearbyGolfersSquircleProps {
   onClick?: () => void;
