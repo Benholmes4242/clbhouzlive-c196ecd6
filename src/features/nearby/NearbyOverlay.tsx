@@ -99,7 +99,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               
               {/* Title */}
               <div className="text-center">
-                <h2 className="text-white text-[18px] font-semibold leading-none">
+                <h2 className="text-white text-[18px] font-semibold leading-none whitespace-nowrap">
                   Nearby Golfers
                 </h2>
               </div>
