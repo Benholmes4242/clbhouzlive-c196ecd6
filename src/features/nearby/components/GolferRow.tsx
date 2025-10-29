@@ -25,6 +25,15 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
   const [isSendingPing, setIsSendingPing] = React.useState(false);
   const { toast } = useToast();
 
+  const handleFriendRequest = () => {
+    analyticsEvents.track('nearby_friend_request_clicked', { golfer_id: golfer.id, position: index });
+    // TODO: Send friend request when friends system is integrated
+    toast({
+      title: 'Friend request',
+      description: 'Friend system coming soon',
+    });
+  };
+
   const handleFollow = () => {
     analyticsEvents.track('nearby_follow_clicked', { golfer_id: golfer.id, position: index });
     setIsFollowing(!isFollowing);
@@ -136,6 +145,13 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
 
       {/* Row 3: Action Bar */}
       <div className="flex flex-row gap-2 border-t border-white/10 px-3 py-3">
+        <button
+          onClick={handleFriendRequest}
+          className="flex-1 rounded-lg border border-white/25 text-white text-[13px] font-medium py-2 hover:bg-white/5 transition-colors"
+        >
+          Friend Request
+        </button>
+
         <button
           onClick={handleFollow}
           className="flex-1 rounded-lg border border-white/25 text-white text-[13px] font-medium py-2 hover:bg-white/5 transition-colors"
