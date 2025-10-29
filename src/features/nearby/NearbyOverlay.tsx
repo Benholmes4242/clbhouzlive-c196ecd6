@@ -87,7 +87,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="px-5 pt-6 pb-5">
+          <div className="px-5 pt-4 pb-3">
             {/* Title + Close */}
             <div className="grid grid-cols-3 items-center mb-5" style={{ userSelect: 'none' }}>
               {/* Left spacer */}
@@ -120,8 +120,11 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               />
             </div>
 
+            {/* Divider */}
+            <div className="w-full my-3" style={{ height: '1px', background: 'rgba(255,255,255,0.08)' }} />
+
             {/* Open to Play toggle pill */}
-            <div className="flex flex-col items-center gap-2.5 pt-4">
+            <div className="flex flex-col items-center gap-2.5">
               <button
                 onClick={handleOpenToPlayToggle}
                 className={`
@@ -202,9 +205,9 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             </button>
           </div>
 
-        {/* Scrollable Content */}
+         {/* Scrollable Content */}
         <div 
-          className="px-5 pt-4 pb-6 flex-1 overflow-y-auto"
+          className="px-5 pt-4 pb-3 flex-1 overflow-y-auto"
           style={{
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',

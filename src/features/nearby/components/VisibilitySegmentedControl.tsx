@@ -17,11 +17,11 @@ export function VisibilitySegmentedControl({ value, onChange }: VisibilitySegmen
   const getStatusText = () => {
     switch (value) {
       case 'all':
-        return { text: "You're visible to golfers nearby 🌍", color: 'rgba(180, 255, 190, 0.9)' };
+        return { text: "You're visible to golfers nearby", color: 'rgba(180, 255, 190, 0.9)' };
       case 'friends':
-        return { text: "Only friends can see you 👥", color: 'rgba(200, 200, 255, 0.9)' };
+        return { text: "Only friends can see you", color: 'rgba(200, 200, 255, 0.9)' };
       case 'hidden':
-        return { text: "You're hidden right now ⛔", color: 'rgba(255, 160, 160, 0.9)' };
+        return { text: "You're hidden right now", color: 'rgba(255, 160, 160, 0.9)' };
     }
   };
 
