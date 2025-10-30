@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Game, GameParticipant } from '@/features/nearby/types';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 interface GameMessagesTabProps {
   game: Game;
@@ -17,8 +18,17 @@ export function GameMessagesTab({ game, participants }: GameMessagesTabProps) {
   const navigate = useNavigate();
   const { thread, messages, isLoading, isSending, sendMessage, isThreadExpired } = useGameMessages(game.id);
   const [messageText, setMessageText] = useState('');
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id || null);
+    };
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
@@ -80,7 +90,7 @@ export function GameMessagesTab({ game, participants }: GameMessagesTabProps) {
         ) : (
           messages.map((message) => {
             const isSystem = message.is_system;
-            const isCurrentUser = message.sender_id === game.host_user_id; // Simplified check
+            const isCurrentUser = message.sender_id === currentUserId;
 
             return (
               <div
@@ -149,10 +159,12 @@ export function GameMessagesTab({ game, participants }: GameMessagesTabProps) {
         </div>
       ) : (
         <div className="border-t border-border/50 bg-background p-4">
-          {/* Non-friend banner */}
-          <div className="mb-2 text-xs text-center text-muted-foreground">
-            This conversation is temporary and closes after the game time. Add each other as friends to keep messaging.
-          </div>
+          {/* Non-friend banner - show if there are other participants */}
+          {participants.length > 1 && (
+            <div className="mb-2 text-xs text-center text-muted-foreground">
+              This conversation is temporary and closes after the game time. Add each other as friends to keep messaging.
+            </div>
+          )}
           
           <div className="flex items-end gap-2">
             <textarea

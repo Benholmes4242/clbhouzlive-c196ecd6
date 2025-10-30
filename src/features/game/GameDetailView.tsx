@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, MapPin, Users, Clock } from 'lucide-react';
 import { useGameDetail } from './hooks/useGameDetail';
 import { GameMessagesTab } from './GameMessagesTab';
@@ -10,8 +10,17 @@ import { format } from 'date-fns';
 export default function GameDetailView() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { game, participants, isLoading } = useGameDetail(id || null);
   const [activeTab, setActiveTab] = useState<'details' | 'messages' | 'participants'>('messages');
+
+  // Handle deep link tab parameter
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['details', 'messages', 'participants'].includes(tabParam)) {
+      setActiveTab(tabParam as 'details' | 'messages' | 'participants');
+    }
+  }, [searchParams]);
 
   if (isLoading) {
     return (

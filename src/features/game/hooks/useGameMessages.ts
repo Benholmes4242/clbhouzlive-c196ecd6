@@ -88,6 +88,7 @@ export function useGameMessages(gameId: string | null) {
   };
 
   const fetchMessages = async (threadId: string) => {
+    // Single joined query to avoid N+1 lookups
     const { data, error } = await supabase
       .from('game_thread_messages')
       .select(`
@@ -97,7 +98,12 @@ export function useGameMessages(gameId: string | null) {
         text,
         is_system,
         attachments,
-        created_at
+        created_at,
+        sender:user_profiles (
+          id,
+          display_name,
+          profile_photo_url
+        )
       `)
       .eq('thread_id', threadId)
       .order('created_at', { ascending: true });
@@ -107,23 +113,7 @@ export function useGameMessages(gameId: string | null) {
       return;
     }
 
-    // Enrich with sender profiles
-    const enrichedMessages = await Promise.all(
-      (data || []).map(async (msg) => {
-        const { data: sender } = await supabase
-          .from('user_profiles')
-          .select('id, display_name, profile_photo_url')
-          .eq('id', msg.sender_id)
-          .single();
-
-        return {
-          ...msg,
-          sender: sender || undefined,
-        } as GameMessage;
-      })
-    );
-
-    setMessages(enrichedMessages);
+    setMessages((data as any) || []);
   };
 
   const setupRealtimeSubscription = (threadId: string) => {
