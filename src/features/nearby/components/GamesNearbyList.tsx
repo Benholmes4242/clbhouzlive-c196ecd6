@@ -128,7 +128,7 @@ export function GamesNearbyList({
   const otherGames = displayGames.filter(b => b.host_user_id !== currentUserId);
 
   return (
-    <div className="space-y-5 pb-4">
+    <div className="space-y-3 pb-4">
       {/* SECTION 1: Find a Game (Search) */}
       <div>
         <ClubSearchInput
@@ -219,7 +219,7 @@ export function GamesNearbyList({
       <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
       {/* SECTION 4: Create a Game CTA - Centered */}
-      <div className="text-center space-y-3 py-2 flex flex-col items-center">
+      <div className="text-center space-y-3 flex flex-col items-center">
         <p className="text-xs text-white/60">
           Can't find a game that suits you?
         </p>
