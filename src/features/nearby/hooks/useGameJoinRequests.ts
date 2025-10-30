@@ -14,6 +14,7 @@ export interface GameJoinRequest {
     profile_photo_url: string | null;
     home_club: string | null;
     eg_handicap_index: number | null;
+    show_handicap?: boolean;
   };
 }
 
@@ -126,7 +127,7 @@ export function useGameJoinRequests(gameId?: string) {
         const userIds = requestsData.map(r => r.requester_user_id);
         const { data: profiles } = await supabase
           .from('user_profiles')
-          .select('id, display_name, profile_photo_url, home_club, eg_handicap_index')
+          .select('id, display_name, profile_photo_url, home_club, eg_handicap_index, show_handicap')
           .in('id', userIds);
 
         const profilesMap = new Map(profiles?.map(p => [p.id, p]) || []);

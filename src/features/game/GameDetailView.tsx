@@ -6,6 +6,7 @@ import { GameMessagesTab } from './GameMessagesTab';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format } from 'date-fns';
+import HcpBadge from '@/components/HcpBadge';
 
 export default function GameDetailView() {
   const { id } = useParams<{ id: string }>();
@@ -156,15 +157,17 @@ export default function GameDetailView() {
                     )}
                   </div>
                   <div className="flex-1">
-                    <div className="font-medium">
-                      {profile?.display_name || 'Unknown'}
-                      {isHost && <span className="ml-2 text-xs text-primary">(Host)</span>}
+                    <div className="flex items-center gap-2 font-medium">
+                      <span>{profile?.display_name || 'Unknown'}</span>
+                      {isHost && <span className="text-xs text-primary">(Host)</span>}
+                      <HcpBadge 
+                        value={profile?.handicap} 
+                        show={profile?.show_handicap ?? true}
+                        className="text-muted-foreground"
+                      />
                     </div>
                     {profile?.username && (
                       <div className="text-sm text-muted-foreground">@{profile.username}</div>
-                    )}
-                    {profile?.handicap !== undefined && profile.handicap !== null && (
-                      <div className="text-xs text-muted-foreground">HCP: {profile.handicap}</div>
                     )}
                   </div>
                   <div className="text-xs text-muted-foreground">

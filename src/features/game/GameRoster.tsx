@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GameParticipant } from '@/features/nearby/types';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import HcpBadge from '@/components/HcpBadge';
 
 interface GameRosterProps {
   participants: GameParticipant[];
@@ -61,14 +62,18 @@ export function GameRoster({ participants, hostUserId }: GameRosterProps) {
       </div>
       <div className="flex-1 flex items-center gap-2 text-sm text-muted-foreground">
         <span>{sortedParticipants.length} {sortedParticipants.length === 1 ? 'player' : 'players'}</span>
-        {sortedParticipants.some(p => p.user_profiles?.handicap !== null && p.user_profiles?.handicap !== undefined) && (
-          <span className="text-xs">
-            • HCP {sortedParticipants
-              .filter(p => p.user_profiles?.handicap !== null && p.user_profiles?.handicap !== undefined)
-              .map(p => Number(p.user_profiles?.handicap).toFixed(1))
-              .join(', ')}
-          </span>
-        )}
+        <div className="flex items-center gap-1 flex-wrap">
+          {sortedParticipants.map((p, i) => (
+            <React.Fragment key={p.id}>
+              {i > 0 && <span>•</span>}
+              <HcpBadge 
+                value={p.user_profiles?.handicap} 
+                show={p.user_profiles?.show_handicap ?? true}
+                className="text-muted-foreground"
+              />
+            </React.Fragment>
+          ))}
+        </div>
       </div>
     </div>
   );

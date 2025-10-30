@@ -2350,6 +2350,7 @@ export type Database = {
           profile_video_url: string | null
           profile_video_visibility: string | null
           show_achievements_public: boolean | null
+          show_handicap: boolean | null
           social_links: Json | null
           top100_visible: boolean | null
           tracker_visible: boolean | null
@@ -2405,6 +2406,7 @@ export type Database = {
           profile_video_url?: string | null
           profile_video_visibility?: string | null
           show_achievements_public?: boolean | null
+          show_handicap?: boolean | null
           social_links?: Json | null
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
@@ -2460,6 +2462,7 @@ export type Database = {
           profile_video_url?: string | null
           profile_video_visibility?: string | null
           show_achievements_public?: boolean | null
+          show_handicap?: boolean | null
           social_links?: Json | null
           top100_visible?: boolean | null
           tracker_visible?: boolean | null

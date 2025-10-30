@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, UserPlus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import HcpBadge from '@/components/HcpBadge';
 
 interface UserProfile {
   id: string;
@@ -9,6 +10,7 @@ interface UserProfile {
   username?: string;
   profile_photo_url?: string;
   eg_handicap_index?: number | null;
+  show_handicap?: boolean;
 }
 
 interface UserSearchTypeaheadProps {
@@ -51,7 +53,7 @@ export function UserSearchTypeahead({
 
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, eg_handicap_index')
+        .select('id, display_name, username, profile_photo_url, eg_handicap_index, show_handicap')
         .or(`display_name.ilike.%${term}%,username.ilike.%${term}%`)
         .limit(10);
 
@@ -99,12 +101,10 @@ export function UserSearchTypeahead({
               key={user.id}
               className="flex items-center gap-2 px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-sm text-white"
             >
-              <span>
-                {user.display_name}
-                {user.eg_handicap_index !== null && user.eg_handicap_index !== undefined && (
-                  <span className="text-white/60 ml-1">(HCP {Number(user.eg_handicap_index).toFixed(1)})</span>
-                )}
-              </span>
+              <div className="flex items-center gap-2">
+                <span>{user.display_name}</span>
+                <HcpBadge value={user.eg_handicap_index} show={user.show_handicap ?? true} />
+              </div>
               <button
                 onClick={() => onUserRemove(user.id)}
                 className="hover:text-white/70 transition-colors"
@@ -152,11 +152,9 @@ export function UserSearchTypeahead({
                       {user.display_name[0]}
                     </div>
                     <div className="flex-1 text-left">
-                      <div className="text-white text-sm font-medium">
-                        {user.display_name}
-                        {user.eg_handicap_index !== null && user.eg_handicap_index !== undefined && (
-                          <span className="text-white/60 ml-1 text-xs">(HCP {Number(user.eg_handicap_index).toFixed(1)})</span>
-                        )}
+                      <div className="flex items-center gap-2 text-white text-sm font-medium">
+                        <span>{user.display_name}</span>
+                        <HcpBadge value={user.eg_handicap_index} show={user.show_handicap ?? true} className="text-white/60" />
                       </div>
                       {user.username && (
                         <div className="text-white/60 text-xs">@{user.username}</div>

@@ -146,7 +146,7 @@ Deno.serve(async (req) => {
     // Fetch participants for response
     const { data: participants } = await supabase
       .from('game_participants')
-      .select('*, user_profiles:user_id(id, display_name, username, profile_photo_url, handicap)')
+      .select('*, user_profiles:user_id(id, display_name, username, profile_photo_url, handicap:eg_handicap_index, show_handicap)')
       .eq('game_id', game.id);
 
     return new Response(

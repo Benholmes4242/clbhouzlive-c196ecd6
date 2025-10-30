@@ -61,7 +61,7 @@ export function useGameDetail(gameId: string | null) {
       const userIds = (participantsData || []).map(p => p.user_id);
       const { data: profiles } = await supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, handicap:eg_handicap_index')
+        .select('id, display_name, username, profile_photo_url, handicap:eg_handicap_index, show_handicap')
         .in('id', userIds);
 
       const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
