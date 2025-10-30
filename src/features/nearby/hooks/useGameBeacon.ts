@@ -172,6 +172,8 @@ export function useGameBeacon() {
     const setupRealtimeSubscription = async () => {
       await fetchBeacons();
 
+      const DEBUG_REALTIME = process.env.NODE_ENV !== 'production';
+
       channel = supabase
         .channel('games_changes')
         .on(
@@ -181,12 +183,20 @@ export function useGameBeacon() {
             schema: 'public',
             table: 'games',
           },
-          () => {
+          (payload) => {
+            if (DEBUG_REALTIME) {
+              const gameId = payload.new && typeof payload.new === 'object' && 'id' in payload.new ? payload.new.id : 'unknown';
+              console.log('[Games] event', new Date().toISOString(), payload.eventType, gameId);
+            }
             // Refetch on any change
             fetchBeacons();
           }
         )
-        .subscribe();
+        .subscribe((status) => {
+          if (DEBUG_REALTIME) {
+            console.log('[Games] status', status, new Date().toISOString());
+          }
+        });
     };
 
     setupRealtimeSubscription();
@@ -197,6 +207,29 @@ export function useGameBeacon() {
       }
     };
   }, [currentLocation]);
+
+  // Refetch on window focus (safety net)
+  useEffect(() => {
+    const handleFocus = () => {
+      const DEBUG_REALTIME = process.env.NODE_ENV !== 'production';
+      if (DEBUG_REALTIME) {
+        console.log('[Games] Refetch on focus');
+      }
+      fetchBeacons();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        handleFocus();
+      }
+    });
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+    };
+  }, []);
 
   const createBeacon = async (input: CreateBeaconInput) => {
     try {

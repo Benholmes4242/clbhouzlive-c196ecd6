@@ -30,6 +30,7 @@ import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaLi
 import { longPressHandler } from '@/utils/longPressHandler';
 import AppShell from '@/components/AppShell';
 import { ReviewIslandLoader } from '@/ReviewIslandLoader';
+import { supabase } from '@/integrations/supabase/client';
 
 
 // Direct import for ProfilePage and Discover to avoid dynamic import issues
@@ -120,6 +121,28 @@ const App: React.FC = () => {
   useEffect(() => {
     longPressHandler.init();
     return () => longPressHandler.cleanup();
+  }, []);
+
+  // Keep realtime socket authenticated after token refresh
+  useEffect(() => {
+    const setupRealtimeAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        supabase.realtime.setAuth(session.access_token);
+      }
+    };
+
+    setupRealtimeAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.access_token) {
+        supabase.realtime.setAuth(session.access_token);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
   
   return (
