@@ -2760,6 +2760,7 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_mobile_device: { Args: never; Returns: boolean }
+      is_thread_member: { Args: { _thread_id: string }; Returns: boolean }
       log_user_achievement: {
         Args: {
           achievement_data_param: Json

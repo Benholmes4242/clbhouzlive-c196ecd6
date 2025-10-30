@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
     const HOST_JWT = body.hostJwt || Deno.env.get('HOST_JWT');
     const TAGGED_JWT = body.taggedJwt || Deno.env.get('TAGGED_JWT');
     const REQUESTER_JWT = body.requesterJwt || Deno.env.get('REQUESTER_JWT');
-    const CLEANUP = body.cleanup || Deno.env.get('CLEANUP') === 'true';
+    const CLEANUP = body.cleanup ?? (Deno.env.get('CLEANUP') === 'true');
 
     if (!HOST_JWT || !TAGGED_JWT || !REQUESTER_JWT) {
       throw new Error('Missing required JWTs. Provide hostJwt, taggedJwt, and requesterJwt in request body.');
@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
 
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
     const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
-    const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE')!;
 
     const uid = {
       host: decodeSub(HOST_JWT),
@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
     addLog('Users', uid);
 
     // Service role client for admin operations (bypasses RLS)
-    const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+    const admin = createClient(SUPABASE_URL, SERVICE_ROLE, {
       auth: { autoRefreshToken: false, persistSession: false }
     });
 
