@@ -608,72 +608,10 @@ export type Database = {
           },
         ]
       }
-      game_beacons: {
-        Row: {
-          course_name: string | null
-          created_at: string
-          expires_at: string
-          game_type: string
-          host_handicap: number | null
-          host_user_id: string
-          id: string
-          is_active: boolean
-          lat: number | null
-          lng: number | null
-          note: string | null
-          other_player_handicaps: number[] | null
-          participants: string[] | null
-          players_needed: number | null
-          start_time: string
-          status: string
-          tee_time: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          course_name?: string | null
-          created_at?: string
-          expires_at: string
-          game_type: string
-          host_handicap?: number | null
-          host_user_id: string
-          id?: string
-          is_active?: boolean
-          lat?: number | null
-          lng?: number | null
-          note?: string | null
-          other_player_handicaps?: number[] | null
-          participants?: string[] | null
-          players_needed?: number | null
-          start_time?: string
-          status?: string
-          tee_time?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          course_name?: string | null
-          created_at?: string
-          expires_at?: string
-          game_type?: string
-          host_handicap?: number | null
-          host_user_id?: string
-          id?: string
-          is_active?: boolean
-          lat?: number | null
-          lng?: number | null
-          note?: string | null
-          other_player_handicaps?: number[] | null
-          participants?: string[] | null
-          players_needed?: number | null
-          start_time?: string
-          status?: string
-          tee_time?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       game_join_requests: {
         Row: {
           created_at: string
+          decided_at: string | null
           game_id: string
           id: string
           requester_user_id: string
@@ -682,6 +620,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          decided_at?: string | null
           game_id: string
           id?: string
           requester_user_id: string
@@ -690,6 +629,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          decided_at?: string | null
           game_id?: string
           id?: string
           requester_user_id?: string
@@ -701,7 +641,72 @@ export type Database = {
             foreignKeyName: "game_join_requests_game_id_fkey"
             columns: ["game_id"]
             isOneToOne: false
-            referencedRelation: "game_beacons"
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      games: {
+        Row: {
+          course_id: string | null
+          course_name: string | null
+          created_at: string
+          expires_at: string
+          host_user_id: string
+          id: string
+          lat: number | null
+          lng: number | null
+          note: string | null
+          players_needed: number | null
+          slots_open: number
+          slots_total: number
+          start_time: string
+          status: string
+          updated_at: string | null
+          visibility: string
+        }
+        Insert: {
+          course_id?: string | null
+          course_name?: string | null
+          created_at?: string
+          expires_at: string
+          host_user_id: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          note?: string | null
+          players_needed?: number | null
+          slots_open?: number
+          slots_total?: number
+          start_time?: string
+          status?: string
+          updated_at?: string | null
+          visibility?: string
+        }
+        Update: {
+          course_id?: string | null
+          course_name?: string | null
+          created_at?: string
+          expires_at?: string
+          host_user_id?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          note?: string | null
+          players_needed?: number | null
+          slots_open?: number
+          slots_total?: number
+          start_time?: string
+          status?: string
+          updated_at?: string | null
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_beacons_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
             referencedColumns: ["id"]
           },
         ]
