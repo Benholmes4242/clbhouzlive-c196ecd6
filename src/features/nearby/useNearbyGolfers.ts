@@ -145,3 +145,13 @@ export function useNearbyGolfers(userLat?: number, userLng?: number, viewerId?: 
 
   return { data: nearby, isLoading: false };
 }
+
+/**
+ * Lightweight hook that returns ONLY the count of nearby golfers
+ * Uses the exact same presence pipeline as useNearbyGolfers to guarantee
+ * the count matches the list (single source of truth)
+ */
+export function useNearbyCount(userLat?: number, userLng?: number, viewerId?: string) {
+  const { data } = useNearbyGolfers(userLat, userLng, viewerId);
+  return { count: data.length, isLoading: false };
+}
