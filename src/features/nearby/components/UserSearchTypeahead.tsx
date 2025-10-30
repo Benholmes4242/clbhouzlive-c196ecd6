@@ -8,6 +8,7 @@ interface UserProfile {
   display_name: string;
   username?: string;
   profile_photo_url?: string;
+  eg_handicap_index?: number | null;
 }
 
 interface UserSearchTypeaheadProps {
@@ -50,7 +51,7 @@ export function UserSearchTypeahead({
 
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url')
+        .select('id, display_name, username, profile_photo_url, eg_handicap_index')
         .or(`display_name.ilike.%${term}%,username.ilike.%${term}%`)
         .limit(10);
 
@@ -98,7 +99,12 @@ export function UserSearchTypeahead({
               key={user.id}
               className="flex items-center gap-2 px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-sm text-white"
             >
-              <span>{user.display_name}</span>
+              <span>
+                {user.display_name}
+                {user.eg_handicap_index !== null && user.eg_handicap_index !== undefined && (
+                  <span className="text-white/60 ml-1">(HCP {user.eg_handicap_index})</span>
+                )}
+              </span>
               <button
                 onClick={() => onUserRemove(user.id)}
                 className="hover:text-white/70 transition-colors"
@@ -148,6 +154,9 @@ export function UserSearchTypeahead({
                     <div className="flex-1 text-left">
                       <div className="text-white text-sm font-medium">
                         {user.display_name}
+                        {user.eg_handicap_index !== null && user.eg_handicap_index !== undefined && (
+                          <span className="text-white/60 ml-1 text-xs">(HCP {user.eg_handicap_index})</span>
+                        )}
                       </div>
                       {user.username && (
                         <div className="text-white/60 text-xs">@{user.username}</div>
