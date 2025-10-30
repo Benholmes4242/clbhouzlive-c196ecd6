@@ -342,7 +342,7 @@ export function CreateGameModal({
                       onClick={() => setGameType(type.value)}
                       className={`py-3 px-4 rounded-xl font-medium transition-all backdrop-blur ${
                         gameType === type.value
-                          ? 'bg-white/11 text-white border border-white/22 shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.22)_inset] active:bg-white/16 active:shadow-[0_24px_48px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.28)_inset]'
+                          ? 'bg-white/20 text-white border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:bg-white/30 active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)_inset]'
                           : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
                       }`}
                     >
@@ -421,7 +421,7 @@ export function CreateGameModal({
                       onClick={() => handleTimingChange(option.value)}
                       className={`py-2 px-3 rounded-lg text-sm font-medium transition-all backdrop-blur ${
                         timing === option.value
-                          ? 'bg-white/11 text-white border border-white/22 shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.22)_inset] active:bg-white/16 active:shadow-[0_24px_48px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.28)_inset]'
+                          ? 'bg-white/20 text-white border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:bg-white/30 active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)_inset]'
                           : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
                       }`}
                     >
@@ -448,7 +448,7 @@ export function CreateGameModal({
                       onClick={() => setPlayersNeeded(playersNeeded === num ? null : num)}
                       className={`py-3 px-4 rounded-xl font-medium transition-all backdrop-blur ${
                         playersNeeded === num
-                          ? 'bg-white/11 text-white border border-white/22 shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_24px_rgba(255,255,255,0.22)_inset] active:bg-white/16 active:shadow-[0_24px_48px_rgba(0,0,0,0.9),_0_0_32px_rgba(255,255,255,0.28)_inset]'
+                          ? 'bg-white/20 text-white border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:bg-white/30 active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)_inset]'
                           : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
                       }`}
                     >
