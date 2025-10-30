@@ -1,0 +1,164 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.76.1';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    const authHeader = req.headers.get('Authorization')!;
+    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.split(' ')[1]);
+
+    if (authError || !user) {
+      throw new Error('Unauthorized');
+    }
+
+    const {
+      course_id,
+      course_name,
+      start_time,
+      slots_total = 4,
+      tagged_user_ids = [],
+      note,
+      lat,
+      lng
+    } = await req.json();
+
+    console.log('Creating game for user:', user.id, { course_name, start_time, slots_total, tagged_count: tagged_user_ids.length });
+
+    // Validate tagged players don't exceed available seats
+    if (tagged_user_ids.length > slots_total - 1) {
+      return new Response(
+        JSON.stringify({ error: 'Too many tagged players for available seats' }),
+        { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Calculate slots_open: total - host - tagged players
+    const slots_open = slots_total - 1 - tagged_user_ids.length;
+
+    // Set expires_at to start_time + 2 hours (game duration estimate)
+    const start = new Date(start_time);
+    const expires_at = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+
+    // Create the game
+    const { data: game, error: gameError } = await supabase
+      .from('games')
+      .insert({
+        host_user_id: user.id,
+        course_id,
+        course_name,
+        start_time,
+        expires_at: expires_at.toISOString(),
+        slots_total,
+        slots_open,
+        note,
+        lat,
+        lng,
+        status: 'active',
+        visibility: 'public'
+      })
+      .select()
+      .single();
+
+    if (gameError) {
+      console.error('Error creating game:', gameError);
+      throw gameError;
+    }
+
+    console.log('Game created:', game.id);
+
+    // Insert host as accepted participant
+    const { error: hostError } = await supabase
+      .from('game_participants')
+      .insert({
+        game_id: game.id,
+        user_id: user.id,
+        role: 'host',
+        state: 'accepted',
+        reserves_slot: true,
+        joined_at: new Date().toISOString()
+      });
+
+    if (hostError) {
+      console.error('Error adding host participant:', hostError);
+      throw hostError;
+    }
+
+    // Insert tagged players as invited participants
+    if (tagged_user_ids.length > 0) {
+      const taggedParticipants = tagged_user_ids.map((userId: string) => ({
+        game_id: game.id,
+        user_id: userId,
+        role: 'player',
+        state: 'invited',
+        reserves_slot: true
+      }));
+
+      const { error: taggedError } = await supabase
+        .from('game_participants')
+        .insert(taggedParticipants);
+
+      if (taggedError) {
+        console.error('Error adding tagged participants:', taggedError);
+        throw taggedError;
+      }
+
+      console.log('Tagged participants added:', tagged_user_ids.length);
+
+      // Get host profile for notifications
+      const { data: hostProfile } = await supabase
+        .from('user_profiles')
+        .select('display_name, username')
+        .eq('id', user.id)
+        .single();
+
+      const hostName = hostProfile?.display_name || hostProfile?.username || 'Someone';
+
+      // Send notifications to tagged players
+      for (const taggedUserId of tagged_user_ids) {
+        await supabase.from('notifications').insert({
+          user_id: taggedUserId,
+          type: 'game_invite',
+          title: 'Seat reserved for you',
+          message: `${hostName} saved you a spot for ${course_name || 'a game'}, ${new Date(start_time).toLocaleDateString()}. Accept to confirm.`,
+          data: {
+            game_id: game.id,
+            host_id: user.id,
+            host_name: hostName,
+            course_name: course_name || null,
+            start_time
+          }
+        });
+      }
+    }
+
+    // Fetch participants for response
+    const { data: participants } = await supabase
+      .from('game_participants')
+      .select('*, user_profiles:user_id(id, display_name, username, profile_photo_url, handicap)')
+      .eq('game_id', game.id);
+
+    return new Response(
+      JSON.stringify({ game, participants }),
+      { status: 201, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
+  } catch (error) {
+    console.error('Error in game-create:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+});
