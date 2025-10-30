@@ -2246,6 +2246,7 @@ export type Database = {
           id: string
           is_hidden: boolean
           last_location_update: string | null
+          last_seen_at: string | null
           lat: number | null
           lng: number | null
           open_to_play_active: boolean | null
@@ -2260,6 +2261,7 @@ export type Database = {
           id?: string
           is_hidden?: boolean
           last_location_update?: string | null
+          last_seen_at?: string | null
           lat?: number | null
           lng?: number | null
           open_to_play_active?: boolean | null
@@ -2274,6 +2276,7 @@ export type Database = {
           id?: string
           is_hidden?: boolean
           last_location_update?: string | null
+          last_seen_at?: string | null
           lat?: number | null
           lng?: number | null
           open_to_play_active?: boolean | null
@@ -2672,6 +2675,13 @@ export type Database = {
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
           website_url?: string | null
+        }
+        Relationships: []
+      }
+      user_friend_pairs: {
+        Row: {
+          u1: string | null
+          u2: string | null
         }
         Relationships: []
       }

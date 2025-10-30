@@ -1,141 +1,147 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { createNearbyPresenceChannel, PresencePayload } from '@/lib/presence/nearbyPresence';
 import { supabase } from '@/integrations/supabase/client';
-import { NearbyGolfer } from './types';
 import { calculateDistance } from './distance';
-import { NEARBY_RADIUS_METERS } from './config';
+import type { NearbyGolfer } from './types';
 
-async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<NearbyGolfer[]> {
-  if (!userLat || !userLng) return [];
+const NEARBY_RADIUS_METERS = 50_000; // 50km
 
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return [];
+export function useNearbyGolfers(userLat?: number, userLng?: number, viewerId?: string) {
+  const [presence, setPresence] = useState<Record<string, PresencePayload[]>>({}); // presenceState map
+  const [profiles, setProfiles] = useState<Map<string, any>>(new Map()); // user_id -> profile
 
-    // Fetch nearby users from user_nearby_status within the last 5 minutes
-    const { data, error } = await supabase
-      .from('user_nearby_status')
-      .select(`
-        user_id,
-        lat,
-        lng,
-        updated_at,
-        user_profiles:user_id (
-          id,
-          display_name,
-          username,
-          profile_photo_url,
-          eg_handicap_index,
-          show_handicap,
-          home_club
-        )
-      `)
-      .eq('is_hidden', false)
-      .gte('updated_at', new Date(Date.now() - 5 * 60 * 1000).toISOString())
-      .neq('user_id', user.id); // Exclude self
+  // 1) Subscribe to presence
+  useEffect(() => {
+    if (!viewerId) return;
 
-    if (error) {
-      console.error('[NearbyGolfers] Fetch error:', error);
-      return [];
-    }
-
-    if (!data) return [];
-
-    // Filter by distance and map to NearbyGolfer format
-    const nearby: NearbyGolfer[] = data
-      .map((item: any): NearbyGolfer | null => {
-        const profile = item.user_profiles;
-        if (!profile) return null;
-
-        const distanceMeters = calculateDistance(userLat, userLng, item.lat, item.lng);
-        if (distanceMeters > NEARBY_RADIUS_METERS) return null;
-
-        return {
-          id: profile.id,
-          display_name: profile.display_name,
-          home_club: profile.home_club,
-          avatar_url: profile.profile_photo_url,
-          is_online: true,
-          distance_km: distanceMeters / 1000,
-          handicap: profile.show_handicap ? profile.eg_handicap_index : undefined,
-          isOpenToPlay: true, // Assume yes if they're broadcasting location
-        };
+    const ch = createNearbyPresenceChannel()
+      .on('presence', { event: 'sync' }, () => {
+        const state = ch.presenceState() as Record<string, PresencePayload[]>;
+        setPresence(state);
       })
-      .filter((g: NearbyGolfer | null): g is NearbyGolfer => g !== null)
-      .sort((a, b) => (a.distance_km || 0) - (b.distance_km || 0));
-
-    return nearby;
-  } catch (error) {
-    console.error('[NearbyGolfers] Error:', error);
-    return [];
-  }
-}
-
-export function useNearbyGolfers(userLat?: number, userLng?: number) {
-  const queryClient = useQueryClient();
-  const DEBUG_REALTIME = process.env.NODE_ENV !== 'production';
-
-  const query = useQuery({
-    queryKey: ['nearbyGolfers', 'live'],
-    queryFn: () => fetchLiveNearby(userLat, userLng),
-    staleTime: 15_000,
-    enabled: !!userLat && !!userLng,
-  });
-
-  // Phase 3: Realtime subscription for nearby presence
-  useEffect(() => {
-    if (!userLat || !userLng) return;
-
-    const channel = supabase
-      .channel('nearby_presence')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'user_nearby_status',
-        },
-        (payload) => {
-          if (DEBUG_REALTIME) {
-            const userId = payload.new && typeof payload.new === 'object' && 'user_id' in payload.new ? payload.new.user_id : 'unknown';
-            console.log('[NearbyGolfers] event', new Date().toISOString(), payload.eventType, userId);
-          }
-          // Refetch when any user's location updates
-          queryClient.invalidateQueries({ queryKey: ['nearbyGolfers', 'live'] });
-        }
-      )
-      .subscribe((status) => {
-        if (DEBUG_REALTIME) {
-          console.log('[NearbyGolfers] status', status, new Date().toISOString());
-        }
-      });
+      .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(ch);
     };
-  }, [userLat, userLng, queryClient, DEBUG_REALTIME]);
+  }, [viewerId]);
 
-  // Refetch on window focus (safety net)
+  // 2) Fetch profiles for newly seen user_ids
   useEffect(() => {
-    const handleFocus = () => {
-      if (DEBUG_REALTIME) {
-        console.log('[NearbyGolfers] Refetch on focus');
-      }
-      queryClient.invalidateQueries({ queryKey: ['nearbyGolfers', 'live'] });
-    };
+    const ids = Object.keys(presence); // keys are presence keys (user_id)
+    const missing = ids.filter((id) => !profiles.has(id));
+    if (missing.length === 0) return;
+
+    (async () => {
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url, eg_handicap_index, show_handicap, home_club')
+        .in('id', missing);
+
+      const next = new Map(profiles);
+      (data || []).forEach((p) => next.set(p.id, p));
+      setProfiles(next);
+    })();
+  }, [presence, profiles]);
+
+  // 3) Fetch friend relationships for newly seen user_ids
+  useEffect(() => {
+    if (!viewerId || profiles.size === 0) return;
     
-    window.addEventListener('focus', handleFocus);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        handleFocus();
-      }
+    const ids = Array.from(profiles.keys());
+    const needsFriendCheck = ids.filter((id) => {
+      const prof = profiles.get(id);
+      return prof && prof._isFriend === undefined;
     });
-    
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleFocus);
-    };
-  }, [queryClient, DEBUG_REALTIME]);
 
-  return query;
+    if (needsFriendCheck.length === 0) return;
+
+    (async () => {
+      // fetch mutuals where viewerId and profile.id follow each other
+      const { data: a } = await supabase
+        .from('user_follows')
+        .select('following_id')
+        .eq('follower_id', viewerId)
+        .in('following_id', needsFriendCheck);
+
+      const { data: b } = await supabase
+        .from('user_follows')
+        .select('follower_id')
+        .eq('following_id', viewerId)
+        .in('follower_id', needsFriendCheck);
+
+      const aSet = new Set((a || []).map((r) => r.following_id));
+      const mutual = new Set((b || []).filter((r) => aSet.has(r.follower_id)).map((r) => r.follower_id));
+
+      // annotate profiles map
+      const next = new Map(profiles);
+      needsFriendCheck.forEach((id) => {
+        const prof = next.get(id);
+        if (!prof) return;
+        prof._isFriend = mutual.has(id);
+        next.set(id, prof);
+      });
+      setProfiles(next);
+    })();
+  }, [viewerId, profiles]);
+
+  // 4) Build the Nearby list from presence + profiles + visibility filtering
+  const nearby = useMemo<NearbyGolfer[]>(() => {
+    if (!viewerId || !userLat || !userLng) return [];
+
+    // flatten presence (payload arrays per user_id)
+    const payloads: PresencePayload[] = Object.values(presence)
+      .flat()
+      // hide self
+      .filter((p) => p.user_id && p.user_id !== viewerId)
+      // hide users who set hidden
+      .filter((p) => p.visibility_mode === 'friends' || p.visibility_mode === 'all');
+
+    // unique by user_id (last wins)
+    const latestByUser = new Map<string, PresencePayload>();
+    payloads.forEach((p) => latestByUser.set(p.user_id, p));
+
+    const items: NearbyGolfer[] = [];
+    latestByUser.forEach((p) => {
+      const prof = profiles.get(p.user_id);
+      if (!prof) return;
+
+      // viewer's relationship: if p.visibility_mode === 'friends', require mutual follow
+      if (p.visibility_mode === 'friends' && !prof._isFriend) {
+        return;
+      }
+
+      const lat = p.lat ?? null;
+      const lng = p.lng ?? null;
+
+      // Distance filter: if no coords in payload, skip distance
+      let distance_km: number | undefined = undefined;
+      if (lat != null && lng != null && userLat != null && userLng != null) {
+        const meters = calculateDistance(userLat, userLng, lat, lng);
+        if (meters > NEARBY_RADIUS_METERS) return;
+        distance_km = meters / 1000;
+      }
+
+      items.push({
+        id: prof.id,
+        display_name: prof.display_name || prof.username || 'Unknown',
+        username: prof.username,
+        home_club: prof.home_club || undefined,
+        avatar_url: prof.profile_photo_url || undefined,
+        is_online: true,
+        distance_km,
+        handicap: prof.show_handicap ? prof.eg_handicap_index : undefined,
+        isOpenToPlay: true,
+        isMock: false,
+        distanceText: distance_km ? (distance_km < 1.6 ? `${(distance_km * 0.621371).toFixed(1)} mi` : `${distance_km.toFixed(1)} km`) : undefined,
+        sameHomeClub: false, // Can be enhanced later with home club matching
+      });
+    });
+
+    // sort by distance when available
+    items.sort((a, b) => (a.distance_km ?? 1e9) - (b.distance_km ?? 1e9));
+    return items;
+  }, [viewerId, userLat, userLng, presence, profiles]);
+
+  return { data: nearby, isLoading: false };
 }
