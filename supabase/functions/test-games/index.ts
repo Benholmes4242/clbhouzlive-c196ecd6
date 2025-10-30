@@ -42,8 +42,12 @@ Deno.serve(async (req) => {
     }
 
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-    const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
-    const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE')!;
+    const ANON_KEY = Deno.env.get('SUPABASE_PUBLISHABLE_KEY') || Deno.env.get('SUPABASE_ANON_KEY')!;
+    const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+    if (!SUPABASE_URL || !ANON_KEY || !SERVICE_ROLE) {
+      throw new Error(`Missing environment variables: URL=${!!SUPABASE_URL}, ANON=${!!ANON_KEY}, SERVICE=${!!SERVICE_ROLE}`);
+    }
 
     const uid = {
       host: decodeSub(HOST_JWT),
@@ -58,10 +62,16 @@ Deno.serve(async (req) => {
       auth: { autoRefreshToken: false, persistSession: false }
     });
 
-    // Per-user clients
+    // Per-user clients (respects RLS)
     const clientFor = (jwt: string) =>
       createClient(SUPABASE_URL, ANON_KEY, {
-        global: { headers: { Authorization: `Bearer ${jwt}` } },
+        global: { 
+          headers: { 
+            Authorization: `Bearer ${jwt}`,
+            apikey: ANON_KEY
+          } 
+        },
+        auth: { autoRefreshToken: false, persistSession: false }
       });
 
     const host = clientFor(HOST_JWT);
