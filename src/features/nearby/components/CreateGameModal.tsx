@@ -238,11 +238,11 @@ export function CreateGameModal({
           maxHeight: '100vh',
           touchAction: 'auto',
           overscrollBehavior: 'contain',
-          background: 'rgba(15, 15, 15, 0.6)',
+          background: 'rgba(15, 15, 15, 0.75)',
           backdropFilter: 'blur(40px)',
           WebkitBackdropFilter: 'blur(40px)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '20px 20px 0 0',
+          borderRadius: '0',
           boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9)',
         }}
         onClick={(e) => e.stopPropagation()}
