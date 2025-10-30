@@ -80,7 +80,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             maxHeight: '100vh',
             touchAction: 'auto',
             overscrollBehavior: 'contain',
-            background: 'rgba(15, 15, 15, 0.8)',
+            background: 'rgba(15, 15, 15, 0.7)',
             backdropFilter: 'blur(40px)',
             WebkitBackdropFilter: 'blur(40px)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
