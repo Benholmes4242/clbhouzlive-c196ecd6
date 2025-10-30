@@ -196,47 +196,12 @@ export function useGameJoinRequests(gameId?: string) {
 
   const acceptRequest = async (requestId: string, gameId: string) => {
     try {
-      // Update request status
-      const { error: updateError } = await supabase
-        .from('game_join_requests')
-        .update({ status: 'accepted', decided_at: new Date().toISOString() })
-        .eq('id', requestId);
+      const { error } = await supabase.rpc('game_request_decide', {
+        p_request_id: requestId,
+        p_decision: 'accept',
+      });
 
-      if (updateError) throw updateError;
-
-      // Decrement slots_open
-      const { data: game, error: selErr } = await supabase
-        .from('games')
-        .select('slots_open, course_name')
-        .eq('id', gameId)
-        .single() as { data: any, error: any };
-
-      if (selErr) throw selErr;
-
-      if (game && typeof game.slots_open === 'number' && game.slots_open > 0) {
-        const { error: updErr } = await supabase
-          .from('games')
-          .update({ slots_open: game.slots_open - 1 })
-          .eq('id', gameId);
-        if (updErr) throw updErr;
-      }
-
-      // Get requester info for notification
-      const { data: request } = await supabase
-        .from('game_join_requests')
-        .select('requester_user_id')
-        .eq('id', requestId)
-        .single();
-
-      if (request?.requester_user_id) {
-        await supabase.from('notifications').insert({
-          user_id: request.requester_user_id,
-          type: 'game_accepted',
-          title: "You're in 👋",
-          message: `You've been added to the game at ${game?.course_name || 'the course'}`,
-          data: { game_id: gameId },
-        });
-      }
+      if (error) throw error;
 
       toast({
         title: "They're in 👍",
@@ -256,29 +221,12 @@ export function useGameJoinRequests(gameId?: string) {
 
   const declineRequest = async (requestId: string) => {
     try {
-      const { error: updateError } = await supabase
-        .from('game_join_requests')
-        .update({ status: 'declined' })
-        .eq('id', requestId);
+      const { error } = await supabase.rpc('game_request_decide', {
+        p_request_id: requestId,
+        p_decision: 'decline',
+      });
 
-      if (updateError) throw updateError;
-
-      // Get requester info for notification
-      const { data: request } = await supabase
-        .from('game_join_requests')
-        .select('requester_user_id')
-        .eq('id', requestId)
-        .single();
-
-      if (request) {
-        await supabase.rpc('send_push_notification', {
-          target_user_id: request.requester_user_id,
-          notification_type: 'game_declined',
-          title: "Game update",
-          message: "This spot is now full.",
-          data: {},
-        });
-      }
+      if (error) throw error;
 
       toast({
         title: "We've let them know the round is full",
