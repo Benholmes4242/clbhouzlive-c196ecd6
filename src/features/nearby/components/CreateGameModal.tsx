@@ -217,7 +217,7 @@ export function CreateGameModal({
       className="fixed inset-0 flex items-end sm:items-center sm:justify-center animate-fade-in"
       style={{ 
         zIndex: 10000, // Above NearbyOverlay's z-9999
-        backgroundColor: 'rgba(0,0,0,0.4)',
+        backgroundColor: 'rgba(0,0,0,0)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         overscrollBehavior: 'none',
