@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, ChevronDown } from 'lucide-react';
+import { X, ChevronDown, AlertCircle } from 'lucide-react';
 import { GameBeacon } from '../hooks/useGameBeacon';
 import { useCourseSearch } from '../hooks/useCourseSearch';
 import { DateTimePicker } from './DateTimePicker';
+import { UserSearchTypeahead } from './UserSearchTypeahead';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -29,10 +30,18 @@ interface CreateGameModalProps {
     host_handicap?: number;
     other_player_handicaps?: number[];
     tee_time?: string;
+    slots_total?: number;
+    tagged_user_ids?: string[];
   }) => Promise<void>;
   onCancelBeacon: (beaconId: string) => Promise<void>;
   myBeacon: GameBeacon | null;
   prefilledClub?: { id: string; name: string };
+}
+
+interface ValidationErrors {
+  slotsTotal?: string;
+  startTime?: string;
+  expiresAt?: string;
 }
 
 const GAME_TYPES = [
@@ -50,6 +59,7 @@ const TIMING_OPTIONS = [
 ];
 
 const PLAYERS_OPTIONS = [1, 2, 3];
+const SLOTS_TOTAL_OPTIONS = [2, 3, 4]; // Common golf game sizes
 
 export function CreateGameModal({
   isOpen,
@@ -68,9 +78,12 @@ export function CreateGameModal({
   const [customDateTime, setCustomDateTime] = useState<Date | null>(null);
   const [showDateTimePicker, setShowDateTimePicker] = useState(false);
   const [playersNeeded, setPlayersNeeded] = useState<number | null>(null);
+  const [slotsTotal, setSlotsTotal] = useState<number>(4);
   const [hostHandicap, setHostHandicap] = useState<string>('');
   const [otherHandicaps, setOtherHandicaps] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const courseInputRef = useRef<HTMLInputElement>(null);
   
   const { courses } = useCourseSearch(courseSearchTerm);
@@ -118,8 +131,44 @@ export function CreateGameModal({
 
   if (!isOpen) return null;
 
+  const validateForm = (): boolean => {
+    const errors: ValidationErrors = {};
+
+    // Validate slots_total
+    if (slotsTotal < 1 || slotsTotal > 10) {
+      errors.slotsTotal = 'Total slots must be between 1 and 10';
+    }
+
+    // Validate start_time is in the future
+    let startTime: Date;
+    if (timing === 'now') {
+      startTime = new Date();
+    } else if (timing === '30') {
+      startTime = new Date(Date.now() + 30 * 60 * 1000);
+    } else if (timing === '60') {
+      startTime = new Date(Date.now() + 60 * 60 * 1000);
+    } else if (timing === 'choose' && customDateTime) {
+      startTime = customDateTime;
+      if (startTime.getTime() < Date.now()) {
+        errors.startTime = 'Start time must be in the future';
+      }
+    } else {
+      startTime = new Date();
+    }
+
+    // Validate tagged users don't exceed capacity
+    const totalReservedSlots = 1 + selectedUsers.length; // 1 for host
+    if (totalReservedSlots > slotsTotal) {
+      errors.slotsTotal = `Cannot tag ${selectedUsers.length} players - only ${slotsTotal - 1} seats available`;
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async () => {
     if (!gameType) return;
+    if (!validateForm()) return;
 
     // Calculate start_time based on timing selection
     let startTime: Date;
@@ -148,7 +197,9 @@ export function CreateGameModal({
         course_name: courseName || undefined,
         note: note || undefined,
         start_time: startTime.toISOString(),
-        tee_time: startTime.toISOString(), // Use same time as start_time
+        tee_time: startTime.toISOString(),
+        slots_total: slotsTotal,
+        tagged_user_ids: selectedUsers.map(u => u.id),
         players_needed: playersNeeded || undefined,
         host_handicap: hostHandicap ? parseFloat(hostHandicap) : undefined,
         other_player_handicaps: otherHandicapsArray.length > 0 ? otherHandicapsArray : undefined,
@@ -162,8 +213,11 @@ export function CreateGameModal({
       setTiming('now');
       setCustomDateTime(null);
       setPlayersNeeded(null);
+      setSlotsTotal(4);
+      setSelectedUsers([]);
       setHostHandicap('');
       setOtherHandicaps('');
+      setValidationErrors({});
     } finally {
       setIsSubmitting(false);
     }
@@ -438,27 +492,49 @@ export function CreateGameModal({
                 )}
               </div>
 
-              {/* Players Needed */}
+              {/* Slots Total */}
               <div className="space-y-3">
-                <label className="block text-sm font-medium text-white/60">
-                  Players Needed
+                <label className="block text-sm font-medium text-white/90">
+                  Total Slots *
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  {PLAYERS_OPTIONS.map(num => (
+                  {SLOTS_TOTAL_OPTIONS.map(num => (
                     <button
                       key={num}
-                      onClick={() => setPlayersNeeded(playersNeeded === num ? null : num)}
+                      onClick={() => setSlotsTotal(num)}
                       className={`py-3 px-4 rounded-xl font-medium transition-all backdrop-blur ${
-                        playersNeeded === num
-                          ? 'bg-white/20 text-white border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:bg-white/30 active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)_inset]'
-                          : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
+                        slotsTotal === num
+                          ? 'bg-white/20 text-white border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset]'
+                          : 'bg-white/5 text-white/70 border border-white/12 hover:bg-white/10'
                       }`}
                     >
                       {num}
                     </button>
                   ))}
                 </div>
+                {validationErrors.slotsTotal && (
+                  <div className="flex items-center gap-2 text-red-400 text-sm">
+                    <AlertCircle className="w-4 h-4" />
+                    {validationErrors.slotsTotal}
+                  </div>
+                )}
               </div>
+
+              {/* Tag Players */}
+              <UserSearchTypeahead
+                selectedUsers={selectedUsers}
+                onUserAdd={(user) => setSelectedUsers([...selectedUsers, user])}
+                onUserRemove={(userId) => setSelectedUsers(selectedUsers.filter(u => u.id !== userId))}
+                maxUsers={slotsTotal - 1}
+              />
+
+              {/* Timing validation error */}
+              {validationErrors.startTime && (
+                <div className="flex items-center gap-2 text-red-400 text-sm">
+                  <AlertCircle className="w-4 h-4" />
+                  {validationErrors.startTime}
+                </div>
+              )}
 
               {/* Your Handicap */}
               <div className="space-y-3">

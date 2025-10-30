@@ -71,6 +71,7 @@ const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
+const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -176,6 +177,7 @@ const App: React.FC = () => {
                                     <Route path="/admin-backfill" element={<AdminBackfill />} />
                                     
                                     <Route path="/channel/:slug" element={<ChannelProfile />} />
+                                    <Route path="/game/:id" element={<GameDetailView />} />
                                     
                                     <Route path="*" element={<NotFound />} />
                                   </Routes>
