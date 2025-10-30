@@ -69,9 +69,6 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           backdropFilter: 'blur(8px)',
           overscrollBehavior: 'none',
           touchAction: 'none',
-          opacity: isCreateGameOpen ? 0 : 1,
-          pointerEvents: isCreateGameOpen ? 'none' : 'auto',
-          transition: 'opacity 0.2s ease-out',
         }}
         onClick={handleClose}
       >
@@ -251,9 +248,9 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               }}
             />
           )}
-         </div>
-       </div>
-     </div>
+        </div>
+      </div>
+    </div>
       
       {/* Create Game Modal - Rendered outside NearbyOverlay but at higher z-index */}
       {isCreateGameOpen && (
