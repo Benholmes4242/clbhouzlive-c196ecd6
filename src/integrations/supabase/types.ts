@@ -646,6 +646,158 @@ export type Database = {
           },
         ]
       }
+      game_participants: {
+        Row: {
+          created_at: string
+          game_id: string
+          id: string
+          joined_at: string | null
+          reserves_slot: boolean
+          role: string
+          state: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          game_id: string
+          id?: string
+          joined_at?: string | null
+          reserves_slot?: boolean
+          role?: string
+          state?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          game_id?: string
+          id?: string
+          joined_at?: string | null
+          reserves_slot?: boolean
+          role?: string
+          state?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_participants_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_thread_messages: {
+        Row: {
+          attachments: Json | null
+          created_at: string
+          id: string
+          is_system: boolean
+          sender_id: string
+          text: string
+          thread_id: string
+        }
+        Insert: {
+          attachments?: Json | null
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          sender_id: string
+          text: string
+          thread_id: string
+        }
+        Update: {
+          attachments?: Json | null
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          sender_id?: string
+          text?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_thread_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "game_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_thread_participants: {
+        Row: {
+          id: string
+          joined_at: string
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          role?: string
+          thread_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_thread_participants_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "game_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_threads: {
+        Row: {
+          created_at: string
+          expires_at: string
+          game_id: string
+          grace_hours: number
+          id: string
+          is_closed: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          game_id: string
+          grace_hours?: number
+          id?: string
+          is_closed?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          game_id?: string
+          grace_hours?: number
+          id?: string
+          is_closed?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_threads_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: true
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
           course_id: string | null
