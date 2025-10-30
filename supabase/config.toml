@@ -1,1 +1,4 @@
 project_id = "ybxkehyomcakqjvuhnna"
+
+[functions.test-games]
+verify_jwt = false
