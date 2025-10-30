@@ -42,7 +42,6 @@ export type GameParticipant = {
     username?: string;
     profile_photo_url?: string;
     handicap?: number;
-    show_handicap?: boolean;
   };
 };
 

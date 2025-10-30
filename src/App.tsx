@@ -29,8 +29,6 @@ import { FLAGS } from '@/config/flags';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 import { longPressHandler } from '@/utils/longPressHandler';
 import AppShell from '@/components/AppShell';
-import { ReviewIslandLoader } from '@/ReviewIslandLoader';
-import { supabase } from '@/integrations/supabase/client';
 
 
 // Direct import for ProfilePage and Discover to avoid dynamic import issues
@@ -72,7 +70,6 @@ const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
-const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -123,53 +120,8 @@ const App: React.FC = () => {
     return () => longPressHandler.cleanup();
   }, []);
   
-  // Phase 2: Keep realtime socket authenticated after token refresh
-  useEffect(() => {
-    const setupRealtimeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.access_token) {
-        supabase.realtime.setAuth(session.access_token);
-      }
-    };
-    
-    setupRealtimeAuth();
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.access_token) {
-        supabase.realtime.setAuth(session.access_token);
-      }
-    });
-    
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  // Keep realtime socket authenticated after token refresh
-  useEffect(() => {
-    const setupRealtimeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.access_token) {
-        supabase.realtime.setAuth(session.access_token);
-      }
-    };
-
-    setupRealtimeAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.access_token) {
-        supabase.realtime.setAuth(session.access_token);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-  
   return (
     <AppShell>
-      <ReviewIslandLoader />
       <GlobalLoadingProvider>
         <BindLoadingBus />
         <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
@@ -222,7 +174,6 @@ const App: React.FC = () => {
                                     <Route path="/admin-backfill" element={<AdminBackfill />} />
                                     
                                     <Route path="/channel/:slug" element={<ChannelProfile />} />
-                                    <Route path="/game/:id" element={<GameDetailView />} />
                                     
                                     <Route path="*" element={<NotFound />} />
                                   </Routes>

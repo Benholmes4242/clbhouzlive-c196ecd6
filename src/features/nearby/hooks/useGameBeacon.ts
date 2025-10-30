@@ -72,39 +72,24 @@ export function useGameBeacon() {
         }
       }
 
-      // Fetch games where user is host OR participant
-      // First, get all active games
-      const { data: allBeacons, error: allError } = await supabase
+      // Fetch all active, non-expired games
+      const { data: beacons, error } = await supabase
         .from('games')
         .select('id, host_user_id, course_id, course_name, lat, lng, start_time, expires_at, status, slots_total, slots_open, visibility, note, created_at, updated_at')
         .eq('status', 'active')
         .gt('expires_at', new Date().toISOString())
         .order('start_time', { ascending: true }) as { data: any[] | null, error: any };
 
-      if (allError) {
-        console.error('Error fetching beacons:', allError);
+      if (error) {
+        console.error('Error fetching beacons:', error);
         return;
       }
 
-      if (!allBeacons) {
+      if (!beacons) {
         setMyBeacon(null);
         setNearbyBeacons([]);
         return;
       }
-
-      // Fetch games where user is a participant
-      const { data: participantGames } = await supabase
-        .from('game_participants')
-        .select('game_id')
-        .eq('user_id', userId)
-        .in('state', ['invited', 'accepted']);
-
-      const participantGameIds = new Set(participantGames?.map(p => p.game_id) || []);
-
-      // Filter beacons: include if user is host OR participant
-      const beacons = allBeacons.filter(b => 
-        b.host_user_id === userId || participantGameIds.has(b.id)
-      ) as any[];
 
       // Separate my beacon from others for backward compatibility
       const myBeaconData = beacons.find(b => b.host_user_id === userId);
@@ -112,70 +97,65 @@ export function useGameBeacon() {
       // Set my beacon for other components that may need it
       if (myBeaconData) {
         setMyBeacon({
-          ...myBeaconData as any,
+          ...myBeaconData,
           isHost: true,
         });
       } else {
         setMyBeacon(null);
       }
 
-      // Now fetch ALL nearby public games to include in the list
+      // Create unified list including user's own games AND nearby games
       if (userLat && userLng) {
-        const { data: nearbyPublicGames } = await supabase
-          .from('games')
-          .select('id, host_user_id, course_id, course_name, lat, lng, start_time, expires_at, status, slots_total, slots_open, visibility, note, created_at, updated_at')
-          .eq('status', 'active')
-          .eq('visibility', 'public')
-          .gt('expires_at', new Date().toISOString())
-          .order('start_time', { ascending: true }) as { data: any[] | null, error: any };
-
-        // Combine user's games with nearby public games (deduplicate by ID)
-        const gameMap = new Map();
-        
-        // Add user's games first (marked as isMyGame)
-        beacons.forEach(beacon => {
-          const isHost = beacon.host_user_id === userId;
-          const isParticipant = participantGameIds.has(beacon.id);
-          gameMap.set(beacon.id, {
-            ...beacon,
-            isHost,
-            isMyGame: isHost || isParticipant,
-            distance_meters: 0,
-            distanceText: undefined,
-          });
-        });
-
-        // Add nearby public games (if not already in map)
-        (nearbyPublicGames || []).forEach(beacon => {
-          if (!gameMap.has(beacon.id) && beacon.lat && beacon.lng) {
-            const distanceMeters = calculateDistance(userLat, userLng, beacon.lat, beacon.lng);
-            if (distanceMeters <= NEARBY_RADIUS_METERS) {
-              gameMap.set(beacon.id, {
+        const allGames = beacons
+          .map(beacon => {
+            const isHost = beacon.host_user_id === userId;
+            
+            // For user's own games, no distance filtering
+            if (isHost) {
+              return {
                 ...beacon,
-                isHost: false,
-                isMyGame: false,
-                distance_meters: distanceMeters,
-                distanceText: formatDistance(distanceMeters),
-              });
+                distance_meters: 0,
+                distanceText: undefined,
+                isHost: true,
+              };
             }
-          }
-        });
 
-        const allGames = Array.from(gameMap.values()).sort((a: any, b: any) => {
-          // User's games first, then by distance
-          if (a.isMyGame && !b.isMyGame) return -1;
-          if (!a.isMyGame && b.isMyGame) return 1;
-          return (a.distance_meters || 0) - (b.distance_meters || 0);
-        });
+            // For other games, apply distance filtering
+            if (!beacon.lat || !beacon.lng) return null;
 
-        setNearbyBeacons(allGames as any);
+            const distanceMeters = calculateDistance(
+              userLat,
+              userLng,
+              beacon.lat,
+              beacon.lng
+            );
+
+            if (distanceMeters > NEARBY_RADIUS_METERS) return null;
+
+            return {
+              ...beacon,
+              distance_meters: distanceMeters,
+              distanceText: formatDistance(distanceMeters),
+              isHost: false,
+            };
+          })
+          .filter((b): b is NonNullable<typeof b> => b !== null)
+          .sort((a, b) => {
+            // User's games first, then by distance
+            if (a.isHost && !b.isHost) return -1;
+            if (!a.isHost && b.isHost) return 1;
+            return (a.distance_meters || 0) - (b.distance_meters || 0);
+          });
+
+        setNearbyBeacons(allGames);
       } else {
         // No location - only show user's own games
-        const myGames = beacons.map(beacon => ({
-          ...beacon,
-          isHost: beacon.host_user_id === userId,
-          isMyGame: true,
-        })) as any[];
+        const myGames = beacons
+          .filter(b => b.host_user_id === userId)
+          .map(beacon => ({
+            ...beacon,
+            isHost: true,
+          }));
         setNearbyBeacons(myGames);
       }
     } catch (error) {
@@ -192,8 +172,6 @@ export function useGameBeacon() {
     const setupRealtimeSubscription = async () => {
       await fetchBeacons();
 
-      const DEBUG_REALTIME = process.env.NODE_ENV !== 'production';
-
       channel = supabase
         .channel('games_changes')
         .on(
@@ -203,20 +181,12 @@ export function useGameBeacon() {
             schema: 'public',
             table: 'games',
           },
-          (payload) => {
-            if (DEBUG_REALTIME) {
-              const gameId = payload.new && typeof payload.new === 'object' && 'id' in payload.new ? payload.new.id : 'unknown';
-              console.log('[Games] event', new Date().toISOString(), payload.eventType, gameId);
-            }
+          () => {
             // Refetch on any change
             fetchBeacons();
           }
         )
-        .subscribe((status) => {
-          if (DEBUG_REALTIME) {
-            console.log('[Games] status', status, new Date().toISOString());
-          }
-        });
+        .subscribe();
     };
 
     setupRealtimeSubscription();
@@ -227,29 +197,6 @@ export function useGameBeacon() {
       }
     };
   }, [currentLocation]);
-
-  // Refetch on window focus (safety net)
-  useEffect(() => {
-    const handleFocus = () => {
-      const DEBUG_REALTIME = process.env.NODE_ENV !== 'production';
-      if (DEBUG_REALTIME) {
-        console.log('[Games] Refetch on focus');
-      }
-      fetchBeacons();
-    };
-    
-    window.addEventListener('focus', handleFocus);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        handleFocus();
-      }
-    });
-    
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleFocus);
-    };
-  }, []);
 
   const createBeacon = async (input: CreateBeaconInput) => {
     try {

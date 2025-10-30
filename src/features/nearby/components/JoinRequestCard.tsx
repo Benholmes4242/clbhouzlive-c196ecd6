@@ -1,7 +1,6 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
 import { GameJoinRequest } from '../hooks/useGameJoinRequests';
-import HcpBadge from '@/components/HcpBadge';
 
 interface JoinRequestCardProps {
   request: GameJoinRequest;
@@ -52,11 +51,11 @@ export function JoinRequestCard({ request, onAccept, onDecline }: JoinRequestCar
             </div>
           )}
           
-          <HcpBadge 
-            value={profile.eg_handicap_index} 
-            show={profile.show_handicap ?? true}
-            className="text-white/60"
-          />
+          {profile.eg_handicap_index !== null && (
+            <div className="text-[12px] text-white/60">
+              Handicap {profile.eg_handicap_index}
+            </div>
+          )}
         </div>
       </div>
 

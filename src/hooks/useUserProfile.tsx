@@ -7,8 +7,7 @@ interface UserProfileData {
   display_name: string;
   profile_photo_url: string | null;
   home_club: string | null;
-    eg_handicap_index: number | null;
-    show_handicap?: boolean;
+  eg_handicap_index: number | null;
 }
 
 export const useUserProfile = (userId: string | null) => {
@@ -19,7 +18,7 @@ export const useUserProfile = (userId: string | null) => {
 
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index, show_handicap')
+        .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index')
         .eq('id', userId)
         .single();
 
