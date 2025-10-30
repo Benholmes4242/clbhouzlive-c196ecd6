@@ -102,6 +102,13 @@ export function UserSearchTypeahead({
               className="flex items-center gap-2 px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-sm text-white"
             >
               <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full overflow-hidden bg-neutral-700/50 flex items-center justify-center shrink-0">
+                  {user.profile_photo_url ? (
+                    <img src={user.profile_photo_url} alt={user.display_name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-primary font-semibold text-xs">{user.display_name[0]}</span>
+                  )}
+                </div>
                 <span>{user.display_name}</span>
                 <HcpBadge value={user.eg_handicap_index} show={user.show_handicap ?? true} />
               </div>
@@ -148,8 +155,12 @@ export function UserSearchTypeahead({
                     onClick={() => handleUserSelect(user)}
                     className="w-full flex items-center gap-3 px-4 py-3 hover:bg-neutral-800 transition-colors border-b border-neutral-800 last:border-b-0"
                   >
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold shrink-0">
-                      {user.display_name[0]}
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-neutral-700/50 flex items-center justify-center shrink-0">
+                      {user.profile_photo_url ? (
+                        <img src={user.profile_photo_url} alt={user.display_name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-primary font-semibold text-sm">{user.display_name[0]}</span>
+                      )}
                     </div>
                     <div className="flex-1 text-left">
                       <div className="flex items-center gap-2 text-white text-sm font-medium">

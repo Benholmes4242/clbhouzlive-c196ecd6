@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { MapPin, Users, Clock, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { useGameParticipants } from '@/features/game/hooks/useGameParticipants';
+import { formatHcp } from '@/lib/formatHcp';
 
 interface AnonymousGameCardProps {
   game: {
@@ -20,6 +22,7 @@ interface AnonymousGameCardProps {
 export function AnonymousGameCard({ game, onRequestJoin, hasRequested, isAccepted }: AnonymousGameCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
+  const { data: participants = [] } = useGameParticipants(game.id);
 
   const formatStartTime = (startTime: string) => {
     const date = parseISO(startTime);
@@ -65,8 +68,29 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested, isAccepte
 
       {/* Block 2: Group snapshot */}
       <div className="space-y-2 mb-3">
-        <div className="text-[13px] text-white/80">
-          {slotsOpen > 0 && (
+        {participants.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1 text-[12px] text-white/70 mb-1">
+            <span className="text-white/50">Players:</span>
+            {participants.slice(0, 3).map((p, idx) => (
+              <React.Fragment key={p.user_id}>
+                <button
+                  onClick={() => navigate(`/profile/${p.username || p.user_id}`)}
+                  className="hover:text-white transition-colors"
+                >
+                  {p.display_name}
+                  {p.show_handicap && p.eg_handicap_index != null && (
+                    <span className="text-white/50"> ({formatHcp(p.eg_handicap_index)})</span>
+                  )}
+                </button>
+                {idx < Math.min(participants.length, 3) - 1 && <span>,</span>}
+              </React.Fragment>
+            ))}
+            {participants.length > 3 && (
+              <span className="text-white/50">+{participants.length - 3} more</span>
+            )}
+          </div>
+        )}
+        <div className="text-[13px] text-white/80">{slotsOpen > 0 && (
             <span className="text-green-400 font-medium">
               {slotsOpen} spot{slotsOpen === 1 ? '' : 's'} open
             </span>

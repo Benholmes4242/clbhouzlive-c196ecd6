@@ -99,10 +99,11 @@ export function useNearbyGolfers(userLat?: number, userLng?: number) {
         },
         (payload) => {
           if (DEBUG_REALTIME) {
-            console.log('[NearbyGolfers] event', new Date().toISOString(), payload.eventType);
+            const userId = payload.new && typeof payload.new === 'object' && 'user_id' in payload.new ? payload.new.user_id : 'unknown';
+            console.log('[NearbyGolfers] event', new Date().toISOString(), payload.eventType, userId);
           }
           // Refetch when any user's location updates
-          queryClient.invalidateQueries({ queryKey: ['nearbyGolfers', 'live', userLat, userLng] });
+          queryClient.invalidateQueries({ queryKey: ['nearbyGolfers'] });
         }
       )
       .subscribe((status) => {

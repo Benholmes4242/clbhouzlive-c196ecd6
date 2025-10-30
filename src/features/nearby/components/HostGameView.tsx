@@ -4,6 +4,9 @@ import { useGameJoinRequests } from '../hooks/useGameJoinRequests';
 import { JoinRequestCard } from './JoinRequestCard';
 import { MapPin, Clock } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
+import { useGameParticipants } from '@/features/game/hooks/useGameParticipants';
+import { useNavigate } from 'react-router-dom';
+import { formatHcp } from '@/lib/formatHcp';
 
 interface HostGameViewProps {
   game: GameBeacon;
@@ -12,6 +15,8 @@ interface HostGameViewProps {
 
 export function HostGameView({ game, onCancelBeacon }: HostGameViewProps) {
   const { requests, acceptRequest, declineRequest } = useGameJoinRequests(game.id);
+  const { data: participants = [] } = useGameParticipants(game.id);
+  const navigate = useNavigate();
 
   const formatStartTime = (startTime: string) => {
     const date = parseISO(startTime);
@@ -53,6 +58,29 @@ export function HostGameView({ game, onCancelBeacon }: HostGameViewProps) {
 
           {/* Game info */}
           <div className="space-y-1">
+            {participants.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {participants.map((p) => (
+                  <button
+                    key={p.user_id}
+                    onClick={() => navigate(`/profile/${p.username || p.user_id}`)}
+                    className="flex items-center gap-1.5 px-2 py-1 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all"
+                  >
+                    <div className="w-5 h-5 rounded-full overflow-hidden bg-neutral-700/50 flex items-center justify-center shrink-0">
+                      {p.profile_photo_url ? (
+                        <img src={p.profile_photo_url} alt={p.display_name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-primary font-semibold text-xs">{p.display_name[0]}</span>
+                      )}
+                    </div>
+                    <span className="text-[11px] text-white/90">{p.display_name}</span>
+                    {p.show_handicap && p.eg_handicap_index != null && (
+                      <span className="text-[10px] text-white/60">({formatHcp(p.eg_handicap_index)})</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
             {slotsOpen > 0 && (
               <div className="text-[13px] text-green-400 font-medium">
                 {slotsOpen} spot{slotsOpen === 1 ? '' : 's'} open

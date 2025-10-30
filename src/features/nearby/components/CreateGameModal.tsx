@@ -456,10 +456,10 @@ export function CreateGameModal({
                 )}
               </div>
 
-              {/* Slots Total */}
+              {/* Available Slots */}
               <div className="space-y-3">
                 <label className="block text-sm font-medium text-white/90">
-                  Total Slots *
+                  Available Slots *
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {SLOTS_TOTAL_OPTIONS.map(num => (
@@ -475,6 +475,9 @@ export function CreateGameModal({
                       {num}
                     </button>
                   ))}
+                </div>
+                <div className="text-xs text-center text-white/60">
+                  {slotsTotal === 1 ? '1 slot available' : `${slotsTotal} slots available`}
                 </div>
                 {validationErrors.slotsTotal && (
                   <div className="flex items-center gap-2 text-red-400 text-sm">
