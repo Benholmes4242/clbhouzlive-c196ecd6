@@ -123,28 +123,6 @@ const App: React.FC = () => {
     return () => longPressHandler.cleanup();
   }, []);
   
-  // Phase 2: Keep realtime socket authenticated after token refresh
-  useEffect(() => {
-    const setupRealtimeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.access_token) {
-        supabase.realtime.setAuth(session.access_token);
-      }
-    };
-    
-    setupRealtimeAuth();
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.access_token) {
-        supabase.realtime.setAuth(session.access_token);
-      }
-    });
-    
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
   // Keep realtime socket authenticated after token refresh
   useEffect(() => {
     const setupRealtimeAuth = async () => {
