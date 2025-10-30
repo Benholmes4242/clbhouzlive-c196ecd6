@@ -22,6 +22,19 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // PRODUCTION GUARD: Require explicit TEST_MODE flag
+  const TEST_MODE = Deno.env.get('TEST_MODE');
+  if (TEST_MODE !== 'enabled') {
+    console.warn('⚠️  Test function called but TEST_MODE not enabled');
+    return new Response(
+      JSON.stringify({ 
+        error: 'Test function disabled in production',
+        hint: 'Set TEST_MODE=enabled secret to run tests' 
+      }),
+      { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
   const logs: any[] = [];
   const addLog = (label: string, obj: any) => {
     const logEntry = log(label, obj);
