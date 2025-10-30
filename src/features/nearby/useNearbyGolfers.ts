@@ -1,6 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { isMockNearby } from './config';
+import { getMockNearby } from './mockNearbyGolfers';
 import { NearbyGolfer } from './types';
 import { calculateDistance } from './distance';
 import { NEARBY_RADIUS_METERS } from './config';
@@ -76,15 +78,15 @@ export function useNearbyGolfers(userLat?: number, userLng?: number) {
   const DEBUG_REALTIME = process.env.NODE_ENV !== 'production';
 
   const query = useQuery({
-    queryKey: ['nearbyGolfers', 'live'],
-    queryFn: () => fetchLiveNearby(userLat, userLng),
+    queryKey: ['nearbyGolfers', isMockNearby ? 'mock' : 'live', userLat, userLng],
+    queryFn: () => isMockNearby ? Promise.resolve(getMockNearby(5)) : fetchLiveNearby(userLat, userLng),
     staleTime: 15_000,
-    enabled: !!userLat && !!userLng,
+    enabled: isMockNearby || (!!userLat && !!userLng),
   });
 
   // Phase 3: Realtime subscription for nearby presence
   useEffect(() => {
-    if (!userLat || !userLng) return;
+    if (isMockNearby || !userLat || !userLng) return;
 
     const channel = supabase
       .channel('nearby_presence')
@@ -101,7 +103,7 @@ export function useNearbyGolfers(userLat?: number, userLng?: number) {
             console.log('[NearbyGolfers] event', new Date().toISOString(), payload.eventType, userId);
           }
           // Refetch when any user's location updates
-          queryClient.invalidateQueries({ queryKey: ['nearbyGolfers', 'live'] });
+          queryClient.invalidateQueries({ queryKey: ['nearbyGolfers'] });
         }
       )
       .subscribe((status) => {
@@ -113,10 +115,12 @@ export function useNearbyGolfers(userLat?: number, userLng?: number) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userLat, userLng, queryClient, DEBUG_REALTIME]);
+  }, [isMockNearby, userLat, userLng, queryClient, DEBUG_REALTIME]);
 
   // Refetch on window focus (safety net)
   useEffect(() => {
+    if (isMockNearby) return;
+
     const handleFocus = () => {
       if (DEBUG_REALTIME) {
         console.log('[NearbyGolfers] Refetch on focus');
@@ -135,7 +139,7 @@ export function useNearbyGolfers(userLat?: number, userLng?: number) {
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleFocus);
     };
-  }, [queryClient, DEBUG_REALTIME]);
+  }, [isMockNearby, queryClient, DEBUG_REALTIME]);
 
   return query;
 }
