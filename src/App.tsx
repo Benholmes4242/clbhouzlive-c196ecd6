@@ -20,8 +20,6 @@ import AIChat from "@/components/ai-chat/AIChat";
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
-import { useNearbyPresencePublisher } from '@/hooks/useNearbyPresencePublisher';
-import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
 import { TopTenProvider } from '@/context/TopTenContext';
 import { UIProvider } from '@/contexts/UIContext';
 import { ModalProvider } from '@/contexts/ModalContext';
@@ -111,55 +109,8 @@ const App: React.FC = () => {
   // Monitor global memory usage
   useGlobalMemoryMonitor(60000); // Check every minute
   
-  // Track user presence for nearby golfers feature (legacy - keeping for backwards compat)
+  // Track user presence for nearby golfers feature
   usePresenceTracker();
-  
-  // NEW: Publish nearby presence using Realtime Presence
-  const { currentLocation, getCurrentLocation } = useLocationPermission();
-  
-  useNearbyPresencePublisher({
-    getCurrentPayload: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
-
-      // Get visibility mode and location from user_nearby_status
-      const { data: status } = await supabase
-        .from('user_nearby_status')
-        .select('visibility_mode, lat, lng')
-        .eq('user_id', user.id)
-        .single();
-
-      // Get home club from profile
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('home_club')
-        .eq('id', user.id)
-        .single();
-
-      const visibility_mode = (status?.visibility_mode || 'hidden') as 'hidden' | 'friends' | 'all';
-      
-      // Only track location if not hidden
-      let lat = status?.lat ?? null;
-      let lng = status?.lng ?? null;
-      
-      // If we don't have coords but visibility is not hidden, try to get current location
-      if (visibility_mode !== 'hidden' && (!lat || !lng)) {
-        const loc = currentLocation || await getCurrentLocation();
-        if (loc) {
-          lat = loc.lat;
-          lng = loc.lng;
-        }
-      }
-
-      return {
-        user_id: user.id,
-        visibility_mode,
-        lat,
-        lng,
-        home_club: profile?.home_club || null,
-      };
-    },
-  });
   
   // Initialize recent media listener for SnapModal thumbnails
   useEffect(() => {

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus } from 'lucide-react';
-import { useNearbyGolfers } from './useNearbyGolfers';
-import { useLocationPermission } from './hooks/useLocationPermission';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { GolferRow } from './components/GolferRow';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useGameBeacon } from './hooks/useGameBeacon';
@@ -18,21 +16,7 @@ interface NearbyOverlayProps {
 }
 
 export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
-  const { user } = useSupabaseSession();
-  const { currentLocation, getCurrentLocation } = useLocationPermission();
-  
-  // Get location immediately when overlay opens
-  useEffect(() => {
-    if (isOpen && !currentLocation) {
-      getCurrentLocation();
-    }
-  }, [isOpen, currentLocation, getCurrentLocation]);
-  
-  const { data: golfers = [], isLoading } = useNearbyGolfers(
-    currentLocation?.lat,
-    currentLocation?.lng,
-    user?.id
-  );
+  const { golfers, isLoading } = useActiveGolfers({ limit: 20, mockCount: 0 });
   const { 
     myBeacon, 
     nearbyBeacons, 
