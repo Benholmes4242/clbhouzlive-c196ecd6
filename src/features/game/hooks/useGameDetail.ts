@@ -57,21 +57,19 @@ export function useGameDetail(gameId: string | null) {
 
       if (participantsError) throw participantsError;
 
-      // Enrich with user profiles
-      const enrichedParticipants = await Promise.all(
-        (participantsData || []).map(async (p) => {
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('id, display_name, username, profile_photo_url')
-            .eq('id', p.user_id)
-            .single();
+      // Enrich with user profiles - batch fetch to avoid N+1
+      const userIds = (participantsData || []).map(p => p.user_id);
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url, handicap:eg_handicap_index')
+        .in('id', userIds);
 
-          return {
-            ...p,
-            user_profiles: profile || undefined,
-          } as GameParticipant;
-        })
-      );
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+      
+      const enrichedParticipants = (participantsData || []).map(p => ({
+        ...p,
+        user_profiles: profileMap.get(p.user_id) || undefined,
+      } as GameParticipant));
 
       setGame({
         ...gameData,

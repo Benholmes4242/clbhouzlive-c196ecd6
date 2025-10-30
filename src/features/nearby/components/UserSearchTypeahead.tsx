@@ -102,7 +102,7 @@ export function UserSearchTypeahead({
               <span>
                 {user.display_name}
                 {user.eg_handicap_index !== null && user.eg_handicap_index !== undefined && (
-                  <span className="text-white/60 ml-1">(HCP {user.eg_handicap_index})</span>
+                  <span className="text-white/60 ml-1">(HCP {Number(user.eg_handicap_index).toFixed(1)})</span>
                 )}
               </span>
               <button
@@ -155,7 +155,7 @@ export function UserSearchTypeahead({
                       <div className="text-white text-sm font-medium">
                         {user.display_name}
                         {user.eg_handicap_index !== null && user.eg_handicap_index !== undefined && (
-                          <span className="text-white/60 ml-1 text-xs">(HCP {user.eg_handicap_index})</span>
+                          <span className="text-white/60 ml-1 text-xs">(HCP {Number(user.eg_handicap_index).toFixed(1)})</span>
                         )}
                       </div>
                       {user.username && (

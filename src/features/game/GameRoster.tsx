@@ -59,8 +59,16 @@ export function GameRoster({ participants, hostUserId }: GameRosterProps) {
           );
         })}
       </div>
-      <div className="flex-1 text-sm text-muted-foreground">
-        {sortedParticipants.length} {sortedParticipants.length === 1 ? 'player' : 'players'}
+      <div className="flex-1 flex items-center gap-2 text-sm text-muted-foreground">
+        <span>{sortedParticipants.length} {sortedParticipants.length === 1 ? 'player' : 'players'}</span>
+        {sortedParticipants.some(p => p.user_profiles?.handicap !== null && p.user_profiles?.handicap !== undefined) && (
+          <span className="text-xs">
+            • HCP {sortedParticipants
+              .filter(p => p.user_profiles?.handicap !== null && p.user_profiles?.handicap !== undefined)
+              .map(p => Number(p.user_profiles?.handicap).toFixed(1))
+              .join(', ')}
+          </span>
+        )}
       </div>
     </div>
   );
