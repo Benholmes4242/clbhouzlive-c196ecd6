@@ -52,7 +52,7 @@ export function ClubSearchInput({ onClubSelect, onClear, selectedClub }: ClubSea
       <div className="px-2 space-y-1 text-center">
         <h3 className="text-sm font-semibold text-white/95">Find a Game</h3>
         <p className="text-[13px] text-white/60">
-          Search a golf club or browse games nearby.
+          Search a golf club or browse games nearby to find active games or golfers looking for playing partners.
         </p>
       </div>
       
@@ -68,9 +68,6 @@ export function ClubSearchInput({ onClubSelect, onClear, selectedClub }: ClubSea
           <Search className="w-4 h-4 text-white/50" />
           <span className="text-sm text-white/50">Search golf club...</span>
         </button>
-        <div className="text-xs text-white/60 text-center mt-1.5">
-          Find active games or golfers looking for a match.
-        </div>
 
         {showDropdown && (
           <>
