@@ -2244,7 +2244,9 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_hidden: boolean
           last_location_update: string | null
+          last_seen_at: string | null
           lat: number | null
           lng: number | null
           open_to_play_active: boolean | null
@@ -2257,7 +2259,9 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_hidden?: boolean
           last_location_update?: string | null
+          last_seen_at?: string | null
           lat?: number | null
           lng?: number | null
           open_to_play_active?: boolean | null
@@ -2270,7 +2274,9 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_hidden?: boolean
           last_location_update?: string | null
+          last_seen_at?: string | null
           lat?: number | null
           lng?: number | null
           open_to_play_active?: boolean | null
@@ -2350,6 +2356,7 @@ export type Database = {
           profile_video_url: string | null
           profile_video_visibility: string | null
           show_achievements_public: boolean | null
+          show_handicap: boolean | null
           social_links: Json | null
           top100_visible: boolean | null
           tracker_visible: boolean | null
@@ -2405,6 +2412,7 @@ export type Database = {
           profile_video_url?: string | null
           profile_video_visibility?: string | null
           show_achievements_public?: boolean | null
+          show_handicap?: boolean | null
           social_links?: Json | null
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
@@ -2460,6 +2468,7 @@ export type Database = {
           profile_video_url?: string | null
           profile_video_visibility?: string | null
           show_achievements_public?: boolean | null
+          show_handicap?: boolean | null
           social_links?: Json | null
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
@@ -2669,6 +2678,13 @@ export type Database = {
         }
         Relationships: []
       }
+      user_friend_pairs: {
+        Row: {
+          u1: string | null
+          u2: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       can_change_email: { Args: { user_id_param: string }; Returns: boolean }
@@ -2760,6 +2776,7 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_mobile_device: { Args: never; Returns: boolean }
+      is_thread_member: { Args: { _thread_id: string }; Returns: boolean }
       log_user_achievement: {
         Args: {
           achievement_data_param: Json

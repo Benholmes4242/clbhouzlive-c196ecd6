@@ -20,6 +20,8 @@ import AIChat from "@/components/ai-chat/AIChat";
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
+import { useNearbyPresencePublisher } from '@/hooks/useNearbyPresencePublisher';
+import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
 import { TopTenProvider } from '@/context/TopTenContext';
 import { UIProvider } from '@/contexts/UIContext';
 import { ModalProvider } from '@/contexts/ModalContext';
@@ -29,6 +31,8 @@ import { FLAGS } from '@/config/flags';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 import { longPressHandler } from '@/utils/longPressHandler';
 import AppShell from '@/components/AppShell';
+import { ReviewIslandLoader } from '@/ReviewIslandLoader';
+import { supabase } from '@/integrations/supabase/client';
 
 
 // Direct import for ProfilePage and Discover to avoid dynamic import issues
@@ -70,6 +74,7 @@ const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
+const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -106,8 +111,55 @@ const App: React.FC = () => {
   // Monitor global memory usage
   useGlobalMemoryMonitor(60000); // Check every minute
   
-  // Track user presence for nearby golfers feature
+  // Track user presence for nearby golfers feature (legacy - keeping for backwards compat)
   usePresenceTracker();
+  
+  // NEW: Publish nearby presence using Realtime Presence
+  const { currentLocation, getCurrentLocation } = useLocationPermission();
+  
+  useNearbyPresencePublisher({
+    getCurrentPayload: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      // Get visibility mode and location from user_nearby_status
+      const { data: status } = await supabase
+        .from('user_nearby_status')
+        .select('visibility_mode, lat, lng')
+        .eq('user_id', user.id)
+        .single();
+
+      // Get home club from profile
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('home_club')
+        .eq('id', user.id)
+        .single();
+
+      const visibility_mode = (status?.visibility_mode || 'hidden') as 'hidden' | 'friends' | 'all';
+      
+      // Only track location if not hidden
+      let lat = status?.lat ?? null;
+      let lng = status?.lng ?? null;
+      
+      // If we don't have coords but visibility is not hidden, try to get current location
+      if (visibility_mode !== 'hidden' && (!lat || !lng)) {
+        const loc = currentLocation || await getCurrentLocation();
+        if (loc) {
+          lat = loc.lat;
+          lng = loc.lng;
+        }
+      }
+
+      return {
+        user_id: user.id,
+        visibility_mode,
+        lat,
+        lng,
+        home_club: profile?.home_club || null,
+      };
+    },
+  });
   
   // Initialize recent media listener for SnapModal thumbnails
   useEffect(() => {
@@ -120,8 +172,31 @@ const App: React.FC = () => {
     return () => longPressHandler.cleanup();
   }, []);
   
+  // Keep realtime socket authenticated after token refresh
+  useEffect(() => {
+    const setupRealtimeAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        supabase.realtime.setAuth(session.access_token);
+      }
+    };
+
+    setupRealtimeAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.access_token) {
+        supabase.realtime.setAuth(session.access_token);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+  
   return (
     <AppShell>
+      <ReviewIslandLoader />
       <GlobalLoadingProvider>
         <BindLoadingBus />
         <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
@@ -174,6 +249,7 @@ const App: React.FC = () => {
                                     <Route path="/admin-backfill" element={<AdminBackfill />} />
                                     
                                     <Route path="/channel/:slug" element={<ChannelProfile />} />
+                                    <Route path="/game/:id" element={<GameDetailView />} />
                                     
                                     <Route path="*" element={<NotFound />} />
                                   </Routes>

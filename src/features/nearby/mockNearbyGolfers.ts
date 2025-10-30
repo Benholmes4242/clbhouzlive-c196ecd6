@@ -10,7 +10,8 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
       is_online: true, 
       distance_km: 0.4, 
       same_club: true,
-      isOpenToPlay: true
+      isOpenToPlay: true,
+      isMock: true
     },
     { 
       id: 'm2', 
@@ -20,7 +21,8 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
       is_online: true, 
       distance_km: 1.2, 
       same_club: false,
-      isOpenToPlay: true
+      isOpenToPlay: true,
+      isMock: true
     },
     { 
       id: 'm3', 
@@ -30,7 +32,8 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
       is_online: true, 
       distance_km: 2.1, 
       same_club: true,
-      isOpenToPlay: false
+      isOpenToPlay: false,
+      isMock: true
     },
     { 
       id: 'm4', 
@@ -40,7 +43,8 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
       is_online: true, 
       distance_km: 0.7, 
       same_club: false,
-      isOpenToPlay: false
+      isOpenToPlay: false,
+      isMock: true
     },
     { 
       id: 'm5', 
@@ -50,7 +54,8 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
       is_online: true, 
       distance_km: 3.8, 
       same_club: false,
-      isOpenToPlay: true
+      isOpenToPlay: true,
+      isMock: true
     },
   ];
   return base.slice(0, count);
