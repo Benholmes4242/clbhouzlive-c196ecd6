@@ -61,17 +61,19 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
 
   return (
     <>
-      <div
-        className="fixed inset-0 z-[9999] flex items-end sm:items-center sm:justify-center animate-fade-in"
-        style={{
-          backgroundColor: 'rgba(0,0,0,0.4)',
-          WebkitBackdropFilter: 'blur(8px)',
-          backdropFilter: 'blur(8px)',
-          overscrollBehavior: 'none',
-          touchAction: 'none',
-        }}
-        onClick={handleClose}
-      >
+      {/* Only show NearbyOverlay backdrop/content when Create Game is not open */}
+      {!isCreateGameOpen && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-end sm:items-center sm:justify-center animate-fade-in"
+          style={{
+            backgroundColor: 'rgba(0,0,0,0.4)',
+            WebkitBackdropFilter: 'blur(8px)',
+            backdropFilter: 'blur(8px)',
+            overscrollBehavior: 'none',
+            touchAction: 'none',
+          }}
+          onClick={handleClose}
+        >
         {/* Modal */}
         <div 
           className="relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200"
@@ -248,9 +250,10 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               }}
             />
           )}
-        </div>
-      </div>
-    </div>
+         </div>
+       </div>
+     </div>
+      )}
       
       {/* Create Game Modal - Rendered outside NearbyOverlay but at higher z-index */}
       {isCreateGameOpen && (
