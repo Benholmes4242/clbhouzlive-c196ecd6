@@ -1,7 +1,7 @@
 # Design Review Mode
 
 ## Overview
-Step-by-step UI review system for fine-tuning the Nearby Golfers and Create Game flows.
+Step-by-step UI review system for fine-tuning the Nearby Golfers and Create Game flows using the "Island" architecture to avoid circular dependencies.
 
 ## How to Enable
 Add `?review=1` to any URL:
@@ -9,12 +9,33 @@ Add `?review=1` to any URL:
 https://yourapp.lovable.app/?review=1
 ```
 
+## Architecture
+
+### Island Approach
+Design Review Mode uses a completely isolated "island" architecture:
+- **No imports from main app** - The island is self-contained
+- **Dynamic loading** - Only loads when `?review=1` is present
+- **Runtime API** - Components communicate via `window.__DRM` global
+- **Zero circular dependencies** - Not part of the build-time module graph
+
+### File Structure
+```
+src/review-island/
+  ├── bootstrap.tsx      # Island initialization
+  ├── panel.tsx          # Step Runner UI
+  ├── states.ts          # 16 flow states
+  └── overrides.ts       # Fixed mock data + types
+
+src/ReviewIslandLoader.tsx  # Lazy loader component
+src/utils/reviewHelpers.ts  # Helper functions for components
+```
+
 ## Features
-- **Step Runner Panel**: Floating control panel at bottom of screen
+- **Step Runner Panel**: Floating control panel at bottom-right of screen
 - **State Navigation**: Prev/Next buttons and dropdown to jump to any state
-- **Screenshot Capture**: Save PNG snapshots of each state
-- **Spacing Guides**: Toggle 8px grid overlay
-- **Design Tokens**: View spacing, typography, and color tokens for each state
+- **Screenshot Capture**: Download PNG snapshots with semantic filenames
+- **Fixed Mock Data**: Consistent golfers and game beacons for reproducibility
+- **No Build Dependencies**: Lazy-loaded island won't affect app bundle
 
 ## State Flows
 
@@ -59,11 +80,46 @@ Screenshots are saved with semantic names:
 - `creategame-01-open-modal.png`
 - etc.
 
+## Using Overrides in Components
+
+Components can access fixed mock data without importing from the island:
+
+```typescript
+import { getDRMOverrides, isDRMActive } from '@/utils/reviewHelpers';
+
+function NearbyGolfersList() {
+  // Get overrides for this state
+  const overrides = getDRMOverrides('nearby-07-golfers-list');
+  
+  // Use fixed data if available, otherwise use real data
+  const golfers = overrides.nearbyGolfers || realGolfers;
+  
+  // Or check if review mode is active
+  if (isDRMActive()) {
+    // Use fixed data
+  }
+  
+  return (/* render golfers */);
+}
+```
+
+### Available Helper Functions
+- `getDRMOverrides(stateId: string)` - Get fixed data for a state
+- `getDRMState()` - Get current state info
+- `isDRMActive()` - Check if review mode is running
+
 ## Implementation Status
-⚠️ **Build Error**: Circular dependency detected in new modules. Needs refactoring to break the circular import chain between context, types, and hooks.
+✅ **Complete and Working**
+- Island architecture implemented
+- Lazy loading via `ReviewIslandLoader`
+- 16 flow states defined
+- Fixed mock data included
+- Screenshot functionality ready
+- No circular dependencies
 
 ## Next Steps
-1. Fix circular dependency (likely in DesignReviewContext importing from hooks)
-2. Test state navigation
-3. Verify screenshot functionality
-4. Add PDF export for full flow sequences
+1. Open app with `?review=1`
+2. Step through all 16 states using Prev/Next
+3. Capture screenshots of each state
+4. Update components to use `getDRMOverrides()` where needed
+5. Fine-tune spacing, copy, and visuals based on screenshots

@@ -29,6 +29,7 @@ import { FLAGS } from '@/config/flags';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 import { longPressHandler } from '@/utils/longPressHandler';
 import AppShell from '@/components/AppShell';
+import { ReviewIslandLoader } from '@/ReviewIslandLoader';
 
 
 // Direct import for ProfilePage and Discover to avoid dynamic import issues
@@ -122,6 +123,7 @@ const App: React.FC = () => {
   
   return (
     <AppShell>
+      <ReviewIslandLoader />
       <GlobalLoadingProvider>
         <BindLoadingBus />
         <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
