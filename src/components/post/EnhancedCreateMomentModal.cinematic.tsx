@@ -358,9 +358,14 @@ export default function EnhancedCreateMomentModalCinematic({
         >
           {/* backdrop - subtle dark with reduced opacity for liquid glass */}
           <div 
-            className="absolute inset-0 bg-black/20 backdrop-blur-[4px] touch-none" 
+            className="absolute inset-0 touch-none" 
             onClick={close}
-            style={{ touchAction: 'none' }}
+            style={{ 
+              backgroundColor: 'rgba(0,0,0,0.65)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              touchAction: 'none' 
+            }}
           />
 
           {/* modal shell - full screen on mobile, centered on desktop */}
