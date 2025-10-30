@@ -29,6 +29,8 @@ import { FLAGS } from '@/config/flags';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 import { longPressHandler } from '@/utils/longPressHandler';
 import AppShell from '@/components/AppShell';
+import { DesignReviewProvider } from '@/features/design-review';
+import { StepRunner } from '@/features/design-review';
 
 
 // Direct import for ProfilePage and Discover to avoid dynamic import issues
@@ -133,7 +135,8 @@ const App: React.FC = () => {
                   <ModalProvider>
                     <BottomNavigationProvider>
                       <UIProvider>
-                      <BrowserRouter>
+                        <DesignReviewProvider>
+                          <BrowserRouter>
                         <ScrollToTop />
                         <GlobalAudioProvider>
                           <VideoManagerProvider>
@@ -187,10 +190,12 @@ const App: React.FC = () => {
                       <Sonner />
                       <AIChat />
                       <GlobalBottomNavigation />
+                      <StepRunner />
                     </BrowserRouter>
-                  </UIProvider>
-                </BottomNavigationProvider>
-                </ModalProvider>
+                  </DesignReviewProvider>
+                </UIProvider>
+              </BottomNavigationProvider>
+            </ModalProvider>
               </HeaderProvider>
             </SiteAccessControl>
         </TooltipProvider>
