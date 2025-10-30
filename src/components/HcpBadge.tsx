@@ -1,5 +1,5 @@
 import { formatHcp } from "@/lib/formatHcp";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 type Props = {
   value: number | null | undefined;
@@ -16,23 +16,22 @@ export default function HcpBadge({ value, show = true, className = "" }: Props) 
   }
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span
-            className={[
-              "text-xs inline-flex items-center",
-              isVisible ? "opacity-80" : "opacity-60 italic",
-              className,
-            ].join(" ")}
-          >
-            HCP {hcp}
-          </span>
-        </TooltipTrigger>
-        <TooltipContent className="text-xs">
-          Handicap from player profile
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span
+          className={[
+            "text-xs inline-flex items-center",
+            isVisible ? "opacity-80" : "opacity-60 italic",
+            className,
+          ].join(" ")}
+        >
+          HCP {hcp}
+        </span>
+      </TooltipTrigger>
+      <TooltipContent className="text-xs">
+        Handicap from player profile
+      </TooltipContent>
+    </Tooltip>
   );
 }
+
