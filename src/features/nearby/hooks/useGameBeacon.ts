@@ -10,33 +10,37 @@ export interface GameBeacon {
   id: string;
   host_user_id: string;
   course_name: string | null;
-  game_type: string;
+  course_id: string | null;
   lat: number | null;
   lng: number | null;
   start_time: string;
   created_at: string;
   expires_at: string;
-  status: string;
-  participants: string[];
+  status: 'active' | 'canceled' | 'completed' | 'expired' | 'at_capacity';
+  slots_total: number;
+  slots_open: number;
+  visibility: 'public' | 'friends' | 'club';
   note: string | null;
-  players_needed: number | null;
   distance_meters?: number;
   distanceText?: string;
   isHost?: boolean;
-  host_handicap?: number | null;
-  other_player_handicaps?: number[] | null;
-  tee_time?: string | null;
+  participants?: Array<{
+    user_id: string;
+    role: 'host' | 'player';
+    state: 'invited' | 'accepted' | 'declined' | 'removed';
+    reserves_slot: boolean;
+  }>;
 }
 
 interface CreateBeaconInput {
-  game_type: string;
+  course_id?: string;
   course_name?: string;
   note?: string;
   start_time?: string;
-  players_needed?: number;
-  host_handicap?: number;
-  other_player_handicaps?: number[];
-  tee_time?: string;
+  slots_total?: number;
+  tagged_user_ids?: string[];
+  lat?: number;
+  lng?: number;
 }
 
 export function useGameBeacon() {
@@ -68,13 +72,13 @@ export function useGameBeacon() {
         }
       }
 
-      // Fetch all active, non-expired beacons
+      // Fetch all active, non-expired games
       const { data: beacons, error } = await supabase
-        .from('game_beacons')
-        .select('*')
+        .from('games')
+        .select('id, host_user_id, course_id, course_name, lat, lng, start_time, expires_at, status, slots_total, slots_open, visibility, note, created_at, updated_at')
         .eq('status', 'active')
         .gt('expires_at', new Date().toISOString())
-        .order('start_time', { ascending: true });
+        .order('start_time', { ascending: true }) as { data: any[] | null, error: any };
 
       if (error) {
         console.error('Error fetching beacons:', error);
@@ -94,7 +98,6 @@ export function useGameBeacon() {
       if (myBeaconData) {
         setMyBeacon({
           ...myBeaconData,
-          participants: myBeaconData.participants || [],
           isHost: true,
         });
       } else {
@@ -111,7 +114,6 @@ export function useGameBeacon() {
             if (isHost) {
               return {
                 ...beacon,
-                participants: beacon.participants || [],
                 distance_meters: 0,
                 distanceText: undefined,
                 isHost: true,
@@ -132,7 +134,6 @@ export function useGameBeacon() {
 
             return {
               ...beacon,
-              participants: beacon.participants || [],
               distance_meters: distanceMeters,
               distanceText: formatDistance(distanceMeters),
               isHost: false,
@@ -153,7 +154,6 @@ export function useGameBeacon() {
           .filter(b => b.host_user_id === userId)
           .map(beacon => ({
             ...beacon,
-            participants: beacon.participants || [],
             isHost: true,
           }));
         setNearbyBeacons(myGames);
@@ -173,13 +173,13 @@ export function useGameBeacon() {
       await fetchBeacons();
 
       channel = supabase
-        .channel('game_beacons_changes')
+        .channel('games_changes')
         .on(
           'postgres_changes',
           {
             event: '*',
             schema: 'public',
-            table: 'game_beacons',
+            table: 'games',
           },
           () => {
             // Refetch on any change
@@ -239,45 +239,52 @@ export function useGameBeacon() {
         }
       }
 
-      // Calculate start_time and expires_at
-      const startTime = input.start_time ? new Date(input.start_time) : new Date();
-      const expiresAt = new Date(startTime.getTime() + 2 * 60 * 60 * 1000); // 2 hours after start
+      // Use edge function to create game properly
+      const { data: authData } = await supabase.auth.getSession();
+      const token = authData.session?.access_token;
 
-      const { data: newBeacon, error } = await supabase
-        .from('game_beacons')
-        .insert({
-          host_user_id: user.user.id,
-          game_type: input.game_type,
-          course_name: input.course_name || null,
-          note: input.note || null,
-          lat: userLat,
-          lng: userLng,
-          start_time: startTime.toISOString(),
-          expires_at: expiresAt.toISOString(),
-          status: 'active',
-          players_needed: input.players_needed || null,
-          participants: [],
-          host_handicap: input.host_handicap || null,
-          other_player_handicaps: input.other_player_handicaps || [],
-          tee_time: input.tee_time || startTime.toISOString(),
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error creating beacon:', error);
+      if (!token) {
         toast({
-          title: 'Failed to create game',
-          description: error.message,
+          title: 'Authentication error',
+          description: 'Please sign in again',
           variant: 'destructive',
         });
         return;
       }
 
+      const startTime = input.start_time ? new Date(input.start_time) : new Date();
+
+      const response = await fetch(
+        `https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/game-create`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            course_id: input.course_id,
+            course_name: input.course_name,
+            start_time: startTime.toISOString(),
+            slots_total: input.slots_total || 4,
+            tagged_user_ids: input.tagged_user_ids || [],
+            note: input.note,
+            lat: input.lat || userLat,
+            lng: input.lng || userLng,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create game');
+      }
+
+      const { game: newBeacon } = await response.json();
+
       // Optimistically update local state
       setMyBeacon({
         ...newBeacon,
-        participants: [],
         isHost: true,
       });
 
@@ -308,10 +315,9 @@ export function useGameBeacon() {
       }
 
       const { error } = await supabase
-        .from('game_beacons')
+        .from('games')
         .update({ 
           status: 'canceled',
-          updated_at: new Date().toISOString()
         })
         .eq('id', beaconId)
         .eq('host_user_id', user.user.id);

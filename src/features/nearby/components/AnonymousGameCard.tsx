@@ -7,11 +7,9 @@ interface AnonymousGameCardProps {
   game: {
     id: string;
     course_name: string | null;
-    tee_time: string | null;
-    game_type: string;
-    players_needed: number | null;
-    host_handicap: number | null;
-    other_player_handicaps: number[] | null;
+    start_time: string;
+    slots_open: number;
+    slots_total: number;
     host_user_id?: string;
   };
   onRequestJoin: (gameId: string) => void;
@@ -23,10 +21,8 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested, isAccepte
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
 
-  const formatTeeTime = (teeTime: string | null) => {
-    if (!teeTime) return 'Time TBD';
-    
-    const date = parseISO(teeTime);
+  const formatTeeTime = (startTime: string) => {
+    const date = parseISO(startTime);
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);

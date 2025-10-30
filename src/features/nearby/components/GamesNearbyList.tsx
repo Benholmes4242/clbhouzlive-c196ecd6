@@ -50,11 +50,11 @@ export function GamesNearbyList({
         const currentUserId = user?.id;
 
         const { data, error } = await supabase
-          .from('game_beacons')
-          .select('*')
+          .from('games')
+          .select('id, host_user_id, course_id, course_name, lat, lng, start_time, expires_at, status, slots_total, slots_open, visibility, note, created_at, updated_at')
           .eq('course_name', selectedClub.name)
-          .eq('is_active', true)
-          .gte('expires_at', new Date().toISOString());
+          .eq('status', 'active')
+          .gte('expires_at', new Date().toISOString()) as { data: any[] | null, error: any };
 
         if (error) throw error;
 
@@ -199,11 +199,9 @@ export function GamesNearbyList({
                 game={{
                   id: game.id,
                   course_name: game.course_name,
-                  tee_time: game.tee_time || game.start_time,
-                  game_type: game.game_type,
-                  players_needed: game.players_needed,
-                  host_handicap: game.host_handicap || null,
-                  other_player_handicaps: game.other_player_handicaps || null,
+                  start_time: game.start_time,
+                  slots_open: game.slots_open || 0,
+                  slots_total: game.slots_total || 4,
                   host_user_id: game.host_user_id,
                 }}
                 onRequestJoin={handleRequestJoin}
