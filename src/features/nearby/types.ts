@@ -1,17 +1,13 @@
 export type NearbyGolfer = {
   id: string;
   display_name: string;
-  username?: string;
   home_club?: string;
   avatar_url?: string;
   is_online: boolean;
   distance_km?: number;
-  distanceText?: string;
   same_club?: boolean;
-  sameHomeClub?: boolean;
   isOpenToPlay?: boolean;
   handicap?: number;
-  isMock: boolean;
 };
 
 export type BeaconAudience = 'followers' | 'friends' | 'nearby' | 'custom';
