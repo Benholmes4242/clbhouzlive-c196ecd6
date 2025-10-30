@@ -64,7 +64,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       <div
         className="fixed inset-0 z-[9999] flex items-end sm:items-center sm:justify-center animate-fade-in"
         style={{
-          backgroundColor: 'rgba(0,0,0,0.6)',
+          backgroundColor: 'rgba(0,0,0,0.65)',
           WebkitBackdropFilter: 'blur(8px)',
           backdropFilter: 'blur(8px)',
           overscrollBehavior: 'none',
