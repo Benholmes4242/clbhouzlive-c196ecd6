@@ -69,8 +69,12 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           backdropFilter: 'blur(8px)',
           overscrollBehavior: 'none',
           touchAction: 'none',
+          pointerEvents: 'auto',
         }}
         onClick={handleClose}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
       >
         {/* Modal */}
         <div 
@@ -78,7 +82,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           style={{
             height: 'calc(100vh - env(safe-area-inset-top))',
             maxHeight: '100vh',
-            touchAction: 'auto',
+            touchAction: 'pan-y',
             overscrollBehavior: 'contain',
             background: 'rgba(15, 15, 15, 0.75)',
             backdropFilter: 'blur(40px)',
@@ -86,8 +90,12 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             border: '1px solid rgba(255, 255, 255, 0.08)',
             borderRadius: '0',
             boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9)',
+            pointerEvents: 'auto',
           }}
           onClick={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+          onTouchEnd={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div className="px-5 pt-4">
