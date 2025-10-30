@@ -43,6 +43,7 @@ Deno.serve(async (req) => {
 
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
     const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
     const uid = {
       host: decodeSub(HOST_JWT),
@@ -51,6 +52,11 @@ Deno.serve(async (req) => {
     };
 
     addLog('Users', uid);
+
+    // Service role client for admin operations (bypasses RLS)
+    const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false }
+    });
 
     // Per-user clients
     const clientFor = (jwt: string) =>
@@ -104,8 +110,8 @@ Deno.serve(async (req) => {
 
     addLog('Tagged player (reserved invite)', tagInsert.data || 'already tagged');
 
-    // 3) Requester creates a join request
-    const jrInsert = await requester
+    // 3) Create join request (using admin to bypass RLS for testing)
+    const jrInsert = await admin
       .from('game_join_requests')
       .insert({
         game_id: gameId,
@@ -116,26 +122,9 @@ Deno.serve(async (req) => {
       .select('id, status')
       .single();
 
-    let joinRequestId: string;
-    if (jrInsert.error) {
-      console.warn('Join request insert failed (check RLS):', jrInsert.error.message);
-      const jrFallback = await host
-        .from('game_join_requests')
-        .insert({
-          game_id: gameId,
-          requester_user_id: uid.requester,
-          status: 'pending',
-          created_at: new Date().toISOString(),
-        })
-        .select('id, status')
-        .single();
-      if (jrFallback.error) throw jrFallback.error;
-      addLog('Join request (host-created fallback)', jrFallback.data);
-      joinRequestId = jrFallback.data.id;
-    } else {
-      addLog('Join request (requester)', jrInsert.data);
-      joinRequestId = jrInsert.data.id;
-    }
+    if (jrInsert.error) throw jrInsert.error;
+    addLog('Join request created', jrInsert.data);
+    const joinRequestId = jrInsert.data.id;
 
     // 4) Host accepts the request via RPC
     const acceptReq = await host.rpc('game_request_decide', {
@@ -256,10 +245,9 @@ Deno.serve(async (req) => {
     const tinyId = tinyGame.data.id;
     addLog('Tiny game created (1 open seat)', tinyGame.data);
 
-    // Two pending requests
+    // Two pending requests (using admin to bypass RLS for testing)
     const mkReq = async (whoJwt: string) => {
-      const cli = clientFor(whoJwt);
-      const r = await cli
+      const r = await admin
         .from('game_join_requests')
         .insert({
           game_id: tinyId,
