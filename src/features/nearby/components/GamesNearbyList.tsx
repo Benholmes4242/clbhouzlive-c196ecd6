@@ -96,7 +96,7 @@ export function GamesNearbyList({
 
   if (isLoading) {
     return (
-      <div className="space-y-5 pb-4">
+      <div className="space-y-3 pb-4">
         <div>
           <ClubSearchInput
             onClubSelect={handleClubSelect}
@@ -172,7 +172,7 @@ export function GamesNearbyList({
 
         {/* Loading state */}
         {isLoadingClubGames ? (
-          <div className="py-6 text-center">
+          <div className="text-center">
             <div className="animate-pulse space-y-3">
               {[1, 2].map(i => (
                 <div key={i} className="bg-neutral-800/30 rounded-xl p-4 h-24" />
@@ -181,7 +181,7 @@ export function GamesNearbyList({
           </div>
         ) : otherGames.length === 0 ? (
           // Empty state
-          <div className="py-6 text-center space-y-2">
+          <div className="text-center space-y-2">
             <MapPin className="w-10 h-10 mx-auto text-neutral-600" />
             <p className="text-sm text-neutral-300">
               {selectedClub 
