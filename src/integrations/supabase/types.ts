@@ -2711,6 +2711,16 @@ export type Database = {
         Args: { p_game_id: string; p_user_id: string }
         Returns: Json
       }
+      game_thread_log_member_event: {
+        Args: { p_event: string; p_game_id: string; p_user_id: string }
+        Returns: string
+      }
+      game_thread_open_for_game: { Args: { p_game_id: string }; Returns: Json }
+      game_thread_sync: { Args: { p_game_id: string }; Returns: Json }
+      game_thread_system_message: {
+        Args: { p_game_id: string; p_text: string }
+        Returns: string
+      }
       get_all_users_admin: {
         Args: never
         Returns: {
