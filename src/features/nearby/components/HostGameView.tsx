@@ -13,10 +13,8 @@ interface HostGameViewProps {
 export function HostGameView({ game, onCancelBeacon }: HostGameViewProps) {
   const { requests, acceptRequest, declineRequest } = useGameJoinRequests(game.id);
 
-  const formatTeeTime = (teeTime: string | null) => {
-    if (!teeTime) return 'Time TBD';
-    
-    const date = parseISO(teeTime);
+  const formatStartTime = (startTime: string) => {
+    const date = parseISO(startTime);
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -30,17 +28,7 @@ export function HostGameView({ game, onCancelBeacon }: HostGameViewProps) {
     }
   };
 
-  const getGameTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      '9_holes': '9 holes',
-      '18_holes': '18 holes',
-      'casual_golf': 'Casual golf',
-      'practice': 'Practice',
-    };
-    return labels[type] || type;
-  };
-
-  const playersNeeded = game.players_needed || 0;
+  const slotsOpen = game.slots_open || 0;
 
   return (
     <div className="space-y-4">
@@ -54,20 +42,20 @@ export function HostGameView({ game, onCancelBeacon }: HostGameViewProps) {
                 {game.course_name || 'Course TBD'}
               </div>
               <div className="text-[13px] text-white/70">
-                {formatTeeTime(game.tee_time)}
+                {formatStartTime(game.start_time)}
               </div>
             </div>
             
             <div className="rounded-full bg-white/10 border border-white/20 text-white/80 text-[12px] font-medium px-2 py-1 whitespace-nowrap ml-2">
-              {getGameTypeLabel(game.game_type)}
+              {game.slots_total - game.slots_open}/{game.slots_total} filled
             </div>
           </div>
 
           {/* Game info */}
           <div className="space-y-1">
-            {playersNeeded > 0 && (
+            {slotsOpen > 0 && (
               <div className="text-[13px] text-green-400 font-medium">
-                {playersNeeded} spot{playersNeeded === 1 ? '' : 's'} open
+                {slotsOpen} spot{slotsOpen === 1 ? '' : 's'} open
               </div>
             )}
             <div className="text-[12px] text-white/50">

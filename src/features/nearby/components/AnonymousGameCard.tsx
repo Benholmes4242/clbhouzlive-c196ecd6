@@ -21,7 +21,7 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested, isAccepte
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
 
-  const formatTeeTime = (startTime: string) => {
+  const formatStartTime = (startTime: string) => {
     const date = parseISO(startTime);
     const today = new Date();
     const tomorrow = new Date(today);
@@ -36,37 +36,8 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested, isAccepte
     }
   };
 
-  const getGameTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      '9_holes': '9 holes',
-      '18_holes': '18 holes',
-      'casual_golf': 'Casual golf',
-      'practice': 'Practice',
-    };
-    return labels[type] || type;
-  };
-
-  const calculatePlayerInfo = () => {
-    const handicaps = [game.host_handicap, ...(game.other_player_handicaps || [])].filter(h => h !== null) as number[];
-    const playerCount = handicaps.length;
-    
-    if (handicaps.length > 0) {
-      const min = Math.min(...handicaps);
-      const max = Math.max(...handicaps);
-      return {
-        count: playerCount,
-        handicapRange: min === max ? `Handicap ${min}` : `Handicaps ${min}–${max}`,
-      };
-    }
-    
-    return {
-      count: 1,
-      handicapRange: null,
-    };
-  };
-
-  const playerInfo = calculatePlayerInfo();
-  const playersNeeded = game.players_needed || 0;
+  const slotsOpen = game.slots_open;
+  const seatsFilled = game.slots_total - game.slots_open;
 
   const handleMessageHost = () => {
     if (game.host_user_id) {
@@ -83,32 +54,25 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested, isAccepte
             {game.course_name || 'Course TBD'}
           </div>
           <div className="text-[13px] text-white/70">
-            {formatTeeTime(game.tee_time)}
+            {formatStartTime(game.start_time)}
           </div>
         </div>
         
         <div className="rounded-full bg-white/10 border border-white/20 text-white/80 text-[12px] font-medium px-2 py-1 whitespace-nowrap ml-2">
-          {getGameTypeLabel(game.game_type)}
+          {seatsFilled}/{game.slots_total} filled
         </div>
       </div>
 
       {/* Block 2: Group snapshot */}
       <div className="space-y-2 mb-3">
         <div className="text-[13px] text-white/80">
-          {playerInfo.count} {playerInfo.count === 1 ? 'player' : 'players'} so far
-          {playerInfo.handicapRange && (
-            <>
-              {' · '}
-              {playerInfo.handicapRange}
-            </>
+          {slotsOpen > 0 && (
+            <span className="text-green-400 font-medium">
+              {slotsOpen} spot{slotsOpen === 1 ? '' : 's'} open
+            </span>
           )}
-          {playersNeeded > 0 && (
-            <>
-              {' · '}
-              <span className="text-green-400 font-medium">
-                {playersNeeded} spot{playersNeeded === 1 ? '' : 's'} open
-              </span>
-            </>
+          {slotsOpen === 0 && (
+            <span className="text-white/60">Game is full</span>
           )}
         </div>
         
@@ -129,16 +93,13 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested, isAccepte
       {isExpanded && (
         <div className="mt-3 mb-3 p-3 rounded-lg bg-white/5 border border-white/10 text-[13px] text-white/70 space-y-1">
           <div>
-            <span className="font-medium text-white/80">Host handicap:</span> {game.host_handicap || 'N/A'}
-          </div>
-          <div>
-            <span className="font-medium text-white/80">Playing with:</span> {Math.max(0, playerInfo.count - 1)} other {playerInfo.count - 1 === 1 ? 'member' : 'members'}
-          </div>
-          <div>
             <span className="font-medium text-white/80">Course:</span> {game.course_name || 'TBD'}
           </div>
           <div>
-            <span className="font-medium text-white/80">They're looking for:</span> {playersNeeded} more
+            <span className="font-medium text-white/80">Seats filled:</span> {seatsFilled} of {game.slots_total}
+          </div>
+          <div>
+            <span className="font-medium text-white/80">Seats available:</span> {slotsOpen}
           </div>
         </div>
       )}
@@ -158,7 +119,7 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested, isAccepte
               Message host
             </button>
           </div>
-        ) : playersNeeded > 0 ? (
+        ) : slotsOpen > 0 ? (
           <button
             onClick={() => onRequestJoin(game.id)}
             disabled={hasRequested}

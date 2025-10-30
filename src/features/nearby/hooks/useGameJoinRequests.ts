@@ -199,23 +199,26 @@ export function useGameJoinRequests(gameId?: string) {
       // Update request status
       const { error: updateError } = await supabase
         .from('game_join_requests')
-        .update({ status: 'accepted' })
+        .update({ status: 'accepted', decided_at: new Date().toISOString() })
         .eq('id', requestId);
 
       if (updateError) throw updateError;
 
-      // Decrement players_needed
-      const { data: game } = await supabase
-        .from('game_beacons')
-        .select('players_needed')
+      // Decrement slots_open
+      const { data: game, error: selErr } = await supabase
+        .from('games')
+        .select('slots_open, course_name')
         .eq('id', gameId)
-        .single();
+        .single() as { data: any, error: any };
 
-      if (game && game.players_needed && game.players_needed > 0) {
-        await supabase
-          .from('game_beacons')
-          .update({ players_needed: game.players_needed - 1 })
+      if (selErr) throw selErr;
+
+      if (game && typeof game.slots_open === 'number' && game.slots_open > 0) {
+        const { error: updErr } = await supabase
+          .from('games')
+          .update({ slots_open: game.slots_open - 1 })
           .eq('id', gameId);
+        if (updErr) throw updErr;
       }
 
       // Get requester info for notification
@@ -225,19 +228,12 @@ export function useGameJoinRequests(gameId?: string) {
         .eq('id', requestId)
         .single();
 
-      if (request) {
-        // Send notification to requester
-        const { data: gameData } = await supabase
-          .from('game_beacons')
-          .select('course_name, tee_time')
-          .eq('id', gameId)
-          .single();
-
-        await supabase.rpc('send_push_notification', {
-          target_user_id: request.requester_user_id,
-          notification_type: 'game_accepted',
+      if (request?.requester_user_id) {
+        await supabase.from('notifications').insert({
+          user_id: request.requester_user_id,
+          type: 'game_accepted',
           title: "You're in 👋",
-          message: `You've been added to the game at ${gameData?.course_name || 'the course'}`,
+          message: `You've been added to the game at ${game?.course_name || 'the course'}`,
           data: { game_id: gameId },
         });
       }

@@ -297,16 +297,18 @@ export function CreateGameModal({
             // Show existing beacon
             <div className="space-y-4">
               <div className="bg-neutral-800/50 rounded-xl p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-neutral-400">Game type</span>
-                  <span className="text-sm font-medium text-neutral-200">{formatGameTypeDisplay(myBeacon.game_type)}</span>
-                </div>
                 {myBeacon.course_name && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-neutral-400">Location</span>
                     <span className="text-sm font-medium text-neutral-200">{myBeacon.course_name}</span>
                   </div>
                 )}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-neutral-400">Seats</span>
+                  <span className="text-sm font-medium text-neutral-200">
+                    {myBeacon.slots_total - myBeacon.slots_open}/{myBeacon.slots_total} filled
+                  </span>
+                </div>
                 {myBeacon.note && (
                   <div className="flex flex-col gap-1">
                     <span className="text-sm text-neutral-400">Note</span>
