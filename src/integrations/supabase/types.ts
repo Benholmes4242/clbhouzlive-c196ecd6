@@ -2679,6 +2679,7 @@ export type Database = {
         }[]
       }
       cleanup_expired_dismissals: { Args: never; Returns: undefined }
+      current_auth_uid: { Args: never; Returns: string }
       execute_sql: { Args: { params?: Json; query: string }; Returns: Json }
       expire_pings: { Args: never; Returns: undefined }
       fetch_social_feed_posts: {
@@ -2699,6 +2700,16 @@ export type Database = {
           shares_count: number
           user_id: string
         }[]
+      }
+      game_request_decide: {
+        Args: { p_decision: string; p_request_id: string }
+        Returns: Json
+      }
+      game_tag_accept: { Args: { p_game_id: string }; Returns: Json }
+      game_tag_decline: { Args: { p_game_id: string }; Returns: Json }
+      game_tag_release: {
+        Args: { p_game_id: string; p_user_id: string }
+        Returns: Json
       }
       get_all_users_admin: {
         Args: never
