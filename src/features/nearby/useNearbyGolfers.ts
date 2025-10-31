@@ -5,8 +5,8 @@ import { NearbyGolfer } from './types';
 import { calculateDistance } from './distance';
 import { NEARBY_RADIUS_METERS } from './config';
 
-async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<NearbyGolfer[]> {
-  console.log('[🔍 NEARBY DEBUG] fetchLiveNearby called', { userLat, userLng });
+async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: string): Promise<NearbyGolfer[]> {
+  console.log('[🔍 NEARBY DEBUG] fetchLiveNearby called', { userLat, userLng, viewerId });
   
   if (!userLat || !userLng) {
     console.log('[🔍 NEARBY DEBUG] No location provided, returning empty');
@@ -14,76 +14,104 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
   }
 
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      console.log('[🔍 NEARBY DEBUG] No authenticated user');
-      return [];
-    }
-    
-    console.log('[🔍 NEARBY DEBUG] Fetching with user:', user.id);
     const twentyMinAgo = new Date(Date.now() - 20 * 60 * 1000).toISOString();
     console.log('[🔍 NEARBY DEBUG] Filter: visibility_mode != hidden, last_location_update >= ', twentyMinAgo);
 
-    // Fetch nearby users from user_nearby_status within the last 20 minutes
-    const { data, error } = await supabase
+    // STEP 1: Fetch candidate IDs from user_nearby_status (no joins to avoid PGRST200)
+    const { data: rows, error: statusErr } = await supabase
       .from('user_nearby_status')
-      .select(`
-        user_id,
-        lat,
-        lng,
-        updated_at,
-        user_profiles:user_id (
-          id,
-          display_name,
-          username,
-          profile_photo_url,
-          eg_handicap_index,
-          show_handicap,
-          home_club
-        )
-      `)
+      .select('user_id, lat, lng, visibility_mode, last_location_update')
       .neq('visibility_mode', 'hidden')
-      .gte('last_location_update', new Date(Date.now() - 20 * 60 * 1000).toISOString())
-      .neq('user_id', user.id); // Exclude self
+      .gte('last_location_update', twentyMinAgo);
 
-    if (error) {
-      console.error('[🔍 NEARBY DEBUG] Fetch error:', error);
+    if (statusErr) {
+      console.error('[🔍 NEARBY DEBUG] Status fetch error:', statusErr);
       return [];
     }
 
-    console.log('[🔍 NEARBY DEBUG] Raw DB results:', data?.length || 0, 'rows');
-    if (!data) {
+    console.log('[🔍 NEARBY DEBUG] Raw DB results:', rows?.length || 0, 'rows');
+    if (!rows || rows.length === 0) {
       console.log('[🔍 NEARBY DEBUG] No data returned');
       return [];
     }
+
+    // Exclude self + ensure lat/lng present + distance filter
+    const candidates = rows.filter(r => {
+      if (!r.user_id || r.user_id === viewerId) return false;
+      if (r.lat == null || r.lng == null) return false;
+      const meters = calculateDistance(userLat, userLng, r.lat, r.lng);
+      return meters <= NEARBY_RADIUS_METERS;
+    });
+
+    console.log('[🔍 NEARBY DEBUG] After distance filter:', candidates.length, 'candidates');
+    if (candidates.length === 0) return [];
+
+    const ids = [...new Set(candidates.map(r => r.user_id))];
+
+    // STEP 2: Fetch profiles for those IDs
+    const { data: profiles, error: profErr } = await supabase
+      .from('user_profiles')
+      .select('id, display_name, username, profile_photo_url, eg_handicap_index, show_handicap, home_club')
+      .in('id', ids);
+
+    if (profErr) {
+      console.error('[🔍 NEARBY DEBUG] Profile fetch error:', profErr);
+      return [];
+    }
+
+    console.log('[🔍 NEARBY DEBUG] Fetched profiles:', profiles?.length || 0);
+
+    // STEP 3: Handle friend visibility (fetch mutual follows if needed)
+    let mutualSet = new Set<string>();
+    const friendOnlyIds = candidates.filter(c => c.visibility_mode === 'friends').map(c => c.user_id);
     
-    console.log('[🔍 NEARBY DEBUG] Sample row:', data[0]);
+    if (viewerId && friendOnlyIds.length > 0) {
+      // Get users that viewerId follows AND who follow viewerId back
+      const { data: following } = await supabase
+        .from('user_follows')
+        .select('following_id')
+        .eq('follower_id', viewerId)
+        .in('following_id', friendOnlyIds);
 
-    // Filter by distance and map to NearbyGolfer format
-    const nearby: NearbyGolfer[] = data
-      .map((item: any): NearbyGolfer | null => {
-        const profile = item.user_profiles;
-        if (!profile) return null;
+      const { data: followers } = await supabase
+        .from('user_follows')
+        .select('follower_id')
+        .eq('following_id', viewerId)
+        .in('follower_id', friendOnlyIds);
 
-        const distanceMeters = calculateDistance(userLat, userLng, item.lat, item.lng);
-        if (distanceMeters > NEARBY_RADIUS_METERS) return null;
+      const followingSet = new Set((following || []).map(r => r.following_id));
+      mutualSet = new Set((followers || []).filter(r => followingSet.has(r.follower_id)).map(r => r.follower_id));
+      
+      console.log('[🔍 NEARBY DEBUG] Mutual friends:', mutualSet.size);
+    }
 
-        return {
-          id: profile.id,
-          display_name: profile.display_name,
-          username: profile.username,
-          home_club: profile.home_club,
-          avatar_url: profile.profile_photo_url,
+    // STEP 4: Build final list
+    const profileById = new Map((profiles || []).map(p => [p.id, p]));
+    const nearby: NearbyGolfer[] = candidates
+      .filter(c => c.visibility_mode === 'all' || mutualSet.has(c.user_id))
+      .map(c => {
+        const prof = profileById.get(c.user_id);
+        if (!prof) return null;
+
+        const distanceMeters = calculateDistance(userLat, userLng, c.lat!, c.lng!);
+        
+        const golfer: NearbyGolfer = {
+          id: prof.id,
+          display_name: prof.display_name || prof.username || 'Unknown',
+          username: prof.username || undefined,
+          home_club: prof.home_club || undefined,
+          avatar_url: prof.profile_photo_url || undefined,
           is_online: true,
           distance_km: distanceMeters / 1000,
-          handicap: profile.show_handicap ? profile.eg_handicap_index : undefined,
-          isOpenToPlay: true, // Assume yes if they're broadcasting location
+          handicap: prof.show_handicap ? prof.eg_handicap_index : undefined,
+          isOpenToPlay: true,
         };
+        return golfer;
       })
-      .filter((g: NearbyGolfer | null): g is NearbyGolfer => g !== null)
+      .filter((g): g is NearbyGolfer => g !== null)
       .sort((a, b) => (a.distance_km || 0) - (b.distance_km || 0));
 
-    console.log('[🔍 NEARBY DEBUG] After distance filter (1km):', nearby.length, 'golfers');
+    console.log('[🔍 NEARBY DEBUG] Final nearby golfers:', nearby.length);
     if (nearby.length > 0) {
       console.log('[🔍 NEARBY DEBUG] First golfer:', nearby[0]);
     }
@@ -108,7 +136,7 @@ export function useNearbyGolfers(userLat?: number, userLng?: number, viewerId?: 
 
   const query = useQuery({
     queryKey: ['nearbyGolfers', 'live', userLat, userLng, viewerId],
-    queryFn: () => fetchLiveNearby(userLat, userLng),
+    queryFn: () => fetchLiveNearby(userLat, userLng, viewerId),
     staleTime: 15_000,
     enabled: !!userLat && !!userLng,
   });
