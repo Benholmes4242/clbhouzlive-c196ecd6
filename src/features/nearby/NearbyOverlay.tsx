@@ -11,6 +11,8 @@ import { GamesNearbyList } from './components/GamesNearbyList';
 import { useVisibility } from './hooks/useVisibility';
 import { useOpenToPlay } from './hooks/useOpenToPlay';
 import { VisibilitySegmentedControl } from './components/VisibilitySegmentedControl';
+import { useNearbyHeartbeat } from './hooks/useNearbyHeartbeat';
+import { supabase } from '@/integrations/supabase/client';
 
 interface NearbyOverlayProps {
   isOpen: boolean;
@@ -27,6 +29,25 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       getCurrentLocation();
     }
   }, [isOpen, currentLocation, getCurrentLocation]);
+
+  // Heartbeat to keep user visible while overlay is open
+  useNearbyHeartbeat(async () => {
+    if (!user) return null;
+    
+    // Fetch current visibility & coords
+    const { data: status } = await supabase
+      .from('user_nearby_status')
+      .select('visibility_mode, lat, lng')
+      .eq('user_id', user.id)
+      .single();
+
+    return {
+      user_id: user.id,
+      visibility_mode: (status?.visibility_mode ?? 'hidden') as 'hidden' | 'friends' | 'all',
+      lat: status?.lat ?? currentLocation?.lat ?? null,
+      lng: status?.lng ?? currentLocation?.lng ?? null,
+    };
+  });
 
   // ✅ Realtime list (postgres_changes subscription + invalidation)
   const { data: golfers = [], isLoading } = useNearbyGolfers(

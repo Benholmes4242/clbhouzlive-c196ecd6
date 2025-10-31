@@ -21,10 +21,10 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
     }
     
     console.log('[🔍 NEARBY DEBUG] Fetching with user:', user.id);
-    const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-    console.log('[🔍 NEARBY DEBUG] Filter: visibility_mode != hidden, last_location_update >= ', fiveMinAgo);
+    const twentyMinAgo = new Date(Date.now() - 20 * 60 * 1000).toISOString();
+    console.log('[🔍 NEARBY DEBUG] Filter: visibility_mode != hidden, last_location_update >= ', twentyMinAgo);
 
-    // Fetch nearby users from user_nearby_status within the last 5 minutes
+    // Fetch nearby users from user_nearby_status within the last 20 minutes
     const { data, error } = await supabase
       .from('user_nearby_status')
       .select(`
@@ -43,7 +43,7 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
         )
       `)
       .neq('visibility_mode', 'hidden')
-      .gte('last_location_update', new Date(Date.now() - 5 * 60 * 1000).toISOString())
+      .gte('last_location_update', new Date(Date.now() - 20 * 60 * 1000).toISOString())
       .neq('user_id', user.id); // Exclude self
 
     if (error) {
