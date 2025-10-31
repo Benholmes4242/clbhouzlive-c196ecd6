@@ -4,7 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLocationPermission } from './useLocationPermission';
 import { useVisibility } from './useVisibility';
 
-const BROADCAST_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
+const BROADCAST_INTERVAL_MS = 5 * 1000; // 5 seconds
 
 /**
  * Continuously broadcasts user location when visibility is not "hidden"
