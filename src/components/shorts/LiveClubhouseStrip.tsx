@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState, useId } from 'react';
 import { useLiveClubhouseProfiles } from '@/hooks/useLiveClubhouseProfiles';
-import { useActiveGolfers } from '@/hooks/useActiveGolfers';
-import { useNearbyGolfersCount } from '@/hooks/useNearbyGolfersCount';
+import { useNearbyGolfers } from '@/features/nearby/useNearbyGolfers';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
@@ -27,8 +28,17 @@ function superellipsePath(w: number, h: number, n = 4.2, steps = 240) {
 
 export function LiveClubhouseStrip() {
   const { creators, isLoading } = useLiveClubhouseProfiles();
-  const { golfers } = useActiveGolfers();
-  const { count: nearbyCount, isLoading: nearbyCountLoading } = useNearbyGolfersCount();
+  const { user } = useSupabaseSession();
+  const { currentLocation } = useLocationPermission();
+  
+  // ✅ Realtime count + list (same SSOT as modal)
+  const { data: golfers = [], isLoading: nearbyCountLoading } = useNearbyGolfers(
+    currentLocation?.lat,
+    currentLocation?.lng,
+    user?.id
+  );
+  const nearbyCount = golfers.length;
+
   const rowRef = useRef<HTMLDivElement>(null);
   const [scrolling, setScrolling] = useState(false);
   const [nearbyOverlayOpen, setNearbyOverlayOpen] = useState(false);
@@ -107,7 +117,7 @@ export function LiveClubhouseStrip() {
               key={golfer.id} 
               creator={{
                 id: golfer.id,
-                username: golfer.username || '',
+                username: golfer.username || golfer.id,
                 display_name: golfer.display_name,
                 profile_photo_url: golfer.avatar_url || null,
                 home_club: golfer.home_club || null,

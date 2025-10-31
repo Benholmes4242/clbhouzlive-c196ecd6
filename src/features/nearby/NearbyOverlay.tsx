@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus } from 'lucide-react';
-import { useActiveGolfers } from '@/hooks/useActiveGolfers';
+import { useNearbyGolfers } from './useNearbyGolfers';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useLocationPermission } from './hooks/useLocationPermission';
 import { GolferRow } from './components/GolferRow';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useGameBeacon } from './hooks/useGameBeacon';
@@ -16,7 +18,23 @@ interface NearbyOverlayProps {
 }
 
 export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
-  const { golfers, isLoading } = useActiveGolfers({ limit: 20, mockCount: 0 });
+  const { user } = useSupabaseSession();
+  const { currentLocation, getCurrentLocation } = useLocationPermission();
+
+  // Get location as soon as the overlay opens
+  useEffect(() => {
+    if (isOpen && !currentLocation) {
+      getCurrentLocation();
+    }
+  }, [isOpen, currentLocation, getCurrentLocation]);
+
+  // ✅ Realtime list (postgres_changes subscription + invalidation)
+  const { data: golfers = [], isLoading } = useNearbyGolfers(
+    currentLocation?.lat,
+    currentLocation?.lng,
+    user?.id
+  );
+
   const { 
     myBeacon, 
     nearbyBeacons, 
@@ -238,7 +256,16 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             ) : (
               <div className="space-y-2">
                 {golfers.map((golfer, index) => (
-                  <GolferRow key={golfer.id ?? index} golfer={golfer} index={index} />
+                  <GolferRow 
+                    key={golfer.id ?? index} 
+                    golfer={{
+                      ...golfer,
+                      isMock: false,
+                      distanceText: golfer.distance_km ? `${golfer.distance_km.toFixed(1)}km` : undefined,
+                      sameHomeClub: golfer.same_club,
+                    }} 
+                    index={index} 
+                  />
                 ))}
               </div>
             )

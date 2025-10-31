@@ -53,6 +53,7 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
         return {
           id: profile.id,
           display_name: profile.display_name,
+          username: profile.username,
           home_club: profile.home_club,
           avatar_url: profile.profile_photo_url,
           is_online: true,
@@ -71,7 +72,7 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
   }
 }
 
-export function useNearbyGolfers(userLat?: number, userLng?: number) {
+export function useNearbyGolfers(userLat?: number, userLng?: number, viewerId?: string) {
   const queryClient = useQueryClient();
   const DEBUG_REALTIME = process.env.NODE_ENV !== 'production';
 
