@@ -20,6 +20,7 @@ import AIChat from "@/components/ai-chat/AIChat";
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
+import { useLocationBroadcast } from '@/features/nearby/hooks/useLocationBroadcast';
 import { TopTenProvider } from '@/context/TopTenContext';
 import { UIProvider } from '@/contexts/UIContext';
 import { ModalProvider } from '@/contexts/ModalContext';
@@ -111,6 +112,9 @@ const App: React.FC = () => {
   
   // Track user presence for nearby golfers feature
   usePresenceTracker();
+  
+  // Continuously broadcast location when visibility is active
+  useLocationBroadcast();
   
   // Initialize recent media listener for SnapModal thumbnails
   useEffect(() => {

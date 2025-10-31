@@ -20,6 +20,8 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
         lat,
         lng,
         updated_at,
+        open_to_play_active,
+        open_to_play_expires_at,
         user_profiles:user_id (
           id,
           display_name,
@@ -50,6 +52,11 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
         const distanceMeters = calculateDistance(userLat, userLng, item.lat, item.lng);
         if (distanceMeters > NEARBY_RADIUS_METERS) return null;
 
+        // Check if open_to_play is active and not expired
+        const isOpenToPlay = item.open_to_play_active && 
+          item.open_to_play_expires_at && 
+          new Date(item.open_to_play_expires_at) > new Date();
+
         return {
           id: profile.id,
           display_name: profile.display_name,
@@ -58,7 +65,7 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
           is_online: true,
           distance_km: distanceMeters / 1000,
           handicap: profile.show_handicap ? profile.eg_handicap_index : undefined,
-          isOpenToPlay: true, // Assume yes if they're broadcasting location
+          isOpenToPlay,
         };
       })
       .filter((g: NearbyGolfer | null): g is NearbyGolfer => g !== null)

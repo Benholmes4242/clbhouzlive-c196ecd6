@@ -8,6 +8,7 @@ import { CreateGameModal } from './components/CreateGameModal';
 import { GamesNearbyList } from './components/GamesNearbyList';
 import { useVisibility } from './hooks/useVisibility';
 import { useOpenToPlay } from './hooks/useOpenToPlay';
+import { useLocationBroadcast } from './hooks/useLocationBroadcast';
 import { VisibilitySegmentedControl } from './components/VisibilitySegmentedControl';
 
 interface NearbyOverlayProps {
@@ -27,6 +28,9 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   } = useGameBeacon();
   const { visibilityMode, setVisibilityMode, loading: visibilityLoading } = useVisibility();
   const { isOpen: isOpenToPlay, remainingText, activate: activateOpen, cancel: cancelOpen } = useOpenToPlay();
+  
+  // Continuously broadcast location when visibility is active
+  useLocationBroadcast();
   
   const [activeTab, setActiveTab] = useState<'golfers' | 'games'>('golfers');
   const [isCreateGameOpen, setIsCreateGameOpen] = useState(false);
