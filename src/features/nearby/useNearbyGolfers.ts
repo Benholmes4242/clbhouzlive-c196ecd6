@@ -30,8 +30,8 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
           home_club
         )
       `)
-      .eq('is_hidden', false)
-      .gte('updated_at', new Date(Date.now() - 5 * 60 * 1000).toISOString())
+      .neq('visibility_mode', 'hidden')
+      .gte('last_location_update', new Date(Date.now() - 5 * 60 * 1000).toISOString())
       .neq('user_id', user.id); // Exclude self
 
     if (error) {
@@ -77,7 +77,7 @@ export function useNearbyGolfers(userLat?: number, userLng?: number, viewerId?: 
   const DEBUG_REALTIME = process.env.NODE_ENV !== 'production';
 
   const query = useQuery({
-    queryKey: ['nearbyGolfers', 'live'],
+    queryKey: ['nearbyGolfers', 'live', userLat, userLng, viewerId],
     queryFn: () => fetchLiveNearby(userLat, userLng),
     staleTime: 15_000,
     enabled: !!userLat && !!userLng,
@@ -102,7 +102,9 @@ export function useNearbyGolfers(userLat?: number, userLng?: number, viewerId?: 
             console.log('[NearbyGolfers] event', new Date().toISOString(), payload.eventType, userId);
           }
           // Refetch when any user's location updates
-          queryClient.invalidateQueries({ queryKey: ['nearbyGolfers', 'live'] });
+          queryClient.invalidateQueries({
+            predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'nearbyGolfers',
+          });
         }
       )
       .subscribe((status) => {
@@ -122,7 +124,9 @@ export function useNearbyGolfers(userLat?: number, userLng?: number, viewerId?: 
       if (DEBUG_REALTIME) {
         console.log('[NearbyGolfers] Refetch on focus');
       }
-      queryClient.invalidateQueries({ queryKey: ['nearbyGolfers', 'live'] });
+      queryClient.invalidateQueries({
+        predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'nearbyGolfers',
+      });
     };
     
     window.addEventListener('focus', handleFocus);
