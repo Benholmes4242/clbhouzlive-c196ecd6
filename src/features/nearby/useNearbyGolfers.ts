@@ -48,10 +48,22 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
 
     const ids = [...new Set(candidates.map(r => r.user_id))];
 
-    // STEP 2: Fetch profiles for those IDs
+    // STEP 2: Fetch profiles for those IDs with club join
     const { data: profiles, error: profErr } = await supabase
       .from('user_profiles')
-      .select('id, display_name, username, profile_photo_url, eg_handicap_index, show_handicap, home_club')
+      .select(`
+        id,
+        display_name,
+        username,
+        profile_photo_url,
+        eg_handicap_index,
+        show_handicap,
+        home_club_id,
+        club:home_club_id (
+          id,
+          name
+        )
+      `)
       .in('id', ids);
 
     if (profErr) {
@@ -102,11 +114,16 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
         const isOpenToPlay = c.open_to_play_active === true && 
           (!c.open_to_play_expires_at || new Date(c.open_to_play_expires_at) > new Date());
         
+        // Build consistent home club object from FK join
+        const homeClub = prof.club 
+          ? { id: prof.club.id, name: prof.club.name }
+          : undefined;
+        
         const golfer: NearbyGolfer = {
           id: prof.id,
           display_name: prof.display_name || prof.username || 'Unknown',
           username: prof.username || undefined,
-          home_club: prof.home_club || undefined,
+          home_club: homeClub,
           avatar_url: prof.profile_photo_url || undefined,
           is_online: true,
           distance_km: distanceMeters / 1000,

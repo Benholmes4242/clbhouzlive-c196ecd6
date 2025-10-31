@@ -9,7 +9,7 @@ interface GolferRowProps {
     id: string;
     display_name: string;
     username?: string;
-    home_club?: string;
+    home_club?: { id: string; name: string };
     avatar_url?: string;
     is_online: boolean;
     isMock: boolean;
@@ -78,7 +78,7 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
   return (
     <article
       className="rounded-xl bg-white/5 backdrop-blur-md border border-white/10 text-white"
-      aria-label={`${golfer.display_name}, ${golfer.home_club || 'No home club'}`}
+      aria-label={`${golfer.display_name}, ${golfer.home_club?.name || 'No home club'}`}
     >
       {/* Row 1: Header - Avatar + Name/Distance + Club */}
       <div className="flex flex-row gap-3 p-3 pb-2">
@@ -113,7 +113,7 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
           {/* Home club */}
           {golfer.home_club && (
             <div className="text-[13px] leading-tight text-white/70 truncate">
-              {golfer.home_club}
+              {golfer.home_club.name}
             </div>
           )}
         </div>

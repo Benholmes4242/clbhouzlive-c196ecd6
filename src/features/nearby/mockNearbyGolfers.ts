@@ -5,7 +5,7 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
     { 
       id: 'm1', 
       display_name: 'Anna Shaw', 
-      home_club: 'Royal Birkdale', 
+      home_club: { id: 'mock-1', name: 'Royal Birkdale' }, 
       avatar_url: '/images/mocks/avatars/anna_shaw.jpg', 
       is_online: true, 
       distance_km: 0.4, 
@@ -15,7 +15,7 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
     { 
       id: 'm2', 
       display_name: 'Tom "Slice" Miller', 
-      home_club: 'Formby Golf Club', 
+      home_club: { id: 'mock-2', name: 'Formby Golf Club' }, 
       avatar_url: '/images/mocks/avatars/tom_slice.jpg', 
       is_online: true, 
       distance_km: 1.2, 
@@ -25,7 +25,7 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
     { 
       id: 'm3', 
       display_name: 'Mia Putts', 
-      home_club: 'Wallasey Golf Club', 
+      home_club: { id: 'mock-3', name: 'Wallasey Golf Club' }, 
       avatar_url: '/images/mocks/avatars/mia_putts.jpg', 
       is_online: true, 
       distance_km: 2.1, 
@@ -35,7 +35,7 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
     { 
       id: 'm4', 
       display_name: 'Ben Holmes', 
-      home_club: 'Hillside Golf Club', 
+      home_club: { id: 'mock-4', name: 'Hillside Golf Club' }, 
       avatar_url: '/images/mocks/avatars/ben_holmes.jpg', 
       is_online: true, 
       distance_km: 0.7, 
@@ -45,7 +45,7 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
     { 
       id: 'm5', 
       display_name: 'Classic Golf Pro', 
-      home_club: 'Royal Liverpool (Hoylake)', 
+      home_club: { id: 'mock-5', name: 'Royal Liverpool (Hoylake)' }, 
       avatar_url: '/images/mocks/avatars/classic_golf_pro.jpg', 
       is_online: true, 
       distance_km: 3.8, 
