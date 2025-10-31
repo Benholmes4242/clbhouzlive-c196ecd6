@@ -69,6 +69,15 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
     }
 
     console.log('[🔍 NEARBY DEBUG] Fetched profiles:', profiles?.length || 0);
+    if (profiles && profiles.length > 0) {
+      console.log('[🔍 NEARBY DEBUG] Sample profile:', {
+        id: profiles[0].id,
+        name: profiles[0].display_name,
+        home_club: profiles[0].home_club,
+        home_club_id: profiles[0].home_club_id,
+        handicap: profiles[0].eg_handicap_index
+      });
+    }
 
     // STEP 2b: Fetch course names for any home_club_id values
     const clubIds = Array.from(new Set((profiles || [])
@@ -133,9 +142,21 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
         let homeClub = prof.home_club_id ? clubMap.get(prof.home_club_id) : undefined;
         
         // Fallback to legacy home_club text field
-        if (!homeClub && prof.home_club) {
-          homeClub = { id: 'legacy', name: prof.home_club };
+        if (!homeClub && prof.home_club && typeof prof.home_club === 'string') {
+          const clubName = prof.home_club.trim();
+          if (clubName) {
+            homeClub = { id: 'legacy', name: clubName };
+          }
         }
+        
+        console.log('[🔍 NEARBY DEBUG] Golfer club data:', {
+          userId: prof.id,
+          name: prof.display_name,
+          home_club_id: prof.home_club_id,
+          home_club_text: prof.home_club,
+          resolved: homeClub,
+          handicap: prof.eg_handicap_index
+        });
         
         // Check if same home club as viewer
         const sameHomeClub = !!(viewerHomeClubId && prof.home_club_id && prof.home_club_id === viewerHomeClubId);
