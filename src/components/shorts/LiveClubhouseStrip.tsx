@@ -1,15 +1,13 @@
 import React, { useEffect, useRef, useState, useId } from 'react';
 import { useLiveClubhouseProfiles } from '@/hooks/useLiveClubhouseProfiles';
-import { useNearbyGolfers } from '@/features/nearby/useNearbyGolfers';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
+import { useActiveGolfers } from '@/hooks/useActiveGolfers';
+import { useNearbyGolfersCount } from '@/hooks/useNearbyGolfersCount';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
 import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import SquircleImage from '@/components/ui/SquircleImage';
 import NearbyGolfersSquircle from '@/components/nearby/NearbyGolfersSquircle';
-import { supabase } from '@/integrations/supabase/client';
 import '@/styles/shorts_live_clubhouse.css';
 
 const SEEN_KEY = 'seenCreatorImmersiveIds';
@@ -29,34 +27,8 @@ function superellipsePath(w: number, h: number, n = 4.2, steps = 240) {
 
 export function LiveClubhouseStrip() {
   const { creators, isLoading } = useLiveClubhouseProfiles();
-  const { user } = useSupabaseSession();
-  const { currentLocation } = useLocationPermission();
-  
-  // Get viewer's profile for home_club_id
-  const [viewerHomeClubId, setViewerHomeClubId] = useState<string | undefined>();
-  
-  useEffect(() => {
-    if (!user?.id) return;
-    
-    supabase
-      .from('user_profiles')
-      .select('home_club_id')
-      .eq('id', user.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data?.home_club_id) setViewerHomeClubId(data.home_club_id);
-      });
-  }, [user?.id]);
-  
-  // ✅ Realtime count + list (same SSOT as modal)
-  const { data: golfers = [], isLoading: nearbyCountLoading } = useNearbyGolfers(
-    currentLocation?.lat,
-    currentLocation?.lng,
-    user?.id,
-    viewerHomeClubId
-  );
-  const nearbyCount = golfers.length;
-
+  const { golfers } = useActiveGolfers();
+  const { count: nearbyCount, isLoading: nearbyCountLoading } = useNearbyGolfersCount();
   const rowRef = useRef<HTMLDivElement>(null);
   const [scrolling, setScrolling] = useState(false);
   const [nearbyOverlayOpen, setNearbyOverlayOpen] = useState(false);
@@ -135,7 +107,7 @@ export function LiveClubhouseStrip() {
               key={golfer.id} 
               creator={{
                 id: golfer.id,
-                username: golfer.username || golfer.id,
+                username: golfer.username || '',
                 display_name: golfer.display_name,
                 profile_photo_url: golfer.avatar_url || null,
                 home_club: golfer.home_club || null,

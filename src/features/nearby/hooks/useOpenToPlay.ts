@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
 import { useToast } from '@/hooks/use-toast';
-import { useQueryClient } from '@tanstack/react-query';
 
 const DURATION_MINUTES = 30;
 const STORAGE_KEY = 'open_to_play_state_v2';
@@ -17,7 +16,6 @@ export function useOpenToPlay() {
   const { user } = useSupabaseSession();
   const { getCurrentLocation } = useLocationPermission();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   // local cache so UI can render instantly
   const [state, setState] = useState<OpenState>(() => {
@@ -104,11 +102,6 @@ export function useOpenToPlay() {
       return;
     }
 
-    // Invalidate nearby queries so O2P status reflects immediately
-    queryClient.invalidateQueries({
-      predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'nearbyGolfers'
-    });
-
     // Success toast
     toast({
       title: 'Open to Play Active',
@@ -151,11 +144,6 @@ export function useOpenToPlay() {
       });
       return;
     }
-
-    // Invalidate nearby queries so O2P status reflects immediately
-    queryClient.invalidateQueries({
-      predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'nearbyGolfers'
-    });
 
     // Success toast
     toast({

@@ -1,8 +1,7 @@
 export type NearbyGolfer = {
   id: string;
   display_name: string;
-  username?: string;
-  home_club?: { id: string; name: string };
+  home_club?: string;
   avatar_url?: string;
   is_online: boolean;
   distance_km?: number;

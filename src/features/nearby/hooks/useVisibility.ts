@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
 import { useToast } from '@/hooks/use-toast';
-import { useQueryClient } from '@tanstack/react-query';
 
 export type VisibilityMode = 'all' | 'friends' | 'hidden';
 
@@ -11,7 +10,6 @@ export function useVisibility() {
   const { user } = useSupabaseSession();
   const { getCurrentLocation } = useLocationPermission();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const [mode, setMode] = useState<VisibilityMode>('hidden');
   const [loading, setLoading] = useState(true);
@@ -31,10 +29,7 @@ export function useVisibility() {
         .single();
 
       if (!error && data?.visibility_mode) {
-        console.log('[🔍 VISIBILITY DEBUG] Loaded visibility mode:', data.visibility_mode);
         setMode(data.visibility_mode as VisibilityMode);
-      } else {
-        console.log('[🔍 VISIBILITY DEBUG] No visibility mode in DB, using default "hidden"');
       }
 
       setLoading(false);
@@ -73,17 +68,9 @@ export function useVisibility() {
 
       // STEP 2: Now do optimistic UI update (location is OK or mode is 'hidden')
       setMode(newMode);
-      
-      console.log('[🔍 VISIBILITY DEBUG] Updating DB:', {
-        user_id: user.id,
-        visibility_mode: newMode,
-        lat: newMode === 'hidden' ? null : lat,
-        lng: newMode === 'hidden' ? null : lng,
-        last_location_update: newMode === 'hidden' ? null : new Date().toISOString()
-      });
 
       // If hidden, we deliberately blank coords
-      const { data: updatedRow, error } = await supabase
+      const { error } = await supabase
         .from('user_nearby_status')
         .upsert(
           {
@@ -95,11 +82,7 @@ export function useVisibility() {
               newMode === 'hidden' ? null : new Date().toISOString(),
           },
           { onConflict: 'user_id' }
-        )
-        .select('*')
-        .single();
-      
-      console.log('[🔍 VISIBILITY DEBUG] DB upsert result:', { data: updatedRow, error });
+        );
 
       if (error) {
         console.error('updateMode error', error);
@@ -112,11 +95,6 @@ export function useVisibility() {
         });
         return;
       }
-
-      // Invalidate nearby queries so changes reflect immediately
-      queryClient.invalidateQueries({
-        predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'nearbyGolfers'
-      });
 
       // Success toast
       toast({

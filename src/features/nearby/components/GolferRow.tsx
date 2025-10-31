@@ -9,14 +9,13 @@ interface GolferRowProps {
     id: string;
     display_name: string;
     username?: string;
-    home_club?: { id: string; name: string };
+    home_club?: string;
     avatar_url?: string;
     is_online: boolean;
     isMock: boolean;
     distanceText?: string;
     isOpenToPlay?: boolean;
     sameHomeClub?: boolean;
-    handicap?: number | null;
   };
   index: number;
 }
@@ -79,7 +78,7 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
   return (
     <article
       className="rounded-xl bg-white/5 backdrop-blur-md border border-white/10 text-white"
-      aria-label={`${golfer.display_name}, ${golfer.home_club?.name || 'No home club'}`}
+      aria-label={`${golfer.display_name}, ${golfer.home_club || 'No home club'}`}
     >
       {/* Row 1: Header - Avatar + Name/Distance + Club */}
       <div className="flex flex-row gap-3 p-3 pb-2">
@@ -111,17 +110,10 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
             )}
           </div>
 
-          {/* Home club + Handicap */}
-          {(golfer.home_club || golfer.handicap !== undefined) && (
-            <div className="flex items-center gap-2 text-[13px] leading-tight text-white/70 truncate">
-              {golfer.home_club && (
-                <span className="truncate">{golfer.home_club.name}</span>
-              )}
-              {golfer.handicap !== undefined && golfer.handicap !== null && (
-                <span className="shrink-0 px-1.5 py-0.5 rounded bg-white/10 text-white/80 text-[11px] font-medium">
-                  HCP {golfer.handicap.toFixed(1)}
-                </span>
-              )}
+          {/* Home club */}
+          {golfer.home_club && (
+            <div className="text-[13px] leading-tight text-white/70 truncate">
+              {golfer.home_club}
             </div>
           )}
         </div>

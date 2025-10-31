@@ -2246,7 +2246,6 @@ export type Database = {
           id: string
           is_hidden: boolean
           last_location_update: string | null
-          last_seen_at: string | null
           lat: number | null
           lng: number | null
           open_to_play_active: boolean | null
@@ -2261,7 +2260,6 @@ export type Database = {
           id?: string
           is_hidden?: boolean
           last_location_update?: string | null
-          last_seen_at?: string | null
           lat?: number | null
           lng?: number | null
           open_to_play_active?: boolean | null
@@ -2276,7 +2274,6 @@ export type Database = {
           id?: string
           is_hidden?: boolean
           last_location_update?: string | null
-          last_seen_at?: string | null
           lat?: number | null
           lng?: number | null
           open_to_play_active?: boolean | null
@@ -2335,7 +2332,6 @@ export type Database = {
           has_profile_video: boolean | null
           header_photo_url: string | null
           home_club: string | null
-          home_club_id: string | null
           id: string
           is_public: boolean | null
           location: string | null
@@ -2392,7 +2388,6 @@ export type Database = {
           has_profile_video?: boolean | null
           header_photo_url?: string | null
           home_club?: string | null
-          home_club_id?: string | null
           id: string
           is_public?: boolean | null
           location?: string | null
@@ -2449,7 +2444,6 @@ export type Database = {
           has_profile_video?: boolean | null
           header_photo_url?: string | null
           home_club?: string | null
-          home_club_id?: string | null
           id?: string
           is_public?: boolean | null
           location?: string | null
@@ -2481,15 +2475,7 @@ export type Database = {
           website_url?: string | null
           websites?: string[] | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "fk_user_profiles_home_club"
-            columns: ["home_club_id"]
-            isOneToOne: false
-            referencedRelation: "golf_courses"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -2686,13 +2672,6 @@ export type Database = {
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
           website_url?: string | null
-        }
-        Relationships: []
-      }
-      user_friend_pairs: {
-        Row: {
-          u1: string | null
-          u2: string | null
         }
         Relationships: []
       }

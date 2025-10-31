@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus } from 'lucide-react';
-import { useNearbyGolfers } from './useNearbyGolfers';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useLocationPermission } from './hooks/useLocationPermission';
+import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { GolferRow } from './components/GolferRow';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useGameBeacon } from './hooks/useGameBeacon';
@@ -11,8 +9,6 @@ import { GamesNearbyList } from './components/GamesNearbyList';
 import { useVisibility } from './hooks/useVisibility';
 import { useOpenToPlay } from './hooks/useOpenToPlay';
 import { VisibilitySegmentedControl } from './components/VisibilitySegmentedControl';
-import { useNearbyHeartbeat } from './hooks/useNearbyHeartbeat';
-import { supabase } from '@/integrations/supabase/client';
 
 interface NearbyOverlayProps {
   isOpen: boolean;
@@ -20,61 +16,7 @@ interface NearbyOverlayProps {
 }
 
 export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
-  const { user } = useSupabaseSession();
-  const { currentLocation, getCurrentLocation } = useLocationPermission();
-
-  // Get location as soon as the overlay opens
-  useEffect(() => {
-    if (isOpen && !currentLocation) {
-      getCurrentLocation();
-    }
-  }, [isOpen, currentLocation, getCurrentLocation]);
-
-  // Heartbeat to keep user visible while overlay is open
-  useNearbyHeartbeat(async () => {
-    if (!user) return null;
-    
-    // Fetch current visibility & coords
-    const { data: status } = await supabase
-      .from('user_nearby_status')
-      .select('visibility_mode, lat, lng')
-      .eq('user_id', user.id)
-      .single();
-
-    return {
-      user_id: user.id,
-      visibility_mode: (status?.visibility_mode ?? 'hidden') as 'hidden' | 'friends' | 'all',
-      lat: status?.lat ?? currentLocation?.lat ?? null,
-      lng: status?.lng ?? currentLocation?.lng ?? null,
-    };
-  });
-
-  // Get viewer's profile for home_club_id
-  const [viewerHomeClubId, setViewerHomeClubId] = useState<string | undefined>();
-  
-  useEffect(() => {
-    if (!user?.id) return;
-    
-    supabase
-      .from('user_profiles')
-      .select('home_club_id')
-      .eq('id', user.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data?.home_club_id) {
-          setViewerHomeClubId(data.home_club_id);
-        }
-      });
-  }, [user?.id]);
-
-  // ✅ Realtime list (postgres_changes subscription + invalidation)
-  const { data: golfers = [], isLoading } = useNearbyGolfers(
-    currentLocation?.lat,
-    currentLocation?.lng,
-    user?.id,
-    viewerHomeClubId
-  );
-
+  const { golfers, isLoading } = useActiveGolfers({ limit: 20, mockCount: 0 });
   const { 
     myBeacon, 
     nearbyBeacons, 
@@ -296,16 +238,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             ) : (
               <div className="space-y-2">
                 {golfers.map((golfer, index) => (
-                  <GolferRow 
-                    key={golfer.id ?? index} 
-                    golfer={{
-                      ...golfer,
-                      isMock: false,
-                      distanceText: golfer.distance_km ? `${golfer.distance_km.toFixed(1)}km` : undefined,
-                      sameHomeClub: golfer.same_club,
-                    }} 
-                    index={index} 
-                  />
+                  <GolferRow key={golfer.id ?? index} golfer={golfer} index={index} />
                 ))}
               </div>
             )

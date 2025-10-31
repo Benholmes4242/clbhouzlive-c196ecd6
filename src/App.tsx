@@ -31,8 +31,6 @@ import { longPressHandler } from '@/utils/longPressHandler';
 import AppShell from '@/components/AppShell';
 import { ReviewIslandLoader } from '@/ReviewIslandLoader';
 import { supabase } from '@/integrations/supabase/client';
-import { ConsoleDebugButton } from '@/components/debug/ConsoleDebugButton';
-
 
 
 // Direct import for ProfilePage and Discover to avoid dynamic import issues
@@ -212,12 +210,11 @@ const App: React.FC = () => {
                           </VideoPlaybackManagerProvider>
                         </VideoManagerProvider>
                       </GlobalAudioProvider>
-                       <Toaster />
-                       <Sonner />
-                       <AIChat />
-                       <GlobalBottomNavigation />
-                       <ConsoleDebugButton />
-                     </BrowserRouter>
+                      <Toaster />
+                      <Sonner />
+                      <AIChat />
+                      <GlobalBottomNavigation />
+                    </BrowserRouter>
                   </UIProvider>
                 </BottomNavigationProvider>
                 </ModalProvider>
