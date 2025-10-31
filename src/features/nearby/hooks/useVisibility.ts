@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
 import { useToast } from '@/hooks/use-toast';
+import { useQueryClient } from '@tanstack/react-query';
 
 export type VisibilityMode = 'all' | 'friends' | 'hidden';
 
@@ -10,6 +11,7 @@ export function useVisibility() {
   const { user } = useSupabaseSession();
   const { getCurrentLocation } = useLocationPermission();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const [mode, setMode] = useState<VisibilityMode>('hidden');
   const [loading, setLoading] = useState(true);
@@ -110,6 +112,11 @@ export function useVisibility() {
         });
         return;
       }
+
+      // Invalidate nearby queries so changes reflect immediately
+      queryClient.invalidateQueries({
+        predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === 'nearbyGolfers'
+      });
 
       // Success toast
       toast({

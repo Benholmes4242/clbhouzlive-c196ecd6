@@ -92,8 +92,11 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
       .map(c => {
         const prof = profileById.get(c.user_id);
         if (!prof) return null;
+        
+        // Safety: skip if coords missing
+        if (c.lat == null || c.lng == null) return null;
 
-        const distanceMeters = calculateDistance(userLat, userLng, c.lat!, c.lng!);
+        const distanceMeters = calculateDistance(userLat, userLng, c.lat, c.lng);
         
         // Calculate if open to play based on actual DB data
         const isOpenToPlay = c.open_to_play_active === true && 
