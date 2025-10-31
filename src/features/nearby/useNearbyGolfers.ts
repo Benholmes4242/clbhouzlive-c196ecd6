@@ -20,7 +20,7 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
     // STEP 1: Fetch candidate IDs from user_nearby_status (no joins to avoid PGRST200)
     const { data: rows, error: statusErr } = await supabase
       .from('user_nearby_status')
-      .select('user_id, lat, lng, visibility_mode, last_location_update')
+      .select('user_id, lat, lng, visibility_mode, last_location_update, open_to_play_active, open_to_play_expires_at')
       .neq('visibility_mode', 'hidden')
       .gte('last_location_update', twentyMinAgo);
 
@@ -95,6 +95,10 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
 
         const distanceMeters = calculateDistance(userLat, userLng, c.lat!, c.lng!);
         
+        // Calculate if open to play based on actual DB data
+        const isOpenToPlay = c.open_to_play_active === true && 
+          (!c.open_to_play_expires_at || new Date(c.open_to_play_expires_at) > new Date());
+        
         const golfer: NearbyGolfer = {
           id: prof.id,
           display_name: prof.display_name || prof.username || 'Unknown',
@@ -104,7 +108,7 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
           is_online: true,
           distance_km: distanceMeters / 1000,
           handicap: prof.show_handicap ? prof.eg_handicap_index : undefined,
-          isOpenToPlay: true,
+          isOpenToPlay,
         };
         return golfer;
       })

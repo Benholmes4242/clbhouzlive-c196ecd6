@@ -81,7 +81,7 @@ export function useVisibility() {
       });
 
       // If hidden, we deliberately blank coords
-      const { error } = await supabase
+      const { data: updatedRow, error } = await supabase
         .from('user_nearby_status')
         .upsert(
           {
@@ -93,7 +93,11 @@ export function useVisibility() {
               newMode === 'hidden' ? null : new Date().toISOString(),
           },
           { onConflict: 'user_id' }
-        );
+        )
+        .select('*')
+        .single();
+      
+      console.log('[🔍 VISIBILITY DEBUG] DB upsert result:', { data: updatedRow, error });
 
       if (error) {
         console.error('updateMode error', error);
