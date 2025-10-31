@@ -29,7 +29,10 @@ export function useVisibility() {
         .single();
 
       if (!error && data?.visibility_mode) {
+        console.log('[🔍 VISIBILITY DEBUG] Loaded visibility mode:', data.visibility_mode);
         setMode(data.visibility_mode as VisibilityMode);
+      } else {
+        console.log('[🔍 VISIBILITY DEBUG] No visibility mode in DB, using default "hidden"');
       }
 
       setLoading(false);
@@ -68,6 +71,14 @@ export function useVisibility() {
 
       // STEP 2: Now do optimistic UI update (location is OK or mode is 'hidden')
       setMode(newMode);
+      
+      console.log('[🔍 VISIBILITY DEBUG] Updating DB:', {
+        user_id: user.id,
+        visibility_mode: newMode,
+        lat: newMode === 'hidden' ? null : lat,
+        lng: newMode === 'hidden' ? null : lng,
+        last_location_update: newMode === 'hidden' ? null : new Date().toISOString()
+      });
 
       // If hidden, we deliberately blank coords
       const { error } = await supabase

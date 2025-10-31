@@ -6,11 +6,23 @@ import { calculateDistance } from './distance';
 import { NEARBY_RADIUS_METERS } from './config';
 
 async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<NearbyGolfer[]> {
-  if (!userLat || !userLng) return [];
+  console.log('[🔍 NEARBY DEBUG] fetchLiveNearby called', { userLat, userLng });
+  
+  if (!userLat || !userLng) {
+    console.log('[🔍 NEARBY DEBUG] No location provided, returning empty');
+    return [];
+  }
 
   try {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return [];
+    if (!user) {
+      console.log('[🔍 NEARBY DEBUG] No authenticated user');
+      return [];
+    }
+    
+    console.log('[🔍 NEARBY DEBUG] Fetching with user:', user.id);
+    const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    console.log('[🔍 NEARBY DEBUG] Filter: visibility_mode != hidden, last_location_update >= ', fiveMinAgo);
 
     // Fetch nearby users from user_nearby_status within the last 5 minutes
     const { data, error } = await supabase
@@ -35,11 +47,17 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
       .neq('user_id', user.id); // Exclude self
 
     if (error) {
-      console.error('[NearbyGolfers] Fetch error:', error);
+      console.error('[🔍 NEARBY DEBUG] Fetch error:', error);
       return [];
     }
 
-    if (!data) return [];
+    console.log('[🔍 NEARBY DEBUG] Raw DB results:', data?.length || 0, 'rows');
+    if (!data) {
+      console.log('[🔍 NEARBY DEBUG] No data returned');
+      return [];
+    }
+    
+    console.log('[🔍 NEARBY DEBUG] Sample row:', data[0]);
 
     // Filter by distance and map to NearbyGolfer format
     const nearby: NearbyGolfer[] = data
@@ -65,9 +83,14 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
       .filter((g: NearbyGolfer | null): g is NearbyGolfer => g !== null)
       .sort((a, b) => (a.distance_km || 0) - (b.distance_km || 0));
 
+    console.log('[🔍 NEARBY DEBUG] After distance filter (1km):', nearby.length, 'golfers');
+    if (nearby.length > 0) {
+      console.log('[🔍 NEARBY DEBUG] First golfer:', nearby[0]);
+    }
+    
     return nearby;
   } catch (error) {
-    console.error('[NearbyGolfers] Error:', error);
+    console.error('[🔍 NEARBY DEBUG] Error:', error);
     return [];
   }
 }
@@ -75,6 +98,13 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
 export function useNearbyGolfers(userLat?: number, userLng?: number, viewerId?: string) {
   const queryClient = useQueryClient();
   const DEBUG_REALTIME = process.env.NODE_ENV !== 'production';
+
+  console.log('[🔍 NEARBY DEBUG] useNearbyGolfers hook render', { 
+    userLat, 
+    userLng, 
+    viewerId,
+    enabled: !!userLat && !!userLng 
+  });
 
   const query = useQuery({
     queryKey: ['nearbyGolfers', 'live', userLat, userLng, viewerId],
