@@ -5,8 +5,8 @@ import { NearbyGolfer } from './types';
 import { calculateDistance } from './distance';
 import { NEARBY_RADIUS_METERS } from './config';
 
-async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: string): Promise<NearbyGolfer[]> {
-  console.log('[🔍 NEARBY DEBUG] fetchLiveNearby called', { userLat, userLng, viewerId });
+async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: string, viewerHomeClubId?: string): Promise<NearbyGolfer[]> {
+  console.log('[🔍 NEARBY DEBUG] fetchLiveNearby called', { userLat, userLng, viewerId, viewerHomeClubId });
   
   if (!userLat || !userLng) {
     console.log('[🔍 NEARBY DEBUG] No location provided, returning empty');
@@ -59,7 +59,7 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
         eg_handicap_index,
         show_handicap,
         home_club_id,
-        club:home_club_id (
+        golf_courses!user_profiles_home_club_id_fkey (
           id,
           name
         )
@@ -72,6 +72,9 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
     }
 
     console.log('[🔍 NEARBY DEBUG] Fetched profiles:', profiles?.length || 0);
+    if (profiles && profiles.length > 0) {
+      console.log('[🔍 NEARBY DEBUG] Sample profile data:', JSON.stringify(profiles[0], null, 2));
+    }
 
     // STEP 3: Handle friend visibility (fetch mutual follows if needed)
     let mutualSet = new Set<string>();
@@ -115,9 +118,13 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
           (!c.open_to_play_expires_at || new Date(c.open_to_play_expires_at) > new Date());
         
         // Build consistent home club object from FK join
-        const homeClub = prof.club 
-          ? { id: prof.club.id, name: prof.club.name }
+        const clubData = Array.isArray(prof.golf_courses) ? prof.golf_courses[0] : prof.golf_courses;
+        const homeClub = clubData 
+          ? { id: clubData.id, name: clubData.name }
           : undefined;
+        
+        // Check if same home club as viewer
+        const sameHomeClub = !!(viewerHomeClubId && prof.home_club_id && prof.home_club_id === viewerHomeClubId);
         
         const golfer: NearbyGolfer = {
           id: prof.id,
@@ -129,6 +136,7 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
           distance_km: distanceMeters / 1000,
           handicap: prof.show_handicap ? prof.eg_handicap_index : undefined,
           isOpenToPlay,
+          same_club: sameHomeClub,
         };
         return golfer;
       })
@@ -147,7 +155,7 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
   }
 }
 
-export function useNearbyGolfers(userLat?: number, userLng?: number, viewerId?: string) {
+export function useNearbyGolfers(userLat?: number, userLng?: number, viewerId?: string, viewerHomeClubId?: string) {
   const queryClient = useQueryClient();
   const DEBUG_REALTIME = process.env.NODE_ENV !== 'production';
 
@@ -155,12 +163,13 @@ export function useNearbyGolfers(userLat?: number, userLng?: number, viewerId?: 
     userLat, 
     userLng, 
     viewerId,
+    viewerHomeClubId,
     enabled: !!userLat && !!userLng 
   });
 
   const query = useQuery({
-    queryKey: ['nearbyGolfers', 'live', userLat, userLng, viewerId],
-    queryFn: () => fetchLiveNearby(userLat, userLng, viewerId),
+    queryKey: ['nearbyGolfers', 'live', userLat, userLng, viewerId, viewerHomeClubId],
+    queryFn: () => fetchLiveNearby(userLat, userLng, viewerId, viewerHomeClubId),
     staleTime: 15_000,
     enabled: !!userLat && !!userLng,
   });

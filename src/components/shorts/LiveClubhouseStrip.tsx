@@ -9,6 +9,7 @@ import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
 import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import SquircleImage from '@/components/ui/SquircleImage';
 import NearbyGolfersSquircle from '@/components/nearby/NearbyGolfersSquircle';
+import { supabase } from '@/integrations/supabase/client';
 import '@/styles/shorts_live_clubhouse.css';
 
 const SEEN_KEY = 'seenCreatorImmersiveIds';
@@ -31,11 +32,30 @@ export function LiveClubhouseStrip() {
   const { user } = useSupabaseSession();
   const { currentLocation } = useLocationPermission();
   
+  // Get viewer's profile for home_club_id
+  const [viewerHomeClubId, setViewerHomeClubId] = useState<string | undefined>();
+  
+  useEffect(() => {
+    if (!user?.id) return;
+    
+    supabase
+      .from('user_profiles')
+      .select('home_club_id')
+      .eq('id', user.id)
+      .single()
+      .then(({ data }) => {
+        if (data?.home_club_id) {
+          setViewerHomeClubId(data.home_club_id);
+        }
+      });
+  }, [user?.id]);
+  
   // ✅ Realtime count + list (same SSOT as modal)
   const { data: golfers = [], isLoading: nearbyCountLoading } = useNearbyGolfers(
     currentLocation?.lat,
     currentLocation?.lng,
-    user?.id
+    user?.id,
+    viewerHomeClubId
   );
   const nearbyCount = golfers.length;
 

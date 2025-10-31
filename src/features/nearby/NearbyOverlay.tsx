@@ -49,11 +49,30 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
     };
   });
 
+  // Get viewer's profile for home_club_id
+  const [viewerHomeClubId, setViewerHomeClubId] = useState<string | undefined>();
+  
+  useEffect(() => {
+    if (!user?.id) return;
+    
+    supabase
+      .from('user_profiles')
+      .select('home_club_id')
+      .eq('id', user.id)
+      .single()
+      .then(({ data }) => {
+        if (data?.home_club_id) {
+          setViewerHomeClubId(data.home_club_id);
+        }
+      });
+  }, [user?.id]);
+
   // ✅ Realtime list (postgres_changes subscription + invalidation)
   const { data: golfers = [], isLoading } = useNearbyGolfers(
     currentLocation?.lat,
     currentLocation?.lng,
-    user?.id
+    user?.id,
+    viewerHomeClubId
   );
 
   const { 
