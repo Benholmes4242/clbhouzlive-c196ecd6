@@ -58,7 +58,8 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
         profile_photo_url,
         eg_handicap_index,
         show_handicap,
-        home_club_id
+        home_club_id,
+        home_club
       `)
       .in('id', ids);
 
@@ -128,8 +129,13 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
         const isOpenToPlay = c.open_to_play_active === true && 
           (!c.open_to_play_expires_at || new Date(c.open_to_play_expires_at) > new Date());
         
-        // Build consistent home club object from separate courses lookup
-        const homeClub = prof.home_club_id ? clubMap.get(prof.home_club_id) : undefined;
+        // Build consistent home club object from home_club field (text) or separate courses lookup
+        let homeClub = prof.home_club_id ? clubMap.get(prof.home_club_id) : undefined;
+        
+        // Fallback to legacy home_club text field
+        if (!homeClub && prof.home_club) {
+          homeClub = { id: 'legacy', name: prof.home_club };
+        }
         
         // Check if same home club as viewer
         const sameHomeClub = !!(viewerHomeClubId && prof.home_club_id && prof.home_club_id === viewerHomeClubId);
@@ -142,7 +148,7 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
           avatar_url: prof.profile_photo_url || undefined,
           is_online: true,
           distance_km: distanceMeters / 1000,
-          handicap: prof.show_handicap ? prof.eg_handicap_index : undefined,
+          handicap: prof.eg_handicap_index ?? undefined, // always show if available
           isOpenToPlay,
           same_club: sameHomeClub,
         };
