@@ -48,7 +48,7 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
 
     const ids = [...new Set(candidates.map(r => r.user_id))];
 
-    // STEP 2: Fetch profiles for those IDs with club join
+    // STEP 2: Fetch profiles for those IDs (no FK join to avoid schema cache issues)
     const { data: profiles, error: profErr } = await supabase
       .from('user_profiles')
       .select(`
@@ -58,11 +58,7 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
         profile_photo_url,
         eg_handicap_index,
         show_handicap,
-        home_club_id,
-        golf_courses!user_profiles_home_club_id_fkey (
-          id,
-          name
-        )
+        home_club_id
       `)
       .in('id', ids);
 
@@ -72,8 +68,23 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
     }
 
     console.log('[🔍 NEARBY DEBUG] Fetched profiles:', profiles?.length || 0);
-    if (profiles && profiles.length > 0) {
-      console.log('[🔍 NEARBY DEBUG] Sample profile data:', JSON.stringify(profiles[0], null, 2));
+
+    // STEP 2b: Fetch course names for any home_club_id values
+    const clubIds = Array.from(new Set((profiles || [])
+      .map((p: any) => p.home_club_id)
+      .filter(Boolean)));
+
+    let clubMap = new Map<string, { id: string; name: string }>();
+    if (clubIds.length > 0) {
+      const { data: clubs, error: clubsErr } = await supabase
+        .from('golf_courses')
+        .select('id, name')
+        .in('id', clubIds);
+
+      if (clubsErr) {
+        console.warn('[🔍 NEARBY DEBUG] Clubs fetch warning:', clubsErr);
+      }
+      (clubs || []).forEach((c: any) => clubMap.set(c.id, { id: c.id, name: c.name }));
     }
 
     // STEP 3: Handle friend visibility (fetch mutual follows if needed)
@@ -117,11 +128,8 @@ async function fetchLiveNearby(userLat?: number, userLng?: number, viewerId?: st
         const isOpenToPlay = c.open_to_play_active === true && 
           (!c.open_to_play_expires_at || new Date(c.open_to_play_expires_at) > new Date());
         
-        // Build consistent home club object from FK join
-        const clubData = Array.isArray(prof.golf_courses) ? prof.golf_courses[0] : prof.golf_courses;
-        const homeClub = clubData 
-          ? { id: clubData.id, name: clubData.name }
-          : undefined;
+        // Build consistent home club object from separate courses lookup
+        const homeClub = prof.home_club_id ? clubMap.get(prof.home_club_id) : undefined;
         
         // Check if same home club as viewer
         const sameHomeClub = !!(viewerHomeClubId && prof.home_club_id && prof.home_club_id === viewerHomeClubId);

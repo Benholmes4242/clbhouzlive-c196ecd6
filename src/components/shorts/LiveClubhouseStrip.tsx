@@ -42,11 +42,9 @@ export function LiveClubhouseStrip() {
       .from('user_profiles')
       .select('home_club_id')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
       .then(({ data }) => {
-        if (data?.home_club_id) {
-          setViewerHomeClubId(data.home_club_id);
-        }
+        if (data?.home_club_id) setViewerHomeClubId(data.home_club_id);
       });
   }, [user?.id]);
   
