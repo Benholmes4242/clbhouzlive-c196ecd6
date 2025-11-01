@@ -119,8 +119,10 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
         onClick={() => openWhenSheet(filters)}
         aria-label={`When: ${labelWhen(filters.when)}`}
       >
-        <span className="chipLabel">When</span>
-        <span className="chipValue">{labelWhen(filters.when)}</span>
+        <div className="chipText">
+          <span className="chipLabel">When</span>
+          <span className="chipValue">{labelWhen(filters.when)}</span>
+        </div>
       </TapButton>
       
       {showDistance && (
@@ -129,8 +131,10 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
           onClick={() => openDistanceSheet(filters)}
           aria-label={`Distance: ${filters.distanceKm} km`}
         >
-          <span className="chipLabel">Distance</span>
-          <span className="chipValue">{filters.distanceKm} km</span>
+          <div className="chipText">
+            <span className="chipLabel">Distance</span>
+            <span className="chipValue">{filters.distanceKm} km</span>
+          </div>
         </TapButton>
       )}
       
@@ -139,8 +143,10 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
         onClick={() => openSortSheet(filters)}
         aria-label={`Sort: ${filters.sortLabel}`}
       >
-        <span className="chipLabel">Sort</span>
-        <span className="chipValue">{filters.sortLabel}</span>
+        <div className="chipText">
+          <span className="chipLabel">Sort</span>
+          <span className="chipValue">{filters.sortLabel}</span>
+        </div>
       </TapButton>
     </div>
   );

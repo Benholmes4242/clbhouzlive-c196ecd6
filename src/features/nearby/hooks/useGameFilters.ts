@@ -28,7 +28,7 @@ export function useGameFilters() {
   const [distanceKm, setDistanceKm] = useState(10);
   const [sort, setSort] = useState<GameSort>('soonest');
 
-  const sortLabel = sort === 'soonest' ? 'Soonest' : sort === 'distance' ? 'Nearest' : 'Seats';
+  const sortLabel = sort === 'soonest' ? 'Soonest' : sort === 'distance' ? 'Nearest' : 'Most Available Slots';
 
   return {
     when,

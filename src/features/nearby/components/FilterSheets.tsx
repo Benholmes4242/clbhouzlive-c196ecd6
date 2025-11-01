@@ -1,6 +1,8 @@
 import { addDays, format } from 'date-fns';
 import { haptic } from '@/utils/haptics';
 import type { TimeWindow, GameSort, WhenFilter } from '../hooks/useGameFilters';
+import { openCalendarPicker } from './CalendarPicker';
+import { openTimePicker } from './TimePicker';
 
 type FilterSheetItem = {
   label: string;
@@ -130,11 +132,15 @@ export function openWhenSheet(f: Filters) {
       { label: 'Today', onPress: () => f.setWhen({ date: today, window: 'any', exactTime: null }) },
       { label: 'Tomorrow', onPress: () => f.setWhen({ date: tomorrow, window: 'any', exactTime: null }) },
       
-      // Time windows
-      { label: 'Any time', onPress: () => f.setWhen({ window: 'any', exactTime: null }) },
-      { label: 'Morning (6–11)', onPress: () => f.setWhen({ window: 'morning', exactTime: null }) },
-      { label: 'Afternoon (11–16)', onPress: () => f.setWhen({ window: 'afternoon', exactTime: null }) },
-      { label: 'Evening (16–21)', onPress: () => f.setWhen({ window: 'evening', exactTime: null }) },
+      // Custom date/time
+      { label: 'Choose Date', onPress: () => openCalendarPicker({
+        initialDate: f.when.date ?? new Date(),
+        onSelect: (d) => f.setWhen({ date: d })
+      }) },
+      { label: 'Choose Time', onPress: () => openTimePicker({
+        initial: f.when.exactTime ?? '08:00',
+        onSelect: (hhmm) => f.setWhen({ exactTime: hhmm })
+      }) },
     ],
   });
 }
@@ -155,7 +161,7 @@ export function openSortSheet(f: Filters) {
     items: [
       { label: 'Soonest', onPress: () => f.setSort('soonest') },
       { label: 'Nearest', onPress: () => f.setSort('distance') },
-      { label: 'Most seats', onPress: () => f.setSort('seats') },
+      { label: 'Most Available Slots', onPress: () => f.setSort('seats') },
     ],
   });
 }
@@ -165,20 +171,25 @@ export function labelWhen(when: WhenFilter): string {
   
   const today = new Date();
   const tomorrow = addDays(today, 1);
+  
+  // Format date if present
   const dateStr = !when.date 
-    ? 'Today'
+    ? null
     : when.date.toDateString() === today.toDateString()
     ? 'Today'
     : when.date.toDateString() === tomorrow.toDateString()
     ? 'Tomorrow'
     : format(when.date, 'MMM d');
   
-  if (when.exactTime) return `${dateStr} • ${when.exactTime}`;
+  // Exact time takes priority
+  if (when.exactTime && dateStr) return `${dateStr} • ${when.exactTime}`;
+  if (when.exactTime && !dateStr) return when.exactTime;
   
-  if (when.window !== 'any') {
+  // Time window
+  if (when.window !== 'any' && dateStr) {
     const windowMap = { morning: 'Morning', afternoon: 'Afternoon', evening: 'Evening' };
     return `${dateStr} • ${windowMap[when.window]}`;
   }
   
-  return dateStr;
+  return dateStr || 'Any';
 }
