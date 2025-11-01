@@ -4,6 +4,8 @@ import { Game } from '../types';
 import { format, parseISO } from 'date-fns';
 import { useGameParticipants } from '@/features/game/hooks/useGameParticipants';
 import { formatHcp } from '@/lib/formatHcp';
+import { formatExpires } from '@/lib/formatExpires';
+import { useMinuteTick } from '@/hooks/useMinuteTick';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -41,6 +43,7 @@ function Chevron({ open }: { open: boolean }) {
 }
 
 export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: YourGamesAccordionCardProps) {
+  useMinuteTick(); // Auto-refresh expiry time every minute
   const [isExpanded, setIsExpanded] = useState(false);
   const [openHost, setOpenHost] = useState(true);
   const [openMembers, setOpenMembers] = useState(false);
@@ -185,17 +188,6 @@ export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: Y
     }
   };
 
-  const getTimeRemaining = (expiresAt: string) => {
-    const now = new Date();
-    const expires = new Date(expiresAt);
-    const diffMs = expires.getTime() - now.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    
-    if (diffMins < 60) return `${diffMins}m`;
-    const hours = Math.floor(diffMins / 60);
-    const mins = diffMins % 60;
-    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
-  };
 
   const seatsFilled = game.slots_total - game.slots_open;
 
@@ -254,7 +246,7 @@ export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: Y
             </div>
             <div className="flex items-center gap-2 text-white/70">
               <Clock className="w-4 h-4 text-white/40" />
-              <span>Expires in {getTimeRemaining(game.expires_at)}</span>
+              <span>{formatExpires(game.expires_at)}</span>
             </div>
           </div>
 
