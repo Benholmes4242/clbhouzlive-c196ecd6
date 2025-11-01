@@ -12,6 +12,7 @@ import { useOpenToPlay } from './hooks/useOpenToPlay';
 import { useLocationBroadcast } from './hooks/useLocationBroadcast';
 import { VisibilitySegmentedControl } from './components/VisibilitySegmentedControl';
 import { supabase } from '@/integrations/supabase/client';
+import { GameFilters, getTimeRangeFromFilters } from './components/GameFiltersBar';
 
 interface NearbyOverlayProps {
   isOpen: boolean;
@@ -20,14 +21,37 @@ interface NearbyOverlayProps {
 
 export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   const { golfers, isLoading } = useActiveGolfers({ limit: 20, mockCount: 0 });
+  
+  // Initialize game filters
+  const [gameFilters, setGameFilters] = useState<GameFilters>({
+    date: null,
+    timeWindow: 'any',
+    hideFullGames: false,
+    radiusKm: 10,
+    sortBy: 'soonest',
+  });
+
+  // Convert filters to discovery format
+  const timeRange = getTimeRangeFromFilters(gameFilters);
+  const discoveryFilters = {
+    dateFrom: timeRange?.from,
+    dateTo: timeRange?.to,
+    hideFullGames: gameFilters.hideFullGames,
+    radiusMeters: gameFilters.radiusKm * 1000,
+    sortBy: gameFilters.sortBy,
+  };
+
   const { 
     myBeacon, 
     nearbyBeacons, 
     isLoading: beaconsLoading,
+    hasMore,
+    loadMore,
     createBeacon,
     cancelBeacon,
     joinBeacon,
-  } = useGameBeacon();
+  } = useGameBeacon(discoveryFilters);
+  
   const { visibilityMode, setVisibilityMode, loading: visibilityLoading } = useVisibility();
   const { isOpen: isOpenToPlay, remainingText, activate: activateOpen, cancel: cancelOpen } = useOpenToPlay();
   
@@ -268,6 +292,8 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             <GamesNearbyList
               beacons={nearbyBeacons}
               isLoading={beaconsLoading}
+              hasMore={hasMore}
+              onLoadMore={loadMore}
               onJoinBeacon={joinBeacon}
               onCancelBeacon={cancelBeacon}
               onCreateGame={(clubData) => {
@@ -276,6 +302,8 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                 }
                 setIsCreateGameOpen(true);
               }}
+              onFiltersChange={setGameFilters}
+              currentFilters={gameFilters}
             />
           ) : (
             <YourGamesList

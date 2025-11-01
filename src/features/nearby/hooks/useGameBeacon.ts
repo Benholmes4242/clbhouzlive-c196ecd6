@@ -6,6 +6,15 @@ import { calculateDistance, formatDistance } from '../distance';
 import { NEARBY_RADIUS_METERS } from '../config';
 import { RealtimeChannel } from '@supabase/supabase-js';
 
+export interface DiscoveryFilters {
+  dateFrom?: Date;
+  dateTo?: Date;
+  hideFullGames?: boolean;
+  radiusMeters?: number;
+  sortBy?: 'soonest' | 'closest' | 'open_seats' | 'newest';
+  courseId?: string;
+}
+
 export interface GameBeacon {
   id: string;
   host_user_id: string;
@@ -46,7 +55,7 @@ interface CreateBeaconInput {
 
 const PAGE_SIZE = 20;
 
-export function useGameBeacon() {
+export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
   const [myBeacon, setMyBeacon] = useState<GameBeacon | null>(null);
   const [nearbyBeacons, setNearbyBeacons] = useState<GameBeacon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -82,7 +91,7 @@ export function useGameBeacon() {
 
       // Fetch games where user is host OR participant
       // Build query with optional bounding box for efficiency
-      const radiusMeters = NEARBY_RADIUS_METERS;
+      const radiusMeters = discoveryFilters?.radiusMeters || NEARBY_RADIUS_METERS;
       const radiusKm = radiusMeters / 1000;
       const LAT_DEGREE_KM = 111;
       
@@ -91,6 +100,24 @@ export function useGameBeacon() {
         .select('id, host_user_id, course_id, course_name, lat, lng, start_time, expires_at, status, slots_total, slots_open, visibility, note, created_at, updated_at')
         .eq('status', 'active')
         .gt('expires_at', new Date().toISOString());
+
+      // Apply date filters
+      if (discoveryFilters?.dateFrom) {
+        query = query.gte('start_time', discoveryFilters.dateFrom.toISOString());
+      }
+      if (discoveryFilters?.dateTo) {
+        query = query.lte('start_time', discoveryFilters.dateTo.toISOString());
+      }
+
+      // Apply hide full games filter
+      if (discoveryFilters?.hideFullGames) {
+        query = query.gt('slots_open', 0);
+      }
+
+      // Apply course filter
+      if (discoveryFilters?.courseId) {
+        query = query.eq('course_id', discoveryFilters.courseId);
+      }
 
       // Apply bounding box if we have user location
       if (userLat && userLng) {
@@ -110,9 +137,26 @@ export function useGameBeacon() {
           .or(`start_time.gt.${cursor.start_time},and(start_time.eq.${cursor.start_time},id.gt.${cursor.id})`);
       }
 
+      // Apply sorting (server-side where possible)
+      const sortBy = discoveryFilters?.sortBy || 'soonest';
+      switch (sortBy) {
+        case 'soonest':
+          query = query.order('start_time', { ascending: true }).order('id', { ascending: true });
+          break;
+        case 'open_seats':
+          query = query.order('slots_open', { ascending: false }).order('start_time', { ascending: true });
+          break;
+        case 'newest':
+          query = query.order('created_at', { ascending: false }).order('id', { ascending: true });
+          break;
+        case 'closest':
+        default:
+          // For 'closest', we'll sort client-side after distance calculation
+          query = query.order('start_time', { ascending: true }).order('id', { ascending: true });
+          break;
+      }
+
       const { data: allBeacons, error: allError } = await query
-        .order('start_time', { ascending: true })
-        .order('id', { ascending: true })
         .limit(PAGE_SIZE + 1) as { data: any[] | null, error: any };
 
       if (allError) {
@@ -176,15 +220,44 @@ export function useGameBeacon() {
           .eq('visibility', 'public')
           .gt('expires_at', new Date().toISOString());
 
+        // Apply same filters to public games
+        if (discoveryFilters?.dateFrom) {
+          publicQuery = publicQuery.gte('start_time', discoveryFilters.dateFrom.toISOString());
+        }
+        if (discoveryFilters?.dateTo) {
+          publicQuery = publicQuery.lte('start_time', discoveryFilters.dateTo.toISOString());
+        }
+        if (discoveryFilters?.hideFullGames) {
+          publicQuery = publicQuery.gt('slots_open', 0);
+        }
+        if (discoveryFilters?.courseId) {
+          publicQuery = publicQuery.eq('course_id', discoveryFilters.courseId);
+        }
+
         // Apply cursor for pagination
         if (append && cursor) {
           publicQuery = publicQuery
             .or(`start_time.gt.${cursor.start_time},and(start_time.eq.${cursor.start_time},id.gt.${cursor.id})`);
         }
 
+        // Apply same sorting
+        switch (sortBy) {
+          case 'soonest':
+            publicQuery = publicQuery.order('start_time', { ascending: true }).order('id', { ascending: true });
+            break;
+          case 'open_seats':
+            publicQuery = publicQuery.order('slots_open', { ascending: false }).order('start_time', { ascending: true });
+            break;
+          case 'newest':
+            publicQuery = publicQuery.order('created_at', { ascending: false }).order('id', { ascending: true });
+            break;
+          case 'closest':
+          default:
+            publicQuery = publicQuery.order('start_time', { ascending: true }).order('id', { ascending: true });
+            break;
+        }
+
         const { data: nearbyPublicGames } = await publicQuery
-          .order('start_time', { ascending: true })
-          .order('id', { ascending: true })
           .limit(PAGE_SIZE + 1) as { data: any[] | null, error: any };
         
         // Check pagination for public games too
@@ -230,16 +303,21 @@ export function useGameBeacon() {
         });
 
         const allGames = Array.from(gameMap.values()).sort((a: any, b: any) => {
-          // User's games first, then by start_time, then by distance
+          // User's games first
           if (a.isMyGame && !b.isMyGame) return -1;
           if (!a.isMyGame && b.isMyGame) return 1;
           
-          // Sort by start_time first (earlier games first)
+          // Apply client-side sorting for 'closest' (since it needs distance)
+          if (sortBy === 'closest') {
+            return (a.distance_meters || 0) - (b.distance_meters || 0);
+          }
+          
+          // For other sorts, server already sorted, just maintain order
+          // But add distance as tertiary for stability
           const timeA = new Date(a.start_time).getTime();
           const timeB = new Date(b.start_time).getTime();
           if (timeA !== timeB) return timeA - timeB;
           
-          // Then by distance
           return (a.distance_meters || 0) - (b.distance_meters || 0);
         });
 
@@ -305,7 +383,7 @@ export function useGameBeacon() {
         supabase.removeChannel(channel);
       }
     };
-  }, [currentLocation]);
+  }, [currentLocation, discoveryFilters]);
 
   // Refetch on window focus (safety net)
   useEffect(() => {

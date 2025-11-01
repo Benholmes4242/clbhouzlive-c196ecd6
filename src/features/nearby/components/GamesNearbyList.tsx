@@ -6,21 +6,31 @@ import { AnonymousGameCard } from './AnonymousGameCard';
 import { HostGameView } from './HostGameView';
 import { useGameJoinRequests } from '../hooks/useGameJoinRequests';
 import { ClubSearchInput } from './ClubSearchInput';
+import { GameFiltersBar, GameFilters, getTimeRangeFromFilters } from './GameFiltersBar';
+import { Button } from '@/components/ui/button';
 
 interface GamesNearbyListProps {
   beacons: GameBeacon[];
   isLoading: boolean;
+  hasMore: boolean;
+  onLoadMore: () => void;
   onJoinBeacon: (beaconId: string) => void;
   onCancelBeacon: (beaconId: string) => void;
   onCreateGame: (clubData?: { id: string; name: string }) => void;
+  onFiltersChange: (filters: GameFilters) => void;
+  currentFilters: GameFilters;
 }
 
 export function GamesNearbyList({
   beacons,
   isLoading,
+  hasMore,
+  onLoadMore,
   onJoinBeacon,
   onCancelBeacon,
   onCreateGame,
+  onFiltersChange,
+  currentFilters,
 }: GamesNearbyListProps) {
   const [selectedClub, setSelectedClub] = useState<{ id: string; name: string } | null>(null);
   const [clubGames, setClubGames] = useState<GameBeacon[]>([]);
@@ -29,6 +39,8 @@ export function GamesNearbyList({
   const [requestedGames, setRequestedGames] = useState<Set<string>>(new Set());
   const [yourGameIds, setYourGameIds] = useState<Set<string>>(new Set());
   const { createRequest, acceptedGameIds } = useGameJoinRequests();
+
+  const mode = selectedClub ? 'course' : 'nearby';
 
   // Get current user ID and fetch their games
   useEffect(() => {
@@ -189,8 +201,47 @@ export function GamesNearbyList({
   // Filter out games the user is hosting or has joined
   const discoverableGames = displayGames.filter(b => !yourGameIds.has(b.id));
 
+  // Get scope label
+  const getScopeLabel = () => {
+    if (selectedClub) {
+      return `Showing public games at ${selectedClub.name}`;
+    }
+    return `Showing games near you within ${currentFilters.radiusKm} km`;
+  };
+
+  const getEmptyStateMessage = () => {
+    if (selectedClub) {
+      if (currentFilters.hideFullGames || currentFilters.date || currentFilters.timeWindow !== 'any') {
+        return "No games match your filters. Try adjusting date/time or removing 'Hide Full'.";
+      }
+      return `No active games at ${selectedClub.name}`;
+    }
+    if (currentFilters.hideFullGames || currentFilters.date || currentFilters.timeWindow !== 'any') {
+      return "Nothing matches your filters — try a larger radius or different time.";
+    }
+    return 'No games nearby';
+  };
+
   return (
     <div className="space-y-3 pb-4">
+      {/* Filters Bar */}
+      <GameFiltersBar
+        filters={currentFilters}
+        onFiltersChange={onFiltersChange}
+        mode={mode}
+        className="px-2"
+      />
+
+      {/* Scope Label */}
+      <div className="px-2">
+        <p className="text-xs text-neutral-400 text-center">
+          {getScopeLabel()}
+        </p>
+      </div>
+
+      {/* Divider */}
+      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
       {/* SECTION 1: Discoverable Games */}
       <div className="space-y-3">
         <div className="px-2 text-center">
@@ -213,32 +264,47 @@ export function GamesNearbyList({
           <div className="text-center space-y-2">
             <MapPin className="w-10 h-10 mx-auto text-neutral-600" />
             <p className="text-sm text-neutral-300">
-              {selectedClub 
-                ? `No active games at ${selectedClub.name}`
-                : 'No games nearby'}
+              {getEmptyStateMessage()}
             </p>
             <p className="text-xs text-neutral-500">Be the first to start one!</p>
           </div>
         ) : (
           // Game cards
-          <div className="space-y-3">
-            {discoverableGames.map(game => (
-              <AnonymousGameCard
-                key={game.id}
-                game={{
-                  id: game.id,
-                  course_name: game.course_name,
-                  start_time: game.start_time,
-                  slots_open: game.slots_open || 0,
-                  slots_total: game.slots_total || 4,
-                  host_user_id: game.host_user_id,
-                }}
-                onRequestJoin={handleRequestJoin}
-                hasRequested={requestedGames.has(game.id)}
-                isAccepted={acceptedGameIds.has(game.id)}
-              />
-            ))}
-          </div>
+          <>
+            <div className="space-y-3">
+              {discoverableGames.map(game => (
+                <AnonymousGameCard
+                  key={game.id}
+                  game={{
+                    id: game.id,
+                    course_name: game.course_name,
+                    start_time: game.start_time,
+                    slots_open: game.slots_open || 0,
+                    slots_total: game.slots_total || 4,
+                    host_user_id: game.host_user_id,
+                  }}
+                  onRequestJoin={handleRequestJoin}
+                  hasRequested={requestedGames.has(game.id)}
+                  isAccepted={acceptedGameIds.has(game.id)}
+                />
+              ))}
+            </div>
+            
+            {/* Load More Button */}
+            {hasMore && !selectedClub && (
+              <div className="text-center pt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onLoadMore}
+                  disabled={isLoading}
+                  className="min-w-[120px]"
+                >
+                  {isLoading ? 'Loading...' : 'Load More'}
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
