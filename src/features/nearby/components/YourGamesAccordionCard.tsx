@@ -148,20 +148,20 @@ export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: Y
               </div>
             </div>
           )}
+
+          {/* Action button */}
+          <button
+            onClick={isHosting ? onCancel : onLeave}
+            className={`w-full mt-2 py-2 px-3 text-sm rounded-lg font-medium transition-colors ${
+              isHosting
+                ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400'
+                : 'bg-white/5 hover:bg-white/10 text-white/70'
+            }`}
+          >
+            {isHosting ? 'Cancel Game' : 'Leave Game'}
+          </button>
         </div>
       )}
-
-      {/* Action button */}
-      <button
-        onClick={isHosting ? onCancel : onLeave}
-        className={`w-full mt-2 py-2 px-3 text-sm rounded-lg font-medium transition-colors ${
-          isHosting
-            ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400'
-            : 'bg-white/5 hover:bg-white/10 text-white/70'
-        }`}
-      >
-        {isHosting ? 'Cancel Game' : 'Leave Game'}
-      </button>
     </div>
   );
 }
