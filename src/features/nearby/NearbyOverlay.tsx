@@ -27,7 +27,6 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   const [gameFilters, setGameFilters] = useState<GameFilters>({
     date: null,
     timeWindow: 'any',
-    hideFullGames: false,
     radiusKm: 10,
     sortBy: 'soonest',
   });
@@ -37,7 +36,6 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   const discoveryFilters = {
     dateFrom: timeRange?.from,
     dateTo: timeRange?.to,
-    hideFullGames: gameFilters.hideFullGames,
     radiusMeters: gameFilters.radiusKm * 1000,
     sortBy: gameFilters.sortBy,
   };

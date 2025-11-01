@@ -9,7 +9,6 @@ import { RealtimeChannel } from '@supabase/supabase-js';
 export interface DiscoveryFilters {
   dateFrom?: Date;
   dateTo?: Date;
-  hideFullGames?: boolean;
   radiusMeters?: number;
   sortBy?: 'soonest' | 'closest' | 'open_seats' | 'newest';
   courseId?: string;
@@ -100,7 +99,8 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
         .from('games')
         .select('id, host_user_id, course_id, course_name, lat, lng, start_time, expires_at, status, slots_total, slots_open, visibility, note, created_at, updated_at')
         .eq('status', 'active')
-        .gt('expires_at', new Date().toISOString());
+        .gt('expires_at', new Date().toISOString())
+        .gt('slots_open', 0);
 
       // Apply date filters
       if (discoveryFilters?.dateFrom) {
@@ -108,11 +108,6 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
       }
       if (discoveryFilters?.dateTo) {
         query = query.lte('start_time', discoveryFilters.dateTo.toISOString());
-      }
-
-      // Apply hide full games filter
-      if (discoveryFilters?.hideFullGames) {
-        query = query.gt('slots_open', 0);
       }
 
       // Apply course filter
@@ -219,7 +214,8 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
           .select('id, host_user_id, course_id, course_name, lat, lng, start_time, expires_at, status, slots_total, slots_open, visibility, note, created_at, updated_at')
           .eq('status', 'active')
           .eq('visibility', 'public')
-          .gt('expires_at', new Date().toISOString());
+          .gt('expires_at', new Date().toISOString())
+          .gt('slots_open', 0);
 
         // Apply same filters to public games
         if (discoveryFilters?.dateFrom) {
@@ -227,9 +223,6 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
         }
         if (discoveryFilters?.dateTo) {
           publicQuery = publicQuery.lte('start_time', discoveryFilters.dateTo.toISOString());
-        }
-        if (discoveryFilters?.hideFullGames) {
-          publicQuery = publicQuery.gt('slots_open', 0);
         }
         if (discoveryFilters?.courseId) {
           publicQuery = publicQuery.eq('course_id', discoveryFilters.courseId);
@@ -287,9 +280,9 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
           });
         });
 
-        // Add nearby public games (if not already in map)
+        // Add nearby public games (if not already in map) - with client-side safety filter
         publicPage.forEach(beacon => {
-          if (!gameMap.has(beacon.id) && beacon.lat && beacon.lng) {
+          if (!gameMap.has(beacon.id) && beacon.lat && beacon.lng && (beacon.slots_open ?? 0) > 0) {
             const distanceMeters = calculateDistance(userLat, userLng, beacon.lat, beacon.lng);
             if (distanceMeters <= NEARBY_RADIUS_METERS) {
               gameMap.set(beacon.id, {

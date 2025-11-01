@@ -213,12 +213,12 @@ export function GamesNearbyList({
 
   const getEmptyStateMessage = () => {
     if (selectedClub) {
-      if (currentFilters.hideFullGames || currentFilters.date || currentFilters.timeWindow !== 'any') {
-        return "No games match your filters. Try adjusting date/time or removing 'Hide Full'.";
+      if (currentFilters.date || currentFilters.timeWindow !== 'any') {
+        return "No games match your filters. Try adjusting date/time.";
       }
       return `No active games at ${selectedClub.name}`;
     }
-    if (currentFilters.hideFullGames || currentFilters.date || currentFilters.timeWindow !== 'any') {
+    if (currentFilters.date || currentFilters.timeWindow !== 'any') {
       return "Nothing matches your filters — try a larger radius or different time.";
     }
     return 'No games nearby';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, Users, MapPin, ArrowUpDown } from 'lucide-react';
+import { Calendar, Clock, MapPin, ChevronsUpDown, ArrowDownWideNarrow } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
@@ -14,7 +14,6 @@ export type SortOption = 'soonest' | 'closest' | 'open_seats' | 'newest';
 export interface GameFilters {
   date: Date | null; // null = no date filter
   timeWindow: TimeWindow;
-  hideFullGames: boolean;
   radiusKm: 5 | 10 | 25;
   sortBy: SortOption;
 }
@@ -41,10 +40,10 @@ const RADIUS_OPTIONS = [
 ];
 
 const SORT_OPTIONS = [
-  { value: 'soonest' as const, label: 'Soonest', icon: Clock },
-  { value: 'closest' as const, label: 'Closest', icon: MapPin },
-  { value: 'open_seats' as const, label: 'Most Slots', icon: Users },
-  { value: 'newest' as const, label: 'Newest', icon: ArrowUpDown },
+  { value: 'soonest' as const, label: 'Soonest' },
+  { value: 'closest' as const, label: 'Closest' },
+  { value: 'open_seats' as const, label: 'Most Slots' },
+  { value: 'newest' as const, label: 'Newest' },
 ];
 
 export function GameFiltersBar({ filters, onFiltersChange, mode, className, portalContainer }: GameFiltersBarProps) {
@@ -62,9 +61,19 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
     const today = startOfDay(new Date());
     const tomorrow = addDays(today, 1);
     
-    if (isSameDay(filters.date, today)) return 'Today';
-    if (isSameDay(filters.date, tomorrow)) return 'Tomorrow';
-    return format(filters.date, 'MMM d');
+    if (isSameDay(filters.date, today)) return 'Date: Today';
+    if (isSameDay(filters.date, tomorrow)) return 'Date: Tomorrow';
+    return `Date: ${format(filters.date, 'MMM d')}`;
+  };
+
+  const getTimeLabel = () => {
+    const tw = TIME_WINDOWS.find(t => t.value === filters.timeWindow);
+    return filters.timeWindow === 'any' ? 'Time: Any' : `Time: ${tw?.label || 'Any'}`;
+  };
+
+  const getSortLabel = () => {
+    const opt = SORT_OPTIONS.find(s => s.value === filters.sortBy);
+    return `Sort: ${opt?.label || 'Soonest'}`;
   };
 
   const quickSetDate = (days: number | null) => {
@@ -90,13 +99,11 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
     updateFilter('date', nextMonday);
   };
 
-  const ChipButton = ({ 
-    active, 
+  const ControlButton = ({ 
     onClick, 
     children, 
     icon: Icon 
   }: { 
-    active?: boolean; 
     onClick: () => void; 
     children: React.ReactNode; 
     icon?: React.ElementType;
@@ -104,67 +111,32 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
     <button
       onClick={onClick}
       className={cn(
-        "h-8 px-3.5 rounded-2xl font-medium text-[13px] transition-all duration-200",
-        "flex items-center gap-1.5 whitespace-nowrap",
-        "active:scale-95",
-        active 
-          ? "bg-gradient-to-br from-[#6E9277] to-[#89A78C] text-white shadow-lg" 
-          : "bg-white/[0.08] text-white/65 hover:bg-white/[0.15] hover:text-white/85"
+        "px-4 py-2 rounded-xl font-medium inline-flex items-center gap-2",
+        "bg-white/20 text-white border border-white/28 backdrop-blur",
+        "hover:bg-white/30 active:bg-white/30",
+        "shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset]",
+        "active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)]",
+        "transition-all"
       )}
     >
-      {Icon && <Icon className="h-3.5 w-3.5" />}
+      {Icon && <Icon className="w-4 h-4 opacity-80" />}
       {children}
+      <ChevronsUpDown className="w-4 h-4 opacity-70" />
     </button>
   );
 
   return (
     <div className={cn('flex flex-col gap-2', className)}>
-      {/* Quick Date Chips Row */}
-      <div className="overflow-x-auto no-scrollbar">
-        <div className="flex items-center gap-2 px-3 py-2 min-w-max">
-          <ChipButton 
-            active={!filters.date} 
-            onClick={() => quickSetDate(null)}
-          >
-            All Games
-          </ChipButton>
-          <ChipButton 
-            active={!!filters.date && isSameDay(filters.date, new Date())} 
-            onClick={() => quickSetDate(0)}
-          >
-            Today
-          </ChipButton>
-          <ChipButton 
-            active={!!filters.date && isSameDay(filters.date, addDays(new Date(), 1))} 
-            onClick={() => quickSetDate(1)}
-          >
-            Tomorrow
-          </ChipButton>
-          <ChipButton 
-            active={!!filters.date && isThisWeekend(filters.date)} 
-            onClick={() => setWeekend()}
-          >
-            This Weekend
-          </ChipButton>
-          <ChipButton 
-            active={!!filters.date && isNextWeek(filters.date)} 
-            onClick={() => setNextWeek()}
-          >
-            Next Week
-          </ChipButton>
-        </div>
-      </div>
-
-      {/* Full Filter Bar */}
+      {/* Filter Controls Row */}
       <div className="relative z-0 bg-transparent border-b border-white/[0.08]">
         <div className="overflow-x-auto no-scrollbar">
           <div className="flex items-center gap-2 px-3 py-2 min-w-max">
             {/* Date Filter with Calendar */}
             <Sheet open={dateOpen} onOpenChange={setDateOpen}>
             <SheetTrigger asChild>
-              <ChipButton active={!!filters.date} onClick={() => setDateOpen(true)} icon={Calendar}>
+              <ControlButton onClick={() => setDateOpen(true)} icon={Calendar}>
                 {getDateLabel()}
-              </ChipButton>
+              </ControlButton>
             </SheetTrigger>
             <SheetContent 
               side="bottom" 
@@ -218,9 +190,9 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
           {/* Time Window Filter */}
           <Sheet open={timeOpen} onOpenChange={setTimeOpen}>
             <SheetTrigger asChild>
-              <ChipButton active={filters.timeWindow !== 'any'} onClick={() => setTimeOpen(true)} icon={Clock}>
-                {TIME_WINDOWS.find(tw => tw.value === filters.timeWindow)?.label || 'Time'}
-              </ChipButton>
+              <ControlButton onClick={() => setTimeOpen(true)} icon={Clock}>
+                {getTimeLabel()}
+              </ControlButton>
             </SheetTrigger>
             <SheetContent 
               side="bottom" 
@@ -242,8 +214,8 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
                       "w-full h-12 px-4 rounded-lg font-medium text-sm transition-all",
                       "flex items-center justify-between",
                       filters.timeWindow === tw.value
-                        ? "bg-gradient-to-br from-[#6E9277] to-[#89A78C] text-white"
-                        : "bg-white/[0.06] text-white/80 hover:bg-white/[0.10]"
+                        ? "bg-white/20 text-white border border-white/28"
+                        : "bg-white/[0.06] text-white/80 hover:bg-white/[0.10] border border-transparent"
                     )}
                   >
                     <span>{tw.label}</span>
@@ -254,29 +226,13 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
             </SheetContent>
           </Sheet>
 
-          {/* Hide Full Games Toggle */}
-          <button
-            onClick={() => updateFilter('hideFullGames', !filters.hideFullGames)}
-            className={cn(
-              "h-8 px-3.5 rounded-2xl font-medium text-[13px] transition-all duration-200",
-              "flex items-center gap-1.5 whitespace-nowrap uppercase tracking-wide",
-              "active:scale-95",
-              filters.hideFullGames
-                ? "bg-gradient-to-br from-[#6E9277] to-[#89A78C] text-white shadow-lg"
-                : "bg-white/[0.08] text-white/65 hover:bg-white/[0.15] hover:text-white/85"
-            )}
-          >
-            <Users className="h-3.5 w-3.5" />
-            Hide Full
-          </button>
-
           {/* Radius Filter (Nearby mode only) */}
           {mode === 'nearby' && (
             <Sheet open={radiusOpen} onOpenChange={setRadiusOpen}>
               <SheetTrigger asChild>
-                <ChipButton active onClick={() => setRadiusOpen(true)} icon={MapPin}>
-                  {filters.radiusKm} km
-                </ChipButton>
+                <ControlButton onClick={() => setRadiusOpen(true)} icon={MapPin}>
+                  Distance: {filters.radiusKm} km
+                </ControlButton>
               </SheetTrigger>
               <SheetContent 
                 side="bottom" 
@@ -298,8 +254,8 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
                         "w-full h-12 px-4 rounded-lg font-medium text-sm transition-all",
                         "flex items-center gap-2",
                         filters.radiusKm === opt.value
-                          ? "bg-gradient-to-br from-[#6E9277] to-[#89A78C] text-white"
-                          : "bg-white/[0.06] text-white/80 hover:bg-white/[0.10]"
+                          ? "bg-white/20 text-white border border-white/28"
+                          : "bg-white/[0.06] text-white/80 hover:bg-white/[0.10] border border-transparent"
                       )}
                     >
                       <MapPin className="h-4 w-4" />
@@ -314,9 +270,9 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
           {/* Sort Options */}
           <Sheet open={sortOpen} onOpenChange={setSortOpen}>
             <SheetTrigger asChild>
-              <ChipButton onClick={() => setSortOpen(true)} icon={ArrowUpDown}>
-                {SORT_OPTIONS.find((s) => s.value === filters.sortBy)?.label}
-              </ChipButton>
+              <ControlButton onClick={() => setSortOpen(true)} icon={ArrowDownWideNarrow}>
+                {getSortLabel()}
+              </ControlButton>
             </SheetTrigger>
             <SheetContent 
               side="bottom" 
@@ -327,28 +283,24 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
                 <SheetTitle>Order your results</SheetTitle>
               </SheetHeader>
               <div className="mt-6 space-y-2">
-                {SORT_OPTIONS.map((opt) => {
-                  const Icon = opt.icon;
-                  return (
-                    <button
-                      key={opt.value}
-                      onClick={() => {
-                        updateFilter('sortBy', opt.value);
-                        setSortOpen(false);
-                      }}
-                      className={cn(
-                        "w-full h-12 px-4 rounded-lg font-medium text-sm transition-all",
-                        "flex items-center gap-2",
-                        filters.sortBy === opt.value
-                          ? "bg-gradient-to-br from-[#6E9277] to-[#89A78C] text-white"
-                          : "bg-white/[0.06] text-white/80 hover:bg-white/[0.10]"
-                      )}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span>{opt.label}</span>
-                    </button>
-                  );
-                })}
+                {SORT_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => {
+                      updateFilter('sortBy', opt.value);
+                      setSortOpen(false);
+                    }}
+                    className={cn(
+                      "w-full h-12 px-4 rounded-lg font-medium text-sm transition-all",
+                      "flex items-center gap-2",
+                      filters.sortBy === opt.value
+                        ? "bg-white/20 text-white border border-white/28"
+                        : "bg-white/[0.06] text-white/80 hover:bg-white/[0.10] border border-transparent"
+                    )}
+                  >
+                    <span>{opt.label}</span>
+                  </button>
+                ))}
               </div>
             </SheetContent>
           </Sheet>
