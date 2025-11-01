@@ -235,27 +235,8 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               </div>
             ) : (
               <div className="space-y-2">
-                {/* MOCK: Thomas Holmes with all features enabled for UI testing */}
-                <GolferRow 
-                  key="mock-thomas" 
-                  golfer={{
-                    id: 'mock-thomas-holmes',
-                    display_name: 'Thomas Holmes',
-                    username: 'tholmes',
-                    home_club: 'Pebble Beach Golf Links',
-                    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Thomas',
-                    is_online: true,
-                    isMock: true,
-                    distanceText: '1.2 mi',
-                    isOpenToPlay: true,
-                    sameHomeClub: true,
-                  }} 
-                  index={0} 
-                />
-                
-                {/* Real golfers */}
                 {golfers.map((golfer, index) => (
-                  <GolferRow key={golfer.id ?? index} golfer={golfer} index={index + 1} />
+                  <GolferRow key={golfer.id ?? index} golfer={golfer} index={index} />
                 ))}
                 
                 {golfers.length === 0 && (
