@@ -43,18 +43,21 @@ export function GamesNearbyList({
       return;
     }
 
-    const fetchClubGames = async () => {
+      const fetchClubGames = async () => {
       setIsLoadingClubGames(true);
       try {
         const { data: { user } } = await supabase.auth.getUser();
         const currentUserId = user?.id;
 
+        // Normalize search term for fuzzy matching
+        const normalizedSearch = selectedClub.name.toLowerCase().trim().replace(/\s+/g, ' ');
+
         const { data, error } = await supabase
           .from('games')
-          .select('id, host_user_id, course_id, course_name, lat, lng, start_time, expires_at, status, slots_total, slots_open, visibility, note, created_at, updated_at')
-          .eq('course_name', selectedClub.name)
+          .select('id, host_user_id, course_id, course_name, lat, lng, start_time, expires_at, status, slots_total, slots_open, visibility, note, created_at, updated_at, course_name_normalized')
           .eq('status', 'active')
-          .gte('expires_at', new Date().toISOString()) as { data: any[] | null, error: any };
+          .gte('expires_at', new Date().toISOString())
+          .or(`course_id.eq.${selectedClub.id},course_name_normalized.ilike.%${normalizedSearch}%`) as { data: any[] | null, error: any };
 
         if (error) throw error;
 
