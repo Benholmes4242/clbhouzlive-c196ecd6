@@ -7,7 +7,7 @@ import { GameCard } from './your-games/GameCard';
 import { EmptyState } from './your-games/EmptyState';
 import { Segmented, SegmentItem } from './Segmented';
 import { TapButton } from '@/components/ui/TapButton';
-import { SkeletonRow } from '@/components/ui/SkeletonRow';
+import { YourGamesSkeleton } from './your-games/YourGamesSkeleton';
 import type { Game as CardGame, Participant } from './your-games/types';
 
 interface YourGamesListProps {
@@ -245,12 +245,7 @@ export function YourGamesList({
 
   // Show loading skeleton while fetching
   if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <div className="h-10 bg-white/5 rounded-lg animate-pulse" />
-        <SkeletonRow count={3} className="grid-flow-row auto-rows-[120px]" />
-      </div>
-    );
+    return <YourGamesSkeleton count={3} />;
   }
 
   // If no games found at all

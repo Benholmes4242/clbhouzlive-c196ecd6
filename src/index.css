@@ -1064,6 +1064,30 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
 }
 
+/* Skeleton shimmer utility - iOS-style loading animation */
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.12) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  animation: shimmer 1.3s infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer::after { 
+    animation: none; 
+  }
+}
+
 @keyframes slide-in-up {
   0% {
     transform: translateY(100%);
