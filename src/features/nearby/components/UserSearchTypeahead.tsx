@@ -66,18 +66,6 @@ export function UserSearchTypeahead({
       );
 
       setResults(filtered);
-      
-      // DEV instrumentation
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[🔍 Guest Search] Search complete:', {
-          query: term,
-          showDropdown: true,
-          isSearching: false,
-          userCount: filtered.length,
-          guestVisible: true,
-          timestamp: new Date().toISOString(),
-        });
-      }
     } catch (error) {
       console.error('Error searching users:', error);
     } finally {

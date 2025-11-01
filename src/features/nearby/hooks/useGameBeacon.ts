@@ -361,27 +361,6 @@ export function useGameBeacon() {
         isHost: true,
       });
 
-      // DEV instrumentation
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[🎮 Game Create] Success:', {
-          gameId: newBeacon.id,
-          timestamp: new Date().toISOString(),
-          payload: {
-            course_id: input.course_id,
-            course_name: input.course_name,
-            tagged_users: input.tagged_user_ids?.length || 0,
-            guests: input.guest_participants?.length || 0,
-            slots_total: input.slots_total,
-          },
-          response: {
-            id: newBeacon.id,
-            host_user_id: newBeacon.host_user_id,
-            slots_open: newBeacon.slots_open,
-            expires_at: newBeacon.expires_at,
-          },
-        });
-      }
-
       toast({
         title: 'Game posted',
         description: 'Nearby golfers can now see your game',
