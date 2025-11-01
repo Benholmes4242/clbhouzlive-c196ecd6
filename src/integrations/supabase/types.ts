@@ -2833,6 +2833,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      user_is_game_participant: {
+        Args: { _game_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "limited_admin"
