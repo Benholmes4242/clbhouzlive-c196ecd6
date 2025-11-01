@@ -23,27 +23,36 @@ export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: Y
   const navigate = useNavigate();
 
   // Prefer participants embedded on the game object (e.g., tagged/reserved) when available
-  const prefetchedParticipants: Participant[] = (game.participants ?? []).map((p: any) => ({
+  const rawPrefetched = (game.participants ?? []) as any[];
+  const prefetchedParticipants: Participant[] = rawPrefetched.map((p: any) => ({
     user_id: p.user_id ?? null,
     role: p.role,
     state: p.state,
-    display_name: p.user_profiles?.display_name || 'Unknown',
+    display_name: p.user_profiles?.display_name || p.guest_name || 'Unknown',
     username: p.user_profiles?.username,
     profile_photo_url: p.user_profiles?.profile_photo_url || undefined,
     eg_handicap_index: (p.user_profiles as any)?.eg_handicap_index ?? (p.user_profiles as any)?.handicap ?? null,
     show_handicap: (p.user_profiles as any)?.show_handicap,
     home_club: (p.user_profiles as any)?.home_club ?? null,
-    guest_name: null,
+    guest_name: p.guest_name ?? null,
     is_guest: !p.user_id,
   }));
+
+  // Enrich prefetched participants with data from the hook (profiles, hcp, etc.)
+  const makeKey = (p: Participant) => (p.user_id ? `u:${p.user_id}` : `g:${p.guest_name ?? ''}`);
+  const hookByKey = new Map<string, Participant>();
+  participants.forEach((p) => hookByKey.set(makeKey(p), p));
+
+  const mergedPrefetched = prefetchedParticipants.map((p) => hookByKey.get(makeKey(p)) ?? p);
+  const extrasFromHook = participants.filter((p) => !mergedPrefetched.some((m) => makeKey(m) === makeKey(p)));
+
+  const baseParticipants = (mergedPrefetched.length > 0 ? [...mergedPrefetched, ...extrasFromHook] : participants);
+  const hasHostInParticipants = baseParticipants.some((p) => p.role === 'host');
 
   // Force-show participants: ensure host and current user rows even if participants query is empty
   const { user } = useSupabaseSession();
   const { data: hostProfile } = useUserProfile(game.host_user_id);
   const { data: currentProfile } = useUserProfile(user?.id || null);
-
-  const baseParticipants = (prefetchedParticipants.length > 0 ? prefetchedParticipants : participants);
-  const hasHostInParticipants = baseParticipants.some((p) => p.role === 'host');
 
   const forcedHost = !hasHostInParticipants && hostProfile ? [
     {
