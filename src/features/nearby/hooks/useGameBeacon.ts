@@ -215,7 +215,8 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
           .eq('status', 'active')
           .eq('visibility', 'public')
           .gt('expires_at', new Date().toISOString())
-          .gt('slots_open', 0);
+          .gt('slots_open', 0)
+          .neq('host_user_id', userId); // Exclude host's own games
 
         // Apply same filters to public games
         if (discoveryFilters?.dateFrom) {
@@ -264,27 +265,19 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
           setHasMore(true);
         }
 
-        // Combine user's games with nearby public games (deduplicate by ID)
+        // Only show nearby public games (user's games appear in "Your Games" tab)
         const gameMap = new Map();
-        
-        // Add user's games first (marked as isMyGame)
-        beacons.forEach(beacon => {
-          const isHost = beacon.host_user_id === userId;
-          const isParticipant = participantGameIds.has(beacon.id);
-          gameMap.set(beacon.id, {
-            ...beacon,
-            isHost,
-            isMyGame: isHost || isParticipant,
-            distance_meters: 0,
-            distanceText: undefined,
-          });
-        });
 
-        // Add nearby public games (if not already in map) - with client-side safety filter
+        // Add nearby public games (excluding host's own and already joined) - with client-side safety filter
         publicPage.forEach(beacon => {
-          if (!gameMap.has(beacon.id) && beacon.lat && beacon.lng && (beacon.slots_open ?? 0) > 0) {
+          // Skip if user is host or participant
+          if (beacon.host_user_id === userId || participantGameIds.has(beacon.id)) {
+            return;
+          }
+          
+          if (beacon.lat && beacon.lng && (beacon.slots_open ?? 0) > 0) {
             const distanceMeters = calculateDistance(userLat, userLng, beacon.lat, beacon.lng);
-            if (distanceMeters <= NEARBY_RADIUS_METERS) {
+            if (distanceMeters <= radiusMeters) {
               gameMap.set(beacon.id, {
                 ...beacon,
                 isHost: false,
@@ -297,10 +290,6 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
         });
 
         const allGames = Array.from(gameMap.values()).sort((a: any, b: any) => {
-          // User's games first
-          if (a.isMyGame && !b.isMyGame) return -1;
-          if (!a.isMyGame && b.isMyGame) return 1;
-          
           // Apply client-side sorting for 'closest' (since it needs distance)
           if (sortBy === 'closest') {
             return (a.distance_meters || 0) - (b.distance_meters || 0);
