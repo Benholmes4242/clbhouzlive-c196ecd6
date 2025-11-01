@@ -296,13 +296,14 @@ export function CreateGameModal({
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         overscrollBehavior: 'none',
-        touchAction: 'none',
+        pointerEvents: 'auto', // Changed from touchAction: 'none' to allow interaction
       }}
     >
       {/* Backdrop */}
       <div 
         className="absolute inset-0"
         onClick={onClose}
+        style={{ pointerEvents: 'auto' }}
       />
       
       {/* Modal */}
@@ -311,7 +312,7 @@ export function CreateGameModal({
         style={{ 
           height: 'calc(100vh - env(safe-area-inset-top))',
           maxHeight: '100vh',
-          touchAction: 'auto',
+          pointerEvents: 'auto',
           overscrollBehavior: 'contain',
           background: 'rgba(15, 15, 15, 0.75)',
           backdropFilter: 'blur(40px)',

@@ -121,7 +121,10 @@ export function YourGamesList({ onCancelGame, onLeaveGame, onCountChange }: Your
   useEffect(() => {
     const handleGameCreated = (e: any) => {
       console.log('[YourGames] game-created event received:', e.detail);
-      fetchYourGames();
+      // Add small delay to ensure DB write completes and RLS catches up
+      setTimeout(() => {
+        fetchYourGames();
+      }, 100);
     };
     window.addEventListener('game-created', handleGameCreated);
     return () => window.removeEventListener('game-created', handleGameCreated);

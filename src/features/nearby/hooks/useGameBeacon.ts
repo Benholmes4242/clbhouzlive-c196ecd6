@@ -499,15 +499,15 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
         isHost: true,
       });
 
+      // Dispatch event immediately BEFORE toast to ensure listeners react first
+      window.dispatchEvent(new CustomEvent('game-created', { 
+        detail: { gameId: newBeacon.id, hostUserId: newBeacon.host_user_id } 
+      }));
+
       toast({
         title: 'Game posted',
         description: 'Nearby golfers can now see your game',
       });
-
-      // Dispatch event to trigger Your Games refetch
-      window.dispatchEvent(new CustomEvent('game-created', { 
-        detail: { gameId: newBeacon.id, hostUserId: newBeacon.host_user_id } 
-      }));
     } catch (error) {
       console.error('Error in createBeacon:', error);
       toast({
