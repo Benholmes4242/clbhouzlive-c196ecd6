@@ -1,24 +1,63 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, MapPin, Calendar, Users, Tag, MessageSquare } from 'lucide-react';
+import { X, ChevronDown, AlertCircle } from 'lucide-react';
 import { GameBeacon } from '../hooks/useGameBeacon';
-import { useCourseSearch, GolfCourse } from '../hooks/useCourseSearch';
-import { Button } from '@/components/ui/button';
+import { useCourseSearch } from '../hooks/useCourseSearch';
+import { DateTimePicker } from './DateTimePicker';
+import { UserSearchTypeahead } from './UserSearchTypeahead';
+import { format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
+
+// Format game type for display
+function formatGameTypeDisplay(gameType: string): string {
+  const typeMap: Record<string, string> = {
+    '9_holes': '9 holes',
+    '18_holes': '18 holes',
+    'casual_golf': 'Casual golf',
+    'practice': 'Practice',
+  };
+  return typeMap[gameType] || gameType;
+}
 
 interface CreateGameModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCreateBeacon: (input: {
-    course_id?: string;
+    game_type: string;
     course_name?: string;
-    start_time: string;
-    slots_total: number;
-    tagged_user_ids?: string[];
     note?: string;
+    start_time?: string;
+    players_needed?: number;
+    tee_time?: string;
+    slots_total?: number;
+    tagged_user_ids?: string[];
   }) => Promise<void>;
   onCancelBeacon: (beaconId: string) => Promise<void>;
   myBeacon: GameBeacon | null;
   prefilledClub?: { id: string; name: string };
 }
+
+interface ValidationErrors {
+  slotsTotal?: string;
+  startTime?: string;
+  expiresAt?: string;
+}
+
+const GAME_TYPES = [
+  { value: '9_holes', label: '9 holes' },
+  { value: '18_holes', label: '18 holes' },
+  { value: 'casual_golf', label: 'Casual golf' },
+  { value: 'practice', label: 'Practice' },
+];
+
+const TIMING_OPTIONS = [
+  { value: 'now', label: 'Now' },
+  { value: '30', label: 'In 30 mins' },
+  { value: '60', label: 'In 1 hour' },
+  { value: 'choose', label: 'Choose' },
+];
+
+const PLAYERS_OPTIONS = [1, 2, 3];
+const SLOTS_TOTAL_OPTIONS = [2, 3, 4]; // Common golf game sizes
 
 export function CreateGameModal({
   isOpen,
@@ -28,39 +67,30 @@ export function CreateGameModal({
   myBeacon,
   prefilledClub,
 }: CreateGameModalProps) {
-  const [courseId, setCourseId] = useState<string>(prefilledClub?.id || '');
-  const [courseName, setCourseName] = useState<string>(prefilledClub?.name || '');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [startTime, setStartTime] = useState(() => {
-    const now = new Date();
-    now.setHours(now.getHours() + 1, 0, 0, 0);
-    return now.toISOString().slice(0, 16);
-  });
-  const [availableSlots, setAvailableSlots] = useState<1 | 2 | 3>(3);
-  const [taggedPlayers, setTaggedPlayers] = useState<string[]>([]);
+  const [gameType, setGameType] = useState<string>('9_holes');
+  const [courseName, setCourseName] = useState('');
+  const [courseSearchTerm, setCourseSearchTerm] = useState('');
+  const [showCourseDropdown, setShowCourseDropdown] = useState(false);
   const [note, setNote] = useState('');
+  const [timing, setTiming] = useState<string>('now');
+  const [customDateTime, setCustomDateTime] = useState<Date | null>(null);
+  const [showDateTimePicker, setShowDateTimePicker] = useState(false);
+  const [playersNeeded, setPlayersNeeded] = useState<number | null>(null);
+  const [slotsTotal, setSlotsTotal] = useState<number>(4);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const courseInputRef = useRef<HTMLInputElement>(null);
   
-  const { courses, isLoading } = useCourseSearch(searchTerm);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const { courses } = useCourseSearch(courseSearchTerm);
 
-  // Calculate current players (host + tagged)
-  const currentPlayers = 1 + taggedPlayers.length;
-  
-  // Calculate max selectable slots (can't exceed 4 total)
-  const maxSelectableSlots = 4 - currentPlayers;
-  
-  // Game size label
-  const gameSizeLabels = ['One-ball', 'Two-ball', 'Three-ball', 'Four-ball'];
-  const gameSizeLabel = currentPlayers <= 4 ? `${gameSizeLabels[currentPlayers - 1]} game` : '';
-
-  // Auto-adjust available slots when tagged players change
+  // Pre-fill club if provided
   useEffect(() => {
-    if (availableSlots > maxSelectableSlots) {
-      setAvailableSlots(maxSelectableSlots as 1 | 2 | 3);
+    if (prefilledClub && !courseName) {
+      setCourseName(prefilledClub.name);
+      setCourseSearchTerm(prefilledClub.name);
     }
-  }, [maxSelectableSlots, availableSlots]);
+  }, [prefilledClub, courseName]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -75,69 +105,106 @@ export function CreateGameModal({
 
   if (!isOpen) return null;
 
-  const handleCourseSelect = (course: GolfCourse) => {
-    setCourseId(course.id);
-    setCourseName(course.name);
-    setSearchTerm(''); // Clear search buffer
-    setShowDropdown(false);
-  };
+  const validateForm = (): boolean => {
+    const errors: ValidationErrors = {};
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // If user types, treat as new search - clear selection
-    const value = e.target.value;
-    setSearchTerm(value);
-    if (value !== courseName) {
-      setCourseId('');
-      setCourseName('');
+    // Validate slots_total
+    if (slotsTotal < 1 || slotsTotal > 10) {
+      errors.slotsTotal = 'Total slots must be between 1 and 10';
     }
-    if (!showDropdown) setShowDropdown(true);
+
+    // Validate start_time is in the future
+    let startTime: Date;
+    if (timing === 'now') {
+      startTime = new Date();
+    } else if (timing === '30') {
+      startTime = new Date(Date.now() + 30 * 60 * 1000);
+    } else if (timing === '60') {
+      startTime = new Date(Date.now() + 60 * 60 * 1000);
+    } else if (timing === 'choose' && customDateTime) {
+      startTime = customDateTime;
+      if (startTime.getTime() < Date.now()) {
+        errors.startTime = 'Start time must be in the future';
+      }
+    } else {
+      startTime = new Date();
+    }
+
+    // Validate tagged users don't exceed capacity
+    const totalReservedSlots = 1 + selectedUsers.length; // 1 for host
+    if (totalReservedSlots > slotsTotal) {
+      errors.slotsTotal = `Cannot tag ${selectedUsers.length} players - only ${slotsTotal - 1} seats available`;
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async () => {
-    // Validation
-    if (!courseId) {
-      alert('Please pick a club from the list.');
-      return;
-    }
+    if (!gameType) return;
+    if (!validateForm()) return;
 
-    const start = new Date(startTime);
-    if (start <= new Date()) {
-      alert('Start time must be in the future.');
-      return;
-    }
-
-    const slotsTotal = currentPlayers + availableSlots;
-    if (slotsTotal > 4) {
-      alert('Maximum 4 players total.');
-      return;
+    // Calculate start_time based on timing selection
+    let startTime: Date;
+    if (timing === 'now') {
+      startTime = new Date();
+    } else if (timing === '30') {
+      startTime = new Date(Date.now() + 30 * 60 * 1000);
+    } else if (timing === '60') {
+      startTime = new Date(Date.now() + 60 * 60 * 1000);
+    } else if (timing === 'choose' && customDateTime) {
+      startTime = customDateTime;
+    } else {
+      startTime = new Date();
     }
 
     setIsSubmitting(true);
     try {
       await onCreateBeacon({
-        course_id: courseId,
-        course_name: courseName,
-        start_time: start.toISOString(),
+        game_type: gameType,
+        course_name: courseName || undefined,
+        note: note || undefined,
+        start_time: startTime.toISOString(),
+        tee_time: startTime.toISOString(),
         slots_total: slotsTotal,
-        tagged_user_ids: taggedPlayers,
-        note: note.trim() || undefined,
+        tagged_user_ids: selectedUsers.map(u => u.id),
+        players_needed: playersNeeded || undefined,
       });
       onClose();
       // Reset form
-      setCourseId('');
+      setGameType('9_holes');
       setCourseName('');
-      setSearchTerm('');
-      setStartTime(() => {
-        const now = new Date();
-        now.setHours(now.getHours() + 1, 0, 0, 0);
-        return now.toISOString().slice(0, 16);
-      });
-      setAvailableSlots(3);
-      setTaggedPlayers([]);
+      setCourseSearchTerm('');
       setNote('');
+      setTiming('now');
+      setCustomDateTime(null);
+      setPlayersNeeded(null);
+      setSlotsTotal(4);
+      setSelectedUsers([]);
+      setValidationErrors({});
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleTimingChange = (value: string) => {
+    setTiming(value);
+    if (value === 'choose') {
+      setShowDateTimePicker(true);
+    }
+  };
+
+  const handleCourseSelect = (course: { name: string }) => {
+    setCourseName(course.name);
+    setCourseSearchTerm(course.name);
+    setShowCourseDropdown(false);
+  };
+
+  const getTimingDisplay = () => {
+    if (timing === 'choose' && customDateTime) {
+      return format(customDateTime, "MMM d 'at' h:mm a");
+    }
+    return TIMING_OPTIONS.find(opt => opt.value === timing)?.label || 'Now';
   };
 
   const handleCancel = async () => {
@@ -163,13 +230,11 @@ export function CreateGameModal({
     return `${hours}h ${mins}m`;
   };
 
-  const isValid = courseId && startTime && (currentPlayers + availableSlots <= 4);
-
   return (
     <div 
       className="fixed inset-0 flex items-end sm:items-center sm:justify-center animate-fade-in"
       style={{ 
-        zIndex: 10000,
+        zIndex: 10000, // Above NearbyOverlay's z-9999
         backgroundColor: 'rgba(0,0,0,0)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
@@ -202,13 +267,19 @@ export function CreateGameModal({
       >
         {/* Header */}
         <div className="px-5 pt-4 pb-4">
+          {/* Title + Close */}
           <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
+            {/* Left spacer */}
             <div />
+            
+            {/* Title */}
             <div className="text-center">
               <h2 className="text-white text-[17px] font-semibold">
                 {myBeacon ? 'Your Game' : 'Create a Game'}
               </h2>
             </div>
+            
+            {/* Close button */}
             <div className="flex justify-end">
               <button
                 onClick={onClose}
@@ -219,6 +290,8 @@ export function CreateGameModal({
               </button>
             </div>
           </div>
+          
+          {/* Subtitle */}
           <p className="text-[15px] text-white/70 text-center">
             {myBeacon ? 'Currently hosting' : 'Let nearby golfers know you\'re looking to play'}
           </p>
@@ -277,178 +350,179 @@ export function CreateGameModal({
           ) : (
             // Create new beacon form
             <>
-              {/* Golf course */}
-              <div className="space-y-3 relative">
-                <label className="block text-sm font-medium text-white/90">
-                  <MapPin className="w-4 h-4 inline mr-2 text-white/60" />
-                  Golf course
-                </label>
-                
-                {courseName && !showDropdown ? (
-                  // Selected state
-                  <div className="w-full py-3 px-4 bg-neutral-800/50 rounded-xl flex items-center justify-between border border-neutral-700/50">
-                    <span className="text-sm text-white">{courseName}</span>
-                    <button
-                      onClick={() => {
-                        setCourseId('');
-                        setCourseName('');
-                        setSearchTerm('');
-                        setShowDropdown(true);
-                        setTimeout(() => inputRef.current?.focus(), 100);
-                      }}
-                      className="text-xs text-white/60 hover:text-white px-2"
-                    >
-                      Change
-                    </button>
-                  </div>
-                ) : (
-                  // Search state
-                  <div className="relative">
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      placeholder="Search club name..."
-                      value={searchTerm}
-                      onChange={handleInputChange}
-                      onFocus={() => setShowDropdown(true)}
-                      className="w-full py-3 px-4 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20"
-                    />
-                    
-                    {showDropdown && searchTerm.length >= 2 && (
-                      <>
-                        <div
-                          className="fixed inset-0 z-10"
-                          onClick={() => setShowDropdown(false)}
-                        />
-                        <div className="absolute z-20 w-full mt-1 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto backdrop-blur-xl">
-                          {isLoading ? (
-                            <div className="px-4 py-3 text-sm text-white/50">
-                              Searching...
-                            </div>
-                          ) : courses.length > 0 ? (
-                            courses.map((course) => (
-                              <button
-                                key={course.id}
-                                onClick={() => handleCourseSelect(course)}
-                                className="w-full text-left px-4 py-3 hover:bg-neutral-800 transition-colors border-b border-neutral-800 last:border-b-0"
-                              >
-                                <div className="text-white text-sm font-medium">{course.name}</div>
-                                {course.region && (
-                                  <div className="text-white/60 text-xs mt-0.5">
-                                    {course.region}, {course.country}
-                                  </div>
-                                )}
-                              </button>
-                            ))
-                          ) : (
-                            <div className="px-4 py-3 text-sm text-white/50">
-                              No clubs found
-                            </div>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
-                {courseName && (
-                  <p className="text-xs text-white/50">Selected: {courseName}</p>
-                )}
-              </div>
-
-              {/* Start time */}
+              {/* Game Type */}
               <div className="space-y-3">
                 <label className="block text-sm font-medium text-white/90">
-                  <Calendar className="w-4 h-4 inline mr-2 text-white/60" />
-                  Start time
+                  Game type *
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {GAME_TYPES.map(type => (
+                    <button
+                      key={type.value}
+                      onClick={() => setGameType(type.value)}
+                      className={`py-3 px-4 rounded-xl font-medium transition-all backdrop-blur ${
+                        gameType === type.value
+                          ? 'bg-white/20 text-white border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:bg-white/30 active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)_inset]'
+                          : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
+                      }`}
+                    >
+                      {type.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Location */}
+              <div className="space-y-3 relative">
+                <label className="block text-sm font-medium text-white/60">
+                  Where
                 </label>
                 <input
-                  type="datetime-local"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full py-3 px-4 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 focus:outline-none focus:ring-2 focus:ring-white/20"
+                  ref={courseInputRef}
+                  type="text"
+                  placeholder="Golf course …"
+                  value={courseSearchTerm}
+                  onChange={(e) => {
+                    setCourseSearchTerm(e.target.value);
+                    setShowCourseDropdown(true);
+                  }}
+                  onFocus={() => setShowCourseDropdown(true)}
+                  className="w-full py-3 px-4 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20"
                 />
+                {showCourseDropdown && courses.length > 0 && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-10"
+                      onClick={() => setShowCourseDropdown(false)}
+                    />
+                    <div className="absolute z-20 w-full mt-1 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto backdrop-blur-xl">
+                      {courses.map((course) => (
+                        <button
+                          key={course.id}
+                          onClick={() => handleCourseSelect(course)}
+                          className="w-full text-left px-4 py-3 hover:bg-neutral-800 transition-colors border-b border-neutral-800 last:border-b-0"
+                        >
+                          <div className="text-white text-sm font-medium">{course.name}</div>
+                          {course.region && (
+                            <div className="text-white/60 text-xs mt-0.5">
+                              {course.region}, {course.country}
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
 
-              {/* Tag Players */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="block text-sm font-medium text-white/60">
-                    <Tag className="w-4 h-4 inline mr-2" />
-                    Tag Players
-                  </label>
-                  {gameSizeLabel && (
-                    <span className="text-xs text-white/50">{gameSizeLabel}</span>
-                  )}
-                </div>
-                <div className="py-3 px-4 bg-neutral-800/30 rounded-xl border border-neutral-700/50 text-sm text-white/50">
-                  {taggedPlayers.length === 0 ? 'No players tagged yet' : `${taggedPlayers.length} player(s) tagged`}
-                </div>
-                <p className="text-xs text-white/50">
-                  Tagging coming soon - reserve seats for specific players
-                </p>
-              </div>
-
-              {/* Available slots */}
-              {maxSelectableSlots > 0 && (
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-white/90">
-                    <Users className="w-4 h-4 inline mr-2 text-white/60" />
-                    Available slots
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[1, 2, 3].map((n) => (
-                      <button
-                        key={n}
-                        onClick={() => setAvailableSlots(n as 1 | 2 | 3)}
-                        disabled={n > maxSelectableSlots}
-                        className={`py-3 px-4 rounded-xl font-medium transition-all backdrop-blur ${
-                          availableSlots === n
-                            ? 'bg-white/20 text-white border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset]'
-                            : n > maxSelectableSlots
-                            ? 'bg-white/5 text-white/30 border border-white/8 opacity-50 cursor-not-allowed'
-                            : 'bg-white/5 text-white/70 border border-white/12 hover:bg-white/10'
-                        }`}
-                      >
-                        {n}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-xs text-center text-white/50">
-                    {availableSlots === 1 ? '1 slot available' : `${availableSlots} slots available`}
-                  </p>
-                </div>
-              )}
-
-              {/* Notes */}
+              {/* Note */}
               <div className="space-y-3">
                 <label className="block text-sm font-medium text-white/60">
-                  <MessageSquare className="w-4 h-4 inline mr-2" />
-                  Notes (optional)
+                  Note
                 </label>
                 <textarea
-                  placeholder="Add details about the game..."
+                  placeholder="2 spots free, off 12hcp, casual vibes"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  maxLength={200}
                   rows={2}
                   className="w-full py-3 px-4 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20 resize-none"
                 />
-                <p className="text-xs text-white/50 text-right">
-                  {note.length}/200
-                </p>
               </div>
+
+              {/* Timing */}
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-white/60">
+                  When
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  {TIMING_OPTIONS.map(option => (
+                    <button
+                      key={option.value}
+                      onClick={() => handleTimingChange(option.value)}
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-all backdrop-blur ${
+                        timing === option.value
+                          ? 'bg-white/20 text-white border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:bg-white/30 active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)_inset]'
+                          : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+                {timing === 'choose' && customDateTime && (
+                  <div className="text-sm text-white/80 text-center mt-2">
+                    {getTimingDisplay()}
+                  </div>
+                )}
+              </div>
+
+              {/* Available Slots */}
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-white/90">
+                  Available Slots *
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {SLOTS_TOTAL_OPTIONS.map(num => (
+                    <button
+                      key={num}
+                      onClick={() => setSlotsTotal(num)}
+                      className={`py-3 px-4 rounded-xl font-medium transition-all backdrop-blur ${
+                        slotsTotal === num
+                          ? 'bg-white/20 text-white border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset]'
+                          : 'bg-white/5 text-white/70 border border-white/12 hover:bg-white/10'
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+                <div className="text-xs text-center text-white/60">
+                  {slotsTotal === 1 ? '1 slot available' : `${slotsTotal} slots available`}
+                </div>
+                {validationErrors.slotsTotal && (
+                  <div className="flex items-center gap-2 text-red-400 text-sm">
+                    <AlertCircle className="w-4 h-4" />
+                    {validationErrors.slotsTotal}
+                  </div>
+                )}
+              </div>
+
+              {/* Tag Players */}
+              <UserSearchTypeahead
+                selectedUsers={selectedUsers}
+                onUserAdd={(user) => setSelectedUsers([...selectedUsers, user])}
+                onUserRemove={(userId) => setSelectedUsers(selectedUsers.filter(u => u.id !== userId))}
+                maxUsers={slotsTotal - 1}
+              />
+
+              {/* Timing validation error */}
+              {validationErrors.startTime && (
+                <div className="flex items-center gap-2 text-red-400 text-sm">
+                  <AlertCircle className="w-4 h-4" />
+                  {validationErrors.startTime}
+                </div>
+              )}
 
               <button
                 onClick={handleSubmit}
-                disabled={!isValid || isSubmitting}
+                disabled={!gameType || isSubmitting}
                 className="w-full py-3 px-4 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Creating...' : 'Create Game'}
+                {isSubmitting ? 'Creating...' : 'Start Game'}
               </button>
             </>
           )}
         </div>
       </div>
+
+      {showDateTimePicker && (
+        <DateTimePicker
+          value={customDateTime}
+          onChange={setCustomDateTime}
+          onClose={() => setShowDateTimePicker(false)}
+        />
+      )}
     </div>
   );
 }
+
