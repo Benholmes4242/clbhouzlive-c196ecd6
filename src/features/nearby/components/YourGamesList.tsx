@@ -33,16 +33,7 @@ export function YourGamesList({ onCancelGame, onLeaveGame, onCountChange }: Your
             user_id,
             role,
             state,
-            reserves_slot,
-            user_profiles:user_id (
-              id,
-              display_name,
-              username,
-              profile_photo_url,
-              eg_handicap_index,
-              show_handicap,
-              home_club
-            )
+            reserves_slot
           )
         `)
         .eq('host_user_id', user.id)
@@ -77,16 +68,7 @@ export function YourGamesList({ onCancelGame, onLeaveGame, onCountChange }: Your
               user_id,
               role,
               state,
-              reserves_slot,
-              user_profiles:user_id (
-                id,
-                display_name,
-                username,
-                profile_photo_url,
-                eg_handicap_index,
-                show_handicap,
-                home_club
-              )
+              reserves_slot
             )
           )
         `)
