@@ -12,16 +12,16 @@ import type { GameParticipant as Participant } from '@/features/game/hooks/useGa
 
 type UiParticipant = {
   user_id: string | null;
-  guest_name?: string | null;
+  guest_name: string | null;
   role: 'host' | 'player' | 'guest';
-  state: 'invited' | 'accepted' | 'declined' | 'removed';
-  display_name: string;
-  username?: string;
-  profile_photo_url?: string;
-  eg_handicap_index?: number | null;
-  show_handicap?: boolean;
-  home_club?: string | null;
-  is_guest?: boolean;
+  state: 'invited' | 'accepted' | 'declined' | 'removed' | string;
+  display_name: string | null;
+  username: string | null;
+  profile_photo_url: string | null;
+  eg_handicap_index: number | null;
+  show_handicap: boolean | null;
+  home_club: string | null;
+  is_guest: boolean;
 };
 
 interface YourGamesAccordionCardProps {
@@ -47,53 +47,59 @@ export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: Y
   const [openGuests, setOpenGuests] = useState(false);
   const { data: participants = [] } = useGameParticipants(game.id);
   const navigate = useNavigate();
-
-  // Force-show participants: ensure host and current user rows even if participants query is empty
   const { user } = useSupabaseSession();
   const { data: hostProfile } = useUserProfile(game.host_user_id);
-  const { data: currentProfile } = useUserProfile(user?.id || null);
 
-  const baseParticipants = participants;
-  const hasHostInParticipants = baseParticipants.some((p) => p.role === 'host');
+  // Helper to create stable keys for deduplication
+  const keyOf = (p: UiParticipant) => `${p.user_id ? 'u:'+p.user_id : 'g:'+ (p.guest_name ?? '')}`;
 
-  const forcedHost: UiParticipant[] = !hasHostInParticipants && hostProfile ? [
-    {
-      user_id: hostProfile.id,
-      role: 'host',
-      state: 'accepted',
-      display_name: hostProfile.display_name,
-      username: hostProfile.username,
-      profile_photo_url: hostProfile.profile_photo_url || undefined,
-      eg_handicap_index: hostProfile.eg_handicap_index,
-      show_handicap: hostProfile.show_handicap,
-      home_club: hostProfile.home_club,
-      guest_name: null,
-      is_guest: false,
-    },
-  ] : [];
+  // 1) Map any prefetched participants from the game object (minimal)
+  const prefetchedParticipants: UiParticipant[] = ((game?.participants ?? []) as any[]).map((p: any) => ({
+    user_id: p.user_id ?? null,
+    guest_name: p.guest_name ?? null,
+    role: p.role as UiParticipant['role'],
+    state: p.state ?? 'invited',
+    display_name: p.display_name ?? p.guest_name ?? null,
+    username: p.username ?? null,
+    profile_photo_url: p.profile_photo_url ?? null,
+    home_club: p.home_club ?? null,
+    eg_handicap_index: p.eg_handicap_index ?? null,
+    show_handicap: p.show_handicap ?? null,
+    is_guest: !p.user_id,
+  }));
 
-  const isCurrentInParticipants = !!user?.id && baseParticipants.some((p) => p.user_id === user?.id);
-  const shouldAddSelf = !!user?.id && !isCurrentInParticipants && !!currentProfile && (!isHosting || !hostProfile);
-  const forcedSelf: UiParticipant[] = shouldAddSelf ? [
-    {
-      user_id: currentProfile!.id,
-      role: isHosting ? 'host' : 'player',
-      state: 'accepted',
-      display_name: currentProfile!.display_name,
-      username: currentProfile!.username,
-      profile_photo_url: currentProfile!.profile_photo_url || undefined,
-      eg_handicap_index: currentProfile!.eg_handicap_index,
-      show_handicap: currentProfile!.show_handicap,
-      home_club: currentProfile!.home_club,
-      guest_name: null,
-      is_guest: false,
-    },
-  ] : [];
+  // 2) Merge prefetched + hook (prefer hook where present, as it has full profile data)
+  const hookMap = new Map<string, UiParticipant>();
+  participants.forEach((p) => hookMap.set(keyOf(p), p));
 
-  const displayParticipants = [...forcedHost, ...baseParticipants, ...forcedSelf];
+  const baseParticipants = prefetchedParticipants.map((p) => hookMap.get(keyOf(p)) ?? p);
+  
+  // Add any hook extras not in prefetched
+  participants.forEach((p) => {
+    if (!baseParticipants.some((m) => keyOf(m) === keyOf(p))) {
+      baseParticipants.push(p);
+    }
+  });
+
+  // 3) Ensure host row shows even if not in participants
+  const hasHost = baseParticipants.some((p) => p.user_id === game.host_user_id);
+  const forcedHost: UiParticipant[] = !hasHost && hostProfile ? [{
+    user_id: hostProfile.id,
+    guest_name: null,
+    role: 'host' as const,
+    state: 'accepted',
+    display_name: hostProfile.display_name ?? null,
+    username: hostProfile.username ?? null,
+    profile_photo_url: hostProfile.profile_photo_url ?? null,
+    home_club: hostProfile.home_club ?? null,
+    eg_handicap_index: hostProfile.eg_handicap_index ?? null,
+    show_handicap: hostProfile.show_handicap ?? null,
+    is_guest: false,
+  }] : [];
+
+  const displayParticipants = [...forcedHost, ...baseParticipants];
 
   // Deduplicate by user_id/guest_name, then sort Host → Members → Guests
-  const keyOf = (p: UiParticipant) => `${p.user_id ?? 'guest'}:${p.guest_name ?? ''}`;
   const dedupMap = new Map<string, UiParticipant>();
   displayParticipants.forEach(p => {
     const k = keyOf(p);
@@ -139,7 +145,7 @@ export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: Y
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className="text-[13px] text-white/90 font-medium truncate">
-              {p.username ? `@${p.username}` : (p.display_name || p.guest_name || 'Guest')}
+              {p.username ? `@${p.username}` : (p.display_name ?? p.guest_name ?? 'Guest')}
             </span>
             {isHost && (
               <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 text-[10px] font-medium rounded">

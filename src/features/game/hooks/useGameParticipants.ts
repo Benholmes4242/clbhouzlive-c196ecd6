@@ -3,18 +3,17 @@ import { supabase } from '@/integrations/supabase/client';
 
 export interface GameParticipant {
   user_id: string | null;
-  role: 'host' | 'player';
-  state: 'invited' | 'accepted' | 'declined' | 'removed';
-  display_name: string;
-  username?: string;
-  profile_photo_url?: string;
-  eg_handicap_index?: number | null;
-  show_handicap?: boolean;
-  home_club?: string | null;
-  guest_name?: string | null;
-  is_guest?: boolean;
+  guest_name: string | null;
+  role: 'host' | 'player' | 'guest';
+  state: 'invited' | 'accepted' | 'declined' | 'removed' | string;
+  display_name: string | null;
+  username: string | null;
+  profile_photo_url: string | null;
+  home_club: string | null;
+  eg_handicap_index: number | null;
+  show_handicap: boolean | null;
+  is_guest: boolean;
 }
-
 
 export function useGameParticipants(gameId: string | null) {
   return useQuery({
@@ -22,45 +21,68 @@ export function useGameParticipants(gameId: string | null) {
     queryFn: async (): Promise<GameParticipant[]> => {
       if (!gameId) return [];
 
-      const { data, error } = await supabase
-        .from('game_participants')
-        .select(`
-          user_id,
-          role,
-          state,
-          guest_name,
-          user_profiles:user_id (
-            id,
-            display_name,
-            username,
-            profile_photo_url,
-            eg_handicap_index,
-            show_handicap,
-            home_club
-          )
-        `)
-        .eq('game_id', gameId)
-        .in('state', ['invited', 'accepted']);
+      try {
+        // 1) Fetch participants (avoid fragile nested joins)
+        const { data: raw, error } = await supabase
+          .from('game_participants')
+          .select('user_id, role, state, guest_name')
+          .eq('game_id', gameId);
 
-      if (error) {
-        console.error('Error fetching game participants:', error);
+        if (error) {
+          console.error('[useGameParticipants] participants error', error);
+          return [];
+        }
+
+        // 2) Client-filter to invited/accepted (case-insensitive)
+        const filtered = (raw ?? []).filter((p: any) => {
+          const s = String(p.state || '').toLowerCase();
+          return s === 'invited' || s === 'accepted';
+        });
+
+        // 3) Hydrate user profiles in a second pass (no nested joins)
+        const userIds = Array.from(
+          new Set(filtered.map((p: any) => p.user_id).filter(Boolean))
+        ) as string[];
+
+        let profileMap = new Map<string, any>();
+        if (userIds.length > 0) {
+          const { data: profiles, error: profilesError } = await supabase
+            .from('user_profiles')
+            .select(
+              'id, display_name, username, profile_photo_url, eg_handicap_index, show_handicap, home_club'
+            )
+            .in('id', userIds);
+
+          if (profilesError) {
+            console.error('[useGameParticipants] profiles error', profilesError);
+          } else {
+            profileMap = new Map((profiles ?? []).map((p: any) => [p.id, p]));
+          }
+        }
+
+        // 4) Merge into a uniform participant shape
+        const merged: GameParticipant[] = filtered.map((p: any) => {
+          const prof = p.user_id ? profileMap.get(p.user_id) : null;
+          return {
+            user_id: p.user_id ?? null,
+            guest_name: p.guest_name ?? null,
+            role: p.role,
+            state: p.state,
+            display_name: prof?.display_name ?? p.guest_name ?? null,
+            username: prof?.username ?? null,
+            profile_photo_url: prof?.profile_photo_url ?? null,
+            home_club: prof?.home_club ?? null,
+            eg_handicap_index: prof?.eg_handicap_index ?? null,
+            show_handicap: prof?.show_handicap ?? null,
+            is_guest: !p.user_id,
+          };
+        });
+
+        return merged;
+      } catch (error) {
+        console.error('[useGameParticipants] unexpected error', error);
         return [];
       }
-
-      return (data || [])
-        .map((p: any) => ({
-          user_id: p.user_id ?? null,
-          role: p.role,
-          state: p.state,
-          display_name: p.user_profiles?.display_name || p.guest_name || 'Unknown',
-          username: p.user_profiles?.username,
-          profile_photo_url: p.user_profiles?.profile_photo_url,
-          eg_handicap_index: p.user_profiles?.eg_handicap_index,
-          show_handicap: p.user_profiles?.show_handicap,
-          home_club: p.user_profiles?.home_club,
-          guest_name: p.guest_name ?? null,
-          is_guest: !p.user_id,
-        }));
     },
     enabled: !!gameId,
     staleTime: 30_000,
