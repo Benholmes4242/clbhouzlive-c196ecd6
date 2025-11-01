@@ -75,6 +75,20 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className }: Ga
     setDateOpen(false);
   };
 
+  const setWeekend = () => {
+    const today = startOfDay(new Date());
+    const daysUntilSaturday = (6 - today.getDay() + 7) % 7 || 7;
+    const thisSaturday = addDays(today, daysUntilSaturday);
+    updateFilter('date', thisSaturday);
+  };
+
+  const setNextWeek = () => {
+    const today = startOfDay(new Date());
+    const daysUntilMonday = (8 - today.getDay()) % 7 || 7;
+    const nextMonday = addDays(today, daysUntilMonday);
+    updateFilter('date', nextMonday);
+  };
+
   const ChipButton = ({ 
     active, 
     onClick, 
@@ -103,12 +117,49 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className }: Ga
   );
 
   return (
-    <div className={cn('sticky top-0 z-10 bg-black/80 backdrop-blur-lg border-b border-white/[0.08]', className)}>
-      {/* Horizontal scroll container */}
+    <div className={cn('flex flex-col gap-2', className)}>
+      {/* Quick Date Chips Row */}
       <div className="overflow-x-auto no-scrollbar">
         <div className="flex items-center gap-2 px-3 py-2 min-w-max">
-          {/* Date Filter */}
-          <Sheet open={dateOpen} onOpenChange={setDateOpen}>
+          <ChipButton 
+            active={!filters.date} 
+            onClick={() => quickSetDate(null)}
+          >
+            All Games
+          </ChipButton>
+          <ChipButton 
+            active={!!filters.date && isSameDay(filters.date, new Date())} 
+            onClick={() => quickSetDate(0)}
+          >
+            Today
+          </ChipButton>
+          <ChipButton 
+            active={!!filters.date && isSameDay(filters.date, addDays(new Date(), 1))} 
+            onClick={() => quickSetDate(1)}
+          >
+            Tomorrow
+          </ChipButton>
+          <ChipButton 
+            active={!!filters.date && isThisWeekend(filters.date)} 
+            onClick={() => setWeekend()}
+          >
+            This Weekend
+          </ChipButton>
+          <ChipButton 
+            active={!!filters.date && isNextWeek(filters.date)} 
+            onClick={() => setNextWeek()}
+          >
+            Next Week
+          </ChipButton>
+        </div>
+      </div>
+
+      {/* Full Filter Bar */}
+      <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-lg border-b border-white/[0.08]">
+        <div className="overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-2 px-3 py-2 min-w-max">
+            {/* Date Filter with Calendar */}
+            <Sheet open={dateOpen} onOpenChange={setDateOpen}>
             <SheetTrigger asChild>
               <ChipButton active={!!filters.date} onClick={() => setDateOpen(true)} icon={Calendar}>
                 {getDateLabel()}
@@ -284,10 +335,31 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className }: Ga
               </div>
             </SheetContent>
           </Sheet>
+          </div>
         </div>
       </div>
     </div>
   );
+}
+
+// Helper functions for date chip logic
+function isThisWeekend(date: Date): boolean {
+  const day = date.getDay();
+  const today = startOfDay(new Date());
+  const daysUntilSaturday = (6 - today.getDay() + 7) % 7 || 7;
+  const thisSaturday = addDays(today, daysUntilSaturday);
+  const thisSunday = addDays(thisSaturday, 1);
+  
+  return isSameDay(date, thisSaturday) || isSameDay(date, thisSunday);
+}
+
+function isNextWeek(date: Date): boolean {
+  const today = startOfDay(new Date());
+  const daysUntilMonday = (8 - today.getDay()) % 7 || 7;
+  const nextMonday = addDays(today, daysUntilMonday);
+  const nextSunday = addDays(nextMonday, 6);
+  
+  return date >= nextMonday && date <= nextSunday;
 }
 
 // Helper to convert filters to query params

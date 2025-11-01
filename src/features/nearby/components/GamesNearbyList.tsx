@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { AnonymousGameCard } from './AnonymousGameCard';
 import { HostGameView } from './HostGameView';
 import { useGameJoinRequests } from '../hooks/useGameJoinRequests';
-import { ClubSearchInput } from './ClubSearchInput';
+import { SmartSearchInput } from '@/components/games/SmartSearchInput';
 import { GameFiltersBar, GameFilters, getTimeRangeFromFilters } from './GameFiltersBar';
 import { Button } from '@/components/ui/button';
 
@@ -172,8 +172,8 @@ export function GamesNearbyList({
     return (
       <div className="space-y-3 pb-4">
         <div>
-          <ClubSearchInput
-            onClubSelect={handleClubSelect}
+          <SmartSearchInput
+            onCourseSelect={handleClubSelect}
             onClear={handleClearSearch}
             selectedClub={selectedClub}
           />
@@ -314,8 +314,8 @@ export function GamesNearbyList({
 
       {/* SECTION 2: Find a Game (Search) */}
       <div>
-        <ClubSearchInput
-          onClubSelect={handleClubSelect}
+        <SmartSearchInput
+          onCourseSelect={handleClubSelect}
           onClear={handleClearSearch}
           selectedClub={selectedClub}
         />
