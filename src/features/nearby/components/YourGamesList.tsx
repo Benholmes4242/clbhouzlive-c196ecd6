@@ -18,7 +18,13 @@ export function YourGamesList({ onCancelGame, onLeaveGame, onCountChange }: Your
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchYourGames = useCallback(async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      setIsLoading(false);
+      setHostedGames([]);
+      setJoinedGames([]);
+      if (onCountChange) onCountChange(0);
+      return;
+    }
     
     setIsLoading(true);
     
