@@ -509,48 +509,50 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
   };
 
   const cancelBeacon = async (beaconId: string) => {
-    try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) {
-        toast({
-          title: 'Not authenticated',
-          description: 'Please sign in to cancel a game',
-          variant: 'destructive',
-        });
-        return;
-      }
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) {
+      toast({
+        title: 'Not authenticated',
+        description: 'Please sign in to cancel a game',
+        variant: 'destructive',
+      });
+      return;
+    }
 
+    // Optimistic update - remove immediately for instant feedback
+    const previousBeacon = myBeacon;
+    const previousNearby = [...nearbyBeacons];
+    
+    setMyBeacon(null);
+    setNearbyBeacons(prev => prev.filter(b => b.id !== beaconId));
+
+    try {
       const { error } = await supabase
         .from('games')
-        .update({ 
-          status: 'canceled',
-        })
+        .update({ status: 'canceled' })
         .eq('id', beaconId)
         .eq('host_user_id', user.user.id);
 
-      if (error) {
-        console.error('Error cancelling beacon:', error);
-        toast({
-          title: 'Failed to cancel game',
-          description: error.message,
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      // Optimistically update local state so UI updates instantly
-      setMyBeacon(null);
-      setNearbyBeacons(prev => prev.filter(b => b.id !== beaconId));
+      if (error) throw error;
 
       toast({
         title: 'Game cancelled',
         description: 'Your game is no longer visible',
       });
 
-      // Refetch to ensure we're synced
+      // Refetch to ensure sync
       await fetchBeacons();
     } catch (error) {
-      console.error('Error in cancelBeacon:', error);
+      // Rollback on error
+      setMyBeacon(previousBeacon);
+      setNearbyBeacons(previousNearby);
+      
+      console.error('Error cancelling beacon:', error);
+      toast({
+        title: 'Failed to cancel game',
+        description: error instanceof Error ? error.message : 'Please try again',
+        variant: 'destructive',
+      });
     }
   };
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GameBeacon } from '../hooks/useGameBeacon';
 import { useGameJoinRequests } from '../hooks/useGameJoinRequests';
 import { JoinRequestCard } from './JoinRequestCard';
@@ -7,6 +7,7 @@ import { format, parseISO } from 'date-fns';
 import { useGameParticipants } from '@/features/game/hooks/useGameParticipants';
 import { useNavigate } from 'react-router-dom';
 import { formatHcp } from '@/lib/formatHcp';
+import { TapButton } from '@/components/ui/TapButton';
 
 interface HostGameViewProps {
   game: GameBeacon;
@@ -17,6 +18,7 @@ export function HostGameView({ game, onCancelBeacon }: HostGameViewProps) {
   const { requests, acceptRequest, declineRequest } = useGameJoinRequests(game.id);
   const { data: participants = [] } = useGameParticipants(game.id);
   const navigate = useNavigate();
+  const [isCancelling, setIsCancelling] = useState(false);
 
   const formatStartTime = (startTime: string) => {
     const date = parseISO(startTime);
@@ -92,12 +94,18 @@ export function HostGameView({ game, onCancelBeacon }: HostGameViewProps) {
           </div>
 
           {/* Cancel button */}
-          <button
-            onClick={() => onCancelBeacon(game.id)}
-            className="w-full rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-[12px] font-medium px-3 py-2 hover:bg-red-500/15 transition-all"
+          <TapButton
+            onClick={async () => {
+              setIsCancelling(true);
+              await onCancelBeacon(game.id);
+              setIsCancelling(false);
+            }}
+            disabled={isCancelling}
+            className="w-full rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-[12px] font-medium px-3 py-2 hover:bg-red-500/15 transition-all disabled:opacity-50"
+            aria-label="Cancel game"
           >
-            Cancel Game
-          </button>
+            {isCancelling ? 'Cancelling…' : 'Cancel Game'}
+          </TapButton>
         </div>
       </div>
 

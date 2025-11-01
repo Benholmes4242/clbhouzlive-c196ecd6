@@ -8,6 +8,7 @@ import { GameVisibilitySelector } from './GameVisibilitySelector';
 import type { GameVisibility } from '../types';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
+import { TapButton } from '@/components/ui/TapButton';
 
 // Format game type for display
 function formatGameTypeDisplay(gameType: string): string {
@@ -339,13 +340,13 @@ export function CreateGameModal({
             
             {/* Close button */}
             <div className="flex justify-end">
-              <button
+              <TapButton
                 onClick={onClose}
                 className="text-white/60 hover:text-white/90 transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
                 aria-label="Close"
               >
                 <X className="w-5 h-5" />
-              </button>
+              </TapButton>
             </div>
           </div>
           
@@ -397,13 +398,13 @@ export function CreateGameModal({
                 </div>
               </div>
               
-              <button
+              <TapButton
                 onClick={handleCancel}
                 disabled={isSubmitting}
                 className="w-full py-3 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl font-medium transition-colors disabled:opacity-50"
               >
                 {isSubmitting ? 'Cancelling...' : 'Cancel Game'}
-              </button>
+              </TapButton>
             </div>
           ) : (
             // Create new beacon form
@@ -415,7 +416,7 @@ export function CreateGameModal({
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {GAME_TYPES.map(type => (
-                    <button
+                    <TapButton
                       key={type.value}
                       onClick={() => setGameType(type.value)}
                       className={`py-3 px-4 rounded-xl font-medium transition-all backdrop-blur ${
@@ -425,7 +426,7 @@ export function CreateGameModal({
                       }`}
                     >
                       {type.label}
-                    </button>
+                    </TapButton>
                   ))}
                 </div>
               </div>
@@ -465,7 +466,7 @@ export function CreateGameModal({
                     />
                     <div className="absolute z-20 w-full mt-1 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto backdrop-blur-xl">
                       {courses.map((course) => (
-                        <button
+                        <TapButton
                           key={course.id}
                           onClick={() => handleCourseSelect(course)}
                           className="w-full text-left px-4 py-3 hover:bg-neutral-800 transition-colors border-b border-neutral-800 last:border-b-0"
@@ -476,7 +477,7 @@ export function CreateGameModal({
                               {course.region}, {course.country}
                             </div>
                           )}
-                        </button>
+                        </TapButton>
                       ))}
                     </div>
                   </>
@@ -512,7 +513,7 @@ export function CreateGameModal({
                 </label>
                 <div className="grid grid-cols-4 gap-2">
                   {TIMING_OPTIONS.map(option => (
-                    <button
+                    <TapButton
                       key={option.value}
                       onClick={() => handleTimingChange(option.value)}
                       className={`py-2 px-3 rounded-lg text-sm font-medium transition-all backdrop-blur ${
@@ -522,7 +523,7 @@ export function CreateGameModal({
                       }`}
                     >
                       {option.label}
-                    </button>
+                    </TapButton>
                   ))}
                 </div>
                 {timing === 'choose' && customDateTime && (
@@ -560,7 +561,7 @@ export function CreateGameModal({
                     {[1, 2, 3].map(num => {
                       const isDisabled = num > maxAvailableSlots;
                       return (
-                        <button
+                        <TapButton
                           key={num}
                           onClick={() => !isDisabled && setAvailableSlots(num)}
                           disabled={isDisabled}
@@ -573,7 +574,7 @@ export function CreateGameModal({
                           }`}
                         >
                           {num}
-                        </button>
+                        </TapButton>
                       );
                     })}
                   </div>
@@ -597,13 +598,13 @@ export function CreateGameModal({
                 </div>
               )}
 
-              <button
+              <TapButton
                 onClick={handleSubmit}
                 disabled={!gameType || isSubmitting}
                 className="w-full py-3 px-4 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Creating...' : 'Start Game'}
-              </button>
+              </TapButton>
             </>
           )}
         </div>
