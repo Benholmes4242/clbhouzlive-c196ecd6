@@ -92,24 +92,28 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
 
   return (
     <>
+      {/* Backdrop - pointer events disabled */}
       <div
-        className="fixed inset-0 z-[9999] flex items-end sm:items-center sm:justify-center animate-fade-in"
+        className="fixed inset-0 z-[9999] pointer-events-none"
         style={{
           backgroundColor: 'rgba(0,0,0,0.65)',
           WebkitBackdropFilter: 'blur(8px)',
           backdropFilter: 'blur(8px)',
-          overscrollBehavior: 'none',
-          touchAction: 'none',
-          pointerEvents: 'auto',
         }}
+      />
+      
+      {/* Click catcher for close-on-backdrop */}
+      <button
+        aria-label="close"
+        className="fixed inset-0 z-[9999]"
         onClick={handleClose}
-        onTouchStart={(e) => e.stopPropagation()}
-        onTouchMove={(e) => e.stopPropagation()}
-        onTouchEnd={(e) => e.stopPropagation()}
-      >
+      />
+
+      {/* Modal container */}
+      <div className="fixed inset-0 z-[9999] flex items-end sm:items-center sm:justify-center animate-fade-in pointer-events-none">
         {/* Modal */}
         <div 
-          className="relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200"
+          className="relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200 pointer-events-auto"
           style={{
             height: 'calc(100vh - env(safe-area-inset-top))',
             maxHeight: '100vh',
@@ -121,12 +125,8 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             border: '1px solid rgba(255, 255, 255, 0.08)',
             borderRadius: '0',
             boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9)',
-            pointerEvents: 'auto',
           }}
           onClick={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
-          onTouchMove={(e) => e.stopPropagation()}
-          onTouchEnd={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div className="px-5 pt-4">
@@ -322,8 +322,8 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             />
           )}
         </div>
+        </div>
       </div>
-    </div>
       
       {/* Create Game Modal - Rendered outside NearbyOverlay but at higher z-index */}
       {isCreateGameOpen && (

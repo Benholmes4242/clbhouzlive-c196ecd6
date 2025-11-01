@@ -155,7 +155,7 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className }: Ga
       </div>
 
       {/* Full Filter Bar */}
-      <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-lg border-b border-white/[0.08]">
+      <div className="relative z-0 bg-transparent border-b border-white/[0.08]">
         <div className="overflow-x-auto no-scrollbar">
           <div className="flex items-center gap-2 px-3 py-2 min-w-max">
             {/* Date Filter with Calendar */}

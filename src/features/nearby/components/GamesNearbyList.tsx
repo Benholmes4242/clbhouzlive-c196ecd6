@@ -224,30 +224,47 @@ export function GamesNearbyList({
 
   return (
     <div className="space-y-3 pb-4">
-      {/* Filters Bar */}
-      <GameFiltersBar
-        filters={currentFilters}
-        onFiltersChange={onFiltersChange}
-        mode={mode}
-        className="px-2"
-      />
-
-      {/* Scope Label */}
-      <div className="px-2">
-        <p className="text-xs text-neutral-400 text-center">
-          {getScopeLabel()}
+      {/* SECTION 1: Create a Game CTA */}
+      <div className="text-center space-y-3 flex flex-col items-center">
+        <p className="text-xs text-white/60">
+          Can't find a game that suits you?
         </p>
+        <button
+          onClick={() => onCreateGame(selectedClub)}
+          className="px-6 py-2.5 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all"
+        >
+          Create a Game
+        </button>
       </div>
 
       {/* Divider */}
       <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-      {/* SECTION 1: Discoverable Games */}
+      {/* SECTION 2: Find a Game (Search) */}
+      <div>
+        <SmartSearchInput
+          onCourseSelect={handleClubSelect}
+          onClear={handleClearSearch}
+          selectedClub={selectedClub}
+        />
+      </div>
+
+      {/* Divider */}
+      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+      {/* SECTION 3: Discoverable Games */}
       <div className="space-y-3">
         <div className="px-2 text-center">
           <h3 className="text-sm font-semibold text-white/95">
             {selectedClub ? `Games at ${selectedClub.name}` : 'Games Near You'}
           </h3>
+        </div>
+
+        {/* Scope Label */}
+        <div className="px-2">
+          <p className="text-xs text-neutral-400 text-center">
+            {getScopeLabel()}
+          </p>
         </div>
 
         {/* Loading state */}
@@ -309,32 +326,16 @@ export function GamesNearbyList({
         )}
       </div>
 
-      {/* Subtle divider */}
+      {/* Divider before filters */}
       <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-      {/* SECTION 2: Find a Game (Search) */}
-      <div>
-        <SmartSearchInput
-          onCourseSelect={handleClubSelect}
-          onClear={handleClearSearch}
-          selectedClub={selectedClub}
+      {/* SECTION 4: Filters Bar (moved to bottom, horizontal scroll) */}
+      <div className="overflow-x-auto no-scrollbar -mx-3 px-3">
+        <GameFiltersBar
+          filters={currentFilters}
+          onFiltersChange={onFiltersChange}
+          mode={mode}
         />
-      </div>
-
-      {/* Subtle divider before CTA */}
-      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-      {/* SECTION 3: Create a Game CTA - Centered */}
-      <div className="text-center space-y-3 flex flex-col items-center">
-        <p className="text-xs text-white/60">
-          Can't find a game that suits you?
-        </p>
-        <button
-          onClick={() => onCreateGame(selectedClub)}
-          className="px-6 py-2.5 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all"
-        >
-          Create a Game
-        </button>
       </div>
     </div>
   );

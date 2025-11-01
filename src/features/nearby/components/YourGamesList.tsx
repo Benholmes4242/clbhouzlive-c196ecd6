@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Game } from '../types';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -17,7 +17,7 @@ export function YourGamesList({ onCancelGame, onLeaveGame, onCountChange }: Your
   const [joinedGames, setJoinedGames] = useState<Game[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchYourGames = async () => {
+  const fetchYourGames = useCallback(async () => {
     if (!user?.id) return;
     
     setIsLoading(true);
@@ -31,7 +31,7 @@ export function YourGamesList({ onCancelGame, onLeaveGame, onCountChange }: Your
         .select('id, course_name, course_id, start_time, expires_at, status, slots_open, slots_total, note, created_at, host_user_id, visibility, updated_at')
         .eq('host_user_id', user.id)
         .eq('status', 'active')
-        .gt('expires_at', nowIso) // Use gt instead of gte
+        .gt('expires_at', nowIso)
         .order('start_time', { ascending: true });
 
       if (hostedError) {
@@ -61,7 +61,7 @@ export function YourGamesList({ onCancelGame, onLeaveGame, onCountChange }: Your
         `)
         .eq('user_id', user.id)
         .eq('games.status', 'active')
-        .gt('games.expires_at', nowIso); // Use gt instead of gte
+        .gt('games.expires_at', nowIso);
 
       if (participantsError) {
         console.error('Error fetching joined games:', participantsError);
@@ -105,11 +105,11 @@ export function YourGamesList({ onCancelGame, onLeaveGame, onCountChange }: Your
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.id, onCountChange]);
 
   useEffect(() => {
     fetchYourGames();
-  }, [user?.id]);
+  }, [fetchYourGames]);
 
   // Listen for game-created events to trigger immediate refetch
   useEffect(() => {
