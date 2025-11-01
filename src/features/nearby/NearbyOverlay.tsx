@@ -6,7 +6,7 @@ import { GolferRow } from './components/GolferRow';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useGameBeacon } from './hooks/useGameBeacon';
 import { CreateGameModal } from './components/CreateGameModal';
-import { GamesNearbyList } from './components/GamesNearbyList';
+import { GamesTab } from './GamesTab';
 import { YourGamesList } from './components/YourGamesList';
 import { useVisibility } from './hooks/useVisibility';
 import { useOpenToPlay } from './hooks/useOpenToPlay';
@@ -14,7 +14,6 @@ import { useLocationBroadcast } from './hooks/useLocationBroadcast';
 import { VisibilitySegmentedControl } from './components/VisibilitySegmentedControl';
 import { OpenToPlayButton } from './components/OpenToPlayButton';
 import { supabase } from '@/integrations/supabase/client';
-import { GameFilters, getTimeRangeFromFilters } from './components/GameFiltersBar';
 
 interface NearbyOverlayProps {
   isOpen: boolean;
@@ -25,33 +24,11 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   const overlayRef = React.useRef<HTMLDivElement>(null);
   const { golfers, isLoading } = useActiveGolfers({ limit: 20, mockCount: 0 });
   
-  // Initialize game filters
-  const [gameFilters, setGameFilters] = useState<GameFilters>({
-    date: null,
-    timeWindow: 'any',
-    radiusKm: 10,
-    sortBy: 'soonest',
-  });
-
-  // Convert filters to discovery format
-  const timeRange = getTimeRangeFromFilters(gameFilters);
-  const discoveryFilters = {
-    dateFrom: timeRange?.from,
-    dateTo: timeRange?.to,
-    radiusMeters: gameFilters.radiusKm * 1000,
-    sortBy: gameFilters.sortBy,
-  };
-
   const { 
     myBeacon, 
-    nearbyBeacons, 
-    isLoading: beaconsLoading,
-    hasMore,
-    loadMore,
     createBeacon,
     cancelBeacon,
-    joinBeacon,
-  } = useGameBeacon(discoveryFilters);
+  } = useGameBeacon({});
   
   const { visibilityMode, setVisibilityMode, loading: visibilityLoading } = useVisibility();
   
@@ -247,23 +224,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               </div>
             )
           ) : activeTab === 'games' ? (
-            <GamesNearbyList
-              beacons={nearbyBeacons}
-              isLoading={beaconsLoading}
-              hasMore={hasMore}
-              onLoadMore={loadMore}
-              onJoinBeacon={joinBeacon}
-              onCancelBeacon={cancelBeacon}
-              onCreateGame={(clubData) => {
-                if (clubData) {
-                  setPrefilledClub(clubData);
-                }
-                setIsCreateGameOpen(true);
-              }}
-              onFiltersChange={setGameFilters}
-              currentFilters={gameFilters}
-              portalContainer={overlayRef.current}
-            />
+            <GamesTab onOpenCreate={() => setIsCreateGameOpen(true)} />
           ) : (
             <YourGamesList
               onCancelGame={cancelBeacon}

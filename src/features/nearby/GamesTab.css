@@ -1,0 +1,336 @@
+.gamesTab {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding-bottom: 20px;
+}
+
+/* Create Game CTA */
+.ctaHero {
+  width: 74%;
+  height: 44px;
+  margin: 10px auto 18px;
+  border-radius: 16px;
+  background: #2a2a2a;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px #3a3a3a, 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: transform 0.08s ease;
+}
+
+.ctaHero:active {
+  transform: scale(0.97);
+}
+
+/* Find a Game */
+.findBlock {
+  margin: 6px 12px 10px;
+}
+
+.findLabel {
+  color: #cfcfcf;
+  display: block;
+  margin: 4px 2px 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: #141414;
+  box-shadow: inset 0 0 0 1px #262626;
+}
+
+.searchBox .glass {
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+.searchBox input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  color: #eaeaea;
+  outline: none;
+  font-size: 15px;
+}
+
+.searchBox input::placeholder {
+  color: #757575;
+}
+
+.resultsSheet {
+  margin-top: 10px;
+  border-radius: 16px;
+  background: #111;
+  box-shadow: inset 0 0 0 1px #222, 0 10px 20px rgba(0, 0, 0, 0.35);
+  max-height: 42vh;
+  overflow: auto;
+  padding: 8px;
+}
+
+.resultsSheet .hint {
+  padding: 16px;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+
+.resultRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #171717;
+  box-shadow: inset 0 0 0 1px #2a2a2a;
+  color: #ddd;
+  text-align: left;
+  margin-bottom: 8px;
+  transition: background 0.08s ease;
+}
+
+.resultRow:active {
+  background: #1f1f1f;
+}
+
+.resultRow .pin {
+  font-size: 18px;
+}
+
+.resultRow .rMid {
+  flex: 1;
+}
+
+.resultRow .rTitle {
+  color: #eaeaea;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.resultRow .rSub {
+  color: #999;
+  font-size: 13px;
+}
+
+.selectedClub {
+  margin: 10px 4px 8px;
+  color: #bdbdbd;
+  font-size: 14px;
+}
+
+.clubPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: #141414;
+  box-shadow: inset 0 0 0 1px #262626;
+  color: #e8e8e8;
+  margin-top: 6px;
+}
+
+.clubPill .clubName {
+  font-weight: 600;
+}
+
+.clubPill .x {
+  background: #1d1d1d;
+  border-radius: 8px;
+  padding: 0 6px;
+  color: #aaa;
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Filters Row */
+.chips {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chip {
+  height: 36px;
+  border-radius: 12px;
+  padding: 0 12px;
+  background: #171717;
+  color: #ddd;
+  box-shadow: inset 0 0 0 1px #2b2b2b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: background 0.08s ease;
+}
+
+.chip:active {
+  background: #1f1f1f;
+}
+
+.chipLabel {
+  font-size: 14px;
+}
+
+.chipValue {
+  color: #9fc0a7;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* Scoped Heading */
+.scopedHeading {
+  padding: 12px 12px 8px;
+  color: #e5e5e5;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+/* Games List */
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.gameCard {
+  border-radius: 16px;
+  background: #101010;
+  box-shadow: inset 0 0 0 1px #222, 0 2px 12px rgba(0, 0, 0, 0.35);
+  padding: 12px;
+  margin: 10px 12px;
+}
+
+.gcTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.gcTitle {
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.gcDistance {
+  color: #a0a0a0;
+  font-size: 13px;
+}
+
+.gcMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  color: #bdbdbd;
+  font-size: 13px;
+}
+
+.gcMeta .m {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #171717;
+  box-shadow: inset 0 0 0 1px #2a2a2a;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge.ok {
+  color: #cfe8d6;
+  background: #162219;
+  box-shadow: inset 0 0 0 1px #325a3e;
+}
+
+.badge.full {
+  color: #e0c2c2;
+  background: #2a1a1a;
+  box-shadow: inset 0 0 0 1px #4a2e2e;
+}
+
+.gcActions {
+  margin-top: 10px;
+}
+
+.gcActions .primary {
+  width: 100%;
+  height: 40px;
+  border-radius: 12px;
+  background: #1f2621;
+  color: #e7f3ea;
+  box-shadow: inset 0 0 0 1px #335a3f;
+  font-weight: 700;
+  transition: transform 0.08s ease, opacity 0.08s ease;
+}
+
+.gcActions .primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.gcActions .primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Empty State */
+.empty {
+  text-align: center;
+  color: #bdbdbd;
+  padding: 28px 16px 40px;
+}
+
+.empty .emoji {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.empty .title {
+  color: #e5e5e5;
+  font-weight: 700;
+  margin: 6px 0;
+  font-size: 18px;
+}
+
+.empty .sub {
+  color: #999;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.empty .sub strong {
+  color: #bdbdbd;
+}
+
+/* Skeleton Loading */
+.gameCard.skeleton {
+  opacity: 0.6;
+}
+
+.skeletonLine {
+  height: 16px;
+  background: linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
