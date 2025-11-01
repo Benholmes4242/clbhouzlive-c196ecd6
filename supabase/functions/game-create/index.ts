@@ -30,8 +30,11 @@ Deno.serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
+      console.error('Auth error:', authError);
       throw new Error('Unauthorized');
     }
+
+    console.log('Authenticated user ID:', user.id);
 
     const {
       course_id,
@@ -66,22 +69,26 @@ Deno.serve(async (req) => {
     const expires_at = new Date(start.getTime() + 2 * 60 * 60 * 1000);
 
     // Create the game
+    const insertPayload = {
+      host_user_id: user.id,
+      course_id,
+      course_name,
+      start_time,
+      expires_at: expires_at.toISOString(),
+      slots_total,
+      slots_open,
+      note,
+      lat,
+      lng,
+      status: 'active',
+      visibility: visibility || 'public'
+    };
+    
+    console.log('Inserting game with payload:', { ...insertPayload, host_user_id: user.id });
+    
     const { data: game, error: gameError } = await supabase
       .from('games')
-      .insert({
-        host_user_id: user.id,
-        course_id,
-        course_name,
-        start_time,
-        expires_at: expires_at.toISOString(),
-        slots_total,
-        slots_open,
-        note,
-        lat,
-        lng,
-        status: 'active',
-        visibility: visibility || 'public'
-      })
+      .insert(insertPayload)
       .select()
       .single();
 
