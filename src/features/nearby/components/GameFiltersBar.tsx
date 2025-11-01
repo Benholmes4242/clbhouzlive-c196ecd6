@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Calendar, Clock, Users, MapPin, ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { format, startOfDay, endOfDay, addDays, isSameDay } from 'date-fns';
+import { format, startOfDay, addDays, isSameDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -47,12 +47,17 @@ const SORT_OPTIONS = [
 ];
 
 export function GameFiltersBar({ filters, onFiltersChange, mode, className }: GameFiltersBarProps) {
+  const [dateOpen, setDateOpen] = useState(false);
+  const [timeOpen, setTimeOpen] = useState(false);
+  const [radiusOpen, setRadiusOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
+
   const updateFilter = <K extends keyof GameFilters>(key: K, value: GameFilters[K]) => {
     onFiltersChange({ ...filters, [key]: value });
   };
 
   const getDateLabel = () => {
-    if (!filters.date) return 'Any Date';
+    if (!filters.date) return 'Date';
     const today = startOfDay(new Date());
     const tomorrow = addDays(today, 1);
     
@@ -67,144 +72,220 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className }: Ga
     } else {
       updateFilter('date', addDays(startOfDay(new Date()), days));
     }
+    setDateOpen(false);
   };
 
-  return (
-    <div className={cn('flex flex-wrap items-center gap-2', className)}>
-      {/* Date Filter */}
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant={filters.date ? 'default' : 'outline'}
-            size="sm"
-            className="h-8 gap-2"
-          >
-            <Calendar className="h-3.5 w-3.5" />
-            <span className="text-xs font-medium">{getDateLabel()}</span>
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <div className="flex flex-col gap-2 p-3">
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => quickSetDate(null)}
-                className="flex-1"
-              >
-                Any Date
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => quickSetDate(0)}
-                className="flex-1"
-              >
-                Today
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => quickSetDate(1)}
-                className="flex-1"
-              >
-                Tomorrow
-              </Button>
-            </div>
-            <div className="border-t pt-2">
-              <CalendarComponent
-                mode="single"
-                selected={filters.date || undefined}
-                onSelect={(date) => updateFilter('date', date || null)}
-                disabled={(date) => date < startOfDay(new Date())}
-                initialFocus
-                className="pointer-events-auto"
-              />
-            </div>
-          </div>
-        </PopoverContent>
-      </Popover>
-
-      {/* Time Window Filter */}
-      <div className="flex gap-1">
-        {TIME_WINDOWS.map((tw) => (
-          <Button
-            key={tw.value}
-            variant={filters.timeWindow === tw.value ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => updateFilter('timeWindow', tw.value)}
-            className="h-8 px-3"
-          >
-            <span className="text-xs font-medium">{tw.label}</span>
-          </Button>
-        ))}
-      </div>
-
-      {/* Hide Full Games Toggle */}
-      <div className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5">
-        <Switch
-          id="hide-full"
-          checked={filters.hideFullGames}
-          onCheckedChange={(checked) => updateFilter('hideFullGames', checked)}
-          className="scale-75"
-        />
-        <Label htmlFor="hide-full" className="text-xs font-medium cursor-pointer">
-          Hide Full
-        </Label>
-      </div>
-
-      {/* Radius Filter (Nearby mode only) */}
-      {mode === 'nearby' && (
-        <div className="flex gap-1">
-          {RADIUS_OPTIONS.map((opt) => (
-            <Button
-              key={opt.value}
-              variant={filters.radiusKm === opt.value ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => updateFilter('radiusKm', opt.value as 5 | 10 | 25)}
-              className="h-8 px-3"
-            >
-              <MapPin className="h-3.5 w-3.5 mr-1" />
-              <span className="text-xs font-medium">{opt.label}</span>
-            </Button>
-          ))}
-        </div>
+  const ChipButton = ({ 
+    active, 
+    onClick, 
+    children, 
+    icon: Icon 
+  }: { 
+    active?: boolean; 
+    onClick: () => void; 
+    children: React.ReactNode; 
+    icon?: React.ElementType;
+  }) => (
+    <button
+      onClick={onClick}
+      className={cn(
+        "h-8 px-3.5 rounded-2xl font-medium text-[13px] transition-all duration-200",
+        "flex items-center gap-1.5 whitespace-nowrap",
+        "active:scale-95",
+        active 
+          ? "bg-gradient-to-br from-[#6E9277] to-[#89A78C] text-white shadow-lg" 
+          : "bg-white/[0.08] text-white/65 hover:bg-white/[0.15] hover:text-white/85"
       )}
+    >
+      {Icon && <Icon className="h-3.5 w-3.5" />}
+      {children}
+    </button>
+  );
 
-      {/* Sort Options */}
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 gap-2 ml-auto"
+  return (
+    <div className={cn('sticky top-0 z-10 bg-black/80 backdrop-blur-lg border-b border-white/[0.08]', className)}>
+      {/* Horizontal scroll container */}
+      <div className="overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-2 px-3 py-2 min-w-max">
+          {/* Date Filter */}
+          <Sheet open={dateOpen} onOpenChange={setDateOpen}>
+            <SheetTrigger asChild>
+              <ChipButton active={!!filters.date} onClick={() => setDateOpen(true)} icon={Calendar}>
+                {getDateLabel()}
+              </ChipButton>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="pb-8">
+              <SheetHeader>
+                <SheetTitle>Choose when you'd like to play</SheetTitle>
+              </SheetHeader>
+              <div className="mt-6 space-y-4">
+                <div className="grid grid-cols-3 gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => quickSetDate(null)}
+                    className="h-10"
+                  >
+                    Any Date
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => quickSetDate(0)}
+                    className="h-10"
+                  >
+                    Today
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => quickSetDate(1)}
+                    className="h-10"
+                  >
+                    Tomorrow
+                  </Button>
+                </div>
+                <div className="flex justify-center">
+                  <CalendarComponent
+                    mode="single"
+                    selected={filters.date || undefined}
+                    onSelect={(date) => {
+                      updateFilter('date', date || null);
+                      if (date) setDateOpen(false);
+                    }}
+                    disabled={(date) => date < startOfDay(new Date())}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          {/* Time Window Filter */}
+          <Sheet open={timeOpen} onOpenChange={setTimeOpen}>
+            <SheetTrigger asChild>
+              <ChipButton active={filters.timeWindow !== 'any'} onClick={() => setTimeOpen(true)} icon={Clock}>
+                {TIME_WINDOWS.find(tw => tw.value === filters.timeWindow)?.label || 'Time'}
+              </ChipButton>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="pb-8">
+              <SheetHeader>
+                <SheetTitle>Select a time window</SheetTitle>
+              </SheetHeader>
+              <div className="mt-6 space-y-2">
+                {TIME_WINDOWS.map((tw) => (
+                  <button
+                    key={tw.value}
+                    onClick={() => {
+                      updateFilter('timeWindow', tw.value);
+                      setTimeOpen(false);
+                    }}
+                    className={cn(
+                      "w-full h-12 px-4 rounded-lg font-medium text-sm transition-all",
+                      "flex items-center justify-between",
+                      filters.timeWindow === tw.value
+                        ? "bg-gradient-to-br from-[#6E9277] to-[#89A78C] text-white"
+                        : "bg-white/[0.06] text-white/80 hover:bg-white/[0.10]"
+                    )}
+                  >
+                    <span>{tw.label}</span>
+                    {tw.hours && <span className="text-xs opacity-70">{tw.hours}</span>}
+                  </button>
+                ))}
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          {/* Hide Full Games Toggle */}
+          <button
+            onClick={() => updateFilter('hideFullGames', !filters.hideFullGames)}
+            className={cn(
+              "h-8 px-3.5 rounded-2xl font-medium text-[13px] transition-all duration-200",
+              "flex items-center gap-1.5 whitespace-nowrap uppercase tracking-wide",
+              "active:scale-95",
+              filters.hideFullGames
+                ? "bg-gradient-to-br from-[#6E9277] to-[#89A78C] text-white shadow-lg"
+                : "bg-white/[0.08] text-white/65 hover:bg-white/[0.15] hover:text-white/85"
+            )}
           >
-            <ArrowUpDown className="h-3.5 w-3.5" />
-            <span className="text-xs font-medium">
-              {SORT_OPTIONS.find((s) => s.value === filters.sortBy)?.label}
-            </span>
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-48 p-2" align="end">
-          <div className="flex flex-col gap-1">
-            {SORT_OPTIONS.map((opt) => {
-              const Icon = opt.icon;
-              return (
-                <Button
-                  key={opt.value}
-                  variant={filters.sortBy === opt.value ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => updateFilter('sortBy', opt.value)}
-                  className="justify-start gap-2"
-                >
-                  <Icon className="h-4 w-4" />
-                  <span>{opt.label}</span>
-                </Button>
-              );
-            })}
-          </div>
-        </PopoverContent>
-      </Popover>
+            <Users className="h-3.5 w-3.5" />
+            Hide Full
+          </button>
+
+          {/* Radius Filter (Nearby mode only) */}
+          {mode === 'nearby' && (
+            <Sheet open={radiusOpen} onOpenChange={setRadiusOpen}>
+              <SheetTrigger asChild>
+                <ChipButton active onClick={() => setRadiusOpen(true)} icon={MapPin}>
+                  {filters.radiusKm} km
+                </ChipButton>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="pb-8">
+                <SheetHeader>
+                  <SheetTitle>How far are you willing to travel?</SheetTitle>
+                </SheetHeader>
+                <div className="mt-6 space-y-2">
+                  {RADIUS_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => {
+                        updateFilter('radiusKm', opt.value as 5 | 10 | 25);
+                        setRadiusOpen(false);
+                      }}
+                      className={cn(
+                        "w-full h-12 px-4 rounded-lg font-medium text-sm transition-all",
+                        "flex items-center gap-2",
+                        filters.radiusKm === opt.value
+                          ? "bg-gradient-to-br from-[#6E9277] to-[#89A78C] text-white"
+                          : "bg-white/[0.06] text-white/80 hover:bg-white/[0.10]"
+                      )}
+                    >
+                      <MapPin className="h-4 w-4" />
+                      <span>{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </SheetContent>
+            </Sheet>
+          )}
+
+          {/* Sort Options */}
+          <Sheet open={sortOpen} onOpenChange={setSortOpen}>
+            <SheetTrigger asChild>
+              <ChipButton onClick={() => setSortOpen(true)} icon={ArrowUpDown}>
+                {SORT_OPTIONS.find((s) => s.value === filters.sortBy)?.label}
+              </ChipButton>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="pb-8">
+              <SheetHeader>
+                <SheetTitle>Order your results</SheetTitle>
+              </SheetHeader>
+              <div className="mt-6 space-y-2">
+                {SORT_OPTIONS.map((opt) => {
+                  const Icon = opt.icon;
+                  return (
+                    <button
+                      key={opt.value}
+                      onClick={() => {
+                        updateFilter('sortBy', opt.value);
+                        setSortOpen(false);
+                      }}
+                      className={cn(
+                        "w-full h-12 px-4 rounded-lg font-medium text-sm transition-all",
+                        "flex items-center gap-2",
+                        filters.sortBy === opt.value
+                          ? "bg-gradient-to-br from-[#6E9277] to-[#89A78C] text-white"
+                          : "bg-white/[0.06] text-white/80 hover:bg-white/[0.10]"
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{opt.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
     </div>
   );
 }
