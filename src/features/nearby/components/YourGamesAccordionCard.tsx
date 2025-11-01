@@ -114,8 +114,12 @@ export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: Y
               <div className="space-y-2">
                 {participants.map((p) => (
                   <button
-                    key={p.user_id}
-                    onClick={() => navigate(`/profile/${p.username || p.user_id}`)}
+                    key={p.user_id || `guest:${p.display_name}`}
+                    onClick={() => {
+                      if (p.username || p.user_id) {
+                        navigate(`/profile/${p.username || p.user_id}`);
+                      }
+                    }}
                     className="w-full flex items-center gap-3 p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all text-left"
                   >
                     <Avatar className="w-10 h-10">
