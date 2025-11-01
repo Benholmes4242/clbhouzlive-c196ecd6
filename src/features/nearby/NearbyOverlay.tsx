@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus } from 'lucide-react';
+import { TapButton } from '@/components/ui/TapButton';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { GolferRow } from './components/GolferRow';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -11,6 +12,7 @@ import { useVisibility } from './hooks/useVisibility';
 import { useOpenToPlay } from './hooks/useOpenToPlay';
 import { useLocationBroadcast } from './hooks/useLocationBroadcast';
 import { VisibilitySegmentedControl } from './components/VisibilitySegmentedControl';
+import { OpenToPlayButton } from './components/OpenToPlayButton';
 import { supabase } from '@/integrations/supabase/client';
 import { GameFilters, getTimeRangeFromFilters } from './components/GameFiltersBar';
 
@@ -52,7 +54,6 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   } = useGameBeacon(discoveryFilters);
   
   const { visibilityMode, setVisibilityMode, loading: visibilityLoading } = useVisibility();
-  const { isOpen: isOpenToPlay, remainingText, activate: activateOpen, cancel: cancelOpen } = useOpenToPlay();
   
   // Continuously broadcast location when visibility is active
   useLocationBroadcast();
@@ -78,14 +79,6 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
     onClose();
   };
 
-
-  const handleOpenToPlayToggle = () => {
-    if (isOpenToPlay) {
-      cancelOpen();
-    } else {
-      activateOpen();
-    }
-  };
 
   if (!isOpen) return null;
 
@@ -148,66 +141,26 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               
               {/* Close button */}
               <div className="flex justify-end">
-                <button
-                  onClick={handleClose}
+                <TapButton
+                  onPointerDown={handleClose}
                   className="text-white/60 hover:text-white/90 transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
                   aria-label="Close"
                 >
                   <X className="w-5 h-5" />
-                </button>
+                </TapButton>
               </div>
             </div>
 
             {/* Visibility Control */}
-            <div className="w-full">
+            <div className="w-full mb-1">
               <VisibilitySegmentedControl 
                 value={visibilityMode}
                 onChange={setVisibilityMode}
               />
             </div>
 
-            {/* Divider */}
-            <div className="w-full mt-3 mb-3" style={{ height: '1px', background: 'rgba(255,255,255,0.08)' }} />
-
-            {/* Open to Play toggle pill */}
-            <div className="flex flex-col items-center gap-1">
-              <button
-                onClick={handleOpenToPlayToggle}
-                className={`
-                  relative inline-flex items-center gap-2 rounded-full px-3.5 py-2 font-semibold text-white
-                  transition-all duration-200 active:scale-[0.96]
-                  ${isOpenToPlay 
-                    ? 'border' 
-                    : 'bg-white/[0.07] border border-white/20 hover:bg-white/[0.1]'
-                  }
-                `}
-                style={isOpenToPlay ? {
-                  background: 'rgba(110, 146, 119, 0.28)',
-                  borderColor: 'rgba(110, 146, 119, 0.5)',
-                  boxShadow: '0 0 16px rgba(110, 146, 119, 0.45)',
-                } : undefined}
-              >
-                <span className="relative text-[14px]">
-                  🏌
-                  {isOpenToPlay && (
-                    <span 
-                      className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-green-400 rounded-full border border-white/30 animate-in fade-in scale-in duration-200" 
-                    />
-                  )}
-                </span>
-                <span className="text-[13px]">
-                  Open to Play
-                </span>
-                {isOpenToPlay && remainingText && (
-                  <span className="text-[11px] text-white/70">
-                    • {remainingText}
-                  </span>
-                )}
-              </button>
-              <div className="text-[13px] text-white/60 text-center max-w-[260px] leading-relaxed">
-                Tap Open to Play to let golfers know you're free right now for a game.
-              </div>
-            </div>
+            {/* Open to Play Button */}
+            <OpenToPlayButton />
           </div>
 
           {/* Tabs */}

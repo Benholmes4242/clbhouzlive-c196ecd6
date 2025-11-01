@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { TapButton } from '@/components/ui/TapButton';
+import { haptic } from '@/utils/haptics';
 import { useOpenToPlay } from '../hooks/useOpenToPlay';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 export function OpenToPlayButton() {
   const { isActive, activate, cancel, getRemainingMinutes, getRemainingMs, durationMs } = useOpenToPlay();
   const [progress, setProgress] = useState(100);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Update progress every second
   useEffect(() => {
@@ -25,67 +28,66 @@ export function OpenToPlayButton() {
     return () => clearInterval(interval);
   }, [isActive, getRemainingMs, durationMs]);
 
-  const handleClick = () => {
-    if (isActive) {
-      cancel();
-    } else {
-      activate();
-      analyticsEvents.track('open2play_tap_activate', { duration: 20 });
+  const handleToggle = async () => {
+    setIsSaving(true);
+    haptic('medium');
+    
+    try {
+      if (isActive) {
+        await cancel();
+      } else {
+        await activate();
+        analyticsEvents.track('open2play_tap_activate', { duration: 30 });
+      }
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const remainingMinutes = getRemainingMinutes();
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <button
-        onClick={handleClick}
-        className={`btn-open2play ${isActive ? 'active' : 'inactive'}`}
+    <section aria-labelledby="otp-title" className="flex flex-col items-center mt-6 mb-2">
+      <h2 id="otp-title" className="sr-only">Open to Play</h2>
+      
+      <TapButton
+        aria-pressed={isActive}
+        aria-label={isActive ? `Open to Play active, ${remainingMinutes} minutes remaining` : 'Activate Open to Play'}
+        disabled={isSaving}
+        onPointerDown={handleToggle}
+        className="relative inline-flex items-center justify-center gap-2.5 transition-all duration-100 active:scale-[0.97]"
         style={{
-          width: '180px',
-          height: '46px',
-          borderRadius: '23px',
+          minWidth: '240px',
+          height: '44px',
+          borderRadius: '22px',
           fontWeight: 600,
           fontSize: '15px',
-          position: 'relative',
-          overflow: 'visible',
-          background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
-          color: isActive ? 'white' : 'var(--accent-frost-text)',
-          border: isActive ? '1px solid rgba(255,255,255,0.25)' : '1px solid var(--accent-frost-border)',
-          cursor: 'pointer',
-          transition: 'all 0.2s ease',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
+          background: isActive ? '#222b24' : '#1b1b1b',
+          color: isActive ? '#fff' : '#fff',
+          border: isActive ? '1px solid #335a3f' : '1px solid #2a2a2a',
+          boxShadow: isActive 
+            ? '0 0 0 4px rgba(110, 146, 119, 0.25), inset 0 1px 0 rgba(255,255,255,0.08)' 
+            : 'inset 0 1px 0 rgba(255,255,255,0.05)',
         }}
       >
-        {isActive && (
-          <div
-            className="absolute inset-0 rounded-full pointer-events-none"
-            style={{
-              border: '3px solid rgba(255,255,255,0.8)',
-              clipPath: 'polygon(0 0, ' + progress + '% 0, ' + progress + '% 100%, 0 100%)',
-              transition: 'clip-path 1s linear',
-            }}
-          />
+        <span className="text-[16px]" aria-hidden="true">🏌️‍♂️</span>
+        {isSaving ? (
+          'Updating…'
+        ) : isActive ? (
+          <>Open to Play <span className="text-white/70 text-[13px]">• {remainingMinutes}m</span></>
+        ) : (
+          'Open to Play'
         )}
-        <span style={{ position: 'relative', zIndex: 1 }}>
-          {isActive ? '⏱ ' + remainingMinutes + ' min left' : 'Open to Play'}
-        </span>
-      </button>
+      </TapButton>
 
-      <div
-        className="tooltip-subtext"
-        style={{
-          fontSize: '12px',
-          color: 'var(--text-secondary)',
-          textAlign: 'center',
-          lineHeight: '1.3',
-          maxWidth: '240px',
-        }}
-      >
-        {isActive
-          ? "We've let nearby golfers know you're available. Your ping will last 20 minutes — tap to stop."
-          : "Let nearby golfers know you're available to play now."}
-      </div>
-    </div>
+      {/* Helper copy */}
+      <p className="mt-2.5 text-[13px] text-[#9b9b9b] text-center leading-[1.35] max-w-[280px]">
+        {isActive ? (
+          <>Nearby golfers can see you're available. <strong className="text-white/80">Tap again</strong> to turn off.</>
+        ) : (
+          <>Let nearby golfers know you're ready to play — tap <strong className="text-white/80">Open to Play</strong> to show up on their radar.</>
+        )}
+      </p>
+    </section>
   );
 }

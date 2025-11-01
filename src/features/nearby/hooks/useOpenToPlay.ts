@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
 import { useToast } from '@/hooks/use-toast';
+import { haptic } from '@/utils/haptics';
 
 const DURATION_MINUTES = 30;
 const STORAGE_KEY = 'open_to_play_state_v2';
@@ -102,7 +103,8 @@ export function useOpenToPlay() {
       return;
     }
 
-    // Success toast
+    // Success toast + haptic
+    haptic('medium');
     toast({
       title: 'Open to Play Active',
       description: 'Nearby golfers can see you are available for the next 30 mins.',
@@ -145,7 +147,8 @@ export function useOpenToPlay() {
       return;
     }
 
-    // Success toast
+    // Success toast + haptic
+    haptic('light');
     toast({
       title: 'Open to Play off',
       description: 'You are no longer broadcasting availability.',

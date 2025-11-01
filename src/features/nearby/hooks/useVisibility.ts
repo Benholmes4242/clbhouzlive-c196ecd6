@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
 import { useToast } from '@/hooks/use-toast';
+import { haptic } from '@/utils/haptics';
 
 export type VisibilityMode = 'all' | 'friends' | 'hidden';
 
@@ -96,7 +97,8 @@ export function useVisibility() {
         return;
       }
 
-      // Success toast
+      // Success toast + haptic
+      haptic('light');
       toast({
         title:
           newMode === 'hidden'

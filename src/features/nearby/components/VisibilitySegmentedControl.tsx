@@ -1,4 +1,6 @@
 import React from 'react';
+import { TapButton } from '@/components/ui/TapButton';
+import { haptic } from '@/utils/haptics';
 import type { VisibilityMode } from '../hooks/useVisibility';
 
 interface VisibilitySegmentedControlProps {
@@ -7,100 +9,120 @@ interface VisibilitySegmentedControlProps {
 }
 
 export function VisibilitySegmentedControl({ value, onChange }: VisibilitySegmentedControlProps) {
-
   const segments: { mode: VisibilityMode; label: string; icon: string }[] = [
     { mode: 'all', label: 'Everyone', icon: '✅' },
     { mode: 'friends', label: 'Friends', icon: '👥' },
     { mode: 'hidden', label: 'Hidden', icon: '⛔️' },
   ];
 
+  const getSliderTransform = () => {
+    switch (value) {
+      case 'all': return 'translateX(0%)';
+      case 'friends': return 'translateX(100%)';
+      case 'hidden': return 'translateX(200%)';
+    }
+  };
+
+  const getSliderStyle = () => {
+    switch (value) {
+      case 'all':
+        return {
+          background: 'radial-gradient(circle at 30% 30%, rgba(110, 146, 119, 0.35) 0%, rgba(110, 146, 119, 0.18) 100%)',
+          border: '1px solid rgba(110, 146, 119, 0.5)',
+          boxShadow: '0 0 20px rgba(110, 146, 119, 0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+        };
+      case 'friends':
+        return {
+          background: 'radial-gradient(circle at 30% 30%, rgba(96, 96, 140, 0.35) 0%, rgba(96, 96, 140, 0.18) 100%)',
+          border: '1px solid rgba(180, 180, 255, 0.45)',
+          boxShadow: '0 0 20px rgba(96, 96, 140, 0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+        };
+      case 'hidden':
+        return {
+          background: 'rgba(20, 20, 20, 0.8)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          boxShadow: '0 0 16px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05)',
+        };
+    }
+  };
+
   const getStatusText = () => {
     switch (value) {
       case 'all':
-        return { text: "You're visible to golfers nearby", color: 'rgba(180, 255, 190, 0.9)' };
+        return { text: 'Visible to all golfers nearby', color: '#4CD964' };
       case 'friends':
-        return { text: "Only friends can see you", color: 'rgba(200, 200, 255, 0.9)' };
+        return { text: 'Visible to friends nearby', color: '#6ea8ff' };
       case 'hidden':
-        return { text: "You're hidden right now", color: 'rgba(255, 160, 160, 0.9)' };
+        return { text: 'Hidden from nearby golfers', color: '#8E8E93' };
     }
   };
 
   const statusInfo = getStatusText();
 
+  const handleChange = (mode: VisibilityMode) => {
+    if (mode !== value) {
+      haptic('light');
+      onChange(mode);
+    }
+  };
+
   return (
-    <div className="w-full">
-      <div className="mb-1 text-[15px] font-semibold text-white/90 text-center">Visibility</div>
-      <div className="text-[13px] text-white/60 mb-4 text-center leading-relaxed">Control who can see you nearby</div>
+    <section aria-labelledby="vis-title" className="w-full">
+      <h2 id="vis-title" className="sr-only">Visibility</h2>
       
-      <div className="flex gap-0 w-full p-1 rounded-full bg-white/[0.05] border border-white/[0.12]">
+      {/* Segmented control */}
+      <div 
+        role="group" 
+        aria-label="Visibility mode"
+        className="relative flex gap-1.5 w-full p-1.5 rounded-[20px] bg-[#141414] border border-[#242424]"
+        style={{ boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.3)' }}
+      >
+        {/* Animated pill slider */}
+        <div
+          aria-hidden="true"
+          className="absolute top-1.5 bottom-1.5 rounded-[14px] transition-transform duration-[180ms] ease-out pointer-events-none"
+          style={{
+            width: 'calc(33.333% - 4px)',
+            left: '6px',
+            transform: getSliderTransform(),
+            ...getSliderStyle(),
+          }}
+        />
+
+        {/* Buttons */}
         {segments.map((segment) => {
           const isActive = value === segment.mode;
           
-          const getActiveStyle = () => {
-            if (segment.mode === 'all') {
-              return {
-                background: 'radial-gradient(circle at 0% 0%, rgba(110, 146, 119, 0.28) 0%, rgba(110, 146, 119, 0.14) 60%, rgba(110, 146, 119, 0.08) 100%)',
-                border: '1px solid rgba(110, 146, 119, 0.5)',
-                shadow: '0 0 16px rgba(110, 146, 119, 0.45)',
-                textColor: 'text-white'
-              };
-            } else if (segment.mode === 'friends') {
-              return {
-                background: 'radial-gradient(circle at 0% 0%, rgba(96, 96, 140, 0.28) 0%, rgba(96, 96, 140, 0.12) 100%)',
-                border: '1px solid rgba(180, 180, 255, 0.4)',
-                shadow: '0 0 16px rgba(96, 96, 140, 0.45)',
-                textColor: 'text-white'
-              };
-            } else {
-              return {
-                background: 'rgba(0, 0, 0, 0.5)',
-                border: '1px solid rgba(255, 255, 255, 0.25)',
-                shadow: '0 0 16px rgba(0, 0, 0, 0.9)',
-                textColor: 'text-white/70'
-              };
-            }
-          };
-          
-          const activeStyle = getActiveStyle();
-          
           return (
-            <button
+            <TapButton
               key={segment.mode}
-              onClick={() => onChange(segment.mode)}
+              aria-pressed={isActive}
+              onPointerDown={() => handleChange(segment.mode)}
               className={`
-                flex-1 py-2.5 px-3 text-[13px] font-semibold rounded-[22px] transition-all duration-120
-                ${isActive 
-                  ? `${activeStyle.textColor} active:scale-[0.98]`
-                  : 'text-white/70 hover:bg-white/[0.08] active:bg-white/[0.08]'
-                }
+                relative flex-1 py-2.5 px-2 text-[13px] font-semibold rounded-[14px] 
+                transition-colors duration-100
+                ${isActive ? 'text-white' : 'text-white/60'}
               `}
-              style={
-                isActive
-                  ? {
-                      background: activeStyle.background,
-                      border: activeStyle.border,
-                      boxShadow: activeStyle.shadow,
-                    }
-                  : { minHeight: '44px' }
-              }
+              style={{ minHeight: '40px', zIndex: 1 }}
             >
               <span className="inline-flex items-center justify-center gap-1.5">
-                <span className="text-[13px]">{segment.icon}</span>
+                <span className="text-[14px]" aria-hidden="true">{segment.icon}</span>
                 <span>{segment.label}</span>
               </span>
-            </button>
+            </TapButton>
           );
         })}
       </div>
       
-      {/* Dynamic status text */}
-      <div 
-        key={value}
-        className="mt-2 text-center text-[13px] animate-in fade-in duration-100"
+      {/* Dynamic status text with ARIA live region */}
+      <p 
+        aria-live="polite" 
+        aria-atomic="true"
+        className="mt-2.5 text-center text-[13px] transition-colors duration-200"
         style={{ color: statusInfo.color }}
       >
         {statusInfo.text}
-      </div>
-    </div>
+      </p>
+    </section>
   );
 }
