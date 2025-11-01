@@ -99,7 +99,58 @@ const navigate = useNavigate();
     rank(a, game.host_user_id) - rank(b, game.host_user_id)
   );
 
+  // Group by role
+  const hostGroup = participantsSorted.filter(p => p.user_id === game.host_user_id);
+  const memberGroup = participantsSorted.filter(p => p.user_id && p.user_id !== game.host_user_id);
+  const guestGroup = participantsSorted.filter(p => !p.user_id);
+
   const participantsCount = participantsSorted.length;
+
+  // Render helper for person row
+  const renderPersonRow = (p: UiParticipant, isHost: boolean) => {
+    return (
+      <button
+        key={keyOf(p)}
+        onClick={() => {
+          if (p.username || p.user_id) {
+            navigate(`/profile/${p.username || p.user_id}`);
+          }
+        }}
+        className="w-full flex items-center gap-3 p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all text-left"
+      >
+        <Avatar className="w-10 h-10">
+          <AvatarImage src={p.profile_photo_url || undefined} alt={p.display_name} />
+          <AvatarFallback className="bg-neutral-700/50 text-white text-sm">
+            {p.display_name[0]}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="text-[13px] text-white/90 font-medium truncate">
+              {p.username ? `@${p.username}` : (p.display_name || p.guest_name || 'Guest')}
+            </span>
+            {isHost && (
+              <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 text-[10px] font-medium rounded">
+                Host
+              </span>
+            )}
+            {!p.user_id && (
+              <span className="px-1.5 py-0.5 bg-neutral-700/40 text-neutral-300 text-[10px] font-medium rounded">
+                Guest
+              </span>
+            )}
+          </div>
+          <div className="text-[11px] text-white/60 flex items-center gap-2">
+            {p.home_club && <span>{p.home_club}</span>}
+            {p.home_club && p.show_handicap && p.eg_handicap_index != null && <span>•</span>}
+            {p.show_handicap && p.eg_handicap_index != null && (
+              <span>HCP {formatHcp(p.eg_handicap_index)}</span>
+            )}
+          </div>
+        </div>
+      </button>
+    );
+  };
 
   const formatStartTime = (startTime: string) => {
     const date = parseISO(startTime);
@@ -192,60 +243,42 @@ const navigate = useNavigate();
           {/* Players */}
           <div className="space-y-2">
             <div className="text-[13px] font-medium text-white/80">Players ({participantsCount})</div>
-            <div className="space-y-2">
-              {participantsSorted.length > 0 ? (
-                participantsSorted.map((p) => {
-                  const isHost = p.user_id === game.host_user_id;
-                  
-                  return (
-                    <button
-                      key={keyOf(p)}
-                      onClick={() => {
-                        if (p.username || p.user_id) {
-                          navigate(`/profile/${p.username || p.user_id}`);
-                        }
-                      }}
-                      className="w-full flex items-center gap-3 p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all text-left"
-                    >
-                      <Avatar className="w-10 h-10">
-                        <AvatarImage src={p.profile_photo_url || undefined} alt={p.display_name} />
-                        <AvatarFallback className="bg-neutral-700/50 text-white text-sm">
-                          {p.display_name[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[13px] text-white/90 font-medium truncate">
-                            {p.username ? `@${p.username}` : (p.display_name || p.guest_name || 'Guest')}
-                          </span>
-                          {isHost && (
-                            <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 text-[10px] font-medium rounded">
-                              Host
-                            </span>
-                          )}
-                          {!p.user_id && (
-                            <span className="px-1.5 py-0.5 bg-neutral-700/40 text-neutral-300 text-[10px] font-medium rounded">
-                              Guest
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-[11px] text-white/60 flex items-center gap-2">
-                          {p.home_club && <span>{p.home_club}</span>}
-                          {p.home_club && p.show_handicap && p.eg_handicap_index != null && <span>•</span>}
-                          {p.show_handicap && p.eg_handicap_index != null && (
-                            <span>HCP {formatHcp(p.eg_handicap_index)}</span>
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })
-              ) : (
-                <div className="text-[13px] text-white/50 p-2 bg-white/5 rounded-lg">
-                  No participants data available
+            
+            {/* Host */}
+            {hostGroup.length > 0 && (
+              <>
+                <div className="mb-2 text-xs uppercase tracking-wide text-white/50">Host</div>
+                <div className="space-y-2">
+                  {hostGroup.map(p => renderPersonRow(p, true))}
                 </div>
-              )}
-            </div>
+              </>
+            )}
+
+            {/* Members */}
+            {memberGroup.length > 0 && (
+              <>
+                <div className="mt-4 mb-2 text-xs uppercase tracking-wide text-white/50">Members</div>
+                <div className="space-y-2">
+                  {memberGroup.map(p => renderPersonRow(p, false))}
+                </div>
+              </>
+            )}
+
+            {/* Guests */}
+            {guestGroup.length > 0 && (
+              <>
+                <div className="mt-4 mb-2 text-xs uppercase tracking-wide text-white/50">Guests</div>
+                <div className="space-y-2">
+                  {guestGroup.map(p => renderPersonRow(p, false))}
+                </div>
+              </>
+            )}
+
+            {participantsSorted.length === 0 && (
+              <div className="text-[13px] text-white/50 p-2 bg-white/5 rounded-lg">
+                No participants data available
+              </div>
+            )}
           </div>
 
           {/* Action button */}
