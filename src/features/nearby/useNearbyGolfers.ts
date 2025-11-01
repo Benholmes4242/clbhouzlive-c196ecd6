@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { NearbyGolfer } from './types';
 import { calculateDistance } from './distance';
 import { NEARBY_RADIUS_METERS } from './config';
+import { sortGolfers } from './utils/sortGolfers';
 
 async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<NearbyGolfer[]> {
   if (!userLat || !userLng) return [];
@@ -85,6 +86,7 @@ export function useNearbyGolfers(userLat?: number, userLng?: number) {
   const query = useQuery({
     queryKey: ['nearbyGolfers', 'live'],
     queryFn: () => fetchLiveNearby(userLat, userLng),
+    select: (golfers) => sortGolfers(golfers),
     staleTime: 15_000,
     enabled: !!userLat && !!userLng,
   });

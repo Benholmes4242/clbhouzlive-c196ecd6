@@ -1,8 +1,8 @@
 import React from 'react';
-import { analyticsEvents } from '@/utils/analyticsEvents';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { Home } from 'lucide-react';
+import { TapButton } from '@/components/ui/TapButton';
+import { haptic } from '@/utils/haptics';
+import { useGolferActions } from '../hooks/useGolferActions';
+import { formatDistance } from '../distance';
 
 interface GolferRowProps {
   golfer: {
@@ -12,160 +12,150 @@ interface GolferRowProps {
     home_club?: string;
     avatar_url?: string;
     is_online: boolean;
-    isMock: boolean;
+    isMock?: boolean;
     distanceText?: string;
+    distance_km?: number;
     isOpenToPlay?: boolean;
     sameHomeClub?: boolean;
+    is_following?: boolean;
   };
   index: number;
 }
 
+function Badge({ 
+  icon, 
+  label, 
+  tone = 'default' 
+}: {
+  icon: string;
+  label: string;
+  tone?: 'success' | 'default';
+}) {
+  return (
+    <span 
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[12px] font-semibold ${
+        tone === 'success'
+          ? 'bg-[#162219] text-[#cfe8d6] shadow-[inset_0_0_0_1px_#325A3E]'
+          : 'bg-[#171717] text-[#d6d6d6] shadow-[inset_0_0_0_1px_#2a2a2a]'
+      }`}
+    >
+      <span className="text-[14px] leading-none">{icon}</span>
+      <span>{label}</span>
+    </span>
+  );
+}
+
 export function GolferRow({ golfer, index }: GolferRowProps) {
-  const [isFollowing, setIsFollowing] = React.useState(false);
-  const [isSendingPing, setIsSendingPing] = React.useState(false);
-  const { toast } = useToast();
+  const { sendFriendRequest, toggleFollow, openMessage, isFollowing } = useGolferActions(golfer.id, golfer.is_following, index);
 
-  const handleFriendRequest = () => {
-    analyticsEvents.track('nearby_friend_request_clicked', { golfer_id: golfer.id, position: index });
-    // TODO: Send friend request when friends system is integrated
-    toast({
-      title: 'Friend request',
-      description: 'Friend system coming soon',
-    });
+  const handleViewProfile = () => {
+    haptic('light');
+    // TODO: Open mini-profile/details
+    console.log('View profile:', golfer.display_name);
   };
 
-  const handleFollow = () => {
-    analyticsEvents.track('nearby_follow_clicked', { golfer_id: golfer.id, position: index });
-    setIsFollowing(!isFollowing);
-    // TODO: Call follow mutation
-  };
-
-  const handleMessage = () => {
-    analyticsEvents.track('nearby_message_clicked', { golfer_id: golfer.id, position: index });
-    // TODO: Open message composer
-    console.log('Message clicked for', golfer.display_name);
-  };
-
-  const handlePing = async () => {
-    if (isSendingPing) return;
-
-    setIsSendingPing(true);
-    analyticsEvents.track('nearby_ping_clicked', { golfer_id: golfer.id, position: index });
-
-    try {
-      const { error } = await supabase.rpc('send_user_ping', {
-        p_recipient_id: golfer.id
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: 'Ping sent! 👋',
-        description: `${golfer.display_name} has been notified`,
-      });
-    } catch (error: any) {
-      console.error('Error sending ping:', error);
-      toast({
-        title: 'Failed to send ping',
-        description: error.message || 'Please try again',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSendingPing(false);
-    }
-  };
+  const distanceText = golfer.distanceText || 
+    (golfer.distance_km ? formatDistance(golfer.distance_km * 1000) : undefined);
 
   return (
     <article
-      className="rounded-xl bg-white/5 backdrop-blur-md border border-white/10 text-white"
-      aria-label={`${golfer.display_name}, ${golfer.home_club || 'No home club'}`}
+      className="rounded-2xl bg-[#101010] shadow-[inset_0_0_0_1px_#222,0_2px_12px_rgba(0,0,0,0.35)] p-3 mx-3 my-2.5"
+      role="article"
+      aria-label={`${golfer.display_name}, ${golfer.home_club || 'No home club'}, ${distanceText || ''}`}
     >
-      {/* Row 1: Header - Avatar + Name/Distance + Club */}
-      <div className="flex flex-row gap-3 p-3 pb-2">
-        {/* Avatar block - matching shorts card style */}
+      {/* Main tappable area */}
+      <TapButton
+        className="flex items-center gap-3 w-full text-left transition-transform active:scale-[0.98]"
+        onPointerDown={handleViewProfile}
+        aria-label={`View ${golfer.display_name}'s profile`}
+      >
+        {/* Avatar with optional open-to-play ring */}
         <div 
-          className="relative shrink-0 w-[56px] h-[56px] rounded-[14px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
-          style={{
-            boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
-          }}
+          className={`relative shrink-0 w-11 h-11 rounded-full overflow-hidden ${
+            golfer.isOpenToPlay ? 'shadow-[0_0_0_3px_rgba(110,146,119,0.5)]' : ''
+          }`}
         >
           <img
             src={golfer.avatar_url || '/placeholder.svg'}
-            alt={golfer.display_name}
+            alt=""
             className="w-full h-full object-cover"
           />
         </div>
 
-        {/* Name + Club + Distance */}
-        <div className="flex flex-col justify-center min-w-0 flex-1">
-          {/* Name row with distance */}
-          <div className="flex justify-between items-center gap-2 mb-0.5">
-            <div className="text-[15px] font-semibold leading-tight text-white truncate">
+        {/* Name, club, badges */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="text-[16px] font-bold text-white truncate">
               {golfer.display_name}
-            </div>
-            {golfer.distanceText && (
-              <div className="text-[12px] leading-tight text-white/60 whitespace-nowrap">
-                {golfer.distanceText} away
-              </div>
+            </span>
+            {distanceText && (
+              <span className="ml-auto text-[#a0a0a0] text-[14px] tabular-nums shrink-0">
+                {distanceText}
+              </span>
             )}
           </div>
-
-          {/* Home club */}
+          
           {golfer.home_club && (
-            <div className="text-[13px] leading-tight text-white/70 truncate">
+            <div className="text-[13px] text-[#b5b5b5] mb-2 truncate">
               {golfer.home_club}
             </div>
           )}
+
+          {(golfer.sameHomeClub || golfer.isOpenToPlay) && (
+            <div className="flex flex-wrap gap-1.5">
+              {golfer.sameHomeClub && (
+                <Badge icon="🏠" label="Same home club" />
+              )}
+              {golfer.isOpenToPlay && (
+                <Badge icon="🟢" label="Open to play" tone="success" />
+              )}
+            </div>
+          )}
         </div>
-      </div>
 
-      {/* Row 2: Pills */}
-      {(golfer.sameHomeClub || golfer.isOpenToPlay) && (
-        <div className={`px-3 pb-3 ${
-          golfer.sameHomeClub && golfer.isOpenToPlay ? '' : 'pl-[68px]'
-        }`}>
-          <div className={`flex flex-row items-center gap-2 ${
-            golfer.sameHomeClub && golfer.isOpenToPlay ? 'justify-center' : 'justify-start'
-          }`}>
-            {golfer.sameHomeClub && (
-              <span className="px-2 py-1 rounded-full text-[12px] font-medium bg-white/10 text-white/80 border border-white/20 flex items-center gap-1">
-                <span className="inline-block">🏠</span>
-                <span>Same home club</span>
-              </span>
-            )}
+        {/* Chevron */}
+        <span className="text-[#777] text-xl shrink-0" aria-hidden="true">›</span>
+      </TapButton>
 
-            {golfer.isOpenToPlay && (
-              <span className="px-2 py-1 rounded-full text-[12px] font-medium bg-green-500/15 text-green-400 border border-green-500/30">
-                🟢 Open to play
-              </span>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Row 3: Action Bar */}
-      <div className="flex flex-row gap-2 border-t border-white/10 px-3 py-3">
-        <button
-          onClick={handleFriendRequest}
-          className="flex-1 rounded-lg border border-white/25 text-white text-[13px] font-medium py-2 hover:bg-white/5 transition-colors"
+      {/* Action CTAs */}
+      <div className="flex gap-2.5 mt-3">
+        <TapButton
+          className="flex-1 h-10 rounded-xl bg-[#171717] text-[#ddd] shadow-[inset_0_0_0_1px_#2b2b2b] transition-transform active:scale-[0.98] font-medium text-[13px]"
+          onPointerDown={() => {
+            haptic('light');
+            sendFriendRequest();
+          }}
+          aria-label="Send friend request"
         >
           Friend Request
-        </button>
+        </TapButton>
 
-        <button
-          onClick={handleFollow}
-          className="flex-1 rounded-lg border border-white/25 text-white text-[13px] font-medium py-2 hover:bg-white/5 transition-colors"
+        <TapButton
+          className={`flex-1 h-10 rounded-xl font-medium text-[13px] transition-transform active:scale-[0.98] ${
+            isFollowing
+              ? 'bg-[#1f2621] text-[#e7f3ea] shadow-[inset_0_0_0_1px_#335a3f]'
+              : 'bg-[#171717] text-[#ddd] shadow-[inset_0_0_0_1px_#2b2b2b]'
+          }`}
+          onPointerDown={() => {
+            haptic('light');
+            toggleFollow();
+          }}
+          aria-label={isFollowing ? 'Unfollow' : 'Follow'}
           aria-pressed={isFollowing}
         >
           {isFollowing ? 'Following' : 'Follow'}
-        </button>
+        </TapButton>
 
-        <button
-          onClick={handleMessage}
-          className="flex-1 rounded-lg bg-white/10 text-white/90 text-[13px] font-medium py-2 hover:bg-white/15 transition-colors"
+        <TapButton
+          className="flex-1 h-10 rounded-xl bg-[#171717] text-[#ddd] shadow-[inset_0_0_0_1px_#2b2b2b] transition-transform active:scale-[0.98] font-medium text-[13px]"
+          onPointerDown={() => {
+            haptic('light');
+            openMessage();
+          }}
+          aria-label="Message"
         >
           Message
-        </button>
+        </TapButton>
       </div>
     </article>
   );
