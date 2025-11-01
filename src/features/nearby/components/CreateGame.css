@@ -8,6 +8,14 @@
   --modal-accent: #6e9277;
   --modal-accent-ink: #d7eadf;
   --modal-danger: #de4a4a;
+  
+  /* Z-index layers */
+  --z-app: 0;
+  --z-toast: 900;
+  --z-modal-backdrop: 10000;
+  --z-modal: 10010;
+  --z-sheet-backdrop: 11000;
+  --z-sheet: 11010;
 }
 
 /* Utility Classes */

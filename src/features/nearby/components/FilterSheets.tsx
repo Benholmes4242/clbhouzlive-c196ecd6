@@ -21,16 +21,22 @@ let currentSheet: (() => void) | null = null;
 function openActionSheet(config: ActionSheetConfig) {
   haptic('light');
   
+  // Lock body scroll
+  const originalOverflow = document.documentElement.style.overflow;
+  document.documentElement.style.overflow = 'hidden';
+  
   // Create overlay
   const overlay = document.createElement('div');
   overlay.style.cssText = `
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.6);
-    z-index: 9999;
+    z-index: 11000;
     display: flex;
     align-items: flex-end;
     animation: fadeIn 0.2s ease;
+    backdrop-filter: saturate(120%) blur(6px);
+    -webkit-backdrop-filter: saturate(120%) blur(6px);
   `;
 
   // Create sheet
@@ -39,10 +45,13 @@ function openActionSheet(config: ActionSheetConfig) {
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
-    background: #1a1a1a;
+    background: #111214;
     border-radius: 20px 20px 0 0;
     padding: 20px;
     animation: slideUp 0.3s ease;
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.5);
+    max-height: 75vh;
+    overflow: auto;
   `;
 
   // Title
@@ -90,7 +99,11 @@ function openActionSheet(config: ActionSheetConfig) {
   const closeSheet = () => {
     overlay.style.animation = 'fadeOut 0.2s ease';
     sheet.style.animation = 'slideDown 0.2s ease';
-    setTimeout(() => overlay.remove(), 200);
+    setTimeout(() => {
+      overlay.remove();
+      // Restore body scroll
+      document.documentElement.style.overflow = originalOverflow;
+    }, 200);
     currentSheet = null;
   };
 
