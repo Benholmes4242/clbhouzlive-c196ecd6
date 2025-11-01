@@ -111,26 +111,21 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
     <button
       onClick={onClick}
       className={cn(
-        "px-4 py-2 rounded-xl font-medium inline-flex items-center gap-2",
-        "bg-white/20 text-white border border-white/28 backdrop-blur",
-        "hover:bg-white/30 active:bg-white/30",
-        "shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset]",
-        "active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)]",
-        "transition-all"
+        "flex items-center justify-center gap-1 rounded-lg border border-white/14",
+        "bg-white/[0.08] hover:bg-white/[0.12] active:bg-white/[0.16]",
+        "px-3 py-1.5 text-[13px] font-medium leading-none",
+        "transition-colors"
       )}
     >
-      {Icon && <Icon className="w-4 h-4 opacity-80" />}
-      {children}
-      <ChevronsUpDown className="w-4 h-4 opacity-70" />
+      {Icon && <Icon className="w-4 h-4" />}
+      <span>{children}</span>
     </button>
   );
 
   return (
     <div className={cn('flex flex-col gap-2', className)}>
       {/* Filter Controls Row */}
-      <div className="relative z-0 bg-transparent border-b border-white/[0.08]">
-        <div className="overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-2 px-3 py-2 min-w-max">
+      <div className="mt-2 flex items-stretch justify-between gap-2">
             {/* Date Filter with Calendar */}
             <Sheet open={dateOpen} onOpenChange={setDateOpen}>
             <SheetTrigger asChild>
@@ -304,8 +299,6 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
               </div>
             </SheetContent>
           </Sheet>
-          </div>
-        </div>
       </div>
     </div>
   );

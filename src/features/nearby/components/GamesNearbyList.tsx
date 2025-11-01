@@ -254,6 +254,14 @@ export function GamesNearbyList({
       {/* Divider */}
       <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
+      {/* Filter chips - moved here */}
+      <GameFiltersBar
+        filters={currentFilters}
+        onFiltersChange={onFiltersChange}
+        mode={mode}
+        portalContainer={portalContainer}
+      />
+
       {/* SECTION 3: Discoverable Games */}
       <div className="space-y-3">
         <div className="px-2 text-center">
@@ -328,18 +336,6 @@ export function GamesNearbyList({
         )}
       </div>
 
-      {/* Divider before filters */}
-      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-      {/* SECTION 4: Filters Bar (moved to bottom, horizontal scroll) */}
-      <div className="overflow-x-auto no-scrollbar -mx-3 px-3">
-        <GameFiltersBar
-          filters={currentFilters}
-          onFiltersChange={onFiltersChange}
-          mode={mode}
-          portalContainer={portalContainer}
-        />
-      </div>
     </div>
   );
 }
