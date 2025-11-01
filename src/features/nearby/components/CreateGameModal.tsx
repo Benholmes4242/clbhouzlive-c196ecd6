@@ -206,8 +206,8 @@ export function CreateGameModal({
         tagged_user_ids: taggedUserIds.length > 0 ? taggedUserIds : undefined,
         guest_participants: guestParticipants.length > 0 ? guestParticipants : undefined,
       });
-      onClose();
-      // Reset form
+      
+      // Reset form after successful creation
       setGameType('9_holes');
       setCourseId('');
       setCourseName('');

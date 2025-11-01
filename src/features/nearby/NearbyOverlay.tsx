@@ -304,10 +304,16 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             setPrefilledClub(undefined);
           }}
           onCreateBeacon={async (input) => {
-            await createBeacon(input);
-            setIsCreateGameOpen(false);
-            setPrefilledClub(undefined);
-            setActiveTab('your-games'); // Navigate to Your Games tab
+            try {
+              await createBeacon(input);
+              // Switch tab first, then dispatch event
+              setActiveTab('your-games');
+              window.dispatchEvent(new CustomEvent('game-created'));
+            } finally {
+              // Always close modal and reset, even if there's an error
+              setIsCreateGameOpen(false);
+              setPrefilledClub(undefined);
+            }
           }}
           onCancelBeacon={cancelBeacon}
           myBeacon={myBeacon}

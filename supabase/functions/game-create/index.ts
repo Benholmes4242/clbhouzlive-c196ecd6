@@ -11,13 +11,23 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Use anon key + JWT so auth.uid() works in RLS policies
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('Missing authorization header');
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: authHeader }
+        }
+      }
     );
 
-    const authHeader = req.headers.get('Authorization')!;
-    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.split(' ')[1]);
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
       throw new Error('Unauthorized');
