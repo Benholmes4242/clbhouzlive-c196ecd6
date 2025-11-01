@@ -29,23 +29,26 @@ Deno.serve(async (req) => {
       start_time,
       slots_total = 4,
       tagged_user_ids = [],
+      guest_participants = [],
       note,
       lat,
       lng
     } = await req.json();
 
-    console.log('Creating game for user:', user.id, { course_name, start_time, slots_total, tagged_count: tagged_user_ids.length });
+    console.log('Creating game for user:', user.id, { course_name, start_time, slots_total, tagged_count: tagged_user_ids.length, guest_count: guest_participants.length });
 
-    // Validate tagged players don't exceed available seats
-    if (tagged_user_ids.length > slots_total - 1) {
+    // Validate tagged players + guests don't exceed available seats
+    const totalTagged = tagged_user_ids.length + guest_participants.length;
+    if (totalTagged > slots_total - 1) {
       return new Response(
-        JSON.stringify({ error: 'Too many tagged players for available seats' }),
+        JSON.stringify({ error: 'Too many tagged players and guests for available seats' }),
         { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Calculate slots_open: total - host - tagged players
-    const slots_open = slots_total - 1 - tagged_user_ids.length;
+    // Calculate slots_open: total - host - tagged players - guests
+    // Note: trigger will auto-recalculate this, but set initial value
+    const slots_open = slots_total - 1 - totalTagged;
 
     // Set expires_at to start_time + 2 hours (game duration estimate)
     const start = new Date(start_time);
@@ -141,6 +144,29 @@ Deno.serve(async (req) => {
           }
         });
       }
+    }
+
+    // Insert guest participants
+    if (guest_participants.length > 0) {
+      const guestParticipants = guest_participants.map((guest: { guest_name: string }) => ({
+        game_id: game.id,
+        guest_name: guest.guest_name,
+        added_by_user_id: user.id,
+        role: 'player',
+        state: 'accepted', // Guests are auto-accepted
+        reserves_slot: true
+      }));
+
+      const { error: guestError } = await supabase
+        .from('game_participants')
+        .insert(guestParticipants);
+
+      if (guestError) {
+        console.error('Error adding guest participants:', guestError);
+        throw guestError;
+      }
+
+      console.log('Guest participants added:', guest_participants.length);
     }
 
     // Fetch participants for response

@@ -6,10 +6,12 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useGameBeacon } from './hooks/useGameBeacon';
 import { CreateGameModal } from './components/CreateGameModal';
 import { GamesNearbyList } from './components/GamesNearbyList';
+import { YourGamesList } from './components/YourGamesList';
 import { useVisibility } from './hooks/useVisibility';
 import { useOpenToPlay } from './hooks/useOpenToPlay';
 import { useLocationBroadcast } from './hooks/useLocationBroadcast';
 import { VisibilitySegmentedControl } from './components/VisibilitySegmentedControl';
+import { supabase } from '@/integrations/supabase/client';
 
 interface NearbyOverlayProps {
   isOpen: boolean;
@@ -32,7 +34,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   // Continuously broadcast location when visibility is active
   useLocationBroadcast();
   
-  const [activeTab, setActiveTab] = useState<'golfers' | 'games'>('golfers');
+  const [activeTab, setActiveTab] = useState<'golfers' | 'games' | 'your-games'>('golfers');
   const [isCreateGameOpen, setIsCreateGameOpen] = useState(false);
   const [prefilledClub, setPrefilledClub] = useState<{ id: string; name: string } | undefined>();
 
@@ -181,7 +183,6 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
 
           {/* Tabs */}
           <div className="flex px-5 mt-3 border-b border-white/[0.06]">
-
             <button
               onClick={() => setActiveTab('golfers')}
               className={`flex-1 py-3.5 text-sm font-medium relative transition-all duration-150 ${
@@ -218,6 +219,22 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                 />
               )}
             </button>
+            <button
+              onClick={() => setActiveTab('your-games')}
+              className={`flex-1 py-3.5 text-sm font-medium relative transition-all duration-150 ${
+                activeTab === 'your-games'
+                  ? 'text-white'
+                  : 'text-white/55 hover:text-white/75'
+              }`}
+            >
+              Your Games
+              {activeTab === 'your-games' && (
+                <div 
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-white/90 rounded-full transition-all duration-150"
+                  style={{ width: '48px' }}
+                />
+              )}
+            </button>
           </div>
 
          {/* Scrollable Content */}
@@ -246,7 +263,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                 ))}
               </div>
             )
-          ) : (
+          ) : activeTab === 'games' ? (
             <GamesNearbyList
               beacons={nearbyBeacons}
               isLoading={beaconsLoading}
@@ -257,6 +274,20 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                   setPrefilledClub(clubData);
                 }
                 setIsCreateGameOpen(true);
+              }}
+            />
+          ) : (
+            <YourGamesList
+              onCancelGame={cancelBeacon}
+              onLeaveGame={async (gameId) => {
+                // Leave game by removing participant
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) return;
+                await supabase
+                  .from('game_participants')
+                  .delete()
+                  .eq('game_id', gameId)
+                  .eq('user_id', user.id);
               }}
             />
           )}
@@ -276,7 +307,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             await createBeacon(input);
             setIsCreateGameOpen(false);
             setPrefilledClub(undefined);
-            setActiveTab('games'); // Show Games tab to see "Your Game"
+            setActiveTab('your-games'); // Navigate to Your Games tab
           }}
           onCancelBeacon={cancelBeacon}
           myBeacon={myBeacon}

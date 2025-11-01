@@ -648,8 +648,10 @@ export type Database = {
       }
       game_participants: {
         Row: {
+          added_by_user_id: string | null
           created_at: string
           game_id: string
+          guest_name: string | null
           id: string
           joined_at: string | null
           reserves_slot: boolean
@@ -659,8 +661,10 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          added_by_user_id?: string | null
           created_at?: string
           game_id: string
+          guest_name?: string | null
           id?: string
           joined_at?: string | null
           reserves_slot?: boolean
@@ -670,8 +674,10 @@ export type Database = {
           user_id: string
         }
         Update: {
+          added_by_user_id?: string | null
           created_at?: string
           game_id?: string
+          guest_name?: string | null
           id?: string
           joined_at?: string | null
           reserves_slot?: boolean

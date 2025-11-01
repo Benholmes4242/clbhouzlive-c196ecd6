@@ -24,12 +24,14 @@ interface CreateGameModalProps {
   onCreateBeacon: (input: {
     game_type: string;
     course_name?: string;
+    course_id?: string;
     note?: string;
     start_time?: string;
     players_needed?: number;
     tee_time?: string;
     slots_total?: number;
     tagged_user_ids?: string[];
+    guest_participants?: Array<{ guest_name: string }>;
   }) => Promise<void>;
   onCancelBeacon: (beaconId: string) => Promise<void>;
   myBeacon: GameBeacon | null;
@@ -186,14 +188,23 @@ export function CreateGameModal({
     setIsSubmitting(true);
     try {
       const totalSlots = currentPlayers + availableSlots;
+      
+      // Separate users and guests
+      const taggedUserIds = selectedUsers.filter(u => !u.guest_name).map(u => u.id);
+      const guestParticipants = selectedUsers
+        .filter(u => u.guest_name)
+        .map(u => ({ guest_name: u.guest_name! }));
+      
       await onCreateBeacon({
         game_type: gameType,
+        course_id: courseId,
         course_name: courseName,
         note: note || undefined,
         start_time: startTime.toISOString(),
         tee_time: startTime.toISOString(),
         slots_total: totalSlots,
-        tagged_user_ids: selectedUsers.map(u => u.id),
+        tagged_user_ids: taggedUserIds.length > 0 ? taggedUserIds : undefined,
+        guest_participants: guestParticipants.length > 0 ? guestParticipants : undefined,
       });
       onClose();
       // Reset form
@@ -510,7 +521,7 @@ export function CreateGameModal({
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="block text-sm font-medium text-white/60">
-                    Tag players
+                    Tag players (optional)
                   </label>
                   <div className="text-xs text-white/50">
                     {gameSizeLabel}

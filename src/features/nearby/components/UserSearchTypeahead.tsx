@@ -11,6 +11,7 @@ interface UserProfile {
   profile_photo_url?: string;
   eg_handicap_index?: number | null;
   show_handicap?: boolean;
+  guest_name?: string; // Added for guest participants
 }
 
 interface UserSearchTypeaheadProps {
@@ -80,18 +81,25 @@ export function UserSearchTypeahead({
     setShowDropdown(false);
   };
 
+  const handleAddGuest = () => {
+    if (selectedUsers.length >= maxUsers) return;
+    const guestCount = selectedUsers.filter(u => u.guest_name).length + 1;
+    const guestUser: UserProfile = {
+      id: `guest-${Date.now()}`,
+      display_name: `Guest ${guestCount}`,
+      guest_name: `Guest ${guestCount}`,
+    };
+    onUserAdd(guestUser);
+    setSearchTerm('');
+    setResults([]);
+    setShowDropdown(false);
+  };
+
   const remainingSlots = maxUsers - selectedUsers.length;
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <label className="block text-sm font-medium text-white/90">
-          Tag players (optional)
-        </label>
-        <span className="text-xs text-white/60">
-          {remainingSlots} {remainingSlots === 1 ? 'seat' : 'seats'} available
-        </span>
-      </div>
+      {/* Label removed - moved to parent component */}
 
       {/* Selected users chips */}
       {selectedUsers.length > 0 && (
@@ -103,14 +111,18 @@ export function UserSearchTypeahead({
             >
               <div className="flex items-center gap-2">
                 <div className="w-5 h-5 rounded-full overflow-hidden bg-neutral-700/50 flex items-center justify-center shrink-0">
-                  {user.profile_photo_url ? (
+                  {user.guest_name ? (
+                    <UserPlus className="w-3 h-3 text-white/60" />
+                  ) : user.profile_photo_url ? (
                     <img src={user.profile_photo_url} alt={user.display_name} className="w-full h-full object-cover" />
                   ) : (
                     <span className="text-primary font-semibold text-xs">{user.display_name[0]}</span>
                   )}
                 </div>
                 <span>{user.display_name}</span>
-                <HcpBadge value={user.eg_handicap_index} show={user.show_handicap ?? true} />
+                {!user.guest_name && (
+                  <HcpBadge value={user.eg_handicap_index} show={user.show_handicap ?? true} />
+                )}
               </div>
               <button
                 onClick={() => onUserRemove(user.id)}
@@ -131,24 +143,46 @@ export function UserSearchTypeahead({
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search by name or username..."
+              placeholder="Search by name or add a guest"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                if (e.target.value.trim()) {
+                  setShowDropdown(true);
+                }
+              }}
               onFocus={() => {
-                if (results.length > 0) setShowDropdown(true);
+                if (searchTerm.trim() || results.length > 0) setShowDropdown(true);
               }}
               className="w-full pl-10 pr-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20"
             />
           </div>
 
           {/* Dropdown results */}
-          {showDropdown && results.length > 0 && (
+          {showDropdown && searchTerm.trim() && (
             <>
               <div
                 className="fixed inset-0 z-10"
                 onClick={() => setShowDropdown(false)}
               />
               <div className="absolute z-20 w-full mt-1 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl max-h-64 overflow-y-auto backdrop-blur-xl">
+                {/* Add Guest option always at top */}
+                <button
+                  onClick={handleAddGuest}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-neutral-800 transition-colors border-b border-neutral-800 bg-white/5"
+                >
+                  <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                    <UserPlus className="w-4 h-4 text-white/70" />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="text-white text-sm font-medium">
+                      ➕ Add Guest
+                    </div>
+                    <div className="text-white/60 text-xs">Add an unnamed player</div>
+                  </div>
+                </button>
+                
+                {/* User results */}
                 {results.map((user) => (
                   <button
                     key={user.id}
@@ -174,6 +208,13 @@ export function UserSearchTypeahead({
                     <UserPlus className="w-4 h-4 text-white/40" />
                   </button>
                 ))}
+                
+                {/* No user results message */}
+                {results.length === 0 && !isSearching && (
+                  <div className="px-4 py-3 text-sm text-white/60 text-center">
+                    No users found matching "{searchTerm}"
+                  </div>
+                )}
               </div>
             </>
           )}
