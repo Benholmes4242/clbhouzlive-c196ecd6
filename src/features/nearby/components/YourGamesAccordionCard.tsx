@@ -12,7 +12,7 @@ import type { GameParticipant as Participant } from '@/features/game/hooks/useGa
 
 type UiParticipant = {
   user_id: string | null;
-  guest_name: string | null;
+  guest_name?: string | null;
   role: 'host' | 'player' | 'guest';
   state: 'invited' | 'accepted' | 'declined' | 'removed';
   display_name: string;
@@ -79,6 +79,27 @@ const navigate = useNavigate();
   ] : [];
 
   const displayParticipants = [...forcedHost, ...baseParticipants, ...forcedSelf];
+
+  // Deduplicate by user_id/guest_name, then sort Host → Members → Guests
+  const keyOf = (p: UiParticipant) => `${p.user_id ?? 'guest'}:${p.guest_name ?? ''}`;
+  const dedupMap = new Map<string, UiParticipant>();
+  displayParticipants.forEach(p => {
+    const k = keyOf(p);
+    if (!dedupMap.has(k)) dedupMap.set(k, p);
+  });
+  const deduped = Array.from(dedupMap.values());
+
+  const rank = (p: UiParticipant, hostUserId: string) => {
+    if (p.user_id === hostUserId) return 0;     // Host first
+    if (p.user_id) return 1;                    // Members next
+    return 2;                                   // Guests last
+  };
+
+  const participantsSorted = deduped.sort((a, b) => 
+    rank(a, game.host_user_id) - rank(b, game.host_user_id)
+  );
+
+  const participantsCount = participantsSorted.length;
 
   const formatStartTime = (startTime: string) => {
     const date = parseISO(startTime);
@@ -170,46 +191,55 @@ const navigate = useNavigate();
 
           {/* Players */}
           <div className="space-y-2">
-            <div className="text-[13px] font-medium text-white/80">Players ({displayParticipants.length})</div>
+            <div className="text-[13px] font-medium text-white/80">Players ({participantsCount})</div>
             <div className="space-y-2">
-              {displayParticipants.length > 0 ? (
-                displayParticipants.map((p) => (
-                  <button
-                    key={p.user_id || `guest:${p.display_name}`}
-                    onClick={() => {
-                      if (p.username || p.user_id) {
-                        navigate(`/profile/${p.username || p.user_id}`);
-                      }
-                    }}
-                    className="w-full flex items-center gap-3 p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all text-left"
-                  >
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src={p.profile_photo_url || undefined} alt={p.display_name} />
-                      <AvatarFallback className="bg-neutral-700/50 text-white text-sm">
-                        {p.display_name[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[13px] text-white/90 font-medium truncate">
-                          @{p.username || p.display_name}
-                        </span>
-                        {p.role === 'host' && (
-                          <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 text-[10px] font-medium rounded">
-                            Host
+              {participantsSorted.length > 0 ? (
+                participantsSorted.map((p) => {
+                  const isHost = p.user_id === game.host_user_id;
+                  
+                  return (
+                    <button
+                      key={keyOf(p)}
+                      onClick={() => {
+                        if (p.username || p.user_id) {
+                          navigate(`/profile/${p.username || p.user_id}`);
+                        }
+                      }}
+                      className="w-full flex items-center gap-3 p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all text-left"
+                    >
+                      <Avatar className="w-10 h-10">
+                        <AvatarImage src={p.profile_photo_url || undefined} alt={p.display_name} />
+                        <AvatarFallback className="bg-neutral-700/50 text-white text-sm">
+                          {p.display_name[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[13px] text-white/90 font-medium truncate">
+                            {p.username ? `@${p.username}` : (p.display_name || p.guest_name || 'Guest')}
                           </span>
-                        )}
+                          {isHost && (
+                            <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 text-[10px] font-medium rounded">
+                              Host
+                            </span>
+                          )}
+                          {!p.user_id && (
+                            <span className="px-1.5 py-0.5 bg-neutral-700/40 text-neutral-300 text-[10px] font-medium rounded">
+                              Guest
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-white/60 flex items-center gap-2">
+                          {p.home_club && <span>{p.home_club}</span>}
+                          {p.home_club && p.show_handicap && p.eg_handicap_index != null && <span>•</span>}
+                          {p.show_handicap && p.eg_handicap_index != null && (
+                            <span>HCP {formatHcp(p.eg_handicap_index)}</span>
+                          )}
+                        </div>
                       </div>
-                      <div className="text-[11px] text-white/60 flex items-center gap-2">
-                        {p.home_club && <span>{p.home_club}</span>}
-                        {p.home_club && p.show_handicap && p.eg_handicap_index != null && <span>•</span>}
-                        {p.show_handicap && p.eg_handicap_index != null && (
-                          <span>HCP {formatHcp(p.eg_handicap_index)}</span>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                ))
+                    </button>
+                  );
+                })
               ) : (
                 <div className="text-[13px] text-white/50 p-2 bg-white/5 rounded-lg">
                   No participants data available
