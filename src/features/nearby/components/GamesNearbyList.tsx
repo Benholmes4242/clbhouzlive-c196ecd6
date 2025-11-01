@@ -38,7 +38,7 @@ export function GamesNearbyList({
 
   // Fetch games at selected club
   useEffect(() => {
-    if (!selectedClub) {
+    if (!selectedClub?.id) {
       setClubGames([]);
       return;
     }
@@ -49,12 +49,18 @@ export function GamesNearbyList({
         const { data: { user } } = await supabase.auth.getUser();
         const currentUserId = user?.id;
 
+        // Normalize search term for fuzzy matching
+        const normalized = selectedClub.name
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, ' ');
+
         const { data, error } = await supabase
           .from('games')
           .select('id, host_user_id, course_id, course_name, lat, lng, start_time, expires_at, status, slots_total, slots_open, visibility, note, created_at, updated_at')
-          .eq('course_name', selectedClub.name)
           .eq('status', 'active')
-          .gte('expires_at', new Date().toISOString()) as { data: any[] | null, error: any };
+          .gte('expires_at', new Date().toISOString())
+          .or(`course_id.eq.${selectedClub.id},course_name_normalized.ilike.%${normalized}%`) as { data: any[] | null, error: any };
 
         if (error) throw error;
 
@@ -73,7 +79,22 @@ export function GamesNearbyList({
     };
 
     fetchClubGames();
-  }, [selectedClub]);
+
+    // Club-scoped realtime subscription for instant updates
+    const channel = supabase
+      .channel(`club_games_${selectedClub.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'games',
+        filter: `course_id=eq.${selectedClub.id}`,
+      }, () => fetchClubGames())
+      .subscribe();
+
+    return () => { 
+      supabase.removeChannel(channel); 
+    };
+  }, [selectedClub?.id]);
 
   const handleClubSelect = (club: { id: string; name: string; country: string; region?: string }) => {
     setSelectedClub({ id: club.id, name: club.name });

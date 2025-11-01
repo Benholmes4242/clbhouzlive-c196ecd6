@@ -73,12 +73,30 @@ export function useGameBeacon() {
       }
 
       // Fetch games where user is host OR participant
-      // First, get all active games
-      const { data: allBeacons, error: allError } = await supabase
+      // Build query with optional bounding box for efficiency
+      const radiusMeters = NEARBY_RADIUS_METERS;
+      const radiusKm = radiusMeters / 1000;
+      const LAT_DEGREE_KM = 111;
+      
+      let query = supabase
         .from('games')
         .select('id, host_user_id, course_id, course_name, lat, lng, start_time, expires_at, status, slots_total, slots_open, visibility, note, created_at, updated_at')
         .eq('status', 'active')
-        .gt('expires_at', new Date().toISOString())
+        .gt('expires_at', new Date().toISOString());
+
+      // Apply bounding box if we have user location
+      if (userLat && userLng) {
+        const latDelta = radiusKm / LAT_DEGREE_KM;
+        const lngDelta = radiusKm / (LAT_DEGREE_KM * Math.cos(userLat * Math.PI / 180));
+        
+        query = query
+          .gte('lat', userLat - latDelta)
+          .lte('lat', userLat + latDelta)
+          .gte('lng', userLng - lngDelta)
+          .lte('lng', userLng + lngDelta);
+      }
+
+      const { data: allBeacons, error: allError } = await query
         .order('start_time', { ascending: true }) as { data: any[] | null, error: any };
 
       if (allError) {

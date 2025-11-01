@@ -802,6 +802,7 @@ export type Database = {
         Row: {
           course_id: string | null
           course_name: string | null
+          course_name_normalized: string | null
           created_at: string
           expires_at: string
           host_user_id: string
@@ -820,6 +821,7 @@ export type Database = {
         Insert: {
           course_id?: string | null
           course_name?: string | null
+          course_name_normalized?: string | null
           created_at?: string
           expires_at: string
           host_user_id: string
@@ -838,6 +840,7 @@ export type Database = {
         Update: {
           course_id?: string | null
           course_name?: string | null
+          course_name_normalized?: string | null
           created_at?: string
           expires_at?: string
           host_user_id?: string
@@ -2246,6 +2249,7 @@ export type Database = {
           id: string
           is_hidden: boolean
           last_location_update: string | null
+          last_seen_at: string | null
           lat: number | null
           lng: number | null
           open_to_play_active: boolean | null
@@ -2260,6 +2264,7 @@ export type Database = {
           id?: string
           is_hidden?: boolean
           last_location_update?: string | null
+          last_seen_at?: string | null
           lat?: number | null
           lng?: number | null
           open_to_play_active?: boolean | null
@@ -2274,6 +2279,7 @@ export type Database = {
           id?: string
           is_hidden?: boolean
           last_location_update?: string | null
+          last_seen_at?: string | null
           lat?: number | null
           lng?: number | null
           open_to_play_active?: boolean | null
@@ -2332,6 +2338,7 @@ export type Database = {
           has_profile_video: boolean | null
           header_photo_url: string | null
           home_club: string | null
+          home_club_id: string | null
           id: string
           is_public: boolean | null
           location: string | null
@@ -2388,6 +2395,7 @@ export type Database = {
           has_profile_video?: boolean | null
           header_photo_url?: string | null
           home_club?: string | null
+          home_club_id?: string | null
           id: string
           is_public?: boolean | null
           location?: string | null
@@ -2444,6 +2452,7 @@ export type Database = {
           has_profile_video?: boolean | null
           header_photo_url?: string | null
           home_club?: string | null
+          home_club_id?: string | null
           id?: string
           is_public?: boolean | null
           location?: string | null
@@ -2475,7 +2484,15 @@ export type Database = {
           website_url?: string | null
           websites?: string[] | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_user_profiles_home_club"
+            columns: ["home_club_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -2675,6 +2692,13 @@ export type Database = {
         }
         Relationships: []
       }
+      user_friend_pairs: {
+        Row: {
+          u1: string | null
+          u2: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       can_change_email: { Args: { user_id_param: string }; Returns: boolean }
@@ -2791,6 +2815,8 @@ export type Database = {
         Returns: undefined
       }
       send_user_ping: { Args: { p_recipient_id: string }; Returns: undefined }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
       update_mobile_crop_data: {
         Args: {
           p_crop_height: number
