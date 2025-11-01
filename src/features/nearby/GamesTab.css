@@ -10,6 +10,8 @@
   overflow: auto;
   max-height: calc(100dvh - 280px);
   -webkit-overflow-scrolling: touch;
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
 }
 
 /* Create Game CTA */
@@ -164,16 +166,23 @@
   line-height: 1;
 }
 
-/* Filters Row */
-.chips {
-  display: flex;
+/* Filters Row - Responsive Grid */
+.chipsGrid {
+  padding: 10px 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
-  padding: 10px 12px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
-.chip {
+/* Grow to 4-in-a-row when there's room */
+@media (min-width: 480px) {
+  .chipsGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.chipsGrid .chip {
+  width: 100%;
   height: 36px;
   border-radius: 12px;
   padding: 0 12px;
@@ -182,23 +191,29 @@
   box-shadow: inset 0 0 0 1px #2b2b2b;
   display: flex;
   align-items: center;
-  gap: 8px;
-  white-space: nowrap;
+  justify-content: space-between;
+  touch-action: manipulation;
   transition: background 0.08s ease;
 }
 
-.chip:active {
+.chipsGrid .chip:active {
   background: #1f1f1f;
 }
 
-.chipLabel {
+.chipsGrid .chipLabel {
   font-size: 14px;
 }
 
-.chipValue {
+.chipsGrid .chipValue {
   color: #9fc0a7;
   font-weight: 700;
   font-size: 14px;
+}
+
+/* Legacy cleanup - hide old carousel styles */
+.chips, .chipsScroller, .chipsCarousel {
+  display: none !important;
+  overflow-x: hidden !important;
 }
 
 /* Scoped Heading */

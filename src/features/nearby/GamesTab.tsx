@@ -108,7 +108,7 @@ function FiltersRow() {
   const filters = useGameFilters();
   
   return (
-    <div className="chips">
+    <div className="chipsGrid" role="group" aria-label="Game filters">
       <TapButton 
         className="chip" 
         onClick={() => openDateSheet(filters)}
