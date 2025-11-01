@@ -6,6 +6,9 @@ import { useGameParticipants } from '@/features/game/hooks/useGameParticipants';
 import { formatHcp } from '@/lib/formatHcp';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import type { GameParticipant as Participant } from '@/features/game/hooks/useGameParticipants';
 
 interface YourGamesAccordionCardProps {
   game: Game;
@@ -17,7 +20,51 @@ interface YourGamesAccordionCardProps {
 export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: YourGamesAccordionCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { data: participants = [] } = useGameParticipants(game.id);
-  const navigate = useNavigate();
+const navigate = useNavigate();
+
+  // Force-show participants: ensure host and current user rows even if participants query is empty
+  const { user } = useSupabaseSession();
+  const { data: hostProfile } = useUserProfile(game.host_user_id);
+  const { data: currentProfile } = useUserProfile(user?.id || null);
+
+  const baseParticipants = participants;
+  const hasHostInParticipants = baseParticipants.some((p) => p.role === 'host');
+
+  const forcedHost = !hasHostInParticipants && hostProfile ? [
+    {
+      user_id: hostProfile.id,
+      role: 'host',
+      state: 'accepted',
+      display_name: hostProfile.display_name,
+      username: hostProfile.username,
+      profile_photo_url: hostProfile.profile_photo_url || undefined,
+      eg_handicap_index: hostProfile.eg_handicap_index,
+      show_handicap: hostProfile.show_handicap,
+      home_club: hostProfile.home_club,
+      guest_name: null,
+      is_guest: false,
+    },
+  ] : [];
+
+  const isCurrentInParticipants = !!user?.id && baseParticipants.some((p) => p.user_id === user?.id);
+  const shouldAddSelf = !!user?.id && !isCurrentInParticipants && !!currentProfile && (!isHosting || !hostProfile);
+  const forcedSelf = shouldAddSelf ? [
+    {
+      user_id: currentProfile!.id,
+      role: (isHosting ? 'host' : 'player') as const,
+      state: 'accepted' as const,
+      display_name: currentProfile!.display_name,
+      username: currentProfile!.username,
+      profile_photo_url: currentProfile!.profile_photo_url || undefined,
+      eg_handicap_index: currentProfile!.eg_handicap_index,
+      show_handicap: currentProfile!.show_handicap,
+      home_club: currentProfile!.home_club,
+      guest_name: null,
+      is_guest: false,
+    },
+  ] : [];
+
+  const displayParticipants = [...forcedHost, ...baseParticipants, ...forcedSelf];
 
   const formatStartTime = (startTime: string) => {
     const date = parseISO(startTime);
@@ -108,11 +155,11 @@ export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: Y
           </div>
 
           {/* Players */}
-          {participants.length > 0 && (
+          <div className="space-y-2">
+            <div className="text-[13px] font-medium text-white/80">Players ({displayParticipants.length})</div>
             <div className="space-y-2">
-              <div className="text-[13px] font-medium text-white/80">Players ({participants.length})</div>
-              <div className="space-y-2">
-                {participants.map((p) => (
+              {displayParticipants.length > 0 ? (
+                displayParticipants.map((p) => (
                   <button
                     key={p.user_id || `guest:${p.display_name}`}
                     onClick={() => {
@@ -148,10 +195,14 @@ export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: Y
                       </div>
                     </div>
                   </button>
-                ))}
-              </div>
+                ))
+              ) : (
+                <div className="text-[13px] text-white/50 p-2 bg-white/5 rounded-lg">
+                  No participants data available
+                </div>
+              )}
             </div>
-          )}
+          </div>
 
           {/* Action button */}
           <button
