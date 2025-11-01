@@ -2837,8 +2837,16 @@ export type Database = {
         Args: { _game_id: string; _user_id: string }
         Returns: boolean
       }
+      user_is_friend_of_host: {
+        Args: { _host_id: string; _viewer_id: string }
+        Returns: boolean
+      }
       user_is_game_participant: {
         Args: { _game_id: string; _user_id: string }
+        Returns: boolean
+      }
+      viewer_shares_host_club: {
+        Args: { _host_id: string; _viewer_id: string }
         Returns: boolean
       }
     }

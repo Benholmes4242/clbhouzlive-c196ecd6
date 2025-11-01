@@ -45,6 +45,7 @@ interface CreateBeaconInput {
   course_id?: string;
   course_name?: string;
   note?: string;
+  visibility?: 'public' | 'friends' | 'club';
   start_time?: string;
   slots_total?: number;
   tagged_user_ids?: string[];
@@ -480,6 +481,7 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
             tagged_user_ids: input.tagged_user_ids || [],
             guest_participants: input.guest_participants || [],
             note: input.note,
+            visibility: input.visibility || 'public',
             lat: input.lat || userLat,
             lng: input.lng || userLng,
           }),

@@ -4,6 +4,8 @@ import { format, parseISO } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useGameParticipants } from '@/features/game/hooks/useGameParticipants';
 import { formatHcp } from '@/lib/formatHcp';
+import { GameVisibilityBadge } from './GameVisibilityBadge';
+import type { GameVisibility } from '../types';
 
 interface AnonymousGameCardProps {
   game: {
@@ -13,6 +15,7 @@ interface AnonymousGameCardProps {
     slots_open: number;
     slots_total: number;
     host_user_id?: string;
+    visibility?: GameVisibility;
   };
   onRequestJoin: (gameId: string) => void;
   hasRequested?: boolean;
@@ -53,8 +56,13 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested, isAccepte
       {/* Block 1: Header row */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
-          <div className="text-[15px] font-semibold text-white mb-0.5">
-            {game.course_name || 'Course TBD'}
+          <div className="flex items-center gap-2 mb-0.5">
+            <div className="text-[15px] font-semibold text-white">
+              {game.course_name || 'Course TBD'}
+            </div>
+            {game.visibility && game.visibility !== 'public' && (
+              <GameVisibilityBadge visibility={game.visibility} size="sm" />
+            )}
           </div>
           <div className="text-[13px] text-white/70">
             {formatStartTime(game.start_time)}

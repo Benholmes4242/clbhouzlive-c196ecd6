@@ -12,6 +12,7 @@ export type NearbyGolfer = {
 
 export type BeaconAudience = 'followers' | 'friends' | 'nearby' | 'custom';
 export type BeaconFormat = '9' | '18' | 'range' | 'casual' | 'stroke' | 'scramble';
+export type GameVisibility = 'public' | 'friends' | 'club';
 
 export type GameBeaconDraft = {
   when: 'now' | '30m' | '1h' | { atISO: string; durationMin?: number };

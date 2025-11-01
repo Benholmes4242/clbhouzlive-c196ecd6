@@ -4,6 +4,8 @@ import { GameBeacon } from '../hooks/useGameBeacon';
 import { useCourseSearch } from '../hooks/useCourseSearch';
 import { DateTimePicker } from './DateTimePicker';
 import { UserSearchTypeahead } from './UserSearchTypeahead';
+import { GameVisibilitySelector } from './GameVisibilitySelector';
+import type { GameVisibility } from '../types';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -32,6 +34,7 @@ interface CreateGameModalProps {
     slots_total?: number;
     tagged_user_ids?: string[];
     guest_participants?: Array<{ guest_name: string }>;
+    visibility?: GameVisibility;
   }) => Promise<void>;
   onCancelBeacon: (beaconId: string) => Promise<void>;
   myBeacon: GameBeacon | null;
@@ -75,6 +78,7 @@ export function CreateGameModal({
   const [courseSearchTerm, setCourseSearchTerm] = useState('');
   const [showCourseDropdown, setShowCourseDropdown] = useState(false);
   const [note, setNote] = useState('');
+  const [visibility, setVisibility] = useState<GameVisibility>('public');
   const [timing, setTiming] = useState<string>('now');
   const [customDateTime, setCustomDateTime] = useState<Date | null>(null);
   const [showDateTimePicker, setShowDateTimePicker] = useState(false);
@@ -200,6 +204,7 @@ export function CreateGameModal({
         course_id: courseId,
         course_name: courseName,
         note: note || undefined,
+        visibility,
         start_time: startTime.toISOString(),
         tee_time: startTime.toISOString(),
         slots_total: totalSlots,
@@ -213,6 +218,7 @@ export function CreateGameModal({
       setCourseName('');
       setCourseSearchTerm('');
       setNote('');
+      setVisibility('public');
       setTiming('now');
       setCustomDateTime(null);
       setAvailableSlots(3);
@@ -487,6 +493,14 @@ export function CreateGameModal({
                   onChange={(e) => setNote(e.target.value)}
                   rows={2}
                   className="w-full py-3 px-4 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20 resize-none"
+                />
+              </div>
+
+              {/* Visibility */}
+              <div className="space-y-3">
+                <GameVisibilitySelector
+                  value={visibility}
+                  onChange={setVisibility}
                 />
               </div>
 

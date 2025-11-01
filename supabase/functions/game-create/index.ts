@@ -41,6 +41,7 @@ Deno.serve(async (req) => {
       tagged_user_ids = [],
       guest_participants = [],
       note,
+      visibility = 'public',
       lat,
       lng
     } = await req.json();
@@ -79,7 +80,7 @@ Deno.serve(async (req) => {
         lat,
         lng,
         status: 'active',
-        visibility: 'public'
+        visibility: visibility || 'public'
       })
       .select()
       .single();

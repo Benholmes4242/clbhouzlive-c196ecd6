@@ -282,6 +282,7 @@ export function GamesNearbyList({
                     slots_open: game.slots_open || 0,
                     slots_total: game.slots_total || 4,
                     host_user_id: game.host_user_id,
+                    visibility: game.visibility as 'public' | 'friends' | 'club',
                   }}
                   onRequestJoin={handleRequestJoin}
                   hasRequested={requestedGames.has(game.id)}
