@@ -233,16 +233,36 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                 <div className="text-[15px] font-medium text-white/90">Loading active golfers…</div>
                 <div className="text-[13px] text-white/60 mt-1">Checking who's nearby</div>
               </div>
-            ) : golfers.length === 0 ? (
-              <div className="py-12 text-center flex flex-col items-center justify-center min-h-[240px]">
-                <div className="text-[15px] font-medium text-white/90">No active golfers right now</div>
-                <div className="text-[13px] text-white/60 mt-1">Check back soon</div>
-              </div>
             ) : (
               <div className="space-y-2">
+                {/* MOCK: Thomas Holmes with all features enabled for UI testing */}
+                <GolferRow 
+                  key="mock-thomas" 
+                  golfer={{
+                    id: 'mock-thomas-holmes',
+                    display_name: 'Thomas Holmes',
+                    username: 'tholmes',
+                    home_club: 'Pebble Beach Golf Links',
+                    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Thomas',
+                    is_online: true,
+                    isMock: true,
+                    distanceText: '1.2 mi',
+                    isOpenToPlay: true,
+                    sameHomeClub: true,
+                  }} 
+                  index={0} 
+                />
+                
+                {/* Real golfers */}
                 {golfers.map((golfer, index) => (
-                  <GolferRow key={golfer.id ?? index} golfer={golfer} index={index} />
+                  <GolferRow key={golfer.id ?? index} golfer={golfer} index={index + 1} />
                 ))}
+                
+                {golfers.length === 0 && (
+                  <div className="py-8 text-center">
+                    <div className="text-[13px] text-white/60">No other active golfers nearby</div>
+                  </div>
+                )}
               </div>
             )
           ) : activeTab === 'games' ? (
