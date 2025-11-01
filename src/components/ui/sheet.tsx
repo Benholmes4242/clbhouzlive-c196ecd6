@@ -58,10 +58,11 @@ const SheetContent = React.forwardRef<
   SheetContentProps
 >(({ side = "right", className, children, container, ...props }, ref) => (
   <SheetPortal container={container}>
+    <div data-filter-sheet className="fixed inset-0 z-[10050] pointer-events-none" />
     <SheetOverlay />
     <SheetPrimitive.Content
       ref={ref}
-      className={cn(sheetVariants({ side }), className)}
+      className={cn(sheetVariants({ side }), "z-[10050]", className)}
       {...props}
     >
       {children}

@@ -105,7 +105,11 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       <button
         aria-label="close"
         className="fixed inset-0 z-[9999]"
-        onClick={handleClose}
+        onClick={(e) => {
+          // Don't close if clicking inside a filter sheet
+          if ((e.target as HTMLElement)?.closest?.('[data-filter-sheet]')) return;
+          handleClose();
+        }}
       />
 
       {/* Modal container */}

@@ -135,8 +135,7 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
             </SheetTrigger>
             <SheetContent 
               side="bottom" 
-              className="pb-8 z-[10020]"
-              container={portalContainer}
+              className="pb-8"
             >
               <SheetHeader>
                 <SheetTitle>Choose when you'd like to play</SheetTitle>
@@ -191,8 +190,7 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
             </SheetTrigger>
             <SheetContent 
               side="bottom" 
-              className="pb-8 z-[10020]"
-              container={portalContainer}
+              className="pb-8"
             >
               <SheetHeader>
                 <SheetTitle>Select a time window</SheetTitle>
@@ -231,8 +229,7 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
               </SheetTrigger>
               <SheetContent 
                 side="bottom" 
-                className="pb-8 z-[10020]"
-                container={portalContainer}
+                className="pb-8"
               >
                 <SheetHeader>
                   <SheetTitle>How far are you willing to travel?</SheetTitle>
@@ -271,8 +268,7 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
             </SheetTrigger>
             <SheetContent 
               side="bottom" 
-              className="pb-8 z-[10020]"
-              container={portalContainer}
+              className="pb-8"
             >
               <SheetHeader>
                 <SheetTitle>Order your results</SheetTitle>
