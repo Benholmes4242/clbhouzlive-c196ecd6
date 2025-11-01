@@ -1,77 +1,142 @@
-/* Glass Elevate Design - Nearby Golfers Squircle (matching profile tiles) */
+/* Nearby Golfers Squircle - Dark Mode Premium */
 
 .nearby-golfers-squircle {
   position: relative;
-  width: 74px;
-  height: 74px;
-  border-radius: 22%;
+  width: 86px;
+  height: 86px;
+  border-radius: 22px;
+  background: #0f0f0f;
+  box-shadow: inset 0 0 0 1px #212121, 0 6px 18px rgba(0, 0, 0, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
-  isolation: isolate;
-  cursor: pointer;
   overflow: hidden;
-  
-  /* Glass background with subtle white tint */
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(245, 245, 245, 0.08) 100%);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  
-  /* Subtle elevation matching profile tiles */
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.12),
-    inset 0 1px 2px rgba(255, 255, 255, 0.2);
-  
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  /* Prevent tap highlight on mobile */
+  touch-action: manipulation;
+  transition: transform 0.08s ease, box-shadow 0.2s ease;
+  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Glass overlay for depth */
-.nearby-golfers-squircle::before {
-  content: "";
+.nearby-golfers-squircle:active {
+  transform: scale(0.97);
+}
+
+.nearby-golfers-squircle.on {
+  box-shadow: inset 0 0 0 1px #335a3f, 0 0 0 4px rgba(110, 146, 119, 0.18), 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+/* Animated radar ring */
+.ring {
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
+  inset: -6px;
+  border-radius: 24px;
+  background: radial-gradient(transparent 58%, rgba(110, 146, 119, 0.12) 60%, transparent 62%);
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 50%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.radar-icon {
-  width: 90%;
-  height: 90%;
+.sweep {
+  position: absolute;
+  inset: -30%;
+  background: conic-gradient(from 0deg, rgba(110, 146, 119, 0.25), transparent 30%);
+  animation: sweep 2.4s linear infinite;
+  mix-blend-mode: screen;
   pointer-events: none;
-  position: relative;
-  z-index: 1;
-  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.2));
 }
 
-/* Radar sweep animation - slowed down */
-.radar-sweep {
-  animation: radarSweep 4.5s linear infinite;
-  transform-origin: 50px 50px;
-}
-
-@keyframes radarSweep {
-  from {
-    transform: rotate(0deg);
-  }
+@keyframes sweep {
   to {
     transform: rotate(360deg);
   }
 }
 
-/* Hover / Active States */
-.nearby-golfers-squircle:hover {
-  transform: translateY(-1px) scale(1.03);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+/* Glyph */
+.glyph {
+  position: absolute;
+  top: 18px;
+  font-size: 22px;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4));
+  pointer-events: none;
 }
 
-.nearby-golfers-squircle:active {
-  transform: translateY(0) scale(0.985);
-  transition: all 0.1s ease;
+/* Title */
+.title {
+  position: absolute;
+  bottom: 24px;
+  font-weight: 700;
+  font-size: 11px;
+  color: #eaeaea;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Count pill */
+.pill {
+  position: absolute;
+  bottom: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #171717;
+  color: #d2d2d2;
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px #2a2a2a;
+  pointer-events: none;
+}
+
+.pill.green {
+  background: #162219;
+  color: #cfe8d6;
+  box-shadow: inset 0 0 0 1px #325a3e;
+}
+
+/* Open to Play indicator */
+.otpDot {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  animation: bob 1.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes bob {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+/* Visibility chip */
+.visChip {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 10px;
+  color: #cfcfcf;
+  background: #151515;
+  border-radius: 999px;
+  padding: 3px 6px;
+  box-shadow: inset 0 0 0 1px #262626;
+  pointer-events: none;
+}
+
+.nearby-golfers-squircle.hidden {
+  filter: saturate(0.3) brightness(0.9);
+}
+
+.nearby-golfers-squircle.friends .visChip {
+  color: #cfe0ff;
+  box-shadow: inset 0 0 0 1px #2b3a56;
+}
+
+/* Error badge */
+.errBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 12px;
+  pointer-events: auto;
 }
 
 /* Accessibility */
@@ -86,11 +151,11 @@
     transition: none;
   }
   
-  .nearby-golfers-squircle:hover {
-    transform: none;
+  .sweep {
+    animation: none;
   }
   
-  .radar-sweep {
+  .otpDot {
     animation: none;
   }
 }

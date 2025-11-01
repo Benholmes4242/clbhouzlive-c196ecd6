@@ -154,8 +154,7 @@ function NearbyTile({ count, isLoading, onOpen }: { count: number; isLoading: bo
     >
       <div className="lc-avatar-btn">
         <NearbyGolfersSquircle 
-          onClick={handleClick}
-          ariaLabel={`Nearby golfers, ${count} ${count === 1 ? 'golfer' : 'golfers'} nearby`}
+          onOpen={handleClick}
         />
       </div>
 
