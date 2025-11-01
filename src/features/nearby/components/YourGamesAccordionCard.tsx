@@ -20,14 +20,29 @@ interface YourGamesAccordionCardProps {
 export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: YourGamesAccordionCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { data: participants = [] } = useGameParticipants(game.id);
-const navigate = useNavigate();
+  const navigate = useNavigate();
+
+  // Prefer participants embedded on the game object (e.g., tagged/reserved) when available
+  const prefetchedParticipants: Participant[] = (game.participants ?? []).map((p: any) => ({
+    user_id: p.user_id ?? null,
+    role: p.role,
+    state: p.state,
+    display_name: p.user_profiles?.display_name || 'Unknown',
+    username: p.user_profiles?.username,
+    profile_photo_url: p.user_profiles?.profile_photo_url || undefined,
+    eg_handicap_index: (p.user_profiles as any)?.eg_handicap_index ?? (p.user_profiles as any)?.handicap ?? null,
+    show_handicap: (p.user_profiles as any)?.show_handicap,
+    home_club: (p.user_profiles as any)?.home_club ?? null,
+    guest_name: null,
+    is_guest: !p.user_id,
+  }));
 
   // Force-show participants: ensure host and current user rows even if participants query is empty
   const { user } = useSupabaseSession();
   const { data: hostProfile } = useUserProfile(game.host_user_id);
   const { data: currentProfile } = useUserProfile(user?.id || null);
 
-  const baseParticipants = participants;
+  const baseParticipants = (prefetchedParticipants.length > 0 ? prefetchedParticipants : participants);
   const hasHostInParticipants = baseParticipants.some((p) => p.role === 'host');
 
   const forcedHost = !hasHostInParticipants && hostProfile ? [

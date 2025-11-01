@@ -28,7 +28,23 @@ export function YourGamesList({ onCancelGame, onLeaveGame, onCountChange }: Your
       // Fetch games you're hosting
       const { data: hosted, error: hostedError } = await supabase
         .from('games')
-        .select('id, course_name, course_id, start_time, expires_at, status, slots_open, slots_total, note, created_at, host_user_id, visibility, updated_at')
+        .select(`id, course_name, course_id, start_time, expires_at, status, slots_open, slots_total, note, created_at, host_user_id, visibility, updated_at,
+          participants:game_participants(
+            user_id,
+            role,
+            state,
+            reserves_slot,
+            user_profiles:user_id (
+              id,
+              display_name,
+              username,
+              profile_photo_url,
+              eg_handicap_index,
+              show_handicap,
+              home_club
+            )
+          )
+        `)
         .eq('host_user_id', user.id)
         .eq('status', 'active')
         .gt('expires_at', nowIso) // Use gt instead of gte
@@ -56,7 +72,22 @@ export function YourGamesList({ onCancelGame, onLeaveGame, onCountChange }: Your
             created_at,
             host_user_id,
             visibility,
-            updated_at
+            updated_at,
+            participants:game_participants(
+              user_id,
+              role,
+              state,
+              reserves_slot,
+              user_profiles:user_id (
+                id,
+                display_name,
+                username,
+                profile_photo_url,
+                eg_handicap_index,
+                show_handicap,
+                home_club
+              )
+            )
           )
         `)
         .eq('user_id', user.id)
