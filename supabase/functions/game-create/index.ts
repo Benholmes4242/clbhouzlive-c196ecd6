@@ -150,6 +150,7 @@ Deno.serve(async (req) => {
     if (guest_participants.length > 0) {
       const guestParticipants = guest_participants.map((guest: { guest_name: string }) => ({
         game_id: game.id,
+        user_id: null, // Explicitly set to null for guests
         guest_name: guest.guest_name,
         added_by_user_id: user.id,
         role: 'player',
