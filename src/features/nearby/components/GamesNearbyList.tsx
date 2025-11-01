@@ -150,19 +150,8 @@ export function GamesNearbyList({
 
   return (
     <div className="space-y-3 pb-4">
-      {/* SECTION 1: Find a Game (Search) */}
-      <div>
-        <ClubSearchInput
-          onClubSelect={handleClubSelect}
-          onClear={handleClearSearch}
-          selectedClub={selectedClub}
-        />
-      </div>
-
-      {/* Subtle divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-      {/* SECTION 2: My Games */}
+      {/* SECTION 1: Games Near You (Available Games) */}
+      {/* SECTION 1a: My Games */}
       {myGames.length > 0 && (
         <div className="space-y-3">
           <div className="px-2 text-center">
@@ -183,7 +172,7 @@ export function GamesNearbyList({
         <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
       )}
 
-      {/* SECTION 3: Available Games */}
+      {/* SECTION 1b: Available Games */}
       <div className="space-y-3">
         <div className="px-2 text-center">
           <h3 className="text-sm font-semibold text-white/95">
@@ -234,10 +223,22 @@ export function GamesNearbyList({
         )}
       </div>
 
+      {/* Subtle divider */}
+      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+      {/* SECTION 2: Find a Game (Search) */}
+      <div>
+        <ClubSearchInput
+          onClubSelect={handleClubSelect}
+          onClear={handleClearSearch}
+          selectedClub={selectedClub}
+        />
+      </div>
+
       {/* Subtle divider before CTA */}
       <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-      {/* SECTION 4: Create a Game CTA - Centered */}
+      {/* SECTION 3: Create a Game CTA - Centered */}
       <div className="text-center space-y-3 flex flex-col items-center">
         <p className="text-xs text-white/60">
           Can't find a game that suits you?
