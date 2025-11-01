@@ -3,19 +3,32 @@ import { supabase } from '@/integrations/supabase/client';
 import { Game } from '../types';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { channelManager } from '@/utils/supabaseChannelManager';
-import { YourGamesAccordionCard } from './YourGamesAccordionCard';
+import { GameCard } from './your-games/GameCard';
+import { EmptyState } from './your-games/EmptyState';
+import { Segmented, SegmentItem } from './Segmented';
+import { TapButton } from '@/components/ui/TapButton';
+import { SkeletonRow } from '@/components/ui/SkeletonRow';
 
 interface YourGamesListProps {
   onCancelGame?: (gameId: string) => void;
   onLeaveGame?: (gameId: string) => void;
   onCountChange?: (count: number) => void;
+  onCreateGame?: () => void;
+  onFindGame?: () => void;
 }
 
-export function YourGamesList({ onCancelGame, onLeaveGame, onCountChange }: YourGamesListProps) {
+export function YourGamesList({ 
+  onCancelGame, 
+  onLeaveGame, 
+  onCountChange, 
+  onCreateGame,
+  onFindGame 
+}: YourGamesListProps) {
   const { user } = useSupabaseSession();
   const [hostedGames, setHostedGames] = useState<Game[]>([]);
   const [joinedGames, setJoinedGames] = useState<Game[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'hosting' | 'joined'>('hosting');
 
   const fetchYourGames = useCallback(async () => {
     if (!user?.id) {
@@ -198,65 +211,93 @@ export function YourGamesList({ onCancelGame, onLeaveGame, onCountChange }: Your
     }
   };
 
+  const segmentItems: SegmentItem[] = [
+    { 
+      value: 'hosting', 
+      label: `Hosting (${hostedGames.length})`,
+      ariaLabel: `Hosting ${hostedGames.length} games`
+    },
+    { 
+      value: 'joined', 
+      label: `Joined (${joinedGames.length})`,
+      ariaLabel: `Joined ${joinedGames.length} games`
+    },
+  ];
+
+  const currentGames = activeTab === 'hosting' ? hostedGames : joinedGames;
+  const isHostingTab = activeTab === 'hosting';
+
+  // Show loading skeleton while fetching
   if (isLoading) {
     return (
-      <div className="py-12 text-center flex flex-col items-center justify-center min-h-[240px]">
-        <div className="text-[15px] font-medium text-white/90">Loading your games…</div>
-        <div className="text-[13px] text-white/60 mt-1">Just a moment</div>
+      <div className="space-y-4">
+        <div className="h-10 bg-white/5 rounded-lg animate-pulse" />
+        <SkeletonRow count={3} className="grid-flow-row auto-rows-[120px]" />
       </div>
     );
   }
 
-  const hasNoGames = hostedGames.length === 0 && joinedGames.length === 0;
-
-  if (hasNoGames) {
+  // If no games found at all
+  if (hostedGames.length === 0 && joinedGames.length === 0) {
     return (
-      <div className="py-12 text-center flex flex-col items-center justify-center min-h-[240px]">
-        <div className="text-[15px] font-medium text-white/90">No active games</div>
-        <div className="text-[13px] text-white/60 mt-1">Create or join a game to get started</div>
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="text-5xl mb-3">⛳</div>
+        <h3 className="text-lg font-semibold text-white/90 mb-2">No games yet</h3>
+        <p className="text-sm text-white/60 max-w-xs mb-4">
+          You haven't hosted or joined any games. Create one to get started!
+        </p>
+        {onCreateGame && (
+          <TapButton
+            onClick={onCreateGame}
+            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/14 active:bg-white/18 border border-white/15 text-sm font-medium text-white/90"
+          >
+            Create a Game
+          </TapButton>
+        )}
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Hosting section */}
-      {hostedGames.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wider">
-            Hosting ({hostedGames.length})
-          </h3>
-          <div className="space-y-2">
-            {hostedGames.map((game) => (
-              <YourGamesAccordionCard
-                key={game.id}
-                game={game}
-                isHosting={true}
-                onCancel={() => handleCancel(game.id)}
-                onLeave={() => handleLeave(game.id)}
-              />
-            ))}
-          </div>
-        </div>
+    <div className="space-y-4">
+      {/* Segmented tabs */}
+      <Segmented
+        items={segmentItems}
+        value={activeTab}
+        onChange={(val) => setActiveTab(val as 'hosting' | 'joined')}
+        columns={2}
+        ariaLabel="Your games view"
+        className="mb-3"
+      />
+
+      {/* Create a Game CTA */}
+      {isHostingTab && onCreateGame && (
+        <TapButton
+          onClick={onCreateGame}
+          className="w-full px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/14 active:bg-white/18 border border-white/15 text-sm font-medium text-white/90 transition-colors"
+        >
+          Create a Game
+        </TapButton>
       )}
 
-      {/* Joined section */}
-      {joinedGames.length > 0 && (
+      {/* Games list */}
+      {currentGames.length === 0 ? (
+        <EmptyState 
+          type={activeTab}
+          onCreateGame={isHostingTab ? onCreateGame : undefined}
+          onFindGame={!isHostingTab ? onFindGame : undefined}
+        />
+      ) : (
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wider">
-            Joined ({joinedGames.length})
-          </h3>
-          <div className="space-y-2">
-            {joinedGames.map((game) => (
-              <YourGamesAccordionCard
-                key={game.id}
-                game={game}
-                isHosting={false}
-                onCancel={() => handleCancel(game.id)}
-                onLeave={() => handleLeave(game.id)}
-              />
-            ))}
-          </div>
+          {currentGames.map((game) => (
+            <GameCard
+              key={game.id}
+              game={game}
+              isHosting={isHostingTab}
+              onCancel={() => handleCancel(game.id)}
+              onLeave={() => handleLeave(game.id)}
+            />
+          ))}
         </div>
       )}
     </div>
