@@ -68,6 +68,7 @@ export function CreateGameModal({
   prefilledClub,
 }: CreateGameModalProps) {
   const [gameType, setGameType] = useState<string>('9_holes');
+  const [courseId, setCourseId] = useState<string>('');
   const [courseName, setCourseName] = useState('');
   const [courseSearchTerm, setCourseSearchTerm] = useState('');
   const [showCourseDropdown, setShowCourseDropdown] = useState(false);
@@ -75,22 +76,40 @@ export function CreateGameModal({
   const [timing, setTiming] = useState<string>('now');
   const [customDateTime, setCustomDateTime] = useState<Date | null>(null);
   const [showDateTimePicker, setShowDateTimePicker] = useState(false);
-  const [playersNeeded, setPlayersNeeded] = useState<number | null>(null);
-  const [slotsTotal, setSlotsTotal] = useState<number>(4);
+  const [availableSlots, setAvailableSlots] = useState<number>(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [courseError, setCourseError] = useState<string>('');
   const courseInputRef = useRef<HTMLInputElement>(null);
   
   const { courses } = useCourseSearch(courseSearchTerm);
 
+  // Calculate current players (host + tagged)
+  const currentPlayers = 1 + selectedUsers.length;
+  
+  // Calculate max available slots based on current players
+  const maxAvailableSlots = 4 - currentPlayers;
+  
+  // Get game size label
+  const gameSizeLabels = ['One-ball', 'Two-ball', 'Three-ball', 'Four-ball'];
+  const gameSizeLabel = currentPlayers <= 4 ? `${gameSizeLabels[currentPlayers - 1]} game` : 'Full game';
+
   // Pre-fill club if provided
   useEffect(() => {
-    if (prefilledClub && !courseName) {
+    if (prefilledClub && !courseId) {
+      setCourseId(prefilledClub.id);
       setCourseName(prefilledClub.name);
-      setCourseSearchTerm(prefilledClub.name);
+      setCourseSearchTerm('');
     }
-  }, [prefilledClub, courseName]);
+  }, [prefilledClub, courseId]);
+
+  // Adjust available slots if currentPlayers changes
+  useEffect(() => {
+    if (availableSlots > maxAvailableSlots) {
+      setAvailableSlots(Math.max(1, maxAvailableSlots));
+    }
+  }, [currentPlayers, maxAvailableSlots, availableSlots]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -107,10 +126,14 @@ export function CreateGameModal({
 
   const validateForm = (): boolean => {
     const errors: ValidationErrors = {};
+    let isValid = true;
 
-    // Validate slots_total
-    if (slotsTotal < 1 || slotsTotal > 10) {
-      errors.slotsTotal = 'Total slots must be between 1 and 10';
+    // Validate course selection (must have courseId)
+    if (!courseId) {
+      setCourseError('Please pick a club from the list.');
+      isValid = false;
+    } else {
+      setCourseError('');
     }
 
     // Validate start_time is in the future
@@ -125,19 +148,21 @@ export function CreateGameModal({
       startTime = customDateTime;
       if (startTime.getTime() < Date.now()) {
         errors.startTime = 'Start time must be in the future';
+        isValid = false;
       }
     } else {
       startTime = new Date();
     }
 
-    // Validate tagged users don't exceed capacity
-    const totalReservedSlots = 1 + selectedUsers.length; // 1 for host
-    if (totalReservedSlots > slotsTotal) {
-      errors.slotsTotal = `Cannot tag ${selectedUsers.length} players - only ${slotsTotal - 1} seats available`;
+    // Validate total doesn't exceed 4
+    const totalSlots = currentPlayers + availableSlots;
+    if (totalSlots > 4) {
+      errors.slotsTotal = `Total cannot exceed 4 players`;
+      isValid = false;
     }
 
     setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
+    return isValid;
   };
 
   const handleSubmit = async () => {
@@ -160,28 +185,29 @@ export function CreateGameModal({
 
     setIsSubmitting(true);
     try {
+      const totalSlots = currentPlayers + availableSlots;
       await onCreateBeacon({
         game_type: gameType,
-        course_name: courseName || undefined,
+        course_name: courseName,
         note: note || undefined,
         start_time: startTime.toISOString(),
         tee_time: startTime.toISOString(),
-        slots_total: slotsTotal,
+        slots_total: totalSlots,
         tagged_user_ids: selectedUsers.map(u => u.id),
-        players_needed: playersNeeded || undefined,
       });
       onClose();
       // Reset form
       setGameType('9_holes');
+      setCourseId('');
       setCourseName('');
       setCourseSearchTerm('');
       setNote('');
       setTiming('now');
       setCustomDateTime(null);
-      setPlayersNeeded(null);
-      setSlotsTotal(4);
+      setAvailableSlots(3);
       setSelectedUsers([]);
       setValidationErrors({});
+      setCourseError('');
     } finally {
       setIsSubmitting(false);
     }
@@ -194,10 +220,24 @@ export function CreateGameModal({
     }
   };
 
-  const handleCourseSelect = (course: { name: string }) => {
+  const handleCourseSelect = (course: { id: string; name: string }) => {
+    setCourseId(course.id);
     setCourseName(course.name);
-    setCourseSearchTerm(course.name);
+    setCourseSearchTerm(''); // Clear search buffer
     setShowCourseDropdown(false);
+    setCourseError('');
+    courseInputRef.current?.blur(); // Optional blur
+  };
+
+  const handleCourseInputChange = (value: string) => {
+    setCourseSearchTerm(value);
+    // If user types again, clear the courseId (treat as new search)
+    if (courseId) {
+      setCourseId('');
+      setCourseName('');
+    }
+    setShowCourseDropdown(true);
+    setCourseError('');
   };
 
   const getTimingDisplay = () => {
@@ -372,23 +412,33 @@ export function CreateGameModal({
                 </div>
               </div>
 
-              {/* Location */}
+              {/* Golf course */}
               <div className="space-y-3 relative">
-                <label className="block text-sm font-medium text-white/60">
-                  Where
+                <label className="block text-sm font-medium text-white/90">
+                  Golf course *
                 </label>
                 <input
                   ref={courseInputRef}
                   type="text"
-                  placeholder="Golf course …"
-                  value={courseSearchTerm}
-                  onChange={(e) => {
-                    setCourseSearchTerm(e.target.value);
-                    setShowCourseDropdown(true);
-                  }}
+                  placeholder="Search club name…"
+                  value={courseName || courseSearchTerm}
+                  onChange={(e) => handleCourseInputChange(e.target.value)}
                   onFocus={() => setShowCourseDropdown(true)}
-                  className="w-full py-3 px-4 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className={`w-full py-3 px-4 bg-neutral-800 border rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20 ${
+                    courseError ? 'border-red-500' : 'border-neutral-700'
+                  }`}
                 />
+                {courseName && courseId && (
+                  <div className="text-xs text-white/50">
+                    Selected: {courseName}
+                  </div>
+                )}
+                {courseError && (
+                  <div className="flex items-center gap-2 text-red-400 text-sm">
+                    <AlertCircle className="w-4 h-4" />
+                    {courseError}
+                  </div>
+                )}
                 {showCourseDropdown && courses.length > 0 && (
                   <>
                     <div 
@@ -456,44 +506,62 @@ export function CreateGameModal({
                 )}
               </div>
 
-              {/* Available Slots */}
+              {/* Tag Players */}
               <div className="space-y-3">
-                <label className="block text-sm font-medium text-white/90">
-                  Available Slots *
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {SLOTS_TOTAL_OPTIONS.map(num => (
-                    <button
-                      key={num}
-                      onClick={() => setSlotsTotal(num)}
-                      className={`py-3 px-4 rounded-xl font-medium transition-all backdrop-blur ${
-                        slotsTotal === num
-                          ? 'bg-white/20 text-white border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset]'
-                          : 'bg-white/5 text-white/70 border border-white/12 hover:bg-white/10'
-                      }`}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
-                <div className="text-xs text-center text-white/60">
-                  {slotsTotal === 1 ? '1 slot available' : `${slotsTotal} slots available`}
-                </div>
-                {validationErrors.slotsTotal && (
-                  <div className="flex items-center gap-2 text-red-400 text-sm">
-                    <AlertCircle className="w-4 h-4" />
-                    {validationErrors.slotsTotal}
+                <div className="flex items-center justify-between">
+                  <label className="block text-sm font-medium text-white/60">
+                    Tag players
+                  </label>
+                  <div className="text-xs text-white/50">
+                    {gameSizeLabel}
                   </div>
-                )}
+                </div>
+                <UserSearchTypeahead
+                  selectedUsers={selectedUsers}
+                  onUserAdd={(user) => setSelectedUsers([...selectedUsers, user])}
+                  onUserRemove={(userId) => setSelectedUsers(selectedUsers.filter(u => u.id !== userId))}
+                  maxUsers={3} // Max 3 tagged (host + 3 = 4 total)
+                />
               </div>
 
-              {/* Tag Players */}
-              <UserSearchTypeahead
-                selectedUsers={selectedUsers}
-                onUserAdd={(user) => setSelectedUsers([...selectedUsers, user])}
-                onUserRemove={(userId) => setSelectedUsers(selectedUsers.filter(u => u.id !== userId))}
-                maxUsers={slotsTotal - 1}
-              />
+              {/* Available Slots */}
+              {maxAvailableSlots > 0 && (
+                <div className="space-y-3">
+                  <label className="block text-sm font-medium text-white/90">
+                    Available slots *
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[1, 2, 3].map(num => {
+                      const isDisabled = num > maxAvailableSlots;
+                      return (
+                        <button
+                          key={num}
+                          onClick={() => !isDisabled && setAvailableSlots(num)}
+                          disabled={isDisabled}
+                          className={`py-3 px-4 rounded-xl font-medium transition-all backdrop-blur ${
+                            availableSlots === num && !isDisabled
+                              ? 'bg-white/20 text-white border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset]'
+                              : isDisabled
+                              ? 'bg-white/5 text-white/30 border border-white/8 cursor-not-allowed'
+                              : 'bg-white/5 text-white/70 border border-white/12 hover:bg-white/10'
+                          }`}
+                        >
+                          {num}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="text-xs text-center text-white/60">
+                    {availableSlots === 1 ? '1 slot available' : `${availableSlots} slots available`}
+                  </div>
+                  {validationErrors.slotsTotal && (
+                    <div className="flex items-center gap-2 text-red-400 text-sm">
+                      <AlertCircle className="w-4 h-4" />
+                      {validationErrors.slotsTotal}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Timing validation error */}
               {validationErrors.startTime && (
