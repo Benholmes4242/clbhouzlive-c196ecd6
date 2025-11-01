@@ -355,6 +355,11 @@ export function useGameBeacon() {
 
       const { game: newBeacon } = await response.json();
 
+      // Dev logging to verify host_user_id matches
+      console.log('[Game Create] newBeacon.host_user_id:', newBeacon.host_user_id);
+      console.log('[Game Create] current user.id:', user.user.id);
+      console.log('[Game Create] IDs match:', newBeacon.host_user_id === user.user.id);
+
       // Optimistically update local state
       setMyBeacon({
         ...newBeacon,
@@ -368,7 +373,7 @@ export function useGameBeacon() {
 
       // Dispatch event to trigger Your Games refetch
       window.dispatchEvent(new CustomEvent('game-created', { 
-        detail: { gameId: newBeacon.id } 
+        detail: { gameId: newBeacon.id, hostUserId: newBeacon.host_user_id } 
       }));
     } catch (error) {
       console.error('Error in createBeacon:', error);

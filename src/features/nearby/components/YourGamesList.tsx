@@ -30,13 +30,11 @@ export function YourGamesList({ onCancelGame, onLeaveGame }: YourGamesListProps)
         .select('id, course_name, course_id, start_time, expires_at, status, slots_open, slots_total, note, created_at, host_user_id, visibility, updated_at')
         .eq('host_user_id', user.id)
         .eq('status', 'active')
-        .gte('expires_at', nowIso)
+        .gt('expires_at', nowIso) // Use gt instead of gte
         .order('start_time', { ascending: true });
 
       if (hostedError) {
         console.error('Error fetching hosted games:', hostedError);
-      } else {
-        setHostedGames((hosted || []) as Game[]);
       }
 
       // Fetch games you've joined (as participant)
@@ -62,20 +60,39 @@ export function YourGamesList({ onCancelGame, onLeaveGame }: YourGamesListProps)
         `)
         .eq('user_id', user.id)
         .eq('games.status', 'active')
-        .gte('games.expires_at', nowIso);
+        .gt('games.expires_at', nowIso); // Use gt instead of gte
 
       if (participantsError) {
         console.error('Error fetching joined games:', participantsError);
-      } else {
-        // Extract unique games from participants (avoid duplicates)
-        const uniqueJoinedGames = (participants || [])
-          .map((p: any) => p.games)
-          .filter((g: any) => g && g.id)
-          .filter((g: any, index: number, arr: any[]) => 
-            arr.findIndex((item: any) => item.id === g.id) === index
-          );
-        setJoinedGames(uniqueJoinedGames);
       }
+
+      // Merge hosted and joined games, deduplicating by id
+      const byId = new Map<string, Game>();
+      
+      // Add hosted games first
+      (hosted || []).forEach((g: any) => byId.set(g.id, g as Game));
+      
+      // Add joined games (won't overwrite if already hosted)
+      (participants || [])
+        .map((p: any) => p.games)
+        .filter((g: any) => g && g.id)
+        .forEach((g: any) => {
+          if (!byId.has(g.id)) {
+            byId.set(g.id, g as Game);
+          }
+        });
+
+      // Separate into hosted and joined for display
+      const allGames = Array.from(byId.values());
+      setHostedGames(allGames.filter(g => g.host_user_id === user.id));
+      setJoinedGames(allGames.filter(g => g.host_user_id !== user.id));
+
+      console.log('[YourGames] Fetched:', {
+        total: allGames.length,
+        hosted: hosted?.length || 0,
+        joined: participants?.length || 0,
+        deduped: allGames.length,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -87,9 +104,22 @@ export function YourGamesList({ onCancelGame, onLeaveGame }: YourGamesListProps)
 
   // Listen for game-created events to trigger immediate refetch
   useEffect(() => {
-    const handleGameCreated = () => fetchYourGames();
+    const handleGameCreated = (e: any) => {
+      console.log('[YourGames] game-created event received:', e.detail);
+      fetchYourGames();
+    };
     window.addEventListener('game-created', handleGameCreated);
     return () => window.removeEventListener('game-created', handleGameCreated);
+  }, [fetchYourGames]);
+
+  // Refetch on window focus (safety net)
+  useEffect(() => {
+    const handleFocus = () => {
+      console.log('[YourGames] Refetch on focus');
+      fetchYourGames();
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
   }, [fetchYourGames]);
 
   // Real-time subscriptions
