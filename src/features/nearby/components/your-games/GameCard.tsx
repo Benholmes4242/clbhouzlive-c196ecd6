@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Game as GameType, Participant, CardVariant } from './types';
 import { formatExpires } from '@/lib/formatExpires';
 import { PlayerRow } from './PlayerRow';
+import { SlotsPill } from './SlotsPill';
 import { useMinuteTick } from '@/hooks/useMinuteTick';
 
 interface GameCardProps {
@@ -49,7 +50,6 @@ export const GameCard: React.FC<GameCardProps> = ({
 
   // Derived
   const filled = Math.max(0, (game.slots_total ?? 0) - (game.slots_open ?? 0));
-  const capacityLabel = `${filled}/${game.slots_total} filled`;
   const start = new Date(game.start_time);
   const dateStr = start.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
   const timeStr = start.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
@@ -75,13 +75,12 @@ export const GameCard: React.FC<GameCardProps> = ({
           {game.course_name}
         </h3>
 
-        {/* Capacity pill */}
-        <span
-          aria-label={`${filled} of ${game.slots_total} spots filled`}
-          className="shrink-0 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[12px] text-white/85 will-change-transform transition-transform"
-        >
-          {capacityLabel}
-        </span>
+        {/* Capacity pill with bump animation */}
+        <SlotsPill
+          slotsOpen={game.slots_open}
+          slotsTotal={game.slots_total}
+          className="ml-auto"
+        />
 
         {/* Chevron */}
         <svg

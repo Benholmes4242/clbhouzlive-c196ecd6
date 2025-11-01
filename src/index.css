@@ -1088,6 +1088,33 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
 }
 
+/* Subtle "tick" micro-interaction for capacity pill */
+.pill-bump {
+  animation: pill-bump 450ms cubic-bezier(.2,.9,.2,1);
+}
+@keyframes pill-bump {
+  0%   { transform: scale(1);   box-shadow: 0 0 0 rgba(255,255,255,0); }
+  25%  { transform: scale(1.06); box-shadow: 0 0 0 rgba(255,255,255,0); }
+  60%  { transform: scale(1.03); box-shadow: 0 0 24px rgba(255,255,255,0.08); }
+  100% { transform: scale(1);   box-shadow: 0 0 0 rgba(255,255,255,0); }
+}
+
+/* Optional: quick numeral flip for the open/filled count */
+.count-flip {
+  animation: count-flip 350ms ease;
+  transform-origin: center bottom;
+  display: inline-block;
+}
+@keyframes count-flip {
+  0% { transform: rotateX(0deg);   opacity: .6; }
+  50%{ transform: rotateX(90deg);  opacity: 0;  }
+  100%{transform: rotateX(0deg);   opacity: 1;  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill-bump, .count-flip { animation: none; }
+}
+
 @keyframes slide-in-up {
   0% {
     transform: translateY(100%);
