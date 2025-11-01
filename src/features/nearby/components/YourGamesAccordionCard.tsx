@@ -10,6 +10,20 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import type { GameParticipant as Participant } from '@/features/game/hooks/useGameParticipants';
 
+type UiParticipant = {
+  user_id: string | null;
+  guest_name: string | null;
+  role: 'host' | 'player' | 'guest';
+  state: 'invited' | 'accepted' | 'declined' | 'removed';
+  display_name: string;
+  username?: string;
+  profile_photo_url?: string;
+  eg_handicap_index?: number | null;
+  show_handicap?: boolean;
+  home_club?: string | null;
+  is_guest?: boolean;
+};
+
 interface YourGamesAccordionCardProps {
   game: Game;
   isHosting: boolean;
@@ -30,7 +44,7 @@ const navigate = useNavigate();
   const baseParticipants = participants;
   const hasHostInParticipants = baseParticipants.some((p) => p.role === 'host');
 
-  const forcedHost = !hasHostInParticipants && hostProfile ? [
+  const forcedHost: UiParticipant[] = !hasHostInParticipants && hostProfile ? [
     {
       user_id: hostProfile.id,
       role: 'host',
@@ -48,11 +62,11 @@ const navigate = useNavigate();
 
   const isCurrentInParticipants = !!user?.id && baseParticipants.some((p) => p.user_id === user?.id);
   const shouldAddSelf = !!user?.id && !isCurrentInParticipants && !!currentProfile && (!isHosting || !hostProfile);
-  const forcedSelf = shouldAddSelf ? [
+  const forcedSelf: UiParticipant[] = shouldAddSelf ? [
     {
       user_id: currentProfile!.id,
-      role: (isHosting ? 'host' : 'player') as const,
-      state: 'accepted' as const,
+      role: isHosting ? 'host' : 'player',
+      state: 'accepted',
       display_name: currentProfile!.display_name,
       username: currentProfile!.username,
       profile_photo_url: currentProfile!.profile_photo_url || undefined,
