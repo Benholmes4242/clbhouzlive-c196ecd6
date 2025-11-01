@@ -51,8 +51,8 @@ const navigate = useNavigate();
   const forcedSelf = shouldAddSelf ? [
     {
       user_id: currentProfile!.id,
-      role: (isHosting ? 'host' : 'player') as const,
-      state: 'accepted' as const,
+      role: (isHosting ? 'host' : 'player'),
+      state: 'accepted',
       display_name: currentProfile!.display_name,
       username: currentProfile!.username,
       profile_photo_url: currentProfile!.profile_photo_url || undefined,

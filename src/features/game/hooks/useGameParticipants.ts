@@ -39,8 +39,7 @@ export function useGameParticipants(gameId: string | null) {
             home_club
           )
         `)
-        .eq('game_id', gameId)
-        .in('state', ['invited', 'accepted']);
+        .eq('game_id', gameId);
 
       if (error) {
         console.error('Error fetching game participants:', error);
@@ -48,6 +47,10 @@ export function useGameParticipants(gameId: string | null) {
       }
 
       return (data || [])
+        .filter((p: any) => {
+          const s = (p.state || '').toLowerCase();
+          return s === 'invited' || s === 'accepted';
+        })
         .map((p: any) => ({
           user_id: p.user_id ?? null,
           role: p.role,
