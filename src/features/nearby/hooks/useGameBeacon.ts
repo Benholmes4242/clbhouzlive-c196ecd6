@@ -44,18 +44,25 @@ interface CreateBeaconInput {
   lng?: number;
 }
 
+const PAGE_SIZE = 20;
+
 export function useGameBeacon() {
   const [myBeacon, setMyBeacon] = useState<GameBeacon | null>(null);
   const [nearbyBeacons, setNearbyBeacons] = useState<GameBeacon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(false);
+  const [cursor, setCursor] = useState<{ start_time: string; id: string } | null>(null);
   const { toast } = useToast();
   const { currentLocation, requestPermission } = useLocationPermission();
 
   const currentUserId = supabase.auth.getUser().then(u => u.data.user?.id);
 
   // Fetch and filter beacons - now includes user's own games in the unified list
-  const fetchBeacons = async () => {
+  const fetchBeacons = async (append: boolean = false) => {
     try {
+      if (append) {
+        setIsLoading(true);
+      }
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) return;
 
@@ -97,8 +104,16 @@ export function useGameBeacon() {
           .lte('lng', userLng + lngDelta);
       }
 
+      // Apply cursor-based pagination
+      if (append && cursor) {
+        query = query
+          .or(`start_time.gt.${cursor.start_time},and(start_time.eq.${cursor.start_time},id.gt.${cursor.id})`);
+      }
+
       const { data: allBeacons, error: allError } = await query
-        .order('start_time', { ascending: true }) as { data: any[] | null, error: any };
+        .order('start_time', { ascending: true })
+        .order('id', { ascending: true })
+        .limit(PAGE_SIZE + 1) as { data: any[] | null, error: any };
 
       if (allError) {
         console.error('Error fetching beacons:', allError);
@@ -108,8 +123,22 @@ export function useGameBeacon() {
       if (!allBeacons) {
         setMyBeacon(null);
         setNearbyBeacons([]);
+        setHasMore(false);
         return;
       }
+
+      // Check if there are more results (we fetched PAGE_SIZE + 1)
+      const hasMoreResults = allBeacons.length > PAGE_SIZE;
+      const beaconsPage = hasMoreResults ? allBeacons.slice(0, PAGE_SIZE) : allBeacons;
+      
+      // Update cursor for next page
+      if (hasMoreResults) {
+        const lastBeacon = beaconsPage[beaconsPage.length - 1];
+        setCursor({ start_time: lastBeacon.start_time, id: lastBeacon.id });
+      } else {
+        setCursor(null);
+      }
+      setHasMore(hasMoreResults);
 
       // Fetch games where user is a participant
       const { data: participantGames } = await supabase
@@ -121,7 +150,7 @@ export function useGameBeacon() {
       const participantGameIds = new Set(participantGames?.map(p => p.game_id) || []);
 
       // Filter beacons: include if user is host OR participant
-      const beacons = allBeacons.filter(b => 
+      const beacons = beaconsPage.filter(b => 
         b.host_user_id === userId || participantGameIds.has(b.id)
       ) as any[];
 
@@ -138,15 +167,35 @@ export function useGameBeacon() {
         setMyBeacon(null);
       }
 
-      // Now fetch ALL nearby public games to include in the list
+      // Now fetch nearby public games to include in the list (paginated)
       if (userLat && userLng) {
-        const { data: nearbyPublicGames } = await supabase
+        let publicQuery = supabase
           .from('games')
           .select('id, host_user_id, course_id, course_name, lat, lng, start_time, expires_at, status, slots_total, slots_open, visibility, note, created_at, updated_at')
           .eq('status', 'active')
           .eq('visibility', 'public')
-          .gt('expires_at', new Date().toISOString())
-          .order('start_time', { ascending: true }) as { data: any[] | null, error: any };
+          .gt('expires_at', new Date().toISOString());
+
+        // Apply cursor for pagination
+        if (append && cursor) {
+          publicQuery = publicQuery
+            .or(`start_time.gt.${cursor.start_time},and(start_time.eq.${cursor.start_time},id.gt.${cursor.id})`);
+        }
+
+        const { data: nearbyPublicGames } = await publicQuery
+          .order('start_time', { ascending: true })
+          .order('id', { ascending: true })
+          .limit(PAGE_SIZE + 1) as { data: any[] | null, error: any };
+        
+        // Check pagination for public games too
+        const hasMorePublic = (nearbyPublicGames?.length || 0) > PAGE_SIZE;
+        const publicPage = hasMorePublic ? (nearbyPublicGames || []).slice(0, PAGE_SIZE) : (nearbyPublicGames || []);
+        
+        if (hasMorePublic && publicPage.length > 0) {
+          const lastPublic = publicPage[publicPage.length - 1];
+          setCursor({ start_time: lastPublic.start_time, id: lastPublic.id });
+          setHasMore(true);
+        }
 
         // Combine user's games with nearby public games (deduplicate by ID)
         const gameMap = new Map();
@@ -165,7 +214,7 @@ export function useGameBeacon() {
         });
 
         // Add nearby public games (if not already in map)
-        (nearbyPublicGames || []).forEach(beacon => {
+        publicPage.forEach(beacon => {
           if (!gameMap.has(beacon.id) && beacon.lat && beacon.lng) {
             const distanceMeters = calculateDistance(userLat, userLng, beacon.lat, beacon.lng);
             if (distanceMeters <= NEARBY_RADIUS_METERS) {
@@ -181,13 +230,24 @@ export function useGameBeacon() {
         });
 
         const allGames = Array.from(gameMap.values()).sort((a: any, b: any) => {
-          // User's games first, then by distance
+          // User's games first, then by start_time, then by distance
           if (a.isMyGame && !b.isMyGame) return -1;
           if (!a.isMyGame && b.isMyGame) return 1;
+          
+          // Sort by start_time first (earlier games first)
+          const timeA = new Date(a.start_time).getTime();
+          const timeB = new Date(b.start_time).getTime();
+          if (timeA !== timeB) return timeA - timeB;
+          
+          // Then by distance
           return (a.distance_meters || 0) - (b.distance_meters || 0);
         });
 
-        setNearbyBeacons(allGames as any);
+        if (append) {
+          setNearbyBeacons(prev => [...prev, ...allGames as any]);
+        } else {
+          setNearbyBeacons(allGames as any);
+        }
       } else {
         // No location - only show user's own games
         const myGames = beacons.map(beacon => ({
@@ -450,10 +510,17 @@ export function useGameBeacon() {
     }
   };
 
+  const loadMore = async () => {
+    if (!hasMore || isLoading) return;
+    await fetchBeacons(true);
+  };
+
   return {
     myBeacon,
     nearbyBeacons,
     isLoading,
+    hasMore,
+    loadMore,
     createBeacon,
     cancelBeacon,
     joinBeacon,
