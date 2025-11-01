@@ -20,64 +20,51 @@ interface YourGamesAccordionCardProps {
 export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: YourGamesAccordionCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { data: participants = [] } = useGameParticipants(game.id);
-  const navigate = useNavigate();
-
-  // Prefer participants embedded on the game object (e.g., tagged/reserved) when available
-  const rawPrefetched = (game.participants ?? []) as any[];
-  const prefetchedParticipants: Participant[] = rawPrefetched.map((p: any) => ({
-    user_id: p.user_id ?? null,
-    role: p.role,
-    state: p.state,
-    display_name: p.user_profiles?.display_name || p.guest_name || 'Unknown',
-    username: p.user_profiles?.username,
-    profile_photo_url: p.user_profiles?.profile_photo_url || undefined,
-    eg_handicap_index: (p.user_profiles as any)?.eg_handicap_index ?? (p.user_profiles as any)?.handicap ?? null,
-    show_handicap: (p.user_profiles as any)?.show_handicap,
-    home_club: (p.user_profiles as any)?.home_club ?? null,
-    guest_name: p.guest_name ?? null,
-    is_guest: !p.user_id,
-  }));
-
-  // Enrich prefetched participants with data from the hook (profiles, hcp, etc.)
-  const makeKey = (p: Participant) => (p.user_id ? `u:${p.user_id}` : `g:${p.guest_name ?? ''}`);
-  const hookByKey = new Map<string, Participant>();
-  participants.forEach((p) => hookByKey.set(makeKey(p), p));
-
-  const mergedPrefetched = prefetchedParticipants.map((p) => hookByKey.get(makeKey(p)) ?? p);
-  const extrasFromHook = participants.filter((p) => !mergedPrefetched.some((m) => makeKey(m) === makeKey(p)));
-
-  const baseParticipants = (mergedPrefetched.length > 0 ? [...mergedPrefetched, ...extrasFromHook] : participants);
-  const hasHostInParticipants = baseParticipants.some((p) => p.role === 'host');
+const navigate = useNavigate();
 
   // Force-show participants: ensure host and current user rows even if participants query is empty
   const { user } = useSupabaseSession();
   const { data: hostProfile } = useUserProfile(game.host_user_id);
   const { data: currentProfile } = useUserProfile(user?.id || null);
 
-  const buildParticipant = (profile: any, role: 'host' | 'player'): Participant => ({
-    user_id: profile.id,
-    role,
-    state: 'accepted',
-    display_name: profile.display_name,
-    username: profile.username,
-    profile_photo_url: profile.profile_photo_url || undefined,
-    eg_handicap_index: profile.eg_handicap_index ?? null,
-    show_handicap: profile.show_handicap,
-    home_club: profile.home_club ?? null,
-    guest_name: null,
-    is_guest: false,
-  });
+  const baseParticipants = participants;
+  const hasHostInParticipants = baseParticipants.some((p) => p.role === 'host');
 
-  const forcedHost: Participant[] =
-    !hasHostInParticipants && hostProfile ? [buildParticipant(hostProfile, 'host')] : [];
+  const forcedHost = !hasHostInParticipants && hostProfile ? [
+    {
+      user_id: hostProfile.id,
+      role: 'host',
+      state: 'accepted',
+      display_name: hostProfile.display_name,
+      username: hostProfile.username,
+      profile_photo_url: hostProfile.profile_photo_url || undefined,
+      eg_handicap_index: hostProfile.eg_handicap_index,
+      show_handicap: hostProfile.show_handicap,
+      home_club: hostProfile.home_club,
+      guest_name: null,
+      is_guest: false,
+    },
+  ] : [];
 
   const isCurrentInParticipants = !!user?.id && baseParticipants.some((p) => p.user_id === user?.id);
   const shouldAddSelf = !!user?.id && !isCurrentInParticipants && !!currentProfile && (!isHosting || !hostProfile);
+  const forcedSelf = shouldAddSelf ? [
+    {
+      user_id: currentProfile!.id,
+      role: (isHosting ? 'host' : 'player') as const,
+      state: 'accepted' as const,
+      display_name: currentProfile!.display_name,
+      username: currentProfile!.username,
+      profile_photo_url: currentProfile!.profile_photo_url || undefined,
+      eg_handicap_index: currentProfile!.eg_handicap_index,
+      show_handicap: currentProfile!.show_handicap,
+      home_club: currentProfile!.home_club,
+      guest_name: null,
+      is_guest: false,
+    },
+  ] : [];
 
-  const forcedSelf: Participant[] =
-    shouldAddSelf ? [buildParticipant(currentProfile!, isHosting ? 'host' : 'player')] : [];
-
-  const displayParticipants: Participant[] = [...forcedHost, ...baseParticipants, ...forcedSelf];
+  const displayParticipants = [...forcedHost, ...baseParticipants, ...forcedSelf];
 
   const formatStartTime = (startTime: string) => {
     const date = parseISO(startTime);

@@ -24,50 +24,43 @@ export function useGameParticipants(gameId: string | null) {
 
       const { data, error } = await supabase
         .from('game_participants')
-        .select('user_id, role, state, guest_name')
-        .eq('game_id', gameId);
+        .select(`
+          user_id,
+          role,
+          state,
+          guest_name,
+          user_profiles:user_id (
+            id,
+            display_name,
+            username,
+            profile_photo_url,
+            eg_handicap_index,
+            show_handicap,
+            home_club
+          )
+        `)
+        .eq('game_id', gameId)
+        .in('state', ['invited', 'accepted']);
 
       if (error) {
         console.error('Error fetching game participants:', error);
         return [];
       }
 
-      const rows = (data || []) as any[];
-      const filtered = rows.filter((p: any) => {
-        const s = (p.state || '').toLowerCase();
-        return s === 'invited' || s === 'accepted';
-      });
-
-      const userIds = Array.from(new Set(filtered.map((p: any) => p.user_id).filter((id: any) => !!id)));
-      let profileMap = new Map<string, any>();
-      if (userIds.length > 0) {
-        const { data: profiles, error: profilesError } = await supabase
-          .from('user_profiles')
-          .select('id, display_name, username, profile_photo_url, eg_handicap_index, show_handicap, home_club')
-          .in('id', userIds);
-        if (profilesError) {
-          console.error('Error fetching participant profiles:', profilesError);
-        } else {
-          profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
-        }
-      }
-
-      return filtered.map((p: any) => {
-        const prof = p.user_id ? profileMap.get(p.user_id) : null;
-        return {
+      return (data || [])
+        .map((p: any) => ({
           user_id: p.user_id ?? null,
           role: p.role,
           state: p.state,
-          display_name: prof?.display_name || p.guest_name || 'Unknown',
-          username: prof?.username,
-          profile_photo_url: prof?.profile_photo_url,
-          eg_handicap_index: prof?.eg_handicap_index ?? null,
-          show_handicap: prof?.show_handicap,
-          home_club: prof?.home_club ?? null,
+          display_name: p.user_profiles?.display_name || p.guest_name || 'Unknown',
+          username: p.user_profiles?.username,
+          profile_photo_url: p.user_profiles?.profile_photo_url,
+          eg_handicap_index: p.user_profiles?.eg_handicap_index,
+          show_handicap: p.user_profiles?.show_handicap,
+          home_club: p.user_profiles?.home_club,
           guest_name: p.guest_name ?? null,
           is_guest: !p.user_id,
-        } as GameParticipant;
-      });
+        }));
     },
     enabled: !!gameId,
     staleTime: 30_000,
