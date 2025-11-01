@@ -31,10 +31,22 @@ interface YourGamesAccordionCardProps {
   onLeave: () => void;
 }
 
+// Chevron component for collapsible sections
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 20 20" className={`transition-transform ${open ? 'rotate-180' : ''}`}>
+      <path d="M5.8 7.2l4.2 4.2 4.2-4.2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
 export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: YourGamesAccordionCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [openHost, setOpenHost] = useState(true);
+  const [openMembers, setOpenMembers] = useState(false);
+  const [openGuests, setOpenGuests] = useState(false);
   const { data: participants = [] } = useGameParticipants(game.id);
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
   // Force-show participants: ensure host and current user rows even if participants query is empty
   const { user } = useSupabaseSession();
@@ -244,33 +256,75 @@ const navigate = useNavigate();
           <div className="space-y-2">
             <div className="text-[13px] font-medium text-white/80">Players ({participantsCount})</div>
             
-            {/* Host */}
+            {/* HOST */}
             {hostGroup.length > 0 && (
               <>
-                <div className="mb-2 text-xs uppercase tracking-wide text-white/50">Host</div>
-                <div className="space-y-2">
-                  {hostGroup.map(p => renderPersonRow(p, true))}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setOpenHost(v => !v)}
+                  aria-expanded={openHost}
+                  className="mb-2 flex w-full items-center justify-between rounded-md bg-white/5 px-3 py-2 text-left text-xs uppercase tracking-wide text-white/60 hover:bg-white/10 transition-colors"
+                >
+                  <span>Host</span>
+                  <div className="flex items-center gap-2 text-white/60">
+                    <span className="text-[11px]">{hostGroup.length}</span>
+                    <Chevron open={openHost} />
+                  </div>
+                </button>
+
+                {openHost && (
+                  <div className="flex flex-col gap-2 mb-2">
+                    {hostGroup.map(p => renderPersonRow(p, true))}
+                  </div>
+                )}
               </>
             )}
 
-            {/* Members */}
+            {/* MEMBERS */}
             {memberGroup.length > 0 && (
               <>
-                <div className="mt-4 mb-2 text-xs uppercase tracking-wide text-white/50">Members</div>
-                <div className="space-y-2">
-                  {memberGroup.map(p => renderPersonRow(p, false))}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setOpenMembers(v => !v)}
+                  aria-expanded={openMembers}
+                  className="mt-2 mb-2 flex w-full items-center justify-between rounded-md bg-white/5 px-3 py-2 text-left text-xs uppercase tracking-wide text-white/60 hover:bg-white/10 transition-colors"
+                >
+                  <span>Members</span>
+                  <div className="flex items-center gap-2 text-white/60">
+                    <span className="text-[11px]">{memberGroup.length}</span>
+                    <Chevron open={openMembers} />
+                  </div>
+                </button>
+
+                {openMembers && (
+                  <div className="flex flex-col gap-2 mb-2">
+                    {memberGroup.map(p => renderPersonRow(p, false))}
+                  </div>
+                )}
               </>
             )}
 
-            {/* Guests */}
+            {/* GUESTS */}
             {guestGroup.length > 0 && (
               <>
-                <div className="mt-4 mb-2 text-xs uppercase tracking-wide text-white/50">Guests</div>
-                <div className="space-y-2">
-                  {guestGroup.map(p => renderPersonRow(p, false))}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setOpenGuests(v => !v)}
+                  aria-expanded={openGuests}
+                  className="mt-2 mb-2 flex w-full items-center justify-between rounded-md bg-white/5 px-3 py-2 text-left text-xs uppercase tracking-wide text-white/60 hover:bg-white/10 transition-colors"
+                >
+                  <span>Guests</span>
+                  <div className="flex items-center gap-2 text-white/60">
+                    <span className="text-[11px]">{guestGroup.length}</span>
+                    <Chevron open={openGuests} />
+                  </div>
+                </button>
+
+                {openGuests && (
+                  <div className="flex flex-col gap-2 mb-2">
+                    {guestGroup.map(p => renderPersonRow(p, false))}
+                  </div>
+                )}
               </>
             )}
 
