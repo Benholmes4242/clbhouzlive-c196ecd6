@@ -27,13 +27,47 @@ export function GamesNearbyList({
   const [isLoadingClubGames, setIsLoadingClubGames] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [requestedGames, setRequestedGames] = useState<Set<string>>(new Set());
+  const [yourGameIds, setYourGameIds] = useState<Set<string>>(new Set());
   const { createRequest, acceptedGameIds } = useGameJoinRequests();
 
-  // Get current user ID
+  // Get current user ID and fetch their games
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setCurrentUserId(data.user?.id || null);
-    });
+    const fetchUserGames = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id || null);
+      
+      if (!user) return;
+
+      const nowIso = new Date().toISOString();
+      
+      // Fetch hosted games
+      const { data: hosted } = await supabase
+        .from('games')
+        .select('id')
+        .eq('host_user_id', user.id)
+        .eq('status', 'active')
+        .gt('expires_at', nowIso);
+
+      // Fetch joined games
+      const { data: participants } = await supabase
+        .from('game_participants')
+        .select('game_id')
+        .eq('user_id', user.id);
+
+      const ids = new Set<string>();
+      (hosted || []).forEach((g: any) => ids.add(g.id));
+      (participants || []).forEach((p: any) => ids.add(p.game_id));
+      
+      setYourGameIds(ids);
+    };
+
+    fetchUserGames();
+
+    // Listen for game-created events to refetch
+    const handleGameCreated = () => fetchUserGames();
+    window.addEventListener('game-created', handleGameCreated);
+    
+    return () => window.removeEventListener('game-created', handleGameCreated);
   }, []);
 
   // Fetch games at selected club
@@ -145,34 +179,12 @@ export function GamesNearbyList({
   }
 
   const displayGames = selectedClub ? clubGames : beacons;
-  const myGames = displayGames.filter(b => b.host_user_id === currentUserId);
-  const otherGames = displayGames.filter(b => b.host_user_id !== currentUserId);
+  // Filter out games the user is hosting or has joined
+  const discoverableGames = displayGames.filter(b => !yourGameIds.has(b.id));
 
   return (
     <div className="space-y-3 pb-4">
-      {/* SECTION 1: Games Near You (Available Games) */}
-      {/* SECTION 1a: My Games */}
-      {myGames.length > 0 && (
-        <div className="space-y-3">
-          <div className="px-2 text-center">
-            <h3 className="text-sm font-semibold text-white/95">Your Games</h3>
-          </div>
-          {myGames.map(game => (
-            <HostGameView
-              key={game.id}
-              game={game}
-              onCancelBeacon={onCancelBeacon}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Divider if both sections exist */}
-      {myGames.length > 0 && otherGames.length > 0 && (
-        <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-      )}
-
-      {/* SECTION 1b: Available Games */}
+      {/* SECTION 1: Discoverable Games */}
       <div className="space-y-3">
         <div className="px-2 text-center">
           <h3 className="text-sm font-semibold text-white/95">
@@ -189,7 +201,7 @@ export function GamesNearbyList({
               ))}
             </div>
           </div>
-        ) : otherGames.length === 0 ? (
+        ) : discoverableGames.length === 0 ? (
           // Empty state
           <div className="text-center space-y-2">
             <MapPin className="w-10 h-10 mx-auto text-neutral-600" />
@@ -203,7 +215,7 @@ export function GamesNearbyList({
         ) : (
           // Game cards
           <div className="space-y-3">
-            {otherGames.map(game => (
+            {discoverableGames.map(game => (
               <AnonymousGameCard
                 key={game.id}
                 game={{

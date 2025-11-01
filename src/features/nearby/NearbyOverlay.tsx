@@ -37,6 +37,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   const [activeTab, setActiveTab] = useState<'golfers' | 'games' | 'your-games'>('golfers');
   const [isCreateGameOpen, setIsCreateGameOpen] = useState(false);
   const [prefilledClub, setPrefilledClub] = useState<{ id: string; name: string } | undefined>();
+  const [yourGamesCount, setYourGamesCount] = useState(0);
 
   // Lock body scroll when overlay is open
   useEffect(() => {
@@ -207,11 +208,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                   : 'text-white/55 hover:text-white/75'
               }`}
             >
-              Games {nearbyBeacons.length > 0 && (
-                <span className="ml-1.5 px-1.5 py-0.5 bg-white/15 text-white text-xs rounded-full">
-                  {nearbyBeacons.length}
-                </span>
-              )}
+              Games
               {activeTab === 'games' && (
                 <div 
                   className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-white/90 rounded-full transition-all duration-150"
@@ -227,7 +224,11 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                   : 'text-white/55 hover:text-white/75'
               }`}
             >
-              Your Games
+              Your Games {yourGamesCount > 0 && (
+                <span className="ml-1.5 px-1.5 py-0.5 bg-white/15 text-white text-xs rounded-full">
+                  {yourGamesCount}
+                </span>
+              )}
               {activeTab === 'your-games' && (
                 <div 
                   className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-white/90 rounded-full transition-all duration-150"
@@ -289,6 +290,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
                   .eq('game_id', gameId)
                   .eq('user_id', user.id);
               }}
+              onCountChange={setYourGamesCount}
             />
           )}
         </div>

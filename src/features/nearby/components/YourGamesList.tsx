@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Game } from '../types';
-import { MapPin, Users, Clock, AlertCircle } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { channelManager } from '@/utils/supabaseChannelManager';
+import { YourGamesAccordionCard } from './YourGamesAccordionCard';
 
 interface YourGamesListProps {
   onCancelGame?: (gameId: string) => void;
   onLeaveGame?: (gameId: string) => void;
+  onCountChange?: (count: number) => void;
 }
 
-export function YourGamesList({ onCancelGame, onLeaveGame }: YourGamesListProps) {
+export function YourGamesList({ onCancelGame, onLeaveGame, onCountChange }: YourGamesListProps) {
   const { user } = useSupabaseSession();
   const [hostedGames, setHostedGames] = useState<Game[]>([]);
   const [joinedGames, setJoinedGames] = useState<Game[]>([]);
@@ -84,8 +85,16 @@ export function YourGamesList({ onCancelGame, onLeaveGame }: YourGamesListProps)
 
       // Separate into hosted and joined for display
       const allGames = Array.from(byId.values());
-      setHostedGames(allGames.filter(g => g.host_user_id === user.id));
-      setJoinedGames(allGames.filter(g => g.host_user_id !== user.id));
+      const hostedFiltered = allGames.filter(g => g.host_user_id === user.id);
+      const joinedFiltered = allGames.filter(g => g.host_user_id !== user.id);
+      
+      setHostedGames(hostedFiltered);
+      setJoinedGames(joinedFiltered);
+
+      // Notify parent of total count for badge
+      if (onCountChange) {
+        onCountChange(allGames.length);
+      }
 
       console.log('[YourGames] Fetched:', {
         total: allGames.length,
@@ -154,18 +163,6 @@ export function YourGamesList({ onCancelGame, onLeaveGame }: YourGamesListProps)
     };
   }, [user?.id]);
 
-  const getTimeRemaining = (expiresAt: string) => {
-    const now = new Date();
-    const expires = new Date(expiresAt);
-    const diffMs = expires.getTime() - now.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    
-    if (diffMins < 60) return `${diffMins}m`;
-    const hours = Math.floor(diffMins / 60);
-    const mins = diffMins % 60;
-    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
-  };
-
   const handleCancel = async (gameId: string) => {
     if (onCancelGame) {
       onCancelGame(gameId);
@@ -208,42 +205,13 @@ export function YourGamesList({ onCancelGame, onLeaveGame }: YourGamesListProps)
           </h3>
           <div className="space-y-2">
             {hostedGames.map((game) => (
-              <div
+              <YourGamesAccordionCard
                 key={game.id}
-                className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-2"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 space-y-1">
-                    {game.course_name && (
-                      <div className="flex items-center gap-2 text-white/90">
-                        <MapPin className="w-4 h-4 text-white/50" />
-                        <span className="text-sm font-medium">{game.course_name}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-2 text-white/70">
-                      <Users className="w-4 h-4 text-white/40" />
-                      <span className="text-sm">
-                        {game.slots_total - game.slots_open}/{game.slots_total} filled
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-white/70">
-                      <Clock className="w-4 h-4 text-white/40" />
-                      <span className="text-sm">Expires in {getTimeRemaining(game.expires_at)}</span>
-                    </div>
-                  </div>
-                </div>
-                {game.note && (
-                  <div className="text-xs text-white/50 pt-2 border-t border-white/5">
-                    {game.note}
-                  </div>
-                )}
-                <button
-                  onClick={() => handleCancel(game.id)}
-                  className="w-full mt-2 py-2 px-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm rounded-lg font-medium transition-colors"
-                >
-                  Cancel Game
-                </button>
-              </div>
+                game={game}
+                isHosting={true}
+                onCancel={() => handleCancel(game.id)}
+                onLeave={() => handleLeave(game.id)}
+              />
             ))}
           </div>
         </div>
@@ -257,42 +225,13 @@ export function YourGamesList({ onCancelGame, onLeaveGame }: YourGamesListProps)
           </h3>
           <div className="space-y-2">
             {joinedGames.map((game) => (
-              <div
+              <YourGamesAccordionCard
                 key={game.id}
-                className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-2"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 space-y-1">
-                    {game.course_name && (
-                      <div className="flex items-center gap-2 text-white/90">
-                        <MapPin className="w-4 h-4 text-white/50" />
-                        <span className="text-sm font-medium">{game.course_name}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-2 text-white/70">
-                      <Users className="w-4 h-4 text-white/40" />
-                      <span className="text-sm">
-                        {game.slots_total - game.slots_open}/{game.slots_total} filled
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-white/70">
-                      <Clock className="w-4 h-4 text-white/40" />
-                      <span className="text-sm">Expires in {getTimeRemaining(game.expires_at)}</span>
-                    </div>
-                  </div>
-                </div>
-                {game.note && (
-                  <div className="text-xs text-white/50 pt-2 border-t border-white/5">
-                    {game.note}
-                  </div>
-                )}
-                <button
-                  onClick={() => handleLeave(game.id)}
-                  className="w-full mt-2 py-2 px-3 bg-white/5 hover:bg-white/10 text-white/70 text-sm rounded-lg font-medium transition-colors"
-                >
-                  Leave Game
-                </button>
-              </div>
+                game={game}
+                isHosting={false}
+                onCancel={() => handleCancel(game.id)}
+                onLeave={() => handleLeave(game.id)}
+              />
             ))}
           </div>
         </div>
