@@ -30,21 +30,29 @@ export function YourGamesList({ onCancelGame, onLeaveGame, onCountChange }: Your
     
     try {
       const nowIso = new Date().toISOString();
+      console.log('[YourGames] Fetching at:', nowIso);
+      console.log('[YourGames] User ID:', user.id);
 
-      // Fetch games you're hosting
+      // Fetch games you're hosting - show future games based on start_time
       const { data: hosted, error: hostedError } = await supabase
         .from('games')
         .select('id, course_name, course_id, start_time, expires_at, status, slots_open, slots_total, note, created_at, host_user_id, visibility, updated_at')
         .eq('host_user_id', user.id)
         .eq('status', 'active')
-        .gt('expires_at', nowIso)
+        .gte('start_time', nowIso) // Changed from expires_at to start_time
         .order('start_time', { ascending: true });
+
+      console.log('[YourGames] Hosted games query result:', {
+        count: hosted?.length || 0,
+        error: hostedError,
+        data: hosted
+      });
 
       if (hostedError) {
         console.error('Error fetching hosted games:', hostedError);
       }
 
-      // Fetch games you've joined (as participant)
+      // Fetch games you've joined (as participant) - show future games based on start_time
       const { data: participants, error: participantsError } = await supabase
         .from('game_participants')
         .select(`
@@ -67,7 +75,13 @@ export function YourGamesList({ onCancelGame, onLeaveGame, onCountChange }: Your
         `)
         .eq('user_id', user.id)
         .eq('games.status', 'active')
-        .gt('games.expires_at', nowIso);
+        .gte('games.start_time', nowIso); // Changed from expires_at to start_time
+
+      console.log('[YourGames] Joined games query result:', {
+        count: participants?.length || 0,
+        error: participantsError,
+        data: participants
+      });
 
       if (participantsError) {
         console.error('Error fetching joined games:', participantsError);
