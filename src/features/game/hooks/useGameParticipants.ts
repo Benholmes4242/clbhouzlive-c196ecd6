@@ -10,6 +10,7 @@ export interface GameParticipant {
   profile_photo_url?: string;
   eg_handicap_index?: number | null;
   show_handicap?: boolean;
+  home_club_name?: string | null;
 }
 
 export function useGameParticipants(gameId: string | null) {
@@ -30,7 +31,8 @@ export function useGameParticipants(gameId: string | null) {
             username,
             profile_photo_url,
             eg_handicap_index,
-            show_handicap
+            show_handicap,
+            home_club_name
           )
         `)
         .eq('game_id', gameId)
@@ -51,6 +53,7 @@ export function useGameParticipants(gameId: string | null) {
           profile_photo_url: p.user_profiles?.profile_photo_url,
           eg_handicap_index: p.user_profiles?.eg_handicap_index,
           show_handicap: p.user_profiles?.show_handicap,
+          home_club_name: p.user_profiles?.home_club_name,
         }))
         .filter((p: GameParticipant) => p.state === 'accepted' || p.role === 'host');
     },

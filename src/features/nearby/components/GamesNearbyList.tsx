@@ -89,12 +89,19 @@ export function GamesNearbyList({
           .trim()
           .replace(/\s+/g, ' ');
 
-        const { data, error } = await supabase
+        let query = supabase
           .from('games')
           .select('id, host_user_id, course_id, course_name, lat, lng, start_time, expires_at, status, slots_total, slots_open, visibility, note, created_at, updated_at')
           .eq('status', 'active')
-          .gte('expires_at', new Date().toISOString())
-          .or(`course_id.eq.${selectedClub.id},course_name_normalized.ilike.%${normalized}%`) as { data: any[] | null, error: any };
+          .gt('expires_at', new Date().toISOString())
+          .or(`course_id.eq.${selectedClub.id},course_name_normalized.ilike.%${normalized}%`);
+
+        // Server-side exclusion: not hosted by me
+        if (currentUserId) {
+          query = query.neq('host_user_id', currentUserId);
+        }
+
+        const { data, error } = await query as { data: any[] | null, error: any };
 
         if (error) throw error;
 

@@ -136,6 +136,8 @@ export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: Y
                         )}
                       </div>
                       <div className="text-[11px] text-white/60 flex items-center gap-2">
+                        {p.home_club_name && <span>{p.home_club_name}</span>}
+                        {p.home_club_name && p.show_handicap && p.eg_handicap_index != null && <span>•</span>}
                         {p.show_handicap && p.eg_handicap_index != null && (
                           <span>HCP {formatHcp(p.eg_handicap_index)}</span>
                         )}
