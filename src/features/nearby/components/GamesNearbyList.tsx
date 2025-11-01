@@ -19,6 +19,7 @@ interface GamesNearbyListProps {
   onCreateGame: (clubData?: { id: string; name: string }) => void;
   onFiltersChange: (filters: GameFilters) => void;
   currentFilters: GameFilters;
+  portalContainer?: HTMLElement | null;
 }
 
 export function GamesNearbyList({
@@ -31,6 +32,7 @@ export function GamesNearbyList({
   onCreateGame,
   onFiltersChange,
   currentFilters,
+  portalContainer,
 }: GamesNearbyListProps) {
   const [selectedClub, setSelectedClub] = useState<{ id: string; name: string } | null>(null);
   const [clubGames, setClubGames] = useState<GameBeacon[]>([]);
@@ -335,6 +337,7 @@ export function GamesNearbyList({
           filters={currentFilters}
           onFiltersChange={onFiltersChange}
           mode={mode}
+          portalContainer={portalContainer}
         />
       </div>
     </div>

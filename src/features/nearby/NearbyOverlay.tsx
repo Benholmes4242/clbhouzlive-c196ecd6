@@ -20,6 +20,7 @@ interface NearbyOverlayProps {
 }
 
 export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
+  const overlayRef = React.useRef<HTMLDivElement>(null);
   const { golfers, isLoading } = useActiveGolfers({ limit: 20, mockCount: 0 });
   
   // Initialize game filters
@@ -112,7 +113,8 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       {/* Modal container */}
       <div className="fixed inset-0 z-[9999] flex items-end sm:items-center sm:justify-center animate-fade-in pointer-events-none">
         {/* Modal */}
-        <div 
+        <div
+          ref={overlayRef}
           className="relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200 pointer-events-auto"
           style={{
             height: 'calc(100vh - env(safe-area-inset-top))',
@@ -304,6 +306,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               }}
               onFiltersChange={setGameFilters}
               currentFilters={gameFilters}
+              portalContainer={overlayRef.current}
             />
           ) : (
             <YourGamesList

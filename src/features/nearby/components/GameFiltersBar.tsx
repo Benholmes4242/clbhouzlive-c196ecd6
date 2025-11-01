@@ -24,6 +24,7 @@ interface GameFiltersBarProps {
   onFiltersChange: (filters: GameFilters) => void;
   mode: 'nearby' | 'course';
   className?: string;
+  portalContainer?: HTMLElement | null;
 }
 
 const TIME_WINDOWS = [
@@ -46,7 +47,7 @@ const SORT_OPTIONS = [
   { value: 'newest' as const, label: 'Newest', icon: ArrowUpDown },
 ];
 
-export function GameFiltersBar({ filters, onFiltersChange, mode, className }: GameFiltersBarProps) {
+export function GameFiltersBar({ filters, onFiltersChange, mode, className, portalContainer }: GameFiltersBarProps) {
   const [dateOpen, setDateOpen] = useState(false);
   const [timeOpen, setTimeOpen] = useState(false);
   const [radiusOpen, setRadiusOpen] = useState(false);
@@ -165,7 +166,11 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className }: Ga
                 {getDateLabel()}
               </ChipButton>
             </SheetTrigger>
-            <SheetContent side="bottom" className="pb-8">
+            <SheetContent 
+              side="bottom" 
+              className="pb-8 z-[10020]"
+              container={portalContainer}
+            >
               <SheetHeader>
                 <SheetTitle>Choose when you'd like to play</SheetTitle>
               </SheetHeader>
@@ -217,7 +222,11 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className }: Ga
                 {TIME_WINDOWS.find(tw => tw.value === filters.timeWindow)?.label || 'Time'}
               </ChipButton>
             </SheetTrigger>
-            <SheetContent side="bottom" className="pb-8">
+            <SheetContent 
+              side="bottom" 
+              className="pb-8 z-[10020]"
+              container={portalContainer}
+            >
               <SheetHeader>
                 <SheetTitle>Select a time window</SheetTitle>
               </SheetHeader>
@@ -269,7 +278,11 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className }: Ga
                   {filters.radiusKm} km
                 </ChipButton>
               </SheetTrigger>
-              <SheetContent side="bottom" className="pb-8">
+              <SheetContent 
+                side="bottom" 
+                className="pb-8 z-[10020]"
+                container={portalContainer}
+              >
                 <SheetHeader>
                   <SheetTitle>How far are you willing to travel?</SheetTitle>
                 </SheetHeader>
@@ -305,7 +318,11 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className }: Ga
                 {SORT_OPTIONS.find((s) => s.value === filters.sortBy)?.label}
               </ChipButton>
             </SheetTrigger>
-            <SheetContent side="bottom" className="pb-8">
+            <SheetContent 
+              side="bottom" 
+              className="pb-8 z-[10020]"
+              container={portalContainer}
+            >
               <SheetHeader>
                 <SheetTitle>Order your results</SheetTitle>
               </SheetHeader>
