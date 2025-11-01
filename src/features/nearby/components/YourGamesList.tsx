@@ -8,6 +8,7 @@ import { EmptyState } from './your-games/EmptyState';
 import { Segmented, SegmentItem } from './Segmented';
 import { TapButton } from '@/components/ui/TapButton';
 import { SkeletonRow } from '@/components/ui/SkeletonRow';
+import type { Game as CardGame, Participant } from './your-games/types';
 
 interface YourGamesListProps {
   onCancelGame?: (gameId: string) => void;
@@ -211,6 +212,21 @@ export function YourGamesList({
     }
   };
 
+  // Map Game to CardGame format
+  const toCardGame = (g: Game): CardGame => ({
+    id: g.id,
+    course_name: g.course_name || 'Course TBD',
+    course_id: g.course_id,
+    start_time: g.start_time,
+    expires_at: g.expires_at,
+    status: g.status,
+    slots_total: g.slots_total,
+    slots_open: g.slots_open,
+    host_user_id: g.host_user_id,
+    visibility: g.visibility,
+    note: g.note,
+  });
+
   const segmentItems: SegmentItem[] = [
     { 
       value: 'hosting', 
@@ -292,8 +308,10 @@ export function YourGamesList({
           {currentGames.map((game) => (
             <GameCard
               key={game.id}
-              game={game}
-              isHosting={isHostingTab}
+              game={toCardGame(game)}
+              variant={isHostingTab ? 'hosting' : 'joined'}
+              host={null}
+              members={[]}
               onCancel={() => handleCancel(game.id)}
               onLeave={() => handleLeave(game.id)}
             />

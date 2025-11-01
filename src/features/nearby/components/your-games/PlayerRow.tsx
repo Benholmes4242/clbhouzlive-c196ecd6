@@ -1,78 +1,43 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import * as React from 'react';
+import { Participant } from './types';
 import { formatHcp } from '@/lib/formatHcp';
 
-type PlayerRowProps = {
-  userId: string | null;
-  displayName: string | null;
-  username: string | null;
-  profilePhotoUrl: string | null;
-  homeClub: string | null;
-  handicap: number | null;
-  showHandicap: boolean | null;
-  isHost: boolean;
-  isGuest: boolean;
-};
+interface PlayerRowProps {
+  p: Participant;
+  isHost?: boolean;
+}
 
-export function PlayerRow({
-  userId,
-  displayName,
-  username,
-  profilePhotoUrl,
-  homeClub,
-  handicap,
-  showHandicap,
-  isHost,
-  isGuest,
-}: PlayerRowProps) {
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    if (username || userId) {
-      navigate(`/profile/${username || userId}`);
-    }
-  };
-
+export const PlayerRow: React.FC<PlayerRowProps> = ({ p, isHost }) => {
+  const name = p.username ? `@${p.username}` : (p.display_name ?? 'Unknown');
+  const hcpLabel = p.eg_handicap_index != null ? `HCP ${formatHcp(p.eg_handicap_index)}` : '';
+  
   return (
-    <button
-      onClick={handleClick}
-      disabled={!username && !userId}
-      className="w-full flex items-center gap-3 p-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all text-left disabled:cursor-default"
-      aria-label={`View profile for ${displayName || 'guest'}`}
+    <div
+      className="flex items-center gap-3 rounded-xl bg-white/[0.03] border border-white/10 px-3 py-2"
+      role="listitem"
     >
-      <Avatar className="w-10 h-10">
-        <AvatarImage src={profilePhotoUrl || undefined} alt={displayName || 'Player'} />
-        <AvatarFallback className="bg-neutral-700/50 text-white text-sm">
-          {displayName?.[0] || '?'}
-        </AvatarFallback>
-      </Avatar>
-      
-      <div className="flex-1 min-w-0">
+      {/* Avatar */}
+      <img
+        src={p.profile_photo_url || '/placeholder.svg'}
+        alt=""
+        className="h-9 w-9 rounded-full object-cover bg-white/10"
+        loading="lazy"
+      />
+      <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="text-[13px] text-white/90 font-medium truncate">
-            {username ? `@${username}` : (displayName || 'Guest')}
-          </span>
+          <span className="truncate text-[15px] font-medium text-white/90">{name}</span>
           {isHost && (
-            <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 text-[10px] font-medium rounded">
+            <span className="text-[11px] px-2 py-[2px] rounded-full bg-white/10 border border-white/15 text-white/70">
               Host
             </span>
           )}
-          {isGuest && (
-            <span className="px-1.5 py-0.5 bg-neutral-700/40 text-neutral-300 text-[10px] font-medium rounded">
-              Guest
-            </span>
-          )}
         </div>
-        
-        <div className="text-[11px] text-white/60 flex items-center gap-2">
-          {homeClub && <span>{homeClub}</span>}
-          {homeClub && showHandicap && handicap != null && <span>•</span>}
-          {showHandicap && handicap != null && (
-            <span>HCP {formatHcp(handicap)}</span>
-          )}
+        <div className="text-xs text-white/70 truncate">
+          {[p.home_club, hcpLabel]
+            .filter(Boolean)
+            .join(' · ')}
         </div>
       </div>
-    </button>
+    </div>
   );
-}
+};
