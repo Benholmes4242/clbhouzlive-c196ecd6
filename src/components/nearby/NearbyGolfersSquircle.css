@@ -1,31 +1,40 @@
 /* Nearby Golfers Squircle - Dark Mode Premium */
 
-.nearby-golfers-squircle {
+.sq {
   position: relative;
   width: 86px;
   height: 86px;
   border-radius: 22px;
   background: #0f0f0f;
-  box-shadow: inset 0 0 0 1px #212121, 0 6px 18px rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 0 0 1px #212121, 0 6px 18px rgba(0, 0, 0, 0.45), inset 0 0 8px rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   touch-action: manipulation;
-  transition: transform 0.08s ease, box-shadow 0.2s ease;
+  transition: transform 0.08s ease, box-shadow 0.2s ease, filter 0.2s ease;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
-.nearby-golfers-squircle:active {
+.sq:active {
   transform: scale(0.97);
 }
 
-.nearby-golfers-squircle.on {
-  box-shadow: inset 0 0 0 1px #335a3f, 0 0 0 4px rgba(110, 146, 119, 0.18), 0 6px 18px rgba(0, 0, 0, 0.35);
+.sq.on {
+  box-shadow: inset 0 0 0 1px #335a3f, 0 0 0 4px rgba(110, 146, 119, 0.18), 0 6px 18px rgba(0, 0, 0, 0.45);
 }
 
-/* Animated radar ring */
+.sq.vis-hidden {
+  filter: saturate(0.35) brightness(0.92);
+}
+
+.sq.vis-friends .visChip {
+  color: #cfe0ff;
+  box-shadow: inset 0 0 0 1px #2b3a56;
+}
+
+/* Radar ring + sweep */
 .ring {
   position: absolute;
   inset: -6px;
@@ -38,9 +47,13 @@
   position: absolute;
   inset: -30%;
   background: conic-gradient(from 0deg, rgba(110, 146, 119, 0.25), transparent 30%);
-  animation: sweep 2.4s linear infinite;
   mix-blend-mode: screen;
   pointer-events: none;
+  animation: sweep 2.4s linear infinite;
+}
+
+.sweep.slow {
+  animation-duration: 3.6s;
 }
 
 @keyframes sweep {
@@ -49,16 +62,37 @@
   }
 }
 
-/* Glyph */
+/* Halo pulse when Open to Play */
+.haloPulse {
+  position: absolute;
+  inset: -10px;
+  border-radius: 28px;
+  box-shadow: 0 0 0 0 rgba(110, 146, 119, 0.28);
+  animation: halo 1.8s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes halo {
+  0% {
+    box-shadow: 0 0 0 0 rgba(110, 146, 119, 0.28);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(110, 146, 119, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(110, 146, 119, 0);
+  }
+}
+
+/* Content */
 .glyph {
   position: absolute;
   top: 18px;
   font-size: 22px;
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35));
   pointer-events: none;
 }
 
-/* Title */
 .title {
   position: absolute;
   bottom: 24px;
@@ -75,12 +109,16 @@
   bottom: 8px;
   padding: 3px 8px;
   border-radius: 999px;
-  background: #171717;
+  background: rgba(20, 20, 20, 0.75);
   color: #d2d2d2;
   font-size: 11px;
   font-weight: 700;
   box-shadow: inset 0 0 0 1px #2a2a2a;
   pointer-events: none;
+}
+
+.pill.active {
+  color: #bfeacd;
 }
 
 .pill.green {
@@ -89,25 +127,7 @@
   box-shadow: inset 0 0 0 1px #325a3e;
 }
 
-/* Open to Play indicator */
-.otpDot {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  animation: bob 1.8s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes bob {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-2px);
-  }
-}
-
-/* Visibility chip */
+/* Visibility chip & error */
 .visChip {
   position: absolute;
   top: 8px;
@@ -121,33 +141,24 @@
   pointer-events: none;
 }
 
-.nearby-golfers-squircle.hidden {
-  filter: saturate(0.3) brightness(0.9);
-}
-
-.nearby-golfers-squircle.friends .visChip {
-  color: #cfe0ff;
-  box-shadow: inset 0 0 0 1px #2b3a56;
-}
-
-/* Error badge */
 .errBadge {
   position: absolute;
   top: 8px;
   right: 8px;
   font-size: 12px;
   pointer-events: auto;
+  cursor: pointer;
 }
 
 /* Accessibility */
-.nearby-golfers-squircle:focus-visible {
+.sq:focus-visible {
   outline: 2px solid rgba(110, 146, 119, 0.6);
   outline-offset: 4px;
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .nearby-golfers-squircle {
+  .sq {
     transition: none;
   }
   
@@ -155,7 +166,7 @@
     animation: none;
   }
   
-  .otpDot {
+  .haloPulse {
     animation: none;
   }
 }
