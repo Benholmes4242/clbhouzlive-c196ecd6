@@ -66,6 +66,18 @@ export function UserSearchTypeahead({
       );
 
       setResults(filtered);
+      
+      // DEV instrumentation
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[🔍 Guest Search] Search complete:', {
+          query: term,
+          showDropdown: true,
+          isSearching: false,
+          userCount: filtered.length,
+          guestVisible: true,
+          timestamp: new Date().toISOString(),
+        });
+      }
     } catch (error) {
       console.error('Error searching users:', error);
     } finally {
@@ -166,7 +178,7 @@ export function UserSearchTypeahead({
                 onClick={() => setShowDropdown(false)}
               />
               <div className="absolute z-20 w-full mt-1 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl max-h-64 overflow-y-auto backdrop-blur-xl">
-                {/* Add Guest option always at top */}
+                {/* Add Guest option - ALWAYS pinned at top, regardless of search state */}
                 <button
                   onClick={handleAddGuest}
                   className="w-full flex items-center gap-3 px-4 py-3 hover:bg-neutral-800 transition-colors border-b border-neutral-800 bg-white/5"
@@ -182,8 +194,15 @@ export function UserSearchTypeahead({
                   </div>
                 </button>
                 
-                {/* User results */}
-                {results.map((user) => (
+                {/* Loading indicator */}
+                {isSearching && (
+                  <div className="px-4 py-3 text-sm text-white/60 text-center border-b border-neutral-800">
+                    Searching for users...
+                  </div>
+                )}
+                
+                {/* User results - only show when not searching */}
+                {!isSearching && results.map((user) => (
                   <button
                     key={user.id}
                     onClick={() => handleUserSelect(user)}
@@ -209,8 +228,8 @@ export function UserSearchTypeahead({
                   </button>
                 ))}
                 
-                {/* No user results message */}
-                {results.length === 0 && !isSearching && (
+                {/* No user results message - only show when search complete */}
+                {!isSearching && results.length === 0 && (
                   <div className="px-4 py-3 text-sm text-white/60 text-center">
                     No users found matching "{searchTerm}"
                   </div>

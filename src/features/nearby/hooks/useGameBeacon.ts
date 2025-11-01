@@ -39,6 +39,7 @@ interface CreateBeaconInput {
   start_time?: string;
   slots_total?: number;
   tagged_user_ids?: string[];
+  guest_participants?: Array<{ guest_name: string }>;
   lat?: number;
   lng?: number;
 }
@@ -339,6 +340,7 @@ export function useGameBeacon() {
             start_time: startTime.toISOString(),
             slots_total: input.slots_total || 4,
             tagged_user_ids: input.tagged_user_ids || [],
+            guest_participants: input.guest_participants || [],
             note: input.note,
             lat: input.lat || userLat,
             lng: input.lng || userLng,
@@ -359,10 +361,36 @@ export function useGameBeacon() {
         isHost: true,
       });
 
+      // DEV instrumentation
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[🎮 Game Create] Success:', {
+          gameId: newBeacon.id,
+          timestamp: new Date().toISOString(),
+          payload: {
+            course_id: input.course_id,
+            course_name: input.course_name,
+            tagged_users: input.tagged_user_ids?.length || 0,
+            guests: input.guest_participants?.length || 0,
+            slots_total: input.slots_total,
+          },
+          response: {
+            id: newBeacon.id,
+            host_user_id: newBeacon.host_user_id,
+            slots_open: newBeacon.slots_open,
+            expires_at: newBeacon.expires_at,
+          },
+        });
+      }
+
       toast({
         title: 'Game posted',
         description: 'Nearby golfers can now see your game',
       });
+
+      // Dispatch event to trigger Your Games refetch
+      window.dispatchEvent(new CustomEvent('game-created', { 
+        detail: { gameId: newBeacon.id } 
+      }));
     } catch (error) {
       console.error('Error in createBeacon:', error);
       toast({

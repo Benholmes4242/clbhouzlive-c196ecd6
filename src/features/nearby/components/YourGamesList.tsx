@@ -19,7 +19,16 @@ export function YourGamesList({ onCancelGame, onLeaveGame }: YourGamesListProps)
   const fetchYourGames = async () => {
     if (!user?.id) return;
     
+    const startTime = Date.now();
     setIsLoading(true);
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[📋 YourGames Fetch] Starting...', {
+        timestamp: new Date().toISOString(),
+        userId: user.id,
+      });
+    }
+    
     try {
       const nowIso = new Date().toISOString();
 
@@ -75,6 +84,15 @@ export function YourGamesList({ onCancelGame, onLeaveGame }: YourGamesListProps)
           );
         setJoinedGames(uniqueJoinedGames);
       }
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[📋 YourGames Fetch] Complete:', {
+          duration: Date.now() - startTime + 'ms',
+          hosted: hosted?.length || 0,
+          joined: participants?.length || 0,
+          timestamp: new Date().toISOString(),
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -84,9 +102,33 @@ export function YourGamesList({ onCancelGame, onLeaveGame }: YourGamesListProps)
     fetchYourGames();
   }, [user?.id]);
 
+  // Listen for game-created events to trigger immediate refetch
+  useEffect(() => {
+    const handleGameCreated = (event: Event) => {
+      const customEvent = event as CustomEvent<{ gameId: string }>;
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[🎮 YourGames] Game created event received, refetching...', customEvent.detail);
+      }
+      fetchYourGames();
+    };
+
+    window.addEventListener('game-created', handleGameCreated);
+    
+    return () => {
+      window.removeEventListener('game-created', handleGameCreated);
+    };
+  }, [fetchYourGames]);
+
   // Real-time subscriptions
   useEffect(() => {
     if (!user?.id) return;
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[📡 YourGames RT] Setting up subscriptions...', {
+        timestamp: new Date().toISOString(),
+        userId: user.id,
+      });
+    }
 
     // Subscribe to games you host
     const hostedChannel = channelManager.createChannel(`your_hosted_games_${user.id}`);
@@ -96,7 +138,16 @@ export function YourGamesList({ onCancelGame, onLeaveGame }: YourGamesListProps)
         schema: 'public',
         table: 'games',
         filter: `host_user_id=eq.${user.id}`,
-      }, () => fetchYourGames())
+      }, () => {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[📡 YourGames RT] Hosted games event received, refetching...', {
+            timestamp: new Date().toISOString(),
+            userId: user.id,
+            channel: 'your_hosted_games',
+          });
+        }
+        fetchYourGames();
+      })
       .subscribe();
 
     // Subscribe to your participant changes
@@ -107,7 +158,16 @@ export function YourGamesList({ onCancelGame, onLeaveGame }: YourGamesListProps)
         schema: 'public',
         table: 'game_participants',
         filter: `user_id=eq.${user.id}`,
-      }, () => fetchYourGames())
+      }, () => {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[📡 YourGames RT] Participant event received, refetching...', {
+            timestamp: new Date().toISOString(),
+            userId: user.id,
+            channel: 'your_joined_games',
+          });
+        }
+        fetchYourGames();
+      })
       .subscribe();
 
     return () => {
