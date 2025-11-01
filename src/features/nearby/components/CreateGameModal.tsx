@@ -2,13 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, ChevronDown, AlertCircle } from 'lucide-react';
 import { GameBeacon } from '../hooks/useGameBeacon';
 import { useCourseSearch } from '../hooks/useCourseSearch';
-import { DateTimePicker } from './DateTimePicker';
 import { UserSearchTypeahead } from './UserSearchTypeahead';
 import { GameVisibilitySelector } from './GameVisibilitySelector';
+import { Segmented } from './Segmented';
+import { Chip } from './Chip';
+import { Token } from './Token';
 import type { GameVisibility } from '../types';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { TapButton } from '@/components/ui/TapButton';
+import { openCalendarPicker } from './CalendarPicker';
+import { openTimePicker } from './TimePicker';
+import './CreateGame.css';
 
 // Format game type for display
 function formatGameTypeDisplay(gameType: string): string {
@@ -82,7 +87,6 @@ export function CreateGameModal({
   const [visibility, setVisibility] = useState<GameVisibility>('public');
   const [timing, setTiming] = useState<string>('now');
   const [customDateTime, setCustomDateTime] = useState<Date | null>(null);
-  const [showDateTimePicker, setShowDateTimePicker] = useState(false);
   const [availableSlots, setAvailableSlots] = useState<number>(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
@@ -234,8 +238,28 @@ export function CreateGameModal({
   const handleTimingChange = (value: string) => {
     setTiming(value);
     if (value === 'choose') {
-      setShowDateTimePicker(true);
+      openCustomTimePicker();
     }
+  };
+
+  const openCustomTimePicker = () => {
+    openCalendarPicker({
+      initialDate: customDateTime || new Date(),
+      onSelect: (date) => {
+        setCustomDateTime(date);
+        setTiming('choose');
+        // Then open time picker
+        openTimePicker({
+          initial: customDateTime ? format(customDateTime, 'HH:mm') : '08:00',
+          onSelect: (time) => {
+            const [hours, minutes] = time.split(':');
+            const newDate = new Date(date);
+            newDate.setHours(parseInt(hours), parseInt(minutes));
+            setCustomDateTime(newDate);
+          }
+        });
+      }
+    });
   };
 
   const handleCourseSelect = (course: { id: string; name: string }) => {
@@ -260,7 +284,7 @@ export function CreateGameModal({
 
   const getTimingDisplay = () => {
     if (timing === 'choose' && customDateTime) {
-      return format(customDateTime, "MMM d 'at' h:mm a");
+      return format(customDateTime, "MMM d • h:mm a");
     }
     return TIMING_OPTIONS.find(opt => opt.value === timing)?.label || 'Now';
   };
@@ -325,7 +349,7 @@ export function CreateGameModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-5 pt-4 pb-4">
+        <div className="px-5 pt-4 pb-5">
           {/* Title + Close */}
           <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
             {/* Left spacer */}
@@ -351,7 +375,7 @@ export function CreateGameModal({
           </div>
           
           {/* Subtitle */}
-          <p className="text-[15px] text-white/70 text-center">
+          <p className="text-[15px] text-white/70 text-center mt-4">
             {myBeacon ? 'Currently hosting' : 'Let nearby golfers know you\'re looking to play'}
           </p>
         </div>
@@ -414,21 +438,13 @@ export function CreateGameModal({
                 <label className="block text-sm font-medium text-white/90">
                   Game type *
                 </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {GAME_TYPES.map(type => (
-                    <TapButton
-                      key={type.value}
-                      onClick={() => setGameType(type.value)}
-                      className={`py-3 px-4 rounded-xl font-medium transition-all backdrop-blur ${
-                        gameType === type.value
-                          ? 'bg-white/20 text-white border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:bg-white/30 active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)_inset]'
-                          : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
-                      }`}
-                    >
-                      {type.label}
-                    </TapButton>
-                  ))}
-                </div>
+                <Segmented
+                  ariaLabel="Game type"
+                  columns={2}
+                  items={GAME_TYPES}
+                  value={gameType}
+                  onChange={(v) => setGameType(String(v))}
+                />
               </div>
 
               {/* Golf course */}
@@ -511,24 +527,19 @@ export function CreateGameModal({
                 <label className="block text-sm font-medium text-white/60">
                   When
                 </label>
-                <div className="grid grid-cols-4 gap-2">
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   {TIMING_OPTIONS.map(option => (
-                    <TapButton
+                    <Chip
                       key={option.value}
+                      label={option.label}
+                      active={timing === option.value}
                       onClick={() => handleTimingChange(option.value)}
-                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-all backdrop-blur ${
-                        timing === option.value
-                          ? 'bg-white/20 text-white border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:bg-white/30 active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)_inset]'
-                          : 'bg-white/5 text-white/70 border border-white/12 shadow-[0_8px_24px_rgba(0,0,0,0.8)] hover:bg-white/10'
-                      }`}
-                    >
-                      {option.label}
-                    </TapButton>
+                    />
                   ))}
                 </div>
                 {timing === 'choose' && customDateTime && (
                   <div className="text-sm text-white/80 text-center mt-2">
-                    {getTimingDisplay()}
+                    Selected • {getTimingDisplay()}
                   </div>
                 )}
               </div>
@@ -557,27 +568,17 @@ export function CreateGameModal({
                   <label className="block text-sm font-medium text-white/90">
                     Available slots *
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[1, 2, 3].map(num => {
-                      const isDisabled = num > maxAvailableSlots;
-                      return (
-                        <TapButton
-                          key={num}
-                          onClick={() => !isDisabled && setAvailableSlots(num)}
-                          disabled={isDisabled}
-                          className={`py-3 px-4 rounded-xl font-medium transition-all backdrop-blur ${
-                            availableSlots === num && !isDisabled
-                              ? 'bg-white/20 text-white border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset]'
-                              : isDisabled
-                              ? 'bg-white/5 text-white/30 border border-white/8 cursor-not-allowed'
-                              : 'bg-white/5 text-white/70 border border-white/12 hover:bg-white/10'
-                          }`}
-                        >
-                          {num}
-                        </TapButton>
-                      );
-                    })}
-                  </div>
+                  <Segmented
+                    ariaLabel="Available slots"
+                    columns={3}
+                    items={[1, 2, 3].map(num => ({
+                      value: num,
+                      label: String(num),
+                      disabled: num > maxAvailableSlots
+                    }))}
+                    value={availableSlots}
+                    onChange={(v) => setAvailableSlots(Number(v))}
+                  />
                   <div className="text-xs text-center text-white/60">
                     {availableSlots === 1 ? '1 slot available' : `${availableSlots} slots available`}
                   </div>
@@ -600,23 +601,16 @@ export function CreateGameModal({
 
               <TapButton
                 onClick={handleSubmit}
-                disabled={!gameType || isSubmitting}
+                disabled={!gameType || !courseId || isSubmitting}
                 className="w-full py-3 px-4 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ height: '52px' }}
               >
-                {isSubmitting ? 'Creating...' : 'Start Game'}
+                {isSubmitting ? 'Starting…' : 'Start Game'}
               </TapButton>
             </>
           )}
         </div>
       </div>
-
-      {showDateTimePicker && (
-        <DateTimePicker
-          value={customDateTime}
-          onChange={setCustomDateTime}
-          onClose={() => setShowDateTimePicker(false)}
-        />
-      )}
     </div>
   );
 }

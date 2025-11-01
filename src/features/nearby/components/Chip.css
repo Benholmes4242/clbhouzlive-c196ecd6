@@ -1,0 +1,39 @@
+.chip {
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid #242424;
+  background: #141414;
+  color: #e9e9e9;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  transition: transform 0.06s ease, background 0.12s;
+  touch-action: manipulation;
+  white-space: nowrap;
+}
+
+.chip:active {
+  transform: scale(0.98);
+}
+
+.chip.is-active {
+  background: #191d1b;
+  border-color: #353535;
+}
+
+.chipIcon {
+  display: inline-flex;
+}
+
+.chipText {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chipValue {
+  color: #9aa0a6;
+  white-space: nowrap;
+}
