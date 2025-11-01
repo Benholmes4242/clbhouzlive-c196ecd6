@@ -1,6 +1,6 @@
 import { addDays, format } from 'date-fns';
 import { haptic } from '@/utils/haptics';
-import type { TimeWindow, GameSort } from '../hooks/useGameFilters';
+import type { TimeWindow, GameSort, WhenFilter } from '../hooks/useGameFilters';
 
 type FilterSheetItem = {
   label: string;
@@ -110,38 +110,31 @@ function openActionSheet(config: ActionSheetConfig) {
 }
 
 type Filters = {
-  date: Date | null;
-  setDate: (d: Date | null) => void;
-  timeWindow: TimeWindow;
-  setTimeWindow: (t: TimeWindow) => void;
+  when: WhenFilter;
+  setWhen: (next: Partial<WhenFilter>) => void;
   distanceKm: number;
   setDistanceKm: (km: number) => void;
   sort: GameSort;
   setSort: (s: GameSort) => void;
 };
 
-export function openDateSheet(f: Filters) {
+export function openWhenSheet(f: Filters) {
   const today = new Date();
   const tomorrow = addDays(today, 1);
   
   openActionSheet({
-    title: 'Select Date',
+    title: 'Select Date & Time',
     items: [
-      { label: 'Any date', onPress: () => f.setDate(null) },
-      { label: 'Today', onPress: () => f.setDate(today) },
-      { label: 'Tomorrow', onPress: () => f.setDate(tomorrow) },
-    ],
-  });
-}
-
-export function openTimeSheet(f: Filters) {
-  openActionSheet({
-    title: 'Select Time',
-    items: [
-      { label: 'Any time', onPress: () => f.setTimeWindow('any') },
-      { label: 'Morning (6–11)', onPress: () => f.setTimeWindow('morning') },
-      { label: 'Afternoon (11–16)', onPress: () => f.setTimeWindow('afternoon') },
-      { label: 'Evening (16–21)', onPress: () => f.setTimeWindow('evening') },
+      // Quick picks
+      { label: 'Any', onPress: () => f.setWhen({ date: null, window: 'any', exactTime: null }) },
+      { label: 'Today', onPress: () => f.setWhen({ date: today, window: 'any', exactTime: null }) },
+      { label: 'Tomorrow', onPress: () => f.setWhen({ date: tomorrow, window: 'any', exactTime: null }) },
+      
+      // Time windows
+      { label: 'Any time', onPress: () => f.setWhen({ window: 'any', exactTime: null }) },
+      { label: 'Morning (6–11)', onPress: () => f.setWhen({ window: 'morning', exactTime: null }) },
+      { label: 'Afternoon (11–16)', onPress: () => f.setWhen({ window: 'afternoon', exactTime: null }) },
+      { label: 'Evening (16–21)', onPress: () => f.setWhen({ window: 'evening', exactTime: null }) },
     ],
   });
 }
@@ -167,20 +160,25 @@ export function openSortSheet(f: Filters) {
   });
 }
 
-export function labelDate(date: Date | null): string {
-  if (!date) return 'Any';
+export function labelWhen(when: WhenFilter): string {
+  if (!when.date && when.window === 'any' && !when.exactTime) return 'Any';
+  
   const today = new Date();
   const tomorrow = addDays(today, 1);
+  const dateStr = !when.date 
+    ? 'Today'
+    : when.date.toDateString() === today.toDateString()
+    ? 'Today'
+    : when.date.toDateString() === tomorrow.toDateString()
+    ? 'Tomorrow'
+    : format(when.date, 'MMM d');
   
-  if (date.toDateString() === today.toDateString()) return 'Today';
-  if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
+  if (when.exactTime) return `${dateStr} • ${when.exactTime}`;
   
-  return format(date, 'MMM d');
-}
-
-export function labelTime(timeWindow: TimeWindow): string {
-  if (timeWindow === 'any') return 'Any';
-  if (timeWindow === 'morning') return 'Morning';
-  if (timeWindow === 'afternoon') return 'Afternoon';
-  return 'Evening';
+  if (when.window !== 'any') {
+    const windowMap = { morning: 'Morning', afternoon: 'Afternoon', evening: 'Evening' };
+    return `${dateStr} • ${windowMap[when.window]}`;
+  }
+  
+  return dateStr;
 }

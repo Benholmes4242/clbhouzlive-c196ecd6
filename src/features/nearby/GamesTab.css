@@ -166,22 +166,22 @@
   line-height: 1;
 }
 
-/* Filters Row - Responsive Grid */
-.chipsGrid {
-  padding: 10px 0;
+/* Filters Row - 3-chip layout with auto-hide Distance */
+.chipsRow {
+  padding: 10px 12px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
-/* Grow to 4-in-a-row when there's room */
-@media (min-width: 480px) {
-  .chipsGrid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
+.chipsRow.cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.chipsGrid .chip {
+.chipsRow.cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.chip {
   width: 100%;
   height: 36px;
   border-radius: 12px;
@@ -193,27 +193,21 @@
   align-items: center;
   justify-content: space-between;
   touch-action: manipulation;
-  transition: background 0.08s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.chipsGrid .chip:active {
+.chip:active {
   background: #1f1f1f;
 }
 
-.chipsGrid .chipLabel {
+.chipLabel {
   font-size: 14px;
 }
 
-.chipsGrid .chipValue {
+.chipValue {
   color: #9fc0a7;
   font-weight: 700;
   font-size: 14px;
-}
-
-/* Legacy cleanup - hide old carousel styles */
-.chips, .chipsScroller, .chipsCarousel {
-  display: none !important;
-  overflow-x: hidden !important;
 }
 
 /* Scoped Heading */

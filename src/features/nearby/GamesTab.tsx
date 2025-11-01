@@ -5,7 +5,7 @@ import { useCourseSearch, GolfCourse } from '@/features/nearby/hooks/useCourseSe
 import { useGameFilters } from './hooks/useGameFilters';
 import { useGamesQuery } from './hooks/useGamesQuery';
 import { useJoinGame } from './hooks/useJoinGame';
-import { openDateSheet, openTimeSheet, openDistanceSheet, openSortSheet, labelDate, labelTime } from './components/FilterSheets';
+import { openWhenSheet, openDistanceSheet, openSortSheet, labelWhen } from './components/FilterSheets';
 import './GamesTab.css';
 
 type Game = {
@@ -104,35 +104,36 @@ function FindAGame({
   );
 }
 
-function FiltersRow() {
+function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
   const filters = useGameFilters();
+  const showDistance = !selectedClub;
   
   return (
-    <div className="chipsGrid" role="group" aria-label="Game filters">
+    <div 
+      className={`chipsRow ${showDistance ? 'cols-3' : 'cols-2'}`} 
+      role="group" 
+      aria-label="Game filters"
+    >
       <TapButton 
         className="chip" 
-        onClick={() => openDateSheet(filters)}
-        aria-label={`Date: ${labelDate(filters.date)}`}
+        onClick={() => openWhenSheet(filters)}
+        aria-label={`When: ${labelWhen(filters.when)}`}
       >
-        <span className="chipLabel">Date</span>
-        <span className="chipValue">{labelDate(filters.date)}</span>
+        <span className="chipLabel">When</span>
+        <span className="chipValue">{labelWhen(filters.when)}</span>
       </TapButton>
-      <TapButton 
-        className="chip" 
-        onClick={() => openTimeSheet(filters)}
-        aria-label={`Time: ${labelTime(filters.timeWindow)}`}
-      >
-        <span className="chipLabel">Time</span>
-        <span className="chipValue">{labelTime(filters.timeWindow)}</span>
-      </TapButton>
-      <TapButton 
-        className="chip" 
-        onClick={() => openDistanceSheet(filters)}
-        aria-label={`Distance: ${filters.distanceKm} km`}
-      >
-        <span className="chipLabel">Distance</span>
-        <span className="chipValue">{filters.distanceKm} km</span>
-      </TapButton>
+      
+      {showDistance && (
+        <TapButton 
+          className="chip" 
+          onClick={() => openDistanceSheet(filters)}
+          aria-label={`Distance: ${filters.distanceKm} km`}
+        >
+          <span className="chipLabel">Distance</span>
+          <span className="chipValue">{filters.distanceKm} km</span>
+        </TapButton>
+      )}
+      
       <TapButton 
         className="chip" 
         onClick={() => openSortSheet(filters)}
@@ -245,7 +246,7 @@ export function GamesTab({ onOpenCreate }: { onOpenCreate: () => void }) {
       
       <div className="gamesScroll">
         <FindAGame selectedClub={selectedClub} onSelectClub={setSelectedClub} />
-        <FiltersRow />
+        <FiltersRow selectedClub={selectedClub} />
         <div className="scopedHeading">
           {selectedClub ? `Games at ${selectedClub.name}` : 'Games Near You'}
         </div>
