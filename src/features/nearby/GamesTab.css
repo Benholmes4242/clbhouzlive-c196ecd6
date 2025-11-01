@@ -5,6 +5,13 @@
   padding-bottom: 20px;
 }
 
+.gamesScroll {
+  position: relative;
+  overflow: auto;
+  max-height: calc(100dvh - 280px);
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Create Game CTA */
 .ctaHero {
   width: 74%;
@@ -119,10 +126,17 @@
   font-size: 13px;
 }
 
-.selectedClub {
-  margin: 10px 4px 8px;
+.selectedClubRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 12px 8px;
   color: #bdbdbd;
   font-size: 14px;
+}
+
+.selectedClubRow .prefix {
+  flex-shrink: 0;
 }
 
 .clubPill {
@@ -289,9 +303,11 @@
 
 /* Empty State */
 .empty {
+  position: static !important;
   text-align: center;
   color: #bdbdbd;
   padding: 28px 16px 40px;
+  margin: 24px 16px 40px;
 }
 
 .empty .emoji {

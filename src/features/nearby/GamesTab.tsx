@@ -5,7 +5,7 @@ import { useCourseSearch, GolfCourse } from '@/features/nearby/hooks/useCourseSe
 import { useGameFilters } from './hooks/useGameFilters';
 import { useGamesQuery } from './hooks/useGamesQuery';
 import { useJoinGame } from './hooks/useJoinGame';
-import { formatDistanceToNowStrict } from 'date-fns';
+import { openDateSheet, openTimeSheet, openDistanceSheet, openSortSheet, labelDate, labelTime } from './components/FilterSheets';
 import './GamesTab.css';
 
 type Game = {
@@ -54,8 +54,8 @@ function FindAGame({
   return (
     <div className="findBlock">
       {selectedClub ? (
-        <div className="selectedClub">
-          <span>Viewing games at</span>
+        <div className="selectedClubRow">
+          <span className="prefix">Viewing games at</span>
           <div className="clubPill">
             <span className="clubName">{selectedClub.name}</span>
             <TapButton className="x" aria-label="Clear" onClick={handleClear}>✕</TapButton>
@@ -105,19 +105,41 @@ function FindAGame({
 }
 
 function FiltersRow() {
-  const { distanceKm, setDistanceKm, sort, setSort } = useGameFilters();
-  
-  const sortLabel = sort === 'soonest' ? 'Soonest' : sort === 'distance' ? 'Nearest' : 'Seats';
+  const filters = useGameFilters();
   
   return (
     <div className="chips">
-      <TapButton className="chip" onClick={() => { haptic('light'); }}>
-        <span className="chipLabel">Distance</span>
-        <span className="chipValue">{distanceKm} km</span>
+      <TapButton 
+        className="chip" 
+        onClick={() => openDateSheet(filters)}
+        aria-label={`Date: ${labelDate(filters.date)}`}
+      >
+        <span className="chipLabel">Date</span>
+        <span className="chipValue">{labelDate(filters.date)}</span>
       </TapButton>
-      <TapButton className="chip" onClick={() => { haptic('light'); }}>
+      <TapButton 
+        className="chip" 
+        onClick={() => openTimeSheet(filters)}
+        aria-label={`Time: ${labelTime(filters.timeWindow)}`}
+      >
+        <span className="chipLabel">Time</span>
+        <span className="chipValue">{labelTime(filters.timeWindow)}</span>
+      </TapButton>
+      <TapButton 
+        className="chip" 
+        onClick={() => openDistanceSheet(filters)}
+        aria-label={`Distance: ${filters.distanceKm} km`}
+      >
+        <span className="chipLabel">Distance</span>
+        <span className="chipValue">{filters.distanceKm} km</span>
+      </TapButton>
+      <TapButton 
+        className="chip" 
+        onClick={() => openSortSheet(filters)}
+        aria-label={`Sort: ${filters.sortLabel}`}
+      >
         <span className="chipLabel">Sort</span>
-        <span className="chipValue">{sortLabel}</span>
+        <span className="chipValue">{filters.sortLabel}</span>
       </TapButton>
     </div>
   );
@@ -220,12 +242,15 @@ export function GamesTab({ onOpenCreate }: { onOpenCreate: () => void }) {
   return (
     <div className="gamesTab">
       <CreateGameCTA onOpen={onOpenCreate} />
-      <FindAGame selectedClub={selectedClub} onSelectClub={setSelectedClub} />
-      <FiltersRow />
-      <div className="scopedHeading">
-        {selectedClub ? `Games at ${selectedClub.name}` : 'Games Near You'}
+      
+      <div className="gamesScroll">
+        <FindAGame selectedClub={selectedClub} onSelectClub={setSelectedClub} />
+        <FiltersRow />
+        <div className="scopedHeading">
+          {selectedClub ? `Games at ${selectedClub.name}` : 'Games Near You'}
+        </div>
+        <GamesList games={games || []} isLoading={isLoading} />
       </div>
-      <GamesList games={games || []} isLoading={isLoading} />
     </div>
   );
 }
