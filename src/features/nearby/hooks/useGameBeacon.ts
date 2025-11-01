@@ -510,9 +510,10 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
       });
     } catch (error) {
       console.error('Error in createBeacon:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create game';
       toast({
-        title: 'Error',
-        description: 'Failed to create game',
+        title: 'Failed to create game',
+        description: errorMessage,
         variant: 'destructive',
       });
     }
