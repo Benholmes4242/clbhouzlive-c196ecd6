@@ -39,6 +39,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   const [isCreateGameOpen, setIsCreateGameOpen] = useState(false);
   const [prefilledClub, setPrefilledClub] = useState<{ id: string; name: string } | undefined>();
   const [yourGamesCount, setYourGamesCount] = useState(0);
+  const [gamesSessionKey, setGamesSessionKey] = useState(0);
 
   // Lock body scroll when overlay is open
   useEffect(() => {
@@ -50,6 +51,14 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       };
     }
   }, [isOpen]);
+
+  // Remount GamesTab on every visit to reset filters
+  useEffect(() => {
+    if (!isOpen) return;
+    if (activeTab === 'games') {
+      setGamesSessionKey(k => k + 1);
+    }
+  }, [activeTab, isOpen]);
 
   const handleClose = () => {
     analyticsEvents.nearby.opened(golfers.length);
@@ -224,7 +233,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
               </div>
             )
           ) : activeTab === 'games' ? (
-            <GamesTab onOpenCreate={() => setIsCreateGameOpen(true)} />
+            <GamesTab key={gamesSessionKey} onOpenCreate={() => setIsCreateGameOpen(true)} />
           ) : (
             <YourGamesList
               onCancelGame={cancelBeacon}
