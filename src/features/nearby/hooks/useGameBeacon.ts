@@ -394,16 +394,6 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
 
   const createBeacon = async (input: CreateBeaconInput) => {
     try {
-      // Check if user already has an active beacon
-      if (myBeacon) {
-        toast({
-          title: 'You already have an active game',
-          description: 'Cancel your current game before creating a new one',
-          variant: 'destructive',
-        });
-        return;
-      }
-
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) {
         toast({
