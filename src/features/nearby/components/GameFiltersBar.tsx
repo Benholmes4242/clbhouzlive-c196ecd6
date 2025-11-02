@@ -144,12 +144,11 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
         flex-1 basis-0
         min-w-0
         h-11 rounded-2xl
-        bg-white/5 border border-white/12
-        backdrop-blur
+        bg-[hsl(0_84%_60%)] border border-[hsl(0_84%_45%)]
         px-4
         flex items-center gap-2
-        text-white/90
-        hover:bg-white/8 active:bg-white/10
+        text-white
+        hover:bg-[hsl(0_84%_55%)] active:bg-[hsl(0_84%_50%)]
         transition
       "
     >
