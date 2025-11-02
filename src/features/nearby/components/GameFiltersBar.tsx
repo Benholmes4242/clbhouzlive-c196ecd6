@@ -71,9 +71,38 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
     return filters.timeWindow === 'any' ? 'Time: Any' : `Time: ${tw?.label || 'Any'}`;
   };
 
+  const formatWhenLabel = () => {
+    if (!filters.date && filters.timeWindow === 'any') return 'When';
+    
+    const today = startOfDay(new Date());
+    const tomorrow = addDays(today, 1);
+    
+    let dateText = '';
+    if (!filters.date) {
+      dateText = '';
+    } else if (isSameDay(filters.date, today)) {
+      dateText = 'Today';
+    } else if (isSameDay(filters.date, tomorrow)) {
+      dateText = 'Tomorrow';
+    } else {
+      dateText = format(filters.date, 'MMM d');
+    }
+    
+    let timeText = '';
+    if (filters.timeWindow !== 'any') {
+      const tw = TIME_WINDOWS.find(t => t.value === filters.timeWindow);
+      timeText = tw?.label || '';
+    }
+    
+    if (dateText && timeText) return `${dateText} • ${timeText}`;
+    if (dateText) return dateText;
+    if (timeText) return timeText;
+    return 'When';
+  };
+
   const getSortLabel = () => {
     const opt = SORT_OPTIONS.find(s => s.value === filters.sortBy);
-    return `Sort: ${opt?.label || 'Soonest'}`;
+    return opt?.label || 'Soonest';
   };
 
   const quickSetDate = (days: number | null) => {
@@ -109,28 +138,35 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
     icon?: React.ElementType;
   }) => (
     <button
+      type="button"
       onClick={onClick}
-      className={cn(
-        "flex items-center justify-center gap-1 rounded-lg border border-white/14",
-        "bg-white/[0.08] hover:bg-white/[0.12] active:bg-white/[0.16]",
-        "px-3 py-1.5 text-[13px] font-medium leading-none",
-        "transition-colors"
-      )}
+      className="
+        flex-1 basis-0
+        min-w-0
+        h-11 rounded-2xl
+        bg-white/5 border border-white/12
+        backdrop-blur
+        px-4
+        flex items-center gap-2
+        text-white/90
+        hover:bg-white/8 active:bg-white/10
+        transition
+      "
     >
-      {Icon && <Icon className="w-4 h-4" />}
-      <span>{children}</span>
+      {Icon && <Icon className="shrink-0 w-4 h-4" aria-hidden="true" />}
+      <span className="truncate">{children}</span>
     </button>
   );
 
   return (
     <div className={cn('flex flex-col gap-2', className)}>
       {/* Filter Controls Row */}
-      <div className="mt-2 flex items-stretch justify-between gap-2">
-            {/* Date Filter with Calendar */}
+      <div className="flex gap-3" role="group" aria-label="Game filters">
+            {/* When Filter */}
             <Sheet open={dateOpen} onOpenChange={setDateOpen}>
             <SheetTrigger asChild>
               <ControlButton onClick={() => setDateOpen(true)} icon={Calendar}>
-                {getDateLabel()}
+                {formatWhenLabel()}
               </ControlButton>
             </SheetTrigger>
             <SheetContent 
@@ -181,50 +217,12 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
             </SheetContent>
           </Sheet>
 
-          {/* Time Window Filter */}
-          <Sheet open={timeOpen} onOpenChange={setTimeOpen}>
-            <SheetTrigger asChild>
-              <ControlButton onClick={() => setTimeOpen(true)} icon={Clock}>
-                {getTimeLabel()}
-              </ControlButton>
-            </SheetTrigger>
-            <SheetContent 
-              side="bottom" 
-              className="pb-8"
-            >
-              <SheetHeader>
-                <SheetTitle>Select a time window</SheetTitle>
-              </SheetHeader>
-              <div className="mt-6 space-y-2">
-                {TIME_WINDOWS.map((tw) => (
-                  <button
-                    key={tw.value}
-                    onClick={() => {
-                      updateFilter('timeWindow', tw.value);
-                      setTimeOpen(false);
-                    }}
-                    className={cn(
-                      "w-full h-12 px-4 rounded-lg font-medium text-sm transition-all",
-                      "flex items-center justify-between",
-                      filters.timeWindow === tw.value
-                        ? "bg-white/20 text-white border border-white/28"
-                        : "bg-white/[0.06] text-white/80 hover:bg-white/[0.10] border border-transparent"
-                    )}
-                  >
-                    <span>{tw.label}</span>
-                    {tw.hours && <span className="text-xs opacity-70">{tw.hours}</span>}
-                  </button>
-                ))}
-              </div>
-            </SheetContent>
-          </Sheet>
-
           {/* Radius Filter (Nearby mode only) */}
           {mode === 'nearby' && (
             <Sheet open={radiusOpen} onOpenChange={setRadiusOpen}>
               <SheetTrigger asChild>
                 <ControlButton onClick={() => setRadiusOpen(true)} icon={MapPin}>
-                  Distance: {filters.radiusKm} km
+                  {filters.radiusKm} km
                 </ControlButton>
               </SheetTrigger>
               <SheetContent 

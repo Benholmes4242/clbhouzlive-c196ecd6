@@ -255,12 +255,14 @@ export function GamesNearbyList({
       <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
       {/* Filter chips - moved here */}
-      <GameFiltersBar
-        filters={currentFilters}
-        onFiltersChange={onFiltersChange}
-        mode={mode}
-        portalContainer={portalContainer}
-      />
+      <div className="px-5">
+        <GameFiltersBar
+          filters={currentFilters}
+          onFiltersChange={onFiltersChange}
+          mode={mode}
+          portalContainer={portalContainer}
+        />
+      </div>
 
       {/* SECTION 3: Discoverable Games */}
       <div className="space-y-3">
