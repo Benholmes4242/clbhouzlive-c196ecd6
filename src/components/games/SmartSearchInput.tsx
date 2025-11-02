@@ -16,12 +16,20 @@ interface SmartSearchInputProps {
   onCourseSelect: (club: { id: string; name: string }) => void;
   onClear: () => void;
   selectedClub: { id: string; name: string } | null;
+  headerText?: string;
+  subtitleText?: string;
+  selectedPrefix?: string;
+  container?: HTMLElement | null;
 }
 
 export const SmartSearchInput: React.FC<SmartSearchInputProps> = ({
   onCourseSelect,
   onClear,
   selectedClub,
+  headerText = 'Find a Game',
+  subtitleText = 'Search golf clubs to find active games',
+  selectedPrefix = 'Viewing games at',
+  container,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -84,7 +92,7 @@ export const SmartSearchInput: React.FC<SmartSearchInputProps> = ({
       <div className="max-w-md mx-auto rounded-xl bg-white/5 backdrop-blur-md border border-white/10 px-4 py-3">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-xs text-white/50 mb-1">Viewing games at</div>
+            <div className="text-xs text-white/50 mb-1">{selectedPrefix}</div>
             <div className="text-sm font-medium text-white">{selectedClub.name}</div>
           </div>
           <button
@@ -103,9 +111,9 @@ export const SmartSearchInput: React.FC<SmartSearchInputProps> = ({
     <div className="space-y-3">
       {/* Section Header */}
       <div className="px-2 space-y-1 text-center">
-        <h3 className="text-sm font-semibold text-white/95">Find a Game</h3>
+        <h3 className="text-sm font-semibold text-white/95">{headerText}</h3>
         <p className="text-[13px] text-white/60">
-          Search golf clubs to find active games
+          {subtitleText}
         </p>
       </div>
       
