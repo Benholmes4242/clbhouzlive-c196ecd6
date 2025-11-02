@@ -191,19 +191,25 @@ export const analyticsEvents = {
 
   // Hub events (My Clubhouse Hub)
   hub: {
-    open: () => {
-      analyticsEvents.track('hub_opened', {
-        timestamp: new Date().toISOString(),
-        session_id: sessionStorage.getItem('session_id') || 'unknown'
-      });
-    },
-    
-    tab_switch: (tabName: string) => {
-      analyticsEvents.track('hub_tab_switch', {
-        tab_name: tabName,
-        timestamp: new Date().toISOString(),
-        session_id: sessionStorage.getItem('session_id') || 'unknown'
-      });
-    }
-  }
+    opened: { event: 'hub_opened', category: 'hub', label: 'Hub Opened' },
+    tab_switch: { event: 'hub_tab_switch', category: 'hub', label: 'Hub Tab Switched' },
+    golfers_view: { event: 'hub_golfers_view', category: 'hub', label: 'Golfers Tab Viewed' },
+    games_view: { event: 'hub_games_view', category: 'hub', label: 'Games Tab Viewed' },
+    your_games_view: { event: 'hub_your_games_view', category: 'hub', label: 'Your Games Tab Viewed' },
+    create_game_open: { event: 'hub_create_game_open', category: 'hub', label: 'Create Game Opened' },
+    echo_open: { event: 'hub_echo_open', category: 'hub', label: 'Echo Tab Opened' },
+  },
+
+  // Game events
+  game: {
+    created: { event: 'game_created', category: 'game', label: 'Game Created' },
+    joined: { event: 'game_joined', category: 'game', label: 'Game Joined' },
+    cancelled: { event: 'game_cancelled', category: 'game', label: 'Game Cancelled' },
+  },
+
+  // Echo events (ready for Phase 4)
+  echo: {
+    message_sent: { event: 'echo_message_sent', category: 'echo', label: 'Echo Message Sent' },
+    history_opened: { event: 'echo_history_opened', category: 'echo', label: 'Echo History Opened' },
+  },
 };

@@ -1,20 +1,30 @@
 /**
  * Hub Golfers Page
  * 
- * Wrapper for existing Golfers tab content.
- * Maintains baseline UI from Phase 1 audit.
+ * Golfers tab with realtime updates (Phase 3 - Baseline UI).
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { GolferRow } from '@/features/nearby/components/GolferRow';
 import { VisibilitySegmentedControl } from '@/features/nearby/components/VisibilitySegmentedControl';
 import { OpenToPlayButton } from '@/features/nearby/components/OpenToPlayButton';
 import { useVisibility } from '@/features/nearby/hooks/useVisibility';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 export function HubGolfersPage() {
   const { golfers, isLoading } = useActiveGolfers({ limit: 20, mockCount: 0 });
   const { visibilityMode, setVisibilityMode } = useVisibility();
+
+  useEffect(() => {
+    // Track Golfers tab view
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', analyticsEvents.hub.golfers_view.event, {
+        event_category: analyticsEvents.hub.golfers_view.category,
+        event_label: analyticsEvents.hub.golfers_view.label,
+      });
+    }
+  }, []);
 
   return (
     <div className="space-y-4">

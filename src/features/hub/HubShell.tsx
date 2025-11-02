@@ -34,10 +34,29 @@ export function HubShell({ onClose }: HubShellProps) {
     };
   }, []);
 
+  // Track Hub open on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', analyticsEvents.hub.opened.event, {
+        event_category: analyticsEvents.hub.opened.category,
+        event_label: analyticsEvents.hub.opened.label,
+      });
+    }
+  }, []);
+
   // Track tab switches
   useEffect(() => {
     const tab = location.pathname.split('/').pop() || 'golfers';
     console.log('[Hub] Tab switched to:', tab);
+    
+    // Track tab switch analytics
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', analyticsEvents.hub.tab_switch.event, {
+        event_category: analyticsEvents.hub.tab_switch.category,
+        event_label: `Hub Tab: ${tab}`,
+        tab_name: tab,
+      });
+    }
   }, [location.pathname]);
 
   const handleClose = () => {
