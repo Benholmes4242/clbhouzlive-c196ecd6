@@ -48,12 +48,11 @@ export function YourGamesList({
     setIsLoading(true);
     
     try {
-      // Add 5-second margin to catch just-created games
-      const nowMinus5s = new Date(Date.now() - 5000).toISOString();
-      console.log('[YourGames] Fetching at:', nowMinus5s);
+      const nowIso = new Date().toISOString();
+      console.log('[YourGames] Fetching at:', nowIso);
       console.log('[YourGames] User ID:', user.id);
 
-      // Fetch games you're hosting - show future games based on start_time
+      // Fetch games you're hosting - show active games based on expires_at
       const { data: hosted, error: hostedError } = await supabase
         .from('games')
         .select(`
@@ -78,8 +77,8 @@ export function YourGamesList({
         `)
         .eq('host_user_id', user.id)
         .eq('status', 'active')
-        .gte('start_time', nowMinus5s)
-        .order('start_time', { ascending: true });
+        .gte('expires_at', nowIso)
+        .order('start_time', { ascending: true, nullsFirst: true });
 
       console.log('[YourGames] Hosted games query result:', {
         count: hosted?.length || 0,
@@ -91,7 +90,7 @@ export function YourGamesList({
         console.error('Error fetching hosted games:', hostedError);
       }
 
-      // Fetch games you've joined (as participant) - show future games based on start_time
+      // Fetch games you've joined (as participant) - show active games based on expires_at
       const { data: participants, error: participantsError } = await supabase
         .from('game_participants')
         .select(`
@@ -130,7 +129,7 @@ export function YourGamesList({
         `)
         .eq('user_id', user.id)
         .eq('games.status', 'active')
-        .gte('games.start_time', nowMinus5s);
+        .gte('games.expires_at', nowIso);
 
       console.log('[YourGames] Joined games query result:', {
         count: participants?.length || 0,
@@ -199,7 +198,10 @@ export function YourGamesList({
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       console.log('[YourGames] game-created event received:', detail);
-      setTimeout(() => fetchYourGames(), 400); // Increased from 150ms to 400ms for DB propagation
+      // Primary refetch at 400ms
+      setTimeout(() => fetchYourGames(), 400);
+      // Secondary safety refetch at 1500ms for read-after-write consistency
+      setTimeout(() => fetchYourGames(), 1500);
     };
     window.addEventListener(EVT_GAME_CREATED, handler as EventListener);
     return () => window.removeEventListener(EVT_GAME_CREATED, handler as EventListener);
