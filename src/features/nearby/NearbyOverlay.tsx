@@ -265,28 +265,30 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           }}
           onCreateBeacon={async (input) => {
             try {
-              // Belt-and-braces: track if createBeacon dispatched event
-              let fired = false;
-              const markFired = () => { fired = true; };
-              window.addEventListener('game-created', markFired, { once: true });
+              if (typeof window !== 'undefined') {
+                // Belt-and-braces: track if createBeacon dispatched event
+                let fired = false;
+                const markFired = () => { fired = true; };
+                window.addEventListener('game-created', markFired, { once: true });
 
-              await createBeacon(input);
+                const result = await createBeacon(input);
 
-              // Microtask turn to see if someone else dispatched
-              await Promise.resolve();
-              if (!fired) {
-                const { data: { user } } = await supabase.auth.getUser();
-                window.dispatchEvent(new CustomEvent('game-created', {
-                  detail: { gameId: undefined, hostUserId: user?.id },
-                }));
+                // Microtask turn to see if someone else dispatched
+                await Promise.resolve();
+                if (!fired) {
+                  const { data: { user } } = await supabase.auth.getUser();
+                  window.dispatchEvent(new CustomEvent('game-created', {
+                    detail: { gameId: result?.id, hostUserId: user?.id },
+                  }));
+                }
+                window.removeEventListener('game-created', markFired);
+
+                // Give the listener & DB a beat
+                await new Promise((r) => setTimeout(r, 150));
+                
+                // Now switch to Your Games
+                setActiveTab('your-games');
               }
-              window.removeEventListener('game-created', markFired);
-
-              // Give the listener & DB a beat
-              await new Promise((r) => setTimeout(r, 150));
-              
-              // Now switch to Your Games
-              setActiveTab('your-games');
             } finally {
               setIsCreateGameOpen(false);
               setPrefilledClub(undefined);

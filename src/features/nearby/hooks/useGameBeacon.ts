@@ -497,6 +497,8 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
         title: 'Game posted',
         description: 'Nearby golfers can now see your game',
       });
+
+      return newBeacon;
     } catch (error) {
       console.error('Error in createBeacon:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to create game';
