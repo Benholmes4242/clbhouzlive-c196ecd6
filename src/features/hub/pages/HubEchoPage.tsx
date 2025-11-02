@@ -1,20 +1,39 @@
 /**
  * Hub Echo Page
  * 
- * Inline AI Chat interface within Hub (Phase 3).
- * Renders chat directly without overlay.
+ * Inline AI Chat interface within Hub (Phase 4).
+ * Full chat experience with history and streaming.
  */
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles, History, MessageSquare } from 'lucide-react';
+import { MessageSquare, History } from 'lucide-react';
 import { TapButton } from '@/components/ui/TapButton';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useEchoConversations } from '@/features/echo/hooks/useEchoConversations';
+import { useAIStream } from '@/features/echo/hooks/useAIStream';
+import { ChatThread } from '@/features/echo/components/ChatThread';
+import { ChatComposer } from '@/features/echo/components/ChatComposer';
+import { HistoryPanel } from '@/features/echo/components/HistoryPanel';
 
 export function HubEchoPage() {
   const [activeView, setActiveView] = useState<'chat' | 'history'>('chat');
+  
+  const {
+    state,
+    dispatch,
+    conversations,
+    activeConversation,
+    isStreaming,
+    createConversation,
+    selectConversation,
+    renameConversation,
+    deleteConversation,
+  } = useEchoConversations();
 
+  const { sendMessage, abort } = useAIStream();
+
+  // Track Echo tab open
   useEffect(() => {
-    // Track Echo tab open
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', analyticsEvents.hub.echo_open.event, {
         event_category: analyticsEvents.hub.echo_open.category,
@@ -23,10 +42,78 @@ export function HubEchoPage() {
     }
   }, []);
 
+  // Create first conversation if none exist
+  useEffect(() => {
+    if (conversations.length === 0) {
+      createConversation();
+    }
+  }, [conversations.length, createConversation]);
+
+  // Track view changes
+  useEffect(() => {
+    if (activeView === 'history' && typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', analyticsEvents.echo.history_opened.event, {
+        event_category: analyticsEvents.echo.history_opened.category,
+        event_label: analyticsEvents.echo.history_opened.label,
+      });
+    }
+  }, [activeView]);
+
+  const handleSendMessage = async (content: string) => {
+    if (!activeConversation) return;
+
+    // Track message sent
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', analyticsEvents.echo.message_sent.event, {
+        event_category: analyticsEvents.echo.message_sent.category,
+        event_label: analyticsEvents.echo.message_sent.label,
+        message_length: content.length,
+      });
+    }
+
+    // Add user message
+    dispatch({ type: 'APPEND_USER', content });
+
+    // Begin assistant response
+    dispatch({ type: 'BEGIN_ASSISTANT' });
+
+    // Send to AI
+    await sendMessage(
+      [...activeConversation.messages, { role: 'user', content }],
+      activeConversation.id,
+      {
+        onChunk: (chunk) => {
+          dispatch({ type: 'APPEND_ASSISTANT', content: chunk });
+        },
+        onComplete: (meta) => {
+          dispatch({ type: 'END_ASSISTANT', meta });
+        },
+        onError: (error) => {
+          dispatch({ type: 'ERROR_ASSISTANT', error });
+        },
+      }
+    );
+  };
+
+  const handleStopStream = () => {
+    abort();
+    dispatch({ type: 'END_ASSISTANT' });
+  };
+
+  const handleSelectConversation = (id: string) => {
+    selectConversation(id);
+    setActiveView('chat');
+  };
+
+  const handleNewConversation = () => {
+    createConversation();
+    setActiveView('chat');
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col h-full">
       {/* View Toggle */}
-      <div className="flex gap-2 bg-white/5 p-1 rounded-lg border border-white/10">
+      <div className="flex gap-2 bg-white/5 p-1 rounded-lg border border-white/10 mb-4">
         <TapButton
           className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${
             activeView === 'chat'
@@ -34,6 +121,7 @@ export function HubEchoPage() {
               : 'text-white/60 hover:text-white/80'
           }`}
           onClick={() => setActiveView('chat')}
+          aria-selected={activeView === 'chat'}
         >
           <MessageSquare className="w-4 h-4 inline mr-1.5" />
           Chat
@@ -45,28 +133,38 @@ export function HubEchoPage() {
               : 'text-white/60 hover:text-white/80'
           }`}
           onClick={() => setActiveView('history')}
+          aria-selected={activeView === 'history'}
         >
           <History className="w-4 h-4 inline mr-1.5" />
           History
         </TapButton>
       </div>
 
-      {/* Echo Coming Soon Message */}
-      <div className="py-16 text-center space-y-4">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-white/10">
-          <Sparkles className="w-8 h-8 text-white/80" />
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold text-white/90 mb-2">Echo AI Assistant</h3>
-          <p className="text-sm text-white/60 max-w-xs mx-auto">
-            {activeView === 'chat' 
-              ? 'AI chat interface will be integrated here in the next phase.'
-              : 'Your conversation history will appear here.'}
-          </p>
-        </div>
-        <div className="text-xs text-white/40">
-          Phase 4 • Coming Soon
-        </div>
+      {/* Content */}
+      <div className="flex-1 flex flex-col min-h-0 bg-background rounded-lg overflow-hidden">
+        {activeView === 'chat' ? (
+          <>
+            <ChatThread 
+              messages={activeConversation?.messages || []} 
+              isStreaming={isStreaming}
+            />
+            <ChatComposer
+              onSend={handleSendMessage}
+              onStop={handleStopStream}
+              disabled={!activeConversation || isStreaming}
+              isStreaming={isStreaming}
+            />
+          </>
+        ) : (
+          <HistoryPanel
+            conversations={conversations}
+            activeConversationId={state.activeConversationId}
+            onSelect={handleSelectConversation}
+            onRename={renameConversation}
+            onDelete={deleteConversation}
+            onNew={handleNewConversation}
+          />
+        )}
       </div>
     </div>
   );

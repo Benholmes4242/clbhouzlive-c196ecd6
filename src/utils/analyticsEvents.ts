@@ -207,9 +207,16 @@ export const analyticsEvents = {
     cancelled: { event: 'game_cancelled', category: 'game', label: 'Game Cancelled' },
   },
 
-  // Echo events (ready for Phase 4)
+  // Echo events (Phase 4 complete)
   echo: {
     message_sent: { event: 'echo_message_sent', category: 'echo', label: 'Echo Message Sent' },
     history_opened: { event: 'echo_history_opened', category: 'echo', label: 'Echo History Opened' },
+    new_conversation: { event: 'echo_new_conversation', category: 'echo', label: 'Echo New Conversation' },
+    conversation_opened: { event: 'echo_conversation_opened', category: 'echo', label: 'Echo Conversation Opened' },
+    conversation_renamed: { event: 'echo_conversation_renamed', category: 'echo', label: 'Echo Conversation Renamed' },
+    conversation_deleted: { event: 'echo_conversation_deleted', category: 'echo', label: 'Echo Conversation Deleted' },
+    stream_started: { event: 'echo_stream_started', category: 'echo', label: 'Echo Stream Started' },
+    stream_completed: { event: 'echo_stream_completed', category: 'echo', label: 'Echo Stream Completed' },
+    stream_aborted: { event: 'echo_stream_aborted', category: 'echo', label: 'Echo Stream Aborted' },
   },
 };
