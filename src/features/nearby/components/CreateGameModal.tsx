@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, ChevronDown, AlertCircle } from 'lucide-react';
 import { GameBeacon } from '../hooks/useGameBeacon';
-import { useCourseSearch } from '../hooks/useCourseSearch';
 import { UserSearchTypeahead } from './UserSearchTypeahead';
 import { GameVisibilitySelector } from './GameVisibilitySelector';
+import { SmartSearchInput } from '@/components/games/SmartSearchInput';
 import { Segmented } from './Segmented';
 import { Chip } from './Chip';
 import { Token } from './Token';
@@ -81,8 +81,6 @@ export function CreateGameModal({
   const [gameType, setGameType] = useState<string>('9_holes');
   const [courseId, setCourseId] = useState<string>('');
   const [courseName, setCourseName] = useState('');
-  const [courseSearchTerm, setCourseSearchTerm] = useState('');
-  const [showCourseDropdown, setShowCourseDropdown] = useState(false);
   const [note, setNote] = useState('');
   const [visibility, setVisibility] = useState<GameVisibility>('public');
   const [timing, setTiming] = useState<string>('now');
@@ -92,9 +90,6 @@ export function CreateGameModal({
   const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const [courseError, setCourseError] = useState<string>('');
-  const courseInputRef = useRef<HTMLInputElement>(null);
-  
-  const { courses } = useCourseSearch(courseSearchTerm);
 
   // Calculate current players (host + tagged)
   const currentPlayers = 1 + selectedUsers.length;
@@ -111,7 +106,6 @@ export function CreateGameModal({
     if (prefilledClub && !courseId) {
       setCourseId(prefilledClub.id);
       setCourseName(prefilledClub.name);
-      setCourseSearchTerm('');
     }
   }, [prefilledClub, courseId]);
 
@@ -132,6 +126,22 @@ export function CreateGameModal({
       };
     }
   }, [isOpen]);
+
+  // Full reset on unmount
+  useEffect(() => {
+    return () => {
+      setGameType('9_holes');
+      setCourseId('');
+      setCourseName('');
+      setNote('');
+      setTiming('now');
+      setCustomDateTime(null);
+      setAvailableSlots(3);
+      setSelectedUsers([]);
+      setValidationErrors({});
+      setCourseError('');
+    };
+  }, []);
 
   if (!isOpen) return null;
 
@@ -221,7 +231,6 @@ export function CreateGameModal({
       setGameType('9_holes');
       setCourseId('');
       setCourseName('');
-      setCourseSearchTerm('');
       setNote('');
       setVisibility('public');
       setTiming('now');
@@ -262,23 +271,15 @@ export function CreateGameModal({
     });
   };
 
-  const handleCourseSelect = (course: { id: string; name: string }) => {
-    setCourseId(course.id);
-    setCourseName(course.name);
-    setCourseSearchTerm(''); // Clear search buffer
-    setShowCourseDropdown(false);
+  const handleCourseSelect = (club: { id: string; name: string; country: string; region?: string }) => {
+    setCourseId(club.id);
+    setCourseName(club.name);
     setCourseError('');
-    courseInputRef.current?.blur(); // Optional blur
   };
 
-  const handleCourseInputChange = (value: string) => {
-    setCourseSearchTerm(value);
-    // If user types again, clear the courseId (treat as new search)
-    if (courseId) {
-      setCourseId('');
-      setCourseName('');
-    }
-    setShowCourseDropdown(true);
+  const handleCourseClear = () => {
+    setCourseId('');
+    setCourseName('');
     setCourseError('');
   };
 
@@ -448,55 +449,20 @@ export function CreateGameModal({
               </div>
 
               {/* Golf course */}
-              <div className="space-y-3 relative">
+              <div className="space-y-3">
                 <label className="block text-sm font-medium text-white/90">
                   Golf course *
                 </label>
-                <input
-                  ref={courseInputRef}
-                  type="text"
-                  placeholder="Search club name…"
-                  value={courseName || courseSearchTerm}
-                  onChange={(e) => handleCourseInputChange(e.target.value)}
-                  onFocus={() => setShowCourseDropdown(true)}
-                  className={`w-full py-3 px-4 bg-neutral-800 border rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20 ${
-                    courseError ? 'border-red-500' : 'border-neutral-700'
-                  }`}
+                <SmartSearchInput
+                  selectedClub={courseId ? { id: courseId, name: courseName } : null}
+                  onCourseSelect={handleCourseSelect}
+                  onClear={handleCourseClear}
                 />
-                {courseName && courseId && (
-                  <div className="text-xs text-white/50">
-                    Selected: {courseName}
-                  </div>
-                )}
                 {courseError && (
                   <div className="flex items-center gap-2 text-red-400 text-sm">
                     <AlertCircle className="w-4 h-4" />
                     {courseError}
                   </div>
-                )}
-                {showCourseDropdown && courses.length > 0 && (
-                  <>
-                    <div 
-                      className="fixed inset-0 z-10"
-                      onClick={() => setShowCourseDropdown(false)}
-                    />
-                    <div className="absolute z-20 w-full mt-1 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto backdrop-blur-xl">
-                      {courses.map((course) => (
-                        <TapButton
-                          key={course.id}
-                          onClick={() => handleCourseSelect(course)}
-                          className="w-full text-left px-4 py-3 hover:bg-neutral-800 transition-colors border-b border-neutral-800 last:border-b-0"
-                        >
-                          <div className="text-white text-sm font-medium">{course.name}</div>
-                          {course.region && (
-                            <div className="text-white/60 text-xs mt-0.5">
-                              {course.region}, {course.country}
-                            </div>
-                          )}
-                        </TapButton>
-                      ))}
-                    </div>
-                  </>
                 )}
               </div>
 

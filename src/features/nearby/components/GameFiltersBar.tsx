@@ -125,7 +125,7 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
   return (
     <div className={cn('flex flex-col gap-2', className)}>
       {/* Filter Controls Row */}
-      <div className="mt-2 flex items-stretch justify-between gap-2">
+      <div className="mt-2 flex flex-wrap gap-2">
             {/* Date Filter with Calendar */}
             <Sheet open={dateOpen} onOpenChange={setDateOpen}>
             <SheetTrigger asChild>
