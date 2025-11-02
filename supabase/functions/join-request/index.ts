@@ -106,7 +106,62 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 4) Upsert pending request (unique pending constraint enforces idempotency)
+    // 4) Check not already pending
+    const { data: existingRequest } = await supabaseClient
+      .from('join_requests')
+      .select('id, state')
+      .eq('game_id', gameId)
+      .eq('requester_id', user.id)
+      .eq('state', 'pending')
+      .maybeSingle();
+
+    if (existingRequest) {
+      console.log('[join-request] Pending request already exists');
+      return new Response(
+        JSON.stringify({ ok: true, status: 'pending_exists' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 5) Friends-only: must follow host
+    if (game.visibility === 'friends') {
+      const { data: followData } = await supabaseClient
+        .from('user_follows')
+        .select('id')
+        .eq('follower_id', user.id)
+        .eq('following_id', game.host_user_id)
+        .eq('status', 'accepted')
+        .maybeSingle();
+      if (!followData) {
+        return new Response(
+          JSON.stringify({ error: 'You must follow this player to join their friends-only game' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // 6) Club-only: share home_club
+    if (game.visibility === 'club') {
+      const { data: requesterProfile } = await supabaseClient
+        .from('user_profiles')
+        .select('home_club')
+        .eq('id', user.id)
+        .single();
+      const { data: hostProfile } = await supabaseClient
+        .from('user_profiles')
+        .select('home_club')
+        .eq('id', game.host_user_id)
+        .single();
+
+      if (!requesterProfile?.home_club || !hostProfile?.home_club || requesterProfile.home_club !== hostProfile.home_club) {
+        return new Response(
+          JSON.stringify({ error: 'You must share the same home club to join this game' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // 7) Upsert pending request (unique pending constraint enforces idempotency)
     const { data: reqRow, error: insertError } = await supabaseClient
       .from('join_requests')
       .insert({ game_id: gameId, requester_id: user.id })
