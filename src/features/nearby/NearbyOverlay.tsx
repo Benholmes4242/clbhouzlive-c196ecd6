@@ -265,9 +265,23 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           }}
           onCreateBeacon={async (input) => {
             try {
-              // createBeacon already dispatches 'game-created' event with detail
+              // Belt-and-braces: track if createBeacon dispatched event
+              let fired = false;
+              const markFired = () => { fired = true; };
+              window.addEventListener('game-created', markFired, { once: true });
+
               await createBeacon(input);
-              
+
+              // Microtask turn to see if someone else dispatched
+              await Promise.resolve();
+              if (!fired) {
+                const { data: { user } } = await supabase.auth.getUser();
+                window.dispatchEvent(new CustomEvent('game-created', {
+                  detail: { gameId: undefined, hostUserId: user?.id },
+                }));
+              }
+              window.removeEventListener('game-created', markFired);
+
               // Give the listener & DB a beat
               await new Promise((r) => setTimeout(r, 150));
               

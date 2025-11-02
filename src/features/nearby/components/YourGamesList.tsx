@@ -159,15 +159,13 @@ export function YourGamesList({
 
   // Listen for game-created events to trigger immediate refetch
   useEffect(() => {
-    const handleGameCreated = (e: any) => {
-      console.log('[YourGames] game-created event received:', e.detail);
-      // Add small delay to ensure DB write completes and RLS catches up
-      setTimeout(() => {
-        fetchYourGames();
-      }, 150);
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      console.log('[YourGames] game-created event received:', detail);
+      setTimeout(() => fetchYourGames(), 150);
     };
-    window.addEventListener('game-created', handleGameCreated);
-    return () => window.removeEventListener('game-created', handleGameCreated);
+    window.addEventListener('game-created', handler as EventListener);
+    return () => window.removeEventListener('game-created', handler as EventListener);
   }, [fetchYourGames]);
 
   // Refetch on window focus (safety net)
