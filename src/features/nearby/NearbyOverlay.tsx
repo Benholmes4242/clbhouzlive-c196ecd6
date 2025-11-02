@@ -14,6 +14,8 @@ import { useLocationBroadcast } from './hooks/useLocationBroadcast';
 import { VisibilitySegmentedControl } from './components/VisibilitySegmentedControl';
 import { OpenToPlayButton } from './components/OpenToPlayButton';
 import { supabase } from '@/integrations/supabase/client';
+import { assertDispatch } from '@/utils/assertDispatch';
+import { EVT_GAME_CREATED } from './constants';
 
 interface NearbyOverlayProps {
   isOpen: boolean;
@@ -265,30 +267,15 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           }}
           onCreateBeacon={async (input) => {
             try {
-              if (typeof window !== 'undefined') {
-                // Belt-and-braces: track if createBeacon dispatched event
-                let fired = false;
-                const markFired = () => { fired = true; };
-                window.addEventListener('game-created', markFired, { once: true });
-
-                const result = await createBeacon(input);
-
-                // Microtask turn to see if someone else dispatched
-                await Promise.resolve();
-                if (!fired) {
-                  const { data: { user } } = await supabase.auth.getUser();
-                  window.dispatchEvent(new CustomEvent('game-created', {
-                    detail: { gameId: result?.id, hostUserId: user?.id },
-                  }));
-                }
-                window.removeEventListener('game-created', markFired);
-
-                // Give the listener & DB a beat
-                await new Promise((r) => setTimeout(r, 150));
-                
-                // Now switch to Your Games
-                setActiveTab('your-games');
-              }
+              const { data: { user } } = await supabase.auth.getUser();
+              await assertDispatch(
+                EVT_GAME_CREATED,
+                () => createBeacon(input),
+                (result) => ({ gameId: result?.id, hostUserId: user?.id }),
+                700
+              );
+              await new Promise((r) => setTimeout(r, 150));
+              setActiveTab('your-games');
             } finally {
               setIsCreateGameOpen(false);
               setPrefilledClub(undefined);

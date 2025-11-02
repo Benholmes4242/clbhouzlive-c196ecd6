@@ -5,6 +5,7 @@ import { useLocationPermission } from './useLocationPermission';
 import { calculateDistance, formatDistance } from '../distance';
 import { NEARBY_RADIUS_METERS } from '../config';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { EVT_GAME_CREATED } from '../constants';
 
 export interface DiscoveryFilters {
   dateFrom?: Date;
@@ -489,9 +490,11 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
       });
 
       // Dispatch event immediately BEFORE toast to ensure listeners react first
-      window.dispatchEvent(new CustomEvent('game-created', { 
-        detail: { gameId: newBeacon.id, hostUserId: newBeacon.host_user_id } 
-      }));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent(EVT_GAME_CREATED, { 
+          detail: { gameId: newBeacon.id, hostUserId: newBeacon.host_user_id } 
+        }));
+      }
 
       toast({
         title: 'Game posted',

@@ -4,13 +4,13 @@
  *
  * @param eventName The DOM event name to listen for (e.g. 'game-created')
  * @param action The async function that is expected to emit this event
- * @param detail Optional event detail payload for the fallback dispatch
+ * @param detail Optional event detail payload for the fallback dispatch (can be a function that receives the action result)
  * @param timeoutMs Max time to wait before manual dispatch (default: 500ms)
  */
 export async function assertDispatch<T>(
   eventName: string,
   action: () => Promise<T>,
-  detail?: Record<string, any>,
+  detail?: Record<string, any> | ((result: T) => Record<string, any>),
   timeoutMs: number = 500
 ): Promise<T> {
   // Skip event logic if not in a browser environment
@@ -41,7 +41,8 @@ export async function assertDispatch<T>(
   // If nothing fired, send a fallback event
   if (!fired) {
     console.warn(`[assertDispatch] '${eventName}' not emitted within ${timeoutMs} ms — dispatching manually.`);
-    window.dispatchEvent(new CustomEvent(eventName, { detail }));
+    const eventDetail = typeof detail === 'function' ? detail(result) : detail;
+    window.dispatchEvent(new CustomEvent(eventName, { detail: eventDetail }));
   }
 
   window.removeEventListener(eventName, markFired);

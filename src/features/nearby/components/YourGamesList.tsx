@@ -10,6 +10,7 @@ import { TapButton } from '@/components/ui/TapButton';
 import { YourGamesSkeleton } from './your-games/YourGamesSkeleton';
 import { HostApprovalSheet } from './HostApprovalSheet';
 import type { Game as CardGame, Participant } from './your-games/types';
+import { EVT_GAME_CREATED } from '../constants';
 
 interface YourGamesListProps {
   activeTab?: 'golfers' | 'games' | 'your-games';
@@ -164,8 +165,8 @@ export function YourGamesList({
       console.log('[YourGames] game-created event received:', detail);
       setTimeout(() => fetchYourGames(), 150);
     };
-    window.addEventListener('game-created', handler as EventListener);
-    return () => window.removeEventListener('game-created', handler as EventListener);
+    window.addEventListener(EVT_GAME_CREATED, handler as EventListener);
+    return () => window.removeEventListener(EVT_GAME_CREATED, handler as EventListener);
   }, [fetchYourGames]);
 
   // Refetch on window focus (safety net)
