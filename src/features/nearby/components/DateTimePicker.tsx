@@ -3,6 +3,8 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { haptic } from '@/utils/haptics';
+import '@/styles/frosted-buttons.css';
 
 interface DateTimePickerProps {
   value: Date | null;
@@ -57,16 +59,26 @@ export function DateTimePicker({ value, onChange, onClose }: DateTimePickerProps
           <div className="flex gap-3 pt-2">
             <button
               onClick={onClose}
-              className="flex-1 py-2 px-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-lg font-medium transition-colors"
+              onPointerDown={(e) => {
+                try { haptic('light'); } catch {}
+                (e.currentTarget as HTMLButtonElement).classList.add('is-tapping');
+                setTimeout(() => (e.currentTarget as HTMLButtonElement).classList.remove('is-tapping'), 200);
+              }}
+              className="frosted-btn cancel pressable flex-1 py-2 px-4 font-medium"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirm}
               disabled={!selectedDate}
-              className="flex-1 py-2 px-4 bg-white/20 hover:bg-white/30 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              onPointerDown={(e) => {
+                try { haptic('light'); } catch {}
+                (e.currentTarget as HTMLButtonElement).classList.add('is-tapping');
+                setTimeout(() => (e.currentTarget as HTMLButtonElement).classList.remove('is-tapping'), 200);
+              }}
+              className="frosted-btn pressable flex-1 py-2 px-4 font-medium"
             >
-              Confirm
+              Done
             </button>
           </div>
         </div>

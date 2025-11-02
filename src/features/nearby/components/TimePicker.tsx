@@ -116,32 +116,36 @@ export function openTimePicker(opts: TimePickerOpts) {
 
   const cancelBtn = document.createElement('button');
   cancelBtn.textContent = 'Cancel';
+  cancelBtn.className = 'frosted-btn cancel pressable';
   cancelBtn.style.cssText = `
     height: 44px;
-    border-radius: 12px;
     padding: 0 14px;
-    border: 1px solid #262626;
-    background: #171717;
-    color: #e9e9e9;
     font-weight: 600;
     flex: 1;
     cursor: pointer;
   `;
+  cancelBtn.onpointerdown = () => {
+    try { haptic('light'); } catch {}
+    cancelBtn.classList.add('is-tapping');
+    setTimeout(() => cancelBtn.classList.remove('is-tapping'), 200);
+  };
   cancelBtn.onclick = closeSheet;
 
   const doneBtn = document.createElement('button');
   doneBtn.textContent = 'Done';
+  doneBtn.className = 'frosted-btn pressable';
   doneBtn.style.cssText = `
     height: 44px;
-    border-radius: 12px;
     padding: 0 14px;
-    border: 1px solid #2b2b2b;
-    background: #1f2621;
-    color: #e7f3ea;
     font-weight: 600;
     flex: 1;
     cursor: pointer;
   `;
+  doneBtn.onpointerdown = () => {
+    try { haptic('light'); } catch {}
+    doneBtn.classList.add('is-tapping');
+    setTimeout(() => doneBtn.classList.remove('is-tapping'), 200);
+  };
   doneBtn.onclick = () => {
     haptic('medium');
     opts.onSelect(input.value);
@@ -155,6 +159,15 @@ export function openTimePicker(opts: TimePickerOpts) {
   overlay.onclick = (e) => {
     if (e.target === overlay) closeSheet();
   };
+
+  // Inject frosted button styles if not already present
+  if (!document.querySelector('#frosted-styles')) {
+    const link = document.createElement('link');
+    link.id = 'frosted-styles';
+    link.rel = 'stylesheet';
+    link.href = '/src/styles/frosted-buttons.css';
+    document.head.appendChild(link);
+  }
 
   const style = document.createElement('style');
   style.textContent = `
