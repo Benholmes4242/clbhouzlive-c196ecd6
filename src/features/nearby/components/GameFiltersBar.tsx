@@ -159,9 +159,9 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
   );
 
   return (
-    <div className={cn('flex flex-col gap-2', className)}>
+    <div className={cn('w-full', className)}>
       {/* Filter Controls Row */}
-      <div className="flex gap-3" role="group" aria-label="Game filters">
+      <div className="flex gap-3 w-full" role="group" aria-label="Game filters">
             {/* When Filter */}
             <Sheet open={dateOpen} onOpenChange={setDateOpen}>
             <SheetTrigger asChild>
