@@ -37,7 +37,15 @@ export function YourGamesList({
   const [approvalSheetGameId, setApprovalSheetGameId] = useState<string | null>(null);
 
   const fetchYourGames = useCallback(async () => {
-    if (!user?.id) {
+    // Resolve user id reliably (avoid race with session hook)
+    let userId = user?.id;
+    if (!userId) {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      userId = authUser?.id ?? undefined;
+    }
+
+    if (!userId) {
+      // No authenticated user; clear state and exit
       setIsLoading(false);
       setHostedGames([]);
       setJoinedGames([]);
