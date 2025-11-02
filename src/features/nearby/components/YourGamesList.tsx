@@ -148,14 +148,23 @@ export function YourGamesList({
           .in('game_id', gameIds as string[]);
 
         if (gpError) {
-          console.error('Error fetching participants for games:', gpError);
+          console.error('[YourGames] Error fetching participants:', gpError);
         } else {
+          console.log('[YourGames] Fetched participants:', gpRows);
           const grouped: Record<string, any[]> = {};
           (gpRows || []).forEach((row: any) => {
             (grouped[row.game_id] ||= []).push(row);
           });
-          (hosted || []).forEach((g: any) => { g.game_participants = grouped[g.id] || []; });
-          (participants || []).forEach((p: any) => { if (p.games) { p.games.game_participants = grouped[p.games.id] || []; } });
+          (hosted || []).forEach((g: any) => { 
+            g.game_participants = grouped[g.id] || []; 
+            console.log(`[YourGames] Game ${g.id} participants:`, g.game_participants);
+          });
+          (participants || []).forEach((p: any) => { 
+            if (p.games) { 
+              p.games.game_participants = grouped[p.games.id] || []; 
+              console.log(`[YourGames] Joined game ${p.games.id} participants:`, p.games.game_participants);
+            } 
+          });
         }
       }
 
@@ -316,8 +325,12 @@ export function YourGamesList({
 
   // Helper: Extract host participant with profile data
   const extractHost = (game: Game): Participant | null => {
+    console.log(`[YourGames] extractHost for game ${game.id}, host_user_id: ${game.host_user_id}`);
+    console.log(`[YourGames] game_participants:`, (game as any).game_participants);
+    
     const hostParticipant = (game as any).game_participants?.find((p: any) => p.role === 'host');
     if (hostParticipant) {
+      console.log('[YourGames] Found host in game_participants:', hostParticipant);
       return {
         user_id: hostParticipant.user_id,
         username: hostParticipant.user_profiles?.username,
@@ -331,7 +344,11 @@ export function YourGamesList({
 
     // Fallback to host profile fetched separately
     const hp = hostProfilesMap[game.host_user_id || ''];
-    if (!hp) return null;
+    console.log('[YourGames] Using fallback host profile:', hp);
+    if (!hp) {
+      console.warn('[YourGames] No host profile found for', game.host_user_id);
+      return null;
+    }
     return {
       user_id: game.host_user_id,
       username: hp.username,
@@ -345,9 +362,12 @@ export function YourGamesList({
 
   // Helper: Extract members (players + guests) with profile data
   const extractMembers = (game: Game): Participant[] => {
+    // Show ALL non-host participants for debugging (invited, accepted, guests)
     const participants = (game as any).game_participants?.filter((p: any) => 
-      (p.role === 'player' && p.state === 'accepted') || p.guest_name
+      p.role !== 'host'
     ) || [];
+
+    console.log(`[YourGames] extractMembers for game ${game.id}:`, participants);
 
     return participants.map((p: any) => ({
       user_id: p.user_id,
