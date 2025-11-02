@@ -35,8 +35,6 @@ export function YourGamesList({
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'hosting' | 'joined'>('hosting');
   const [approvalSheetGameId, setApprovalSheetGameId] = useState<string | null>(null);
-  // Cache of host profiles keyed by user id for fallback rendering
-  const [hostProfilesMap, setHostProfilesMap] = useState<Record<string, any>>({});
 
   const fetchYourGames = useCallback(async () => {
     // Resolve user id reliably (avoid race with session hook)
@@ -59,67 +57,36 @@ export function YourGamesList({
     
     try {
       const nowIso = new Date().toISOString();
-      console.log('[YourGames] Fetching at:', nowIso);
-      console.log('[YourGames] User ID:', userId);
 
-      // Fetch games you're hosting - show active games based on expires_at
+      // 1) Fetch hosted games
       const { data: hosted, error: hostedError } = await supabase
         .from('games')
-        .select(`
-          id, course_name, course_id, start_time, expires_at, status,
-          slots_open, slots_total, note, created_at, host_user_id, visibility, updated_at
-        `)
+        .select('id, course_name, course_id, start_time, expires_at, status, slots_open, slots_total, note, created_at, host_user_id, visibility, updated_at')
         .eq('host_user_id', userId)
         .eq('status', 'active')
         .gte('expires_at', nowIso)
         .order('start_time', { ascending: true, nullsFirst: true });
 
-      console.log('[YourGames] Hosted games query result:', {
-        count: hosted?.length || 0,
-        error: hostedError,
-        data: hosted
-      });
-
       if (hostedError) {
         console.error('Error fetching hosted games:', hostedError);
       }
 
-      // Fetch games you've joined (as participant) - show active games based on expires_at
+      // 2) Fetch joined games
       const { data: participants, error: participantsError } = await supabase
         .from('game_participants')
         .select(`
           game_id,
-          games!inner(
-            id,
-            course_name,
-            course_id,
-            start_time,
-            expires_at,
-            status,
-            slots_open,
-            slots_total,
-            note,
-            created_at,
-            host_user_id,
-            visibility,
-            updated_at
-          )
+          games!inner(id, course_name, course_id, start_time, expires_at, status, slots_open, slots_total, note, created_at, host_user_id, visibility, updated_at)
         `)
         .eq('user_id', userId)
         .eq('games.status', 'active')
         .gte('games.expires_at', nowIso);
 
-      console.log('[YourGames] Joined games query result:', {
-        count: participants?.length || 0,
-        error: participantsError,
-        data: participants
-      });
-
       if (participantsError) {
         console.error('Error fetching joined games:', participantsError);
       }
 
-      // Secondary fetch: ensure participants/profiles are attached for all games
+      // 3) Batch fetch all participants with embedded profiles
       const gameIds = Array.from(new Set([
         ...((hosted || []).map((g: any) => g.id)),
         ...((participants || []).map((p: any) => p.games?.id).filter(Boolean)),
@@ -129,72 +96,37 @@ export function YourGamesList({
         const { data: gpRows, error: gpError } = await supabase
           .from('game_participants')
           .select(`
-            id,
-            game_id,
-            user_id,
-            guest_name,
-            role,
-            state,
-            reserves_slot,
-            user_profiles(
-              id,
-              display_name,
-              username,
-              profile_photo_url,
-              home_club,
-              eg_handicap_index
-            )
+            game_id, user_id, guest_name, role, state, reserves_slot,
+            user_profiles(id, display_name, username, profile_photo_url, home_club, eg_handicap_index, show_handicap)
           `)
           .in('game_id', gameIds as string[]);
 
         if (gpError) {
           console.error('[YourGames] Error fetching participants:', gpError);
         } else {
-          console.log('[YourGames] Fetched participants:', gpRows);
+          // Group participants by game_id
           const grouped: Record<string, any[]> = {};
           (gpRows || []).forEach((row: any) => {
             (grouped[row.game_id] ||= []).push(row);
           });
+          
+          // Attach to hosted games
           (hosted || []).forEach((g: any) => { 
             g.game_participants = grouped[g.id] || []; 
-            console.log(`[YourGames] Game ${g.id} participants:`, g.game_participants);
           });
+          
+          // Attach to joined games
           (participants || []).forEach((p: any) => { 
             if (p.games) { 
               p.games.game_participants = grouped[p.games.id] || []; 
-              console.log(`[YourGames] Joined game ${p.games.id} participants:`, p.games.game_participants);
             } 
           });
         }
       }
 
-      // Fallback: fetch host profiles to render host details even if not present in game_participants
-      const hostIds = Array.from(new Set([
-        ...((hosted || []).map((g: any) => g.host_user_id).filter(Boolean)),
-        ...((participants || []).map((p: any) => p.games?.host_user_id).filter(Boolean)),
-      ]));
-
-      if (hostIds.length > 0) {
-        const { data: hostRows, error: hostErr } = await supabase
-          .from('user_profiles')
-          .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index')
-          .in('id', hostIds as string[]);
-        if (hostErr) {
-          console.error('[YourGames] Error fetching host profiles:', hostErr);
-        } else {
-          const map: Record<string, any> = {};
-          (hostRows || []).forEach((r: any) => { map[r.id] = r; });
-          setHostProfilesMap(map);
-        }
-      }
-
       // Merge hosted and joined games, deduplicating by id
       const byId = new Map<string, Game>();
-      
-      // Add hosted games first
       (hosted || []).forEach((g: any) => byId.set(g.id, g as Game));
-      
-      // Add joined games (won't overwrite if already hosted)
       (participants || [])
         .map((p: any) => p.games)
         .filter((g: any) => g && g.id)
@@ -212,17 +144,10 @@ export function YourGamesList({
       setHostedGames(hostedFiltered);
       setJoinedGames(joinedFiltered);
 
-      // Notify parent of total count for badge
+      // Notify parent of total count
       if (onCountChange) {
         onCountChange(allGames.length);
       }
-
-      console.log('[YourGames] Fetched:', {
-        total: allGames.length,
-        hosted: hosted?.length || 0,
-        joined: participants?.length || 0,
-        deduped: allGames.length,
-      });
     } finally {
       setIsLoading(false);
     }
@@ -235,31 +160,23 @@ export function YourGamesList({
   // Refetch whenever Your Games tab becomes active
   useEffect(() => {
     if (activeTabFromParent === 'your-games') {
-      console.log('[YourGames] Tab activated, refetching...');
       fetchYourGames();
     }
   }, [activeTabFromParent, fetchYourGames]);
 
-  // Listen for game-created events to trigger immediate refetch
+  // Listen for game-created events
   useEffect(() => {
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      console.log('[YourGames] game-created event received:', detail);
-      // Primary refetch at 400ms
+    const handler = () => {
       setTimeout(() => fetchYourGames(), 400);
-      // Secondary safety refetch at 1500ms for read-after-write consistency
       setTimeout(() => fetchYourGames(), 1500);
     };
     window.addEventListener(EVT_GAME_CREATED, handler as EventListener);
     return () => window.removeEventListener(EVT_GAME_CREATED, handler as EventListener);
   }, [fetchYourGames]);
 
-  // Refetch on window focus (safety net)
+  // Refetch on window focus
   useEffect(() => {
-    const handleFocus = () => {
-      console.log('[YourGames] Refetch on focus');
-      fetchYourGames();
-    };
+    const handleFocus = () => fetchYourGames();
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
   }, [fetchYourGames]);
@@ -323,56 +240,33 @@ export function YourGamesList({
     note: g.note,
   });
 
-  // Helper: Extract host participant with profile data
+  // Extract host from participants
   const extractHost = (game: Game): Participant | null => {
-    console.log(`[YourGames] extractHost for game ${game.id}, host_user_id: ${game.host_user_id}`);
-    console.log(`[YourGames] game_participants:`, (game as any).game_participants);
-    
     const hostParticipant = (game as any).game_participants?.find((p: any) => p.role === 'host');
-    if (hostParticipant) {
-      console.log('[YourGames] Found host in game_participants:', hostParticipant);
+    if (hostParticipant?.user_profiles) {
       return {
         user_id: hostParticipant.user_id,
-        username: hostParticipant.user_profiles?.username,
-        display_name: hostParticipant.user_profiles?.display_name,
-        profile_photo_url: hostParticipant.user_profiles?.profile_photo_url,
-        home_club: hostParticipant.user_profiles?.home_club,
-        eg_handicap_index: hostParticipant.user_profiles?.eg_handicap_index,
+        username: hostParticipant.user_profiles.username,
+        display_name: hostParticipant.user_profiles.display_name,
+        profile_photo_url: hostParticipant.user_profiles.profile_photo_url,
+        home_club: hostParticipant.user_profiles.home_club,
+        eg_handicap_index: hostParticipant.user_profiles.eg_handicap_index,
         role: 'host' as const,
       };
     }
-
-    // Fallback to host profile fetched separately
-    const hp = hostProfilesMap[game.host_user_id || ''];
-    console.log('[YourGames] Using fallback host profile:', hp);
-    if (!hp) {
-      console.warn('[YourGames] No host profile found for', game.host_user_id);
-      return null;
-    }
-    return {
-      user_id: game.host_user_id,
-      username: hp.username,
-      display_name: hp.display_name,
-      profile_photo_url: hp.profile_photo_url,
-      home_club: hp.home_club,
-      eg_handicap_index: hp.eg_handicap_index,
-      role: 'host' as const,
-    };
+    return null;
   };
 
-  // Helper: Extract members (players + guests) with profile data
+  // Extract members (accepted players + guests)
   const extractMembers = (game: Game): Participant[] => {
-    // Show ALL non-host participants for debugging (invited, accepted, guests)
     const participants = (game as any).game_participants?.filter((p: any) => 
-      p.role !== 'host'
+      p.role === 'player' && (p.state === 'accepted' || p.guest_name)
     ) || [];
-
-    console.log(`[YourGames] extractMembers for game ${game.id}:`, participants);
 
     return participants.map((p: any) => ({
       user_id: p.user_id,
       username: p.user_profiles?.username,
-      display_name: p.user_profiles?.display_name ?? p.guest_name ?? 'Guest',
+      display_name: p.user_profiles?.display_name || p.guest_name || 'Guest',
       profile_photo_url: p.user_profiles?.profile_photo_url,
       home_club: p.user_profiles?.home_club,
       eg_handicap_index: p.user_profiles?.eg_handicap_index,
