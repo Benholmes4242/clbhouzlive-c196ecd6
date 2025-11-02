@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
 import { useCourseSearch, GolfCourse } from '@/features/nearby/hooks/useCourseSearch';
@@ -251,11 +251,24 @@ export function GamesTab({ onOpenCreate }: { onOpenCreate: () => void }) {
   const [selectedClub, setSelectedClub] = useState<GolfCourse | null>(null);
   const { data: games, isLoading } = useGamesQuery(selectedClub?.id);
 
+  // Scroll to top on mount (runs on every visit due to remount key)
+  useEffect(() => {
+    const el = document.getElementById('games-scroll');
+    const t = requestAnimationFrame(() => {
+      if (el && 'scrollTo' in el) {
+        el.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      } else {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      }
+    });
+    return () => cancelAnimationFrame(t);
+  }, []);
+
   return (
     <div className="gamesTab">
       <CreateGameCTA onOpen={onOpenCreate} />
       
-      <div className="gamesScroll">
+      <div id="games-scroll" className="gamesScroll">
         <FindAGame selectedClub={selectedClub} onSelectClub={setSelectedClub} />
         <FiltersRow selectedClub={selectedClub} />
         <div className="scopedHeading">
