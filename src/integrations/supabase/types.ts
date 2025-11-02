@@ -2754,6 +2754,10 @@ export type Database = {
     }
     Functions: {
       can_change_email: { Args: { user_id_param: string }; Returns: boolean }
+      can_view_game_participant_profile: {
+        Args: { _profile_user_id: string; _viewer_id: string }
+        Returns: boolean
+      }
       check_and_award_badges: {
         Args: { user_id_param: string }
         Returns: {
