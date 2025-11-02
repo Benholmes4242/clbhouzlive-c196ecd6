@@ -104,55 +104,24 @@ function FindAGame({
   );
 }
 
-function formatWhenLabel(when: { date: Date | null; window: string; exactTime: string | null }): string {
-  if (!when.date) return 'Any';
-  
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const targetDate = new Date(when.date);
-  targetDate.setHours(0, 0, 0, 0);
-  
-  let dateText = '';
-  if (targetDate.getTime() === today.getTime()) {
-    dateText = 'Today';
-  } else if (targetDate.getTime() === tomorrow.getTime()) {
-    dateText = 'Tomorrow';
-  } else {
-    dateText = when.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-  }
-  
-  if (when.exactTime) {
-    return `${dateText} • ${when.exactTime}`;
-  }
-  
-  if (when.window && when.window !== 'any') {
-    const windowLabel = when.window.charAt(0).toUpperCase() + when.window.slice(1);
-    return `${dateText} • ${windowLabel}`;
-  }
-  
-  return dateText;
-}
-
 function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
   const filters = useGameFilters();
   const showDistance = !selectedClub;
   
   return (
     <div 
-      className="flex gap-3 w-full"
+      className={`chipsRow ${showDistance ? 'cols-3' : 'cols-2'}`} 
       role="group" 
       aria-label="Game filters"
     >
       <TapButton 
         className="chip" 
         onClick={() => openWhenSheet(filters)}
-        aria-label={`When: ${formatWhenLabel(filters.when)}`}
+        aria-label={`When: ${labelWhen(filters.when)}`}
       >
         <div className="chipText">
           <span className="chipLabel">When</span>
-          <span className="chipValue">{formatWhenLabel(filters.when)}</span>
+          <span className="chipValue">{labelWhen(filters.when)}</span>
         </div>
       </TapButton>
       
@@ -283,15 +252,7 @@ export function GamesTab({ onOpenCreate }: { onOpenCreate: () => void }) {
       
       <div className="gamesScroll">
         <FindAGame selectedClub={selectedClub} onSelectClub={setSelectedClub} />
-        <div
-          className="px-5"
-          style={{
-            marginLeft: 'calc(-1 * max(12px, env(safe-area-inset-left)))',
-            marginRight: 'calc(-1 * max(12px, env(safe-area-inset-right)))',
-          }}
-        >
-          <FiltersRow selectedClub={selectedClub} />
-        </div>
+        <FiltersRow selectedClub={selectedClub} />
         <div className="scopedHeading">
           {selectedClub ? `Games at ${selectedClub.name}` : 'Games Near You'}
         </div>
