@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, MapPin, Calendar, X } from 'lucide-react';
+import { MapPin, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
@@ -126,8 +126,7 @@ export const SmartSearchInput: React.FC<SmartSearchInputProps> = ({
           }}
           className="w-full rounded-xl bg-white/5 backdrop-blur-md border border-white/10 px-4 py-3 flex items-center gap-3 hover:bg-white/10 transition-colors"
         >
-          <Search className="w-4 h-4 text-white/50" />
-          <span className="text-sm text-white/50">Search golf club...</span>
+          <span className="text-sm text-white/50">🔍 Search golf club...</span>
         </button>
 
         {showDropdown && (
@@ -139,7 +138,7 @@ export const SmartSearchInput: React.FC<SmartSearchInputProps> = ({
             <div className="absolute z-30 w-full mt-2 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">
               <div className="p-3 border-b border-neutral-800">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50">🔍</span>
                   <input
                     ref={inputRef}
                     type="text"
