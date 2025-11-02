@@ -81,6 +81,7 @@ export function CreateGameModal({
   const [gameType, setGameType] = useState<string>('9_holes');
   const [courseId, setCourseId] = useState<string>('');
   const [courseName, setCourseName] = useState('');
+  const [selectedClub, setSelectedClub] = useState<{ id: string; name: string } | null>(null);
   const [note, setNote] = useState('');
   const [visibility, setVisibility] = useState<GameVisibility>('public');
   const [timing, setTiming] = useState<string>('now');
@@ -103,11 +104,12 @@ export function CreateGameModal({
 
   // Pre-fill club if provided
   useEffect(() => {
-    if (prefilledClub && !courseId) {
+    if (prefilledClub) {
       setCourseId(prefilledClub.id);
       setCourseName(prefilledClub.name);
+      setSelectedClub({ id: prefilledClub.id, name: prefilledClub.name });
     }
-  }, [prefilledClub, courseId]);
+  }, [prefilledClub]);
 
   // Adjust available slots if currentPlayers changes
   useEffect(() => {
@@ -133,6 +135,7 @@ export function CreateGameModal({
       setGameType('9_holes');
       setCourseId('');
       setCourseName('');
+      setSelectedClub(null);
       setNote('');
       setTiming('now');
       setCustomDateTime(null);
@@ -231,6 +234,7 @@ export function CreateGameModal({
       setGameType('9_holes');
       setCourseId('');
       setCourseName('');
+      setSelectedClub(null);
       setNote('');
       setVisibility('public');
       setTiming('now');
@@ -274,12 +278,14 @@ export function CreateGameModal({
   const handleCourseSelect = (club: { id: string; name: string; country: string; region?: string }) => {
     setCourseId(club.id);
     setCourseName(club.name);
+    setSelectedClub({ id: club.id, name: club.name });
     setCourseError('');
   };
 
   const handleCourseClear = () => {
     setCourseId('');
     setCourseName('');
+    setSelectedClub(null);
     setCourseError('');
   };
 
@@ -451,10 +457,10 @@ export function CreateGameModal({
               {/* Golf course */}
               <div className="space-y-3">
                 <label className="block text-sm font-medium text-white/90">
-                  Golf course *
+                  Host a game at
                 </label>
                 <SmartSearchInput
-                  selectedClub={courseId ? { id: courseId, name: courseName } : null}
+                  selectedClub={selectedClub}
                   onCourseSelect={handleCourseSelect}
                   onClear={handleCourseClear}
                 />
