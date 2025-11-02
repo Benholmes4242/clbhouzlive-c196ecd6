@@ -283,7 +283,13 @@ export function GamesTab({ onOpenCreate }: { onOpenCreate: () => void }) {
       
       <div className="gamesScroll">
         <FindAGame selectedClub={selectedClub} onSelectClub={setSelectedClub} />
-        <div className="mx-[-12px] px-5">
+        <div
+          className="px-5"
+          style={{
+            marginLeft: 'calc(-1 * max(12px, env(safe-area-inset-left)))',
+            marginRight: 'calc(-1 * max(12px, env(safe-area-inset-right)))',
+          }}
+        >
           <FiltersRow selectedClub={selectedClub} />
         </div>
         <div className="scopedHeading">
