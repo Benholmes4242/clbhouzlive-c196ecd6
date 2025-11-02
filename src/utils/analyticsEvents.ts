@@ -187,5 +187,23 @@ export const analyticsEvents = {
         session_id: sessionStorage.getItem('session_id') || 'unknown'
       });
     }
+  },
+
+  // Hub events (My Clubhouse Hub)
+  hub: {
+    open: () => {
+      analyticsEvents.track('hub_opened', {
+        timestamp: new Date().toISOString(),
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    },
+    
+    tab_switch: (tabName: string) => {
+      analyticsEvents.track('hub_tab_switch', {
+        tab_name: tabName,
+        timestamp: new Date().toISOString(),
+        session_id: sessionStorage.getItem('session_id') || 'unknown'
+      });
+    }
   }
 };

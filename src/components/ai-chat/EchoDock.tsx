@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { PiWaveform } from 'react-icons/pi';
 import { openAIOverlay } from '@/controllers/aiOverlayController';
 import EchoOrb from '@/components/echo/EchoOrb';
+import { Z } from '@/config/zIndex';
 
 interface EchoDockProps {
   onClick: () => void;
@@ -283,7 +284,7 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
         position: 'fixed',
         inset: 0,
         pointerEvents: 'none',
-        zIndex: 9999
+        zIndex: Z.echo
       }}
     >
       {items.map((item, index) => {

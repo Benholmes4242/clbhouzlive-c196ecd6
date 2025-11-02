@@ -23,6 +23,7 @@ import EchoProtection from './EchoProtection';
 import { useEchoProtection } from '@/hooks/useEchoProtection';
 import { AnimatePresence, motion } from 'framer-motion';
 import { subscribeAIOverlay, type AITab } from '@/controllers/aiOverlayController';
+import { Z } from '@/config/zIndex';
 
 interface ChatMessageData {
   id: string;
@@ -442,7 +443,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         open={isOpen}
         onClose={handleClose}
         width="w-full"
-        zIndex="z-[1100]"
+        zIndex={`z-[${Z.aiOverlay}]`}
         ariaLabel="Echo AI chat interface"
         backdrop="blurred"
       >

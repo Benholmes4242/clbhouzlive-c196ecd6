@@ -16,6 +16,7 @@ import { OpenToPlayButton } from './components/OpenToPlayButton';
 import { supabase } from '@/integrations/supabase/client';
 import { assertDispatch } from '@/utils/assertDispatch';
 import { EVT_GAME_CREATED } from './constants';
+import { Z } from '@/config/zIndex';
 
 interface NearbyOverlayProps {
   isOpen: boolean;
@@ -74,8 +75,9 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
     <>
       {/* Backdrop - pointer events disabled */}
       <div
-        className="fixed inset-0 z-[9999] pointer-events-none"
+        className="fixed inset-0 pointer-events-none"
         style={{
+          zIndex: Z.hub,
           backgroundColor: 'rgba(0,0,0,0.65)',
           WebkitBackdropFilter: 'blur(8px)',
           backdropFilter: 'blur(8px)',
@@ -85,7 +87,8 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       {/* Click catcher for close-on-backdrop */}
       <button
         aria-label="close"
-        className="fixed inset-0 z-[9999]"
+        className="fixed inset-0"
+        style={{ zIndex: Z.hub }}
         onClick={(e) => {
           // Don't close if clicking inside a filter sheet
           if ((e.target as HTMLElement)?.closest?.('[data-filter-sheet]')) return;
@@ -94,7 +97,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
       />
 
       {/* Modal container */}
-      <div className="fixed inset-0 z-[9999] flex items-end sm:items-center sm:justify-center animate-fade-in pointer-events-none">
+      <div className="fixed inset-0 flex items-end sm:items-center sm:justify-center animate-fade-in pointer-events-none" style={{ zIndex: Z.hub }}>
         {/* Modal */}
         <div
           ref={overlayRef}

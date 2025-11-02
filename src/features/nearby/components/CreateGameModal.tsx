@@ -16,6 +16,7 @@ import { openTimePicker } from './TimePicker';
 import { haptic } from '@/utils/haptics';
 import './CreateGame.css';
 import '../GamesTab.css';
+import { Z } from '@/config/zIndex';
 
 // Format game type for display
 function formatGameTypeDisplay(gameType: string): string {
@@ -276,12 +277,12 @@ export function CreateGameModal({
     <div 
       className="fixed inset-0 flex items-end sm:items-center sm:justify-center animate-fade-in"
       style={{ 
-        zIndex: 10000, // Above NearbyOverlay's z-9999
+        zIndex: Z.createGame,
         backgroundColor: 'rgba(0,0,0,0)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         overscrollBehavior: 'none',
-        pointerEvents: 'auto', // Changed from touchAction: 'none' to allow interaction
+        pointerEvents: 'auto',
       }}
     >
       {/* Backdrop */}

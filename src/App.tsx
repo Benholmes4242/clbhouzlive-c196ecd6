@@ -27,11 +27,13 @@ import { ModalProvider } from '@/contexts/ModalContext';
 import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { FLAGS } from '@/config/flags';
+import { FEATURE_FLAGS } from '@/config/featureFlags';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 import { longPressHandler } from '@/utils/longPressHandler';
 import AppShell from '@/components/AppShell';
 import { ReviewIslandLoader } from '@/ReviewIslandLoader';
 import { supabase } from '@/integrations/supabase/client';
+import { migrateChatHistory } from '@/utils/chatHistoryMigration';
 
 
 // Direct import for ProfilePage and Discover to avoid dynamic import issues
@@ -75,6 +77,14 @@ const AdminPage = lazy(() => import("./pages/AdminPage"));
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
 const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 
+// Hub components (lazy load when feature flag is enabled)
+const HubShell = lazy(() => import("./features/hub/HubShell").then(m => ({ default: m.HubShell })));
+const HubGolfersPage = lazy(() => import("./features/hub/pages/HubGolfersPage").then(m => ({ default: m.HubGolfersPage })));
+const HubGamesPage = lazy(() => import("./features/hub/pages/HubGamesPage").then(m => ({ default: m.HubGamesPage })));
+const HubYourGamesPage = lazy(() => import("./features/hub/pages/HubYourGamesPage").then(m => ({ default: m.HubYourGamesPage })));
+const HubCreateGamePage = lazy(() => import("./features/hub/pages/HubCreateGamePage").then(m => ({ default: m.HubCreateGamePage })));
+const HubEchoPage = lazy(() => import("./features/hub/pages/HubEchoPage").then(m => ({ default: m.HubEchoPage })));
+
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -115,6 +125,11 @@ const App: React.FC = () => {
   
   // Continuously broadcast location when visibility is active
   useLocationBroadcast();
+  
+  // Run chat history migration once on app init
+  useEffect(() => {
+    migrateChatHistory();
+  }, []);
   
   // Initialize recent media listener for SnapModal thumbnails
   useEffect(() => {
@@ -205,6 +220,18 @@ const App: React.FC = () => {
                                     
                                     <Route path="/channel/:slug" element={<ChannelProfile />} />
                                     <Route path="/game/:id" element={<GameDetailView />} />
+                                    
+                                    {/* Hub routes (feature-flagged) */}
+                                    {FEATURE_FLAGS.HUB && (
+                                      <Route path="/hub" element={<HubShell />}>
+                                        <Route index element={<HubGolfersPage />} />
+                                        <Route path="golfers" element={<HubGolfersPage />} />
+                                        <Route path="games" element={<HubGamesPage />} />
+                                        <Route path="your-games" element={<HubYourGamesPage />} />
+                                        <Route path="create-game" element={<HubCreateGamePage />} />
+                                        <Route path="echo" element={<HubEchoPage />} />
+                                      </Route>
+                                    )}
                                     
                                     <Route path="*" element={<NotFound />} />
                                   </Routes>

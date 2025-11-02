@@ -13,7 +13,10 @@ export const useNavigationHandlers = () => {
     if (currentTab) {
       setActiveTab(currentTab.id);
     } else if (location.pathname === '/' || location.pathname === '/clubhouse') {
-      setActiveTab('clubhouse'); // Set clubhouse as active when on home page or clubhouse page
+      setActiveTab('clubhouse');
+    } else if (location.pathname.startsWith('/hub')) {
+      // Keep hub icon active for all /hub/* routes
+      setActiveTab('hub');
     }
   }, [location.pathname]);
 
@@ -31,8 +34,8 @@ export const useNavigationHandlers = () => {
       setActiveTab(tab.id);
       navigate(tab.path);
       
-      // Only scroll to top when navigating to different pages, not when staying on profile
-      if (tab.path !== '/profile') {
+      // Only scroll to top when navigating to different pages, not when staying on profile or hub
+      if (tab.path !== '/profile' && !tab.path?.startsWith('/hub')) {
         setTimeout(() => {
           window.scrollTo({
             top: 0,
