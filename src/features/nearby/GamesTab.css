@@ -36,6 +36,40 @@
   margin: 6px 12px 10px;
 }
 
+/* Search Mode Toggle */
+.searchModeToggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.modeChip {
+  flex: 1;
+  height: 44px;
+  border-radius: 14px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #999;
+  font-weight: 600;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.12s ease;
+}
+
+.modeChip--active {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.24);
+  color: #fff;
+}
+
+.modeChip:active {
+  transform: scale(0.98);
+}
+
 .findLabel {
   color: #cfcfcf;
   display: block;
@@ -126,6 +160,14 @@
 .resultRow .rSub {
   color: #999;
   font-size: 13px;
+}
+
+.resultRow .userAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #2a2a2a;
 }
 
 .selectedClubRow {

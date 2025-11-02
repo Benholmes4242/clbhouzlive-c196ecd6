@@ -6,6 +6,7 @@ import { useGameFilters } from './hooks/useGameFilters';
 import { useGamesQuery } from './hooks/useGamesQuery';
 import { useJoinGame } from './hooks/useJoinGame';
 import { openWhenSheet, openDistanceSheet, openSortSheet, labelWhen } from './components/FilterSheets';
+import { PeopleSearchInput } from './components/PeopleSearchInput';
 import './GamesTab.css';
 
 type Game = {
@@ -30,10 +31,18 @@ function CreateGameCTA({ onOpen }: { onOpen: () => void }) {
 
 function FindAGame({ 
   selectedClub, 
-  onSelectClub 
+  onSelectClub,
+  searchMode,
+  onSearchModeChange,
+  selectedUser,
+  onSelectUser
 }: { 
   selectedClub: GolfCourse | null; 
   onSelectClub: (club: GolfCourse | null) => void;
+  searchMode: 'clubs' | 'people';
+  onSearchModeChange: (mode: 'clubs' | 'people') => void;
+  selectedUser: { id: string; display_name: string } | null;
+  onSelectUser: (user: { id: string; display_name: string } | null) => void;
 }) {
   const [query, setQuery] = useState('');
   const [isOpen, setOpen] = useState(false);
@@ -53,52 +62,81 @@ function FindAGame({
 
   return (
     <div className="findBlock">
-      {selectedClub ? (
-        <div className="selectedClubRow">
-          <span className="prefix">Viewing games at</span>
-          <div className="clubPill">
-            <span className="clubName">{selectedClub.name}</span>
-            <TapButton className="x" aria-label="Clear" onClick={handleClear}>✕</TapButton>
+      {/* Search mode toggle */}
+      <div className="searchModeToggle">
+        <TapButton
+          className={`modeChip ${searchMode === 'clubs' ? 'modeChip--active' : ''}`}
+          onClick={() => {
+            haptic('light');
+            onSearchModeChange('clubs');
+          }}
+        >
+          🏌️ Clubs
+        </TapButton>
+        <TapButton
+          className={`modeChip ${searchMode === 'people' ? 'modeChip--active' : ''}`}
+          onClick={() => {
+            haptic('light');
+            onSearchModeChange('people');
+          }}
+        >
+          👥 People
+        </TapButton>
+      </div>
+
+      {searchMode === 'clubs' ? (
+        selectedClub ? (
+          <div className="selectedClubRow">
+            <span className="prefix">Viewing games at</span>
+            <div className="clubPill">
+              <span className="clubName">{selectedClub.name}</span>
+              <TapButton className="x" aria-label="Clear" onClick={handleClear}>✕</TapButton>
+            </div>
           </div>
-        </div>
+        ) : (
+          <>
+            <label className="findLabel">Find a Game</label>
+            <div className="searchBox">
+              <span className="glass">🔎</span>
+              <input
+                placeholder="Search golf club..."
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                onFocus={() => setOpen(true)}
+                onBlur={() => setTimeout(() => setOpen(false), 200)}
+              />
+            </div>
+            {isOpen && query.length >= 2 && (
+              <div className="resultsSheet">
+                {isLoading ? (
+                  <div className="hint">Searching...</div>
+                ) : courses.length === 0 ? (
+                  <div className="hint">No clubs found</div>
+                ) : (
+                  courses.map(c => (
+                    <TapButton key={c.id} className="resultRow" onClick={() => handleSelect(c)}>
+                      <span className="pin">📍</span>
+                      <div className="rMid">
+                        <div className="rTitle">{c.name}</div>
+                        <div className="rSub">{c.region || c.country}</div>
+                      </div>
+                    </TapButton>
+                  ))
+                )}
+              </div>
+            )}
+            {isOpen && query.length > 0 && query.length < 2 && (
+              <div className="resultsSheet">
+                <div className="hint">Type at least 2 characters</div>
+              </div>
+            )}
+          </>
+        )
       ) : (
-        <>
-          <label className="findLabel">Find a Game</label>
-          <div className="searchBox">
-            <span className="glass">🔎</span>
-            <input
-              placeholder="Search golf club..."
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              onFocus={() => setOpen(true)}
-              onBlur={() => setTimeout(() => setOpen(false), 200)}
-            />
-          </div>
-          {isOpen && query.length >= 2 && (
-            <div className="resultsSheet">
-              {isLoading ? (
-                <div className="hint">Searching...</div>
-              ) : courses.length === 0 ? (
-                <div className="hint">No clubs found</div>
-              ) : (
-                courses.map(c => (
-                  <TapButton key={c.id} className="resultRow" onClick={() => handleSelect(c)}>
-                    <span className="pin">📍</span>
-                    <div className="rMid">
-                      <div className="rTitle">{c.name}</div>
-                      <div className="rSub">{c.region || c.country}</div>
-                    </div>
-                  </TapButton>
-                ))
-              )}
-            </div>
-          )}
-          {isOpen && query.length > 0 && query.length < 2 && (
-            <div className="resultsSheet">
-              <div className="hint">Type at least 2 characters</div>
-            </div>
-          )}
-        </>
+        <PeopleSearchInput
+          selectedUser={selectedUser}
+          onSelect={onSelectUser}
+        />
       )}
     </div>
   );
@@ -251,6 +289,8 @@ function GamesList({ games, isLoading }: { games: Game[]; isLoading: boolean }) 
 
 export function GamesTab({ onOpenCreate }: { onOpenCreate: () => void }) {
   const [selectedClub, setSelectedClub] = useState<GolfCourse | null>(null);
+  const [searchMode, setSearchMode] = useState<'clubs' | 'people'>('clubs');
+  const [selectedUser, setSelectedUser] = useState<{ id: string; display_name: string } | null>(null);
   const { data: games, isLoading } = useGamesQuery(selectedClub?.id);
 
   // Scroll to top on mount (runs on every visit due to remount key)
@@ -271,7 +311,14 @@ export function GamesTab({ onOpenCreate }: { onOpenCreate: () => void }) {
       <CreateGameCTA onOpen={onOpenCreate} />
       
       <div id="games-scroll" className="gamesScroll">
-        <FindAGame selectedClub={selectedClub} onSelectClub={setSelectedClub} />
+        <FindAGame 
+          selectedClub={selectedClub} 
+          onSelectClub={setSelectedClub}
+          searchMode={searchMode}
+          onSearchModeChange={setSearchMode}
+          selectedUser={selectedUser}
+          onSelectUser={setSelectedUser}
+        />
         <FiltersRow selectedClub={selectedClub} />
         <div className="scopedHeading">
           {selectedClub ? `Games at ${selectedClub.name}` : 'Games Near You'}
