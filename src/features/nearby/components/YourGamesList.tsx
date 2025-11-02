@@ -65,23 +65,7 @@ export function YourGamesList({
         .from('games')
         .select(`
           id, course_name, course_id, start_time, expires_at, status,
-          slots_open, slots_total, note, created_at, host_user_id, visibility, updated_at,
-          game_participants(
-            id,
-            user_id,
-            guest_name,
-            role,
-            state,
-            reserves_slot,
-            user_profiles(
-              id,
-              display_name,
-              username,
-              profile_photo_url,
-              home_club,
-              eg_handicap_index
-            )
-          )
+          slots_open, slots_total, note, created_at, host_user_id, visibility, updated_at
         `)
         .eq('host_user_id', userId)
         .eq('status', 'active')
@@ -116,23 +100,7 @@ export function YourGamesList({
             created_at,
             host_user_id,
             visibility,
-            updated_at,
-            game_participants(
-              id,
-              user_id,
-              guest_name,
-              role,
-              state,
-              reserves_slot,
-              user_profiles(
-                id,
-                display_name,
-                username,
-                profile_photo_url,
-                home_club,
-                eg_handicap_index
-              )
-            )
+            updated_at
           )
         `)
         .eq('user_id', userId)
