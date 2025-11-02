@@ -117,6 +117,7 @@ export function ChatThread({ messages, isStreaming }: ChatThreadProps) {
       ref={containerRef}
       onScroll={handleScroll}
       className="flex-1 overflow-y-auto p-4 space-y-4"
+      style={{ overflowY: 'auto', height: '100%' }}
     >
       {messages.map((message) => renderMessage(message))}
       

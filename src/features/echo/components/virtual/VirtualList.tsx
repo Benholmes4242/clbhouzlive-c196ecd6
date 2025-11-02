@@ -3,7 +3,7 @@
  * Optimized for large message threads and conversation history
  */
 
-import React, { useRef, useState, useCallback, useLayoutEffect } from 'react';
+import React, { useRef, useState, useCallback, useLayoutEffect, useMemo } from 'react';
 
 interface VirtualListProps {
   count: number;
@@ -40,9 +40,9 @@ function Sizer({
  * VirtualList - Renders only visible items for performance
  * 
  * Features:
- * - Dynamic height measurement
+ * - Dynamic height measurement with prefix sums for O(1) lookups
  * - Overscan for smooth scrolling
- * - Anchor-based scroll preservation
+ * - Proper absolute positioning with scroll container
  */
 export function VirtualList({
   count,
@@ -54,11 +54,47 @@ export function VirtualList({
 }: VirtualListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
-  const [sizes, setSizes] = useState<number[]>(() => 
-    Array(count).fill(estimateSize)
+  const [sizes, setSizes] = useState<number[]>(
+    () => Array(count).fill(estimateSize)
   );
 
-  // Measure actual item height
+  // Expand/shrink sizes array when count changes
+  useLayoutEffect(() => {
+    setSizes(prev => {
+      if (prev.length === count) return prev;
+      const next = Array(count).fill(estimateSize);
+      for (let i = 0; i < Math.min(prev.length, count); i++) next[i] = prev[i];
+      // Optional: seed with getSize hints
+      if (getSize) {
+        for (let i = 0; i < count; i++) next[i] = getSize(i) ?? next[i];
+      }
+      return next;
+    });
+  }, [count, estimateSize, getSize]);
+
+  // Prefix sums for O(1) top offsets
+  const prefix = useMemo(() => {
+    const p = new Array(sizes.length + 1).fill(0);
+    for (let i = 0; i < sizes.length; i++) p[i + 1] = p[i] + sizes[i];
+    return p;
+  }, [sizes]);
+
+  const totalHeight = prefix[prefix.length - 1];
+
+  // Find first visible index via linear scan
+  let start = 0;
+  while (start < count && prefix[start + 1] < scrollTop) start++;
+
+  // Find end index
+  const viewport = containerRef.current?.clientHeight ?? 0;
+  let end = start;
+  const maxY = scrollTop + viewport;
+  while (end < count && prefix[end] < maxY) end++;
+
+  // Apply overscan
+  const visStart = Math.max(0, start - overscan);
+  const visEnd = Math.min(count, end + overscan);
+
   const measure = useCallback((index: number, height: number) => {
     setSizes(prev => {
       if (prev[index] === height) return prev;
@@ -68,49 +104,6 @@ export function VirtualList({
     });
   }, []);
 
-  // Update sizes array when count changes
-  useLayoutEffect(() => {
-    setSizes(prev => {
-      if (prev.length === count) return prev;
-      const next = Array(count).fill(estimateSize);
-      // Copy existing measurements
-      for (let i = 0; i < Math.min(prev.length, count); i++) {
-        next[i] = prev[i];
-      }
-      return next;
-    });
-  }, [count, estimateSize]);
-
-  // Calculate total height
-  const totalHeight = sizes.reduce((acc, size) => acc + size, 0);
-
-  // Calculate visible range
-  const containerHeight = containerRef.current?.clientHeight || 0;
-  
-  let start = 0;
-  let accumulatedHeight = 0;
-  
-  // Find start index
-  while (start < count && accumulatedHeight + sizes[start] < scrollTop) {
-    accumulatedHeight += sizes[start];
-    start++;
-  }
-  
-  // Find end index
-  let end = start;
-  let visibleHeight = accumulatedHeight;
-  while (end < count && visibleHeight < scrollTop + containerHeight) {
-    visibleHeight += sizes[end];
-    end++;
-  }
-  
-  // Apply overscan
-  const visibleStart = Math.max(0, start - overscan);
-  const visibleEnd = Math.min(count, end + overscan);
-
-  // Calculate offset for visible items
-  const offsetY = sizes.slice(0, visibleStart).reduce((acc, size) => acc + size, 0);
-
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setScrollTop(e.currentTarget.scrollTop);
   }, []);
@@ -119,33 +112,27 @@ export function VirtualList({
     <div
       ref={containerRef}
       onScroll={handleScroll}
-      className={`overflow-y-auto ${className}`}
-      style={{ height: '100%' }}
+      className={className}
+      style={{ overflowY: 'auto', height: '100%' }}
+      role="list"
     >
+      {/* Spacer to create the full scroll range */}
       <div style={{ height: totalHeight, position: 'relative' }}>
-        <div style={{ transform: `translateY(${offsetY}px)` }}>
-          {Array.from({ length: visibleEnd - visibleStart }, (_, k) => {
-            const index = visibleStart + k;
-            const top = sizes.slice(visibleStart, index).reduce((acc, size) => acc + size, 0);
-            
-            return (
-              <div
-                key={index}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  transform: `translateY(${top}px)`,
-                }}
-              >
-                <Sizer onSize={(height) => measure(index, height)}>
-                  {render(index)}
-                </Sizer>
-              </div>
-            );
-          })}
-        </div>
+        {Array.from({ length: visEnd - visStart }, (_, k) => {
+          const i = visStart + k;
+          const top = prefix[i];
+          return (
+            <div
+              key={i}
+              style={{ position: 'absolute', top, left: 0, right: 0 }}
+              role="listitem"
+            >
+              <Sizer onSize={h => measure(i, h)}>
+                {render(i)}
+              </Sizer>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
