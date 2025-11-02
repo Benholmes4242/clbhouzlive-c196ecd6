@@ -166,39 +166,47 @@
   line-height: 1;
 }
 
-/* Filters Row - 3-chip layout with auto-hide Distance */
+/* Filters Row - aligned with Visibility toggle */
 .chipsRow {
-  padding: 10px 12px;
-  display: grid;
-  gap: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  display: flex;
+  gap: 12px;
+  width: 100%;
 }
 
-.chipsRow.cols-3 {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
+.chipsRow.cols-3,
 .chipsRow.cols-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Remove grid, use flex for all layouts */
+  display: flex;
 }
 
 .chip {
-  width: 100%;
-  height: 40px;
-  border-radius: 12px;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 44px;
+  border-radius: 14px;
   padding: 0 10px;
-  background: hsl(0 84% 60%);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: #fff;
-  box-shadow: inset 0 0 0 1px hsl(0 84% 45%);
-  display: flex;
+  font-weight: 600;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   touch-action: manipulation;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: transform 0.08s ease, background-color 0.12s ease, border-color 0.12s ease;
 }
 
 .chip:active {
-  background: #1c1c1c;
-  transform: scale(0.98);
+  transform: translateY(1px);
+}
+
+.chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.18);
 }
 
 .chipText {
@@ -207,11 +215,14 @@
   justify-content: center;
   gap: 6px;
   flex-wrap: nowrap;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .chipLabel {
   font-size: 14px;
   color: #a0a0a0;
+  flex-shrink: 0;
 }
 
 .chipValue {
@@ -219,6 +230,9 @@
   font-weight: 600;
   font-size: 14px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 /* Handle overflow text gracefully on smaller screens */
