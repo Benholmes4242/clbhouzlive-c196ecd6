@@ -255,7 +255,7 @@ export function GamesNearbyList({
       <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
       {/* Filter chips - moved here */}
-      <div className="mx-auto w-full max-w-[680px] px-5">
+      <div className="mx-auto w-full max-w-[680px]">
         <GameFiltersBar
           filters={currentFilters}
           onFiltersChange={onFiltersChange}

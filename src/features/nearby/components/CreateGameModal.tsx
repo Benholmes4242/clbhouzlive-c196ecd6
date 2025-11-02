@@ -43,6 +43,7 @@ interface CreateGameModalProps {
     visibility?: GameVisibility;
   }) => Promise<void>;
   onCancelBeacon: (beaconId: string) => Promise<void>;
+  myBeacon: GameBeacon | null;
   prefilledClub?: { id: string; name: string };
 }
 
@@ -74,12 +75,12 @@ export function CreateGameModal({
   onClose,
   onCreateBeacon,
   onCancelBeacon,
+  myBeacon,
   prefilledClub,
 }: CreateGameModalProps) {
   const [gameType, setGameType] = useState<string>('9_holes');
   const [courseId, setCourseId] = useState<string>('');
   const [courseName, setCourseName] = useState('');
-  const [selectedClub, setSelectedClub] = useState<{ id: string; name: string } | null>(null);
   const [note, setNote] = useState('');
   const [visibility, setVisibility] = useState<GameVisibility>('public');
   const [timing, setTiming] = useState<string>('now');
@@ -102,12 +103,11 @@ export function CreateGameModal({
 
   // Pre-fill club if provided
   useEffect(() => {
-    if (prefilledClub) {
+    if (prefilledClub && !courseId) {
       setCourseId(prefilledClub.id);
       setCourseName(prefilledClub.name);
-      setSelectedClub({ id: prefilledClub.id, name: prefilledClub.name });
     }
-  }, [prefilledClub]);
+  }, [prefilledClub, courseId]);
 
   // Adjust available slots if currentPlayers changes
   useEffect(() => {
@@ -133,7 +133,6 @@ export function CreateGameModal({
       setGameType('9_holes');
       setCourseId('');
       setCourseName('');
-      setSelectedClub(null);
       setNote('');
       setTiming('now');
       setCustomDateTime(null);
@@ -232,7 +231,6 @@ export function CreateGameModal({
       setGameType('9_holes');
       setCourseId('');
       setCourseName('');
-      setSelectedClub(null);
       setNote('');
       setVisibility('public');
       setTiming('now');
@@ -276,14 +274,12 @@ export function CreateGameModal({
   const handleCourseSelect = (club: { id: string; name: string; country: string; region?: string }) => {
     setCourseId(club.id);
     setCourseName(club.name);
-    setSelectedClub({ id: club.id, name: club.name });
     setCourseError('');
   };
 
   const handleCourseClear = () => {
     setCourseId('');
     setCourseName('');
-    setSelectedClub(null);
     setCourseError('');
   };
 
@@ -294,6 +290,28 @@ export function CreateGameModal({
     return TIMING_OPTIONS.find(opt => opt.value === timing)?.label || 'Now';
   };
 
+  const handleCancel = async () => {
+    if (!myBeacon) return;
+    setIsSubmitting(true);
+    try {
+      await onCancelBeacon(myBeacon.id);
+      onClose();
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const getTimeRemaining = (expiresAt: string) => {
+    const now = new Date();
+    const expires = new Date(expiresAt);
+    const diffMs = expires.getTime() - now.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 60) return `${diffMins}m`;
+    const hours = Math.floor(diffMins / 60);
+    const mins = diffMins % 60;
+    return `${hours}h ${mins}m`;
+  };
 
   return (
     <div 
@@ -341,7 +359,7 @@ export function CreateGameModal({
             {/* Title */}
             <div className="text-center">
               <h2 className="text-white text-[17px] font-semibold">
-                Create a Game
+                {myBeacon ? 'Your Game' : 'Create a Game'}
               </h2>
             </div>
             
@@ -359,7 +377,7 @@ export function CreateGameModal({
           
           {/* Subtitle */}
           <p className="text-[15px] text-white/70 text-center mt-4">
-            Let nearby golfers know you're looking to play
+            {myBeacon ? 'Currently hosting' : 'Let nearby golfers know you\'re looking to play'}
           </p>
         </div>
 
@@ -377,8 +395,45 @@ export function CreateGameModal({
             overscrollBehavior: 'contain',
           }}
         >
-          {/* Create new beacon form */}
-          <>
+          {myBeacon ? (
+            // Show existing beacon
+            <div className="space-y-4">
+              <div className="bg-neutral-800/50 rounded-xl p-4 space-y-3">
+                {myBeacon.course_name && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-neutral-400">Location</span>
+                    <span className="text-sm font-medium text-neutral-200">{myBeacon.course_name}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-neutral-400">Seats</span>
+                  <span className="text-sm font-medium text-neutral-200">
+                    {myBeacon.slots_total - myBeacon.slots_open}/{myBeacon.slots_total} filled
+                  </span>
+                </div>
+                {myBeacon.note && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm text-neutral-400">Note</span>
+                    <span className="text-sm text-neutral-200">{myBeacon.note}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between pt-2 border-t border-neutral-700/50">
+                  <span className="text-sm text-neutral-400">Expires in</span>
+                  <span className="text-sm font-medium text-white/90">{getTimeRemaining(myBeacon.expires_at)}</span>
+                </div>
+              </div>
+              
+              <TapButton
+                onClick={handleCancel}
+                disabled={isSubmitting}
+                className="w-full py-3 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl font-medium transition-colors disabled:opacity-50"
+              >
+                {isSubmitting ? 'Cancelling...' : 'Cancel Game'}
+              </TapButton>
+            </div>
+          ) : (
+            // Create new beacon form
+            <>
               {/* Game Type */}
               <div className="space-y-3">
                 <label className="block text-sm font-medium text-white/90">
@@ -396,10 +451,10 @@ export function CreateGameModal({
               {/* Golf course */}
               <div className="space-y-3">
                 <label className="block text-sm font-medium text-white/90">
-                  Host a game at
+                  Golf course *
                 </label>
                 <SmartSearchInput
-                  selectedClub={selectedClub}
+                  selectedClub={courseId ? { id: courseId, name: courseName } : null}
                   onCourseSelect={handleCourseSelect}
                   onClear={handleCourseClear}
                 />
@@ -519,6 +574,7 @@ export function CreateGameModal({
                 {isSubmitting ? 'Starting…' : 'Start Game'}
               </TapButton>
             </>
+          )}
         </div>
       </div>
     </div>
