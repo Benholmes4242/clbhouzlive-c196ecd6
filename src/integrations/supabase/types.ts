@@ -935,6 +935,52 @@ export type Database = {
         }
         Relationships: []
       }
+      join_requests: {
+        Row: {
+          created_at: string
+          game_id: string
+          id: string
+          requester_id: string
+          state: string
+        }
+        Insert: {
+          created_at?: string
+          game_id: string
+          id?: string
+          requester_id: string
+          state?: string
+        }
+        Update: {
+          created_at?: string
+          game_id?: string
+          id?: string
+          requester_id?: string
+          state?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "join_requests_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "join_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "join_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       logos: {
         Row: {
           category: string
@@ -2716,6 +2762,10 @@ export type Database = {
       }
       cleanup_expired_dismissals: { Args: never; Returns: undefined }
       current_auth_uid: { Args: never; Returns: string }
+      decrement_slots_if_available: {
+        Args: { p_game_id: string }
+        Returns: undefined
+      }
       execute_sql: { Args: { params?: Json; query: string }; Returns: Json }
       expire_pings: { Args: never; Returns: undefined }
       fetch_social_feed_posts: {

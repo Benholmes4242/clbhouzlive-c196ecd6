@@ -15,6 +15,10 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  if (req.method !== 'POST') {
+    return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+  }
+
   try {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -26,7 +30,7 @@ Deno.serve(async (req) => {
       }
     );
 
-    // Get authenticated user
+    // 1) Auth
     const {
       data: { user },
       error: authError,
@@ -50,151 +54,77 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 1. Check if game exists and is active
+    // 2) Load game & basic checks
     const { data: game, error: gameError } = await supabaseClient
       .from('games')
-      .select('id, host_user_id, visibility, status, expires_at, slots_open, slots_total')
+      .select('id, host_user_id, visibility, status, expires_at, slots_open')
       .eq('id', gameId)
       .single();
 
     if (gameError || !game) {
       console.error('[join-request] Game not found:', gameError);
       return new Response(
-        JSON.stringify({ error: 'Game not found or not visible' }),
+        JSON.stringify({ error: 'Game not found' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // 2. Check if game is active and not expired
-    if (game.status !== 'active' || new Date(game.expires_at) <= new Date()) {
-      console.log('[join-request] Game is inactive or expired');
+    if (game.status !== 'active') {
       return new Response(
-        JSON.stringify({ error: 'Game is no longer active' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Game not active' }),
+        { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // 3. Check if user is already the host
-    if (game.host_user_id === user.id) {
-      console.log('[join-request] User is the host');
+    if (new Date(game.expires_at) <= new Date()) {
       return new Response(
-        JSON.stringify({ error: 'You are the host of this game' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Game expired' }),
+        { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // 4. Check if user is already a participant
-    const { data: existingParticipant } = await supabaseClient
+    if (user.id === game.host_user_id) {
+      return new Response(
+        JSON.stringify({ error: 'Host cannot request' }),
+        { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 3) Check not already a participant
+    const { data: alreadyIn } = await supabaseClient
       .from('game_participants')
-      .select('id, state')
+      .select('id')
       .eq('game_id', gameId)
       .eq('user_id', user.id)
       .maybeSingle();
 
-    if (existingParticipant) {
-      console.log('[join-request] User is already a participant:', existingParticipant.state);
+    if (alreadyIn) {
+      console.log('[join-request] User already participant');
       return new Response(
-        JSON.stringify({ 
-          ok: true, 
-          message: 'Already a participant',
-          state: existingParticipant.state 
-        }),
+        JSON.stringify({ ok: true, status: 'already_participant' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // 5. Check if user already has a pending request
-    const { data: existingRequest } = await supabaseClient
-      .from('game_join_requests')
-      .select('id, status')
-      .eq('game_id', gameId)
-      .eq('requester_user_id', user.id)
-      .eq('status', 'pending')
-      .maybeSingle();
-
-    if (existingRequest) {
-      console.log('[join-request] User already has a pending request');
-      return new Response(
-        JSON.stringify({ 
-          ok: true, 
-          message: 'Request already pending',
-          requestId: existingRequest.id 
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // 6. For friends-only games, verify follow relationship
-    if (game.visibility === 'friends') {
-      const { data: followData } = await supabaseClient
-        .from('user_follows')
-        .select('id')
-        .eq('follower_id', user.id)
-        .eq('following_id', game.host_user_id)
-        .maybeSingle();
-
-      if (!followData) {
-        console.log('[join-request] User does not follow host for friends-only game');
-        return new Response(
-          JSON.stringify({ error: 'You must follow this player to join their friends-only game' }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-    }
-
-    // 7. For club games, verify same home_club
-    if (game.visibility === 'club') {
-      const { data: requesterProfile } = await supabaseClient
-        .from('user_profiles')
-        .select('home_club')
-        .eq('id', user.id)
-        .single();
-
-      const { data: hostProfile } = await supabaseClient
-        .from('user_profiles')
-        .select('home_club')
-        .eq('id', game.host_user_id)
-        .single();
-
-      if (!requesterProfile?.home_club || !hostProfile?.home_club || 
-          requesterProfile.home_club !== hostProfile.home_club) {
-        console.log('[join-request] User does not share home club with host');
-        return new Response(
-          JSON.stringify({ error: 'You must share the same home club to join this game' }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-    }
-
-    // 8. Create join request
-    const { data: newRequest, error: insertError } = await supabaseClient
-      .from('game_join_requests')
-      .insert({
-        game_id: gameId,
-        requester_user_id: user.id,
-        status: 'pending',
-      })
-      .select()
+    // 4) Upsert pending request (unique pending constraint enforces idempotency)
+    const { data: reqRow, error: insertError } = await supabaseClient
+      .from('join_requests')
+      .insert({ game_id: gameId, requester_id: user.id })
+      .select('id, state')
       .single();
 
     if (insertError) {
-      console.error('[join-request] Failed to create request:', insertError);
+      // Unique violation means there's already a pending request
+      console.log('[join-request] Pending request already exists');
       return new Response(
-        JSON.stringify({ error: 'Failed to create join request' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ ok: true, status: 'pending_exists' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log('[join-request] Request created successfully:', newRequest.id);
-
-    // TODO: Send notification to host (future enhancement)
-
+    console.log('[join-request] Request created:', reqRow.id);
     return new Response(
-      JSON.stringify({
-        ok: true,
-        message: 'Join request sent successfully',
-        requestId: newRequest.id,
-      }),
+      JSON.stringify({ ok: true, requestId: reqRow.id }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {

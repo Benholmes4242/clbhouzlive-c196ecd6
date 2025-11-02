@@ -18,6 +18,7 @@ interface GameCardProps {
   onCancel?: (gameId: string) => void;
   onMessageHost?: (gameId: string) => void;
   onLeave?: (gameId: string) => void;
+  onViewRequests?: (gameId: string) => void;
 
   // Optional: control expand from parent
   isOpen?: boolean;
@@ -35,6 +36,7 @@ export const GameCard: React.FC<GameCardProps> = ({
   onCancel,
   onMessageHost,
   onLeave,
+  onViewRequests,
   isOpen,
   onToggle,
 }) => {
@@ -159,6 +161,15 @@ export const GameCard: React.FC<GameCardProps> = ({
           <div className="flex flex-wrap gap-2">
             {variant === 'hosting' ? (
               <>
+                {onViewRequests && (
+                  <button
+                    type="button"
+                    className="px-3 py-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/15 active:bg-blue-500/20 border border-blue-400/25 text-sm font-medium text-blue-300 transition-colors"
+                    onClick={() => onViewRequests(game.id)}
+                  >
+                    Requests
+                  </button>
+                )}
                 {onInvite && (
                   <button
                     type="button"

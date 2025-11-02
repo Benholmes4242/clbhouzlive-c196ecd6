@@ -8,6 +8,7 @@ import { EmptyState } from './your-games/EmptyState';
 import { Segmented, SegmentItem } from './Segmented';
 import { TapButton } from '@/components/ui/TapButton';
 import { YourGamesSkeleton } from './your-games/YourGamesSkeleton';
+import { HostApprovalSheet } from './HostApprovalSheet';
 import type { Game as CardGame, Participant } from './your-games/types';
 
 interface YourGamesListProps {
@@ -32,6 +33,7 @@ export function YourGamesList({
   const [joinedGames, setJoinedGames] = useState<Game[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'hosting' | 'joined'>('hosting');
+  const [approvalSheetGameId, setApprovalSheetGameId] = useState<string | null>(null);
 
   const fetchYourGames = useCallback(async () => {
     if (!user?.id) {
@@ -319,9 +321,21 @@ export function YourGamesList({
               members={[]}
               onCancel={() => handleCancel(game.id)}
               onLeave={() => handleLeave(game.id)}
+              onViewRequests={isHostingTab ? (gameId) => setApprovalSheetGameId(gameId) : undefined}
             />
           ))}
         </div>
+      )}
+
+      {/* Host Approval Sheet */}
+      {approvalSheetGameId && (
+        <HostApprovalSheet
+          gameId={approvalSheetGameId}
+          open={!!approvalSheetGameId}
+          onOpenChange={(open) => {
+            if (!open) setApprovalSheetGameId(null);
+          }}
+        />
       )}
     </div>
   );
