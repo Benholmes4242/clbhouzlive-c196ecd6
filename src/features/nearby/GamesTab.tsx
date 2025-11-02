@@ -283,7 +283,7 @@ export function GamesTab({ onOpenCreate }: { onOpenCreate: () => void }) {
       
       <div className="gamesScroll">
         <FindAGame selectedClub={selectedClub} onSelectClub={setSelectedClub} />
-        <div className="px-5">
+        <div className="mx-[-12px] px-5">
           <FiltersRow selectedClub={selectedClub} />
         </div>
         <div className="scopedHeading">
