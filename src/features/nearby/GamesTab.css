@@ -330,6 +330,29 @@
   gap: 4px;
 }
 
+.seatPill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #171717;
+  box-shadow: inset 0 0 0 1px #2a2a2a;
+}
+
+.seatDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.seatText {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e5e5e5;
+}
+
 .badge {
   padding: 4px 8px;
   border-radius: 999px;
