@@ -111,22 +111,21 @@ export function GameFiltersBar({ filters, onFiltersChange, mode, className, port
     <button
       onClick={onClick}
       className={cn(
-        "inline-flex items-center justify-center gap-1 rounded-lg border border-white/14",
+        "flex items-center justify-center gap-1 rounded-lg border border-white/14",
         "bg-white/[0.08] hover:bg-white/[0.12] active:bg-white/[0.16]",
-        "px-3 h-10 text-[13px] font-medium leading-none",
-        "whitespace-nowrap max-w-[33%] min-w-[92px]",
+        "px-3 py-1.5 text-[13px] font-medium leading-none",
         "transition-colors"
       )}
     >
-      {Icon && <Icon className="w-4 h-4 flex-shrink-0" />}
-      <span className="truncate">{children}</span>
+      {Icon && <Icon className="w-4 h-4" />}
+      <span>{children}</span>
     </button>
   );
 
   return (
     <div className={cn('flex flex-col gap-2', className)}>
       {/* Filter Controls Row */}
-      <div className="mt-2 flex flex-wrap gap-2 items-stretch w-full">
+      <div className="mt-2 flex items-stretch justify-between gap-2">
             {/* Date Filter with Calendar */}
             <Sheet open={dateOpen} onOpenChange={setDateOpen}>
             <SheetTrigger asChild>

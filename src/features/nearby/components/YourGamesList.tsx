@@ -225,7 +225,6 @@ export function YourGamesList({
     host_user_id: g.host_user_id,
     visibility: g.visibility,
     note: g.note,
-    participants: [], // Will be hydrated by GameCard
   });
 
   const segmentItems: SegmentItem[] = [

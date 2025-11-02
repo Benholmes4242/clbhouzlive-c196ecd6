@@ -4,8 +4,6 @@ import { formatExpires } from '@/lib/formatExpires';
 import { PlayerRow } from './PlayerRow';
 import { SlotsPill } from './SlotsPill';
 import { useMinuteTick } from '@/hooks/useMinuteTick';
-import { useGameParticipants } from '@/features/game/hooks/useGameParticipants';
-import { useUserProfile } from '@/hooks/useUserProfile';
 
 interface GameCardProps {
   game: GameType;
@@ -29,8 +27,8 @@ interface GameCardProps {
 export const GameCard: React.FC<GameCardProps> = ({
   game,
   variant,
-  host: hostProp,
-  members: membersProp = [],
+  host,
+  members = [],
   defaultOpen = false,
   onInvite,
   onEdit,
@@ -43,58 +41,6 @@ export const GameCard: React.FC<GameCardProps> = ({
   useMinuteTick(); // Auto-refresh expiry time
   const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
   const open = isOpen ?? internalOpen;
-
-  // Fetch participants and host profile
-  const { data: participants = [] } = useGameParticipants(game.id);
-  const { data: hostProfile } = useUserProfile(game.host_user_id);
-
-  // Helper to create unique keys
-  const keyOf = (p: any) => (p.user_id ? `u:${p.user_id}` : `g:${p.guest_name ?? ''}`);
-
-  // Merge prefetched participants with hook participants
-  const seeded = (game.participants ?? []).map((x: any) => ({
-    user_id: x.user_id ?? null,
-    role: x.role,
-    state: x.state,
-    display_name: x.display_name ?? x.guest_name ?? 'Unknown',
-    username: x.username ?? null,
-    profile_photo_url: x.profile_photo_url ?? null,
-    home_club: x.home_club ?? null,
-    eg_handicap_index: x.eg_handicap_index ?? null,
-    show_handicap: x.show_handicap ?? null,
-    guest_name: x.guest_name ?? null,
-    is_guest: !x.user_id,
-  }));
-
-  const byKey = new Map<string, any>(seeded.map((p: any) => [keyOf(p), p]));
-  participants.forEach((p: any) => byKey.set(keyOf(p), { ...byKey.get(keyOf(p)), ...p }));
-
-  let display = [...byKey.values()];
-
-  // Force-add host if missing
-  const hasHost = display.some((p: any) => p.user_id === game.host_user_id);
-  if (!hasHost && hostProfile) {
-    display = [
-      {
-        user_id: hostProfile.id,
-        role: 'host' as const,
-        state: 'accepted',
-        display_name: hostProfile.display_name,
-        username: hostProfile.username,
-        profile_photo_url: hostProfile.profile_photo_url ?? null,
-        home_club: hostProfile.home_club ?? null,
-        eg_handicap_index: hostProfile.eg_handicap_index ?? null,
-        show_handicap: hostProfile.show_handicap ?? null,
-        guest_name: null,
-        is_guest: false,
-      },
-      ...display,
-    ];
-  }
-
-  // Split into host and members
-  const host = display.find((p: any) => p.user_id === game.host_user_id) || hostProp;
-  const members = display.filter((p: any) => p.user_id !== game.host_user_id);
 
   const toggle = () => {
     const next = !open;
