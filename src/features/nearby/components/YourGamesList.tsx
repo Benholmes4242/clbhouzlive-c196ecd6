@@ -58,7 +58,7 @@ export function YourGamesList({
     try {
       const nowIso = new Date().toISOString();
       console.log('[YourGames] Fetching at:', nowIso);
-      console.log('[YourGames] User ID:', user.id);
+      console.log('[YourGames] User ID:', userId);
 
       // Fetch games you're hosting - show active games based on expires_at
       const { data: hosted, error: hostedError } = await supabase
@@ -83,7 +83,7 @@ export function YourGamesList({
             )
           )
         `)
-        .eq('host_user_id', user.id)
+        .eq('host_user_id', userId)
         .eq('status', 'active')
         .gte('expires_at', nowIso)
         .order('start_time', { ascending: true, nullsFirst: true });
@@ -135,7 +135,7 @@ export function YourGamesList({
             )
           )
         `)
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .eq('games.status', 'active')
         .gte('games.expires_at', nowIso);
 
@@ -167,8 +167,8 @@ export function YourGamesList({
 
       // Separate into hosted and joined for display
       const allGames = Array.from(byId.values());
-      const hostedFiltered = allGames.filter(g => g.host_user_id === user.id);
-      const joinedFiltered = allGames.filter(g => g.host_user_id !== user.id);
+      const hostedFiltered = allGames.filter(g => g.host_user_id === userId);
+      const joinedFiltered = allGames.filter(g => g.host_user_id !== userId);
       
       setHostedGames(hostedFiltered);
       setJoinedGames(joinedFiltered);
