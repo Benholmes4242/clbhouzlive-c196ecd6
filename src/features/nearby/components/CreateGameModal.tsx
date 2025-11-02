@@ -328,7 +328,7 @@ export function CreateGameModal({
           </div>
           
           {/* Subtitle */}
-          <p className="text-[15px] text-white/70 text-center mt-4">
+          <p className="text-[14px] text-white/60 text-center mt-4">
             Let nearby golfers know you're looking to play
           </p>
         </div>
@@ -338,11 +338,8 @@ export function CreateGameModal({
 
         {/* Content */}
         <div 
-          className="flex-1 overflow-y-auto px-5 pt-4 pb-6"
+          className="flex-1 overflow-y-auto px-5 pt-4 pb-6 space-y-5"
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px',
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',
           }}
@@ -350,10 +347,10 @@ export function CreateGameModal({
           {/* Create new beacon form */}
           <>
             {/* Game Type */}
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-white/90">
-                  Game type *
-                </label>
+              <div className="space-y-2">
+                <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
+                  Game type
+                </h3>
                 <Segmented
                   ariaLabel="Game type"
                   columns={2}
@@ -392,16 +389,16 @@ export function CreateGameModal({
               </div>
 
               {/* Note */}
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-white/60">
+              <div className="space-y-2">
+                <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
                   Note
-                </label>
+                </h3>
                 <textarea
                   placeholder="2 spots free, off 12hcp, casual vibes"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   rows={2}
-                  className="w-full py-3 px-4 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20 resize-none"
+                  className="w-full py-3 px-4 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 resize-none"
                 />
               </div>
 
@@ -414,10 +411,10 @@ export function CreateGameModal({
               </div>
 
               {/* Timing */}
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-white/60">
-                  When
-                </label>
+              <div className="space-y-2">
+                <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
+                  📅 When
+                </h3>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   {TIMING_OPTIONS.map(option => (
                     <Chip
@@ -436,11 +433,11 @@ export function CreateGameModal({
               </div>
 
               {/* Tag Players */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="block text-sm font-medium text-white/60">
+                  <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
                     Tag players (optional)
-                  </label>
+                  </h3>
                   <div className="text-xs text-white/50">
                     {gameSizeLabel}
                   </div>
@@ -455,10 +452,10 @@ export function CreateGameModal({
 
               {/* Available Slots */}
               {maxAvailableSlots > 0 && (
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-white/90">
-                    Available slots *
-                  </label>
+                <div className="space-y-2">
+                  <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
+                    Available slots
+                  </h3>
                   <Segmented
                     ariaLabel="Available slots"
                     columns={3}
@@ -493,10 +490,15 @@ export function CreateGameModal({
               <TapButton
                 onClick={handleSubmit}
                 disabled={!gameType || !courseId || isSubmitting}
-                className="w-full py-3 px-4 bg-white/20 hover:bg-white/30 active:bg-white/30 text-white rounded-xl font-medium backdrop-blur border border-white/28 shadow-[0_20px_48px_rgba(0,0,0,0.9),_0_0_30px_rgba(255,255,255,0.18)_inset] active:shadow-[0_24px_54px_rgba(0,0,0,0.9),_0_0_40px_rgba(255,255,255,0.28)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ height: '52px' }}
+                className="w-full h-[56px] rounded-2xl bg-white/[0.08] border border-white/10 py-[10px] text-[15px] font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:bg-white/[0.12] active:scale-[0.98] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                style={{ 
+                  userSelect: 'none', 
+                  WebkitTapHighlightColor: 'transparent', 
+                  WebkitTouchCallout: 'none', 
+                  WebkitUserSelect: 'none',
+                }}
               >
-                {isSubmitting ? 'Starting…' : 'Start Game'}
+                {isSubmitting ? 'Creating…' : 'Create Game'}
               </TapButton>
             </>
         </div>
