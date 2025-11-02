@@ -17,27 +17,42 @@ const VIRTUALIZATION_THRESHOLD = 50;
 export function ChatThread({ messages, isStreaming }: ChatThreadProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const endSentinelRef = useRef<HTMLDivElement>(null);
   const shouldAutoScrollRef = useRef(true);
   const useVirtualization = messages.length > VIRTUALIZATION_THRESHOLD;
 
-  // Auto-scroll to bottom on new messages (unless user scrolled up)
+  // IntersectionObserver for near-bottom detection
+  useEffect(() => {
+    if (!endSentinelRef.current || !containerRef.current) return;
+
+    const el = endSentinelRef.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const nearBottom = entries.some(e => e.isIntersecting);
+        shouldAutoScrollRef.current = nearBottom;
+      },
+      {
+        root: containerRef.current,
+        rootMargin: '0px 0px 120px 0px', // treat within 120px of bottom as "near"
+        threshold: 0.01,
+      }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Auto-scroll to bottom on new messages (when near bottom)
   useEffect(() => {
     if (shouldAutoScrollRef.current && !useVirtualization) {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isStreaming, useVirtualization]);
 
-  const handleScroll = () => {
-    if (!containerRef.current) return;
-    
-    const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
-    const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
-    shouldAutoScrollRef.current = isNearBottom;
-  };
-
   const renderMessage = (message: EchoMessage) => (
     <div
       key={message.id}
+      data-msg-id={message.id}
       className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
     >
       <div
@@ -115,7 +130,6 @@ export function ChatThread({ messages, isStreaming }: ChatThreadProps) {
   return (
     <div
       ref={containerRef}
-      onScroll={handleScroll}
       className="flex-1 overflow-y-auto p-4 space-y-4"
       style={{ overflowY: 'auto', height: '100%' }}
     >
@@ -123,6 +137,7 @@ export function ChatThread({ messages, isStreaming }: ChatThreadProps) {
       
       {streamingIndicator}
       
+      <div ref={endSentinelRef} style={{ height: 1 }} />
       <div ref={bottomRef} />
     </div>
   );

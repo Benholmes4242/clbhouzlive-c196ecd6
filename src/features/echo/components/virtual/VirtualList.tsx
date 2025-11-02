@@ -5,6 +5,31 @@
 
 import React, { useRef, useState, useCallback, useLayoutEffect, useMemo } from 'react';
 
+/**
+ * Binary search helpers for O(log n) visible range detection
+ */
+function upperBound(arr: number[], x: number) {
+  // first index i where arr[i] > x
+  let lo = 0, hi = arr.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (arr[mid] <= x) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo;
+}
+
+function lowerBound(arr: number[], x: number) {
+  // first index i where arr[i] >= x
+  let lo = 0, hi = arr.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (arr[mid] < x) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo;
+}
+
 interface VirtualListProps {
   count: number;
   estimateSize: number;
@@ -81,15 +106,18 @@ export function VirtualList({
 
   const totalHeight = prefix[prefix.length - 1];
 
-  // Find first visible index via linear scan
-  let start = 0;
-  while (start < count && prefix[start + 1] < scrollTop) start++;
-
-  // Find end index
+  // Binary search for visible range (O(log n))
   const viewport = containerRef.current?.clientHeight ?? 0;
-  let end = start;
   const maxY = scrollTop + viewport;
-  while (end < count && prefix[end] < maxY) end++;
+
+  // Find first fully/partially visible item
+  let start = upperBound(prefix, scrollTop) - 1;
+  if (start < 0) start = 0;
+  if (start > count - 1) start = count - 1;
+
+  // Find end: first i where prefix[i] >= maxY
+  let endExclusive = lowerBound(prefix, maxY);
+  let end = Math.min(count, Math.max(start, endExclusive));
 
   // Apply overscan
   const visStart = Math.max(0, start - overscan);
