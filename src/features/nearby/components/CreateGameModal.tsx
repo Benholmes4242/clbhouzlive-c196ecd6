@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, ChevronDown, AlertCircle } from 'lucide-react';
 import { GameBeacon } from '../hooks/useGameBeacon';
-import { SmartSearchInput } from '@/components/games/SmartSearchInput';
+import { useCourseSearch } from '../hooks/useCourseSearch';
 import { UserSearchTypeahead } from './UserSearchTypeahead';
 import { GameVisibilitySelector } from './GameVisibilitySelector';
 import { Segmented } from './Segmented';
@@ -13,7 +13,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { TapButton } from '@/components/ui/TapButton';
 import { openCalendarPicker } from './CalendarPicker';
 import { openTimePicker } from './TimePicker';
+import { haptic } from '@/utils/haptics';
 import './CreateGame.css';
+import '../GamesTab.css';
 
 // Format game type for display
 function formatGameTypeDisplay(gameType: string): string {
@@ -89,6 +91,11 @@ export function CreateGameModal({
   const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const [courseError, setCourseError] = useState<string>('');
+  
+  // Course search state (matching GamesTab pattern)
+  const [courseQuery, setCourseQuery] = useState('');
+  const [isCourseDropdownOpen, setIsCourseDropdownOpen] = useState(false);
+  const { courses, isLoading: isSearchingCourses } = useCourseSearch(courseQuery);
 
   // Calculate current players (host + tagged)
   const currentPlayers = 1 + selectedUsers.length;
@@ -360,26 +367,80 @@ export function CreateGameModal({
                 />
               </div>
 
-              {/* Golf course */}
-              <div className="space-y-3">
-                <SmartSearchInput
-                  selectedClub={selectedClub ?? (courseId && courseName ? { id: courseId, name: courseName } : null)}
-                  onCourseSelect={(club) => {
-                    setCourseId(club.id);
-                    setCourseName(club.name);
-                    setSelectedClub({ id: club.id, name: club.name });
-                    setCourseError('');
-                  }}
-                  onClear={() => {
-                    setCourseId('');
-                    setCourseName('');
-                    setSelectedClub(null);
-                  }}
-                  headerText="Host a game at"
-                  subtitleText="Search golf clubs to host your game"
-                  selectedPrefix="Hosting at"
-                  container={portalContainer}
-                />
+              {/* Golf course - matching GamesTab styling */}
+              <div className="findBlock">
+                {selectedClub ? (
+                  <div className="selectedClubRow">
+                    <span className="prefix">Hosting at</span>
+                    <div className="clubPill">
+                      <span className="clubName">{selectedClub.name}</span>
+                      <TapButton 
+                        className="x" 
+                        aria-label="Clear" 
+                        onClick={() => {
+                          haptic('light');
+                          setCourseId('');
+                          setCourseName('');
+                          setSelectedClub(null);
+                          setCourseQuery('');
+                          setCourseError('');
+                        }}
+                      >
+                        ✕
+                      </TapButton>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <label className="findLabel">Host a game at</label>
+                    <div className="searchBox">
+                      <span className="glass">🔎</span>
+                      <input
+                        placeholder="Search golf club..."
+                        value={courseQuery}
+                        onChange={(e) => setCourseQuery(e.target.value)}
+                        onFocus={() => setIsCourseDropdownOpen(true)}
+                        onBlur={() => setTimeout(() => setIsCourseDropdownOpen(false), 200)}
+                      />
+                    </div>
+                    {isCourseDropdownOpen && courseQuery.length >= 2 && (
+                      <div className="resultsSheet">
+                        {isSearchingCourses ? (
+                          <div className="hint">Searching...</div>
+                        ) : courses.length === 0 ? (
+                          <div className="hint">No clubs found</div>
+                        ) : (
+                          courses.map(c => (
+                            <TapButton 
+                              key={c.id} 
+                              className="resultRow" 
+                              onClick={() => {
+                                haptic('light');
+                                setCourseId(c.id);
+                                setCourseName(c.name);
+                                setSelectedClub({ id: c.id, name: c.name });
+                                setCourseQuery('');
+                                setIsCourseDropdownOpen(false);
+                                setCourseError('');
+                              }}
+                            >
+                              <span className="pin">📍</span>
+                              <div className="rMid">
+                                <div className="rTitle">{c.name}</div>
+                                <div className="rSub">{c.region || c.country}</div>
+                              </div>
+                            </TapButton>
+                          ))
+                        )}
+                      </div>
+                    )}
+                    {isCourseDropdownOpen && courseQuery.length > 0 && courseQuery.length < 2 && (
+                      <div className="resultsSheet">
+                        <div className="hint">Type at least 2 characters</div>
+                      </div>
+                    )}
+                  </>
+                )}
                 {courseError && (
                   <div className="flex items-center gap-2 text-red-400 text-sm mt-2">
                     <AlertCircle className="w-4 h-4" />
