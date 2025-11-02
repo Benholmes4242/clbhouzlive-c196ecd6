@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Filter } from 'lucide-react';
 import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
 import { useCourseSearch, GolfCourse } from '@/features/nearby/hooks/useCourseSearch';
@@ -108,10 +109,21 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
   const filters = useGameFilters();
   const showDistance = !selectedClub;
   
-  // Check if filters are at default values
-  const isDefaultWhen = !filters.when.date && filters.when.window === 'any' && !filters.when.exactTime;
-  const isDefaultDistance = filters.distanceKm === 10;
-  const isDefaultSort = filters.sort === 'soonest';
+  // Helpers to get chip text
+  const whenChipText = () => {
+    if (filters.when === null) return 'When ?';
+    return labelWhen(filters.when);
+  };
+  
+  const distanceChipText = () => {
+    if (filters.distanceKm === null) return 'Distance ?';
+    return `${filters.distanceKm} km`;
+  };
+  
+  const sortChipText = () => {
+    if (filters.sort === null) return 'Sort';
+    return filters.sort === 'soonest' ? 'Soonest' : filters.sort === 'distance' ? 'Nearest' : 'Most Available Slots';
+  };
   
   return (
     <div 
@@ -120,38 +132,30 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
       aria-label="Game filters"
     >
       <TapButton 
-        className="chip" 
+        className={`chip ${filters.when === null ? 'placeholder' : ''}`}
         onClick={() => openWhenSheet(filters)}
-        aria-label={`When: ${labelWhen(filters.when)}`}
+        aria-label="Filter by date & time"
       >
-        <div className="chipText">
-          {isDefaultWhen && <span className="chipLabel">When</span>}
-          <span className="chipValue">{labelWhen(filters.when)}</span>
-        </div>
+        <span className="chip-text">{whenChipText()}</span>
       </TapButton>
       
       {showDistance && (
         <TapButton 
-          className="chip" 
+          className={`chip ${filters.distanceKm === null ? 'placeholder' : ''}`}
           onClick={() => openDistanceSheet(filters)}
-          aria-label={`Distance: ${filters.distanceKm} km`}
+          aria-label="Filter by distance"
         >
-          <div className="chipText">
-            {isDefaultDistance && <span className="chipLabel">Distance</span>}
-            <span className="chipValue">{filters.distanceKm} km</span>
-          </div>
+          <span className="chip-text">{distanceChipText()}</span>
         </TapButton>
       )}
       
       <TapButton 
-        className="chip" 
+        className={`chip ${filters.sort === null ? 'placeholder' : ''}`}
         onClick={() => openSortSheet(filters)}
-        aria-label={`Sort: ${filters.sortLabel}`}
+        aria-label="Sort games"
       >
-        <div className="chipText">
-          {isDefaultSort && <span className="chipLabel">Sort</span>}
-          <span className="chipValue">{filters.sortLabel}</span>
-        </div>
+        <Filter className="chip-icon" size={14} aria-hidden="true" />
+        <span className="chip-text">{sortChipText()}</span>
       </TapButton>
     </div>
   );

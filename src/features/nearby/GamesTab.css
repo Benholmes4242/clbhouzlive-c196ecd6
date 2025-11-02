@@ -194,8 +194,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   touch-action: manipulation;
   transition: transform 0.08s ease, background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.chip.placeholder {
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 400;
 }
 
 .chip:active {
@@ -207,30 +213,18 @@
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.18);
 }
 
-.chipText {
-  display: flex;
+.chip .chip-icon {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  flex-wrap: nowrap;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.chipLabel {
-  font-size: 14px;
-  color: #a0a0a0;
   flex-shrink: 0;
 }
 
-.chipValue {
-  color: #9fc0a7;
-  font-weight: 600;
-  font-size: 14px;
+.chip .chip-text {
+  display: inline-block;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-width: 0;
 }
 
 /* Handle overflow text gracefully on smaller screens */

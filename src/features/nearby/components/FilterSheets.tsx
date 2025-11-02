@@ -125,12 +125,12 @@ function openActionSheet(config: ActionSheetConfig) {
 }
 
 type Filters = {
-  when: WhenFilter;
-  setWhen: (next: Partial<WhenFilter>) => void;
-  distanceKm: number;
-  setDistanceKm: (km: number) => void;
-  sort: GameSort;
-  setSort: (s: GameSort) => void;
+  when: WhenFilter | null;
+  setWhen: (next: WhenFilter | null | Partial<WhenFilter>) => void;
+  distanceKm: number | null;
+  setDistanceKm: (km: number | null) => void;
+  sort: GameSort | null;
+  setSort: (s: GameSort | null) => void;
 };
 
 export function openWhenSheet(f: Filters) {
@@ -141,18 +141,18 @@ export function openWhenSheet(f: Filters) {
     title: 'Select Date & Time',
     items: [
       // Quick picks
-      { label: 'Any', onPress: () => f.setWhen({ date: null, window: 'any', exactTime: null }) },
+      { label: 'Any', onPress: () => f.setWhen(null) },
       { label: 'Today', onPress: () => f.setWhen({ date: today, window: 'any', exactTime: null }) },
       { label: 'Tomorrow', onPress: () => f.setWhen({ date: tomorrow, window: 'any', exactTime: null }) },
       
       // Custom date/time
       { label: 'Choose Date', onPress: () => openCalendarPicker({
-        initialDate: f.when.date ?? new Date(),
-        onSelect: (d) => f.setWhen({ date: d })
+        initialDate: f.when?.date ?? new Date(),
+        onSelect: (d) => f.setWhen({ date: d, window: 'any', exactTime: null })
       }) },
       { label: 'Choose Time', onPress: () => openTimePicker({
-        initial: f.when.exactTime ?? '08:00',
-        onSelect: (hhmm) => f.setWhen({ exactTime: hhmm })
+        initial: f.when?.exactTime ?? '08:00',
+        onSelect: (hhmm) => f.setWhen({ date: f.when?.date ?? null, window: 'any', exactTime: hhmm })
       }) },
     ],
   });
@@ -161,10 +161,13 @@ export function openWhenSheet(f: Filters) {
 export function openDistanceSheet(f: Filters) {
   openActionSheet({
     title: 'Distance',
-    items: [5, 10, 20, 50].map(km => ({
-      label: `${km} km`,
-      onPress: () => f.setDistanceKm(km),
-    })),
+    items: [
+      { label: 'Any', onPress: () => f.setDistanceKm(null) },
+      ...([5, 10, 20, 50].map(km => ({
+        label: `${km} km`,
+        onPress: () => f.setDistanceKm(km),
+      }))),
+    ],
   });
 }
 
@@ -179,8 +182,8 @@ export function openSortSheet(f: Filters) {
   });
 }
 
-export function labelWhen(when: WhenFilter): string {
-  if (!when.date && when.window === 'any' && !when.exactTime) return 'Any';
+export function labelWhen(when: WhenFilter | null): string {
+  if (!when || (!when.date && when.window === 'any' && !when.exactTime)) return 'Any';
   
   const today = new Date();
   const tomorrow = addDays(today, 1);
