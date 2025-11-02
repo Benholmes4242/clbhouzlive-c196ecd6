@@ -13,18 +13,15 @@ export const USE_VIDEO_PROGRESS_SYNC_V1 = true;
 /**
  * Hub Feature Flag
  * 
- * Controls visibility of My Clubhouse Hub (/hub/*) routes and navigation.
- * Default: false (off in production)
- * 
- * To enable: Set environment variable VITE_FEATURE_HUB=true
+ * Phase 5: Hub is now always enabled for all users (production launch)
  */
-const HUB_ENABLED = import.meta.env.VITE_FEATURE_HUB === 'true';
+const HUB_ENABLED = true;
 
 export const FEATURE_FLAGS = {
   CLUBHOUSE_VERTICAL_ONLY,
   SAFE_AUTOPLAY_V2: USE_SAFE_AUTOPLAY_V2,
   VIDEO_PROGRESS_SYNC_V1: USE_VIDEO_PROGRESS_SYNC_V1,
-  HUB: HUB_ENABLED,
+  HUB: HUB_ENABLED, // Always enabled - no longer feature flagged
 } as const;
 
 // Vertical aspect ratio band (9:16 ± 7%) - width/height
