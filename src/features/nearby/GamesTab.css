@@ -186,22 +186,28 @@
   min-width: 0;
   height: 44px;
   border-radius: 14px;
-  padding: 0 10px;
+  padding: 10px 14px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #fff;
   font-weight: 600;
+  font-size: 15px;
+  line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   touch-action: manipulation;
   transition: transform 0.08s ease, background-color 0.12s ease, border-color 0.12s ease;
+  white-space: nowrap;
+  max-width: 42vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.chip.placeholder {
-  color: rgba(255, 255, 255, 0.65);
-  font-weight: 400;
+/* Apple-style placeholder with subtle opacity like iOS secondaryLabel */
+.chip--placeholder {
+  opacity: 0.85;
 }
 
 .chip:active {
@@ -213,18 +219,11 @@
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.18);
 }
 
-.chip .chip-icon {
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.chip .chip-text {
-  display: inline-block;
-  max-width: 100%;
-  white-space: nowrap;
+/* Ensure inner text truncates cleanly */
+.chip__text {
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Handle overflow text gracefully on smaller screens */

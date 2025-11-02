@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Filter } from 'lucide-react';
 import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
 import { useCourseSearch, GolfCourse } from '@/features/nearby/hooks/useCourseSearch';
@@ -109,19 +108,19 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
   const filters = useGameFilters();
   const showDistance = !selectedClub;
   
-  // Helpers to get chip text
-  const whenChipText = () => {
-    if (filters.when === null) return 'When ?';
+  // Apple-style chip labels: emoji + title when unset, value only when set
+  const getWhenLabel = () => {
+    if (filters.when === null) return '📅 When';
     return labelWhen(filters.when);
   };
   
-  const distanceChipText = () => {
-    if (filters.distanceKm === null) return 'Distance ?';
+  const getDistanceLabel = () => {
+    if (filters.distanceKm === null) return '📍 Distance';
     return `${filters.distanceKm} km`;
   };
   
-  const sortChipText = () => {
-    if (filters.sort === null) return 'Sort';
+  const getSortLabel = () => {
+    if (filters.sort === null) return '↕️ Sort';
     return filters.sort === 'soonest' ? 'Soonest' : filters.sort === 'distance' ? 'Nearest' : 'Most Available Slots';
   };
   
@@ -132,30 +131,29 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
       aria-label="Game filters"
     >
       <TapButton 
-        className={`chip ${filters.when === null ? 'placeholder' : ''}`}
+        className={`chip ${filters.when === null ? 'chip--placeholder' : ''}`}
         onClick={() => openWhenSheet(filters)}
         aria-label="Filter by date & time"
       >
-        <span className="chip-text">{whenChipText()}</span>
+        <span className="chip__text">{getWhenLabel()}</span>
       </TapButton>
       
       {showDistance && (
         <TapButton 
-          className={`chip ${filters.distanceKm === null ? 'placeholder' : ''}`}
+          className={`chip ${filters.distanceKm === null ? 'chip--placeholder' : ''}`}
           onClick={() => openDistanceSheet(filters)}
           aria-label="Filter by distance"
         >
-          <span className="chip-text">{distanceChipText()}</span>
+          <span className="chip__text">{getDistanceLabel()}</span>
         </TapButton>
       )}
       
       <TapButton 
-        className={`chip ${filters.sort === null ? 'placeholder' : ''}`}
+        className={`chip ${filters.sort === null ? 'chip--placeholder' : ''}`}
         onClick={() => openSortSheet(filters)}
         aria-label="Sort games"
       >
-        <Filter className="chip-icon" size={14} aria-hidden="true" />
-        <span className="chip-text">{sortChipText()}</span>
+        <span className="chip__text">{getSortLabel()}</span>
       </TapButton>
     </div>
   );
