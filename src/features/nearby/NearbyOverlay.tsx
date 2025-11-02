@@ -236,6 +236,7 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             <GamesTab key={gamesSessionKey} onOpenCreate={() => setIsCreateGameOpen(true)} />
           ) : (
             <YourGamesList
+              activeTab={activeTab}
               onCancelGame={cancelBeacon}
               onLeaveGame={async (gameId) => {
                 // Leave game by removing participant
@@ -265,9 +266,15 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
           onCreateBeacon={async (input) => {
             try {
               await createBeacon(input);
-              // Switch tab first, then dispatch event
-              setActiveTab('your-games');
+              
+              // 1) Dispatch event FIRST so listeners attach before tab switch
               window.dispatchEvent(new CustomEvent('game-created'));
+              
+              // 2) Small buffer for listener + DB propagation
+              await new Promise(resolve => setTimeout(resolve, 150));
+              
+              // 3) Now switch to Your Games
+              setActiveTab('your-games');
             } finally {
               // Always close modal and reset, even if there's an error
               setIsCreateGameOpen(false);

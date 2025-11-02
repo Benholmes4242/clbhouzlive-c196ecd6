@@ -11,6 +11,7 @@ import { YourGamesSkeleton } from './your-games/YourGamesSkeleton';
 import type { Game as CardGame, Participant } from './your-games/types';
 
 interface YourGamesListProps {
+  activeTab?: 'golfers' | 'games' | 'your-games';
   onCancelGame?: (gameId: string) => void;
   onLeaveGame?: (gameId: string) => void;
   onCountChange?: (count: number) => void;
@@ -19,6 +20,7 @@ interface YourGamesListProps {
 }
 
 export function YourGamesList({ 
+  activeTab: activeTabFromParent,
   onCancelGame, 
   onLeaveGame, 
   onCountChange, 
@@ -145,6 +147,14 @@ export function YourGamesList({
     fetchYourGames();
   }, [fetchYourGames]);
 
+  // Refetch whenever Your Games tab becomes active
+  useEffect(() => {
+    if (activeTabFromParent === 'your-games') {
+      console.log('[YourGames] Tab activated, refetching...');
+      fetchYourGames();
+    }
+  }, [activeTabFromParent, fetchYourGames]);
+
   // Listen for game-created events to trigger immediate refetch
   useEffect(() => {
     const handleGameCreated = (e: any) => {
@@ -152,7 +162,7 @@ export function YourGamesList({
       // Add small delay to ensure DB write completes and RLS catches up
       setTimeout(() => {
         fetchYourGames();
-      }, 100);
+      }, 150);
     };
     window.addEventListener('game-created', handleGameCreated);
     return () => window.removeEventListener('game-created', handleGameCreated);
