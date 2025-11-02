@@ -48,17 +48,37 @@ export function YourGamesList({
     setIsLoading(true);
     
     try {
-      const nowIso = new Date().toISOString();
-      console.log('[YourGames] Fetching at:', nowIso);
+      // Add 5-second margin to catch just-created games
+      const nowMinus5s = new Date(Date.now() - 5000).toISOString();
+      console.log('[YourGames] Fetching at:', nowMinus5s);
       console.log('[YourGames] User ID:', user.id);
 
       // Fetch games you're hosting - show future games based on start_time
       const { data: hosted, error: hostedError } = await supabase
         .from('games')
-        .select('id, course_name, course_id, start_time, expires_at, status, slots_open, slots_total, note, created_at, host_user_id, visibility, updated_at')
+        .select(`
+          id, course_name, course_id, start_time, expires_at, status,
+          slots_open, slots_total, note, created_at, host_user_id, visibility, updated_at,
+          game_participants(
+            id,
+            user_id,
+            guest_name,
+            role,
+            state,
+            reserves_slot,
+            user_profiles(
+              id,
+              display_name,
+              username,
+              profile_photo_url,
+              home_club,
+              eg_handicap_index
+            )
+          )
+        `)
         .eq('host_user_id', user.id)
         .eq('status', 'active')
-        .gte('start_time', nowIso) // Changed from expires_at to start_time
+        .gte('start_time', nowMinus5s)
         .order('start_time', { ascending: true });
 
       console.log('[YourGames] Hosted games query result:', {
@@ -77,24 +97,40 @@ export function YourGamesList({
         .select(`
           game_id,
           games!inner(
-            id, 
-            course_name, 
-            course_id, 
-            start_time, 
-            expires_at, 
-            status, 
-            slots_open, 
-            slots_total, 
+            id,
+            course_name,
+            course_id,
+            start_time,
+            expires_at,
+            status,
+            slots_open,
+            slots_total,
             note,
             created_at,
             host_user_id,
             visibility,
-            updated_at
+            updated_at,
+            game_participants(
+              id,
+              user_id,
+              guest_name,
+              role,
+              state,
+              reserves_slot,
+              user_profiles(
+                id,
+                display_name,
+                username,
+                profile_photo_url,
+                home_club,
+                eg_handicap_index
+              )
+            )
           )
         `)
         .eq('user_id', user.id)
         .eq('games.status', 'active')
-        .gte('games.start_time', nowIso); // Changed from expires_at to start_time
+        .gte('games.start_time', nowMinus5s);
 
       console.log('[YourGames] Joined games query result:', {
         count: participants?.length || 0,
@@ -163,7 +199,7 @@ export function YourGamesList({
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       console.log('[YourGames] game-created event received:', detail);
-      setTimeout(() => fetchYourGames(), 150);
+      setTimeout(() => fetchYourGames(), 400); // Increased from 150ms to 400ms for DB propagation
     };
     window.addEventListener(EVT_GAME_CREATED, handler as EventListener);
     return () => window.removeEventListener(EVT_GAME_CREATED, handler as EventListener);
@@ -237,6 +273,39 @@ export function YourGamesList({
     visibility: g.visibility,
     note: g.note,
   });
+
+  // Helper: Extract host participant with profile data
+  const extractHost = (game: Game): Participant | null => {
+    const hostParticipant = (game as any).game_participants?.find((p: any) => p.role === 'host');
+    if (!hostParticipant) return null;
+
+    return {
+      user_id: hostParticipant.user_id,
+      username: hostParticipant.user_profiles?.username,
+      display_name: hostParticipant.user_profiles?.display_name,
+      profile_photo_url: hostParticipant.user_profiles?.profile_photo_url,
+      home_club: hostParticipant.user_profiles?.home_club,
+      eg_handicap_index: hostParticipant.user_profiles?.eg_handicap_index,
+      role: 'host' as const,
+    };
+  };
+
+  // Helper: Extract members (players + guests) with profile data
+  const extractMembers = (game: Game): Participant[] => {
+    const participants = (game as any).game_participants?.filter((p: any) => 
+      (p.role === 'player' && p.state === 'accepted') || p.guest_name
+    ) || [];
+
+    return participants.map((p: any) => ({
+      user_id: p.user_id,
+      username: p.user_profiles?.username,
+      display_name: p.user_profiles?.display_name ?? p.guest_name ?? 'Guest',
+      profile_photo_url: p.user_profiles?.profile_photo_url,
+      home_club: p.user_profiles?.home_club,
+      eg_handicap_index: p.user_profiles?.eg_handicap_index,
+      role: 'player' as const,
+    }));
+  };
 
   const segmentItems: SegmentItem[] = [
     { 
@@ -316,8 +385,8 @@ export function YourGamesList({
               key={game.id}
               game={toCardGame(game)}
               variant={isHostingTab ? 'hosting' : 'joined'}
-              host={null}
-              members={[]}
+              host={extractHost(game)}
+              members={extractMembers(game)}
               onCancel={() => handleCancel(game.id)}
               onLeave={() => handleLeave(game.id)}
               onViewRequests={isHostingTab ? (gameId) => setApprovalSheetGameId(gameId) : undefined}
