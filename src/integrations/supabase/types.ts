@@ -2772,6 +2772,10 @@ export type Database = {
         Args: { _profile_user_id: string; _viewer_id: string }
         Returns: boolean
       }
+      can_view_game_participants: {
+        Args: { p_game_id: string; p_user_id: string }
+        Returns: boolean
+      }
       check_and_award_badges: {
         Args: { user_id_param: string }
         Returns: {
@@ -2863,7 +2867,15 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      is_host_of_game: {
+        Args: { p_game_id: string; p_user_id: string }
+        Returns: boolean
+      }
       is_mobile_device: { Args: never; Returns: boolean }
+      is_participant: {
+        Args: { p_game_id: string; p_user_id: string }
+        Returns: boolean
+      }
       is_thread_member: { Args: { _thread_id: string }; Returns: boolean }
       log_user_achievement: {
         Args: {
