@@ -35,6 +35,8 @@ export function YourGamesList({
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'hosting' | 'joined'>('hosting');
   const [approvalSheetGameId, setApprovalSheetGameId] = useState<string | null>(null);
+  // Cache of host profiles keyed by user id for fallback rendering
+  const [hostProfilesMap, setHostProfilesMap] = useState<Record<string, any>>({});
 
   const fetchYourGames = useCallback(async () => {
     // Resolve user id reliably (avoid race with session hook)
@@ -154,6 +156,26 @@ export function YourGamesList({
           });
           (hosted || []).forEach((g: any) => { g.game_participants = grouped[g.id] || []; });
           (participants || []).forEach((p: any) => { if (p.games) { p.games.game_participants = grouped[p.games.id] || []; } });
+        }
+      }
+
+      // Fallback: fetch host profiles to render host details even if not present in game_participants
+      const hostIds = Array.from(new Set([
+        ...((hosted || []).map((g: any) => g.host_user_id).filter(Boolean)),
+        ...((participants || []).map((p: any) => p.games?.host_user_id).filter(Boolean)),
+      ]));
+
+      if (hostIds.length > 0) {
+        const { data: hostRows, error: hostErr } = await supabase
+          .from('user_profiles')
+          .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index')
+          .in('id', hostIds as string[]);
+        if (hostErr) {
+          console.error('[YourGames] Error fetching host profiles:', hostErr);
+        } else {
+          const map: Record<string, any> = {};
+          (hostRows || []).forEach((r: any) => { map[r.id] = r; });
+          setHostProfilesMap(map);
         }
       }
 
@@ -295,15 +317,28 @@ export function YourGamesList({
   // Helper: Extract host participant with profile data
   const extractHost = (game: Game): Participant | null => {
     const hostParticipant = (game as any).game_participants?.find((p: any) => p.role === 'host');
-    if (!hostParticipant) return null;
+    if (hostParticipant) {
+      return {
+        user_id: hostParticipant.user_id,
+        username: hostParticipant.user_profiles?.username,
+        display_name: hostParticipant.user_profiles?.display_name,
+        profile_photo_url: hostParticipant.user_profiles?.profile_photo_url,
+        home_club: hostParticipant.user_profiles?.home_club,
+        eg_handicap_index: hostParticipant.user_profiles?.eg_handicap_index,
+        role: 'host' as const,
+      };
+    }
 
+    // Fallback to host profile fetched separately
+    const hp = hostProfilesMap[game.host_user_id || ''];
+    if (!hp) return null;
     return {
-      user_id: hostParticipant.user_id,
-      username: hostParticipant.user_profiles?.username,
-      display_name: hostParticipant.user_profiles?.display_name,
-      profile_photo_url: hostParticipant.user_profiles?.profile_photo_url,
-      home_club: hostParticipant.user_profiles?.home_club,
-      eg_handicap_index: hostParticipant.user_profiles?.eg_handicap_index,
+      user_id: game.host_user_id,
+      username: hp.username,
+      display_name: hp.display_name,
+      profile_photo_url: hp.profile_photo_url,
+      home_club: hp.home_club,
+      eg_handicap_index: hp.eg_handicap_index,
       role: 'host' as const,
     };
   };
