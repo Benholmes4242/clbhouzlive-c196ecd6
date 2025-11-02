@@ -266,7 +266,6 @@ export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
             }
           }}
           onCancelBeacon={cancelBeacon}
-          myBeacon={myBeacon}
           prefilledClub={prefilledClub}
         />
       )}
