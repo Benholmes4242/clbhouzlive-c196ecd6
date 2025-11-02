@@ -108,6 +108,11 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
   const filters = useGameFilters();
   const showDistance = !selectedClub;
   
+  // Check if filters are at default values
+  const isDefaultWhen = !filters.when.date && filters.when.window === 'any' && !filters.when.exactTime;
+  const isDefaultDistance = filters.distanceKm === 10;
+  const isDefaultSort = filters.sort === 'soonest';
+  
   return (
     <div 
       className={`chipsRow ${showDistance ? 'cols-3' : 'cols-2'}`} 
@@ -120,7 +125,7 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
         aria-label={`When: ${labelWhen(filters.when)}`}
       >
         <div className="chipText">
-          <span className="chipLabel">When</span>
+          {isDefaultWhen && <span className="chipLabel">When</span>}
           <span className="chipValue">{labelWhen(filters.when)}</span>
         </div>
       </TapButton>
@@ -132,7 +137,7 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
           aria-label={`Distance: ${filters.distanceKm} km`}
         >
           <div className="chipText">
-            <span className="chipLabel">Distance</span>
+            {isDefaultDistance && <span className="chipLabel">Distance</span>}
             <span className="chipValue">{filters.distanceKm} km</span>
           </div>
         </TapButton>
@@ -144,7 +149,7 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
         aria-label={`Sort: ${filters.sortLabel}`}
       >
         <div className="chipText">
-          <span className="chipLabel">Sort</span>
+          {isDefaultSort && <span className="chipLabel">Sort</span>}
           <span className="chipValue">{filters.sortLabel}</span>
         </div>
       </TapButton>
