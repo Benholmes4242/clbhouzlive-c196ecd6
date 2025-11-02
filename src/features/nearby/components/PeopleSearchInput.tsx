@@ -79,7 +79,7 @@ export function PeopleSearchInput({ selectedUser, onSelect }: PeopleSearchInputP
         </div>
       ) : (
         <>
-          <label className="findLabel">Find a Player</label>
+          <label className="findLabel">Find a players games</label>
           <div className="searchBox">
             <span className="glass">🔎</span>
             <input
