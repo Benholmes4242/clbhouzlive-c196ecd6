@@ -17,11 +17,11 @@ export function ViewAllPill({ onClick }: ViewAllPillProps) {
       style={{ 
         maxWidth: 128, 
         whiteSpace: 'nowrap',
-        border: '1px solid var(--hub-stroke-subtle)',
+        border: '1px solid var(--hub-stroke-strong)',
         color: 'var(--hub-text-body)',
         background: 'transparent',
       }}
-      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-subtle)'}
+      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button)'}
       onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
       aria-label="View all"
     >

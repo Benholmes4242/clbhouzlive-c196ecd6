@@ -40,7 +40,7 @@ export function GamesNearYouTile({
     >
       <div className="space-y-2">
         {isLoading && Array.from({ length: limit }).map((_, i) => (
-          <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-subtle)' }} />
+          <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
         ))}
         {!isLoading && games.map(g => {
           const availableSlots = g.slots_open || 0;
@@ -49,7 +49,7 @@ export function GamesNearYouTile({
               key={g.id} 
               className="flex items-center gap-3 w-full py-2 rounded-xl transition-colors text-left"
               style={{ background: 'transparent' }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-subtle)'}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-hover)'}
               onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               onClick={() => nav(`/game/${g.id}`)}
             >

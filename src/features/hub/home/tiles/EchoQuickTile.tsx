@@ -35,8 +35,8 @@ export function EchoQuickTile() {
           aria-label="Ask Echo"
           className="flex-1 min-w-0 h-11 rounded-2xl px-4 text-[15px] placeholder:opacity-45 focus:outline-none focus:ring-2 transition"
           style={{
-            background: 'var(--hub-glass-subtle)',
-            border: '1px solid var(--hub-stroke-subtle)',
+            background: 'var(--hub-glass-bg-input)',
+            border: '1px solid var(--hub-stroke)',
             color: 'var(--hub-text)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
@@ -49,9 +49,9 @@ export function EchoQuickTile() {
           className="h-11 w-11 rounded-2xl flex items-center justify-center transition focus:outline-none disabled:opacity-40"
           disabled={!text.trim()}
           style={{
-            background: 'transparent',
-            border: '1px solid var(--hub-stroke-subtle)',
-            color: 'var(--hub-text-sub)',
+            background: 'var(--hub-glass-bg-button)',
+            border: '1px solid var(--hub-stroke)',
+            color: 'rgba(255,255,255,0.85)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
           }}
