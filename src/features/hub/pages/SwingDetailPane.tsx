@@ -7,8 +7,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEchoDeepLink } from '@/features/echo/hooks/useEchoDeepLink';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { ArrowLeft, Copy, Check, Video } from 'lucide-react';
+import { ArrowLeft, Copy, Check, Loader2 } from 'lucide-react';
 import { echoLinks } from '@/features/echo/utils/echoLinks';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -82,20 +81,19 @@ export function SwingDetailPane() {
 
   if (loading) {
     return (
-      <div className="h-full flex items-center justify-center bg-gradient-to-b from-black via-[#0A0A0A] to-black">
-        <div className="text-white/60">Loading...</div>
+      <div className="h-full flex items-center justify-center bg-transparent">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (!analysis) {
     return (
-      <div className="h-full flex flex-col items-center justify-center gap-4 text-white/60 bg-gradient-to-b from-black via-[#0A0A0A] to-black">
+      <div className="h-full flex flex-col items-center justify-center gap-4 text-muted-foreground bg-transparent">
         <p>Swing analysis not found</p>
         <Button 
           variant="outline" 
           onClick={() => navigate('/hub/echo/history')}
-          className="bg-white/05 border-white/20 text-white hover:bg-white/10"
         >
           Back to History
         </Button>
@@ -104,21 +102,20 @@ export function SwingDetailPane() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-b from-black via-[#0A0A0A] to-black">
+    <div className="h-full flex flex-col bg-transparent">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
+      <div className="flex items-center gap-3 px-4 md:px-5 py-3 border-b border-border bg-background/95 backdrop-blur-sm">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => navigate('/hub/echo/history')}
-          className="text-white/80 hover:text-white hover:bg-white/10"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back
         </Button>
         <div className="flex-1 min-w-0">
-          <div className="font-semibold text-white truncate">{analysis.title}</div>
-          <div className="text-xs text-white/60">
+          <div className="font-semibold truncate">{analysis.title}</div>
+          <div className="text-xs text-muted-foreground">
             {analysis.timestamp.toLocaleDateString()}
           </div>
         </div>
@@ -126,7 +123,6 @@ export function SwingDetailPane() {
           variant="ghost"
           size="sm"
           onClick={() => copyLink()}
-          className="text-white/60 hover:text-white hover:bg-white/10"
         >
           {copiedId === 'main' ? (
             <Check className="h-4 w-4" />
@@ -137,11 +133,11 @@ export function SwingDetailPane() {
       </div>
 
       {/* Content */}
-      <ScrollArea className="flex-1">
-        <div className="px-4 py-4 space-y-4 max-w-3xl mx-auto">
+      <div className="flex-1 overflow-y-auto">
+        <div className="px-4 md:px-5 py-4 space-y-4 max-w-3xl mx-auto">
           {/* Video */}
           {analysis.videoUrl && (
-            <div className="relative aspect-video bg-black rounded-lg overflow-hidden border border-white/10">
+            <div className="relative aspect-video bg-black rounded-lg overflow-hidden border border-border">
               <HLSVideoPlayer
                 src={analysis.videoUrl}
                 className="w-full h-full"
@@ -150,19 +146,19 @@ export function SwingDetailPane() {
           )}
 
           {/* Analysis Content */}
-          <div className="bg-white/05 rounded-lg p-4 border border-white/10">
-            <div className="text-sm text-white/90 whitespace-pre-wrap">
+          <div className="bg-muted/50 rounded-lg p-4 border border-border">
+            <div className="text-sm whitespace-pre-wrap">
               {analysis.content ?? 'No analysis content available'}
             </div>
           </div>
 
           {seekTime !== null && (
-            <div className="text-xs text-white/40 text-center">
+            <div className="text-xs text-muted-foreground text-center">
               Video seeking to {seekTime}s
             </div>
           )}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }

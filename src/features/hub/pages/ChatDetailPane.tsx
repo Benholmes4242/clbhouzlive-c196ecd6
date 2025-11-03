@@ -93,20 +93,19 @@ export function ChatDetailPane() {
 
   if (loading) {
     return (
-      <div className="h-full flex items-center justify-center bg-gradient-to-b from-black via-[#0A0A0A] to-black">
-        <Loader2 className="h-8 w-8 animate-spin text-white/60" />
+      <div className="h-full flex items-center justify-center bg-transparent">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (!conv) {
     return (
-      <div className="h-full flex flex-col items-center justify-center gap-4 text-white/60 bg-gradient-to-b from-black via-[#0A0A0A] to-black">
+      <div className="h-full flex flex-col items-center justify-center gap-4 text-muted-foreground bg-transparent">
         <p>Conversation not found</p>
         <Button 
           variant="outline" 
           onClick={() => navigate('/hub/echo/history')}
-          className="bg-white/05 border-white/20 text-white hover:bg-white/10"
         >
           Back to History
         </Button>
@@ -115,29 +114,28 @@ export function ChatDetailPane() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-b from-black via-[#0A0A0A] to-black">
+    <div className="h-full flex flex-col bg-transparent">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
+      <div className="flex items-center gap-3 px-4 md:px-5 py-3 border-b border-border bg-background/95 backdrop-blur-sm">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => navigate('/hub/echo/history')}
-          className="text-white/80 hover:text-white hover:bg-white/10"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back
         </Button>
         <div className="flex-1 min-w-0">
-          <div className="font-semibold text-white truncate">{conv.title}</div>
-          <div className="text-xs text-white/60">
+          <div className="font-semibold truncate">{conv.title}</div>
+          <div className="text-xs text-muted-foreground">
             {conv.messages.length} messages
           </div>
         </div>
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1">
-        <div className="px-4 py-4 space-y-3 max-w-3xl mx-auto">
+      <div className="flex-1 overflow-y-auto">
+        <div className="px-4 md:px-5 py-4 space-y-3 max-w-3xl mx-auto">
           {conv.messages.map((msg) => {
             const isUser = msg.type === 'user';
             return (
@@ -150,13 +148,13 @@ export function ChatDetailPane() {
                   <div
                     className={`max-w-[85%] rounded-2xl px-4 py-3 ${
                       isUser
-                        ? 'bg-white/10 text-white rounded-br-md'
-                        : 'bg-white/05 text-white border border-white/10 rounded-bl-md'
+                        ? 'bg-primary text-primary-foreground rounded-br-md'
+                        : 'bg-muted rounded-bl-md'
                     }`}
                   >
                     <div className="whitespace-pre-wrap break-words">{msg.content}</div>
                     {msg.metadata?.error && (
-                      <div className="mt-2 text-xs text-red-400">
+                      <div className="mt-2 text-xs text-destructive">
                         Error: {msg.metadata.error}
                       </div>
                     )}
@@ -165,20 +163,20 @@ export function ChatDetailPane() {
                 {/* Copy link button */}
                 <button
                   onClick={() => copyMessageLink(msg.id)}
-                  className="absolute -right-10 top-2 opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-white/10 rounded-md"
+                  className="absolute -right-10 top-2 opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-muted rounded-md"
                   title="Copy link to this message"
                 >
                   {copiedId === msg.id ? (
-                    <Check className="h-4 w-4 text-green-400" />
+                    <Check className="h-4 w-4 text-green-500" />
                   ) : (
-                    <Copy className="h-4 w-4 text-white/60" />
+                    <Copy className="h-4 w-4 text-muted-foreground" />
                   )}
                 </button>
               </div>
             );
           })}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }

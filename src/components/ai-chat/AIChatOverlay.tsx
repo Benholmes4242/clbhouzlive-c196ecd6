@@ -605,6 +605,140 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
     );
   }
 
+  const isPageMode = layout === 'page';
+
+  // In page mode, render without SlideOver wrapper and chrome
+  if (isPageMode) {
+    return (
+      <div className="w-full h-full bg-transparent flex flex-col">
+        {/* No header in page mode - Hub provides it */}
+        
+        {/* Segmented Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+          {/* Tabs */}
+          <div className="sticky top-0 z-[1] bg-background/95 backdrop-blur-sm border-b border-border">
+            <div className="w-full px-4 md:px-5 py-3">
+              <TabsList className="h-11 w-full rounded-full bg-muted/50 border border-border/50 flex p-1">
+                <TabsTrigger
+                  value="chat"
+                  className="flex-1 rounded-full px-4 text-sm font-medium 
+                             data-[state=active]:bg-background data-[state=active]:shadow-sm
+                             transition-all"
+                >
+                  Chat
+                </TabsTrigger>
+                <TabsTrigger
+                  value="swing"
+                  className="flex-1 rounded-full px-4 text-sm font-medium 
+                             data-[state=active]:bg-background data-[state=active]:shadow-sm
+                             transition-all"
+                >
+                  Swing Coach
+                </TabsTrigger>
+              </TabsList>
+            </div>
+          </div>
+
+          {/* Content area - no internal padding */}
+          <TabsContent value="chat" className="m-0 flex-1 overflow-hidden" style={{ minHeight: 0 }}>
+            <div 
+              className="h-full overflow-y-auto px-4 md:px-5"
+              ref={chatScrollRef}
+              onScroll={handleChatScroll}
+            >
+              <div className="w-full max-w-3xl mx-auto py-6 space-y-4">
+                {/* Messages */}
+                {messages.length === 0 && (
+                  <div className="text-center py-12 space-y-6">
+                    <EchoAvatar state="idle" size={64} />
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">Chat with Echo</h3>
+                      <p className="text-sm text-muted-foreground">Ask me anything about golf</p>
+                    </div>
+                    <div className="flex flex-wrap gap-2 justify-center max-w-2xl mx-auto">
+                      {suggestedPrompts.slice(0, 4).map((prompt, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleSuggestedPrompt(prompt.text)}
+                          className="px-4 py-2 rounded-full bg-muted hover:bg-muted/80 text-sm transition-colors"
+                        >
+                          {prompt.emoji} {prompt.text}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {messages.map((message) => (
+                  <ChatMessageComponent
+                    key={message.id}
+                    message={message}
+                    onSaveToInsights={() => saveToInsights(message)}
+                  />
+                ))}
+
+                {isLoading && (
+                  <div className="flex items-start gap-3">
+                    <EchoAvatar state="processing" size={32} />
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <div className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <div className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="swing" className="m-0 flex-1 overflow-hidden" style={{ minHeight: 0 }}>
+            <div className="h-full overflow-y-auto">
+              <SwingCoach
+                onAnalysisTextChange={(text) => setSwingCoachAnalysisText(text)}
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Input bar - docked at bottom */}
+        <footer className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-sm">
+          <div className="w-full px-4 md:px-5 py-3" style={{ paddingBottom: `calc(12px + env(safe-area-inset-bottom))` }}>
+            {activeTab === 'chat' && (
+              <div className="flex items-end gap-2">
+                <Textarea
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage(inputValue);
+                    }
+                  }}
+                  placeholder="Message Echo…"
+                  className="flex-1 min-h-[42px] max-h-32 resize-none bg-muted/50 border-border text-foreground placeholder:text-muted-foreground"
+                  disabled={isLoading}
+                />
+                <Button
+                  onClick={() => sendMessage(inputValue)}
+                  disabled={!inputValue.trim() || isLoading}
+                  size="icon"
+                  className="h-[42px] w-[42px] rounded-full"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+            {activeTab === 'swing' && (
+              <OverlayFooter onOpen={() => openHistory('swing')} isSticky={false} />
+            )}
+          </div>
+        </footer>
+      </div>
+    );
+  }
+
   return (
     <>
       <SlideOver
