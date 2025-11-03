@@ -173,7 +173,9 @@ interface AIChatHistoryProps {
   onDelete: () => void;
   isExpanded: boolean;
   onToggleExpand: () => void;
-}> = ({ analysis, onDelete, isExpanded, onToggleExpand }) => {
+  navigate?: (path: string) => void; // NEW - for page mode navigation
+  isPageMode?: boolean; // NEW - to control behavior
+}> = ({ analysis, onDelete, isExpanded, onToggleExpand, navigate: navigateFn, isPageMode }) => {
   const [thumbnailError, setThumbnailError] = useState(false);
   const [thumbnailLoading, setThumbnailLoading] = useState(true);
   const [isVideoLoading, setIsVideoLoading] = useState(true);
@@ -197,7 +199,7 @@ interface AIChatHistoryProps {
         "focus-visible:outline-none focus-within:ring-2 focus-within:ring-white/20",
         isExpanded && "shadow-lg"
       )}
-      onClick={!isExpanded ? onToggleExpand : undefined}
+      onClick={!isExpanded ? (isPageMode && navigateFn ? () => navigateFn(`/hub/echo/history/swing/${analysis.id}`) : onToggleExpand) : undefined}
       role="button"
       tabIndex={0}
       aria-label={`Swing analysis from ${analysis.timestamp.toLocaleDateString()}`}
@@ -1783,15 +1785,17 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                  Last 7 Days
                                </h3>
                                <div className="space-y-4 sm:space-y-5">
-                                {last7Days.map((analysis) => (
-                                  <SwingAnalysisCard
-                                    key={analysis.id}
-                                    analysis={analysis}
-                                    onDelete={() => deleteSwingAnalysis(analysis.id)}
-                                    isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
-                                    onToggleExpand={() => handleExpansion('swing', analysis.id)}
-                                  />
-                                ))}
+                                 {last7Days.map((analysis) => (
+                                   <SwingAnalysisCard
+                                     key={analysis.id}
+                                     analysis={analysis}
+                                     onDelete={() => deleteSwingAnalysis(analysis.id)}
+                                     isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
+                                     onToggleExpand={() => handleExpansion('swing', analysis.id)}
+                                     navigate={navigate}
+                                     isPageMode={isPageMode}
+                                   />
+                                 ))}
                               </div>
                             </div>
                           );
@@ -1811,15 +1815,17 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                  This Month
                                </h3>
                                <div className="space-y-4 sm:space-y-5">
-                                {thisMonth.map((analysis) => (
-                                  <SwingAnalysisCard
-                                    key={analysis.id}
-                                    analysis={analysis}
-                                    onDelete={() => deleteSwingAnalysis(analysis.id)}
-                                    isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
-                                    onToggleExpand={() => handleExpansion('swing', analysis.id)}
-                                  />
-                                ))}
+                                 {thisMonth.map((analysis) => (
+                                   <SwingAnalysisCard
+                                     key={analysis.id}
+                                     analysis={analysis}
+                                     onDelete={() => deleteSwingAnalysis(analysis.id)}
+                                     isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
+                                     onToggleExpand={() => handleExpansion('swing', analysis.id)}
+                                     navigate={navigate}
+                                     isPageMode={isPageMode}
+                                   />
+                                 ))}
                               </div>
                             </div>
                           );
@@ -1839,15 +1845,17 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                  Older
                                </h3>
                                <div className="space-y-4 sm:space-y-5">
-                                {older.map((analysis) => (
-                                  <SwingAnalysisCard
-                                    key={analysis.id}
-                                    analysis={analysis}
-                                    onDelete={() => deleteSwingAnalysis(analysis.id)}
-                                    isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
-                                    onToggleExpand={() => handleExpansion('swing', analysis.id)}
-                                  />
-                                ))}
+                                 {older.map((analysis) => (
+                                   <SwingAnalysisCard
+                                     key={analysis.id}
+                                     analysis={analysis}
+                                     onDelete={() => deleteSwingAnalysis(analysis.id)}
+                                     isExpanded={expandedCard?.type === 'swing' && expandedCard?.id === analysis.id}
+                                     onToggleExpand={() => handleExpansion('swing', analysis.id)}
+                                     navigate={navigate}
+                                     isPageMode={isPageMode}
+                                   />
+                                 ))}
                               </div>
                             </div>
                           );
