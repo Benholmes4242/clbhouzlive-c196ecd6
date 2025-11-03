@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3, ChevronUp, Settings } from 'lucide-react';
 import { PiWaveform } from 'react-icons/pi';
+
+console.log('🔴 [AIChatHistory] MODULE LOADED - Timestamp:', Date.now());
+
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import Hls from 'hls.js';
@@ -400,6 +403,9 @@ const ErrorState: React.FC<{
 
 const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelectMessage, onNewConversation, defaultCategory, initialTab = 'chat', paneMode = false }) => {
   const navigate = useNavigate();
+  
+  console.log('🚀 [AIChatHistory] Component mounted/updated', { isOpen, paneMode, initialTab });
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(defaultCategory || 'all');
   const [selectedTag, setSelectedTag] = useState('all');
@@ -410,6 +416,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   // ✅ Correct: Always call hook (Rules of Hooks), but only use when paneMode
   const echoCtx = useEchoConversationsOptional(); // Won't throw if no provider
   const providerConvos = (paneMode && echoCtx) ? echoCtx.conversations : [];
+  
+  console.log('🔍 [AIChatHistory] Context check:', {
+    paneMode,
+    hasContext: !!echoCtx,
+    providerCount: providerConvos.length,
+    conversationsCount: conversations.length
+  });
   
   // Debug logging
   useEffect(() => {
@@ -511,26 +524,34 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       // loadCaddieLogs(); // Now handled by hook
       loadSwingAnalyses();
     }
-  }, [isOpen, providerConvos.length]); // Use length instead of array reference
+  }, [isOpen, echoCtx, providerConvos.length]); // Also depend on echoCtx itself
 
   const loadChatConversations = async () => {
-    console.log('🔍 [AIChatHistory] Loading chat conversations...', { paneMode, providerCount: providerConvos.length });
+    console.log('🔍 [loadChatConversations] Starting...', { 
+      paneMode, 
+      hasEchoCtx: !!echoCtx,
+      providerCount: providerConvos.length,
+      echoConvosCount: echoCtx?.conversations?.length
+    });
+    
     setLoadingStates(prev => ({ ...prev, conversations: true }));
     setErrorStates(prev => ({ ...prev, conversations: null }));
     
     try {
-      // ✅ Use provider data in Hub pane - even if empty, we'll update when it loads
+      // ✅ Use provider data in Hub pane
       if (paneMode) {
-        console.log('📱 [AIChatHistory] Using provider conversations:', providerConvos.length);
+        console.log('📱 [loadChatConversations] In paneMode, checking provider...');
+        console.log('Provider conversations:', echoCtx?.conversations?.length);
         
-        if (providerConvos.length === 0) {
-          console.log('⚠️ [AIChatHistory] Provider has 0 conversations');
+        if (!echoCtx || !echoCtx.conversations || echoCtx.conversations.length === 0) {
+          console.log('⚠️ [loadChatConversations] No provider data, setting empty');
           setConversations([]);
           setLoadingStates(prev => ({ ...prev, conversations: false }));
           return;
         }
         
-        const mapped = providerConvos.map(conv => ({
+        console.log('✅ [loadChatConversations] Mapping provider data:', echoCtx.conversations.length);
+        const mapped = echoCtx.conversations.map(conv => ({
           id: conv.id,
           title: conv.title || "New conversation",
           customTitle: conv.title,

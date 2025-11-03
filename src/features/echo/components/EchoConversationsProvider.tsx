@@ -22,6 +22,8 @@ const EchoConversationsContext = createContext<EchoConversationsContextValue | n
 
 export function EchoConversationsProvider({ children }: { children: ReactNode }) {
   const echoState = useEchoConversations();
+  
+  console.log('🟢 [EchoConversationsProvider] Rendering with conversations:', echoState.conversations.length);
 
   return (
     <EchoConversationsContext.Provider value={echoState}>
