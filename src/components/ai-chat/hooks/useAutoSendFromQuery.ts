@@ -3,22 +3,46 @@
  * Used for deep-linking to chat with pre-filled message
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
-export function useAutoSendFromQuery(onSend: (msg: string) => void) {
+type SendFn = (text: string) => void;
+
+interface AutoSendOptions {
+  param?: string;
+  maxLen?: number;
+  stripOn?: 'success' | 'always';
+}
+
+export function useAutoSendFromQuery(onSend: SendFn, opts?: AutoSendOptions) {
+  const { param = 'msg', maxLen = 800, stripOn = 'always' } = opts || {};
+  const firedRef = useRef(false);
+
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const msg = params.get('msg');
-    if (!msg) return;
-    const text = msg.trim();
-    if (!text) return;
+    if (firedRef.current) return;
 
-    // Fire once
-    onSend(text);
+    const url = new URL(window.location.href);
+    const raw = url.searchParams.get(param);
+    if (!raw) return;
 
-    // Strip the query param without a full reload
-    params.delete('msg');
-    const url = `${window.location.pathname}${params.toString() ? `?${params}` : ''}${window.location.hash}`;
-    window.history.replaceState({}, '', url);
-  }, [onSend]);
+    // decode + basic sanitization
+    const decoded = raw.replace(/\+/g, ' ');
+    const text = decoded.trim().slice(0, maxLen); // hard cap
+
+    if (!text) {
+      // strip empty param
+      url.searchParams.delete(param);
+      window.history.replaceState({}, '', url.toString());
+      return;
+    }
+
+    firedRef.current = true;
+    try {
+      onSend(text);
+    } finally {
+      if (stripOn === 'always') {
+        url.searchParams.delete(param);
+        window.history.replaceState({}, '', url.toString());
+      }
+    }
+  }, [onSend, param, maxLen, stripOn]);
 }

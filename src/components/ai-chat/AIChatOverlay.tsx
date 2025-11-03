@@ -231,7 +231,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
     if (paneMode && activeTab === 'chat' && isOpen) {
       sendMessage(msg);
     }
-  });
+  }, { param: 'msg', maxLen: 800, stripOn: 'always' });
 
   const requestLocation = () => {
     if (navigator.geolocation) {
