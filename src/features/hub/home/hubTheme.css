@@ -35,9 +35,9 @@
   --hub-header-highlight: rgba(255,255,255,0.10);
   
   /* Tile/Card glass surfaces - Smoke Glass */
-  --hub-glass-bg-start: rgba(255,255,255,0.08);
-  --hub-glass-bg-end: rgba(255,255,255,0.05);
-  --hub-glass-bg-hover: rgba(255,255,255,0.10);
+  --hub-glass-bg-start: rgba(255,255,255,0.10);
+  --hub-glass-bg-end: rgba(255,255,255,0.06);
+  --hub-glass-bg-hover: rgba(255,255,255,0.12);
   --hub-glass-bg-subtle: rgba(255,255,255,0.08);
   --hub-glass-bg-input: rgba(255,255,255,0.08);
   --hub-glass-bg-button: rgba(255,255,255,0.10);
