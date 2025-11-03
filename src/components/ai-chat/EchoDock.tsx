@@ -130,6 +130,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
   }
 
   const openEcho = (dest: 'chat' | 'swing' | 'history' = 'chat') => {
+    // Navigate to Hub Echo routes
     navigate(`/hub/echo/${dest}`);
   };
 

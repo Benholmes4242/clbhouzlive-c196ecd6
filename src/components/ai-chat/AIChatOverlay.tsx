@@ -38,6 +38,7 @@ interface AIChatOverlayProps {
   onClose: () => void;
   onHistoryStateChange?: (isHistoryOpen: boolean) => void;
   initialTab?: AITab;
+  paneMode?: boolean; // NEW - render as inline pane without modal chrome
 }
 
 const suggestedPrompts = [
@@ -48,7 +49,7 @@ const suggestedPrompts = [
   { text: "Plan me a 5 course USA golf trip", emoji: "🚩" }
 ];
 
-const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistoryStateChange, initialTab }) => {
+const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistoryStateChange, initialTab, paneMode = false }) => {
   const [messages, setMessages] = useState<ChatMessageData[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -436,6 +437,18 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
     if (isRecording) return 'listening';
     return 'idle';
   };
+
+  // Pane mode rendering - simple placeholder for now
+  if (paneMode) {
+    return (
+      <div className="w-full h-full flex items-center justify-center text-white/60">
+        <div className="text-center">
+          <p className="text-lg font-medium mb-2">Echo Chat</p>
+          <p className="text-sm">Pane mode active</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
