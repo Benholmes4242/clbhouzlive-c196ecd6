@@ -29,9 +29,9 @@ function EchoRow({
   const fallback = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=100&h=100&fit=crop';
   
   return (
-    <div 
+    <button 
       onClick={onClick} 
-      className="w-full flex items-center gap-3 py-2.5 group hover:bg-white/06 rounded-xl transition-colors cursor-pointer"
+      className="w-full flex items-center gap-3 py-2.5 group hover:bg-white/06 rounded-xl transition-colors text-left"
     >
       <div className="h-14 w-14 rounded-2xl overflow-hidden border border-white/12 bg-black/30 shrink-0">
         {thumb ? (
@@ -49,12 +49,13 @@ function EchoRow({
         <div className="text-[15px] text-white/95 truncate">{title}</div>
         <div className="text-[13px] text-white/65">{date}</div>
       </div>
-      <span
-        className="ml-auto rounded-2xl px-3 h-10 border border-white/12 text-white/85 text-[13px] hover:bg-white/08 shrink-0 flex items-center justify-center"
+      <button
+        onClick={(e) => { e.stopPropagation(); onClick(); }}
+        className="ml-auto rounded-2xl px-3 h-10 border border-white/12 text-white/85 text-[13px] hover:bg-white/08 shrink-0"
       >
         View
-      </span>
-    </div>
+      </button>
+    </button>
   );
 }
 

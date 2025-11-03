@@ -32,29 +32,15 @@ export function EchoQuickTile() {
           onChange={(e) => setText(e.target.value)}
           placeholder="Ask Echo anything…"
           aria-label="Ask Echo"
-          className="flex-1 min-w-0 rounded-2xl h-11 px-4 text-[15px] transition focus:outline-none focus:ring-2 placeholder:opacity-40"
-          style={{
-            background: 'var(--hub-glass-bg)',
-            border: '1px solid var(--hub-stroke)',
-            color: 'var(--hub-text)',
-            backdropFilter: 'blur(12px)',
-          }}
+          className="flex-1 min-w-0 rounded-2xl h-11 px-4 text-[15px] bg-white/04 border border-white/12 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/12 transition"
         />
         <button 
           type="submit"
           disabled={!text.trim()}
           aria-label="Send"
-          className="rounded-2xl h-11 w-11 flex items-center justify-center transition disabled:opacity-40"
-          style={{
-            border: '1px solid var(--hub-stroke)',
-            background: 'var(--hub-glass-bg)',
-            backdropFilter: 'blur(12px)',
-          }}
+          className="rounded-2xl h-11 w-11 flex items-center justify-center border border-white/15 bg-white/08 hover:bg-white/12 transition disabled:opacity-40"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeOpacity="0.9" strokeWidth="1.6">
-            <path d="M22 2L11 13" />
-            <path d="M22 2l-7 20-4-9-9-4 20-7z" />
-          </svg>
+          <Send size={18} className="text-white" />
         </button>
       </form>
     </Tile>
