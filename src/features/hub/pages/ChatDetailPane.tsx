@@ -42,7 +42,7 @@ function loadLegacyConversation(id: string): ChatConversationRow | null {
     const hit = arr.find((c: any) => c?.id === id);
     if (!hit || typeof hit !== 'object') return null;
 
-    const convId = hit.id ?? crypto.randomUUID();
+    const convId = hit.id ?? (globalThis.crypto?.randomUUID?.() ?? `conv-${Date.now()}`);
     const createdAt = hit.createdAt || hit.timestamp || new Date().toISOString();
     const lastActivityAt = hit.lastActivityAt || createdAt;
 
