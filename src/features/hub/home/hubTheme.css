@@ -26,11 +26,12 @@
   --hub-backdrop: rgba(0,0,0,0.70);
   --hub-backdrop-blur: 12px;
   
-  /* Header gradient */
-  --hub-header-bg-start: rgba(28,28,30,0.98);
-  --hub-header-bg-mid: rgba(28,28,30,0.94);
-  --hub-header-bg-end: rgba(28,28,30,0.00);
-  --hub-header-blur: 12px;
+  /* Header gradient - Apple Realism (warmer graphite) */
+  --hub-header-bg-start: rgba(28,28,28,0.95);
+  --hub-header-bg-mid: rgba(24,24,24,0.88);
+  --hub-header-bg-end: rgba(20,20,20,0.80);
+  --hub-header-blur: 24px;
+  --hub-header-highlight: rgba(255,255,255,0.10);
   
   /* Tile/Card glass surfaces - frosted with translucency */
   --hub-glass-bg-start: rgba(35,35,35,0.74);
