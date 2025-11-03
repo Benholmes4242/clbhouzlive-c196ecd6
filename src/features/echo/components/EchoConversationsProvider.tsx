@@ -37,3 +37,9 @@ export function useEchoConversationsContext() {
   }
   return context;
 }
+
+// Optional version that returns null instead of throwing
+export function useEchoConversationsOptional() {
+  const context = useContext(EchoConversationsContext);
+  return context;
+}

@@ -24,7 +24,7 @@ import { useCaddieLogs } from '@/hooks/useCaddieLogs';
 import { SlideOver } from '@/components/ui/slide-over';
 import EchoProtection from './EchoProtection';
 import { useEchoProtection } from '@/hooks/useEchoProtection';
-import { useEchoConversationsContext } from '@/features/echo/components/EchoConversationsProvider';
+import { useEchoConversationsOptional } from '@/features/echo/components/EchoConversationsProvider';
 
 // HLS Video Player Component
 export const HLSVideoPlayer: React.FC<{ src: string; poster?: string; className?: string }> = ({ src, poster, className }) => {
@@ -407,9 +407,20 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   
-  // ✅ Correct: read provider at top level when paneMode=true
-  const echoCtx = paneMode ? useEchoConversationsContext() : null;
-  const providerConvos = echoCtx?.conversations ?? [];
+  // ✅ Correct: Always call hook (Rules of Hooks), but only use when paneMode
+  const echoCtx = useEchoConversationsOptional(); // Won't throw if no provider
+  const providerConvos = (paneMode && echoCtx) ? echoCtx.conversations : [];
+  
+  // Debug logging
+  useEffect(() => {
+    if (paneMode) {
+      console.log('🔍 [AIChatHistory] Provider conversations:', {
+        hasContext: !!echoCtx,
+        count: providerConvos.length,
+        sample: providerConvos.slice(0, 3).map(c => ({ id: c.id, title: c.title }))
+      });
+    }
+  }, [paneMode, echoCtx, providerConvos.length]);
   
   // Get conversation session for chat history  
   const conversationSession = useConversationSession({
@@ -500,17 +511,25 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       // loadCaddieLogs(); // Now handled by hook
       loadSwingAnalyses();
     }
-  }, [isOpen, providerConvos]);
+  }, [isOpen, providerConvos.length]); // Use length instead of array reference
 
   const loadChatConversations = async () => {
-    console.log('🔍 Loading chat conversations...');
+    console.log('🔍 [AIChatHistory] Loading chat conversations...', { paneMode, providerCount: providerConvos.length });
     setLoadingStates(prev => ({ ...prev, conversations: true }));
     setErrorStates(prev => ({ ...prev, conversations: null }));
     
     try {
-      // ✅ Use provider data in Hub pane
-      if (paneMode && providerConvos.length > 0) {
-        console.log('📱 Using provider conversations:', providerConvos.length);
+      // ✅ Use provider data in Hub pane - even if empty, we'll update when it loads
+      if (paneMode) {
+        console.log('📱 [AIChatHistory] Using provider conversations:', providerConvos.length);
+        
+        if (providerConvos.length === 0) {
+          console.log('⚠️ [AIChatHistory] Provider has 0 conversations');
+          setConversations([]);
+          setLoadingStates(prev => ({ ...prev, conversations: false }));
+          return;
+        }
+        
         const mapped = providerConvos.map(conv => ({
           id: conv.id,
           title: conv.title || "New conversation",
