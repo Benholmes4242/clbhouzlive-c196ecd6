@@ -1,6 +1,6 @@
 /**
  * Your Games Tile
- * Shows games user is hosting or joined
+ * Content tile showing games user is hosting or joined
  */
 
 import React from 'react';
@@ -9,11 +9,37 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { Tile } from '../components/Tile';
-import { TileHeader } from '../components/TileHeader';
+import { ViewAllPill } from '../components/ViewAllPill';
 import { Chip } from '../components/Chip';
 
 interface YourGamesTileProps {
   viewAllTo: string;
+}
+
+function GameRow({ 
+  tag, 
+  club, 
+  meta, 
+  onClick 
+}: { 
+  tag: 'Hosting' | 'Joined'; 
+  club: string; 
+  meta: string; 
+  onClick: () => void;
+}) {
+  return (
+    <button 
+      onClick={onClick}
+      className="w-full flex items-center gap-3 py-2 hover:bg-white/06 rounded-xl transition-colors text-left"
+    >
+      <Chip>{tag}</Chip>
+      <div className="min-w-0 flex-1 flex items-center gap-2">
+        <span role="img" aria-label="flag">⛳</span>
+        <span className="truncate text-white/95 text-[16px]">{club}</span>
+      </div>
+      <span className="text-white/60 text-sm shrink-0">{meta}</span>
+    </button>
+  );
 }
 
 export function YourGamesTile({ viewAllTo }: YourGamesTileProps) {
@@ -57,52 +83,39 @@ export function YourGamesTile({ viewAllTo }: YourGamesTileProps) {
   });
 
   return (
-    <Tile className="col-span-2">
-      <TileHeader 
-        title="Your Games" 
-        subtitle="Hosting & Joined" 
-        onViewAll={() => nav(viewAllTo)}
-      />
-      <div className="space-y-2 mt-2">
+    <Tile 
+      title="Your Games" 
+      subtitle="Hosting & Joined" 
+      variant="content"
+      right={<ViewAllPill onClick={() => nav(viewAllTo)} />}
+    >
+      <div className="space-y-1">
         {isLoading && [0, 1, 2].map(i => (
-          <div key={i} className="h-16 rounded-2xl bg-white/04 animate-pulse" />
+          <div key={i} className="h-14 rounded-2xl bg-white/04 animate-pulse" />
         ))}
         {!isLoading && games.map(g => {
           const totalSlots = g.slots_total || 0;
           const availableSlots = g.slots_open || 0;
           return (
-            <button 
-              key={g.id} 
-              className="flex items-center justify-between gap-2.5 w-full p-2.5 rounded-2xl hover:bg-white/06 transition-colors text-left"
+            <GameRow
+              key={g.id}
+              tag={g.kind}
+              club={g.course_name || 'Golf Course'}
+              meta={`${availableSlots}/${totalSlots}`}
               onClick={() => nav(`/game/${g.id}`)}
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <Chip>{g.kind}</Chip>
-                  <span className="text-[15px] font-medium text-white truncate" title={g.course_name}>
-                    ⛳ {g.course_name || 'Golf Course'}
-                  </span>
-                </div>
-                <div className="text-[12px] text-white/60">
-                  {g.start_time ? formatDistanceToNow(new Date(g.start_time), { addSuffix: true }) : 'TBD'}
-                </div>
-              </div>
-              <div className="shrink-0 text-[13px] text-white/70">
-                {availableSlots}/{totalSlots}
-              </div>
-            </button>
+            />
           );
         })}
         {!isLoading && games.length === 0 && (
-          <div className="text-[13px] text-white/60 py-2">
+          <p className="text-[15px] text-white/70">
             No games yet.{' '}
             <button 
               onClick={() => nav('/hub/create-game')}
-              className="text-[#FF8C32] hover:underline"
+              className="text-[#ff8e2b] underline-offset-2 hover:underline"
             >
               Create one
             </button>
-          </div>
+          </p>
         )}
       </div>
     </Tile>

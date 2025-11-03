@@ -1,12 +1,12 @@
 /**
  * Swing Coach Quick Upload Tile
- * Quick access to upload swing video from dashboard
+ * Compact tile balanced with Echo
  */
 
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
-import { TileHeader } from '../components/TileHeader';
+import { ViewAllPill } from '../components/ViewAllPill';
 
 export function SwingQuickTile() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -21,16 +21,17 @@ export function SwingQuickTile() {
   };
 
   return (
-    <Tile>
-      <TileHeader 
-        title="Swing Coach" 
-        subtitle="Upload a swing for instant analysis" 
-        onViewAll={() => nav('/hub/echo/swing')} 
-      />
-      <div className="mt-2">
+    <Tile 
+      title="Swing Coach" 
+      subtitle="Upload for instant analysis" 
+      variant="compact"
+      right={<ViewAllPill onClick={() => nav('/hub/echo/swing')} />}
+    >
+      <div className="space-y-3">
+        <div className="rounded-xl border border-white/12 bg-white/5 aspect-[16/9]" />
         <button 
           type="button" 
-          className="px-3.5 py-2.5 rounded-2xl border border-white/14 bg-white/06 text-[13px] font-medium text-white hover:bg-white/12 transition-all duration-200"
+          className="h-11 w-full rounded-xl border border-white/15 text-white/90 hover:bg-white/10 transition"
           onClick={pick}
         >
           Upload Swing Video

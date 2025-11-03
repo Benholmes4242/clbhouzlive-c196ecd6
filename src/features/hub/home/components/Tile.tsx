@@ -1,26 +1,53 @@
 /**
  * Tile Component
- * Reusable glass tile with Apple-style polish
+ * Consistent chrome with overflow guards and locked header height
  */
 
 import React from 'react';
 
-interface TileProps {
-  children: React.ReactNode;
-  className?: string;
-}
+type TileProps = React.PropsWithChildren<{
+  title: string;
+  subtitle?: string;
+  variant?: 'compact' | 'content';
+  right?: React.ReactNode;
+  footer?: React.ReactNode;
+}>;
 
-export function Tile({ children, className = '' }: TileProps) {
+export function Tile({ title, subtitle, right, children, footer, variant = 'compact' }: TileProps) {
+  const minHeight = variant === 'compact' ? 'var(--hub-tile-compact)' : 'var(--hub-tile-content)';
+  
   return (
-    <div
-      className={`w-full rounded-3xl p-4 md:p-5 transition-all duration-300 hover:shadow-[0_1px_0_rgba(255,255,255,.08)_inset,0_12px_40px_rgba(0,0,0,.55)] hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03))] ${className}`}
+    <section
+      className="relative rounded-[var(--hub-radius)]"
       style={{
-        background: 'linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02))',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        boxShadow: '0 1px 0 rgba(255,255,255,.06) inset, 0 8px 32px rgba(0,0,0,.45)',
+        background: 'var(--hub-surface-2)',
+        border: '1px solid var(--hub-stroke)',
+        minHeight,
+        overflow: 'hidden',
       }}
     >
-      {children}
-    </div>
+      {/* Header row (locked height) */}
+      <div
+        className="flex items-center justify-between"
+        style={{ height: 'var(--hub-header-height)', padding: 'var(--hub-pad)' }}
+      >
+        <div className="min-w-0 flex-1">
+          <h3 className="text-[20px] font-semibold leading-none text-white truncate">{title}</h3>
+          {subtitle && (
+            <p className="text-sm text-white/70 mt-1 truncate">{subtitle}</p>
+          )}
+        </div>
+        {right}
+      </div>
+
+      {/* Content */}
+      <div className="px-[var(--hub-pad)] pb-[var(--hub-pad)]">
+        {children}
+      </div>
+
+      {footer && (
+        <div className="px-[var(--hub-pad)] pb-[var(--hub-pad)]">{footer}</div>
+      )}
+    </section>
   );
 }

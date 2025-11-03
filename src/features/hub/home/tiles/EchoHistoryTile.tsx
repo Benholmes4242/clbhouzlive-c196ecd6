@@ -1,6 +1,6 @@
 /**
  * Echo History Tile
- * Shows recent Echo chat and swing analyses with thumbnails
+ * Content tile showing recent Echo chat and swing analyses with thumbnails
  */
 
 import React from 'react';
@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { Tile } from '../components/Tile';
-import { TileHeader } from '../components/TileHeader';
+import { ViewAllPill } from '../components/ViewAllPill';
 
 interface EchoHistoryTileProps {
   limitChat?: number;
@@ -17,8 +17,45 @@ interface EchoHistoryTileProps {
   viewAllTo: string;
 }
 
+function EchoRow({ 
+  thumb, 
+  title, 
+  date, 
+  onClick 
+}: { 
+  thumb?: string; 
+  title: string; 
+  date: string; 
+  onClick: () => void;
+}) {
+  return (
+    <button 
+      onClick={onClick} 
+      className="w-full flex items-center gap-3 py-2 group hover:bg-white/06 rounded-xl transition-colors text-left"
+    >
+      <div className="h-14 w-14 rounded-2xl overflow-hidden border border-white/12 bg-white/5 shrink-0 grid place-items-center">
+        {thumb ? (
+          <video 
+            src={thumb} 
+            className="h-full w-full object-cover"
+            muted
+            playsInline
+          />
+        ) : (
+          <span className="text-[18px]">💬</span>
+        )}
+      </div>
+      <div className="min-w-0 flex-1 text-left">
+        <div className="text-[16px] text-white/95 truncate">{title}</div>
+        <div className="text-sm text-white/60">{date}</div>
+      </div>
+      <span className="ml-auto text-white/40 group-hover:text-white/70">›</span>
+    </button>
+  );
+}
+
 export function EchoHistoryTile({ 
-  limitChat = 2, 
+  limitChat = 1, 
   limitSwing = 2, 
   viewAllTo 
 }: EchoHistoryTileProps) {
@@ -70,89 +107,47 @@ export function EchoHistoryTile({
   });
 
   return (
-    <Tile className="col-span-2 min-h-[140px]">
-      <TileHeader 
-        title="Recent Echo" 
-        subtitle="Chat & Swing" 
-        onViewAll={() => nav(viewAllTo)}
-      />
-      
-      <div className="space-y-3 mt-2">
+    <Tile 
+      title="Recent Echo" 
+      subtitle="Chat & Swing" 
+      variant="content"
+      right={<ViewAllPill onClick={() => nav(viewAllTo)} />}
+    >
+      <div className="space-y-3">
         {/* Chat Section */}
         <div>
-          <div className="text-[12px] text-white/50 font-medium mb-2 px-1">CHAT</div>
-          <div className="space-y-1">
-            {chatLoading && [0, 1].slice(0, limitChat).map(i => (
-              <div key={i} className="h-14 rounded-2xl bg-white/04 animate-pulse" />
-            ))}
-            {!chatLoading && chatItems.map((i: any) => (
-              <button 
-                key={i.id} 
-                className="flex items-center gap-3 w-full p-2.5 rounded-2xl hover:bg-white/06 transition-colors text-left"
-                onClick={() => nav(`/hub/echo/history/chat/${i.id}`)}
-              >
-                <div className="w-14 h-14 rounded-2xl border border-white/10 bg-white/04 grid place-items-center text-[18px] shrink-0">
-                  💬
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-[15px] font-medium text-white truncate" title={i.title}>
-                    {i.title}
-                  </div>
-                  <div className="text-[12px] text-white/60">
-                    {formatDistanceToNow(new Date(i.dateISO), { addSuffix: true })}
-                  </div>
-                </div>
-                <span className="ml-auto text-white/40 text-lg">›</span>
-              </button>
-            ))}
-            {!chatLoading && chatItems.length === 0 && (
-              <div className="text-[13px] text-white/60 py-2 px-1">No chat history yet</div>
-            )}
-          </div>
+          <div className="text-xs tracking-wide text-white/55 mb-1">CHAT</div>
+          {chatLoading && <div className="h-14 rounded-2xl bg-white/04 animate-pulse" />}
+          {!chatLoading && chatItems.length > 0 && (
+            <EchoRow 
+              title={chatItems[0].title} 
+              date={formatDistanceToNow(new Date(chatItems[0].dateISO), { addSuffix: true })}
+              onClick={() => nav(`/hub/echo/history/chat/${chatItems[0].id}`)}
+            />
+          )}
+          {!chatLoading && chatItems.length === 0 && (
+            <div className="text-white/50 py-2 text-sm">No chat history yet</div>
+          )}
         </div>
-
-        {/* Divider */}
-        <div 
-          className="h-px my-2.5"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent)' }}
-        />
 
         {/* Swing Section */}
         <div>
-          <div className="text-[12px] text-white/50 font-medium mb-2 px-1">SWING</div>
+          <div className="text-xs tracking-wide text-white/55 mb-1">SWING</div>
           <div className="space-y-1">
             {swingLoading && [0, 1].slice(0, limitSwing).map(i => (
               <div key={i} className="h-14 rounded-2xl bg-white/04 animate-pulse" />
             ))}
-            {!swingLoading && swingItems.map((i: any) => (
-              <button 
-                key={i.id} 
-                className="flex items-center gap-3 w-full p-2.5 rounded-2xl hover:bg-white/06 transition-colors text-left"
-                onClick={() => nav(`/hub/echo/history/swing/${i.id}`)}
-              >
-                {i.thumbUrl ? (
-                  <video 
-                    src={i.thumbUrl} 
-                    className="w-14 h-14 max-w-full rounded-2xl object-cover border border-white/12 shrink-0"
-                    muted
-                    playsInline
-                  />
-                ) : (
-                  <div className="w-14 h-14 rounded-2xl border border-white/10 bg-white/04 grid place-items-center text-[18px] shrink-0">
-                    🏌️‍♂️
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <div className="text-[15px] font-medium text-white">{i.title}</div>
-                  <div className="text-[12px] text-white/60">
-                    {formatDistanceToNow(new Date(i.dateISO), { addSuffix: true })}
-                  </div>
-                </div>
-                <span className="ml-auto text-white/40 text-lg">›</span>
-              </button>
+            {!swingLoading && swingItems.map(s => (
+              <EchoRow 
+                key={s.id}
+                thumb={s.thumbUrl} 
+                title="Swing Analysis" 
+                date={formatDistanceToNow(new Date(s.dateISO), { addSuffix: true })}
+                onClick={() => nav(`/hub/echo/history/swing/${s.id}`)}
+              />
             ))}
             {!swingLoading && swingItems.length === 0 && (
-              <div className="text-[13px] text-white/60 py-2 px-1">No swing analyses yet</div>
+              <div className="text-white/50 py-2 text-sm">No swing analyses yet</div>
             )}
           </div>
         </div>

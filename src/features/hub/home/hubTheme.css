@@ -1,0 +1,20 @@
+/**
+ * Hub Dashboard Design Tokens
+ * Compact 2-column layout system
+ */
+
+:root {
+  --hub-radius: 18px;
+  --hub-pad: 16px;
+  --hub-gap: 14px;
+
+  --hub-header-height: 56px;      /* forces equal tile headers */
+  --hub-tile-compact: 200px;       /* Echo / Swing / Nearby */
+  --hub-tile-content: 312px;       /* Games / Your Games / Recent Echo */
+
+  --hub-stroke: rgba(255,255,255,.08);
+  --hub-surface: rgba(255,255,255,.06);
+  --hub-surface-2: rgba(255,255,255,.04);
+  --hub-text: rgba(255,255,255,.92);
+  --hub-text-sub: rgba(255,255,255,.60);
+}

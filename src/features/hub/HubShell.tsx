@@ -162,27 +162,40 @@ export function HubShell({ onClose }: HubShellProps) {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="px-5 pt-4">
-            <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
-              <div />
-              
-              <div className="text-center">
-                <h2 className="text-white text-[22px] md:text-[24px] font-semibold tracking-[-0.01em]">
-                  My{'\u00A0'}Clubhouz
-                </h2>
-              </div>
-              
-              <div className="flex justify-end">
-                <TapButton
-                  onPointerDown={handleClose}
-                  className="text-white/60 hover:text-white/90 transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
-                  aria-label="Close hub"
-                >
-                  <X className="w-5 h-5" />
-                </TapButton>
+          <header 
+            className="sticky top-0 z-20"
+            style={{ 
+              background: 'linear-gradient(180deg, rgba(0,0,0,.72), rgba(0,0,0,.72))'
+            }}
+          >
+            <div className="px-5 pt-4">
+              <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
+                <div />
+                
+                <div className="text-center">
+                  <h2 className="text-white text-[22px] md:text-[24px] font-semibold tracking-[-0.01em]">
+                    My{'\u00A0'}Clubhouz
+                  </h2>
+                </div>
+                
+                <div className="flex justify-end">
+                  <TapButton
+                    onPointerDown={handleClose}
+                    className="text-white/60 hover:text-white/90 transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
+                    aria-label="Close hub"
+                  >
+                    <X className="w-5 h-5" />
+                  </TapButton>
+                </div>
               </div>
             </div>
-          </div>
+            <div 
+              className="h-px w-full" 
+              style={{ 
+                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent)' 
+              }} 
+            />
+          </header>
 
           {/* Primary Tabs (Nearby | Echo) - Hidden on home page */}
           {!isHomePage && (
