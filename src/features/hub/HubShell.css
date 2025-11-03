@@ -15,6 +15,25 @@
   transform: translateZ(0);
 }
 
+/* Apple-style top-edge glow on header */
+.hub-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0.18) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  opacity: 0.35;
+  pointer-events: none;
+}
+
 /* Smooth scroll behavior */
 .hub-shell [data-hub-scroll] {
   scroll-behavior: smooth;

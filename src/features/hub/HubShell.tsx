@@ -158,18 +158,19 @@ export function HubShell({ onClose }: HubShellProps) {
             border: '1px solid var(--hub-stroke-subtle)',
             borderRadius: '0',
             boxShadow: 'var(--hub-shadow-main)',
+            isolation: 'isolate',
           }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <header 
-            className="sticky top-0 z-20"
+            className="hub-header sticky top-0 z-20"
             style={{ 
               background: 'linear-gradient(180deg, var(--hub-header-bg-start) 0%, var(--hub-header-bg-mid) 60%, var(--hub-header-bg-end) 100%)',
               borderBottom: '1px solid rgba(255,255,255,0.08)',
               backdropFilter: 'blur(var(--hub-header-blur))',
               WebkitBackdropFilter: 'blur(var(--hub-header-blur))',
-              boxShadow: 'inset 0 1px 0 var(--hub-header-highlight)',
+              willChange: 'backdrop-filter, background',
             }}
           >
             <div className="px-5 pt-4">
