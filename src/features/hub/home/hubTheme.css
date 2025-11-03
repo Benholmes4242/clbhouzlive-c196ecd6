@@ -14,7 +14,7 @@
 
   /* Red Glass Theme */
   --hub-bg-gradient: linear-gradient(180deg, #1A0505 0%, #2A0A0A 100%);
-  --hub-header-bg: #2A0A0A;
+  --hub-header-bg: #1A0505;
   
   --hub-glass-bg: rgba(255, 50, 50, 0.08);
   --hub-glass-bg-hover: rgba(255, 50, 50, 0.12);
