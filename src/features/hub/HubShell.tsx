@@ -142,7 +142,7 @@ export function HubShell({ onClose }: HubShellProps) {
         style={{ zIndex: Z.hub }}
       >
         <div
-          className="hub-shell relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200 pointer-events-auto overflow-x-hidden"
+          className="hub-shell relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200 pointer-events-auto"
           style={{
             height: 'calc(100vh - env(safe-area-inset-top))',
             maxHeight: '100vh',
@@ -153,11 +153,8 @@ export function HubShell({ onClose }: HubShellProps) {
             paddingTop: 'env(safe-area-inset-top)',
             paddingBottom: 'env(safe-area-inset-bottom)',
             background: 'linear-gradient(180deg, var(--hub-bg-start) 0%, var(--hub-bg-end) 100%)',
-            backdropFilter: 'blur(var(--hub-backdrop-blur))',
-            WebkitBackdropFilter: 'blur(var(--hub-backdrop-blur))',
             border: '1px solid var(--hub-stroke-subtle)',
             borderRadius: '0',
-            boxShadow: 'var(--hub-shadow-main)',
             isolation: 'isolate',
           }}
           onClick={(e) => e.stopPropagation()}

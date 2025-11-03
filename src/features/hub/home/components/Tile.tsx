@@ -17,19 +17,18 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
 
   return (
     <section
-      className="hub-card relative rounded-3xl p-4 pt-3.5 pb-3.5 overflow-hidden flex flex-col min-h-[192px]"
+      className="hub-card relative rounded-3xl p-4 pt-3.5 pb-3.5 flex flex-col min-h-[192px]"
       style={{
-        background: 'rgba(255,255,255,0.14)',
-        border: '1px solid rgba(255,255,255,0.22)',
+        background: 'var(--hub-glass)',
+        border: '1px solid var(--hub-stroke)',
         boxShadow: '0 4px 22px rgba(0,0,0,0.28)',
-        backdropFilter: 'blur(28px)',
-        WebkitBackdropFilter: 'blur(28px)',
-        willChange: 'transform, backdrop-filter',
-        transform: 'translateZ(0)',
+        backdropFilter: 'blur(var(--hub-blur))',
+        WebkitBackdropFilter: 'blur(var(--hub-blur))',
+        willChange: 'backdrop-filter',
         transition: 'background 0.2s ease-out',
       }}
-      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.18)'}
-      onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.14)'}
+      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-hover)'}
+      onMouseLeave={(e) => e.currentTarget.style.background = 'var(--hub-glass)'}
     >
       <div className="flex-1">
         <div className="text-[20px] font-semibold mb-0.5" style={{ color: 'var(--hub-text)' }}>

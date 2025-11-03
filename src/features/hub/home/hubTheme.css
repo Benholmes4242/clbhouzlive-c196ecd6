@@ -35,7 +35,7 @@
   /* Frosted glass surface (light-through-dark) */
   --hub-glass: rgba(255,255,255,0.14);
   --hub-glass-hover: rgba(255,255,255,0.18);
-  --hub-glass-subtle: rgba(255,255,255,0.08);
+  --hub-glass-subtle: rgba(255,255,255,0.10);
   
   /* Video/thumbnail backgrounds */
   --hub-media-bg: rgba(0,0,0,0.40);
@@ -47,9 +47,9 @@
      BORDERS & STROKES
      ======================================== */
   /* Crisp edges & strokes (brighter than smoke) */
-  --hub-stroke: rgba(255,255,255,0.22);
+  --hub-stroke: rgba(255,255,255,0.14);
   --hub-stroke-subtle: rgba(255,255,255,0.14);
-  --hub-stroke-mid: rgba(255,255,255,0.22);
+  --hub-stroke-mid: rgba(255,255,255,0.14);
   --hub-stroke-strong: rgba(255,255,255,0.22);
   --hub-stroke-avatar: rgba(255,255,255,0.22);
   --hub-stroke-divider: rgba(255,255,255,0.14);
