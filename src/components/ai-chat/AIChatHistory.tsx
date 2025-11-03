@@ -404,6 +404,18 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   
+  // In pane mode, try to use provider; otherwise use session storage
+  let echoConversations: any[] = [];
+  try {
+    if (paneMode) {
+      const { useEchoConversationsContext } = require('@/features/echo/components/EchoConversationsProvider');
+      const { conversations: providerConvos } = useEchoConversationsContext();
+      echoConversations = providerConvos;
+    }
+  } catch (e) {
+    // Provider not available, fallback to session storage
+  }
+  
   // Get conversation session for chat history  
   const conversationSession = useConversationSession({
     storageKey: 'echo_chat',
@@ -475,14 +487,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     direction: 'top'
   });
 
-  // Load data when component opens
+  // Load data when component opens or when provider data changes
   useEffect(() => {
     if (isOpen) {
       loadChatConversations();
       // loadCaddieLogs(); // Now handled by hook
       loadSwingAnalyses();
     }
-  }, [isOpen]);
+  }, [isOpen, echoConversations]);
 
   const loadChatConversations = async () => {
     console.log('🔍 Loading chat conversations...');
@@ -490,6 +502,29 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     setErrorStates(prev => ({ ...prev, conversations: null }));
     
     try {
+      // In pane mode, use provider conversations (from localStorage)
+      if (paneMode && echoConversations.length > 0) {
+        console.log('📱 Using provider conversations:', echoConversations.length);
+        const providerConversations = echoConversations.map(conv => ({
+          id: conv.id,
+          title: conv.title || "New conversation",
+          customTitle: conv.title,
+          messages: conv.messages.map((msg: any, index: number) => ({
+            id: msg.id || `${conv.id}-${index}`,
+            type: (msg.role === 'user' ? 'user' : 'ai') as 'user' | 'ai',
+            content: msg.content || '',
+            timestamp: new Date(msg.createdAt),
+            metadata: msg.meta
+          })),
+          timestamp: new Date(conv.updatedAt),
+          createdAt: new Date(conv.createdAt),
+          lastActivityAt: new Date(conv.updatedAt),
+          messageCount: conv.messages.length
+        }));
+        setConversations(providerConversations);
+        return;
+      }
+      
       // Load from conversation session hook (database) first
       console.log('📱 Loading from conversation session...');
       await conversationSession.loadConversations();
