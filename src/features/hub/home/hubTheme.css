@@ -18,9 +18,9 @@
   /* ========================================
      BACKGROUNDS & SURFACES
      ======================================== */
-  /* Main Hub container gradient - Smoke Glass Lite */
-  --hub-bg-start: #121315;
-  --hub-bg-end: #1A1C1E;
+  /* Main Hub container gradient - Orange */
+  --hub-bg-start: #ff8e2b;
+  --hub-bg-end: #ff6b00;
   
   /* Backdrop overlay (behind Hub) */
   --hub-backdrop: rgba(0,0,0,0.70);
