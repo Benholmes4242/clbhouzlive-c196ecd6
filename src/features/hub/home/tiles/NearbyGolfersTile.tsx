@@ -11,19 +11,17 @@ import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 
 interface NearbyGolfersTileProps {
   limit?: number;
-  viewAllTo: string;
 }
 
-export function NearbyGolfersTile({ limit = 5, viewAllTo }: NearbyGolfersTileProps) {
+export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
   const nav = useNavigate();
   const { golfers, isLoading } = useActiveGolfers({ limit });
 
   return (
     <Tile 
       title="Nearby Golfers" 
-      subtitle="Open to Play" 
-      variant="compact"
-      right={<ViewAllPill onClick={() => nav(viewAllTo)} />}
+      subtitle="Open to Play"
+      onViewAll={() => nav('/hub/golfers')}
     >
       <div className="space-y-2">
         {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (

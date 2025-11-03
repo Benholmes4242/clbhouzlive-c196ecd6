@@ -1,6 +1,6 @@
 /**
  * Tile Component
- * Consistent chrome with overflow guards and locked header height
+ * Consistent chrome with View all in footer
  */
 
 import React from 'react';
@@ -8,45 +8,39 @@ import React from 'react';
 type TileProps = React.PropsWithChildren<{
   title: string;
   subtitle?: string;
-  variant?: 'compact' | 'content';
-  right?: React.ReactNode;
+  onViewAll?: () => void;
   footer?: React.ReactNode;
 }>;
 
-export function Tile({ title, subtitle, right, children, footer, variant = 'compact' }: TileProps) {
-  const minHeight = variant === 'compact' ? 'var(--hub-tile-compact)' : 'var(--hub-tile-content)';
-  
+export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps) {
   return (
     <section
-      className="relative rounded-[var(--hub-radius)]"
+      className="relative rounded-3xl p-4 pt-3.5 pb-3.5 overflow-hidden"
       style={{
-        background: 'var(--hub-surface-2)',
-        border: '1px solid var(--hub-stroke)',
-        minHeight,
-        overflow: 'hidden',
+        background: 'linear-gradient(180deg, rgba(35,35,35,0.78), rgba(25,25,25,0.78))',
+        border: '1px solid rgba(255,255,255,0.08)',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
       }}
     >
-      {/* Header row (locked height) */}
-      <div
-        className="flex items-center justify-between"
-        style={{ height: 'var(--hub-header-height)', padding: 'var(--hub-pad)' }}
-      >
-        <div className="min-w-0 flex-1">
-          <h3 className="text-[20px] font-semibold leading-none text-white truncate">{title}</h3>
-          {subtitle && (
-            <p className="text-sm text-white/70 mt-1 truncate">{subtitle}</p>
+      <div>
+        <div className="text-[20px] font-semibold text-white mb-0.5">{title}</div>
+        {subtitle && <div className="text-[13px] text-white/70 mb-2.5 line-clamp-1">{subtitle}</div>}
+        <div className="mt-2.5">{children}</div>
+      </div>
+
+      {/* Footer bar with View all */}
+      {(footer || onViewAll) && (
+        <div className="mt-3 flex items-center gap-2">
+          <div className="flex-1 min-w-0">{footer}</div>
+          {onViewAll && (
+            <button
+              onClick={onViewAll}
+              className="shrink-0 rounded-2xl px-3.5 py-2 text-[13px] border border-white/15 text-white/85 hover:bg-white/08 transition"
+            >
+              View all →
+            </button>
           )}
         </div>
-        {right}
-      </div>
-
-      {/* Content */}
-      <div className="px-[var(--hub-pad)] pb-[var(--hub-pad)]">
-        {children}
-      </div>
-
-      {footer && (
-        <div className="px-[var(--hub-pad)] pb-[var(--hub-pad)]">{footer}</div>
       )}
     </section>
   );

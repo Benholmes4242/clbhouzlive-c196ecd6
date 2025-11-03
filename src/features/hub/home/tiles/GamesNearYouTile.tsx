@@ -14,13 +14,11 @@ import { Chip } from '../components/Chip';
 
 interface GamesNearYouTileProps {
   limit?: number;
-  viewAllTo: string;
   enableFilters?: boolean;
 }
 
 export function GamesNearYouTile({ 
-  limit = 3, 
-  viewAllTo,
+  limit = 3,
   enableFilters 
 }: GamesNearYouTileProps) {
   const nav = useNavigate();
@@ -36,16 +34,10 @@ export function GamesNearYouTile({
   return (
     <Tile 
       title="Games Near You" 
-      subtitle="Find a game to join" 
-      variant="content"
-      right={<ViewAllPill onClick={() => nav(viewAllTo)} />}
+      subtitle="Find a game to join"
+      onViewAll={() => nav('/hub/games')}
+      footer={enableFilters ? <InlineFilters value={filters} onChange={setFilters} /> : undefined}
     >
-      {enableFilters && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          <InlineFilters value={filters} onChange={setFilters} />
-        </div>
-      )}
-
       <div className="space-y-2">
         {isLoading && Array.from({ length: limit }).map((_, i) => (
           <div key={i} className="h-16 rounded-2xl bg-white/04 animate-pulse" />

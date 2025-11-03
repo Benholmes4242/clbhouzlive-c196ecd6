@@ -1,6 +1,6 @@
 /**
  * Echo History Tile
- * Content tile showing recent Echo chat and swing analyses with thumbnails
+ * Full-width tile showing recent Echo chat and swing analyses with thumbnails
  */
 
 import React from 'react';
@@ -9,12 +9,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { Tile } from '../components/Tile';
-import { ViewAllPill } from '../components/ViewAllPill';
 
 interface EchoHistoryTileProps {
   limitChat?: number;
   limitSwing?: number;
-  viewAllTo: string;
 }
 
 function EchoRow({ 
@@ -28,12 +26,14 @@ function EchoRow({
   date: string; 
   onClick: () => void;
 }) {
+  const fallback = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=100&h=100&fit=crop';
+  
   return (
     <button 
       onClick={onClick} 
-      className="w-full flex items-center gap-3 py-2 group hover:bg-white/06 rounded-xl transition-colors text-left"
+      className="w-full flex items-center gap-3 py-2.5 group hover:bg-white/06 rounded-xl transition-colors text-left"
     >
-      <div className="h-14 w-14 rounded-2xl overflow-hidden border border-white/12 bg-white/5 shrink-0 grid place-items-center">
+      <div className="h-14 w-14 rounded-2xl overflow-hidden border border-white/12 bg-black/30 shrink-0">
         {thumb ? (
           <video 
             src={thumb} 
@@ -42,22 +42,26 @@ function EchoRow({
             playsInline
           />
         ) : (
-          <span className="text-[18px]">💬</span>
+          <div className="h-full w-full grid place-items-center text-[20px]">🏌️‍♂️</div>
         )}
       </div>
       <div className="min-w-0 flex-1 text-left">
-        <div className="text-[16px] text-white/95 truncate">{title}</div>
-        <div className="text-sm text-white/60">{date}</div>
+        <div className="text-[15px] text-white/95 truncate">{title}</div>
+        <div className="text-[13px] text-white/65">{date}</div>
       </div>
-      <span className="ml-auto text-white/40 group-hover:text-white/70">›</span>
+      <button
+        onClick={(e) => { e.stopPropagation(); onClick(); }}
+        className="ml-auto rounded-2xl px-3 h-10 border border-white/12 text-white/85 text-[13px] hover:bg-white/08 shrink-0"
+      >
+        View
+      </button>
     </button>
   );
 }
 
 export function EchoHistoryTile({ 
   limitChat = 1, 
-  limitSwing = 2, 
-  viewAllTo 
+  limitSwing = 2
 }: EchoHistoryTileProps) {
   const nav = useNavigate();
 
@@ -109,31 +113,28 @@ export function EchoHistoryTile({
   return (
     <Tile 
       title="Recent Echo" 
-      subtitle="Chat & Swing" 
-      variant="content"
-      right={<ViewAllPill onClick={() => nav(viewAllTo)} />}
+      subtitle="Chat & Swing"
+      onViewAll={() => nav('/hub/echo/history')}
     >
-      <div className="space-y-3">
+      <div className="space-y-4">
         {/* Chat Section */}
         <div>
-          <div className="text-xs tracking-wide text-white/55 mb-1">CHAT</div>
+          <div className="text-[12px] tracking-wide text-white/55 mb-1.5">CHAT</div>
           {chatLoading && <div className="h-14 rounded-2xl bg-white/04 animate-pulse" />}
           {!chatLoading && chatItems.length > 0 && (
-            <EchoRow 
-              title={chatItems[0].title} 
-              date={formatDistanceToNow(new Date(chatItems[0].dateISO), { addSuffix: true })}
-              onClick={() => nav(`/hub/echo/history/chat/${chatItems[0].id}`)}
-            />
+            <div className="text-[14px] text-white/60 py-2">
+              {chatItems[0].title}
+            </div>
           )}
           {!chatLoading && chatItems.length === 0 && (
-            <div className="text-white/50 py-2 text-sm">No chat history yet</div>
+            <div className="text-white/50 py-2 text-[14px]">No chat history yet</div>
           )}
         </div>
 
         {/* Swing Section */}
         <div>
-          <div className="text-xs tracking-wide text-white/55 mb-1">SWING</div>
-          <div className="space-y-1">
+          <div className="text-[12px] tracking-wide text-white/55 mb-1.5">SWING</div>
+          <ul className="space-y-2.5">
             {swingLoading && [0, 1].slice(0, limitSwing).map(i => (
               <div key={i} className="h-14 rounded-2xl bg-white/04 animate-pulse" />
             ))}
@@ -147,9 +148,9 @@ export function EchoHistoryTile({
               />
             ))}
             {!swingLoading && swingItems.length === 0 && (
-              <div className="text-white/50 py-2 text-sm">No swing analyses yet</div>
+              <div className="text-white/50 py-2 text-[14px]">No swing analyses yet</div>
             )}
-          </div>
+          </ul>
         </div>
       </div>
     </Tile>

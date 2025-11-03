@@ -1,20 +1,13 @@
 /**
  * Your Games Tile
- * Content tile showing games user is hosting or joined
+ * Full-width tile showing games user is hosting or joined
  */
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { formatDistanceToNow } from 'date-fns';
 import { Tile } from '../components/Tile';
-import { ViewAllPill } from '../components/ViewAllPill';
-import { Chip } from '../components/Chip';
-
-interface YourGamesTileProps {
-  viewAllTo: string;
-}
 
 function GameRow({ 
   tag, 
@@ -30,19 +23,21 @@ function GameRow({
   return (
     <button 
       onClick={onClick}
-      className="w-full flex items-center gap-3 py-2 hover:bg-white/06 rounded-xl transition-colors text-left"
+      className="w-full flex items-center gap-2.5 py-2.5 hover:bg-white/06 rounded-xl transition-colors text-left"
     >
-      <Chip>{tag}</Chip>
+      <span className="rounded-xl px-2.5 py-1.5 text-[12px] border border-white/15 text-white/85 bg-white/05 shrink-0">
+        {tag}
+      </span>
       <div className="min-w-0 flex-1 flex items-center gap-2">
-        <span role="img" aria-label="flag">⛳</span>
-        <span className="truncate text-white/95 text-[16px]">{club}</span>
+        <span role="img" aria-label="flag">⛳️</span>
+        <span className="truncate text-white/95 text-[15px]">{club}</span>
       </div>
-      <span className="text-white/60 text-sm shrink-0">{meta}</span>
+      <span className="text-white/65 text-[13px] shrink-0">{meta}</span>
     </button>
   );
 }
 
-export function YourGamesTile({ viewAllTo }: YourGamesTileProps) {
+export function YourGamesTile() {
   const nav = useNavigate();
   
   const { data: games = [], isLoading } = useQuery({
@@ -85,11 +80,10 @@ export function YourGamesTile({ viewAllTo }: YourGamesTileProps) {
   return (
     <Tile 
       title="Your Games" 
-      subtitle="Hosting & Joined" 
-      variant="content"
-      right={<ViewAllPill onClick={() => nav(viewAllTo)} />}
+      subtitle="Hosting & Joined"
+      onViewAll={() => nav('/hub/your-games')}
     >
-      <div className="space-y-1">
+      <ul className="mt-1.5 space-y-2.5">
         {isLoading && [0, 1, 2].map(i => (
           <div key={i} className="h-14 rounded-2xl bg-white/04 animate-pulse" />
         ))}
@@ -101,7 +95,7 @@ export function YourGamesTile({ viewAllTo }: YourGamesTileProps) {
               key={g.id}
               tag={g.kind}
               club={g.course_name || 'Golf Course'}
-              meta={`${availableSlots}/${totalSlots}`}
+              meta={`${availableSlots ?? 0}/${totalSlots}`}
               onClick={() => nav(`/game/${g.id}`)}
             />
           );
@@ -117,7 +111,7 @@ export function YourGamesTile({ viewAllTo }: YourGamesTileProps) {
             </button>
           </p>
         )}
-      </div>
+      </ul>
     </Tile>
   );
 }

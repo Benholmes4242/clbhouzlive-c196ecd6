@@ -163,9 +163,10 @@ export function HubShell({ onClose }: HubShellProps) {
         >
           {/* Header */}
           <header 
-            className="sticky top-0 z-20"
+            className="sticky top-0 z-20 backdrop-blur"
             style={{ 
-              background: 'linear-gradient(180deg, rgba(0,0,0,.72), rgba(0,0,0,.72))'
+              background: 'linear-gradient(180deg, rgba(23,23,23,0.96) 0%, rgba(23,23,23,0.92) 60%, rgba(23,23,23,0.00) 100%)',
+              borderBottom: '1px solid rgba(255,255,255,0.06)'
             }}
           >
             <div className="px-5 pt-4">

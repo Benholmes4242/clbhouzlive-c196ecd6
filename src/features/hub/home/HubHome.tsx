@@ -13,33 +13,27 @@ import { EchoHistoryTile } from './tiles/EchoHistoryTile';
 
 export default function HubHome() {
   return (
-    <main className="w-full overflow-x-hidden px-3 pb-6">
-      <div
-        className="grid"
-        style={{
-          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-          gap: 'var(--hub-gap)',
-        }}
-      >
-        <style>{`
-          @media (max-width: 360px) {
-            main > div {
-              grid-template-columns: 1fr !important;
-            }
-          }
-        `}</style>
-
-        {/* Row 1 — Echo + Swing (same height) */}
+    <main className="w-full overflow-x-hidden px-3.5 pb-6">
+      {/* Row 1 — Echo + Swing (2-up) */}
+      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
         <EchoQuickTile />
         <SwingQuickTile />
+      </div>
 
-        {/* Row 2 — Nearby + Games */}
-        <NearbyGolfersTile limit={5} viewAllTo="/hub/golfers" />
-        <GamesNearYouTile limit={3} viewAllTo="/hub/games" enableFilters={false} />
+      {/* Row 2 — Nearby + Games (2-up) */}
+      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 mt-3.5">
+        <NearbyGolfersTile limit={5} />
+        <GamesNearYouTile limit={3} enableFilters={false} />
+      </div>
 
-        {/* Row 3 — Your Games + Recent Echo */}
-        <YourGamesTile viewAllTo="/hub/your-games" />
-        <EchoHistoryTile limitChat={1} limitSwing={2} viewAllTo="/hub/echo/history" />
+      {/* Row 3 — Your Games (full-width) */}
+      <div className="mt-3.5">
+        <YourGamesTile />
+      </div>
+
+      {/* Row 4 — Recent Echo (full-width) */}
+      <div className="mt-3.5">
+        <EchoHistoryTile limitChat={1} limitSwing={2} />
       </div>
     </main>
   );
