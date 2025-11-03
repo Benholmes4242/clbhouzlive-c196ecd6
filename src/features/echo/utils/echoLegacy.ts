@@ -13,6 +13,7 @@ export type ChatConversationRow = {
   createdAt: string;
   lastActivityAt: string;
   messages: ChatMessageRow[];
+  _source?: 'db' | 'local'; // for UI tag
 };
 
 export function safeParse<T>(key: string): T | null {
@@ -50,6 +51,7 @@ export function mapLegacyConv(hit: any): ChatConversationRow | null {
     createdAt,
     lastActivityAt,
     messages,
+    _source: 'local',
   };
 }
 
@@ -59,4 +61,15 @@ export function getLegacyConversations(): ChatConversationRow[] {
   if (!legacy) return [];
   const arr = Array.isArray(legacy) ? legacy : Object.values(legacy);
   return arr.map(mapLegacyConv).filter(Boolean) as ChatConversationRow[];
+}
+
+/** Mark this device as migrated (you can also set a server flag if desired) */
+export function markLegacyMigrated() {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem('echo_migration_done', '1');
+}
+
+export function isLegacyMigrated() {
+  if (typeof window === 'undefined') return false;
+  return window.localStorage.getItem('echo_migration_done') === '1';
 }

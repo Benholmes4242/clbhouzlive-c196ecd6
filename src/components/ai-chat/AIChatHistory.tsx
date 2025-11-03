@@ -33,6 +33,9 @@ import {
   getLegacyConversations,
   type ChatConversationRow,
 } from '@/features/echo/utils/echoLegacy';
+import { useEchoLegacyMigration } from '@/features/echo/hooks/useEchoLegacyMigration';
+import { LegacyImportBanner } from '@/features/echo/components/LegacyImportBanner';
+import { LocalTag } from '@/features/echo/components/LocalTag';
 
 // HLS Video Player Component
 export const HLSVideoPlayer: React.FC<{ src: string; poster?: string; className?: string }> = ({ src, poster, className }) => {
@@ -432,6 +435,15 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const isPageMode = layout === 'page';
   
   console.log('🚀 [AIChatHistory] Component mounted/updated', { isOpen, paneMode, initialTab, layout });
+  
+  // Legacy migration hook
+  const {
+    hasLegacy,
+    needsConsent,
+    isMigrating,
+    acceptAndMigrate,
+    dismissMigration,
+  } = useEchoLegacyMigration({ batchSize: 25, requireConsent: true });
   
   const PAGE_SIZE = 20;
   const [page, setPage] = useState(0);
@@ -914,13 +926,25 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
               </div>
             ) : (
               <div className="space-y-3">
+                {/* Legacy import banner */}
+                {needsConsent && (
+                  <LegacyImportBanner
+                    isMigrating={isMigrating}
+                    onAccept={acceptAndMigrate}
+                    onDismiss={dismissMigration}
+                  />
+                )}
+                
                 {filteredConversations.map((conv) => (
                   <button
                     key={conv.id}
                     onClick={() => handleExpansion('chat', conv.id, undefined, (conv as any).source)}
                     className="w-full text-left rounded-xl bg-white/06 hover:bg-white/08 border border-white/08 hover:border-white/12 p-4 transition"
                   >
-                    <div className="font-medium text-white mb-1">{conv.customTitle || conv.title}</div>
+                    <div className="flex items-center font-medium text-white mb-1">
+                      <span className="line-clamp-1">{conv.customTitle || conv.title}</span>
+                      {conv.source === 'legacy' && <LocalTag />}
+                    </div>
                     <div className="text-sm text-white/60 line-clamp-2">
                       {conv.messages.find(m => m.type === 'user')?.content || 'No messages'}
                     </div>
@@ -1075,6 +1099,15 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
           <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
             <TabsContent value="chat" className="m-0 flex-1 overflow-y-auto px-4 md:px-5">
               <div className="w-full max-w-3xl mx-auto py-6 space-y-4">
+                {/* Legacy import banner */}
+                {needsConsent && (
+                  <LegacyImportBanner
+                    isMigrating={isMigrating}
+                    onAccept={acceptAndMigrate}
+                    onDismiss={dismissMigration}
+                  />
+                )}
+                
                 {loadingStates.conversations ? (
                   <>
                     <SkeletonCard />
@@ -1099,7 +1132,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-sm truncate">{conv.title}</h3>
+                            <h3 className="font-medium text-sm truncate flex items-center">
+                              <span className="line-clamp-1">{conv.title}</span>
+                              {conv.source === 'legacy' && <LocalTag />}
+                            </h3>
                             <p className="text-xs text-muted-foreground mt-1">
                               {conv.messages.length} messages · {new Date(conv.lastActivityAt).toLocaleDateString()}
                             </p>
