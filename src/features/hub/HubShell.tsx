@@ -168,11 +168,10 @@ export function HubShell({ onClose }: HubShellProps) {
             className="relative z-30 shrink-0"
             style={{
               background:
-                'linear-gradient(180deg, rgba(30,30,31,0.92) 0%, rgba(30,30,31,0.72) 60%, rgba(30,30,31,0.00) 100%)',
-              WebkitBackdropFilter: 'blur(24px)',
-              backdropFilter: 'blur(24px)',
-              borderBottom: '1px solid rgba(255,255,255,0.10)',
-              boxShadow: 'inset 0 1px rgba(255,255,255,0.08)',
+                'linear-gradient(180deg, var(--hub-header-bg-start) 0%, var(--hub-header-bg-mid) 60%, var(--hub-header-bg-end) 100%)',
+              WebkitBackdropFilter: 'blur(var(--hub-header-blur))',
+              backdropFilter: 'blur(var(--hub-header-blur))',
+              borderBottom: '1px solid var(--hub-header-stroke)',
               willChange: 'backdrop-filter, background',
               isolation: 'isolate',
             }}
