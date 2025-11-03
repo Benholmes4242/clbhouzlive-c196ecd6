@@ -18,12 +18,11 @@ export function SwingQuickTile({ className }: SwingQuickTileProps) {
 
   const pick = () => inputRef.current?.click();
 
-  const onPick = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onPick: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
-    // Navigate to swing coach - it will handle the upload
-    nav('/hub/echo/swing');
+    // Hand off to Swing page (it already handles upload)
+    nav('/hub/echo/swing', { state: { preselectedFileName: file.name } });
   };
 
   return (
@@ -34,21 +33,8 @@ export function SwingQuickTile({ className }: SwingQuickTileProps) {
         viewAllTo="/hub/echo/swing" 
       />
       <div className="row">
-        <button 
-          className="chip flex items-center gap-2" 
-          onClick={pick} 
-          aria-pressed="false"
-        >
-          <Upload className="w-4 h-4" />
-          Upload Swing Video
-        </button>
-        <input 
-          ref={inputRef} 
-          type="file" 
-          accept="video/*" 
-          hidden 
-          onChange={onPick}
-        />
+        <button type="button" className="chip" onClick={pick}>Upload Swing Video</button>
+        <input ref={inputRef} type="file" accept="video/*" hidden onChange={onPick} />
       </div>
     </section>
   );

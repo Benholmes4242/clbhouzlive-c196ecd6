@@ -18,10 +18,11 @@ export function EchoQuickTile({ className }: EchoQuickTileProps) {
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!text.trim()) return;
-    
-    // Navigate to chat with query param to auto-send message
-    nav(`/hub/echo/chat?msg=${encodeURIComponent(text.trim())}`);
+    const msg = text.trim();
+    if (!msg) return;
+    // Deep-link and let chat screen auto-send via ?msg=
+    nav(`/hub/echo/chat?msg=${encodeURIComponent(msg)}`);
+    setText('');
   };
 
   return (
@@ -37,20 +38,16 @@ export function EchoQuickTile({ className }: EchoQuickTileProps) {
           onChange={(e) => setText(e.target.value)}
           placeholder="Ask Echo anything…"
           aria-label="Ask Echo"
-          className="flex-1 border rounded-xl px-3.5 py-3 bg-white/02 text-white placeholder:text-white/40"
           style={{
-            borderColor: 'var(--hub-stroke)',
-            borderRadius: '14px',
+            flex: 1,
+            border: '1px solid var(--hub-stroke)',
+            borderRadius: 14,
+            padding: '12px 14px',
+            background: 'rgba(255,255,255,.02)',
+            color: 'var(--hub-text)',
           }}
         />
-        <button 
-          type="submit"
-          disabled={!text.trim()} 
-          className="chip flex items-center gap-1.5"
-          aria-pressed="false"
-        >
-          Send <SendHorizontal className="w-3.5 h-3.5" />
-        </button>
+        <button className="chip" disabled={!text.trim()}>Send</button>
       </form>
     </section>
   );

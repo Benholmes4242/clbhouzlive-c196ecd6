@@ -20,17 +20,20 @@ export function TileHeader({ title, subtitle, viewAllTo, rightSlot }: TileHeader
     <div className="tile-header">
       <div>
         <div className="tile-title">{title}</div>
-        {subtitle && <div className="eyebrow">{subtitle}</div>}
+        {subtitle ? <div className="eyebrow">{subtitle}</div> : null}
       </div>
-      {rightSlot ?? (viewAllTo && (
-        <button 
-          className="row link" 
-          onClick={() => nav(viewAllTo)}
-          aria-label={`View all ${title}`}
-        >
-          View all <span className="chev">›</span>
-        </button>
-      ))}
+      {rightSlot ?? (
+        viewAllTo ? (
+          <button 
+            type="button"
+            className="row link" 
+            onClick={() => nav(viewAllTo)}
+            aria-label={`View all ${title}`}
+          >
+            View all <span className="chev">›</span>
+          </button>
+        ) : null
+      )}
     </div>
   );
 }
