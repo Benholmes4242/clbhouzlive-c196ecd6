@@ -122,9 +122,9 @@ export function HubShell({ onClose }: HubShellProps) {
         className="fixed inset-0 pointer-events-none"
         style={{
           zIndex: Z.hub,
-          backgroundColor: 'var(--hub-backdrop)',
-          WebkitBackdropFilter: 'blur(var(--hub-backdrop-blur))',
-          backdropFilter: 'blur(var(--hub-backdrop-blur))',
+          backgroundColor: 'transparent',
+          WebkitBackdropFilter: 'none',
+          backdropFilter: 'none',
         }}
       />
       
