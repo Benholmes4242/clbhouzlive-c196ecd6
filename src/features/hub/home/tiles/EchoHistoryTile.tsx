@@ -33,7 +33,7 @@ function EchoRow({
       <div 
         className="h-14 w-14 rounded-2xl overflow-hidden shrink-0"
         style={{ 
-          border: '1px solid var(--hub-stroke)',
+          border: '1px solid var(--hub-stroke-mid)',
           background: 'var(--hub-media-bg)',
         }}
       >
@@ -60,11 +60,11 @@ function EchoRow({
         onClick={onClick}
         className="ml-auto rounded-2xl px-3 h-10 text-[13px] shrink-0 transition"
         style={{
-          border: '1px solid var(--hub-stroke-subtle)',
+          border: '1px solid var(--hub-stroke-mid)',
           color: 'var(--hub-text-body)',
           background: 'transparent',
         }}
-        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-subtle)'}
+        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button)'}
         onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
       >
         View
@@ -137,7 +137,7 @@ export function EchoHistoryTile({
             CHAT
           </div>
           {chatLoading && (
-            <div className="h-14 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-subtle)' }} />
+            <div className="h-14 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
           )}
           {!chatLoading && chatItems.length > 0 && (
             <div className="text-[14px] py-2" style={{ color: 'var(--hub-text-sub)' }}>
@@ -158,7 +158,7 @@ export function EchoHistoryTile({
           </div>
           <ul className="space-y-2.5">
             {swingLoading && [0, 1].slice(0, limitSwing).map(i => (
-              <div key={i} className="h-14 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-subtle)' }} />
+              <div key={i} className="h-14 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
             ))}
             {!swingLoading && swingItems.map(s => (
               <EchoRow 
