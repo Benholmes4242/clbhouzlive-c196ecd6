@@ -1,7 +1,7 @@
 /**
  * Hub Dashboard Design Tokens
  * Single source of truth for My Clubhouz Hub colors, effects, and layout
- * Graphite Glass theme
+ * Smoke Glass theme
  */
 
 :root {
@@ -18,27 +18,27 @@
   /* ========================================
      BACKGROUNDS & SURFACES
      ======================================== */
-  /* Main Hub container gradient - Graphite Glass theme */
-  --hub-bg-start: #0E0E0E;
-  --hub-bg-end: #1C1C1E;
+  /* Main Hub container gradient - Smoke Glass theme */
+  --hub-bg-start: #1E1E1F;
+  --hub-bg-end: #2A2A2C;
   
   /* Backdrop overlay (behind Hub) */
   --hub-backdrop: rgba(0,0,0,0.70);
   --hub-backdrop-blur: 12px;
   
-  /* Header gradient - Apple Realism (warmer graphite) */
-  --hub-header-bg-start: rgba(28,28,28,0.95);
-  --hub-header-bg-mid: rgba(24,24,24,0.88);
-  --hub-header-bg-end: rgba(20,20,20,0.80);
+  /* Header gradient - Apple Realism (Smoke Glass) */
+  --hub-header-bg-start: rgba(30,30,31,0.92);
+  --hub-header-bg-mid: rgba(30,30,31,0.72);
+  --hub-header-bg-end: rgba(30,30,31,0.00);
   --hub-header-blur: 24px;
   --hub-header-highlight: rgba(255,255,255,0.10);
   
-  /* Tile/Card glass surfaces - frosted with translucency */
-  --hub-glass-bg-start: rgba(35,35,35,0.74);
-  --hub-glass-bg-end: rgba(25,25,25,0.74);
-  --hub-glass-bg-hover: rgba(255,255,255,0.08);
-  --hub-glass-bg-subtle: rgba(255,255,255,0.05);
-  --hub-glass-bg-input: rgba(255,255,255,0.06);
+  /* Tile/Card glass surfaces - frosted with translucency (Smoke Glass) */
+  --hub-glass-bg-start: rgba(255,255,255,0.10);
+  --hub-glass-bg-end: rgba(255,255,255,0.06);
+  --hub-glass-bg-hover: rgba(255,255,255,0.12);
+  --hub-glass-bg-subtle: rgba(255,255,255,0.08);
+  --hub-glass-bg-input: rgba(255,255,255,0.08);
   --hub-glass-bg-button: rgba(255,255,255,0.10);
   --hub-glass-bg-button-hover: rgba(255,255,255,0.15);
   
@@ -48,23 +48,23 @@
   /* ========================================
      BORDERS & STROKES
      ======================================== */
-  /* Light-diffused borders for Graphite Glass */
-  --hub-stroke: rgba(255,255,255,0.12);
-  --hub-stroke-subtle: rgba(255,255,255,0.08);
-  --hub-stroke-mid: rgba(255,255,255,0.14);
+  /* Light-diffused borders for Smoke Glass */
+  --hub-stroke: rgba(255,255,255,0.18);
+  --hub-stroke-subtle: rgba(255,255,255,0.10);
+  --hub-stroke-mid: rgba(255,255,255,0.18);
   --hub-stroke-strong: rgba(255,255,255,0.18);
-  --hub-stroke-avatar: rgba(255,255,255,0.12);
+  --hub-stroke-avatar: rgba(255,255,255,0.18);
   --hub-stroke-divider: rgba(255,255,255,0.10);
 
   /* ========================================
      SHADOWS & DEPTH
      ======================================== */
-  /* Tighter, deeper shadows for floating glass effect */
+  /* Soft, natural shadows for Smoke Glass */
   --hub-shadow-main: 0 30px 80px rgba(0,0,0,0.85), 0 0 1px rgba(255,255,255,0.08) inset;
-  --hub-shadow-tile: 0 4px 24px rgba(0,0,0,0.50);
-  --hub-shadow-tile-hover: 0 10px 28px rgba(0,0,0,0.55);
-  --hub-shadow-tile-inset: inset 0 0 0 1px rgba(255,255,255,0.05);
-  --hub-top-highlight: inset 0 1px 0 rgba(255,255,255,0.06);
+  --hub-shadow-tile: 0 4px 24px rgba(0,0,0,0.45);
+  --hub-shadow-tile-hover: 0 10px 28px rgba(0,0,0,0.50);
+  --hub-shadow-tile-inset: inset 0 0 0 1px rgba(255,255,255,0.08);
+  --hub-top-highlight: inset 0 1px 0 rgba(255,255,255,0.08);
 
   /* ========================================
      TEXT & TYPOGRAPHY
@@ -72,7 +72,7 @@
   --hub-text: rgba(255,255,255,0.92);
   --hub-text-bright: rgba(255,255,255,0.95);
   --hub-text-body: rgba(255,255,255,0.85);
-  --hub-text-sub: rgba(255,255,255,0.60);
+  --hub-text-sub: rgba(255,255,255,0.65);
   --hub-text-dim: rgba(255,255,255,0.50);
   --hub-text-dimmer: rgba(255,255,255,0.40);
   --hub-text-muted: rgba(255,255,255,0.45);
