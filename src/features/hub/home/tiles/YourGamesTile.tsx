@@ -70,10 +70,14 @@ export function YourGamesTile() {
             .order('start_time', { ascending: true })
         : { data: [] };
 
-      return [
-        ...hosting.map(g => ({ ...g, kind: 'Hosting' as const })),
-        ...joined.map(g => ({ ...g, kind: 'Joined' as const }))
-      ].slice(0, 3);
+      // Filter out duplicates (in case user is both host and participant)
+      const hostingWithKind = hosting.map(g => ({ ...g, kind: 'Hosting' as const }));
+      const hostingIds = new Set(hosting.map(g => g.id));
+      const joinedWithKind = joined
+        .filter(g => !hostingIds.has(g.id))
+        .map(g => ({ ...g, kind: 'Joined' as const }));
+      
+      return [...hostingWithKind, ...joinedWithKind].slice(0, 3);
     },
   });
 
