@@ -229,12 +229,7 @@ const App: React.FC = () => {
                         <Route path="games" element={<HubGamesPage />} />
                         <Route path="your-games" element={<HubYourGamesPage />} />
                         <Route path="create-game" element={<HubCreateGamePage />} />
-                        <Route path="echo">
-                          <Route index element={<HubEchoPage />} />
-                          <Route path="chat" element={<HubEchoPage />} />
-                          <Route path="swing" element={<HubEchoPage />} />
-                          <Route path="history" element={<HubEchoPage />} />
-                        </Route>
+                        <Route path="echo/*" element={<HubEchoPage />} />
                       </Route>
                     )}
                                     
