@@ -6,7 +6,6 @@
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TileHeader } from '../parts/TileHeader';
-import { Upload } from 'lucide-react';
 
 interface SwingQuickTileProps {
   className?: string;

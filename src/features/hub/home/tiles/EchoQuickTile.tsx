@@ -6,7 +6,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TileHeader } from '../parts/TileHeader';
-import { SendHorizontal } from 'lucide-react';
 
 interface EchoQuickTileProps {
   className?: string;

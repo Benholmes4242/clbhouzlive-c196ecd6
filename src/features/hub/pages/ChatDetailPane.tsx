@@ -51,7 +51,38 @@ export function ChatDetailPane() {
           .eq('user_id', user.id)
           .single();
 
-        if (error) throw error;
+        if (error || !data) {
+          // Fallback: check localStorage for legacy conversations
+          try {
+            const raw = localStorage.getItem('echo_chat');
+            if (raw) {
+              const stored = JSON.parse(raw);
+              const legacyConv = Object.values(stored).find((c: any) => c.id === id);
+              if (legacyConv && isMounted) {
+                const row: ChatConversationRow = {
+                  id: (legacyConv as any).id,
+                  title: (legacyConv as any).customTitle || (legacyConv as any).title || 'Untitled conversation',
+                  createdAt: (legacyConv as any).createdAt || new Date().toISOString(),
+                  lastActivityAt: (legacyConv as any).lastActivityAt || new Date().toISOString(),
+                  messages: Array.isArray((legacyConv as any).messages) ? (legacyConv as any).messages.map((m: any, i: number) => ({
+                    id: m.id ?? `${(legacyConv as any).id}-${i}`,
+                    type: m.type === 'user' ? 'user' : 'ai',
+                    content: m.content ?? '',
+                    timestamp: m.timestamp ?? (legacyConv as any).createdAt,
+                    metadata: m.metadata,
+                  })) : [],
+                };
+                setConv(row);
+                analyticsEvents.track('hub_echo_history_open', { category: 'hub', label: 'chat' });
+                return;
+              }
+            }
+          } catch (e) {
+            console.error('Error loading legacy conversation:', e);
+          }
+          
+          if (error) throw error;
+        }
 
         if (isMounted && data) {
           const row: ChatConversationRow = {

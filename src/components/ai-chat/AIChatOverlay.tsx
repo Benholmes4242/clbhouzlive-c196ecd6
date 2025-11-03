@@ -24,6 +24,7 @@ import { useEchoProtection } from '@/hooks/useEchoProtection';
 import { AnimatePresence, motion } from 'framer-motion';
 import { subscribeAIOverlay, type AITab } from '@/controllers/aiOverlayController';
 import { Z } from '@/config/zIndex';
+import { useAutoSendFromQuery } from './hooks/useAutoSendFromQuery';
 
 interface ChatMessageData {
   id: string;
@@ -224,6 +225,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
       setActiveTab(initialTab || 'chat');
     }
   }, [isOpen, initialTab]);
+
+  // Auto-send message from URL query param (pane mode only, chat tab)
+  useAutoSendFromQuery((msg) => {
+    if (paneMode && activeTab === 'chat' && isOpen) {
+      sendMessage(msg);
+    }
+  });
 
   const requestLocation = () => {
     if (navigator.geolocation) {
