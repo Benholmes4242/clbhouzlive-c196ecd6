@@ -1,87 +1,20 @@
 /**
  * Hub Dashboard Design Tokens
- * Graphite Glass theme and utility classes
+ * Compact 2-column layout system
  */
 
 :root {
-  --hub-radius: 20px;
+  --hub-radius: 18px;
   --hub-pad: 16px;
-  --hub-gap: 16px;
+  --hub-gap: 14px;
 
-  --hub-header-height: 56px;
-  --hub-tile-compact: 200px;
-  --hub-tile-content: 312px;
+  --hub-header-height: 56px;      /* forces equal tile headers */
+  --hub-tile-compact: 200px;       /* Echo / Swing / Nearby */
+  --hub-tile-content: 312px;       /* Games / Your Games / Recent Echo */
 
-  /* Red Glass Theme */
-  --hub-bg-gradient: linear-gradient(180deg, #1A0505 0%, #2A0A0A 100%);
-  --hub-header-gradient: linear-gradient(180deg, #200808 0%, #2A0A0A 100%);
-  
-  --hub-glass-bg: rgba(255, 50, 50, 0.08);
-  --hub-glass-bg-hover: rgba(255, 50, 50, 0.12);
-  --hub-glass-blur: blur(20px);
-  
-  --hub-stroke: rgba(255, 80, 80, 0.25);
-  --hub-stroke-inner: rgba(255, 80, 80, 0.15);
-  
-  --hub-text: rgba(255, 255, 255, 0.95);
-  --hub-text-title: rgba(255, 255, 255, 0.95);
-  --hub-text-sub: rgba(255, 200, 200, 0.7);
-  
-  --hub-accent: #FF4444;
-  --hub-accent-bg: rgba(255, 68, 68, 0.1);
-  --hub-accent-bg-hover: rgba(255, 68, 68, 0.2);
-  --hub-accent-border: rgba(255, 68, 68, 0.5);
-  
-  --hub-shadow: 0 4px 24px rgba(255, 0, 0, 0.3);
-  --hub-shadow-inner: inset 0 0 0 0.5px rgba(255, 80, 80, 0.2);
+  --hub-stroke: rgba(255,255,255,.08);
+  --hub-surface: rgba(255,255,255,.06);
+  --hub-surface-2: rgba(255,255,255,.04);
+  --hub-text: rgba(255,255,255,.92);
+  --hub-text-sub: rgba(255,255,255,.60);
 }
-
-/* Page and Header */
-.hub-page { 
-  background: var(--hub-bg-gradient);
-  color: var(--hub-text);
-}
-.hub-header {
-  background: var(--hub-header-gradient);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(24px);
-}
-
-/* Card */
-.hub-card {
-  background: var(--hub-glass-bg);
-  border: 1px solid var(--hub-stroke);
-  border-radius: var(--hub-radius);
-  backdrop-filter: var(--hub-glass-blur);
-  box-shadow: var(--hub-shadow-inner), var(--hub-shadow);
-  padding: 16px 20px;
-  transition: all 0.3s ease;
-}
-.hub-card:hover { background: var(--hub-glass-bg-hover); transform: translateY(-2px); }
-
-/* Accent + Pills */
-.hub-accent { color: var(--hub-accent); }
-.hub-pill {
-  border: 1px solid var(--hub-accent-border);
-  color: rgba(255, 255, 255, 0.9);
-  background: var(--hub-accent-bg);
-  border-radius: 20px;
-  padding: 6px 14px;
-  backdrop-filter: blur(12px);
-  transition: background 0.2s ease;
-}
-.hub-pill:hover { background: var(--hub-accent-bg-hover); }
-
-/* Text helpers */
-.hub-text-title { color: var(--hub-text-title); }
-.hub-text-subtitle { color: var(--hub-text-sub); }
-
-/* Buttons */
-.hub-btn-glass {
-  border: 1px solid var(--hub-stroke);
-  background: var(--hub-glass-bg);
-  color: var(--hub-text);
-  backdrop-filter: blur(12px);
-  transition: background 0.2s ease;
-}
-.hub-btn-glass:hover { background: var(--hub-glass-bg-hover); }
