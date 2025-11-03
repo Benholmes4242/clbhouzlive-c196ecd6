@@ -1,7 +1,7 @@
 /* Load after Tailwind base/components/utilities */
 :root {
-  --hub-bg-start: #0E0E0E;
-  --hub-bg-end:   #1C1C1E;
+  --hub-bg-start: #1A2530;
+  --hub-bg-end:   #253540;
 
   --hub-text: rgba(255,255,255,0.92);
   --hub-sub:  rgba(255,255,255,0.65);
@@ -29,7 +29,7 @@
 }
 
 .hub-header {
-  background: linear-gradient(180deg, #111111 0%, var(--hub-bg-end) 100%);
+  background: linear-gradient(180deg, #1F2D38 0%, var(--hub-bg-end) 100%);
   border-bottom: 1px solid rgba(255,255,255,0.08);
   backdrop-filter: blur(24px);
 }
