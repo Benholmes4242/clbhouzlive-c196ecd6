@@ -19,8 +19,8 @@
      BACKGROUNDS & SURFACES
      ======================================== */
   /* Main Hub container gradient - Apple Frosted Glass */
-  --hub-bg-start: #f5f5f7;
-  --hub-bg-end: #e8e8ed;
+  --hub-bg-start: #ff7a00; /* DEBUG: orange test */
+  --hub-bg-end: #ffb347;   /* DEBUG: orange test */
   
   /* Backdrop overlay (behind Hub) */
   --hub-backdrop: rgba(0,0,0,0.70);
