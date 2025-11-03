@@ -39,6 +39,7 @@ interface AIChatOverlayProps {
   onHistoryStateChange?: (isHistoryOpen: boolean) => void;
   initialTab?: AITab;
   paneMode?: boolean; // NEW - render as inline pane without modal chrome
+  layout?: 'overlay' | 'page'; // NEW - page mode strips all chrome for Hub integration
 }
 
 const suggestedPrompts = [
@@ -49,7 +50,7 @@ const suggestedPrompts = [
   { text: "Plan me a 5 course USA golf trip", emoji: "🚩" }
 ];
 
-const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistoryStateChange, initialTab, paneMode = false }) => {
+const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistoryStateChange, initialTab, paneMode = false, layout = 'overlay' }) => {
   const [messages, setMessages] = useState<ChatMessageData[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -440,21 +441,31 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
   // Pane mode: render inner content without SlideOver modal chrome (Hub provides tabs)
   if (paneMode) {
+    const isPageMode = layout === 'page';
     return (
-      <div className="h-full w-full bg-gradient-to-b from-black via-[#0A0A0A] to-black flex flex-col overflow-hidden">
+      <div className={cn(
+        "h-full w-full flex flex-col overflow-hidden",
+        !isPageMode && "bg-gradient-to-b from-black via-[#0A0A0A] to-black"
+      )}>
         {/* Tabs - Hidden in pane mode since Hub shell provides main tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
 
           {/* Chat Tab */}
           <TabsContent value="chat" className="m-0 flex-1 overflow-hidden" style={{ minHeight: 0 }}>
             <div 
-              className="h-full overflow-y-auto overscroll-contain scroll-smooth px-4 pt-3 pb-4"
+              className={cn(
+                "h-full overflow-y-auto overscroll-contain scroll-smooth",
+                isPageMode ? "px-0 pt-0 pb-0" : "px-4 pt-3 pb-4"
+              )}
               style={{ WebkitOverflowScrolling: "touch" }}
               ref={chatScrollRef}
               onScroll={handleChatScroll}
             >
               {messages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center text-center px-6 py-20 space-y-6">
+                <div className={cn(
+                  "flex flex-col items-center justify-center text-center space-y-6",
+                  isPageMode ? "px-4 py-16" : "px-6 py-20"
+                )}>
                   <div className="h-20 w-20 rounded-3xl bg-black/40 backdrop-blur border border-white/20 shadow-[0_30px_120px_rgba(0,0,0,1),0_0_60px_rgba(255,255,255,0.08)] grid place-items-center">
                     <Bot className="h-9 w-9 text-white/80" />
                   </div>
@@ -466,7 +477,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   </div>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className={cn("space-y-2", isPageMode && "px-4")}>
                   {messages.map((message, index) => {
                     const isUser = message.type === 'user';
                     const prevMessage = index > 0 ? messages[index - 1] : null;
@@ -524,7 +535,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           {/* Swing Coach Tab */}
           <TabsContent value="swing" className="m-0 flex-1 overflow-hidden" style={{ minHeight: 0 }}>
             <div 
-              className="h-full overflow-y-auto overscroll-contain scroll-smooth px-4 pt-3 pb-4"
+              className={cn(
+                "h-full overflow-y-auto overscroll-contain scroll-smooth",
+                isPageMode ? "px-0 pt-0 pb-0" : "px-4 pt-3 pb-4"
+              )}
               style={{ WebkitOverflowScrolling: "touch" }}
             >
               <SwingCoach
@@ -543,7 +557,17 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         {/* Composer footer (chat only) */}
         {activeTab === 'chat' && (
           <footer 
-            className="sticky bottom-0 z-[2] bg-gradient-to-t from-black/95 to-black/60 backdrop-blur pt-3 pb-4 px-4 border-t border-white/08"
+            className={cn(
+              "sticky bottom-0 z-[2] border-t border-white/08",
+              isPageMode 
+                ? "bg-[rgba(15,15,15,0.85)] backdrop-blur pt-2 px-4" 
+                : "bg-gradient-to-t from-black/95 to-black/60 backdrop-blur pt-3 px-4"
+            )}
+            style={{
+              paddingBottom: isPageMode 
+                ? 'calc(12px + env(safe-area-inset-bottom, 0px))' 
+                : 'calc(16px + env(safe-area-inset-bottom, 0px))'
+            }}
             role="region"
             aria-label="Message composer"
           >

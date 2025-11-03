@@ -31,35 +31,38 @@ export function HubEchoPage() {
           <Route
             path="chat"
             element={
-              <AIChatOverlay
-                isOpen={true}
-                onClose={() => navigate('/hub/golfers', { replace: true })}
-                paneMode
-                initialTab="chat"
-              />
+                <AIChatOverlay
+                  isOpen={true}
+                  onClose={() => navigate('/hub/golfers', { replace: true })}
+                  paneMode
+                  layout="page"
+                  initialTab="chat"
+                />
             }
           />
           <Route
             path="swing"
             element={
-              <AIChatOverlay
-                isOpen={true}
-                onClose={() => navigate('/hub/golfers', { replace: true })}
-                paneMode
-                initialTab="swing"
-              />
+                <AIChatOverlay
+                  isOpen={true}
+                  onClose={() => navigate('/hub/golfers', { replace: true })}
+                  paneMode
+                  layout="page"
+                  initialTab="swing"
+                />
             }
           />
           <Route
             path="history"
             element={
-              <AIChatHistory
-                isOpen={true}
-                onClose={() => navigate('/hub/echo/chat')}
-                onSelectMessage={(id) => navigate(`/hub/echo/history/chat/${id}`)}
-                paneMode
-                defaultCategory="chat"
-              />
+                <AIChatHistory
+                  isOpen={true}
+                  onClose={() => navigate('/hub/echo/chat')}
+                  onSelectMessage={(id) => navigate(`/hub/echo/history/chat/${id}`)}
+                  paneMode
+                  layout="page"
+                  defaultCategory="chat"
+                />
             }
           />
           <Route path="history/chat/:id" element={<ChatDetailPane />} />
