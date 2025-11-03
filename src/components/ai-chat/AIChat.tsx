@@ -45,8 +45,8 @@ const AIChat: React.FC = () => {
     });
   }, []);
 
-  // Echo should never render on auth pages, when user is not authenticated, when modals are open, or in immersive modal
-  const shouldRenderEcho = !loading && user && !isAuthPage && !isTransitioning && !hasModalOpen && !isImmersiveModalOpen && !isProfileModalOpen;
+  // Echo should never render on auth pages, when user is not authenticated, when modals are open, in immersive modal, or on Hub routes
+  const shouldRenderEcho = !loading && user && !isAuthPage && !isTransitioning && !hasModalOpen && !isImmersiveModalOpen && !isProfileModalOpen && !location.pathname.startsWith('/hub');
 
   // Handle route changes - destroy Echo before navigation and hide during transition
   useEffect(() => {

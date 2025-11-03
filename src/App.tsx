@@ -221,17 +221,22 @@ const App: React.FC = () => {
                                     <Route path="/channel/:slug" element={<ChannelProfile />} />
                                     <Route path="/game/:id" element={<GameDetailView />} />
                                     
-                                    {/* Hub routes (feature-flagged) */}
-                                    {FEATURE_FLAGS.HUB && (
-                                      <Route path="/hub" element={<HubShell />}>
-                                        <Route index element={<HubGolfersPage />} />
-                                        <Route path="golfers" element={<HubGolfersPage />} />
-                                        <Route path="games" element={<HubGamesPage />} />
-                                        <Route path="your-games" element={<HubYourGamesPage />} />
-                                        <Route path="create-game" element={<HubCreateGamePage />} />
-                                        <Route path="echo" element={<HubEchoPage />} />
-                                      </Route>
-                                    )}
+                    {/* Hub routes (feature-flagged) */}
+                    {FEATURE_FLAGS.HUB && (
+                      <Route path="/hub" element={<HubShell />}>
+                        <Route index element={<HubGolfersPage />} />
+                        <Route path="golfers" element={<HubGolfersPage />} />
+                        <Route path="games" element={<HubGamesPage />} />
+                        <Route path="your-games" element={<HubYourGamesPage />} />
+                        <Route path="create-game" element={<HubCreateGamePage />} />
+                        <Route path="echo">
+                          <Route index element={<HubEchoPage view="chat" />} />
+                          <Route path="chat" element={<HubEchoPage view="chat" />} />
+                          <Route path="swing" element={<HubEchoPage view="swing" />} />
+                          <Route path="history" element={<HubEchoPage view="history" />} />
+                        </Route>
+                      </Route>
+                    )}
                                     
                                     <Route path="*" element={<NotFound />} />
                                   </Routes>

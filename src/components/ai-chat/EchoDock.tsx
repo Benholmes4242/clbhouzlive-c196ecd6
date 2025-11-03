@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { PiWaveform } from 'react-icons/pi';
-import { openAIOverlay } from '@/controllers/aiOverlayController';
 import EchoOrb from '@/components/echo/EchoOrb';
 import { Z } from '@/config/zIndex';
 
@@ -16,6 +15,7 @@ type ChatTab = 'chat' | 'swing' | 'message';
 
 const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldHide = false }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [pressTimer, setPressTimer] = useState<number | null>(null);
@@ -129,15 +129,8 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
     onClick();
   }
 
-  const openAIChatOverlay = (tab: ChatTab) => {
-    if (tab === 'swing') {
-      openAIOverlay('swing');
-    } else if (tab === 'chat') {
-      openAIOverlay('chat');
-    } else {
-      // Default fallback - use onClick for other tabs
-      onClick();
-    }
+  const openEcho = (dest: 'chat' | 'swing' | 'history' = 'chat') => {
+    navigate(`/hub/echo/${dest}`);
   };
 
   const dockContent = (
@@ -166,7 +159,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
         />
       </div>
 
-      {panelOpen && <RadialFan onItemClick={(tab) => { setPanelOpen(false); openAIChatOverlay(tab); }} />}
+      {panelOpen && <RadialFan onItemClick={(dest) => { setPanelOpen(false); openEcho(dest); }} />}
     </>
   );
 
@@ -174,7 +167,7 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
 };
 
 type RadialFanProps = {
-  onItemClick: (tab: ChatTab) => void;
+  onItemClick: (dest: 'chat' | 'swing' | 'history') => void;
 };
 
 const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
@@ -182,9 +175,9 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
   const fanRef = useRef<HTMLDivElement>(null);
   
   const items = [
-    { label: 'Chat', tab: 'chat' as ChatTab, disabled: false },
-    { label: 'Swing\nCoach', tab: 'swing' as ChatTab, disabled: false },
-    { label: 'Message', tab: 'message' as ChatTab, disabled: false },
+    { label: 'Chat', dest: 'chat' as const, disabled: false },
+    { label: 'Swing\nCoach', dest: 'swing' as const, disabled: false },
+    { label: 'History', dest: 'history' as const, disabled: false },
   ];
 
   const calculateSafePositions = useCallback(() => {
@@ -293,7 +286,7 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
         
         return (
           <button
-            key={item.tab}
+            key={item.dest}
             role="menuitem"
             className={`echoDoc-fanItem animate-in ${item.disabled ? 'is-disabled' : ''}`}
             style={{
@@ -303,7 +296,7 @@ const RadialFan: React.FC<RadialFanProps> = ({ onItemClick }) => {
               animationDelay: `${delay}ms`,
               pointerEvents: 'auto'
             }}
-            onClick={item.disabled ? undefined : () => onItemClick(item.tab)}
+            onClick={item.disabled ? undefined : () => onItemClick(item.dest)}
             onPointerDown={(e) => {
               e.stopPropagation();
               try { (navigator as any).vibrate?.(5); } catch {}

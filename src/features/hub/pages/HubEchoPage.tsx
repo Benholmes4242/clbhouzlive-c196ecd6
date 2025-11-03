@@ -15,8 +15,17 @@ import { ChatThread } from '@/features/echo/components/ChatThread';
 import { ChatComposer } from '@/features/echo/components/ChatComposer';
 import { HistoryPanel } from '@/features/echo/components/HistoryPanel';
 
-export function HubEchoPage() {
-  const [activeView, setActiveView] = useState<'chat' | 'history'>('chat');
+interface HubEchoPageProps {
+  view?: 'chat' | 'swing' | 'history';
+}
+
+export function HubEchoPage({ view = 'chat' }: HubEchoPageProps) {
+  const [activeView, setActiveView] = useState<'chat' | 'swing' | 'history'>(view);
+
+  // Update active view when route changes
+  useEffect(() => {
+    setActiveView(view);
+  }, [view]);
   
   const {
     state,
@@ -112,37 +121,11 @@ export function HubEchoPage() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* View Toggle */}
-      <div className="flex gap-2 bg-white/5 p-1 rounded-lg border border-white/10 mb-4">
-        <TapButton
-          className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${
-            activeView === 'chat'
-              ? 'bg-white/15 text-white'
-              : 'text-white/60 hover:text-white/80'
-          }`}
-          onClick={() => setActiveView('chat')}
-          aria-selected={activeView === 'chat'}
-        >
-          <MessageSquare className="w-4 h-4 inline mr-1.5" />
-          Chat
-        </TapButton>
-        <TapButton
-          className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${
-            activeView === 'history'
-              ? 'bg-white/15 text-white'
-              : 'text-white/60 hover:text-white/80'
-          }`}
-          onClick={() => setActiveView('history')}
-          aria-selected={activeView === 'history'}
-        >
-          <History className="w-4 h-4 inline mr-1.5" />
-          History
-        </TapButton>
-      </div>
+      {/* Temporarily hidden - controlled by HubShell primary tabs instead */}
 
       {/* Content */}
       <div className="flex-1 flex flex-col min-h-0 bg-background rounded-lg overflow-hidden">
-        {activeView === 'chat' ? (
+        {activeView === 'chat' && (
           <>
             <ChatThread 
               messages={activeConversation?.messages || []} 
@@ -155,7 +138,18 @@ export function HubEchoPage() {
               isStreaming={isStreaming}
             />
           </>
-        ) : (
+        )}
+        
+        {activeView === 'swing' && (
+          <div className="flex-1 flex items-center justify-center text-white/60">
+            <div className="text-center">
+              <p className="text-lg font-medium mb-2">Swing Coach</p>
+              <p className="text-sm">Coming soon</p>
+            </div>
+          </div>
+        )}
+        
+        {activeView === 'history' && (
           <HistoryPanel
             conversations={conversations}
             activeConversationId={state.activeConversationId}

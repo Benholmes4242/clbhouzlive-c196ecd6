@@ -68,24 +68,49 @@ export function HubShell({ onClose }: HubShellProps) {
     }
   };
 
-  // Determine active tab from route
-  const getActiveTab = () => {
+  // Determine primary tab (Nearby vs Echo)
+  const getPrimaryTab = () => {
+    const path = location.pathname;
+    if (path.includes('/echo')) return 'echo';
+    return 'nearby';
+  };
+
+  // Determine secondary tab within primary context
+  const getSecondaryTab = () => {
     const path = location.pathname;
     if (path.includes('/golfers')) return 'golfers';
     if (path.includes('/games')) return 'games';
     if (path.includes('/your-games')) return 'your-games';
     if (path.includes('/create-game')) return 'create-game';
-    if (path.includes('/echo')) return 'echo';
+    if (path.includes('/echo/chat')) return 'chat';
+    if (path.includes('/echo/swing')) return 'swing';
+    if (path.includes('/echo/history')) return 'history';
     return 'golfers';
   };
 
-  const activeTab = getActiveTab();
+  const activePrimary = getPrimaryTab();
+  const activeSecondary = getSecondaryTab();
 
-  const tabs = [
+  // Primary tabs
+  const primaryTabs = [
+    { id: 'nearby', label: 'Nearby', path: '/hub/golfers' },
+    { id: 'echo', label: 'Echo', path: '/hub/echo/chat' },
+  ];
+
+  // Secondary tabs (contextual based on primary)
+  const nearbyTabs = [
     { id: 'golfers', label: 'Golfers', path: '/hub/golfers' },
     { id: 'games', label: 'Games', path: '/hub/games' },
     { id: 'your-games', label: 'Your Games', path: '/hub/your-games' },
   ];
+
+  const echoTabs = [
+    { id: 'chat', label: 'Chat', path: '/hub/echo/chat' },
+    { id: 'swing', label: 'Swing Coach', path: '/hub/echo/swing' },
+    { id: 'history', label: 'History', path: '/hub/echo/history' },
+  ];
+
+  const secondaryTabs = activePrimary === 'echo' ? echoTabs : nearbyTabs;
 
   return (
     <>
@@ -152,23 +177,46 @@ export function HubShell({ onClose }: HubShellProps) {
             </div>
           </div>
 
-          {/* Tabs */}
-          <div className="flex px-5 mt-3 border-b border-white/[0.06]">
-            {tabs.map((tab) => (
+          {/* Primary Tabs (Nearby | Echo) */}
+          <div className="flex gap-2 px-5 mt-3 border-b border-white/[0.06]">
+            {primaryTabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => navigate(tab.path)}
-                className={`flex-1 py-3.5 text-sm font-medium relative transition-all duration-150 ${
-                  activeTab === tab.id
+                className={`flex-1 py-3 text-sm font-semibold relative transition-all duration-150 ${
+                  activePrimary === tab.id
                     ? 'text-white'
-                    : 'text-white/55 hover:text-white/75'
+                    : 'text-white/50 hover:text-white/70'
                 }`}
               >
                 {tab.label}
-                {activeTab === tab.id && (
+                {activePrimary === tab.id && (
                   <div 
                     className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-white/90 rounded-full transition-all duration-150"
-                    style={{ width: '48px' }}
+                    style={{ width: '56px' }}
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Secondary Tabs (contextual) */}
+          <div className="flex px-5 mt-2 border-b border-white/[0.04]">
+            {secondaryTabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => navigate(tab.path)}
+                className={`flex-1 py-2.5 text-xs font-medium relative transition-all duration-150 ${
+                  activeSecondary === tab.id
+                    ? 'text-white/90'
+                    : 'text-white/45 hover:text-white/65'
+                }`}
+              >
+                {tab.label}
+                {activeSecondary === tab.id && (
+                  <div 
+                    className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-white/70 rounded-full transition-all duration-150"
+                    style={{ width: '40px' }}
                   />
                 )}
               </button>
