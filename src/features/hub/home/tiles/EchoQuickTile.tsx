@@ -51,7 +51,10 @@ export function EchoQuickTile() {
             backdropFilter: 'blur(12px)',
           }}
         >
-          <Send size={18} style={{ color: 'var(--hub-text)' }} />
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeOpacity="0.9" strokeWidth="1.6">
+            <path d="M22 2L11 13" />
+            <path d="M22 2l-7 20-4-9-9-4 20-7z" />
+          </svg>
         </button>
       </form>
     </Tile>

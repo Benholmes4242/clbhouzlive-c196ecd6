@@ -13,29 +13,23 @@ import { EchoHistoryTile } from './tiles/EchoHistoryTile';
 
 export default function HubHome() {
   return (
-    <main 
-      className="w-full overflow-x-hidden px-3.5 pb-6"
-      style={{ 
-        background: 'var(--hub-bg-gradient)',
-        minHeight: '100vh'
-      }}
-    >
+    <main className="w-full overflow-x-hidden px-3.5 pb-6">
       {/* Top 2×2 grid */}
-      <div
-        className="grid"
-        style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem' }}
+      <section 
+        className="grid gap-4 sm:gap-5"
+        style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}
       >
         <EchoQuickTile />
         <SwingQuickTile />
         <NearbyGolfersTile limit={5} />
         <GamesNearYouTile limit={3} enableFilters={false} />
-      </div>
+      </section>
 
       {/* Full-width stack */}
-      <div className="mt-3.5 space-y-3.5">
+      <section className="mt-6 grid gap-4 sm:gap-5">
         <YourGamesTile />
         <EchoHistoryTile limitChat={1} limitSwing={2} />
-      </div>
+      </section>
     </main>
   );
 }

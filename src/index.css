@@ -11,6 +11,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './features/hub/styles/hubTheme.css';
+
 /* Sliding panels animations (in utilities layer so they can be composed with classes) */
 @layer utilities {
   .panel { will-change: transform, opacity; }
