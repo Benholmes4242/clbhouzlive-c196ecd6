@@ -17,7 +17,8 @@ export type ChatConversationRow = {
 
 export function safeParse<T>(key: string): T | null {
   try {
-    const raw = localStorage.getItem(key);
+    if (typeof window === 'undefined') return null;
+    const raw = window.localStorage.getItem(key);
     if (!raw) return null;
     return JSON.parse(raw) as T;
   } catch {

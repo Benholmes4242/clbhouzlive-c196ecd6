@@ -143,6 +143,7 @@ interface ChatConversation {
   createdAt: Date;
   lastActivityAt: Date;
   messageCount?: number;
+  source?: 'db' | 'legacy';
 }
 
 interface AIChatHistoryProps {
@@ -498,12 +499,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [editTitle, setEditTitle] = useState('');
   
   // Helper function to handle expansion with scroll management
-  const handleExpansion = (type: 'chat' | 'caddie' | 'swing', id: string, element?: HTMLElement) => {
+  const handleExpansion = (type: 'chat' | 'caddie' | 'swing', id: string, element?: HTMLElement, source?: 'db' | 'legacy') => {
     // ✅ In paneMode, navigate to detail view instead of expanding
     if (paneMode) {
       if (type === 'chat') {
+        analyticsEvents.track('hub_echo_history_open', { category: 'hub', label: 'chat', source: source ?? 'db' });
         navigate(`/hub/echo/history/chat/${id}`);
       } else if (type === 'swing') {
+        analyticsEvents.track('hub_echo_history_open', { category: 'hub', label: 'swing', source: source ?? 'db' });
         navigate(`/hub/echo/history/swing/${id}`);
       }
       return;
@@ -592,9 +595,9 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     setErrorStates(prev => ({ ...prev, conversations: null }));
     
     try {
-      const rows: Array<{ id: string; title: string; dateISO: string; count?: number }> = [];
+      const rows: Array<{ id: string; title: string; dateISO: string; count?: number; source: 'db' | 'legacy' }> = [];
 
-      // 1) DB (when available)
+      // 1) DB first (when available) - DB takes precedence
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
@@ -617,6 +620,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 title: conv.title ?? 'New conversation',
                 dateISO: conv.updated_at || conv.created_at,
                 count: messages.length,
+                source: 'db'
               });
             }
           }
@@ -634,18 +638,26 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             title: conv.title,
             dateISO: conv.lastActivityAt || conv.createdAt,
             count: conv.messages?.length || undefined,
+            source: 'legacy'
           });
         }
       } catch (e) {
         console.warn('Legacy chat history load skipped', e);
       }
 
-      // 3) De-dup by id, sort desc
-      const dedup = new Map<string, { id: string; title: string; dateISO: string; count?: number }>();
-      for (const r of rows) if (r.id && !dedup.has(r.id)) dedup.set(r.id, r);
+      // 3) De-dup by id (DB wins over legacy), sort desc
+      const dedup = new Map<string, { id: string; title: string; dateISO: string; count?: number; source: 'db' | 'legacy' }>();
+      for (const r of rows) {
+        if (r.id && (!dedup.has(r.id) || r.source === 'db')) {
+          dedup.set(r.id, r);
+        }
+      }
       const merged = Array.from(dedup.values())
         .sort((a, b) => new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime())
         .slice(0, PAGE_SIZE);
+
+      // Helper for safe date parsing
+      const toDate = (v?: string) => (v && !Number.isNaN(Date.parse(v)) ? new Date(v) : new Date());
 
       // Map to UI format
       const uiRows = merged.map(row => ({
@@ -653,20 +665,23 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         title: row.title,
         customTitle: row.title,
         messages: [],
-        timestamp: new Date(row.dateISO),
-        createdAt: new Date(row.dateISO),
-        lastActivityAt: new Date(row.dateISO),
-        messageCount: row.count
+        timestamp: toDate(row.dateISO),
+        createdAt: toDate(row.dateISO),
+        lastActivityAt: toDate(row.dateISO),
+        messageCount: row.count,
+        source: row.source
       }));
 
-      setHasMore(rows.length >= PAGE_SIZE);
+      setHasMore(merged.length === PAGE_SIZE);
       setConversations(prev => nextPage === 0 ? uiRows : [...prev, ...uiRows]);
       setPage(nextPage);
 
       console.log('✅ [loadPage] Loaded conversations (DB + legacy):', {
         page: nextPage,
         loaded: merged.length,
-        hasMore: rows.length >= PAGE_SIZE
+        dbCount: rows.filter(r => r.source === 'db').length,
+        legacyCount: rows.filter(r => r.source === 'legacy').length,
+        hasMore: merged.length === PAGE_SIZE
       });
     } catch (error) {
       console.error('Failed to load chat conversations:', error);
@@ -902,7 +917,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 {filteredConversations.map((conv) => (
                   <button
                     key={conv.id}
-                    onClick={() => handleExpansion('chat', conv.id)}
+                    onClick={() => handleExpansion('chat', conv.id, undefined, (conv as any).source)}
                     className="w-full text-left rounded-xl bg-white/06 hover:bg-white/08 border border-white/08 hover:border-white/12 p-4 transition"
                   >
                     <div className="font-medium text-white mb-1">{conv.customTitle || conv.title}</div>
@@ -1394,7 +1409,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                    <article 
                                      key={conversation.id} 
                                      className="group relative rounded-2xl bg-white/06 backdrop-blur border border-white/08 hover:border-white/12 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] active:translate-y-0 focus-within:ring-2 focus-within:ring-white/20 px-4 py-3 sm:px-5 sm:py-4 cursor-pointer shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
-                                     onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
+                                     onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id, undefined, conversation.source)}
                                      role="button"
                                      tabIndex={0}
                                      aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
@@ -1402,7 +1417,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                        if (e.key === 'Enter' || e.key === ' ') {
                                          e.preventDefault();
                                          if (!(expandedCard?.type === 'chat' && expandedCard?.id === conversation.id)) {
-                                           handleExpansion('chat', conversation.id);
+                                           handleExpansion('chat', conversation.id, undefined, conversation.source);
                                          }
                                        }
                                      }}
@@ -1508,7 +1523,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                    <article 
                                      key={conversation.id} 
                                      className="group relative rounded-2xl bg-white/06 backdrop-blur border border-white/08 hover:border-white/12 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] active:translate-y-0 focus-within:ring-2 focus-within:ring-white/20 px-4 py-3 sm:px-5 sm:py-4 cursor-pointer shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
-                                     onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
+                                     onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id, undefined, conversation.source)}
                                      role="button"
                                      tabIndex={0}
                                      aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
@@ -1516,7 +1531,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                        if (e.key === 'Enter' || e.key === ' ') {
                                          e.preventDefault();
                                          if (!(expandedCard?.type === 'chat' && expandedCard?.id === conversation.id)) {
-                                           handleExpansion('chat', conversation.id);
+                                           handleExpansion('chat', conversation.id, undefined, conversation.source);
                                          }
                                        }
                                      }}
@@ -1622,7 +1637,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                    <article 
                                      key={conversation.id} 
                                      className="group relative rounded-2xl bg-white/06 backdrop-blur border border-white/08 hover:border-white/12 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] active:translate-y-0 focus-within:ring-2 focus-within:ring-white/20 px-4 py-3 sm:px-5 sm:py-4 cursor-pointer shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
-                                     onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id)}
+                                     onClick={expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? undefined : () => handleExpansion('chat', conversation.id, undefined, conversation.source)}
                                      role="button"
                                      tabIndex={0}
                                      aria-label={`Open conversation: ${conversation.customTitle || conversation.title}`}
@@ -1630,7 +1645,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                        if (e.key === 'Enter' || e.key === ' ') {
                                          e.preventDefault();
                                          if (!(expandedCard?.type === 'chat' && expandedCard?.id === conversation.id)) {
-                                           handleExpansion('chat', conversation.id);
+                                           handleExpansion('chat', conversation.id, undefined, conversation.source);
                                          }
                                        }
                                      }}

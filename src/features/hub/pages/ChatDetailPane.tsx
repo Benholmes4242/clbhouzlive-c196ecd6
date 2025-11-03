@@ -48,7 +48,9 @@ export function ChatDetailPane() {
             return;
           }
           
-          if (error) throw error;
+          if (error && !legacyRow) {
+            throw new Error('Conversation not found');
+          }
         }
 
         if (isMounted && data) {

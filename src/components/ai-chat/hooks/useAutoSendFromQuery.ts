@@ -38,6 +38,8 @@ export function useAutoSendFromQuery(onSend: SendFn, opts?: AutoSendOptions) {
     firedRef.current = true;
     try {
       onSend(text);
+    } catch (e) {
+      console.warn('[useAutoSendFromQuery] Send failed:', e);
     } finally {
       if (stripOn === 'always') {
         url.searchParams.delete(param);
