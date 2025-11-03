@@ -28,6 +28,22 @@ import { SlideOver } from '@/components/ui/slide-over';
 import EchoProtection from './EchoProtection';
 import { useEchoProtection } from '@/hooks/useEchoProtection';
 import { useEchoConversationsOptional } from '@/features/echo/components/EchoConversationsProvider';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
+// Chat conversation row type (DB single source of truth)
+type ChatConversationRow = {
+  id: string;
+  title: string;
+  createdAt: string;
+  lastActivityAt: string;
+  messages: Array<{
+    id: string;
+    type: 'user' | 'ai';
+    content: string;
+    timestamp: string;
+    metadata?: any;
+  }>;
+};
 
 // HLS Video Player Component
 export const HLSVideoPlayer: React.FC<{ src: string; poster?: string; className?: string }> = ({ src, poster, className }) => {
@@ -406,11 +422,19 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   
   console.log('🚀 [AIChatHistory] Component mounted/updated', { isOpen, paneMode, initialTab });
   
+  const PAGE_SIZE = 20;
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(defaultCategory || 'all');
   const [selectedTag, setSelectedTag] = useState('all');
   const [historyMessages, setHistoryMessages] = useState<HistoryMessage[]>([]);
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
+  
+  // Swing pagination
+  const [swingPage, setSwingPage] = useState(0);
+  const [swingHasMore, setSwingHasMore] = useState(true);
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   
   // ✅ Correct: Always call hook (Rules of Hooks), but only use when paneMode
@@ -435,10 +459,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     }
   }, [paneMode, echoCtx, providerConvos.length]);
   
-  // Get conversation session for chat history  
-  const conversationSession = useConversationSession({
+  // DB session for single source of truth in Hub
+  const session = useConversationSession({
     storageKey: 'echo_chat',
-    isModalOpen: false // We don't want to trigger auto-save behavior
+    isModalOpen: false
   });
   
   // Loading and error states
@@ -517,165 +541,193 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     direction: 'top'
   });
 
+  // Mapper function for session conversations
+  function mapSessionToRows(input: typeof session.conversations): ChatConversationRow[] {
+    return input.map(conv => ({
+      id: conv.id,
+      title: conv.title ?? 'New conversation',
+      createdAt: conv.createdAt.toISOString(),
+      lastActivityAt: conv.lastActivityAt.toISOString(),
+      messages: conv.messages.map((m, i) => ({
+        id: m.id ?? `${conv.id}-${i}`,
+        type: m.type === 'user' ? 'user' : 'ai',
+        content: m.content ?? '',
+        timestamp: m.timestamp.toISOString(),
+        metadata: m.metadata,
+      })),
+    }));
+  }
+
   // Load data when component opens or when provider data changes
   useEffect(() => {
     if (isOpen) {
-      loadChatConversations();
-      // loadCaddieLogs(); // Now handled by hook
-      loadSwingAnalyses();
+      analyticsEvents.track('hub_echo_open', { category: 'hub' });
+      loadPage(0);
+      loadSwingPage(0);
     }
-  }, [isOpen, echoCtx, providerConvos.length]); // Also depend on echoCtx itself
+  }, [isOpen]);
 
-  const loadChatConversations = async () => {
-    console.log('🔍 [loadChatConversations] Starting...', { 
-      paneMode, 
-      hasEchoCtx: !!echoCtx,
-      providerCount: providerConvos.length,
-      echoConvosCount: echoCtx?.conversations?.length
-    });
+  // Track tab switches
+  useEffect(() => {
+    if (isOpen && activeTab) {
+      analyticsEvents.track('hub_echo_tab', { category: 'hub', label: activeTab });
+    }
+  }, [activeTab, isOpen]);
+
+  // Load chat conversations with pagination (DB single source of truth)
+  async function loadPage(nextPage = 0) {
+    if (loadingStates.conversations) return;
     
     setLoadingStates(prev => ({ ...prev, conversations: true }));
     setErrorStates(prev => ({ ...prev, conversations: null }));
     
     try {
-      // ✅ Use provider data in Hub pane
-      if (paneMode) {
-        console.log('📱 [loadChatConversations] In paneMode, checking provider...');
-        console.log('Provider conversations:', echoCtx?.conversations?.length);
-        
-        if (echoCtx && echoCtx.conversations && echoCtx.conversations.length > 0) {
-          console.log('✅ [loadChatConversations] Mapping provider data:', echoCtx.conversations.length);
-          const mapped = echoCtx.conversations.map(conv => ({
-            id: conv.id,
-            title: conv.title || "New conversation",
-            customTitle: conv.title,
-            messages: conv.messages.map((msg: any, index: number) => ({
-              id: msg.id || `${conv.id}-${index}`,
-              type: (msg.role === 'user' ? 'user' : 'ai') as 'user' | 'ai',
-              content: msg.content || '',
-              timestamp: new Date(msg.createdAt ?? conv.updatedAt ?? Date.now()),
-              metadata: msg.meta
-            })),
-            timestamp: new Date(conv.updatedAt ?? Date.now()),
-            createdAt: new Date(conv.createdAt ?? Date.now()),
-            lastActivityAt: new Date(conv.updatedAt ?? Date.now()),
-            messageCount: conv.messages.length
-          }));
-          setConversations(mapped);
-          // Do not return; continue to also consider DB fallback merge if needed
-        } else {
-          console.log('⚠️ [loadChatConversations] No provider data; will fallback to Supabase list');
-        }
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setConversations([]);
+        setHasMore(false);
+        return;
       }
-      
-      // Fallback: load from Supabase conversation session
-      console.log('📱 Loading from conversation session...');
-      await conversationSession.loadConversations();
-      console.log('📱 Conversation session data:', conversationSession.conversations.length, 'conversations');
-      
-      const sessionConversations = conversationSession.conversations.map(conv => ({
+
+      const from = nextPage * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+
+      const { data, error, count } = await supabase
+        .from('conversations')
+        .select('*', { count: 'exact' })
+        .eq('user_id', user.id)
+        .eq('conversation_type', 'chat')
+        .order('updated_at', { ascending: false })
+        .range(from, to);
+
+      if (error) throw error;
+
+      const rows: ChatConversationRow[] = (data ?? []).map(conv => ({
         id: conv.id,
-        title: conv.title || "New conversation",
-        customTitle: conv.title,
-        messages: conv.messages.map((msg, index) => ({
-          id: `${conv.id}-${index}`,
-          type: (msg.type === 'user' ? 'user' : 'ai') as 'user' | 'ai',
-          content: msg.content || '',
-          timestamp: new Date(msg.timestamp),
-          metadata: msg.metadata
-        })),
-        timestamp: new Date(conv.lastActivityAt),
-        createdAt: new Date(conv.createdAt),
-        lastActivityAt: new Date(conv.lastActivityAt),
-        messageCount: conv.messages.length
+        title: conv.title ?? 'New conversation',
+        createdAt: conv.created_at,
+        lastActivityAt: conv.updated_at,
+        messages: Array.isArray(conv.messages) ? conv.messages.map((m: any, i: number) => ({
+          id: m.id ?? `${conv.id}-${i}`,
+          type: m.type === 'user' ? 'user' : 'ai',
+          content: m.content ?? '',
+          timestamp: m.timestamp ?? conv.created_at,
+          metadata: m.metadata,
+        })) : [],
       }));
 
-      // If provider already set conversations, prefer that; otherwise use session
-      if (paneMode && echoCtx?.conversations?.length) {
-        console.log('ℹ️ [loadChatConversations] Keeping provider conversations');
-      } else {
-        console.log('ℹ️ [loadChatConversations] Using Supabase conversations:', sessionConversations.length);
-        setConversations(sessionConversations);
-      }
+      // Map to UI format
+      const uiRows = rows.map(row => ({
+        id: row.id,
+        title: row.title,
+        customTitle: row.title,
+        messages: row.messages.map(m => ({
+          ...m,
+          timestamp: new Date(m.timestamp)
+        })),
+        timestamp: new Date(row.lastActivityAt),
+        createdAt: new Date(row.createdAt),
+        lastActivityAt: new Date(row.lastActivityAt),
+        messageCount: row.messages.length
+      }));
 
-      console.log('📱 Session conversations processed:', sessionConversations.length);
-      setConversations(sessionConversations);
+      setHasMore((from + rows.length) < (count ?? 0));
+      setConversations(prev => nextPage === 0 ? uiRows : [...prev, ...uiRows]);
+      setPage(nextPage);
 
+      console.log('✅ [loadPage] Loaded conversations:', {
+        page: nextPage,
+        loaded: rows.length,
+        total: count,
+        hasMore: (from + rows.length) < (count ?? 0)
+      });
     } catch (error) {
       console.error('Failed to load chat conversations:', error);
       setErrorStates(prev => ({ ...prev, conversations: 'Failed to load conversations. Please try again.' }));
     } finally {
       setLoadingStates(prev => ({ ...prev, conversations: false }));
     }
-  };
+  }
 
-  const loadSwingAnalyses = async () => {
-    console.log('🔍 Loading swing analyses...');
+  // Load swing analyses with pagination
+  async function loadSwingPage(nextPage = 0) {
+    if (loadingStates.swingAnalyses) return;
+    
     setLoadingStates(prev => ({ ...prev, swingAnalyses: true }));
     setErrorStates(prev => ({ ...prev, swingAnalyses: null }));
     
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        console.log('No authenticated user for loading swing analyses');
         setSwingAnalyses([]);
+        setSwingHasMore(false);
         return;
       }
 
-      const { data, error } = await supabase
-        .from('pro_ai_analyses')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+      const from = nextPage * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
 
-      console.log('Swing analyses query result - data:', data, 'error:', error);
+      const { data, error, count } = await supabase
+        .from('pro_ai_analyses')
+        .select('*', { count: 'exact' })
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
       if (error) {
         console.error('Error loading swing analyses:', error);
         setErrorStates(prev => ({ ...prev, swingAnalyses: 'Failed to load swing analyses. Please try again.' }));
+        setSwingHasMore(false);
         return;
       }
 
-      if (data) {
-        const formattedAnalyses = data.map(analysis => {
-          const analysisResults = analysis.analysis_results as any;
-          const swingContextData = analysis.swing_context as string;
-          
-          let swingContext: any = {};
-          try {
-            if (swingContextData) {
-              swingContext = JSON.parse(swingContextData);
-            }
-          } catch (e) {
-            console.error('Error parsing swing context:', e);
+      const formattedAnalyses = (data ?? []).map(analysis => {
+        const analysisResults = analysis.analysis_results as any;
+        const swingContextData = analysis.swing_context as string;
+        
+        let swingContext: any = {};
+        try {
+          if (swingContextData) {
+            swingContext = JSON.parse(swingContextData);
           }
+        } catch (e) {
+          console.error('Error parsing swing context:', e);
+        }
 
-          return {
-            id: analysis.id,
-            save_card: analysisResults?.metadata?.save_card || 'Swing Analysis',
-            category: analysisResults?.metadata?.category || 'Swing',
-            content: analysisResults?.aiResponse || '',
-            tags: analysisResults?.metadata?.tags || [],
-            videoUrl: analysis.video_url,
-            videoThumbnail: swingContext.videoThumbnail || null,
-            timestamp: new Date(analysis.created_at)
-          };
-        });
-        console.log('Formatted swing analyses:', formattedAnalyses);
-        setSwingAnalyses(formattedAnalyses);
-      }
+        return {
+          id: analysis.id,
+          save_card: analysisResults?.metadata?.save_card || 'Swing Analysis',
+          category: analysisResults?.metadata?.category || 'Swing',
+          content: analysisResults?.aiResponse || '',
+          tags: analysisResults?.metadata?.tags || [],
+          videoUrl: analysis.video_url,
+          videoThumbnail: swingContext.videoThumbnail || null,
+          timestamp: new Date(analysis.created_at)
+        };
+      });
+
+      setSwingHasMore((from + formattedAnalyses.length) < (count ?? 0));
+      setSwingAnalyses(prev => nextPage === 0 ? formattedAnalyses : [...prev, ...formattedAnalyses]);
+      setSwingPage(nextPage);
+
+      console.log('✅ [loadSwingPage] Loaded swing analyses:', {
+        page: nextPage,
+        loaded: formattedAnalyses.length,
+        total: count,
+        hasMore: (from + formattedAnalyses.length) < (count ?? 0)
+      });
     } catch (error) {
       console.error('Failed to load swing analyses:', error);
       setErrorStates(prev => ({ ...prev, swingAnalyses: 'Failed to load swing analyses. Please try again.' }));
     } finally {
       setLoadingStates(prev => ({ ...prev, swingAnalyses: false }));
     }
-  };
+  }
 
   const deleteConversation = async (conversationId: string) => {
     try {
-      // Delete from conversation session
-      await conversationSession.deleteConversation(conversationId);
+      // Delete from DB session
+      await session.deleteConversation(conversationId);
       
       // Update local state
       setConversations(prev => prev.filter(conv => conv.id !== conversationId));
@@ -1015,7 +1067,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     ) : errorStates.conversations ? (
                       <ErrorState
                         message={errorStates.conversations}
-                        onRetry={loadChatConversations}
+                        onRetry={() => loadPage(0)}
                       />
                     ) : filteredConversations.length === 0 ? (
                       searchQuery ? (
@@ -1389,8 +1441,21 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           );
                         })()}
                         
+                        {/* Load more button */}
+                        {hasMore && !loadingStates.conversations && (
+                          <div className="flex justify-center py-6">
+                            <button
+                              className="px-6 py-3 rounded-full bg-white/08 hover:bg-white/12 border border-white/12 hover:border-white/20 text-white font-medium transition-all duration-200"
+                              onClick={() => loadPage(page + 1)}
+                              disabled={loadingStates.conversations}
+                            >
+                              {loadingStates.conversations ? 'Loading…' : 'Load more'}
+                            </button>
+                          </div>
+                        )}
+                        
                         {/* End of list marker */}
-                        {filteredConversations.length > 0 && (
+                        {!hasMore && filteredConversations.length > 0 && (
                           <div className="py-6 text-center text-[12px] text-white/40 select-none">
                             You're all caught up
                           </div>
@@ -1423,7 +1488,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     ) : errorStates.swingAnalyses ? (
                       <ErrorState 
                         message={errorStates.swingAnalyses}
-                        onRetry={loadSwingAnalyses}
+                        onRetry={() => loadSwingPage(0)}
                       />
                     ) : filteredSwingAnalyses.length === 0 ? (
                       searchQuery ? (
@@ -1540,8 +1605,21 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           );
                         })()}
                         
+                        {/* Load more button */}
+                        {swingHasMore && !loadingStates.swingAnalyses && (
+                          <div className="flex justify-center py-6">
+                            <button
+                              className="px-6 py-3 rounded-full bg-white/08 hover:bg-white/12 border border-white/12 hover:border-white/20 text-white font-medium transition-all duration-200"
+                              onClick={() => loadSwingPage(swingPage + 1)}
+                              disabled={loadingStates.swingAnalyses}
+                            >
+                              {loadingStates.swingAnalyses ? 'Loading…' : 'Load more'}
+                            </button>
+                          </div>
+                        )}
+                        
                         {/* End of list marker */}
-                        {filteredSwingAnalyses.length > 0 && (
+                        {!swingHasMore && filteredSwingAnalyses.length > 0 && (
                           <div className="py-6 text-center text-[12px] text-white/40 select-none">
                             You're all caught up
                           </div>

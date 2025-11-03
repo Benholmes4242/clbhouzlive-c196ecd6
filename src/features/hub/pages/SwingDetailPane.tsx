@@ -13,6 +13,7 @@ import { echoLinks } from '@/features/echo/utils/echoLinks';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { HLSVideoPlayer } from '@/components/ai-chat/AIChatHistory';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 export function SwingDetailPane() {
   const { id } = useParams<{ id: string }>();
@@ -52,9 +53,10 @@ export function SwingDetailPane() {
             id: data.id,
             title: analysisResults?.metadata?.save_card || 'Swing Analysis',
             content: analysisResults?.aiResponse || '',
-            videoUrl: data.video_url,
+            videoUrl: data.video_url || null,
             timestamp: new Date(data.created_at),
           });
+          analyticsEvents.track('hub_echo_swing_view', { category: 'hub', label: data.id });
         }
       } catch (error) {
         console.error('Error loading swing analysis:', error);
@@ -150,7 +152,7 @@ export function SwingDetailPane() {
           {/* Analysis Content */}
           <div className="bg-white/05 rounded-lg p-4 border border-white/10">
             <div className="text-sm text-white/90 whitespace-pre-wrap">
-              {analysis.content}
+              {analysis.content ?? 'No analysis content available'}
             </div>
           </div>
 

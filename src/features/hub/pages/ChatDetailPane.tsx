@@ -1,30 +1,87 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEchoConversationsContext } from '@/features/echo/components/EchoConversationsProvider';
+import { supabase } from '@/integrations/supabase/client';
 import { useEchoDeepLink } from '@/features/echo/hooks/useEchoDeepLink';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ArrowLeft, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Copy, Check, Loader2 } from 'lucide-react';
 import { echoLinks } from '@/features/echo/utils/echoLinks';
 import { toast } from 'sonner';
-import ChatMessageComponent from '@/components/ai-chat/ChatMessage';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
+type ChatConversationRow = {
+  id: string;
+  title: string;
+  createdAt: string;
+  lastActivityAt: string;
+  messages: Array<{
+    id: string;
+    type: 'user' | 'ai';
+    content: string;
+    timestamp: string;
+    metadata?: any;
+  }>;
+};
 
 export function ChatDetailPane() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { conversations, selectConversation } = useEchoConversationsContext();
+  const [conv, setConv] = useState<ChatConversationRow | null>(null);
+  const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = React.useState<string | null>(null);
   
   useEchoDeepLink();
 
-  // Find and select conversation
-  React.useEffect(() => {
-    if (id) {
-      selectConversation(id);
-    }
-  }, [id, selectConversation]);
+  // Cold start hydration - fetch from DB if needed
+  useEffect(() => {
+    let isMounted = true;
+    
+    (async () => {
+      if (!id) return;
+      
+      setLoading(true);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user || !isMounted) return;
 
-  const conversation = conversations.find(c => c.id === id);
+        const { data, error } = await supabase
+          .from('conversations')
+          .select('*')
+          .eq('id', id)
+          .eq('user_id', user.id)
+          .single();
+
+        if (error) throw error;
+
+        if (isMounted && data) {
+          const row: ChatConversationRow = {
+            id: data.id,
+            title: data.title ?? 'New conversation',
+            createdAt: data.created_at,
+            lastActivityAt: data.updated_at,
+            messages: Array.isArray(data.messages) ? data.messages.map((m: any, i: number) => ({
+              id: m.id ?? `${data.id}-${i}`,
+              type: m.type === 'user' ? 'user' : 'ai',
+              content: m.content ?? '',
+              timestamp: m.timestamp ?? data.created_at,
+              metadata: m.metadata,
+            })) : [],
+          };
+          setConv(row);
+          analyticsEvents.track('hub_echo_history_open', { category: 'hub', label: 'chat' });
+        }
+      } catch (error) {
+        console.error('Error loading conversation:', error);
+        if (isMounted) {
+          toast.error('Failed to load conversation');
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    })();
+
+    return () => { isMounted = false; };
+  }, [id]);
 
   const copyMessageLink = (messageId: string) => {
     const link = `${window.location.origin}${echoLinks.chat(id!, { msgId: messageId })}`;
@@ -34,7 +91,15 @@ export function ChatDetailPane() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  if (!conversation) {
+  if (loading) {
+    return (
+      <div className="h-full flex items-center justify-center bg-gradient-to-b from-black via-[#0A0A0A] to-black">
+        <Loader2 className="h-8 w-8 animate-spin text-white/60" />
+      </div>
+    );
+  }
+
+  if (!conv) {
     return (
       <div className="h-full flex flex-col items-center justify-center gap-4 text-white/60 bg-gradient-to-b from-black via-[#0A0A0A] to-black">
         <p>Conversation not found</p>
@@ -63,9 +128,9 @@ export function ChatDetailPane() {
           Back
         </Button>
         <div className="flex-1 min-w-0">
-          <div className="font-semibold text-white truncate">{conversation.title}</div>
+          <div className="font-semibold text-white truncate">{conv.title}</div>
           <div className="text-xs text-white/60">
-            {conversation.messages.length} messages
+            {conv.messages.length} messages
           </div>
         </div>
       </div>
@@ -73,8 +138,8 @@ export function ChatDetailPane() {
       {/* Messages */}
       <ScrollArea className="flex-1">
         <div className="px-4 py-4 space-y-3 max-w-3xl mx-auto">
-          {conversation.messages.map((msg) => {
-            const isUser = msg.role === 'user';
+          {conv.messages.map((msg) => {
+            const isUser = msg.type === 'user';
             return (
               <div
                 key={msg.id}
@@ -90,9 +155,9 @@ export function ChatDetailPane() {
                     }`}
                   >
                     <div className="whitespace-pre-wrap break-words">{msg.content}</div>
-                    {msg.meta?.error && (
+                    {msg.metadata?.error && (
                       <div className="mt-2 text-xs text-red-400">
-                        Error: {msg.meta.error}
+                        Error: {msg.metadata.error}
                       </div>
                     )}
                   </div>

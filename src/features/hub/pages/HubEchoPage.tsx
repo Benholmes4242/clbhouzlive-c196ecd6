@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import AIChatOverlay from '@/components/ai-chat/AIChatOverlay';
 import AIChatHistory from '@/components/ai-chat/AIChatHistory';
 import { EchoConversationsProvider } from '@/features/echo/components/EchoConversationsProvider';
@@ -14,6 +14,14 @@ import { SwingDetailPane } from './SwingDetailPane';
 
 export function HubEchoPage() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  // Explicit redirect for /hub/echo to /hub/echo/chat
+  const isIndex = pathname === '/hub/echo' || pathname === '/hub/echo/';
+  
+  if (isIndex) {
+    return <Navigate to="/hub/echo/chat" replace />;
+  }
 
   return (
     <EchoConversationsProvider>
