@@ -35,7 +35,7 @@ function safeParse<T>(key: string): T | null {
 
 function loadLegacyConversation(id: string): ChatConversationRow | null {
   try {
-    const legacy = safeParse<Record<string, any>>('echo_chat');
+    const legacy = safeParse<Record<string, any> | any[]>('echo_chat');
     if (!legacy) return null;
 
     const arr = Array.isArray(legacy) ? legacy : Object.values(legacy);
@@ -49,7 +49,7 @@ function loadLegacyConversation(id: string): ChatConversationRow | null {
     const messages = Array.isArray(hit.messages)
       ? hit.messages.map((m: any, i: number) => ({
           id: m.id ?? `${convId}-${i}`,
-          type: (m.role || m.type || 'ai') === 'user' ? 'user' : 'ai',
+          type: (m.role || m.type) === 'user' ? 'user' : 'ai',
           content: String(m.content ?? ''),
           timestamp: m.timestamp || createdAt,
           metadata: m.meta || m.metadata,
