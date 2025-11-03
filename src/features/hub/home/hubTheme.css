@@ -18,24 +18,24 @@
   /* ========================================
      BACKGROUNDS & SURFACES
      ======================================== */
-  /* Main Hub container gradient - Dark charcoal like reference */
-  --hub-bg-start: #2a2d32; /* Dark charcoal */
-  --hub-bg-end: #1e2024;   /* Darker charcoal */
+  /* Main Hub container gradient - Apple Frosted Glass */
+  --hub-bg-start: #ff7a00; /* DEBUG: orange test */
+  --hub-bg-end: #ffb347;   /* DEBUG: orange test */
   
   /* Backdrop overlay (behind Hub) */
   --hub-backdrop: rgba(0,0,0,0.70);
   --hub-backdrop-blur: 12px;
   
-  /* Header - Subtle dark glass */
-  --hub-header-top: rgba(50,52,56,0.95);
-  --hub-header-mid: rgba(50,52,56,0.75);
-  --hub-header-clear: rgba(50,52,56,0.00);
+  /* Header - Apple Control Center vibe */
+  --hub-header-top: rgba(28,28,30,0.92);
+  --hub-header-mid: rgba(28,28,30,0.70);
+  --hub-header-clear: rgba(28,28,30,0.00);
   --hub-header-blur: 24px;
   
-  /* Frosted glass surface - Subtle like reference image */
-  --hub-glass: rgba(255,255,255,0.10);      /* Subtle white overlay */
-  --hub-glass-hover: rgba(255,255,255,0.14); /* Slightly brighter on hover */
-  --hub-glass-subtle: rgba(255,255,255,0.06); /* Very subtle */
+  /* Frosted glass surface (light-through-dark) */
+  --hub-glass: rgba(255,255,255,0.14);
+  --hub-glass-hover: rgba(255,255,255,0.18);
+  --hub-glass-subtle: rgba(255,255,255,0.10);
   
   /* Video/thumbnail backgrounds */
   --hub-media-bg: rgba(0,0,0,0.40);
@@ -46,13 +46,13 @@
   /* ========================================
      BORDERS & STROKES
      ======================================== */
-  /* Crisp edges & strokes - Subtle like reference */
-  --hub-stroke: rgba(255,255,255,0.12);      /* Very subtle border */
-  --hub-stroke-subtle: rgba(255,255,255,0.08);
-  --hub-stroke-mid: rgba(255,255,255,0.12);
-  --hub-stroke-strong: rgba(255,255,255,0.16);
-  --hub-stroke-avatar: rgba(255,255,255,0.16);
-  --hub-stroke-divider: rgba(255,255,255,0.08);
+  /* Crisp edges & strokes (brighter than smoke) */
+  --hub-stroke: rgba(255,255,255,0.14);
+  --hub-stroke-subtle: rgba(255,255,255,0.14);
+  --hub-stroke-mid: rgba(255,255,255,0.14);
+  --hub-stroke-strong: rgba(255,255,255,0.22);
+  --hub-stroke-avatar: rgba(255,255,255,0.22);
+  --hub-stroke-divider: rgba(255,255,255,0.14);
 
   /* ========================================
      SHADOWS & DEPTH
@@ -98,11 +98,11 @@
   --hub-surface-2: var(--hub-glass-subtle);
 }
 
-/* Dark subtle glass - matches reference image */
+/* DEBUG: force glass if something still overrides (remove after verification) */
 #hubHeader, .hub-card {
   background: var(--hub-glass) !important;
-  border: 1px solid rgba(255,255,255,0.12) !important;
+  border: 1px solid var(--hub-stroke-strong) !important;
   backdrop-filter: blur(var(--hub-blur)) !important;
   -webkit-backdrop-filter: blur(var(--hub-blur)) !important;
-  box-shadow: 0 4px 22px rgba(0,0,0,0.40) !important;
+  box-shadow: 0 4px 22px rgba(0,0,0,0.28) !important;
 }
