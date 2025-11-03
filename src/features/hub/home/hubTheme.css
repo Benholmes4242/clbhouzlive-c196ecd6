@@ -18,47 +18,49 @@
   /* ========================================
      BACKGROUNDS & SURFACES
      ======================================== */
-  /* Main Hub container gradient */
+  /* Main Hub container gradient - Graphite Glass theme */
   --hub-bg-start: #0E0E0E;
-  --hub-bg-end: #1A1A1A;
+  --hub-bg-end: #1C1C1E;
   
   /* Backdrop overlay (behind Hub) */
-  --hub-backdrop: rgba(0,0,0,0.65);
-  --hub-backdrop-blur: 8px;
+  --hub-backdrop: rgba(0,0,0,0.70);
+  --hub-backdrop-blur: 12px;
   
   /* Header gradient */
-  --hub-header-bg-start: rgba(23,23,23,0.96);
-  --hub-header-bg-mid: rgba(23,23,23,0.92);
-  --hub-header-bg-end: rgba(23,23,23,0.00);
+  --hub-header-bg-start: rgba(28,28,30,0.98);
+  --hub-header-bg-mid: rgba(28,28,30,0.94);
+  --hub-header-bg-end: rgba(28,28,30,0.00);
   --hub-header-blur: 12px;
   
-  /* Tile/Card glass surfaces */
-  --hub-glass-bg-start: rgba(35,35,35,0.78);
-  --hub-glass-bg-end: rgba(25,25,25,0.78);
-  --hub-glass-bg-hover: rgba(255,255,255,0.06);
-  --hub-glass-bg-subtle: rgba(255,255,255,0.04);
-  --hub-glass-bg-input: rgba(255,255,255,0.04);
-  --hub-glass-bg-button: rgba(255,255,255,0.08);
-  --hub-glass-bg-button-hover: rgba(255,255,255,0.12);
+  /* Tile/Card glass surfaces - frosted with translucency */
+  --hub-glass-bg-start: rgba(45,45,48,0.70);
+  --hub-glass-bg-end: rgba(38,38,40,0.68);
+  --hub-glass-bg-hover: rgba(255,255,255,0.08);
+  --hub-glass-bg-subtle: rgba(255,255,255,0.05);
+  --hub-glass-bg-input: rgba(255,255,255,0.06);
+  --hub-glass-bg-button: rgba(255,255,255,0.10);
+  --hub-glass-bg-button-hover: rgba(255,255,255,0.15);
   
   /* Video/thumbnail backgrounds */
-  --hub-media-bg: rgba(0,0,0,0.30);
+  --hub-media-bg: rgba(0,0,0,0.40);
 
   /* ========================================
      BORDERS & STROKES
      ======================================== */
-  --hub-stroke: rgba(255,255,255,0.08);
-  --hub-stroke-subtle: rgba(255,255,255,0.05);
-  --hub-stroke-mid: rgba(255,255,255,0.12);
-  --hub-stroke-strong: rgba(255,255,255,0.15);
-  --hub-stroke-avatar: rgba(255,255,255,0.10);
-  --hub-stroke-divider: rgba(255,255,255,0.06);
+  /* Light-diffused borders for Graphite Glass */
+  --hub-stroke: rgba(255,255,255,0.12);
+  --hub-stroke-subtle: rgba(255,255,255,0.08);
+  --hub-stroke-mid: rgba(255,255,255,0.14);
+  --hub-stroke-strong: rgba(255,255,255,0.18);
+  --hub-stroke-avatar: rgba(255,255,255,0.12);
+  --hub-stroke-divider: rgba(255,255,255,0.10);
 
   /* ========================================
      SHADOWS & DEPTH
      ======================================== */
-  --hub-shadow-main: 0 30px 80px rgba(0,0,0,0.9);
-  --hub-shadow-tile: 0 8px 24px rgba(0,0,0,0.35);
+  /* Softer shadows with inner glow effect */
+  --hub-shadow-main: 0 30px 80px rgba(0,0,0,0.85), 0 0 1px rgba(255,255,255,0.08) inset;
+  --hub-shadow-tile: 0 8px 32px rgba(0,0,0,0.40), 0 0 0 1px rgba(255,255,255,0.06) inset;
 
   /* ========================================
      TEXT & TYPOGRAPHY

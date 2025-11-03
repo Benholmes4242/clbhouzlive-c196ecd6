@@ -20,6 +20,8 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
         background: 'linear-gradient(180deg, var(--hub-glass-bg-start), var(--hub-glass-bg-end))',
         border: '1px solid var(--hub-stroke)',
         boxShadow: 'var(--hub-shadow-tile)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
       }}
     >
       <div className="flex-1">

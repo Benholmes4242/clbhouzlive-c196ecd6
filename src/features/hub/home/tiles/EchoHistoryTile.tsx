@@ -29,13 +29,7 @@ function EchoRow({
   const fallback = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=100&h=100&fit=crop';
   
   return (
-    <button 
-      onClick={onClick} 
-      className="w-full flex items-center gap-3 py-2.5 group rounded-xl transition-colors text-left"
-      style={{ background: 'transparent' }}
-      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-hover)'}
-      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-    >
+    <div className="w-full flex items-center gap-3 py-2.5 rounded-xl text-left">
       <div 
         className="h-14 w-14 rounded-2xl overflow-hidden shrink-0"
         style={{ 
@@ -63,7 +57,7 @@ function EchoRow({
         </div>
       </div>
       <button
-        onClick={(e) => { e.stopPropagation(); onClick(); }}
+        onClick={onClick}
         className="ml-auto rounded-2xl px-3 h-10 text-[13px] shrink-0 transition"
         style={{
           border: '1px solid var(--hub-stroke-mid)',
@@ -75,7 +69,7 @@ function EchoRow({
       >
         View
       </button>
-    </button>
+    </div>
   );
 }
 
