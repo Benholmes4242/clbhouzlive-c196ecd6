@@ -14,7 +14,7 @@
 
   /* Red Glass Theme */
   --hub-bg-gradient: linear-gradient(180deg, #1A0505 0%, #2A0A0A 100%);
-  --hub-header-gradient: linear-gradient(180deg, #200808 0%, #2A0A0A 100%);
+  --hub-header-bg: #2A0A0A;
   
   --hub-glass-bg: rgba(255, 50, 50, 0.08);
   --hub-glass-bg-hover: rgba(255, 50, 50, 0.12);
@@ -42,7 +42,7 @@
   color: var(--hub-text);
 }
 .hub-header {
-  background: var(--hub-header-gradient);
+  background: var(--hub-header-bg);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(24px);
 }
