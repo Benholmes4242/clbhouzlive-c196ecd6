@@ -1,7 +1,7 @@
 /**
  * Hub Dashboard Design Tokens
  * Single source of truth for My Clubhouz Hub colors, effects, and layout
- * Smoke Glass theme
+ * Apple Frosted Glass theme
  */
 
 :root {
@@ -94,6 +94,6 @@
   /* ========================================
      SEMANTIC SURFACES (legacy compat)
      ======================================== */
-  --hub-surface: var(--hub-glass-bg-hover);
-  --hub-surface-2: var(--hub-glass-bg-subtle);
+  --hub-surface: var(--hub-glass-subtle);
+  --hub-surface-2: var(--hub-glass-subtle);
 }
