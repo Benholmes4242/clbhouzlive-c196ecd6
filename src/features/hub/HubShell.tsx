@@ -28,9 +28,13 @@ export function HubShell({ onClose }: HubShellProps) {
   // Lock body scroll when hub is mounted
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
+    const originalBg = document.body.style.background;
     document.body.style.overflow = 'hidden';
+    // Ensure page backdrop under Hub isn't pure black
+    document.body.style.background = 'linear-gradient(180deg, var(--hub-bg-start) 0%, var(--hub-bg-end) 100%)';
     return () => {
       document.body.style.overflow = originalOverflow;
+      document.body.style.background = originalBg;
     };
   }, []);
 
@@ -42,6 +46,33 @@ export function HubShell({ onClose }: HubShellProps) {
         event_label: analyticsEvents.hub.opened.label,
       });
     }
+
+    // DEBUG: log computed styles for header/card to find override source
+    setTimeout(() => {
+      try {
+        const header = document.querySelector('#hubHeader') as HTMLElement | null;
+        const card = document.querySelector('.hub-card') as HTMLElement | null;
+        const h = header ? getComputedStyle(header) : null;
+        const c = card ? getComputedStyle(card) : null;
+        console.info('[Hub Debug] header', h ? {
+          bgImg: h.backgroundImage,
+          bg: h.backgroundColor,
+          blur: (h as any).backdropFilter || (h as any).webkitBackdropFilter,
+          border: h.borderBottomColor,
+          isolation: h.isolation,
+        } : 'missing');
+        console.info('[Hub Debug] card', c ? {
+          bgImg: c.backgroundImage,
+          bg: c.backgroundColor,
+          blur: (c as any).backdropFilter || (c as any).webkitBackdropFilter,
+          border: c.borderColor,
+          boxShadow: c.boxShadow,
+          willChange: c.willChange,
+        } : 'missing');
+      } catch (e) {
+        console.warn('[Hub Debug] style read failed', e);
+      }
+    }, 300);
   }, []);
 
   // Track tab switches
@@ -139,7 +170,7 @@ export function HubShell({ onClose }: HubShellProps) {
       {/* Hub Container */}
       <div 
         className="fixed inset-0 flex items-end sm:items-center sm:justify-center animate-fade-in pointer-events-none"
-        style={{ zIndex: Z.hub }}
+        style={{ zIndex: Z.hub, background: 'linear-gradient(180deg, var(--hub-bg-start) 0%, var(--hub-bg-end) 100%)' }}
       >
         <div
           className="hub-shell relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200 pointer-events-auto"
