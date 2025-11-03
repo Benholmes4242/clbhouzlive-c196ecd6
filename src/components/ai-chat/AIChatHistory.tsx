@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Search, Filter, Trash2, RotateCcw, Play, Maximize2, Calendar, FileText, Plus, Edit2, MessageSquare, Minimize2, AlertCircle, MessageCircle, Mic, BarChart3, ChevronUp, Settings } from 'lucide-react';
 import { PiWaveform } from 'react-icons/pi';
 import { cn } from '@/lib/utils';
@@ -23,6 +24,7 @@ import { useCaddieLogs } from '@/hooks/useCaddieLogs';
 import { SlideOver } from '@/components/ui/slide-over';
 import EchoProtection from './EchoProtection';
 import { useEchoProtection } from '@/hooks/useEchoProtection';
+import { useEchoConversationsContext } from '@/features/echo/components/EchoConversationsProvider';
 
 // HLS Video Player Component
 export const HLSVideoPlayer: React.FC<{ src: string; poster?: string; className?: string }> = ({ src, poster, className }) => {
@@ -397,6 +399,7 @@ const ErrorState: React.FC<{
 );
 
 const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelectMessage, onNewConversation, defaultCategory, initialTab = 'chat', paneMode = false }) => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(defaultCategory || 'all');
   const [selectedTag, setSelectedTag] = useState('all');
@@ -404,17 +407,9 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   
-  // In pane mode, try to use provider; otherwise use session storage
-  let echoConversations: any[] = [];
-  try {
-    if (paneMode) {
-      const { useEchoConversationsContext } = require('@/features/echo/components/EchoConversationsProvider');
-      const { conversations: providerConvos } = useEchoConversationsContext();
-      echoConversations = providerConvos;
-    }
-  } catch (e) {
-    // Provider not available, fallback to session storage
-  }
+  // ✅ Correct: read provider at top level when paneMode=true
+  const echoCtx = paneMode ? useEchoConversationsContext() : null;
+  const providerConvos = echoCtx?.conversations ?? [];
   
   // Get conversation session for chat history  
   const conversationSession = useConversationSession({
@@ -446,6 +441,17 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   
   // Helper function to handle expansion with scroll management
   const handleExpansion = (type: 'chat' | 'caddie' | 'swing', id: string, element?: HTMLElement) => {
+    // ✅ In paneMode, navigate to detail view instead of expanding
+    if (paneMode) {
+      if (type === 'chat') {
+        navigate(`/hub/echo/history/chat/${id}`);
+      } else if (type === 'swing') {
+        navigate(`/hub/echo/history/swing/${id}`);
+      }
+      return;
+    }
+
+    // Regular expansion behavior for overlay mode
     const newExpanded = expandedCard?.type === type && expandedCard?.id === id ? null : { type, id };
     setExpandedCard(newExpanded);
     
@@ -494,7 +500,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
       // loadCaddieLogs(); // Now handled by hook
       loadSwingAnalyses();
     }
-  }, [isOpen, echoConversations]);
+  }, [isOpen, providerConvos]);
 
   const loadChatConversations = async () => {
     console.log('🔍 Loading chat conversations...');
@@ -502,10 +508,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     setErrorStates(prev => ({ ...prev, conversations: null }));
     
     try {
-      // In pane mode, use provider conversations (from localStorage)
-      if (paneMode && echoConversations.length > 0) {
-        console.log('📱 Using provider conversations:', echoConversations.length);
-        const providerConversations = echoConversations.map(conv => ({
+      // ✅ Use provider data in Hub pane
+      if (paneMode && providerConvos.length > 0) {
+        console.log('📱 Using provider conversations:', providerConvos.length);
+        const mapped = providerConvos.map(conv => ({
           id: conv.id,
           title: conv.title || "New conversation",
           customTitle: conv.title,
@@ -513,15 +519,15 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             id: msg.id || `${conv.id}-${index}`,
             type: (msg.role === 'user' ? 'user' : 'ai') as 'user' | 'ai',
             content: msg.content || '',
-            timestamp: new Date(msg.createdAt),
+            timestamp: new Date(msg.createdAt ?? conv.updatedAt ?? Date.now()),
             metadata: msg.meta
           })),
-          timestamp: new Date(conv.updatedAt),
-          createdAt: new Date(conv.createdAt),
-          lastActivityAt: new Date(conv.updatedAt),
+          timestamp: new Date(conv.updatedAt ?? Date.now()),
+          createdAt: new Date(conv.createdAt ?? Date.now()),
+          lastActivityAt: new Date(conv.updatedAt ?? Date.now()),
           messageCount: conv.messages.length
         }));
-        setConversations(providerConversations);
+        setConversations(mapped);
         return;
       }
       
