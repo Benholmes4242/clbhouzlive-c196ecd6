@@ -148,10 +148,10 @@ export function HubShell({ onClose }: HubShellProps) {
             maxHeight: '100vh',
             touchAction: 'pan-y',
             overscrollBehavior: 'contain',
-            background: 'rgba(15, 15, 15, 0.75)',
+            background: 'linear-gradient(180deg, #0E0E0E 0%, #1A1A1A 100%)',
             backdropFilter: 'blur(40px)',
             WebkitBackdropFilter: 'blur(40px)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.05)',
             borderRadius: '0',
             boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9)',
           }}

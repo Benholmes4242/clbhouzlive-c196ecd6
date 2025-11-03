@@ -4,36 +4,39 @@
  */
 
 :root {
-  /* Background - Deep green radial gradient */
-  --hub-bg-gradient: radial-gradient(circle at top left, #0b1913, #101c16 60%, #0a0f0d);
+  /* Background - Charcoal Graphite gradient */
+  --hub-bg-top: #0E0E0E;
+  --hub-bg-bottom: #1A1A1A;
+  --hub-bg-gradient: linear-gradient(180deg, #0E0E0E 0%, #1A1A1A 100%);
   
-  /* Glass Surface */
-  --hub-surface: rgba(255, 255, 255, 0.05);
-  --hub-surface-strong: rgba(255, 255, 255, 0.08);
-  --hub-surface-hover: rgba(255, 255, 255, 0.08);
+  /* Glass Surface - Neutral charcoal */
+  --hub-surface: rgba(255, 255, 255, 0.04);
+  --hub-surface-strong: rgba(255, 255, 255, 0.06);
+  --hub-surface-hover: rgba(255, 255, 255, 0.06);
   --hub-stroke: rgba(255, 255, 255, 0.08);
   
   /* Shadows & Glow */
-  --hub-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  --hub-shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.35);
-  --hub-glow: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), transparent);
+  --hub-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --hub-shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.35);
+  --hub-glow: linear-gradient(to bottom, rgba(255, 255, 255, 0.08), transparent);
   
   /* Typography */
-  --hub-text: #ffffff;
-  --hub-text-dim: rgba(255, 255, 255, 0.7);
-  --hub-text-mute: rgba(212, 230, 218, 0.6);
+  --hub-text: #FFFFFF;
+  --hub-text-dim: rgba(255, 255, 255, 0.65);
+  --hub-text-mute: rgba(255, 255, 255, 0.5);
   
   /* Button */
-  --hub-btn-bg: rgba(255, 255, 255, 0.08);
-  --hub-btn-border: rgba(255, 255, 255, 0.15);
-  --hub-btn-hover: rgba(255, 255, 255, 0.15);
+  --hub-btn-bg: rgba(255, 255, 255, 0.06);
+  --hub-btn-border: rgba(255, 255, 255, 0.12);
+  --hub-btn-hover: rgba(255, 255, 255, 0.08);
   
   /* Brand Colors */
   --hub-brand-echo: #34d399;
   --hub-brand-swing: #60a5fa;
-  --hub-brand-cta: #8fb29a;
+  --hub-brand-cta: #FF8C32;
   --hub-accent-red: #ff4d4f;
   --hub-accent-blue: #4da3ff;
+  --hub-accent-orange: #FF8C32;
   
   /* Spacing */
   --hub-blur: 10px;
@@ -75,6 +78,7 @@
   background: var(--hub-surface-hover);
   transform: translateY(-2px);
   box-shadow: var(--hub-shadow-hover);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .glass-strong {
