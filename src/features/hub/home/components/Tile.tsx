@@ -15,14 +15,14 @@ type TileProps = React.PropsWithChildren<{
 export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps) {
   return (
     <section
-      className="relative rounded-3xl p-4 pt-3.5 pb-3.5 overflow-hidden"
+      className="relative rounded-3xl p-4 pt-3.5 pb-3.5 overflow-hidden flex flex-col min-h-[192px]"
       style={{
         background: 'linear-gradient(180deg, rgba(35,35,35,0.78), rgba(25,25,25,0.78))',
         border: '1px solid rgba(255,255,255,0.08)',
         boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
       }}
     >
-      <div>
+      <div className="flex-1">
         <div className="text-[20px] font-semibold text-white mb-0.5">{title}</div>
         {subtitle && <div className="text-[13px] text-white/70 mb-2.5 line-clamp-1">{subtitle}</div>}
         <div className="mt-2.5">{children}</div>
