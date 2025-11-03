@@ -22,6 +22,8 @@
   color: var(--hub-text);
   color-scheme: dark;
   overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
 }
 
 .hub-header {

@@ -142,8 +142,9 @@ export function HubShell({ onClose }: HubShellProps) {
         style={{ zIndex: Z.hub }}
       >
         <div
-          className="hub-page hub-shell relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200 pointer-events-auto min-h-[100dvh]"
+          className="hub-page hub-shell relative w-full max-w-lg h-full flex flex-col animate-in slide-in-from-bottom-4 duration-200 pointer-events-auto"
           style={{
+            maxHeight: '100vh',
             touchAction: 'pan-y',
             overscrollBehavior: 'contain',
             overscrollBehaviorX: 'none',
@@ -154,7 +155,7 @@ export function HubShell({ onClose }: HubShellProps) {
         >
           {/* Header */}
           <header 
-            className="hub-header sticky top-0 z-20"
+            className="hub-header sticky top-0 z-20 shrink-0"
           >
             <div className="px-5 pt-4">
               <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
