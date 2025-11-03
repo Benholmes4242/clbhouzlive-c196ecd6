@@ -190,6 +190,23 @@ interface AIChatHistoryProps {
     setThumbnailLoading(false);
   };
 
+  const handleCardClick = () => {
+    if (isExpanded) return;
+    
+    console.log('🎯 [SwingAnalysisCard] Clicked:', {
+      analysisId: analysis.id,
+      isPageMode,
+      hasNavigateFn: !!navigateFn,
+      willNavigate: isPageMode && !!navigateFn
+    });
+    
+    if (isPageMode && navigateFn) {
+      navigateFn(`/hub/echo/history/swing/${analysis.id}`);
+    } else {
+      onToggleExpand();
+    }
+  };
+
   return (
     <article 
       ref={cardRef}
@@ -199,7 +216,7 @@ interface AIChatHistoryProps {
         "focus-visible:outline-none focus-within:ring-2 focus-within:ring-white/20",
         isExpanded && "shadow-lg"
       )}
-      onClick={!isExpanded ? (isPageMode && navigateFn ? () => navigateFn(`/hub/echo/history/swing/${analysis.id}`) : onToggleExpand) : undefined}
+      onClick={handleCardClick}
       role="button"
       tabIndex={0}
       aria-label={`Swing analysis from ${analysis.timestamp.toLocaleDateString()}`}
@@ -879,7 +896,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 {filteredConversations.map((conv) => (
                   <button
                     key={conv.id}
-                    onClick={() => onSelectMessage(conv.id)}
+                    onClick={() => handleExpansion('chat', conv.id)}
                     className="w-full text-left rounded-xl bg-white/06 hover:bg-white/08 border border-white/08 hover:border-white/12 p-4 transition"
                   >
                     <div className="font-medium text-white mb-1">{conv.customTitle || conv.title}</div>
@@ -928,7 +945,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 {filteredSwingAnalyses.map((analysis) => (
                   <button
                     key={analysis.id}
-                    onClick={() => onSelectMessage(analysis.id)}
+                    onClick={() => handleExpansion('swing', analysis.id)}
                     className="w-full text-left rounded-xl bg-white/06 hover:bg-white/08 border border-white/08 hover:border-white/12 p-4 transition"
                   >
                     <div className="font-medium text-white mb-1">Swing Analysis</div>
