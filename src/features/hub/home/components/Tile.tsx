@@ -19,16 +19,16 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
     <section
       className="relative rounded-3xl p-4 pt-3.5 pb-3.5 overflow-hidden flex flex-col min-h-[192px]"
       style={{
-        background: 'linear-gradient(180deg, var(--hub-glass-bg-start), var(--hub-glass-bg-end))',
+        background: isHovered ? 'var(--hub-glass-hover)' : 'var(--hub-glass)',
         border: '1px solid var(--hub-stroke)',
         boxShadow: isHovered 
-          ? 'var(--hub-shadow-tile-hover), var(--hub-shadow-tile-inset), var(--hub-top-highlight)'
-          : 'var(--hub-shadow-tile), var(--hub-shadow-tile-inset), var(--hub-top-highlight)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
+          ? 'var(--hub-shadow-tile-hover)'
+          : 'var(--hub-shadow-tile)',
+        backdropFilter: 'blur(var(--hub-blur))',
+        WebkitBackdropFilter: 'blur(var(--hub-blur))',
         willChange: 'transform, backdrop-filter',
         transform: 'translateZ(0)',
-        transition: 'box-shadow 0.2s ease-out',
+        transition: 'background 0.2s ease-out, box-shadow 0.2s ease-out',
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -54,11 +54,11 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
               onClick={onViewAll}
               className="shrink-0 rounded-2xl px-3.5 py-2 text-[13px] transition"
               style={{
-                border: '1px solid var(--hub-stroke-strong)',
+                border: '1px solid var(--hub-stroke-subtle)',
                 color: 'var(--hub-text-body)',
                 background: 'transparent',
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button)'}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-subtle)'}
               onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
             >
               View all →

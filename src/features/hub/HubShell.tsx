@@ -168,14 +168,25 @@ export function HubShell({ onClose }: HubShellProps) {
             className="relative z-30 shrink-0"
             style={{
               background:
-                'linear-gradient(180deg, var(--hub-header-bg-start) 0%, var(--hub-header-bg-mid) 60%, var(--hub-header-bg-end) 100%)',
+                'linear-gradient(180deg, var(--hub-header-top) 0%, var(--hub-header-mid) 56%, var(--hub-header-clear) 100%)',
               WebkitBackdropFilter: 'blur(var(--hub-header-blur))',
               backdropFilter: 'blur(var(--hub-header-blur))',
-              borderBottom: '1px solid var(--hub-header-stroke)',
+              borderBottom: '1px solid var(--hub-stroke-subtle)',
               willChange: 'backdrop-filter, background',
               isolation: 'isolate',
             }}
           >
+            {/* Top sheen */}
+            <span
+              aria-hidden
+              style={{
+                position: 'absolute',
+                inset: '0 0 auto 0',
+                height: '1px',
+                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 50%, transparent 100%)',
+                pointerEvents: 'none',
+              }}
+            />
             <div className="px-5 pt-4">
               <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
                 <div />
