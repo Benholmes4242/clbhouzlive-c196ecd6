@@ -23,14 +23,14 @@
   --hub-bg-end: #ff6b00;
   
   /* Backdrop overlay (behind Hub) */
-  --hub-backdrop: rgba(0,0,0,0.70);
-  --hub-backdrop-blur: 12px;
+  --hub-backdrop: rgba(0,0,0,0.00);
+  --hub-backdrop-blur: 0px;
   
   /* Header v2 - Apple Control Center vibe */
-  --hub-header-bg-start: rgba(36,36,38,0.85);
-  --hub-header-bg-mid: rgba(36,36,38,0.55);
-  --hub-header-bg-end: rgba(36,36,38,0.00);
-  --hub-header-blur: 24px;
+  --hub-header-bg-start: rgba(255,255,255,0.00);
+  --hub-header-bg-mid: rgba(255,255,255,0.00);
+  --hub-header-bg-end: rgba(255,255,255,0.00);
+  --hub-header-blur: 0px;
   --hub-header-stroke: rgba(255,255,255,0.09);
   --hub-header-highlight: rgba(255,255,255,0.10);
   
