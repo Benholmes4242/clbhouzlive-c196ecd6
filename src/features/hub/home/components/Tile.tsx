@@ -13,7 +13,7 @@ interface TileProps {
 export function Tile({ children, className = '' }: TileProps) {
   return (
     <div
-      className={`rounded-3xl p-4 md:p-5 transition-all duration-300 hover:shadow-[0_1px_0_rgba(255,255,255,.08)_inset,0_12px_40px_rgba(0,0,0,.55)] hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03))] ${className}`}
+      className={`w-full rounded-3xl p-4 md:p-5 transition-all duration-300 hover:shadow-[0_1px_0_rgba(255,255,255,.08)_inset,0_12px_40px_rgba(0,0,0,.55)] hover:-translate-y-0.5 hover:bg-[linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03))] ${className}`}
       style={{
         background: 'linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02))',
         border: '1px solid rgba(255, 255, 255, 0.1)',

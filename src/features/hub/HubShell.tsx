@@ -142,12 +142,16 @@ export function HubShell({ onClose }: HubShellProps) {
         style={{ zIndex: Z.hub }}
       >
         <div
-          className="hub-shell relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200 pointer-events-auto"
+          className="hub-shell relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200 pointer-events-auto overflow-x-hidden"
           style={{
             height: 'calc(100vh - env(safe-area-inset-top))',
             maxHeight: '100vh',
+            maxWidth: '100%',
             touchAction: 'pan-y',
             overscrollBehavior: 'contain',
+            overscrollBehaviorX: 'none',
+            paddingTop: 'env(safe-area-inset-top)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
             background: 'linear-gradient(180deg, #0E0E0E 0%, #1A1A1A 100%)',
             backdropFilter: 'blur(40px)',
             WebkitBackdropFilter: 'blur(40px)',

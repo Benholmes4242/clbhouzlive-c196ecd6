@@ -27,13 +27,13 @@ export function EchoQuickTile() {
         subtitle="Ask anything about golf" 
         onViewAll={() => nav('/hub/echo/chat')} 
       />
-      <form onSubmit={onSubmit} className="flex gap-2 mt-2">
+      <form onSubmit={onSubmit} className="flex items-center gap-2 mt-2">
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Ask Echo anything…"
           aria-label="Ask Echo"
-          className="flex-1 h-11 md:h-12 rounded-2xl border border-white/12 bg-white/04 backdrop-blur px-3.5 text-[15px] placeholder:text-white/45 text-white outline-none focus:border-white/20 transition-colors"
+          className="flex-1 min-w-0 h-11 md:h-12 rounded-2xl border border-white/12 bg-white/04 backdrop-blur px-3.5 text-[15px] placeholder:text-white/45 text-white outline-none focus:border-white/20 transition-colors"
           style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,.06)' }}
         />
         <button 

@@ -38,7 +38,7 @@ export function NearbyGolfersTile({ limit = 5, viewAllTo }: NearbyGolfersTilePro
             <img 
               src={g.avatar_url || '/placeholder.svg'} 
               alt="" 
-              className="w-11 h-11 rounded-full object-cover border border-white/10"
+              className="w-11 h-11 max-w-full rounded-full object-cover border border-white/10 shrink-0"
             />
             <div className="flex-1 min-w-0">
               <div className="text-white text-[15px] font-medium truncate">

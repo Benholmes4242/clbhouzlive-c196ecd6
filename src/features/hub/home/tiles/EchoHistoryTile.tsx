@@ -133,7 +133,7 @@ export function EchoHistoryTile({
                 {i.thumbUrl ? (
                   <video 
                     src={i.thumbUrl} 
-                    className="w-14 h-14 rounded-2xl object-cover border border-white/12 shrink-0"
+                    className="w-14 h-14 max-w-full rounded-2xl object-cover border border-white/12 shrink-0"
                     muted
                     playsInline
                   />

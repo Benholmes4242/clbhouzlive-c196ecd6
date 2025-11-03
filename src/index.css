@@ -76,10 +76,12 @@ body {
 }
 
 /* Prevent rubber-band overscroll gaps revealing white */
-html, body { 
+html, body, #root { 
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   overscroll-behavior: none;
   overscroll-behavior-y: contain;
-  overflow-x: clip; /* Prevent horizontal overflow on iOS */
   background: var(--bg-page); /* Ensure background extends behind status bar */
 }
 

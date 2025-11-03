@@ -14,23 +14,26 @@ import { EchoHistoryTile } from './tiles/EchoHistoryTile';
 export default function HubHome() {
   return (
     <main 
-      className="grid gap-3 md:gap-4 px-4 md:px-5 py-4"
-      style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}
+      className="w-full max-w-[720px] mx-auto px-4 md:px-5 py-4"
     >
-      <style>{`
-        @media (max-width: 360px) {
-          main[style*="gridTemplateColumns"] {
-            grid-template-columns: 1fr !important;
+      <div 
+        className="grid gap-3 md:gap-4 grid-cols-1 xs:grid-cols-2 sm:grid-cols-2"
+      >
+        <style>{`
+          @media (max-width: 360px) {
+            .grid.grid-cols-1.xs\\:grid-cols-2 {
+              grid-template-columns: 1fr !important;
+            }
           }
-        }
-      `}</style>
+        `}</style>
       
-      <EchoQuickTile />
-      <SwingQuickTile />
-      <NearbyGolfersTile limit={5} viewAllTo="/hub/golfers" />
-      <GamesNearYouTile limit={3} viewAllTo="/hub/games" enableFilters />
-      <YourGamesTile viewAllTo="/hub/your-games" />
-      <EchoHistoryTile limitChat={3} limitSwing={2} viewAllTo="/hub/echo/history" />
+        <EchoQuickTile />
+        <SwingQuickTile />
+        <NearbyGolfersTile limit={5} viewAllTo="/hub/golfers" />
+        <GamesNearYouTile limit={3} viewAllTo="/hub/games" enableFilters />
+        <YourGamesTile viewAllTo="/hub/your-games" />
+        <EchoHistoryTile limitChat={3} limitSwing={2} viewAllTo="/hub/echo/history" />
+      </div>
     </main>
   );
 }
