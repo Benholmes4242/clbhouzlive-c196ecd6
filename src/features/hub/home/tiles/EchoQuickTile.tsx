@@ -1,19 +1,18 @@
 /**
  * Echo Quick Chat Tile
- * Compact tile with wider input and paper-airplane send icon
+ * Compact Harmony layout with hairline divider
  */
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send } from 'lucide-react';
+import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { Tile } from '../components/Tile';
 
 export function EchoQuickTile() {
   const [text, setText] = useState('');
   const nav = useNavigate();
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const submit = () => {
     const msg = text.trim();
     if (!msg) return;
     nav(`/hub/echo/chat?msg=${encodeURIComponent(msg)}`);
@@ -26,35 +25,52 @@ export function EchoQuickTile() {
       subtitle="Ask anything about golf"
       onViewAll={() => nav('/hub/echo/history')}
     >
-      <form onSubmit={onSubmit} className="flex items-center gap-2.5" aria-label="Ask Echo">
+      {/* Input row */}
+      <div className="flex items-center gap-3">
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
           placeholder="Ask Echo anything…"
           aria-label="Ask Echo"
-          className="flex-1 min-w-0 rounded-2xl h-11 px-4 text-[15px] focus:outline-none focus:ring-2 transition"
+          className="flex-1 min-w-0 h-11 rounded-2xl px-4 text-[15px] placeholder:opacity-45 focus:outline-none focus:ring-2 transition"
           style={{
             background: 'var(--hub-glass-bg-input)',
-            border: '1px solid var(--hub-stroke-mid)',
+            border: '1px solid var(--hub-stroke)',
             color: 'var(--hub-text)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
           }}
-          onFocus={(e) => e.currentTarget.style.borderColor = 'var(--hub-stroke-mid)'}
         />
-        <button 
-          type="submit"
+
+        <button
+          onClick={submit}
+          aria-label="Send to Echo"
+          className="h-11 w-11 rounded-2xl flex items-center justify-center transition focus:outline-none disabled:opacity-40"
           disabled={!text.trim()}
-          aria-label="Send"
-          className="rounded-2xl h-11 w-11 flex items-center justify-center transition disabled:opacity-40"
           style={{
-            border: '1px solid var(--hub-stroke-strong)',
             background: 'var(--hub-glass-bg-button)',
+            border: '1px solid var(--hub-stroke)',
+            color: 'rgba(255,255,255,0.85)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
           }}
-          onMouseEnter={(e) => !text.trim() ? null : e.currentTarget.style.background = 'var(--hub-glass-bg-button-hover)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button)'}
         >
-          <Send size={18} style={{ color: 'var(--hub-text)' }} />
+          <PaperAirplaneIcon className="h-5 w-5 -rotate-45" />
         </button>
-      </form>
+      </div>
+
+      {/* Hairline divider */}
+      <div
+        className="mt-4"
+        style={{
+          height: 1,
+          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent)',
+        }}
+      />
+
+      {/* Bottom spacer for View all button */}
+      <div className="h-2" />
     </Tile>
   );
 }
