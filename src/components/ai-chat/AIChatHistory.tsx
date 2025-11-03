@@ -729,12 +729,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 {filteredConversations.map((conv) => (
                   <button
                     key={conv.id}
-                    onClick={() => {
-                      const lastUserMsg = conv.messages.filter(m => m.type === 'user').pop();
-                      if (lastUserMsg) {
-                        onSelectMessage(lastUserMsg.id);
-                      }
-                    }}
+                    onClick={() => onSelectMessage(conv.id)}
                     className="w-full text-left rounded-xl bg-white/06 hover:bg-white/08 border border-white/08 hover:border-white/12 p-4 transition"
                   >
                     <div className="font-medium text-white mb-1">{conv.customTitle || conv.title}</div>
@@ -761,14 +756,15 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
             ) : (
               <div className="space-y-3">
                 {filteredSwingAnalyses.map((analysis) => (
-                  <div
+                  <button
                     key={analysis.id}
-                    className="rounded-xl bg-white/06 border border-white/08 p-4"
+                    onClick={() => onSelectMessage(analysis.id)}
+                    className="w-full text-left rounded-xl bg-white/06 hover:bg-white/08 border border-white/08 hover:border-white/12 p-4 transition"
                   >
                     <div className="font-medium text-white mb-1">Swing Analysis</div>
                     <div className="text-sm text-white/60 line-clamp-2">{analysis.content}</div>
                     <div className="text-xs text-white/40 mt-2">{analysis.timestamp.toLocaleDateString()}</div>
-                  </div>
+                  </button>
                 ))}
               </div>
             )

@@ -438,36 +438,12 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
     return 'idle';
   };
 
-  // Pane mode: render inner content without SlideOver modal chrome
+  // Pane mode: render inner content without SlideOver modal chrome (Hub provides tabs)
   if (paneMode) {
     return (
       <div className="h-full w-full bg-gradient-to-b from-black via-[#0A0A0A] to-black flex flex-col overflow-hidden">
-        {/* Tabs */}
+        {/* Tabs - Hidden in pane mode since Hub shell provides main tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-          <div className="bg-gradient-to-b from-black/60 to-transparent backdrop-blur-sm border-b border-white/08">
-            <div className="px-4 py-2">
-              <TabsList className="h-11 w-full rounded-full bg-white/06 backdrop-blur border border-white/12 flex p-1">
-                <TabsTrigger
-                  value="chat"
-                  className="flex-1 rounded-full px-4 text-[14px] font-medium 
-                             data-[state=active]:bg-white/05 data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_rgba(255,255,255,0.18)] data-[state=active]:ring-1 data-[state=active]:ring-inset data-[state=active]:ring-white/20
-                             data-[state=inactive]:text-white/60 data-[state=inactive]:hover:bg-white/05 data-[state=inactive]:hover:ring-1 data-[state=inactive]:hover:ring-inset data-[state=inactive]:hover:ring-white/10
-                             transition-all"
-                >
-                  Chat
-                </TabsTrigger>
-                <TabsTrigger
-                  value="swing"
-                  className="flex-1 rounded-full px-4 text-[14px] font-medium 
-                             data-[state=active]:bg-white/05 data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_rgba(255,255,255,0.18)] data-[state=active]:ring-1 data-[state=active]:ring-inset data-[state=active]:ring-white/20
-                             data-[state=inactive]:text-white/60 data-[state=inactive]:hover:bg-white/05 data-[state=inactive]:hover:ring-1 data-[state=inactive]:hover:ring-inset data-[state=inactive]:hover:ring-white/10
-                             transition-all"
-                >
-                  Swing Coach
-                </TabsTrigger>
-              </TabsList>
-            </div>
-          </div>
 
           {/* Chat Tab */}
           <TabsContent value="chat" className="m-0 flex-1 overflow-hidden" style={{ minHeight: 0 }}>
