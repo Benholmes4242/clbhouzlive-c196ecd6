@@ -142,6 +142,7 @@ interface AIChatHistoryProps {
   onNewConversation?: () => void;
   defaultCategory?: string;
   initialTab?: 'chat' | 'swing';
+  paneMode?: boolean;
 }
 
 // Swing Analysis Card Component
@@ -395,7 +396,7 @@ const ErrorState: React.FC<{
   </div>
 );
 
-const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelectMessage, onNewConversation, defaultCategory, initialTab = 'chat' }) => {
+const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelectMessage, onNewConversation, defaultCategory, initialTab = 'chat', paneMode = false }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(defaultCategory || 'all');
   const [selectedTag, setSelectedTag] = useState('all');

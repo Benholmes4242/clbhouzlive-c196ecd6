@@ -438,13 +438,12 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
     return 'idle';
   };
 
-  // Pane mode rendering - simple placeholder for now
+  // Pane mode: render inner content without SlideOver modal chrome
   if (paneMode) {
     return (
-      <div className="w-full h-full flex items-center justify-center text-white/60">
-        <div className="text-center">
-          <p className="text-lg font-medium mb-2">Echo Chat</p>
-          <p className="text-sm">Pane mode active</p>
+      <div className="h-full w-full bg-gradient-to-b from-black via-[#0A0A0A] to-black flex flex-col overflow-hidden">
+        <div className="text-center py-20 text-white/60">
+          <p>Echo pane mode (work in progress)</p>
         </div>
       </div>
     );
