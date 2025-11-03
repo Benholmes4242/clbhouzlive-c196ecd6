@@ -122,9 +122,9 @@ export function HubShell({ onClose }: HubShellProps) {
         className="fixed inset-0 pointer-events-none"
         style={{
           zIndex: Z.hub,
-          backgroundColor: 'rgba(0,0,0,0.65)',
-          WebkitBackdropFilter: 'blur(8px)',
-          backdropFilter: 'blur(8px)',
+          backgroundColor: 'var(--hub-backdrop)',
+          WebkitBackdropFilter: 'blur(var(--hub-backdrop-blur))',
+          backdropFilter: 'blur(var(--hub-backdrop-blur))',
         }}
       />
       
@@ -152,12 +152,12 @@ export function HubShell({ onClose }: HubShellProps) {
             overscrollBehaviorX: 'none',
             paddingTop: 'env(safe-area-inset-top)',
             paddingBottom: 'env(safe-area-inset-bottom)',
-            background: 'linear-gradient(180deg, #0E0E0E 0%, #1A1A1A 100%)',
-            backdropFilter: 'blur(40px)',
-            WebkitBackdropFilter: 'blur(40px)',
-            border: '1px solid rgba(255, 255, 255, 0.05)',
+            background: 'linear-gradient(180deg, var(--hub-bg-start) 0%, var(--hub-bg-end) 100%)',
+            backdropFilter: 'blur(var(--hub-backdrop-blur))',
+            WebkitBackdropFilter: 'blur(var(--hub-backdrop-blur))',
+            border: '1px solid var(--hub-stroke-subtle)',
             borderRadius: '0',
-            boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9)',
+            boxShadow: 'var(--hub-shadow-main)',
           }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -165,8 +165,8 @@ export function HubShell({ onClose }: HubShellProps) {
           <header 
             className="sticky top-0 z-20 backdrop-blur"
             style={{ 
-              background: 'linear-gradient(180deg, rgba(23,23,23,0.96) 0%, rgba(23,23,23,0.92) 60%, rgba(23,23,23,0.00) 100%)',
-              borderBottom: '1px solid rgba(255,255,255,0.06)'
+              background: 'linear-gradient(180deg, var(--hub-header-bg-start) 0%, var(--hub-header-bg-mid) 60%, var(--hub-header-bg-end) 100%)',
+              borderBottom: '1px solid var(--hub-stroke-divider)'
             }}
           >
             <div className="px-5 pt-4">
@@ -182,7 +182,10 @@ export function HubShell({ onClose }: HubShellProps) {
                 <div className="flex justify-end">
                   <TapButton
                     onPointerDown={handleClose}
-                    className="text-white/60 hover:text-white/90 transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
+                    className="transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
+                    style={{ color: 'var(--hub-close-idle)' }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-close-hover)'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-close-idle)'}
                     aria-label="Close hub"
                   >
                     <X className="w-5 h-5" />
@@ -193,29 +196,34 @@ export function HubShell({ onClose }: HubShellProps) {
             <div 
               className="h-px w-full" 
               style={{ 
-                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent)' 
+                background: 'linear-gradient(90deg, transparent, var(--hub-stroke), transparent)' 
               }} 
             />
           </header>
 
           {/* Primary Tabs (Nearby | Echo) - Hidden on home page */}
           {!isHomePage && (
-            <div className="flex gap-2 px-5 mt-3 border-b border-white/[0.06]">
+            <div className="flex gap-2 px-5 mt-3" style={{ borderBottom: '1px solid var(--hub-stroke-divider)' }}>
               {primaryTabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => navigate(tab.path)}
-                  className={`flex-1 py-3 text-sm font-semibold relative transition-all duration-150 ${
-                    activePrimary === tab.id
-                      ? 'text-white'
-                      : 'text-white/50 hover:text-white/70'
-                  }`}
+                  className="flex-1 py-3 text-sm font-semibold relative transition-all duration-150"
+                  style={{ 
+                    color: activePrimary === tab.id ? 'var(--hub-text)' : 'var(--hub-text-dim)' 
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activePrimary !== tab.id) e.currentTarget.style.color = 'var(--hub-text-sub)';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activePrimary !== tab.id) e.currentTarget.style.color = 'var(--hub-text-dim)';
+                  }}
                 >
                   {tab.label}
                   {activePrimary === tab.id && (
                     <div 
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-white/90 rounded-full transition-all duration-150"
-                      style={{ width: '56px' }}
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 rounded-full transition-all duration-150"
+                      style={{ width: '56px', background: 'var(--hub-tab-indicator)' }}
                     />
                   )}
                 </button>
@@ -225,22 +233,27 @@ export function HubShell({ onClose }: HubShellProps) {
 
           {/* Secondary Tabs (contextual) - Hidden on home page */}
           {!isHomePage && (
-            <div className="flex px-5 mt-2 border-b border-white/[0.04]">
+            <div className="flex px-5 mt-2" style={{ borderBottom: '1px solid var(--hub-stroke-subtle)' }}>
               {secondaryTabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => navigate(tab.path)}
-                  className={`flex-1 py-2.5 text-xs font-medium relative transition-all duration-150 ${
-                    activeSecondary === tab.id
-                      ? 'text-white/90'
-                      : 'text-white/45 hover:text-white/65'
-                  }`}
+                  className="flex-1 py-2.5 text-xs font-medium relative transition-all duration-150"
+                  style={{ 
+                    color: activeSecondary === tab.id ? 'var(--hub-text-body)' : 'var(--hub-text-muted)' 
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeSecondary !== tab.id) e.currentTarget.style.color = 'var(--hub-text-sub)';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeSecondary !== tab.id) e.currentTarget.style.color = 'var(--hub-text-muted)';
+                  }}
                 >
                   {tab.label}
                   {activeSecondary === tab.id && (
                     <div 
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-white/70 rounded-full transition-all duration-150"
-                      style={{ width: '40px' }}
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 rounded-full transition-all duration-150"
+                      style={{ width: '40px', background: 'var(--hub-tab-indicator-subtle)' }}
                     />
                   )}
                 </button>

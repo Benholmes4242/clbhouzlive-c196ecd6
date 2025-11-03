@@ -23,16 +23,30 @@ function GameRow({
   return (
     <button 
       onClick={onClick}
-      className="w-full flex items-center gap-2.5 py-2.5 hover:bg-white/06 rounded-xl transition-colors text-left"
+      className="w-full flex items-center gap-2.5 py-2.5 rounded-xl transition-colors text-left"
+      style={{ background: 'transparent' }}
+      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-hover)'}
+      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
     >
-      <span className="rounded-xl px-2.5 py-1.5 text-[12px] border border-white/15 text-white/85 bg-white/05 shrink-0">
+      <span 
+        className="rounded-xl px-2.5 py-1.5 text-[12px] shrink-0"
+        style={{
+          border: '1px solid var(--hub-stroke-strong)',
+          color: 'var(--hub-text-body)',
+          background: 'var(--hub-glass-bg-subtle)',
+        }}
+      >
         {tag}
       </span>
       <div className="min-w-0 flex-1 flex items-center gap-2">
         <span role="img" aria-label="flag">⛳️</span>
-        <span className="truncate text-white/95 text-[15px]">{club}</span>
+        <span className="truncate text-[15px]" style={{ color: 'var(--hub-text-bright)' }}>
+          {club}
+        </span>
       </div>
-      <span className="text-white/65 text-[13px] shrink-0">{meta}</span>
+      <span className="text-[13px] shrink-0" style={{ color: 'var(--hub-text-sub)' }}>
+        {meta}
+      </span>
     </button>
   );
 }
@@ -89,7 +103,7 @@ export function YourGamesTile() {
     >
       <ul className="mt-1.5 space-y-2.5">
         {isLoading && [0, 1, 2].map(i => (
-          <div key={i} className="h-14 rounded-2xl bg-white/04 animate-pulse" />
+          <div key={i} className="h-14 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
         ))}
         {!isLoading && games.map(g => {
           const totalSlots = g.slots_total || 0;
@@ -105,11 +119,12 @@ export function YourGamesTile() {
           );
         })}
         {!isLoading && games.length === 0 && (
-          <p className="text-[15px] text-white/70">
+          <p className="text-[15px]" style={{ color: 'var(--hub-text-sub)' }}>
             No games yet.{' '}
             <button 
               onClick={() => nav('/hub/create-game')}
-              className="text-[#ff8e2b] underline-offset-2 hover:underline"
+              className="underline-offset-2 hover:underline"
+              style={{ color: 'var(--hub-accent-orange)' }}
             >
               Create one
             </button>

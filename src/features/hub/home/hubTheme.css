@@ -1,20 +1,94 @@
 /**
  * Hub Dashboard Design Tokens
- * Compact 2-column layout system
+ * Single source of truth for My Clubhouz Hub colors, effects, and layout
+ * Graphite Glass theme
  */
 
 :root {
+  /* ========================================
+     LAYOUT TOKENS (spacing, sizing)
+     ======================================== */
   --hub-radius: 18px;
   --hub-pad: 16px;
   --hub-gap: 14px;
+  --hub-header-height: 56px;
+  --hub-tile-compact: 200px;
+  --hub-tile-content: 312px;
 
-  --hub-header-height: 56px;      /* forces equal tile headers */
-  --hub-tile-compact: 200px;       /* Echo / Swing / Nearby */
-  --hub-tile-content: 312px;       /* Games / Your Games / Recent Echo */
+  /* ========================================
+     BACKGROUNDS & SURFACES
+     ======================================== */
+  /* Main Hub container gradient */
+  --hub-bg-start: #0E0E0E;
+  --hub-bg-end: #1A1A1A;
+  
+  /* Backdrop overlay (behind Hub) */
+  --hub-backdrop: rgba(0,0,0,0.65);
+  --hub-backdrop-blur: 8px;
+  
+  /* Header gradient */
+  --hub-header-bg-start: rgba(23,23,23,0.96);
+  --hub-header-bg-mid: rgba(23,23,23,0.92);
+  --hub-header-bg-end: rgba(23,23,23,0.00);
+  --hub-header-blur: 12px;
+  
+  /* Tile/Card glass surfaces */
+  --hub-glass-bg-start: rgba(35,35,35,0.78);
+  --hub-glass-bg-end: rgba(25,25,25,0.78);
+  --hub-glass-bg-hover: rgba(255,255,255,0.06);
+  --hub-glass-bg-subtle: rgba(255,255,255,0.04);
+  --hub-glass-bg-input: rgba(255,255,255,0.04);
+  --hub-glass-bg-button: rgba(255,255,255,0.08);
+  --hub-glass-bg-button-hover: rgba(255,255,255,0.12);
+  
+  /* Video/thumbnail backgrounds */
+  --hub-media-bg: rgba(0,0,0,0.30);
 
-  --hub-stroke: rgba(255,255,255,.08);
-  --hub-surface: rgba(255,255,255,.06);
-  --hub-surface-2: rgba(255,255,255,.04);
-  --hub-text: rgba(255,255,255,.92);
-  --hub-text-sub: rgba(255,255,255,.60);
+  /* ========================================
+     BORDERS & STROKES
+     ======================================== */
+  --hub-stroke: rgba(255,255,255,0.08);
+  --hub-stroke-subtle: rgba(255,255,255,0.05);
+  --hub-stroke-mid: rgba(255,255,255,0.12);
+  --hub-stroke-strong: rgba(255,255,255,0.15);
+  --hub-stroke-avatar: rgba(255,255,255,0.10);
+  --hub-stroke-divider: rgba(255,255,255,0.06);
+
+  /* ========================================
+     SHADOWS & DEPTH
+     ======================================== */
+  --hub-shadow-main: 0 30px 80px rgba(0,0,0,0.9);
+  --hub-shadow-tile: 0 8px 24px rgba(0,0,0,0.35);
+
+  /* ========================================
+     TEXT & TYPOGRAPHY
+     ======================================== */
+  --hub-text: rgba(255,255,255,0.92);
+  --hub-text-bright: rgba(255,255,255,0.95);
+  --hub-text-body: rgba(255,255,255,0.85);
+  --hub-text-sub: rgba(255,255,255,0.60);
+  --hub-text-dim: rgba(255,255,255,0.50);
+  --hub-text-dimmer: rgba(255,255,255,0.40);
+  --hub-text-muted: rgba(255,255,255,0.45);
+  --hub-text-placeholder: rgba(255,255,255,0.40);
+
+  /* ========================================
+     ACCENT COLORS
+     ======================================== */
+  --hub-accent: #6E9277;
+  --hub-accent-orange: #ff8e2b;
+  
+  /* Tab indicators */
+  --hub-tab-indicator: rgba(255,255,255,0.90);
+  --hub-tab-indicator-subtle: rgba(255,255,255,0.70);
+  
+  /* Close button */
+  --hub-close-idle: rgba(255,255,255,0.60);
+  --hub-close-hover: rgba(255,255,255,0.90);
+
+  /* ========================================
+     SEMANTIC SURFACES (legacy compat)
+     ======================================== */
+  --hub-surface: var(--hub-glass-bg-hover);
+  --hub-surface-2: var(--hub-glass-bg-subtle);
 }

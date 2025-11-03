@@ -48,7 +48,13 @@ export function SwingQuickTile() {
       onViewAll={() => nav('/hub/echo/history?tab=swing')}
     >
       <div className="flex items-center gap-3">
-        <div className="h-20 w-32 rounded-2xl overflow-hidden border border-white/12 bg-black/30 shrink-0">
+        <div 
+          className="h-20 w-32 rounded-2xl overflow-hidden shrink-0"
+          style={{
+            border: '1px solid var(--hub-stroke-mid)',
+            background: 'var(--hub-media-bg)',
+          }}
+        >
           {lastSwing?.video_url ? (
             <video src={thumbnail} className="h-full w-full object-cover" muted playsInline />
           ) : (
@@ -57,7 +63,14 @@ export function SwingQuickTile() {
         </div>
         <button 
           type="button" 
-          className="rounded-2xl px-4 h-11 border border-white/15 bg-white/08 hover:bg-white/12 text-[14px] text-white transition"
+          className="rounded-2xl px-4 h-11 text-[14px] transition"
+          style={{
+            border: '1px solid var(--hub-stroke-strong)',
+            background: 'var(--hub-glass-bg-button)',
+            color: 'var(--hub-text)',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button-hover)'}
+          onMouseLeave={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button)'}
           onClick={pick}
         >
           Upload Video

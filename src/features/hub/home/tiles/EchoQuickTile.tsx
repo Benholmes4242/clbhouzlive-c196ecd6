@@ -32,15 +32,27 @@ export function EchoQuickTile() {
           onChange={(e) => setText(e.target.value)}
           placeholder="Ask Echo anything…"
           aria-label="Ask Echo"
-          className="flex-1 min-w-0 rounded-2xl h-11 px-4 text-[15px] bg-white/04 border border-white/12 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/12 transition"
+          className="flex-1 min-w-0 rounded-2xl h-11 px-4 text-[15px] focus:outline-none focus:ring-2 transition"
+          style={{
+            background: 'var(--hub-glass-bg-input)',
+            border: '1px solid var(--hub-stroke-mid)',
+            color: 'var(--hub-text)',
+          }}
+          onFocus={(e) => e.currentTarget.style.borderColor = 'var(--hub-stroke-mid)'}
         />
         <button 
           type="submit"
           disabled={!text.trim()}
           aria-label="Send"
-          className="rounded-2xl h-11 w-11 flex items-center justify-center border border-white/15 bg-white/08 hover:bg-white/12 transition disabled:opacity-40"
+          className="rounded-2xl h-11 w-11 flex items-center justify-center transition disabled:opacity-40"
+          style={{
+            border: '1px solid var(--hub-stroke-strong)',
+            background: 'var(--hub-glass-bg-button)',
+          }}
+          onMouseEnter={(e) => !text.trim() ? null : e.currentTarget.style.background = 'var(--hub-glass-bg-button-hover)'}
+          onMouseLeave={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button)'}
         >
-          <Send size={18} className="text-white" />
+          <Send size={18} style={{ color: 'var(--hub-text)' }} />
         </button>
       </form>
     </Tile>

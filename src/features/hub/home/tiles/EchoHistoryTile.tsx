@@ -31,9 +31,18 @@ function EchoRow({
   return (
     <button 
       onClick={onClick} 
-      className="w-full flex items-center gap-3 py-2.5 group hover:bg-white/06 rounded-xl transition-colors text-left"
+      className="w-full flex items-center gap-3 py-2.5 group rounded-xl transition-colors text-left"
+      style={{ background: 'transparent' }}
+      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-hover)'}
+      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
     >
-      <div className="h-14 w-14 rounded-2xl overflow-hidden border border-white/12 bg-black/30 shrink-0">
+      <div 
+        className="h-14 w-14 rounded-2xl overflow-hidden shrink-0"
+        style={{ 
+          border: '1px solid var(--hub-stroke-mid)',
+          background: 'var(--hub-media-bg)',
+        }}
+      >
         {thumb ? (
           <video 
             src={thumb} 
@@ -46,12 +55,23 @@ function EchoRow({
         )}
       </div>
       <div className="min-w-0 flex-1 text-left">
-        <div className="text-[15px] text-white/95 truncate">{title}</div>
-        <div className="text-[13px] text-white/65">{date}</div>
+        <div className="text-[15px] truncate" style={{ color: 'var(--hub-text-bright)' }}>
+          {title}
+        </div>
+        <div className="text-[13px]" style={{ color: 'var(--hub-text-sub)' }}>
+          {date}
+        </div>
       </div>
       <button
         onClick={(e) => { e.stopPropagation(); onClick(); }}
-        className="ml-auto rounded-2xl px-3 h-10 border border-white/12 text-white/85 text-[13px] hover:bg-white/08 shrink-0"
+        className="ml-auto rounded-2xl px-3 h-10 text-[13px] shrink-0 transition"
+        style={{
+          border: '1px solid var(--hub-stroke-mid)',
+          color: 'var(--hub-text-body)',
+          background: 'transparent',
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button)'}
+        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
       >
         View
       </button>
@@ -119,24 +139,32 @@ export function EchoHistoryTile({
       <div className="space-y-4">
         {/* Chat Section */}
         <div>
-          <div className="text-[12px] tracking-wide text-white/55 mb-1.5">CHAT</div>
-          {chatLoading && <div className="h-14 rounded-2xl bg-white/04 animate-pulse" />}
+          <div className="text-[12px] tracking-wide mb-1.5" style={{ color: 'var(--hub-text-muted)' }}>
+            CHAT
+          </div>
+          {chatLoading && (
+            <div className="h-14 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
+          )}
           {!chatLoading && chatItems.length > 0 && (
-            <div className="text-[14px] text-white/60 py-2">
+            <div className="text-[14px] py-2" style={{ color: 'var(--hub-text-sub)' }}>
               {chatItems[0].title}
             </div>
           )}
           {!chatLoading && chatItems.length === 0 && (
-            <div className="text-white/50 py-2 text-[14px]">No chat history yet</div>
+            <div className="py-2 text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
+              No chat history yet
+            </div>
           )}
         </div>
 
         {/* Swing Section */}
         <div>
-          <div className="text-[12px] tracking-wide text-white/55 mb-1.5">SWING</div>
+          <div className="text-[12px] tracking-wide mb-1.5" style={{ color: 'var(--hub-text-muted)' }}>
+            SWING
+          </div>
           <ul className="space-y-2.5">
             {swingLoading && [0, 1].slice(0, limitSwing).map(i => (
-              <div key={i} className="h-14 rounded-2xl bg-white/04 animate-pulse" />
+              <div key={i} className="h-14 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
             ))}
             {!swingLoading && swingItems.map(s => (
               <EchoRow 
@@ -148,7 +176,9 @@ export function EchoHistoryTile({
               />
             ))}
             {!swingLoading && swingItems.length === 0 && (
-              <div className="text-white/50 py-2 text-[14px]">No swing analyses yet</div>
+              <div className="py-2 text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
+                No swing analyses yet
+              </div>
             )}
           </ul>
         </div>

@@ -40,23 +40,26 @@ export function GamesNearYouTile({
     >
       <div className="space-y-2">
         {isLoading && Array.from({ length: limit }).map((_, i) => (
-          <div key={i} className="h-16 rounded-2xl bg-white/04 animate-pulse" />
+          <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
         ))}
         {!isLoading && games.map(g => {
           const availableSlots = g.slots_open || 0;
           return (
             <button 
               key={g.id} 
-              className="flex items-center gap-3 w-full py-2 hover:bg-white/06 rounded-xl transition-colors text-left"
+              className="flex items-center gap-3 w-full py-2 rounded-xl transition-colors text-left"
+              style={{ background: 'transparent' }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-hover)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               onClick={() => nav(`/game/${g.id}`)}
             >
               <div className="min-w-0 flex-1 flex items-center gap-2">
                 <span role="img" aria-label="golf">⛳</span>
                 <div className="min-w-0">
-                  <div className="text-[16px] text-white/95 truncate" title={g.course_name}>
+                  <div className="text-[16px] truncate" style={{ color: 'var(--hub-text-bright)' }} title={g.course_name}>
                     {g.course_name || 'Golf Course'}
                   </div>
-                  <div className="text-[12px] text-white/60">
+                  <div className="text-[12px]" style={{ color: 'var(--hub-text-sub)' }}>
                     {g.start_time ? formatDistanceToNow(new Date(g.start_time), { addSuffix: true }) : 'TBD'}
                   </div>
                 </div>
@@ -68,11 +71,12 @@ export function GamesNearYouTile({
           );
         })}
         {!isLoading && games.length === 0 && (
-          <p className="text-[15px] text-white/70">
+          <p className="text-[15px]" style={{ color: 'var(--hub-text-sub)' }}>
             Be the first!{' '}
             <button 
               onClick={() => nav('/hub/create-game')}
-              className="text-[#ff8e2b] underline-offset-2 hover:underline"
+              className="underline-offset-2 hover:underline"
+              style={{ color: 'var(--hub-accent-orange)' }}
             >
               Create a Game
             </button>

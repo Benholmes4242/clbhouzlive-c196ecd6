@@ -16,11 +16,17 @@ export function TileHeader({ title, subtitle, onViewAll }: TileHeaderProps) {
     <div className="mb-2.5">
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <h3 className="text-[20px] font-semibold leading-snug text-white truncate tracking-[-0.01em]">
+          <h3 
+            className="text-[20px] font-semibold leading-snug truncate tracking-[-0.01em]"
+            style={{ color: 'var(--hub-text)' }}
+          >
             {title}
           </h3>
           {subtitle && (
-            <p className="text-[13px] leading-tight text-white/65 truncate mt-0.5">
+            <p 
+              className="text-[13px] leading-tight truncate mt-0.5"
+              style={{ color: 'var(--hub-text-sub)' }}
+            >
               {subtitle}
             </p>
           )}
@@ -28,7 +34,14 @@ export function TileHeader({ title, subtitle, onViewAll }: TileHeaderProps) {
         {onViewAll && (
           <button
             onClick={onViewAll}
-            className="shrink-0 px-3.5 py-2.5 rounded-2xl border border-white/14 bg-white/06 backdrop-blur text-[13px] font-medium text-white hover:bg-white/12 transition-all duration-200 whitespace-nowrap"
+            className="shrink-0 px-3.5 py-2.5 rounded-2xl backdrop-blur text-[13px] font-medium transition-all duration-200 whitespace-nowrap"
+            style={{
+              border: '1px solid var(--hub-stroke-mid)',
+              background: 'var(--hub-glass-bg-hover)',
+              color: 'var(--hub-text)',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-hover)'}
           >
             View all →
           </button>

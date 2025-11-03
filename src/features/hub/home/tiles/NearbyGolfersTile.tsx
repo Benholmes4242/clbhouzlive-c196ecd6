@@ -25,32 +25,38 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
     >
       <div className="space-y-2">
         {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
-          <div key={i} className="h-12 rounded-2xl bg-white/04 animate-pulse" />
+          <div key={i} className="h-12 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
         ))}
         {!isLoading && golfers.slice(0, 3).map(g => (
           <button 
             key={g.id} 
-            className="flex items-center gap-3 w-full p-2 rounded-2xl hover:bg-white/06 transition-colors text-left"
+            className="flex items-center gap-3 w-full p-2 rounded-2xl transition-colors text-left"
+            style={{ background: 'transparent' }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
             onClick={() => nav(`/profile/${g.username}`)}
           >
             <img 
               src={g.avatar_url || '/placeholder.svg'} 
               alt="" 
-              className="w-10 h-10 rounded-full object-cover border border-white/10 shrink-0"
+              className="w-10 h-10 rounded-full object-cover shrink-0"
+              style={{ border: '1px solid var(--hub-stroke-avatar)' }}
             />
             <div className="flex-1 min-w-0">
-              <div className="text-white text-[15px] font-medium truncate">
+              <div className="text-[15px] font-medium truncate" style={{ color: 'var(--hub-text)' }}>
                 {g.display_name || g.username}
               </div>
-              <div className="text-[12px] text-white/60 truncate">
+              <div className="text-[12px] truncate" style={{ color: 'var(--hub-text-sub)' }}>
                 {g.distanceText ?? 'Open to Play'}
               </div>
             </div>
-            <span className="text-white/40 text-lg">›</span>
+            <span className="text-lg" style={{ color: 'var(--hub-text-dimmer)' }}>›</span>
           </button>
         ))}
         {!isLoading && golfers.length === 0 && (
-          <div className="text-[13px] text-white/60 py-2">No active golfers nearby</div>
+          <div className="text-[13px] py-2" style={{ color: 'var(--hub-text-sub)' }}>
+            No active golfers nearby
+          </div>
         )}
       </div>
     </Tile>

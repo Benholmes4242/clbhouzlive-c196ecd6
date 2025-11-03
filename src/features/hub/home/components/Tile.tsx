@@ -17,14 +17,20 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
     <section
       className="relative rounded-3xl p-4 pt-3.5 pb-3.5 overflow-hidden flex flex-col min-h-[192px]"
       style={{
-        background: 'linear-gradient(180deg, rgba(35,35,35,0.78), rgba(25,25,25,0.78))',
-        border: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+        background: 'linear-gradient(180deg, var(--hub-glass-bg-start), var(--hub-glass-bg-end))',
+        border: '1px solid var(--hub-stroke)',
+        boxShadow: 'var(--hub-shadow-tile)',
       }}
     >
       <div className="flex-1">
-        <div className="text-[20px] font-semibold text-white mb-0.5">{title}</div>
-        {subtitle && <div className="text-[13px] text-white/70 mb-2.5 line-clamp-1">{subtitle}</div>}
+        <div className="text-[20px] font-semibold mb-0.5" style={{ color: 'var(--hub-text)' }}>
+          {title}
+        </div>
+        {subtitle && (
+          <div className="text-[13px] mb-2.5 line-clamp-1" style={{ color: 'var(--hub-text-sub)' }}>
+            {subtitle}
+          </div>
+        )}
         <div className="mt-2.5">{children}</div>
       </div>
 
@@ -35,7 +41,14 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
           {onViewAll && (
             <button
               onClick={onViewAll}
-              className="shrink-0 rounded-2xl px-3.5 py-2 text-[13px] border border-white/15 text-white/85 hover:bg-white/08 transition"
+              className="shrink-0 rounded-2xl px-3.5 py-2 text-[13px] transition"
+              style={{
+                border: '1px solid var(--hub-stroke-strong)',
+                color: 'var(--hub-text-body)',
+                background: 'transparent',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
             >
               View all →
             </button>
