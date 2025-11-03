@@ -5,13 +5,10 @@
 
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TileHeader } from '../parts/TileHeader';
+import { Tile } from '../components/Tile';
+import { TileHeader } from '../components/TileHeader';
 
-interface SwingQuickTileProps {
-  className?: string;
-}
-
-export function SwingQuickTile({ className }: SwingQuickTileProps) {
+export function SwingQuickTile() {
   const inputRef = useRef<HTMLInputElement>(null);
   const nav = useNavigate();
 
@@ -20,21 +17,26 @@ export function SwingQuickTile({ className }: SwingQuickTileProps) {
   const onPick: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // Hand off to Swing page (it already handles upload)
     nav('/hub/echo/swing', { state: { preselectedFileName: file.name } });
   };
 
   return (
-    <section className={className}>
+    <Tile>
       <TileHeader 
         title="Swing Coach" 
         subtitle="Upload a swing for instant analysis" 
-        viewAllTo="/hub/echo/swing" 
+        onViewAll={() => nav('/hub/echo/swing')} 
       />
-      <div className="row">
-        <button type="button" className="chip" onClick={pick}>Upload Swing Video</button>
+      <div className="mt-2">
+        <button 
+          type="button" 
+          className="px-3.5 py-2.5 rounded-2xl border border-white/14 bg-white/06 text-[13px] font-medium text-white hover:bg-white/12 transition-all duration-200"
+          onClick={pick}
+        >
+          Upload Swing Video
+        </button>
         <input ref={inputRef} type="file" accept="video/*" hidden onChange={onPick} />
       </div>
-    </section>
+    </Tile>
   );
 }

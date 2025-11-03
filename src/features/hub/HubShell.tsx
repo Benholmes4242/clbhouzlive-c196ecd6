@@ -163,8 +163,8 @@ export function HubShell({ onClose }: HubShellProps) {
               <div />
               
               <div className="text-center">
-                <h2 className="text-white text-[17px] font-semibold">
-                  My Clubhouse
+                <h2 className="text-white text-[22px] md:text-[24px] font-semibold tracking-[-0.01em]">
+                  My{'\u00A0'}Clubhouz
                 </h2>
               </div>
               
