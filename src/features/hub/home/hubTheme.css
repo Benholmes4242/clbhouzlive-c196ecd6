@@ -18,9 +18,9 @@
   /* ========================================
      BACKGROUNDS & SURFACES
      ======================================== */
-  /* Main Hub container gradient - Dark Glass */
-  --hub-bg-start: #0a0a0f;
-  --hub-bg-end: #1a1a2e;
+  /* Main Hub container gradient - Light Glass */
+  --hub-bg-start: #f8f9fa;
+  --hub-bg-end: #e9ecef;
   
   /* Backdrop overlay (behind Hub) */
   --hub-backdrop: rgba(0,0,0,0.70);
