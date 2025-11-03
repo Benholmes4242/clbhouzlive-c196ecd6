@@ -1,6 +1,6 @@
 /**
  * Hub Dashboard Design Tokens
- * Compact 2-column layout system
+ * Graphite Glass theme and utility classes
  */
 
 :root {
@@ -35,3 +35,53 @@
   --hub-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
   --hub-shadow-inner: inset 0 0 0 0.5px rgba(255, 255, 255, 0.08);
 }
+
+/* Page and Header */
+.hub-page { 
+  background: var(--hub-bg-gradient);
+  color: var(--hub-text);
+}
+.hub-header {
+  background: var(--hub-header-gradient);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px);
+}
+
+/* Card */
+.hub-card {
+  background: var(--hub-glass-bg);
+  border: 1px solid var(--hub-stroke);
+  border-radius: var(--hub-radius);
+  backdrop-filter: var(--hub-glass-blur);
+  box-shadow: var(--hub-shadow-inner), var(--hub-shadow);
+  padding: 16px 20px;
+  transition: all 0.3s ease;
+}
+.hub-card:hover { background: var(--hub-glass-bg-hover); transform: translateY(-2px); }
+
+/* Accent + Pills */
+.hub-accent { color: var(--hub-accent); }
+.hub-pill {
+  border: 1px solid var(--hub-accent-border);
+  color: rgba(255, 255, 255, 0.9);
+  background: var(--hub-accent-bg);
+  border-radius: 20px;
+  padding: 6px 14px;
+  backdrop-filter: blur(12px);
+  transition: background 0.2s ease;
+}
+.hub-pill:hover { background: var(--hub-accent-bg-hover); }
+
+/* Text helpers */
+.hub-text-title { color: var(--hub-text-title); }
+.hub-text-subtitle { color: var(--hub-text-sub); }
+
+/* Buttons */
+.hub-btn-glass {
+  border: 1px solid var(--hub-stroke);
+  background: var(--hub-glass-bg);
+  color: var(--hub-text);
+  backdrop-filter: blur(12px);
+  transition: background 0.2s ease;
+}
+.hub-btn-glass:hover { background: var(--hub-glass-bg-hover); }
