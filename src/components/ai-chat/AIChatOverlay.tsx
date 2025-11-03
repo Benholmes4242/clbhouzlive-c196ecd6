@@ -588,7 +588,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   }
                 }}
                 placeholder="Ask Echo anything..."
-                className="flex-1 min-h-[42px] max-h-32 resize-none bg-white/05 border-white/12 text-white placeholder:text-white/40 focus:border-white/20"
+                className="flex-1 min-h-[42px] max-h-32 resize-none bg-white/05 border-white/12 text-black placeholder:text-black/40 focus:border-white/20"
                 disabled={isLoading}
               />
               <Button
