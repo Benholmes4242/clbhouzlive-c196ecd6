@@ -36,12 +36,12 @@ export function TileHeader({ title, subtitle, onViewAll }: TileHeaderProps) {
             onClick={onViewAll}
             className="shrink-0 px-3.5 py-2.5 rounded-2xl backdrop-blur text-[13px] font-medium transition-all duration-200 whitespace-nowrap"
             style={{
-              border: '1px solid var(--hub-stroke-mid)',
-              background: 'var(--hub-glass-bg-hover)',
+              border: '1px solid var(--hub-stroke-subtle)',
+              background: 'transparent',
               color: 'var(--hub-text)',
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button-hover)'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-hover)'}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-subtle)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
           >
             View all →
           </button>

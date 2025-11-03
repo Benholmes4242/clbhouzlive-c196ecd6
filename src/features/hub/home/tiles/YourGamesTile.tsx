@@ -25,15 +25,15 @@ function GameRow({
       onClick={onClick}
       className="w-full flex items-center gap-2.5 py-2.5 rounded-xl transition-colors text-left"
       style={{ background: 'transparent' }}
-      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-hover)'}
+      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-subtle)'}
       onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
     >
       <span 
         className="rounded-xl px-2.5 py-1.5 text-[12px] shrink-0"
         style={{
-          border: '1px solid var(--hub-stroke-strong)',
+          border: '1px solid var(--hub-stroke-subtle)',
           color: 'var(--hub-text-body)',
-          background: 'var(--hub-glass-bg-subtle)',
+          background: 'var(--hub-glass-subtle)',
         }}
       >
         {tag}
@@ -103,7 +103,7 @@ export function YourGamesTile() {
     >
       <ul className="mt-1.5 space-y-2.5">
         {isLoading && [0, 1, 2].map(i => (
-          <div key={i} className="h-14 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
+          <div key={i} className="h-14 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-subtle)' }} />
         ))}
         {!isLoading && games.map(g => {
           const totalSlots = g.slots_total || 0;

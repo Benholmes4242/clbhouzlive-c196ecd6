@@ -28,9 +28,13 @@ export function HubShell({ onClose }: HubShellProps) {
   // Lock body scroll when hub is mounted
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
+    const originalBg = document.body.style.background;
     document.body.style.overflow = 'hidden';
+    // Ensure page backdrop under Hub isn't pure black
+    document.body.style.background = 'linear-gradient(180deg, var(--hub-bg-start) 0%, var(--hub-bg-end) 100%)';
     return () => {
       document.body.style.overflow = originalOverflow;
+      document.body.style.background = originalBg;
     };
   }, []);
 
@@ -42,6 +46,33 @@ export function HubShell({ onClose }: HubShellProps) {
         event_label: analyticsEvents.hub.opened.label,
       });
     }
+
+    // DEBUG: log computed styles for header/card to find override source
+    setTimeout(() => {
+      try {
+        const header = document.querySelector('#hubHeader') as HTMLElement | null;
+        const card = document.querySelector('.hub-card') as HTMLElement | null;
+        const h = header ? getComputedStyle(header) : null;
+        const c = card ? getComputedStyle(card) : null;
+        console.info('[Hub Debug] header', h ? {
+          bgImg: h.backgroundImage,
+          bg: h.backgroundColor,
+          blur: (h as any).backdropFilter || (h as any).webkitBackdropFilter,
+          border: h.borderBottomColor,
+          isolation: h.isolation,
+        } : 'missing');
+        console.info('[Hub Debug] card', c ? {
+          bgImg: c.backgroundImage,
+          bg: c.backgroundColor,
+          blur: (c as any).backdropFilter || (c as any).webkitBackdropFilter,
+          border: c.borderColor,
+          boxShadow: c.boxShadow,
+          willChange: c.willChange,
+        } : 'missing');
+      } catch (e) {
+        console.warn('[Hub Debug] style read failed', e);
+      }
+    }, 300);
   }, []);
 
   // Track tab switches
@@ -122,9 +153,9 @@ export function HubShell({ onClose }: HubShellProps) {
         className="fixed inset-0 pointer-events-none"
         style={{
           zIndex: Z.hub,
-          backgroundColor: 'var(--hub-backdrop)',
-          WebkitBackdropFilter: 'blur(var(--hub-backdrop-blur))',
-          backdropFilter: 'blur(var(--hub-backdrop-blur))',
+          backgroundColor: 'transparent',
+          WebkitBackdropFilter: 'none',
+          backdropFilter: 'none',
         }}
       />
       
@@ -139,10 +170,10 @@ export function HubShell({ onClose }: HubShellProps) {
       {/* Hub Container */}
       <div 
         className="fixed inset-0 flex items-end sm:items-center sm:justify-center animate-fade-in pointer-events-none"
-        style={{ zIndex: Z.hub }}
+        style={{ zIndex: Z.hub, background: 'linear-gradient(180deg, var(--hub-bg-start) 0%, var(--hub-bg-end) 100%)' }}
       >
         <div
-          className="hub-shell relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200 pointer-events-auto overflow-x-hidden"
+          className="hub-shell relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200 pointer-events-auto"
           style={{
             height: 'calc(100vh - env(safe-area-inset-top))',
             maxHeight: '100vh',
@@ -153,11 +184,8 @@ export function HubShell({ onClose }: HubShellProps) {
             paddingTop: 'env(safe-area-inset-top)',
             paddingBottom: 'env(safe-area-inset-bottom)',
             background: 'linear-gradient(180deg, var(--hub-bg-start) 0%, var(--hub-bg-end) 100%)',
-            backdropFilter: 'blur(var(--hub-backdrop-blur))',
-            WebkitBackdropFilter: 'blur(var(--hub-backdrop-blur))',
             border: '1px solid var(--hub-stroke-subtle)',
             borderRadius: '0',
-            boxShadow: 'var(--hub-shadow-main)',
             isolation: 'isolate',
           }}
           onClick={(e) => e.stopPropagation()}
@@ -168,14 +196,25 @@ export function HubShell({ onClose }: HubShellProps) {
             className="relative z-30 shrink-0"
             style={{
               background:
-                'linear-gradient(180deg, var(--hub-header-bg-start) 0%, var(--hub-header-bg-mid) 60%, var(--hub-header-bg-end) 100%)',
+                'linear-gradient(180deg, var(--hub-header-top) 0%, var(--hub-header-mid) 56%, var(--hub-header-clear) 100%)',
               WebkitBackdropFilter: 'blur(var(--hub-header-blur))',
               backdropFilter: 'blur(var(--hub-header-blur))',
-              borderBottom: '1px solid var(--hub-header-stroke)',
+              borderBottom: '1px solid var(--hub-stroke-subtle)',
               willChange: 'backdrop-filter, background',
               isolation: 'isolate',
             }}
           >
+            {/* Top sheen */}
+            <span
+              aria-hidden
+              style={{
+                position: 'absolute',
+                inset: '0 0 auto 0',
+                height: '1px',
+                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 50%, transparent 100%)',
+                pointerEvents: 'none',
+              }}
+            />
             <div className="px-5 pt-4">
               <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
                 <div />

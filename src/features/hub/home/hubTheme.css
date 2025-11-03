@@ -1,7 +1,7 @@
 /**
  * Hub Dashboard Design Tokens
  * Single source of truth for My Clubhouz Hub colors, effects, and layout
- * Smoke Glass theme
+ * Apple Frosted Glass theme
  */
 
 :root {
@@ -18,66 +18,63 @@
   /* ========================================
      BACKGROUNDS & SURFACES
      ======================================== */
-  /* Main Hub container gradient - Orange */
-  --hub-bg-start: #ff8e2b;
-  --hub-bg-end: #ff6b00;
+  /* Main Hub container gradient - Apple Frosted Glass */
+  --hub-bg-start: #ff7a00; /* DEBUG: orange test */
+  --hub-bg-end: #ffb347;   /* DEBUG: orange test */
   
   /* Backdrop overlay (behind Hub) */
-  --hub-backdrop: rgba(0,0,0,0.00);
-  --hub-backdrop-blur: 0px;
+  --hub-backdrop: rgba(0,0,0,0.70);
+  --hub-backdrop-blur: 12px;
   
-  /* Header v2 - Apple Control Center vibe */
-  --hub-header-bg-start: rgba(255,255,255,0.00);
-  --hub-header-bg-mid: rgba(255,255,255,0.00);
-  --hub-header-bg-end: rgba(255,255,255,0.00);
-  --hub-header-blur: 0px;
-  --hub-header-stroke: rgba(255,255,255,0.09);
-  --hub-header-highlight: rgba(255,255,255,0.10);
+  /* Header - Apple Control Center vibe */
+  --hub-header-top: rgba(28,28,30,0.92);
+  --hub-header-mid: rgba(28,28,30,0.70);
+  --hub-header-clear: rgba(28,28,30,0.00);
+  --hub-header-blur: 24px;
   
-  /* Tile/Card glass surfaces - Smoke Glass */
-  --hub-glass-bg-start: rgba(255,255,255,0.10);
-  --hub-glass-bg-end: rgba(255,255,255,0.06);
-  --hub-glass-bg-hover: rgba(255,255,255,0.12);
-  --hub-glass-bg: rgba(255,255,255,0.08);
-  --hub-glass-bg-subtle: rgba(255,255,255,0.08);
-  --hub-glass-bg-input: rgba(255,255,255,0.08);
-  --hub-glass-bg-button: rgba(255,255,255,0.10);
-  --hub-glass-bg-button-hover: rgba(255,255,255,0.15);
+  /* Frosted glass surface (light-through-dark) */
+  --hub-glass: rgba(255,255,255,0.14);
+  --hub-glass-hover: rgba(255,255,255,0.18);
+  --hub-glass-subtle: rgba(255,255,255,0.10);
   
   /* Video/thumbnail backgrounds */
   --hub-media-bg: rgba(0,0,0,0.40);
+  
+  /* Blur amounts (stronger diffusion) */
+  --hub-blur: 28px;
 
   /* ========================================
      BORDERS & STROKES
      ======================================== */
-  /* Light-diffused borders for Smoke Glass */
+  /* Crisp edges & strokes (brighter than smoke) */
   --hub-stroke: rgba(255,255,255,0.14);
-  --hub-stroke-subtle: rgba(255,255,255,0.10);
+  --hub-stroke-subtle: rgba(255,255,255,0.14);
   --hub-stroke-mid: rgba(255,255,255,0.14);
-  --hub-stroke-strong: rgba(255,255,255,0.14);
-  --hub-stroke-avatar: rgba(255,255,255,0.18);
-  --hub-stroke-divider: rgba(255,255,255,0.10);
+  --hub-stroke-strong: rgba(255,255,255,0.22);
+  --hub-stroke-avatar: rgba(255,255,255,0.22);
+  --hub-stroke-divider: rgba(255,255,255,0.14);
 
   /* ========================================
      SHADOWS & DEPTH
      ======================================== */
-  /* Soft, natural shadows for Smoke Glass */
+  /* Tighter, softer shadows for Frosted Glass */
   --hub-shadow-main: 0 30px 80px rgba(0,0,0,0.85), 0 0 1px rgba(255,255,255,0.08) inset;
-  --hub-shadow-tile: 0 4px 24px rgba(0,0,0,0.50);
-  --hub-shadow-tile-hover: 0 10px 28px rgba(0,0,0,0.50);
+  --hub-shadow-tile: 0 4px 22px rgba(0,0,0,0.28);
+  --hub-shadow-tile-hover: 0 8px 26px rgba(0,0,0,0.32);
   --hub-shadow-tile-inset: inset 0 0 0 1px rgba(255,255,255,0.08);
   --hub-top-highlight: inset 0 1px 0 rgba(255,255,255,0.08);
 
   /* ========================================
      TEXT & TYPOGRAPHY
      ======================================== */
+  /* Brighter text for Frosted Glass */
   --hub-text: rgba(255,255,255,0.95);
   --hub-text-bright: rgba(255,255,255,0.95);
   --hub-text-body: rgba(255,255,255,0.85);
   --hub-text-sub: rgba(255,255,255,0.72);
-  --hub-text-dim: rgba(255,255,255,0.50);
+  --hub-text-dim: rgba(255,255,255,0.55);
   --hub-text-dimmer: rgba(255,255,255,0.40);
-  --hub-text-muted: rgba(255,255,255,0.45);
+  --hub-text-muted: rgba(255,255,255,0.55);
   --hub-text-placeholder: rgba(255,255,255,0.40);
 
   /* ========================================
@@ -97,6 +94,15 @@
   /* ========================================
      SEMANTIC SURFACES (legacy compat)
      ======================================== */
-  --hub-surface: var(--hub-glass-bg-hover);
-  --hub-surface-2: var(--hub-glass-bg-subtle);
+  --hub-surface: var(--hub-glass-subtle);
+  --hub-surface-2: var(--hub-glass-subtle);
+}
+
+/* DEBUG: force glass if something still overrides (remove after verification) */
+#hubHeader, .hub-card {
+  background: var(--hub-glass) !important;
+  border: 1px solid var(--hub-stroke-strong) !important;
+  backdrop-filter: blur(var(--hub-blur)) !important;
+  -webkit-backdrop-filter: blur(var(--hub-blur)) !important;
+  box-shadow: 0 4px 22px rgba(0,0,0,0.28) !important;
 }

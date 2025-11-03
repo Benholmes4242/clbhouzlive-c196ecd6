@@ -51,7 +51,7 @@ export function SwingQuickTile() {
         <div 
           className="h-20 w-32 rounded-2xl overflow-hidden shrink-0"
           style={{
-            border: '1px solid var(--hub-stroke-mid)',
+            border: '1px solid var(--hub-stroke)',
             background: 'var(--hub-media-bg)',
           }}
         >
@@ -65,12 +65,12 @@ export function SwingQuickTile() {
           type="button" 
           className="rounded-2xl px-4 h-11 text-[14px] transition"
           style={{
-            border: '1px solid var(--hub-stroke-strong)',
-            background: 'var(--hub-glass-bg-button)',
+            border: '1px solid var(--hub-stroke-subtle)',
+            background: 'transparent',
             color: 'var(--hub-text)',
           }}
-          onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button-hover)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button)'}
+          onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-subtle)'}
+          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
           onClick={pick}
         >
           Upload Video

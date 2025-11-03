@@ -17,21 +17,18 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
 
   return (
     <section
-      className="relative rounded-3xl p-4 pt-3.5 pb-3.5 overflow-hidden flex flex-col min-h-[192px]"
+      className="hub-card relative rounded-3xl p-4 pt-3.5 pb-3.5 flex flex-col min-h-[192px]"
       style={{
-        background: 'linear-gradient(180deg, var(--hub-glass-bg-start), var(--hub-glass-bg-end))',
+        background: 'var(--hub-glass)',
         border: '1px solid var(--hub-stroke)',
-        boxShadow: isHovered 
-          ? 'var(--hub-shadow-tile-hover), var(--hub-shadow-tile-inset), var(--hub-top-highlight)'
-          : 'var(--hub-shadow-tile), var(--hub-shadow-tile-inset), var(--hub-top-highlight)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        willChange: 'transform, backdrop-filter',
-        transform: 'translateZ(0)',
-        transition: 'box-shadow 0.2s ease-out',
+        boxShadow: '0 4px 22px rgba(0,0,0,0.28)',
+        backdropFilter: 'blur(var(--hub-blur))',
+        WebkitBackdropFilter: 'blur(var(--hub-blur))',
+        willChange: 'backdrop-filter',
+        transition: 'background 0.2s ease-out',
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-hover)'}
+      onMouseLeave={(e) => e.currentTarget.style.background = 'var(--hub-glass)'}
     >
       <div className="flex-1">
         <div className="text-[20px] font-semibold mb-0.5" style={{ color: 'var(--hub-text)' }}>
@@ -54,11 +51,11 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
               onClick={onViewAll}
               className="shrink-0 rounded-2xl px-3.5 py-2 text-[13px] transition"
               style={{
-                border: '1px solid var(--hub-stroke-strong)',
+                border: '1px solid var(--hub-stroke-subtle)',
                 color: 'var(--hub-text-body)',
                 background: 'transparent',
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button)'}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-subtle)'}
               onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
             >
               View all →

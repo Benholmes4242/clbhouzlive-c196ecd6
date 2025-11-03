@@ -15,8 +15,8 @@ export function Chip({ children, className = '' }: ChipProps) {
     <span 
       className={`inline-flex items-center px-2.5 py-1.5 rounded-full text-[12px] ${className}`}
       style={{
-        border: '1px solid var(--hub-stroke-mid)',
-        background: 'var(--hub-glass-bg-hover)',
+        border: '1px solid var(--hub-stroke-subtle)',
+        background: 'var(--hub-glass-subtle)',
         color: 'var(--hub-text-body)',
       }}
     >

@@ -25,14 +25,14 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
     >
       <div className="space-y-2">
         {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
-          <div key={i} className="h-12 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
+          <div key={i} className="h-12 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-subtle)' }} />
         ))}
         {!isLoading && golfers.slice(0, 3).map(g => (
           <button 
             key={g.id} 
             className="flex items-center gap-3 w-full p-2 rounded-2xl transition-colors text-left"
             style={{ background: 'transparent' }}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-hover)'}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-subtle)'}
             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
             onClick={() => nav(`/profile/${g.username}`)}
           >
@@ -40,7 +40,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
               src={g.avatar_url || '/placeholder.svg'} 
               alt="" 
               className="w-10 h-10 rounded-full object-cover shrink-0"
-              style={{ border: '1px solid var(--hub-stroke-avatar)' }}
+              style={{ border: '1px solid var(--hub-stroke)' }}
             />
             <div className="flex-1 min-w-0">
               <div className="text-[15px] font-medium truncate" style={{ color: 'var(--hub-text)' }}>
