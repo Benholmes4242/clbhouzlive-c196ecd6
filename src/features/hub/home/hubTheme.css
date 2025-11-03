@@ -12,28 +12,28 @@
   --hub-tile-compact: 200px;
   --hub-tile-content: 312px;
 
-  /* Graphite Glass Theme */
-  --hub-bg-gradient: linear-gradient(180deg, #0E0E0E 0%, #1C1C1E 100%);
-  --hub-header-gradient: linear-gradient(180deg, #111111 0%, #1C1C1E 100%);
+  /* Red Glass Theme */
+  --hub-bg-gradient: linear-gradient(180deg, #1A0505 0%, #2A0A0A 100%);
+  --hub-header-gradient: linear-gradient(180deg, #200808 0%, #2A0A0A 100%);
   
-  --hub-glass-bg: rgba(255, 255, 255, 0.05);
-  --hub-glass-bg-hover: rgba(255, 255, 255, 0.07);
+  --hub-glass-bg: rgba(255, 50, 50, 0.08);
+  --hub-glass-bg-hover: rgba(255, 50, 50, 0.12);
   --hub-glass-blur: blur(20px);
   
-  --hub-stroke: rgba(255, 255, 255, 0.12);
-  --hub-stroke-inner: rgba(255, 255, 255, 0.08);
+  --hub-stroke: rgba(255, 80, 80, 0.25);
+  --hub-stroke-inner: rgba(255, 80, 80, 0.15);
   
-  --hub-text: rgba(255, 255, 255, 0.92);
-  --hub-text-title: rgba(255, 255, 255, 0.9);
-  --hub-text-sub: rgba(255, 255, 255, 0.65);
+  --hub-text: rgba(255, 255, 255, 0.95);
+  --hub-text-title: rgba(255, 255, 255, 0.95);
+  --hub-text-sub: rgba(255, 200, 200, 0.7);
   
-  --hub-accent: #6E9277;
-  --hub-accent-bg: rgba(110, 146, 119, 0.05);
-  --hub-accent-bg-hover: rgba(110, 146, 119, 0.1);
-  --hub-accent-border: rgba(110, 146, 119, 0.5);
+  --hub-accent: #FF4444;
+  --hub-accent-bg: rgba(255, 68, 68, 0.1);
+  --hub-accent-bg-hover: rgba(255, 68, 68, 0.2);
+  --hub-accent-border: rgba(255, 68, 68, 0.5);
   
-  --hub-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-  --hub-shadow-inner: inset 0 0 0 0.5px rgba(255, 255, 255, 0.08);
+  --hub-shadow: 0 4px 24px rgba(255, 0, 0, 0.3);
+  --hub-shadow-inner: inset 0 0 0 0.5px rgba(255, 80, 80, 0.2);
 }
 
 /* Page and Header */
