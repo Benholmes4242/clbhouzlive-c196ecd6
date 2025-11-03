@@ -1,13 +1,10 @@
 import React, { useEffect, useRef, useState, useId } from 'react';
 import { useLiveClubhouseProfiles } from '@/hooks/useLiveClubhouseProfiles';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
-import { useNearbyGolfersCount } from '@/hooks/useNearbyGolfersCount';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
-import { NearbyOverlay } from '@/features/nearby/NearbyOverlay';
 import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import SquircleImage from '@/components/ui/SquircleImage';
-import NearbyGolfersSquircle from '@/components/nearby/NearbyGolfersSquircle';
 import '@/styles/shorts_live_clubhouse.css';
 
 const SEEN_KEY = 'seenCreatorImmersiveIds';
@@ -28,10 +25,8 @@ function superellipsePath(w: number, h: number, n = 4.2, steps = 240) {
 export function LiveClubhouseStrip() {
   const { creators, isLoading } = useLiveClubhouseProfiles();
   const { golfers } = useActiveGolfers();
-  const { count: nearbyCount, isLoading: nearbyCountLoading } = useNearbyGolfersCount();
   const rowRef = useRef<HTMLDivElement>(null);
   const [scrolling, setScrolling] = useState(false);
-  const [nearbyOverlayOpen, setNearbyOverlayOpen] = useState(false);
   
   // All golfers are now real (no mocks), so we can use the full list
   const nearbyOnlineGolfers = golfers;
@@ -89,19 +84,13 @@ export function LiveClubhouseStrip() {
   if (!creators.length) return null;
 
   return (
-    <>
-      <div className="live-row">
-        <div 
-          className="live-scroll" 
-          ref={rowRef} 
-          role="listbox" 
-          aria-label="Suggested creators"
-        >
-          <NearbyTile 
-            count={nearbyCount}
-            isLoading={nearbyCountLoading}
-            onOpen={() => setNearbyOverlayOpen(true)} 
-          />
+    <div className="live-row">
+      <div 
+        className="live-scroll" 
+        ref={rowRef} 
+        role="listbox" 
+        aria-label="Suggested creators"
+      >
           {nearbyOnlineGolfers.map((golfer, idx) => (
             <LiveTile 
               key={golfer.id} 
@@ -124,47 +113,7 @@ export function LiveClubhouseStrip() {
               creator={c} 
               index={idx + nearbyOnlineGolfers.length + 1} 
             />
-          ))}
-        </div>
-      </div>
-
-      <NearbyOverlay 
-        isOpen={nearbyOverlayOpen} 
-        onClose={() => setNearbyOverlayOpen(false)} 
-      />
-    </>
-  );
-}
-
-function NearbyTile({ count, isLoading, onOpen }: { count: number; isLoading: boolean; onOpen: () => void }) {
-  const handleClick = () => {
-    analyticsEvents.lcStrip.nearbyOpen(count);
-    onOpen();
-  };
-
-  let captionText = "...";
-  if (!isLoading) {
-    captionText = `${count ?? 0} nearby`;
-  }
-
-  return (
-    <div 
-      className="lc-tile lc-nearby" 
-      role="option"
-    >
-      <div className="lc-avatar-btn">
-        <NearbyGolfersSquircle 
-          onOpen={handleClick}
-        />
-      </div>
-
-      <div className="lc-label">
-        <div className="lc-name" title="Nearby Golfers">
-          Nearby Golfers
-        </div>
-        <div className="lc-sub" style={count > 0 ? { color: 'rgba(74, 222, 128, 0.8)' } : undefined}>
-          {captionText}
-        </div>
+        ))}
       </div>
     </div>
   );

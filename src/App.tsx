@@ -16,7 +16,6 @@ import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 import { VideoManagerProvider } from './contexts/VideoManagerContext';
 import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
-import AIChat from "@/components/ai-chat/AIChat";
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
@@ -244,7 +243,6 @@ const App: React.FC = () => {
                       </GlobalAudioProvider>
                       <Toaster />
                       <Sonner />
-                      <AIChat />
                       <GlobalBottomNavigation />
                     </BrowserRouter>
                   </UIProvider>
