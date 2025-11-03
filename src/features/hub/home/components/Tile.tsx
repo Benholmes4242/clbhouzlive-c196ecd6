@@ -15,11 +15,22 @@ type TileProps = React.PropsWithChildren<{
 export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps) {
   return (
     <section
-      className="relative rounded-3xl p-4 pt-3.5 pb-3.5 overflow-hidden flex flex-col min-h-[192px]"
+      className="hub-card relative p-4 pt-3.5 pb-3.5 overflow-hidden flex flex-col min-h-[192px] transition-all duration-300"
       style={{
-        background: 'linear-gradient(180deg, rgba(35,35,35,0.78), rgba(25,25,25,0.78))',
-        border: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+        background: 'var(--hub-surface)',
+        border: '1px solid var(--hub-stroke)',
+        borderRadius: 'var(--hub-radius)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        boxShadow: 'inset 0 0 0 0.5px rgba(255, 255, 255, 0.08), 0 4px 24px rgba(0, 0, 0, 0.5)',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = 'var(--hub-surface-hover)';
+        e.currentTarget.style.transform = 'translateY(-2px)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = 'var(--hub-surface)';
+        e.currentTarget.style.transform = 'translateY(0)';
       }}
     >
       <div className="flex-1">

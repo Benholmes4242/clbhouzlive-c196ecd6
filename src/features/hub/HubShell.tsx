@@ -142,7 +142,7 @@ export function HubShell({ onClose }: HubShellProps) {
         style={{ zIndex: Z.hub }}
       >
         <div
-          className="hub-shell relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200 pointer-events-auto overflow-x-hidden"
+          className="hub-page relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200 pointer-events-auto overflow-x-hidden"
           style={{
             height: 'calc(100vh - env(safe-area-inset-top))',
             maxHeight: '100vh',
@@ -152,23 +152,11 @@ export function HubShell({ onClose }: HubShellProps) {
             overscrollBehaviorX: 'none',
             paddingTop: 'env(safe-area-inset-top)',
             paddingBottom: 'env(safe-area-inset-bottom)',
-            background: 'linear-gradient(180deg, #0E0E0E 0%, #1A1A1A 100%)',
-            backdropFilter: 'blur(40px)',
-            WebkitBackdropFilter: 'blur(40px)',
-            border: '1px solid rgba(255, 255, 255, 0.05)',
-            borderRadius: '0',
-            boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9)',
           }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <header 
-            className="sticky top-0 z-20 backdrop-blur"
-            style={{ 
-              background: 'linear-gradient(180deg, rgba(23,23,23,0.96) 0%, rgba(23,23,23,0.92) 60%, rgba(23,23,23,0.00) 100%)',
-              borderBottom: '1px solid rgba(255,255,255,0.06)'
-            }}
-          >
+          <header className="hub-header sticky top-0 z-20">
             <div className="px-5 pt-4">
               <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
                 <div />

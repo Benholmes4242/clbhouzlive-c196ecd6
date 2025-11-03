@@ -1,20 +1,45 @@
 /**
- * Hub Dashboard Design Tokens
- * Compact 2-column layout system
+ * Hub Dashboard Design Tokens - Graphite Glass Theme
+ * Apple-inspired glass morphism with subtle depth
  */
 
 :root {
-  --hub-radius: 18px;
+  --hub-radius: 20px;
   --hub-pad: 16px;
   --hub-gap: 14px;
 
-  --hub-header-height: 56px;      /* forces equal tile headers */
-  --hub-tile-compact: 200px;       /* Echo / Swing / Nearby */
-  --hub-tile-content: 312px;       /* Games / Your Games / Recent Echo */
+  --hub-header-height: 56px;
+  --hub-tile-compact: 200px;
+  --hub-tile-content: 312px;
 
-  --hub-stroke: rgba(255,255,255,.08);
-  --hub-surface: rgba(255,255,255,.06);
+  /* Graphite Glass Colors */
+  --hub-bg-start: #0E0E0E;
+  --hub-bg-end: #1C1C1E;
+  --hub-stroke: rgba(255,255,255,.12);
+  --hub-surface: rgba(255,255,255,.05);
+  --hub-surface-hover: rgba(255,255,255,.07);
   --hub-surface-2: rgba(255,255,255,.04);
   --hub-text: rgba(255,255,255,.92);
-  --hub-text-sub: rgba(255,255,255,.60);
+  --hub-text-sub: rgba(255,255,255,.65);
+  --hub-accent: #6E9277;
+  --hub-accent-glow: rgba(110, 146, 119, 0.5);
+}
+
+/* Hub page background */
+.hub-page {
+  background: linear-gradient(180deg, var(--hub-bg-start) 0%, var(--hub-bg-end) 100%);
+  color: var(--hub-text);
+  overflow-x: hidden;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
+}
+
+/* Hub header to match background */
+.hub-header {
+  background: linear-gradient(180deg, #111111 0%, var(--hub-bg-end) 100%);
+  border-bottom: 1px solid var(--hub-stroke);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
