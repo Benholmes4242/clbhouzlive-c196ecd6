@@ -26,14 +26,14 @@ export function EchoQuickTile() {
       onViewAll={() => nav('/hub/echo/history')}
     >
       {/* Input row */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 mt-1">
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
           placeholder="Ask Echo anything…"
           aria-label="Ask Echo"
-          className="flex-1 min-w-0 h-11 rounded-2xl px-4 text-[15px] placeholder:opacity-45 focus:outline-none focus:ring-2 transition"
+          className="flex-1 min-w-0 h-12 rounded-[20px] px-4 text-[15px] placeholder:opacity-50 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
           style={{
             background: 'var(--hub-glass-bg-input)',
             border: '1px solid var(--hub-stroke)',
@@ -46,7 +46,7 @@ export function EchoQuickTile() {
         <button
           onClick={submit}
           aria-label="Send to Echo"
-          className="h-11 w-11 rounded-2xl flex items-center justify-center transition focus:outline-none disabled:opacity-40"
+          className="h-12 w-12 rounded-[20px] flex items-center justify-center transition-all focus:outline-none disabled:opacity-40 hover:scale-105 active:scale-95"
           disabled={!text.trim()}
           style={{
             background: 'var(--hub-glass-bg-button)',
@@ -62,15 +62,15 @@ export function EchoQuickTile() {
 
       {/* Hairline divider */}
       <div
-        className="mt-4"
+        className="mt-5"
         style={{
           height: 1,
-          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent)',
+          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent)',
         }}
       />
 
       {/* Bottom spacer for View all button */}
-      <div className="h-2" />
+      <div className="h-2.5" />
     </Tile>
   );
 }
