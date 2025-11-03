@@ -71,6 +71,7 @@ export function HubShell({ onClose }: HubShellProps) {
   // Determine primary tab (Nearby vs Echo)
   const getPrimaryTab = () => {
     const path = location.pathname;
+    if (path === '/hub' || path === '/hub/') return 'home';
     if (path.includes('/echo')) return 'echo';
     return 'nearby';
   };
@@ -78,6 +79,7 @@ export function HubShell({ onClose }: HubShellProps) {
   // Determine secondary tab within primary context
   const getSecondaryTab = () => {
     const path = location.pathname;
+    if (path === '/hub' || path === '/hub/') return 'home';
     if (path.includes('/golfers')) return 'golfers';
     if (path.includes('/games')) return 'games';
     if (path.includes('/your-games')) return 'your-games';
@@ -85,11 +87,12 @@ export function HubShell({ onClose }: HubShellProps) {
     if (path.includes('/echo/chat')) return 'chat';
     if (path.includes('/echo/swing')) return 'swing';
     if (path.includes('/echo/history')) return 'history';
-    return 'golfers';
+    return 'home';
   };
 
   const activePrimary = getPrimaryTab();
   const activeSecondary = getSecondaryTab();
+  const isHomePage = location.pathname === '/hub' || location.pathname === '/hub/';
 
   // Primary tabs
   const primaryTabs = [
@@ -177,55 +180,59 @@ export function HubShell({ onClose }: HubShellProps) {
             </div>
           </div>
 
-          {/* Primary Tabs (Nearby | Echo) */}
-          <div className="flex gap-2 px-5 mt-3 border-b border-white/[0.06]">
-            {primaryTabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => navigate(tab.path)}
-                className={`flex-1 py-3 text-sm font-semibold relative transition-all duration-150 ${
-                  activePrimary === tab.id
-                    ? 'text-white'
-                    : 'text-white/50 hover:text-white/70'
-                }`}
-              >
-                {tab.label}
-                {activePrimary === tab.id && (
-                  <div 
-                    className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-white/90 rounded-full transition-all duration-150"
-                    style={{ width: '56px' }}
-                  />
-                )}
-              </button>
-            ))}
-          </div>
+          {/* Primary Tabs (Nearby | Echo) - Hidden on home page */}
+          {!isHomePage && (
+            <div className="flex gap-2 px-5 mt-3 border-b border-white/[0.06]">
+              {primaryTabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => navigate(tab.path)}
+                  className={`flex-1 py-3 text-sm font-semibold relative transition-all duration-150 ${
+                    activePrimary === tab.id
+                      ? 'text-white'
+                      : 'text-white/50 hover:text-white/70'
+                  }`}
+                >
+                  {tab.label}
+                  {activePrimary === tab.id && (
+                    <div 
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-white/90 rounded-full transition-all duration-150"
+                      style={{ width: '56px' }}
+                    />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
 
-          {/* Secondary Tabs (contextual) */}
-          <div className="flex px-5 mt-2 border-b border-white/[0.04]">
-            {secondaryTabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => navigate(tab.path)}
-                className={`flex-1 py-2.5 text-xs font-medium relative transition-all duration-150 ${
-                  activeSecondary === tab.id
-                    ? 'text-white/90'
-                    : 'text-white/45 hover:text-white/65'
-                }`}
-              >
-                {tab.label}
-                {activeSecondary === tab.id && (
-                  <div 
-                    className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-white/70 rounded-full transition-all duration-150"
-                    style={{ width: '40px' }}
-                  />
-                )}
-              </button>
-            ))}
-          </div>
+          {/* Secondary Tabs (contextual) - Hidden on home page */}
+          {!isHomePage && (
+            <div className="flex px-5 mt-2 border-b border-white/[0.04]">
+              {secondaryTabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => navigate(tab.path)}
+                  className={`flex-1 py-2.5 text-xs font-medium relative transition-all duration-150 ${
+                    activeSecondary === tab.id
+                      ? 'text-white/90'
+                      : 'text-white/45 hover:text-white/65'
+                  }`}
+                >
+                  {tab.label}
+                  {activeSecondary === tab.id && (
+                    <div 
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-white/70 rounded-full transition-all duration-150"
+                      style={{ width: '40px' }}
+                    />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Content Area - Routed */}
           <div 
-            className="flex-1 overflow-y-auto px-5 pt-4 pb-3"
+            className={`flex-1 overflow-y-auto ${isHomePage ? '' : 'px-5 pt-4'} pb-3`}
             style={{
               WebkitOverflowScrolling: 'touch',
               overscrollBehavior: 'contain',

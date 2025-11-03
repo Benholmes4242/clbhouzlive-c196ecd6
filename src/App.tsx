@@ -79,6 +79,7 @@ const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 
 // Hub components (lazy load when feature flag is enabled)
 const HubShell = lazy(() => import("./features/hub/HubShell").then(m => ({ default: m.HubShell })));
+const HubHome = lazy(() => import("./features/hub/home/HubHome"));
 const HubGolfersPage = lazy(() => import("./features/hub/pages/HubGolfersPage").then(m => ({ default: m.HubGolfersPage })));
 const HubGamesPage = lazy(() => import("./features/hub/pages/HubGamesPage").then(m => ({ default: m.HubGamesPage })));
 const HubYourGamesPage = lazy(() => import("./features/hub/pages/HubYourGamesPage").then(m => ({ default: m.HubYourGamesPage })));
@@ -224,7 +225,7 @@ const App: React.FC = () => {
                     {/* Hub routes (feature-flagged) */}
                     {FEATURE_FLAGS.HUB && (
                       <Route path="/hub" element={<HubShell />}>
-                        <Route index element={<HubGolfersPage />} />
+                        <Route index element={<HubHome />} />
                         <Route path="golfers" element={<HubGolfersPage />} />
                         <Route path="games" element={<HubGamesPage />} />
                         <Route path="your-games" element={<HubYourGamesPage />} />
