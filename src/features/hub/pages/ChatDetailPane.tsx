@@ -8,66 +8,7 @@ import { ArrowLeft, Copy, Check, Loader2 } from 'lucide-react';
 import { echoLinks } from '@/features/echo/utils/echoLinks';
 import { toast } from 'sonner';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-
-type ChatConversationRow = {
-  id: string;
-  title: string;
-  createdAt: string;
-  lastActivityAt: string;
-  messages: Array<{
-    id: string;
-    type: 'user' | 'ai';
-    content: string;
-    timestamp: string;
-    metadata?: any;
-  }>;
-};
-
-function safeParse<T>(key: string): T | null {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return null;
-    return JSON.parse(raw) as T;
-  } catch {
-    return null;
-  }
-}
-
-function loadLegacyConversation(id: string): ChatConversationRow | null {
-  try {
-    const legacy = safeParse<Record<string, any> | any[]>('echo_chat');
-    if (!legacy) return null;
-
-    const arr = Array.isArray(legacy) ? legacy : Object.values(legacy);
-    const hit = arr.find((c: any) => c?.id === id);
-    if (!hit || typeof hit !== 'object') return null;
-
-    const convId = hit.id ?? (globalThis.crypto?.randomUUID?.() ?? `conv-${Date.now()}`);
-    const createdAt = hit.createdAt || hit.timestamp || new Date().toISOString();
-    const lastActivityAt = hit.lastActivityAt || createdAt;
-
-    const messages = Array.isArray(hit.messages)
-      ? hit.messages.map((m: any, i: number) => ({
-          id: m.id ?? `${convId}-${i}`,
-          type: (m.role || m.type) === 'user' ? 'user' : 'ai',
-          content: String(m.content ?? ''),
-          timestamp: m.timestamp || createdAt,
-          metadata: m.meta || m.metadata,
-        }))
-      : [];
-
-    return {
-      id: convId,
-      title: hit.customTitle || hit.title || 'Untitled conversation',
-      createdAt,
-      lastActivityAt,
-      messages,
-    };
-  } catch (e) {
-    console.error('Error loading legacy conversation:', e);
-    return null;
-  }
-}
+import { getLegacyConversations, type ChatConversationRow } from '@/features/echo/utils/echoLegacy';
 
 export function ChatDetailPane() {
   const { id } = useParams<{ id: string }>();
@@ -99,7 +40,8 @@ export function ChatDetailPane() {
 
         if (error || !data) {
           // Fallback: check localStorage for legacy conversations
-          const legacyRow = loadLegacyConversation(id);
+          const legacy = getLegacyConversations();
+          const legacyRow = legacy.find(c => c.id === id);
           if (legacyRow && isMounted) {
             setConv(legacyRow);
             analyticsEvents.track('hub_echo_history_open', { category: 'hub', label: 'chat', source: 'legacy' });

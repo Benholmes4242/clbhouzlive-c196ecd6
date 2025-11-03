@@ -29,21 +29,10 @@ import EchoProtection from './EchoProtection';
 import { useEchoProtection } from '@/hooks/useEchoProtection';
 import { useEchoConversationsOptional } from '@/features/echo/components/EchoConversationsProvider';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-
-// Chat conversation row type (DB single source of truth)
-type ChatConversationRow = {
-  id: string;
-  title: string;
-  createdAt: string;
-  lastActivityAt: string;
-  messages: Array<{
-    id: string;
-    type: 'user' | 'ai';
-    content: string;
-    timestamp: string;
-    metadata?: any;
-  }>;
-};
+import {
+  getLegacyConversations,
+  type ChatConversationRow,
+} from '@/features/echo/utils/echoLegacy';
 
 // HLS Video Player Component
 export const HLSVideoPlayer: React.FC<{ src: string; poster?: string; className?: string }> = ({ src, poster, className }) => {
@@ -595,7 +584,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     }
   }, [activeTab, isOpen]);
 
-  // Load chat conversations with pagination (DB single source of truth)
+  // Load chat conversations with pagination (DB + legacy localStorage merged)
   async function loadPage(nextPage = 0) {
     if (loadingStates.conversations) return;
     
@@ -603,64 +592,81 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     setErrorStates(prev => ({ ...prev, conversations: null }));
     
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setConversations([]);
-        setHasMore(false);
-        return;
+      const rows: Array<{ id: string; title: string; dateISO: string; count?: number }> = [];
+
+      // 1) DB (when available)
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const from = nextPage * PAGE_SIZE;
+          const to = from + PAGE_SIZE - 1;
+
+          const { data, error } = await supabase
+            .from('conversations')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('conversation_type', 'chat')
+            .order('updated_at', { ascending: false })
+            .range(from, to);
+
+          if (!error && data) {
+            for (const conv of data) {
+              const messages = Array.isArray(conv.messages) ? conv.messages : [];
+              rows.push({
+                id: conv.id,
+                title: conv.title ?? 'New conversation',
+                dateISO: conv.updated_at || conv.created_at,
+                count: messages.length,
+              });
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('DB chat history load skipped', e);
       }
 
-      const from = nextPage * PAGE_SIZE;
-      const to = from + PAGE_SIZE - 1;
+      // 2) Legacy localStorage (merged)
+      try {
+        const legacy = getLegacyConversations();
+        for (const conv of legacy) {
+          rows.push({
+            id: conv.id,
+            title: conv.title,
+            dateISO: conv.lastActivityAt || conv.createdAt,
+            count: conv.messages?.length || undefined,
+          });
+        }
+      } catch (e) {
+        console.warn('Legacy chat history load skipped', e);
+      }
 
-      const { data, error, count } = await supabase
-        .from('conversations')
-        .select('*', { count: 'exact' })
-        .eq('user_id', user.id)
-        .eq('conversation_type', 'chat')
-        .order('updated_at', { ascending: false })
-        .range(from, to);
-
-      if (error) throw error;
-
-      const rows: ChatConversationRow[] = (data ?? []).map(conv => ({
-        id: conv.id,
-        title: conv.title ?? 'New conversation',
-        createdAt: conv.created_at,
-        lastActivityAt: conv.updated_at,
-        messages: Array.isArray(conv.messages) ? conv.messages.map((m: any, i: number) => ({
-          id: m.id ?? `${conv.id}-${i}`,
-          type: m.type === 'user' ? 'user' : 'ai',
-          content: m.content ?? '',
-          timestamp: m.timestamp ?? conv.created_at,
-          metadata: m.metadata,
-        })) : [],
-      }));
+      // 3) De-dup by id, sort desc
+      const dedup = new Map<string, { id: string; title: string; dateISO: string; count?: number }>();
+      for (const r of rows) if (r.id && !dedup.has(r.id)) dedup.set(r.id, r);
+      const merged = Array.from(dedup.values())
+        .sort((a, b) => new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime())
+        .slice(0, PAGE_SIZE);
 
       // Map to UI format
-      const uiRows = rows.map(row => ({
+      const uiRows = merged.map(row => ({
         id: row.id,
         title: row.title,
         customTitle: row.title,
-        messages: row.messages.map(m => ({
-          ...m,
-          timestamp: new Date(m.timestamp)
-        })),
-        timestamp: new Date(row.lastActivityAt),
-        createdAt: new Date(row.createdAt),
-        lastActivityAt: new Date(row.lastActivityAt),
-        messageCount: row.messages.length
+        messages: [],
+        timestamp: new Date(row.dateISO),
+        createdAt: new Date(row.dateISO),
+        lastActivityAt: new Date(row.dateISO),
+        messageCount: row.count
       }));
 
-      setHasMore((from + rows.length) < (count ?? 0));
+      setHasMore(rows.length >= PAGE_SIZE);
       setConversations(prev => nextPage === 0 ? uiRows : [...prev, ...uiRows]);
       setPage(nextPage);
 
-      console.log('✅ [loadPage] Loaded conversations:', {
+      console.log('✅ [loadPage] Loaded conversations (DB + legacy):', {
         page: nextPage,
-        loaded: rows.length,
-        total: count,
-        hasMore: (from + rows.length) < (count ?? 0)
+        loaded: merged.length,
+        hasMore: rows.length >= PAGE_SIZE
       });
     } catch (error) {
       console.error('Failed to load chat conversations:', error);
@@ -903,7 +909,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     <div className="text-sm text-white/60 line-clamp-2">
                       {conv.messages.find(m => m.type === 'user')?.content || 'No messages'}
                     </div>
-                    <div className="text-xs text-white/40 mt-2">{conv.timestamp.toLocaleDateString()}</div>
+                    <div className="text-xs text-white/40 mt-2">
+                      {conv.timestamp.toLocaleDateString()}
+                      {typeof conv.messageCount === 'number' && <span aria-hidden="true"> • {conv.messageCount} {conv.messageCount === 1 ? 'message' : 'messages'}</span>}
+                    </div>
                   </button>
                 ))}
                 
