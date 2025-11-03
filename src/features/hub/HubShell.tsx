@@ -152,10 +152,10 @@ export function HubShell({ onClose }: HubShellProps) {
             overscrollBehaviorX: 'none',
             paddingTop: 'env(safe-area-inset-top)',
             paddingBottom: 'env(safe-area-inset-bottom)',
-            background: 'var(--hub-bg-gradient)',
+            background: 'linear-gradient(180deg, #0E0E0E 0%, #1A1A1A 100%)',
             backdropFilter: 'blur(40px)',
             WebkitBackdropFilter: 'blur(40px)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.05)',
             borderRadius: '0',
             boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9)',
           }}
@@ -165,8 +165,8 @@ export function HubShell({ onClose }: HubShellProps) {
           <header 
             className="sticky top-0 z-20 backdrop-blur"
             style={{ 
-              background: 'linear-gradient(180deg, rgba(17,17,17,0.96) 0%, rgba(28,28,30,0.92) 60%, rgba(28,28,30,0.00) 100%)',
-              borderBottom: '1px solid rgba(255,255,255,0.08)'
+              background: 'linear-gradient(180deg, rgba(23,23,23,0.96) 0%, rgba(23,23,23,0.92) 60%, rgba(23,23,23,0.00) 100%)',
+              borderBottom: '1px solid rgba(255,255,255,0.06)'
             }}
           >
             <div className="px-5 pt-4">
