@@ -597,21 +597,6 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         console.log('ℹ️ [loadChatConversations] Using Supabase conversations:', sessionConversations.length);
         setConversations(sessionConversations);
       }
-        id: conv.id,
-        title: conv.title || "New conversation",
-        customTitle: conv.title,
-         messages: conv.messages.map((msg, index) => ({
-           id: `${conv.id}-${index}`,
-           type: (msg.type === 'user' ? 'user' : 'ai') as 'user' | 'ai',
-           content: msg.content || '',
-           timestamp: new Date(msg.timestamp),
-           metadata: msg.metadata
-         })),
-        timestamp: new Date(conv.lastActivityAt),
-        createdAt: new Date(conv.createdAt),
-        lastActivityAt: new Date(conv.lastActivityAt),
-        messageCount: conv.messages.length
-      }));
 
       console.log('📱 Session conversations processed:', sessionConversations.length);
       setConversations(sessionConversations);
