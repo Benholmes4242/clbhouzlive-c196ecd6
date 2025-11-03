@@ -21,12 +21,15 @@ export function HubEchoPage() {
   const backToChat = () => navigate('/hub/echo/chat');
 
   return (
-    <div className="h-full w-full flex flex-col">
+    <div className="h-full w-full">
       {subtab === 'history' ? (
         <AIChatHistory
           isOpen={true}
           onClose={backToChat}
-          onSelectMessage={backToChat}
+          onSelectMessage={(id) => {
+            // Navigate back to chat when selecting a conversation
+            backToChat();
+          }}
           paneMode
           defaultCategory="chat"
         />

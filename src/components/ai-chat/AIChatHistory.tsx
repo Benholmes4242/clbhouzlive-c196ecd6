@@ -402,6 +402,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
   const [selectedTag, setSelectedTag] = useState('all');
   const [historyMessages, setHistoryMessages] = useState<HistoryMessage[]>([]);
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
   
   // Get conversation session for chat history  
   const conversationSession = useConversationSession({
@@ -428,7 +429,6 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
   // Use the caddie logs hook
   const { caddieLogs, loading: caddieLogsLoading, deleteCaddieLog: deleteCaddieLogHook } = useCaddieLogs();
-  const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [editingConversationId, setEditingConversationId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   
@@ -648,6 +648,135 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
     analysis.save_card?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     analysis.content?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Pane mode: render inline without SlideOver modal chrome
+  if (paneMode) {
+    return (
+      <div className="h-full w-full bg-gradient-to-b from-black via-[#0A0A0A] to-black flex flex-col overflow-hidden">
+        {/* Search & Tabs */}
+        <div className="bg-gradient-to-b from-black/60 to-transparent backdrop-blur-sm border-b border-white/08">
+          <div className="px-4 py-2">
+            {/* Search bar */}
+            <div className="flex items-center gap-2 mb-2">
+              <label className="flex-1 h-11 rounded-xl bg-white/06 backdrop-blur border border-white/12 px-3 flex items-center gap-2 transition focus-within:bg-white/08 focus-within:border-white/20">
+                <Search className="h-4 w-4 text-white/60" aria-hidden="true" />
+                <input
+                  type="search"
+                  placeholder="Search Echo…"
+                  className="w-full bg-transparent outline-none text-[14px] text-white placeholder:text-white/40"
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  value={searchQuery}
+                  aria-label="Search Echo history"
+                />
+                {searchQuery && (
+                  <button
+                    className="h-7 w-7 grid place-items-center rounded-full hover:bg-white/08 active:scale-[0.98] transition"
+                    onClick={() => setSearchQuery('')}
+                    aria-label="Clear search"
+                  >
+                    <X className="h-4 w-4 text-white/60" />
+                  </button>
+                )}
+              </label>
+            </div>
+
+            {/* Tabs */}
+            <div className="h-11 w-full rounded-full bg-white/06 backdrop-blur border border-white/12 grid grid-cols-2 gap-1 p-1">
+              <button
+                type="button"
+                onClick={() => setActiveTab('chat')}
+                className={cn(
+                  "rounded-full px-4 text-[14px] font-medium transition-all",
+                  activeTab === 'chat'
+                    ? "bg-white/05 text-white shadow-[0_0_16px_rgba(255,255,255,0.18)] ring-1 ring-inset ring-white/20" 
+                    : "text-white/60 hover:bg-white/05"
+                )}
+              >
+                Chat
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('swing')}
+                className={cn(
+                  "rounded-full px-4 text-[14px] font-medium transition-all",
+                  activeTab === 'swing'
+                    ? "bg-white/05 text-white shadow-[0_0_16px_rgba(255,255,255,0.18)] ring-1 ring-inset ring-white/20" 
+                    : "text-white/60 hover:bg-white/05"
+                )}
+              >
+                Swing
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Results */}
+        <div className="flex-1 overflow-y-auto px-4 pt-3 pb-4">
+          {activeTab === 'chat' ? (
+            loadingStates.conversations ? (
+              <div className="space-y-4">
+                <div className="h-24 rounded-xl bg-white/05 animate-pulse" />
+                <div className="h-24 rounded-xl bg-white/05 animate-pulse" />
+              </div>
+            ) : filteredConversations.length === 0 ? (
+              <div className="text-center py-20 text-white/60">
+                <MessageCircle className="h-12 w-12 mx-auto mb-3 opacity-40" />
+                <div className="text-lg font-medium">No conversations yet</div>
+                <div className="text-sm mt-1">Your chats will appear here</div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {filteredConversations.map((conv) => (
+                  <button
+                    key={conv.id}
+                    onClick={() => {
+                      const lastUserMsg = conv.messages.filter(m => m.type === 'user').pop();
+                      if (lastUserMsg) {
+                        onSelectMessage(lastUserMsg.id);
+                      }
+                    }}
+                    className="w-full text-left rounded-xl bg-white/06 hover:bg-white/08 border border-white/08 hover:border-white/12 p-4 transition"
+                  >
+                    <div className="font-medium text-white mb-1">{conv.customTitle || conv.title}</div>
+                    <div className="text-sm text-white/60 line-clamp-2">
+                      {conv.messages.find(m => m.type === 'user')?.content || 'No messages'}
+                    </div>
+                    <div className="text-xs text-white/40 mt-2">{conv.timestamp.toLocaleDateString()}</div>
+                  </button>
+                ))}
+              </div>
+            )
+          ) : (
+            loadingStates.swingAnalyses ? (
+              <div className="space-y-4">
+                <div className="h-24 rounded-xl bg-white/05 animate-pulse" />
+                <div className="h-24 rounded-xl bg-white/05 animate-pulse" />
+              </div>
+            ) : filteredSwingAnalyses.length === 0 ? (
+              <div className="text-center py-20 text-white/60">
+                <PiWaveform className="h-12 w-12 mx-auto mb-3 opacity-40" />
+                <div className="text-lg font-medium">No swing analyses yet</div>
+                <div className="text-sm mt-1">Your analyses will appear here</div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {filteredSwingAnalyses.map((analysis) => (
+                  <div
+                    key={analysis.id}
+                    className="rounded-xl bg-white/06 border border-white/08 p-4"
+                  >
+                    <div className="font-medium text-white mb-1">Swing Analysis</div>
+                    <div className="text-sm text-white/60 line-clamp-2">{analysis.content}</div>
+                    <div className="text-xs text-white/40 mt-2">{analysis.timestamp.toLocaleDateString()}</div>
+                  </div>
+                ))}
+              </div>
+            )
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

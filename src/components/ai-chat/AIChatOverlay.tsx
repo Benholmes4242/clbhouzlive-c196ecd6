@@ -442,9 +442,165 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
   if (paneMode) {
     return (
       <div className="h-full w-full bg-gradient-to-b from-black via-[#0A0A0A] to-black flex flex-col overflow-hidden">
-        <div className="text-center py-20 text-white/60">
-          <p>Echo pane mode (work in progress)</p>
-        </div>
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+          <div className="bg-gradient-to-b from-black/60 to-transparent backdrop-blur-sm border-b border-white/08">
+            <div className="px-4 py-2">
+              <TabsList className="h-11 w-full rounded-full bg-white/06 backdrop-blur border border-white/12 flex p-1">
+                <TabsTrigger
+                  value="chat"
+                  className="flex-1 rounded-full px-4 text-[14px] font-medium 
+                             data-[state=active]:bg-white/05 data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_rgba(255,255,255,0.18)] data-[state=active]:ring-1 data-[state=active]:ring-inset data-[state=active]:ring-white/20
+                             data-[state=inactive]:text-white/60 data-[state=inactive]:hover:bg-white/05 data-[state=inactive]:hover:ring-1 data-[state=inactive]:hover:ring-inset data-[state=inactive]:hover:ring-white/10
+                             transition-all"
+                >
+                  Chat
+                </TabsTrigger>
+                <TabsTrigger
+                  value="swing"
+                  className="flex-1 rounded-full px-4 text-[14px] font-medium 
+                             data-[state=active]:bg-white/05 data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_rgba(255,255,255,0.18)] data-[state=active]:ring-1 data-[state=active]:ring-inset data-[state=active]:ring-white/20
+                             data-[state=inactive]:text-white/60 data-[state=inactive]:hover:bg-white/05 data-[state=inactive]:hover:ring-1 data-[state=inactive]:hover:ring-inset data-[state=inactive]:hover:ring-white/10
+                             transition-all"
+                >
+                  Swing Coach
+                </TabsTrigger>
+              </TabsList>
+            </div>
+          </div>
+
+          {/* Chat Tab */}
+          <TabsContent value="chat" className="m-0 flex-1 overflow-hidden" style={{ minHeight: 0 }}>
+            <div 
+              className="h-full overflow-y-auto overscroll-contain scroll-smooth px-4 pt-3 pb-4"
+              style={{ WebkitOverflowScrolling: "touch" }}
+              ref={chatScrollRef}
+              onScroll={handleChatScroll}
+            >
+              {messages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center text-center px-6 py-20 space-y-6">
+                  <div className="h-20 w-20 rounded-3xl bg-black/40 backdrop-blur border border-white/20 shadow-[0_30px_120px_rgba(0,0,0,1),0_0_60px_rgba(255,255,255,0.08)] grid place-items-center">
+                    <Bot className="h-9 w-9 text-white/80" />
+                  </div>
+                  <div className="text-[17px] font-semibold text-white">
+                    Start a conversation with Echo
+                  </div>
+                  <div className="text-[14px] text-white/60 max-w-[280px]">
+                    Ask about your swing, your stats, or just chat golf — Echo's always here.
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {messages.map((message, index) => {
+                    const isUser = message.type === 'user';
+                    const prevMessage = index > 0 ? messages[index - 1] : null;
+                    const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
+                    
+                    return (
+                      <div key={message.id} className={cn("w-full", isFirstInGroup && index > 0 && "mt-4")}>
+                        <ChatMessageComponent
+                          message={message}
+                          onSaveToInsights={saveToInsights}
+                          onRequestDetail={requestMoreDetail}
+                          isFirstInGroup={isFirstInGroup}
+                          showHeading={isFirstInGroup}
+                          showActions={false}
+                        />
+                      </div>
+                    );
+                  })}
+                  {isLoading && (
+                    <div className="flex items-end gap-2 mt-4">
+                      <div className="shrink-0">
+                        <EchoAvatar state="processing" size={28} />
+                      </div>
+                      <div className="max-w-full flex-1">
+                        <div className="rounded-2xl rounded-bl-md bg-white/05 backdrop-blur border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
+                            <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce"></span>
+                            <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Scroll to bottom button */}
+              {showScrollToBottom && (
+                <button
+                  onClick={scrollToBottom}
+                  className="fixed bottom-[88px] right-3 z-[2] h-10 px-3.5 rounded-full bg-white/08 backdrop-blur border border-white/12 shadow-[0_6px_20px_rgba(0,0,0,0.6)] text-[13px] text-white flex items-center gap-2 hover:bg-white/12 hover:border-white/20 transition"
+                  aria-label="Jump to latest"
+                  type="button"
+                >
+                  <span className="inline-block h-4 w-4 rounded-full grid place-items-center bg-white/08">
+                    <ChevronDown className="h-3 w-3" />
+                  </span>
+                  <span>Newer messages</span>
+                </button>
+              )}
+            </div>
+          </TabsContent>
+
+          {/* Swing Coach Tab */}
+          <TabsContent value="swing" className="m-0 flex-1 overflow-hidden" style={{ minHeight: 0 }}>
+            <div 
+              className="h-full overflow-y-auto overscroll-contain scroll-smooth px-4 pt-3 pb-4"
+              style={{ WebkitOverflowScrolling: "touch" }}
+            >
+              <SwingCoach
+                onClose={() => setActiveTab('chat')}
+                isRecording={isRecording}
+                isProcessing={isProcessing}
+                startRecording={startRecording}
+                stopRecording={stopRecording}
+                analysisText={swingCoachAnalysisText}
+                onAnalysisTextChange={setSwingCoachAnalysisText}
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Composer footer (chat only) */}
+        {activeTab === 'chat' && (
+          <footer 
+            className="sticky bottom-0 z-[2] bg-gradient-to-t from-black/95 to-black/60 backdrop-blur pt-3 pb-4 px-4 border-t border-white/08"
+            role="region"
+            aria-label="Message composer"
+          >
+            {(isLoading || isProcessing) && (
+              <div className="absolute left-0 right-0 top-0 h-[2px] bg-white/20 overflow-hidden">
+                <div className="h-full bg-white/60 animate-[shimmer_1.6s_linear_infinite] w-1/3" />
+              </div>
+            )}
+            
+            <div className="flex items-end gap-2">
+              <Textarea
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage(inputValue);
+                  }
+                }}
+                placeholder="Ask Echo anything..."
+                className="flex-1 min-h-[42px] max-h-32 resize-none bg-white/05 border-white/12 text-white placeholder:text-white/40 focus:border-white/20"
+                disabled={isLoading}
+              />
+              <Button
+                onClick={() => sendMessage(inputValue)}
+                disabled={!inputValue.trim() || isLoading}
+                className="h-[42px] w-[42px] p-0 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 disabled:opacity-50"
+              >
+                <Send className="h-4 w-4 text-white" />
+              </Button>
+            </div>
+          </footer>
+        )}
       </div>
     );
   }
