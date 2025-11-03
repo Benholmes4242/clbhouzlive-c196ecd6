@@ -163,13 +163,15 @@ export function HubShell({ onClose }: HubShellProps) {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <header 
-            className="hub-header sticky top-0 z-20"
-            style={{ 
-              background: 'linear-gradient(180deg, var(--hub-header-bg-start) 0%, var(--hub-header-bg-mid) 60%, var(--hub-header-bg-end) 100%)',
+          <div
+            id="hubHeader"
+            className="relative z-30 shrink-0"
+            style={{
+              background:
+                'linear-gradient(180deg, rgba(28,28,30,0.92) 0%, rgba(28,28,30,0.72) 60%, rgba(28,28,30,0.00) 100%)',
+              WebkitBackdropFilter: 'blur(24px)',
+              backdropFilter: 'blur(24px)',
               borderBottom: '1px solid rgba(255,255,255,0.08)',
-              backdropFilter: 'blur(var(--hub-header-blur))',
-              WebkitBackdropFilter: 'blur(var(--hub-header-blur))',
               willChange: 'backdrop-filter, background',
             }}
           >
@@ -197,13 +199,7 @@ export function HubShell({ onClose }: HubShellProps) {
                 </div>
               </div>
             </div>
-            <div 
-              className="h-px w-full" 
-              style={{ 
-                background: 'linear-gradient(90deg, transparent, var(--hub-stroke), transparent)' 
-              }} 
-            />
-          </header>
+          </div>
 
           {/* Primary Tabs (Nearby | Echo) - Hidden on home page */}
           {!isHomePage && (

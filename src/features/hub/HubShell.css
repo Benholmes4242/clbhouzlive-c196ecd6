@@ -16,7 +16,7 @@
 }
 
 /* Apple-style top-edge glow on header */
-.hub-header::after {
+#hubHeader::after {
   content: '';
   position: absolute;
   left: 0;
