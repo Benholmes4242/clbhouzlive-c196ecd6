@@ -58,9 +58,9 @@
   /* ========================================
      SHADOWS & DEPTH
      ======================================== */
-  /* Floating glass effect with pronounced depth */
-  --hub-shadow-main: 0 30px 80px rgba(0,0,0,0.85), 0 0 2px rgba(255,255,255,0.12) inset;
-  --hub-shadow-tile: 0 4px 24px rgba(0,0,0,0.50), 0 0 0 1px rgba(255,255,255,0.10) inset;
+  /* Softer shadows with inner glow effect */
+  --hub-shadow-main: 0 30px 80px rgba(0,0,0,0.85), 0 0 1px rgba(255,255,255,0.08) inset;
+  --hub-shadow-tile: 0 8px 32px rgba(0,0,0,0.40), 0 0 0 1px rgba(255,255,255,0.06) inset;
 
   /* ========================================
      TEXT & TYPOGRAPHY
