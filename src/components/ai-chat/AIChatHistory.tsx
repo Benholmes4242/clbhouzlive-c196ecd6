@@ -543,41 +543,60 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
         console.log('📱 [loadChatConversations] In paneMode, checking provider...');
         console.log('Provider conversations:', echoCtx?.conversations?.length);
         
-        if (!echoCtx || !echoCtx.conversations || echoCtx.conversations.length === 0) {
-          console.log('⚠️ [loadChatConversations] No provider data, setting empty');
-          setConversations([]);
-          setLoadingStates(prev => ({ ...prev, conversations: false }));
-          return;
+        if (echoCtx && echoCtx.conversations && echoCtx.conversations.length > 0) {
+          console.log('✅ [loadChatConversations] Mapping provider data:', echoCtx.conversations.length);
+          const mapped = echoCtx.conversations.map(conv => ({
+            id: conv.id,
+            title: conv.title || "New conversation",
+            customTitle: conv.title,
+            messages: conv.messages.map((msg: any, index: number) => ({
+              id: msg.id || `${conv.id}-${index}`,
+              type: (msg.role === 'user' ? 'user' : 'ai') as 'user' | 'ai',
+              content: msg.content || '',
+              timestamp: new Date(msg.createdAt ?? conv.updatedAt ?? Date.now()),
+              metadata: msg.meta
+            })),
+            timestamp: new Date(conv.updatedAt ?? Date.now()),
+            createdAt: new Date(conv.createdAt ?? Date.now()),
+            lastActivityAt: new Date(conv.updatedAt ?? Date.now()),
+            messageCount: conv.messages.length
+          }));
+          setConversations(mapped);
+          // Do not return; continue to also consider DB fallback merge if needed
+        } else {
+          console.log('⚠️ [loadChatConversations] No provider data; will fallback to Supabase list');
         }
-        
-        console.log('✅ [loadChatConversations] Mapping provider data:', echoCtx.conversations.length);
-        const mapped = echoCtx.conversations.map(conv => ({
-          id: conv.id,
-          title: conv.title || "New conversation",
-          customTitle: conv.title,
-          messages: conv.messages.map((msg: any, index: number) => ({
-            id: msg.id || `${conv.id}-${index}`,
-            type: (msg.role === 'user' ? 'user' : 'ai') as 'user' | 'ai',
-            content: msg.content || '',
-            timestamp: new Date(msg.createdAt ?? conv.updatedAt ?? Date.now()),
-            metadata: msg.meta
-          })),
-          timestamp: new Date(conv.updatedAt ?? Date.now()),
-          createdAt: new Date(conv.createdAt ?? Date.now()),
-          lastActivityAt: new Date(conv.updatedAt ?? Date.now()),
-          messageCount: conv.messages.length
-        }));
-        setConversations(mapped);
-        return;
       }
       
-      // Load from conversation session hook (database) first
+      // Fallback: load from Supabase conversation session
       console.log('📱 Loading from conversation session...');
       await conversationSession.loadConversations();
       console.log('📱 Conversation session data:', conversationSession.conversations.length, 'conversations');
       
-      // Convert conversation session format to our chat conversation format
       const sessionConversations = conversationSession.conversations.map(conv => ({
+        id: conv.id,
+        title: conv.title || "New conversation",
+        customTitle: conv.title,
+        messages: conv.messages.map((msg, index) => ({
+          id: `${conv.id}-${index}`,
+          type: (msg.type === 'user' ? 'user' : 'ai') as 'user' | 'ai',
+          content: msg.content || '',
+          timestamp: new Date(msg.timestamp),
+          metadata: msg.metadata
+        })),
+        timestamp: new Date(conv.lastActivityAt),
+        createdAt: new Date(conv.createdAt),
+        lastActivityAt: new Date(conv.lastActivityAt),
+        messageCount: conv.messages.length
+      }));
+
+      // If provider already set conversations, prefer that; otherwise use session
+      if (paneMode && echoCtx?.conversations?.length) {
+        console.log('ℹ️ [loadChatConversations] Keeping provider conversations');
+      } else {
+        console.log('ℹ️ [loadChatConversations] Using Supabase conversations:', sessionConversations.length);
+        setConversations(sessionConversations);
+      }
         id: conv.id,
         title: conv.title || "New conversation",
         customTitle: conv.title,
