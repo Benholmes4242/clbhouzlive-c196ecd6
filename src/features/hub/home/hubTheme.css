@@ -100,7 +100,7 @@
 
 /* DEBUG: force glass if something still overrides (remove after verification) */
 #hubHeader, .hub-card {
-  background: var(--hub-glass) !important;
+  background: orange !important;
   border: 1px solid var(--hub-stroke-strong) !important;
   backdrop-filter: blur(var(--hub-blur)) !important;
   -webkit-backdrop-filter: blur(var(--hub-blur)) !important;
