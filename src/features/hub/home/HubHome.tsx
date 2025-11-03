@@ -15,7 +15,10 @@ export default function HubHome() {
   return (
     <main className="w-full overflow-x-hidden px-3.5 pb-6">
       {/* Top 2×2 grid */}
-      <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+      <div
+        className="grid"
+        style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem' }}
+      >
         <EchoQuickTile />
         <SwingQuickTile />
         <NearbyGolfersTile limit={5} />
