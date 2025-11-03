@@ -13,7 +13,7 @@ import { EchoHistoryTile } from './tiles/EchoHistoryTile';
 
 export default function HubHome() {
   return (
-    <main className="w-full overflow-x-hidden px-3.5 pb-6">
+    <main className="w-full overflow-x-hidden px-3.5 pb-6 mt-3">
       {/* Top 2×2 grid */}
       <div
         className="grid"
