@@ -33,8 +33,8 @@
   --hub-header-blur: 12px;
   
   /* Tile/Card glass surfaces - frosted with translucency */
-  --hub-glass-bg-start: rgba(45,45,48,0.70);
-  --hub-glass-bg-end: rgba(38,38,40,0.68);
+  --hub-glass-bg-start: rgba(35,35,35,0.74);
+  --hub-glass-bg-end: rgba(25,25,25,0.74);
   --hub-glass-bg-hover: rgba(255,255,255,0.08);
   --hub-glass-bg-subtle: rgba(255,255,255,0.05);
   --hub-glass-bg-input: rgba(255,255,255,0.06);
@@ -58,9 +58,12 @@
   /* ========================================
      SHADOWS & DEPTH
      ======================================== */
-  /* Softer shadows with inner glow effect */
+  /* Tighter, deeper shadows for floating glass effect */
   --hub-shadow-main: 0 30px 80px rgba(0,0,0,0.85), 0 0 1px rgba(255,255,255,0.08) inset;
-  --hub-shadow-tile: 0 8px 32px rgba(0,0,0,0.40), 0 0 0 1px rgba(255,255,255,0.06) inset;
+  --hub-shadow-tile: 0 4px 24px rgba(0,0,0,0.50);
+  --hub-shadow-tile-hover: 0 10px 28px rgba(0,0,0,0.55);
+  --hub-shadow-tile-inset: inset 0 0 0 1px rgba(255,255,255,0.05);
+  --hub-top-highlight: inset 0 1px 0 rgba(255,255,255,0.06);
 
   /* ========================================
      TEXT & TYPOGRAPHY

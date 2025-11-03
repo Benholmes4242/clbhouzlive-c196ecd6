@@ -13,16 +13,25 @@ type TileProps = React.PropsWithChildren<{
 }>;
 
 export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps) {
+  const [isHovered, setIsHovered] = React.useState(false);
+
   return (
     <section
       className="relative rounded-3xl p-4 pt-3.5 pb-3.5 overflow-hidden flex flex-col min-h-[192px]"
       style={{
         background: 'linear-gradient(180deg, var(--hub-glass-bg-start), var(--hub-glass-bg-end))',
         border: '1px solid var(--hub-stroke)',
-        boxShadow: 'var(--hub-shadow-tile)',
+        boxShadow: isHovered 
+          ? 'var(--hub-shadow-tile-hover), var(--hub-shadow-tile-inset), var(--hub-top-highlight)'
+          : 'var(--hub-shadow-tile), var(--hub-shadow-tile-inset), var(--hub-top-highlight)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
+        willChange: 'transform, backdrop-filter',
+        transform: 'translateZ(0)',
+        transition: 'box-shadow 0.2s ease-out',
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex-1">
         <div className="text-[20px] font-semibold mb-0.5" style={{ color: 'var(--hub-text)' }}>

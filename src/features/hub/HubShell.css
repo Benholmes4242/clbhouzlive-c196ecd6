@@ -9,6 +9,12 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* Ensure shadows and blur don't get clipped */
+.hub-shell section {
+  will-change: transform, backdrop-filter;
+  transform: translateZ(0);
+}
+
 /* Smooth scroll behavior */
 .hub-shell [data-hub-scroll] {
   scroll-behavior: smooth;
