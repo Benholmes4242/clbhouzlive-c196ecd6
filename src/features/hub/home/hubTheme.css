@@ -4,17 +4,34 @@
  */
 
 :root {
-  --hub-radius: 18px;
+  --hub-radius: 20px;
   --hub-pad: 16px;
-  --hub-gap: 14px;
+  --hub-gap: 16px;
 
-  --hub-header-height: 56px;      /* forces equal tile headers */
-  --hub-tile-compact: 200px;       /* Echo / Swing / Nearby */
-  --hub-tile-content: 312px;       /* Games / Your Games / Recent Echo */
+  --hub-header-height: 56px;
+  --hub-tile-compact: 200px;
+  --hub-tile-content: 312px;
 
-  --hub-stroke: rgba(255,255,255,.08);
-  --hub-surface: rgba(255,255,255,.06);
-  --hub-surface-2: rgba(255,255,255,.04);
-  --hub-text: rgba(255,255,255,.92);
-  --hub-text-sub: rgba(255,255,255,.60);
+  /* Graphite Glass Theme */
+  --hub-bg-gradient: linear-gradient(180deg, #0E0E0E 0%, #1C1C1E 100%);
+  --hub-header-gradient: linear-gradient(180deg, #111111 0%, #1C1C1E 100%);
+  
+  --hub-glass-bg: rgba(255, 255, 255, 0.05);
+  --hub-glass-bg-hover: rgba(255, 255, 255, 0.07);
+  --hub-glass-blur: blur(20px);
+  
+  --hub-stroke: rgba(255, 255, 255, 0.12);
+  --hub-stroke-inner: rgba(255, 255, 255, 0.08);
+  
+  --hub-text: rgba(255, 255, 255, 0.92);
+  --hub-text-title: rgba(255, 255, 255, 0.9);
+  --hub-text-sub: rgba(255, 255, 255, 0.65);
+  
+  --hub-accent: #6E9277;
+  --hub-accent-bg: rgba(110, 146, 119, 0.05);
+  --hub-accent-bg-hover: rgba(110, 146, 119, 0.1);
+  --hub-accent-border: rgba(110, 146, 119, 0.5);
+  
+  --hub-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --hub-shadow-inner: inset 0 0 0 0.5px rgba(255, 255, 255, 0.08);
 }
