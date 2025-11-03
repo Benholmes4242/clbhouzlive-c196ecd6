@@ -161,13 +161,8 @@ export function HubShell({ onClose }: HubShellProps) {
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
           <header 
-            className="sticky top-0 z-20 backdrop-blur"
-            style={{ 
-              background: 'linear-gradient(180deg, rgba(17,17,17,0.96) 0%, rgba(28,28,30,0.92) 60%, rgba(28,28,30,0.00) 100%)',
-              borderBottom: '1px solid rgba(255,255,255,0.08)'
-            }}
+            className="hub-header sticky top-0 z-20"
           >
             <div className="px-5 pt-4">
               <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
