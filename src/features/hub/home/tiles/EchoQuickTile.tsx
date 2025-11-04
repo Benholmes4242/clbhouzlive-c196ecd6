@@ -72,9 +72,10 @@ export function EchoQuickTile() {
         {/* Bottom footer: divider + View all */}
         <div className="mt-4">
           <div
-            className="h-px w-full"
+            className="h-px"
             style={{
-              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent)',
+              background: 'var(--hub-stroke-strong)',
+              borderRadius: '1px',
             }}
           />
           <button
