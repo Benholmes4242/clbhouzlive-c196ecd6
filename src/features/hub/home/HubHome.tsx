@@ -12,7 +12,7 @@ import { YourGamesTile } from './tiles/YourGamesTile';
 
 export default function HubHome() {
   return (
-    <main className="w-full overflow-x-hidden px-3.5 pb-6 mt-3">
+    <main className="w-full hub-home-container">
       {/* Top 2×2 grid - fixed height tiles */}
       <div
         className="grid"
@@ -26,14 +26,14 @@ export default function HubHome() {
         </div>
       </div>
 
-      {/* Your Games - full width */}
-      <div className="mt-3.5">
+      {/* Your Games - flex to fill remaining space */}
+      <div className="hub-middle-flex">
         <YourGamesTile />
       </div>
 
       {/* Echo & Swing 2×2 grid - fixed height tiles */}
       <div
-        className="grid mt-3.5"
+        className="grid"
         style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem' }}
       >
         <div className="hub-tile-fixed">
