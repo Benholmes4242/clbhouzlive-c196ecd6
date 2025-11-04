@@ -103,18 +103,10 @@ export const usePushNotifications = () => {
   };
 
   const registerServiceWorker = async () => {
-    if (!('serviceWorker' in navigator)) return;
-
-    try {
-      // Register a basic service worker for notifications
-      const registration = await navigator.serviceWorker.register('/sw.js');
-      console.log('Service Worker registered:', registration);
-      
-      // Store registration for future use
-      // In a real implementation, you'd also handle push subscription here
-    } catch (error) {
-      console.error('Service Worker registration failed:', error);
-    }
+    // Service worker disabled - no sw.js file exists
+    // If push notifications are needed, implement a proper service worker with cache versioning
+    console.log('[Push] Service worker registration disabled - no sw.js file');
+    return;
   };
 
   const updateSubscriptionStatus = async (enabled: boolean) => {
