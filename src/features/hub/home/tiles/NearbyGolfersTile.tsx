@@ -58,8 +58,16 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
           )}
         </div>
 
-        {/* Bottom footer: See all */}
+        {/* Bottom footer: divider + See all */}
         <div className="mt-auto pt-4">
+          <div 
+            className="h-px"
+            style={{
+              background: 'rgba(255,255,255,0.18)',
+              borderRadius: '1px',
+              width: '100%',
+            }}
+          />
           <button
             onClick={() => openSheet('golfers')}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
