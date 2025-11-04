@@ -40,7 +40,7 @@ export function EchoQuickTile() {
   return (
     <Tile 
       title="Echo" 
-      subtitle="Ask anything about golf"
+      subtitle="Ask me anything"
     >
       <div className="flex flex-col h-full justify-between">
         <div>
