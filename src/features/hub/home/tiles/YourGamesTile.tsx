@@ -208,7 +208,7 @@ export function YourGamesTile() {
         `)
         .eq('host_user_id', user.id)
         .eq('status', 'active')
-        .gte('start_time', new Date().toISOString())
+        .gte('expires_at', new Date().toISOString())
         .order('start_time', { ascending: true })
         .limit(3);
 
@@ -233,7 +233,7 @@ export function YourGamesTile() {
             `)
             .in('id', gameIds)
             .eq('status', 'active')
-            .gte('start_time', new Date().toISOString())
+            .gte('expires_at', new Date().toISOString())
             .order('start_time', { ascending: true })
         : { data: [] };
 
