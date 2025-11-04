@@ -42,7 +42,7 @@ export function EchoQuickTile() {
       title="Echo" 
       subtitle="Ask me anything"
     >
-      <div className="flex flex-col h-full justify-between">
+      <div className="flex flex-col h-full">
         <div>
           <form
             className="relative mt-3"
@@ -80,38 +80,42 @@ export function EchoQuickTile() {
               <PaperAirplaneIcon className="h-5 w-5 -rotate-45" />
             </button>
           </form>
+        </div>
 
-          {/* Suggestions (2 multi-line chips) */}
-          <div className="mt-3 sm:mt-4 grid grid-cols-1 gap-2">
-            {SUGGESTIONS.map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => handleSuggestionClick(s)}
-                className="w-full rounded-2xl px-3 py-2 border text-left transition active:scale-[0.995]"
-                style={{
-                  borderColor: 'rgba(255,255,255,0.16)',
-                  background: 'rgba(255,255,255,0.10)',
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)',
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.14)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.10)'}
-                aria-label={`Ask Echo: ${s}`}
-              >
-                <span
-                  className="block text-[13px] leading-[18px] whitespace-normal break-words"
-                  style={{ color: 'rgba(255,255,255,0.88)' }}
+        {/* Centered gap region for suggestions */}
+        <div className="flex-1 relative flex">
+          <div className="my-auto w-full">
+            <div className="flex flex-col gap-2">
+              {SUGGESTIONS.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => handleSuggestionClick(s)}
+                  className="inline-flex items-center w-max max-w-[calc(100%-2rem)] self-start rounded-2xl px-3 py-2 border text-left transition active:scale-[0.995]"
+                  style={{
+                    borderColor: 'rgba(255,255,255,0.16)',
+                    background: 'rgba(255,255,255,0.10)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.14)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.10)'}
+                  aria-label={`Ask Echo: ${s}`}
                 >
-                  {s}
-                </span>
-              </button>
-            ))}
+                  <span
+                    className="text-[13px] leading-[18px] whitespace-normal break-words"
+                    style={{ color: 'rgba(255,255,255,0.88)' }}
+                  >
+                    {s}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Bottom footer: divider + View all */}
-        <div className="mt-6 sm:mt-8">
+        <div className="mt-4 sm:mt-5">
           <div
             className="h-px"
             style={{
