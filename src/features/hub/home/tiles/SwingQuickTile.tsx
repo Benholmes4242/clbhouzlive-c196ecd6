@@ -59,7 +59,7 @@ export function SwingQuickTile() {
     
     try {
       // Navigate to swing analysis page with the selected file
-      nav('/hub/echo/swing', { state: { preselectedFileName: file.name } });
+      nav('/hub?sheet=swing', { state: { preselectedFileName: file.name } });
       
       // Simulate success after navigation
       setTimeout(() => {
@@ -142,7 +142,7 @@ export function SwingQuickTile() {
                 backdropFilter: 'blur(28px)',
                 WebkitBackdropFilter: 'blur(28px)',
               }}
-              onClick={() => lastSwing && nav(`/hub/echo/swing/${lastSwing.id}`)}
+              onClick={() => lastSwing && nav(`/hub?sheet=swing&id=${lastSwing.id}`)}
               role={lastSwing ? 'button' : 'presentation'}
               aria-label={lastSwing ? 'View latest swing analysis' : 'No swing available'}
             >
@@ -190,7 +190,7 @@ export function SwingQuickTile() {
             }}
           />
           <button
-            onClick={() => nav('/hub/echo/history?tab=swing')}
+            onClick={() => nav('/hub?sheet=recent-echo')}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
             style={{ 
               background: 'transparent',

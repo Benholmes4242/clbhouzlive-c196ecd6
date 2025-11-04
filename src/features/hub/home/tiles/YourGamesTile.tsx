@@ -99,7 +99,7 @@ export function YourGamesTile() {
     <Tile 
       title="Your Games" 
       subtitle="Hosting & Joined"
-      onViewAll={() => nav('/hub/your-games')}
+      onViewAll={() => nav('/hub?sheet=your-games')}
     >
       <ul className="mt-1.5 space-y-2.5">
         {isLoading && [0, 1, 2].map(i => (
@@ -122,7 +122,7 @@ export function YourGamesTile() {
           <p className="text-[15px]" style={{ color: 'var(--hub-text-sub)' }}>
             No games yet.{' '}
             <button 
-              onClick={() => nav('/hub/create-game')}
+              onClick={() => nav('/hub?sheet=create-game')}
               className="underline-offset-2 hover:underline"
               style={{ color: 'var(--hub-accent-orange)' }}
             >

@@ -25,7 +25,7 @@ export function EchoQuickTile() {
   const submit = () => {
     const msg = text.trim();
     if (!msg) return;
-    nav(`/hub/echo/chat?msg=${encodeURIComponent(msg)}`);
+    nav(`/hub?sheet=echo&msg=${encodeURIComponent(msg)}`);
     setText('');
   };
 
@@ -33,7 +33,7 @@ export function EchoQuickTile() {
     const q = sanitize(suggestion);
     setText(q);
     setTimeout(() => {
-      nav(`/hub/echo/chat?msg=${encodeURIComponent(q)}`);
+      nav(`/hub?sheet=echo&msg=${encodeURIComponent(q)}`);
       setText('');
     }, 150);
   };
@@ -130,7 +130,7 @@ export function EchoQuickTile() {
             }}
           />
           <button
-            onClick={() => nav('/hub/echo/history')}
+            onClick={() => nav('/hub?sheet=recent-echo')}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
             style={{ 
               background: 'transparent',

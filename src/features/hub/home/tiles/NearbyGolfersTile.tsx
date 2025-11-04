@@ -20,7 +20,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
   return (
     <Tile 
       title="Nearby Golfers" 
-      onViewAll={() => nav('/hub/golfers')}
+      onViewAll={() => nav('/hub?sheet=golfers')}
     >
       <div className="space-y-2">
         {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (

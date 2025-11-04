@@ -9,12 +9,13 @@
  * @see Phase 1 Audit Report - Section 13.2: Hub Shell Component
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { TapButton } from '@/components/ui/TapButton';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { Z } from '@/config/zIndex';
+import { HubSheetRouter } from './HubSheetRouter';
 import './HubShell.css';
 
 interface HubShellProps {
@@ -24,6 +25,19 @@ interface HubShellProps {
 export function HubShell({ onClose }: HubShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  // Measure header height for bottom sheet positioning
+  useLayoutEffect(() => {
+    const setHeaderHeight = () => {
+      if (headerRef.current) {
+        document.documentElement.style.setProperty('--hub-header-h', `${headerRef.current.offsetHeight}px`);
+      }
+    };
+    setHeaderHeight();
+    window.addEventListener('resize', setHeaderHeight);
+    return () => window.removeEventListener('resize', setHeaderHeight);
+  }, []);
 
   // Lock body scroll when hub is mounted
   useEffect(() => {
@@ -164,6 +178,7 @@ export function HubShell({ onClose }: HubShellProps) {
         >
           {/* Header */}
           <div
+            ref={headerRef}
             id="hubHeader"
             className="relative z-30 shrink-0"
             style={{
@@ -277,6 +292,9 @@ export function HubShell({ onClose }: HubShellProps) {
           </div>
         </div>
       </div>
+
+      {/* Sheet Router */}
+      <HubSheetRouter />
     </>
   );
 }

@@ -128,7 +128,7 @@ export function EchoHistoryTile({
     <Tile 
       title="Recent Echo" 
       subtitle="Chat & Swing"
-      onViewAll={() => nav('/hub/echo/history')}
+      onViewAll={() => nav('/hub?sheet=recent-echo')}
     >
       <div className="space-y-4">
         {/* Chat Section */}

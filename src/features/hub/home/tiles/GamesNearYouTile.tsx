@@ -35,7 +35,7 @@ export function GamesNearYouTile({
     <Tile 
       title="Games Near You" 
       subtitle="Find a game to join"
-      onViewAll={() => nav('/hub/games')}
+      onViewAll={() => nav('/hub?sheet=games')}
       footer={enableFilters ? <InlineFilters value={filters} onChange={setFilters} /> : undefined}
     >
       <div className="space-y-2">
@@ -74,7 +74,7 @@ export function GamesNearYouTile({
           <p className="text-[15px]" style={{ color: 'var(--hub-text-sub)' }}>
             Be the first!{' '}
             <button 
-              onClick={() => nav('/hub/create-game')}
+              onClick={() => nav('/hub?sheet=create-game')}
               className="underline-offset-2 hover:underline"
               style={{ color: 'var(--hub-accent-orange)' }}
             >
