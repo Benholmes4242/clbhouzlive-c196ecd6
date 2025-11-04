@@ -136,7 +136,7 @@ export function SwingQuickTile() {
             <div 
               className="mt-3 flex flex-col items-center justify-center gap-4 rounded-3xl overflow-hidden relative"
               style={{
-                height: '128px',
+                height: '96px',
                 background: 'rgba(255,255,255,0.08)',
                 border: '1px solid rgba(255,71,71,0.25)',
                 boxShadow: 'var(--hub-shadow-tile)',
@@ -162,7 +162,7 @@ export function SwingQuickTile() {
             <div
               className="mt-3 rounded-3xl overflow-hidden relative cursor-pointer transition"
               style={{
-                height: '128px',
+                height: '96px',
                 background: 'var(--hub-glass-subtle)',
                 border: '1px solid var(--hub-stroke)',
                 boxShadow: 'var(--hub-shadow-tile)',
