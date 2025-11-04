@@ -182,13 +182,13 @@ export function HubShell({ onClose }: HubShellProps) {
                 
                 <div className="flex justify-center items-center gap-2">
                   <img
-                    src="/lovable-uploads/b3fc8551-2b91-49af-b2ef-1dd493276207.png"
+                    src="/assets/logomark-orange.png"
                     alt="Logo mark"
                     className="h-10 md:h-12 w-auto object-contain"
                   />
                   <img
-                    src="/assets/clbhouz-white-logo.png"
-                    alt="clbhouz Logo"
+                    src="/assets/clbhouz-white.png"
+                    alt="clbhouz"
                     className="h-10 md:h-12 w-auto object-contain"
                   />
                 </div>
