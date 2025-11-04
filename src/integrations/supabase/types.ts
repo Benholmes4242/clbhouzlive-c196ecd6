@@ -2959,6 +2959,7 @@ export type Database = {
       send_user_ping: { Args: { p_recipient_id: string }; Returns: undefined }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      test_echo_insert: { Args: never; Returns: string }
       update_mobile_crop_data: {
         Args: {
           p_crop_height: number
