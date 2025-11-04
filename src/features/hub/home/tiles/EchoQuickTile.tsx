@@ -69,7 +69,6 @@ export function EchoQuickTile() {
             }}
             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-            aria-label="View all Echo"
           >
             View all →
           </button>
@@ -86,7 +85,6 @@ export function EchoQuickTile() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Ask Echo"
-            aria-label="Ask Echo"
             className="w-full h-11 rounded-2xl pl-4 pr-12 text-[15px] outline-none transition placeholder:opacity-60"
             style={{
               background: 'var(--hub-glass)',
@@ -101,7 +99,6 @@ export function EchoQuickTile() {
           <button
             type="submit"
             onClick={submit}
-            aria-label="Send to Echo"
             disabled={!text.trim()}
             className="absolute right-[8px] top-1/2 -translate-y-1/2 h-9 w-9 grid place-items-center transition disabled:opacity-40 hover:opacity-90 active:opacity-80"
             style={{
@@ -133,7 +130,6 @@ export function EchoQuickTile() {
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.14)'}
                   onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.10)'}
-                  aria-label={`Ask Echo: ${s}`}
                 >
                   <span
                     className="block text-[13px] leading-[18px] whitespace-normal break-words"

@@ -100,7 +100,6 @@ export function SwingQuickTile() {
             }}
             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-            aria-label="View all"
           >
             View all →
           </button>
@@ -125,85 +124,10 @@ export function SwingQuickTile() {
             onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
             onMouseDown={(e) => !isUploading && (e.currentTarget.style.background = 'rgba(255,255,255,0.20)')}
             onMouseUp={(e) => !isUploading && (e.currentTarget.style.background = 'rgba(255,255,255,0.16)')}
-            aria-label="Upload swing video"
           >
             <span className="truncate">{isUploading ? 'Uploading...' : 'Upload swing'}</span>
-            <ArrowUpTrayIcon className="w-[18px] h-[18px] opacity-80 mr-[-2px] shrink-0" aria-hidden="true" />
+            <ArrowUpTrayIcon className="w-[18px] h-[18px] opacity-80 mr-[-2px] shrink-0" />
           </button>
-
-          {/* Preview surface or Retry state */}
-          {uploadError ? (
-            <div 
-              className="mt-3 flex flex-col items-center justify-center gap-4 rounded-3xl overflow-hidden relative"
-              style={{
-                height: '96px',
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,71,71,0.25)',
-                boxShadow: 'var(--hub-shadow-tile)',
-                backdropFilter: 'blur(28px)',
-                WebkitBackdropFilter: 'blur(28px)',
-              }}
-            >
-              <p className="text-white/75 text-[13px]">Upload failed — please try again</p>
-              <button
-                onClick={handleUpload}
-                className="px-4 py-2 rounded-xl text-white/90 text-[13px] font-medium transition"
-                style={{
-                  background: 'rgba(255,71,71,0.25)',
-                  border: '1px solid rgba(255,71,71,0.35)',
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,71,71,0.35)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,71,71,0.25)'}
-              >
-                Retry Upload
-              </button>
-            </div>
-          ) : (
-            <div
-              className="mt-3 rounded-3xl overflow-hidden relative cursor-pointer transition"
-              style={{
-                height: '96px',
-                background: 'var(--hub-glass-subtle)',
-                border: '1px solid var(--hub-stroke)',
-                boxShadow: 'var(--hub-shadow-tile)',
-                backdropFilter: 'blur(28px)',
-                WebkitBackdropFilter: 'blur(28px)',
-              }}
-              onClick={() => lastSwing && nav(`/hub?sheet=swing&id=${lastSwing.id}`)}
-              role={lastSwing ? 'button' : 'presentation'}
-              aria-label={lastSwing ? 'View latest swing analysis' : 'No swing available'}
-            >
-              {thumbnail ? (
-                <>
-                  <video 
-                    src={thumbnail} 
-                    className="w-full h-full object-cover opacity-[.92]"
-                    muted 
-                    playsInline
-                  />
-                  <div 
-                    className="absolute inset-0 pointer-events-none"
-                    style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.06)' }} 
-                  />
-                  <div 
-                    className="absolute right-3 bottom-3 rounded-xl px-2 h-8 flex items-center text-[12px] font-medium"
-                    style={{ 
-                      background: 'rgba(0,0,0,.25)', 
-                      border: '1px solid rgba(255,255,255,.14)',
-                      color: 'rgba(255,255,255,.92)',
-                    }}
-                  >
-                    View
-                  </div>
-                </>
-              ) : (
-                <div 
-                  className="w-full h-full animate-pulse"
-                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04))' }} 
-                />
-              )}
-            </div>
-          )}
         </div>
       </div>
       
