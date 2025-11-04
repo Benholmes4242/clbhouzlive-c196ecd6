@@ -154,6 +154,7 @@ export function HubShell({ onClose }: HubShellProps) {
             paddingBottom: 'env(safe-area-inset-bottom)',
             borderRadius: '0',
             isolation: 'isolate',
+            background: 'transparent',
           }}
           onClick={(e) => e.stopPropagation()}
         >
