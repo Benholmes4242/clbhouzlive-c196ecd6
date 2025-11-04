@@ -23,9 +23,8 @@ export function EchoQuickTile() {
     <Tile 
       title="Echo" 
       subtitle="Ask anything about golf"
-      onViewAll={() => nav('/hub/echo/history')}
     >
-      {/* Unified pill input */}
+      {/* Unified pill input with inline send icon */}
       <div className="relative">
         <input
           value={text}
@@ -44,20 +43,20 @@ export function EchoQuickTile() {
           }}
         />
 
-        {/* Send icon button inside the pill */}
+        {/* Send icon - no background, flush inside */}
         <button
           type="button"
           onClick={submit}
           aria-label="Send to Echo"
           disabled={!text.trim()}
-          className="absolute right-1.5 top-1.5 h-9 w-9 rounded-xl grid place-items-center transition disabled:opacity-40 hover:bg-[var(--hub-glass-hover)] active:scale-97"
+          className="absolute right-4 top-1/2 -translate-y-1/2 p-0 transition disabled:opacity-40"
           style={{
-            background: 'var(--hub-glass-subtle)',
-            border: '1px solid var(--hub-stroke)',
-            color: 'var(--hub-text)',
-            backdropFilter: 'blur(var(--hub-blur))',
-            WebkitBackdropFilter: 'blur(var(--hub-blur))',
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--hub-text-dim)',
           }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-dim)'}
         >
           <PaperAirplaneIcon className="h-5 w-5 -rotate-45" />
         </button>
@@ -72,8 +71,24 @@ export function EchoQuickTile() {
         }}
       />
 
-      {/* Bottom spacer for View all button */}
-      <div className="h-2" />
+      {/* Custom text-only View all */}
+      <div className="mt-3 flex justify-end">
+        <button
+          onClick={() => nav('/hub/echo/history')}
+          className="text-[15px] transition"
+          style={{ 
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--hub-text-body)',
+            padding: 0,
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+          aria-label="View all Echo"
+        >
+          View all →
+        </button>
+      </div>
     </Tile>
   );
 }
