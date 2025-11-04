@@ -30,45 +30,33 @@ export async function fetchChatHistory(limit = 20): Promise<ChatItem[]> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return [];
 
-    // 1) Fetch all user messages, newest first
-    const { data: msgs, error: msgErr } = await supabase
-      .from('echo_messages')
-      .select('thread_id, role, content, created_at')
+    // Fetch conversations from the original conversations table
+    const { data: conversations, error } = await supabase
+      .from('conversations')
+      .select('id, title, created_at, updated_at, messages')
       .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(500);
+      .eq('conversation_type', 'chat')
+      .order('updated_at', { ascending: false })
+      .limit(limit);
     
-    if (msgErr) throw msgErr;
-    if (!msgs?.length) return [];
+    if (error) throw error;
+    if (!conversations?.length) return [];
 
-    // 2) Reduce to most-recent per thread + choose a preview
-    const seen = new Set<string>();
-    const byThread: Record<string, ChatSummary> = {};
-    for (const m of msgs) {
-      if (seen.has(m.thread_id)) continue;
-      seen.add(m.thread_id);
-      byThread[m.thread_id] = {
-        thread_id: m.thread_id,
-        last_at: m.created_at,
-        last_user: m.role === 'user' ? m.content : undefined,
-        last_assistant: m.role === 'assistant' ? m.content : undefined,
+    // Convert conversations to ChatItem format
+    return conversations.map(conv => {
+      const messages = Array.isArray(conv.messages) ? conv.messages : [];
+      const lastMessage = messages[messages.length - 1] as any;
+      const preview = lastMessage?.content || conv.title || 'Empty conversation';
+      
+      return {
+        id: conv.id,
+        preview_text: String(preview)
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 80) + (String(preview).length > 80 ? '…' : ''),
+        created_at: conv.updated_at || conv.created_at
       };
-    }
-
-    // 3) Order by recency and cap
-    const ordered = Object.values(byThread)
-      .sort((a, b) => (a.last_at < b.last_at ? 1 : -1))
-      .slice(0, limit);
-
-    // 4) Convert to ChatItem format
-    return ordered.map(s => ({
-      id: s.thread_id,
-      preview_text: (s.last_user || s.last_assistant || 'Empty conversation')
-        .replace(/\s+/g, ' ')
-        .trim()
-        .slice(0, 80) + ((s.last_user || s.last_assistant || '').length > 80 ? '…' : ''),
-      created_at: s.last_at
-    }));
+    });
   } catch (error) {
     console.error('[fetchChatHistory] Error:', error);
     throw error;
