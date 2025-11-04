@@ -11,7 +11,6 @@ import { Tile } from '../components/Tile';
 const SUGGESTIONS = [
   'Plan me a 3-night golf trip to Ireland',
   'When is the next major?',
-  'Which pro has the most hole-in-ones?',
 ];
 
 function sanitize(str: string) {
@@ -82,29 +81,30 @@ export function EchoQuickTile() {
             </button>
           </form>
 
-          {/* Suggestions */}
-          <div className="mt-3 sm:mt-4 grid grid-cols-1 xs:grid-cols-2 gap-2">
+          {/* Suggestions (2 multi-line chips) */}
+          <div className="mt-3 sm:mt-4 grid grid-cols-1 gap-2">
             {SUGGESTIONS.map((s) => (
               <button
                 key={s}
                 type="button"
                 onClick={() => handleSuggestionClick(s)}
-                className="inline-flex items-center justify-between w-full rounded-2xl px-3 h-10 border transition active:scale-[0.995]"
+                className="w-full rounded-2xl px-3 py-2 border text-left transition active:scale-[0.995]"
                 style={{
                   borderColor: 'rgba(255,255,255,0.16)',
                   background: 'rgba(255,255,255,0.10)',
                   backdropFilter: 'blur(12px)',
                   WebkitBackdropFilter: 'blur(12px)',
-                  color: 'rgba(255,255,255,0.85)',
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.14)'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.10)'}
                 aria-label={`Ask Echo: ${s}`}
               >
-                <span className="truncate text-[15px]">{s}</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" className="opacity-70 flex-shrink-0 ml-2">
-                  <path fill="currentColor" d="M9 6l6 6-6 6" />
-                </svg>
+                <span
+                  className="block text-[13px] leading-[18px] whitespace-normal break-words"
+                  style={{ color: 'rgba(255,255,255,0.88)' }}
+                >
+                  {s}
+                </span>
               </button>
             ))}
           </div>
