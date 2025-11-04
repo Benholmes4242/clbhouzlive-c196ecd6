@@ -38,7 +38,7 @@
 /* Fixed height for corner tiles */
 :root {
   --hub-tile-fixed-h: 220px;
-  --hub-gap: 0.875rem;
+  --hub-gap: 0.75rem;
   --hub-header-h: 72px;
 }
 
@@ -53,7 +53,7 @@
   display: flex;
   flex-direction: column;
   height: calc(100dvh - var(--hub-header-h));
-  padding: 0.75rem 0.875rem calc(env(safe-area-inset-bottom, 0px) + 1.5rem);
+  padding: 0.75rem 0.875rem calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
   overflow: hidden;
 }
 

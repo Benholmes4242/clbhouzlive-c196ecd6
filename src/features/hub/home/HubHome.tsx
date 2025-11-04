@@ -16,7 +16,7 @@ export default function HubHome() {
       {/* Top 2×2 grid - fixed height tiles */}
       <div
         className="grid"
-        style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem' }}
+        style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.75rem' }}
       >
         <div className="hub-tile-fixed">
           <NearbyGolfersTile limit={5} />
@@ -34,7 +34,7 @@ export default function HubHome() {
       {/* Echo & Swing 2×2 grid - fixed height tiles */}
       <div
         className="grid"
-        style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem' }}
+        style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.75rem' }}
       >
         <div className="hub-tile-fixed">
           <EchoQuickTile />
