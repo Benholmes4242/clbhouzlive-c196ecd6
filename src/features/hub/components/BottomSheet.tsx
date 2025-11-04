@@ -38,13 +38,14 @@ function hapticTapLight() {
 
 export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetProps) {
   const sheetRef = React.useRef<HTMLDivElement>(null);
+  const handleRef = React.useRef<HTMLDivElement>(null);
   const contentRef = React.useRef<HTMLDivElement>(null);
   const startY = React.useRef(0);
   const lastY = React.useRef(0);
   const lastT = React.useRef(0);
   const dragging = React.useRef(false);
-  const [translate, setTranslate] = React.useState(0);
-  const [handleScale, setHandleScale] = React.useState(1);
+  const yRef = React.useRef(0);
+  const animFrame = React.useRef<number | null>(null);
 
   // Scroll lock when open
   React.useEffect(() => {
@@ -62,25 +63,50 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
     return () => window.removeEventListener('keydown', onKey);
   }, [open, onClose]);
 
-  // Helpers
-  const setY = (y: number) => {
-    const rb = rubberband(y);
-    setTranslate(rb);
-    // 1 → 1.25 scale across first ~120px of pull
-    const s = 1 + Math.min(0.25, rb / 480);
-    setHandleScale(s);
-    if (sheetRef.current) sheetRef.current.style.transform = `translate3d(0, ${rb}px, 0)`;
-  };
-  const snapTo = (y: number) => {
+  // Helpers - RAF-based for smooth animation
+  const applyY = React.useCallback((nextY: number) => {
+    yRef.current = nextY;
+    if (animFrame.current != null) return;
+    animFrame.current = requestAnimationFrame(() => {
+      animFrame.current = null;
+      if (sheetRef.current) {
+        sheetRef.current.style.transform = `translate3d(0, ${yRef.current}px, 0)`;
+      }
+      if (handleRef.current) {
+        const s = 1 + Math.min(0.25, yRef.current / 480);
+        handleRef.current.style.transform = `scaleX(${s})`;
+        handleRef.current.style.opacity = String(Math.min(1, 0.85 + (s - 1) * 1.2));
+      }
+    });
+  }, []);
+
+  const snapTo = React.useCallback((y: number) => {
     if (!sheetRef.current) return;
-    sheetRef.current.style.transition = 'transform 240ms cubic-bezier(.2,.8,.2,1)';
-    setY(y);
+
+    // Apply target position first, then enable transition in next microtask
+    Promise.resolve().then(() => {
+      if (!sheetRef.current) return;
+      sheetRef.current.style.transition = 'transform 240ms cubic-bezier(.2,.8,.2,1)';
+      void sheetRef.current.offsetHeight; // force style flush
+      sheetRef.current.style.transform = `translate3d(0, ${y}px, 0)`;
+      
+      if (handleRef.current) {
+        handleRef.current.style.transition = 'transform 180ms ease, opacity 180ms ease';
+        const s = y === 0 ? 1 : 1 + Math.min(0.25, y / 480);
+        handleRef.current.style.transform = `scaleX(${s})`;
+        handleRef.current.style.opacity = String(Math.min(1, 0.85 + (s - 1) * 1.2));
+      }
+    });
+
     window.setTimeout(() => {
       if (!sheetRef.current) return;
       sheetRef.current.style.transition = '';
-      if (y === 0) setHandleScale(1); // reset stretch on snap-back
+      if (handleRef.current) {
+        handleRef.current.style.transition = '';
+      }
+      yRef.current = y;
     }, 260);
-  };
+  }, []);
 
   // Drag start (only if content is scrolled to top)
   const canStartDrag = () => {
@@ -90,25 +116,29 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
 
   const onPointerDown: React.PointerEventHandler = (e) => {
     if (!open) return;
-    // Only left / primary
     if (e.button !== 0) return;
     if (!canStartDrag()) return;
+    
     dragging.current = true;
     startY.current = e.clientY;
     lastY.current = e.clientY;
     lastT.current = e.timeStamp;
-    (e.target as Element).setPointerCapture?.(e.pointerId);
+    
+    // Disable transitions immediately
+    if (sheetRef.current) sheetRef.current.style.transition = 'none';
+    if (handleRef.current) handleRef.current.style.transition = 'none';
+    
+    (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
   };
 
   const onPointerMove: React.PointerEventHandler = (e) => {
     if (!dragging.current) return;
-    const dy = e.clientY - startY.current;
-    if (dy < 0) return; // only allow downward pull
-    // prevent rubber-band scroll
+    const dy = Math.max(0, e.clientY - startY.current);
     e.preventDefault();
     lastY.current = e.clientY;
     lastT.current = e.timeStamp;
-    setY(dy);
+    const rb = rubberband(dy);
+    applyY(rb);
   };
 
   const onPointerUp: React.PointerEventHandler = (e) => {
@@ -142,28 +172,23 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop - simple opacity fade, no blur on animated layer */}
       <div
         aria-hidden
-        onMouseDown={onBackdropClick}
-        onTouchStart={onBackdropClick}
+        onClick={onBackdropClick}
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(0,0,0,0.35)',
-          backdropFilter: 'blur(6px)',
-          WebkitBackdropFilter: 'blur(6px)',
-          zIndex: 12002, // under header, above hub
-          opacity: 1,
-          transition: 'opacity 160ms ease',
+          background: 'rgba(0,0,0,0.45)',
+          zIndex: 12002,
+          opacity: open ? 1 : 0,
+          transition: 'opacity 180ms ease',
+          pointerEvents: open ? 'auto' : 'none',
         }}
       />
 
-      {/* Sheet */}
+      {/* Sheet - wrapper for transform, inner surface for blur */}
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={ariaLabel || 'Panel'}
         ref={sheetRef}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -172,51 +197,62 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           position: 'fixed',
           left: 0,
           right: 0,
-          // start just below the header
           top: headerH,
           bottom: 0,
           transform: 'translate3d(0, 0, 0)',
           willChange: 'transform',
           zIndex: 12003,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          background:
-            'linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.10))',
-          backdropFilter: 'blur(28px)',
-          WebkitBackdropFilter: 'blur(28px)',
-          border: '1px solid rgba(255,255,255,0.22)',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.45)',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
+          touchAction: 'none',
+          WebkitUserSelect: 'none',
+          userSelect: 'none',
         }}
       >
-        {/* Handle */}
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={ariaLabel || 'Panel'}
           style={{
-            alignSelf: 'center',
-            width: 44,
-            height: 5,
-            borderRadius: 999,
-            background: 'rgba(255,255,255,0.35)',
-            margin: '10px 0 6px',
-            pointerEvents: 'none',
-            transform: `scaleX(${handleScale})`,
-            opacity: Math.min(1, 0.85 + (handleScale - 1) * 1.2),
-            transition: dragging.current ? 'none' : 'transform 180ms ease, opacity 180ms ease',
-          }}
-        />
-        {/* Scrollable content */}
-        <div
-          ref={contentRef}
-          style={{
-            flex: 1,
-            overflow: 'auto',
-            WebkitOverflowScrolling: 'touch',
-            padding: '12px 14px 18px',
+            height: '100%',
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            background:
+              'linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.10))',
+            backdropFilter: 'blur(28px)',
+            WebkitBackdropFilter: 'blur(28px)',
+            border: '1px solid rgba(255,255,255,0.22)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.45)',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
           }}
         >
-          {children}
+          {/* Handle */}
+          <div
+            ref={handleRef}
+            style={{
+              alignSelf: 'center',
+              width: 44,
+              height: 5,
+              borderRadius: 999,
+              background: 'rgba(255,255,255,0.35)',
+              margin: '10px 0 6px',
+              pointerEvents: 'none',
+              transform: 'scaleX(1)',
+              opacity: 0.85,
+            }}
+          />
+          {/* Scrollable content */}
+          <div
+            ref={contentRef}
+            style={{
+              flex: 1,
+              overflow: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              padding: '12px 14px 18px',
+            }}
+          >
+            {children}
+          </div>
         </div>
       </div>
     </>
