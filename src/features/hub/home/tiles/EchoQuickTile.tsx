@@ -26,9 +26,6 @@ export function EchoQuickTile() {
     >
       <div className="flex flex-col h-full justify-between">
         <div>
-          {/* Top spacer */}
-          <div className="h-2" />
-
           <form
             className="relative mt-3"
             onSubmit={(e) => { e.preventDefault(); submit(); }}
