@@ -266,11 +266,13 @@ export function YourGamesTile() {
         </div>
 
         {/* Bottom region: divider + text-only "View all" */}
-        <div className="mt-auto pt-4 px-4 sm:px-5">
+        <div className="mt-auto pt-4">
           <div 
-            className="h-px rounded"
+            className="h-px"
             style={{
               background: 'rgba(255,255,255,0.18)',
+              borderRadius: '1px',
+              width: '100%',
             }}
           />
           <button
