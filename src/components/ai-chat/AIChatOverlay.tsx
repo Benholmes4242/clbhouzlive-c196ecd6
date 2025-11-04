@@ -25,6 +25,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { subscribeAIOverlay, type AITab } from '@/controllers/aiOverlayController';
 import { Z } from '@/config/zIndex';
 import { useAutoSendFromQuery } from './hooks/useAutoSendFromQuery';
+import { ensureThreadId, persistUserMessage, persistAssistantMessage } from '@/features/echo/services/echoPersistence';
 
 interface ChatMessageData {
   id: string;
@@ -309,6 +310,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
     setIsLoading(true);
 
     try {
+      // Persist user message to database
+      const threadId = await ensureThreadId();
+      await persistUserMessage(threadId, messageText);
       // Prepare conversation context (last 6 messages for context)
       const conversation = messages.slice(-6).map(msg => ({
         role: msg.type === 'user' ? 'user' : 'assistant',
@@ -376,6 +380,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
       // Add AI response to conversation session for history tracking
       console.log('🐛 CHAT DEBUG - Adding AI message to conversation session...');
       conversationSession.addMessage(aiMessage);
+
+      // Persist assistant message to database (reuse threadId from above)
+      await persistAssistantMessage(threadId, data.response);
 
     } catch (error) {
       console.error('Error sending message:', error);
