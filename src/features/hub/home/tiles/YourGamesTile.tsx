@@ -10,6 +10,59 @@ import { useOpenSheet } from '@/features/hub/sheets/useOpenSheet';
 import { useUserGames } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
 
+type GameKind = 'Hosting' | 'Joined';
+
+type GameStatus = 'active' | 'completed' | 'cancelled';
+
+type Game = {
+  id: string;
+  course_id: string | null;
+  kind: GameKind;
+  status: GameStatus;
+  start_time: string;
+};
+
+function GameRowPlaceholder() {
+  return (
+    <div
+      className="w-full rounded-[14px] px-4 py-3 text-left transition-all"
+      style={{
+        background: 'rgba(255,255,255,0.06)',
+        border: '1px solid rgba(255,255,255,0.12)',
+      }}
+    >
+      <div className="flex items-center gap-2">
+        <span
+          className="rounded-full px-2.5 py-1 text-[12px] leading-none shrink-0"
+          style={{
+            background: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.3)',
+            color: 'var(--hub-text-body)',
+          }}
+        >
+          Loading
+        </span>
+
+        <span role="img" aria-label="flag">
+          ⛳
+        </span>
+
+        <div className="truncate flex-1 font-medium text-[15px]" style={{ color: 'var(--hub-text-bright)' }}>
+          Course Name
+        </div>
+
+        <div className="text-[12px] shrink-0 ml-2" style={{ color: 'var(--hub-text-sub)' }}>
+          0/0
+        </div>
+
+        <span className="ml-2 transition-transform text-[18px]" style={{ color: 'var(--hub-text-sub)' }}>
+          ›
+        </span>
+      </div>
+    </div>
+  );
+}
+
 type GameWithDetails = {
   id: string;
   kind: 'Hosting' | 'Joined';
@@ -243,7 +296,7 @@ export function YourGamesTile() {
           
           {!isLoading && !isError && games.length === 0 && (
             <div className="text-[14px]" style={{ color: 'var(--hub-text-sub)' }}>
-              No games yet.{' '}
+              No games yet.{" "}
               <button 
                 onClick={() => openSheet('create-game')}
                 className="underline underline-offset-2"
@@ -275,23 +328,23 @@ export function YourGamesTile() {
               width: '100%',
             }}
           />
+          <button
+            onClick={() => openSheet('your-games')}
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+            style={{ 
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--hub-text)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--hub-text-body)')}
+            aria-label="View all your games"
+            disabled={!hasAny && isLoading}
+          >
+            View all →
+          </button>
         </div>
-        <button
-          onClick={() => openSheet('your-games')}
-          className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-          style={{ 
-            background: 'transparent',
-            border: 'none',
-            color: 'var(--hub-text-body)',
-            padding: 0,
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-          aria-label="View all your games"
-          disabled={!hasAny && isLoading}
-        >
-          View all →
-        </button>
       </div>
     </Tile>
   );
