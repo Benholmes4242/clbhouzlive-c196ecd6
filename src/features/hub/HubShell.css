@@ -35,18 +35,6 @@
   scroll-behavior: smooth;
 }
 
-/* Fixed height for corner tiles */
-:root {
-  --hub-tile-fixed-h: 220px;
-  --hub-gap: 0.875rem;
-}
-
-.hub-tile-fixed {
-  height: var(--hub-tile-fixed-h);
-  min-height: var(--hub-tile-fixed-h);
-  max-height: var(--hub-tile-fixed-h);
-}
-
 /* Animation classes (if not using Tailwind) */
 @keyframes slide-in-from-bottom-4 {
   from {
