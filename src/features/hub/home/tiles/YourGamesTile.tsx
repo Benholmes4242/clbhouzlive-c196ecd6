@@ -284,7 +284,6 @@ export function YourGamesTile() {
             border: 'none',
             color: 'var(--hub-text-body)',
             padding: 0,
-            paddingBottom: '14px',
           }}
           onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
           onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
