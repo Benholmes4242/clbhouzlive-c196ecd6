@@ -14,6 +14,7 @@
   --hub-header-height: 56px;
   --hub-tile-compact: 200px;
   --hub-tile-content: 312px;
+  --hub-blur: 28px;
 
   /* ========================================
      BACKGROUNDS & SURFACES
@@ -43,6 +44,10 @@
   --hub-glass-bg-input: rgba(255,255,255,0.08);
   --hub-glass-bg-button: rgba(255,255,255,0.10);
   --hub-glass-bg-button-hover: rgba(255,255,255,0.15);
+  
+  /* Unified pill surfaces */
+  --hub-glass: rgba(255,255,255,0.14);
+  --hub-glass-hover: rgba(255,255,255,0.14);
   
   /* Video/thumbnail backgrounds */
   --hub-media-bg: rgba(0,0,0,0.40);

@@ -25,35 +25,38 @@ export function EchoQuickTile() {
       subtitle="Ask anything about golf"
       onViewAll={() => nav('/hub/echo/history')}
     >
-      {/* Input row */}
-      <div className="flex items-center gap-3">
+      {/* Unified pill input */}
+      <div className="relative">
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
           placeholder="Ask Echo anything…"
           aria-label="Ask Echo"
-          className="flex-1 min-w-0 h-11 rounded-2xl px-4 text-[15px] placeholder:opacity-45 focus:outline-none focus:ring-2 transition"
+          className="w-full h-12 rounded-2xl pr-12 pl-4 text-[15px] placeholder:opacity-60 outline-none transition"
           style={{
-            background: 'var(--hub-glass-bg-input)',
-            border: '1px solid var(--hub-stroke)',
+            background: 'var(--hub-glass)',
+            border: '1px solid var(--hub-stroke-strong)',
             color: 'var(--hub-text)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
+            backdropFilter: 'blur(var(--hub-blur))',
+            WebkitBackdropFilter: 'blur(var(--hub-blur))',
+            boxShadow: 'var(--hub-shadow-tile)',
           }}
         />
 
+        {/* Send icon button inside the pill */}
         <button
+          type="button"
           onClick={submit}
           aria-label="Send to Echo"
-          className="h-11 w-11 rounded-2xl flex items-center justify-center transition focus:outline-none disabled:opacity-40"
           disabled={!text.trim()}
+          className="absolute right-1.5 top-1.5 h-9 w-9 rounded-xl grid place-items-center transition disabled:opacity-40 hover:bg-[var(--hub-glass-hover)] active:scale-97"
           style={{
-            background: 'var(--hub-glass-bg-button)',
+            background: 'var(--hub-glass-subtle)',
             border: '1px solid var(--hub-stroke)',
-            color: 'rgba(255,255,255,0.85)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
+            color: 'var(--hub-text)',
+            backdropFilter: 'blur(var(--hub-blur))',
+            WebkitBackdropFilter: 'blur(var(--hub-blur))',
           }}
         >
           <PaperAirplaneIcon className="h-5 w-5 -rotate-45" />
