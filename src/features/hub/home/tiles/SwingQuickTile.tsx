@@ -190,7 +190,7 @@ export function SwingQuickTile() {
             }}
           />
           <button
-            onClick={() => nav('/hub?sheet=recent-echo')}
+            onClick={() => nav('/hub?sheet=swing')}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
             style={{ 
               background: 'transparent',
