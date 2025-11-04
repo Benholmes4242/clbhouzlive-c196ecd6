@@ -80,116 +80,124 @@ export function SwingQuickTile() {
       title="Swing Coach" 
       subtitle="Upload for instant feedback"
     >
-      <div className="flex flex-col h-full">
-        {/* Upload pill with inline icon */}
-        <button
-          onClick={handleUpload}
-          disabled={isUploading}
-          className="mt-3 h-11 w-full rounded-2xl px-4 flex items-center justify-between text-[15px] leading-[15px] transition focus:outline-none focus-visible:ring-2 disabled:opacity-60 whitespace-nowrap"
-          style={{
-            background: 'rgba(255,255,255,0.12)',
-            border: '1px solid rgba(255,255,255,0.22)',
-            color: 'rgba(255,255,255,0.85)',
-            backdropFilter: 'blur(28px)',
-            WebkitBackdropFilter: 'blur(28px)',
-          }}
-          onMouseEnter={(e) => !isUploading && (e.currentTarget.style.background = 'rgba(255,255,255,0.16)')}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
-          onMouseDown={(e) => !isUploading && (e.currentTarget.style.background = 'rgba(255,255,255,0.20)')}
-          onMouseUp={(e) => !isUploading && (e.currentTarget.style.background = 'rgba(255,255,255,0.16)')}
-          aria-label="Upload swing video"
-        >
-          <span className="truncate">{isUploading ? 'Uploading...' : 'Upload swing'}</span>
-          <ArrowUpTrayIcon className="w-[18px] h-[18px] opacity-80 mr-[-2px] shrink-0" aria-hidden="true" />
-        </button>
-
-        {/* Preview surface or Retry state */}
-        {uploadError ? (
-          <div 
-            className="mt-3 flex flex-col items-center justify-center gap-4 rounded-3xl overflow-hidden relative"
+      <div className="flex flex-col h-full justify-between">
+        <div>
+          {/* Upload pill with inline icon */}
+          <button
+            onClick={handleUpload}
+            disabled={isUploading}
+            className="mt-3 h-11 w-full rounded-2xl px-4 flex items-center justify-between text-[15px] leading-[15px] transition focus:outline-none focus-visible:ring-2 disabled:opacity-60 whitespace-nowrap"
             style={{
-              height: '128px',
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,71,71,0.25)',
-              boxShadow: 'var(--hub-shadow-tile)',
+              background: 'rgba(255,255,255,0.12)',
+              border: '1px solid rgba(255,255,255,0.22)',
+              color: 'rgba(255,255,255,0.85)',
               backdropFilter: 'blur(28px)',
               WebkitBackdropFilter: 'blur(28px)',
             }}
+            onMouseEnter={(e) => !isUploading && (e.currentTarget.style.background = 'rgba(255,255,255,0.16)')}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
+            onMouseDown={(e) => !isUploading && (e.currentTarget.style.background = 'rgba(255,255,255,0.20)')}
+            onMouseUp={(e) => !isUploading && (e.currentTarget.style.background = 'rgba(255,255,255,0.16)')}
+            aria-label="Upload swing video"
           >
-            <p className="text-white/75 text-[13px]">Upload failed — please try again</p>
-            <button
-              onClick={handleUpload}
-              className="px-4 py-2 rounded-xl text-white/90 text-[13px] font-medium transition"
+            <span className="truncate">{isUploading ? 'Uploading...' : 'Upload swing'}</span>
+            <ArrowUpTrayIcon className="w-[18px] h-[18px] opacity-80 mr-[-2px] shrink-0" aria-hidden="true" />
+          </button>
+
+          {/* Preview surface or Retry state */}
+          {uploadError ? (
+            <div 
+              className="mt-3 flex flex-col items-center justify-center gap-4 rounded-3xl overflow-hidden relative"
               style={{
-                background: 'rgba(255,71,71,0.25)',
-                border: '1px solid rgba(255,71,71,0.35)',
+                height: '128px',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,71,71,0.25)',
+                boxShadow: 'var(--hub-shadow-tile)',
+                backdropFilter: 'blur(28px)',
+                WebkitBackdropFilter: 'blur(28px)',
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,71,71,0.35)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,71,71,0.25)'}
             >
-              Retry Upload
-            </button>
-          </div>
-        ) : (
-          <div
-            className="mt-3 rounded-3xl overflow-hidden relative cursor-pointer transition"
+              <p className="text-white/75 text-[13px]">Upload failed — please try again</p>
+              <button
+                onClick={handleUpload}
+                className="px-4 py-2 rounded-xl text-white/90 text-[13px] font-medium transition"
+                style={{
+                  background: 'rgba(255,71,71,0.25)',
+                  border: '1px solid rgba(255,71,71,0.35)',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,71,71,0.35)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,71,71,0.25)'}
+              >
+                Retry Upload
+              </button>
+            </div>
+          ) : (
+            <div
+              className="mt-3 rounded-3xl overflow-hidden relative cursor-pointer transition"
+              style={{
+                height: '128px',
+                background: 'var(--hub-glass-subtle)',
+                border: '1px solid var(--hub-stroke)',
+                boxShadow: 'var(--hub-shadow-tile)',
+                backdropFilter: 'blur(28px)',
+                WebkitBackdropFilter: 'blur(28px)',
+              }}
+              onClick={() => lastSwing && nav(`/hub/echo/swing/${lastSwing.id}`)}
+              role={lastSwing ? 'button' : 'presentation'}
+              aria-label={lastSwing ? 'View latest swing analysis' : 'No swing available'}
+            >
+              {thumbnail ? (
+                <>
+                  <video 
+                    src={thumbnail} 
+                    className="w-full h-full object-cover opacity-[.92]"
+                    muted 
+                    playsInline
+                  />
+                  <div 
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.06)' }} 
+                  />
+                  <div 
+                    className="absolute right-3 bottom-3 rounded-xl px-2 h-8 flex items-center text-[12px] font-medium"
+                    style={{ 
+                      background: 'rgba(0,0,0,.25)', 
+                      border: '1px solid rgba(255,255,255,.14)',
+                      color: 'rgba(255,255,255,.92)',
+                    }}
+                  >
+                    View
+                  </div>
+                </>
+              ) : (
+                <div 
+                  className="w-full h-full animate-pulse"
+                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04))' }} 
+                />
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom footer: divider + View all (Echo parity) */}
+        <div className="mt-6 sm:mt-8">
+          <div 
+            className="mx-4 h-px rounded-full"
             style={{
-              height: '128px',
-              background: 'var(--hub-glass-subtle)',
-              border: '1px solid var(--hub-stroke)',
-              boxShadow: 'var(--hub-shadow-tile)',
-              backdropFilter: 'blur(28px)',
-              WebkitBackdropFilter: 'blur(28px)',
+              background: 'rgba(255,255,255,0.16)',
             }}
-            onClick={() => lastSwing && nav(`/hub/echo/swing/${lastSwing.id}`)}
-            role={lastSwing ? 'button' : 'presentation'}
-            aria-label={lastSwing ? 'View latest swing analysis' : 'No swing available'}
-          >
-            {thumbnail ? (
-              <>
-                <video 
-                  src={thumbnail} 
-                  className="w-full h-full object-cover opacity-[.92]"
-                  muted 
-                  playsInline
-                />
-                <div 
-                  className="absolute inset-0 pointer-events-none"
-                  style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.06)' }} 
-                />
-                <div 
-                  className="absolute right-3 bottom-3 rounded-xl px-2 h-8 flex items-center text-[12px] font-medium"
-                  style={{ 
-                    background: 'rgba(0,0,0,.25)', 
-                    border: '1px solid rgba(255,255,255,.14)',
-                    color: 'rgba(255,255,255,.92)',
-                  }}
-                >
-                  View
-                </div>
-              </>
-            ) : (
-              <div 
-                className="w-full h-full animate-pulse"
-                style={{ background: 'linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04))' }} 
-              />
-            )}
-          </div>
-        )}
-
-        {/* Divider matching pill width */}
-        <div 
-          className="mx-4 mt-4 h-px rounded-full"
-          style={{
-            background: 'rgba(255,255,255,0.16)',
-          }}
-        />
-
-        {/* View all text link - bottom right */}
-        <div className="mt-4 flex-1 flex items-end">
+          />
           <button
             onClick={() => nav('/hub/echo/history?tab=swing')}
-            className="ml-auto py-2 px-1 -mx-1 text-white/90 text-[15px] leading-[15px] hover:text-white transition"
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+            style={{ 
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
             aria-label="View all"
           >
             View all →
