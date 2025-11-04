@@ -9,6 +9,7 @@ import { Tile } from '../components/Tile';
 import { useOpenSheet } from '@/features/hub/sheets/useOpenSheet';
 import { useUserGames } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
+import { devlog } from '@/utils/log';
 
 type GameWithDetails = {
   id: string;
@@ -195,10 +196,27 @@ export function YourGamesTile() {
   const nav = useNavigate();
   const openSheet = useOpenSheet();
   const [openId, setOpenId] = React.useState<string | null>(null);
+  const viewAllRef = React.useRef<HTMLButtonElement>(null);
   
   // Use shared hook for consistency with the sheet
   const { data, isLoading, isError, refetch } = useUserGames();
   useUserGamesRealtime();
+
+  React.useEffect(() => {
+    const btn = viewAllRef.current;
+    const tile = btn?.closest('section');
+    if (!btn || !tile) return;
+    const measure = () => {
+      const br = btn.getBoundingClientRect();
+      const tr = tile.getBoundingClientRect();
+      const gap = Math.round(tr.bottom - br.bottom);
+      const cs = window.getComputedStyle(tile as Element);
+      devlog('[YourGamesTile] gap (tile bottom - button bottom):', gap, 'tile pb:', cs.paddingBottom, 'btn mb:', window.getComputedStyle(btn).marginBottom);
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
 
   // Combine hosting & joined, take top 3 by time
   const games = React.useMemo(() => {
