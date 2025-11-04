@@ -80,12 +80,12 @@ export function SwingQuickTile() {
       title="Swing Coach" 
       subtitle="Upload for instant feedback"
     >
-      <div className="flex flex-col gap-4 sm:gap-5">
+      <div className="flex flex-col h-full">
         {/* Upload pill with inline icon */}
         <button
           onClick={handleUpload}
           disabled={isUploading}
-          className="h-11 sm:h-12 rounded-2xl px-4 flex items-center justify-between text-[15px] w-full transition focus:outline-none focus-visible:ring-2 disabled:opacity-60 whitespace-nowrap"
+          className="mt-3 h-11 w-full rounded-2xl px-4 flex items-center justify-between text-[15px] leading-[15px] transition focus:outline-none focus-visible:ring-2 disabled:opacity-60 whitespace-nowrap"
           style={{
             background: 'rgba(255,255,255,0.12)',
             border: '1px solid rgba(255,255,255,0.22)',
@@ -106,7 +106,7 @@ export function SwingQuickTile() {
         {/* Preview surface or Retry state */}
         {uploadError ? (
           <div 
-            className="flex flex-col items-center justify-center gap-4 rounded-3xl overflow-hidden relative"
+            className="mt-3 flex flex-col items-center justify-center gap-4 rounded-3xl overflow-hidden relative"
             style={{
               height: '128px',
               background: 'rgba(255,255,255,0.08)',
@@ -132,7 +132,7 @@ export function SwingQuickTile() {
           </div>
         ) : (
           <div
-            className="rounded-3xl overflow-hidden relative cursor-pointer transition"
+            className="mt-3 rounded-3xl overflow-hidden relative cursor-pointer transition"
             style={{
               height: '128px',
               background: 'var(--hub-glass-subtle)',
@@ -179,14 +179,14 @@ export function SwingQuickTile() {
 
         {/* Divider matching pill width */}
         <div 
-          className="h-px mx-4 rounded-full"
+          className="mx-4 mt-4 h-px rounded-full"
           style={{
             background: 'rgba(255,255,255,0.16)',
           }}
         />
 
         {/* View all text link - bottom right */}
-        <div className="flex-1 flex items-end">
+        <div className="mt-3 flex-1 flex items-end">
           <button
             onClick={() => nav('/hub/echo/history?tab=swing')}
             className="ml-auto py-2 px-1 -mx-1 text-white/90 text-[15px] leading-[15px] hover:text-white transition"
