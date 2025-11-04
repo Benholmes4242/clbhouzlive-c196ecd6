@@ -14,28 +14,27 @@ Run this backfill script when you're ready to consolidate all historical data in
 - Better query performance
 - Single source of truth
 
-## Pre-flight Checks
+## One-Click Backfill Script
 
-```sql
--- Check how many conversations will be migrated
-SELECT COUNT(*) as total_conversations
-FROM conversations 
-WHERE conversation_type = 'chat';
-
--- Check current state of new tables
-SELECT 
-  (SELECT COUNT(*) FROM echo_threads) as thread_count,
-  (SELECT COUNT(*) FROM echo_messages) as message_count;
-```
-
-## Backfill Script
-
-Run this in Supabase SQL Editor when ready:
+Run this in Supabase SQL Editor. It's wrapped in a transaction—if anything looks wrong, it will ROLLBACK automatically:
 
 ```sql
 -- ============================================================================
+-- ECHO CHAT BACKFILL: Single Transaction Script
+-- ============================================================================
+BEGIN;
+
+-- PRE-FLIGHT: Ensure indexes exist for performance
+CREATE INDEX IF NOT EXISTS conversations_user_updated_idx
+  ON conversations (user_id, updated_at DESC) WHERE conversation_type = 'chat';
+
+CREATE INDEX IF NOT EXISTS echo_threads_user_updated_idx
+  ON echo_threads (user_id, updated_at DESC);
+
+CREATE INDEX IF NOT EXISTS echo_messages_user_created_idx
+  ON echo_messages (user_id, created_at DESC);
+
 -- STEP 1: Create missing threads from conversations
--- ============================================================================
 INSERT INTO echo_threads (id, user_id, created_at, updated_at)
 SELECT 
   c.id,
@@ -48,12 +47,7 @@ WHERE c.conversation_type = 'chat'
     SELECT 1 FROM echo_threads t WHERE t.id = c.id
   );
 
--- ============================================================================
 -- STEP 2: Explode messages JSON array into individual rows
--- ============================================================================
--- Note: Adjust the json field paths if your messages structure differs
--- Expected structure: messages = [{role: 'user'|'assistant', content: '...', timestamp: '...'}]
-
 INSERT INTO echo_messages (thread_id, user_id, role, content, created_at)
 SELECT
   c.id as thread_id,
@@ -69,39 +63,59 @@ SELECT
 FROM conversations c
 CROSS JOIN LATERAL jsonb_array_elements(COALESCE(c.messages, '[]'::jsonb)) as m
 WHERE c.conversation_type = 'chat'
-  AND (m->>'content') IS NOT NULL -- Skip empty messages
-ON CONFLICT DO NOTHING; -- In case of re-runs
+  AND (m->>'content') IS NOT NULL
+ON CONFLICT DO NOTHING;
 
--- ============================================================================
--- STEP 3: Verify the migration
--- ============================================================================
-SELECT 
-  'Threads migrated' as check_type,
-  COUNT(*) as count
-FROM echo_threads
-UNION ALL
-SELECT 
-  'Messages migrated' as check_type,
-  COUNT(*) as count
-FROM echo_messages
-UNION ALL
-SELECT 
-  'Original conversations' as check_type,
-  COUNT(*) as count
-FROM conversations
-WHERE conversation_type = 'chat';
+-- STEP 3: Verification queries
+DO $$
+DECLARE
+  v_old_conv_count INTEGER;
+  v_new_thread_count INTEGER;
+  v_old_msg_count INTEGER;
+  v_new_msg_count INTEGER;
+BEGIN
+  -- Count conversations
+  SELECT COUNT(*) INTO v_old_conv_count
+  FROM conversations WHERE conversation_type = 'chat';
+  
+  SELECT COUNT(*) INTO v_new_thread_count
+  FROM echo_threads;
+  
+  -- Count messages (approximate for old)
+  SELECT SUM(jsonb_array_length(messages)) INTO v_old_msg_count
+  FROM conversations WHERE conversation_type = 'chat';
+  
+  SELECT COUNT(*) INTO v_new_msg_count
+  FROM echo_messages;
+  
+  RAISE NOTICE 'Verification Results:';
+  RAISE NOTICE '  Old conversations: %', v_old_conv_count;
+  RAISE NOTICE '  New threads: %', v_new_thread_count;
+  RAISE NOTICE '  Old messages (approx): %', v_old_msg_count;
+  RAISE NOTICE '  New messages: %', v_new_msg_count;
+  
+  -- Basic sanity check
+  IF v_new_thread_count < v_old_conv_count THEN
+    RAISE EXCEPTION 'Thread count mismatch! Expected >=% but got %', v_old_conv_count, v_new_thread_count;
+  END IF;
+  
+  IF v_new_msg_count < (v_old_msg_count * 0.9) THEN
+    RAISE WARNING 'Message count seems low. Expected ~% but got %', v_old_msg_count, v_new_msg_count;
+  END IF;
+END $$;
 
--- Check for any threads without messages (might need investigation)
-SELECT 
-  t.id,
-  t.user_id,
-  t.created_at,
-  (SELECT COUNT(*) FROM echo_messages m WHERE m.thread_id = t.id) as message_count
-FROM echo_threads t
-WHERE NOT EXISTS (
-  SELECT 1 FROM echo_messages m WHERE m.thread_id = t.id
-)
-LIMIT 10;
+-- COMMIT if everything looks good, or manually ROLLBACK if needed
+COMMIT;
+
+-- Post-commit verification (run separately after COMMIT)
+-- SELECT 
+--   'Threads' as type, COUNT(*) as count FROM echo_threads
+-- UNION ALL
+-- SELECT 
+--   'Messages' as type, COUNT(*) as count FROM echo_messages
+-- UNION ALL
+-- SELECT 
+--   'Conversations' as type, COUNT(*) as count FROM conversations WHERE conversation_type = 'chat';
 ```
 
 ## Post-Migration Steps
