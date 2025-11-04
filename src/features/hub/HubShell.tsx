@@ -122,7 +122,7 @@ export function HubShell({ onClose }: HubShellProps) {
         className="fixed inset-0 pointer-events-none"
         style={{
           zIndex: Z.hub,
-          backgroundColor: 'rgba(0,0,0,0.65)',
+          backgroundColor: 'rgba(0,0,0,0.50)',
           WebkitBackdropFilter: 'blur(8px)',
           backdropFilter: 'blur(8px)',
         }}
@@ -161,9 +161,9 @@ export function HubShell({ onClose }: HubShellProps) {
           <div 
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'var(--ecm-glass-bg)',
-              backdropFilter: 'blur(var(--ecm-glass-blur)) saturate(var(--ecm-glass-saturate))',
-              WebkitBackdropFilter: 'blur(var(--ecm-glass-blur)) saturate(var(--ecm-glass-saturate))',
+              background: 'rgba(20,20,20,0.55)',
+              backdropFilter: 'blur(28px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(28px) saturate(180%)',
             }}
           />
           
