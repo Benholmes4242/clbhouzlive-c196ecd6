@@ -31,13 +31,14 @@ type UserGames = {
 };
 
 export function useUserGames() {
-  const nowIso = new Date().toISOString();
-
   return useQuery<UserGames>({
-    queryKey: ['userGamesV2', nowIso],
+    queryKey: ['userGamesV2'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: authErr } = await supabase.auth.getUser();
+      if (authErr) throw authErr;
       if (!user) return { hosting: [], joined: [] };
+
+      const nowIso = new Date().toISOString();
 
       // HOSTING: games where user is the host
       const { data: hostingRaw = [] } = await supabase
@@ -53,13 +54,15 @@ export function useUserGames() {
         .eq('host_user_id', user.id)
         .eq('status', 'active')
         .gte('expires_at', nowIso)
-        .order('start_time', { ascending: true });
+        .order('start_time', { ascending: true })
+        .throwOnError();
 
       // JOINED: games where user is a participant (but not host)
       const { data: participantRows = [] } = await supabase
         .from('game_participants')
         .select('game_id')
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .throwOnError();
 
       const joinedIds = participantRows.map(p => p.game_id);
       let joinedRaw: any[] = [];
@@ -79,7 +82,8 @@ export function useUserGames() {
           .neq('host_user_id', user.id)
           .eq('status', 'active')
           .gte('expires_at', nowIso)
-          .order('start_time', { ascending: true });
+          .order('start_time', { ascending: true })
+          .throwOnError();
         
         joinedRaw = data || [];
       }
