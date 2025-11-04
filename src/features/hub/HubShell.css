@@ -4,72 +4,9 @@
  * Minimal CSS for Hub-specific UI patterns not covered by Tailwind.
  */
 
-:root {
-  /* fixed height for the small tiles (top + bottom rows) */
-  --hub-tile-h: 220px;
-  --hub-gap: 16px;
-  --hub-pad-x: 16px;
-  --hub-header-h: 72px;
-}
-
 .hub-shell {
   /* Mobile safe area handling */
   padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-/* Full-height Hub grid (beneath header) */
-.hub-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  /* Row1 = fixed small tiles, Row2 = flexible (fills), Row3 = fixed small tiles */
-  grid-template-rows: var(--hub-tile-h) 1fr var(--hub-tile-h);
-  gap: var(--hub-gap);
-  padding: 0 var(--hub-pad-x) calc(env(safe-area-inset-bottom) + var(--hub-gap));
-  height: calc(100dvh - var(--hub-header-h));
-  overflow: hidden;
-}
-
-/* Map items into the grid */
-.hub-top-left { grid-column: 1; grid-row: 1; }
-.hub-top-right { grid-column: 2; grid-row: 1; }
-.hub-middle-wide { grid-column: 1 / span 2; grid-row: 2; }
-.hub-bottom-left { grid-column: 1; grid-row: 3; }
-.hub-bottom-right { grid-column: 2; grid-row: 3; }
-
-/* Tile chrome */
-.tile {
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(22px);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 12px 30px rgba(0, 0, 0, 0.35);
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  overflow: hidden;
-}
-
-/* Top/bottom tiles: lock height */
-.tile--fixed {
-  height: var(--hub-tile-h);
-}
-
-/* Middle tile: fills the flexible row; scroll its content if tall */
-.tile--flex {
-  min-height: 0;
-}
-
-.tile--flex .tile-body {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
-}
-
-/* Optional slight responsiveness for shorter screens */
-@media (max-height: 780px) {
-  :root {
-    --hub-tile-h: 206px;
-    --hub-gap: 14px;
-  }
 }
 
 /* Ensure shadows and blur don't get clipped */

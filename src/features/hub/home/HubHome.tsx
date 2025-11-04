@@ -12,31 +12,29 @@ import { YourGamesTile } from './tiles/YourGamesTile';
 
 export default function HubHome() {
   return (
-    <div className="hub-grid">
-      {/* Top row - fixed height */}
-      <section className="tile tile--fixed hub-top-left">
+    <main className="w-full overflow-x-hidden px-3.5 pb-6 mt-3">
+      {/* Top 2×2 grid */}
+      <div
+        className="grid"
+        style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem' }}
+      >
         <NearbyGolfersTile limit={5} />
-      </section>
-
-      <section className="tile tile--fixed hub-top-right">
         <GamesNearYouTile limit={3} enableFilters={false} />
-      </section>
+      </div>
 
-      {/* Middle - grows to fill */}
-      <section className="tile tile--flex hub-middle-wide">
-        <div className="tile-body">
-          <YourGamesTile />
-        </div>
-      </section>
+      {/* Your Games - full width */}
+      <div className="mt-3.5">
+        <YourGamesTile />
+      </div>
 
-      {/* Bottom row - fixed height */}
-      <section className="tile tile--fixed hub-bottom-left">
-        <EchoQuickTile />
-      </section>
-
-      <section className="tile tile--fixed hub-bottom-right">
+      {/* Echo & Swing 2×2 grid */}
+      <div
+        className="grid mt-3.5"
+        style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem' }}
+      >
+      <EchoQuickTile />
         <SwingQuickTile />
-      </section>
-    </div>
+      </div>
+    </main>
   );
 }
