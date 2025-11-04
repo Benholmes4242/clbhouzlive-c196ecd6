@@ -79,27 +79,28 @@ export function SwingQuickTile() {
     <Tile 
       title="Swing Coach" 
       subtitle="Upload for instant feedback"
-      footer={<ViewAllPill onClick={() => nav('/hub/echo/history?tab=swing')} />}
     >
       <div className="flex flex-col gap-4 sm:gap-5">
         {/* Upload pill with inline icon */}
         <button
           onClick={handleUpload}
           disabled={isUploading}
-          className="h-11 sm:h-12 rounded-2xl px-4 sm:px-5 flex items-center justify-between text-[15px] w-full transition focus:outline-none focus-visible:ring-2 disabled:opacity-60"
+          className="h-11 sm:h-12 rounded-2xl px-4 flex items-center justify-between text-[15px] w-full transition focus:outline-none focus-visible:ring-2 disabled:opacity-60 whitespace-nowrap"
           style={{
-            background: 'var(--hub-glass)',
-            border: '1px solid var(--hub-stroke-strong)',
-            color: 'var(--hub-text)',
+            background: 'rgba(255,255,255,0.12)',
+            border: '1px solid rgba(255,255,255,0.22)',
+            color: 'rgba(255,255,255,0.85)',
             backdropFilter: 'blur(28px)',
             WebkitBackdropFilter: 'blur(28px)',
           }}
-          onMouseEnter={(e) => !isUploading && (e.currentTarget.style.background = 'var(--hub-glass-hover)')}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'var(--hub-glass)'}
+          onMouseEnter={(e) => !isUploading && (e.currentTarget.style.background = 'rgba(255,255,255,0.16)')}
+          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
+          onMouseDown={(e) => !isUploading && (e.currentTarget.style.background = 'rgba(255,255,255,0.20)')}
+          onMouseUp={(e) => !isUploading && (e.currentTarget.style.background = 'rgba(255,255,255,0.16)')}
           aria-label="Upload swing video"
         >
-          <span>{isUploading ? 'Uploading...' : 'Upload a swing…'}</span>
-          <ArrowUpTrayIcon className="w-5 h-5 opacity-70" aria-hidden="true" />
+          <span className="truncate">{isUploading ? 'Uploading...' : 'Upload swing'}</span>
+          <ArrowUpTrayIcon className="w-[18px] h-[18px] opacity-80 mr-[-2px] shrink-0" aria-hidden="true" />
         </button>
 
         {/* Preview surface or Retry state */}
@@ -178,13 +179,22 @@ export function SwingQuickTile() {
 
         {/* Divider matching pill width */}
         <div 
-          className="h-px"
+          className="h-px mx-4 rounded-full"
           style={{
-            background: 'rgba(255,255,255,0.18)',
-            borderRadius: '1px',
-            width: '100%',
+            background: 'rgba(255,255,255,0.16)',
           }}
         />
+
+        {/* View all text link - bottom right */}
+        <div className="flex-1 flex items-end">
+          <button
+            onClick={() => nav('/hub/echo/history?tab=swing')}
+            className="ml-auto py-2 px-1 -mx-1 text-white/90 text-[15px] leading-[15px] hover:text-white transition"
+            aria-label="View all"
+          >
+            View all →
+          </button>
+        </div>
       </div>
       
       <input 
