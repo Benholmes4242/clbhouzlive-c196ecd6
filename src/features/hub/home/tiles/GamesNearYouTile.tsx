@@ -38,6 +38,33 @@ export function GamesNearYouTile({
   return (
     <Tile 
       title="Games Near You"
+      footer={
+        <div className="mt-auto pt-4">
+          <div 
+            className="h-px"
+            style={{
+              background: 'rgba(255,255,255,0.18)',
+              borderRadius: '1px',
+              width: '100%',
+            }}
+          />
+          <button
+            onClick={onAction}
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+            aria-label={games.length === 0 ? 'Create a Game' : 'View all'}
+            style={{ 
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+          >
+            {games.length === 0 ? 'Create a Game +' : 'View all →'}
+          </button>
+        </div>
+      }
     >
       <div className="flex flex-col h-full" style={{ ['--tile-x' as any]: '16px' }}>
         {/* Game list or empty state */}
@@ -78,33 +105,6 @@ export function GamesNearYouTile({
               No active games nearby
             </div>
           )}
-        </div>
-
-        {/* Bottom region: divider + text CTA */}
-        <div className="mt-auto pt-4">
-          <div 
-            className="h-px"
-            style={{
-              background: 'rgba(255,255,255,0.18)',
-              borderRadius: '1px',
-              width: '100%',
-            }}
-          />
-          <button
-            onClick={onAction}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            aria-label={games.length === 0 ? 'Create a Game' : 'View all'}
-            style={{ 
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-          >
-            {games.length === 0 ? 'Create a Game +' : 'View all →'}
-          </button>
         </div>
       </div>
     </Tile>

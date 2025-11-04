@@ -232,7 +232,38 @@ export function YourGamesTile() {
   const hasAny = games.length > 0;
 
   return (
-    <Tile title="Your Games">
+    <Tile 
+      title="Your Games"
+      footer={
+        <div className="mt-auto pt-4">
+          <div 
+            className="h-px"
+            style={{
+              background: 'rgba(255,255,255,0.18)',
+              borderRadius: '1px',
+              width: '100%',
+            }}
+          />
+          <button
+            ref={viewAllRef}
+            onClick={() => openSheet('your-games')}
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+            style={{ 
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            aria-label="View all your games"
+            disabled={!hasAny && isLoading}
+          >
+            View all →
+          </button>
+        </div>
+      }
+    >
       <div className="flex flex-col h-full" style={{ ['--tile-x' as any]: '16px' }}>
         <div className="space-y-3">
           {isLoading && [0, 1, 2].map(i => (
@@ -281,35 +312,6 @@ export function YourGamesTile() {
               onLongPress={() => nav(`/hub?sheet=your-games&id=${g.id}`)}
             />
           ))}
-        </div>
-
-        {/* Bottom region: divider + text-only "View all" */}
-        <div className="mt-auto pt-4">
-          <div 
-            className="h-px"
-            style={{
-              background: 'rgba(255,255,255,0.18)',
-              borderRadius: '1px',
-              width: '100%',
-            }}
-          />
-          <button
-            onClick={() => openSheet('your-games')}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            style={{ 
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
-              marginBottom: '-14px', // pull to bottom edge of Tile (pb-3.5)
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-            aria-label="View all your games"
-            disabled={!hasAny && isLoading}
-          >
-            View all →
-          </button>
         </div>
       </div>
     </Tile>

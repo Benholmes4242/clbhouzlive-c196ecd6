@@ -79,6 +79,33 @@ export function SwingQuickTile() {
     <Tile 
       title="Swing Coach" 
       subtitle="Upload your swing"
+      footer={
+        <div className="mt-auto pt-4">
+          <div 
+            className="h-px"
+            style={{
+              background: 'rgba(255,255,255,0.18)',
+              borderRadius: '1px',
+              width: '100%',
+            }}
+          />
+          <button
+            onClick={() => nav('/hub?sheet=swing')}
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+            style={{ 
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            aria-label="View all"
+          >
+            View all →
+          </button>
+        </div>
+      }
     >
       <div className="flex flex-col h-full justify-between">
         <div>
@@ -177,33 +204,6 @@ export function SwingQuickTile() {
               )}
             </div>
           )}
-        </div>
-
-        {/* Bottom footer: divider + View all (Echo parity) */}
-        <div className="mt-6 sm:mt-8">
-          <div 
-            className="h-px"
-            style={{
-              background: 'rgba(255,255,255,0.18)',
-              borderRadius: '1px',
-              width: '100%',
-            }}
-          />
-          <button
-            onClick={() => nav('/hub?sheet=swing')}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            style={{ 
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-            aria-label="View all"
-          >
-            View all →
-          </button>
         </div>
       </div>
       

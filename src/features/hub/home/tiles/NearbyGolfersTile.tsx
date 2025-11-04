@@ -19,7 +19,36 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
   const { golfers, isLoading } = useActiveGolfers({ limit });
 
   return (
-    <Tile title="Nearby Golfers">
+    <Tile 
+      title="Nearby Golfers"
+      footer={
+        <div className="mt-auto pt-4">
+          <div 
+            className="h-px"
+            style={{
+              background: 'rgba(255,255,255,0.18)',
+              borderRadius: '1px',
+              width: '100%',
+            }}
+          />
+          <button
+            onClick={() => openSheet('golfers')}
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+            style={{ 
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            aria-label="View all golfers"
+          >
+            View all →
+          </button>
+        </div>
+      }
+    >
       <div className="flex flex-col h-full">
         <div className="space-y-2">
           {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
@@ -56,33 +85,6 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
               No active golfers nearby
             </div>
           )}
-        </div>
-
-        {/* Bottom footer: divider + See all */}
-        <div className="mt-auto pt-4">
-          <div 
-            className="h-px"
-            style={{
-              background: 'rgba(255,255,255,0.18)',
-              borderRadius: '1px',
-              width: '100%',
-            }}
-          />
-          <button
-            onClick={() => openSheet('golfers')}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            style={{ 
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-            aria-label="View all golfers"
-          >
-            View all →
-          </button>
         </div>
       </div>
     </Tile>

@@ -48,6 +48,33 @@ export function EchoQuickTile() {
         </div>
       }
       subtitle="Ask me anything"
+      footer={
+        <div className="mt-auto pt-4">
+          <div
+            className="h-px"
+            style={{
+              background: 'rgba(255,255,255,0.18)',
+              borderRadius: '1px',
+              width: '100%',
+            }}
+          />
+          <button
+            onClick={() => openSheet('echo')}
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+            style={{ 
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            aria-label="View all Echo"
+          >
+            View all →
+          </button>
+        </div>
+      }
     >
       <div className="flex flex-col h-full">
         {/* Input form */}
@@ -118,33 +145,6 @@ export function EchoQuickTile() {
               ))}
             </div>
           </div>
-        </div>
-
-        {/* Bottom footer: divider + View all */}
-        <div>
-          <div
-            className="h-px"
-            style={{
-              background: 'rgba(255,255,255,0.18)',
-              borderRadius: '1px',
-              width: '100%',
-            }}
-          />
-          <button
-            onClick={() => openSheet('echo')}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            style={{ 
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-            aria-label="View all Echo"
-          >
-            View all →
-          </button>
         </div>
       </div>
     </Tile>
