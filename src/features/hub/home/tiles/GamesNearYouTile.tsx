@@ -90,16 +90,11 @@ export function GamesNearYouTile({
           />
           <button
             onClick={onAction}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium hover:opacity-90 active:opacity-80 transition"
+            className="ml-auto mt-3 sm:mt-4 flex items-center gap-2 text-[15px] font-medium hover:opacity-90 active:opacity-80 transition"
             aria-label={actionLabel}
-            style={{ 
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}
           >
             <span>{actionLabel}</span>
-            {games.length === 0 && <span aria-hidden="true">+</span>}
+            {games.length === 0 && <span aria-hidden="true" className="text-lg">+</span>}
           </button>
         </div>
       </div>
