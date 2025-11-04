@@ -9,7 +9,6 @@ import { SwingQuickTile } from './tiles/SwingQuickTile';
 import { NearbyGolfersTile } from './tiles/NearbyGolfersTile';
 import { GamesNearYouTile } from './tiles/GamesNearYouTile';
 import { YourGamesTile } from './tiles/YourGamesTile';
-import { EchoHistoryTile } from './tiles/EchoHistoryTile';
 
 export default function HubHome() {
   return (
@@ -33,13 +32,8 @@ export default function HubHome() {
         className="grid mt-3.5"
         style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem' }}
       >
-        <EchoQuickTile />
+      <EchoQuickTile />
         <SwingQuickTile />
-      </div>
-
-      {/* Echo History - full width */}
-      <div className="mt-3.5">
-        <EchoHistoryTile limitChat={1} limitSwing={2} />
       </div>
     </main>
   );
