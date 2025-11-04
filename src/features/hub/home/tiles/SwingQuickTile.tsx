@@ -91,6 +91,8 @@ export function SwingQuickTile() {
               background: 'rgba(255,255,255,0.12)',
               border: '1px solid rgba(255,255,255,0.22)',
               color: 'rgba(255,255,255,0.85)',
+              backdropFilter: 'blur(28px)',
+              WebkitBackdropFilter: 'blur(28px)',
             }}
             onMouseEnter={(e) => !isUploading && (e.currentTarget.style.background = 'rgba(255,255,255,0.16)')}
             onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
@@ -111,6 +113,8 @@ export function SwingQuickTile() {
                 background: 'rgba(255,255,255,0.08)',
                 border: '1px solid rgba(255,71,71,0.25)',
                 boxShadow: 'var(--hub-shadow-tile)',
+                backdropFilter: 'blur(28px)',
+                WebkitBackdropFilter: 'blur(28px)',
               }}
             >
               <p className="text-white/75 text-[13px]">Upload failed — please try again</p>
@@ -135,6 +139,8 @@ export function SwingQuickTile() {
                 background: 'var(--hub-glass-subtle)',
                 border: '1px solid var(--hub-stroke)',
                 boxShadow: 'var(--hub-shadow-tile)',
+                backdropFilter: 'blur(28px)',
+                WebkitBackdropFilter: 'blur(28px)',
               }}
               onClick={() => lastSwing && nav(`/hub?sheet=swing&id=${lastSwing.id}`)}
               role={lastSwing ? 'button' : 'presentation'}

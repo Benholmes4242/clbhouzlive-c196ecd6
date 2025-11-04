@@ -65,6 +65,8 @@ export function EchoQuickTile() {
               background: 'var(--hub-glass)',
               border: '1px solid var(--hub-stroke-strong)',
               color: 'var(--hub-text)',
+              backdropFilter: 'blur(var(--hub-blur))',
+              WebkitBackdropFilter: 'blur(var(--hub-blur))',
             }}
           />
 
@@ -99,6 +101,8 @@ export function EchoQuickTile() {
                   style={{
                     borderColor: 'rgba(255,255,255,0.16)',
                     background: 'rgba(255,255,255,0.10)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.14)'}
                   onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.10)'}
