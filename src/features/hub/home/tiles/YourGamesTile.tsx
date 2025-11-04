@@ -278,13 +278,12 @@ export function YourGamesTile() {
         </div>
         <button
           onClick={() => openSheet('your-games')}
-          className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition pb-3.5"
+          className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
           style={{ 
             background: 'transparent',
             border: 'none',
             color: 'var(--hub-text-body)',
             padding: 0,
-            paddingBottom: '14px',
           }}
           onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
           onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
