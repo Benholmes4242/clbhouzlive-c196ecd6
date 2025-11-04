@@ -83,11 +83,9 @@ export function GamesNearYouTile({
           <div 
             className="h-px"
             style={{
-              opacity: 0.18,
-              background: 'rgba(255,255,255,0.9)',
-              marginLeft: 'var(--tile-x)',
-              marginRight: 'var(--tile-x)',
-              borderRadius: 1,
+              background: 'rgba(255,255,255,0.18)',
+              borderRadius: '1px',
+              width: '100%',
             }}
           />
           <button
