@@ -186,7 +186,7 @@ export function SwingQuickTile() {
         />
 
         {/* View all text link - bottom right */}
-        <div className="mt-3 flex-1 flex items-end">
+        <div className="mt-4 flex-1 flex items-end">
           <button
             onClick={() => nav('/hub/echo/history?tab=swing')}
             className="ml-auto py-2 px-1 -mx-1 text-white/90 text-[15px] leading-[15px] hover:text-white transition"
