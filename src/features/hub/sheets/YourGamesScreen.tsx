@@ -60,7 +60,7 @@ export function YourGamesScreen({ onClose, focusId }: YourGamesScreenProps) {
       
       <PullToRefresh onRefresh={() => refetch()}>
         <div className="flex-1 overflow-y-auto px-4 pb-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Your Games</h2>
+          <h2 className="text-xl font-semibold text-white mb-0.5">Your Games</h2>
           
           <YourGamesList
             activeTab="your-games"
