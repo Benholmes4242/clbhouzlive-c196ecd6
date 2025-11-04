@@ -211,58 +211,81 @@ export function YourGamesTile() {
 
   const toggle = (id: string) => setOpenId(o => (o === id ? null : id));
 
+  const hasAny = games.length > 0;
+
   return (
-    <Tile 
-      title="Your Games" 
-      onViewAll={() => openSheet('your-games')}
-    >
-      <div className="space-y-3">
-        {isLoading && [0, 1, 2].map(i => (
+    <Tile title="Your Games">
+      <div className="flex flex-col h-full" style={{ ['--tile-x' as any]: '16px' }}>
+        <div className="space-y-3">
+          {isLoading && [0, 1, 2].map(i => (
+            <div 
+              key={i} 
+              className="h-12 rounded-[14px] animate-pulse" 
+              style={{ 
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.12)',
+              }} 
+            />
+          ))}
+
+          {isError && (
+            <div className="text-[13px] space-y-2" style={{ color: 'var(--hub-text-sub)' }}>
+              <div>Couldn't load games</div>
+              <button 
+                onClick={() => refetch()}
+                className="text-[13px] underline underline-offset-2"
+                style={{ color: 'var(--hub-accent-orange)' }}
+              >
+                Retry
+              </button>
+            </div>
+          )}
+          
+          {!isLoading && !isError && games.length === 0 && (
+            <div className="text-[14px]" style={{ color: 'var(--hub-text-sub)' }}>
+              No games yet.{' '}
+              <button 
+                onClick={() => openSheet('create-game')}
+                className="underline underline-offset-2"
+                style={{ color: 'var(--hub-accent-orange)' }}
+              >
+                Create one
+              </button>
+            </div>
+          )}
+
+          {!isLoading && !isError && games.map(g => (
+            <GameRow
+              key={g.id}
+              game={g}
+              expanded={openId === g.id}
+              onToggle={() => toggle(g.id)}
+              onLongPress={() => nav(`/hub?sheet=your-games&id=${g.id}`)}
+            />
+          ))}
+        </div>
+
+        {/* Bottom region: divider + text-only "View all" */}
+        <div className="mt-auto pt-4">
           <div 
-            key={i} 
-            className="h-12 rounded-[14px] animate-pulse" 
-            style={{ 
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.12)',
-            }} 
+            className="h-px"
+            style={{
+              opacity: 0.18,
+              background: 'rgba(255,255,255,0.9)',
+              marginLeft: 'var(--tile-x)',
+              marginRight: 'var(--tile-x)',
+              borderRadius: 1,
+            }}
           />
-        ))}
-
-        {isError && (
-          <div className="text-[13px] space-y-2" style={{ color: 'var(--hub-text-sub)' }}>
-            <div>Couldn't load games</div>
-            <button 
-              onClick={() => refetch()}
-              className="text-[13px] underline underline-offset-2"
-              style={{ color: 'var(--hub-accent-orange)' }}
-            >
-              Retry
-            </button>
-          </div>
-        )}
-        
-        {!isLoading && !isError && games.length === 0 && (
-          <div className="text-[14px]" style={{ color: 'var(--hub-text-sub)' }}>
-            No games yet.{' '}
-            <button 
-              onClick={() => openSheet('create-game')}
-              className="underline underline-offset-2"
-              style={{ color: 'var(--hub-accent-orange)' }}
-            >
-              Create one
-            </button>
-          </div>
-        )}
-
-        {!isLoading && !isError && games.map(g => (
-          <GameRow
-            key={g.id}
-            game={g}
-            expanded={openId === g.id}
-            onToggle={() => toggle(g.id)}
-            onLongPress={() => nav(`/hub?sheet=your-games&id=${g.id}`)}
-          />
-        ))}
+          <button
+            onClick={() => openSheet('your-games')}
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium hover:opacity-90 active:opacity-80 transition"
+            aria-label="View all your games"
+            disabled={!hasAny && isLoading}
+          >
+            View all
+          </button>
+        </div>
       </div>
     </Tile>
   );

@@ -25,14 +25,24 @@ export function GamesNearYouTile({
   const { data: allGames = [], isLoading } = useGamesQuery();
   
   const games = allGames.slice(0, limit);
+  
+  // Adaptive subtitle and action
+  const subtitle = games.length === 0 ? 'No active games nearby' : 'Find a game to join';
+  const actionLabel = games.length === 0 ? 'Create a Game' : 'View all';
+  const onAction = () => {
+    if (games.length === 0) {
+      nav('/hub?sheet=create-game');
+    } else {
+      openSheet('games');
+    }
+  };
 
   return (
     <Tile 
       title="Games Near You" 
-      subtitle="Find a game to join"
-      onViewAll={() => openSheet('games')}
+      subtitle={subtitle}
     >
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full" style={{ ['--tile-x' as any]: '16px' }}>
         {/* Game list or empty state */}
         <div className="space-y-2">
           {isLoading && Array.from({ length: limit }).map((_, i) => (
@@ -66,41 +76,32 @@ export function GamesNearYouTile({
               </button>
             );
           })}
-          {!isLoading && games.length === 0 && (
-            <div className="mt-1 text-[15px] text-white/75">
-              Be the first to post one.
-            </div>
-          )}
         </div>
 
         {/* Bottom region: divider + text CTA */}
-        <div className="mt-auto pt-6 sm:pt-8">
+        <div className="mt-auto pt-4">
           <div 
             className="h-px"
             style={{
-              background: 'rgba(255,255,255,0.18)',
-              borderRadius: '1px',
-              width: '100%',
+              opacity: 0.18,
+              background: 'rgba(255,255,255,0.9)',
+              marginLeft: 'var(--tile-x)',
+              marginRight: 'var(--tile-x)',
+              borderRadius: 1,
             }}
           />
           <button
-            onClick={() => nav('/hub?sheet=create-game')}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+            onClick={onAction}
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium hover:opacity-90 active:opacity-80 transition"
+            aria-label={actionLabel}
             style={{ 
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
             }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-            aria-label="Create a Game"
           >
-            <span>Create a Game</span>
-            <span aria-hidden="true">+</span>
+            <span>{actionLabel}</span>
+            {games.length === 0 && <span aria-hidden="true">+</span>}
           </button>
         </div>
       </div>
