@@ -214,7 +214,6 @@ export function YourGamesTile() {
   return (
     <Tile 
       title="Your Games" 
-      subtitle="Hosting & Joined"
       onViewAll={() => openSheet('your-games')}
     >
       <div className="space-y-3">
