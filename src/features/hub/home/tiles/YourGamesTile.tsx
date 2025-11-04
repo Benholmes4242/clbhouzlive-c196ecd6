@@ -45,6 +45,11 @@ function GameRow({
 }) {
   const totalSlots = game.slots_total || 0;
   const availableSlots = game.slots_open || 0;
+  const hostName = React.useMemo(() => {
+    if (game.kind === 'Hosting') return 'You';
+    const hostP = game.participants.find(p => p.user_id === game.host_user_id);
+    return hostP?.user_profiles?.display_name || null;
+  }, [game]);
   const timerRef = React.useRef<number | null>(null);
   
   const handlePointerDown = (e: React.PointerEvent) => {
@@ -143,13 +148,15 @@ function GameRow({
                 minute: '2-digit',
               })}
             </div>
-            {game.host_profile?.[0] && (
-              <div className="text-[13px]" style={{ color: 'var(--hub-text-sub)' }}>
-                Host: <span style={{ color: 'var(--hub-text-body)' }}>
-                  {game.host_profile[0].display_name || 'Unknown'}
-                </span>
-              </div>
-            )}
+            {(() => {
+              const hostP = game.participants.find(p => p.user_id === game.host_user_id);
+              const name = game.kind === 'Hosting' ? 'You' : (hostP?.user_profiles?.display_name || 'Host');
+              return (
+                <div className="text-[13px]" style={{ color: 'var(--hub-text-sub)' }}>
+                  Host: <span style={{ color: 'var(--hub-text-body)' }}>{name}</span>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Right: Mini roster */}
@@ -195,12 +202,11 @@ export function YourGamesTile() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
 
-      // Get games where user is host with host profile
+      // Get games where user is host (no FK join to user_profiles)
       const { data: hosting = [] } = await supabase
         .from('games')
         .select(`
           *,
-          host_profile:user_profiles!games_host_user_id_fkey(display_name, profile_photo_url),
           participants:game_participants(
             user_id,
             user_profiles(display_name, profile_photo_url, eg_handicap_index)
@@ -225,7 +231,6 @@ export function YourGamesTile() {
             .from('games')
             .select(`
               *,
-              host_profile:user_profiles!games_host_user_id_fkey(display_name, profile_photo_url),
               participants:game_participants(
                 user_id,
                 user_profiles(display_name, profile_photo_url, eg_handicap_index)
