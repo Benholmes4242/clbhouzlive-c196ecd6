@@ -5,10 +5,10 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Tile } from '../components/Tile';
 import { useOpenSheet } from '@/features/hub/sheets/useOpenSheet';
+import { useUserGames } from '@/features/hub/hooks/useUserGames';
+import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
 
 type GameWithDetails = {
   id: string;
@@ -196,66 +196,18 @@ export function YourGamesTile() {
   const openSheet = useOpenSheet();
   const [openId, setOpenId] = React.useState<string | null>(null);
   
-  const { data: games = [], isLoading } = useQuery({
-    queryKey: ['userGames'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+  // Use shared hook for consistency with the sheet
+  const { data, isLoading } = useUserGames();
+  useUserGamesRealtime();
 
-      // Get games where user is host (no FK join to user_profiles)
-      const { data: hosting = [] } = await supabase
-        .from('games')
-        .select(`
-          *,
-          participants:game_participants(
-            user_id,
-            user_profiles(display_name, profile_photo_url, eg_handicap_index)
-          )
-        `)
-        .eq('host_user_id', user.id)
-        .eq('status', 'active')
-        .gte('expires_at', new Date().toISOString())
-        .order('start_time', { ascending: true })
-        .limit(3);
-
-      // Get games where user is participant
-      const { data: participantRecords = [] } = await supabase
-        .from('game_participants')
-        .select('game_id')
-        .eq('user_id', user.id)
-        .limit(3);
-
-      const gameIds = participantRecords.map(p => p.game_id);
-      const { data: joined = [] } = gameIds.length > 0
-        ? await supabase
-            .from('games')
-            .select(`
-              *,
-              participants:game_participants(
-                user_id,
-                user_profiles(display_name, profile_photo_url, eg_handicap_index)
-              )
-            `)
-            .in('id', gameIds)
-            .eq('status', 'active')
-            .gte('expires_at', new Date().toISOString())
-            .order('start_time', { ascending: true })
-        : { data: [] };
-
-      // Merge, dedupe, and sort by time
-      const hostingWithKind = hosting.map(g => ({ ...g, kind: 'Hosting' as const }));
-      const hostingIds = new Set(hosting.map(g => g.id));
-      const joinedWithKind = joined
-        .filter(g => !hostingIds.has(g.id))
-        .map(g => ({ ...g, kind: 'Joined' as const }));
-      
-      const combined = [...hostingWithKind, ...joinedWithKind]
-        .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
-        .slice(0, 3);
-      
-      return combined as GameWithDetails[];
-    },
-  });
+  // Combine hosting & joined, take top 3 by time
+  const games = React.useMemo(() => {
+    if (!data) return [];
+    const combined = [...data.hosting, ...data.joined]
+      .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+      .slice(0, 3);
+    return combined as GameWithDetails[];
+  }, [data]);
 
   const toggle = (id: string) => setOpenId(o => (o === id ? null : id));
 

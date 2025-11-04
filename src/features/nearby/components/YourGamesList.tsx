@@ -1,8 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Game } from '../types';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { channelManager } from '@/utils/supabaseChannelManager';
+import React, { useEffect, useState } from 'react';
 import { GameCard } from './your-games/GameCard';
 import { EmptyState } from './your-games/EmptyState';
 import { Segmented, SegmentItem } from './Segmented';
@@ -10,7 +6,8 @@ import { TapButton } from '@/components/ui/TapButton';
 import { YourGamesSkeleton } from './your-games/YourGamesSkeleton';
 import { HostApprovalSheet } from './HostApprovalSheet';
 import type { Game as CardGame, Participant } from './your-games/types';
-import { EVT_GAME_CREATED } from '../constants';
+import { useUserGames, type UserGame } from '@/features/hub/hooks/useUserGames';
+import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
 
 interface YourGamesListProps {
   activeTab?: 'golfers' | 'games' | 'your-games';
@@ -31,134 +28,23 @@ export function YourGamesList({
   onFindGame,
   focusId,
 }: YourGamesListProps) {
-  const { user } = useSupabaseSession();
-  const [hostedGames, setHostedGames] = useState<Game[]>([]);
-  const [joinedGames, setJoinedGames] = useState<Game[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Use shared hook for consistency with the tile
+  const { data, isLoading } = useUserGames();
+  useUserGamesRealtime();
+
+  const hostedGames = data?.hosting || [];
+  const joinedGames = data?.joined || [];
+
   const [activeTab, setActiveTab] = useState<'hosting' | 'joined'>('hosting');
   const [approvalSheetGameId, setApprovalSheetGameId] = useState<string | null>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
 
-  const fetchYourGames = useCallback(async () => {
-    // Resolve user id reliably (avoid race with session hook)
-    let userId = user?.id;
-    if (!userId) {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      userId = authUser?.id ?? undefined;
-    }
-
-    if (!userId) {
-      // No authenticated user; clear state and exit
-      setIsLoading(false);
-      setHostedGames([]);
-      setJoinedGames([]);
-      if (onCountChange) onCountChange(0);
-      return;
-    }
-    
-    setIsLoading(true);
-    
-    try {
-      const nowIso = new Date().toISOString();
-
-      // 1) Fetch hosted games
-      const { data: hosted, error: hostedError } = await supabase
-        .from('games')
-        .select('id, course_name, course_id, start_time, expires_at, status, slots_open, slots_total, note, created_at, host_user_id, visibility, updated_at')
-        .eq('host_user_id', userId)
-        .eq('status', 'active')
-        .gte('expires_at', nowIso)
-        .order('start_time', { ascending: true, nullsFirst: true });
-
-      if (hostedError) {
-        console.error('Error fetching hosted games:', hostedError);
-      }
-
-      // 2) Fetch joined games
-      const { data: participants, error: participantsError } = await supabase
-        .from('game_participants')
-        .select(`
-          game_id,
-          games!inner(id, course_name, course_id, start_time, expires_at, status, slots_open, slots_total, note, created_at, host_user_id, visibility, updated_at)
-        `)
-        .eq('user_id', userId)
-        .eq('games.status', 'active')
-        .gte('games.expires_at', nowIso);
-
-      if (participantsError) {
-        console.error('Error fetching joined games:', participantsError);
-      }
-
-      // 3) Batch fetch all participants with embedded profiles
-      const gameIds = Array.from(new Set([
-        ...((hosted || []).map((g: any) => g.id)),
-        ...((participants || []).map((p: any) => p.games?.id).filter(Boolean)),
-      ]));
-
-      if (gameIds.length > 0) {
-        const { data: gpRows, error: gpError } = await supabase
-          .from('game_participants')
-          .select(`
-            game_id, user_id, guest_name, role, state, reserves_slot,
-            user_profiles(id, display_name, username, profile_photo_url, home_club, eg_handicap_index, show_handicap)
-          `)
-          .in('game_id', gameIds as string[]);
-
-        if (gpError) {
-          console.error('[YourGames] Error fetching participants:', gpError);
-        } else {
-          // Group participants by game_id
-          const grouped: Record<string, any[]> = {};
-          (gpRows || []).forEach((row: any) => {
-            (grouped[row.game_id] ||= []).push(row);
-          });
-          
-          // Attach to hosted games
-          (hosted || []).forEach((g: any) => { 
-            g.game_participants = grouped[g.id] || []; 
-          });
-          
-          // Attach to joined games
-          (participants || []).forEach((p: any) => { 
-            if (p.games) { 
-              p.games.game_participants = grouped[p.games.id] || []; 
-            } 
-          });
-        }
-      }
-
-      // Merge hosted and joined games, deduplicating by id
-      const byId = new Map<string, Game>();
-      (hosted || []).forEach((g: any) => byId.set(g.id, g as Game));
-      (participants || [])
-        .map((p: any) => p.games)
-        .filter((g: any) => g && g.id)
-        .forEach((g: any) => {
-          if (!byId.has(g.id)) {
-            byId.set(g.id, g as Game);
-          }
-        });
-
-      // Separate into hosted and joined for display
-      const allGames = Array.from(byId.values());
-      const hostedFiltered = allGames.filter(g => g.host_user_id === userId);
-      const joinedFiltered = allGames.filter(g => g.host_user_id !== userId);
-      
-      setHostedGames(hostedFiltered);
-      setJoinedGames(joinedFiltered);
-
-      // Notify parent of total count
-      if (onCountChange) {
-        onCountChange(allGames.length);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user?.id, onCountChange]);
-
+  // Notify parent of total count
   useEffect(() => {
-    fetchYourGames();
-  }, [fetchYourGames]);
+    if (onCountChange) {
+      onCountChange(hostedGames.length + joinedGames.length);
+    }
+  }, [hostedGames.length, joinedGames.length, onCountChange]);
 
   // Handle focus scroll & highlight after data loads
   useEffect(() => {
@@ -184,61 +70,6 @@ export function YourGamesList({
     return () => clearTimeout(timer);
   }, [focusId, isLoading, hostedGames, joinedGames]);
 
-  // Refetch whenever Your Games tab becomes active
-  useEffect(() => {
-    if (activeTabFromParent === 'your-games') {
-      fetchYourGames();
-    }
-  }, [activeTabFromParent, fetchYourGames]);
-
-  // Listen for game-created events
-  useEffect(() => {
-    const handler = () => {
-      setTimeout(() => fetchYourGames(), 400);
-      setTimeout(() => fetchYourGames(), 1500);
-    };
-    window.addEventListener(EVT_GAME_CREATED, handler as EventListener);
-    return () => window.removeEventListener(EVT_GAME_CREATED, handler as EventListener);
-  }, [fetchYourGames]);
-
-  // Refetch on window focus
-  useEffect(() => {
-    const handleFocus = () => fetchYourGames();
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
-  }, [fetchYourGames]);
-
-  // Real-time subscriptions
-  useEffect(() => {
-    if (!user?.id) return;
-
-    // Subscribe to games you host
-    const hostedChannel = channelManager.createChannel(`your_hosted_games_${user.id}`);
-    hostedChannel
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'games',
-        filter: `host_user_id=eq.${user.id}`,
-      }, () => fetchYourGames())
-      .subscribe();
-
-    // Subscribe to your participant changes
-    const participantsChannel = channelManager.createChannel(`your_joined_games_${user.id}`);
-    participantsChannel
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'game_participants',
-        filter: `user_id=eq.${user.id}`,
-      }, () => fetchYourGames())
-      .subscribe();
-
-    return () => {
-      channelManager.removeChannel(`your_hosted_games_${user.id}`);
-      channelManager.removeChannel(`your_joined_games_${user.id}`);
-    };
-  }, [user?.id]);
 
   const handleCancel = async (gameId: string) => {
     if (onCancelGame) {
@@ -252,31 +83,31 @@ export function YourGamesList({
     }
   };
 
-  // Map Game to CardGame format
-  const toCardGame = (g: Game): CardGame => ({
+  // Map UserGame to CardGame format
+  const toCardGame = (g: UserGame): CardGame => ({
     id: g.id,
     course_name: g.course_name || 'Course TBD',
-    course_id: g.course_id,
+    course_id: null,
     start_time: g.start_time,
     expires_at: g.expires_at,
     status: g.status,
     slots_total: g.slots_total,
     slots_open: g.slots_open,
     host_user_id: g.host_user_id,
-    visibility: g.visibility,
-    note: g.note,
+    visibility: 'public',
+    note: null,
   });
 
   // Extract host from participants
-  const extractHost = (game: Game): Participant | null => {
-    const hostParticipant = (game as any).game_participants?.find((p: any) => p.role === 'host');
+  const extractHost = (game: UserGame): Participant | null => {
+    const hostParticipant = game.participants?.find(p => p.user_id === game.host_user_id);
     if (hostParticipant?.user_profiles) {
       return {
         user_id: hostParticipant.user_id,
-        username: hostParticipant.user_profiles.username,
+        username: null,
         display_name: hostParticipant.user_profiles.display_name,
         profile_photo_url: hostParticipant.user_profiles.profile_photo_url,
-        home_club: hostParticipant.user_profiles.home_club,
+        home_club: null,
         eg_handicap_index: hostParticipant.user_profiles.eg_handicap_index,
         role: 'host' as const,
       };
@@ -284,18 +115,16 @@ export function YourGamesList({
     return null;
   };
 
-  // Extract members (accepted players + guests)
-  const extractMembers = (game: Game): Participant[] => {
-    const participants = (game as any).game_participants?.filter((p: any) => 
-      p.role === 'player' && (p.state === 'accepted' || p.guest_name)
-    ) || [];
+  // Extract members (players excluding host)
+  const extractMembers = (game: UserGame): Participant[] => {
+    const participants = game.participants?.filter(p => p.user_id !== game.host_user_id) || [];
 
-    return participants.map((p: any) => ({
+    return participants.map(p => ({
       user_id: p.user_id,
-      username: p.user_profiles?.username,
-      display_name: p.user_profiles?.display_name || p.guest_name || 'Guest',
+      username: null,
+      display_name: p.user_profiles?.display_name || 'Player',
       profile_photo_url: p.user_profiles?.profile_photo_url,
-      home_club: p.user_profiles?.home_club,
+      home_club: null,
       eg_handicap_index: p.user_profiles?.eg_handicap_index,
       role: 'player' as const,
     }));
