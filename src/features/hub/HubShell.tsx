@@ -177,10 +177,8 @@ export function HubShell({ onClose }: HubShellProps) {
             }}
           >
             <div className="px-5 pt-4">
-              <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
-                <div />
-                
-                <div className="flex justify-center items-center gap-2">
+              <div className="flex items-center justify-between mb-3" style={{ userSelect: 'none' }}>
+                <div className="flex items-center gap-2">
                   <img
                     src="/assets/logomark-orange.png"
                     alt="Logo mark"
@@ -193,18 +191,16 @@ export function HubShell({ onClose }: HubShellProps) {
                   />
                 </div>
                 
-                <div className="flex justify-end">
-                  <TapButton
-                    onPointerDown={handleClose}
-                    className="transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
-                    style={{ color: 'var(--hub-close-idle)' }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-close-hover)'}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-close-idle)'}
-                    aria-label="Close hub"
-                  >
-                    <X className="w-5 h-5" />
-                  </TapButton>
-                </div>
+                <TapButton
+                  onPointerDown={handleClose}
+                  className="transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
+                  style={{ color: 'var(--hub-close-idle)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-close-hover)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-close-idle)'}
+                  aria-label="Close hub"
+                >
+                  <X className="w-5 h-5" />
+                </TapButton>
               </div>
             </div>
           </div>
