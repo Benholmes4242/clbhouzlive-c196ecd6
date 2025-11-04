@@ -1,4 +1,5 @@
 import React from 'react';
+import { Z } from '@/config/zIndex';
 
 type BottomSheetProps = {
   open: boolean;
@@ -22,7 +23,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
       <div
         aria-hidden
         className={`fixed inset-0 z-[95] transition-opacity duration-200 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(6px)' }}
+        style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(6px)', zIndex: Z.hub + 1 }}
         onClick={onClose}
       />
 
@@ -42,6 +43,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           WebkitBackdropFilter: 'blur(24px)',
           boxShadow: '0 -12px 50px rgba(0,0,0,0.45)',
           borderTop: '1px solid rgba(255,255,255,0.14)',
+          zIndex: Z.hub + 2,
         }}
       >
         {/* drag handle */}
