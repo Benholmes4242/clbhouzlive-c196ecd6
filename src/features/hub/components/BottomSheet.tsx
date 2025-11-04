@@ -1,5 +1,4 @@
-import React from 'react';
-import { Z } from '@/config/zIndex';
+import * as React from 'react';
 
 type BottomSheetProps = {
   open: boolean;
@@ -8,8 +7,20 @@ type BottomSheetProps = {
   ariaLabel?: string;
 };
 
+const THRESHOLD_PX = 92;          // distance to close
+const VELOCITY_CLOSE = 0.55;      // px/ms
+const MAX_DRAG = 480;             // clamp
+
 export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetProps) {
-  // scroll lock
+  const sheetRef = React.useRef<HTMLDivElement>(null);
+  const contentRef = React.useRef<HTMLDivElement>(null);
+  const startY = React.useRef(0);
+  const lastY = React.useRef(0);
+  const lastT = React.useRef(0);
+  const dragging = React.useRef(false);
+  const [translate, setTranslate] = React.useState(0);
+
+  // Scroll lock when open
   React.useEffect(() => {
     if (!open) return;
     const { overflow } = document.body.style;
@@ -17,44 +28,163 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
     return () => { document.body.style.overflow = overflow; };
   }, [open]);
 
+  // ESC to close
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose]);
+
+  // Helpers
+  const setY = (y: number) => {
+    const clamped = Math.max(0, Math.min(MAX_DRAG, y));
+    setTranslate(clamped);
+    if (sheetRef.current) sheetRef.current.style.transform = `translate3d(0, ${clamped}px, 0)`;
+  };
+  const snapTo = (y: number) => {
+    if (!sheetRef.current) return;
+    sheetRef.current.style.transition = 'transform 240ms cubic-bezier(.2,.8,.2,1)';
+    setY(y);
+    window.setTimeout(() => {
+      if (!sheetRef.current) return;
+      sheetRef.current.style.transition = '';
+    }, 260);
+  };
+
+  // Drag start (only if content is scrolled to top)
+  const canStartDrag = () => {
+    const el = contentRef.current;
+    return !el || el.scrollTop <= 0;
+  };
+
+  const onPointerDown: React.PointerEventHandler = (e) => {
+    if (!open) return;
+    // Only left / primary
+    if (e.button !== 0) return;
+    if (!canStartDrag()) return;
+    dragging.current = true;
+    startY.current = e.clientY;
+    lastY.current = e.clientY;
+    lastT.current = e.timeStamp;
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+  };
+
+  const onPointerMove: React.PointerEventHandler = (e) => {
+    if (!dragging.current) return;
+    const dy = e.clientY - startY.current;
+    if (dy < 0) return; // only allow downward pull
+    // prevent rubber-band scroll
+    e.preventDefault();
+    lastY.current = e.clientY;
+    lastT.current = e.timeStamp;
+    setY(dy);
+  };
+
+  const onPointerUp: React.PointerEventHandler = (e) => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    const dy = lastY.current - startY.current;
+    const dt = Math.max(1, e.timeStamp - lastT.current);
+    const vy = (e.clientY - lastY.current) / dt; // px/ms (last segment)
+    const shouldClose = dy > THRESHOLD_PX || vy > VELOCITY_CLOSE;
+    if (shouldClose) {
+      // animate off-screen then close
+      snapTo(window.innerHeight * 0.75);
+      window.setTimeout(onClose, 220);
+    } else {
+      snapTo(0); // snap back
+    }
+  };
+
+  // Backdrop click to close (ignore clicks that start inside the sheet)
+  const onBackdropClick = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    if (sheetRef.current && !sheetRef.current.contains(e.target as Node)) {
+      onClose();
+    }
+  };
+
+  if (!open) return null;
+
+  const headerH = getComputedStyle(document.documentElement)
+    .getPropertyValue('--hub-header-h') || '72px';
+
   return (
     <>
       {/* Backdrop */}
       <div
         aria-hidden
-        className={`fixed inset-0 z-[95] transition-opacity duration-200 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(6px)', zIndex: Z.hub + 1 }}
-        onClick={onClose}
+        onMouseDown={onBackdropClick}
+        onTouchStart={onBackdropClick}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.35)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+          zIndex: 12002, // under header, above hub
+          opacity: 1,
+          transition: 'opacity 160ms ease',
+        }}
       />
 
       {/* Sheet */}
-      <section
+      <div
         role="dialog"
         aria-modal="true"
-        aria-label={ariaLabel}
-        className="fixed left-0 right-0 z-[96] rounded-t-2xl"
+        aria-label={ariaLabel || 'Panel'}
+        ref={sheetRef}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
         style={{
-          top: 'var(--hub-header-h)',
-          height: 'calc(100dvh - var(--hub-header-h))',
-          transform: `translateY(${open ? '0%' : '100%'})`,
-          transition: 'transform 320ms cubic-bezier(.22,.8,.18,1)',
-          background: 'rgba(28,28,30,0.72)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          boxShadow: '0 -12px 50px rgba(0,0,0,0.45)',
-          borderTop: '1px solid rgba(255,255,255,0.14)',
-          zIndex: Z.hub + 2,
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          // start just below the header
+          top: headerH,
+          bottom: 0,
+          transform: 'translate3d(0, 0, 0)',
+          willChange: 'transform',
+          zIndex: 12003,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          background:
+            'linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.10))',
+          backdropFilter: 'blur(28px)',
+          WebkitBackdropFilter: 'blur(28px)',
+          border: '1px solid rgba(255,255,255,0.22)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.45)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
         }}
       >
-        {/* drag handle */}
-        <div className="flex justify-center py-2">
-          <div style={{ width: 36, height: 4, borderRadius: 9999, background: 'rgba(255,255,255,0.25)' }} />
-        </div>
-
-        <div className="h-[calc(100%-28px)] overflow-auto px-4 pb-[env(safe-area-inset-bottom)]">
+        {/* Handle */}
+        <div
+          style={{
+            alignSelf: 'center',
+            width: 44,
+            height: 5,
+            borderRadius: 999,
+            background: 'rgba(255,255,255,0.35)',
+            margin: '10px 0 6px',
+            pointerEvents: 'none',
+          }}
+        />
+        {/* Scrollable content */}
+        <div
+          ref={contentRef}
+          style={{
+            flex: 1,
+            overflow: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            padding: '12px 14px 18px',
+          }}
+        >
           {children}
         </div>
-      </section>
+      </div>
     </>
   );
 }
