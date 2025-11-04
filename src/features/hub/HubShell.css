@@ -1,107 +1,23 @@
 /**
- * Hub Shell Styles - 2–1–2 Control-Center Layout
+ * Hub Shell Styles
+ * 
+ * Minimal CSS for Hub-specific UI patterns not covered by Tailwind.
  */
 
 :root {
-  --hub-gap: 16px;
-  --hub-pad-x: 16px;
-  --hub-header-h: 72px;
-  --hub-fixed-h: 220px;
+  --hub-tile-fixed-h: 220px;
 }
 
 .hub-shell {
+  /* Mobile safe area handling */
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* 2-1-2 Grid Layout */
-.hub-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: var(--hub-fixed-h) 1fr var(--hub-fixed-h);
-  gap: var(--hub-gap);
-  padding: 0 var(--hub-pad-x) calc(env(safe-area-inset-bottom) + var(--hub-gap));
-  height: calc(100dvh - var(--hub-header-h));
-  overflow: hidden;
+.hub-tile-fixed {
+  height: var(--hub-tile-fixed-h);
 }
-
-.hub-top-left { grid-column: 1; grid-row: 1; }
-.hub-top-right { grid-column: 2; grid-row: 1; }
-.hub-middle-wide { grid-column: 1 / span 2; grid-row: 2; }
-.hub-bottom-left { grid-column: 1; grid-row: 3; }
-.hub-bottom-right { grid-column: 2; grid-row: 3; }
-
-/* Tile styles */
-.tile {
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 12px 30px rgba(0, 0, 0, 0.35);
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.tile--fixed {
-  height: var(--hub-fixed-h);
-}
-
-.tile--flex {
-  min-height: 0;
-}
-
-.tile--flex .tile-body {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
-}
-
-/* Tile chrome */
-.tile-header {
-  padding: 16px 16px 0 16px;
-}
-
-.tile-header h2 {
-  font-size: 20px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.95);
-  margin: 0;
-}
-
-.tile-sub {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.55);
-  margin: 4px 0 0 0;
-}
-
-.tile-body {
-  padding: 16px;
-  flex: 1;
-  min-height: 0;
-}
-
-.tile-divider {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.08);
-  margin-top: auto;
-}
-
-.tile-footer {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 12px 16px 14px 16px;
-  font-weight: 600;
-  opacity: 0.9;
-}
-
-/* Tiny phones */
-@media (max-height: 780px) {
-  .hub-grid {
-    grid-template-rows: 206px 1fr 206px;
-    gap: 14px;
-  }
+.hub-tile-fixed > * {
+  height: 100%;
 }
 
 /* Ensure shadows and blur don't get clipped */
