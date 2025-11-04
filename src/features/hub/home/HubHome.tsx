@@ -1,46 +1,25 @@
 /**
  * Hub Home Dashboard
- * Apple-style dashboard with glass morphism tiles
+ * Compact 2×3 control-center grid with no vertical scroll
  */
 
 import React from 'react';
-import { EchoQuickTile } from './tiles/EchoQuickTile';
-import { SwingQuickTile } from './tiles/SwingQuickTile';
+import { EchoTile } from './tiles/EchoTile';
+import { SwingTile } from './tiles/SwingTile';
 import { NearbyGolfersTile } from './tiles/NearbyGolfersTile';
 import { GamesNearYouTile } from './tiles/GamesNearYouTile';
 import { YourGamesTile } from './tiles/YourGamesTile';
-import { EchoHistoryTile } from './tiles/EchoHistoryTile';
+import { QuickActionsTile } from './tiles/QuickActionsTile';
 
 export default function HubHome() {
   return (
-    <main className="w-full overflow-x-hidden px-3.5 pb-6 mt-3">
-      {/* Top 2×2 grid */}
-      <div
-        className="grid"
-        style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem' }}
-      >
-        <NearbyGolfersTile limit={5} />
-        <GamesNearYouTile limit={3} enableFilters={false} />
-      </div>
-
-      {/* Your Games - full width */}
-      <div className="mt-3.5">
-        <YourGamesTile />
-      </div>
-
-      {/* Echo & Swing 2×2 grid */}
-      <div
-        className="grid mt-3.5"
-        style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem' }}
-      >
-        <EchoQuickTile />
-        <SwingQuickTile />
-      </div>
-
-      {/* Echo History - full width */}
-      <div className="mt-3.5">
-        <EchoHistoryTile limitChat={1} limitSwing={2} />
-      </div>
+    <main className="hub-grid-compact">
+      <NearbyGolfersTile />
+      <GamesNearYouTile />
+      <YourGamesTile />
+      <EchoTile />
+      <SwingTile />
+      <QuickActionsTile />
     </main>
   );
 }
