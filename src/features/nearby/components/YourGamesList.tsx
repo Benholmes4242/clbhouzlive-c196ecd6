@@ -133,12 +133,12 @@ export function YourGamesList({
   const segmentItems: SegmentItem[] = [
     { 
       value: 'hosting', 
-      label: `Hosting (${hostedGames.length})`,
+      label: `${hostedGames.length}`,
       ariaLabel: `Hosting ${hostedGames.length} games`
     },
     { 
       value: 'joined', 
-      label: `Joined (${joinedGames.length})`,
+      label: `${joinedGames.length}`,
       ariaLabel: `Joined ${joinedGames.length} games`
     },
   ];
