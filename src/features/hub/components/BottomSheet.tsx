@@ -80,18 +80,22 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
     });
   }, []);
 
-  const snapTo = React.useCallback((y: number) => {
+  const snapTo = React.useCallback((y: number, isClosing = false) => {
     if (!sheetRef.current) return;
+
+    // Use faster, smoother easing for close
+    const duration = isClosing ? 280 : 240;
+    const easing = isClosing ? 'cubic-bezier(.2, .9, .1, 1)' : 'cubic-bezier(.2,.8,.2,1)';
 
     // Apply target position first, then enable transition in next microtask
     Promise.resolve().then(() => {
       if (!sheetRef.current) return;
-      sheetRef.current.style.transition = 'transform 240ms cubic-bezier(.2,.8,.2,1)';
+      sheetRef.current.style.transition = `transform ${duration}ms ${easing}`;
       void sheetRef.current.offsetHeight; // force style flush
       sheetRef.current.style.transform = `translate3d(0, ${y}px, 0)`;
       
       if (handleRef.current) {
-        handleRef.current.style.transition = 'transform 180ms ease, opacity 180ms ease';
+        handleRef.current.style.transition = `transform ${duration - 60}ms ease, opacity ${duration - 60}ms ease`;
         const s = y === 0 ? 1 : 1 + Math.min(0.25, y / 480);
         handleRef.current.style.transform = `scaleX(${s})`;
         handleRef.current.style.opacity = String(Math.min(1, 0.85 + (s - 1) * 1.2));
@@ -105,7 +109,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
         handleRef.current.style.transition = '';
       }
       yRef.current = y;
-    }, 260);
+    }, duration + 20);
   }, []);
 
   // Drag start (only if content is scrolled to top)
@@ -150,11 +154,12 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
     const shouldClose = dy > THRESHOLD_PX || vy > VELOCITY_CLOSE;
     if (shouldClose) {
       hapticTapLight(); // subtle tap when it commits to close
-      // animate off-screen then close
-      snapTo(window.innerHeight * 0.75);
-      window.setTimeout(onClose, 220);
+      // animate fully off-screen then close
+      const exitDistance = Math.max(window.innerHeight, 800);
+      snapTo(exitDistance, true);
+      window.setTimeout(onClose, 300);
     } else {
-      snapTo(0); // snap back
+      snapTo(0, false); // snap back
     }
   };
 
