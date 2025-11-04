@@ -10,12 +10,14 @@ import { ArrowUpTrayIcon } from '@heroicons/react/24/outline';
 import { supabase } from '@/integrations/supabase/client';
 import { Tile } from '../components/Tile';
 import { ViewAllPill } from '../components/ViewAllPill';
-import { showToast } from '@/utils/toast';
+import { ToastContainer } from '@/components/ui/FrostedToast';
 
 export function SwingQuickTile() {
   const inputRef = useRef<HTMLInputElement>(null);
   const nav = useNavigate();
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(false);
+  const [toasts, setToasts] = useState<Array<{ id: number; message: string; type?: 'success' | 'error' }>>([]);
 
   const { data: lastSwing } = useQuery({
     queryKey: ['lastSwing'],
@@ -35,8 +37,15 @@ export function SwingQuickTile() {
     }
   });
 
+  const addToast = (message: string, type: 'success' | 'error' = 'success') => {
+    const id = Date.now();
+    setToasts((prev) => [...prev.slice(-2), { id, message, type }]);
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 2800);
+  };
+
   const handleUpload = () => {
     if (isUploading) return;
+    setUploadError(false);
     inputRef.current?.click();
   };
 
@@ -45,13 +54,23 @@ export function SwingQuickTile() {
     if (!file) return;
     
     setIsUploading(true);
-    showToast('Uploading swing...', '⛳');
+    setUploadError(false);
+    addToast('Uploading swing...', 'success');
     
-    // Navigate to swing analysis page with the selected file
-    nav('/hub/echo/swing', { state: { preselectedFileName: file.name } });
-    
-    // Reset after navigation
-    setTimeout(() => setIsUploading(false), 1000);
+    try {
+      // Navigate to swing analysis page with the selected file
+      nav('/hub/echo/swing', { state: { preselectedFileName: file.name } });
+      
+      // Simulate success after navigation
+      setTimeout(() => {
+        setIsUploading(false);
+        addToast('Swing uploaded successfully', 'success');
+      }, 1000);
+    } catch (error) {
+      setIsUploading(false);
+      setUploadError(true);
+      addToast('Upload failed. Tap to retry.', 'error');
+    }
   };
 
   const thumbnail = lastSwing?.video_url;
@@ -83,51 +102,79 @@ export function SwingQuickTile() {
           <ArrowUpTrayIcon className="w-5 h-5 opacity-70" aria-hidden="true" />
         </button>
 
-        {/* Preview surface */}
-        <div
-          className="rounded-3xl overflow-hidden relative cursor-pointer transition"
-          style={{
-            height: '128px',
-            background: 'var(--hub-glass-subtle)',
-            border: '1px solid var(--hub-stroke)',
-            boxShadow: 'var(--hub-shadow-tile)',
-            backdropFilter: 'blur(28px)',
-            WebkitBackdropFilter: 'blur(28px)',
-          }}
-          onClick={() => lastSwing && nav(`/hub/echo/swing/${lastSwing.id}`)}
-          role={lastSwing ? 'button' : 'presentation'}
-          aria-label={lastSwing ? 'View latest swing analysis' : 'No swing available'}
-        >
-          {thumbnail ? (
-            <>
-              <video 
-                src={thumbnail} 
-                className="w-full h-full object-cover opacity-[.92]"
-                muted 
-                playsInline
-              />
+        {/* Preview surface or Retry state */}
+        {uploadError ? (
+          <div 
+            className="flex flex-col items-center justify-center gap-4 rounded-3xl overflow-hidden relative"
+            style={{
+              height: '128px',
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,71,71,0.25)',
+              boxShadow: 'var(--hub-shadow-tile)',
+              backdropFilter: 'blur(28px)',
+              WebkitBackdropFilter: 'blur(28px)',
+            }}
+          >
+            <p className="text-white/75 text-[13px]">Upload failed — please try again</p>
+            <button
+              onClick={handleUpload}
+              className="px-4 py-2 rounded-xl text-white/90 text-[13px] font-medium transition"
+              style={{
+                background: 'rgba(255,71,71,0.25)',
+                border: '1px solid rgba(255,71,71,0.35)',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,71,71,0.35)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,71,71,0.25)'}
+            >
+              Retry Upload
+            </button>
+          </div>
+        ) : (
+          <div
+            className="rounded-3xl overflow-hidden relative cursor-pointer transition"
+            style={{
+              height: '128px',
+              background: 'var(--hub-glass-subtle)',
+              border: '1px solid var(--hub-stroke)',
+              boxShadow: 'var(--hub-shadow-tile)',
+              backdropFilter: 'blur(28px)',
+              WebkitBackdropFilter: 'blur(28px)',
+            }}
+            onClick={() => lastSwing && nav(`/hub/echo/swing/${lastSwing.id}`)}
+            role={lastSwing ? 'button' : 'presentation'}
+            aria-label={lastSwing ? 'View latest swing analysis' : 'No swing available'}
+          >
+            {thumbnail ? (
+              <>
+                <video 
+                  src={thumbnail} 
+                  className="w-full h-full object-cover opacity-[.92]"
+                  muted 
+                  playsInline
+                />
+                <div 
+                  className="absolute inset-0 pointer-events-none"
+                  style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.06)' }} 
+                />
+                <div 
+                  className="absolute right-3 bottom-3 rounded-xl px-2 h-8 flex items-center text-[12px] font-medium"
+                  style={{ 
+                    background: 'rgba(0,0,0,.25)', 
+                    border: '1px solid rgba(255,255,255,.14)',
+                    color: 'rgba(255,255,255,.92)',
+                  }}
+                >
+                  View
+                </div>
+              </>
+            ) : (
               <div 
-                className="absolute inset-0 pointer-events-none"
-                style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.06)' }} 
+                className="w-full h-full animate-pulse"
+                style={{ background: 'linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04))' }} 
               />
-              <div 
-                className="absolute right-3 bottom-3 rounded-xl px-2 h-8 flex items-center text-[12px] font-medium"
-                style={{ 
-                  background: 'rgba(0,0,0,.25)', 
-                  border: '1px solid rgba(255,255,255,.14)',
-                  color: 'rgba(255,255,255,.92)',
-                }}
-              >
-                View
-              </div>
-            </>
-          ) : (
-            <div 
-              className="w-full h-full animate-pulse"
-              style={{ background: 'linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04))' }} 
-            />
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
         {/* Divider matching pill width */}
         <div 
@@ -148,6 +195,8 @@ export function SwingQuickTile() {
         onChange={onPick}
         aria-hidden="true"
       />
+      
+      <ToastContainer toasts={toasts} removeToast={(id) => setToasts((p) => p.filter((t) => t.id !== id))} />
     </Tile>
   );
 }
