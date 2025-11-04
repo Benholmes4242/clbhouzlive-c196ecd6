@@ -63,7 +63,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
           <div 
             className="h-px"
             style={{
-              background: 'rgba(255,255,255,0.18)',
+              background: 'rgba(255,255,255,0.26)',
               borderRadius: '1px',
               width: '100%',
             }}
