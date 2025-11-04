@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { emitHub } from '@/lib/hubEvents';
 
 export interface GameJoinRequest {
   id: string;
@@ -203,6 +204,9 @@ export function useGameJoinRequests(gameId?: string) {
       });
 
       if (error) throw error;
+
+      // Emit hub event for instant local UI update
+      emitHub('game:joined', { gameId, requestId });
 
       toast({
         title: "They're in 👍",

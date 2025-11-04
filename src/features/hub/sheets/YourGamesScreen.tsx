@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useGameBeacon } from '@/features/nearby/hooks/useGameBeacon';
 import { useUserGames } from '@/features/hub/hooks/useUserGames';
 import { PullToRefresh } from '@/components/PullToRefresh';
+import { emitHub } from '@/lib/hubEvents';
 
 type YourGamesScreenProps = {
   onClose: () => void;
@@ -34,6 +35,9 @@ export function YourGamesScreen({ onClose, focusId }: YourGamesScreenProps) {
       .delete()
       .eq('game_id', gameId)
       .eq('user_id', user.id);
+
+    // Emit hub event for instant local UI update
+    emitHub('game:left', { gameId });
   };
 
   return (

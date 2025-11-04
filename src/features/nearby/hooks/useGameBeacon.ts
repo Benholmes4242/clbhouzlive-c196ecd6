@@ -6,6 +6,7 @@ import { calculateDistance, formatDistance } from '../distance';
 import { NEARBY_RADIUS_METERS } from '../config';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { EVT_GAME_CREATED } from '../constants';
+import { emitHub } from '@/lib/hubEvents';
 
 export interface DiscoveryFilters {
   dateFrom?: Date;
@@ -486,6 +487,9 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
         }));
       }
 
+      // Emit hub event for instant local UI update
+      emitHub('game:created', { gameId: newBeacon.id });
+
       toast({
         title: 'Game posted',
         description: 'Nearby golfers can now see your game',
@@ -529,6 +533,9 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
         .eq('host_user_id', user.user.id);
 
       if (error) throw error;
+
+      // Emit hub event for instant local UI update
+      emitHub('game:cancelled', { gameId: beaconId });
 
       toast({
         title: 'Game cancelled',
