@@ -61,8 +61,8 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
         {/* Bottom footer: divider + See all */}
         <div className="mt-auto pt-4">
           <div 
+            className="h-px"
             style={{
-              height: '1px',
               background: 'rgba(255,255,255,0.18)',
               borderRadius: '1px',
               width: '100%',
@@ -70,17 +70,13 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
           />
           <button
             onClick={() => openSheet('golfers')}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            style={{ 
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            className="ml-auto mt-3 sm:mt-4 flex items-center gap-1 text-[15px] font-medium transition"
+            style={{ color: 'var(--hub-text)' }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
           >
-            See all →
+            <span>See all</span>
+            <span className="text-lg">›</span>
           </button>
         </div>
       </div>
