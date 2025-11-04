@@ -211,11 +211,10 @@ export function YourGamesTile() {
 
   const toggle = (id: string) => setOpenId(o => (o === id ? null : id));
 
-  const hasAny = games.length > 0;
-
   return (
-    <Tile title="Your Games">
-      <div className="flex flex-col h-full" style={{ ['--tile-x' as any]: '16px' }}>
+    <Tile title="Your Games" className="flex flex-col h-full">
+      {/* list */}
+      <div className="grow px-4 sm:px-5 pt-1">
         <div className="space-y-3">
           {isLoading && [0, 1, 2].map(i => (
             <div 
@@ -264,29 +263,21 @@ export function YourGamesTile() {
             />
           ))}
         </div>
-
-        {/* Bottom region: divider + text-only "View all" */}
-        <div className="mt-auto pt-4">
-          <div 
-            className="h-px"
-            style={{
-              opacity: 0.18,
-              background: 'rgba(255,255,255,0.9)',
-              marginLeft: 'var(--tile-x)',
-              marginRight: 'var(--tile-x)',
-              borderRadius: 1,
-            }}
-          />
-          <button
-            onClick={() => openSheet('your-games')}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium hover:opacity-90 active:opacity-80 transition"
-            aria-label="View all your games"
-            disabled={!hasAny && isLoading}
-          >
-            View all
-          </button>
-        </div>
       </div>
+
+      {/* divider (same as Echo/GamesNearYou) */}
+      <div className="px-4 sm:px-5">
+        <div className="h-px rounded bg-white/20" />
+      </div>
+
+      {/* footer link bottom-right */}
+      <button
+        onClick={() => openSheet('your-games')}
+        className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium hover:opacity-90 focus:outline-none"
+        aria-label="View all your games"
+      >
+        View all
+      </button>
     </Tile>
   );
 }

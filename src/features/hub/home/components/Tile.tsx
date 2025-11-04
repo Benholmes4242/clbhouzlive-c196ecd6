@@ -10,9 +10,10 @@ type TileProps = React.PropsWithChildren<{
   subtitle?: string;
   onViewAll?: () => void;
   footer?: React.ReactNode;
+  className?: string;
 }>;
 
-export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps) {
+export function Tile({ title, subtitle, children, onViewAll, footer, className }: TileProps) {
   const [isHovered, setIsHovered] = React.useState(false);
 
   return (
@@ -33,17 +34,33 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex-1 flex flex-col">
-        <div className="text-[20px] font-semibold mb-0.5" style={{ color: 'var(--hub-text)' }}>
-          {title}
-        </div>
-        {subtitle && (
-          <div className="text-[13px] mb-2.5 line-clamp-1" style={{ color: 'var(--hub-text-sub)' }}>
-            {subtitle}
+      {className ? (
+        // Custom layout mode - children control everything except title
+        <>
+          <div className="text-[20px] font-semibold mb-0.5" style={{ color: 'var(--hub-text)' }}>
+            {title}
           </div>
-        )}
-        <div className="flex-1 flex flex-col">{children}</div>
-      </div>
+          {subtitle && (
+            <div className="text-[13px] mb-2.5 line-clamp-1" style={{ color: 'var(--hub-text-sub)' }}>
+              {subtitle}
+            </div>
+          )}
+          <div className={className}>{children}</div>
+        </>
+      ) : (
+        // Default layout mode
+        <div className="flex-1 flex flex-col">
+          <div className="text-[20px] font-semibold mb-0.5" style={{ color: 'var(--hub-text)' }}>
+            {title}
+          </div>
+          {subtitle && (
+            <div className="text-[13px] mb-2.5 line-clamp-1" style={{ color: 'var(--hub-text-sub)' }}>
+              {subtitle}
+            </div>
+          )}
+          <div className="flex-1 flex flex-col">{children}</div>
+        </div>
+      )}
 
       {/* Footer bar with View all */}
       {(footer || onViewAll) && (
