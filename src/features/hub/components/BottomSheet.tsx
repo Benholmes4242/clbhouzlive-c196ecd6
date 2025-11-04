@@ -11,6 +11,31 @@ const THRESHOLD_PX = 92;          // distance to close
 const VELOCITY_CLOSE = 0.55;      // px/ms
 const MAX_DRAG = 480;             // clamp
 
+// Rubber-band mapping (feel like iOS pull-to-dismiss)
+function rubberband(distance: number, constant = 0.55, max = MAX_DRAG) {
+  const d = Math.max(0, distance);
+  return (max * d) / (d + constant * max);
+}
+
+// Best-effort light haptic
+function hapticTapLight() {
+  // Capacitor (if app)
+  // @ts-ignore
+  if (window?.TapticEngine?.impact) {
+    // @ts-ignore
+    window.TapticEngine.impact({ style: 'light' });
+    return;
+  }
+  // @ts-ignore – Capacitor Haptics plugin
+  if (window?.Capacitor?.Plugins?.Haptics?.impact) {
+    // @ts-ignore
+    window.Capacitor.Plugins.Haptics.impact({ style: 'light' });
+    return;
+  }
+  // Android / some browsers
+  if (navigator.vibrate) navigator.vibrate(10);
+}
+
 export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetProps) {
   const sheetRef = React.useRef<HTMLDivElement>(null);
   const contentRef = React.useRef<HTMLDivElement>(null);
@@ -19,6 +44,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
   const lastT = React.useRef(0);
   const dragging = React.useRef(false);
   const [translate, setTranslate] = React.useState(0);
+  const [handleScale, setHandleScale] = React.useState(1);
 
   // Scroll lock when open
   React.useEffect(() => {
@@ -38,9 +64,12 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
 
   // Helpers
   const setY = (y: number) => {
-    const clamped = Math.max(0, Math.min(MAX_DRAG, y));
-    setTranslate(clamped);
-    if (sheetRef.current) sheetRef.current.style.transform = `translate3d(0, ${clamped}px, 0)`;
+    const rb = rubberband(y);
+    setTranslate(rb);
+    // 1 → 1.25 scale across first ~120px of pull
+    const s = 1 + Math.min(0.25, rb / 480);
+    setHandleScale(s);
+    if (sheetRef.current) sheetRef.current.style.transform = `translate3d(0, ${rb}px, 0)`;
   };
   const snapTo = (y: number) => {
     if (!sheetRef.current) return;
@@ -49,6 +78,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
     window.setTimeout(() => {
       if (!sheetRef.current) return;
       sheetRef.current.style.transition = '';
+      if (y === 0) setHandleScale(1); // reset stretch on snap-back
     }, 260);
   };
 
@@ -89,6 +119,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
     const vy = (e.clientY - lastY.current) / dt; // px/ms (last segment)
     const shouldClose = dy > THRESHOLD_PX || vy > VELOCITY_CLOSE;
     if (shouldClose) {
+      hapticTapLight(); // subtle tap when it commits to close
       // animate off-screen then close
       snapTo(window.innerHeight * 0.75);
       window.setTimeout(onClose, 220);
@@ -170,6 +201,9 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
             background: 'rgba(255,255,255,0.35)',
             margin: '10px 0 6px',
             pointerEvents: 'none',
+            transform: `scaleX(${handleScale})`,
+            opacity: Math.min(1, 0.85 + (handleScale - 1) * 1.2),
+            transition: dragging.current ? 'none' : 'transform 180ms ease, opacity 180ms ease',
           }}
         />
         {/* Scrollable content */}
