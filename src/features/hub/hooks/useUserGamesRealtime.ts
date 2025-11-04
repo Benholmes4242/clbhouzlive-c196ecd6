@@ -11,10 +11,10 @@ export function useUserGamesRealtime() {
     const channel = supabase
       .channel('games-and-participants')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'games' }, () => {
-        qc.invalidateQueries({ queryKey: ['userGames:v2'] });
+        qc.invalidateQueries({ queryKey: ['userGamesV2'] });
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'game_participants' }, () => {
-        qc.invalidateQueries({ queryKey: ['userGames:v2'] });
+        qc.invalidateQueries({ queryKey: ['userGamesV2'] });
       })
       .subscribe();
 
@@ -25,7 +25,7 @@ export function useUserGamesRealtime() {
 
   useEffect(() => {
     // Event Bridge: UI → UI (instant local updates)
-    const handler = () => qc.invalidateQueries({ queryKey: ['userGames:v2'] });
+    const handler = () => qc.invalidateQueries({ queryKey: ['userGamesV2'] });
     const types: HubEvent[] = ['game:created', 'game:updated', 'game:cancelled', 'game:joined', 'game:left'];
     
     types.forEach(t => hubEvents.addEventListener(t, handler));

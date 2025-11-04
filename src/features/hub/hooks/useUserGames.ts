@@ -32,7 +32,7 @@ type UserGames = {
 
 export function useUserGames() {
   return useQuery<UserGames>({
-    queryKey: ['userGames:v2'],
+    queryKey: ['userGamesV2'],
     staleTime: 30_000,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
