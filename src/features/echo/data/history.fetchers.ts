@@ -18,45 +18,83 @@ export type SwingItem = {
   created_at: string;
 };
 
-type ChatSummary = {
-  thread_id: string;
-  last_user?: string;
-  last_assistant?: string;
-  last_at: string;
-};
+/**
+ * Fetch from legacy conversations table
+ */
+async function fromConversations(limit = 20): Promise<ChatItem[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+  
+  const { data, error } = await supabase
+    .from('conversations')
+    .select('id, title, created_at, updated_at, messages, conversation_type')
+    .eq('user_id', user.id)
+    .eq('conversation_type', 'chat')
+    .order('updated_at', { ascending: false })
+    .limit(limit);
+  
+  if (error || !data?.length) return [];
+  
+  return data.map((conv: any) => {
+    const msgs = Array.isArray(conv.messages) ? conv.messages : [];
+    const last = msgs[msgs.length - 1] as any;
+    const raw = (last?.content ?? conv.title ?? 'Empty conversation') + '';
+    const preview = raw.replace(/\s+/g, ' ').trim();
+    return {
+      id: conv.id,
+      preview_text: preview.slice(0, 80) + (preview.length > 80 ? '…' : ''),
+      created_at: conv.updated_at ?? conv.created_at
+    };
+  });
+}
 
+/**
+ * Fetch from new echo_threads/echo_messages tables
+ */
+async function fromThreads(limit = 20): Promise<ChatItem[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+  
+  const { data: latest, error } = await supabase
+    .from('echo_messages')
+    .select('thread_id, role, content, created_at')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(500);
+  
+  if (error || !latest?.length) return [];
+  
+  const seen = new Set<string>();
+  const items: ChatItem[] = [];
+  
+  for (const m of latest) {
+    if (seen.has(m.thread_id)) continue;
+    seen.add(m.thread_id);
+    const raw = (m.content ?? 'Empty conversation') + '';
+    const preview = raw.replace(/\s+/g, ' ').trim();
+    items.push({
+      id: m.thread_id,
+      preview_text: preview.slice(0, 80) + (preview.length > 80 ? '…' : ''),
+      created_at: m.created_at
+    });
+    if (items.length >= limit) break;
+  }
+  
+  return items;
+}
+
+/**
+ * Dual-read strategy: primary from conversations, fallback to threads
+ * This ensures backward compatibility during migration
+ */
 export async function fetchChatHistory(limit = 20): Promise<ChatItem[]> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return [];
-
-    // Fetch conversations from the original conversations table
-    const { data: conversations, error } = await supabase
-      .from('conversations')
-      .select('id, title, created_at, updated_at, messages')
-      .eq('user_id', user.id)
-      .eq('conversation_type', 'chat')
-      .order('updated_at', { ascending: false })
-      .limit(limit);
+    // Try legacy conversations first (covers existing users)
+    const primary = await fromConversations(limit);
+    if (primary.length) return primary;
     
-    if (error) throw error;
-    if (!conversations?.length) return [];
-
-    // Convert conversations to ChatItem format
-    return conversations.map(conv => {
-      const messages = Array.isArray(conv.messages) ? conv.messages : [];
-      const lastMessage = messages[messages.length - 1] as any;
-      const preview = lastMessage?.content || conv.title || 'Empty conversation';
-      
-      return {
-        id: conv.id,
-        preview_text: String(preview)
-          .replace(/\s+/g, ' ')
-          .trim()
-          .slice(0, 80) + (String(preview).length > 80 ? '…' : ''),
-        created_at: conv.updated_at || conv.created_at
-      };
-    });
+    // Fallback to new echo_threads/messages (covers new users after writer switches)
+    return fromThreads(limit);
   } catch (error) {
     console.error('[fetchChatHistory] Error:', error);
     throw error;
