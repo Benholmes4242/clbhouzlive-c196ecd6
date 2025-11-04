@@ -29,7 +29,6 @@ export function EchoQuickTile() {
           {/* Top spacer */}
           <div className="h-2" />
 
-          {/* Form with unified pill */}
           <form
             className="relative mt-4 sm:mt-6"
             onSubmit={(e) => { e.preventDefault(); submit(); }}
@@ -37,7 +36,7 @@ export function EchoQuickTile() {
             <input
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Ask Echo anything…"
+              placeholder="Ask Echo"
               aria-label="Ask Echo"
               className="w-full h-12 rounded-2xl pl-4 pr-12 text-[15px] outline-none transition placeholder:opacity-60"
               style={{
@@ -55,7 +54,7 @@ export function EchoQuickTile() {
               onClick={submit}
               aria-label="Send to Echo"
               disabled={!text.trim()}
-              className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 grid place-items-center transition disabled:opacity-40 hover:opacity-90 active:opacity-80"
+              className="absolute right-[8px] top-1/2 -translate-y-1/2 h-9 w-9 grid place-items-center transition disabled:opacity-40 hover:opacity-90 active:opacity-80"
               style={{
                 background: 'transparent',
                 border: 'none',
