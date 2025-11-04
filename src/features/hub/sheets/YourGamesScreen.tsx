@@ -1,8 +1,10 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { YourGamesList } from '@/features/nearby/components/YourGamesList';
 import { supabase } from '@/integrations/supabase/client';
 import { useGameBeacon } from '@/features/nearby/hooks/useGameBeacon';
+import { useUserGames } from '@/features/hub/hooks/useUserGames';
+import { PullToRefresh } from '@/components/PullToRefresh';
 
 type YourGamesScreenProps = {
   onClose: () => void;
@@ -12,6 +14,16 @@ type YourGamesScreenProps = {
 export function YourGamesScreen({ onClose, focusId }: YourGamesScreenProps) {
   const nav = useNavigate();
   const { cancelBeacon } = useGameBeacon({});
+  const { refetch } = useUserGames();
+  const [params] = useSearchParams();
+
+  // Auto-refetch when sheet opens
+  useEffect(() => {
+    if (params.get('sheet') === 'your-games') {
+      const t = setTimeout(() => refetch(), 250);
+      return () => clearTimeout(t);
+    }
+  }, [params, refetch]);
 
   const handleLeaveGame = async (gameId: string) => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -42,18 +54,20 @@ export function YourGamesScreen({ onClose, focusId }: YourGamesScreenProps) {
         </div>
       )}
       
-      <div className="flex-1 overflow-y-auto px-4 pb-6">
-        <h2 className="text-xl font-semibold text-white mb-4">Your Games</h2>
-        
-        <YourGamesList
-          activeTab="your-games"
-          onCancelGame={cancelBeacon}
-          onLeaveGame={handleLeaveGame}
-          onCreateGame={() => nav('/hub?sheet=create-game')}
-          onFindGame={() => nav('/hub?sheet=games')}
-          focusId={focusId}
-        />
-      </div>
+      <PullToRefresh onRefresh={() => refetch()}>
+        <div className="flex-1 overflow-y-auto px-4 pb-6">
+          <h2 className="text-xl font-semibold text-white mb-4">Your Games</h2>
+          
+          <YourGamesList
+            activeTab="your-games"
+            onCancelGame={cancelBeacon}
+            onLeaveGame={handleLeaveGame}
+            onCreateGame={() => nav('/hub?sheet=create-game')}
+            onFindGame={() => nav('/hub?sheet=games')}
+            focusId={focusId}
+          />
+        </div>
+      </PullToRefresh>
     </div>
   );
 }
