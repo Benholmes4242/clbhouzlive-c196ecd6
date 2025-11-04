@@ -33,7 +33,7 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex-1">
+      <div className="flex-1 flex flex-col">
         <div className="text-[20px] font-semibold mb-0.5" style={{ color: 'var(--hub-text)' }}>
           {title}
         </div>
@@ -42,7 +42,7 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
             {subtitle}
           </div>
         )}
-        <div className="mt-2.5">{children}</div>
+        <div className="flex-1 flex flex-col">{children}</div>
       </div>
 
       {/* Footer bar with View all */}
