@@ -197,7 +197,7 @@ export function YourGamesTile() {
   const [openId, setOpenId] = React.useState<string | null>(null);
   
   // Use shared hook for consistency with the sheet
-  const { data, isLoading } = useUserGames();
+  const { data, isLoading, isError, refetch } = useUserGames();
   useUserGamesRealtime();
 
   // Combine hosting & joined, take top 3 by time
@@ -228,8 +228,21 @@ export function YourGamesTile() {
             }} 
           />
         ))}
+
+        {isError && (
+          <div className="text-[13px] space-y-2" style={{ color: 'var(--hub-text-sub)' }}>
+            <div>Couldn't load games</div>
+            <button 
+              onClick={() => refetch()}
+              className="text-[13px] underline underline-offset-2"
+              style={{ color: 'var(--hub-accent-orange)' }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
         
-        {!isLoading && games.length === 0 && (
+        {!isLoading && !isError && games.length === 0 && (
           <div className="text-[14px]" style={{ color: 'var(--hub-text-sub)' }}>
             No games yet.{' '}
             <button 
@@ -242,7 +255,7 @@ export function YourGamesTile() {
           </div>
         )}
 
-        {!isLoading && games.map(g => (
+        {!isLoading && !isError && games.map(g => (
           <GameRow
             key={g.id}
             game={g}

@@ -32,7 +32,10 @@ type UserGames = {
 
 export function useUserGames() {
   return useQuery<UserGames>({
-    queryKey: ['userGamesV2'],
+    queryKey: ['userGames:v2'],
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     queryFn: async () => {
       const { data: { user }, error: authErr } = await supabase.auth.getUser();
       if (authErr) throw authErr;
@@ -93,6 +96,5 @@ export function useUserGames() {
 
       return { hosting, joined };
     },
-    staleTime: 30000,
   });
 }

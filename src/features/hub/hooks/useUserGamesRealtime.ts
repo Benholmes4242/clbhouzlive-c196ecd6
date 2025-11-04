@@ -9,10 +9,10 @@ export function useUserGamesRealtime() {
     const channel = supabase
       .channel('games-and-participants')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'games' }, () => {
-        qc.invalidateQueries({ queryKey: ['userGamesV2'] });
+        qc.invalidateQueries({ queryKey: ['userGames:v2'] });
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'game_participants' }, () => {
-        qc.invalidateQueries({ queryKey: ['userGamesV2'] });
+        qc.invalidateQueries({ queryKey: ['userGames:v2'] });
       })
       .subscribe();
 
