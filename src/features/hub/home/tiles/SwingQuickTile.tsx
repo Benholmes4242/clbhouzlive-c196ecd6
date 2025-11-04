@@ -78,7 +78,7 @@ export function SwingQuickTile() {
   return (
     <Tile 
       title="Swing Coach" 
-      subtitle="Upload for instant feedback"
+      subtitle="Upload your swing"
     >
       <div className="flex flex-col h-full justify-between">
         <div>
