@@ -33,21 +33,20 @@ export async function persistUserMessage(threadId: string, text: string) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
   
-  const { error } = await supabase
+  await supabase
     .from('echo_messages')
     .insert({ 
       thread_id: threadId, 
       user_id: user.id, 
       role: 'user', 
       content: text 
-    });
-  
-  if (error) throw error;
+    })
+    .throwOnError();
 }
 
 export async function persistAssistantMessage(threadId: string, text: string) {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
+  if (!user) throw new Error('Not authenticated');
   
   await supabase
     .from('echo_messages')

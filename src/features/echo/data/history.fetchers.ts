@@ -30,41 +30,33 @@ export async function fetchChatHistory(limit = 20): Promise<ChatItem[]> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return [];
 
-    // 1) Get the user's threads (newest first)
-    const { data: threads, error: thErr } = await supabase
-      .from('echo_threads')
-      .select('id, updated_at')
-      .eq('user_id', user.id)
-      .order('updated_at', { ascending: false })
-      .limit(50);
-    
-    if (thErr) throw thErr;
-    if (!threads?.length) return [];
-
-    const ids = threads.map(t => t.id);
-
-    // 2) Fetch last two messages per thread (user + assistant)
+    // 1) Fetch all user messages, newest first
     const { data: msgs, error: msgErr } = await supabase
       .from('echo_messages')
       .select('thread_id, role, content, created_at')
-      .in('thread_id', ids)
-      .order('created_at', { ascending: false });
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(500);
     
     if (msgErr) throw msgErr;
+    if (!msgs?.length) return [];
 
-    // 3) Reduce to summaries
-    const byThread = new Map<string, ChatSummary>();
-    for (const m of msgs || []) {
-      let s = byThread.get(m.thread_id);
-      if (!s) {
-        s = { thread_id: m.thread_id, last_at: m.created_at };
-        byThread.set(m.thread_id, s);
-      }
-      if (m.role === 'assistant' && !s.last_assistant) s.last_assistant = m.content;
-      if (m.role === 'user' && !s.last_user) s.last_user = m.content;
+    // 2) Reduce to most-recent per thread + choose a preview
+    const seen = new Set<string>();
+    const byThread: Record<string, ChatSummary> = {};
+    for (const m of msgs) {
+      if (seen.has(m.thread_id)) continue;
+      seen.add(m.thread_id);
+      byThread[m.thread_id] = {
+        thread_id: m.thread_id,
+        last_at: m.created_at,
+        last_user: m.role === 'user' ? m.content : undefined,
+        last_assistant: m.role === 'assistant' ? m.content : undefined,
+      };
     }
 
-    const ordered = Array.from(byThread.values())
+    // 3) Order by recency and cap
+    const ordered = Object.values(byThread)
       .sort((a, b) => (a.last_at < b.last_at ? 1 : -1))
       .slice(0, limit);
 
