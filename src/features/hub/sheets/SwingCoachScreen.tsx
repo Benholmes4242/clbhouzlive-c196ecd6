@@ -1,4 +1,6 @@
 import React from 'react';
+import AIChatOverlay from '@/components/ai-chat/AIChatOverlay';
+import { EchoConversationsProvider } from '@/features/echo/components/EchoConversationsProvider';
 
 type SwingCoachScreenProps = {
   onClose: () => void;
@@ -6,12 +8,16 @@ type SwingCoachScreenProps = {
 
 export function SwingCoachScreen({ onClose }: SwingCoachScreenProps) {
   return (
-    <div className="space-y-4 pb-6">
-      <h2 className="text-xl font-semibold text-white">Swing Coach</h2>
-      
-      <div className="text-center py-12" style={{ color: 'rgba(255,255,255,0.6)' }}>
-        <p className="text-[15px]">Swing coach interface coming soon</p>
+    <EchoConversationsProvider>
+      <div className="h-full w-full -mx-4 -mb-6">
+        <AIChatOverlay
+          isOpen={true}
+          onClose={onClose}
+          paneMode
+          layout="page"
+          initialTab="swing"
+        />
       </div>
-    </div>
+    </EchoConversationsProvider>
   );
 }

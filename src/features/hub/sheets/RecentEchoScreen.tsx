@@ -1,4 +1,6 @@
 import React from 'react';
+import AIChatHistory from '@/components/ai-chat/AIChatHistory';
+import { EchoConversationsProvider } from '@/features/echo/components/EchoConversationsProvider';
 
 type RecentEchoScreenProps = {
   onClose: () => void;
@@ -6,12 +8,17 @@ type RecentEchoScreenProps = {
 
 export function RecentEchoScreen({ onClose }: RecentEchoScreenProps) {
   return (
-    <div className="space-y-4 pb-6">
-      <h2 className="text-xl font-semibold text-white">Recent Echo</h2>
-      
-      <div className="text-center py-12" style={{ color: 'rgba(255,255,255,0.6)' }}>
-        <p className="text-[15px]">Recent Echo history coming soon</p>
+    <EchoConversationsProvider>
+      <div className="h-full w-full -mx-4 -mb-6">
+        <AIChatHistory
+          isOpen={true}
+          onClose={onClose}
+          onSelectMessage={(id) => console.log('Selected message:', id)}
+          paneMode
+          layout="page"
+          defaultCategory="chat"
+        />
       </div>
-    </div>
+    </EchoConversationsProvider>
   );
 }

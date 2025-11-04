@@ -1,17 +1,46 @@
 import React from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { CreateGameModal } from '@/features/nearby/components/CreateGameModal';
+import { useGameBeacon } from '@/features/nearby/hooks/useGameBeacon';
+import { supabase } from '@/integrations/supabase/client';
+import { assertDispatch } from '@/utils/assertDispatch';
+import { EVT_GAME_CREATED } from '@/features/nearby/constants';
 
 type CreateGameScreenProps = {
   onClose: () => void;
 };
 
 export function CreateGameScreen({ onClose }: CreateGameScreenProps) {
-  return (
-    <div className="space-y-4 pb-6">
-      <h2 className="text-xl font-semibold text-white">Create a Game</h2>
+  const nav = useNavigate();
+  const [qs, setQs] = useSearchParams();
+  const { createBeacon } = useGameBeacon({});
+
+  const handleCreate = async (input: any) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      await assertDispatch(
+        EVT_GAME_CREATED,
+        () => createBeacon(input),
+        (result) => ({ gameId: result?.id, hostUserId: user?.id }),
+        700
+      );
       
-      <div className="text-center py-12" style={{ color: 'rgba(255,255,255,0.6)' }}>
-        <p className="text-[15px]">Game creation form coming soon</p>
-      </div>
-    </div>
+      // Navigate to Your Games sheet after creation
+      await new Promise((r) => setTimeout(r, 150));
+      qs.set('sheet', 'your-games');
+      setQs(qs, { replace: true });
+    } catch (error) {
+      console.error('Failed to create game:', error);
+      throw error;
+    }
+  };
+
+  return (
+    <CreateGameModal
+      isOpen={true}
+      onClose={onClose}
+      onCreateBeacon={handleCreate}
+    />
   );
 }
