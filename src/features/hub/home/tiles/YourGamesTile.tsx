@@ -193,129 +193,127 @@ function GameRow({
 }
 
 export function YourGamesTile() {
+  const nav = useNavigate();
   const openSheet = useOpenSheet();
+  const [openId, setOpenId] = React.useState<string | null>(null);
+  const viewAllRef = React.useRef<HTMLButtonElement>(null);
   
   // Use shared hook for consistency with the sheet
   const { data, isLoading, isError, refetch } = useUserGames();
   useUserGamesRealtime();
 
-  // Take top 6 games for horizontal carousel
+  React.useEffect(() => {
+    const btn = viewAllRef.current;
+    const tile = btn?.closest('section');
+    if (!btn || !tile) return;
+    const measure = () => {
+      const br = btn.getBoundingClientRect();
+      const tr = tile.getBoundingClientRect();
+      const gap = Math.round(tr.bottom - br.bottom);
+      const cs = window.getComputedStyle(tile as Element);
+      devlog('[YourGamesTile] gap (tile bottom - button bottom):', gap, 'tile pb:', cs.paddingBottom, 'btn mb:', window.getComputedStyle(btn).marginBottom);
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
+
+  // Combine hosting & joined, take top 3 by time
   const games = React.useMemo(() => {
     if (!data) return [];
     const combined = [...data.hosting, ...data.joined]
       .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
-      .slice(0, 6);
+      .slice(0, 3);
     return combined as GameWithDetails[];
   }, [data]);
+
+  const toggle = (id: string) => setOpenId(o => (o === id ? null : id));
+
+  const hasAny = games.length > 0;
 
   return (
     <Tile 
       title="Your Games"
-      subtitle="Hosting & Joined"
-      onViewAll={() => openSheet('your-games')}
+      footer={
+        <div className="mt-auto pt-4">
+          <div 
+            className="h-px"
+            style={{
+              background: 'rgba(255,255,255,0.18)',
+              borderRadius: '1px',
+              width: '100%',
+            }}
+          />
+          <button
+            ref={viewAllRef}
+            onClick={() => openSheet('your-games')}
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+            style={{ 
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            aria-label="View all your games"
+            disabled={!hasAny && isLoading}
+          >
+            View all →
+          </button>
+        </div>
+      }
     >
-      <div className="flex flex-col flex-1 min-h-0">
-        {isLoading && (
-          <div className="tile-x-scroll">
-            {[0, 1, 2].map(i => (
-              <div 
-                key={i} 
-                className="min-w-[240px] h-20 rounded-xl animate-pulse" 
-                style={{ 
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                }} 
-              />
-            ))}
-          </div>
-        )}
+      <div className="flex flex-col h-full" style={{ ['--tile-x' as any]: '16px' }}>
+        <div className="space-y-3">
+          {isLoading && [0, 1, 2].map(i => (
+            <div 
+              key={i} 
+              className="h-12 rounded-[14px] animate-pulse" 
+              style={{ 
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.12)',
+              }} 
+            />
+          ))}
 
-        {isError && (
-          <div className="text-[12px] space-y-2" style={{ color: 'var(--hub-text-sub)' }}>
-            <div>Couldn't load games</div>
-            <button 
-              onClick={() => refetch()}
-              className="text-[12px] underline"
-              style={{ color: 'var(--hub-accent-orange)' }}
-            >
-              Retry
-            </button>
-          </div>
-        )}
-        
-        {!isLoading && !isError && games.length === 0 && (
-          <div className="text-[12px]" style={{ color: 'var(--hub-text-sub)' }}>
-            No games yet.{' '}
-            <button 
-              onClick={() => openSheet('create-game')}
-              className="underline"
-              style={{ color: 'var(--hub-accent-orange)' }}
-            >
-              Create one
-            </button>
-          </div>
-        )}
+          {isError && (
+            <div className="text-[13px] space-y-2" style={{ color: 'var(--hub-text-sub)' }}>
+              <div>Couldn't load games</div>
+              <button 
+                onClick={() => refetch()}
+                className="text-[13px] underline underline-offset-2"
+                style={{ color: 'var(--hub-accent-orange)' }}
+              >
+                Retry
+              </button>
+            </div>
+          )}
+          
+          {!isLoading && !isError && games.length === 0 && (
+            <div className="text-[14px]" style={{ color: 'var(--hub-text-sub)' }}>
+              No games yet.{' '}
+              <button 
+                onClick={() => openSheet('create-game')}
+                className="underline underline-offset-2"
+                style={{ color: 'var(--hub-accent-orange)' }}
+              >
+                Create one
+              </button>
+            </div>
+          )}
 
-        {!isLoading && !isError && games.length > 0 && (
-          <div className="tile-x-scroll">
-            {games.map(g => (
-              <GameChip
-                key={g.id}
-                game={g}
-                onClick={() => openSheet('your-games', { id: g.id })}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    </Tile>
-  );
-}
-
-function GameChip({ game, onClick }: { game: GameWithDetails; onClick: () => void }) {
-  const totalSlots = game.slots_total || 0;
-  const availableSlots = game.slots_open || 0;
-
-  return (
-    <button
-      onClick={onClick}
-      className="min-w-[240px] rounded-xl p-3 text-left transition"
-      style={{
-        background: 'rgba(255,255,255,0.06)',
-        border: '1px solid rgba(255,255,255,0.12)',
-      }}
-    >
-      <div className="flex items-center gap-2 mb-2">
-        <span 
-          className="rounded-full px-2 py-0.5 text-[10px] leading-tight shrink-0"
-          style={{
-            background: 'rgba(255,255,255,0.08)',
-            border: `1px solid ${game.kind === 'Hosting' ? 'rgba(34,197,94,0.3)' : 'rgba(59,130,246,0.3)'}`,
-            color: 'var(--hub-text-body)',
-          }}
-        >
-          {game.kind}
-        </span>
-        <span className="text-[11px]" style={{ color: 'var(--hub-text-sub)' }}>
-          {availableSlots}/{totalSlots}
-        </span>
-      </div>
-      
-      <div className="flex items-center gap-2">
-        <span>⛳</span>
-        <div className="truncate font-medium text-[13px]" style={{ color: 'var(--hub-text-bright)' }}>
-          {game.course_name || 'Golf Course'}
+          {!isLoading && !isError && games.map(g => (
+            <GameRow
+              key={g.id}
+              game={g}
+              expanded={openId === g.id}
+              onToggle={() => toggle(g.id)}
+              onLongPress={() => nav(`/hub?sheet=your-games&id=${g.id}`)}
+            />
+          ))}
         </div>
       </div>
-      
-      <div className="mt-2 text-[11px]" style={{ color: 'var(--hub-text-sub)' }}>
-        {new Date(game.start_time).toLocaleDateString('en-US', { 
-          month: 'short', 
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-        })}
-      </div>
-    </button>
+    </Tile>
   );
 }

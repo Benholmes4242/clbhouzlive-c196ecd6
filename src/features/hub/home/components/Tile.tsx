@@ -17,7 +17,7 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
 
   return (
     <section
-      className="relative rounded-3xl p-3.5 pb-3 overflow-hidden flex flex-col"
+      className="relative rounded-3xl p-4 pt-3.5 pb-3.5 overflow-hidden flex flex-col min-h-[192px]"
       style={{
         background: 'linear-gradient(180deg, var(--hub-glass-bg-start), var(--hub-glass-bg-end))',
         border: '1px solid var(--hub-stroke)',
@@ -33,53 +33,38 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Header */}
-      <div className="mb-2">
-        <h3 className="text-[17px] font-bold leading-tight tracking-tight" style={{ color: 'var(--hub-text)' }}>
+      <div className="flex-1 flex flex-col">
+        <div className="text-[20px] font-semibold mb-0.5" style={{ color: 'var(--hub-text)' }}>
           {title}
-        </h3>
+        </div>
         {subtitle && (
-          <p className="text-[11px] mt-0.5 line-clamp-1 opacity-70" style={{ color: 'var(--hub-text-sub)' }}>
+          <div className="text-[13px] mb-2.5 line-clamp-1" style={{ color: 'var(--hub-text-sub)' }}>
             {subtitle}
-          </p>
+          </div>
         )}
+        <div className="flex-1 flex flex-col">{children}</div>
       </div>
 
-      {/* Body */}
-      <div className="flex-1 flex flex-col min-h-0">{children}</div>
-
-      {/* Footer - simplified for compact layout */}
+      {/* Footer bar with View all */}
       {(footer || onViewAll) && (
-        <>
-          <div 
-            className="h-px my-2"
-            style={{
-              background: 'rgba(255,255,255,0.08)',
-            }}
-          />
-          <div className="flex items-center justify-between">
-            <div className="flex-1 min-w-0">{footer}</div>
-            {onViewAll && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onViewAll();
-                }}
-                className="shrink-0 text-[12px] font-medium transition"
-                style={{
-                  color: 'var(--hub-text-body)',
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 0,
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-                onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-              >
-                View all →
-              </button>
-            )}
-          </div>
-        </>
+        <div className="mt-3 flex items-center gap-2">
+          <div className="flex-1 min-w-0">{footer}</div>
+          {onViewAll && (
+            <button
+              onClick={onViewAll}
+              className="shrink-0 rounded-2xl px-3.5 py-2 text-[13px] transition"
+              style={{
+                border: '1px solid var(--hub-stroke-strong)',
+                color: 'var(--hub-text-body)',
+                background: 'transparent',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            >
+              View all →
+            </button>
+          )}
+        </div>
       )}
     </section>
   );
