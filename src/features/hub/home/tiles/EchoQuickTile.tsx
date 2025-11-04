@@ -70,11 +70,11 @@ export function EchoQuickTile() {
         {/* Bottom footer: divider + View all */}
         <div className="mt-6 sm:mt-8">
           <div
-            className="h-px mx-[12px] sm:mx-[14px]"
+            className="h-px"
             style={{
               background: 'rgba(255,255,255,0.18)',
-              width: 'calc(100% - 24px)',
               borderRadius: '1px',
+              width: '100%',
             }}
           />
           <button
