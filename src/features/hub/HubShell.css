@@ -16,6 +16,9 @@
 .hub-tile-fixed {
   height: var(--hub-tile-fixed-h);
 }
+.hub-tile-fixed > * {
+  height: 100%;
+}
 
 /* Ensure shadows and blur don't get clipped */
 .hub-shell section {
