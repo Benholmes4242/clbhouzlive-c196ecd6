@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { Tile } from '../components/Tile';
+import echoIcon from '@/assets/echo-icon.png';
 
 const SUGGESTIONS = [
   'Plan me a 3-night golf trip to Ireland',
@@ -39,7 +40,12 @@ export function EchoQuickTile() {
 
   return (
     <Tile 
-      title="Echo" 
+      title={
+        <div className="flex items-center gap-2">
+          <img src={echoIcon} alt="" className="w-5 h-5" />
+          <span>Echo</span>
+        </div>
+      }
       subtitle="Ask me anything"
     >
       <div className="flex flex-col h-full">

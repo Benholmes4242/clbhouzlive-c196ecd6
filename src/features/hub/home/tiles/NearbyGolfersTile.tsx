@@ -20,7 +20,6 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
   return (
     <Tile 
       title="Nearby Golfers" 
-      subtitle="Open to Play"
       onViewAll={() => nav('/hub/golfers')}
     >
       <div className="space-y-2">
@@ -47,7 +46,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
                 {g.display_name || g.username}
               </div>
               <div className="text-[12px] truncate" style={{ color: 'var(--hub-text-sub)' }}>
-                {g.distanceText ?? 'Open to Play'}
+                {g.distanceText}
               </div>
             </div>
             <span className="text-lg" style={{ color: 'var(--hub-text-dimmer)' }}>›</span>

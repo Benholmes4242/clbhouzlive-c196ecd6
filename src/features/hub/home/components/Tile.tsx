@@ -6,7 +6,7 @@
 import React from 'react';
 
 type TileProps = React.PropsWithChildren<{
-  title: string;
+  title: string | React.ReactNode;
   subtitle?: string;
   onViewAll?: () => void;
   footer?: React.ReactNode;
