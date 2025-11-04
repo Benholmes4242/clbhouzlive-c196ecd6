@@ -90,7 +90,7 @@ export function GamesNearYouTile({
           />
           <button
             onClick={onAction}
-            className="ml-auto mt-3 sm:mt-4 flex items-center gap-2 text-[15px] font-medium hover:opacity-90 active:opacity-80 transition"
+            className="ml-auto mt-3 sm:mt-4 flex items-center gap-1 text-[15px] font-medium hover:opacity-90 active:opacity-80 transition"
             aria-label={actionLabel}
           >
             <span>{actionLabel}</span>
