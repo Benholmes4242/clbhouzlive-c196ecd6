@@ -283,6 +283,7 @@ export function YourGamesTile() {
               border: 'none',
               color: 'var(--hub-text-body)',
               padding: 0,
+              marginBottom: '-14px', // pull to bottom edge of Tile (pb-3.5)
             }}
             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
