@@ -117,14 +117,14 @@ export function HubShell({ onClose }: HubShellProps) {
 
   return (
     <>
-      {/* Backdrop - Liquid glass style */}
+      {/* Backdrop */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
           zIndex: Z.hub,
-          backgroundColor: 'rgba(0,0,0,0)',
-          WebkitBackdropFilter: 'blur(8px)',
-          backdropFilter: 'blur(8px)',
+          backgroundColor: 'var(--hub-backdrop)',
+          WebkitBackdropFilter: 'blur(var(--hub-backdrop-blur))',
+          backdropFilter: 'blur(var(--hub-backdrop-blur))',
         }}
       />
       
@@ -152,43 +152,21 @@ export function HubShell({ onClose }: HubShellProps) {
             overscrollBehaviorX: 'none',
             paddingTop: 'env(safe-area-inset-top)',
             paddingBottom: 'env(safe-area-inset-bottom)',
+            background: 'linear-gradient(180deg, var(--hub-bg-start) 0%, var(--hub-bg-end) 100%)',
+            backdropFilter: 'blur(var(--hub-backdrop-blur))',
+            WebkitBackdropFilter: 'blur(var(--hub-backdrop-blur))',
+            border: '1px solid var(--hub-stroke-subtle)',
             borderRadius: '0',
+            boxShadow: 'var(--hub-shadow-main)',
             isolation: 'isolate',
-            background: 'transparent',
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Liquid glass background layer */}
-          <div 
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'rgba(20,20,20,0.55)',
-              backdropFilter: 'blur(28px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(28px) saturate(180%)',
-            }}
-          />
-          
-          {/* Inner glow for depth */}
-          <div 
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'radial-gradient(ellipse at center top, var(--ecm-inner-glow) 0%, transparent 60%)',
-            }}
-          />
-          
-          {/* Border highlight */}
-          <div 
-            className="absolute inset-0 rounded-[inherit] pointer-events-none"
-            style={{
-              boxShadow: 'inset 0 0 0 1px var(--ecm-glass-border), inset 0 2px 4px 0 rgba(255, 255, 255, 0.1)',
-            }}
-          />
           {/* Header */}
           <div
             id="hubHeader"
-            className="relative shrink-0"
+            className="relative z-30 shrink-0"
             style={{
-              zIndex: 10,
               background:
                 'linear-gradient(180deg, var(--hub-header-bg-start) 0%, var(--hub-header-bg-mid) 60%, var(--hub-header-bg-end) 100%)',
               WebkitBackdropFilter: 'blur(var(--hub-header-blur))',
@@ -226,7 +204,7 @@ export function HubShell({ onClose }: HubShellProps) {
 
           {/* Primary Tabs (Nearby | Echo) - Hidden on home page */}
           {!isHomePage && (
-            <div className="relative flex gap-2 px-5 mt-3" style={{ zIndex: 10, borderBottom: '1px solid var(--hub-stroke-divider)' }}>
+            <div className="flex gap-2 px-5 mt-3" style={{ borderBottom: '1px solid var(--hub-stroke-divider)' }}>
               {primaryTabs.map((tab) => (
                 <button
                   key={tab.id}
@@ -256,7 +234,7 @@ export function HubShell({ onClose }: HubShellProps) {
 
           {/* Secondary Tabs (contextual) - Hidden on home page */}
           {!isHomePage && (
-            <div className="relative flex px-5 mt-2" style={{ zIndex: 10, borderBottom: '1px solid var(--hub-stroke-subtle)' }}>
+            <div className="flex px-5 mt-2" style={{ borderBottom: '1px solid var(--hub-stroke-subtle)' }}>
               {secondaryTabs.map((tab) => (
                 <button
                   key={tab.id}
@@ -286,9 +264,8 @@ export function HubShell({ onClose }: HubShellProps) {
 
           {/* Content Area - Routed */}
           <div 
-            className={`relative flex-1 overflow-y-auto ${isHomePage ? '' : 'px-5 pt-4'} pb-3`}
+            className={`flex-1 overflow-y-auto ${isHomePage ? '' : 'px-5 pt-4'} pb-3`}
             style={{
-              zIndex: 10,
               WebkitOverflowScrolling: 'touch',
               overscrollBehavior: 'contain',
             }}
