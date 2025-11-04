@@ -56,39 +56,72 @@
     <script>
       // Chunk recovery - Must be before main script to catch early errors
       let triedReload = false;
+      let recoveryAttempts = parseInt(sessionStorage.getItem('chunkRecoveryAttempts') || '0');
+      
       window.addEventListener('error', (e) => {
         const msg = String((e && e.message) || '');
-        if (!triedReload && (
-            msg.includes('ChunkLoadError') ||
-            msg.includes('Importing a module script failed') ||
-            msg.includes('Failed to fetch dynamically imported module') ||
-            msg.includes('Loading chunk'))) {
+        const isChunkError = 
+          msg.includes('ChunkLoadError') ||
+          msg.includes('Importing a module script failed') ||
+          msg.includes('Failed to fetch dynamically imported module') ||
+          msg.includes('Loading chunk');
+          
+        if (!triedReload && isChunkError) {
           triedReload = true;
-          console.log('[Chunk Recovery] Detected chunk loading error, clearing caches and reloading...');
+          recoveryAttempts++;
+          sessionStorage.setItem('chunkRecoveryAttempts', recoveryAttempts.toString());
+          
+          // After 3 attempts, show user-friendly message instead of auto-reload
+          if (recoveryAttempts >= 3) {
+            console.error('[Chunk Recovery] Multiple recovery attempts failed. Manual intervention needed.');
+            sessionStorage.removeItem('chunkRecoveryAttempts');
+            
+            // Show user-friendly error
+            document.body.innerHTML = `
+              <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;text-align:center;font-family:system-ui,-apple-system,sans-serif;background:#000;color:#fff;">
+                <h1 style="font-size:1.5rem;font-weight:600;margin-bottom:1rem;">Update Available</h1>
+                <p style="margin-bottom:2rem;color:#999;">A new version is available. Please refresh to continue.</p>
+                <button onclick="window.location.reload(true)" style="background:#fff;color:#000;border:none;padding:0.75rem 2rem;border-radius:0.5rem;font-size:1rem;font-weight:500;cursor:pointer;">Refresh Now</button>
+              </div>
+            `;
+            return;
+          }
+          
+          console.log('[Chunk Recovery] Attempt', recoveryAttempts, '- clearing caches and reloading...');
           
           (async () => {
             try {
-              // Unregister all service workers
-              if ('serviceWorker' in navigator) {
-                const regs = await navigator.serviceWorker.getRegistrations();
-                await Promise.all(regs.map(r => r.unregister()));
-              }
-              
               // Clear all caches
               if (window.caches) {
                 const keys = await caches.keys();
                 await Promise.all(keys.map(k => caches.delete(k)));
               }
+              
+              // Unregister service workers (they might be serving stale chunks)
+              if ('serviceWorker' in navigator) {
+                const regs = await navigator.serviceWorker.getRegistrations();
+                await Promise.all(regs.map(r => r.unregister()));
+              }
             } catch (error) {
               console.error('[Chunk Recovery] Error clearing caches:', error);
             } finally {
-              location.reload();
+              // Force hard reload
+              location.reload(true);
             }
           })();
         }
       }, true);
+      
+      // Clear recovery attempts on successful load
+      if (document.readyState === 'complete') {
+        sessionStorage.removeItem('chunkRecoveryAttempts');
+      } else {
+        window.addEventListener('load', () => {
+          sessionStorage.removeItem('chunkRecoveryAttempts');
+        });
+      }
     </script>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" crossorigin src="/src/main.tsx"></script>
     <script>
       // Register service worker for caching
       if ('serviceWorker' in navigator) {

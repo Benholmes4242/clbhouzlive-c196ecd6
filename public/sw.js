@@ -1,5 +1,6 @@
 // Basic Service Worker for Push Notifications
-const CACHE_NAME = 'clbhouz-notifications-v1';
+// NOTE: Does NOT cache Vite chunks to avoid chunk loading errors
+const CACHE_NAME = 'clbhouz-notifications-v2';
 
 // Install event
 self.addEventListener('install', (event) => {
@@ -12,12 +13,41 @@ self.addEventListener('activate', (event) => {
   console.log('Service Worker activating');
   event.waitUntil(
     Promise.all([
-      // Clean up all old caches
-      caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))),
+      // Clean up only old notification caches, NOT Vite chunks
+      caches.keys().then(keys => 
+        Promise.all(
+          keys
+            .filter(k => k.startsWith('clbhouz-notifications-') && k !== CACHE_NAME)
+            .map(k => caches.delete(k))
+        )
+      ),
       // Claim all clients
       self.clients.claim()
     ])
   );
+});
+
+// Explicitly DO NOT intercept fetch for Vite chunks
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  
+  // Never cache or interfere with:
+  // - Vite dev server chunks (node_modules/.vite/*)
+  // - Build assets with query params (*.js?v=*)
+  // - Any .js, .css, .map files
+  if (
+    url.pathname.includes('/.vite/') ||
+    url.pathname.includes('/node_modules/') ||
+    url.pathname.includes('/assets/') ||
+    url.search.includes('?v=') ||
+    /\.(js|css|map)$/.test(url.pathname)
+  ) {
+    // Let browser handle these directly, no SW interference
+    return;
+  }
+  
+  // For everything else, just pass through
+  // (we're only using SW for push notifications)
 });
 
 // Push event handler
