@@ -30,7 +30,7 @@ export function EchoQuickTile() {
           <div className="h-2" />
 
           <form
-            className="relative mt-4 sm:mt-6"
+            className="relative mt-3"
             onSubmit={(e) => { e.preventDefault(); submit(); }}
           >
             <input
@@ -38,7 +38,7 @@ export function EchoQuickTile() {
               onChange={(e) => setText(e.target.value)}
               placeholder="Ask Echo"
               aria-label="Ask Echo"
-              className="w-full h-12 rounded-2xl pl-4 pr-12 text-[15px] outline-none transition placeholder:opacity-60"
+              className="w-full h-11 rounded-2xl pl-4 pr-12 text-[15px] outline-none transition placeholder:opacity-60"
               style={{
                 background: 'var(--hub-glass)',
                 border: '1px solid var(--hub-stroke-strong)',
