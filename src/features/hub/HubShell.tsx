@@ -180,10 +180,17 @@ export function HubShell({ onClose }: HubShellProps) {
               <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
                 <div />
                 
-                <div className="text-center">
-                  <h2 className="text-white text-[22px] md:text-[24px] font-semibold tracking-[-0.01em]">
-                    My{'\u00A0'}Clubhouz
-                  </h2>
+                <div className="flex justify-center items-center gap-2">
+                  <img
+                    src="/lovable-uploads/b3fc8551-2b91-49af-b2ef-1dd493276207.png"
+                    alt="Logo mark"
+                    className="h-10 md:h-12 w-auto object-contain"
+                  />
+                  <img
+                    src="/assets/clbhouz-white-logo.png"
+                    alt="clbhouz Logo"
+                    className="h-10 md:h-12 w-auto object-contain"
+                  />
                 </div>
                 
                 <div className="flex justify-end">
