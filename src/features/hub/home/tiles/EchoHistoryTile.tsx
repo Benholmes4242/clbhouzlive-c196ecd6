@@ -5,32 +5,129 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { formatDistanceToNow } from 'date-fns';
 import { Tile } from '../components/Tile';
-import { formatRelativeTime } from '@/utils/dateFormat';
-import { useEchoChatHistory } from '@/features/echo/hooks/useEchoChatHistory';
-import { useSwingHistory } from '@/features/echo/hooks/useSwingHistory';
 
 interface EchoHistoryTileProps {
   limitChat?: number;
   limitSwing?: number;
 }
 
+function EchoRow({ 
+  thumb, 
+  title, 
+  date, 
+  onClick 
+}: { 
+  thumb?: string; 
+  title: string; 
+  date: string; 
+  onClick: () => void;
+}) {
+  const fallback = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=100&h=100&fit=crop';
+  
+  return (
+    <div className="w-full flex items-center gap-3 py-2.5 rounded-xl text-left">
+      <div 
+        className="h-14 w-14 rounded-2xl overflow-hidden shrink-0"
+        style={{ 
+          border: '1px solid var(--hub-stroke-mid)',
+          background: 'var(--hub-media-bg)',
+        }}
+      >
+        {thumb ? (
+          <video 
+            src={thumb} 
+            className="h-full w-full object-cover"
+            muted
+            playsInline
+          />
+        ) : (
+          <div className="h-full w-full grid place-items-center text-[20px]">🏌️‍♂️</div>
+        )}
+      </div>
+      <div className="min-w-0 flex-1 text-left">
+        <div className="text-[15px] truncate" style={{ color: 'var(--hub-text-bright)' }}>
+          {title}
+        </div>
+        <div className="text-[13px]" style={{ color: 'var(--hub-text-sub)' }}>
+          {date}
+        </div>
+      </div>
+      <button
+        onClick={onClick}
+        className="ml-auto rounded-2xl px-3 h-10 text-[13px] shrink-0 transition"
+        style={{
+          border: '1px solid var(--hub-stroke-mid)',
+          color: 'var(--hub-text-body)',
+          background: 'transparent',
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button)'}
+        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+      >
+        View
+      </button>
+    </div>
+  );
+}
+
 export function EchoHistoryTile({ 
-  limitChat = 10, 
-  limitSwing = 8
+  limitChat = 1, 
+  limitSwing = 2
 }: EchoHistoryTileProps) {
   const nav = useNavigate();
-  
-  const { data: chatItems = [], isLoading: chatLoading, error: chatErr } = useEchoChatHistory({ limit: limitChat });
-  const { data: swingItems = [], isLoading: swingLoading, error: swingErr } = useSwingHistory({ limit: limitSwing });
 
-  // Surface errors for debugging (won't break the other section)
-  if (chatErr) console.warn('[EchoHistoryTile] chat history error:', chatErr);
-  if (swingErr) console.warn('[EchoHistoryTile] swing history error:', swingErr);
+  const { data: chatItems = [], isLoading: chatLoading } = useQuery({
+    queryKey: ['echoChatHistory', limitChat],
+    queryFn: async () => {
+      try {
+        const stored = localStorage.getItem('echo_chat');
+        if (!stored) return [];
+        
+        const conversations = JSON.parse(stored);
+        return Object.values(conversations)
+          .map((conv: any) => ({
+            id: conv.id,
+            title: conv.customTitle || conv.title || 'Untitled conversation',
+            dateISO: conv.createdAt || conv.timestamp || new Date().toISOString()
+          }))
+          .sort((a: any, b: any) => new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime())
+          .slice(0, limitChat);
+      } catch (error) {
+        console.error('Error loading chat history:', error);
+        return [];
+      }
+    },
+  });
+
+  const { data: swingItems = [], isLoading: swingLoading } = useQuery({
+    queryKey: ['swingAnalysesHistory', limitSwing],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data = [] } = await supabase
+        .from('pro_ai_analyses')
+        .select('id, video_url, created_at, analysis_results')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(limitSwing);
+
+      return data.map(d => ({
+        id: d.id,
+        title: 'Swing Analysis',
+        dateISO: d.created_at,
+        thumbUrl: d.video_url
+      }));
+    },
+  });
 
   return (
     <Tile 
-      title="Chat and Swing History"
+      title="Recent Echo" 
+      subtitle="Chat & Swing"
       footer={
         <div className="mt-auto pt-4">
           <div 
@@ -52,122 +149,59 @@ export function EchoHistoryTile({
             }}
             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-            aria-label="View all chat and swing history"
+            aria-label="View all recent echo"
           >
             View all →
           </button>
         </div>
       }
     >
-      <div className="flex flex-col gap-4">
-        {/* CHAT SECTION */}
-        <section>
-          <div className="text-[15px] font-medium mb-2 opacity-80">Chat</div>
-
-          <div className="relative">
-            {/* Scroll container */}
-            <div className="cs-scroll max-h-[140px] overflow-y-auto pr-1 -mr-1">
-              {chatLoading && (
-                <>
-                  {[0, 1, 2].map(i => (
-                    <div key={i} className="h-[68px] rounded-xl mb-2 animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
-                  ))}
-                </>
-              )}
-              {!chatLoading && chatItems.length === 0 && (
-                <div className="text-[13px] opacity-60 py-10 text-center">
-                  No Echo chats yet — ask Echo anything above.
-                </div>
-              )}
-              {!chatLoading && chatItems.map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => nav(`/hub?sheet=echo&id=${item.id}`)}
-                  className="w-full text-left rounded-xl bg-white/5 hover:bg-white/7 transition px-3 py-2.5 mb-2 flex items-start gap-2 border border-white/6"
-                >
-                  <span className="inline-flex h-[22px] w-[22px] rounded-full items-center justify-center bg-white/10 mr-1">
-                    🗨️
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <div className="truncate text-[14px] leading-tight">
-                      {item.preview_text}
-                    </div>
-                    <div className="text-[12px] opacity-60 mt-0.5">
-                      {formatRelativeTime(item.created_at)}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            {/* Fade mask */}
-            {!chatLoading && chatItems.length > 0 && (
-              <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-[rgba(0,0,0,0.35)] to-transparent" />
-            )}
+      <div className="space-y-4">
+        {/* Chat Section */}
+        <div>
+          <div className="text-[12px] tracking-wide mb-1.5" style={{ color: 'var(--hub-text-muted)' }}>
+            CHAT
           </div>
-        </section>
-
-        {/* SWING SECTION */}
-        <section>
-          <div className="text-[15px] font-medium mb-2 opacity-80">Swing</div>
-
-          <div className="relative">
-            <div className="cs-scroll max-h-[160px] overflow-y-auto pr-1 -mr-1">
-              {swingLoading && (
-                <>
-                  {[0, 1].map(i => (
-                    <div key={i} className="h-[140px] rounded-2xl mb-3 animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
-                  ))}
-                </>
-              )}
-              {!swingLoading && swingItems.length === 0 && (
-                <div className="text-[13px] opacity-60 py-10 text-center">
-                  No swing videos yet — upload one to get feedback.
-                </div>
-              )}
-              {!swingLoading && swingItems.map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => nav(`/hub?sheet=swing&id=${item.id}`)}
-                  className="w-full mb-3 rounded-2xl overflow-hidden relative border border-white/6 bg-white/5 hover:bg-white/7 transition"
-                >
-                  {/* Title above thumb */}
-                  <div className="px-3 pt-3 pb-2 text-[14px] leading-tight">
-                    {item.title || 'Swing Analysis'}
-                  </div>
-
-                  {/* Thumbnail with overlay */}
-                  <div className="relative px-3 pb-3">
-                    <div className="rounded-xl overflow-hidden relative h-[92px]">
-                      {item.thumbnail_url ? (
-                        <video
-                          src={item.thumbnail_url}
-                          className="absolute inset-0 h-full w-full object-cover"
-                          muted
-                          playsInline
-                        />
-                      ) : (
-                        <div className="absolute inset-0 h-full w-full bg-white/10" />
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/45 to-black/0" />
-                      <div className="absolute left-2 bottom-2 text-[12px] opacity-85">
-                        {formatRelativeTime(item.created_at)}
-                      </div>
-                      <span className="absolute right-2 bottom-2 text-[13px] px-3 py-1 rounded-full bg-white/12 border border-white/15">
-                        View
-                      </span>
-                    </div>
-                  </div>
-                </button>
-              ))}
+          {chatLoading && (
+            <div className="h-14 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
+          )}
+          {!chatLoading && chatItems.length > 0 && (
+            <div className="text-[14px] py-2" style={{ color: 'var(--hub-text-sub)' }}>
+              {chatItems[0].title}
             </div>
+          )}
+          {!chatLoading && chatItems.length === 0 && (
+            <div className="py-2 text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
+              No chat history yet
+            </div>
+          )}
+        </div>
 
-            {/* Fade mask */}
-            {!swingLoading && swingItems.length > 0 && (
-              <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-[rgba(0,0,0,0.35)] to-transparent" />
-            )}
+        {/* Swing Section */}
+        <div>
+          <div className="text-[12px] tracking-wide mb-1.5" style={{ color: 'var(--hub-text-muted)' }}>
+            SWING
           </div>
-        </section>
+          <ul className="space-y-2.5">
+            {swingLoading && [0, 1].slice(0, limitSwing).map(i => (
+              <div key={i} className="h-14 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
+            ))}
+            {!swingLoading && swingItems.map(s => (
+              <EchoRow 
+                key={s.id}
+                thumb={s.thumbUrl} 
+                title="Swing Analysis" 
+                date={formatDistanceToNow(new Date(s.dateISO), { addSuffix: true })}
+                onClick={() => nav(`/hub/echo/history/swing/${s.id}`)}
+              />
+            ))}
+            {!swingLoading && swingItems.length === 0 && (
+              <div className="py-2 text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
+                No swing analyses yet
+              </div>
+            )}
+          </ul>
+        </div>
       </div>
     </Tile>
   );

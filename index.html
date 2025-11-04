@@ -122,5 +122,24 @@
       }
     </script>
     <script type="module" crossorigin src="/src/main.tsx"></script>
+    <script>
+      // Register service worker for caching
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('[SW] Registered successfully');
+              
+              // Clean cache periodically
+              setInterval(() => {
+                registration.active?.postMessage({ type: 'CLEAN_CACHE' });
+              }, 60 * 60 * 1000); // Every hour
+            })
+            .catch((error) => {
+              console.log('[SW] Registration failed:', error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
