@@ -5,10 +5,10 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Tile } from '../components/Tile';
 import { formatRelativeTime } from '@/utils/dateFormat';
+import { useEchoChatHistory } from '@/features/echo/hooks/useEchoChatHistory';
+import { useSwingHistory } from '@/features/echo/hooks/useSwingHistory';
 
 interface EchoHistoryTileProps {
   limitChat?: number;
@@ -20,54 +20,13 @@ export function EchoHistoryTile({
   limitSwing = 8
 }: EchoHistoryTileProps) {
   const nav = useNavigate();
+  
+  const { data: chatItems = [], isLoading: chatLoading, error: chatErr } = useEchoChatHistory({ limit: limitChat });
+  const { data: swingItems = [], isLoading: swingLoading, error: swingErr } = useSwingHistory({ limit: limitSwing });
 
-  const { data: chatItems = [], isLoading: chatLoading } = useQuery({
-    queryKey: ['echoChatHistory', limitChat],
-    queryFn: async () => {
-      try {
-        const stored = localStorage.getItem('echo_chat');
-        if (!stored) return [];
-        
-        const conversations = JSON.parse(stored);
-        return Object.values(conversations)
-          .map((conv: any) => ({
-            id: conv.id,
-            previewText: (conv.customTitle || conv.title || 'Untitled conversation')
-              .replace(/\s+/g, ' ')
-              .trim()
-              .slice(0, 80) + ((conv.customTitle || conv.title || '').length > 80 ? '…' : ''),
-            timestamp: conv.createdAt || conv.timestamp || new Date().toISOString()
-          }))
-          .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-          .slice(0, limitChat);
-      } catch (error) {
-        console.error('Error loading chat history:', error);
-        return [];
-      }
-    },
-  });
-
-  const { data: swingItems = [], isLoading: swingLoading } = useQuery({
-    queryKey: ['swingAnalysesHistory', limitSwing],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-
-      const { data = [] } = await supabase
-        .from('pro_ai_analyses')
-        .select('id, video_url, created_at, analysis_results')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(limitSwing);
-
-      return data.map(d => ({
-        id: d.id,
-        title: 'Swing Analysis',
-        timestamp: d.created_at,
-        thumbnail_url: d.video_url
-      }));
-    },
-  });
+  // Surface errors for debugging (won't break the other section)
+  if (chatErr) console.warn('[EchoHistoryTile] chat history error:', chatErr);
+  if (swingErr) console.warn('[EchoHistoryTile] swing history error:', swingErr);
 
   return (
     <Tile 
@@ -131,10 +90,10 @@ export function EchoHistoryTile({
                   </span>
                   <div className="flex-1 min-w-0">
                     <div className="truncate text-[14px] leading-tight">
-                      {item.previewText}
+                      {item.preview_text}
                     </div>
                     <div className="text-[12px] opacity-60 mt-0.5">
-                      {formatRelativeTime(item.timestamp)}
+                      {formatRelativeTime(item.created_at)}
                     </div>
                   </div>
                 </button>
@@ -180,15 +139,19 @@ export function EchoHistoryTile({
                   {/* Thumbnail with overlay */}
                   <div className="relative px-3 pb-3">
                     <div className="rounded-xl overflow-hidden relative h-[92px]">
-                      <video
-                        src={item.thumbnail_url}
-                        className="absolute inset-0 h-full w-full object-cover"
-                        muted
-                        playsInline
-                      />
+                      {item.thumbnail_url ? (
+                        <video
+                          src={item.thumbnail_url}
+                          className="absolute inset-0 h-full w-full object-cover"
+                          muted
+                          playsInline
+                        />
+                      ) : (
+                        <div className="absolute inset-0 h-full w-full bg-white/10" />
+                      )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/45 to-black/0" />
                       <div className="absolute left-2 bottom-2 text-[12px] opacity-85">
-                        {formatRelativeTime(item.timestamp)}
+                        {formatRelativeTime(item.created_at)}
                       </div>
                       <span className="absolute right-2 bottom-2 text-[13px] px-3 py-1 rounded-full bg-white/12 border border-white/15">
                         View
