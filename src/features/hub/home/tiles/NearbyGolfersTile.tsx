@@ -61,8 +61,8 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
         {/* Bottom footer: divider + See all */}
         <div className="mt-auto pt-4">
           <div 
-            className="h-px"
             style={{
+              height: '1px',
               background: 'rgba(255,255,255,0.18)',
               borderRadius: '1px',
               width: '100%',
