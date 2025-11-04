@@ -26,9 +26,7 @@ export function GamesNearYouTile({
   
   const games = allGames.slice(0, limit);
   
-  // Adaptive subtitle and action
-  const subtitle = games.length === 0 ? 'No active games nearby' : 'Find a game to join';
-  const actionLabel = games.length === 0 ? 'Create a Game' : 'View all';
+  // Adaptive action
   const onAction = () => {
     if (games.length === 0) {
       nav('/hub?sheet=create-game');
@@ -40,7 +38,7 @@ export function GamesNearYouTile({
   return (
     <Tile 
       title="Games Near You" 
-      subtitle={subtitle}
+      subtitle="Find a game to join"
     >
       <div className="flex flex-col h-full" style={{ ['--tile-x' as any]: '16px' }}>
         {/* Game list or empty state */}
@@ -76,6 +74,11 @@ export function GamesNearYouTile({
               </button>
             );
           })}
+          {!isLoading && games.length === 0 && (
+            <div className="text-[13px] py-2" style={{ color: 'var(--hub-text-sub)' }}>
+              No active games nearby
+            </div>
+          )}
         </div>
 
         {/* Bottom region: divider + text CTA */}
@@ -91,7 +94,7 @@ export function GamesNearYouTile({
           <button
             onClick={onAction}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            aria-label={actionLabel}
+            aria-label={games.length === 0 ? 'Create a Game' : 'View all'}
             style={{ 
               background: 'transparent',
               border: 'none',
