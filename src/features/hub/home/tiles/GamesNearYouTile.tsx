@@ -37,8 +37,7 @@ export function GamesNearYouTile({
 
   return (
     <Tile 
-      title="Games Near You" 
-      subtitle="Find a game to join"
+      title="Games Near You"
     >
       <div className="flex flex-col h-full" style={{ ['--tile-x' as any]: '16px' }}>
         {/* Game list or empty state */}
