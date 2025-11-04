@@ -20,8 +20,8 @@
      BACKGROUNDS & SURFACES
      ======================================== */
   /* Main Hub container gradient - Smoke Glass Lite */
-  --hub-bg-start: #dedede;
-  --hub-bg-end: #dedede;
+  --hub-bg-start: #121315;
+  --hub-bg-end: #1A1C1E;
   
   /* Backdrop overlay (behind Hub) */
   --hub-backdrop: rgba(0,0,0,0.70);
