@@ -18,8 +18,12 @@ export default function HubHome() {
         className="grid"
         style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem' }}
       >
-        <NearbyGolfersTile limit={5} />
-        <GamesNearYouTile limit={3} enableFilters={false} />
+        <div className="hub-tile-fixed">
+          <NearbyGolfersTile limit={5} />
+        </div>
+        <div className="hub-tile-fixed">
+          <GamesNearYouTile limit={3} enableFilters={false} />
+        </div>
       </div>
 
       {/* Your Games - full width */}
@@ -32,8 +36,12 @@ export default function HubHome() {
         className="grid mt-3.5"
         style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem' }}
       >
-      <EchoQuickTile />
-        <SwingQuickTile />
+        <div className="hub-tile-fixed">
+          <EchoQuickTile />
+        </div>
+        <div className="hub-tile-fixed">
+          <SwingQuickTile />
+        </div>
       </div>
     </main>
   );

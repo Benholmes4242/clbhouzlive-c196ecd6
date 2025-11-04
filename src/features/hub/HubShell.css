@@ -4,9 +4,17 @@
  * Minimal CSS for Hub-specific UI patterns not covered by Tailwind.
  */
 
+:root {
+  --hub-tile-fixed-h: 220px;
+}
+
 .hub-shell {
   /* Mobile safe area handling */
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.hub-tile-fixed {
+  height: var(--hub-tile-fixed-h);
 }
 
 /* Ensure shadows and blur don't get clipped */
