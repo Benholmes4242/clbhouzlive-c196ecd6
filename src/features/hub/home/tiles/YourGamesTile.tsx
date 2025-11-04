@@ -270,20 +270,26 @@ export function YourGamesTile() {
           <div 
             className="h-px"
             style={{
-              opacity: 0.18,
-              background: 'rgba(255,255,255,0.9)',
-              marginLeft: 'var(--tile-x)',
-              marginRight: 'var(--tile-x)',
-              borderRadius: 1,
+              background: 'rgba(255,255,255,0.18)',
+              borderRadius: '1px',
+              width: '100%',
             }}
           />
           <button
             onClick={() => openSheet('your-games')}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium hover:opacity-90 active:opacity-80 transition"
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+            style={{ 
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
             aria-label="View all your games"
             disabled={!hasAny && isLoading}
           >
-            View all
+            View all →
           </button>
         </div>
       </div>

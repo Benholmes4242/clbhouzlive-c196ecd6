@@ -71,11 +71,17 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
           <button
             onClick={() => openSheet('golfers')}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            style={{ color: 'var(--hub-text)' }}
-            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
-            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+            style={{ 
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            aria-label="View all golfers"
           >
-            See all
+            View all →
           </button>
         </div>
       </div>
