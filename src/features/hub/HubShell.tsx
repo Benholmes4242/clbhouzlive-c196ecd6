@@ -39,6 +39,12 @@ export function HubShell({ onClose }: HubShellProps) {
     return () => window.removeEventListener('resize', setHeaderHeight);
   }, []);
 
+  // Debug header height
+  useEffect(() => {
+    const v = getComputedStyle(document.documentElement).getPropertyValue('--hub-header-h');
+    console.log('[HubShell] mounted; --hub-header-h=', v);
+  }, []);
+
   // Lock body scroll when hub is mounted
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;

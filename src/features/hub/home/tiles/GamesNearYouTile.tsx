@@ -11,6 +11,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Tile } from '../components/Tile';
 import { ViewAllPill } from '../components/ViewAllPill';
 import { Chip } from '../components/Chip';
+import { useOpenSheet } from '@/features/hub/sheets/useOpenSheet';
 
 interface GamesNearYouTileProps {
   limit?: number;
@@ -22,6 +23,7 @@ export function GamesNearYouTile({
   enableFilters 
 }: GamesNearYouTileProps) {
   const nav = useNavigate();
+  const openSheet = useOpenSheet();
   const [filters, setFilters] = useState<GamesFilters>({ 
     when: 'today', 
     distance: '10', 
@@ -35,7 +37,7 @@ export function GamesNearYouTile({
     <Tile 
       title="Games Near You" 
       subtitle="Find a game to join"
-      onViewAll={() => nav('/hub?sheet=games')}
+      onViewAll={() => openSheet('games')}
       footer={enableFilters ? <InlineFilters value={filters} onChange={setFilters} /> : undefined}
     >
       <div className="space-y-2">
@@ -74,7 +76,7 @@ export function GamesNearYouTile({
           <p className="text-[15px]" style={{ color: 'var(--hub-text-sub)' }}>
             Be the first!{' '}
             <button 
-              onClick={() => nav('/hub?sheet=create-game')}
+              onClick={() => openSheet('create-game')}
               className="underline-offset-2 hover:underline"
               style={{ color: 'var(--hub-accent-orange)' }}
             >

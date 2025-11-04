@@ -4,10 +4,11 @@
  */
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { Tile } from '../components/Tile';
 import EchoAvatar from '@/components/ai-chat/EchoAvatar';
+import { useOpenSheet } from '@/features/hub/sheets/useOpenSheet';
 
 const SUGGESTIONS = [
   'Plan me a 3-night golf trip to Ireland',
@@ -20,12 +21,12 @@ function sanitize(str: string) {
 
 export function EchoQuickTile() {
   const [text, setText] = useState('');
-  const nav = useNavigate();
+  const openSheet = useOpenSheet();
 
   const submit = () => {
     const msg = text.trim();
     if (!msg) return;
-    nav(`/hub?sheet=echo&msg=${encodeURIComponent(msg)}`);
+    openSheet('echo', { msg });
     setText('');
   };
 
@@ -33,7 +34,7 @@ export function EchoQuickTile() {
     const q = sanitize(suggestion);
     setText(q);
     setTimeout(() => {
-      nav(`/hub?sheet=echo&msg=${encodeURIComponent(q)}`);
+      openSheet('echo', { msg: q });
       setText('');
     }, 150);
   };
@@ -130,7 +131,7 @@ export function EchoQuickTile() {
             }}
           />
           <button
-            onClick={() => nav('/hub?sheet=recent-echo')}
+            onClick={() => openSheet('recent-echo')}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
             style={{ 
               background: 'transparent',

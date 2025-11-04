@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Tile } from '../components/Tile';
+import { useOpenSheet } from '@/features/hub/sheets/useOpenSheet';
 
 function GameRow({ 
   tag, 
@@ -53,6 +54,7 @@ function GameRow({
 
 export function YourGamesTile() {
   const nav = useNavigate();
+  const openSheet = useOpenSheet();
   
   const { data: games = [], isLoading } = useQuery({
     queryKey: ['userGames'],
@@ -99,7 +101,7 @@ export function YourGamesTile() {
     <Tile 
       title="Your Games" 
       subtitle="Hosting & Joined"
-      onViewAll={() => nav('/hub?sheet=your-games')}
+      onViewAll={() => openSheet('your-games')}
     >
       <ul className="mt-1.5 space-y-2.5">
         {isLoading && [0, 1, 2].map(i => (
@@ -122,7 +124,7 @@ export function YourGamesTile() {
           <p className="text-[15px]" style={{ color: 'var(--hub-text-sub)' }}>
             No games yet.{' '}
             <button 
-              onClick={() => nav('/hub?sheet=create-game')}
+              onClick={() => openSheet('create-game')}
               className="underline-offset-2 hover:underline"
               style={{ color: 'var(--hub-accent-orange)' }}
             >

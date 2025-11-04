@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { ViewAllPill } from '../components/ViewAllPill';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
+import { useOpenSheet } from '@/features/hub/sheets/useOpenSheet';
 
 interface NearbyGolfersTileProps {
   limit?: number;
@@ -15,12 +16,13 @@ interface NearbyGolfersTileProps {
 
 export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
   const nav = useNavigate();
+  const openSheet = useOpenSheet();
   const { golfers, isLoading } = useActiveGolfers({ limit });
 
   return (
     <Tile 
       title="Nearby Golfers" 
-      onViewAll={() => nav('/hub?sheet=golfers')}
+      onViewAll={() => openSheet('golfers')}
     >
       <div className="space-y-2">
         {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (

@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { BottomSheet } from './components/BottomSheet';
 import { GolfersScreen } from './sheets/GolfersScreen';
 import { GamesNearYouScreen } from './sheets/GamesNearYouScreen';
@@ -19,21 +19,22 @@ const SHEETS = {
 } as const;
 
 export function HubSheetRouter() {
-  const nav = useNavigate();
-  const { search } = useLocation();
-  const qs = new URLSearchParams(search);
-  const key = qs.get('sheet') as keyof typeof SHEETS | null;
+  const [qs, setQs] = useSearchParams();
+  const key = (qs.get('sheet') as keyof typeof SHEETS | null) ?? null;
 
-  const open = Boolean(key);
   const close = () => {
+    // Clear sheet + common extras these sheets might set
     qs.delete('sheet');
-    nav({ search: qs.toString() ? `?${qs}` : '' }, { replace: true });
+    ['id', 'msg', 'tab'].forEach((p) => qs.delete(p));
+    setQs(qs, { replace: true });
   };
 
   const SheetComp = key ? SHEETS[key] : null;
 
+  if (key) console.log('[HubSheetRouter] open sheet =', key);
+
   return (
-    <BottomSheet open={open} onClose={close} ariaLabel={key ?? undefined}>
+    <BottomSheet open={Boolean(SheetComp)} onClose={close} ariaLabel={key ?? undefined}>
       {SheetComp ? <SheetComp onClose={close} /> : null}
     </BottomSheet>
   );
