@@ -182,9 +182,11 @@ export function SwingQuickTile() {
         {/* Bottom footer: divider + View all (Echo parity) */}
         <div className="mt-6 sm:mt-8">
           <div 
-            className="mx-4 h-px rounded-full"
+            className="h-px"
             style={{
-              background: 'rgba(255,255,255,0.16)',
+              background: 'rgba(255,255,255,0.18)',
+              borderRadius: '1px',
+              width: '100%',
             }}
           />
           <button
