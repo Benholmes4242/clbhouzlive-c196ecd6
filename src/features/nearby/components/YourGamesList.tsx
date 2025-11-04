@@ -19,6 +19,7 @@ interface YourGamesListProps {
   onCountChange?: (count: number) => void;
   onCreateGame?: () => void;
   onFindGame?: () => void;
+  focusId?: string;
 }
 
 export function YourGamesList({ 
@@ -27,7 +28,8 @@ export function YourGamesList({
   onLeaveGame, 
   onCountChange, 
   onCreateGame,
-  onFindGame 
+  onFindGame,
+  focusId,
 }: YourGamesListProps) {
   const { user } = useSupabaseSession();
   const [hostedGames, setHostedGames] = useState<Game[]>([]);
@@ -35,6 +37,7 @@ export function YourGamesList({
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'hosting' | 'joined'>('hosting');
   const [approvalSheetGameId, setApprovalSheetGameId] = useState<string | null>(null);
+  const listRef = React.useRef<HTMLDivElement>(null);
 
   const fetchYourGames = useCallback(async () => {
     // Resolve user id reliably (avoid race with session hook)
@@ -156,6 +159,30 @@ export function YourGamesList({
   useEffect(() => {
     fetchYourGames();
   }, [fetchYourGames]);
+
+  // Handle focus scroll & highlight after data loads
+  useEffect(() => {
+    if (!focusId || !listRef.current || isLoading) return;
+
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      const el = listRef.current?.querySelector<HTMLElement>(`[data-game-id="${focusId}"]`);
+      if (!el) return;
+
+      // Scroll into view
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+
+      // Add highlight class temporarily
+      el.classList.add('sheet-focus-highlight');
+      const highlightTimer = setTimeout(() => {
+        el.classList.remove('sheet-focus-highlight');
+      }, 1400);
+
+      return () => clearTimeout(highlightTimer);
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [focusId, isLoading, hostedGames, joinedGames]);
 
   // Refetch whenever Your Games tab becomes active
   useEffect(() => {
@@ -317,7 +344,7 @@ export function YourGamesList({
   }
 
   return (
-    <div className="space-y-4">
+    <div ref={listRef} className="space-y-4">
       {/* Segmented tabs */}
       <Segmented
         items={segmentItems}
@@ -348,16 +375,17 @@ export function YourGamesList({
       ) : (
         <div className="space-y-3">
           {currentGames.map((game) => (
-            <GameCard
-              key={game.id}
-              game={toCardGame(game)}
-              variant={isHostingTab ? 'hosting' : 'joined'}
-              host={extractHost(game)}
-              members={extractMembers(game)}
-              onCancel={() => handleCancel(game.id)}
-              onLeave={() => handleLeave(game.id)}
-              onViewRequests={isHostingTab ? (gameId) => setApprovalSheetGameId(gameId) : undefined}
-            />
+            <div key={game.id} data-game-id={game.id}>
+              <GameCard
+                game={toCardGame(game)}
+                variant={isHostingTab ? 'hosting' : 'joined'}
+                host={extractHost(game)}
+                members={extractMembers(game)}
+                onCancel={() => handleCancel(game.id)}
+                onLeave={() => handleLeave(game.id)}
+                onViewRequests={isHostingTab ? (gameId) => setApprovalSheetGameId(gameId) : undefined}
+              />
+            </div>
           ))}
         </div>
       )}

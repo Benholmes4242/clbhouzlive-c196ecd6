@@ -105,3 +105,19 @@
   --hub-surface: var(--hub-glass-bg-hover);
   --hub-surface-2: var(--hub-glass-bg-subtle);
 }
+
+/* ========================================
+   FOCUS HIGHLIGHT ANIMATION
+   ======================================== */
+@keyframes sheetFocusPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255,255,255,0.28); }
+  60%  { box-shadow: 0 0 0 8px rgba(255,255,255,0.00); }
+  100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.00); }
+}
+
+.sheet-focus-highlight {
+  position: relative;
+  border-color: rgba(255,255,255,0.30) !important;
+  background: rgba(255,255,255,0.14) !important;
+  animation: sheetFocusPulse 900ms ease-out 2;
+}

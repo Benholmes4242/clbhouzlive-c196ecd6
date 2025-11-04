@@ -36,17 +36,43 @@ function GameRow({
   game,
   expanded,
   onToggle,
+  onLongPress,
 }: { 
   game: GameWithDetails;
   expanded: boolean;
   onToggle: () => void;
+  onLongPress: () => void;
 }) {
   const totalSlots = game.slots_total || 0;
   const availableSlots = game.slots_open || 0;
+  const timerRef = React.useRef<number | null>(null);
+  
+  const handlePointerDown = (e: React.PointerEvent) => {
+    timerRef.current = window.setTimeout(() => {
+      onLongPress();
+    }, 420);
+  };
+
+  const handlePointerUp = () => {
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  const handlePointerCancel = () => {
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
   
   return (
     <button 
       onClick={onToggle}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
       className="w-full rounded-[14px] px-4 py-3 text-left transition-all"
       style={{ 
         background: 'rgba(255,255,255,0.06)',
@@ -265,6 +291,7 @@ export function YourGamesTile() {
             game={g}
             expanded={openId === g.id}
             onToggle={() => toggle(g.id)}
+            onLongPress={() => nav(`/hub?sheet=your-games&id=${g.id}`)}
           />
         ))}
       </div>

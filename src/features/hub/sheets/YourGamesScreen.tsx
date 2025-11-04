@@ -6,9 +6,10 @@ import { useGameBeacon } from '@/features/nearby/hooks/useGameBeacon';
 
 type YourGamesScreenProps = {
   onClose: () => void;
+  focusId?: string;
 };
 
-export function YourGamesScreen({ onClose }: YourGamesScreenProps) {
+export function YourGamesScreen({ onClose, focusId }: YourGamesScreenProps) {
   const nav = useNavigate();
   const { cancelBeacon } = useGameBeacon({});
 
@@ -24,16 +25,35 @@ export function YourGamesScreen({ onClose }: YourGamesScreenProps) {
   };
 
   return (
-    <div className="space-y-4 pb-6">
-      <h2 className="text-xl font-semibold text-white">Your Games</h2>
+    <div className="flex flex-col h-full">
+      {focusId && (
+        <div
+          className="sticky top-0 z-10 px-4 py-2 text-[13px]"
+          style={{
+            background: 'rgba(255,255,255,0.10)',
+            borderBottom: '1px solid rgba(255,255,255,0.16)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            color: 'var(--hub-text-body)',
+          }}
+          aria-live="polite"
+        >
+          Jumped to selected game
+        </div>
+      )}
       
-      <YourGamesList
-        activeTab="your-games"
-        onCancelGame={cancelBeacon}
-        onLeaveGame={handleLeaveGame}
-        onCreateGame={() => nav('/hub?sheet=create-game')}
-        onFindGame={() => nav('/hub?sheet=games')}
-      />
+      <div className="flex-1 overflow-y-auto px-4 pb-6">
+        <h2 className="text-xl font-semibold text-white mb-4">Your Games</h2>
+        
+        <YourGamesList
+          activeTab="your-games"
+          onCancelGame={cancelBeacon}
+          onLeaveGame={handleLeaveGame}
+          onCreateGame={() => nav('/hub?sheet=create-game')}
+          onFindGame={() => nav('/hub?sheet=games')}
+          focusId={focusId}
+        />
+      </div>
     </div>
   );
 }

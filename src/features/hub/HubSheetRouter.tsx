@@ -21,6 +21,7 @@ const SHEETS = {
 export function HubSheetRouter() {
   const [qs, setQs] = useSearchParams();
   const key = (qs.get('sheet') as keyof typeof SHEETS | null) ?? null;
+  const focusId = qs.get('id') || undefined;
 
   const close = () => {
     // Clear sheet + common extras these sheets might set
@@ -31,11 +32,11 @@ export function HubSheetRouter() {
 
   const SheetComp = key ? SHEETS[key] : null;
 
-  if (key) console.log('[HubSheetRouter] open sheet =', key);
+  if (key) console.log('[HubSheetRouter] open sheet =', key, focusId ? `focusId=${focusId}` : '');
 
   return (
     <BottomSheet open={Boolean(SheetComp)} onClose={close} ariaLabel={key ?? undefined}>
-      {SheetComp ? <SheetComp onClose={close} /> : null}
+      {SheetComp ? <SheetComp onClose={close} {...(focusId ? { focusId } : {})} /> : null}
     </BottomSheet>
   );
 }
