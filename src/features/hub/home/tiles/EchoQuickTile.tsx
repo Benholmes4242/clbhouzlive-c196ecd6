@@ -10,15 +10,6 @@ import { Tile } from '../components/Tile';
 import EchoAvatar from '@/components/ai-chat/EchoAvatar';
 import { useOpenSheet } from '@/features/hub/sheets/useOpenSheet';
 
-const SUGGESTIONS = [
-  'Plan me a 3-night golf trip to Ireland',
-  'When is the next major?',
-];
-
-function sanitize(str: string) {
-  return str.replace(/\s+/g, ' ').trim();
-}
-
 export function EchoQuickTile() {
   const [text, setText] = useState('');
   const openSheet = useOpenSheet();
@@ -28,15 +19,6 @@ export function EchoQuickTile() {
     if (!msg) return;
     openSheet('echo', { msg });
     setText('');
-  };
-
-  const handleSuggestionClick = (suggestion: string) => {
-    const q = sanitize(suggestion);
-    setText(q);
-    setTimeout(() => {
-      openSheet('echo', { msg: q });
-      setText('');
-    }, 150);
   };
 
   return (
@@ -111,37 +93,6 @@ export function EchoQuickTile() {
             <PaperAirplaneIcon className="h-5 w-5 -rotate-45" />
           </button>
         </form>
-
-        {/* Centered gap region for suggestions */}
-        <div className="flex-1 flex">
-          <div className="my-auto w-full">
-            <div className="grid grid-cols-1 gap-2">
-              {SUGGESTIONS.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => handleSuggestionClick(s)}
-                  className="w-full rounded-2xl px-3 py-2 border text-left transition active:scale-[0.995]"
-                  style={{
-                    borderColor: 'rgba(255,255,255,0.16)',
-                    background: 'rgba(255,255,255,0.10)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.14)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.10)'}
-                >
-                  <span
-                    className="block text-[13px] leading-[18px] whitespace-normal break-words"
-                    style={{ color: 'rgba(255,255,255,0.88)' }}
-                  >
-                    {s}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
       </div>
     </Tile>
   );
