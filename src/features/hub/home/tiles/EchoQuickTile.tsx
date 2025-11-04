@@ -24,63 +24,63 @@ export function EchoQuickTile() {
       title="Echo" 
       subtitle="Ask anything about golf"
     >
-      <div className="flex h-full flex-col">
-        {/* Top spacer */}
-        <div className="h-2" />
+      <div className="flex flex-col h-full justify-between">
+        <div>
+          {/* Top spacer */}
+          <div className="h-2" />
 
-        {/* Form with unified pill */}
-        <form
-          className="relative"
-          onSubmit={(e) => { e.preventDefault(); submit(); }}
-        >
-          <input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Ask Echo anything…"
-            aria-label="Ask Echo"
-            className="w-full h-12 rounded-2xl pl-4 pr-12 text-[15px] outline-none transition placeholder:opacity-60"
-            style={{
-              background: 'var(--hub-glass)',
-              border: '1px solid var(--hub-stroke-strong)',
-              color: 'var(--hub-text)',
-              backdropFilter: 'blur(var(--hub-blur))',
-              WebkitBackdropFilter: 'blur(var(--hub-blur))',
-            }}
-          />
-
-          {/* Send icon button at far right inside pill */}
-          <button
-            type="submit"
-            onClick={submit}
-            aria-label="Send to Echo"
-            disabled={!text.trim()}
-            className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 grid place-items-center transition disabled:opacity-40 hover:opacity-90 active:opacity-80"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text)',
-              WebkitTapHighlightColor: 'transparent',
-            }}
+          {/* Form with unified pill */}
+          <form
+            className="relative mt-4 sm:mt-6"
+            onSubmit={(e) => { e.preventDefault(); submit(); }}
           >
-            <PaperAirplaneIcon className="h-5 w-5 -rotate-45" />
-          </button>
-        </form>
+            <input
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Ask Echo anything…"
+              aria-label="Ask Echo"
+              className="w-full h-12 rounded-2xl pl-4 pr-12 text-[15px] outline-none transition placeholder:opacity-60"
+              style={{
+                background: 'var(--hub-glass)',
+                border: '1px solid var(--hub-stroke-strong)',
+                color: 'var(--hub-text)',
+                backdropFilter: 'blur(var(--hub-blur))',
+                WebkitBackdropFilter: 'blur(var(--hub-blur))',
+              }}
+            />
 
-        {/* Flexible spacer pushes footer to bottom */}
-        <div className="flex-1" />
+            {/* Send icon button at far right inside pill */}
+            <button
+              type="submit"
+              onClick={submit}
+              aria-label="Send to Echo"
+              disabled={!text.trim()}
+              className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 grid place-items-center transition disabled:opacity-40 hover:opacity-90 active:opacity-80"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--hub-text)',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              <PaperAirplaneIcon className="h-5 w-5 -rotate-45" />
+            </button>
+          </form>
+        </div>
 
         {/* Bottom footer: divider + View all */}
-        <div className="mt-4">
+        <div className="mt-6 sm:mt-8">
           <div
-            className="h-px"
+            className="h-px mx-[12px] sm:mx-[14px]"
             style={{
-              background: 'var(--hub-stroke-strong)',
+              background: 'rgba(255,255,255,0.18)',
+              width: 'calc(100% - 24px)',
               borderRadius: '1px',
             }}
           />
           <button
             onClick={() => nav('/hub/echo/history')}
-            className="ml-auto mt-3 block text-[15px] font-medium transition"
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
             style={{ 
               background: 'transparent',
               border: 'none',
