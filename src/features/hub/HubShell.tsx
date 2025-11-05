@@ -164,8 +164,6 @@ export function HubShell({ onClose }: HubShellProps) {
         style={{ 
           zIndex: Z.hub,
           backgroundColor: 'rgba(0, 0, 0, 0.25)',
-          backdropFilter: 'blur(0px)',
-          WebkitBackdropFilter: 'blur(0px)',
         }}
         onClick={handleClose}
       />
