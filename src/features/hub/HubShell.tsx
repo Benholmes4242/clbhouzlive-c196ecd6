@@ -287,7 +287,7 @@ export function HubShell({ onClose }: HubShellProps) {
             style={{
               WebkitOverflowScrolling: 'touch',
               overscrollBehavior: 'contain',
-              paddingBottom: '12px',
+              paddingBottom: '0px',
             }}
           >
             <Outlet />

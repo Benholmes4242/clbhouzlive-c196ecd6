@@ -43,6 +43,7 @@ export default function HubHome() {
           <QuickActionsTile />
         </div>
       </div>
+      <div style={{ height: '12px' }} aria-hidden="true" />
     </main>
   );
 }
