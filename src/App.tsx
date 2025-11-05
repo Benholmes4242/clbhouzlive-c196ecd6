@@ -27,7 +27,6 @@ import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
-import { HubProvider } from '@/features/hub/useHub';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 import { longPressHandler } from '@/utils/longPressHandler';
 import AppShell from '@/components/AppShell';
@@ -89,22 +88,14 @@ const HubGlassBlankPage = lazy(() => import("./features/hub/pages/HubGlassBlankP
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-// Routes component that handles background location pattern for Hub overlays
+// Routes component that handles background location pattern for Hub modal
 function AppRoutes() {
   const location = useLocation();
-  const state = location.state as { backgroundLocation?: Location; fromHub?: boolean } | null;
+  const state = location.state as { backgroundLocation?: Location } | null;
   
-  // Render origin page when we have a background location
+  // If navigated to hub OR glass-blank with a background location, use that for the main routes
   const routesLocation = state?.backgroundLocation || location;
-  
-  // Hub overlay = /hub exactly (not /hub/*)
-  const showHubModal = state?.backgroundLocation && location.pathname === '/hub';
-  
-  // Hub page overlay = /hub/* (golfers, games, echo, etc.)
-  const isHubPage = location.pathname.startsWith('/hub/') && location.pathname !== '/hub';
-  const showHubPageOverlay = isHubPage && !!state?.backgroundLocation;
-  
-  // Glass blank test page
+  const showHubModal = state?.backgroundLocation && location.pathname.startsWith('/hub') && !location.pathname.includes('glass-blank');
   const showGlassBlank = state?.backgroundLocation && location.pathname.includes('/hub/glass-blank');
 
   return (
@@ -141,22 +132,16 @@ function AppRoutes() {
         <Route path="/channel/:slug" element={<ChannelProfile />} />
         <Route path="/game/:id" element={<GameDetailView />} />
         
-        {/* Hub home route - only when NOT using background location */}
-        {!showHubModal && !showHubPageOverlay && !showGlassBlank && FEATURE_FLAGS.HUB && (
+        {/* Hub routes - only when NOT using background location */}
+        {!showHubModal && !showGlassBlank && FEATURE_FLAGS.HUB && (
           <Route path="/hub" element={<HubShell />}>
             <Route index element={<HubHome />} />
+            <Route path="golfers" element={<HubGolfersPage />} />
+            <Route path="games" element={<HubGamesPage />} />
+            <Route path="your-games" element={<HubYourGamesPage />} />
+            <Route path="create-game" element={<HubCreateGamePage />} />
+            <Route path="echo/*" element={<HubEchoPage />} />
           </Route>
-        )}
-        
-        {/* Hub page routes (not nested) - only when NOT using background location */}
-        {!showHubPageOverlay && FEATURE_FLAGS.HUB && (
-          <>
-            <Route path="/hub/golfers" element={<HubGolfersPage />} />
-            <Route path="/hub/games" element={<HubGamesPage />} />
-            <Route path="/hub/your-games" element={<HubYourGamesPage />} />
-            <Route path="/hub/create-game" element={<HubCreateGamePage />} />
-            <Route path="/hub/echo/*" element={<HubEchoPage />} />
-          </>
         )}
         
         {/* Standalone glass blank page - only when NOT using background location */}
@@ -170,18 +155,12 @@ function AppRoutes() {
         <Routes>
           <Route path="/hub" element={<HubShell />}>
             <Route index element={<HubHome />} />
+            <Route path="golfers" element={<HubGolfersPage />} />
+            <Route path="games" element={<HubGamesPage />} />
+            <Route path="your-games" element={<HubYourGamesPage />} />
+            <Route path="create-game" element={<HubCreateGamePage />} />
+            <Route path="echo/*" element={<HubEchoPage />} />
           </Route>
-        </Routes>
-      )}
-      
-      {/* Hub Page Overlays - rendered over origin page */}
-      {showHubPageOverlay && FEATURE_FLAGS.HUB && (
-        <Routes>
-          <Route path="/hub/golfers" element={<HubGolfersPage />} />
-          <Route path="/hub/games" element={<HubGamesPage />} />
-          <Route path="/hub/your-games" element={<HubYourGamesPage />} />
-          <Route path="/hub/create-game" element={<HubCreateGamePage />} />
-          <Route path="/hub/echo/*" element={<HubEchoPage />} />
         </Routes>
       )}
       
@@ -285,7 +264,6 @@ const App: React.FC = () => {
                     <BottomNavigationProvider>
                       <UIProvider>
                       <BrowserRouter>
-                        <HubProvider>
                         <ScrollToTop />
                         <GlobalAudioProvider>
                           <VideoManagerProvider>
@@ -304,7 +282,6 @@ const App: React.FC = () => {
                       <Toaster />
                       <Sonner />
                       <GlobalBottomNavigation />
-                        </HubProvider>
                     </BrowserRouter>
                   </UIProvider>
                 </BottomNavigationProvider>

@@ -6,18 +6,15 @@
 
 import React from 'react';
 import { Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
-import { useHub } from '@/features/hub/useHub';
 import AIChatOverlay from '@/components/ai-chat/AIChatOverlay';
 import AIChatHistory from '@/components/ai-chat/AIChatHistory';
 import { EchoConversationsProvider } from '@/features/echo/components/EchoConversationsProvider';
 import { ChatDetailPane } from './ChatDetailPane';
 import { SwingDetailPane } from './SwingDetailPane';
-import '../home/hubTheme.css';
 
 export function HubEchoPage() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { open } = useHub();
 
   // Explicit redirect for /hub/echo to /hub/echo/chat
   const isIndex = pathname === '/hub/echo' || pathname === '/hub/echo/';
@@ -26,34 +23,17 @@ export function HubEchoPage() {
     return <Navigate to="/hub/echo/chat" replace />;
   }
 
-  const handleClose = () => {
-    const state = (window.history.state?.usr as any) || {};
-    if (state?.backgroundLocation) {
-      open();
-    } else {
-      navigate('/clubhouse', { replace: true });
-    }
-  };
-
   return (
-    <div
-      className="fixed inset-0 z-[9999]"
-      style={{
-        background: 'rgba(0, 0, 0, 0.25)',
-        backdropFilter: 'blur(120px)',
-        WebkitBackdropFilter: 'blur(120px)',
-      }}
-    >
-      <EchoConversationsProvider>
-        <div className="h-full w-full">
-          <Routes>
+    <EchoConversationsProvider>
+      <div className="h-full w-full">
+        <Routes>
           <Route index element={<Navigate to="chat" replace />} />
           <Route
             path="chat"
             element={
                 <AIChatOverlay
                   isOpen={true}
-                  onClose={handleClose}
+                  onClose={() => navigate('/hub/golfers', { replace: true })}
                   paneMode
                   layout="page"
                   initialTab="chat"
@@ -65,7 +45,7 @@ export function HubEchoPage() {
             element={
                 <AIChatOverlay
                   isOpen={true}
-                  onClose={handleClose}
+                  onClose={() => navigate('/hub/golfers', { replace: true })}
                   paneMode
                   layout="page"
                   initialTab="swing"
@@ -88,8 +68,7 @@ export function HubEchoPage() {
           <Route path="history/chat/:id" element={<ChatDetailPane />} />
           <Route path="history/swing/:id" element={<SwingDetailPane />} />
         </Routes>
-        </div>
-      </EchoConversationsProvider>
-    </div>
+      </div>
+    </EchoConversationsProvider>
   );
 }

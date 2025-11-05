@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
-import { useHub } from '@/features/hub/useHub';
 
 function QA({ labelTop, labelBottom, onClick, icon }: { 
   labelTop: string; 
@@ -50,11 +49,10 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
 
 export function QuickActionsTile() {
   const navigate = useNavigate();
-  const { navigateFromHub } = useHub();
 
-  const openCreateGame = () => navigateFromHub('/hub/create-game');
-  const openEcho = () => navigateFromHub('/hub/echo/chat');
-  const openSwing = () => navigateFromHub('/hub/echo/swing');
+  const openCreateGame = () => navigate('/hub/create-game');
+  const openEcho = () => navigate('/hub/echo/chat');
+  const openSwing = () => navigate('/hub/echo/swing');
   const openProfile = () => navigate('/profile');
 
   return (

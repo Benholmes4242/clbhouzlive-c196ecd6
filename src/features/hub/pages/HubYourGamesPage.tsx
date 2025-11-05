@@ -1,24 +1,19 @@
 /**
  * Hub Your Games Page
  * 
- * Full-screen glass page showing your hosted and joined games.
- * Opens as an overlay above the origin page.
+ * Your hosted and joined games with realtime updates (Phase 3).
  */
 
 import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useHub } from '@/features/hub/useHub';
 import { YourGamesList } from '@/features/nearby/components/YourGamesList';
 import { supabase } from '@/integrations/supabase/client';
 import { useGameBeacon } from '@/features/nearby/hooks/useGameBeacon';
+import { useNavigate } from 'react-router-dom';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import '../home/hubTheme.css';
 
 export function HubYourGamesPage() {
-  const { open } = useHub();
-  const nav = useNavigate();
-  const loc = useLocation();
   const { cancelBeacon } = useGameBeacon({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Track Your Games tab view
@@ -29,17 +24,6 @@ export function HubYourGamesPage() {
       });
     }
   }, []);
-
-  const handleBack = () => {
-    const state = loc.state as any;
-    if (state?.backgroundLocation) {
-      // Return to Hub overlay
-      open();
-    } else {
-      // Deep link fallback
-      nav('/clubhouse', { replace: true });
-    }
-  };
 
   const handleLeaveGame = async (gameId: string) => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -53,42 +37,12 @@ export function HubYourGamesPage() {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[9999]"
-      style={{
-        background: 'rgba(0, 0, 0, 0.25)',
-        backdropFilter: 'blur(120px)',
-        WebkitBackdropFilter: 'blur(120px)',
-      }}
-    >
-      {/* Simple Header */}
-      <header className="sticky top-0 z-10 flex items-center justify-between px-4 h-14 border-b"
-        style={{
-          borderColor: 'rgba(255,255,255,0.1)',
-          background: 'rgba(0,0,0,0.2)',
-        }}
-      >
-        <button
-          onClick={handleBack}
-          className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
-          aria-label="Back to Hub"
-        >
-          ‹ Back
-        </button>
-        <h1 className="text-white/90 text-[17px] font-semibold">Your Games</h1>
-        <div className="w-16" />
-      </header>
-
-      {/* Content */}
-      <div className="overflow-y-auto h-[calc(100vh-3.5rem)] px-4 pt-4">
-        <YourGamesList
-          activeTab="your-games"
-          onCancelGame={cancelBeacon}
-          onLeaveGame={handleLeaveGame}
-          onCreateGame={() => nav('/hub/create-game')}
-          onFindGame={() => nav('/hub/games')}
-        />
-      </div>
-    </div>
+    <YourGamesList
+      activeTab="your-games"
+      onCancelGame={cancelBeacon}
+      onLeaveGame={handleLeaveGame}
+      onCreateGame={() => navigate('/hub/create-game')}
+      onFindGame={() => navigate('/hub/games')}
+    />
   );
 }

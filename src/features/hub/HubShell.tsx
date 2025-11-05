@@ -15,7 +15,6 @@ import { X } from 'lucide-react';
 import { TapButton } from '@/components/ui/TapButton';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { Z } from '@/config/zIndex';
-import { useHub } from './useHub';
 import './HubShell.css';
 
 interface HubShellProps {
@@ -25,7 +24,6 @@ interface HubShellProps {
 export function HubShell({ onClose }: HubShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { close } = useHub();
   const headerRef = useRef<HTMLDivElement>(null);
 
   // Measure header height for bottom sheet positioning
@@ -92,8 +90,8 @@ export function HubShell({ onClose }: HubShellProps) {
     if (onClose) {
       onClose();
     } else {
-      // Use Hub context to return to origin
-      close();
+      // Default: navigate back or to clubhouse
+      navigate('/clubhouse');
     }
   };
 
