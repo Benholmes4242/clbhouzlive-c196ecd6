@@ -87,6 +87,7 @@ const HubYourGamesPage = lazy(() => import("./features/hub/pages/HubYourGamesPag
 const HubCreateGamePage = lazy(() => import("./features/hub/pages/HubCreateGamePage").then(m => ({ default: m.HubCreateGamePage })));
 const HubEchoPage = lazy(() => import("./features/hub/pages/HubEchoPage").then(m => ({ default: m.HubEchoPage })));
 const HubGlassBlankPage = lazy(() => import("./features/hub/pages/HubGlassBlankPage"));
+const HubRedirect = lazy(() => import("./features/hub/HubRedirect").then(m => ({ default: m.HubRedirect })));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -139,6 +140,9 @@ function AppRoutes() {
         
         <Route path="/channel/:slug" element={<ChannelProfile />} />
         <Route path="/game/:id" element={<GameDetailView />} />
+        
+        {/* Hub fallback - redirect to clubhouse with Hub opened */}
+        {FEATURE_FLAGS.HUB && <Route path="/hub" element={<HubRedirect />} />}
         
         <Route path="*" element={<NotFound />} />
       </Routes>
