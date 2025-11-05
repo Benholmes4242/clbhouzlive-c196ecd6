@@ -49,27 +49,8 @@ export function HubShell({ onClose }: HubShellProps) {
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    
-    // Add red test dot to verify transparency
-    const testDot = document.createElement('div');
-    testDot.id = 'hub-transparency-test';
-    testDot.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 200px;
-      height: 200px;
-      background: red;
-      border-radius: 50%;
-      z-index: 1;
-      pointer-events: none;
-    `;
-    document.body.appendChild(testDot);
-    
     return () => {
       document.body.style.overflow = originalOverflow;
-      testDot.remove();
     };
   }, []);
 
