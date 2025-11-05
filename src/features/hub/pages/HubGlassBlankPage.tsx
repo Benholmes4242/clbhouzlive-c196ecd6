@@ -15,11 +15,18 @@ export default function HubGlassBlankPage() {
     <div
       className="hub-glass-blank"
       style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         width: '100vw',
         height: '100vh',
         background: 'rgba(0, 0, 0, 0.25)',
         backdropFilter: 'blur(120px)',
         WebkitBackdropFilter: 'blur(120px)',
+        zIndex: 9999,
+        pointerEvents: 'none', // Allow clicking through to test
       }}
     />
   );
