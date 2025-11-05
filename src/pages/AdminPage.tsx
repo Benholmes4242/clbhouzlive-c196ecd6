@@ -27,8 +27,8 @@ const AdminPage = () => {
   return (
     <AdminRouteProtection requiredRole="limited_admin">
       <div className="min-h-screen bg-background">
-        
-        <AdminDashboard 
+        <ClubhouseHeaderNew />
+        <AdminDashboard
           users={users} 
           onRoleChange={handleRoleChange}
           userRole={userRole || 'admin'}

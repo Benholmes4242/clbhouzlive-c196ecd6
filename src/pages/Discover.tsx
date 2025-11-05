@@ -1,4 +1,5 @@
 import React, { useState, useMemo, lazy, Suspense } from 'react';
+import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
 
 import SegmentedControl from '@/components/discover/SegmentedControl';
@@ -164,6 +165,7 @@ const Discover = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground page-with-header">
+      <ClubhouseHeaderNew />
       <main className="pb-20">
           {/* Static Tabs */}
           <div className="relative z-30">

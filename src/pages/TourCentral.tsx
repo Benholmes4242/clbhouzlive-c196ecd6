@@ -13,7 +13,7 @@ const TourCentral = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      
+      <ClubhouseHeaderNew />
       <div className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
         <div className="mb-6">
           <h1 className="font-display text-3xl font-bold text-center">Tour Central</h1>

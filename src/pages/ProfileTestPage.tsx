@@ -87,7 +87,7 @@ const ProfileTestPage = () => {
   return (
     <div className="min-h-screen bg-background pb-28 relative">
       {/* Header */}
-      
+      <ClubhouseHeaderNew />
       
       {/* Test Page Banner */}
       <div className="bg-yellow-500/20 border-b border-yellow-500/30 px-4 py-2 text-center">
