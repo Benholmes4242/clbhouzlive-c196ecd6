@@ -304,5 +304,3 @@ export function HubShell({ onClose }: HubShellProps) {
     </>
   );
 }
-
-export default HubShell;

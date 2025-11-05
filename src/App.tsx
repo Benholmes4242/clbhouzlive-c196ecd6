@@ -77,7 +77,7 @@ const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
 const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 
 // Hub components (lazy load when feature flag is enabled)
-const HubShell = lazy(() => import("./features/hub/HubShell"));
+const HubShell = lazy(() => import("./features/hub/HubShell").then(m => ({ default: m.HubShell })));
 const HubHome = lazy(() => import("./features/hub/home/HubHome"));
 const HubGolfersPage = lazy(() => import("./features/hub/pages/HubGolfersPage").then(m => ({ default: m.HubGolfersPage })));
 const HubGamesPage = lazy(() => import("./features/hub/pages/HubGamesPage").then(m => ({ default: m.HubGamesPage })));
