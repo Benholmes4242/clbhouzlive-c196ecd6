@@ -144,3 +144,32 @@ body.hub-open .sheet-backdrop {
   pointer-events: none !important;
   display: none !important;
 }
+
+/* DEBUG: Colorize overlays/scrims to identify the covering layer */
+/* Remove after debugging */
+html.overlay-debug .sheet-backdrop,
+html.overlay-debug .DialogOverlay,
+html.overlay-debug .AlertDialogOverlay,
+html.overlay-debug .SheetOverlay,
+html.overlay-debug [data-overlay],
+html.overlay-debug .overlay,
+html.overlay-debug [data-filter-sheet] {
+  background: hsla(0, 100%, 50%, 0.35) !important; /* vivid red */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  outline: 2px dashed hsla(0, 100%, 50%, 0.85);
+}
+
+/* Also tint when common flags are set (in case overlay-debug isn't present) */
+body.sheet-open .sheet-backdrop,
+body.sheet-open .DialogOverlay,
+body.sheet-open .AlertDialogOverlay,
+body.sheet-open .SheetOverlay,
+body.modal-open .DialogOverlay,
+body.modal-open .AlertDialogOverlay,
+body.overlay-active .DialogOverlay,
+body.overlay-active .AlertDialogOverlay {
+  background: hsla(0, 100%, 50%, 0.25) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}

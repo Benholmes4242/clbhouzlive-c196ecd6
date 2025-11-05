@@ -31,6 +31,16 @@ export function BottomSheet({
     };
   }, [open]);
 
+  // TEMP: enable global overlay debug while this sheet is open
+  useEffect(() => {
+    if (!open) return;
+    const root = document.documentElement;
+    root.classList.add('overlay-debug');
+    return () => {
+      root.classList.remove('overlay-debug');
+    };
+  }, [open]);
+
   // ESC key handling
   useEffect(() => {
     if (!open) return;

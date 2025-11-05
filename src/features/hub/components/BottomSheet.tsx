@@ -59,6 +59,14 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
     };
   }, [open]);
 
+  // TEMP: enable global overlay debug while this sheet is open
+  React.useEffect(() => {
+    if (!open) return;
+    const root = document.documentElement;
+    root.classList.add('overlay-debug');
+    return () => { root.classList.remove('overlay-debug'); };
+  }, [open]);
+
   // ESC to close
   React.useEffect(() => {
     if (!open) return;
