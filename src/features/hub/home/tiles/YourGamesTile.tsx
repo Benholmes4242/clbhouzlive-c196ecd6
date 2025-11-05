@@ -202,6 +202,11 @@ export function YourGamesTile() {
   const { data, isLoading, isError, refetch } = useUserGames();
   useUserGamesRealtime();
 
+  const openCreateGame = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    openSheet('create-game');
+  };
+
   React.useEffect(() => {
     const btn = viewAllRef.current;
     const tile = btn?.closest('section');
@@ -233,7 +238,29 @@ export function YourGamesTile() {
 
   return (
     <Tile 
-      title="Your Games"
+      title={
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '12px' }}>
+          <div>
+            <h3>Your Games</h3>
+            <p className="tile-sub">Hosting & Joined</p>
+          </div>
+          <button
+            onClick={openCreateGame}
+            className="text-[15px] font-medium transition"
+            style={{ 
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            aria-label="Create a Game"
+          >
+            Create a Game +
+          </button>
+        </div>
+      }
       footer={
         <div className="mt-auto pt-4">
           <div 
@@ -244,27 +271,44 @@ export function YourGamesTile() {
               width: '100%',
             }}
           />
-          <button
-            ref={viewAllRef}
-            onClick={() => openSheet('your-games')}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            style={{ 
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-            aria-label="View all your games"
-            disabled={!hasAny && isLoading}
-          >
-            View all →
-          </button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
+            <button
+              onClick={(e) => { e.stopPropagation(); openSheet('games-near-you'); }}
+              className="text-[15px] font-medium transition"
+              style={{ 
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--hub-text-body)',
+                padding: 0,
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+              aria-label="Search Games"
+            >
+              ← Search Games
+            </button>
+            <button
+              ref={viewAllRef}
+              onClick={() => openSheet('your-games')}
+              className="text-[15px] font-medium transition"
+              style={{ 
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--hub-text-body)',
+                padding: 0,
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+              aria-label="View all your games"
+              disabled={!hasAny && isLoading}
+            >
+              View all →
+            </button>
+          </div>
         </div>
       }
       >
-      <div className="flex flex-col h-full overflow-y-auto" style={{ ['--tile-x' as any]: '16px' }}>
+      <div className="flex flex-col h-full overflow-y-auto" style={{ ['--tile-x' as any]: '16px', marginTop: '12px' }}>
         <div className="space-y-3 pb-2">
           {isLoading && [0, 1, 2].map(i => (
             <div 

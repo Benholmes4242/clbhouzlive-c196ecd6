@@ -51,7 +51,7 @@ export function GamesNearYouTile({
           <button
             onClick={onAction}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            aria-label={games.length === 0 ? 'Create a Game' : 'View all'}
+            aria-label="View all"
             style={{ 
               background: 'transparent',
               border: 'none',
@@ -61,7 +61,7 @@ export function GamesNearYouTile({
             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
           >
-            {games.length === 0 ? 'Create a Game +' : 'View all →'}
+            View all →
           </button>
         </div>
       }
