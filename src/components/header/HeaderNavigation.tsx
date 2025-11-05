@@ -1,6 +1,6 @@
 
 import React, { useRef } from 'react';
-import { Bell, User, Settings, Shield } from 'lucide-react';
+import { Bell, User, Settings, Shield, LayoutGrid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAdaptiveTextColor } from "@/hooks/useAdaptiveTextColor";
 import { useHeader } from "@/contexts/GlobalHeaderContext";
 import { cn } from "@/lib/utils";
+import { useHub } from "@/features/hub/useHub";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +25,7 @@ const HeaderNavigation = () => {
   const { user } = useSupabaseSession();
   const { unreadCount } = useNotifications();
   const { variant } = useHeader();
+  const { open: openHub } = useHub();
   
   // Create refs for adaptive text color detection
   const navigationRef = useRef<HTMLDivElement>(null);
@@ -144,6 +146,10 @@ const HeaderNavigation = () => {
   if (!user) {
     return (
       <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
+        <Button data-action="hub" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={openHub}>
+          <LayoutGrid className="h-5 w-5" />
+        </Button>
+
         <Button data-action="notifications" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleNotificationsClick}>
           <Bell className="h-5 w-5" />
         </Button>
@@ -174,6 +180,10 @@ const HeaderNavigation = () => {
 
   return (
     <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
+      <Button data-action="hub" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={openHub}>
+        <LayoutGrid className="h-5 w-5" />
+      </Button>
+
       <Button data-action="notifications" variant="ghost" className={cn("relative p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleNotificationsClick}>
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
