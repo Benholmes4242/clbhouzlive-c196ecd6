@@ -18,14 +18,16 @@ export function BottomSheet({
   className = '',
   ariaLabelledBy,
 }: BottomSheetProps) {
-  // Scroll lock
+  // Scroll lock + modal-open class
   useEffect(() => {
     if (!open) return;
     const { body } = document;
     const prev = body.style.overflow;
     body.style.overflow = 'hidden';
+    body.classList.add('modal-open');
     return () => {
       body.style.overflow = prev;
+      body.classList.remove('modal-open');
     };
   }, [open]);
 

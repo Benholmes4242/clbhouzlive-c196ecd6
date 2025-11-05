@@ -47,12 +47,16 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
   const yRef = React.useRef(0);
   const animFrame = React.useRef<number | null>(null);
 
-  // Scroll lock when open
+  // Scroll lock + modal-open class when open
   React.useEffect(() => {
     if (!open) return;
     const { overflow } = document.body.style;
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = overflow; };
+    document.body.classList.add('modal-open');
+    return () => { 
+      document.body.style.overflow = overflow;
+      document.body.classList.remove('modal-open');
+    };
   }, [open]);
 
   // ESC to close
