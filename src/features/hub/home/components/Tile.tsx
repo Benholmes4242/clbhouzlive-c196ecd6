@@ -21,9 +21,7 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
       style={{
         background: 'var(--hub-glass-bg)',
         border: '1px solid var(--hub-stroke)',
-        boxShadow: isHovered 
-          ? 'var(--hub-shadow-tile-hover), var(--hub-shadow-tile-inset), var(--hub-top-highlight)'
-          : 'var(--hub-shadow-tile), var(--hub-shadow-tile-inset), var(--hub-top-highlight)',
+        boxShadow: 'none',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         willChange: 'transform, backdrop-filter',
