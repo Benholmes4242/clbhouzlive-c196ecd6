@@ -31,10 +31,18 @@ export default function HubHome() {
         <YourGamesTile />
       </div>
 
-      {/* Echo & Quick Actions 2×2 grid */}
+      {/* Echo & Quick Actions 2×2 grid (pinned to bottom for verification) */}
       <div
         className="grid mt-3.5"
-        style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem', gridAutoRows: 'var(--hub-tile-fixed-h)' }}
+        style={{ 
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
+          gap: '0.875rem', 
+          gridAutoRows: 'var(--hub-tile-fixed-h)',
+          position: 'sticky',
+          bottom: '12px',
+          zIndex: 1,
+        }}
+        data-bottom-pinned
       >
         <div className="hub-tile-fixed">
           <EchoTile />
