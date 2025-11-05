@@ -42,10 +42,13 @@ export function VideoProgressVerticalHUD({
     };
   }, [videoRef]);
   
-  // Detect modal open state via body class
+  // Detect modal/sheet/hub open state via body class
   React.useEffect(() => {
     const checkModalState = () => {
-      setIsModalOpen(document.body.classList.contains('modal-open'));
+      const hasModal = document.body.classList.contains('modal-open');
+      const hasSheet = document.body.classList.contains('sheet-open');
+      const hasHub = document.body.classList.contains('hub-open');
+      setIsModalOpen(hasModal || hasSheet || hasHub);
     };
     
     // Check immediately

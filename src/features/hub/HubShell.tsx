@@ -54,11 +54,13 @@ export function HubShell({ onClose }: HubShellProps) {
     };
   }, []);
 
-  // Mark hub-open on html while mounted
+  // Mark hub-open on html and body while mounted
   useEffect(() => {
     document.documentElement.classList.add('hub-open');
+    document.body.classList.add('hub-open');
     return () => {
       document.documentElement.classList.remove('hub-open');
+      document.body.classList.remove('hub-open');
     };
   }, []);
 

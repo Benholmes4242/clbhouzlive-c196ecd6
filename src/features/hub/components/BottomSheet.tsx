@@ -47,15 +47,15 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
   const yRef = React.useRef(0);
   const animFrame = React.useRef<number | null>(null);
 
-  // Scroll lock + modal-open class when open
+  // Scroll lock + sheet-open class when open
   React.useEffect(() => {
     if (!open) return;
     const { overflow } = document.body.style;
     document.body.style.overflow = 'hidden';
-    document.body.classList.add('modal-open');
+    document.body.classList.add('sheet-open');
     return () => { 
       document.body.style.overflow = overflow;
-      document.body.classList.remove('modal-open');
+      document.body.classList.remove('sheet-open');
     };
   }, [open]);
 
@@ -181,7 +181,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
 
   return (
     <>
-      {/* Backdrop - starts below header, doesn't cover it */}
+      {/* Backdrop - transparent for hub sheets, clickable for dismiss */}
       <div
         aria-hidden
         onClick={onBackdropClick}
@@ -191,9 +191,9 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           right: 0,
           top: headerH,
           height: `calc(100dvh - ${headerH})`,
-          background: 'rgba(0,0,0,0.45)',
-          backdropFilter: 'blur(120px)',
-          WebkitBackdropFilter: 'blur(120px)',
+          background: 'transparent',
+          backdropFilter: 'none',
+          WebkitBackdropFilter: 'none',
           zIndex: 12002,
           opacity: open ? 1 : 0,
           transition: 'opacity 180ms ease',
@@ -242,6 +242,9 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
             boxShadow: '0 -20px 50px rgba(0,0,0,0.35)',
             display: 'flex',
             flexDirection: 'column',
+            WebkitTransform: 'translateZ(0)',
+            transform: 'translateZ(0)',
+            willChange: 'transform',
           }}
         >
           {/* Scrollable content */}
