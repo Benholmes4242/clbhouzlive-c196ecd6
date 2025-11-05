@@ -26,8 +26,13 @@ export default function HubHome() {
         </div>
       </div>
 
-      {/* Your Games - full width, fixed height */}
-      <div className="mt-3.5" style={{ height: '440px' }}>
+      {/* Your Games - calculated height to push bottom tiles to 12px from edge */}
+      <div 
+        className="mt-3.5" 
+        style={{ 
+          height: 'calc(100vh - var(--hub-header-h, 80px) - env(safe-area-inset-top) - env(safe-area-inset-bottom) - var(--hub-tile-fixed-h) - var(--hub-tile-fixed-h) - 0.875rem - 0.875rem - 0.75rem - 12px)' 
+        }}
+      >
         <YourGamesTile />
       </div>
 
