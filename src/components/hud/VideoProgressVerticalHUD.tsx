@@ -19,6 +19,8 @@ export function VideoProgressVerticalHUD({
 }) {
   // Bind to the video element even if it appears after initial render
   const [attachedVideo, setAttachedVideo] = React.useState<HTMLVideoElement | null>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  
   React.useEffect(() => {
     // Initial grab or late mount
     if (videoRef.current) {
@@ -39,6 +41,25 @@ export function VideoProgressVerticalHUD({
       window.clearInterval(iv);
     };
   }, [videoRef]);
+  
+  // Detect modal/sheet/hub open state via body class
+  React.useEffect(() => {
+    const checkModalState = () => {
+      const hasModal = document.body.classList.contains('modal-open');
+      const hasSheet = document.body.classList.contains('sheet-open');
+      const hasHub = document.body.classList.contains('hub-open');
+      setIsModalOpen(hasModal || hasSheet || hasHub);
+    };
+    
+    // Check immediately
+    checkModalState();
+    
+    // Watch for class changes on body
+    const observer = new MutationObserver(checkModalState);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    
+    return () => observer.disconnect();
+  }, []);
 
   const { setProgressFillRef, progress, pauseSync, resumeSync } = useVideoProgressSync(attachedVideo);
   const trackRef = React.useRef<HTMLDivElement | null>(null);
@@ -328,7 +349,8 @@ export function VideoProgressVerticalHUD({
 
   const duration = attachedVideo?.duration || 0;
 
-  const progressBar = (!attachedVideo) ? null : (
+  // Don't render if modal is open
+  const progressBar = (!attachedVideo || isModalOpen) ? null : (
     <div
       className="pointer-events-none fixed z-[950] flex items-stretch justify-end"
       style={{

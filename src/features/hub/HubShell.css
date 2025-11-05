@@ -105,3 +105,75 @@ html.hub-open { --bg-page: transparent; }
   background: transparent !important;
   background-color: transparent !important;
 }
+
+/* Neutralize app-wide modal scrims while hub is open */
+body.hub-open.modal-open,
+body.hub-open.overlay-active,
+body.hub-open.sheet-open {
+  --app-scrim: transparent;
+  background-color: transparent !important;
+}
+
+/* Force all overlays/scrims transparent in Hub and while any sheet/modal is active */
+html.hub-open .app-scrim,
+html.hub-open .overlay,
+html.hub-open [data-overlay],
+html.hub-open .DialogOverlay,
+html.hub-open .AlertDialogOverlay,
+html.hub-open .SheetOverlay,
+html.hub-open .sheet-backdrop,
+body.sheet-open .app-scrim,
+body.sheet-open .overlay,
+body.sheet-open [data-overlay],
+body.sheet-open .DialogOverlay,
+body.sheet-open .AlertDialogOverlay,
+body.sheet-open .SheetOverlay,
+body.sheet-open .sheet-backdrop,
+body.modal-open .app-scrim,
+body.modal-open .overlay,
+body.modal-open [data-overlay],
+body.modal-open .DialogOverlay,
+body.modal-open .AlertDialogOverlay,
+body.modal-open .SheetOverlay,
+body.modal-open .sheet-backdrop,
+body.overlay-active .app-scrim,
+body.overlay-active .overlay,
+body.overlay-active [data-overlay],
+body.overlay-active .DialogOverlay,
+body.overlay-active .AlertDialogOverlay,
+body.overlay-active .SheetOverlay,
+body.overlay-active .sheet-backdrop,
+/* Common library overlays */
+html.hub-open .vaul-drawer-overlay,
+body.sheet-open .vaul-drawer-overlay,
+body.modal-open .vaul-drawer-overlay,
+/* Bruteforce: any full-screen fixed backdrop with bg-* utility */
+html.hub-open .fixed.inset-0[class*="bg-"],
+body.sheet-open .fixed.inset-0[class*="bg-"],
+body.modal-open .fixed.inset-0[class*="bg-"],
+body.overlay-active .fixed.inset-0[class*="bg-"] {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Hub container: transparent + own paint layer */
+#hub-root,
+.hub-shell {
+  background: transparent !important;
+  isolation: isolate;
+  contain: paint;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Hide progress bar when hub or any modal is open */
+.hub-open .progress-rail,
+.modal-open .progress-rail,
+.sheet-open .progress-rail {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: none !important;
+}
+
+/* All overlay debug and tinting removed - overlays now permanently transparent */

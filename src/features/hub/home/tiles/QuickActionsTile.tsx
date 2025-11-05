@@ -60,17 +60,28 @@ export function QuickActionsTile() {
   return (
     <Tile title="Quick Actions" align="center">
       <div 
-        className="quick-grid" 
+        className="qa-wrap" 
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '10px',
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
-        <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />
-        <QA labelTop="Ask" labelBottom="Echo" onClick={openEcho} icon="💬" />
-        <QA labelTop="Upload" labelBottom="Swing" onClick={openSwing} icon="🏌️" />
-        <QA labelTop="Your" labelBottom="Profile" onClick={openProfile} icon="👤" />
+        <div 
+          className="quick-grid" 
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '10px',
+            width: '100%',
+          }}
+        >
+          <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />
+          <QA labelTop="Ask" labelBottom="Echo" onClick={openEcho} icon="💬" />
+          <QA labelTop="Upload" labelBottom="Swing" onClick={openSwing} icon="🏌️" />
+          <QA labelTop="Your" labelBottom="Profile" onClick={openProfile} icon="👤" />
+        </div>
       </div>
     </Tile>
   );

@@ -47,12 +47,23 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
   const yRef = React.useRef(0);
   const animFrame = React.useRef<number | null>(null);
 
-  // Scroll lock when open
+  // Scroll lock + sheet-open class when open
   React.useEffect(() => {
     if (!open) return;
     const { overflow } = document.body.style;
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = overflow; };
+    document.body.classList.add('sheet-open');
+    return () => { 
+      document.body.style.overflow = overflow;
+      document.body.classList.remove('sheet-open');
+    };
+  }, [open]);
+
+  // Remove overlay-debug toggling in production
+  // (kept disabled to avoid any unintended tinting)
+  // No-op effect retained for reference
+  React.useEffect(() => {
+    return;
   }, [open]);
 
   // ESC to close
@@ -177,14 +188,19 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
 
   return (
     <>
-      {/* Backdrop - simple opacity fade, no blur on animated layer */}
+      {/* Backdrop - transparent click catcher */}
       <div
         aria-hidden
         onClick={onBackdropClick}
         style={{
           position: 'fixed',
-          inset: 0,
-          background: 'rgba(0,0,0,0.45)',
+          left: 0,
+          right: 0,
+          top: 0,
+          height: '100dvh',
+          background: 'transparent',
+          backdropFilter: 'none',
+          WebkitBackdropFilter: 'none',
           zIndex: 12002,
           opacity: open ? 1 : 0,
           transition: 'opacity 180ms ease',
@@ -192,60 +208,54 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
         }}
       />
 
-      {/* Sheet - wrapper for transform, inner surface for blur */}
+      {/* Clipper - owns the rounded radius and clips everything inside */}
       <div
         ref={sheetRef}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
+        role="dialog"
+        aria-modal="true"
+        aria-label={ariaLabel || 'Panel'}
         style={{
           position: 'fixed',
           left: 0,
           right: 0,
           top: headerH,
           bottom: 0,
+          borderTopLeftRadius: '24px',
+          borderTopRightRadius: '24px',
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0,
           transform: 'translate3d(0, 0, 0)',
           willChange: 'transform',
           zIndex: 12003,
           touchAction: 'none',
           WebkitUserSelect: 'none',
           userSelect: 'none',
+          overflow: 'hidden',
+          clipPath: 'inset(0 0 0 0 round 24px 24px 0 0)',
+          WebkitMaskImage: '-webkit-radial-gradient(white, black)',
+          isolation: 'isolate',
+          background: 'transparent',
         }}
       >
+        {/* Surface - holds all visual effects (blur, background, shadow) */}
         <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={ariaLabel || 'Panel'}
           style={{
-            height: '100%',
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            background:
-              'linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.10))',
-            backdropFilter: 'blur(28px)',
-            WebkitBackdropFilter: 'blur(28px)',
-            border: '1px solid rgba(255,255,255,0.22)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.45)',
+            position: 'absolute',
+            inset: 0,
+            backdropFilter: 'saturate(120%) blur(24px)',
+            WebkitBackdropFilter: 'saturate(120%) blur(24px)',
+            background: 'hsl(var(--background) / 0.85)',
+            boxShadow: '0 -20px 50px rgba(0,0,0,0.35)',
             display: 'flex',
             flexDirection: 'column',
-            overflow: 'hidden',
+            WebkitTransform: 'translateZ(0)',
+            transform: 'translateZ(0)',
+            willChange: 'transform',
           }}
         >
-          {/* Handle */}
-          <div
-            ref={handleRef}
-            style={{
-              alignSelf: 'center',
-              width: 44,
-              height: 5,
-              borderRadius: 999,
-              background: 'rgba(255,255,255,0.35)',
-              margin: '10px 0 6px',
-              pointerEvents: 'none',
-              transform: 'scaleX(1)',
-              opacity: 0.85,
-            }}
-          />
           {/* Scrollable content */}
           <div
             ref={contentRef}
@@ -253,7 +263,9 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
               flex: 1,
               overflow: 'auto',
               WebkitOverflowScrolling: 'touch',
-              padding: '12px 14px 18px',
+              padding: '0',
+              overscrollBehavior: 'contain',
+              background: 'transparent',
             }}
           >
             {children}
