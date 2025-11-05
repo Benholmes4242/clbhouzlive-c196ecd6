@@ -220,7 +220,12 @@ export function HubShell({ onClose }: HubShellProps) {
                 <div className="flex items-center gap-2">
                   {/* Temporary glass test button */}
                   <button
-                    onClick={() => navigate('/hub/glass-blank')}
+                    onClick={() => {
+                      const state = location.state as any;
+                      navigate('/hub/glass-blank', { 
+                        state: { backgroundLocation: state?.backgroundLocation || location } 
+                      });
+                    }}
                     className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 active:scale-95 transition-all"
                     aria-label="Test glass effect"
                   />

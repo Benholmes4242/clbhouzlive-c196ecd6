@@ -93,9 +93,10 @@ function AppRoutes() {
   const location = useLocation();
   const state = location.state as { backgroundLocation?: Location } | null;
   
-  // If navigated to hub with a background location, use that for the main routes
+  // If navigated to hub OR glass-blank with a background location, use that for the main routes
   const routesLocation = state?.backgroundLocation || location;
-  const showHubModal = state?.backgroundLocation && location.pathname.startsWith('/hub');
+  const showHubModal = state?.backgroundLocation && location.pathname.startsWith('/hub') && !location.pathname.includes('glass-blank');
+  const showGlassBlank = state?.backgroundLocation && location.pathname.includes('/hub/glass-blank');
 
   return (
     <>
@@ -132,7 +133,7 @@ function AppRoutes() {
         <Route path="/game/:id" element={<GameDetailView />} />
         
         {/* Hub routes - only when NOT using background location */}
-        {!showHubModal && FEATURE_FLAGS.HUB && (
+        {!showHubModal && !showGlassBlank && FEATURE_FLAGS.HUB && (
           <Route path="/hub" element={<HubShell />}>
             <Route index element={<HubHome />} />
             <Route path="golfers" element={<HubGolfersPage />} />
@@ -143,8 +144,8 @@ function AppRoutes() {
           </Route>
         )}
         
-        {/* Standalone glass blank page - outside HubShell */}
-        <Route path="/hub/glass-blank" element={<HubGlassBlankPage />} />
+        {/* Standalone glass blank page - only when NOT using background location */}
+        {!showGlassBlank && <Route path="/hub/glass-blank" element={<HubGlassBlankPage />} />}
         
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -160,9 +161,12 @@ function AppRoutes() {
             <Route path="create-game" element={<HubCreateGamePage />} />
             <Route path="echo/*" element={<HubEchoPage />} />
           </Route>
-          {/* Standalone glass blank page - outside HubShell modal */}
-          <Route path="/hub/glass-blank" element={<HubGlassBlankPage />} />
         </Routes>
+      )}
+      
+      {/* Glass blank overlay - rendered when background location exists */}
+      {showGlassBlank && (
+        <HubGlassBlankPage />
       )}
     </>
   );
