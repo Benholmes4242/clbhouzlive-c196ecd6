@@ -51,8 +51,8 @@ export function QuickActionsTile() {
         }}
       >
         <QA label="Create Game" onClick={openCreateGame} icon="⛳" />
-        <QA label="Ask Echo" onClick={openEcho} icon="🗣️" />
-        <QA label="Upload Swing" onClick={openSwing} icon="📤" />
+        <QA label="Ask Echo" onClick={openEcho} icon="💬" />
+        <QA label="Upload Swing" onClick={openSwing} icon="🏌️" />
         <QA label="Profile" onClick={openProfile} icon="👤" />
       </div>
     </Tile>
