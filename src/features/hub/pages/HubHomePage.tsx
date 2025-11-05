@@ -12,7 +12,6 @@ import { NearbyGolfersTile } from '../home/tiles/NearbyGolfersTile';
 import { YourGamesTile } from '../home/tiles/YourGamesTile';
 import { SwingQuickTile } from '../home/tiles/SwingQuickTile';
 import '../home/hubTheme.css';
-import '../HubShell.css';
 
 export default function HubHomePage() {
   const navigate = useNavigate();
