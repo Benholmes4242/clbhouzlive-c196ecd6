@@ -54,13 +54,11 @@ export function HubShell({ onClose }: HubShellProps) {
     };
   }, []);
 
-  // Mark hub-open on html and body while mounted
+  // Mark hub-open on html while mounted
   useEffect(() => {
     document.documentElement.classList.add('hub-open');
-    document.body.classList.add('hub-open');
     return () => {
       document.documentElement.classList.remove('hub-open');
-      document.body.classList.remove('hub-open');
     };
   }, []);
 
@@ -147,15 +145,15 @@ export function HubShell({ onClose }: HubShellProps) {
 
   return (
     <>
-      {/* Backdrop - Transparent click catcher for Hub */}
+      {/* Backdrop - Liquid Glass (matches CinematicCreateMomentModal) */}
       <button
         aria-label="close hub"
         className="fixed inset-0"
         style={{ 
           zIndex: Z.hub,
-          backgroundColor: 'transparent',
-          backdropFilter: 'none',
-          WebkitBackdropFilter: 'none',
+          backgroundColor: 'rgba(0, 0, 0, 0.25)',
+          backdropFilter: 'blur(120px)',
+          WebkitBackdropFilter: 'blur(120px)',
         }}
         onClick={handleClose}
       />
@@ -163,7 +161,7 @@ export function HubShell({ onClose }: HubShellProps) {
       {/* Hub Container */}
       <div 
         className="fixed inset-0 flex items-end sm:items-center sm:justify-center animate-fade-in pointer-events-none"
-        style={{ zIndex: Z.hub, background: 'transparent', backgroundColor: 'transparent' }}
+        style={{ zIndex: Z.hub }}
       >
         <div
           className="hub-shell relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200 pointer-events-auto overflow-x-hidden"
@@ -180,9 +178,6 @@ export function HubShell({ onClose }: HubShellProps) {
             borderRadius: '0',
             boxShadow: 'none',
             isolation: 'isolate',
-            backgroundColor: 'rgba(0, 0, 0, 0.25)',
-            backdropFilter: 'blur(120px)',
-            WebkitBackdropFilter: 'blur(120px)',
           }}
           onClick={(e) => e.stopPropagation()}
         >

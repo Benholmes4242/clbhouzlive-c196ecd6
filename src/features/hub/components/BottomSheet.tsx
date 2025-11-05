@@ -47,23 +47,12 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
   const yRef = React.useRef(0);
   const animFrame = React.useRef<number | null>(null);
 
-  // Scroll lock + sheet-open class when open
+  // Scroll lock when open
   React.useEffect(() => {
     if (!open) return;
     const { overflow } = document.body.style;
     document.body.style.overflow = 'hidden';
-    document.body.classList.add('sheet-open');
-    return () => { 
-      document.body.style.overflow = overflow;
-      document.body.classList.remove('sheet-open');
-    };
-  }, [open]);
-
-  // Remove overlay-debug toggling in production
-  // (kept disabled to avoid any unintended tinting)
-  // No-op effect retained for reference
-  React.useEffect(() => {
-    return;
+    return () => { document.body.style.overflow = overflow; };
   }, [open]);
 
   // ESC to close
@@ -188,6 +177,26 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
 
   return (
     <>
+      {/* Backdrop - starts below header, doesn't cover it */}
+      <div
+        aria-hidden
+        onClick={onBackdropClick}
+        style={{
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          top: headerH,
+          height: `calc(100dvh - ${headerH})`,
+          background: 'rgba(0,0,0,0.45)',
+          backdropFilter: 'blur(120px)',
+          WebkitBackdropFilter: 'blur(120px)',
+          zIndex: 12002,
+          opacity: open ? 1 : 0,
+          transition: 'opacity 180ms ease',
+          pointerEvents: open ? 'auto' : 'none',
+        }}
+      />
+
       {/* Clipper - owns the rounded radius and clips everything inside */}
       <div
         ref={sheetRef}
@@ -205,8 +214,6 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           bottom: 0,
           borderTopLeftRadius: '24px',
           borderTopRightRadius: '24px',
-          borderBottomLeftRadius: 0,
-          borderBottomRightRadius: 0,
           transform: 'translate3d(0, 0, 0)',
           willChange: 'transform',
           zIndex: 12003,
@@ -214,28 +221,39 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           WebkitUserSelect: 'none',
           userSelect: 'none',
           overflow: 'hidden',
-          clipPath: 'inset(0 0 0 0 round 24px 24px 0 0)',
+          clipPath: 'inset(0 round 24px)',
           WebkitMaskImage: '-webkit-radial-gradient(white, black)',
           isolation: 'isolate',
-          backgroundColor: 'rgba(0, 0, 0, 0.25)',
-          backdropFilter: 'blur(120px)',
-          WebkitBackdropFilter: 'blur(120px)',
+          background: 'transparent',
         }}
       >
-        {/* Scrollable content */}
+        {/* Surface - holds all visual effects (blur, background, shadow) */}
         <div
-          ref={contentRef}
           style={{
             position: 'absolute',
             inset: 0,
-            overflow: 'auto',
-            WebkitOverflowScrolling: 'touch',
-            padding: '0',
-            overscrollBehavior: 'contain',
-            background: 'transparent',
+            backdropFilter: 'saturate(120%) blur(24px)',
+            WebkitBackdropFilter: 'saturate(120%) blur(24px)',
+            background: 'rgba(255, 255, 255, 0.15)',
+            boxShadow: '0 -20px 50px rgba(0,0,0,0.35)',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
-          {children}
+          {/* Scrollable content */}
+          <div
+            ref={contentRef}
+            style={{
+              flex: 1,
+              overflow: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              padding: '0',
+              overscrollBehavior: 'contain',
+              background: 'transparent',
+            }}
+          >
+            {children}
+          </div>
         </div>
       </div>
     </>

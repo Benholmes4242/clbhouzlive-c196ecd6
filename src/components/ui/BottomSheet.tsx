@@ -18,19 +18,16 @@ export function BottomSheet({
   className = '',
   ariaLabelledBy,
 }: BottomSheetProps) {
-  // Scroll lock + sheet-open class
+  // Scroll lock
   useEffect(() => {
     if (!open) return;
     const { body } = document;
     const prev = body.style.overflow;
     body.style.overflow = 'hidden';
-    body.classList.add('sheet-open');
     return () => {
       body.style.overflow = prev;
-      body.classList.remove('sheet-open');
     };
   }, [open]);
-
 
   // ESC key handling
   useEffect(() => {
@@ -50,7 +47,7 @@ export function BottomSheet({
     <>
       <div
         className="sheet-backdrop"
-        style={{ zIndex: zIndexBase, background: 'transparent', backdropFilter: 'none', WebkitBackdropFilter: 'none' }}
+        style={{ zIndex: zIndexBase }}
         onClick={onClose}
         aria-hidden="true"
       />

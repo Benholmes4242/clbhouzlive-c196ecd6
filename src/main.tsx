@@ -26,9 +26,6 @@ const setViewportHeight = () => {
 window.addEventListener('resize', setViewportHeight);
 setViewportHeight();
 
-// Ensure no debug tint is present
-document.documentElement.classList.remove('overlay-debug');
-
 // Initialize performance monitoring
 initializePerformanceMonitoring();
 initWebVitals(sendToAnalytics);
