@@ -32,16 +32,15 @@ export const useNavigationHandlers = () => {
     if (tab.path) {
       console.log('useNavigationHandlers: Navigating to:', tab.path);
       setActiveTab(tab.id);
-      navigate(tab.path);
-      
-      // Only scroll to top when navigating to different pages, not when staying on profile or hub
-      if (tab.path !== '/profile' && !tab.path?.startsWith('/hub')) {
+
+      // If navigating to Hub, use background location pattern so the previous page stays under the modal
+      if (tab.path.startsWith('/hub')) {
+        navigate(tab.path, { state: { backgroundLocation: location } });
+      } else {
+        navigate(tab.path);
+        // Only scroll to top when navigating to different pages, not when staying on profile or hub
         setTimeout(() => {
-          window.scrollTo({
-            top: 0,
-            left: 0,
-            behavior: 'smooth'
-          });
+          window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         }, 50);
       }
     }
