@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Tile } from '../components/Tile';
 import { useEchoHistory } from '../../hooks/useEchoHistory';
 import { useOpenSheet } from '../../sheets/useOpenSheet';
-import { Send } from 'lucide-react';
 
 function timeAgo(iso?: string) {
   if (!iso) return '';
@@ -21,16 +20,13 @@ export function EchoTile() {
   const [input, setInput] = React.useState('');
   const openSheet = useOpenSheet();
 
-  const RAW_PROMPTS = [
-    'Build me a 4-week practice plan',
+  const prompts = [
+    'Plan me a 3-night golf trip to Ireland',
     "What's the next major?",
+    'Build me a 4-week practice plan',
     'Best drivers under £400 right now?',
     'How do I stop slicing my driver?',
-    'Plan a 3-night golf trip to Ireland',
   ];
-
-  const MAX_CHARS = 90;
-  const prompts = RAW_PROMPTS.map(p => p.length > MAX_CHARS ? p.slice(0, MAX_CHARS - 1) + '…' : p);
 
   const [carouselIdx, setCarouselIdx] = React.useState(0);
   const [carouselPaused, setCarouselPaused] = React.useState(false);
@@ -39,7 +35,7 @@ export function EchoTile() {
     if (carouselPaused) return;
     const timer = setInterval(() => {
       setCarouselIdx((i) => (i + 1) % prompts.length);
-    }, 8000);
+    }, 5000);
     return () => clearInterval(timer);
   }, [carouselPaused, prompts.length]);
 
@@ -61,18 +57,10 @@ export function EchoTile() {
       onViewAll={() => openEcho()}
       align="center"
     >
-      <div 
-        className="echo-body"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          gap: '10px',
-        }}
-      >
+      <div className="flex flex-col gap-3 h-full">
         {/* Ask input with send button */}
         <form 
-          onSubmit={(e) => { e.preventDefault(); handleSend(); e.stopPropagation(); }}
+          onSubmit={(e) => { e.preventDefault(); handleSend(); }}
           style={{ position: 'relative' }}
         >
           <input
@@ -83,7 +71,7 @@ export function EchoTile() {
             onClick={(e) => e.stopPropagation()}
             style={{
               width: '100%',
-              height: '40px',
+              height: '44px',
               borderRadius: '14px',
               padding: '0 44px 0 14px',
               background: 'rgba(255,255,255,0.06)',
@@ -111,32 +99,27 @@ export function EchoTile() {
               fontSize: '16px',
               cursor: input.trim() ? 'pointer' : 'default',
               opacity: input.trim() ? 1 : 0.4,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
             }}
           >
-            <Send size={16} />
+            ✈️
           </button>
         </form>
 
-        {/* Carousel - centered between input and footer */}
+        {/* Carousel */}
         <div
           onClick={(e) => {
             e.stopPropagation();
-            setInput(prompts[carouselIdx].replace(/(^"|"$)/g, ''));
+            setInput(prompts[carouselIdx]);
           }}
           onMouseEnter={() => setCarouselPaused(true)}
           onMouseLeave={() => setCarouselPaused(false)}
           onTouchStart={() => setCarouselPaused(true)}
           onTouchEnd={() => setCarouselPaused(false)}
           style={{
-            marginTop: 'auto',
-            marginBottom: 'auto',
-            height: 'calc(1.25em * 2 + 6px)',
+            marginTop: '10px',
+            height: '22px',
             overflow: 'hidden',
             borderRadius: '8px',
-            padding: '3px 0',
             background: 'rgba(255,255,255,0.04)',
             cursor: 'pointer',
           }}
@@ -154,14 +137,12 @@ export function EchoTile() {
                 key={i}
                 style={{
                   minWidth: '100%',
-                  display: '-webkit-box',
-                  WebkitBoxOrient: 'vertical',
-                  WebkitLineClamp: 2,
-                  overflow: 'hidden',
-                  lineHeight: '1.25',
+                  display: 'flex',
+                  alignItems: 'center',
                   padding: '0 10px',
                   fontSize: '12.5px',
-                  whiteSpace: 'normal',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   color: 'var(--hub-text-body)',
                 }}
