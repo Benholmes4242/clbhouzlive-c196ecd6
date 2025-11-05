@@ -263,9 +263,9 @@ export function YourGamesTile() {
           </button>
         </div>
       }
-    >
-      <div className="flex flex-col h-full" style={{ ['--tile-x' as any]: '16px' }}>
-        <div className="space-y-3">
+      >
+      <div className="flex flex-col h-full overflow-y-auto" style={{ ['--tile-x' as any]: '16px' }}>
+        <div className="space-y-3 pb-2">
           {isLoading && [0, 1, 2].map(i => (
             <div 
               key={i} 
@@ -312,7 +312,6 @@ export function YourGamesTile() {
               onLongPress={() => nav(`/hub?sheet=your-games&id=${g.id}`)}
             />
           ))}
-          <div aria-hidden="true" style={{ height: '80px' }} />
         </div>
       </div>
     </Tile>

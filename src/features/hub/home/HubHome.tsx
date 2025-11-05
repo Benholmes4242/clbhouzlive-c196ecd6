@@ -26,8 +26,8 @@ export default function HubHome() {
         </div>
       </div>
 
-      {/* Your Games - full width */}
-      <div className="mt-3.5">
+      {/* Your Games - full width, fixed height */}
+      <div className="mt-3.5" style={{ height: 'var(--hub-tile-fixed-h)' }}>
         <YourGamesTile />
       </div>
 
