@@ -140,9 +140,11 @@ function AppRoutes() {
             <Route path="your-games" element={<HubYourGamesPage />} />
             <Route path="create-game" element={<HubCreateGamePage />} />
             <Route path="echo/*" element={<HubEchoPage />} />
-            <Route path="glass-blank" element={<HubGlassBlankPage />} />
           </Route>
         )}
+        
+        {/* Standalone glass blank page - outside HubShell */}
+        <Route path="/hub/glass-blank" element={<HubGlassBlankPage />} />
         
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -157,8 +159,9 @@ function AppRoutes() {
             <Route path="your-games" element={<HubYourGamesPage />} />
             <Route path="create-game" element={<HubCreateGamePage />} />
             <Route path="echo/*" element={<HubEchoPage />} />
-            <Route path="glass-blank" element={<HubGlassBlankPage />} />
           </Route>
+          {/* Standalone glass blank page - outside HubShell modal */}
+          <Route path="/hub/glass-blank" element={<HubGlassBlankPage />} />
         </Routes>
       )}
     </>

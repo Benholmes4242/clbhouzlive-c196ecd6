@@ -120,12 +120,6 @@ export function HubShell({ onClose }: HubShellProps) {
   const activePrimary = getPrimaryTab();
   const activeSecondary = getSecondaryTab();
   const isHomePage = location.pathname === '/hub' || location.pathname === '/hub/';
-  const isGlassBlank = location.pathname === '/hub/glass-blank';
-  
-  // Hide Hub UI completely when on glass-blank page
-  if (isGlassBlank) {
-    return <Outlet />;
-  }
 
   // Primary tabs
   const primaryTabs = [
