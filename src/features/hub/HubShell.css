@@ -90,9 +90,8 @@ html.hub-open { --bg-page: transparent; }
 }
 
 /* Hide ALL page headers when hub is open to prevent interference */
-.hub-open header[class*="z-header"],
-.hub-open header[data-chrome="header"],
-.hub-open [data-header] {
+.hub-open header.global-header,
+.hub-open [data-chrome="header"] {
   opacity: 0 !important;
   pointer-events: none !important;
 }

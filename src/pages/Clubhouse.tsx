@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
-import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
+import GlobalHeader from '@/components/GlobalHeader';
 import NavigationBar from '@/components/bottom-navigation/NavigationBar';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
@@ -209,11 +209,7 @@ const Clubhouse = () => {
       {/* Intersection sentinel for header fade-away */}
       <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
       
-      <ClubhouseHeaderNew
-        activeTab={headerActiveTab} 
-        onTabChange={setHeaderActiveTab}
-        chromeState={chromeControls.chromeState}
-      />
+      <GlobalHeader />
 
       {/* Main Content - Fullscreen Vertical Feed */}
       <div className="clubhouse-scroll">

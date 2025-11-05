@@ -8,7 +8,7 @@ import { ArrowLeft, Send, Search } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessages } from '@/hooks/useMessages';
 import { useConversation } from '@/hooks/useConversation';
-import Header from '@/components/Header';
+import GlobalHeader from '@/components/GlobalHeader';
 import BottomNavigation from '@/components/BottomNavigation';
 import { formatDistanceToNow } from 'date-fns';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';

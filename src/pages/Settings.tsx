@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from "@/components/Header";
+import GlobalHeader from "@/components/GlobalHeader";
 import BottomNavigation from '@/components/BottomNavigation';
 import UserAccountInfo from '@/components/profile/UserAccountInfo';
 import EmailChangeSection from '@/components/profile/EmailChangeSection';

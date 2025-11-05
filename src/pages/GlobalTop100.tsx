@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from '@/components/Header';
+import GlobalHeader from '@/components/GlobalHeader';
 import BottomNavigation from '@/components/BottomNavigation';
 import GlobalTop100Content from '@/components/global-top100/GlobalTop100Content';
 

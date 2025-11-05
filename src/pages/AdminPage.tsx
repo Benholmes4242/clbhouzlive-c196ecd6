@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from "@/components/Header";
+import GlobalHeader from "@/components/GlobalHeader";
 import { useAdmin } from '@/hooks/useAdmin';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import AdminRouteProtection from '@/components/admin/AdminRouteProtection';

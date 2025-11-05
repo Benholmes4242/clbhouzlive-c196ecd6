@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import Header from '@/components/Header';
+import GlobalHeader from '@/components/GlobalHeader';
 import BottomNavigation from '@/components/BottomNavigation';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNotifications } from '@/hooks/useNotifications';

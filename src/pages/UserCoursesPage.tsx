@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import Header from '@/components/Header';
+import GlobalHeader from '@/components/GlobalHeader';
 import BottomNavigation from '@/components/BottomNavigation';
 import CoursesContent from '@/components/courses/CoursesContent';
 import { useUserCoursesData } from '@/components/courses/user/useUserCoursesData';
