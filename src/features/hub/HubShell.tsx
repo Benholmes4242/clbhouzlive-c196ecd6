@@ -15,7 +15,6 @@ import { X } from 'lucide-react';
 import { TapButton } from '@/components/ui/TapButton';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { Z } from '@/config/zIndex';
-import { HubSheetRouter } from './HubSheetRouter';
 import './HubShell.css';
 
 interface HubShellProps {
@@ -305,9 +304,6 @@ export function HubShell({ onClose }: HubShellProps) {
           </div>
         </div>
       </div>
-
-      {/* Sheet Router */}
-      <HubSheetRouter />
     </>
   );
 }
