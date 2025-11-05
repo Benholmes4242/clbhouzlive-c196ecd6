@@ -217,7 +217,9 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           clipPath: 'inset(0 0 0 0 round 24px 24px 0 0)',
           WebkitMaskImage: '-webkit-radial-gradient(white, black)',
           isolation: 'isolate',
-          background: 'transparent',
+          backgroundColor: 'rgba(0, 0, 0, 0.25)',
+          backdropFilter: 'blur(120px)',
+          WebkitBackdropFilter: 'blur(120px)',
         }}
       >
         {/* Scrollable content */}
