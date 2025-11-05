@@ -47,21 +47,13 @@ export function BottomSheet({
     <>
       <div
         className="sheet-backdrop"
-        style={{ 
-          zIndex: zIndexBase,
-          backgroundColor: 'rgba(0, 0, 0, 0.25)',
-          backdropFilter: 'blur(120px)',
-          WebkitBackdropFilter: 'blur(120px)',
-        }}
+        style={{ zIndex: zIndexBase }}
         onClick={onClose}
         aria-hidden="true"
       />
       <div
         className={`sheet sheet-enter ${className}`}
-        style={{ 
-          zIndex: zIndexBase + 1,
-          backgroundColor: 'transparent',
-        }}
+        style={{ zIndex: zIndexBase + 1 }}
         role="dialog"
         aria-modal="true"
         aria-labelledby={ariaLabelledBy}
