@@ -198,6 +198,9 @@ export function HubShell({ onClose }: HubShellProps) {
             border: 'none',
             borderRadius: '0',
             boxShadow: 'none',
+            background: 'rgba(40, 40, 40, 0.95)',
+            backdropFilter: 'blur(40px)',
+            WebkitBackdropFilter: 'blur(40px)',
           }}
           onClick={(e) => e.stopPropagation()}
         >
