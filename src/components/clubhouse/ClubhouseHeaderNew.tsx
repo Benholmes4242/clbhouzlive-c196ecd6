@@ -19,19 +19,16 @@ interface ClubhouseHeaderNewProps {
 const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = 'visible' }: ClubhouseHeaderNewProps) => {
   const navigate = useNavigate();
   const { currentLogo } = useAppLogo();
-  const { variant } = useHeader();
   const isMobile = useIsMobile();
   const [searchOpen, setSearchOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
 
-  // Get variant-specific styles
-  const isGlassDark = variant === 'glass-dark';
-  const isSolidLight = variant === 'solid-light';
+  // ALWAYS use glass-dark style (ignore variant context - force consistency)
+  const isGlassDark = true;
+  const isSolidLight = false;
   
-  // Logo source based on variant
-  const logoSrc = isGlassDark 
-    ? "/assets/clbhouz-white-logo.png" 
-    : "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png";
+  // ALWAYS use white logo
+  const logoSrc = "/assets/clbhouz-white-logo.png";
 
   const handleLogoClick = () => {
     navigate('/clubhouse');
@@ -137,7 +134,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
           <div className="hidden md:flex flex-1 justify-center px-4">
             <SearchPill 
               className="w-full max-w-xl" 
-              variant={variant}
+              variant="glass-dark"
               isClubhousePage={true}
             />
           </div>
@@ -183,7 +180,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
                 autoFocus 
                 onClose={() => setSearchOpen(false)}
                 placeholder="Search clbhouz..."
-                variant={variant}
+                variant="glass-dark"
                 isClubhousePage={true}
               />
             </div>
