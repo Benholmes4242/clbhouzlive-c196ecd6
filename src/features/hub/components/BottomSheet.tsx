@@ -220,32 +220,15 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
             height: '100%',
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
-            background:
-              'linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.10))',
-            backdropFilter: 'blur(28px)',
-            WebkitBackdropFilter: 'blur(28px)',
-            border: '1px solid rgba(255,255,255,0.22)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.45)',
+            background: 'transparent',
+            border: 'none',
+            boxShadow: 'none',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
           }}
         >
-          {/* Handle */}
-          <div
-            ref={handleRef}
-            style={{
-              alignSelf: 'center',
-              width: 44,
-              height: 5,
-              borderRadius: 999,
-              background: 'rgba(255,255,255,0.35)',
-              margin: '10px 0 6px',
-              pointerEvents: 'none',
-              transform: 'scaleX(1)',
-              opacity: 0.85,
-            }}
-          />
+          {/* Handle - removed */}
           {/* Scrollable content */}
           <div
             ref={contentRef}
@@ -253,7 +236,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
               flex: 1,
               overflow: 'auto',
               WebkitOverflowScrolling: 'touch',
-              padding: '12px 14px 18px',
+              padding: '0',
             }}
           >
             {children}
