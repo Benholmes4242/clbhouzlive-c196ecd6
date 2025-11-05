@@ -232,10 +232,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           style={{
             position: 'absolute',
             inset: 0,
-            backdropFilter: 'saturate(120%) blur(24px)',
-            WebkitBackdropFilter: 'saturate(120%) blur(24px)',
             background: 'transparent',
-            boxShadow: '0 -20px 50px rgba(0,0,0,0.35)',
             display: 'flex',
             flexDirection: 'column',
           }}
