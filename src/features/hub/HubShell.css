@@ -89,6 +89,14 @@ html.hub-open { --bg-page: transparent; }
   background-color: transparent !important;
 }
 
+/* Hide ALL page headers when hub is open to prevent interference */
+.hub-open header[class*="z-header"],
+.hub-open header[data-chrome="header"],
+.hub-open [data-header] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 /* Neutralize hardcoded dark backdrops when hub is open */
 .hub-open .videoContainer,
 .hub-open .highlights__card,
