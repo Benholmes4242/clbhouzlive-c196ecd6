@@ -283,10 +283,11 @@ export function HubShell({ onClose }: HubShellProps) {
 
           {/* Content Area - Routed */}
           <div 
-            className={`flex-1 overflow-y-auto ${isHomePage ? '' : 'px-5 pt-4'} pb-3`}
+            className={`flex-1 overflow-y-auto ${isHomePage ? '' : 'px-5 pt-4'}`}
             style={{
               WebkitOverflowScrolling: 'touch',
               overscrollBehavior: 'contain',
+              paddingBottom: '12px',
             }}
           >
             <Outlet />
