@@ -78,3 +78,19 @@
     opacity: 1;
   }
 }
+
+/* Hub Open: make underlying app background transparent for true glass */
+html.hub-open {
+  --bg-page: transparent;
+}
+.hub-open body,
+.hub-open #root,
+.hub-open .clubhouse-root {
+  background: transparent !important;
+}
+
+/* Neutralize hardcoded black backgrounds when hub is open */
+.hub-open .videoContainer,
+.hub-open .highlights__card {
+  background: transparent !important;
+}

@@ -54,6 +54,14 @@ export function HubShell({ onClose }: HubShellProps) {
     };
   }, []);
 
+  // Mark hub-open on html while mounted
+  useEffect(() => {
+    document.documentElement.classList.add('hub-open');
+    return () => {
+      document.documentElement.classList.remove('hub-open');
+    };
+  }, []);
+
   // Track Hub open on mount
   useEffect(() => {
     if (typeof window !== 'undefined' && (window as any).gtag) {
