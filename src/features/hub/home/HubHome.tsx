@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import { EchoQuickTile } from './tiles/EchoQuickTile';
-import { SwingQuickTile } from './tiles/SwingQuickTile';
+import { EchoTile } from './tiles/EchoTile';
+import { QuickActionsTile } from './tiles/QuickActionsTile';
 import { NearbyGolfersTile } from './tiles/NearbyGolfersTile';
 import { GamesNearYouTile } from './tiles/GamesNearYouTile';
 import { YourGamesTile } from './tiles/YourGamesTile';
@@ -31,16 +31,16 @@ export default function HubHome() {
         <YourGamesTile />
       </div>
 
-      {/* Echo & Swing 2×2 grid */}
+      {/* Echo & Quick Actions 2×2 grid */}
       <div
         className="grid mt-3.5"
         style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem', gridAutoRows: 'var(--hub-tile-fixed-h)' }}
       >
         <div className="hub-tile-fixed">
-          <EchoQuickTile />
+          <EchoTile />
         </div>
         <div className="hub-tile-fixed">
-          <SwingQuickTile />
+          <QuickActionsTile />
         </div>
       </div>
     </main>
