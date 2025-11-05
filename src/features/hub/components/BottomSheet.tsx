@@ -188,26 +188,6 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
 
   return (
     <>
-      {/* Backdrop - transparent click catcher */}
-      <div
-        aria-hidden
-        onClick={onBackdropClick}
-        style={{
-          position: 'fixed',
-          left: 0,
-          right: 0,
-          top: 0,
-          height: '100dvh',
-          background: 'transparent',
-          backdropFilter: 'none',
-          WebkitBackdropFilter: 'none',
-          zIndex: 12002,
-          opacity: open ? 1 : 0,
-          transition: 'opacity 180ms ease',
-          pointerEvents: open ? 'auto' : 'none',
-        }}
-      />
-
       {/* Clipper - owns the rounded radius and clips everything inside */}
       <div
         ref={sheetRef}
