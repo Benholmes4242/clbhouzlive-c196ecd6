@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Tile } from '../components/Tile';
 import { useEchoHistory } from '../../hooks/useEchoHistory';
 import { useOpenSheet } from '../../sheets/useOpenSheet';
+import { Send } from 'lucide-react';
 
 function timeAgo(iso?: string) {
   if (!iso) return '';
@@ -101,7 +102,7 @@ export function EchoTile() {
               opacity: input.trim() ? 1 : 0.4,
             }}
           >
-            ✈️
+            <Send size={16} />
           </button>
         </form>
 
