@@ -1,4 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
+import { useEffect } from 'react';
 import { BottomSheet } from './components/BottomSheet';
 import { GolfersScreen } from './sheets/GolfersScreen';
 import { GamesNearYouScreen } from './sheets/GamesNearYouScreen';
@@ -31,7 +32,24 @@ export function HubSheetRouter() {
   };
 
   const SheetComp = key ? SHEETS[key] : null;
+  const isOpen = Boolean(SheetComp);
 
+  // Ensure hub-open class during hub sheet lifecycle
+  useEffect(() => {
+    const html = document.documentElement;
+    if (isOpen) {
+      html.classList.add('hub-open');
+      document.body.classList.add('hub-open');
+    } else {
+      html.classList.remove('hub-open');
+      document.body.classList.remove('hub-open');
+    }
+    return () => {
+      html.classList.remove('hub-open');
+      document.body.classList.remove('hub-open');
+    };
+  }, [isOpen]);
+  
   if (key) console.log('[HubSheetRouter] open sheet =', key, focusId ? `focusId=${focusId}` : '');
 
   return (
