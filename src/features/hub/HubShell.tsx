@@ -187,7 +187,9 @@ export function HubShell({ onClose }: HubShellProps) {
             id="hubHeader"
             className="relative z-30 shrink-0"
             style={{
-              background: 'transparent',
+              background: 'linear-gradient(180deg, var(--hub-header-bg-start) 0%, var(--hub-header-bg-mid) 50%, var(--hub-header-bg-end) 100%)',
+              backdropFilter: 'blur(var(--hub-header-blur))',
+              WebkitBackdropFilter: 'blur(var(--hub-header-blur))',
               borderBottom: '1px solid var(--hub-header-stroke)',
               isolation: 'isolate',
             }}
