@@ -47,23 +47,12 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
   const yRef = React.useRef(0);
   const animFrame = React.useRef<number | null>(null);
 
-  // Scroll lock + sheet-open class when open
+  // Scroll lock when open
   React.useEffect(() => {
     if (!open) return;
     const { overflow } = document.body.style;
     document.body.style.overflow = 'hidden';
-    document.body.classList.add('sheet-open');
-    return () => { 
-      document.body.style.overflow = overflow;
-      document.body.classList.remove('sheet-open');
-    };
-  }, [open]);
-
-  // Remove overlay-debug toggling in production
-  // (kept disabled to avoid any unintended tinting)
-  // No-op effect retained for reference
-  React.useEffect(() => {
-    return;
+    return () => { document.body.style.overflow = overflow; };
   }, [open]);
 
   // ESC to close
@@ -188,19 +177,14 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
 
   return (
     <>
-      {/* Backdrop - transparent click catcher */}
+      {/* Backdrop - simple opacity fade, no blur on animated layer */}
       <div
         aria-hidden
         onClick={onBackdropClick}
         style={{
           position: 'fixed',
-          left: 0,
-          right: 0,
-          top: 0,
-          height: '100dvh',
-          background: 'transparent',
-          backdropFilter: 'none',
-          WebkitBackdropFilter: 'none',
+          inset: 0,
+          background: 'rgba(0,0,0,0.45)',
           zIndex: 12002,
           opacity: open ? 1 : 0,
           transition: 'opacity 180ms ease',
@@ -208,54 +192,43 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
         }}
       />
 
-      {/* Clipper - owns the rounded radius and clips everything inside */}
+      {/* Sheet - wrapper for transform, inner surface for blur */}
       <div
         ref={sheetRef}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        role="dialog"
-        aria-modal="true"
-        aria-label={ariaLabel || 'Panel'}
         style={{
           position: 'fixed',
           left: 0,
           right: 0,
           top: headerH,
           bottom: 0,
-          borderTopLeftRadius: '24px',
-          borderTopRightRadius: '24px',
-          borderBottomLeftRadius: 0,
-          borderBottomRightRadius: 0,
           transform: 'translate3d(0, 0, 0)',
           willChange: 'transform',
           zIndex: 12003,
           touchAction: 'none',
           WebkitUserSelect: 'none',
           userSelect: 'none',
-          overflow: 'hidden',
-          clipPath: 'inset(0 0 0 0 round 24px 24px 0 0)',
-          WebkitMaskImage: '-webkit-radial-gradient(white, black)',
-          isolation: 'isolate',
-          background: 'transparent',
         }}
       >
-        {/* Surface - holds all visual effects (blur, background, shadow) */}
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={ariaLabel || 'Panel'}
           style={{
-            position: 'absolute',
-            inset: 0,
-            backdropFilter: 'saturate(120%) blur(24px)',
-            WebkitBackdropFilter: 'saturate(120%) blur(24px)',
-            background: 'hsl(var(--background) / 0.85)',
-            boxShadow: '0 -20px 50px rgba(0,0,0,0.35)',
+            height: '100%',
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            background: 'transparent',
+            border: 'none',
+            boxShadow: 'none',
             display: 'flex',
             flexDirection: 'column',
-            WebkitTransform: 'translateZ(0)',
-            transform: 'translateZ(0)',
-            willChange: 'transform',
+            overflow: 'hidden',
           }}
         >
+          {/* Handle - removed */}
           {/* Scrollable content */}
           <div
             ref={contentRef}
@@ -264,8 +237,6 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
               overflow: 'auto',
               WebkitOverflowScrolling: 'touch',
               padding: '0',
-              overscrollBehavior: 'contain',
-              background: 'transparent',
             }}
           >
             {children}

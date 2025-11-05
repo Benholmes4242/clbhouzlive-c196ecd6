@@ -220,9 +220,9 @@ html, body, #root {
 .sheet-backdrop {
   position: fixed;
   inset: 0;
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  background: var(--modal-backdrop);
+  backdrop-filter: blur(var(--modal-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--modal-backdrop-blur));
 }
 
 .sheet {
