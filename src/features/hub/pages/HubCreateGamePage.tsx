@@ -1,20 +1,25 @@
 /**
  * Hub Create Game Page
  * 
- * Game creation with validation and analytics (Phase 3).
+ * Full-screen glass page for game creation.
+ * Opens as an overlay above the origin page.
  */
 
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useHub } from '@/features/hub/useHub';
 import { CreateGameModal } from '@/features/nearby/components/CreateGameModal';
 import { useGameBeacon } from '@/features/nearby/hooks/useGameBeacon';
 import { supabase } from '@/integrations/supabase/client';
 import { assertDispatch } from '@/utils/assertDispatch';
 import { EVT_GAME_CREATED } from '@/features/nearby/constants';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import '../home/hubTheme.css';
 
 export function HubCreateGamePage() {
-  const navigate = useNavigate();
+  const { open } = useHub();
+  const nav = useNavigate();
+  const loc = useLocation();
   const { createBeacon } = useGameBeacon({});
 
   useEffect(() => {
@@ -26,6 +31,17 @@ export function HubCreateGamePage() {
       });
     }
   }, []);
+
+  const handleBack = () => {
+    const state = loc.state as any;
+    if (state?.backgroundLocation) {
+      // Return to Hub overlay
+      open();
+    } else {
+      // Deep link fallback
+      nav('/clubhouse', { replace: true });
+    }
+  };
 
   const handleCreate = async (input: any) => {
     try {
@@ -48,7 +64,7 @@ export function HubCreateGamePage() {
       
       // Navigate to Your Games after creation
       await new Promise((r) => setTimeout(r, 150));
-      navigate('/hub/your-games');
+      nav('/hub/your-games');
     } catch (error) {
       console.error('Failed to create game:', error);
       throw error;
@@ -56,10 +72,19 @@ export function HubCreateGamePage() {
   };
 
   return (
-    <CreateGameModal
-      isOpen={true}
-      onClose={() => navigate('/hub/your-games')}
-      onCreateBeacon={handleCreate}
-    />
+    <div
+      className="fixed inset-0 z-[9999]"
+      style={{
+        background: 'rgba(0, 0, 0, 0.25)',
+        backdropFilter: 'blur(120px)',
+        WebkitBackdropFilter: 'blur(120px)',
+      }}
+    >
+      <CreateGameModal
+        isOpen={true}
+        onClose={handleBack}
+        onCreateBeacon={handleCreate}
+      />
+    </div>
   );
 }
