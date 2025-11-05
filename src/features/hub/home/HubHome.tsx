@@ -12,7 +12,7 @@ import { YourGamesTile } from './tiles/YourGamesTile';
 
 export default function HubHome() {
   return (
-    <main className="w-full overflow-x-hidden px-3.5 pb-6 mt-3">
+    <main className="w-full overflow-x-hidden px-3.5 mt-3" style={{ paddingBottom: '12px' }}>
       {/* Top 2×2 grid */}
       <div
         className="grid"
