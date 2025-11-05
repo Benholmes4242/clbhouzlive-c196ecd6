@@ -1,7 +1,7 @@
 /**
  * Hub Create Game Page
  * 
- * Full-screen Create Game modal with glass background, rendered over origin page.
+ * Game creation with validation and analytics (Phase 3).
  */
 
 import React, { useEffect } from 'react';
@@ -12,14 +12,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { assertDispatch } from '@/utils/assertDispatch';
 import { EVT_GAME_CREATED } from '@/features/nearby/constants';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { useHub } from '../useHub';
-import { Z } from '@/config/zIndex';
-import '../home/hubTheme.css';
 
 export function HubCreateGamePage() {
   const navigate = useNavigate();
   const { createBeacon } = useGameBeacon({});
-  const { open } = useHub();
 
   useEffect(() => {
     // Track Create Game open
@@ -50,47 +46,20 @@ export function HubCreateGamePage() {
         700
       );
       
-      // Navigate back to Hub after creation
+      // Navigate to Your Games after creation
       await new Promise((r) => setTimeout(r, 150));
-      open(); // Reopen Hub
-      navigate(-1); // Remove Create Game from history
+      navigate('/hub/your-games');
     } catch (error) {
       console.error('Failed to create game:', error);
       throw error;
     }
   };
 
-  const handleClose = () => {
-    open(); // Reopen Hub
-    navigate(-1); // Go back
-  };
-
   return (
-    <>
-      {/* Glass background */}
-      <div
-        className="fixed inset-0"
-        style={{
-          background: 'rgba(0, 0, 0, 0.25)',
-          backdropFilter: 'blur(120px)',
-          WebkitBackdropFilter: 'blur(120px)',
-          zIndex: Z.hub,
-        }}
-      />
-
-      {/* Modal Content */}
-      <div
-        className="fixed inset-0"
-        style={{
-          zIndex: Z.hub,
-        }}
-      >
-        <CreateGameModal
-          isOpen={true}
-          onClose={handleClose}
-          onCreateBeacon={handleCreate}
-        />
-      </div>
-    </>
+    <CreateGameModal
+      isOpen={true}
+      onClose={() => navigate('/hub/your-games')}
+      onCreateBeacon={handleCreate}
+    />
   );
 }

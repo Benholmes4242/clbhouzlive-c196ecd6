@@ -15,7 +15,6 @@ import { X } from 'lucide-react';
 import { TapButton } from '@/components/ui/TapButton';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { Z } from '@/config/zIndex';
-import { useHub } from './useHub';
 import './HubShell.css';
 
 interface HubShellProps {
@@ -26,7 +25,6 @@ export function HubShell({ onClose }: HubShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const headerRef = useRef<HTMLDivElement>(null);
-  const { close, navigateFromHub } = useHub();
 
   // Measure header height for bottom sheet positioning
   useLayoutEffect(() => {
@@ -92,8 +90,8 @@ export function HubShell({ onClose }: HubShellProps) {
     if (onClose) {
       onClose();
     } else {
-      // Use Hub context to close and return to origin
-      close();
+      // Default: navigate back or to clubhouse
+      navigate('/clubhouse');
     }
   };
 
@@ -222,7 +220,12 @@ export function HubShell({ onClose }: HubShellProps) {
                 <div className="flex items-center gap-2">
                   {/* Temporary glass test button */}
                   <button
-                    onClick={() => navigateFromHub('/hub/glass-blank')}
+                    onClick={() => {
+                      const state = location.state as any;
+                      navigate('/hub/glass-blank', { 
+                        state: { backgroundLocation: state?.backgroundLocation || location } 
+                      });
+                    }}
                     className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 active:scale-95 transition-all"
                     aria-label="Test glass effect"
                   />
