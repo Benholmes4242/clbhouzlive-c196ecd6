@@ -14,21 +14,22 @@ function QA({ label, onClick, icon }: { label: string; onClick: () => void; icon
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '8px',
+        gap: '6px',
         aspectRatio: '1 / 1',
         width: '100%',
-        padding: '0',
+        padding: '10px',
         borderRadius: '16px',
         background: 'rgba(255,255,255,0.10)',
         border: '1px solid rgba(255,255,255,0.15)',
         cursor: 'pointer',
         transition: 'background 0.2s',
+        minHeight: 0,
       }}
       onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
       onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.10)')}
     >
-      <div className="qa-icon" style={{ fontSize: '22px', lineHeight: 1 }}>{icon}</div>
-      <div className="qa-label" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--hub-text-body)' }}>{label}</div>
+      <div className="qa-icon" style={{ fontSize: '20px', lineHeight: 1 }}>{icon}</div>
+      <div className="qa-label" style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--hub-text-body)', letterSpacing: '0.2px', textAlign: 'center', maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
     </button>
   );
 }

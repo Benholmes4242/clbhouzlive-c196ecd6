@@ -7,8 +7,8 @@ import React from 'react';
 import { EchoTile } from './tiles/EchoTile';
 import { QuickActionsTile } from './tiles/QuickActionsTile';
 import { NearbyGolfersTile } from './tiles/NearbyGolfersTile';
-import { GamesNearYouTile } from './tiles/GamesNearYouTile';
 import { YourGamesTile } from './tiles/YourGamesTile';
+import { SwingQuickTile } from './tiles/SwingQuickTile';
 
 export default function HubHome() {
   return (
@@ -18,11 +18,11 @@ export default function HubHome() {
         className="grid"
         style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem', gridAutoRows: 'var(--hub-tile-fixed-h)' }}
       >
-        <div className="hub-tile-fixed">
+      <div className="hub-tile-fixed">
           <NearbyGolfersTile limit={5} />
         </div>
         <div className="hub-tile-fixed">
-          <GamesNearYouTile limit={3} enableFilters={false} />
+          <EchoTile />
         </div>
       </div>
 
@@ -46,7 +46,7 @@ export default function HubHome() {
         }}
       >
         <div className="hub-tile-fixed">
-          <EchoTile />
+          <SwingQuickTile />
         </div>
         <div className="hub-tile-fixed">
           <QuickActionsTile />

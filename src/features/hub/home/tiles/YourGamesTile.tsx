@@ -240,10 +240,7 @@ export function YourGamesTile() {
     <Tile 
       title={
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '12px' }}>
-          <div>
-            <h3>Your Games</h3>
-            <p className="tile-sub">Hosting & Joined</p>
-          </div>
+          <h3>Games</h3>
           <button
             onClick={openCreateGame}
             className="text-[15px] font-medium transition"
@@ -302,7 +299,7 @@ export function YourGamesTile() {
               aria-label="View all your games"
               disabled={!hasAny && isLoading}
             >
-              View all →
+              Your Games →
             </button>
           </div>
         </div>
