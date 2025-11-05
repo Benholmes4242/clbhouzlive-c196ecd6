@@ -120,7 +120,24 @@ body.hub-open .overlay,
 body.hub-open [data-overlay],
 body.hub-open .DialogOverlay,
 body.hub-open .SheetOverlay,
-body.hub-open .sheet-backdrop {
+body.hub-open .sheet-backdrop,
+body.hub-open .hub-backdrop,
+body.hub-open .hub-sheet-overlay,
+body.hub-open [data-portal] .DialogOverlay,
+body.hub-open [data-portal] .SheetOverlay,
+body.hub-open .hub-modal-overlay {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 1 !important;
+  transition: none !important;
+}
+
+/* Prevent body scrim pseudo-elements */
+body.hub-open::before,
+body.hub-open .hub-root::before,
+body.hub-open .hub-modal::before,
+body.hub-open .hub-modal-scrim {
   background: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -128,11 +145,22 @@ body.hub-open .sheet-backdrop {
 
 /* Hub container: transparent + own paint layer */
 #hub-root,
-.hub-shell {
+.hub-shell,
+.hub-modal {
   background: transparent !important;
+  --hub-bg: transparent;
   isolation: isolate;
   contain: paint;
   -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Hub sheet surface containment */
+.hub-sheet,
+.hub-surface {
+  overflow: clip !important;
+  contain: paint;
+  -webkit-mask-composite: source-over;
   transform: translateZ(0);
 }
 
