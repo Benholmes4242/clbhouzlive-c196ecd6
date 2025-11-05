@@ -174,8 +174,6 @@ export function HubShell({ onClose }: HubShellProps) {
             overscrollBehaviorX: 'none',
             paddingTop: 'env(safe-area-inset-top)',
             paddingBottom: 'env(safe-area-inset-bottom)',
-            backdropFilter: 'blur(var(--hub-backdrop-blur))',
-            WebkitBackdropFilter: 'blur(var(--hub-backdrop-blur))',
             border: 'none',
             borderRadius: '0',
             boxShadow: 'none',
