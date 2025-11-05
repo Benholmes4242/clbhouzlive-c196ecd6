@@ -187,7 +187,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           right: 0,
           top: headerH,
           height: `calc(100dvh - ${headerH})`,
-          background: 'rgba(0,0,0,0.45)',
+          background: 'transparent',
           backdropFilter: 'blur(120px)',
           WebkitBackdropFilter: 'blur(120px)',
           zIndex: 12002,
