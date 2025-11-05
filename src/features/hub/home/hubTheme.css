@@ -19,13 +19,13 @@
   /* ========================================
      BACKGROUNDS & SURFACES
      ======================================== */
-  /* Main Hub container - Dark Glass (matches CinematicOverlay) */
-  --hub-bg-start: rgba(18, 18, 18, 0.95);
-  --hub-bg-end: rgba(18, 18, 18, 0.95);
+  /* Main Hub container - Transparent */
+  --hub-bg-start: transparent;
+  --hub-bg-end: transparent;
   
-  /* Backdrop overlay (behind Hub - matches CinematicOverlay) */
-  --hub-backdrop: rgba(0, 0, 0, 0.45);
-  --hub-backdrop-blur: 14px;
+  /* Backdrop overlay - Transparent */
+  --hub-backdrop: transparent;
+  --hub-backdrop-blur: 0px;
   
   /* Header v2 - Apple Control Center vibe */
   --hub-header-bg-start: rgba(36,36,38,0.85);
