@@ -163,7 +163,7 @@ export function HubShell({ onClose }: HubShellProps) {
       {/* Hub Container */}
       <div 
         className="fixed inset-0 flex items-end sm:items-center sm:justify-center animate-fade-in pointer-events-none"
-        style={{ zIndex: Z.hub }}
+        style={{ zIndex: Z.hub, background: 'transparent', backgroundColor: 'transparent' }}
       >
         <div
           className="hub-shell relative w-full max-w-lg flex flex-col animate-in slide-in-from-bottom-4 duration-200 pointer-events-auto overflow-x-hidden"
@@ -180,6 +180,8 @@ export function HubShell({ onClose }: HubShellProps) {
             borderRadius: '0',
             boxShadow: 'none',
             isolation: 'isolate',
+            background: 'transparent',
+            backgroundColor: 'transparent',
           }}
           onClick={(e) => e.stopPropagation()}
         >
