@@ -2,10 +2,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { navigationTabs } from './navigationTabs';
+import { useHub } from '@/features/hub/useHub';
 
 export const useNavigationHandlers = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { open: openHub } = useHub();
   const [activeTab, setActiveTab] = useState('clubhouse');
 
   useEffect(() => {
@@ -33,9 +35,9 @@ export const useNavigationHandlers = () => {
       console.log('useNavigationHandlers: Navigating to:', tab.path);
       setActiveTab(tab.id);
 
-      // If navigating to Hub, use background location pattern so the previous page stays under the modal
-      if (tab.path.startsWith('/hub')) {
-        navigate(tab.path, { state: { backgroundLocation: location } });
+      // If navigating to Hub, use Hub context to capture origin
+      if (tab.path === '/hub' || tab.path.startsWith('/hub')) {
+        openHub();
       } else {
         navigate(tab.path);
         // Only scroll to top when navigating to different pages, not when staying on profile or hub
