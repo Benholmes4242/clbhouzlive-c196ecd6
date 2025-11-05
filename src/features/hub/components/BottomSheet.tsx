@@ -177,7 +177,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
 
   return (
     <>
-      {/* Backdrop - simple opacity fade, no blur on animated layer */}
+      {/* Backdrop - with backdrop blur */}
       <div
         aria-hidden
         onClick={onBackdropClick}
@@ -185,6 +185,8 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           position: 'fixed',
           inset: 0,
           background: 'rgba(0,0,0,0.45)',
+          backdropFilter: 'blur(120px)',
+          WebkitBackdropFilter: 'blur(120px)',
           zIndex: 12002,
           opacity: open ? 1 : 0,
           transition: 'opacity 180ms ease',
