@@ -1,14 +1,14 @@
 /**
- * Hub Golfers Page - Standalone Glass Overlay
+ * Hub Swing Coach Page - Standalone Glass Overlay
  */
 
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
-import { GolfersScreen } from '../sheets/GolfersScreen';
+import { SwingCoachScreen } from '../sheets/SwingCoachScreen';
 import '../home/hubTheme.css';
 
-export default function HubGolfersPage() {
+export default function HubSwingPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -59,13 +59,13 @@ export default function HubGolfersPage() {
               <ChevronLeft className="w-6 h-6" />
             </button>
             <h1 className="text-xl font-semibold" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>
-              Nearby Golfers
+              Swing Coach
             </h1>
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto px-5">
-            <GolfersScreen onClose={handleBack} />
+          <div className="flex-1 overflow-hidden">
+            <SwingCoachScreen onClose={handleBack} />
           </div>
         </div>
       </div>

@@ -1,48 +1,74 @@
 /**
- * Hub Your Games Page
- * 
- * Your hosted and joined games with realtime updates (Phase 3).
+ * Hub Your Games Page - Standalone Glass Overlay
  */
 
-import React, { useEffect } from 'react';
-import { YourGamesList } from '@/features/nearby/components/YourGamesList';
-import { supabase } from '@/integrations/supabase/client';
-import { useGameBeacon } from '@/features/nearby/hooks/useGameBeacon';
-import { useNavigate } from 'react-router-dom';
-import { analyticsEvents } from '@/utils/analyticsEvents';
+import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ChevronLeft } from 'lucide-react';
+import { YourGamesScreen } from '../sheets/YourGamesScreen';
+import '../home/hubTheme.css';
 
-export function HubYourGamesPage() {
-  const { cancelBeacon } = useGameBeacon({});
+export default function HubYourGamesPage() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  useEffect(() => {
-    // Track Your Games tab view
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', analyticsEvents.hub.your_games_view.event, {
-        event_category: analyticsEvents.hub.your_games_view.category,
-        event_label: analyticsEvents.hub.your_games_view.label,
-      });
+  const handleBack = () => {
+    const state = location.state as { backgroundLocation?: Location } | null;
+    if (state?.backgroundLocation) {
+      navigate(-1);
+    } else {
+      navigate('/clubhouse', { replace: true });
     }
-  }, []);
-
-  const handleLeaveGame = async (gameId: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    
-    await supabase
-      .from('game_participants')
-      .delete()
-      .eq('game_id', gameId)
-      .eq('user_id', user.id);
   };
 
   return (
-    <YourGamesList
-      activeTab="your-games"
-      onCancelGame={cancelBeacon}
-      onLeaveGame={handleLeaveGame}
-      onCreateGame={() => navigate('/hub/create-game')}
-      onFindGame={() => navigate('/hub/games')}
-    />
+    <>
+      {/* Glass backdrop */}
+      <div
+        className="fixed inset-0"
+        style={{
+          background: 'rgba(0, 0, 0, 0.25)',
+          backdropFilter: 'blur(120px)',
+          WebkitBackdropFilter: 'blur(120px)',
+          zIndex: 9999,
+        }}
+        onClick={handleBack}
+      />
+
+      {/* Glass page content */}
+      <div
+        className="fixed inset-0 flex flex-col"
+        style={{ zIndex: 10000 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          className="w-full h-full flex flex-col overflow-hidden"
+          style={{
+            paddingTop: 'env(safe-area-inset-top)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+          }}
+        >
+          {/* Header */}
+          <div className="shrink-0 px-5 py-4 flex items-center gap-3">
+            <button
+              onClick={handleBack}
+              className="w-9 h-9 flex items-center justify-center -ml-2 transition-colors active:scale-95"
+              style={{ color: 'rgba(255, 255, 255, 0.85)' }}
+              aria-label="Back"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <h1 className="text-xl font-semibold" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>
+              Your Games
+            </h1>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto px-5">
+            <YourGamesScreen onClose={handleBack} />
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

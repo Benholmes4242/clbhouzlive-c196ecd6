@@ -1,74 +1,74 @@
 /**
- * Hub Echo Page
- * 
- * Full-page Echo experience integrated inside Hub
+ * Hub Echo Page - Standalone Glass Overlay
  */
 
 import React from 'react';
-import { Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
-import AIChatOverlay from '@/components/ai-chat/AIChatOverlay';
-import AIChatHistory from '@/components/ai-chat/AIChatHistory';
-import { EchoConversationsProvider } from '@/features/echo/components/EchoConversationsProvider';
-import { ChatDetailPane } from './ChatDetailPane';
-import { SwingDetailPane } from './SwingDetailPane';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ChevronLeft } from 'lucide-react';
+import { EchoChatScreen } from '../sheets/EchoChatScreen';
+import '../home/hubTheme.css';
 
-export function HubEchoPage() {
+export default function HubEchoPage() {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const location = useLocation();
 
-  // Explicit redirect for /hub/echo to /hub/echo/chat
-  const isIndex = pathname === '/hub/echo' || pathname === '/hub/echo/';
-  
-  if (isIndex) {
-    return <Navigate to="/hub/echo/chat" replace />;
-  }
+  const handleBack = () => {
+    const state = location.state as { backgroundLocation?: Location } | null;
+    if (state?.backgroundLocation) {
+      navigate(-1);
+    } else {
+      navigate('/clubhouse', { replace: true });
+    }
+  };
 
   return (
-    <EchoConversationsProvider>
-      <div className="h-full w-full">
-        <Routes>
-          <Route index element={<Navigate to="chat" replace />} />
-          <Route
-            path="chat"
-            element={
-                <AIChatOverlay
-                  isOpen={true}
-                  onClose={() => navigate('/hub/golfers', { replace: true })}
-                  paneMode
-                  layout="page"
-                  initialTab="chat"
-                />
-            }
-          />
-          <Route
-            path="swing"
-            element={
-                <AIChatOverlay
-                  isOpen={true}
-                  onClose={() => navigate('/hub/golfers', { replace: true })}
-                  paneMode
-                  layout="page"
-                  initialTab="swing"
-                />
-            }
-          />
-          <Route
-            path="history"
-            element={
-                <AIChatHistory
-                  isOpen={true}
-                  onClose={() => navigate('/hub/echo/chat')}
-                  onSelectMessage={(id) => navigate(`/hub/echo/history/chat/${id}`)}
-                  paneMode
-                  layout="page"
-                  defaultCategory="chat"
-                />
-            }
-          />
-          <Route path="history/chat/:id" element={<ChatDetailPane />} />
-          <Route path="history/swing/:id" element={<SwingDetailPane />} />
-        </Routes>
+    <>
+      {/* Glass backdrop */}
+      <div
+        className="fixed inset-0"
+        style={{
+          background: 'rgba(0, 0, 0, 0.25)',
+          backdropFilter: 'blur(120px)',
+          WebkitBackdropFilter: 'blur(120px)',
+          zIndex: 9999,
+        }}
+        onClick={handleBack}
+      />
+
+      {/* Glass page content */}
+      <div
+        className="fixed inset-0 flex flex-col"
+        style={{ zIndex: 10000 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          className="w-full h-full flex flex-col overflow-hidden"
+          style={{
+            paddingTop: 'env(safe-area-inset-top)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+          }}
+        >
+          {/* Header */}
+          <div className="shrink-0 px-5 py-4 flex items-center gap-3">
+            <button
+              onClick={handleBack}
+              className="w-9 h-9 flex items-center justify-center -ml-2 transition-colors active:scale-95"
+              style={{ color: 'rgba(255, 255, 255, 0.85)' }}
+              aria-label="Back"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <h1 className="text-xl font-semibold" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>
+              Echo
+            </h1>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-hidden">
+            <EchoChatScreen onClose={handleBack} />
+          </div>
+        </div>
       </div>
-    </EchoConversationsProvider>
+    </>
   );
 }

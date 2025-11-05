@@ -76,27 +76,27 @@ const AdminPage = lazy(() => import("./pages/AdminPage"));
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
 const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 
-// Hub components (lazy load when feature flag is enabled)
-const HubShell = lazy(() => import("./features/hub/HubShell").then(m => ({ default: m.HubShell })));
-const HubHome = lazy(() => import("./features/hub/home/HubHome"));
-const HubGolfersPage = lazy(() => import("./features/hub/pages/HubGolfersPage").then(m => ({ default: m.HubGolfersPage })));
-const HubGamesPage = lazy(() => import("./features/hub/pages/HubGamesPage").then(m => ({ default: m.HubGamesPage })));
-const HubYourGamesPage = lazy(() => import("./features/hub/pages/HubYourGamesPage").then(m => ({ default: m.HubYourGamesPage })));
-const HubCreateGamePage = lazy(() => import("./features/hub/pages/HubCreateGamePage").then(m => ({ default: m.HubCreateGamePage })));
-const HubEchoPage = lazy(() => import("./features/hub/pages/HubEchoPage").then(m => ({ default: m.HubEchoPage })));
+// Hub components (lazy load when feature flag is enabled) - All standalone glass pages
+const HubHomePage = lazy(() => import("./features/hub/pages/HubHomePage"));
+const HubGolfersPage = lazy(() => import("./features/hub/pages/HubGolfersPage"));
+const HubGamesPage = lazy(() => import("./features/hub/pages/HubGamesPage"));
+const HubYourGamesPage = lazy(() => import("./features/hub/pages/HubYourGamesPage"));
+const HubCreateGamePage = lazy(() => import("./features/hub/pages/HubCreateGamePage"));
+const HubEchoPage = lazy(() => import("./features/hub/pages/HubEchoPage"));
+const HubSwingPage = lazy(() => import("./features/hub/pages/HubSwingPage"));
+const HubRecentEchoPage = lazy(() => import("./features/hub/pages/HubRecentEchoPage"));
 const HubGlassBlankPage = lazy(() => import("./features/hub/pages/HubGlassBlankPage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-// Routes component that handles background location pattern for Hub modal
+// Routes component that handles background location pattern for Hub glass overlays
 function AppRoutes() {
   const location = useLocation();
   const state = location.state as { backgroundLocation?: Location } | null;
   
-  // If navigated to hub OR glass-blank with a background location, use that for the main routes
+  // Use background location for main routes when Hub pages are overlays
   const routesLocation = state?.backgroundLocation || location;
-  const showHubModal = state?.backgroundLocation && location.pathname.startsWith('/hub') && !location.pathname.includes('glass-blank');
-  const showGlassBlank = state?.backgroundLocation && location.pathname.includes('/hub/glass-blank');
+  const showHubOverlay = state?.backgroundLocation && location.pathname.startsWith('/hub');
 
   return (
     <>
@@ -132,41 +132,37 @@ function AppRoutes() {
         <Route path="/channel/:slug" element={<ChannelProfile />} />
         <Route path="/game/:id" element={<GameDetailView />} />
         
-        {/* Hub routes - only when NOT using background location */}
-        {!showHubModal && !showGlassBlank && FEATURE_FLAGS.HUB && (
-          <Route path="/hub" element={<HubShell />}>
-            <Route index element={<HubHome />} />
-            <Route path="golfers" element={<HubGolfersPage />} />
-            <Route path="games" element={<HubGamesPage />} />
-            <Route path="your-games" element={<HubYourGamesPage />} />
-            <Route path="create-game" element={<HubCreateGamePage />} />
-            <Route path="echo/*" element={<HubEchoPage />} />
-          </Route>
+        {/* Hub routes - only when NOT overlays (direct access/deep links) */}
+        {!showHubOverlay && FEATURE_FLAGS.HUB && (
+          <>
+            <Route path="/hub" element={<HubHomePage />} />
+            <Route path="/hub/golfers" element={<HubGolfersPage />} />
+            <Route path="/hub/games" element={<HubGamesPage />} />
+            <Route path="/hub/your-games" element={<HubYourGamesPage />} />
+            <Route path="/hub/create-game" element={<HubCreateGamePage />} />
+            <Route path="/hub/echo" element={<HubEchoPage />} />
+            <Route path="/hub/swing" element={<HubSwingPage />} />
+            <Route path="/hub/recent-echo" element={<HubRecentEchoPage />} />
+            <Route path="/hub/glass-blank" element={<HubGlassBlankPage />} />
+          </>
         )}
-        
-        {/* Standalone glass blank page - only when NOT using background location */}
-        {!showGlassBlank && <Route path="/hub/glass-blank" element={<HubGlassBlankPage />} />}
         
         <Route path="*" element={<NotFound />} />
       </Routes>
 
-      {/* Hub Modal Overlay - rendered when background location exists */}
-      {showHubModal && FEATURE_FLAGS.HUB && (
+      {/* Hub Glass Overlays - rendered when background location exists */}
+      {showHubOverlay && FEATURE_FLAGS.HUB && (
         <Routes>
-          <Route path="/hub" element={<HubShell />}>
-            <Route index element={<HubHome />} />
-            <Route path="golfers" element={<HubGolfersPage />} />
-            <Route path="games" element={<HubGamesPage />} />
-            <Route path="your-games" element={<HubYourGamesPage />} />
-            <Route path="create-game" element={<HubCreateGamePage />} />
-            <Route path="echo/*" element={<HubEchoPage />} />
-          </Route>
+          <Route path="/hub" element={<HubHomePage />} />
+          <Route path="/hub/golfers" element={<HubGolfersPage />} />
+          <Route path="/hub/games" element={<HubGamesPage />} />
+          <Route path="/hub/your-games" element={<HubYourGamesPage />} />
+          <Route path="/hub/create-game" element={<HubCreateGamePage />} />
+          <Route path="/hub/echo" element={<HubEchoPage />} />
+          <Route path="/hub/swing" element={<HubSwingPage />} />
+          <Route path="/hub/recent-echo" element={<HubRecentEchoPage />} />
+          <Route path="/hub/glass-blank" element={<HubGlassBlankPage />} />
         </Routes>
-      )}
-      
-      {/* Glass blank overlay - rendered when background location exists */}
-      {showGlassBlank && (
-        <HubGlassBlankPage />
       )}
     </>
   );
