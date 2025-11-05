@@ -176,9 +176,9 @@ export function HubShell({ onClose }: HubShellProps) {
             paddingBottom: 'env(safe-area-inset-bottom)',
             backdropFilter: 'blur(var(--hub-backdrop-blur))',
             WebkitBackdropFilter: 'blur(var(--hub-backdrop-blur))',
-            border: '1px solid var(--hub-stroke-subtle)',
+            border: 'none',
             borderRadius: '0',
-            boxShadow: 'var(--hub-shadow-main)',
+            boxShadow: 'none',
             isolation: 'isolate',
           }}
           onClick={(e) => e.stopPropagation()}

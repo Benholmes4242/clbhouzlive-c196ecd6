@@ -91,6 +91,7 @@ html.hub-open {
 
 /* Neutralize hardcoded black backgrounds when hub is open */
 .hub-open .videoContainer,
-.hub-open .highlights__card {
+.hub-open .highlights__card,
+.hub-open .fixed.inset-0.bg-black { /* e.g., Clubhouse/Discover vertical feeds */
   background: transparent !important;
 }
