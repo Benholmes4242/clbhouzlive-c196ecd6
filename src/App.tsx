@@ -39,7 +39,7 @@ import { migrateChatHistory } from '@/utils/chatHistoryMigration';
 import ProfilePage from "./pages/ProfilePage";
 import Discover from "./pages/Discover";
 import { HeaderProvider } from '@/contexts/GlobalHeaderContext';
-import GlobalHeader from '@/components/GlobalHeader';
+
 
 // Import wrapped components with explicit variants
 import ClubhouseWrapped from "./pages/ClubhouseWrapped";
@@ -261,8 +261,7 @@ const App: React.FC = () => {
                               <TopTenProvider>
                                 <AuthWrapper>
                                   <Suspense fallback={<ClbhouzPageSpinner />}>
-                                  {/* Global header should render before routes so it sits at the top in normal flow */}
-                                  <GlobalHeader />
+                                  {/* No global header - each page renders its own ClubhouseHeaderNew */}
                                   <AppRoutes />
                                 </Suspense>
                               </AuthWrapper>

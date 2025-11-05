@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import GlobalHeader from '@/components/GlobalHeader';
+import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import BottomNavigation from '@/components/BottomNavigation';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNotifications } from '@/hooks/useNotifications';

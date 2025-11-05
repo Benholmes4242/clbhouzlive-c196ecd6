@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import GlobalHeader from "@/components/GlobalHeader";
+import ClubhouseHeaderNew from "@/components/clubhouse/ClubhouseHeaderNew";
 import UserProfileLoader from '@/components/profile/UserProfileLoader';
 import UserProfileContent from '@/components/profile/UserProfileContent';
 import { useUserProfileQueries } from '@/hooks/useUserProfileQueries';
@@ -71,7 +71,7 @@ const UserProfilePage = () => {
       <link rel="preload" as="image" href="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/50-club-badge.png" />
       
       {/* Glass Header - overlays the hero photo */}
-      <GlobalHeader />
+      <ClubhouseHeaderNew />
       
       {/* Spacer for fixed header */}
       <div className="h-16 md:h-18" />

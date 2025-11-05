@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import GlobalHeader from '@/components/GlobalHeader';
+import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import BottomNavigation from '@/components/BottomNavigation';
 import UpcomingEvents from '@/components/tour/UpcomingEvents';
 import LiveLeaderboards from '@/components/tour/LiveLeaderboards';

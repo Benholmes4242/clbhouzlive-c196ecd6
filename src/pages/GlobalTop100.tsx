@@ -1,5 +1,5 @@
 import React from 'react';
-import GlobalHeader from '@/components/GlobalHeader';
+import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import BottomNavigation from '@/components/BottomNavigation';
 import GlobalTop100Content from '@/components/global-top100/GlobalTop100Content';
 

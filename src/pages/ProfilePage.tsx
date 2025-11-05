@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import GlobalHeader from '@/components/GlobalHeader';
+import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
@@ -92,7 +92,7 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-background relative">
-      <GlobalHeader />
+      <ClubhouseHeaderNew />
       
       {/* Add spacing for fixed header */}
       <div className="h-16 md:h-18" />

@@ -1,5 +1,5 @@
 import React from 'react';
-import GlobalHeader from "@/components/GlobalHeader";
+import ClubhouseHeaderNew from "@/components/clubhouse/ClubhouseHeaderNew";
 import { useAdmin } from '@/hooks/useAdmin';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import AdminRouteProtection from '@/components/admin/AdminRouteProtection';

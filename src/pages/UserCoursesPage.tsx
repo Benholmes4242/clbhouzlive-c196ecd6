@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import GlobalHeader from '@/components/GlobalHeader';
+import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import BottomNavigation from '@/components/BottomNavigation';
 import CoursesContent from '@/components/courses/CoursesContent';
 import { useUserCoursesData } from '@/components/courses/user/useUserCoursesData';
