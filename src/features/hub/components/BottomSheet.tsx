@@ -59,12 +59,11 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
     };
   }, [open]);
 
-  // TEMP: enable global overlay debug while this sheet is open
+  // Remove overlay-debug toggling in production
+  // (kept disabled to avoid any unintended tinting)
+  // No-op effect retained for reference
   React.useEffect(() => {
-    if (!open) return;
-    const root = document.documentElement;
-    root.classList.add('overlay-debug');
-    return () => { root.classList.remove('overlay-debug'); };
+    return;
   }, [open]);
 
   // ESC to close
@@ -189,7 +188,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
 
   return (
     <>
-      {/* Backdrop - TEMPORARILY VISIBLE FOR DEBUGGING */}
+      {/* Backdrop - transparent click catcher */}
       <div
         aria-hidden
         onClick={onBackdropClick}
@@ -197,9 +196,9 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           position: 'fixed',
           left: 0,
           right: 0,
-          top: headerH,
-          height: `calc(100dvh - ${headerH})`,
-          background: 'rgba(255, 0, 0, 0.3)', // RED - so you can see it!
+          top: 0,
+          height: '100dvh',
+          background: 'transparent',
           backdropFilter: 'none',
           WebkitBackdropFilter: 'none',
           zIndex: 12002,
