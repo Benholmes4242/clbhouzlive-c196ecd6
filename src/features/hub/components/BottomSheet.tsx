@@ -197,12 +197,15 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
         }}
       />
 
-      {/* Sheet - wrapper for transform with clipping at rounded corners */}
+      {/* Clipper - owns the rounded radius and clips everything inside */}
       <div
         ref={sheetRef}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
+        role="dialog"
+        aria-modal="true"
+        aria-label={ariaLabel || 'Panel'}
         style={{
           position: 'fixed',
           left: 0,
@@ -217,29 +220,27 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           touchAction: 'none',
           WebkitUserSelect: 'none',
           userSelect: 'none',
-          overflow: 'clip',
-          contain: 'paint',
-          backgroundClip: 'padding-box',
+          overflow: 'hidden',
+          clipPath: 'inset(0 round 24px)',
+          WebkitMaskImage: '-webkit-radial-gradient(white, black)',
+          isolation: 'isolate',
+          background: 'transparent',
         }}
       >
+        {/* Surface - holds all visual effects (blur, background, shadow) */}
         <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={ariaLabel || 'Panel'}
           style={{
-            height: '100%',
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            background: 'transparent',
-            border: 'none',
-            boxShadow: 'none',
+            position: 'absolute',
+            inset: 0,
+            backdropFilter: 'saturate(120%) blur(24px)',
+            WebkitBackdropFilter: 'saturate(120%) blur(24px)',
+            background: 'hsl(var(--background) / 0.85)',
+            boxShadow: '0 -20px 50px rgba(0,0,0,0.35)',
             display: 'flex',
             flexDirection: 'column',
-            overflow: 'hidden',
           }}
         >
-          {/* Handle - removed */}
-          {/* Scrollable content with overscroll containment */}
+          {/* Scrollable content */}
           <div
             ref={contentRef}
             style={{
