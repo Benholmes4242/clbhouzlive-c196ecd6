@@ -177,13 +177,16 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
 
   return (
     <>
-      {/* Backdrop - with backdrop blur */}
+      {/* Backdrop - starts below header, doesn't cover it */}
       <div
         aria-hidden
         onClick={onBackdropClick}
         style={{
           position: 'fixed',
-          inset: 0,
+          left: 0,
+          right: 0,
+          top: headerH,
+          height: `calc(100dvh - ${headerH})`,
           background: 'rgba(0,0,0,0.45)',
           backdropFilter: 'blur(120px)',
           WebkitBackdropFilter: 'blur(120px)',
@@ -194,7 +197,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
         }}
       />
 
-      {/* Sheet - wrapper for transform, inner surface for blur */}
+      {/* Sheet - wrapper for transform with clipping at rounded corners */}
       <div
         ref={sheetRef}
         onPointerDown={onPointerDown}
@@ -206,12 +209,17 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           right: 0,
           top: headerH,
           bottom: 0,
+          borderTopLeftRadius: '24px',
+          borderTopRightRadius: '24px',
           transform: 'translate3d(0, 0, 0)',
           willChange: 'transform',
           zIndex: 12003,
           touchAction: 'none',
           WebkitUserSelect: 'none',
           userSelect: 'none',
+          overflow: 'clip',
+          contain: 'paint',
+          backgroundClip: 'padding-box',
         }}
       >
         <div
@@ -231,7 +239,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           }}
         >
           {/* Handle - removed */}
-          {/* Scrollable content */}
+          {/* Scrollable content with overscroll containment */}
           <div
             ref={contentRef}
             style={{
@@ -239,6 +247,8 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
               overflow: 'auto',
               WebkitOverflowScrolling: 'touch',
               padding: '0',
+              overscrollBehavior: 'contain',
+              background: 'transparent',
             }}
           >
             {children}
