@@ -17,13 +17,11 @@ function QA({ label, onClick, icon }: { label: string; onClick: () => void; icon
         gap: '6px',
         aspectRatio: '1 / 1',
         width: '100%',
-        padding: '10px',
         borderRadius: '16px',
         background: 'rgba(255,255,255,0.10)',
         border: '1px solid rgba(255,255,255,0.15)',
         cursor: 'pointer',
         transition: 'background 0.2s',
-        minHeight: 0,
       }}
       onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
       onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.10)')}
