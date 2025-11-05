@@ -163,7 +163,7 @@ export function HubShell({ onClose }: HubShellProps) {
         className="fixed inset-0"
         style={{ 
           zIndex: Z.hub,
-          backgroundColor: 'rgba(0, 0, 0, 0.25)',
+          backgroundColor: 'transparent',
         }}
         onClick={handleClose}
       />
