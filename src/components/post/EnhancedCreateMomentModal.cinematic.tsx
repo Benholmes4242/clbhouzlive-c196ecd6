@@ -356,14 +356,14 @@ export default function EnhancedCreateMomentModalCinematic({
             touchAction: 'none'
           }}
         >
-          {/* backdrop - subtle dark with reduced opacity for liquid glass */}
+          {/* backdrop - Liquid Glass effect */}
           <div 
             className="absolute inset-0 touch-none" 
             onClick={close}
             style={{ 
-              backgroundColor: 'rgba(0,0,0,0.65)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
+              backgroundColor: 'rgba(0, 0, 0, 0.25)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
               touchAction: 'none' 
             }}
           />
