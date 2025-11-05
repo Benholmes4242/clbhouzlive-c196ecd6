@@ -80,14 +80,15 @@
 }
 
 /* Hub Open: make underlying app background transparent for true glass */
-html.hub-open { --bg-page: transparent; }
+/* TEMPORARILY DISABLED to show page content */
+/* html.hub-open { --bg-page: transparent; }
 
 .hub-open body,
 .hub-open #root,
 .hub-open .clubhouse-root {
   background: transparent !important;
   background-color: transparent !important;
-}
+} */
 
 /* Hide ALL page headers when hub is open to prevent interference */
 .hub-open header.chrome-header,
