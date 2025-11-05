@@ -312,6 +312,7 @@ export function YourGamesTile() {
               onLongPress={() => nav(`/hub?sheet=your-games&id=${g.id}`)}
             />
           ))}
+          <div aria-hidden="true" style={{ height: '80px' }} />
         </div>
       </div>
     </Tile>
