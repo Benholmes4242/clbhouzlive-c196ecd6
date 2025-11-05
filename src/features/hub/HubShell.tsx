@@ -147,15 +147,15 @@ export function HubShell({ onClose }: HubShellProps) {
 
   return (
     <>
-      {/* Backdrop - Liquid Glass (matches CinematicCreateMomentModal) */}
+      {/* Backdrop - Transparent click catcher for Hub */}
       <button
         aria-label="close hub"
         className="fixed inset-0"
         style={{ 
           zIndex: Z.hub,
-          backgroundColor: 'rgba(0, 0, 0, 0.25)',
-          backdropFilter: 'blur(120px)',
-          WebkitBackdropFilter: 'blur(120px)',
+          backgroundColor: 'transparent',
+          backdropFilter: 'none',
+          WebkitBackdropFilter: 'none',
         }}
         onClick={handleClose}
       />
