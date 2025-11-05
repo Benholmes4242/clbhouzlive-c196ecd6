@@ -19,13 +19,13 @@
   /* ========================================
      BACKGROUNDS & SURFACES
      ======================================== */
-  /* Main Hub container gradient - Smoke Glass Lite */
-  --hub-bg-start: #121315;
-  --hub-bg-end: #1A1C1E;
+  /* Main Hub container - Dark Glass (matches CinematicOverlay) */
+  --hub-bg-start: rgba(18, 18, 18, 0.95);
+  --hub-bg-end: rgba(18, 18, 18, 0.95);
   
-  /* Backdrop overlay (behind Hub) */
-  --hub-backdrop: rgba(0,0,0,0.70);
-  --hub-backdrop-blur: 12px;
+  /* Backdrop overlay (behind Hub - matches CinematicOverlay) */
+  --hub-backdrop: rgba(0, 0, 0, 0.45);
+  --hub-backdrop-blur: 14px;
   
   /* Header v2 - Apple Control Center vibe */
   --hub-header-bg-start: rgba(36,36,38,0.85);
