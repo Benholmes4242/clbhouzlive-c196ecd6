@@ -26,8 +26,8 @@ const setViewportHeight = () => {
 window.addEventListener('resize', setViewportHeight);
 setViewportHeight();
 
-// TEMP: Enable global overlay debug to identify lingering scrims
-document.documentElement.classList.add('overlay-debug');
+// Ensure no debug tint is present
+document.documentElement.classList.remove('overlay-debug');
 
 // Initialize performance monitoring
 initializePerformanceMonitoring();
