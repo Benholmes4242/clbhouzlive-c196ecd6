@@ -39,7 +39,7 @@ export function EchoTile() {
     if (carouselPaused) return;
     const timer = setInterval(() => {
       setCarouselIdx((i) => (i + 1) % prompts.length);
-    }, 5000);
+    }, 8000);
     return () => clearInterval(timer);
   }, [carouselPaused, prompts.length]);
 
