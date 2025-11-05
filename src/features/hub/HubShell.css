@@ -92,8 +92,8 @@ html.hub-open { --bg-page: transparent; }
 /* Neutralize hardcoded dark backdrops when hub is open */
 .hub-open .videoContainer,
 .hub-open .highlights__card,
-.hub-open .fixed.inset-0,
-.hub-open [class*="bg-black"] {
+.hub-open .fixed.inset-0.z-10.bg-black,
+.hub-open .fixed.inset-0[class*="bg-black"] {
   background: transparent !important;
   background-color: transparent !important;
 }
