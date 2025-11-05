@@ -84,6 +84,7 @@ const HubGamesPage = lazy(() => import("./features/hub/pages/HubGamesPage").then
 const HubYourGamesPage = lazy(() => import("./features/hub/pages/HubYourGamesPage").then(m => ({ default: m.HubYourGamesPage })));
 const HubCreateGamePage = lazy(() => import("./features/hub/pages/HubCreateGamePage").then(m => ({ default: m.HubCreateGamePage })));
 const HubEchoPage = lazy(() => import("./features/hub/pages/HubEchoPage").then(m => ({ default: m.HubEchoPage })));
+const HubGlassBlankPage = lazy(() => import("./features/hub/pages/HubGlassBlankPage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -141,6 +142,9 @@ function AppRoutes() {
             <Route path="echo/*" element={<HubEchoPage />} />
           </Route>
         )}
+        
+        {/* Temporary test route for glass blank page */}
+        <Route path="/hub/glass-blank" element={<HubGlassBlankPage />} />
         
         <Route path="*" element={<NotFound />} />
       </Routes>
