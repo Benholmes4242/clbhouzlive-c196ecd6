@@ -19,7 +19,7 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
     <section
       className="relative rounded-3xl p-4 pt-3.5 pb-3.5 overflow-hidden flex flex-col min-h-[192px]"
       style={{
-        background: 'linear-gradient(180deg, var(--hub-glass-bg-start), var(--hub-glass-bg-end))',
+        background: 'var(--hub-glass-bg)',
         border: '1px solid var(--hub-stroke)',
         boxShadow: isHovered 
           ? 'var(--hub-shadow-tile-hover), var(--hub-shadow-tile-inset), var(--hub-top-highlight)'
