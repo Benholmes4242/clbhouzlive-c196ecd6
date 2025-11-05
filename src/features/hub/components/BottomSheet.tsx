@@ -234,7 +234,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
             inset: 0,
             backdropFilter: 'saturate(120%) blur(24px)',
             WebkitBackdropFilter: 'saturate(120%) blur(24px)',
-            background: 'hsl(var(--background) / 0.85)',
+            background: 'rgba(255, 255, 255, 0.15)',
             boxShadow: '0 -20px 50px rgba(0,0,0,0.35)',
             display: 'flex',
             flexDirection: 'column',
