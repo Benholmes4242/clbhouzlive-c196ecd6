@@ -328,44 +328,9 @@ export function VideoProgressVerticalHUD({
 
   const duration = attachedVideo?.duration || 0;
 
-  // Check if hub or other overlays are open - hide progress bar if so
-  const isOverlayOpen = React.useMemo(() => {
-    if (typeof document === 'undefined') return false;
-    return document.documentElement.classList.contains('hub-open') ||
-           document.querySelector('[data-filter-sheet]') !== null ||
-           document.querySelector('[role="dialog"][data-state="open"]') !== null;
-  }, []);
-
-  // Re-check when DOM mutations occur (modals opening/closing)
-  const [shouldHide, setShouldHide] = React.useState(false);
-  React.useEffect(() => {
-    const checkOverlays = () => {
-      const isOpen = document.documentElement.classList.contains('hub-open') ||
-                     document.querySelector('[data-filter-sheet]') !== null ||
-                     document.querySelector('[role="dialog"][data-state="open"]') !== null;
-      setShouldHide(isOpen);
-    };
-    
-    checkOverlays();
-    const observer = new MutationObserver(checkOverlays);
-    observer.observe(document.documentElement, { 
-      attributes: true, 
-      attributeFilter: ['class'],
-      subtree: true,
-      childList: true,
-    });
-    
-    return () => observer.disconnect();
-  }, []);
-
-  // Don't render if overlays are open or no video attached
-  if (!attachedVideo || shouldHide) {
-    return null;
-  }
-
-  const progressBar = (
+  const progressBar = (!attachedVideo) ? null : (
     <div
-      className="pointer-events-none fixed z-[1100] flex items-stretch justify-end"
+      className="pointer-events-none fixed z-[950] flex items-stretch justify-end"
       style={{
         right: railBox ? `${railBox.right}px` : 'calc(env(safe-area-inset-right, 0px) + 64px)',
         top: railBox ? `${railBox.top}px` : '25%',
