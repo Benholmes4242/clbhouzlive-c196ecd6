@@ -140,11 +140,9 @@ function AppRoutes() {
             <Route path="your-games" element={<HubYourGamesPage />} />
             <Route path="create-game" element={<HubCreateGamePage />} />
             <Route path="echo/*" element={<HubEchoPage />} />
+            <Route path="glass-blank" element={<HubGlassBlankPage />} />
           </Route>
         )}
-        
-        {/* Temporary test route for glass blank page */}
-        <Route path="/hub/glass-blank" element={<HubGlassBlankPage />} />
         
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -159,6 +157,7 @@ function AppRoutes() {
             <Route path="your-games" element={<HubYourGamesPage />} />
             <Route path="create-game" element={<HubCreateGamePage />} />
             <Route path="echo/*" element={<HubEchoPage />} />
+            <Route path="glass-blank" element={<HubGlassBlankPage />} />
           </Route>
         </Routes>
       )}

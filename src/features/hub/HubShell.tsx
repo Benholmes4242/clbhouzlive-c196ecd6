@@ -217,16 +217,25 @@ export function HubShell({ onClose }: HubShellProps) {
                   />
                 </div>
                 
-                <TapButton
-                  onPointerDown={handleClose}
-                  className="transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
-                  style={{ color: 'var(--hub-close-idle)' }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-close-hover)'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-close-idle)'}
-                  aria-label="Close hub"
-                >
-                  <X className="w-5 h-5" />
-                </TapButton>
+                <div className="flex items-center gap-2">
+                  {/* Temporary glass test button */}
+                  <button
+                    onClick={() => navigate('/hub/glass-blank')}
+                    className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 active:scale-95 transition-all"
+                    aria-label="Test glass effect"
+                  />
+                  
+                  <TapButton
+                    onPointerDown={handleClose}
+                    className="transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
+                    style={{ color: 'var(--hub-close-idle)' }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-close-hover)'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-close-idle)'}
+                    aria-label="Close hub"
+                  >
+                    <X className="w-5 h-5" />
+                  </TapButton>
+                </div>
               </div>
             </div>
           </div>
