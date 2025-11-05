@@ -184,7 +184,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(0,0,0,0.50)',
+          background: 'rgba(0,0,0,1.00)',
           zIndex: 12002,
           opacity: open ? 1 : 0,
           transition: 'opacity 180ms ease',
