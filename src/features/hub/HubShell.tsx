@@ -187,6 +187,7 @@ export function HubShell({ onClose }: HubShellProps) {
             border: 'none',
             borderRadius: '0',
             boxShadow: 'none',
+            background: 'rgba(40, 40, 40, 0.95)',
           }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -296,7 +297,6 @@ export function HubShell({ onClose }: HubShellProps) {
               WebkitOverflowScrolling: 'touch',
               overscrollBehavior: 'contain',
               paddingBottom: '0px',
-              background: isHomePage ? 'transparent' : 'rgba(40, 40, 40, 0.95)',
             }}
           >
             <Outlet />
