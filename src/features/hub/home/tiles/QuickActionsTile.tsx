@@ -1,6 +1,7 @@
-import React from 'react';
+import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
+import { useOpenSheet } from '../../sheets/useOpenSheet';
 
 function QA({ labelTop, labelBottom, onClick, icon }: { 
   labelTop: string; 
@@ -48,11 +49,12 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
 }
 
 export function QuickActionsTile() {
+  const openSheet = useOpenSheet();
   const navigate = useNavigate();
 
-  const openCreateGame = () => navigate('/hub/create-game');
-  const openEcho = () => navigate('/hub/echo/chat');
-  const openSwing = () => navigate('/hub/echo/swing');
+  const openCreateGame = () => openSheet('create-game');
+  const openEcho = () => openSheet('echo');
+  const openSwing = () => openSheet('swing-coach');
   const openProfile = () => navigate('/profile');
 
   return (

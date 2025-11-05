@@ -9,6 +9,7 @@ import { useGamesQuery } from '@/features/nearby/hooks/useGamesQuery';
 import { formatDistanceToNow } from 'date-fns';
 import { Tile } from '../components/Tile';
 import { Chip } from '../components/Chip';
+import { useOpenSheet } from '@/features/hub/sheets/useOpenSheet';
 
 interface GamesNearYouTileProps {
   limit?: number;
@@ -20,15 +21,17 @@ export function GamesNearYouTile({
   enableFilters 
 }: GamesNearYouTileProps) {
   const nav = useNavigate();
+  const openSheet = useOpenSheet();
   const { data: allGames = [], isLoading } = useGamesQuery();
   
   const games = allGames.slice(0, limit);
   
-  const handleTileClick = () => {
-    if (allGames.length === 0) {
-      nav('/hub/create-game');
+  // Adaptive action
+  const onAction = () => {
+    if (games.length === 0) {
+      nav('/hub?sheet=create-game');
     } else {
-      nav('/hub/games');
+      openSheet('games');
     }
   };
 
@@ -46,10 +49,10 @@ export function GamesNearYouTile({
             }}
           />
           <button
-            onClick={handleTileClick}
+            onClick={onAction}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
             aria-label="View all"
-            style={{
+            style={{ 
               background: 'transparent',
               border: 'none',
               color: 'var(--hub-text-body)',

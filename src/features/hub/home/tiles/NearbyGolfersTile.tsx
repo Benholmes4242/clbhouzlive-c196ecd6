@@ -7,6 +7,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
+import { useOpenSheet } from '@/features/hub/sheets/useOpenSheet';
 
 interface NearbyGolfersTileProps {
   limit?: number;
@@ -14,6 +15,7 @@ interface NearbyGolfersTileProps {
 
 export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
   const nav = useNavigate();
+  const openSheet = useOpenSheet();
   const { golfers, isLoading } = useActiveGolfers({ limit });
 
   return (
@@ -31,9 +33,9 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
             }}
           />
           <button
-            onClick={() => nav('/hub/golfers')}
+            onClick={() => openSheet('golfers')}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            style={{
+            style={{ 
               background: 'transparent',
               border: 'none',
               color: 'var(--hub-text-body)',

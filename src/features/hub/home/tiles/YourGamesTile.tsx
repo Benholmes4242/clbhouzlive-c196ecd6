@@ -6,6 +6,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
+import { useOpenSheet } from '@/features/hub/sheets/useOpenSheet';
 import { useUserGames } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
 import { devlog } from '@/utils/log';
@@ -193,6 +194,7 @@ function GameRow({
 
 export function YourGamesTile() {
   const nav = useNavigate();
+  const openSheet = useOpenSheet();
   const [openId, setOpenId] = React.useState<string | null>(null);
   const viewAllRef = React.useRef<HTMLButtonElement>(null);
   
@@ -202,7 +204,7 @@ export function YourGamesTile() {
 
   const openCreateGame = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    nav('/hub/create-game');
+    openSheet('create-game');
   };
 
   React.useEffect(() => {
@@ -268,9 +270,9 @@ export function YourGamesTile() {
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
             <button
-              onClick={(e) => { e.stopPropagation(); nav('/hub/games'); }}
+              onClick={(e) => { e.stopPropagation(); openSheet('games-near-you'); }}
               className="text-[15px] font-medium transition"
-              style={{
+              style={{ 
                 background: 'transparent',
                 border: 'none',
                 color: 'var(--hub-text-body)',
@@ -284,9 +286,9 @@ export function YourGamesTile() {
             </button>
             <button
               ref={viewAllRef}
-              onClick={() => nav('/hub/your-games')}
+              onClick={() => openSheet('your-games')}
               className="text-[15px] font-medium transition"
-              style={{
+              style={{ 
                 background: 'transparent',
                 border: 'none',
                 color: 'var(--hub-text-body)',
@@ -333,7 +335,7 @@ export function YourGamesTile() {
             <div className="text-[14px]" style={{ color: 'var(--hub-text-sub)' }}>
               No games yet.{' '}
               <button 
-                onClick={() => nav('/hub/create-game')}
+                onClick={() => openSheet('create-game')}
                 className="underline underline-offset-2"
                 style={{ color: 'var(--hub-accent-orange)' }}
               >
