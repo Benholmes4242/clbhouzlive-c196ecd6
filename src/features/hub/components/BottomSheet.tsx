@@ -181,7 +181,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
 
   return (
     <>
-      {/* Backdrop - transparent for hub sheets, clickable for dismiss */}
+      {/* Backdrop - TEMPORARILY VISIBLE FOR DEBUGGING */}
       <div
         aria-hidden
         onClick={onBackdropClick}
@@ -191,7 +191,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           right: 0,
           top: headerH,
           height: `calc(100dvh - ${headerH})`,
-          background: 'transparent',
+          background: 'rgba(255, 0, 0, 0.3)', // RED - so you can see it!
           backdropFilter: 'none',
           WebkitBackdropFilter: 'none',
           zIndex: 12002,
