@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { PiWaveform } from 'react-icons/pi';
 import EchoOrb from '@/components/echo/EchoOrb';
 import { Z } from '@/config/zIndex';
+import { useHub } from '@/features/hub/useHub';
 
 interface EchoDockProps {
   onClick: () => void;
@@ -16,6 +17,7 @@ type ChatTab = 'chat' | 'swing' | 'message';
 const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldHide = false }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { navigateFromHub } = useHub();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [pressTimer, setPressTimer] = useState<number | null>(null);
@@ -130,8 +132,8 @@ const EchoDock: React.FC<EchoDockProps> = ({ onClick, onSwingCoachClick, shouldH
   }
 
   const openEcho = (dest: 'chat' | 'swing' | 'history' = 'chat') => {
-    // Always navigate to Hub Echo routes
-    navigate(`/hub/echo/${dest}`);
+    // Close Hub if open, then navigate to Hub Echo routes
+    navigateFromHub(`/hub/echo/${dest}`);
   };
 
   const dockContent = (

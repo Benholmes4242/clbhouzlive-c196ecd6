@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useEchoHistory } from '../../hooks/useEchoHistory';
 import { Send } from 'lucide-react';
+import { useHub } from '../../useHub';
 
 function timeAgo(iso?: string) {
   if (!iso) return '';
@@ -20,6 +21,7 @@ export function EchoTile() {
   const { data: recent, isLoading } = useEchoHistory();
   const [input, setInput] = React.useState('');
   const nav = useNavigate();
+  const { navigateFromHub } = useHub();
 
   const RAW_PROMPTS = [
     'Build me a 4-week practice plan',
@@ -44,7 +46,7 @@ export function EchoTile() {
   }, [carouselPaused, prompts.length]);
 
   const openEcho = (seedPrompt?: string) => {
-    nav(seedPrompt ? `/hub/echo/chat?msg=${encodeURIComponent(seedPrompt)}` : '/hub/echo/chat');
+    navigateFromHub(seedPrompt ? `/hub/echo/chat?msg=${encodeURIComponent(seedPrompt)}` : '/hub/echo/chat');
   };
 
   const handleSend = () => {

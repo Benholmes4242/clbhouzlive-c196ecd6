@@ -9,6 +9,7 @@ import { Tile } from '../components/Tile';
 import { useUserGames } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
 import { devlog } from '@/utils/log';
+import { useHub } from '../../useHub';
 
 type GameWithDetails = {
   id: string;
@@ -193,6 +194,7 @@ function GameRow({
 
 export function YourGamesTile() {
   const nav = useNavigate();
+  const { navigateFromHub } = useHub();
   const [openId, setOpenId] = React.useState<string | null>(null);
   const viewAllRef = React.useRef<HTMLButtonElement>(null);
   
@@ -202,7 +204,7 @@ export function YourGamesTile() {
 
   const openCreateGame = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    nav('/hub/create-game');
+    navigateFromHub('/hub/create-game');
   };
 
   React.useEffect(() => {
@@ -268,7 +270,7 @@ export function YourGamesTile() {
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
             <button
-              onClick={(e) => { e.stopPropagation(); nav('/hub/games'); }}
+              onClick={(e) => { e.stopPropagation(); navigateFromHub('/hub/games'); }}
               className="text-[15px] font-medium transition"
               style={{
                 background: 'transparent',
@@ -284,7 +286,7 @@ export function YourGamesTile() {
             </button>
             <button
               ref={viewAllRef}
-              onClick={() => nav('/hub/your-games')}
+              onClick={() => navigateFromHub('/hub/your-games')}
               className="text-[15px] font-medium transition"
               style={{
                 background: 'transparent',
@@ -333,7 +335,7 @@ export function YourGamesTile() {
             <div className="text-[14px]" style={{ color: 'var(--hub-text-sub)' }}>
               No games yet.{' '}
               <button 
-                onClick={() => nav('/hub/create-game')}
+                onClick={() => navigateFromHub('/hub/create-game')}
                 className="underline underline-offset-2"
                 style={{ color: 'var(--hub-accent-orange)' }}
               >
