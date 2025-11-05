@@ -195,8 +195,8 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           backdropFilter: 'none',
           WebkitBackdropFilter: 'none',
           zIndex: 12002,
-          opacity: 1,
-          transition: 'none',
+          opacity: open ? 1 : 0,
+          transition: 'opacity 180ms ease',
           pointerEvents: open ? 'auto' : 'none',
         }}
       />
@@ -226,10 +226,9 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           touchAction: 'none',
           WebkitUserSelect: 'none',
           userSelect: 'none',
-          overflow: 'clip',
+          overflow: 'hidden',
           clipPath: 'inset(0 0 0 0 round 24px 24px 0 0)',
-          WebkitMaskImage: 'radial-gradient(#000 99%, transparent 100%)',
-          contain: 'paint',
+          WebkitMaskImage: '-webkit-radial-gradient(white, black)',
           isolation: 'isolate',
           background: 'transparent',
         }}
