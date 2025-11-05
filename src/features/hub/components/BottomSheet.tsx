@@ -220,36 +220,20 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           background: 'transparent',
         }}
       >
-        {/* Surface - holds all visual effects (blur, background, shadow) */}
+        {/* Scrollable content */}
         <div
+          ref={contentRef}
           style={{
             position: 'absolute',
             inset: 0,
-            backdropFilter: 'saturate(120%) blur(24px)',
-            WebkitBackdropFilter: 'saturate(120%) blur(24px)',
-            background: 'hsl(var(--background) / 0.85)',
-            boxShadow: '0 -20px 50px rgba(0,0,0,0.35)',
-            display: 'flex',
-            flexDirection: 'column',
-            WebkitTransform: 'translateZ(0)',
-            transform: 'translateZ(0)',
-            willChange: 'transform',
+            overflow: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            padding: '0',
+            overscrollBehavior: 'contain',
+            background: 'transparent',
           }}
         >
-          {/* Scrollable content */}
-          <div
-            ref={contentRef}
-            style={{
-              flex: 1,
-              overflow: 'auto',
-              WebkitOverflowScrolling: 'touch',
-              padding: '0',
-              overscrollBehavior: 'contain',
-              background: 'transparent',
-            }}
-          >
-            {children}
-          </div>
+          {children}
         </div>
       </div>
     </>
