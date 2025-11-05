@@ -16,7 +16,9 @@ export const Z = {
   toast: 12000,
   
   // Modal & overlay layers (ordered by priority)
-  hub: 11000,           // Hub modal shell
+  hub: 12000,           // Hub modal shell
+  sheetBackdrop: 12002, // Bottom sheet backdrop
+  sheet: 12003,         // Bottom sheet surface
   echo: 11500,          // Echo floating orb + radial fan
   createGame: 11800,    // Create Game modal (above Hub)
   aiOverlay: 11100,     // AI Chat overlay (above Hub)
@@ -26,7 +28,9 @@ export const Z = {
     header: { zIndex: 1000 },
     nav: { zIndex: 999 },
     toast: { zIndex: 12000 },
-    hub: { zIndex: 11000 },
+    hub: { zIndex: 12000 },
+    sheetBackdrop: { zIndex: 12002 },
+    sheet: { zIndex: 12003 },
     echo: { zIndex: 11500 },
     createGame: { zIndex: 11800 },
     aiOverlay: { zIndex: 11100 },

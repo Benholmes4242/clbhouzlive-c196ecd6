@@ -15,7 +15,6 @@ import { X } from 'lucide-react';
 import { TapButton } from '@/components/ui/TapButton';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { Z } from '@/config/zIndex';
-import { HubSheetRouter } from './HubSheetRouter';
 import './HubShell.css';
 
 interface HubShellProps {
@@ -145,6 +144,19 @@ export function HubShell({ onClose }: HubShellProps) {
 
   return (
     <>
+      {/* iOS Safari backdrop-filter guard - invisible shim provides pixels to blur */}
+      <div 
+        className="hub-glass-shim" 
+        aria-hidden 
+        style={{
+          position: 'fixed',
+          inset: 0,
+          pointerEvents: 'none',
+          background: 'rgba(0,0,0,0.001)',
+          zIndex: Z.hub - 1,
+        }}
+      />
+
       {/* Backdrop - Liquid Glass (matches CinematicCreateMomentModal) */}
       <button
         aria-label="close hub"
@@ -177,7 +189,6 @@ export function HubShell({ onClose }: HubShellProps) {
             border: 'none',
             borderRadius: '0',
             boxShadow: 'none',
-            isolation: 'isolate',
           }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -189,7 +200,6 @@ export function HubShell({ onClose }: HubShellProps) {
             style={{
               background: 'transparent',
               borderBottom: '1px solid var(--hub-header-stroke)',
-              isolation: 'isolate',
             }}
           >
             <div className="px-5 pt-4">
@@ -294,9 +304,6 @@ export function HubShell({ onClose }: HubShellProps) {
           </div>
         </div>
       </div>
-
-      {/* Sheet Router */}
-      <HubSheetRouter />
     </>
   );
 }

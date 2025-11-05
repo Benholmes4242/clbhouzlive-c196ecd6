@@ -4,20 +4,19 @@
  */
 
 import React, { useState } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { Tile } from '../components/Tile';
 import EchoAvatar from '@/components/ai-chat/EchoAvatar';
-import { useOpenSheet } from '@/features/hub/sheets/useOpenSheet';
 
 export function EchoQuickTile() {
   const [text, setText] = useState('');
-  const openSheet = useOpenSheet();
+  const nav = useNavigate();
 
   const submit = () => {
     const msg = text.trim();
     if (!msg) return;
-    openSheet('echo', { msg });
+    nav(`/hub/echo/chat?msg=${encodeURIComponent(msg)}`);
     setText('');
   };
 
@@ -41,9 +40,9 @@ export function EchoQuickTile() {
             }}
           />
           <button
-            onClick={() => openSheet('echo')}
+            onClick={() => nav('/hub/echo/chat')}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            style={{ 
+            style={{
               background: 'transparent',
               border: 'none',
               color: 'var(--hub-text-body)',
