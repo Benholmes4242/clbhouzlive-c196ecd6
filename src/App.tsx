@@ -24,7 +24,6 @@ import { TopTenProvider } from '@/context/TopTenContext';
 import { UIProvider } from '@/contexts/UIContext';
 import { ModalProvider } from '@/contexts/ModalContext';
 import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
-import { HubProvider } from '@/features/hub/useHub';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
@@ -78,7 +77,7 @@ const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
 const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 
 // Hub components (lazy load when feature flag is enabled)
-const HubGate = lazy(() => import("./features/hub/HubGate").then(m => ({ default: m.HubGate })));
+const HubShell = lazy(() => import("./features/hub/HubShell").then(m => ({ default: m.HubShell })));
 const HubHome = lazy(() => import("./features/hub/home/HubHome"));
 const HubGolfersPage = lazy(() => import("./features/hub/pages/HubGolfersPage").then(m => ({ default: m.HubGolfersPage })));
 const HubGamesPage = lazy(() => import("./features/hub/pages/HubGamesPage").then(m => ({ default: m.HubGamesPage })));
@@ -88,55 +87,78 @@ const HubEchoPage = lazy(() => import("./features/hub/pages/HubEchoPage").then(m
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-// Routes component - simplified without background location pattern
+// Routes component that handles background location pattern for Hub modal
 function AppRoutes() {
+  const location = useLocation();
+  const state = location.state as { backgroundLocation?: Location } | null;
+  
+  // If navigated to hub with a background location, use that for the main routes
+  const routesLocation = state?.backgroundLocation || location;
+  const showHubModal = state?.backgroundLocation && location.pathname.startsWith('/hub');
+
   return (
-    <Routes>
-      <Route path="/" element={<ClubhouseWrapped />} />
-      <Route path="/auth" element={<AuthWrapped />} />
-      <Route path="/create-profile" element={<CreateProfile />} />
-      <Route path="/profile" element={<ProfileWrapped />} />
-      <Route path="/profile-test" element={<ProfileTestPage />} />
-      <Route path="/profile/:username" element={<UserProfilePage />} />
-      <Route path="/settings" element={<SettingsWrapped />} />
-      <Route path="/clubhouse" element={<ClubhouseWrapped />} />
-      <Route path="/discover" element={<DiscoverWrapped />} />
-      <Route path="/courses" element={<Courses />} />
-      <Route path="/courses/:courseId" element={<CourseDetailPage />} />
-      <Route path="/user/:username/courses" element={<UserCoursesPage />} />
-      <Route path="/my-ratings" element={<MyRatings />} />
-      <Route path="/news" element={<News />} />
-      <Route path="/tour-central" element={<TourCentral />} />
-      
-      <Route path="/messages" element={<MessagesPage />} />
-      <Route path="/notifications" element={<NotificationsPage />} />
-      <Route path="/friends" element={<FriendsPage />} />
-      <Route path="/followers" element={<FollowersPage />} />
-      <Route path="/following" element={<FollowingPage />} />
-      
-      <Route path="/global-top100" element={<GlobalTop100 />} />
-      <Route path="/achievements" element={<AchievementsPage />} />
-      <Route path="/admin-setup" element={<AdminSetupPage />} />
-      <Route path="/admin" element={<AdminPage />} />
-      <Route path="/admin-backfill" element={<AdminBackfill />} />
-      
-      <Route path="/channel/:slug" element={<ChannelProfile />} />
-      <Route path="/game/:id" element={<GameDetailView />} />
-      
-      {/* Hub full-screen pages as top-level routes */}
-      {FEATURE_FLAGS.HUB && (
-        <>
-          <Route path="/hub" element={<HubHome />} />
-          <Route path="/hub/golfers" element={<HubGolfersPage />} />
-          <Route path="/hub/games" element={<HubGamesPage />} />
-          <Route path="/hub/your-games" element={<HubYourGamesPage />} />
-          <Route path="/hub/create-game" element={<HubCreateGamePage />} />
-          <Route path="/hub/echo/*" element={<HubEchoPage />} />
-        </>
+    <>
+      <Routes location={routesLocation}>
+        <Route path="/" element={<ClubhouseWrapped />} />
+        <Route path="/auth" element={<AuthWrapped />} />
+        <Route path="/create-profile" element={<CreateProfile />} />
+        <Route path="/profile" element={<ProfileWrapped />} />
+        <Route path="/profile-test" element={<ProfileTestPage />} />
+        <Route path="/profile/:username" element={<UserProfilePage />} />
+        <Route path="/settings" element={<SettingsWrapped />} />
+        <Route path="/clubhouse" element={<ClubhouseWrapped />} />
+        <Route path="/discover" element={<DiscoverWrapped />} />
+        <Route path="/courses" element={<Courses />} />
+        <Route path="/courses/:courseId" element={<CourseDetailPage />} />
+        <Route path="/user/:username/courses" element={<UserCoursesPage />} />
+        <Route path="/my-ratings" element={<MyRatings />} />
+        <Route path="/news" element={<News />} />
+        <Route path="/tour-central" element={<TourCentral />} />
+        
+        <Route path="/messages" element={<MessagesPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
+        <Route path="/friends" element={<FriendsPage />} />
+        <Route path="/followers" element={<FollowersPage />} />
+        <Route path="/following" element={<FollowingPage />} />
+        
+        <Route path="/global-top100" element={<GlobalTop100 />} />
+        <Route path="/achievements" element={<AchievementsPage />} />
+        <Route path="/admin-setup" element={<AdminSetupPage />} />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin-backfill" element={<AdminBackfill />} />
+        
+        <Route path="/channel/:slug" element={<ChannelProfile />} />
+        <Route path="/game/:id" element={<GameDetailView />} />
+        
+        {/* Hub routes - only when NOT using background location */}
+        {!showHubModal && FEATURE_FLAGS.HUB && (
+          <Route path="/hub" element={<HubShell />}>
+            <Route index element={<HubHome />} />
+            <Route path="golfers" element={<HubGolfersPage />} />
+            <Route path="games" element={<HubGamesPage />} />
+            <Route path="your-games" element={<HubYourGamesPage />} />
+            <Route path="create-game" element={<HubCreateGamePage />} />
+            <Route path="echo/*" element={<HubEchoPage />} />
+          </Route>
+        )}
+        
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+
+      {/* Hub Modal Overlay - rendered when background location exists */}
+      {showHubModal && FEATURE_FLAGS.HUB && (
+        <Routes>
+          <Route path="/hub" element={<HubShell />}>
+            <Route index element={<HubHome />} />
+            <Route path="golfers" element={<HubGolfersPage />} />
+            <Route path="games" element={<HubGamesPage />} />
+            <Route path="your-games" element={<HubYourGamesPage />} />
+            <Route path="create-game" element={<HubCreateGamePage />} />
+            <Route path="echo/*" element={<HubEchoPage />} />
+          </Route>
+        </Routes>
       )}
-      
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    </>
   );
 }
 
@@ -232,29 +254,25 @@ const App: React.FC = () => {
                     <BottomNavigationProvider>
                       <UIProvider>
                       <BrowserRouter>
-                        <HubProvider>
-                          <ScrollToTop />
-                          <GlobalAudioProvider>
-                            <VideoManagerProvider>
-                              <VideoPlaybackManagerProvider>
-                                <TopTenProvider>
-                                  <AuthWrapper>
-                                    <Suspense fallback={<ClbhouzPageSpinner />}>
-                                    {/* No global header - each page renders its own ClubhouseHeaderNew */}
-                                    <AppRoutes />
-                                    {/* Hub gate - renders Hub only when open */}
-                                    {FEATURE_FLAGS.HUB && <HubGate />}
-                                  </Suspense>
-                                </AuthWrapper>
-                              </TopTenProvider>
-                            </VideoPlaybackManagerProvider>
-                          </VideoManagerProvider>
-                        </GlobalAudioProvider>
-                        </HubProvider>
-                        <Toaster />
-                        <Sonner />
-                        <GlobalBottomNavigation />
-                      </BrowserRouter>
+                        <ScrollToTop />
+                        <GlobalAudioProvider>
+                          <VideoManagerProvider>
+                            <VideoPlaybackManagerProvider>
+                              <TopTenProvider>
+                                <AuthWrapper>
+                                  <Suspense fallback={<ClbhouzPageSpinner />}>
+                                  {/* No global header - each page renders its own ClubhouseHeaderNew */}
+                                  <AppRoutes />
+                                </Suspense>
+                              </AuthWrapper>
+                            </TopTenProvider>
+                          </VideoPlaybackManagerProvider>
+                        </VideoManagerProvider>
+                      </GlobalAudioProvider>
+                      <Toaster />
+                      <Sonner />
+                      <GlobalBottomNavigation />
+                    </BrowserRouter>
                   </UIProvider>
                 </BottomNavigationProvider>
                 </ModalProvider>

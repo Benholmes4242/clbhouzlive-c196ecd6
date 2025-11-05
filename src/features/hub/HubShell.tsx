@@ -26,15 +26,6 @@ export function HubShell({ onClose }: HubShellProps) {
   const navigate = useNavigate();
   const headerRef = useRef<HTMLDivElement>(null);
 
-  // Close Hub on back button
-  useEffect(() => {
-    const handlePopState = () => {
-      if (onClose) onClose();
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [onClose]);
-
   // Measure header height for bottom sheet positioning
   useLayoutEffect(() => {
     const setHeaderHeight = () => {
@@ -198,9 +189,6 @@ export function HubShell({ onClose }: HubShellProps) {
             border: 'none',
             borderRadius: '0',
             boxShadow: 'none',
-            background: 'rgba(40, 40, 40, 0.95)',
-            backdropFilter: 'blur(40px)',
-            WebkitBackdropFilter: 'blur(40px)',
           }}
           onClick={(e) => e.stopPropagation()}
         >

@@ -9,7 +9,6 @@ import { useGamesQuery } from '@/features/nearby/hooks/useGamesQuery';
 import { formatDistanceToNow } from 'date-fns';
 import { Tile } from '../components/Tile';
 import { Chip } from '../components/Chip';
-import { useHub } from '../../useHub';
 
 interface GamesNearYouTileProps {
   limit?: number;
@@ -21,16 +20,15 @@ export function GamesNearYouTile({
   enableFilters 
 }: GamesNearYouTileProps) {
   const nav = useNavigate();
-  const { navigateFromHub } = useHub();
   const { data: allGames = [], isLoading } = useGamesQuery();
   
   const games = allGames.slice(0, limit);
   
   const handleTileClick = () => {
     if (allGames.length === 0) {
-      navigateFromHub('/hub/create-game');
+      nav('/hub/create-game');
     } else {
-      navigateFromHub('/hub/games');
+      nav('/hub/games');
     }
   };
 
