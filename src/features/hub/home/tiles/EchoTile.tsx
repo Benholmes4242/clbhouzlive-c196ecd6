@@ -20,8 +20,34 @@ export function EchoTile() {
   const [input, setInput] = React.useState('');
   const openSheet = useOpenSheet();
 
+  const prompts = [
+    'Plan me a 3-night golf trip to Ireland',
+    "What's the next major?",
+    'Build me a 4-week practice plan',
+    'Best drivers under £400 right now?',
+    'How do I stop slicing my driver?',
+  ];
+
+  const [carouselIdx, setCarouselIdx] = React.useState(0);
+  const [carouselPaused, setCarouselPaused] = React.useState(false);
+
+  React.useEffect(() => {
+    if (carouselPaused) return;
+    const timer = setInterval(() => {
+      setCarouselIdx((i) => (i + 1) % prompts.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [carouselPaused, prompts.length]);
+
   const openEcho = (seedPrompt?: string) => {
     openSheet('echo', seedPrompt ? { msg: seedPrompt } : undefined);
+  };
+
+  const handleSend = () => {
+    if (input.trim()) {
+      openEcho(input);
+      setInput('');
+    }
   };
 
   return (
@@ -29,140 +55,103 @@ export function EchoTile() {
       title="Echo" 
       subtitle="Ask me anything"
       onViewAll={() => openEcho()}
+      align="center"
     >
       <div className="flex flex-col gap-3 h-full">
-        {/* Ask input */}
-        <div className="echo-input" style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '10px 12px',
-          borderRadius: '14px',
-          background: 'rgba(255,255,255,0.12)',
-          border: '1px solid rgba(255,255,255,0.18)',
-        }}>
+        {/* Ask input with send button */}
+        <form 
+          onSubmit={(e) => { e.preventDefault(); handleSend(); }}
+          style={{ position: 'relative' }}
+        >
           <input
             aria-label="Ask Echo"
             placeholder="Ask Echo"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && input.trim()) { openEcho(input); setInput(''); } }}
             onClick={(e) => e.stopPropagation()}
             style={{
-              flex: 1,
-              border: 0,
+              width: '100%',
+              height: '44px',
+              borderRadius: '14px',
+              padding: '0 44px 0 14px',
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.08)',
               outline: 0,
               fontSize: '15px',
-              background: 'transparent',
               color: 'var(--hub-text)',
             }}
           />
           <button
-            className="send"
+            type="submit"
             disabled={!input.trim()}
-            onClick={(e) => { e.stopPropagation(); openEcho(input); setInput(''); }}
-            aria-label="Send to Echo"
+            aria-label="Send"
+            onClick={(e) => e.stopPropagation()}
             style={{
+              position: 'absolute',
+              right: '6px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: '34px',
+              height: '34px',
+              borderRadius: '12px',
               border: 0,
-              background: 'transparent',
+              background: 'rgba(255,255,255,0.08)',
               fontSize: '16px',
-              color: 'var(--hub-text)',
               cursor: input.trim() ? 'pointer' : 'default',
               opacity: input.trim() ? 1 : 0.4,
             }}
           >
-            ➤
+            ✈️
           </button>
-        </div>
+        </form>
 
-        {/* Suggestions */}
-        <div className="chip-row" style={{
-          display: 'flex',
-          gap: '8px',
-          overflowX: 'auto',
-          scrollbarWidth: 'none',
-        }}>
-          <button 
-            className="chip"
-            onClick={(e) => { e.stopPropagation(); openEcho('Plan me a 3-night golf trip to Ireland'); }}
-            style={{
-              padding: '8px 12px',
-              borderRadius: '12px',
-              whiteSpace: 'nowrap',
-              background: 'rgba(255,255,255,0.10)',
-              border: '1px solid rgba(255,255,255,0.15)',
-              color: 'var(--hub-text-body)',
-              fontSize: '14px',
-              cursor: 'pointer',
-            }}
-          >
-            Plan me a 3-night golf trip to Ireland
-          </button>
-          <button 
-            className="chip"
-            onClick={(e) => { e.stopPropagation(); openEcho('When is the next major?'); }}
-            style={{
-              padding: '8px 12px',
-              borderRadius: '12px',
-              whiteSpace: 'nowrap',
-              background: 'rgba(255,255,255,0.10)',
-              border: '1px solid rgba(255,255,255,0.15)',
-              color: 'var(--hub-text-body)',
-              fontSize: '14px',
-              cursor: 'pointer',
-            }}
-          >
-            When is the next major?
-          </button>
-        </div>
-
-        {/* Single recent preview */}
-        <button
-          className="recent-row"
-          onClick={(e) => { e.stopPropagation(); openEcho(); }}
-          aria-label="Open Echo history"
+        {/* Carousel */}
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            setInput(prompts[carouselIdx]);
+          }}
+          onMouseEnter={() => setCarouselPaused(true)}
+          onMouseLeave={() => setCarouselPaused(false)}
+          onTouchStart={() => setCarouselPaused(true)}
+          onTouchEnd={() => setCarouselPaused(false)}
           style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '10px',
-            padding: 0,
-            border: 0,
-            textAlign: 'left',
-            background: 'transparent',
+            marginTop: '10px',
+            height: '22px',
+            overflow: 'hidden',
+            borderRadius: '8px',
+            background: 'rgba(255,255,255,0.04)',
             cursor: 'pointer',
-            width: '100%',
           }}
         >
-          <div 
-            className="bubble" 
+          <div
             style={{
-              flex: 1,
-              maxHeight: '44px',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              padding: '10px 12px',
-              borderRadius: '12px',
-              background: 'rgba(255,255,255,0.08)',
-              color: 'var(--hub-text-body)',
-              fontSize: '14px',
+              display: 'flex',
+              height: '100%',
+              transition: 'transform 0.35s ease',
+              transform: `translateX(-${carouselIdx * 100}%)`,
             }}
           >
-            {isLoading ? 'Loading…' : (recent?.preview ?? 'No chats yet — ask Echo above.')}
+            {prompts.map((prompt, i) => (
+              <div
+                key={i}
+                style={{
+                  minWidth: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0 10px',
+                  fontSize: '12.5px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  color: 'var(--hub-text-body)',
+                }}
+              >
+                "{prompt}"
+              </div>
+            ))}
           </div>
-          <div 
-            className="ts" 
-            style={{
-              fontSize: '12px',
-              opacity: 0.7,
-              color: 'var(--hub-text-body)',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {recent?.when ? timeAgo(recent.when) : ''}
-          </div>
-        </button>
+        </div>
       </div>
     </Tile>
   );

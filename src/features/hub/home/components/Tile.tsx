@@ -10,9 +10,10 @@ type TileProps = React.PropsWithChildren<{
   subtitle?: string;
   onViewAll?: () => void;
   footer?: React.ReactNode;
+  align?: 'start' | 'center';
 }>;
 
-export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps) {
+export function Tile({ title, subtitle, children, onViewAll, footer, align = 'start' }: TileProps) {
   const [isHovered, setIsHovered] = React.useState(false);
 
   return (
@@ -32,11 +33,23 @@ export function Tile({ title, subtitle, children, onViewAll, footer }: TileProps
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex-1 flex flex-col">
-        <div className="text-[20px] font-semibold mb-0.5" style={{ color: 'var(--hub-text)' }}>
+        <div 
+          className="text-[20px] font-semibold mb-0.5" 
+          style={{ 
+            color: 'var(--hub-text)',
+            textAlign: align === 'center' ? 'center' : 'left'
+          }}
+        >
           {title}
         </div>
         {subtitle && (
-          <div className="text-[13px] mb-2.5 line-clamp-1" style={{ color: 'var(--hub-text-sub)' }}>
+          <div 
+            className="text-[13px] mb-2.5 line-clamp-1" 
+            style={{ 
+              color: 'var(--hub-text-sub)',
+              textAlign: align === 'center' ? 'center' : 'left'
+            }}
+          >
             {subtitle}
           </div>
         )}

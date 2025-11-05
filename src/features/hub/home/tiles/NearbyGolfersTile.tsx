@@ -21,6 +21,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
   return (
     <Tile 
       title="Nearby Golfers"
+      align="center"
       footer={
         <div className="mt-auto pt-4">
           <div 

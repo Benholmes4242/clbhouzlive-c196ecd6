@@ -79,6 +79,7 @@ export function SwingQuickTile() {
     <Tile 
       title="Swing Coach" 
       subtitle="Upload your swing"
+      align="center"
       footer={
         <div className="mt-auto pt-4">
           <div 
