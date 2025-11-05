@@ -11,10 +11,29 @@ const THRESHOLD_PX = 92;          // distance to close
 const VELOCITY_CLOSE = 0.55;      // px/ms
 const MAX_DRAG = 480;             // clamp
 
+// Feature flags for safe rollback
+const USE_SHEET_SAFE_UNMOUNT = true;
+const USE_IOS_GLASS_SHIM = true;
+
 // Rubber-band mapping (feel like iOS pull-to-dismiss)
 function rubberband(distance: number, constant = 0.55, max = MAX_DRAG) {
   const d = Math.max(0, distance);
   return (max * d) / (d + constant * max);
+}
+
+// Event-based unmount helper - waits for CSS transitions to complete
+function waitTransitionEnd(el: HTMLElement, prop?: string) {
+  return new Promise<void>(resolve => {
+    const done = () => { el.removeEventListener('transitionend', onEnd, true); resolve(); };
+    const onEnd = (e: TransitionEvent) => {
+      if (!prop || e.propertyName === prop) done();
+    };
+    // Fallback in case no transition fires
+    const t = window.setTimeout(done, 600);
+    el.addEventListener('transitionend', (e) => {
+      if (!prop || e.propertyName === prop) { clearTimeout(t); done(); }
+    }, true);
+  });
 }
 
 // Best-effort light haptic
@@ -38,6 +57,7 @@ function hapticTapLight() {
 
 export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetProps) {
   const sheetRef = React.useRef<HTMLDivElement>(null);
+  const backdropRef = React.useRef<HTMLDivElement>(null);
   const handleRef = React.useRef<HTMLDivElement>(null);
   const contentRef = React.useRef<HTMLDivElement>(null);
   const startY = React.useRef(0);
@@ -46,22 +66,24 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
   const dragging = React.useRef(false);
   const yRef = React.useRef(0);
   const animFrame = React.useRef<number | null>(null);
+  const [mounted, setMounted] = React.useState(false);
+  const [closing, setClosing] = React.useState(false);
 
-  // Scroll lock when open
+  // Mount/unmount control
   React.useEffect(() => {
-    if (!open) return;
-    const { overflow } = document.body.style;
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = overflow; };
+    if (open) {
+      setMounted(true);
+      setClosing(false);
+    }
   }, [open]);
 
-  // ESC to close
+  // Frame-safe body scroll lock cleanup
   React.useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { requestAnimationFrame(() => { document.body.style.overflow = prev; }); };
+  }, [open]);
 
   // Helpers - RAF-based for smooth animation
   const applyY = React.useCallback((nextY: number) => {
@@ -102,15 +124,58 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
       }
     });
 
-    window.setTimeout(() => {
-      if (!sheetRef.current) return;
-      sheetRef.current.style.transition = '';
-      if (handleRef.current) {
-        handleRef.current.style.transition = '';
-      }
-      yRef.current = y;
-    }, duration + 20);
+    if (!USE_SHEET_SAFE_UNMOUNT) {
+      // Old path: timer-based cleanup
+      window.setTimeout(() => {
+        if (!sheetRef.current) return;
+        sheetRef.current.style.transition = '';
+        if (handleRef.current) {
+          handleRef.current.style.transition = '';
+        }
+        yRef.current = y;
+      }, duration + 20);
+    }
   }, []);
+
+  // Event-based close with proper unmount order
+  const closeSheet = React.useCallback(async () => {
+    if (!USE_SHEET_SAFE_UNMOUNT || !sheetRef.current) {
+      onClose?.();
+      return;
+    }
+
+    setClosing(true);
+    
+    // Trigger closing animations
+    const exitDistance = Math.max(window.innerHeight, 800);
+    snapTo(exitDistance, true);
+
+    // Wait for both panel and backdrop to finish animating
+    await Promise.all([
+      waitTransitionEnd(sheetRef.current, 'transform'),
+      backdropRef.current ? waitTransitionEnd(backdropRef.current, 'opacity') : Promise.resolve()
+    ]);
+
+    // Fully unmount overlay & panel before calling onClose
+    setMounted(false);
+    onClose?.();
+  }, [onClose, snapTo]);
+
+  // ESC to close
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { 
+      if (e.key === 'Escape') {
+        if (USE_SHEET_SAFE_UNMOUNT) {
+          closeSheet();
+        } else {
+          onClose();
+        }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose, closeSheet]);
 
   // Drag start (only if content is scrolled to top)
   const canStartDrag = () => {
@@ -154,10 +219,14 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
     const shouldClose = dy > THRESHOLD_PX || vy > VELOCITY_CLOSE;
     if (shouldClose) {
       hapticTapLight(); // subtle tap when it commits to close
-      // animate fully off-screen then close
-      const exitDistance = Math.max(window.innerHeight, 800);
-      snapTo(exitDistance, true);
-      window.setTimeout(onClose, 300);
+      if (USE_SHEET_SAFE_UNMOUNT) {
+        closeSheet();
+      } else {
+        // Old path
+        const exitDistance = Math.max(window.innerHeight, 800);
+        snapTo(exitDistance, true);
+        window.setTimeout(onClose, 300);
+      }
     } else {
       snapTo(0, false); // snap back
     }
@@ -166,11 +235,15 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
   // Backdrop click to close (ignore clicks that start inside the sheet)
   const onBackdropClick = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     if (sheetRef.current && !sheetRef.current.contains(e.target as Node)) {
-      onClose();
+      if (USE_SHEET_SAFE_UNMOUNT) {
+        closeSheet();
+      } else {
+        onClose();
+      }
     }
   };
 
-  if (!open) return null;
+  if (!mounted && !open) return null;
 
   const headerH = getComputedStyle(document.documentElement)
     .getPropertyValue('--hub-header-h') || '72px';
@@ -179,8 +252,10 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
     <>
       {/* Backdrop - starts below header, doesn't cover it */}
       <div
+        ref={backdropRef}
         aria-hidden
         onClick={onBackdropClick}
+        className={closing ? 'sheetBackdrop closing' : 'sheetBackdrop'}
         style={{
           position: 'fixed',
           left: 0,
@@ -189,9 +264,9 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           height: `calc(100dvh - ${headerH})`,
           background: 'transparent',
           zIndex: 12002,
-          opacity: open ? 1 : 0,
-          transition: 'opacity 180ms ease',
-          pointerEvents: open ? 'auto' : 'none',
+          opacity: closing ? 0 : 1,
+          transition: 'opacity 220ms ease',
+          pointerEvents: open && !closing ? 'auto' : 'none',
         }}
       />
 
@@ -204,6 +279,7 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel || 'Panel'}
+        className={closing ? 'bottomSheet closing' : 'bottomSheet'}
         style={{
           position: 'fixed',
           left: 0,
@@ -212,7 +288,8 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           bottom: 0,
           borderTopLeftRadius: '24px',
           borderTopRightRadius: '24px',
-          transform: 'translate3d(0, 0, 0)',
+          transform: closing ? `translate3d(0, ${Math.max(window.innerHeight, 800)}px, 0)` : 'translate3d(0, 0, 0)',
+          transition: closing ? 'transform 280ms cubic-bezier(.2, .9, .1, 1)' : '',
           willChange: 'transform',
           zIndex: 12003,
           touchAction: 'none',
@@ -221,7 +298,6 @@ export function BottomSheet({ open, onClose, children, ariaLabel }: BottomSheetP
           overflow: 'hidden',
           clipPath: 'inset(0 round 24px)',
           WebkitMaskImage: '-webkit-radial-gradient(white, black)',
-          isolation: 'isolate',
           background: 'transparent',
         }}
       >
