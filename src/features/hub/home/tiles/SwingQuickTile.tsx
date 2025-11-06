@@ -15,8 +15,12 @@ export function SwingQuickTile() {
   const nav = useNavigate();
   const { navigateFromHub } = useHub();
 
-  const openSwingPage = () => {
+  const openSwingUpload = () => {
     navigateFromHub('/hub/swing');
+  };
+
+  const openSwingCoach = () => {
+    navigateFromHub('/hub/swing-coach');
   };
 
   const { data: lastSwing } = useQuery({
@@ -55,7 +59,7 @@ export function SwingQuickTile() {
             }}
           />
           <button
-            onClick={openSwingPage}
+            onClick={openSwingCoach}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
             style={{ 
               background: 'transparent',
@@ -75,7 +79,7 @@ export function SwingQuickTile() {
         <div>
           {/* Upload pill with inline icon */}
           <button
-            onClick={openSwingPage}
+            onClick={openSwingUpload}
             className="mt-3 h-11 w-full rounded-2xl px-4 flex items-center justify-between text-[15px] leading-[15px] transition focus:outline-none focus-visible:ring-2 whitespace-nowrap"
             style={{
               background: 'rgba(255,255,255,0.12)',
