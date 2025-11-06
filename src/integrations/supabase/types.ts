@@ -1005,6 +1005,39 @@ export type Database = {
         }
         Relationships: []
       }
+      invite_requests: {
+        Row: {
+          club: string | null
+          created_at: string | null
+          email: string
+          id: string
+          ip_hash: string | null
+          name: string | null
+          source: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          club?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          ip_hash?: string | null
+          name?: string | null
+          source?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          club?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          ip_hash?: string | null
+          name?: string | null
+          source?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       join_requests: {
         Row: {
           created_at: string
