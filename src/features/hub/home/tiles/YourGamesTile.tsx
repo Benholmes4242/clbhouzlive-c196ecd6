@@ -217,6 +217,11 @@ export function YourGamesTile() {
     navigateFromHub('/hub/games');
   };
 
+  const openYourGames = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    navigateFromHub('/hub/your-games');
+  };
+
   React.useEffect(() => {
     const btn = viewAllRef.current;
     const tile = btn?.closest('section');
@@ -296,7 +301,7 @@ export function YourGamesTile() {
             </button>
             <button
               ref={viewAllRef}
-              onClick={comingSoon}
+              onClick={openYourGames}
               className="text-[15px] font-medium transition"
               style={{
                 background: 'transparent',
