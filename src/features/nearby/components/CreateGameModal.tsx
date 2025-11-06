@@ -47,6 +47,7 @@ interface CreateGameModalProps {
   }) => Promise<void>;
   prefilledClub?: { id: string; name: string };
   portalContainer?: HTMLElement | null;
+  hubMode?: boolean;
 }
 
 interface ValidationErrors {
@@ -78,6 +79,7 @@ export function CreateGameModal({
   onCreateBeacon,
   prefilledClub,
   portalContainer,
+  hubMode = false,
 }: CreateGameModalProps) {
   const [gameType, setGameType] = useState<string>('9_holes');
   const [courseId, setCourseId] = useState<string>('');
@@ -273,40 +275,64 @@ export function CreateGameModal({
   };
 
 
+  // Hub mode uses same glass as HubGolfersPage
+  const containerStyle = hubMode ? {
+    background: 'rgba(0, 0, 0, 0.25)',
+    backdropFilter: 'blur(120px)',
+    WebkitBackdropFilter: 'blur(120px)',
+  } : {
+    backgroundColor: 'rgba(0,0,0,0)',
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
+  };
+
+  const modalStyle = hubMode ? {
+    height: '100vh',
+    maxHeight: '100vh',
+    pointerEvents: 'auto' as const,
+    overscrollBehavior: 'contain' as const,
+    background: 'transparent',
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
+    border: 'none',
+    borderRadius: '0',
+    boxShadow: 'none',
+  } : {
+    height: 'calc(100vh - env(safe-area-inset-top))',
+    maxHeight: '100vh',
+    pointerEvents: 'auto' as const,
+    overscrollBehavior: 'contain' as const,
+    background: 'rgba(15, 15, 15, 0.75)',
+    backdropFilter: 'blur(40px)',
+    WebkitBackdropFilter: 'blur(40px)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '0',
+    boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9)',
+  };
+
   return (
     <div 
       className="fixed inset-0 flex items-end sm:items-center sm:justify-center animate-fade-in"
       style={{ 
-        zIndex: Z.createGame,
-        backgroundColor: 'rgba(0,0,0,0)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
+        zIndex: hubMode ? 9999 : Z.createGame,
+        ...containerStyle,
         overscrollBehavior: 'none',
         pointerEvents: 'auto',
       }}
     >
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0"
-        onClick={onClose}
-        style={{ pointerEvents: 'auto' }}
-      />
+      {!hubMode && (
+        <div 
+          className="absolute inset-0"
+          onClick={onClose}
+          style={{ pointerEvents: 'auto' }}
+        />
+      )}
       
       {/* Modal */}
       <div 
         className="relative w-full max-w-lg flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-200"
-        style={{ 
-          height: 'calc(100vh - env(safe-area-inset-top))',
-          maxHeight: '100vh',
-          pointerEvents: 'auto',
-          overscrollBehavior: 'contain',
-          background: 'rgba(15, 15, 15, 0.75)',
-          backdropFilter: 'blur(40px)',
-          WebkitBackdropFilter: 'blur(40px)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '0',
-          boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9)',
-        }}
+        style={modalStyle}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

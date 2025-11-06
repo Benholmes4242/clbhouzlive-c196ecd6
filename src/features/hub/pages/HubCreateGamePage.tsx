@@ -38,6 +38,7 @@ export function HubCreateGamePage() {
       onCreateBeacon={handleCreate}
       prefilledClub={(loc.state as any)?.prefilledClub}
       portalContainer={null}
+      hubMode={true}
     />
   );
 }
