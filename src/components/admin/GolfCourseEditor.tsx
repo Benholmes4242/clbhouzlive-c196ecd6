@@ -34,6 +34,7 @@ import { GolfCourse, CourseRating, GolfCourseEditorProps } from './golf-courses/
 const primaryCountryOptions = [
   'Britain & Ireland',
   'Continental Europe',
+  'Rest of World',
   'USA'
 ];
 
@@ -59,6 +60,9 @@ const subCountryOptions: Record<string, string[]> = {
     'Latvia', 'Lithuania', 'Luxembourg', 'Malta', 'Moldova', 'Montenegro', 'Netherlands', 
     'Northern Ireland', 'Norway', 'Poland', 'Portugal', 'Romania', 'Russia', 'Scotland', 
     'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'Turkey', 'Ukraine', 'Wales'
+  ],
+  'Rest of World': [
+    'Puerto Rico'
   ]
 };
 
