@@ -1,12 +1,15 @@
 /**
- * Hub New Page - Empty Glass Shell
- * Full-screen glass overlay following Hub design pattern
+ * AI Chat History — Chat-only list
+ * Renders inside the existing /hub/new glass page.
+ * No thread navigation yet; rows are non-navigating buttons.
  */
 
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { TapButton } from '@/components/ui/TapButton';
+import { useEchoChatHistory } from '@/features/echo/hooks/useEchoChatHistory';
+import { formatRelativeTime } from '@/utils/dateFormat';
 import '../home/hubTheme.css';
 
 export function HubNewPage() {
@@ -27,6 +30,9 @@ export function HubNewPage() {
       nav('/clubhouse', { replace: true });
     }
   };
+
+  // Data (chat-only)
+  const { data: chats = [], isLoading, error } = useEchoChatHistory({ limit: 50 });
 
   return (
     <div
@@ -58,7 +64,7 @@ export function HubNewPage() {
             className="text-[17px] font-semibold"
             style={{ color: 'var(--hub-text)' }}
           >
-            New Page
+            AI Chat History
           </h1>
 
           <TapButton
@@ -77,18 +83,95 @@ export function HubNewPage() {
       {/* Body */}
       <main className="w-full h-[calc(100vh-80px)] overflow-y-auto px-3.5 pt-3 pb-6">
         <div
-          className="rounded-3xl p-6 flex items-center justify-center"
+          className="rounded-3xl p-6"
           style={{
             background: 'var(--hub-glass-bg)',
             border: '1px solid var(--hub-stroke)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            minHeight: '240px',
           }}
         >
-          <div style={{ color: 'var(--hub-text-dim)', textAlign: 'center' }}>
-            Empty glass page ready for content
+          <div
+            className="text-[15px] font-medium mb-4"
+            style={{ color: 'var(--hub-text)' }}
+          >
+            Recent chats
           </div>
+
+          {isLoading && (
+            <div className="space-y-2">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="h-16 rounded-2xl animate-pulse"
+                  style={{ background: 'var(--hub-glass-bg)' }}
+                />
+              ))}
+            </div>
+          )}
+
+          {!isLoading && error && (
+            <div
+              className="text-center py-8 text-[15px]"
+              style={{ color: 'var(--hub-text-dim)' }}
+            >
+              Couldn't load chat history. Please try again.
+            </div>
+          )}
+
+          {!isLoading && !error && (
+            <div className="space-y-2">
+              {chats.length === 0 && (
+                <div
+                  className="text-center py-8 text-[15px]"
+                  style={{ color: 'var(--hub-text-dim)' }}
+                >
+                  No Echo chats yet — ask Echo a question to get started.
+                </div>
+              )}
+
+              {chats.map((item) => (
+                <button
+                  key={item.id}
+                  className="w-full flex items-center gap-3 p-4 rounded-2xl transition-colors text-left"
+                  style={{
+                    background: 'var(--hub-glass-bg)',
+                    border: '1px solid var(--hub-stroke)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'var(--hub-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'var(--hub-glass-bg)';
+                  }}
+                  onClick={() => {}}
+                  aria-label="Chat thread"
+                >
+                  <div className="text-2xl">🗨️</div>
+                  <div className="flex-1 min-w-0">
+                    <div
+                      className="text-[15px] font-medium truncate"
+                      style={{ color: 'var(--hub-text)' }}
+                    >
+                      {item.preview_text || 'Chat with Echo'}
+                    </div>
+                    <div
+                      className="text-[13px] mt-0.5"
+                      style={{ color: 'var(--hub-text-dim)' }}
+                    >
+                      {formatRelativeTime(item.created_at)}
+                    </div>
+                  </div>
+                  <div
+                    className="text-xl"
+                    style={{ color: 'var(--hub-text-dim)' }}
+                  >
+                    ›
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </main>
     </div>
