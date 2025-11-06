@@ -46,14 +46,17 @@ export function BottomSheet({
   return createPortal(
     <>
       <div
-        className="sheet-backdrop"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
         style={{ zIndex: zIndexBase }}
         onClick={onClose}
         aria-hidden="true"
       />
       <div
-        className={`sheet sheet-enter ${className}`}
-        style={{ zIndex: zIndexBase + 1 }}
+        className={`fixed bottom-0 left-0 right-0 bg-background rounded-t-3xl shadow-xl transform transition-transform duration-300 ${className}`}
+        style={{ 
+          zIndex: zIndexBase + 1,
+          maxHeight: '90vh',
+        }}
         role="dialog"
         aria-modal="true"
         aria-labelledby={ariaLabelledBy}

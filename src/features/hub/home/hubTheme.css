@@ -104,6 +104,11 @@
      ======================================== */
   --hub-surface: var(--hub-glass-bg-hover);
   --hub-surface-2: var(--hub-glass-bg-subtle);
+
+  /* ========================================
+     LAYOUT - FIXED TILES
+     ======================================== */
+  --hub-tile-fixed-h: 220px;
 }
 
 /* ========================================
@@ -120,4 +125,45 @@
   border-color: rgba(255,255,255,0.30) !important;
   background: rgba(255,255,255,0.14) !important;
   animation: sheetFocusPulse 900ms ease-out 2;
+}
+
+/* ========================================
+   HUB TILE HELPERS
+   ======================================== */
+.hub-tile-fixed {
+  height: var(--hub-tile-fixed-h);
+}
+.hub-tile-fixed > * {
+  height: 100%;
+}
+
+/* ========================================
+   HUB OPEN STATE
+   ======================================== */
+html.hub-open { 
+  --bg-page: transparent; 
+}
+
+.hub-open body,
+.hub-open #root,
+.hub-open .clubhouse-root {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Hide ALL page headers when hub is open to prevent interference */
+.hub-open header.chrome-header,
+.hub-open [data-chrome="header"],
+.hub-open [data-hides-on-scroll] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Neutralize hardcoded dark backdrops when hub is open */
+.hub-open .videoContainer,
+.hub-open .highlights__card,
+.hub-open .fixed.inset-0.z-10.bg-black,
+.hub-open .fixed.inset-0[class*="bg-black"] {
+  background: transparent !important;
+  background-color: transparent !important;
 }

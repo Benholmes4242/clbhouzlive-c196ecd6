@@ -202,7 +202,10 @@ export function YourGamesTile() {
 
   const openCreateGame = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    nav('/hub/create-game');
+    const state = window.location.pathname.includes('/hub') 
+      ? { backgroundLocation: (window.history.state as any)?.backgroundLocation }
+      : undefined;
+    nav('/hub/create-game', state ? { state } : undefined);
   };
 
   React.useEffect(() => {
@@ -348,7 +351,7 @@ export function YourGamesTile() {
               game={g}
               expanded={openId === g.id}
               onToggle={() => toggle(g.id)}
-              onLongPress={() => nav(`/hub?sheet=your-games&id=${g.id}`)}
+              onLongPress={() => nav('/hub/your-games')}
             />
           ))}
         </div>
