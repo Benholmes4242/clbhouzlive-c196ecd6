@@ -1743,6 +1743,24 @@ export type Database = {
         }
         Relationships: []
       }
+      site_gate_attempts: {
+        Row: {
+          fail_count: number
+          ip: string
+          last_failed_at: string | null
+        }
+        Insert: {
+          fail_count?: number
+          ip: string
+          last_failed_at?: string | null
+        }
+        Update: {
+          fail_count?: number
+          ip?: string
+          last_failed_at?: string | null
+        }
+        Relationships: []
+      }
       swing_coach_outreach: {
         Row: {
           city: string | null
@@ -2839,6 +2857,7 @@ export type Database = {
         }[]
       }
       cleanup_expired_dismissals: { Args: never; Returns: undefined }
+      cleanup_old_gate_attempts: { Args: never; Returns: undefined }
       current_auth_uid: { Args: never; Returns: string }
       decrement_slots_if_available: {
         Args: { p_game_id: string }

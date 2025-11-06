@@ -30,7 +30,23 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         }
       }
 
-      // Check localStorage for existing access
+      // Check for cookie-based session first
+      try {
+        const res = await fetch("https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/secure-site-access-check", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (res.ok) {
+          setHasAccess(true);
+          setLoading(false);
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking cookie session:', error);
+      }
+
+      // Fallback: Check localStorage for legacy sessions (transition period)
       try {
         const storedAccess = localStorage.getItem('siteAccess');
         if (storedAccess) {
@@ -61,27 +77,22 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
 
     setSubmitting(true);
     try {
-      const { data, error } = await supabase.functions.invoke('secure-site-access', {
-        body: {
+      const res = await fetch("https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/secure-site-access", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "include", // Important for Set-Cookie
+        body: JSON.stringify({
           accessCode: accessCode.toUpperCase(),
           domain: window.location.hostname
-        }
+        })
       });
 
-      if (error) throw error;
+      const data = await res.json();
 
-      if (data?.success) {
-        const accessData = {
-          granted: true,
-          timestamp: new Date().toISOString(),
-          domain: window.location.hostname,
-          sessionToken: data.sessionToken,
-          expiresAt: data.expiresAt
-        };
-        
-        localStorage.setItem('siteAccess', JSON.stringify(accessData));
+      if (res.ok && data?.success) {
         toast.success("Access Granted - Welcome to clubhouz!");
         setHasAccess(true);
+        // Cookie is now set by the server, no need for localStorage
       } else {
         toast.error(data?.message || "Invalid access code");
         setAccessCode("");
