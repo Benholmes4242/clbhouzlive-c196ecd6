@@ -25,57 +25,62 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
 
   useEffect(() => {
     const checkAccess = async () => {
-      // Check if user has admin privileges
-      if (user) {
+      try {
+        // Check if user has admin privileges
+        if (user) {
+          try {
+            const { data, error } = await supabase.rpc('is_admin');
+            if (!error && data === true) {
+              console.log('Admin access granted');
+              setHasAccess(true);
+              setLoading(false);
+              return;
+            }
+          } catch (error) {
+            console.error('Error checking admin status:', error);
+          }
+        }
+
+        // Check for cookie-based session
         try {
-          const { data, error } = await supabase.rpc('is_admin');
-          if (!error && data === true) {
+          const res = await fetch("https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/secure-site-access-check", {
+            method: "GET",
+            headers: {
+              'apikey': ANON_KEY,
+              'Authorization': `Bearer ${ANON_KEY}`,
+            },
+            credentials: "include",
+          });
+
+          if (res.ok) {
+            console.log('Session cookie valid - access granted');
             setHasAccess(true);
-            setLoading(false);
-            return;
+          } else if (res.status === 401) {
+            // Expected: no cookie yet, show access form
+            console.log('No session cookie found - showing access form');
+            setHasAccess(false);
+          } else {
+            console.warn('Gate check unexpected status:', res.status);
+            setHasAccess(false);
           }
         } catch (error) {
-          console.error('Error checking admin status:', error);
+          console.warn('Gate check network error:', error);
+          // On network error, show form to allow retry
+          setHasAccess(false);
         }
-      }
 
-      // Check for cookie-based session first
-      try {
-        const res = await fetch("https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/secure-site-access-check", {
-          method: "GET",
-          headers: {
-            'apikey': ANON_KEY,
-            'Authorization': `Bearer ${ANON_KEY}`,
-          },
-          credentials: "include",
-        });
-
-        if (res.ok) {
-          setHasAccess(true);
-          setLoading(false);
-          return;
-        } else if (res.status === 401) {
-          // Not signed in yet — just show the form, no errors
-          setHasAccess(false);
-        } else {
-          // Other error — log, but do not crash
-          console.warn('Gate check failed:', await res.text());
-          setHasAccess(false);
+        // Clean up legacy localStorage
+        try {
+          localStorage.removeItem('siteAccess');
+        } catch (error) {
+          // Silent cleanup
         }
       } catch (error) {
-        // Network error — log but do not crash
-        console.warn('Gate check network error:', error);
+        console.error('Unexpected error in checkAccess:', error);
         setHasAccess(false);
+      } finally {
+        setLoading(false);
       }
-
-      // Clean up legacy localStorage (transition complete)
-      try {
-        localStorage.removeItem('siteAccess');
-      } catch (error) {
-        // Silent cleanup
-      }
-      
-      setLoading(false);
     };
 
     checkAccess();
