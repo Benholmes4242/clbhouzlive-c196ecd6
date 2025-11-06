@@ -1,135 +1,61 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
-function makeCorsHeaders(req: Request) {
-  const origin = req.headers.get('origin') ?? '*';
-  return {
-    'Access-Control-Allow-Origin': origin,
-    'Vary': 'Origin',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-    'Access-Control-Allow-Credentials': 'true',
-  };
-}
-
-// Parse cookies from header
-function parseCookie(cookieHeader: string): Record<string, string> {
-  return Object.fromEntries(
-    cookieHeader
-      .split(";")
-      .map((pair) => pair.trim().split("=").map(decodeURIComponent))
-  );
-}
-
-// Verify signed token
-async function verifyToken(token: string, key: string): Promise<any | null> {
-  try {
-    const [headerB64, payloadB64, signatureB64] = token.split(".");
-    if (!headerB64 || !payloadB64 || !signatureB64) return null;
-
-    // Verify signature
-    const encoder = new TextEncoder();
-    const keyData = encoder.encode(key);
-    const messageData = encoder.encode(`${headerB64}.${payloadB64}`);
-
-    const cryptoKey = await crypto.subtle.importKey(
-      "raw",
-      keyData,
-      { name: "HMAC", hash: "SHA-256" },
-      false,
-      ["sign"]
-    );
-
-    // Decode expected signature
-    const expectedSig = Uint8Array.from(
-      atob(signatureB64.replace(/-/g, '+').replace(/_/g, '/') + '=='.slice(0, (4 - signatureB64.length % 4) % 4)), 
-      c => c.charCodeAt(0)
-    );
-
-    const signature = await crypto.subtle.sign("HMAC", cryptoKey, messageData);
-    const actualSig = new Uint8Array(signature);
-
-    // Compare signatures
-    if (actualSig.length !== expectedSig.length) return null;
-    for (let i = 0; i < actualSig.length; i++) {
-      if (actualSig[i] !== expectedSig[i]) return null;
-    }
-
-    // Decode payload
-    const payloadJson = atob(
-      payloadB64.replace(/-/g, '+').replace(/_/g, '/') + '=='.slice(0, (4 - payloadB64.length % 4) % 4)
-    );
-    const payload = JSON.parse(payloadJson);
-
-    // Check expiration
-    if (Date.now() > payload.exp) return null;
-
-    return payload;
-  } catch (e) {
-    console.error("Token verification error:", e);
-    return null;
-  }
-}
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+};
 
 const handler = async (req: Request): Promise<Response> => {
-  const corsHeaders = makeCorsHeaders(req);
+  // Handle CORS preflight
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const cookieHeader = req.headers.get("cookie") ?? "";
-    const cookies = parseCookie(cookieHeader);
-    const token = cookies["clubhouz_gate"];
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
 
-    if (!token) {
-      return new Response(
-        JSON.stringify({ ok: false, message: "No session found" }),
-        {
-          status: 401,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
-      );
-    }
-
-    const signingKey = Deno.env.get("SITE_ACCESS_SIGNING_KEY");
-    if (!signingKey) {
-      console.error("SITE_ACCESS_SIGNING_KEY not configured");
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error("Missing Supabase environment variables");
       return new Response(
         JSON.stringify({ ok: false, message: "Server misconfigured" }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    const payload = await verifyToken(token, signingKey);
+    // Forward auth header from the incoming request to supabase client
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
 
-    if (!payload) {
+    // Resolve the user from the JWT
+    const {
+      data: { user },
+      error: userErr,
+    } = await supabase.auth.getUser();
+
+    if (userErr || !user) {
       return new Response(
-        JSON.stringify({ ok: false, message: "Invalid or expired session" }),
-        {
-          status: 401,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
+        JSON.stringify({ ok: false, message: "No session found" }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
+
+    // Check if user is admin
+    const { data: isAdmin } = await supabase.rpc('is_admin');
 
     return new Response(
-      JSON.stringify({ ok: true }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      JSON.stringify({ ok: true, user_id: user.id, is_admin: isAdmin || false }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   } catch (error: any) {
     console.error("Error in secure-site-access-check:", error);
     return new Response(
       JSON.stringify({ ok: false, message: "Internal server error" }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
 };

@@ -41,23 +41,28 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
           }
         }
 
-        // Check for cookie-based session
+        // Check session with JWT token
         try {
+          const { data: { session } } = await supabase.auth.getSession();
+          const token = session?.access_token;
+
           const res = await fetch("https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/secure-site-access-check", {
-            method: "GET",
+            method: "POST",
             headers: {
+              'Content-Type': 'application/json',
               'apikey': ANON_KEY,
-              'Authorization': `Bearer ${ANON_KEY}`,
+              ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
             },
             credentials: "include",
+            body: JSON.stringify({}),
           });
 
           if (res.ok) {
-            console.log('Session cookie valid - access granted');
+            console.log('Valid JWT session - access granted');
             setHasAccess(true);
           } else if (res.status === 401) {
-            // Expected: no cookie yet, show access form
-            console.log('No session cookie found - showing access form');
+            // Expected: no valid session, show access form
+            console.log('No valid session found - showing access form');
             setHasAccess(false);
           } else {
             console.warn('Gate check unexpected status:', res.status);
