@@ -717,14 +717,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           </TabsContent>
         </Tabs>
 
-        {/* Input bar - docked at bottom with glass styling */}
+        {/* Input bar - fully glass, no solid backgrounds */}
         <footer 
-          className="sticky bottom-0 border-t"
+          className="sticky bottom-0"
           style={{
-            borderColor: 'rgba(255,255,255,0.1)',
-            background: 'rgba(0,0,0,0.2)',
-            backdropFilter: 'blur(40px)',
-            WebkitBackdropFilter: 'blur(40px)',
+            background: 'transparent',
           }}
         >
           <div className="w-full px-4 md:px-5 py-3" style={{ paddingBottom: `calc(12px + env(safe-area-inset-bottom))` }}>
@@ -740,11 +737,12 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     }
                   }}
                   placeholder="Ask Echo anything..."
-                  className="flex-1 min-h-[42px] max-h-32 resize-none text-white placeholder:text-white/60 border-white/20"
+                  className="flex-1 min-h-[42px] max-h-32 resize-none text-white placeholder:text-white/50 border-0"
                   style={{
                     background: 'rgba(255,255,255,0.08)',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)',
                   }}
                   disabled={isLoading}
                 />
@@ -752,14 +750,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   onClick={() => sendMessage(inputValue)}
                   disabled={!inputValue.trim() || isLoading}
                   size="icon"
-                  className="h-[42px] w-[42px] rounded-full"
+                  className="h-[42px] w-[42px] rounded-full border-0"
                   style={{
                     background: 'rgba(255,255,255,0.12)',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.15)',
                   }}
                 >
-                  <Send className="h-4 w-4" />
+                  <Send className="h-4 w-4 text-white" />
                 </Button>
               </div>
             )}
