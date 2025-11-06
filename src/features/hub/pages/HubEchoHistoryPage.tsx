@@ -12,7 +12,7 @@ import { useEchoChatHistory } from '@/features/echo/hooks/useEchoChatHistory';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import '../home/hubTheme.css';
 
-export function HubNewPage() {
+export function HubEchoHistoryPage() {
   const nav = useNavigate();
   const loc = useLocation();
 

@@ -54,7 +54,7 @@ export function EchoTile() {
     <Tile 
       title="Echo" 
       subtitle="Ask me anything"
-      onViewAll={() => navigateFromHub('/hub/echo')}
+      onViewAll={() => navigateFromHub('/hub/echo/history')}
       align="center"
     >
       <div 

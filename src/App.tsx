@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import ScrollToTop from '@/components/ScrollToTop';
 import { ThemeProvider } from '@/components/theme-provider';
 import SiteAccessControl from "@/components/SiteAccessControl";
@@ -85,7 +85,7 @@ const HubCreateGamePage = lazy(() => import("./features/hub/pages/HubCreateGameP
 const HubGamesPage = lazy(() => import("./features/hub/pages/HubGamesPage").then(m => ({ default: m.HubGamesPage })));
 const HubYourGamesPage = lazy(() => import("./features/hub/pages/HubYourGamesPage").then(m => ({ default: m.HubYourGamesPage })));
 const HubSwingPage = lazy(() => import("./features/hub/pages/HubSwingPage").then(m => ({ default: m.HubSwingPage })));
-const HubNewPage = lazy(() => import("./features/hub/pages/HubNewPage").then(m => ({ default: m.HubNewPage })));
+const HubEchoHistoryPage = lazy(() => import("./features/hub/pages/HubEchoHistoryPage").then(m => ({ default: m.HubEchoHistoryPage })));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -145,7 +145,8 @@ function AppRoutes() {
             <Route path="/hub/games" element={<HubGamesPage />} />
             <Route path="/hub/your-games" element={<HubYourGamesPage />} />
             <Route path="/hub/swing" element={<HubSwingPage />} />
-            <Route path="/hub/new" element={<HubNewPage />} />
+            <Route path="/hub/echo/history" element={<HubEchoHistoryPage />} />
+            <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
           </>
         )}
         
@@ -162,7 +163,8 @@ function AppRoutes() {
           <Route path="/hub/games" element={<HubGamesPage />} />
           <Route path="/hub/your-games" element={<HubYourGamesPage />} />
           <Route path="/hub/swing" element={<HubSwingPage />} />
-          <Route path="/hub/new" element={<HubNewPage />} />
+          <Route path="/hub/echo/history" element={<HubEchoHistoryPage />} />
+          <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
         </Routes>
       )}
     </>
