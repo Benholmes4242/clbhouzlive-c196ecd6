@@ -389,10 +389,8 @@ export default function EnhancedCreateMomentModalCinematic({
               }
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Liquid glass background */}
-              <LiquidGlassBackdrop isVisible={true} />
               {/* MEDIA STAGE - full-bleed, top-anchored */}
-              <section 
+              <section
                 id="media" 
                 className="absolute inset-x-0 overflow-hidden z-[1002]"
                 style={{ 
