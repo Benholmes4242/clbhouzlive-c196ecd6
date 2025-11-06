@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.secure-site-access-check]
 verify_jwt = false
+
+[functions.invite-request]
+verify_jwt = false

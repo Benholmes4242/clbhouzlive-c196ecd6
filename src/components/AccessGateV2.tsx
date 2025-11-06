@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
+import InviteRequestModal from "./InviteRequestModal";
 
 interface AccessGateV2Props {
   children: React.ReactNode;
@@ -12,6 +13,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
   const [hasAccess, setHasAccess] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const { user } = useSupabaseSession();
 
   useEffect(() => {
@@ -187,10 +189,16 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         <button 
           type="button"
           className="mt-4 text-white/85 text-[14px] underline-offset-4 hover:underline transition-colors"
-          onClick={() => toast.info("Request invite feature coming soon")}
+          onClick={() => setInviteModalOpen(true)}
         >
           Request Invite
         </button>
+
+        {/* Invite Request Modal */}
+        <InviteRequestModal 
+          open={inviteModalOpen} 
+          onOpenChange={setInviteModalOpen} 
+        />
 
         {/* Footer */}
         <p className="mt-6 text-xs text-white/60">
