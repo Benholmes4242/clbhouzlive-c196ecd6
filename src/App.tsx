@@ -81,6 +81,7 @@ const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 const HubHomePage = lazy(() => import("./features/hub/pages/HubHomePage").then(m => ({ default: m.HubHomePage })));
 const HubGolfersPage = lazy(() => import("./features/hub/pages/HubGolfersPage").then(m => ({ default: m.HubGolfersPage })));
 const HubEchoChatPage = lazy(() => import("./features/hub/pages/HubEchoChatPage").then(m => ({ default: m.HubEchoChatPage })));
+const HubCreateGamePage = lazy(() => import("./features/hub/pages/HubCreateGamePage").then(m => ({ default: m.HubCreateGamePage })));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -136,6 +137,7 @@ function AppRoutes() {
             <Route path="/hub" element={<HubHomePage />} />
             <Route path="/hub/golfers" element={<HubGolfersPage />} />
             <Route path="/hub/echo" element={<HubEchoChatPage />} />
+            <Route path="/hub/create-game" element={<HubCreateGamePage />} />
           </>
         )}
         
@@ -148,6 +150,7 @@ function AppRoutes() {
           <Route path="/hub" element={<HubHomePage />} />
           <Route path="/hub/golfers" element={<HubGolfersPage />} />
           <Route path="/hub/echo" element={<HubEchoChatPage />} />
+          <Route path="/hub/create-game" element={<HubCreateGamePage />} />
         </Routes>
       )}
     </>
