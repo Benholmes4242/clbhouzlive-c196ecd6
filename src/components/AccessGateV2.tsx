@@ -5,6 +5,8 @@ import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import InviteRequestModal from "./InviteRequestModal";
 import { posthog } from "@/lib/posthog";
 
+const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
 interface AccessGateV2Props {
   children: React.ReactNode;
 }
@@ -43,6 +45,10 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
       try {
         const res = await fetch("https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/secure-site-access-check", {
           method: "GET",
+          headers: {
+            'apikey': ANON_KEY,
+            'Authorization': `Bearer ${ANON_KEY}`,
+          },
           credentials: "include",
         });
 
@@ -82,8 +88,12 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
     try {
       const res = await fetch("https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/secure-site-access", {
         method: "POST",
-        headers: { "content-type": "application/json" },
-        credentials: "include", // Important for Set-Cookie
+        headers: {
+          "content-type": "application/json",
+          'apikey': ANON_KEY,
+          'Authorization': `Bearer ${ANON_KEY}`,
+        },
+        credentials: "include",
         body: JSON.stringify({
           accessCode: accessCode.toUpperCase(),
           domain: window.location.hostname

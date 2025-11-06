@@ -1,10 +1,16 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+function makeCorsHeaders(req: Request) {
+  const origin = req.headers.get('origin') ?? '*';
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Vary': 'Origin',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+    'Access-Control-Allow-Credentials': 'true',
+  };
+}
 
 const BACKOFF_STEPS = [1, 2, 4, 8, 16]; // seconds
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -84,6 +90,7 @@ async function signToken(payload: string, key: string): Promise<string> {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  const corsHeaders = makeCorsHeaders(req);
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -208,7 +215,7 @@ const handler = async (req: Request): Promise<Response> => {
     headers.append("Content-Type", "application/json");
     headers.append(
       "Set-Cookie",
-      `clubhouz_gate=${signedToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${SESSION_TTL_MS / 1000}`
+      `clubhouz_gate=${signedToken}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=${SESSION_TTL_MS / 1000}`
     );
     Object.entries(corsHeaders).forEach(([key, value]) => {
       headers.append(key, value);
