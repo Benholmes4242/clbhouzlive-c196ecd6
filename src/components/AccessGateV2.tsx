@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
-import InviteRequestModal from "./InviteRequestModal";
 import { posthog } from "@/lib/posthog";
 
 const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -16,7 +15,6 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
   const [hasAccess, setHasAccess] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { user } = useSupabaseSession();
 
@@ -163,7 +161,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
 
         {/* Headline */}
         <h1 className="font-display text-white text-[32px] font-semibold tracking-[.02em] leading-[1.2] mb-3">
-          THE HOME<br/>OF GOLF
+          YOUR HOME<br/>OF GOLF
         </h1>
 
         {/* Subtitle */}
@@ -211,24 +209,6 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
             {submitting ? "Checking..." : "ENTER"}
           </button>
         </form>
-
-        {/* Request Invite */}
-        <button 
-          type="button"
-          className="mt-4 text-white/85 text-[14px] underline-offset-4 hover:underline transition-colors"
-          onClick={() => {
-            posthog.capture('invite_open');
-            setInviteModalOpen(true);
-          }}
-        >
-          Request Invite
-        </button>
-
-        {/* Invite Request Modal */}
-        <InviteRequestModal 
-          open={inviteModalOpen} 
-          onOpenChange={setInviteModalOpen} 
-        />
 
         {/* Footer */}
         <p className="mt-6 text-xs text-white/60">
