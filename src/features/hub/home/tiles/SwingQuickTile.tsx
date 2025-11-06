@@ -11,10 +11,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { Tile } from '../components/Tile';
 import { ViewAllPill } from '../components/ViewAllPill';
 import { ToastContainer } from '@/components/ui/FrostedToast';
+import { useHub } from '@/features/hub/useHub';
 
 export function SwingQuickTile() {
   const inputRef = useRef<HTMLInputElement>(null);
   const nav = useNavigate();
+  const { navigateFromHub } = useHub();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(false);
   const [toasts, setToasts] = useState<Array<{ id: number; message: string; type?: 'success' | 'error' }>>([]);
@@ -59,7 +61,7 @@ export function SwingQuickTile() {
     
     try {
       // Navigate to swing analysis page with the selected file
-      nav('/hub?sheet=swing', { state: { preselectedFileName: file.name } });
+      navigateFromHub('/hub/echo/swing');
       
       // Simulate success after navigation
       setTimeout(() => {
@@ -91,7 +93,7 @@ export function SwingQuickTile() {
             }}
           />
           <button
-            onClick={() => nav('/hub?sheet=swing')}
+            onClick={() => navigateFromHub('/hub/echo/swing')}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
             style={{ 
               background: 'transparent',

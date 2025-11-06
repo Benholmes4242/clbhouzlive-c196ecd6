@@ -9,6 +9,7 @@ import { Tile } from '../components/Tile';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import { useEchoChatHistory } from '@/features/echo/hooks/useEchoChatHistory';
 import { useSwingHistory } from '@/features/echo/hooks/useSwingHistory';
+import { useHub } from '@/features/hub/useHub';
 
 interface EchoHistoryTileProps {
   limitChat?: number;
@@ -20,6 +21,7 @@ export function EchoHistoryTile({
   limitSwing = 8
 }: EchoHistoryTileProps) {
   const nav = useNavigate();
+  const { navigateFromHub } = useHub();
   
   const { data: chatItems = [], isLoading: chatLoading, error: chatErr } = useEchoChatHistory({ limit: limitChat });
   const { data: swingItems = [], isLoading: swingLoading, error: swingErr } = useSwingHistory({ limit: limitSwing });
@@ -42,7 +44,7 @@ export function EchoHistoryTile({
             }}
           />
           <button
-            onClick={() => nav('/hub?sheet=recent-echo')}
+            onClick={() => navigateFromHub('/hub/echo/history')}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
             style={{ 
               background: 'transparent',
@@ -82,7 +84,7 @@ export function EchoHistoryTile({
               {!chatLoading && chatItems.map(item => (
                 <button
                   key={item.id}
-                  onClick={() => nav(`/hub?sheet=echo&id=${item.id}`)}
+                  onClick={() => navigateFromHub(`/hub/echo/history/chat/${item.id}`)}
                   className="w-full text-left rounded-xl bg-white/5 hover:bg-white/7 transition px-3 py-2.5 mb-2 flex items-start gap-2 border border-white/6"
                 >
                   <span className="inline-flex h-[22px] w-[22px] rounded-full items-center justify-center bg-white/10 mr-1">
@@ -128,7 +130,7 @@ export function EchoHistoryTile({
               {!swingLoading && swingItems.map(item => (
                 <button
                   key={item.id}
-                  onClick={() => nav(`/hub?sheet=swing&id=${item.id}`)}
+                  onClick={() => navigateFromHub(`/hub/echo/history/swing/${item.id}`)}
                   className="w-full mb-3 rounded-2xl overflow-hidden relative border border-white/6 bg-white/5 hover:bg-white/7 transition"
                 >
                   {/* Title above thumb */}

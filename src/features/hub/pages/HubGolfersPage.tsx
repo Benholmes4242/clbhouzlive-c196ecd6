@@ -7,24 +7,50 @@
 
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useHub } from '@/features/hub/useHub';
-import { GolfersScreen } from '@/features/hub/sheets/GolfersScreen';
+import { useQueryClient } from '@tanstack/react-query';
+import { useActiveGolfers } from '@/hooks/useActiveGolfers';
+import { GolferRow } from '@/features/nearby/components/GolferRow';
+import { VisibilitySegmentedControl } from '@/features/nearby/components/VisibilitySegmentedControl';
+import { OpenToPlayButton } from '@/features/nearby/components/OpenToPlayButton';
+import { useVisibility } from '@/features/nearby/hooks/useVisibility';
+import { PullToRefresh } from '@/components/PullToRefresh';
 import '../home/hubTheme.css';
 
 export function HubGolfersPage() {
-  const { open } = useHub();
   const nav = useNavigate();
   const loc = useLocation();
+  const queryClient = useQueryClient();
+  const { golfers, isLoading } = useActiveGolfers({ limit: 50, mockCount: 0 });
+  const { visibilityMode, setVisibilityMode } = useVisibility();
 
   const handleBack = () => {
     const state = loc.state as any;
     if (state?.backgroundLocation) {
       // Return to Hub overlay
-      open();
+      nav(-1);
     } else {
       // Deep link fallback
       nav('/clubhouse', { replace: true });
     }
+  };
+
+  // Refetch on foreground/focus
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        queryClient.invalidateQueries({ queryKey: ['activeGolfers'] });
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
+    };
+  }, [queryClient]);
+
+  const handleRefresh = () => {
+    return queryClient.invalidateQueries({ queryKey: ['activeGolfers'] });
   };
 
   return (
@@ -56,7 +82,40 @@ export function HubGolfersPage() {
 
       {/* Content */}
       <div className="overflow-y-auto h-[calc(100vh-3.5rem)] px-4 pt-4">
-        <GolfersScreen onClose={handleBack} />
+        <PullToRefresh onRefresh={handleRefresh}>
+          <div className="space-y-4 pb-6">
+            {/* Visibility Control */}
+            <div className="w-full">
+              <VisibilitySegmentedControl 
+                value={visibilityMode}
+                onChange={setVisibilityMode}
+              />
+            </div>
+
+            {/* Open to Play Button */}
+            <OpenToPlayButton />
+
+            {/* Golfers List */}
+            {isLoading ? (
+              <div className="py-12 text-center flex flex-col items-center justify-center min-h-[240px]">
+                <div className="text-[15px] font-medium text-white/90">Loading active golfers…</div>
+                <div className="text-[13px] text-white/60 mt-1">Checking who's nearby</div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {golfers.map((golfer, index) => (
+                  <GolferRow key={golfer.id ?? index} golfer={golfer} index={index} />
+                ))}
+                
+                {golfers.length === 0 && (
+                  <div className="py-8 text-center">
+                    <div className="text-[13px] text-white/60">No other active golfers nearby</div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </PullToRefresh>
       </div>
     </div>
   );
