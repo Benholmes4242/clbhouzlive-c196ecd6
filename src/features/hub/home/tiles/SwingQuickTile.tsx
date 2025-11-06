@@ -19,6 +19,10 @@ export function SwingQuickTile() {
     navigateFromHub('/hub/swing');
   };
 
+  const openSwingHistory = () => {
+    navigateFromHub('/hub/swing/history');
+  };
+
   const { data: lastSwing } = useQuery({
     queryKey: ['lastSwing'],
     queryFn: async () => {
@@ -55,7 +59,7 @@ export function SwingQuickTile() {
             }}
           />
           <button
-            onClick={openSwingPage}
+            onClick={openSwingHistory}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
             style={{ 
               background: 'transparent',
