@@ -48,20 +48,11 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         console.error('Error checking cookie session:', error);
       }
 
-      // Fallback: Check localStorage for legacy sessions (transition period)
+      // Clean up legacy localStorage (transition complete)
       try {
-        const storedAccess = localStorage.getItem('siteAccess');
-        if (storedAccess) {
-          const accessData = JSON.parse(storedAccess);
-          const isExpired = accessData.expiresAt && new Date(accessData.expiresAt) < new Date();
-          const isDomainMatch = accessData.domain === window.location.hostname;
-          
-          if (accessData.granted && !isExpired && isDomainMatch) {
-            setHasAccess(true);
-          }
-        }
+        localStorage.removeItem('siteAccess');
       } catch (error) {
-        console.error('Error checking stored access:', error);
+        // Silent cleanup
       }
       
       setLoading(false);
