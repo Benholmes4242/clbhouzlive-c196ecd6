@@ -61,27 +61,20 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
           {!isLoading && golfers.slice(0, 3).map(g => (
             <button 
               key={g.id} 
-              className="flex items-center gap-3 w-full p-2 rounded-2xl transition-colors text-left"
-              style={{ background: 'transparent' }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-hover)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              className="ng-row"
               onClick={() => nav(`/profile/${g.username}`)}
             >
               <img 
                 src={g.avatar_url || '/placeholder.svg'} 
                 alt="" 
-                className="w-10 h-10 rounded-full object-cover shrink-0"
-                style={{ border: '1px solid var(--hub-stroke-avatar)' }}
+                className="ng-avatar"
               />
-              <div className="flex-1 min-w-0">
-                <div className="text-[15px] font-medium truncate" style={{ color: 'var(--hub-text)' }}>
+              <div className="ng-main">
+                <div className="ng-name" title={g.display_name || g.username}>
                   {g.display_name || g.username}
                 </div>
-                <div className="text-[12px] truncate" style={{ color: 'var(--hub-text-sub)' }}>
-                  {g.distanceText}
-                </div>
+                <div className="ng-distance">{g.distanceText}</div>
               </div>
-              <span className="text-lg" style={{ color: 'var(--hub-text-dimmer)' }}>›</span>
             </button>
           ))}
           {!isLoading && golfers.length === 0 && (

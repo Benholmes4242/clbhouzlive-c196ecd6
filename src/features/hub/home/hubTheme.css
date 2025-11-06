@@ -15,6 +15,10 @@
   --hub-tile-compact: 200px;
   --hub-tile-content: 312px;
   --hub-blur: 28px;
+  
+  /* Nearby Golfers spacing (matches Ask Echo pill) */
+  --hub-pill-pad-x: 14px;
+  --hub-tile-pad-x: 18px;
 
   /* ========================================
      BACKGROUNDS & SURFACES
@@ -281,4 +285,57 @@ html.hub-open {
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
+}
+
+/* ========================================
+   NEARBY GOLFERS ROW
+   ======================================== */
+.ng-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px var(--hub-tile-pad-x);
+  background: transparent;
+  border: none;
+  border-radius: 16px;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  text-align: left;
+}
+
+.ng-row:hover {
+  background: var(--hub-glass-bg-hover);
+}
+
+.ng-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex: 0 0 44px;
+  object-fit: cover;
+  border: 1px solid var(--hub-stroke-avatar);
+  margin-left: calc(-1 * (var(--hub-tile-pad-x) - var(--hub-pill-pad-x)));
+}
+
+.ng-main {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ng-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--hub-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: var(--hub-pill-pad-x);
+}
+
+.ng-distance {
+  font-size: 13px;
+  color: var(--hub-text-body);
 }

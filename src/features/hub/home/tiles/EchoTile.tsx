@@ -80,7 +80,7 @@ export function EchoTile() {
             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
             aria-label="View echo history"
           >
-            View all →
+            View Chats →
           </button>
         </div>
       }

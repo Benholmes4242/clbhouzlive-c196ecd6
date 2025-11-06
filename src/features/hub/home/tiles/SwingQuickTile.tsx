@@ -70,7 +70,7 @@ export function SwingQuickTile() {
             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
           >
-            View all →
+            View Swings →
           </button>
         </div>
       }
