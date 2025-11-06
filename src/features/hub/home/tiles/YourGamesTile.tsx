@@ -200,12 +200,9 @@ export function YourGamesTile() {
   const { data, isLoading, isError, refetch } = useUserGames();
   useUserGamesRealtime();
 
-  const openCreateGame = (e?: React.MouseEvent) => {
+  const comingSoon = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    const state = window.location.pathname.includes('/hub') 
-      ? { backgroundLocation: (window.history.state as any)?.backgroundLocation }
-      : undefined;
-    nav('/hub/create-game', state ? { state } : undefined);
+    alert('Coming soon');
   };
 
   React.useEffect(() => {
@@ -243,7 +240,7 @@ export function YourGamesTile() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '12px' }}>
           <h3>Games</h3>
           <button
-            onClick={openCreateGame}
+            onClick={comingSoon}
             className="text-[15px] font-medium transition"
             style={{ 
               background: 'transparent',
@@ -271,7 +268,7 @@ export function YourGamesTile() {
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
             <button
-              onClick={(e) => { e.stopPropagation(); nav('/hub/games'); }}
+              onClick={comingSoon}
               className="text-[15px] font-medium transition"
               style={{
                 background: 'transparent',
@@ -287,7 +284,7 @@ export function YourGamesTile() {
             </button>
             <button
               ref={viewAllRef}
-              onClick={() => nav('/hub/your-games')}
+              onClick={comingSoon}
               className="text-[15px] font-medium transition"
               style={{
                 background: 'transparent',
@@ -336,7 +333,7 @@ export function YourGamesTile() {
             <div className="text-[14px]" style={{ color: 'var(--hub-text-sub)' }}>
               No games yet.{' '}
               <button 
-                onClick={() => nav('/hub/create-game')}
+                onClick={comingSoon}
                 className="underline underline-offset-2"
                 style={{ color: 'var(--hub-accent-orange)' }}
               >
@@ -351,7 +348,7 @@ export function YourGamesTile() {
               game={g}
               expanded={openId === g.id}
               onToggle={() => toggle(g.id)}
-              onLongPress={() => nav('/hub/your-games')}
+              onLongPress={comingSoon}
             />
           ))}
         </div>

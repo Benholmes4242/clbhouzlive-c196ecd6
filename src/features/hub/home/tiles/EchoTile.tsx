@@ -43,13 +43,13 @@ export function EchoTile() {
     return () => clearInterval(timer);
   }, [carouselPaused, prompts.length]);
 
-  const openEcho = (seedPrompt?: string) => {
-    nav(seedPrompt ? `/hub/echo/chat?msg=${encodeURIComponent(seedPrompt)}` : '/hub/echo/chat');
+  const comingSoon = () => {
+    alert('Coming soon');
   };
 
   const handleSend = () => {
     if (input.trim()) {
-      openEcho(input);
+      comingSoon();
       setInput('');
     }
   };
@@ -58,7 +58,7 @@ export function EchoTile() {
     <Tile 
       title="Echo" 
       subtitle="Ask me anything"
-      onViewAll={() => openEcho()}
+      onViewAll={comingSoon}
       align="center"
     >
       <div 

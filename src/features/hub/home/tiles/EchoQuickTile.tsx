@@ -13,10 +13,14 @@ export function EchoQuickTile() {
   const [text, setText] = useState('');
   const nav = useNavigate();
 
+  const comingSoon = () => {
+    alert('Coming soon');
+  };
+
   const submit = () => {
     const msg = text.trim();
     if (!msg) return;
-    nav(`/hub/echo/chat?msg=${encodeURIComponent(msg)}`);
+    comingSoon();
     setText('');
   };
 
@@ -40,7 +44,7 @@ export function EchoQuickTile() {
             }}
           />
           <button
-            onClick={() => nav('/hub/echo/chat')}
+            onClick={comingSoon}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
             style={{
               background: 'transparent',

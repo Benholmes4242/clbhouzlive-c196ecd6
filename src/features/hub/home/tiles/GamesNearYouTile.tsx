@@ -24,12 +24,8 @@ export function GamesNearYouTile({
   
   const games = allGames.slice(0, limit);
   
-  const handleTileClick = () => {
-    if (allGames.length === 0) {
-      nav('/hub/create-game');
-    } else {
-      nav('/hub/games');
-    }
+  const comingSoon = () => {
+    alert('Coming soon');
   };
 
   return (
@@ -46,7 +42,7 @@ export function GamesNearYouTile({
             }}
           />
           <button
-            onClick={handleTileClick}
+            onClick={comingSoon}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
             aria-label="View all"
             style={{

@@ -11,15 +11,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { Tile } from '../components/Tile';
 import { ViewAllPill } from '../components/ViewAllPill';
 import { ToastContainer } from '@/components/ui/FrostedToast';
-import { useHub } from '@/features/hub/useHub';
 
 export function SwingQuickTile() {
   const inputRef = useRef<HTMLInputElement>(null);
   const nav = useNavigate();
-  const { navigateFromHub } = useHub();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(false);
   const [toasts, setToasts] = useState<Array<{ id: number; message: string; type?: 'success' | 'error' }>>([]);
+  
+  const comingSoon = () => {
+    alert('Coming soon');
+  };
 
   const { data: lastSwing } = useQuery({
     queryKey: ['lastSwing'],
@@ -60,13 +62,13 @@ export function SwingQuickTile() {
     addToast('Uploading swing...', 'success');
     
     try {
-      // Navigate to swing analysis page with the selected file
-      navigateFromHub('/hub/echo/swing');
+      // Show coming soon message
+      comingSoon();
       
-      // Simulate success after navigation
+      // Simulate success after message
       setTimeout(() => {
         setIsUploading(false);
-        addToast('Swing uploaded successfully', 'success');
+        addToast('Feature coming soon', 'success');
       }, 1000);
     } catch (error) {
       setIsUploading(false);
@@ -93,7 +95,7 @@ export function SwingQuickTile() {
             }}
           />
           <button
-            onClick={() => navigateFromHub('/hub/echo/swing')}
+            onClick={comingSoon}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
             style={{ 
               background: 'transparent',

@@ -80,10 +80,6 @@ const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 // Hub components (lazy load when feature flag is enabled)
 const HubHomePage = lazy(() => import("./features/hub/pages/HubHomePage").then(m => ({ default: m.HubHomePage })));
 const HubGolfersPage = lazy(() => import("./features/hub/pages/HubGolfersPage").then(m => ({ default: m.HubGolfersPage })));
-const HubGamesPage = lazy(() => import("./features/hub/pages/HubGamesPage").then(m => ({ default: m.HubGamesPage })));
-const HubYourGamesPage = lazy(() => import("./features/hub/pages/HubYourGamesPage").then(m => ({ default: m.HubYourGamesPage })));
-const HubCreateGamePage = lazy(() => import("./features/hub/pages/HubCreateGamePage").then(m => ({ default: m.HubCreateGamePage })));
-const HubEchoPage = lazy(() => import("./features/hub/pages/HubEchoPage").then(m => ({ default: m.HubEchoPage })));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -138,10 +134,6 @@ function AppRoutes() {
           <>
             <Route path="/hub" element={<HubHomePage />} />
             <Route path="/hub/golfers" element={<HubGolfersPage />} />
-            <Route path="/hub/games" element={<HubGamesPage />} />
-            <Route path="/hub/your-games" element={<HubYourGamesPage />} />
-            <Route path="/hub/create-game" element={<HubCreateGamePage />} />
-            <Route path="/hub/echo/*" element={<HubEchoPage />} />
           </>
         )}
         
@@ -153,10 +145,6 @@ function AppRoutes() {
         <Routes>
           <Route path="/hub" element={<HubHomePage />} />
           <Route path="/hub/golfers" element={<HubGolfersPage />} />
-          <Route path="/hub/games" element={<HubGamesPage />} />
-          <Route path="/hub/your-games" element={<HubYourGamesPage />} />
-          <Route path="/hub/create-game" element={<HubCreateGamePage />} />
-          <Route path="/hub/echo/*" element={<HubEchoPage />} />
         </Routes>
       )}
     </>
