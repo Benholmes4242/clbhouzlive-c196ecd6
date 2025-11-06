@@ -29,55 +29,35 @@ export function HubEchoChatPage() {
   };
 
   return (
-    <div className="glass-page" style={{
-      position: 'fixed',
-      inset: 0,
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100dvh',
-    }}>
+    <div
+      className="fixed inset-0 z-[9999] flex flex-col"
+      style={{
+        background: 'rgba(0, 0, 0, 0.25)',
+        backdropFilter: 'blur(120px)',
+        WebkitBackdropFilter: 'blur(120px)',
+      }}
+    >
       {/* Glass header */}
-      <header style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '12px 16px',
-        borderBottom: '1px solid var(--hub-stroke)',
-      }}>
+      <header
+        className="sticky top-0 z-10 flex items-center justify-between px-4 h-14 border-b"
+        style={{
+          borderColor: 'rgba(255,255,255,0.1)',
+          background: 'rgba(0,0,0,0.2)',
+        }}
+      >
         <button
           onClick={handleBack}
-          aria-label="Back"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: 'none',
-            border: 0,
-            color: 'var(--hub-text)',
-            fontSize: '15px',
-            cursor: 'pointer',
-            padding: '6px 10px',
-            borderRadius: '8px',
-            transition: 'background 0.2s',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
-          onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+          className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
+          aria-label="Back to Hub"
         >
-          <ArrowLeft size={18} />
-          Back
+          ‹ Back
         </button>
-        <h1 style={{
-          fontSize: '17px',
-          fontWeight: 600,
-          color: 'var(--hub-text)',
-        }}>
-          Echo
-        </h1>
-        <div style={{ width: 72 }} /> {/* spacer to balance back button */}
+        <h1 className="text-white/90 text-[17px] font-semibold">Echo</h1>
+        <div className="w-16" />
       </header>
 
       {/* Chat body */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="flex-1 flex flex-col overflow-hidden">
         <EchoConversationsProvider>
           <EchoChat />
         </EchoConversationsProvider>
