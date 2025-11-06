@@ -59,6 +59,7 @@ export function QuickActionsTile() {
 
   const openProfile = () => navigate('/profile');
   const openCreateGame = () => navigateFromHub('/hub/create-game');
+  const openSwing = () => navigateFromHub('/hub/swing');
 
   return (
     <Tile title="Quick Actions" align="center">
@@ -82,7 +83,7 @@ export function QuickActionsTile() {
         >
           <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />
           <QA labelTop="Ask" labelBottom="Echo" onClick={() => navigateFromHub('/hub/echo')} icon="💬" />
-          <QA labelTop="Upload" labelBottom="Swing" onClick={comingSoon} icon="🏌️" />
+          <QA labelTop="Upload" labelBottom="Swing" onClick={openSwing} icon="🏌️" />
           <QA labelTop="Your" labelBottom="Profile" onClick={openProfile} icon="👤" />
         </div>
       </div>
