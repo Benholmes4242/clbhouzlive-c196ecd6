@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useUserGames } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
+import { useHub } from '@/features/hub/useHub';
 import { devlog } from '@/utils/log';
 
 type GameWithDetails = {
@@ -193,6 +194,7 @@ function GameRow({
 
 export function YourGamesTile() {
   const nav = useNavigate();
+  const { navigateFromHub } = useHub();
   const [openId, setOpenId] = React.useState<string | null>(null);
   const viewAllRef = React.useRef<HTMLButtonElement>(null);
   
@@ -203,6 +205,11 @@ export function YourGamesTile() {
   const comingSoon = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     alert('Coming soon');
+  };
+
+  const openCreateGame = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    navigateFromHub('/hub/create-game');
   };
 
   React.useEffect(() => {
@@ -240,7 +247,7 @@ export function YourGamesTile() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '12px' }}>
           <h3>Games</h3>
           <button
-            onClick={comingSoon}
+            onClick={openCreateGame}
             className="text-[15px] font-medium transition"
             style={{ 
               background: 'transparent',
@@ -333,7 +340,7 @@ export function YourGamesTile() {
             <div className="text-[14px]" style={{ color: 'var(--hub-text-sub)' }}>
               No games yet.{' '}
               <button 
-                onClick={comingSoon}
+                onClick={openCreateGame}
                 className="underline underline-offset-2"
                 style={{ color: 'var(--hub-accent-orange)' }}
               >
