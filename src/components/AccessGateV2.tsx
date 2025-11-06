@@ -107,7 +107,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         })
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({ success: false, message: "Invalid response" }));
 
       posthog.capture('gate_submit', { success: res.ok && data?.success });
 
@@ -116,7 +116,6 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         posthog.capture('gate_access_granted');
         setHasAccess(true);
         setErrorMessage("");
-        // Cookie is now set by the server, no need for localStorage
       } else {
         const msg = data?.message || "Invalid access code";
         setErrorMessage(msg);
@@ -125,10 +124,10 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
       }
     } catch (error: any) {
       console.error('Error validating access code:', error);
-      const msg = error.message || "Failed to validate access code";
+      const msg = "Failed to validate access code. Please try again.";
       setErrorMessage(msg);
       toast.error(msg);
-      posthog.capture('gate_submit', { success: false });
+      posthog.capture('gate_submit', { success: false, error: error.message });
     } finally {
       setSubmitting(false);
     }
