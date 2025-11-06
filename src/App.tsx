@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-route
 import ScrollToTop from '@/components/ScrollToTop';
 import { ThemeProvider } from '@/components/theme-provider';
 import SiteAccessControl from "@/components/SiteAccessControl";
+import AccessGateV2 from "@/components/AccessGateV2";
 import { SecurityHeaders } from "@/components/security/SecurityHeaders";
 import { GlobalLoadingProvider } from "@/loading/GlobalLoading";
 import GlobalSpinner from "@/loading/GlobalSpinner";
@@ -215,6 +216,10 @@ const queryClient = new QueryClient({
 });
 
 const App: React.FC = () => {
+  // Feature flag for access gate version
+  const useV2Gate = import.meta.env.VITE_ACCESS_GATE_VERSION?.toString().toLowerCase() === "v2";
+  const AccessGate = useV2Gate ? AccessGateV2 : SiteAccessControl;
+  
   // Enforce R2-only policy globally
   useImageUploadSafeguard();
   
@@ -274,7 +279,7 @@ const App: React.FC = () => {
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>
               <SecurityHeaders />
-              <SiteAccessControl>
+              <AccessGate>
                 <HeaderProvider>
                   <ModalProvider>
                     <BottomNavigationProvider>
@@ -305,7 +310,7 @@ const App: React.FC = () => {
                 </BottomNavigationProvider>
                 </ModalProvider>
               </HeaderProvider>
-            </SiteAccessControl>
+            </AccessGate>
         </TooltipProvider>
       </QueryClientProvider>
       </ThemeProvider>
