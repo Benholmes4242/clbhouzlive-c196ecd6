@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
+import { useHub } from '@/features/hub/useHub';
 
 function QA({ labelTop, labelBottom, onClick, icon }: { 
   labelTop: string; 
@@ -49,6 +50,7 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
 
 export function QuickActionsTile() {
   const navigate = useNavigate();
+  const { navigateFromHub } = useHub();
 
   const comingSoon = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -78,7 +80,7 @@ export function QuickActionsTile() {
           }}
         >
           <QA labelTop="Create" labelBottom="Game" onClick={comingSoon} icon="⛳" />
-          <QA labelTop="Ask" labelBottom="Echo" onClick={comingSoon} icon="💬" />
+          <QA labelTop="Ask" labelBottom="Echo" onClick={() => navigateFromHub('/hub/echo')} icon="💬" />
           <QA labelTop="Upload" labelBottom="Swing" onClick={comingSoon} icon="🏌️" />
           <QA labelTop="Your" labelBottom="Profile" onClick={openProfile} icon="👤" />
         </div>

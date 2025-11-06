@@ -80,6 +80,7 @@ const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 // Hub components (lazy load when feature flag is enabled)
 const HubHomePage = lazy(() => import("./features/hub/pages/HubHomePage").then(m => ({ default: m.HubHomePage })));
 const HubGolfersPage = lazy(() => import("./features/hub/pages/HubGolfersPage").then(m => ({ default: m.HubGolfersPage })));
+const HubEchoChatPage = lazy(() => import("./features/hub/pages/HubEchoChatPage").then(m => ({ default: m.HubEchoChatPage })));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -134,6 +135,7 @@ function AppRoutes() {
           <>
             <Route path="/hub" element={<HubHomePage />} />
             <Route path="/hub/golfers" element={<HubGolfersPage />} />
+            <Route path="/hub/echo" element={<HubEchoChatPage />} />
           </>
         )}
         
@@ -145,6 +147,7 @@ function AppRoutes() {
         <Routes>
           <Route path="/hub" element={<HubHomePage />} />
           <Route path="/hub/golfers" element={<HubGolfersPage />} />
+          <Route path="/hub/echo" element={<HubEchoChatPage />} />
         </Routes>
       )}
     </>

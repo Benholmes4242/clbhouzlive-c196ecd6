@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useEchoHistory } from '../../hooks/useEchoHistory';
+import { useHub } from '@/features/hub/useHub';
 import { Send } from 'lucide-react';
 
 function timeAgo(iso?: string) {
@@ -19,7 +19,7 @@ function timeAgo(iso?: string) {
 export function EchoTile() {
   const { data: recent, isLoading } = useEchoHistory();
   const [input, setInput] = React.useState('');
-  const nav = useNavigate();
+  const { navigateFromHub } = useHub();
 
   const RAW_PROMPTS = [
     'Build me a 4-week practice plan',
@@ -43,13 +43,9 @@ export function EchoTile() {
     return () => clearInterval(timer);
   }, [carouselPaused, prompts.length]);
 
-  const comingSoon = () => {
-    alert('Coming soon');
-  };
-
   const handleSend = () => {
     if (input.trim()) {
-      comingSoon();
+      navigateFromHub('/hub/echo');
       setInput('');
     }
   };
@@ -58,7 +54,7 @@ export function EchoTile() {
     <Tile 
       title="Echo" 
       subtitle="Ask me anything"
-      onViewAll={comingSoon}
+      onViewAll={() => navigateFromHub('/hub/echo')}
       align="center"
     >
       <div 
@@ -124,7 +120,7 @@ export function EchoTile() {
         <div
           onClick={(e) => {
             e.stopPropagation();
-            setInput(prompts[carouselIdx].replace(/(^"|"$)/g, ''));
+            navigateFromHub('/hub/echo');
           }}
           onMouseEnter={() => setCarouselPaused(true)}
           onMouseLeave={() => setCarouselPaused(false)}
