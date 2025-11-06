@@ -212,6 +212,11 @@ export function YourGamesTile() {
     navigateFromHub('/hub/create-game');
   };
 
+  const openSearchGames = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    navigateFromHub('/hub/games');
+  };
+
   React.useEffect(() => {
     const btn = viewAllRef.current;
     const tile = btn?.closest('section');
@@ -275,7 +280,7 @@ export function YourGamesTile() {
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
             <button
-              onClick={comingSoon}
+              onClick={openSearchGames}
               className="text-[15px] font-medium transition"
               style={{
                 background: 'transparent',

@@ -1,0 +1,62 @@
+/**
+ * Hub Games Page
+ * Full-screen glass page overlaying the origin page.
+ */
+import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import '../home/hubTheme.css';
+
+export function HubGamesPage() {
+  const nav = useNavigate();
+  const loc = useLocation();
+
+  const goBack = () => {
+    const state = loc.state as any;
+    if (state?.backgroundLocation) {
+      // Navigate back to close this overlay
+      nav(-1);
+    } else {
+      // Deep link fallback
+      nav('/clubhouse', { replace: true });
+    }
+  };
+
+  return (
+    <div
+      className="hub-glass-page fixed inset-0 z-[9999]"
+      style={{
+        background: 'rgba(0, 0, 0, 0.25)',
+        backdropFilter: 'blur(120px)',
+        WebkitBackdropFilter: 'blur(120px)',
+      }}
+    >
+      {/* Simple header */}
+      <header className="sticky top-0 z-10 flex items-center justify-between px-4 h-14 border-b"
+        style={{
+          borderColor: 'rgba(255,255,255,0.1)',
+          background: 'rgba(0,0,0,0.2)',
+        }}
+      >
+        <button
+          onClick={goBack}
+          className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
+          aria-label="Back to Hub"
+        >
+          ‹ Back
+        </button>
+        <h1 className="text-white/90 text-[17px] font-semibold">Games</h1>
+        <div className="w-16" />
+      </header>
+
+      {/* Content area */}
+      <main className="overflow-y-auto h-[calc(100vh-3.5rem)] px-4 pt-4">
+        <div className="space-y-4 pb-6">
+          <div className="text-center py-12">
+            <div className="text-[15px] font-medium text-white/90">Games Search</div>
+            <div className="text-[13px] text-white/60 mt-1">Coming soon</div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
