@@ -4,11 +4,14 @@
  */
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { GamesTab } from '@/features/nearby/GamesTab';
+import { useHub } from '@/features/hub/useHub';
 import '../home/hubTheme.css';
 
 export function HubGamesPage() {
   const nav = useNavigate();
   const loc = useLocation();
+  const { navigateFromHub } = useHub();
 
   const goBack = () => {
     const state = loc.state as any;
@@ -19,6 +22,10 @@ export function HubGamesPage() {
       // Deep link fallback
       nav('/clubhouse', { replace: true });
     }
+  };
+
+  const handleOpenCreate = () => {
+    navigateFromHub('/hub/create-game');
   };
 
   return (
@@ -48,15 +55,10 @@ export function HubGamesPage() {
         <div className="w-16" />
       </header>
 
-      {/* Content area */}
-      <main className="overflow-y-auto h-[calc(100vh-3.5rem)] px-4 pt-4">
-        <div className="space-y-4 pb-6">
-          <div className="text-center py-12">
-            <div className="text-[15px] font-medium text-white/90">Games Search</div>
-            <div className="text-[13px] text-white/60 mt-1">Coming soon</div>
-          </div>
-        </div>
-      </main>
+      {/* Content area - GamesTab content */}
+      <div className="overflow-y-auto h-[calc(100vh-3.5rem)]">
+        <GamesTab onOpenCreate={handleOpenCreate} />
+      </div>
     </div>
   );
 }
