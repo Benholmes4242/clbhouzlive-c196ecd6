@@ -717,8 +717,16 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           </TabsContent>
         </Tabs>
 
-        {/* Input bar - docked at bottom */}
-        <footer className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-sm">
+        {/* Input bar - docked at bottom with glass styling */}
+        <footer 
+          className="sticky bottom-0 border-t"
+          style={{
+            borderColor: 'rgba(255,255,255,0.1)',
+            background: 'rgba(0,0,0,0.2)',
+            backdropFilter: 'blur(40px)',
+            WebkitBackdropFilter: 'blur(40px)',
+          }}
+        >
           <div className="w-full px-4 md:px-5 py-3" style={{ paddingBottom: `calc(12px + env(safe-area-inset-bottom))` }}>
             {activeTab === 'chat' && (
               <div className="flex items-end gap-2">
@@ -731,8 +739,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       sendMessage(inputValue);
                     }
                   }}
-                  placeholder="Message Echo…"
-                  className="flex-1 min-h-[42px] max-h-32 resize-none bg-muted/50 border-border text-foreground placeholder:text-muted-foreground"
+                  placeholder="Ask Echo anything..."
+                  className="flex-1 min-h-[42px] max-h-32 resize-none text-white placeholder:text-white/60 border-white/20"
+                  style={{
+                    background: 'rgba(255,255,255,0.08)',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                  }}
                   disabled={isLoading}
                 />
                 <Button
@@ -740,6 +753,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   disabled={!inputValue.trim() || isLoading}
                   size="icon"
                   className="h-[42px] w-[42px] rounded-full"
+                  style={{
+                    background: 'rgba(255,255,255,0.12)',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                  }}
                 >
                   <Send className="h-4 w-4" />
                 </Button>
