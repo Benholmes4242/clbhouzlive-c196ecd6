@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { verify as argon2Verify } from "https://deno.land/x/argon2@v0.9.0/lib/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,6 +12,54 @@ const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 interface AccessValidationRequest {
   accessCode: string;
   domain: string;
+}
+
+// Base64url helpers
+function b64urlToBytes(b64: string) {
+  const pad = '='.repeat((4 - (b64.length % 4)) % 4);
+  const s = (b64 + pad).replace(/-/g, '+').replace(/_/g, '/');
+  const bin = atob(s);
+  return Uint8Array.from(bin, c => c.charCodeAt(0));
+}
+
+function bytesToB64url(bytes: Uint8Array) {
+  const bin = String.fromCharCode(...bytes);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+// Verify a hash in the form: pbkdf2$sha256$<iters>$<salt_b64>$<dk_b64>
+async function verifyPBKDF2(scheme: string, rawCode: string) {
+  try {
+    const [alg, hash, iterStr, saltB64, dkB64] = scheme.split('$').slice(1);
+    if (alg !== 'sha256' || !iterStr || !saltB64 || !dkB64) return false;
+
+    const iterations = parseInt(iterStr, 10);
+    const salt = b64urlToBytes(saltB64);
+    const codeKey = await crypto.subtle.importKey(
+      'raw',
+      new TextEncoder().encode(rawCode.toUpperCase()),
+      { name: 'PBKDF2' },
+      false,
+      ['deriveBits']
+    );
+    const bits = await crypto.subtle.deriveBits(
+      {
+        name: 'PBKDF2',
+        salt,
+        iterations,
+        hash: 'SHA-256',
+      },
+      codeKey,
+      256 // 32 bytes
+    );
+    const derived = new Uint8Array(bits);
+    const derivedB64 = bytesToB64url(derived);
+    return crypto.timingSafeEqual
+      ? crypto.timingSafeEqual(b64urlToBytes(derivedB64), b64urlToBytes(dkB64))
+      : derivedB64 === dkB64; // fallback if timingSafeEqual not present
+  } catch {
+    return false;
+  }
 }
 
 // Simple HMAC signing for session tokens
@@ -82,25 +129,16 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Verify access code against Argon2 hashes
+    // Verify access code against PBKDF2 hashes
     let isValid = false;
-    if (accessCode) {
-      try {
-        const normalizedCode = String(accessCode).toUpperCase();
-        // Try to verify against each hash
-        for (const hash of hashes) {
-          try {
-            if (await argon2Verify(hash, normalizedCode)) {
-              isValid = true;
-              break;
-            }
-          } catch (e) {
-            // Hash verification failed, try next
-            continue;
+    if (accessCode && hashes.length) {
+      for (const scheme of hashes) {
+        if (scheme.startsWith("pbkdf2$sha256$")) {
+          if (await verifyPBKDF2(scheme, String(accessCode))) {
+            isValid = true;
+            break;
           }
         }
-      } catch (e) {
-        console.error("Error verifying code:", e);
       }
     }
 
