@@ -131,9 +131,7 @@ export function EchoTile() {
             marginBottom: 'auto',
             height: 'calc(1.25em * 2 + 6px)',
             overflow: 'hidden',
-            borderRadius: '8px',
             padding: '3px 0',
-            background: 'rgba(255,255,255,0.04)',
             cursor: 'pointer',
           }}
         >
@@ -155,11 +153,12 @@ export function EchoTile() {
                   WebkitLineClamp: 2,
                   overflow: 'hidden',
                   lineHeight: '1.25',
-                  padding: '0 10px',
-                  fontSize: '12.5px',
+                  padding: '0 8px',
+                  fontSize: '15px',
                   whiteSpace: 'normal',
                   textOverflow: 'ellipsis',
                   color: 'var(--hub-text-body)',
+                  textAlign: 'center',
                 }}
               >
                 "{prompt}"
