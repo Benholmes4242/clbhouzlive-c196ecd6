@@ -1,0 +1,133 @@
+/**
+ * Hub Shell Styles
+ * 
+ * Minimal CSS for Hub-specific UI patterns not covered by Tailwind.
+ */
+
+:root {
+  --hub-tile-fixed-h: 220px;
+}
+
+.hub-shell {
+  /* Mobile safe area handling */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.hub-tile-fixed {
+  height: var(--hub-tile-fixed-h);
+}
+.hub-tile-fixed > * {
+  height: 100%;
+}
+
+/* Ensure shadows and blur don't get clipped */
+.hub-shell section {
+  will-change: transform, backdrop-filter;
+  transform: translateZ(0);
+}
+
+/* Apple-style top-edge glow on header */
+#hubHeader::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* Smooth scroll behavior */
+.hub-shell [data-hub-scroll] {
+  scroll-behavior: smooth;
+}
+
+/* Animation classes (if not using Tailwind) */
+@keyframes slide-in-from-bottom-4 {
+  from {
+    transform: translateY(1rem);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-in {
+  animation-fill-mode: forwards;
+}
+
+.slide-in-from-bottom-4 {
+  animation: slide-in-from-bottom-4 0.2s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.15s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Hub Open: make underlying app background transparent for true glass */
+html.hub-open { --bg-page: transparent; }
+
+.hub-open body,
+.hub-open #root,
+.hub-open .clubhouse-root {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Hide ALL page headers when hub is open to prevent interference */
+.hub-open header.chrome-header,
+.hub-open [data-chrome="header"],
+.hub-open [data-hides-on-scroll] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Neutralize hardcoded dark backdrops when hub is open */
+.hub-open .videoContainer,
+.hub-open .highlights__card,
+.hub-open .fixed.inset-0.z-10.bg-black,
+.hub-open .fixed.inset-0[class*="bg-black"] {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* iOS Safari backdrop-filter guard - invisible shim to stabilize blur */
+.hub-glass-shim {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(0,0,0,0.001); /* 0.1% alpha creates pixels for WebKit to sample */
+}
+
+/* Bottom Sheet Animation Classes */
+.bottomSheet {
+  transition: transform 300ms cubic-bezier(.2,.8,.2,1);
+}
+
+.bottomSheet.closing {
+  /* Applied by inline style for dynamic exit distance */
+}
+
+.sheetBackdrop {
+  transition: opacity 220ms ease;
+  opacity: 1;
+}
+
+.sheetBackdrop.closing {
+  opacity: 0;
+}

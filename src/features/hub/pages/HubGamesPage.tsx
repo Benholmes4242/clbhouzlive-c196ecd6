@@ -1,74 +1,30 @@
 /**
- * Hub Games Page - Standalone Glass Overlay
+ * Hub Games Page
+ * 
+ * Games discovery tab with normalized UI (Phase 3).
  */
 
-import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
-import { GamesNearYouScreen } from '../sheets/GamesNearYouScreen';
-import '../home/hubTheme.css';
+import React, { useEffect } from 'react';
+import { GamesTab } from '@/features/nearby/GamesTab';
+import { useNavigate } from 'react-router-dom';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
-export default function HubGamesPage() {
+export function HubGamesPage() {
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const handleBack = () => {
-    const state = location.state as { backgroundLocation?: Location } | null;
-    if (state?.backgroundLocation) {
-      navigate(-1);
-    } else {
-      navigate('/clubhouse', { replace: true });
+  useEffect(() => {
+    // Track Games tab view
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', analyticsEvents.hub.games_view.event, {
+        event_category: analyticsEvents.hub.games_view.category,
+        event_label: analyticsEvents.hub.games_view.label,
+      });
     }
-  };
+  }, []);
 
   return (
-    <>
-      {/* Glass backdrop */}
-      <div
-        className="fixed inset-0"
-        style={{
-          background: 'rgba(0, 0, 0, 0.25)',
-          backdropFilter: 'blur(120px)',
-          WebkitBackdropFilter: 'blur(120px)',
-          zIndex: 9999,
-        }}
-        onClick={handleBack}
-      />
-
-      {/* Glass page content */}
-      <div
-        className="fixed inset-0 flex flex-col"
-        style={{ zIndex: 10000 }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div
-          className="w-full h-full flex flex-col overflow-hidden"
-          style={{
-            paddingTop: 'env(safe-area-inset-top)',
-            paddingBottom: 'env(safe-area-inset-bottom)',
-          }}
-        >
-          {/* Header */}
-          <div className="shrink-0 px-5 py-4 flex items-center gap-3">
-            <button
-              onClick={handleBack}
-              className="w-9 h-9 flex items-center justify-center -ml-2 transition-colors active:scale-95"
-              style={{ color: 'rgba(255, 255, 255, 0.85)' }}
-              aria-label="Back"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-            <h1 className="text-xl font-semibold" style={{ color: 'rgba(255, 255, 255, 0.95)' }}>
-              Games Near You
-            </h1>
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto px-5">
-            <GamesNearYouScreen onClose={handleBack} />
-          </div>
-        </div>
-      </div>
-    </>
+    <GamesTab 
+      onOpenCreate={() => navigate('/hub/create-game')} 
+    />
   );
 }

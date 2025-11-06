@@ -14,7 +14,6 @@
   --hub-header-height: 56px;
   --hub-tile-compact: 200px;
   --hub-tile-content: 312px;
-  --hub-tile-fixed-h: 220px;
   --hub-blur: 28px;
 
   /* ========================================
@@ -121,15 +120,4 @@
   border-color: rgba(255,255,255,0.30) !important;
   background: rgba(255,255,255,0.14) !important;
   animation: sheetFocusPulse 900ms ease-out 2;
-}
-
-/* ========================================
-   HUB TILE UTILITIES
-   ======================================== */
-.hub-tile-fixed {
-  height: var(--hub-tile-fixed-h);
-}
-
-.hub-tile-fixed > * {
-  height: 100%;
 }
