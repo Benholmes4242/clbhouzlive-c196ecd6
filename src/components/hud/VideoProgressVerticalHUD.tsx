@@ -333,7 +333,7 @@ export function VideoProgressVerticalHUD({
 
   const progressBar = (!attachedVideo) ? null : (
     <div
-      className="pointer-events-none fixed z-[100]"
+      className="clubhouse-progress pointer-events-none fixed z-[100]"
       style={{
         right: railBox ? `${railBox.right}px` : 'calc(env(safe-area-inset-right, 0px) + 64px)',
         top: railBox ? `${railBox.top}px` : '25%',

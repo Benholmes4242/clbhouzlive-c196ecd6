@@ -693,6 +693,11 @@ body.route-clubhouse .global-header {
   overflow: hidden;
 }
 
+/* Hide Clubhouse progress bar when any overlay is active */
+html.overlay-open .clubhouse-progress {
+  display: none !important;
+}
+
 /* Fallbacks for older browsers */
 @supports (height: 100dvh) {
   .clubhouse-root { height: 100dvh; }

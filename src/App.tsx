@@ -48,6 +48,7 @@ import DiscoverWrapped from "./pages/DiscoverWrapped";
 import ProfileWrapped from "./pages/ProfileWrapped";
 import SettingsWrapped from "./pages/SettingsWrapped";
 import AuthWrapped from "./pages/AuthWrapped";
+import { useModalContext } from '@/contexts/ModalContext';
 
 // Lazy load other pages for better code splitting and loading screen experience
 const Auth = lazy(() => import("./pages/Auth"));
@@ -94,6 +95,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 function AppRoutes() {
   const location = useLocation();
   const state = location.state as { backgroundLocation?: Location; fromHub?: boolean } | null;
+  const { shouldHideHeader } = useModalContext();
   
   // Render origin page when we have a background location
   const routesLocation = state?.backgroundLocation || location;
@@ -101,6 +103,18 @@ function AppRoutes() {
   // Hub overlay = /hub or /hub/* with backgroundLocation
   const isHubRoute = location.pathname === '/hub' || location.pathname.startsWith('/hub/');
   const showHubOverlay = isHubRoute && !!state?.backgroundLocation;
+  
+  // Global overlay detection - sync with <html> class
+  const overlayActive = showHubOverlay || shouldHideHeader;
+  
+  useEffect(() => {
+    const el = document.documentElement;
+    if (overlayActive) {
+      el.classList.add('overlay-open');
+    } else {
+      el.classList.remove('overlay-open');
+    }
+  }, [overlayActive]);
 
   return (
     <>
