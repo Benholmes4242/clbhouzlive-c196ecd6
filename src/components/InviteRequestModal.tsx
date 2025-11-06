@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { posthog } from "@/lib/posthog";
 
 interface InviteRequestModalProps {
   open: boolean;
@@ -77,6 +78,8 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
 
       const data = await res.json();
 
+      posthog.capture('invite_submit', { success: res.ok && data?.ok });
+
       if (res.ok && data?.ok) {
         toast.success("Thanks! We'll be in touch soon.");
         onOpenChange(false);
@@ -89,6 +92,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
     } catch (error) {
       console.error("Invite request error:", error);
       toast.error("Something went wrong. Please try again.");
+      posthog.capture('invite_submit', { success: false });
     } finally {
       setSubmitting(false);
     }

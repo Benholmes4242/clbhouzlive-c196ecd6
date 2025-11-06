@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import InviteRequestModal from "./InviteRequestModal";
+import { posthog } from "@/lib/posthog";
 
 interface AccessGateV2Props {
   children: React.ReactNode;
@@ -14,7 +15,13 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const { user } = useSupabaseSession();
+
+  useEffect(() => {
+    // Track gate view
+    posthog.capture('gate_view');
+  }, []);
 
   useEffect(() => {
     const checkAccess = async () => {
@@ -64,11 +71,14 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!accessCode.trim()) {
-      toast.error("Please enter an access code");
+      const msg = "Please enter an access code";
+      setErrorMessage(msg);
+      toast.error(msg);
       return;
     }
 
     setSubmitting(true);
+    setErrorMessage("");
     try {
       const res = await fetch("https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/secure-site-access", {
         method: "POST",
@@ -82,17 +92,26 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
 
       const data = await res.json();
 
+      posthog.capture('gate_submit', { success: res.ok && data?.success });
+
       if (res.ok && data?.success) {
         toast.success("Access Granted - Welcome to clubhouz!");
+        posthog.capture('gate_access_granted');
         setHasAccess(true);
+        setErrorMessage("");
         // Cookie is now set by the server, no need for localStorage
       } else {
-        toast.error(data?.message || "Invalid access code");
+        const msg = data?.message || "Invalid access code";
+        setErrorMessage(msg);
+        toast.error(msg);
         setAccessCode("");
       }
     } catch (error: any) {
       console.error('Error validating access code:', error);
-      toast.error(error.message || "Failed to validate access code");
+      const msg = error.message || "Failed to validate access code";
+      setErrorMessage(msg);
+      toast.error(msg);
+      posthog.capture('gate_submit', { success: false });
     } finally {
       setSubmitting(false);
     }
@@ -144,8 +163,19 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
 
         {/* Subtitle */}
         <p className="text-white/80 text-[15px] mb-6">
-          Enter access code below
+          Enter access code to continue
         </p>
+
+        {/* Error message */}
+        {errorMessage && (
+          <div 
+            role="alert" 
+            aria-live="polite"
+            className="text-red-400 text-sm mb-3"
+          >
+            {errorMessage}
+          </div>
+        )}
 
         {/* Form */}
         <form className="space-y-3" onSubmit={handleSubmit}>
@@ -169,6 +199,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
           <button
             type="submit"
             disabled={submitting}
+            aria-label="Submit access code"
             className="w-full rounded-lg bg-white text-black py-3 font-medium text-[15px]
                      hover:bg-white/90 disabled:opacity-60 transition-colors"
           >
@@ -180,7 +211,10 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         <button 
           type="button"
           className="mt-4 text-white/85 text-[14px] underline-offset-4 hover:underline transition-colors"
-          onClick={() => setInviteModalOpen(true)}
+          onClick={() => {
+            posthog.capture('invite_open');
+            setInviteModalOpen(true);
+          }}
         >
           Request Invite
         </button>

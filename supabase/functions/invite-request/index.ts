@@ -108,6 +108,24 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Invite request saved successfully for: ${email}`);
 
+    // Send Slack notification if webhook is configured
+    const slackWebhook = Deno.env.get("SLACK_INVITES_WEBHOOK");
+    if (slackWebhook) {
+      try {
+        await fetch(slackWebhook, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            text: `🟢 New gate invite: ${email}${name ? ` (${name})` : ''}${club ? ` • ${club}` : ''}`
+          })
+        });
+        console.log(`Slack notification sent for: ${email}`);
+      } catch (slackError) {
+        console.error("Failed to send Slack notification:", slackError);
+        // Don't fail the request if Slack notification fails
+      }
+    }
+
     return new Response(
       JSON.stringify({ ok: true }),
       { 
