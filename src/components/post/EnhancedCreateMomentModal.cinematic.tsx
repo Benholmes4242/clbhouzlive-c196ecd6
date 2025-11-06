@@ -361,7 +361,6 @@ export default function EnhancedCreateMomentModalCinematic({
             className="absolute inset-0 touch-none" 
             onClick={close}
             style={{ 
-              backgroundColor: 'rgba(0, 0, 0, 0.25)',
               backdropFilter: 'blur(120px)',
               WebkitBackdropFilter: 'blur(120px)',
               touchAction: 'none' 
