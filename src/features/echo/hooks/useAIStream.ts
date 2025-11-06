@@ -4,7 +4,7 @@
  */
 
 import { useRef, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { edgePost } from '@/utils/callEdge';
 import type { EchoMessage } from '../state/echoTypes';
 
 interface StreamOptions {
@@ -33,16 +33,12 @@ export function useAIStream() {
       const t0 = performance.now();
 
       try {
-        const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
-          body: {
-            messages: messages.map(m => ({ role: m.role, content: m.content })),
-            conversation_id: conversationId,
-            stream: true,
-            mode: 'chat',
-          },
+        const data = await edgePost('clbhouz-pro-ai', {
+          messages: messages.map(m => ({ role: m.role, content: m.content })),
+          conversation_id: conversationId,
+          stream: true,
+          mode: 'chat',
         });
-
-        if (error) throw error;
 
         // Handle streaming response
         if (data && typeof data === 'object' && 'text' in data) {

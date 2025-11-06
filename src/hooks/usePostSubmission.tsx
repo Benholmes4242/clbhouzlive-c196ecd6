@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { validateFiles } from '@/components/posts/utils/fileValidation';
 import { generateStreamHlsUrl } from '@/config/cloudflareStream';
+import { edgePost } from '@/utils/callEdge';
 
 interface PostSubmissionData {
   user: any;
@@ -96,11 +97,9 @@ export const usePostSubmission = () => {
                   description: 'Video uploaded from post'
                 }));
                 
-                const { data: streamData, error: streamError } = await supabase.functions.invoke('cloudflare-stream-upload', {
-                  body: formData
-                });
+                const streamData = await edgePost('cloudflare-stream-upload', formData);
                 
-                if (!streamError && streamData?.success && streamData.videoId) {
+                if (streamData?.success && streamData.videoId) {
                   const hlsUrl = generateStreamHlsUrl(streamData.videoId);
                   
                   console.log(`Successfully uploaded video to Cloudflare Stream: ${hlsUrl}`);
@@ -137,7 +136,7 @@ export const usePostSubmission = () => {
                   if (mediaError) throw mediaError;
                   return { success: true, fileName: file.name };
                 }
-                console.log('Cloudflare Stream upload failed, trying R2 fallback:', streamError || streamData);
+                console.log('Cloudflare Stream upload failed, trying R2 fallback');
               } catch (streamError) {
                 console.log('Cloudflare Stream error, falling back to R2:', streamError);
               }

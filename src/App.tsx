@@ -215,10 +215,29 @@ const queryClient = new QueryClient({
   },
 });
 
+// Global focus re-auth to reduce retries
+function useReauthOnFocus() {
+  useEffect(() => {
+    const onFocus = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) await supabase.auth.refreshSession().catch(() => {});
+    };
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && onFocus());
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onFocus as any);
+    };
+  }, []);
+}
+
 const App: React.FC = () => {
   // Feature flag for access gate version
   const useV2Gate = import.meta.env.VITE_ACCESS_GATE_VERSION?.toString().toLowerCase() === "v2";
   const AccessGate = useV2Gate ? AccessGateV2 : SiteAccessControl;
+  
+  // Global focus re-auth hook
+  useReauthOnFocus();
   
   // Enforce R2-only policy globally
   useImageUploadSafeguard();

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { edgePost } from '@/utils/callEdge';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 
 interface CloudflareStreamResponse {
@@ -36,14 +36,7 @@ export const useCloudflareStream = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const { data, error } = await supabase.functions.invoke('cloudflare-stream-upload', {
-        body: formData,
-      });
-
-      if (error) {
-        console.error('Cloudflare Stream upload error:', error);
-        throw new Error(error.message || 'Upload failed');
-      }
+      const data = await edgePost('cloudflare-stream-upload', formData);
 
       // Handle different response structures from Cloudflare Stream
       if (!data?.success) {

@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { posthog } from "@/lib/posthog";
+import { edgePost } from "@/utils/callEdge";
 
 const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
@@ -41,36 +42,19 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
           }
         }
 
-        // Check session with JWT token
+        // Check session with JWT token using resilient edge helper
         try {
-          const { data: { session } } = await supabase.auth.getSession();
-          const token = session?.access_token;
-
-          const res = await fetch("https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/secure-site-access-check", {
-            method: "POST",
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': ANON_KEY,
-              ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-            },
-            credentials: "include",
-            body: JSON.stringify({}),
-          });
-
-          if (res.ok) {
+          const data = await edgePost('secure-site-access-check', {});
+          if (data?.ok) {
             console.log('Valid JWT session - access granted');
             setHasAccess(true);
-          } else if (res.status === 401) {
-            // Expected: no valid session, show access form
-            console.log('No valid session found - showing access form');
-            setHasAccess(false);
           } else {
-            console.warn('Gate check unexpected status:', res.status);
+            console.log('No valid session found - showing access form');
             setHasAccess(false);
           }
         } catch (error) {
-          console.warn('Gate check network error:', error);
-          // On network error, show form to allow retry
+          console.warn('Gate check error:', error);
+          // On error, show form to allow retry
           setHasAccess(false);
         }
 
@@ -103,25 +87,14 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
     setSubmitting(true);
     setErrorMessage("");
     try {
-      const res = await fetch("https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/secure-site-access", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          'apikey': ANON_KEY,
-          'Authorization': `Bearer ${ANON_KEY}`,
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          accessCode: accessCode.toUpperCase(),
-          domain: window.location.hostname
-        })
+      const data = await edgePost('secure-site-access', {
+        accessCode: accessCode.toUpperCase(),
+        domain: window.location.hostname
       });
 
-      const data = await res.json().catch(() => ({ success: false, message: "Invalid response" }));
+      posthog.capture('gate_submit', { success: data?.success });
 
-      posthog.capture('gate_submit', { success: res.ok && data?.success });
-
-      if (res.ok && data?.success) {
+      if (data?.success) {
         toast.success("Access Granted - Welcome to clubhouz!");
         posthog.capture('gate_access_granted');
         setHasAccess(true);

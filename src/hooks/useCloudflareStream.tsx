@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { edgePost } from '@/utils/callEdge';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { useToast } from '@/hooks/use-toast';
 
@@ -55,16 +55,9 @@ export const useCloudflareStream = () => {
       }, 500);
 
       // Upload to Cloudflare Stream via edge function
-      const { data, error } = await supabase.functions.invoke('cloudflare-stream-upload', {
-        body: formData,
-      });
+      const data = await edgePost('cloudflare-stream-upload', formData);
 
       clearInterval(progressInterval);
-
-      if (error) {
-        console.error('Cloudflare Stream upload error:', error);
-        throw new Error(error.message || 'Upload failed');
-      }
 
       if (!data.success) {
         console.error('Cloudflare Stream upload failed:', data.error);
@@ -110,13 +103,7 @@ export const useCloudflareStream = () => {
 
   const getVideoStatus = async (videoId: string): Promise<CloudflareStreamUploadResult> => {
     try {
-      const { data, error } = await supabase.functions.invoke('cloudflare-stream-upload', {
-        body: null,
-        method: 'GET',
-      });
-
-      if (error) throw new Error(error.message);
-
+      const data = await edgePost('cloudflare-stream-status', { videoId });
       return data;
     } catch (error) {
       console.error('Error getting video status:', error);
