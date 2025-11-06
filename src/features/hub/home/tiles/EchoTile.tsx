@@ -54,8 +54,37 @@ export function EchoTile() {
     <Tile 
       title="Echo" 
       subtitle="Ask me anything"
-      onViewAll={() => navigateFromHub('/hub/echo/history')}
       align="center"
+      footer={
+        <div className="mt-auto pt-4">
+          <div 
+            className="h-px"
+            style={{
+              background: 'rgba(255,255,255,0.18)',
+              borderRadius: '1px',
+              width: '100%',
+            }}
+          />
+          <button
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              navigateFromHub('/hub/echo/history'); 
+            }}
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            aria-label="View echo history"
+          >
+            View all →
+          </button>
+        </div>
+      }
     >
       <div 
         className="echo-body"
