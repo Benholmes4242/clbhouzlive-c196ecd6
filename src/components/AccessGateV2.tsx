@@ -54,9 +54,18 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
           setHasAccess(true);
           setLoading(false);
           return;
+        } else if (res.status === 401) {
+          // Not signed in yet — just show the form, no errors
+          setHasAccess(false);
+        } else {
+          // Other error — log, but do not crash
+          console.warn('Gate check failed:', await res.text());
+          setHasAccess(false);
         }
       } catch (error) {
-        console.error('Error checking cookie session:', error);
+        // Network error — log but do not crash
+        console.warn('Gate check network error:', error);
+        setHasAccess(false);
       }
 
       // Clean up legacy localStorage (transition complete)

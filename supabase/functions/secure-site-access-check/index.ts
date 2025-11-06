@@ -36,7 +36,7 @@ async function verifyToken(token: string, key: string): Promise<any | null> {
       keyData,
       { name: "HMAC", hash: "SHA-256" },
       false,
-      ["verify"]
+      ["sign"]
     );
 
     // Decode expected signature
