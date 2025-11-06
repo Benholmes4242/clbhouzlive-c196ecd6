@@ -122,22 +122,10 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get("SITE_ACCESS_CODE_PRIMARY_HASH"),
     ].filter(Boolean) as string[];
 
-    // Fallback plaintext codes for development
-    const plaintextCodes = [
-      "CLBHOUZ2025*",
-      "CLBHOUZ2024",
-    ];
-
-    // Verify access code against PBKDF2 hashes or plaintext fallbacks
+    // Verify access code against PBKDF2 hashes
     let isValid = false;
     
-    // Check plaintext codes first (for development/testing)
-    if (accessCode && plaintextCodes.some(code => code.toUpperCase() === String(accessCode).toUpperCase())) {
-      isValid = true;
-    }
-    
-    // Then check PBKDF2 hashes if configured
-    if (!isValid && accessCode && hashes.length) {
+    if (accessCode && hashes.length) {
       for (const scheme of hashes) {
         if (scheme.startsWith("pbkdf2$sha256$")) {
           if (await verifyPBKDF2(scheme, String(accessCode))) {
