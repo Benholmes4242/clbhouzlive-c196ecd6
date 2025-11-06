@@ -4,9 +4,7 @@
  */
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { EchoConversationsProvider } from '@/features/echo/components/EchoConversationsProvider';
-import { EchoChat } from '@/features/echo/components/EchoChat';
+import AIChatOverlay from '@/components/ai-chat/AIChatOverlay';
 import '../home/hubTheme.css';
 
 export function HubEchoChatPage() {
@@ -56,11 +54,15 @@ export function HubEchoChatPage() {
         <div className="w-16" />
       </header>
 
-      {/* Chat body */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <EchoConversationsProvider>
-          <EchoChat />
-        </EchoConversationsProvider>
+      {/* Echo Chat - using existing system in pane mode */}
+      <div className="flex-1 overflow-hidden">
+        <AIChatOverlay
+          isOpen={true}
+          onClose={() => {}}
+          initialTab="chat"
+          paneMode={true}
+          layout="page"
+        />
       </div>
     </div>
   );
