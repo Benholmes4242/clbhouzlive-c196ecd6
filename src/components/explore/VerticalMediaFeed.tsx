@@ -500,13 +500,8 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                  className="relative w-full h-full flex items-center justify-center"
                  onMouseEnter={() => setIsTextExpanded(true)}
                  onMouseLeave={() => setIsTextExpanded(false)}
-               >
-                 {/* DEBUG: Red circle to confirm this is the right modal */}
-                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-red-500 rounded-full z-50 flex items-center justify-center">
-                   <span className="text-white font-bold text-xs">VERTICAL</span>
-                 </div>
-
-                 {currentMedia.media_type === 'video' ? (
+                >
+                  {currentMedia.media_type === 'video' ? (
                   <div className="relative w-full h-full bg-media-loading">
                      <EnhancedVideoPlayer
                        src={currentMedia.media_url}
