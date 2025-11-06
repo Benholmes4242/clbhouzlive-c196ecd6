@@ -717,13 +717,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           </TabsContent>
         </Tabs>
 
-        {/* Input bar - fully glass, no solid backgrounds */}
-        <footer 
-          className="sticky bottom-0"
-          style={{
-            background: 'transparent',
-          }}
-        >
+        {/* Input bar - docked at bottom */}
+        <footer className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-sm">
           <div className="w-full px-4 md:px-5 py-3" style={{ paddingBottom: `calc(12px + env(safe-area-inset-bottom))` }}>
             {activeTab === 'chat' && (
               <div className="flex items-end gap-2">
@@ -736,29 +731,17 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       sendMessage(inputValue);
                     }
                   }}
-                  placeholder="Ask Echo anything..."
-                  className="flex-1 min-h-[42px] max-h-32 resize-none text-white placeholder:text-white/50 border-0"
-                  style={{
-                    background: 'rgba(255,255,255,0.08)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)',
-                  }}
+                  placeholder="Message Echo…"
+                  className="flex-1 min-h-[42px] max-h-32 resize-none bg-muted/50 border-border text-foreground placeholder:text-muted-foreground"
                   disabled={isLoading}
                 />
                 <Button
                   onClick={() => sendMessage(inputValue)}
                   disabled={!inputValue.trim() || isLoading}
                   size="icon"
-                  className="h-[42px] w-[42px] rounded-full border-0"
-                  style={{
-                    background: 'rgba(255,255,255,0.12)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.15)',
-                  }}
+                  className="h-[42px] w-[42px] rounded-full"
                 >
-                  <Send className="h-4 w-4 text-white" />
+                  <Send className="h-4 w-4" />
                 </Button>
               </div>
             )}
