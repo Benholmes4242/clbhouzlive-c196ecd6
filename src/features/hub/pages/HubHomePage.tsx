@@ -50,7 +50,7 @@ export function HubHomePage() {
 
   return (
     <div
-      className="fixed inset-0 z-[9999]"
+      className="hub-glass-page fixed inset-0 z-[9999]"
       style={{
         background: 'rgba(0, 0, 0, 0.25)',
         backdropFilter: 'blur(120px)',

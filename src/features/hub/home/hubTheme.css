@@ -167,3 +167,18 @@ html.hub-open {
   background: transparent !important;
   background-color: transparent !important;
 }
+
+/* ========================================
+   OVERLAY STACKING CONTEXT
+   Ensure all overlays sit above Clubhouse elements
+   ======================================== */
+.hub-glass-page,
+.camera-page,
+.post-page,
+[data-overlay="true"],
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  isolation: isolate;
+  z-index: 1000;
+}

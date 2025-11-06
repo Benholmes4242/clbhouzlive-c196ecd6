@@ -9,13 +9,16 @@ import Hls from 'hls.js';
  * Props:
  *  - videoRef: HTMLVideoElement ref of the currently focused/playing clip
  *  - accent?: optional CSS color for fill gradient
+ *  - container?: optional container element to render into (default: portal to document.body)
  */
 export function VideoProgressVerticalHUD({
   videoRef,
   accent,
+  container,
 }: {
   videoRef: React.RefObject<HTMLVideoElement | null>;
   accent?: string;
+  container?: HTMLElement | null;
 }) {
   // Bind to the video element even if it appears after initial render
   const [attachedVideo, setAttachedVideo] = React.useState<HTMLVideoElement | null>(null);
@@ -330,7 +333,7 @@ export function VideoProgressVerticalHUD({
 
   const progressBar = (!attachedVideo) ? null : (
     <div
-      className="pointer-events-none fixed z-[950] flex items-stretch justify-end"
+      className="pointer-events-none fixed z-[100]"
       style={{
         right: railBox ? `${railBox.right}px` : 'calc(env(safe-area-inset-right, 0px) + 64px)',
         top: railBox ? `${railBox.top}px` : '25%',
@@ -401,6 +404,8 @@ export function VideoProgressVerticalHUD({
     </div>
   );
 
-  // Render via Portal to escape any transformed ancestors
-  return typeof window !== 'undefined' ? createPortal(progressBar, document.body) : null;
+  // Render into provided container, or portal to document.body
+  if (typeof window === 'undefined') return null;
+  if (container) return progressBar;
+  return createPortal(progressBar, document.body);
 }

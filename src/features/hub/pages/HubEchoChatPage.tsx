@@ -28,7 +28,7 @@ export function HubEchoChatPage() {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex flex-col"
+      className="hub-glass-page fixed inset-0 z-[9999] flex flex-col"
       style={{
         background: 'rgba(0, 0, 0, 0.25)',
         backdropFilter: 'blur(120px)',

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import NavigationBar from '@/components/bottom-navigation/NavigationBar';
@@ -23,6 +24,9 @@ const Clubhouse = () => {
   // Set header variant for clubhouse (glass-dark)
   useHeaderVariant('glass-dark');
   
+  const location = useLocation();
+  const clubhouseRootRef = useRef<HTMLDivElement>(null);
+  
   // Clubhouse: explore feed with short videos only (<120s)
   const {
     posts,
@@ -37,6 +41,12 @@ const Clubhouse = () => {
   
   // Track active video for progress HUD
   const activeVideoRef = useRef<HTMLVideoElement | null>(null);
+  
+  // Route guard: only show progress bar on /clubhouse and when no overlay is active
+  const state = location.state as { backgroundLocation?: Location } | null;
+  const isOverlayActive = !!state?.backgroundLocation;
+  const isClubhouseRoute = location.pathname.startsWith('/clubhouse') || location.pathname === '/';
+  const showProgressBar = isClubhouseRoute && !isOverlayActive;
   
   // Composer state management
   const {
@@ -205,7 +215,7 @@ const Clubhouse = () => {
   }
 
   return (
-    <div className="clubhouse-root">
+    <div ref={clubhouseRootRef} className="clubhouse-root" style={{ position: 'relative', isolation: 'isolate', zIndex: 0 }}>
       {/* Intersection sentinel for header fade-away */}
       <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
       
@@ -241,11 +251,14 @@ const Clubhouse = () => {
         )}
       </div>
 
-      {/* Video Progress Vertical HUD - Pulse Line beside engagement icons */}
-      <VideoProgressVerticalHUD 
-        videoRef={activeVideoRef}
-        accent="linear-gradient(to top, rgba(110,146,119,1) 0%, rgba(255,255,255,0.6) 60%)"
-      />
+      {/* Video Progress Vertical HUD - Pulse Line beside engagement icons (Clubhouse-only) */}
+      {showProgressBar && (
+        <VideoProgressVerticalHUD 
+          videoRef={activeVideoRef}
+          accent="linear-gradient(to top, rgba(110,146,119,1) 0%, rgba(255,255,255,0.6) 60%)"
+          container={clubhouseRootRef.current}
+        />
+      )}
       
       {/* Post Submission Handler */}
       <PostSubmissionHandler
