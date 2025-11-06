@@ -53,10 +53,9 @@ export function EchoTile() {
   return (
     <Tile 
       title="Echo" 
-      subtitle="Ask me anything"
       align="center"
       footer={
-        <div className="mt-auto pt-4">
+        <div className="mt-auto pt-2">
           <div 
             className="h-px"
             style={{
@@ -92,7 +91,6 @@ export function EchoTile() {
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
-          gap: '10px',
         }}
       >
         {/* Ask input with send button */}

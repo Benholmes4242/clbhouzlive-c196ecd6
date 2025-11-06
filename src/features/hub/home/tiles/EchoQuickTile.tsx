@@ -32,9 +32,8 @@ export function EchoQuickTile() {
           <EchoAvatar state="idle" size={20} />
         </div>
       }
-      subtitle="Ask me anything"
       footer={
-        <div className="mt-auto pt-4">
+        <div className="mt-auto pt-2">
           <div
             className="h-px"
             style={{
@@ -63,7 +62,7 @@ export function EchoQuickTile() {
       <div className="flex flex-col h-full">
         {/* Input form */}
         <form
-          className="relative mt-3"
+          className="relative"
           onSubmit={(e) => { e.preventDefault(); submit(); }}
         >
           <input
