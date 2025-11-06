@@ -48,6 +48,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({
     { id: 'new', label: 'New', icon: '✨' },
     { id: 'popular', label: 'Popular', icon: '🔥' },
     { id: 'golf-tips', label: 'Golf Tips', icon: '💡' },
+    { id: 'equipment', label: 'Equipment', icon: '⛳' },
     { id: 'on-course', label: 'On-Course', icon: '🏌️' },
     { id: 'interviews', label: 'Interviews', icon: '🎤' },
   ];
