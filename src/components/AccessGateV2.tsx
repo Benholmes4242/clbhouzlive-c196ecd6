@@ -130,29 +130,24 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
   }
 
   return (
-    <main 
-      className="min-h-screen bg-cover bg-center relative flex items-center justify-center px-4"
-      style={{ 
-        backgroundImage: "url(/assets/bg-course.jpg)",
-        backgroundColor: "#1a4d2e" // Fallback color
-      }}
-    >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/35 backdrop-blur-[3px]" />
+    <main className="min-h-screen relative flex items-center justify-center px-4">
+      {/* Background Image */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center"
+        style={{ backgroundImage: "url(/images/gate/course-blur.jpg)" }}
+      />
+      
+      {/* Overlay with blur */}
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-md" />
       
       {/* Content Card */}
       <section className="relative z-10 w-[90%] max-w-[360px] rounded-[18px] bg-black/35 backdrop-blur-xl p-8 text-center">
         {/* Logo */}
-        <div className="flex justify-center items-center gap-3 mb-6">
+        <div className="flex justify-center items-center mb-6">
           <img
-            src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
-            alt="Logo Mark"
-            className="w-auto h-12 object-contain opacity-95"
-          />
-          <img
-            src="/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"
-            alt="clbhouz Logo"
-            className="w-auto h-14 object-contain opacity-95"
+            src="/images/brand/clubhouz-mark-white.svg"
+            alt="clubhouz"
+            className="w-auto h-16 object-contain"
           />
         </div>
 
