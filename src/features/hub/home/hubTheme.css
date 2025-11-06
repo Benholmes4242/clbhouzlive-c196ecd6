@@ -168,51 +168,6 @@ html.hub-open {
   background-color: transparent !important;
 }
 
-/* Hide vertical progress bar when hub is open (Clubhouse-only) */
-html.hub-open .clubhouse-scroll-progress {
-  display: none;
-}
-
-/* Swing upload page utilities */
-.hub-video { 
-  width: 100%; 
-  border-radius: 12px; 
-  border: 1px solid rgba(255,255,255,.12); 
-}
-
-.hub-file-name { 
-  margin-top: 8px; 
-  opacity: .8; 
-  color: rgba(255,255,255,0.9);
-  font-size: 13px;
-}
-
-.hub-actions { 
-  display: flex; 
-  gap: 10px; 
-  margin-top: 12px; 
-  flex-wrap: wrap; 
-}
-
-.hub-progress { 
-  width: 100%; 
-  height: 8px; 
-  border-radius: 999px; 
-  background: rgba(255,255,255,.08); 
-  overflow: hidden; 
-}
-
-.hub-progress-bar { 
-  height: 100%; 
-  border-radius: 999px; 
-  background: rgba(255,255,255,.85); 
-  transition: width 0.3s ease;
-}
-
-.swing-upload-bg .hub-glass-page { 
-  display: none; 
-}
-
 /* ========================================
    OVERLAY STACKING CONTEXT
    Ensure all overlays sit above Clubhouse elements
