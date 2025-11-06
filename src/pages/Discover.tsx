@@ -22,7 +22,6 @@ import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
-import VideosPage from '@/features/videos/pages/VideosPage';
 
 // Lazy load heavy/inactive components for better initial bundle size
 const FollowingFeed = lazy(() => import('@/components/discover/FollowingFeed'));
@@ -224,11 +223,7 @@ const Discover = () => {
                   </div>
                 );
               }
-              // Use new VideosPage for videos tab (Path B refactor)
-              if (key === 'videos') {
-                return <VideosPage />;
-              }
-              // Shorts use DiscoverContent
+              // Both 'shorts' and 'videos' use DiscoverContent
               return (
                 <div className="md:container md:mx-auto md:px-0">
                   <DiscoverContent
