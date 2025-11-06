@@ -64,6 +64,7 @@ export function EchoQuickTile() {
         <form
           className="relative"
           onSubmit={(e) => { e.preventDefault(); submit(); }}
+          style={{ marginTop: '8px' }}
         >
           <input
             value={text}

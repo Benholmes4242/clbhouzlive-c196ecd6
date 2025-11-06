@@ -96,7 +96,7 @@ export function EchoTile() {
         {/* Ask input with send button */}
         <form 
           onSubmit={(e) => { e.preventDefault(); handleSend(); e.stopPropagation(); }}
-          style={{ position: 'relative' }}
+          style={{ position: 'relative', marginTop: '8px' }}
         >
           <input
             aria-label="Ask Echo"
