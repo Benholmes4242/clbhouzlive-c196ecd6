@@ -182,3 +182,103 @@ html.hub-open {
   isolation: isolate;
   z-index: 1000;
 }
+
+/* ========================================
+   CARD & LIST COMPONENTS
+   ======================================== */
+.hub-card {
+  background: var(--hub-glass-bg);
+  border: 1px solid var(--hub-stroke);
+  border-radius: var(--hub-radius);
+  padding: var(--hub-pad);
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.hub-card-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--hub-text-bright);
+  margin-bottom: 12px;
+}
+
+/* Single-column vertical list */
+.hub-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Full-width list row */
+.hub-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--hub-glass-bg-subtle);
+  border: 1px solid var(--hub-stroke-subtle);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hub-row:hover {
+  background: var(--hub-glass-bg-hover);
+  border-color: var(--hub-stroke);
+}
+
+.hub-row-leading {
+  flex: 0 0 auto;
+  font-size: 24px;
+}
+
+.hub-row-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.hub-row-title {
+  font-weight: 600;
+  color: var(--hub-text-bright);
+  font-size: 15px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.hub-row-sub {
+  color: var(--hub-text-sub);
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.hub-row-trailing {
+  flex: 0 0 auto;
+  color: var(--hub-text-dim);
+  font-size: 20px;
+  margin-left: 8px;
+}
+
+/* Empty state message */
+.hub-msg {
+  padding: 24px;
+  text-align: center;
+  color: var(--hub-text-sub);
+  font-size: 15px;
+}
+
+/* Loading skeleton row */
+.hub-skel-row {
+  height: 64px;
+  border-radius: 16px;
+  background: var(--hub-glass-bg-subtle);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
