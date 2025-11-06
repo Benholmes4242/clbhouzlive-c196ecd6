@@ -1,25 +1,21 @@
 /**
  * Hub Swing Page
- * Full-screen glass overlay for Swing Coach video upload & analysis.
- * Matches the pattern of other Hub page overlays (Golfers, Echo, Create Game).
+ * Full-screen liquid-glass page overlaying the origin page.
  */
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useHub } from '@/features/hub/useHub';
 import SwingCoach from '@/components/ai-chat/SwingCoach';
 import '../home/hubTheme.css';
 
 export function HubSwingPage() {
   const nav = useNavigate();
   const loc = useLocation();
-  const { open } = useHub();
   const [analysisText, setAnalysisText] = useState('');
 
   const goBack = () => {
-    const bg = (loc.state as any)?.backgroundLocation;
-    if (bg) {
-      // Return to Hub overlay over the same origin
-      open();
+    const state = loc.state as any;
+    if (state?.backgroundLocation) {
+      // Navigate back to close this overlay
       nav(-1);
     } else {
       // Deep link fallback
@@ -28,18 +24,34 @@ export function HubSwingPage() {
   };
 
   return (
-    <div className="hub-glass-page">
-      {/* Header */}
-      <header className="hub-page-header">
-        <button className="hub-back" onClick={goBack} aria-label="Back">
+    <div
+      className="hub-glass-page fixed inset-0 z-[9999] flex flex-col"
+      style={{
+        background: 'rgba(0, 0, 0, 0.25)',
+        backdropFilter: 'blur(120px)',
+        WebkitBackdropFilter: 'blur(120px)',
+      }}
+    >
+      {/* Simple header */}
+      <header className="sticky top-0 z-10 flex items-center justify-between px-4 h-14 border-b"
+        style={{
+          borderColor: 'rgba(255,255,255,0.1)',
+          background: 'rgba(0,0,0,0.2)',
+        }}
+      >
+        <button
+          onClick={goBack}
+          className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
+          aria-label="Back to Hub"
+        >
           ‹ Back
         </button>
-        <h1 className="hub-title">Swing Coach</h1>
-        <div style={{ width: 44 }} />
+        <h1 className="text-white/90 text-[17px] font-semibold">Swing Coach</h1>
+        <div className="w-16" />
       </header>
 
       {/* Swing Coach content */}
-      <div className="hub-page-body">
+      <div className="flex-1 overflow-hidden">
         <SwingCoach
           onAnalysisTextChange={setAnalysisText}
           analysisText={analysisText}
