@@ -130,7 +130,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
         )}
         
         {!isLoading && golfers.length === 0 && (
-          <div className="text-[13px] py-2" style={{ color: 'var(--hub-text-mute)' }}>
+          <div className="text-[13px] py-2 text-center" style={{ color: 'var(--hub-text-mute)' }}>
             No active golfers nearby
           </div>
         )}
