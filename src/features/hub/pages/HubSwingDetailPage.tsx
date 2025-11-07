@@ -8,6 +8,7 @@ import '../home/hubTheme.css';
 import { useSwingDetail } from '@/features/echo/hooks/useSwingDetail';
 import { useSwingConversation } from '@/features/echo/hooks/useSwingConversation';
 import { GlassVideo } from '@/components/media/GlassVideo';
+import '@/components/media/GlassVideo.css';
 
 export function HubSwingDetailPage() {
   const nav = useNavigate();
