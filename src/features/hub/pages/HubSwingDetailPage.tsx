@@ -8,6 +8,7 @@ import '../home/hubTheme.css';
 import { useSwingDetail } from '@/features/echo/hooks/useSwingDetail';
 import { useSwingThreadId } from '@/features/echo/hooks/useSwingThreadId';
 import { useSwingMessages } from '@/features/echo/hooks/useSwingMessages';
+import { useSwingCoachFeedback } from '@/features/echo/hooks/useSwingCoachFeedback';
 
 export function HubSwingDetailPage() {
   const nav = useNavigate();
@@ -17,6 +18,7 @@ export function HubSwingDetailPage() {
   const { data: swing, isLoading, error } = useSwingDetail(swingId);
   const { data: threadId } = useSwingThreadId(swingId, swing?.thread_id);
   const { data: messages = [], isLoading: msgsLoading } = useSwingMessages(threadId);
+  const { data: coachFeedback = [], isLoading: coachLoading } = useSwingCoachFeedback(swingId);
 
   useEffect(() => {
     document.documentElement.classList.add('hub-open');
@@ -112,6 +114,27 @@ export function HubSwingDetailPage() {
                   </div>
                 ))}
               </div>
+
+              {/* Coach Feedback (via swing_shares) */}
+              {coachLoading && <div className="hub-msg">Loading coach feedback…</div>}
+              {!coachLoading && coachFeedback.length > 0 && (
+                <div className="space-y-2 pt-2">
+                  <div className="hub-muted text-sm">Coach feedback</div>
+                  {coachFeedback.map((f) => (
+                    <div
+                      key={f.id}
+                      className={`rounded-2xl px-3 py-2 border ${
+                        f.author === 'coach'
+                          ? 'bg-black/20 border-white/10'
+                          : 'bg-white/8 border-white/10'
+                      }`}
+                    >
+                      {f.message}
+                    </div>
+                  ))}
+                </div>
+              )}
+
             </div>
           )}
         </div>
