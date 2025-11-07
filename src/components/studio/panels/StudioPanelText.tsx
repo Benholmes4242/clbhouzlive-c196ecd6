@@ -11,7 +11,7 @@ type StudioPanelTextProps = {
 };
 
 const FONTS: TextOverlay['style'][] = ['modern', 'classic', 'signature'];
-const COLORS = ['#000000', '#FFFFFF', '#FF9C40', '#3B82F6', '#EF4444', '#10B981'];
+const COLORS = ['#0a0a0a', '#FFFFFF', '#FF9C40', '#3B82F6', '#EF4444', '#10B981'];
 
 export default function StudioPanelText({ edits, updateEdits, onApply, onReset }: StudioPanelTextProps) {
   const [textBoxes, setTextBoxes] = useState<TextOverlay[]>(edits?.textOverlays || []);

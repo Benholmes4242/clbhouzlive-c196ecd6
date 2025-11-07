@@ -36,7 +36,11 @@
   }
   .animate-out-left  { animation: slide-out-left  300ms ease both; }
   .animate-out-right { animation: slide-out-right 300ms ease both; }
+
+  /* Nuke solid Tailwind black backgrounds to new page tone */
+  .bg-black { --tw-bg-opacity: 1; background-color: rgb(10 10 10 / var(--tw-bg-opacity)) !important; }
 }
+
 
 /* Hide scrollbar utility */
 .no-scrollbar {
@@ -1505,7 +1509,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
     
     /* Apple-Inspired Pill Design Tokens */
     --pill-text: #4A4A4A;
-    --pill-text-active: #000000;
+    --pill-text-active: #0a0a0a;
     --pill-bg: rgba(255,255,255,0.28);
     --pill-bg-active: rgba(255,255,255,0.56);
     --pill-ring: rgba(0,0,0,0.06);

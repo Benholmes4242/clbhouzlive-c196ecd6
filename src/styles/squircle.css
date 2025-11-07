@@ -74,7 +74,7 @@
   font-size: 13px; 
   line-height: 1.2;
   text-align: center; 
-  color: #000000;
+  color: var(--text-primary);
   max-width: var(--sq-size, 72px); 
   width: 100%;
   white-space: normal;
