@@ -23,7 +23,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       title="Nearby Golfers"
       align="center"
       footer={
-        <div className="mt-auto pt-4">
+        <div className="mt-auto pt-2">
           <div 
             className="h-px"
             style={{
