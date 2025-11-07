@@ -15,10 +15,11 @@ type TileProps = React.PropsWithChildren<{
 
 export function Tile({ title, subtitle, children, onViewAll, footer, align = 'start' }: TileProps) {
   const [isHovered, setIsHovered] = React.useState(false);
+  const hasFooter = !!(footer || onViewAll);
 
   return (
     <section
-      className="relative rounded-3xl p-4 pt-3.5 pb-0 overflow-hidden flex flex-col h-full"
+      className={`HubTile ${hasFooter ? 'HubTile--withFooter' : ''} relative rounded-3xl p-4 pt-3.5 pb-0 overflow-hidden flex flex-col h-full`}
       style={{
         background: 'var(--hub-glass-bg)',
         border: '1px solid var(--hub-stroke)',
@@ -56,27 +57,8 @@ export function Tile({ title, subtitle, children, onViewAll, footer, align = 'st
         <div className="flex-1 flex flex-col">{children}</div>
       </div>
 
-      {/* Footer bar with View all */}
-      {(footer || onViewAll) && (
-        <div className="mt-3 flex items-center gap-2">
-          <div className="flex-1 min-w-0">{footer}</div>
-          {onViewAll && (
-            <button
-              onClick={onViewAll}
-              className="shrink-0 rounded-2xl px-3.5 py-2 text-[13px] transition"
-              style={{
-                border: '1px solid var(--hub-stroke-strong)',
-                color: 'var(--hub-text-body)',
-                background: 'transparent',
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-button)'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-            >
-              View all →
-            </button>
-          )}
-        </div>
-      )}
+      {/* Footer rendered via children - new system uses HubTileFooter */}
+      {footer}
     </section>
   );
 }

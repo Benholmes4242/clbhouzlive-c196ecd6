@@ -505,3 +505,69 @@ html.hub-open {
   align-self: flex-start;
   max-width: 90%;
 }
+
+/* ========================================
+   HUB TILE FOOTER - Shared positioning system
+   Divider: 32px from bottom
+   CTA: Centered at 16px from bottom
+   ======================================== */
+:root {
+  --tile-footer-gap: 32px;         /* divider distance from bottom */
+  --tile-footer-mid: calc(var(--tile-footer-gap) / 2);   /* 16px */
+  --tile-footer-cta-min: 28px;     /* min CTA height used for reservation */
+}
+
+/* Attach to each tile root container */
+.HubTile {
+  position: relative;
+}
+
+/* Reserve space at the bottom so body content never overlaps footer */
+.HubTile--withFooter {
+  padding-bottom: calc(var(--tile-footer-gap) + max(var(--tile-footer-cta-min), 32px));
+}
+
+/* The overlay layer that draws divider + positions CTA */
+.HubTileFooterLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* let clicks pass except on CTA itself */
+}
+
+/* Divider line: always 32px from the bottom of the tile */
+.HubTileFooterLayer::after {
+  content: "";
+  position: absolute;
+  left: 16px; 
+  right: 16px;
+  bottom: var(--tile-footer-gap);
+  height: 1px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 1px;
+}
+
+/* CTA: center between divider and bottom */
+.HubTileFooterCTA {
+  position: absolute;
+  right: 16px;
+  top: calc(100% - var(--tile-footer-mid)); /* centerline at 16px from bottom */
+  transform: translateY(-50%);              /* true vertical centering */
+  pointer-events: auto;                     /* clickable */
+  white-space: nowrap;
+}
+
+/* Compact CTA style baseline */
+.HubTileFooterCTA button {
+  background: transparent;
+  border: 0;
+  color: var(--hub-text-body);
+  font-weight: 500;
+  font-size: 15px;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.HubTileFooterCTA button:hover { 
+  color: var(--hub-text); 
+}

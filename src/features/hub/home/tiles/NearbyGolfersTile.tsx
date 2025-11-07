@@ -6,6 +6,7 @@
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
+import { HubTileFooter } from '../components/HubTileFooter';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { useHub } from '@/features/hub/useHub';
 
@@ -31,36 +32,6 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
     <Tile 
       title="Nearby Golfers"
       align="center"
-      footer={
-        <div className="mt-auto">
-          <div 
-            className="NearbyDivider h-px w-full"
-            style={{
-              background: 'rgba(255,255,255,0.18)',
-            }}
-          />
-          <div className="flex items-center justify-end" style={{ height: '32px' }}>
-            <button
-              onClick={(e) => { 
-                e.stopPropagation(); 
-                navigateFromHub('/hub/golfers'); 
-              }}
-              className="text-[15px] font-medium transition"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--hub-text-body)',
-                padding: 0,
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-              aria-label="View all golfers"
-            >
-              View all →
-            </button>
-          </div>
-        </div>
-      }
     >
       <style>{`
         .nearby-golfers-scroll::-webkit-scrollbar { 
@@ -135,6 +106,20 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
           </div>
         )}
       </div>
+
+      <HubTileFooter
+        cta={
+          <button
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              navigateFromHub('/hub/golfers'); 
+            }}
+            aria-label="View all golfers"
+          >
+            View all →
+          </button>
+        }
+      />
     </Tile>
   );
 }
