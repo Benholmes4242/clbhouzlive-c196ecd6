@@ -54,7 +54,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       }
     >
       <div className="flex flex-col h-full">
-        <div className="space-y-1 hub-golfers-list-scroll">
+        <div className="space-y-[2px] hub-golfers-list-scroll">
           {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
             <div key={i} className="h-12 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
           ))}
