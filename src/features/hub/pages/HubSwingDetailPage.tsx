@@ -5,25 +5,65 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import '../home/hubTheme.css';
-import { useSwingHistory } from '@/features/echo/hooks/useSwingHistory';
+import { useSwingDetail } from '@/features/echo/hooks/useSwingDetail';
+import { useEchoThreadMessages } from '@/features/echo/hooks/useEchoThreadMessages';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 export function HubSwingDetailPage() {
   const nav = useNavigate();
   const loc = useLocation();
   const { id } = useParams();
-  const { data: items = [], isLoading, error } = useSwingHistory({ limit: 200 });
+  
+  const { data: swing, isLoading, error } = useSwingDetail(id);
+  const { data: messages = [], isLoading: msgsLoading } = useEchoThreadMessages(swing?.session_id);
 
   useEffect(() => {
     document.documentElement.classList.add('hub-open');
     return () => document.documentElement.classList.remove('hub-open');
   }, []);
 
-  const item = items.find(x => String(x.id) === String(id));
-
   const cameFromHub = Boolean((loc.state as any)?.backgroundLocation);
   const goBack = () => {
     if (cameFromHub) nav(-1);
     else nav('/clubhouse', { replace: true });
+  };
+
+  const renderVideo = () => {
+    if (!swing) return null;
+    
+    if (swing.video_url) {
+      // Check if it's a Cloudflare Stream URL
+      const streamIdMatch = swing.video_url.match(/\/([a-f0-9]{32})\//);
+      if (streamIdMatch) {
+        const hlsUrl = generateStreamHlsUrl(streamIdMatch[1]);
+        return (
+          <div className="rounded-2xl border border-white/10 mb-3 overflow-hidden bg-black/20">
+            <EnhancedVideoPlayer
+              src={hlsUrl}
+              enableHLS
+              controls
+              playsInline
+              className="w-full"
+            />
+          </div>
+        );
+      }
+      
+      // Direct video URL
+      return (
+        <div className="rounded-2xl border border-white/10 mb-3 overflow-hidden bg-black/20">
+          <video
+            src={swing.video_url}
+            controls
+            playsInline
+            className="w-full"
+          />
+        </div>
+      );
+    }
+    
+    return null;
   };
 
   return (
@@ -58,28 +98,34 @@ export function HubSwingDetailPage() {
         <div className="space-y-4 pb-6">
           {isLoading && <div className="hub-msg">Loading swing…</div>}
           {error && !isLoading && <div className="hub-msg">Couldn't load swing.</div>}
-          {!isLoading && !error && !item && <div className="hub-msg">Swing not found.</div>}
+          {!isLoading && !error && !swing && <div className="hub-msg">Swing not found.</div>}
 
-          {!isLoading && item && (
+          {!isLoading && swing && (
             <div className="hub-card">
-              {/* Header/meta */}
-              <div className="hub-card-title">{item.title || 'Swing Analysis'}</div>
-              <div className="hub-muted mb-3">{new Date(item.created_at).toLocaleString()}</div>
+              <div className="hub-card-title">Swing Analysis</div>
+              <div className="hub-muted mb-3">
+                {new Date(swing.created_at).toLocaleString()}
+              </div>
 
-              {/* Video thumbnail (using thumbnail_url) */}
-              {item.thumbnail_url && (
-                <div className="rounded-2xl border border-white/10 mb-3 overflow-hidden bg-black/20">
-                  <img 
-                    src={item.thumbnail_url} 
-                    alt="Swing thumbnail"
-                    className="w-full"
-                  />
-                </div>
-              )}
+              {renderVideo()}
 
-              {/* Note: Full conversation history would require fetching from pro_ai_analyses */}
-              <div className="hub-muted text-sm">
-                Full swing analysis conversation history coming soon.
+              <div className="space-y-2">
+                {msgsLoading && <div className="hub-msg">Loading conversation…</div>}
+                {!msgsLoading && messages.length === 0 && (
+                  <div className="hub-muted">No messages yet for this swing.</div>
+                )}
+                {!msgsLoading && messages.map((m) => (
+                  <div
+                    key={m.id}
+                    className={`rounded-2xl px-3 py-2 border ${
+                      m.role === 'user'
+                        ? 'bg-white/8 border-white/10'
+                        : 'bg-black/20 border-white/10'
+                    }`}
+                  >
+                    {m.content}
+                  </div>
+                ))}
               </div>
             </div>
           )}
