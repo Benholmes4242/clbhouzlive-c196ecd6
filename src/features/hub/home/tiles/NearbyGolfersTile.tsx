@@ -18,6 +18,21 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
   const { navigateFromHub } = useHub();
   const { golfers, isLoading } = useActiveGolfers({ limit });
 
+  // Design tokens for 2.1 row peek
+  const ROW = 56;   // row height in px
+  const GAP = 8;    // vertical gap between rows in px
+  const VISIBLE_ROWS = 2.1;
+  
+  // Height calculation: 2.1*ROW + 1*GAP (2 full gaps for 2.1 rows)
+  const twoPointOneHeight = VISIBLE_ROWS * ROW + (Math.floor(VISIBLE_ROWS) - 1) * GAP;
+  const showPeeker = golfers.length > 2;
+  
+  const sortedGolfers = [...golfers].sort((a, b) => {
+    const da = a.distance_km ?? Number.POSITIVE_INFINITY;
+    const db = b.distance_km ?? Number.POSITIVE_INFINITY;
+    return da - db;
+  });
+
   return (
     <Tile 
       title="Nearby Golfers"
@@ -53,36 +68,64 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
         </div>
       }
     >
+      <style>{`
+        .nearby-golfers-scroll::-webkit-scrollbar { 
+          display: none; 
+        }
+      `}</style>
+      
       <div className="flex flex-col h-full">
-        <div className="space-y-2 hub-golfers-list-scroll">
-          {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
-            <div key={i} className="h-12 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
-          ))}
-          {!isLoading && [...golfers].sort((a, b) => {
-            const da = a.distance_km ?? Number.POSITIVE_INFINITY;
-            const db = b.distance_km ?? Number.POSITIVE_INFINITY;
-            return da - db;
-          }).slice(0, 3).map(g => (
-            <button 
-              key={g.id} 
-              className="ng-row"
-              onClick={() => nav(`/profile/${g.username}`)}
-            >
-              <img 
-                src={g.avatar_url || '/placeholder.svg'} 
-                alt="" 
-                className="ng-avatar"
-              />
-              <div className="ng-main">
-                <div className="hub-ellipsis-fade ng-name" title={g.display_name || g.username}>
-                  {g.display_name || g.username}
-                </div>
-                <div className="ng-distance">{g.distanceText}</div>
-              </div>
-            </button>
-          ))}
+        <div 
+          className="nearby-golfers-scroll relative overflow-y-auto pr-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none]"
+          style={{
+            height: showPeeker ? `${twoPointOneHeight}px` : 'auto',
+            maskImage: showPeeker ? 'linear-gradient(to bottom, transparent 0, black 16px, black calc(100% - 16px), transparent 100%)' : 'none',
+          }}
+        >
+          {isLoading && (
+            <div className="flex flex-col" style={{ gap: `${GAP}px` }}>
+              {Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
+                <div 
+                  key={i} 
+                  className="rounded-2xl animate-pulse" 
+                  style={{ 
+                    background: 'var(--hub-glass-bg-subtle)',
+                    height: `${ROW}px`
+                  }} 
+                />
+              ))}
+            </div>
+          )}
+          
+          {!isLoading && sortedGolfers.length > 0 && (
+            <div className="flex flex-col" style={{ gap: `${GAP}px` }}>
+              {sortedGolfers.map(g => (
+                <button 
+                  key={g.id} 
+                  className="flex items-center w-full text-left"
+                  style={{ height: `${ROW}px` }}
+                  onClick={() => nav(`/profile/${g.username}`)}
+                >
+                  <img 
+                    src={g.avatar_url || '/placeholder.svg'} 
+                    alt="" 
+                    className="h-10 w-10 rounded-full object-cover flex-shrink-0"
+                  />
+                  <div className="ml-3 min-w-0 flex-1">
+                    <p className="truncate text-[13px] font-medium" style={{ color: 'var(--hub-text)' }}>
+                      {g.display_name || g.username}
+                    </p>
+                    <p className="truncate text-[12px]" style={{ color: 'var(--hub-text-dim)' }}>
+                      {g.distanceText}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+          
           {!isLoading && golfers.length === 0 && (
-            <div className="text-[13px] py-2" style={{ color: 'var(--hub-text-sub)' }}>
+            <div className="text-[13px] py-2" style={{ color: 'var(--hub-text-mute)' }}>
               No active golfers nearby
             </div>
           )}
