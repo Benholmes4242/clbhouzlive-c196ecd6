@@ -31,9 +31,9 @@ export default function VideosPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-[var(--bg-page)]">
       {/* Header - Reuse your global header component here */}
-      <div className="sticky top-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-sm border-b border-gray-800">
+      <div className="sticky top-0 z-50 bg-[color:rgba(10,10,10,0.95)] backdrop-blur-sm border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <h1 className="text-2xl font-bold text-white mb-4">Videos</h1>
           <FilterBar active={filter} onChange={setFilter} />

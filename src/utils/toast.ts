@@ -8,7 +8,7 @@ export function showToast(message: string, emoji = '', duration = 2000) {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    backgroundColor: '#000000',
+    backgroundColor: '#0a0a0a',
     color: '#FFFFFF',
     padding: '16px',
     borderRadius: '12px',

@@ -335,7 +335,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
             type="submit" 
             disabled={submitting || (isSignUp && usernameAvailable !== true)} 
             className="w-full mb-3 text-white hover:opacity-90"
-            style={{ backgroundColor: '#000000' }}
+            style={{ backgroundColor: '#0a0a0a' }}
           >
             {isSignUp ? (submitting ? "Signing up..." : "Sign Up") : (submitting ? "Signing in..." : "Sign In")}
           </Button>
