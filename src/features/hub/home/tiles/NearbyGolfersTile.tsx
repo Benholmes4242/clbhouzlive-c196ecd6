@@ -20,7 +20,29 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
   const { golfers, isLoading } = useActiveGolfers({ limit });
 
   const vpRef = useRef<HTMLDivElement>(null);
+  const tileRef = useRef<HTMLElement>(null);
   const hasMoreThanTwo = golfers.length > 2;
+  
+  // Debug logging
+  React.useEffect(() => {
+    if (tileRef.current) {
+      const tile = tileRef.current;
+      const hasHubTile = tile.classList.contains('HubTile');
+      const hasWithFooter = tile.classList.contains('HubTile--withFooter');
+      const footerLayer = tile.querySelector('.HubTileFooterLayer');
+      const footerCTA = tile.querySelector('.HubTileFooterCTA');
+      const cs = getComputedStyle(tile);
+      
+      console.log('[NearbyGolfersTile] Audit:', {
+        hasHubTile,
+        hasWithFooter,
+        footerLayerFound: !!footerLayer,
+        footerCTAFound: !!footerCTA,
+        paddingBottom: cs.paddingBottom,
+        tileFooterGap: cs.getPropertyValue('--tile-footer-gap'),
+      });
+    }
+  }, []);
   
   const sortedGolfers = [...golfers].sort((a, b) => {
     const da = a.distance_km ?? Number.POSITIVE_INFINITY;
@@ -30,6 +52,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
 
   return (
     <Tile 
+      ref={tileRef}
       title="Nearby Golfers"
       align="center"
       withFooter
