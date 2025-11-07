@@ -357,16 +357,11 @@ html.hub-open {
   height: calc((var(--row-h) * 2) + var(--row-gap));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
   /* avoid accidental horizontal scroll */
   overflow-x: hidden;
-  padding-top: 0;
   padding-bottom: 12px;
   -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
   mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
-}
-.hub-golfers-list-scroll.no-snap {
-  scroll-snap-type: none !important;
 }
 .hub-golfers-list-scroll::-webkit-scrollbar {
   width: 0;
