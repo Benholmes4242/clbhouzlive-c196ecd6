@@ -31,15 +31,50 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       const hasWithFooter = tile.classList.contains('HubTile--withFooter');
       const footerLayer = tile.querySelector('.HubTileFooterLayer');
       const footerCTA = tile.querySelector('.HubTileFooterCTA');
+      const cta = tile.querySelector('.HubTileFooterCTA button');
       const cs = getComputedStyle(tile);
+      
+      // Build path from tile to layer
+      const path = [];
+      let n = footerLayer;
+      while (n && n !== tile) { 
+        path.unshift(n.className || n.tagName); 
+        n = n.parentElement; 
+      }
+      
+      const parent = footerLayer?.parentElement;
+      const parentCS = parent ? getComputedStyle(parent) : null;
+      const layerCS = footerLayer ? getComputedStyle(footerLayer) : null;
+      const tileRect = tile.getBoundingClientRect();
+      const ctaRect = cta?.getBoundingClientRect();
+      const ctaCenterFromBottom = ctaRect ? tileRect.bottom - (ctaRect.top + ctaRect.height/2) : null;
       
       console.log('[NearbyGolfersTile] Audit:', {
         hasHubTile,
         hasWithFooter,
         footerLayerFound: !!footerLayer,
         footerCTAFound: !!footerCTA,
-        paddingBottom: cs.paddingBottom,
-        tileFooterGap: cs.getPropertyValue('--tile-footer-gap'),
+        layerPathFromRoot: path.join(' > ') || '(direct child or missing)',
+        tile: {
+          position: cs.position,
+          overflow: cs.overflow || cs.overflowY,
+          paddingBottom: cs.paddingBottom,
+          footerGapVar: cs.getPropertyValue('--tile-footer-gap'),
+        },
+        parentOfLayer: parent ? {
+          className: parent.className,
+          position: parentCS?.position,
+          overflow: parentCS?.overflow,
+          paddingBottom: parentCS?.paddingBottom,
+        } : '(direct child)',
+        layer: footerLayer ? {
+          position: layerCS?.position,
+          inset: layerCS?.inset,
+        } : '(missing)',
+        geometry: {
+          dividerExpectedDist: cs.getPropertyValue('--tile-footer-gap'),
+          ctaCenterlineDistFromBottom: ctaCenterFromBottom ? `${ctaCenterFromBottom.toFixed(1)}px` : '(no cta)',
+        }
       });
     }
   }, []);
