@@ -54,7 +54,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       }
     >
       <div className="flex flex-col h-full">
-        <div className="space-y-2">
+        <div className="space-y-2 hub-golfers-list-scroll">
           {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
             <div key={i} className="h-12 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
           ))}
@@ -70,7 +70,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
                 className="ng-avatar"
               />
               <div className="ng-main">
-                <div className="ng-name" title={g.display_name || g.username}>
+                <div className="hub-two-dot-ellipsis ng-name" title={g.display_name || g.username}>
                   {g.display_name || g.username}
                 </div>
                 <div className="ng-distance">{g.distanceText}</div>
