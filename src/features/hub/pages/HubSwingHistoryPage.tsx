@@ -9,7 +9,8 @@ import { useSwingHistory } from '@/features/echo/hooks/useSwingHistory';
 import { formatRelativeTime } from '@/utils/dateFormat';
 
 function Thumb({ src }: { src?: string | null }) {
-  const [ready, setReady] = React.useState(false);
+  const [ready, setReady] = React.useState(!src); // If no src, show fallback immediately
+  const [error, setError] = React.useState(false);
 
   return (
     <div className="thumb">
@@ -20,15 +21,12 @@ function Thumb({ src }: { src?: string | null }) {
           alt=""
           loading="lazy"
           onLoad={() => setReady(true)}
-          style={{ display: ready ? 'block' : 'none' }}
+          onError={() => { setError(true); setReady(true); }}
+          style={{ display: ready && !error ? 'block' : 'none' }}
         />
-      ) : (
-        <div
-          className="thumb-fallback"
-          style={{ display: ready ? 'grid' : 'none' }}
-          aria-hidden="true"
-          onLoad={() => setReady(true)}
-        >
+      ) : null}
+      {(error || !src) && ready && (
+        <div className="thumb-fallback">
           🏌️‍♂️
         </div>
       )}

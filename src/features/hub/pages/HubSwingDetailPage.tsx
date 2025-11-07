@@ -6,8 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import '../home/hubTheme.css';
 import { useSwingDetail } from '@/features/echo/hooks/useSwingDetail';
-import { useSwingThreadId } from '@/features/echo/hooks/useSwingThreadId';
-import { useSwingMessages } from '@/features/echo/hooks/useSwingMessages';
+import { useSwingConversation } from '@/features/echo/hooks/useSwingConversation';
 
 export function HubSwingDetailPage() {
   const nav = useNavigate();
@@ -15,8 +14,7 @@ export function HubSwingDetailPage() {
   const { id: swingId } = useParams();
   
   const { data: swing, isLoading, error } = useSwingDetail(swingId);
-  const { data: threadId } = useSwingThreadId(swing?.thread_id);
-  const { data: messages = [], isLoading: msgsLoading } = useSwingMessages(threadId);
+  const { data: messages = [], isLoading: msgsLoading, error: msgError } = useSwingConversation(swingId);
 
   const [isPlaying, setPlaying] = useState(false);
   const [vidReady, setVidReady] = useState(false);
@@ -33,7 +31,8 @@ export function HubSwingDetailPage() {
     else nav('/clubhouse', { replace: true });
   };
 
-  const togglePlay = () => {
+  const togglePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
     const v = vidRef.current;
     if (!v) return;
     if (v.paused) {
@@ -54,7 +53,7 @@ export function HubSwingDetailPage() {
       : swing.video_url;
 
     return (
-      <div className="swing-video-wrap" onClick={togglePlay}>
+      <div className="swing-video-wrap">
         {!vidReady && <div className="shimmer video" aria-hidden="true" />}
         <video
           ref={vidRef}
@@ -125,18 +124,26 @@ export function HubSwingDetailPage() {
 
               <div className="space-y-2">
                 {msgsLoading && <div className="hub-msg">Loading conversation…</div>}
-                {!msgsLoading && messages.length === 0 && (
+                {msgError && (
+                  <div className="hub-msg" style={{ color: 'rgba(255,100,100,0.9)' }}>
+                    Failed to load conversation: {String(msgError)}
+                  </div>
+                )}
+                {!msgsLoading && !msgError && messages.length === 0 && (
                   <div className="hub-muted">No messages yet for this swing.</div>
                 )}
-                {!msgsLoading && messages.map((m) => (
+                {!msgsLoading && !msgError && messages.map((m, idx) => (
                   <div
-                    key={m.id}
+                    key={`${m.role}-${idx}`}
                     className={`rounded-2xl px-3 py-2 border ${
                       m.role === 'user'
                         ? 'bg-white/8 border-white/10'
                         : 'bg-black/20 border-white/10'
                     }`}
                   >
+                    <div className="text-[11px] text-white/50 mb-1 uppercase">
+                      {m.role === 'user' ? 'You' : 'Coach'}
+                    </div>
                     {m.content}
                   </div>
                 ))}

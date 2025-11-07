@@ -378,10 +378,13 @@ html.hub-open {
   line-height: 1;
   color: rgba(255,255,255,.95);
   transition: background 0.2s ease;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 10;
 }
 
 .play-overlay:hover {
-  background: rgba(0,0,0,.45);
+  background: rgba(0,0,0,.55);
 }
 
 /* ========================================

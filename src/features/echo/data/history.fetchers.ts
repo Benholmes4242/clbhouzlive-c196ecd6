@@ -114,10 +114,17 @@ export async function fetchSwingHistory(limit = 20): Promise<SwingItem[]> {
 
   if (error) throw error;
 
-  return (data ?? []).map(d => ({
-    id: d.id,
-    title: 'Swing Analysis',
-    thumbnail_url: d.video_url,
-    created_at: d.created_at
-  }));
+  return (data ?? []).map(d => {
+    // Extract thumbnail from analysis_results.metadata.videoThumbnail
+    const results = d.analysis_results as any;
+    const metadata = results?.metadata;
+    const thumbnailUrl = metadata?.videoThumbnail || null;
+    
+    return {
+      id: d.id,
+      title: 'Swing Analysis',
+      thumbnail_url: thumbnailUrl,
+      created_at: d.created_at
+    };
+  });
 }
