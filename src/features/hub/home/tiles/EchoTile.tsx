@@ -21,27 +21,16 @@ export function EchoTile() {
   const [input, setInput] = React.useState('');
   const { navigateFromHub } = useHub();
 
-  const RAW_PROMPTS = [
-    'Build me a 4-week practice plan',
-    "What's the next major?",
+  const quickPrompts = [
     'Best drivers under £400 right now?',
-    'How do I stop slicing my driver?',
     'Plan a 3-night golf trip to Ireland',
+    'Fix my slice (driver)',
+    'Build me a 4-week practice plan',
   ];
 
-  const MAX_CHARS = 90;
-  const prompts = RAW_PROMPTS.map(p => p.length > MAX_CHARS ? p.slice(0, MAX_CHARS - 1) + '…' : p);
-
-  const [carouselIdx, setCarouselIdx] = React.useState(0);
-  const [carouselPaused, setCarouselPaused] = React.useState(false);
-
-  React.useEffect(() => {
-    if (carouselPaused) return;
-    const timer = setInterval(() => {
-      setCarouselIdx((i) => (i + 1) % prompts.length);
-    }, 8000);
-    return () => clearInterval(timer);
-  }, [carouselPaused, prompts.length]);
+  const handlePromptClick = (prompt: string) => {
+    navigateFromHub(`/hub/echo?msg=${encodeURIComponent(prompt)}`);
+  };
 
   const handleSend = () => {
     const text = input.trim();
@@ -138,55 +127,53 @@ export function EchoTile() {
           </button>
         </form>
 
-        {/* Carousel - positioned closer to input */}
+        {/* Quick prompts - clickable pills */}
         <div
-          onClick={(e) => {
-            e.stopPropagation();
-            navigateFromHub('/hub/echo');
-          }}
-          onMouseEnter={() => setCarouselPaused(true)}
-          onMouseLeave={() => setCarouselPaused(false)}
-          onTouchStart={() => setCarouselPaused(true)}
-          onTouchEnd={() => setCarouselPaused(false)}
           style={{
             marginTop: '12px',
             marginBottom: 'auto',
-            height: 'calc(1.25em * 2 + 6px)',
-            overflow: 'hidden',
-            padding: '3px 0',
-            cursor: 'pointer',
+            display: 'flex',
+            gap: '8px',
+            overflowX: 'auto',
+            padding: '6px 2px',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
           }}
+          className="hide-scrollbar"
         >
-          <div
-            style={{
-              display: 'flex',
-              height: '100%',
-              transition: 'transform 0.35s ease',
-              transform: `translateX(-${carouselIdx * 100}%)`,
-            }}
-          >
-            {prompts.map((prompt, i) => (
-              <div
-                key={i}
-                style={{
-                  minWidth: '100%',
-                  display: '-webkit-box',
-                  WebkitBoxOrient: 'vertical',
-                  WebkitLineClamp: 2,
-                  overflow: 'hidden',
-                  lineHeight: '1.25',
-                  padding: '0 8px',
-                  fontSize: '15px',
-                  whiteSpace: 'normal',
-                  textOverflow: 'ellipsis',
-                  color: 'var(--hub-text-body)',
-                  textAlign: 'center',
-                }}
-              >
-                "{prompt}"
-              </div>
-            ))}
-          </div>
+          {quickPrompts.map((prompt, i) => (
+            <button
+              key={i}
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePromptClick(prompt);
+              }}
+              aria-label={`Ask Echo: ${prompt}`}
+              style={{
+                border: 0,
+                padding: '10px 14px',
+                borderRadius: '14px',
+                background: 'transparent',
+                color: 'var(--hub-text-body)',
+                whiteSpace: 'nowrap',
+                fontSize: '15px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--hub-text)';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--hub-text-body)';
+                e.currentTarget.style.background = 'transparent';
+              }}
+            >
+              "{prompt}"
+            </button>
+          ))}
         </div>
       </div>
     </Tile>
