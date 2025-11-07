@@ -137,7 +137,7 @@ export function EchoTile() {
           </button>
         </form>
 
-        {/* Carousel - centered between input and footer */}
+        {/* Carousel - positioned closer to input */}
         <div
           onClick={(e) => {
             e.stopPropagation();
@@ -148,7 +148,7 @@ export function EchoTile() {
           onTouchStart={() => setCarouselPaused(true)}
           onTouchEnd={() => setCarouselPaused(false)}
           style={{
-            marginTop: 'auto',
+            marginTop: '12px',
             marginBottom: 'auto',
             height: 'calc(1.25em * 2 + 6px)',
             overflow: 'hidden',
