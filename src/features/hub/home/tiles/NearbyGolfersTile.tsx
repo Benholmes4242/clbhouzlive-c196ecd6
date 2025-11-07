@@ -3,10 +3,9 @@
  * Compact tile showing golfers open to play
  */
 
-import React, { useRef } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
-import { HubTileFooter } from '../components/HubTileFooter';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { useHub } from '@/features/hub/useHub';
 
@@ -19,166 +18,75 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
   const { navigateFromHub } = useHub();
   const { golfers, isLoading } = useActiveGolfers({ limit });
 
-  const vpRef = useRef<HTMLDivElement>(null);
-  const tileRef = useRef<HTMLElement>(null);
-  const hasMoreThanTwo = golfers.length > 2;
-  
-  // Debug logging
-  React.useEffect(() => {
-    if (tileRef.current) {
-      const tile = tileRef.current;
-      const hasHubTile = tile.classList.contains('HubTile');
-      const hasWithFooter = tile.classList.contains('HubTile--withFooter');
-      const footerLayer = tile.querySelector('.HubTileFooterLayer');
-      const footerCTA = tile.querySelector('.HubTileFooterCTA');
-      const cta = tile.querySelector('.HubTileFooterCTA button');
-      const cs = getComputedStyle(tile);
-      
-      // Build path from tile to layer
-      const path = [];
-      let n = footerLayer;
-      while (n && n !== tile) { 
-        path.unshift(n.className || n.tagName); 
-        n = n.parentElement; 
-      }
-      
-      const parent = footerLayer?.parentElement;
-      const parentCS = parent ? getComputedStyle(parent) : null;
-      const layerCS = footerLayer ? getComputedStyle(footerLayer) : null;
-      const tileRect = tile.getBoundingClientRect();
-      const ctaRect = cta?.getBoundingClientRect();
-      const ctaCenterFromBottom = ctaRect ? tileRect.bottom - (ctaRect.top + ctaRect.height/2) : null;
-      
-      console.log('[NearbyGolfersTile] Audit:', {
-        hasHubTile,
-        hasWithFooter,
-        footerLayerFound: !!footerLayer,
-        footerCTAFound: !!footerCTA,
-        layerPathFromRoot: path.join(' > ') || '(direct child or missing)',
-        tile: {
-          position: cs.position,
-          overflow: cs.overflow || cs.overflowY,
-          paddingBottom: cs.paddingBottom,
-          footerGapVar: cs.getPropertyValue('--tile-footer-gap'),
-        },
-        parentOfLayer: parent ? {
-          className: parent.className,
-          position: parentCS?.position,
-          overflow: parentCS?.overflow,
-          paddingBottom: parentCS?.paddingBottom,
-        } : '(direct child)',
-        layer: footerLayer ? {
-          position: layerCS?.position,
-          inset: layerCS?.inset,
-        } : '(missing)',
-        geometry: {
-          dividerExpectedDist: cs.getPropertyValue('--tile-footer-gap'),
-          ctaCenterlineDistFromBottom: ctaCenterFromBottom ? `${ctaCenterFromBottom.toFixed(1)}px` : '(no cta)',
-        }
-      });
-    }
-  }, []);
-  
-  const sortedGolfers = [...golfers].sort((a, b) => {
-    const da = a.distance_km ?? Number.POSITIVE_INFINITY;
-    const db = b.distance_km ?? Number.POSITIVE_INFINITY;
-    return da - db;
-  });
-
   return (
     <Tile 
-      ref={tileRef}
       title="Nearby Golfers"
       align="center"
-      withFooter
       footer={
-        <HubTileFooter
-          cta={
-            <button
-              onClick={(e) => { 
-                e.stopPropagation(); 
-                navigateFromHub('/hub/golfers'); 
-              }}
-              aria-label="View all golfers"
-            >
-              View all →
-            </button>
-          }
-        />
+        <div className="mt-auto pt-4">
+          <div 
+            className="h-px"
+            style={{
+              background: 'rgba(255,255,255,0.18)',
+              borderRadius: '1px',
+              width: '100%',
+            }}
+          />
+          <button
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              navigateFromHub('/hub/golfers'); 
+            }}
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            aria-label="View all golfers"
+          >
+            View all →
+          </button>
+        </div>
       }
     >
-      <style>{`
-        .nearby-golfers-scroll::-webkit-scrollbar { 
-          display: none; 
-        }
-        .nearby-golfers-scroll {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .nearby-golfers-scroll > *:last-child {
-          margin-bottom: 0 !important;
-        }
-        .nearby-golfers-scroll img {
-          display: block;
-        }
-        .mask-fade-right {
-          -webkit-mask-image: linear-gradient(to right, black 75%, transparent 100%);
-          mask-image: linear-gradient(to right, black 75%, transparent 100%);
-        }
-      `}</style>
-      
-      <div 
-        ref={vpRef}
-        className="nearby-golfers-scroll overflow-y-auto pb-0 mb-0"
-        style={{
-          height: '50px',
-          maskImage: hasMoreThanTwo ? 'linear-gradient(to bottom, transparent 0, black 16px, black calc(100% - 16px), transparent 100%)' : 'none',
-          WebkitOverflowScrolling: 'touch',
-        }}
-      >
-        {isLoading && (
-          <div className="flex flex-col space-y-1 pb-0 mb-0">
-            {Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
-              <div 
-                key={i} 
-                className="h-12 rounded-2xl animate-pulse" 
-                style={{ background: 'var(--hub-glass-bg-subtle)' }} 
+      <div className="flex flex-col h-full">
+        <div className="space-y-1 hub-golfers-list-scroll">
+          {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
+            <div key={i} className="h-12 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
+          ))}
+          {!isLoading && [...golfers].sort((a, b) => {
+            const da = a.distance_km ?? Number.POSITIVE_INFINITY;
+            const db = b.distance_km ?? Number.POSITIVE_INFINITY;
+            return da - db;
+          }).slice(0, 3).map(g => (
+            <button 
+              key={g.id} 
+              className="ng-row"
+              onClick={() => nav(`/profile/${g.username}`)}
+            >
+              <img 
+                src={g.avatar_url || '/placeholder.svg'} 
+                alt="" 
+                className="ng-avatar"
               />
-            ))}
-          </div>
-        )}
-        
-        {!isLoading && sortedGolfers.length > 0 && (
-          <div className="flex flex-col space-y-1 pb-0 mb-0">
-            {sortedGolfers.map((g) => (
-              <button 
-                key={g.id} 
-                className="h-12 w-full flex items-center overflow-hidden text-left"
-                onClick={() => nav(`/profile/${g.username}`)}
-              >
-                <img 
-                  src={g.avatar_url || '/placeholder.svg'} 
-                  alt={g.display_name || g.username}
-                  className="h-[34px] w-[34px] block rounded-full object-cover flex-shrink-0"
-                />
-                <div className="ml-2 min-w-0 w-full">
-                  <p className="mask-fade-right whitespace-nowrap overflow-hidden text-[12px] font-medium" style={{ color: 'var(--hub-text)' }}>
-                    {g.display_name || g.username}
-                  </p>
-                  <p className="mask-fade-right whitespace-nowrap overflow-hidden text-[11px] leading-[1.1rem]" style={{ color: 'var(--hub-text-dim)' }}>
-                    {g.distanceText}
-                  </p>
+              <div className="ng-main">
+                <div className="hub-ellipsis-fade ng-name" title={g.display_name || g.username}>
+                  {g.display_name || g.username}
                 </div>
-              </button>
-            ))}
-          </div>
-        )}
-        
-        {!isLoading && golfers.length === 0 && (
-          <div className="text-[13px] py-2 text-center" style={{ color: 'var(--hub-text-mute)' }}>
-            No active golfers nearby
-          </div>
-        )}
+                <div className="ng-distance">{g.distanceText}</div>
+              </div>
+            </button>
+          ))}
+          {!isLoading && golfers.length === 0 && (
+            <div className="text-[13px] py-2" style={{ color: 'var(--hub-text-sub)' }}>
+              No active golfers nearby
+            </div>
+          )}
+        </div>
       </div>
     </Tile>
   );

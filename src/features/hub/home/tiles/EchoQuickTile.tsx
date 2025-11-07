@@ -7,7 +7,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { Tile } from '../components/Tile';
-import { HubTileFooter } from '../components/HubTileFooter';
 import EchoAvatar from '@/components/ai-chat/EchoAvatar';
 
 export function EchoQuickTile() {
@@ -33,9 +32,34 @@ export function EchoQuickTile() {
           <EchoAvatar state="idle" size={20} />
         </div>
       }
-      withFooter
+      footer={
+        <div className="mt-auto pt-2">
+          <div
+            className="h-px"
+            style={{
+              background: 'rgba(255,255,255,0.18)',
+              borderRadius: '1px',
+              width: '100%',
+            }}
+          />
+          <button
+            onClick={comingSoon}
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+          >
+            View all →
+          </button>
+        </div>
+      }
     >
-      <div className="flex flex-col">
+      <div className="flex flex-col h-full">
         {/* Input form */}
         <form
           className="relative"
@@ -73,14 +97,6 @@ export function EchoQuickTile() {
           </button>
         </form>
       </div>
-
-      <HubTileFooter
-        cta={
-          <button onClick={comingSoon} aria-label="View all chats">
-            View chats →
-          </button>
-        }
-      />
     </Tile>
   );
 }
