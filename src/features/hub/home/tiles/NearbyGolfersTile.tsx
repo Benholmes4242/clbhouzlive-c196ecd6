@@ -37,7 +37,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
               e.stopPropagation(); 
               navigateFromHub('/hub/golfers'); 
             }}
-            className="ml-auto mt-2 block text-[15px] font-medium transition"
+            className="ml-auto mt-1 block text-[15px] font-medium transition"
             style={{
               background: 'transparent',
               border: 'none',
