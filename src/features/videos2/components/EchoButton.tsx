@@ -1,49 +1,9 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Heart } from 'lucide-react';
-
-type EchoButtonProps = {
-  count: number;
-  active?: boolean;
-  onToggle: () => void;
-  size?: 'sm' | 'md';
-};
-
-export function EchoButton({ count, active = false, onToggle, size = 'md' }: EchoButtonProps) {
-  const iconSize = size === 'sm' ? 16 : 20;
-  const textSize = size === 'sm' ? 'text-xs' : 'text-sm';
-
-  const formatCount = (n: number): string => {
-    if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
-    return String(n);
-  };
-
+import { motion } from "framer-motion";
+export default function EchoButton({ count, active, onToggle }:{ count: number; active?: boolean; onToggle?: ()=>void; }){
   return (
-    <motion.button
-      onClick={(e) => {
-        e.stopPropagation();
-        onToggle();
-      }}
-      whileTap={{ scale: 0.9 }}
-      className="flex items-center gap-1.5 group"
-      aria-label={`${count} Echoes`}
-    >
-      <motion.div
-        animate={active ? { scale: [1, 1.2, 1] } : {}}
-        transition={{ duration: 0.3 }}
-      >
-        <Heart
-          size={iconSize}
-          className={`transition-colors ${
-            active
-              ? 'fill-[#6e9277] text-[#6e9277]'
-              : 'text-gray-400 group-hover:text-[#6e9277]'
-          }`}
-        />
-      </motion.div>
-      <span className={`${textSize} text-gray-400 group-hover:text-gray-300`}>
-        {count > 0 ? formatCount(count) : ''}
-      </span>
-    </motion.button>
+    <button aria-label="Echo" onClick={onToggle} className="flex items-center gap-1 text-sm text-gray-300">
+      <motion.span animate={active ? { scale: [1,1.2,1] } : {}} className={`inline-block w-4 h-4 rounded-full ${active?"bg-[#6e9277]":"bg-gray-500"}`}/>
+      <span className="text-gray-300">{count} Echoes</span>
+    </button>
   );
 }

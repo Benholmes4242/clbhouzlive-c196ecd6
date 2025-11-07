@@ -1,28 +1,9 @@
-import React from 'react';
-import { VideoFilter } from '../types';
-
-type FilterBarProps = {
-  active: VideoFilter;
-  onChange: (filter: VideoFilter) => void;
-};
-
-const filters: VideoFilter[] = ['All', 'Pro Golf', 'Course Vlogs', 'Tips', 'Gear'];
-
-export function FilterBar({ active, onChange }: FilterBarProps) {
+export default function FilterBar({ active = "All", onChange }:{ active?: string; onChange?: (f:string)=>void; }){
+  const filters = ["All","Pro Golf","Course Vlogs","Tips","Gear","Funny"]; 
   return (
-    <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
-      {filters.map((filter) => (
-        <button
-          key={filter}
-          onClick={() => onChange(filter)}
-          className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-            active === filter
-              ? 'bg-[#6e9277]/20 text-white'
-              : 'bg-gray-800/60 text-gray-300 hover:bg-gray-800'
-          }`}
-        >
-          {filter}
-        </button>
+    <div className="flex gap-3 overflow-x-auto px-4 py-3 no-scrollbar border-b border-gray-800/70">
+      {filters.map(f => (
+        <button key={f} onClick={()=>onChange?.(f)} className={`rounded-full px-4 py-1 text-sm whitespace-nowrap ${active===f?"bg-[#6e9277]/20 text-white":"bg-gray-800/60 text-gray-300 hover:bg-gray-700/60"}`}>{f}</button>
       ))}
     </div>
   );
