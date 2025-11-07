@@ -23,8 +23,8 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       title="Nearby Golfers"
       align="center"
       footer={
-        <div className="mt-auto pt-0">
-          <div
+        <div className="mt-auto pt-4">
+          <div 
             className="h-px"
             style={{
               background: 'rgba(255,255,255,0.18)',
@@ -37,7 +37,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
               e.stopPropagation(); 
               navigateFromHub('/hub/golfers'); 
             }}
-            className="ml-auto mt-1 block text-[15px] font-medium transition"
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
             style={{
               background: 'transparent',
               border: 'none',
@@ -54,20 +54,15 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       }
     >
       <div className="flex flex-col h-full">
-        <div className="ng-list-container hub-golfers-list-scroll">
-          {isLoading && Array.from({ length: 2 }).map((_, i) => (
+        <div className="space-y-2 hub-golfers-list-scroll">
+          {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
             <div key={i} className="h-12 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
           ))}
-          {!isLoading && golfers.length === 0 && (
-            <div className="ng-empty-state">
-              No active golfers nearby
-            </div>
-          )}
-          {!isLoading && golfers.length > 0 && [...golfers].sort((a, b) => {
+          {!isLoading && [...golfers].sort((a, b) => {
             const da = a.distance_km ?? Number.POSITIVE_INFINITY;
             const db = b.distance_km ?? Number.POSITIVE_INFINITY;
             return da - db;
-          }).map(g => (
+          }).slice(0, 3).map(g => (
             <button 
               key={g.id} 
               className="ng-row"
@@ -86,6 +81,11 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
               </div>
             </button>
           ))}
+          {!isLoading && golfers.length === 0 && (
+            <div className="text-[13px] py-2" style={{ color: 'var(--hub-text-sub)' }}>
+              No active golfers nearby
+            </div>
+          )}
         </div>
       </div>
     </Tile>

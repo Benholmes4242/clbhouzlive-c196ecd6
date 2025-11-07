@@ -45,22 +45,6 @@
   --hub-radius-lg: 22px;
   --hub-gap: 16px;
   --hub-pad: 16px;
-
-  /* Nearby Golfers list fixed height */
-  --ng-row-h: 48px;
-  --ng-row-gap: 2px;
-  --ng-visible-rows: 2.1;
-  --ng-vpad: 0px;
-  --ng-list-min-h: calc(
-    var(--ng-vpad)*2 +
-    var(--ng-row-h)*2 +
-    var(--ng-row-gap)*(2 - 1)
-  );
-  --ng-list-max-h: calc(
-    var(--ng-vpad)*2 +
-    var(--ng-row-h)*var(--ng-visible-rows) +
-    var(--ng-row-gap)*(var(--ng-visible-rows) - 1)
-  );
 }
 
 /* ============================
@@ -295,50 +279,4 @@ button.ghost:hover,
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
-}
-
-/* ============================
-   Nearby Golfers Fixed List
-   ============================ */
-.hub-golfers-list-scroll {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.hub-golfers-list-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.ng-list-container {
-  position: relative;
-  min-height: var(--ng-list-min-h);
-  max-height: var(--ng-list-max-h);
-  display: flex;
-  flex-direction: column;
-  gap: var(--ng-row-gap);
-  scroll-behavior: smooth;
-}
-
-/* Subtle fade at bottom to hint more content */
-.ng-list-container::after {
-  content: "";
-  position: sticky;
-  bottom: 0;
-  height: 18px;
-  display: block;
-  background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.10));
-  border-bottom-left-radius: 14px;
-  border-bottom-right-radius: 14px;
-  pointer-events: none;
-}
-
-.ng-empty-state {
-  min-height: var(--ng-list-min-h);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--hub-text-mute);
-  font-size: 13px;
 }

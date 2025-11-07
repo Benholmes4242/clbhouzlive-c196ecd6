@@ -5,6 +5,7 @@ import { channelManager } from '@/utils/supabaseChannelManager';
 import { calculateDistance, formatDistance } from '@/features/nearby/distance';
 import { NEARBY_RADIUS_METERS } from '@/features/nearby/config';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
+import { getMockNearby } from '@/features/nearby/mockNearbyGolfers';
 
 export type ActiveGolfer = {
   id: string;
@@ -192,11 +193,30 @@ export function useActiveGolfers({ limit = 20, mockCount = 0 }: { limit?: number
   // }, [realProfiles.length]);
 
   const golfers = useMemo<ActiveGolfer[]>(() => {
-    return realProfiles.map(p => ({
+    // Return real golfers if available, otherwise show mock data
+    const realWithOnline: ActiveGolfer[] = realProfiles.map(p => ({
       ...p,
-      is_online: false,
+      is_online: false, // No longer tracking online status
       isMock: false,
     }));
+
+    // If no real golfers, show mock data for testing
+    if (realWithOnline.length === 0) {
+      const mockGolfers = getMockNearby(5).map(m => ({
+        ...m,
+        display_name: m.display_name,
+        username: m.display_name.toLowerCase().replace(/\s+/g, '_'),
+        avatar_url: m.avatar_url,
+        is_online: m.is_online,
+        isMock: true,
+        distanceText: m.distance_km < 1 ? `${Math.round(m.distance_km * 1000)}m away` : `${m.distance_km.toFixed(1)}km away`,
+        sameHomeClub: m.same_club,
+        isOpenToPlay: m.isOpenToPlay,
+      }));
+      return mockGolfers;
+    }
+
+    return realWithOnline;
   }, [realProfiles]);
 
   const realOnlineCount = useMemo(() => {
