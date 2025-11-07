@@ -294,11 +294,11 @@ html.hub-open {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 10px 14px;
+  padding: 10px 8px 10px 14px;
   background: transparent;
   border: none;
   border-radius: 16px;
-  gap: 12px;
+  gap: 8px;
   cursor: pointer;
   transition: background 0.2s ease;
   text-align: left;
@@ -332,7 +332,6 @@ html.hub-open {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding-right: var(--hub-pill-pad-x);
 }
 
 .ng-distance {
