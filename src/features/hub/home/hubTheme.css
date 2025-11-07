@@ -298,7 +298,7 @@ html.hub-open {
   background: transparent;
   border: none;
   border-radius: 16px;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
   transition: background 0.2s ease;
   text-align: left;
