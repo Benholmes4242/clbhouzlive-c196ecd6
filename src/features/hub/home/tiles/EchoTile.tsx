@@ -3,6 +3,7 @@ import { Tile } from '../components/Tile';
 import { useEchoHistory } from '../../hooks/useEchoHistory';
 import { useHub } from '@/features/hub/useHub';
 import { Send } from 'lucide-react';
+import '@/styles/echo-tile.css';
 
 function timeAgo(iso?: string) {
   if (!iso) return '';
@@ -88,16 +89,18 @@ export function EchoTile() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onClick={(e) => e.stopPropagation()}
+            className="echo-input"
             style={{
               width: '100%',
               height: '40px',
               borderRadius: '14px',
               padding: '0 44px 0 14px',
               background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              border: '1px solid transparent',
               outline: 0,
               fontSize: '15px',
               color: 'var(--hub-text)',
+              transition: 'box-shadow 0.15s ease, border-color 0.15s ease',
             }}
           />
           <button
@@ -127,53 +130,60 @@ export function EchoTile() {
           </button>
         </form>
 
-        {/* Quick prompts - clickable pills */}
+        {/* Quick prompts - clickable pills with scroll fade */}
         <div
+          className="echo-quick-wrap"
           style={{
+            position: 'relative',
             marginTop: '12px',
             marginBottom: 'auto',
-            display: 'flex',
-            gap: '8px',
-            overflowX: 'auto',
-            padding: '6px 2px',
-            WebkitOverflowScrolling: 'touch',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
           }}
-          className="hide-scrollbar"
         >
-          {quickPrompts.map((prompt, i) => (
-            <button
-              key={i}
-              onClick={(e) => {
-                e.stopPropagation();
-                handlePromptClick(prompt);
-              }}
-              aria-label={`Ask Echo: ${prompt}`}
-              style={{
-                border: 0,
-                padding: '10px 14px',
-                borderRadius: '14px',
-                background: 'transparent',
-                color: 'var(--hub-text-body)',
-                whiteSpace: 'nowrap',
-                fontSize: '15px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                flexShrink: 0,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--hub-text)';
-                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--hub-text-body)';
-                e.currentTarget.style.background = 'transparent';
-              }}
-            >
-              "{prompt}"
-            </button>
-          ))}
+          <div
+            className="echo-quick-scroll"
+            style={{
+              display: 'flex',
+              gap: '8px',
+              overflowX: 'auto',
+              padding: '6px 2px',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}
+          >
+            {quickPrompts.map((prompt, i) => (
+              <button
+                key={i}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePromptClick(prompt);
+                }}
+                aria-label={`Ask Echo: ${prompt}`}
+                style={{
+                  border: 0,
+                  padding: '10px 14px',
+                  borderRadius: '14px',
+                  background: 'transparent',
+                  color: 'var(--hub-text-body)',
+                  whiteSpace: 'nowrap',
+                  fontSize: '15px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'var(--hub-text)';
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'var(--hub-text-body)';
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                "{prompt}"
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </Tile>
