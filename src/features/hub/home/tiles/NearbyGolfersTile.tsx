@@ -64,7 +64,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
               background: 'rgba(255,255,255,0.18)',
             }}
           />
-          <div className="flex items-center justify-end" style={{ height: '44px' }}>
+          <div className="flex items-center justify-end py-4">
             <button
               onClick={(e) => { 
                 e.stopPropagation(); 
