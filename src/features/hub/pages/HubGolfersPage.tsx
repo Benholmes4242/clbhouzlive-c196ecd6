@@ -20,7 +20,7 @@ export function HubGolfersPage() {
   const nav = useNavigate();
   const loc = useLocation();
   const queryClient = useQueryClient();
-  const { golfers, isLoading } = useActiveGolfers({ limit: 50 });
+  const { golfers, isLoading } = useActiveGolfers({ limit: 50, mockCount: 0 });
   const { visibilityMode, setVisibilityMode } = useVisibility();
 
   const handleBack = () => {
