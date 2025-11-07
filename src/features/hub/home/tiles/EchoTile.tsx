@@ -44,8 +44,9 @@ export function EchoTile() {
   }, [carouselPaused, prompts.length]);
 
   const handleSend = () => {
-    if (input.trim()) {
-      navigateFromHub('/hub/echo');
+    const text = input.trim();
+    if (text) {
+      navigateFromHub(`/hub/echo?msg=${encodeURIComponent(text)}`);
       setInput('');
     }
   };
