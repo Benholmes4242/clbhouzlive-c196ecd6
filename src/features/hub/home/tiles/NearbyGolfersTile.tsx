@@ -28,17 +28,15 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
     return da - db;
   });
 
-  // Dynamically measure and set 2.1-row height
+  // Dynamically measure and set 2.1-row height (clamped to prevent wrap inflation)
   useLayoutEffect(() => {
     if (!vpRef.current || !firstRowRef.current || !hasMoreThanTwo) return;
 
     const calc = () => {
       if (!vpRef.current || !firstRowRef.current) return;
-      const rowRect = firstRowRef.current.getBoundingClientRect();
-      const rowH = rowRect.height;
-      const cs = getComputedStyle(firstRowRef.current);
-      const gap = parseFloat(cs.marginBottom) || 8;
-      // 2 full rows + 0.1 row + 1 gap (between row1 & row2)
+      const measured = firstRowRef.current.getBoundingClientRect().height || 56;
+      const rowH = Math.min(56, Math.round(measured)); // clamp to 56px
+      const gap = 8; // controlled by space-y-2
       const target = (rowH * 2.1) + gap;
       vpRef.current.style.height = `${Math.round(target)}px`;
     };
@@ -135,7 +133,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
               <button 
                 key={g.id} 
                 ref={i === 0 ? firstRowRef : undefined}
-                className="h-14 flex items-center w-full text-left"
+                className="h-14 w-full flex items-center overflow-hidden text-left"
                 onClick={() => nav(`/profile/${g.username}`)}
               >
                 <img 
@@ -143,11 +141,11 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
                   alt="" 
                   className="h-10 w-10 block rounded-full object-cover flex-shrink-0"
                 />
-                <div className="ml-3 min-w-0 flex-1">
-                  <p className="mask-fade-right text-[13px] font-medium overflow-hidden" style={{ color: 'var(--hub-text)' }}>
+                <div className="ml-3 min-w-0 w-full">
+                  <p className="mask-fade-right whitespace-nowrap overflow-hidden text-[13px] font-medium" style={{ color: 'var(--hub-text)' }}>
                     {g.display_name || g.username}
                   </p>
-                  <p className="mask-fade-right text-[12px] overflow-hidden" style={{ color: 'var(--hub-text-dim)' }}>
+                  <p className="mask-fade-right whitespace-nowrap overflow-hidden text-[12px]" style={{ color: 'var(--hub-text-dim)' }}>
                     {g.distanceText}
                   </p>
                 </div>
