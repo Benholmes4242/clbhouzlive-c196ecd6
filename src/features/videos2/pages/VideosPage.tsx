@@ -1,29 +1,19 @@
-import React, { useState, useRef } from 'react';
-import { useVirtualizer } from '@tanstack/react-virtual';
+import React, { useState } from 'react';
 import { useAutoplay } from '../hooks/useAutoplay';
-import { VideoFilter } from '../types';
+import { VideoFilter, FeedItemType } from '../types';
 import { FilterBar } from '../components/FilterBar';
 import { VideoCardWide } from '../components/VideoCardWide';
 import { VideoCardPair } from '../components/VideoCardPair';
 import { SuggestedChannels } from '../components/SuggestedChannels';
 import { ShortsCarousel } from '../components/ShortsCarousel';
-import { useVideos2Data, getMockShorts, getMockChannels } from '../data/getVideos2Data';
-import type { VideoItem } from '../types';
-
-type Row = 
-  | { type: 'wide'; video: VideoItem }
-  | { type: 'pair'; videos: [VideoItem, VideoItem?] }
-  | { type: 'channels' }
-  | { type: 'shorts' };
+import { generateMockFeed } from '../data/mockData';
 
 export default function VideosPage() {
   const [filter, setFilter] = useState<VideoFilter>('All');
   const { register } = useAutoplay();
-  const parentRef = useRef<HTMLDivElement>(null);
   
-  const { videos, isLoading } = useVideos2Data(20);
-  const SHORTS = getMockShorts(6);
-  const CHANNELS = getMockChannels(6);
+  // Mock feed data - replace with real API call
+  const feedItems = generateMockFeed(20);
 
   const handleVideoClick = (id: string) => {
     console.log('Open video player for:', id);
@@ -40,39 +30,9 @@ export default function VideosPage() {
     // TODO: API call to toggle subscription
   };
 
-  // Build interleaved rows: Wide → Pair → Wide → Pair with rails
-  const rows: Row[] = [];
-  for (let i = 0; i < videos.length; i += 3) {
-    if (videos[i]) {
-      rows.push({ type: 'wide', video: videos[i] });
-    }
-    if (videos[i + 1]) {
-      rows.push({ type: 'pair', videos: [videos[i + 1], videos[i + 2]] });
-    }
-    if (i > 0 && i % 9 === 0) {
-      rows.push({ type: 'channels' });
-    }
-    if (i > 0 && i % 12 === 0) {
-      rows.push({ type: 'shorts' });
-    }
-  }
-
-  const rowVirtualizer = useVirtualizer({
-    count: rows.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: (i) => {
-      const row = rows[i];
-      if (row.type === 'pair') return 360;
-      if (row.type === 'wide') return window.innerHeight * 0.5 + 140;
-      if (row.type === 'channels') return 180;
-      return 340;
-    },
-    overscan: 6,
-  });
-
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
-      {/* Header */}
+      {/* Header - Reuse your global header component here */}
       <div className="sticky top-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-sm border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <h1 className="text-2xl font-bold text-white mb-4">Videos</h1>
@@ -80,30 +40,33 @@ export default function VideosPage() {
         </div>
       </div>
 
-      {/* Virtualized Feed */}
-      <div ref={parentRef} className="h-[calc(100vh-120px)] overflow-auto">
-        <div
-          style={{
-            height: `${rowVirtualizer.getTotalSize()}px`,
-            width: '100%',
-            position: 'relative',
-          }}
-        >
-          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-            const row = rows[virtualRow.index];
-            const style: React.CSSProperties = {
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              transform: `translateY(${virtualRow.start}px)`,
-            };
-
-            if (row.type === 'wide') {
+      {/* Feed */}
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="space-y-8">
+          {feedItems.map((item: FeedItemType, index) => {
+            if (item.type === 'wide') {
               return (
-                <div key={virtualRow.key} style={style} className="px-4 py-5">
-                  <VideoCardWide
-                    video={row.video}
+                <VideoCardWide
+                  key={`wide-${index}`}
+                  video={item.video}
+                  autoRegister={register}
+                  onVideoClick={handleVideoClick}
+                  onEchoToggle={handleEchoToggle}
+                />
+              );
+            }
+
+            if (item.type === 'pair') {
+              return (
+                <div key={`pair-${index}`} className="grid grid-cols-2 gap-4">
+                  <VideoCardPair
+                    video={item.videos[0]}
+                    autoRegister={register}
+                    onVideoClick={handleVideoClick}
+                    onEchoToggle={handleEchoToggle}
+                  />
+                  <VideoCardPair
+                    video={item.videos[1]}
                     autoRegister={register}
                     onVideoClick={handleVideoClick}
                     onEchoToggle={handleEchoToggle}
@@ -112,62 +75,37 @@ export default function VideosPage() {
               );
             }
 
-            if (row.type === 'pair') {
+            if (item.type === 'channels') {
               return (
-                <div key={virtualRow.key} style={style} className="px-4 pb-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <VideoCardPair
-                      video={row.videos[0]}
-                      autoRegister={register}
-                      onVideoClick={handleVideoClick}
-                      onEchoToggle={handleEchoToggle}
-                    />
-                    {row.videos[1] && (
-                      <VideoCardPair
-                        video={row.videos[1]}
-                        autoRegister={register}
-                        onVideoClick={handleVideoClick}
-                        onEchoToggle={handleEchoToggle}
-                      />
-                    )}
-                  </div>
-                </div>
+                <SuggestedChannels
+                  key={`channels-${index}`}
+                  channels={item.channels}
+                  onSubscribe={handleSubscribe}
+                />
               );
             }
 
-            if (row.type === 'channels') {
+            if (item.type === 'shorts') {
               return (
-                <div key={virtualRow.key} style={style}>
-                  <SuggestedChannels
-                    channels={CHANNELS}
-                    onSubscribe={handleSubscribe}
-                  />
-                </div>
-              );
-            }
-
-            if (row.type === 'shorts') {
-              return (
-                <div key={virtualRow.key} style={style}>
-                  <ShortsCarousel
-                    videos={SHORTS}
-                    onVideoClick={handleVideoClick}
-                  />
-                </div>
+                <ShortsCarousel
+                  key={`shorts-${index}`}
+                  videos={item.videos}
+                  onVideoClick={handleVideoClick}
+                />
               );
             }
 
             return null;
           })}
         </div>
-      </div>
 
-      {/* Loading state */}
-      {isLoading && videos.length === 0 && (
-        <div className="fixed inset-0 flex items-center justify-center bg-[#0a0a0a]/80">
-          <div className="text-white text-lg">Loading videos...</div>
+        {/* Load more trigger - TODO: Implement infinite scroll */}
+        <div className="mt-12 text-center">
+          <button className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors">
+            Load More
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
