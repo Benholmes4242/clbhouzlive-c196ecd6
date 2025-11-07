@@ -1,66 +1,82 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-type Message = { role: 'user' | 'assistant'; content: string; created_at: string };
+type EchoMsg = { id?: string; role: 'user' | 'assistant' | 'system'; content: string; created_at?: string };
+type Thread = { id: string; created_at: string };
 
-export function useEchoChatThread(id: string) {
+function mapJsonbMessages(jsonb: any[]): EchoMsg[] {
+  if (!Array.isArray(jsonb)) return [];
+  return jsonb.map((m: any, i: number) => {
+    const rawRole = (m.role || m.type || '').toLowerCase();
+    const role: 'user' | 'assistant' | 'system' = rawRole === 'user' ? 'user' : rawRole === 'system' ? 'system' : 'assistant';
+    return {
+      id: m.id ?? String(i),
+      role,
+      content: m.content ?? m.text ?? '',
+      created_at: m.timestamp ?? m.created_at ?? null,
+    };
+  }).filter(m => m.content);
+}
+
+async function fetchConversationById(id: string) {
+  const { data, error } = await supabase
+    .from('conversations')
+    .select('id, user_id, title, created_at, updated_at, messages, conversation_type')
+    .eq('id', id)
+    .single();
+  if (error) return { data: null, error };
+  if (!data) return { data: null, error: null };
+  return { data, error: null };
+}
+
+async function fetchRelationalByThreadId(id: string) {
+  // 1) find thread by id
+  const { data: thread, error: thErr } = await supabase
+    .from('echo_threads')
+    .select('id, created_at')
+    .eq('id', id)
+    .single();
+
+  if (thErr || !thread) return { thread: null, messages: [], error: thErr ?? null };
+
+  // 2) load messages for that thread
+  const { data: msgs, error: msgErr } = await supabase
+    .from('echo_messages')
+    .select('id, role, content, created_at')
+    .eq('thread_id', thread.id)
+    .order('created_at', { ascending: true });
+
+  return { thread, messages: msgs ?? [], error: msgErr ?? null };
+}
+
+export function useEchoChatThread(chatId: string | undefined) {
   return useQuery({
-    queryKey: ['echo-thread', id],
+    queryKey: ['echo-chat-thread', chatId],
+    enabled: Boolean(chatId),
     queryFn: async () => {
-      // Try common table name variations
-      const chatTables = ['echo_threads', 'echo_chats', 'ai_chats', 'conversations'];
-      const msgTables = ['echo_messages', 'echo_chat_messages', 'ai_chat_messages'];
+      if (!chatId) throw new Error('No chat id');
 
-      let thread = null;
-      let threadError = null;
-
-      // Try to find thread metadata in any of the common tables
-      for (const table of chatTables) {
-        const { data, error } = await supabase
-          .from(table as any)
-          .select('id, created_at, user_id')
-          .eq('id', id)
-          .single();
-        
-        if (!error && data) {
-          thread = data;
-          break;
-        }
-        threadError = error;
+      // PATH A: Legacy conversations (JSONB)
+      const { data: conv, error: convErr } = await fetchConversationById(chatId);
+      if (conv && conv.conversation_type === 'chat') {
+        const messages = mapJsonbMessages(conv.messages || []);
+        return {
+          source: 'conversations',
+          thread: { id: conv.id, created_at: conv.created_at } as Thread,
+          messages,
+        };
       }
 
-      if (!thread) throw threadError || new Error('Thread not found in any table');
-
-      // Try to find messages in any of the common tables
-      let messages: Message[] = [];
-      let msgsError = null;
-
-      for (const table of msgTables) {
-        const { data: msgs, error } = await supabase
-          .from(table as any)
-          .select('role, content, created_at, chat_id, thread_id, conversation_id')
-          .or(`chat_id.eq.${id},thread_id.eq.${id},conversation_id.eq.${id}`)
-          .order('created_at', { ascending: true });
-
-        if (!error && msgs && msgs.length > 0) {
-          messages = msgs.map((m: any) => ({
-            role: m.role === 'user' ? 'user' : 'assistant',
-            content: m.content,
-            created_at: m.created_at,
-          }));
-          break;
-        }
-        msgsError = error;
+      // PATH B: Relational echo_threads + echo_messages
+      const { thread, messages, error: relErr } = await fetchRelationalByThreadId(chatId);
+      if (thread) {
+        return { source: 'relational', thread, messages };
       }
 
-      // If we found the thread but no messages, that's okay (empty chat)
-      // Only throw if we got an actual error (not just empty result)
-      if (messages.length === 0 && msgsError && msgsError.code !== 'PGRST116') {
-        console.warn('[useEchoChatThread] Messages error:', msgsError);
-      }
-
-      return { meta: thread, messages };
+      // If both miss, surface the better error
+      if (convErr) throw convErr;
+      if (relErr) throw relErr;
+      return { source: 'none', thread: null, messages: [] as EchoMsg[] };
     },
-    retry: 1,
   });
 }

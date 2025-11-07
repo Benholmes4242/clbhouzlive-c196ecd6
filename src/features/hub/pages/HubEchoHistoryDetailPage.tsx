@@ -2,7 +2,7 @@
  * Echo Chat Thread (read-only) – overlays origin; back returns to History list
  */
 import React, { useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import '../home/hubTheme.css';
 import { useEchoChatThread } from '@/features/echo/hooks/useEchoChatThread';
 import { formatDateTime } from '@/utils/dateFormat';
@@ -18,7 +18,7 @@ export default function HubEchoHistoryDetailPage() {
 
   const goBack = () => nav(-1);
 
-  const { data, isLoading, error } = useEchoChatThread(id!);
+  const { data, isLoading, error } = useEchoChatThread(id);
 
   return (
     <div
@@ -54,9 +54,6 @@ export default function HubEchoHistoryDetailPage() {
           {error && !isLoading && (
             <div className="hub-msg">
               Couldn't load this chat.
-              <pre style={{whiteSpace:'pre-wrap',opacity:.7,marginTop:8,fontSize:12}}>
-                {JSON.stringify(error, null, 2)}
-              </pre>
             </div>
           )}
           {!isLoading && !error && !data && <div className="hub-msg">Chat not found.</div>}
@@ -65,16 +62,16 @@ export default function HubEchoHistoryDetailPage() {
             <div className="hub-card">
               <div className="hub-card-title">Conversation</div>
               <div className="hub-muted mb-3">
-                {formatDateTime(data.meta?.created_at)}
+                {data.thread?.created_at ? formatDateTime(data.thread.created_at) : ''}
               </div>
 
-              {data.messages.length === 0 ? (
+              {(data.messages ?? []).length === 0 ? (
                 <div className="hub-msg">No messages in this chat yet.</div>
               ) : (
                 <div className="echo-thread">
-                  {data.messages.map((m, i) => (
+                  {(data.messages ?? []).map((m, i) => (
                     <div
-                      key={i}
+                      key={m.id ?? i}
                       className={`bubble ${m.role === 'user' ? 'me' : 'bot'}`}
                     >
                       {m.content}
