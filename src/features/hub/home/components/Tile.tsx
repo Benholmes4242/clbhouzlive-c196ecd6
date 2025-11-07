@@ -11,11 +11,12 @@ type TileProps = React.PropsWithChildren<{
   onViewAll?: () => void;
   footer?: React.ReactNode;
   align?: 'start' | 'center';
+  withFooter?: boolean;
 }>;
 
-export function Tile({ title, subtitle, children, onViewAll, footer, align = 'start' }: TileProps) {
+export function Tile({ title, subtitle, children, onViewAll, footer, align = 'start', withFooter = false }: TileProps) {
   const [isHovered, setIsHovered] = React.useState(false);
-  const hasFooter = !!(footer || onViewAll);
+  const hasFooter = withFooter || !!(footer || onViewAll);
 
   return (
     <section

@@ -32,6 +32,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
     <Tile 
       title="Nearby Golfers"
       align="center"
+      withFooter
     >
       <style>{`
         .nearby-golfers-scroll::-webkit-scrollbar { 

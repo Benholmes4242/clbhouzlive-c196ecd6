@@ -33,6 +33,7 @@ export function EchoQuickTile() {
           <EchoAvatar state="idle" size={20} />
         </div>
       }
+      withFooter
     >
       <div className="flex flex-col">
         {/* Input form */}
