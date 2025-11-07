@@ -339,36 +339,21 @@ html.hub-open {
   color: var(--hub-text-body);
 }
 
-/* === Two-dot truncation (single line) === */
-.hub-two-dot-ellipsis {
-  position: relative;
+/* === Fade truncation (no dots) === */
+.hub-ellipsis-fade {
   display: block;
   overflow: hidden;
   white-space: nowrap;
-  /* leave a little room for the dots */
-  padding-right: 0.9em;
-  /* softly fade the last ~1ch so the dots read cleanly */
+  text-overflow: clip;
   -webkit-mask-image: linear-gradient(to right, #000 0%, #000 86%, transparent 100%);
           mask-image: linear-gradient(to right, #000 0%, #000 86%, transparent 100%);
 }
 
-.hub-two-dot-ellipsis::after {
-  content: "‥"; /* U+2025 TWO-DOT LEADER */
-  position: absolute;
-  right: 0.15em;   /* tucks dots in a touch */
-  top: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  opacity: 0.9;
-  pointer-events: none;
-}
-
 /* === Inline scroll: show 2 rows max inside the tile === */
 .hub-golfers-list-scroll {
-  /* row height ~64px; adjust if your row differs */
-  --row-h: 64px;
-  --row-gap: 8px;
+  /* row height ~60px; adjust if your row differs */
+  --row-h: 60px;
+  --row-gap: 6px;
   max-height: calc((var(--row-h) * 2) + var(--row-gap));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
