@@ -309,10 +309,10 @@ html.hub-open {
 }
 
 .ng-avatar {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  flex: 0 0 44px;
+  flex: 0 0 40px;
   object-fit: cover;
   border: 1px solid var(--hub-stroke-avatar);
   margin-left: calc(-1 * (var(--hub-tile-pad-x) - var(--hub-pill-pad-x)));
