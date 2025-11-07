@@ -139,7 +139,7 @@ export const HeaderPhotoSection: React.FC<HeaderPhotoSectionProps> = ({
                     className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white/80 via-white/40 to-transparent pointer-events-none"
                     style={{ height: `${(PROFILE_PANEL_OVERLAP_PX / 128) * 100}%` }}
                   />
-                  <div className="absolute bottom-2 left-2 text-xs bg-black/60 text-white px-2 py-1 rounded">
+                  <div className="absolute bottom-2 left-2 text-xs bg-[#0a0a0a]/60 text-white px-2 py-1 rounded">
                     Panel covers this area
                   </div>
                 </div>
@@ -181,7 +181,7 @@ export const HeaderPhotoSection: React.FC<HeaderPhotoSectionProps> = ({
                     className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white/80 via-white/40 to-transparent pointer-events-none"
                     style={{ height: `${(PROFILE_PANEL_OVERLAP_PX / 128) * 100}%` }}
                   />
-                  <div className="absolute bottom-2 left-2 text-xs bg-black/60 text-white px-2 py-1 rounded">
+                  <div className="absolute bottom-2 left-2 text-xs bg-[#0a0a0a]/60 text-white px-2 py-1 rounded">
                     Panel covers this area
                   </div>
                 </div>

@@ -1319,7 +1319,7 @@ const HeroProfileHeader = ({
 
       {/* Compare Progress Modal - Placeholder for now */}
       {isCompareModalOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setIsCompareModalOpen(false)}>
+        <div className="fixed inset-0 bg-[#0a0a0a]/50 z-50 flex items-center justify-center" onClick={() => setIsCompareModalOpen(false)}>
           <div className="bg-white p-4 rounded-lg">
             <h3>Compare Progress Modal</h3>
             <button onClick={() => setIsCompareModalOpen(false)}>Close</button>

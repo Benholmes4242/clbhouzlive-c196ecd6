@@ -130,7 +130,7 @@ export const HeaderCropTool: React.FC<HeaderCropToolProps> = ({
             />
             
             {/* Safe zone indicator */}
-            <div className="absolute bottom-4 left-4 bg-black/70 text-white text-xs px-2 py-1 rounded">
+            <div className="absolute bottom-4 left-4 bg-[#0a0a0a]/70 text-white text-xs px-2 py-1 rounded">
               Panel overlap area
             </div>
             

@@ -105,7 +105,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
           "relative z-header", // Remove transition, handled by chrome-autohide.css
           "h-16 md:h-18", // 64px mobile, 72px desktop
           // Keep original variant-specific backgrounds for clubhouse
-          isGlassDark && "backdrop-blur-md bg-black/60",
+          isGlassDark && "backdrop-blur-md bg-[#0a0a0a]/60",
           isSolidLight && "bg-white/95 backdrop-blur-sm border-b border-gray-200/50 shadow-sm",
           className
         )}
@@ -147,7 +147,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
               className={cn(
                 "md:hidden p-2 md:p-3 flex-shrink-0 mt-3 transition-colors",
                 isGlassDark && "hover:bg-white/10 text-white/80 hover:text-white",
-                isSolidLight && "hover:bg-black/10 text-black/70 hover:text-black"
+                isSolidLight && "hover:bg-[#0a0a0a]/10 text-black/70 hover:text-black"
               )}
               onClick={() => setSearchOpen(true)}
             >
@@ -165,7 +165,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
         <>
           {/* Background overlay */}
           <div 
-            className="fixed inset-0 z-[70] bg-black/20 backdrop-blur-sm"
+            className="fixed inset-0 z-[70] bg-[#0a0a0a]/20 backdrop-blur-sm"
             onClick={() => setSearchOpen(false)}
           />
           

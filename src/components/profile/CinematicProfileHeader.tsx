@@ -454,7 +454,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       
       {/* Loading Overlay */}
       {uploading && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-20">
+        <div className="absolute inset-0 bg-[#0a0a0a]/50 flex items-center justify-center z-20">
           <div className="flex flex-col items-center gap-3">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
             <span className="text-white font-medium">Uploading...</span>
