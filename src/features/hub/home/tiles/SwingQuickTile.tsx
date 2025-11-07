@@ -48,47 +48,44 @@ export function SwingQuickTile() {
       title="Swing Coach" 
       subtitle="Upload your swing"
       align="center"
-      footer={
-        <div className="mt-auto pt-4">
-          <button
-            onClick={openSwingHistory}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            style={{ 
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-          >
-            View Swings →
-          </button>
-        </div>
-      }
     >
       <div className="flex flex-col h-full justify-between">
-        <div>
-          {/* Upload pill with inline icon */}
-          <button
-            onClick={openSwingPage}
-            className="mt-3 h-11 w-full rounded-2xl px-4 flex items-center justify-between text-[15px] leading-[15px] transition focus:outline-none focus-visible:ring-2 whitespace-nowrap"
-            style={{
-              background: 'rgba(255,255,255,0.12)',
-              border: '1px solid rgba(255,255,255,0.22)',
-              color: 'rgba(255,255,255,0.85)',
-              backdropFilter: 'blur(28px)',
-              WebkitBackdropFilter: 'blur(28px)',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
-            onMouseDown={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.20)'}
-            onMouseUp={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}
-          >
-            <span className="truncate">Upload swing</span>
-            <ArrowUpTrayIcon className="w-[18px] h-[18px] opacity-80 mr-[-2px] shrink-0" />
-          </button>
-        </div>
+        {/* Upload pill with inline icon */}
+        <button
+          onClick={openSwingPage}
+          className="mt-3 h-11 w-full rounded-2xl px-4 flex items-center justify-between text-[15px] leading-[15px] transition focus:outline-none focus-visible:ring-2 whitespace-nowrap"
+          style={{
+            background: 'rgba(255,255,255,0.12)',
+            border: '1px solid rgba(255,255,255,0.22)',
+            color: 'rgba(255,255,255,0.85)',
+            backdropFilter: 'blur(28px)',
+            WebkitBackdropFilter: 'blur(28px)',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}
+          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
+          onMouseDown={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.20)'}
+          onMouseUp={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}
+        >
+          <span className="truncate">Upload swing</span>
+          <ArrowUpTrayIcon className="w-[18px] h-[18px] opacity-80 mr-[-2px] shrink-0" />
+        </button>
+
+        {/* View swings CTA */}
+        <button
+          onClick={openSwingHistory}
+          className="mt-3 h-10 w-full rounded-2xl px-4 flex items-center justify-center text-[15px] transition focus:outline-none focus-visible:ring-2"
+          style={{
+            background: 'rgba(255,255,255,0.12)',
+            border: '1px solid rgba(255,255,255,0.22)',
+            color: 'rgba(255,255,255,0.85)',
+            backdropFilter: 'blur(28px)',
+            WebkitBackdropFilter: 'blur(28px)',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}
+          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
+        >
+          View swings
+        </button>
       </div>
     </Tile>
   );

@@ -31,25 +31,6 @@ export function GamesNearYouTile({
   return (
     <Tile 
       title="Games Near You"
-      footer={
-        <div className="mt-auto pt-4">
-          <button
-            onClick={comingSoon}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            aria-label="View all"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-          >
-            View all →
-          </button>
-        </div>
-      }
     >
       <div className="flex flex-col h-full" style={{ ['--tile-x' as any]: '16px' }}>
         {/* Game list or empty state */}
@@ -90,6 +71,40 @@ export function GamesNearYouTile({
               No active games nearby
             </div>
           )}
+        </div>
+
+        {/* CTAs */}
+        <div className="flex gap-2 mt-4">
+          <button
+            onClick={comingSoon}
+            className="flex-1 h-10 rounded-2xl px-4 flex items-center justify-center text-[15px] transition focus:outline-none focus-visible:ring-2"
+            style={{
+              background: 'rgba(255,255,255,0.12)',
+              border: '1px solid rgba(255,255,255,0.22)',
+              color: 'rgba(255,255,255,0.85)',
+              backdropFilter: 'blur(28px)',
+              WebkitBackdropFilter: 'blur(28px)',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
+          >
+            Search games
+          </button>
+          <button
+            onClick={() => nav('/hub/your-games')}
+            className="flex-1 h-10 rounded-2xl px-4 flex items-center justify-center text-[15px] transition focus:outline-none focus-visible:ring-2"
+            style={{
+              background: 'rgba(255,255,255,0.12)',
+              border: '1px solid rgba(255,255,255,0.22)',
+              color: 'rgba(255,255,255,0.85)',
+              backdropFilter: 'blur(28px)',
+              WebkitBackdropFilter: 'blur(28px)',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
+          >
+            Your games
+          </button>
         </div>
       </div>
     </Tile>
