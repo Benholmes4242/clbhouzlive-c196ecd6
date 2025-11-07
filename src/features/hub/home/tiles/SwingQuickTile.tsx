@@ -73,18 +73,18 @@ export function SwingQuickTile() {
         {/* View swings CTA */}
         <button
           onClick={openSwingHistory}
-          className="mt-3 h-10 w-full rounded-2xl px-4 flex items-center justify-center text-[15px] transition focus:outline-none focus-visible:ring-2"
+          className="ml-auto mt-3 block text-[15px] font-medium transition"
           style={{
-            background: 'rgba(255,255,255,0.12)',
-            border: '1px solid rgba(255,255,255,0.22)',
-            color: 'rgba(255,255,255,0.85)',
-            backdropFilter: 'blur(28px)',
-            WebkitBackdropFilter: 'blur(28px)',
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--hub-text-body)',
+            padding: 0,
           }}
-          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+          aria-label="View swing history"
         >
-          View swings
+          View swings →
         </button>
       </div>
     </Tile>
