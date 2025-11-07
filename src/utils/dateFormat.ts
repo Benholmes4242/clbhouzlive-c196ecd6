@@ -41,6 +41,19 @@ export const formatRelativeTime = (date: Date | string): string => {
   return `${diffInYears} ${diffInYears === 1 ? 'year' : 'years'} ago`;
 };
 
+export const formatDateTime = (date: Date | string): string => {
+  const d = new Date(date);
+  const options: Intl.DateTimeFormatOptions = {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  };
+  return d.toLocaleString('en-US', options);
+};
+
 export const formatLikes = (n: number): string => {
   if (!n) return '0';
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;

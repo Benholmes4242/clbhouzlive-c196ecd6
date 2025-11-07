@@ -451,3 +451,32 @@ html.hub-open {
 
 .shimmer.thumb { border-radius: 12px; }
 .shimmer.video { border-radius: 18px; max-height: 40vh; }
+
+/* ========================================
+   ECHO CHAT BUBBLES
+   ======================================== */
+.echo-thread { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 10px; 
+}
+
+.bubble { 
+  padding: 12px 14px; 
+  border-radius: 14px; 
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.9);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.bubble.me { 
+  align-self: flex-end; 
+  background: rgba(255,255,255,.10);
+  max-width: 80%;
+}
+
+.bubble.bot { 
+  align-self: flex-start;
+  max-width: 90%;
+}

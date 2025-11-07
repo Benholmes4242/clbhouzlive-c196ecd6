@@ -31,6 +31,13 @@ export function HubEchoHistoryPage() {
     }
   };
 
+  const openThread = (id: string) => {
+    const state = loc.state as any;
+    nav(`/hub/echo/history/chat/${id}`, {
+      state: { backgroundLocation: state?.backgroundLocation, fromHub: true },
+    });
+  };
+
   // Data (chat-only)
   const { data: chats = [], isLoading, error } = useEchoChatHistory({ limit: 50 });
 
@@ -144,7 +151,7 @@ export function HubEchoHistoryPage() {
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = 'var(--hub-glass-bg)';
                   }}
-                  onClick={() => {}}
+                  onClick={() => openThread(item.id)}
                   aria-label="Chat thread"
                 >
                   <div className="text-2xl">🗨️</div>
