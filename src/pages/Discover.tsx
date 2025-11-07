@@ -14,6 +14,7 @@ import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 // import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned'; // Stored for future use
 import DiscoverContent from '@/components/discover/DiscoverContent';
 import { ChannelsFeed } from '@/components/channels/ChannelsFeed';
+import VideosPageContent from '@/features/videos2/components/VideosPageContent';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem } from '@/types/media';
@@ -175,8 +176,8 @@ const Discover = () => {
               onTabChange={() => {}} // No-op: tabs control via URL now
             />
             
-            {/* Videos Header - only show for videos tab */}
-            {main === 'videos' && (
+            {/* Videos Header - only show for shorts, not videos (videos2 has its own header) */}
+            {main === 'shorts' && (
               <DiscoverVideosHeader
                 activeDuration={durationFilter}
                 onChangeDuration={setDurationFilter}
@@ -223,7 +224,11 @@ const Discover = () => {
                   </div>
                 );
               }
-              // Both 'shorts' and 'videos' use DiscoverContent
+              // Shorts use DiscoverContent, Videos use new VideosPageContent
+              if (key === 'videos') {
+                return <VideosPageContent />;
+              }
+              // Shorts uses DiscoverContent
               return (
                 <div className="md:container md:mx-auto md:px-0">
                   <DiscoverContent
