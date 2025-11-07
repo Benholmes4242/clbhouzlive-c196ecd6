@@ -21,11 +21,8 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
   // Design tokens for 2.1 row peek
   const ROW = 56;   // row height in px
   const GAP = 8;    // vertical gap between rows in px
-  const VISIBLE_ROWS = 2.1;
-  
-  // Height calculation: 2.1*ROW + 1*GAP (2 full gaps for 2.1 rows)
-  const twoPointOneHeight = VISIBLE_ROWS * ROW + (Math.floor(VISIBLE_ROWS) - 1) * GAP;
-  const showPeeker = golfers.length > 2;
+  const peekHeightPx = 126; // 2.1*56 + 8 = 126
+  const hasMoreThanTwo = golfers.length > 2;
   
   const sortedGolfers = [...golfers].sort((a, b) => {
     const da = a.distance_km ?? Number.POSITIVE_INFINITY;
@@ -38,13 +35,11 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       title="Nearby Golfers"
       align="center"
       footer={
-        <div className="mt-auto pt-4">
+        <>
           <div 
-            className="h-px"
+            className="NearbyDivider mt-2 h-px w-full"
             style={{
               background: 'rgba(255,255,255,0.18)',
-              borderRadius: '1px',
-              width: '100%',
             }}
           />
           <button
@@ -52,7 +47,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
               e.stopPropagation(); 
               navigateFromHub('/hub/golfers'); 
             }}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+            className="NearbyFooter ml-auto mt-2 block text-[15px] font-medium transition"
             style={{
               background: 'transparent',
               border: 'none',
@@ -65,71 +60,76 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
           >
             View all →
           </button>
-        </div>
+        </>
       }
     >
       <style>{`
         .nearby-golfers-scroll::-webkit-scrollbar { 
           display: none; 
         }
+        .nearby-golfers-scroll {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .nearby-golfers-scroll > *:last-child {
+          margin-bottom: 0 !important;
+        }
+        .nearby-golfers-scroll img {
+          display: block;
+        }
       `}</style>
       
-      <div className="flex flex-col h-full">
-        <div 
-          className="nearby-golfers-scroll relative overflow-y-auto pr-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none]"
-          style={{
-            height: showPeeker ? `${twoPointOneHeight}px` : 'auto',
-            maskImage: showPeeker ? 'linear-gradient(to bottom, transparent 0, black 16px, black calc(100% - 16px), transparent 100%)' : 'none',
-          }}
-        >
-          {isLoading && (
-            <div className="flex flex-col" style={{ gap: `${GAP}px` }}>
-              {Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
-                <div 
-                  key={i} 
-                  className="rounded-2xl animate-pulse" 
-                  style={{ 
-                    background: 'var(--hub-glass-bg-subtle)',
-                    height: `${ROW}px`
-                  }} 
+      <div 
+        className="nearby-golfers-scroll overflow-y-auto pb-0 mb-0"
+        style={{
+          height: hasMoreThanTwo ? `${peekHeightPx}px` : 'auto',
+          maskImage: hasMoreThanTwo ? 'linear-gradient(to bottom, transparent 0, black 16px, black calc(100% - 16px), transparent 100%)' : 'none',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {isLoading && (
+          <div className="flex flex-col space-y-2 pb-0 mb-0">
+            {Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
+              <div 
+                key={i} 
+                className="h-14 rounded-2xl animate-pulse" 
+                style={{ background: 'var(--hub-glass-bg-subtle)' }} 
+              />
+            ))}
+          </div>
+        )}
+        
+        {!isLoading && sortedGolfers.length > 0 && (
+          <div className="flex flex-col space-y-2 pb-0 mb-0">
+            {sortedGolfers.map(g => (
+              <button 
+                key={g.id} 
+                className="h-14 flex items-center w-full text-left"
+                onClick={() => nav(`/profile/${g.username}`)}
+              >
+                <img 
+                  src={g.avatar_url || '/placeholder.svg'} 
+                  alt="" 
+                  className="h-10 w-10 block rounded-full object-cover flex-shrink-0"
                 />
-              ))}
-            </div>
-          )}
-          
-          {!isLoading && sortedGolfers.length > 0 && (
-            <div className="flex flex-col" style={{ gap: `${GAP}px` }}>
-              {sortedGolfers.map(g => (
-                <button 
-                  key={g.id} 
-                  className="flex items-center w-full text-left"
-                  style={{ height: `${ROW}px` }}
-                  onClick={() => nav(`/profile/${g.username}`)}
-                >
-                  <img 
-                    src={g.avatar_url || '/placeholder.svg'} 
-                    alt="" 
-                    className="h-10 w-10 rounded-full object-cover flex-shrink-0"
-                  />
-                  <div className="ml-3 min-w-0 flex-1">
-                    <p className="truncate text-[13px] font-medium" style={{ color: 'var(--hub-text)' }}>
-                      {g.display_name || g.username}
-                    </p>
-                    <p className="truncate text-[12px]" style={{ color: 'var(--hub-text-dim)' }}>
-                      {g.distanceText}
-                    </p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-          
-          {!isLoading && golfers.length === 0 && (
-            <div className="text-[13px] py-2" style={{ color: 'var(--hub-text-mute)' }}>
-              No active golfers nearby
-            </div>
-          )}
-        </div>
+                <div className="ml-3 min-w-0 flex-1">
+                  <p className="truncate text-[13px] font-medium" style={{ color: 'var(--hub-text)' }}>
+                    {g.display_name || g.username}
+                  </p>
+                  <p className="truncate text-[12px]" style={{ color: 'var(--hub-text-dim)' }}>
+                    {g.distanceText}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+        
+        {!isLoading && golfers.length === 0 && (
+          <div className="text-[13px] py-2" style={{ color: 'var(--hub-text-mute)' }}>
+            No active golfers nearby
+          </div>
+        )}
       </div>
     </Tile>
   );
