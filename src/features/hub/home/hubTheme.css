@@ -295,11 +295,10 @@ html.hub-open {
   align-items: center;
   width: 100%;
   padding: 10px 6px 10px 6px;
-  margin-right: -20px;
   background: transparent;
   border: none;
   border-radius: 16px;
-  gap: 6px;
+  gap: 8px;
   cursor: pointer;
   transition: background 0.2s ease;
   text-align: left;
@@ -327,13 +326,12 @@ html.hub-open {
 }
 
 .ng-name {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--hub-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 100%;
 }
 
 .ng-distance {
