@@ -64,26 +64,24 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
               background: 'rgba(255,255,255,0.18)',
             }}
           />
-          <div className="flex items-center justify-end py-4">
-            <button
-              onClick={(e) => { 
-                e.stopPropagation(); 
-                navigateFromHub('/hub/golfers'); 
-              }}
-              className="text-[15px] font-medium transition"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--hub-text-body)',
-                padding: 0,
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-              aria-label="View all golfers"
-            >
-              View all →
-            </button>
-          </div>
+          <button
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              navigateFromHub('/hub/golfers'); 
+            }}
+            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            aria-label="View all golfers"
+          >
+            View all →
+          </button>
         </div>
       }
     >
