@@ -25,7 +25,7 @@ interface NearbyOverlayProps {
 
 export function NearbyOverlay({ isOpen, onClose }: NearbyOverlayProps) {
   const overlayRef = React.useRef<HTMLDivElement>(null);
-  const { golfers, isLoading } = useActiveGolfers({ limit: 20, mockCount: 0 });
+  const { golfers, isLoading } = useActiveGolfers({ limit: 20 });
   
   const { 
     myBeacon, 
