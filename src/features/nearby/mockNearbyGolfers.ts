@@ -4,7 +4,7 @@ export function getMockNearby(count = 5): NearbyGolfer[] {
   const base: NearbyGolfer[] = [
     { 
       id: 'm1', 
-      display_name: 'Anna Shaw', 
+      display_name: 'Anna "The Eagle" Shaw-Winchester III', 
       home_club: 'Royal Birkdale', 
       avatar_url: '/images/mocks/avatars/anna_shaw.jpg', 
       is_online: true, 
