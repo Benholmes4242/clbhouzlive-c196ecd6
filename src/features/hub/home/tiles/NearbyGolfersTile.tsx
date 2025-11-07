@@ -22,28 +22,6 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
     <Tile 
       title="Nearby Golfers"
       align="center"
-      footer={
-        <div className="mt-auto pt-0.5">
-          <button
-            onClick={(e) => { 
-              e.stopPropagation(); 
-              navigateFromHub('/hub/golfers'); 
-            }}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-            aria-label="View all golfers"
-          >
-            View all →
-          </button>
-        </div>
-      }
     >
       <div className="flex flex-col h-full">
         <div className="space-y-0.5 hub-golfers-list-scroll">
@@ -79,6 +57,24 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
             </div>
           )}
         </div>
+        <button
+          onClick={(e) => { 
+            e.stopPropagation(); 
+            navigateFromHub('/hub/golfers'); 
+          }}
+          className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--hub-text-body)',
+            padding: 0,
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+          aria-label="View all golfers"
+        >
+          View all →
+        </button>
       </div>
     </Tile>
   );
