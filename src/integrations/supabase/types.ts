@@ -1585,6 +1585,7 @@ export type Database = {
           id: string
           session_id: string | null
           swing_context: string | null
+          thread_id: string | null
           updated_at: string
           user_id: string
           video_url: string | null
@@ -1595,6 +1596,7 @@ export type Database = {
           id?: string
           session_id?: string | null
           swing_context?: string | null
+          thread_id?: string | null
           updated_at?: string
           user_id: string
           video_url?: string | null
@@ -1605,11 +1607,20 @@ export type Database = {
           id?: string
           session_id?: string | null
           swing_context?: string | null
+          thread_id?: string | null
           updated_at?: string
           user_id?: string
           video_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "pro_ai_analyses_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "echo_threads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profile_immersive_telemetry: {
         Row: {

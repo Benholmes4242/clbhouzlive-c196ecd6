@@ -15,7 +15,7 @@ export function HubSwingDetailPage() {
   const { id: swingId } = useParams();
   
   const { data: swing, isLoading, error } = useSwingDetail(swingId);
-  const { data: threadId } = useSwingThreadId(swingId);
+  const { data: threadId } = useSwingThreadId(swingId, swing?.thread_id);
   const { data: messages = [], isLoading: msgsLoading } = useSwingMessages(threadId);
 
   useEffect(() => {
