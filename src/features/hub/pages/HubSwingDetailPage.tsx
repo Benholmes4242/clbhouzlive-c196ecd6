@@ -98,21 +98,23 @@ export function HubSwingDetailPage() {
 
               <div className="space-y-2">
                 {msgsLoading && <div className="hub-msg">Loading conversation…</div>}
-                {!msgsLoading && messages.length === 0 && (
+                {!msgsLoading && messages.length > 0 && (
+                  messages.map((m) => (
+                    <div
+                      key={m.id}
+                      className={`rounded-2xl px-3 py-2 border ${
+                        m.role === 'user'
+                          ? 'bg-white/8 border-white/10'
+                          : 'bg-black/20 border-white/10'
+                      }`}
+                    >
+                      {m.content}
+                    </div>
+                  ))
+                )}
+                {!msgsLoading && messages.length === 0 && coachFeedback.length === 0 && (
                   <div className="hub-muted">No messages yet for this swing.</div>
                 )}
-                {!msgsLoading && messages.map((m) => (
-                  <div
-                    key={m.id}
-                    className={`rounded-2xl px-3 py-2 border ${
-                      m.role === 'user'
-                        ? 'bg-white/8 border-white/10'
-                        : 'bg-black/20 border-white/10'
-                    }`}
-                  >
-                    {m.content}
-                  </div>
-                ))}
               </div>
 
               {/* Coach Feedback (via swing_shares) */}

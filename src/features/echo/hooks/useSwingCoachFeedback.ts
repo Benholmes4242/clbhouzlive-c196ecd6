@@ -16,21 +16,11 @@ export function useSwingCoachFeedback(analysisId?: string) {
     queryFn: async (): Promise<CoachFeedbackItem[]> => {
       if (!analysisId) return [];
 
-      // Find shares for this analysis
-      const { data: shares, error: sharesErr } = await supabase
-        .from('swing_shares')
-        .select('id')
-        .eq('analysis_id', analysisId);
-
-      if (sharesErr) throw sharesErr;
-      const shareIds = (shares ?? []).map((s: any) => s.id);
-      if (shareIds.length === 0) return [];
-
-      // Fetch feedback tied to those shares
+      // Query coach_feedback directly, filtering via inner join on swing_shares
       const { data, error } = await supabase
         .from('coach_feedback')
-        .select('id, author, message, attachments, created_at, share_id')
-        .in('share_id', shareIds)
+        .select('id, author, message, attachments, created_at, share_id, swing_shares!inner(analysis_id)')
+        .eq('swing_shares.analysis_id', analysisId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
