@@ -99,12 +99,6 @@ export function VideoCardPair({ video, autoRegister, onVideoClick, onEchoToggle 
 
         {/* Meta */}
         <div className="flex items-center gap-1.5 text-xs text-gray-400">
-          <img
-            src={video.user.avatar}
-            alt={video.user.name}
-            className="w-4 h-4 rounded-full object-cover"
-            onError={(e) => (e.currentTarget.src = "https://i.pravatar.cc/100?img=5")}
-          />
           <span className="flex items-center gap-1">
             {video.user.name}
             {video.user.verified && <Check size={12} className="text-[#6e9277]" />}

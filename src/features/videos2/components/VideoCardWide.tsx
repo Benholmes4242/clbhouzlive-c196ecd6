@@ -97,7 +97,6 @@ export function VideoCardWide({ video, autoRegister, onVideoClick, onEchoToggle 
           src={video.user.avatar}
           alt={video.user.name}
           className="w-10 h-10 rounded-full flex-shrink-0 bg-gray-800"
-          onError={(e) => (e.currentTarget.src = "https://i.pravatar.cc/100?img=5")}
         />
 
         {/* Info */}

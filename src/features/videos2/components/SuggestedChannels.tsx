@@ -1,8 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { ChannelLite } from '../types';
-import { isGolfChannel, GOLF_FACE } from '../data/getVideos2Data';
 
 type SuggestedChannelsProps = {
   channels: ChannelLite[];
@@ -10,18 +9,8 @@ type SuggestedChannelsProps = {
 };
 
 export function SuggestedChannels({ channels, onSubscribe }: SuggestedChannelsProps) {
-  const cleaned = useMemo(() => 
-    channels
-      .filter(isGolfChannel)
-      .map(c => ({
-        ...c,
-        avatar: c.avatar?.startsWith("http") ? c.avatar : GOLF_FACE,
-      })),
-    [channels]
-  );
-
   const [subscribed, setSubscribed] = useState<Set<string>>(
-    new Set(cleaned.filter(c => c.subscribed).map(c => c.id))
+    new Set(channels.filter(c => c.subscribed).map(c => c.id))
   );
 
   const handleSubscribe = (channelId: string) => {
@@ -40,7 +29,7 @@ export function SuggestedChannels({ channels, onSubscribe }: SuggestedChannelsPr
       <h3 className="text-white font-semibold text-lg mb-4">Suggested Channels</h3>
       
       <div className="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
-        {cleaned.map((channel) => (
+        {channels.map((channel) => (
           <motion.div
             key={channel.id}
             className="flex-shrink-0 flex flex-col items-center gap-2 w-32"
@@ -52,7 +41,6 @@ export function SuggestedChannels({ channels, onSubscribe }: SuggestedChannelsPr
                 src={channel.avatar}
                 alt={channel.name}
                 className="w-20 h-20 rounded-full bg-gray-800 object-cover"
-                onError={(e) => (e.currentTarget.src = GOLF_FACE)}
               />
               {channel.verified && (
                 <div className="absolute bottom-0 right-0 bg-[#6e9277] rounded-full p-1">

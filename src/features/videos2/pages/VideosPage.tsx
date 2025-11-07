@@ -1,45 +1,19 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useAutoplay } from '../hooks/useAutoplay';
-import { VideoFilter, VideoItem } from '../types';
+import { VideoFilter, FeedItemType } from '../types';
 import { FilterBar } from '../components/FilterBar';
 import { VideoCardWide } from '../components/VideoCardWide';
 import { VideoCardPair } from '../components/VideoCardPair';
 import { SuggestedChannels } from '../components/SuggestedChannels';
 import { ShortsCarousel } from '../components/ShortsCarousel';
-import { useVideos2Data, getMockShorts, getMockChannels } from '../data/getVideos2Data';
+import { generateMockFeed } from '../data/mockData';
 
 export default function VideosPage() {
   const [filter, setFilter] = useState<VideoFilter>('All');
   const { register } = useAutoplay();
   
-  // Get blended real + mock data (golf-only, no kids)
-  const { videos, realCount, isLoading } = useVideos2Data(20);
-  const shorts = useMemo(() => getMockShorts(6), []);
-  const channels = useMemo(() => getMockChannels(6), []);
-
-  // Build feed rows: wide → pair → wide → pair, with rails interspersed
-  type Row = 
-    | { type: 'wide'; video: VideoItem }
-    | { type: 'pair'; videos: [VideoItem, VideoItem?] }
-    | { type: 'channels' }
-    | { type: 'shorts' };
-
-  const rows: Row[] = useMemo(() => {
-    const result: Row[] = [];
-    for (let i = 0; i < videos.length; i += 3) {
-      if (videos[i]) result.push({ type: 'wide', video: videos[i] });
-      if (videos[i + 1]) {
-        result.push({ 
-          type: 'pair', 
-          videos: [videos[i + 1], videos[i + 2]] as [VideoItem, VideoItem?]
-        });
-      }
-      // Insert rails periodically
-      if (i > 0 && i % 9 === 0) result.push({ type: 'channels' });
-      if (i > 0 && i % 12 === 0) result.push({ type: 'shorts' });
-    }
-    return result;
-  }, [videos]);
+  // Mock feed data - replace with real API call
+  const feedItems = generateMockFeed(20);
 
   const handleVideoClick = (id: string) => {
     console.log('Open video player for:', id);
@@ -68,68 +42,62 @@ export default function VideosPage() {
 
       {/* Feed */}
       <div className="max-w-7xl mx-auto px-4 py-6">
-        {isLoading && realCount === 0 ? (
-          <div className="text-center text-gray-400 py-12">Loading golf videos...</div>
-        ) : (
-          <div className="space-y-8">
-            {rows.map((item, index) => {
-              if (item.type === 'wide') {
-                return (
-                  <VideoCardWide
-                    key={`wide-${item.video.id}-${index}`}
-                    video={item.video}
+        <div className="space-y-8">
+          {feedItems.map((item: FeedItemType, index) => {
+            if (item.type === 'wide') {
+              return (
+                <VideoCardWide
+                  key={`wide-${index}`}
+                  video={item.video}
+                  autoRegister={register}
+                  onVideoClick={handleVideoClick}
+                  onEchoToggle={handleEchoToggle}
+                />
+              );
+            }
+
+            if (item.type === 'pair') {
+              return (
+                <div key={`pair-${index}`} className="grid grid-cols-2 gap-4">
+                  <VideoCardPair
+                    video={item.videos[0]}
                     autoRegister={register}
                     onVideoClick={handleVideoClick}
                     onEchoToggle={handleEchoToggle}
                   />
-                );
-              }
-
-              if (item.type === 'pair') {
-                return (
-                  <div key={`pair-${index}`} className="grid grid-cols-2 gap-4">
-                    <VideoCardPair
-                      video={item.videos[0]}
-                      autoRegister={register}
-                      onVideoClick={handleVideoClick}
-                      onEchoToggle={handleEchoToggle}
-                    />
-                    {item.videos[1] && (
-                      <VideoCardPair
-                        video={item.videos[1]}
-                        autoRegister={register}
-                        onVideoClick={handleVideoClick}
-                        onEchoToggle={handleEchoToggle}
-                      />
-                    )}
-                  </div>
-                );
-              }
-
-              if (item.type === 'channels') {
-                return (
-                  <SuggestedChannels
-                    key={`channels-${index}`}
-                    channels={channels}
-                    onSubscribe={handleSubscribe}
-                  />
-                );
-              }
-
-              if (item.type === 'shorts') {
-                return (
-                  <ShortsCarousel
-                    key={`shorts-${index}`}
-                    videos={shorts}
+                  <VideoCardPair
+                    video={item.videos[1]}
+                    autoRegister={register}
                     onVideoClick={handleVideoClick}
+                    onEchoToggle={handleEchoToggle}
                   />
-                );
-              }
+                </div>
+              );
+            }
 
-              return null;
-            })}
-          </div>
-        )}
+            if (item.type === 'channels') {
+              return (
+                <SuggestedChannels
+                  key={`channels-${index}`}
+                  channels={item.channels}
+                  onSubscribe={handleSubscribe}
+                />
+              );
+            }
+
+            if (item.type === 'shorts') {
+              return (
+                <ShortsCarousel
+                  key={`shorts-${index}`}
+                  videos={item.videos}
+                  onVideoClick={handleVideoClick}
+                />
+              );
+            }
+
+            return null;
+          })}
+        </div>
 
         {/* Load more trigger - TODO: Implement infinite scroll */}
         <div className="mt-12 text-center">
