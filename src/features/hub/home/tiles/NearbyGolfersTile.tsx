@@ -23,7 +23,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       title="Nearby Golfers"
       align="center"
       footer={
-        <div className="mt-auto pt-0.5 -mb-1">
+        <div className="mt-auto pt-0.5">
           <button
             onClick={(e) => { 
               e.stopPropagation(); 
