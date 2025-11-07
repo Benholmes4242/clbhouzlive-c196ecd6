@@ -3,7 +3,7 @@
  * Compact tile showing golfers open to play
  */
 
-import React, { useRef } from 'react';
+import React, { useRef, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
@@ -19,6 +19,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
   const { golfers, isLoading } = useActiveGolfers({ limit });
 
   const vpRef = useRef<HTMLDivElement>(null);
+  const firstRowRef = useRef<HTMLButtonElement>(null);
   const hasMoreThanTwo = golfers.length > 2;
   
   const sortedGolfers = [...golfers].sort((a, b) => {
@@ -26,6 +27,30 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
     const db = b.distance_km ?? Number.POSITIVE_INFINITY;
     return da - db;
   });
+
+  // Dynamically measure and set 2.3-row height (clamped to prevent wrap inflation)
+  useLayoutEffect(() => {
+    if (!vpRef.current || !firstRowRef.current || !hasMoreThanTwo) return;
+
+    const calc = () => {
+      if (!vpRef.current || !firstRowRef.current) return;
+      const ROW = 48;
+      const GAP = 4;
+      const measured = firstRowRef.current.getBoundingClientRect().height || ROW;
+      const rowH = Math.min(ROW, Math.round(measured)); // clamp to 48px
+      const target = (rowH * 2.3) + GAP; // ≈112px
+      vpRef.current.style.height = `${Math.round(target)}px`;
+    };
+
+    calc();
+    const ro = new ResizeObserver(calc);
+    ro.observe(firstRowRef.current);
+    window.addEventListener('resize', calc);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', calc);
+    };
+  }, [hasMoreThanTwo, golfers.length]);
 
   return (
     <Tile 
@@ -86,7 +111,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
         ref={vpRef}
         className="nearby-golfers-scroll overflow-y-auto pb-0 mb-0"
         style={{
-          height: '120px',
+          height: 'auto',
           maskImage: hasMoreThanTwo ? 'linear-gradient(to bottom, transparent 0, black 16px, black calc(100% - 16px), transparent 100%)' : 'none',
           WebkitOverflowScrolling: 'touch',
         }}
@@ -105,9 +130,10 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
         
         {!isLoading && sortedGolfers.length > 0 && (
           <div className="flex flex-col space-y-1 pb-0 mb-0">
-            {sortedGolfers.map((g) => (
+            {sortedGolfers.map((g, i) => (
               <button 
                 key={g.id} 
+                ref={i === 0 ? firstRowRef : undefined}
                 className="h-12 w-full flex items-center overflow-hidden text-left"
                 onClick={() => nav(`/profile/${g.username}`)}
               >
