@@ -25,6 +25,7 @@ import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 // Lazy load heavy/inactive components for better initial bundle size
 const FollowingFeed = lazy(() => import('@/components/discover/FollowingFeed'));
+const VideosPage = lazy(() => import('@/features/videos2/pages/VideosPage'));
 
 type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
 
@@ -175,8 +176,8 @@ const Discover = () => {
               onTabChange={() => {}} // No-op: tabs control via URL now
             />
             
-            {/* Videos Header - only show for videos tab */}
-            {main === 'videos' && (
+            {/* Videos Header - only show for shorts tab */}
+            {main === 'shorts' && (
               <DiscoverVideosHeader
                 activeDuration={durationFilter}
                 onChangeDuration={setDurationFilter}
@@ -223,7 +224,14 @@ const Discover = () => {
                   </div>
                 );
               }
-              // Both 'shorts' and 'videos' use DiscoverContent
+              if (key === 'videos') {
+                return (
+                  <Suspense fallback={null}>
+                    <VideosPage />
+                  </Suspense>
+                );
+              }
+              // 'shorts' uses DiscoverContent
               return (
                 <div className="md:container md:mx-auto md:px-0">
                   <DiscoverContent
