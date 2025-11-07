@@ -156,7 +156,7 @@ export function EchoTile() {
             cursor: 'pointer',
           }}
         >
-          <div className="echo-tip-line">{tips[tipIdx]}</div>
+          <div className="echo-tip-line">"{tips[tipIdx]}"</div>
         </div>
       </div>
     </Tile>
