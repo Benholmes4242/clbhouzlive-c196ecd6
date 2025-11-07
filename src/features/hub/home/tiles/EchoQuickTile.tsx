@@ -33,29 +33,30 @@ export function EchoQuickTile() {
         </div>
       }
       footer={
-        <div className="mt-auto pt-2">
-          <div
-            className="h-px"
+        <div className="mt-auto">
+          <div 
+            className="h-px w-full"
             style={{
               background: 'rgba(255,255,255,0.18)',
-              borderRadius: '1px',
-              width: '100%',
             }}
           />
-          <button
-            onClick={comingSoon}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-          >
-            View all →
-          </button>
+          <div className="flex items-center justify-end" style={{ height: '32px' }}>
+            <button
+              onClick={comingSoon}
+              className="text-[15px] font-medium transition"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--hub-text-body)',
+                padding: 0,
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+              aria-label="View all chats"
+            >
+              View chats →
+            </button>
+          </div>
         </div>
       }
     >
