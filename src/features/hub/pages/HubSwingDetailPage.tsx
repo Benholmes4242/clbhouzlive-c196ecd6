@@ -19,6 +19,7 @@ export function HubSwingDetailPage() {
   const { data: messages = [], isLoading: msgsLoading } = useSwingMessages(threadId);
 
   const [isPlaying, setPlaying] = useState(false);
+  const [vidReady, setVidReady] = useState(false);
   const vidRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -54,16 +55,19 @@ export function HubSwingDetailPage() {
 
     return (
       <div className="swing-video-wrap" onClick={togglePlay}>
+        {!vidReady && <div className="shimmer video" aria-hidden="true" />}
         <video
           ref={vidRef}
           src={videoSrc}
           playsInline
           controls={false}
           preload="metadata"
+          onLoadedData={() => setVidReady(true)}
           onPause={() => setPlaying(false)}
           onPlay={() => setPlaying(true)}
+          style={{ display: vidReady ? 'block' : 'none' }}
         />
-        {!isPlaying && (
+        {!isPlaying && vidReady && (
           <button 
             className="play-overlay" 
             aria-label="Play video"

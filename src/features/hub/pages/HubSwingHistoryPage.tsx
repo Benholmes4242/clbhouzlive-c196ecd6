@@ -8,6 +8,35 @@ import '../home/hubTheme.css';
 import { useSwingHistory } from '@/features/echo/hooks/useSwingHistory';
 import { formatRelativeTime } from '@/utils/dateFormat';
 
+function Thumb({ src }: { src?: string | null }) {
+  const [ready, setReady] = React.useState(false);
+
+  return (
+    <div className="thumb">
+      {!ready && <div className="shimmer thumb" aria-hidden="true" />}
+      {src ? (
+        <img
+          src={src}
+          alt=""
+          loading="lazy"
+          onLoad={() => setReady(true)}
+          style={{ display: ready ? 'block' : 'none' }}
+        />
+      ) : (
+        <div
+          className="thumb-fallback"
+          style={{ display: ready ? 'grid' : 'none' }}
+          aria-hidden="true"
+          onLoad={() => setReady(true)}
+        >
+          🏌️‍♂️
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 export function HubSwingHistoryPage() {
   const nav = useNavigate();
   const loc = useLocation();
@@ -82,13 +111,7 @@ export function HubSwingHistoryPage() {
                     onClick={() => nav(`/hub/swing/history/${item.id}`, { state: loc.state })}
                     aria-label="Open swing analysis"
                   >
-                    <div className="thumb">
-                      {item.thumbnail_url ? (
-                        <img src={item.thumbnail_url} alt="" loading="lazy" />
-                      ) : (
-                        <div className="thumb-fallback">🏌️</div>
-                      )}
-                    </div>
+                    <Thumb src={item.thumbnail_url} />
                     <div className="hub-row-main">
                       <div className="hub-row-title">{item.title || 'Swing analysis'}</div>
                       <div className="hub-row-sub">{formatRelativeTime(item.created_at)}</div>
