@@ -54,28 +54,6 @@ export function EchoTile() {
     <Tile 
       title="Echo" 
       align="center"
-      footer={
-        <div className="mt-auto pt-2">
-          <button
-            onClick={(e) => { 
-              e.stopPropagation(); 
-              navigateFromHub('/hub/echo/history'); 
-            }}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-            aria-label="View echo history"
-          >
-            View Chats →
-          </button>
-        </div>
-      }
     >
       <div 
         className="echo-body"
@@ -83,8 +61,32 @@ export function EchoTile() {
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
+          position: 'relative',
         }}
       >
+        {/* View Chats CTA - positioned on tile */}
+        <button
+          onClick={(e) => { 
+            e.stopPropagation(); 
+            navigateFromHub('/hub/echo/history'); 
+          }}
+          className="text-[15px] font-medium transition"
+          style={{
+            position: 'absolute',
+            bottom: '0',
+            right: '0',
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--hub-text-body)',
+            padding: 0,
+            zIndex: 1,
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+          aria-label="View echo history"
+        >
+          View Chats →
+        </button>
         {/* Ask input with send button */}
         <form 
           onSubmit={(e) => { e.preventDefault(); handleSend(); e.stopPropagation(); }}
