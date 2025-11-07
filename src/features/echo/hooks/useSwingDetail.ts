@@ -20,7 +20,7 @@ export function useSwingDetail(id?: string) {
 
       const { data, error } = await supabase
         .from('pro_ai_analyses')
-        .select('id, created_at, video_url, session_id, swing_context, analysis_results, thread_id')
+        .select('id, created_at, video_url, session_id, swing_context, analysis_results')
         .eq('id', id)
         .maybeSingle();
 
