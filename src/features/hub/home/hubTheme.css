@@ -359,6 +359,9 @@ html.hub-open {
   -webkit-overflow-scrolling: touch;
   /* avoid accidental horizontal scroll */
   overflow-x: hidden;
+  padding-bottom: 12px;
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
 }
 .hub-golfers-list-scroll::-webkit-scrollbar {
   width: 0;
