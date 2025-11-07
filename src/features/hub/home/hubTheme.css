@@ -327,7 +327,7 @@ html.hub-open {
 }
 
 .ng-name {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--hub-text);
   white-space: nowrap;
