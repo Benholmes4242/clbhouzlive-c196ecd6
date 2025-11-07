@@ -275,14 +275,6 @@ export function YourGamesTile() {
       }
       footer={
         <div className="mt-auto pt-4">
-          <div 
-            className="h-px"
-            style={{
-              background: 'rgba(255,255,255,0.18)',
-              borderRadius: '1px',
-              width: '100%',
-            }}
-          />
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
             <button
               onClick={openSearchGames}

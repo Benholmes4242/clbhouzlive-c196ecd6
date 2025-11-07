@@ -34,14 +34,6 @@ export function EchoQuickTile() {
       }
       footer={
         <div className="mt-auto pt-2">
-          <div
-            className="h-px"
-            style={{
-              background: 'rgba(255,255,255,0.18)',
-              borderRadius: '1px',
-              width: '100%',
-            }}
-          />
           <button
             onClick={comingSoon}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"

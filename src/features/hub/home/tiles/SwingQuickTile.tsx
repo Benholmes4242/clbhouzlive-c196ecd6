@@ -50,14 +50,6 @@ export function SwingQuickTile() {
       align="center"
       footer={
         <div className="mt-auto pt-4">
-          <div 
-            className="h-px"
-            style={{
-              background: 'rgba(255,255,255,0.18)',
-              borderRadius: '1px',
-              width: '100%',
-            }}
-          />
           <button
             onClick={openSwingHistory}
             className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
