@@ -6,9 +6,8 @@ import React, { useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import '../home/hubTheme.css';
 import { useSwingDetail } from '@/features/echo/hooks/useSwingDetail';
+import { useEchoThreadIdBySwingId } from '@/features/echo/hooks/useEchoThreadIdBySwingId';
 import { useEchoThreadMessages } from '@/features/echo/hooks/useEchoThreadMessages';
-import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import { generateStreamHlsUrl } from '@/config/cloudflareStream';
 
 export function HubSwingDetailPage() {
   const nav = useNavigate();
@@ -16,7 +15,8 @@ export function HubSwingDetailPage() {
   const { id } = useParams();
   
   const { data: swing, isLoading, error } = useSwingDetail(id);
-  const { data: messages = [], isLoading: msgsLoading } = useEchoThreadMessages(swing?.session_id);
+  const { data: resolvedThreadId } = useEchoThreadIdBySwingId(id, swing?.thread_id);
+  const { data: messages = [], isLoading: msgsLoading } = useEchoThreadMessages(resolvedThreadId);
 
   useEffect(() => {
     document.documentElement.classList.add('hub-open');
@@ -31,38 +31,23 @@ export function HubSwingDetailPage() {
 
   const renderVideo = () => {
     if (!swing) return null;
-    
+
+    const commonProps = {
+      controls: true,
+      playsInline: true,
+      className: 'swing-video',
+    } as const;
+
     if (swing.video_url) {
-      // Check if it's a Cloudflare Stream URL
+      // Check if it's a Cloudflare Stream URL and extract stream ID
       const streamIdMatch = swing.video_url.match(/\/([a-f0-9]{32})\//);
       if (streamIdMatch) {
-        const hlsUrl = generateStreamHlsUrl(streamIdMatch[1]);
-        return (
-          <div className="rounded-2xl border border-white/10 mb-3 overflow-hidden bg-black/20">
-            <EnhancedVideoPlayer
-              src={hlsUrl}
-              enableHLS
-              controls
-              playsInline
-              className="w-full"
-            />
-          </div>
-        );
+        const hls = `https://videodelivery.net/${streamIdMatch[1]}/manifest/video.m3u8`;
+        return <video src={hls} {...commonProps} />;
       }
-      
-      // Direct video URL
-      return (
-        <div className="rounded-2xl border border-white/10 mb-3 overflow-hidden bg-black/20">
-          <video
-            src={swing.video_url}
-            controls
-            playsInline
-            className="w-full"
-          />
-        </div>
-      );
+      return <video src={swing.video_url} {...commonProps} />;
     }
-    
+
     return null;
   };
 

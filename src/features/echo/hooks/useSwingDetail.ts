@@ -8,6 +8,7 @@ export type SwingDetail = {
   session_id: string | null;
   swing_context: string | null;
   analysis_results: any;
+  thread_id?: string | null;
 };
 
 export function useSwingDetail(id?: string) {

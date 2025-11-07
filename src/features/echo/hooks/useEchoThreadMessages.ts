@@ -8,27 +8,17 @@ export type EchoMessage = {
   created_at: string;
 };
 
-export function useEchoThreadMessages(sessionId?: string) {
+export function useEchoThreadMessages(threadId?: string | null) {
   return useQuery({
-    queryKey: ['echo-session-messages', sessionId],
-    enabled: !!sessionId,
+    queryKey: ['echo-thread', threadId],
+    enabled: !!threadId,
     queryFn: async (): Promise<EchoMessage[]> => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user || !sessionId) return [];
-
-      // Try to find a thread associated with this session
-      const { data: threadData } = await supabase
-        .from('echo_threads')
-        .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (!threadData) return [];
+      if (!threadId) return [];
 
       const { data, error } = await supabase
         .from('echo_messages')
         .select('id, role, content, created_at')
-        .eq('thread_id', threadData.id)
+        .eq('thread_id', threadId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
