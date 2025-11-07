@@ -91,6 +91,21 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       title="Nearby Golfers"
       align="center"
       withFooter
+      footer={
+        <HubTileFooter
+          cta={
+            <button
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                navigateFromHub('/hub/golfers'); 
+              }}
+              aria-label="View all golfers"
+            >
+              View all →
+            </button>
+          }
+        />
+      }
     >
       <style>{`
         .nearby-golfers-scroll::-webkit-scrollbar { 
@@ -165,20 +180,6 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
           </div>
         )}
       </div>
-
-      <HubTileFooter
-        cta={
-          <button
-            onClick={(e) => { 
-              e.stopPropagation(); 
-              navigateFromHub('/hub/golfers'); 
-            }}
-            aria-label="View all golfers"
-          >
-            View all →
-          </button>
-        }
-      />
     </Tile>
   );
 }
