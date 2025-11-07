@@ -1216,7 +1216,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
   :root {
     /* Disable old light mode design system colors */
-    --background: 0 0% 0%;
+    --background: 0 0% 4%;
     --foreground: 0 0% 100%;
     --card: 0 0% 7.8%;
     --card-foreground: 0 0% 100%;
@@ -1515,7 +1515,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
   .dark {
     /* Dark mode tokens (currently disabled - app is dark-only) */
-    --background: 0 0% 0%;
+    --background: 0 0% 4%;
     --foreground: 0 0% 100%;
     --card: 0 0% 7.8%;
     --card-foreground: 0 0% 100%;
