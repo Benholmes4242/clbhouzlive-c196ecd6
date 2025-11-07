@@ -45,6 +45,17 @@
   --hub-radius-lg: 22px;
   --hub-gap: 16px;
   --hub-pad: 16px;
+
+  /* Nearby Golfers list fixed height */
+  --ng-row-h: 48px;
+  --ng-row-gap: 2px;
+  --ng-visible-rows: 2;
+  --ng-vpad: 0px;
+  --ng-list-h: calc(
+    var(--ng-vpad)*2 +
+    var(--ng-row-h)*var(--ng-visible-rows) +
+    var(--ng-row-gap)*(var(--ng-visible-rows) - 1)
+  );
 }
 
 /* ============================
@@ -279,4 +290,35 @@ button.ghost:hover,
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
+}
+
+/* ============================
+   Nearby Golfers Fixed List
+   ============================ */
+.hub-golfers-list-scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hub-golfers-list-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.ng-list-container {
+  min-height: var(--ng-list-h);
+  max-height: var(--ng-list-h);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ng-row-gap);
+}
+
+.ng-empty-state {
+  min-height: var(--ng-list-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--hub-text-mute);
+  font-size: 13px;
 }
