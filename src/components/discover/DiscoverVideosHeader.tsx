@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SearchActivator from './SearchActivator';
 import type { LengthKey } from '@/components/videos/VideoChipRail';
 import { cn } from '@/lib/utils';
-import { Search } from 'lucide-react';
+import { Search, ChevronRight } from 'lucide-react';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 
 interface DiscoverVideosHeaderProps {
@@ -43,6 +44,7 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
   onSearchSubmit,
   initialQuery = ''
 }) => {
+  const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { topic, channel, setTopic, setChannel, setDuration } = useDiscoverQuery();
 
@@ -120,6 +122,14 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
           })}
         </div>
 
+        {/* View All button */}
+        <button
+          onClick={() => navigate('/videos')}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#6e9277]/20 text-[#6e9277] text-sm font-medium hover:bg-[#6e9277]/30 transition-colors flex-shrink-0"
+        >
+          <span>View All</span>
+          <ChevronRight size={16} />
+        </button>
       </div>
       
       {/* Search overlay */}
