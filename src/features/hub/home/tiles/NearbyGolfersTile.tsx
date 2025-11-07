@@ -3,7 +3,7 @@
  * Compact tile showing golfers open to play
  */
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
@@ -17,6 +17,22 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
   const nav = useNavigate();
   const { navigateFromHub } = useHub();
   const { golfers, isLoading } = useActiveGolfers({ limit });
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Reset scroll position to top after data loads
+  useEffect(() => {
+    if (!isLoading && scrollRef.current) {
+      const el = scrollRef.current;
+      el.classList.add('no-snap');
+      requestAnimationFrame(() => {
+        el.scrollTop = 0;
+        requestAnimationFrame(() => {
+          el.scrollTop = 0;
+          el.classList.remove('no-snap');
+        });
+      });
+    }
+  }, [isLoading, golfers.length]);
 
   return (
     <Tile 
@@ -24,7 +40,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       align="center"
     >
       <div className="flex flex-col h-full">
-        <div className="space-y-0.5 hub-golfers-list-scroll flex flex-col justify-center">
+        <div ref={scrollRef} className="space-y-0.5 hub-golfers-list-scroll flex flex-col justify-center">
           {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
             <div key={i} className="h-12 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
           ))}
