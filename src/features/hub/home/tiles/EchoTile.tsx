@@ -3,6 +3,7 @@ import { Tile } from '../components/Tile';
 import { useEchoHistory } from '../../hooks/useEchoHistory';
 import { useHub } from '@/features/hub/useHub';
 import { Send } from 'lucide-react';
+import '../echo-tip.css';
 
 function timeAgo(iso?: string) {
   if (!iso) return '';
@@ -21,16 +22,26 @@ export function EchoTile() {
   const [input, setInput] = React.useState('');
   const { navigateFromHub } = useHub();
 
-  const quickPrompts = [
+  const tips = [
     'Best drivers under £400 right now?',
     'Plan a 3-night golf trip to Ireland',
     'Fix my slice (driver)',
     'Build me a 4-week practice plan',
   ];
 
-  const handlePromptClick = (prompt: string) => {
-    navigateFromHub(`/hub/echo?msg=${encodeURIComponent(prompt)}`);
-  };
+  const [tipIdx, setTipIdx] = React.useState(0);
+  const [paused, setPaused] = React.useState(false);
+
+  // Auto-advance every 7s (respect reduced motion)
+  React.useEffect(() => {
+    if (paused) return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const id = setInterval(() => setTipIdx(i => (i + 1) % tips.length), 7000);
+    return () => clearInterval(id);
+  }, [paused, tips.length]);
+
+  const sendTip = (t: string) =>
+    navigateFromHub(`/hub/echo?msg=${encodeURIComponent(t)}`);
 
   const handleSend = () => {
     const text = input.trim();
@@ -127,53 +138,25 @@ export function EchoTile() {
           </button>
         </form>
 
-        {/* Quick prompts - clickable pills */}
+        {/* Tip carousel – text only, centered, two-line clamp, clickable */}
         <div
+          role="button"
+          tabIndex={0}
+          onClick={(e) => { e.stopPropagation(); sendTip(tips[tipIdx]); }}
+          onKeyDown={(e) => { if (e.key === 'Enter') sendTip(tips[tipIdx]); }}
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          onTouchStart={() => setPaused(true)}
+          onTouchEnd={() => setPaused(false)}
+          aria-label={`Ask Echo: ${tips[tipIdx]}`}
           style={{
-            marginTop: '12px',
+            marginTop: 12,
             marginBottom: 'auto',
-            display: 'flex',
-            gap: '8px',
-            overflowX: 'auto',
-            padding: '6px 2px',
-            WebkitOverflowScrolling: 'touch',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
+            padding: '2px 8px',
+            cursor: 'pointer',
           }}
-          className="hide-scrollbar"
         >
-          {quickPrompts.map((prompt, i) => (
-            <button
-              key={i}
-              onClick={(e) => {
-                e.stopPropagation();
-                handlePromptClick(prompt);
-              }}
-              aria-label={`Ask Echo: ${prompt}`}
-              style={{
-                border: 0,
-                padding: '10px 14px',
-                borderRadius: '14px',
-                background: 'transparent',
-                color: 'var(--hub-text-body)',
-                whiteSpace: 'nowrap',
-                fontSize: '15px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                flexShrink: 0,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--hub-text)';
-                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--hub-text-body)';
-                e.currentTarget.style.background = 'transparent';
-              }}
-            >
-              "{prompt}"
-            </button>
-          ))}
+          <div className="echo-tip-line">{tips[tipIdx]}</div>
         </div>
       </div>
     </Tile>

@@ -1,0 +1,13 @@
+/* Two-line centered tip; no bubble background */
+.echo-tip-line {
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.25rem;
+  color: var(--hub-text-body);
+  /* two-line clamp */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal; /* allow wrap */
+}
