@@ -294,7 +294,7 @@ html.hub-open {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 10px var(--hub-tile-pad-x);
+  padding: 10px 14px;
   background: transparent;
   border: none;
   border-radius: 16px;
