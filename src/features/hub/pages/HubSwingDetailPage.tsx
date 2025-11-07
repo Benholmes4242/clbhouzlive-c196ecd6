@@ -2,11 +2,12 @@
  * Hub Swing Coach – Detail thread
  * Full-screen glass page opened from /hub/swing/history
  */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import '../home/hubTheme.css';
 import { useSwingDetail } from '@/features/echo/hooks/useSwingDetail';
 import { useSwingConversation } from '@/features/echo/hooks/useSwingConversation';
+import { GlassVideo } from '@/components/media/GlassVideo';
 
 export function HubSwingDetailPage() {
   const nav = useNavigate();
@@ -15,10 +16,6 @@ export function HubSwingDetailPage() {
   
   const { data: swing, isLoading, error } = useSwingDetail(swingId);
   const { data: messages = [], isLoading: msgsLoading, error: msgError } = useSwingConversation(swingId);
-
-  const [isPlaying, setPlaying] = useState(false);
-  const [vidReady, setVidReady] = useState(false);
-  const vidRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     document.documentElement.classList.add('hub-open');
@@ -31,18 +28,6 @@ export function HubSwingDetailPage() {
     else nav('/clubhouse', { replace: true });
   };
 
-  const togglePlay = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const v = vidRef.current;
-    if (!v) return;
-    if (v.paused) {
-      v.play().then(() => setPlaying(true)).catch(() => {/* ignore */});
-    } else {
-      v.pause();
-      setPlaying(false);
-    }
-  };
-
   const renderVideo = () => {
     if (!swing || !swing.video_url) return null;
 
@@ -52,30 +37,15 @@ export function HubSwingDetailPage() {
       ? `https://videodelivery.net/${streamIdMatch[1]}/manifest/video.m3u8`
       : swing.video_url;
 
+    // Extract thumbnail from analysis_results if available
+    const thumbnail = (swing as any).analysis_results?.metadata?.videoThumbnail || undefined;
+
     return (
-      <div className="swing-video-wrap">
-        {!vidReady && <div className="shimmer video" aria-hidden="true" />}
-        <video
-          ref={vidRef}
-          src={videoSrc}
-          playsInline
-          controls={false}
-          preload="metadata"
-          onLoadedData={() => setVidReady(true)}
-          onPause={() => setPlaying(false)}
-          onPlay={() => setPlaying(true)}
-          style={{ display: vidReady ? 'block' : 'none' }}
-        />
-        {!isPlaying && vidReady && (
-          <button 
-            className="play-overlay" 
-            aria-label="Play video"
-            onClick={togglePlay}
-          >
-            ▶
-          </button>
-        )}
-      </div>
+      <GlassVideo
+        src={videoSrc}
+        poster={thumbnail}
+        ratio={16/9}
+      />
     );
   };
 
