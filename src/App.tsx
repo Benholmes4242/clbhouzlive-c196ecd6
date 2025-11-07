@@ -89,6 +89,7 @@ const HubYourGamesPage = lazy(() => import("./features/hub/pages/HubYourGamesPag
 const HubSwingPage = lazy(() => import("./features/hub/pages/HubSwingPage").then(m => ({ default: m.HubSwingPage })));
 const HubEchoHistoryPage = lazy(() => import("./features/hub/pages/HubEchoHistoryPage").then(m => ({ default: m.HubEchoHistoryPage })));
 const HubSwingHistoryPage = lazy(() => import("./features/hub/pages/HubSwingHistoryPage").then(m => ({ default: m.HubSwingHistoryPage })));
+const HubSwingDetailPage = lazy(() => import("./features/hub/pages/HubSwingDetailPage").then(m => ({ default: m.HubSwingDetailPage })));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -162,6 +163,7 @@ function AppRoutes() {
             <Route path="/hub/your-games" element={<HubYourGamesPage />} />
             <Route path="/hub/swing" element={<HubSwingPage />} />
             <Route path="/hub/swing/history" element={<HubSwingHistoryPage />} />
+            <Route path="/hub/swing/history/:id" element={<HubSwingDetailPage />} />
             <Route path="/hub/echo/history" element={<HubEchoHistoryPage />} />
             <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
           </>
@@ -181,6 +183,7 @@ function AppRoutes() {
           <Route path="/hub/your-games" element={<HubYourGamesPage />} />
           <Route path="/hub/swing" element={<HubSwingPage />} />
           <Route path="/hub/swing/history" element={<HubSwingHistoryPage />} />
+          <Route path="/hub/swing/history/:id" element={<HubSwingDetailPage />} />
           <Route path="/hub/echo/history" element={<HubEchoHistoryPage />} />
           <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
         </Routes>

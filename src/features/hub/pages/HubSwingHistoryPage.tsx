@@ -79,7 +79,7 @@ export function HubSwingHistoryPage() {
                   <button
                     key={item.id}
                     className="hub-row"
-                    onClick={() => {}}
+                    onClick={() => nav(`/hub/swing/history/${item.id}`, { state: loc.state })}
                     aria-label="Open swing analysis"
                   >
                     <div className="hub-row-leading">🏌️</div>
