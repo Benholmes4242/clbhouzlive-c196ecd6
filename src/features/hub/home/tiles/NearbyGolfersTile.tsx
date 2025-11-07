@@ -3,7 +3,7 @@
  * Compact tile showing golfers open to play
  */
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
@@ -18,7 +18,11 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
   const { navigateFromHub } = useHub();
   const { golfers, isLoading } = useActiveGolfers({ limit });
   const scrollRef = useRef<HTMLDivElement>(null);
-
+  useLayoutEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
+  }, []);
   // Reset scroll to top when data loads to ensure first profile is visible
   useEffect(() => {
     if (!isLoading && scrollRef.current) {
@@ -40,7 +44,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       align="center"
     >
       <div className="flex flex-col h-full">
-        <div ref={scrollRef} className="space-y-0.5 hub-golfers-list-scroll flex flex-col justify-center">
+        <div ref={scrollRef} className="space-y-0.5 hub-golfers-list-scroll flex flex-col">
           {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
             <div key={i} className="h-12 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
           ))}
