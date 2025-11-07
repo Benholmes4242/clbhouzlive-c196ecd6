@@ -326,7 +326,7 @@ html.hub-open {
 }
 
 .ng-name {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--hub-text);
   white-space: nowrap;
@@ -335,7 +335,7 @@ html.hub-open {
 }
 
 .ng-distance {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--hub-text-body);
 }
 
