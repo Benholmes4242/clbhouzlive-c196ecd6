@@ -28,16 +28,17 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
     return da - db;
   });
 
-  // Dynamically measure and set 2.1-row height (clamped to prevent wrap inflation)
+  // Dynamically measure and set 2.3-row height (clamped to prevent wrap inflation)
   useLayoutEffect(() => {
     if (!vpRef.current || !firstRowRef.current || !hasMoreThanTwo) return;
 
     const calc = () => {
       if (!vpRef.current || !firstRowRef.current) return;
-      const measured = firstRowRef.current.getBoundingClientRect().height || 56;
-      const rowH = Math.min(56, Math.round(measured)); // clamp to 56px
-      const gap = 8; // controlled by space-y-2
-      const target = (rowH * 2.1) + gap;
+      const ROW = 48;
+      const GAP = 4;
+      const measured = firstRowRef.current.getBoundingClientRect().height || ROW;
+      const rowH = Math.min(ROW, Math.round(measured)); // clamp to 48px
+      const target = (rowH * 2.3) + GAP; // ≈112px
       vpRef.current.style.height = `${Math.round(target)}px`;
     };
 
@@ -116,11 +117,11 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
         }}
       >
         {isLoading && (
-          <div className="flex flex-col space-y-2 pb-0 mb-0">
+          <div className="flex flex-col space-y-1 pb-0 mb-0">
             {Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
               <div 
                 key={i} 
-                className="h-14 rounded-2xl animate-pulse" 
+                className="h-12 rounded-2xl animate-pulse" 
                 style={{ background: 'var(--hub-glass-bg-subtle)' }} 
               />
             ))}
@@ -128,24 +129,24 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
         )}
         
         {!isLoading && sortedGolfers.length > 0 && (
-          <div className="flex flex-col space-y-2 pb-0 mb-0">
+          <div className="flex flex-col space-y-1 pb-0 mb-0">
             {sortedGolfers.map((g, i) => (
               <button 
                 key={g.id} 
                 ref={i === 0 ? firstRowRef : undefined}
-                className="h-14 w-full flex items-center overflow-hidden text-left"
+                className="h-12 w-full flex items-center overflow-hidden text-left"
                 onClick={() => nav(`/profile/${g.username}`)}
               >
                 <img 
                   src={g.avatar_url || '/placeholder.svg'} 
-                  alt="" 
-                  className="h-10 w-10 block rounded-full object-cover flex-shrink-0"
+                  alt={g.display_name || g.username}
+                  className="h-[34px] w-[34px] block rounded-full object-cover flex-shrink-0"
                 />
-                <div className="ml-3 min-w-0 w-full">
-                  <p className="mask-fade-right whitespace-nowrap overflow-hidden text-[13px] font-medium" style={{ color: 'var(--hub-text)' }}>
+                <div className="ml-2 min-w-0 w-full">
+                  <p className="mask-fade-right whitespace-nowrap overflow-hidden text-[12px] font-medium" style={{ color: 'var(--hub-text)' }}>
                     {g.display_name || g.username}
                   </p>
-                  <p className="mask-fade-right whitespace-nowrap overflow-hidden text-[12px]" style={{ color: 'var(--hub-text-dim)' }}>
+                  <p className="mask-fade-right whitespace-nowrap overflow-hidden text-[11px] leading-[1.1rem]" style={{ color: 'var(--hub-text-dim)' }}>
                     {g.distanceText}
                   </p>
                 </div>
