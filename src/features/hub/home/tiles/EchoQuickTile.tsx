@@ -60,7 +60,7 @@ export function EchoQuickTile() {
         </div>
       }
     >
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col">
         {/* Input form */}
         <form
           className="relative"
