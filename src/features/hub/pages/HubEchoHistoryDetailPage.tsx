@@ -51,7 +51,14 @@ export default function HubEchoHistoryDetailPage() {
       <div className="overflow-y-auto h-[calc(100vh-3.5rem)] px-4 pt-4">
         <div className="space-y-4 pb-6">
           {isLoading && <div className="hub-msg">Loading chat…</div>}
-          {error && !isLoading && <div className="hub-msg">Couldn't load this chat.</div>}
+          {error && !isLoading && (
+            <div className="hub-msg">
+              Couldn't load this chat.
+              <pre style={{whiteSpace:'pre-wrap',opacity:.7,marginTop:8,fontSize:12}}>
+                {JSON.stringify(error, null, 2)}
+              </pre>
+            </div>
+          )}
           {!isLoading && !error && !data && <div className="hub-msg">Chat not found.</div>}
 
           {!isLoading && data && (
@@ -61,16 +68,20 @@ export default function HubEchoHistoryDetailPage() {
                 {formatDateTime(data.meta?.created_at)}
               </div>
 
-              <div className="echo-thread">
-                {data.messages.map((m, i) => (
-                  <div
-                    key={i}
-                    className={`bubble ${m.role === 'user' ? 'me' : 'bot'}`}
-                  >
-                    {m.content}
-                  </div>
-                ))}
-              </div>
+              {data.messages.length === 0 ? (
+                <div className="hub-msg">No messages in this chat yet.</div>
+              ) : (
+                <div className="echo-thread">
+                  {data.messages.map((m, i) => (
+                    <div
+                      key={i}
+                      className={`bubble ${m.role === 'user' ? 'me' : 'bot'}`}
+                    >
+                      {m.content}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

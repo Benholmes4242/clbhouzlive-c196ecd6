@@ -31,9 +31,11 @@ export function HubEchoHistoryPage() {
     }
   };
 
-  const openThread = (id: string) => {
+  const openThread = (item: any) => {
+    const chatId = item.chat_id || item.thread_id || item.id;
+    console.debug('[Echo] navigate to chat id:', chatId);
     const state = loc.state as any;
-    nav(`/hub/echo/history/chat/${id}`, {
+    nav(`/hub/echo/history/chat/${chatId}`, {
       state: { backgroundLocation: state?.backgroundLocation, fromHub: true },
     });
   };
@@ -151,7 +153,7 @@ export function HubEchoHistoryPage() {
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = 'var(--hub-glass-bg)';
                   }}
-                  onClick={() => openThread(item.id)}
+                  onClick={() => openThread(item)}
                   aria-label="Chat thread"
                 >
                   <div className="text-2xl">🗨️</div>
