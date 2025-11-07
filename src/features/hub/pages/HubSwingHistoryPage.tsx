@@ -78,11 +78,17 @@ export function HubSwingHistoryPage() {
                 {items.map(item => (
                   <button
                     key={item.id}
-                    className="hub-row"
+                    className="hub-row swing-row"
                     onClick={() => nav(`/hub/swing/history/${item.id}`, { state: loc.state })}
                     aria-label="Open swing analysis"
                   >
-                    <div className="hub-row-leading">🏌️</div>
+                    <div className="thumb">
+                      {item.thumbnail_url ? (
+                        <img src={item.thumbnail_url} alt="" loading="lazy" />
+                      ) : (
+                        <div className="thumb-fallback">🏌️</div>
+                      )}
+                    </div>
                     <div className="hub-row-main">
                       <div className="hub-row-title">{item.title || 'Swing analysis'}</div>
                       <div className="hub-row-sub">{formatRelativeTime(item.created_at)}</div>

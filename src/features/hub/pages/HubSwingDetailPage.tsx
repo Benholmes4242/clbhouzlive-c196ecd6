@@ -2,7 +2,7 @@
  * Hub Swing Coach – Detail thread
  * Full-screen glass page opened from /hub/swing/history
  */
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import '../home/hubTheme.css';
 import { useSwingDetail } from '@/features/echo/hooks/useSwingDetail';
@@ -15,8 +15,11 @@ export function HubSwingDetailPage() {
   const { id: swingId } = useParams();
   
   const { data: swing, isLoading, error } = useSwingDetail(swingId);
-  const { data: threadId } = useSwingThreadId(swingId);
+  const { data: threadId } = useSwingThreadId(swing?.thread_id);
   const { data: messages = [], isLoading: msgsLoading } = useSwingMessages(threadId);
+
+  const [isPlaying, setPlaying] = useState(false);
+  const vidRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     document.documentElement.classList.add('hub-open');
@@ -29,26 +32,48 @@ export function HubSwingDetailPage() {
     else nav('/clubhouse', { replace: true });
   };
 
-  const renderVideo = () => {
-    if (!swing) return null;
-
-    const commonProps = {
-      controls: true,
-      playsInline: true,
-      className: 'swing-video',
-    } as const;
-
-    if (swing.video_url) {
-      // Check if it's a Cloudflare Stream URL and extract stream ID
-      const streamIdMatch = swing.video_url.match(/\/([a-f0-9]{32})\//);
-      if (streamIdMatch) {
-        const hls = `https://videodelivery.net/${streamIdMatch[1]}/manifest/video.m3u8`;
-        return <video src={hls} {...commonProps} />;
-      }
-      return <video src={swing.video_url} {...commonProps} />;
+  const togglePlay = () => {
+    const v = vidRef.current;
+    if (!v) return;
+    if (v.paused) {
+      v.play().then(() => setPlaying(true)).catch(() => {/* ignore */});
+    } else {
+      v.pause();
+      setPlaying(false);
     }
+  };
 
-    return null;
+  const renderVideo = () => {
+    if (!swing || !swing.video_url) return null;
+
+    // Check if it's a Cloudflare Stream URL and extract stream ID
+    const streamIdMatch = swing.video_url.match(/\/([a-f0-9]{32})\//);
+    const videoSrc = streamIdMatch 
+      ? `https://videodelivery.net/${streamIdMatch[1]}/manifest/video.m3u8`
+      : swing.video_url;
+
+    return (
+      <div className="swing-video-wrap" onClick={togglePlay}>
+        <video
+          ref={vidRef}
+          src={videoSrc}
+          playsInline
+          controls={false}
+          preload="metadata"
+          onPause={() => setPlaying(false)}
+          onPlay={() => setPlaying(true)}
+        />
+        {!isPlaying && (
+          <button 
+            className="play-overlay" 
+            aria-label="Play video"
+            onClick={togglePlay}
+          >
+            ▶
+          </button>
+        )}
+      </div>
+    );
   };
 
   return (

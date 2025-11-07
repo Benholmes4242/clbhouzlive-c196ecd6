@@ -340,12 +340,80 @@ html.hub-open {
   color: var(--hub-text-body);
 }
 
-.swing-video {
-  width: 100%;
-  max-height: 45vh;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: block;
-  object-fit: cover;
+/* ========================================
+   SWING VIDEO PLAYER WITH OVERLAY
+   ======================================== */
+.swing-video-wrap {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.25);
+  max-height: 40vh;
+  cursor: pointer;
   margin-bottom: 12px;
+}
+
+.swing-video-wrap video {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 40vh;
+  object-fit: cover;
+}
+
+.play-overlay {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(6px);
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  line-height: 1;
+  color: rgba(255,255,255,.95);
+  transition: background 0.2s ease;
+}
+
+.play-overlay:hover {
+  background: rgba(0,0,0,.45);
+}
+
+/* ========================================
+   SWING HISTORY ROW WITH THUMBNAIL
+   ======================================== */
+.swing-row {
+  align-items: center;
+}
+
+.swing-row .thumb {
+  width: 86px;
+  aspect-ratio: 16/9;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.25);
+  margin-right: 12px;
+  flex: 0 0 auto;
+}
+
+.swing-row .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumb-fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  color: rgba(255,255,255,.9);
 }
