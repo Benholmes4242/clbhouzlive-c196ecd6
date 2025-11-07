@@ -57,31 +57,33 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       title="Nearby Golfers"
       align="center"
       footer={
-        <div className="mt-auto pt-2">
+        <div className="mt-auto">
           <div 
             className="NearbyDivider h-px w-full"
             style={{
               background: 'rgba(255,255,255,0.18)',
             }}
           />
-          <button
-            onClick={(e) => { 
-              e.stopPropagation(); 
-              navigateFromHub('/hub/golfers'); 
-            }}
-            className="ml-auto mt-3 sm:mt-4 block text-[15px] font-medium transition"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-            aria-label="View all golfers"
-          >
-            View all →
-          </button>
+          <div style={{ height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+            <button
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                navigateFromHub('/hub/golfers'); 
+              }}
+              className="text-[15px] font-medium transition"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--hub-text-body)',
+                padding: 0,
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+              aria-label="View all golfers"
+            >
+              View all →
+            </button>
+          </div>
         </div>
       }
     >
