@@ -92,6 +92,9 @@ const HubSwingHistoryPage = lazy(() => import("./features/hub/pages/HubSwingHist
 const HubSwingDetailPage = lazy(() => import("./features/hub/pages/HubSwingDetailPage").then(m => ({ default: m.HubSwingDetailPage })));
 const HubEchoHistoryDetailPage = lazy(() => import("./features/hub/pages/HubEchoHistoryDetailPage"));
 
+// Videos2 page
+const VideosPage = lazy(() => import("./features/videos2/pages/VideosPage"));
+
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Routes component that handles background location pattern for Hub overlays
@@ -137,6 +140,7 @@ function AppRoutes() {
         <Route path="/my-ratings" element={<MyRatings />} />
         <Route path="/news" element={<News />} />
         <Route path="/tour-central" element={<TourCentral />} />
+        <Route path="/videos" element={<VideosPage />} />
         
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
