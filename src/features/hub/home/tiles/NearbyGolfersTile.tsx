@@ -111,7 +111,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
         ref={vpRef}
         className="nearby-golfers-scroll overflow-y-auto pb-0 mb-0"
         style={{
-          height: '125px',
+          height: '140px',
           maskImage: hasMoreThanTwo ? 'linear-gradient(to bottom, transparent 0, black 16px, black calc(100% - 16px), transparent 100%)' : 'none',
           WebkitOverflowScrolling: 'touch',
         }}
