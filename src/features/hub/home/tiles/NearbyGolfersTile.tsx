@@ -3,7 +3,7 @@
  * Compact tile showing golfers open to play
  */
 
-import React from 'react';
+import React, { useRef, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
@@ -18,10 +18,8 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
   const { navigateFromHub } = useHub();
   const { golfers, isLoading } = useActiveGolfers({ limit });
 
-  // Design tokens for 2.1 row peek
-  const ROW = 56;   // row height in px
-  const GAP = 8;    // vertical gap between rows in px
-  const peekHeightPx = 126; // 2.1*56 + 8 = 126
+  const vpRef = useRef<HTMLDivElement>(null);
+  const firstRowRef = useRef<HTMLButtonElement>(null);
   const hasMoreThanTwo = golfers.length > 2;
   
   const sortedGolfers = [...golfers].sort((a, b) => {
@@ -30,6 +28,31 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
     return da - db;
   });
 
+  // Dynamically measure and set 2.1-row height
+  useLayoutEffect(() => {
+    if (!vpRef.current || !firstRowRef.current || !hasMoreThanTwo) return;
+
+    const calc = () => {
+      if (!vpRef.current || !firstRowRef.current) return;
+      const rowRect = firstRowRef.current.getBoundingClientRect();
+      const rowH = rowRect.height;
+      const cs = getComputedStyle(firstRowRef.current);
+      const gap = parseFloat(cs.marginBottom) || 8;
+      // 2 full rows + 0.1 row + 1 gap (between row1 & row2)
+      const target = (rowH * 2.1) + gap;
+      vpRef.current.style.height = `${Math.round(target)}px`;
+    };
+
+    calc();
+    const ro = new ResizeObserver(calc);
+    ro.observe(firstRowRef.current);
+    window.addEventListener('resize', calc);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', calc);
+    };
+  }, [hasMoreThanTwo, golfers.length]);
+
   return (
     <Tile 
       title="Nearby Golfers"
@@ -37,29 +60,31 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       footer={
         <>
           <div 
-            className="NearbyDivider mt-2 h-px w-full"
+            className="NearbyDivider mt-1 h-px w-full"
             style={{
               background: 'rgba(255,255,255,0.18)',
             }}
           />
-          <button
-            onClick={(e) => { 
-              e.stopPropagation(); 
-              navigateFromHub('/hub/golfers'); 
-            }}
-            className="NearbyFooter ml-auto mt-2 block text-[15px] font-medium transition"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-            aria-label="View all golfers"
-          >
-            View all →
-          </button>
+          <div className="NearbyFooter mt-1">
+            <button
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                navigateFromHub('/hub/golfers'); 
+              }}
+              className="ml-auto block text-[15px] font-medium transition"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--hub-text-body)',
+                padding: 0,
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+              aria-label="View all golfers"
+            >
+              View all →
+            </button>
+          </div>
         </>
       }
     >
@@ -77,12 +102,17 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
         .nearby-golfers-scroll img {
           display: block;
         }
+        .mask-fade-right {
+          -webkit-mask-image: linear-gradient(to right, black 75%, transparent 100%);
+          mask-image: linear-gradient(to right, black 75%, transparent 100%);
+        }
       `}</style>
       
       <div 
+        ref={vpRef}
         className="nearby-golfers-scroll overflow-y-auto pb-0 mb-0"
         style={{
-          height: hasMoreThanTwo ? `${peekHeightPx}px` : 'auto',
+          height: 'auto',
           maskImage: hasMoreThanTwo ? 'linear-gradient(to bottom, transparent 0, black 16px, black calc(100% - 16px), transparent 100%)' : 'none',
           WebkitOverflowScrolling: 'touch',
         }}
@@ -101,9 +131,10 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
         
         {!isLoading && sortedGolfers.length > 0 && (
           <div className="flex flex-col space-y-2 pb-0 mb-0">
-            {sortedGolfers.map(g => (
+            {sortedGolfers.map((g, i) => (
               <button 
                 key={g.id} 
+                ref={i === 0 ? firstRowRef : undefined}
                 className="h-14 flex items-center w-full text-left"
                 onClick={() => nav(`/profile/${g.username}`)}
               >
@@ -113,10 +144,10 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
                   className="h-10 w-10 block rounded-full object-cover flex-shrink-0"
                 />
                 <div className="ml-3 min-w-0 flex-1">
-                  <p className="truncate text-[13px] font-medium" style={{ color: 'var(--hub-text)' }}>
+                  <p className="mask-fade-right text-[13px] font-medium overflow-hidden" style={{ color: 'var(--hub-text)' }}>
                     {g.display_name || g.username}
                   </p>
-                  <p className="truncate text-[12px]" style={{ color: 'var(--hub-text-dim)' }}>
+                  <p className="mask-fade-right text-[12px] overflow-hidden" style={{ color: 'var(--hub-text-dim)' }}>
                     {g.distanceText}
                   </p>
                 </div>
