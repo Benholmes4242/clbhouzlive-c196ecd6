@@ -6,17 +6,17 @@ import React, { useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import '../home/hubTheme.css';
 import { useSwingDetail } from '@/features/echo/hooks/useSwingDetail';
-import { useEchoThreadIdBySwingId } from '@/features/echo/hooks/useEchoThreadIdBySwingId';
-import { useEchoThreadMessages } from '@/features/echo/hooks/useEchoThreadMessages';
+import { useSwingThreadId } from '@/features/echo/hooks/useSwingThreadId';
+import { useSwingMessages } from '@/features/echo/hooks/useSwingMessages';
 
 export function HubSwingDetailPage() {
   const nav = useNavigate();
   const loc = useLocation();
-  const { id } = useParams();
+  const { id: swingId } = useParams();
   
-  const { data: swing, isLoading, error } = useSwingDetail(id);
-  const { data: resolvedThreadId } = useEchoThreadIdBySwingId(id, swing?.thread_id);
-  const { data: messages = [], isLoading: msgsLoading } = useEchoThreadMessages(resolvedThreadId);
+  const { data: swing, isLoading, error } = useSwingDetail(swingId);
+  const { data: threadId } = useSwingThreadId(swingId);
+  const { data: messages = [], isLoading: msgsLoading } = useSwingMessages(threadId);
 
   useEffect(() => {
     document.documentElement.classList.add('hub-open');
