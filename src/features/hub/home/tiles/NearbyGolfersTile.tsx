@@ -24,7 +24,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       align="center"
     >
       <div className="flex flex-col h-full">
-        <div className="space-y-0.5 hub-golfers-list-scroll">
+        <div className="space-y-0.5 hub-golfers-list-scroll flex flex-col justify-center">
           {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
             <div key={i} className="h-12 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
           ))}
@@ -52,7 +52,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
             </button>
           ))}
           {!isLoading && golfers.length === 0 && (
-            <div className="text-[13px] py-2" style={{ color: 'var(--hub-text-sub)' }}>
+            <div className="text-[13px] py-2 text-center" style={{ color: 'var(--hub-text-sub)' }}>
               No active golfers nearby
             </div>
           )}

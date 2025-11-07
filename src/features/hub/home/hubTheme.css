@@ -354,7 +354,7 @@ html.hub-open {
   /* row height ~60px; adjust if your row differs */
   --row-h: 60px;
   --row-gap: 6px;
-  max-height: calc((var(--row-h) * 2) + var(--row-gap));
+  height: calc((var(--row-h) * 2) + var(--row-gap));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   /* avoid accidental horizontal scroll */
