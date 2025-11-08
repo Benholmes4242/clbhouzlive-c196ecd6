@@ -255,6 +255,25 @@ export function YourGamesTile() {
   const { data, isLoading, isError, refetch } = useUserGames();
   useUserGamesRealtime();
 
+  // Scroll helper: snap expanded row to top of container
+  const scrollChildToTop = (container: HTMLDivElement, child: HTMLElement, padding = 12) => {
+    const cRect = container.getBoundingClientRect();
+    const rRect = child.getBoundingClientRect();
+
+    // Distance from child's top to container's top, plus current scroll
+    const targetTop = (rRect.top - cRect.top) + container.scrollTop - padding;
+
+    const prefersReduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    container.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: prefersReduced ? 'auto' : 'smooth',
+    });
+  };
+
   const comingSoon = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     alert('Coming soon');
@@ -418,7 +437,8 @@ export function YourGamesTile() {
                   if (!expanded) return;
                   const container = listRef.current;
                   if (container && rowEl) {
-                    scrollChildIntoView(container, rowEl, 12);
+                    // Defer to next frame so layout is final before measuring
+                    requestAnimationFrame(() => scrollChildToTop(container, rowEl, 12));
                   }
                 }}
               />
