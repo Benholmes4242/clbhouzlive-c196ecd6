@@ -150,6 +150,18 @@ export function VideoProgressVerticalHUD({
       fillRef.current.style.transformOrigin = 'bottom';
     }
   }, [setProgressFillRef]);
+  
+  // Temporary diagnostic logging for playback progress
+  React.useEffect(() => {
+    if (process.env.NODE_ENV !== 'production' && fillRef.current) {
+      console.debug('[vhud:playback]', { 
+        progress, 
+        transform: fillRef.current.style.transform,
+        isPlaying,
+        isBarActive 
+      });
+    }
+  }, [progress, isPlaying, isBarActive]);
 
   // Briefly activate bar on attach/play to ensure visibility on first video
   React.useEffect(() => {
@@ -302,36 +314,41 @@ export function VideoProgressVerticalHUD({
     }
     
     // UPDATE THUMB POSITION near the bar
-    const rail = railBox;
-    if (rail) {
-      const barX = window.innerWidth - rail.right; // Convert right offset to left position
-      let top = clientY;
-      let left = barX - 12; // Position to left of bar with gap
-
-      // Edge-aware alignment
-      const viewportW = window.innerWidth;
-      const viewportH = window.innerHeight;
-      const estWidth = Math.min(Math.max(viewportW * 0.28, 96), 128); // 96–128
-      const estHeight = estWidth * 9 / 16;
-
-      // Flip to left if near right edge
-      const alignLeft = left + estWidth + 8 > viewportW;
-      setThumbAlignLeft(alignLeft);
-      
-      // Avoid bottom overflow
-      if (top + estHeight / 2 + 8 > viewportH) top = viewportH - estHeight / 2 - 8;
-      if (top - estHeight / 2 - 8 < 0) top = estHeight / 2 + 8;
-
-      setThumbTop(top);
-      setThumbLeft(left);
+    // Defensive positioning: fallback if railBox isn't ready yet
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+    const estWidth = Math.min(Math.max(viewportW * 0.28, 96), 128); // 96–128
+    const estHeight = estWidth * 9 / 16;
+    
+    let barX: number;
+    if (railBox) {
+      barX = window.innerWidth - railBox.right; // Convert right offset to left position
+    } else {
+      // Fallback: position based on safe area + default gap
+      const safeRight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sat') || '0');
+      const fallbackRight = 64 + safeRight; // 64px default gap + safe area
+      barX = window.innerWidth - fallbackRight;
     }
+    
+    let top = clientY;
+    let left = barX - 12; // Position to left of bar with gap
+
+    // Flip to left if near right edge
+    const alignLeft = left + estWidth + 8 > viewportW;
+    setThumbAlignLeft(alignLeft);
+    
+    // Avoid bottom overflow
+    if (top + estHeight / 2 + 8 > viewportH) top = viewportH - estHeight / 2 - 8;
+    if (top - estHeight / 2 - 8 < 0) top = estHeight / 2 + 8;
+
+    setThumbTop(top);
+    setThumbLeft(left);
     
     // DRAW into canvas via offscreen video (no main video seeking)
     const off = offscreenVideoRef.current;
     const canvas = previewCanvasRef.current;
     if (off && canvas && !drawingRef.current) {
       drawingRef.current = true;
-      off.currentTime = newTime; // Jump offscreen only
       
       const draw = () => {
         const ctx = canvas.getContext('2d');
@@ -340,18 +357,44 @@ export function VideoProgressVerticalHUD({
         }
         drawingRef.current = false;
       };
-
-      // Prefer requestVideoFrameCallback when available
-      // @ts-ignore
-      if (typeof off.requestVideoFrameCallback === 'function') {
-        // @ts-ignore
-        off.requestVideoFrameCallback(() => requestAnimationFrame(draw));
+      
+      // Check readyState before seeking to prevent errors
+      if (off.readyState < 2) {
+        // Need to load metadata first
+        const onLoaded = () => {
+          off.removeEventListener('loadeddata', onLoaded);
+          off.currentTime = newTime;
+          
+          // Prefer requestVideoFrameCallback when available
+          // @ts-ignore
+          if (typeof off.requestVideoFrameCallback === 'function') {
+            // @ts-ignore
+            off.requestVideoFrameCallback(() => requestAnimationFrame(draw));
+          } else {
+            requestAnimationFrame(draw);
+          }
+        };
+        off.addEventListener('loadeddata', onLoaded, { once: true });
       } else {
-        requestAnimationFrame(draw);
+        off.currentTime = newTime; // Jump offscreen only
+        
+        // Prefer requestVideoFrameCallback when available
+        // @ts-ignore
+        if (typeof off.requestVideoFrameCallback === 'function') {
+          // @ts-ignore
+          off.requestVideoFrameCallback(() => requestAnimationFrame(draw));
+        } else {
+          requestAnimationFrame(draw);
+        }
       }
     }
     
     setThumbVisible(true);
+    
+    // Temporary diagnostic logging
+    if (process.env.NODE_ENV !== 'production') {
+      console.debug('[vhud:scrub]', { ratio, newTime, thumbTop, thumbLeft, thumbVisible: true });
+    }
   }, [clamp01, railBox]);
 
   // Global move handler with velocity detection and scrub activation
@@ -513,7 +556,7 @@ export function VideoProgressVerticalHUD({
 
   const progressBar = (!attachedVideo) ? null : (
     <div
-      className={`vhud-wrap ${isScrubbing || isBarActive ? 'vhud-active' : 'vhud-idle'}`}
+      className={`vhud-wrap clubhouse-progress ${isScrubbing || isBarActive || isPlaying ? 'vhud-active' : 'vhud-idle'}`}
       style={{
         right: railBox ? `${railBox.right}px` : 'calc(env(safe-area-inset-right, 0px) + 64px)',
         top: railBox ? `${railBox.top}px` : '25%',
