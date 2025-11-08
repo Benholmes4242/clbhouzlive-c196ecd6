@@ -22,9 +22,9 @@ export const MOCK_CREATORS: MockCreator[] = [
 ];
 
 export const MOCK_NEARBY = [
-  { id: 'nb-001', username: 'local_amy', display_name: 'Amy Local', profile_photo_url: 'https://picsum.photos/seed/amy/200/200', home_club: 'Royal Birkdale' },
-  { id: 'nb-002', username: 'local_max', display_name: 'Max Local', profile_photo_url: 'https://picsum.photos/seed/max/200/200', home_club: 'Formby' },
-  { id: 'nb-003', username: 'local_lee', display_name: 'Lee Local', profile_photo_url: 'https://picsum.photos/seed/lee/200/200', home_club: 'Hillside' },
-  { id: 'nb-004', username: 'local_ava', display_name: 'Ava Local', profile_photo_url: 'https://picsum.photos/seed/ava/200/200', home_club: 'Wallasey' },
-  { id: 'nb-005', username: 'local_jai', display_name: 'Jai Local', profile_photo_url: 'https://picsum.photos/seed/jai/200/200', home_club: 'Formby Hall' },
+  { id: 'nb-001', username: 'local_amy', display_name: 'Amy Local', profile_photo_url: 'https://picsum.photos/seed/amy/200/200', home_club: 'Royal Birkdale', distance_km: 1.2 },
+  { id: 'nb-002', username: 'local_max', display_name: 'Max Local', profile_photo_url: 'https://picsum.photos/seed/max/200/200', home_club: 'Formby', distance_km: 2.5 },
+  { id: 'nb-003', username: 'local_lee', display_name: 'Lee Local', profile_photo_url: 'https://picsum.photos/seed/lee/200/200', home_club: 'Hillside', distance_km: 3.8 },
+  { id: 'nb-004', username: 'local_ava', display_name: 'Ava Local', profile_photo_url: 'https://picsum.photos/seed/ava/200/200', home_club: 'Wallasey', distance_km: 0.8 },
+  { id: 'nb-005', username: 'local_jai', display_name: 'Jai Local', profile_photo_url: 'https://picsum.photos/seed/jai/200/200', home_club: 'Formby Hall', distance_km: 4.3 },
 ];
