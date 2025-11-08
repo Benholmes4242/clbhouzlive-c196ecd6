@@ -349,12 +349,10 @@ html.hub-open {
           mask-image: linear-gradient(to right, #000 0%, #000 86%, transparent 100%);
 }
 
-/* === Inline scroll: show 2 rows max inside the tile === */
+/* === Inline scroll: fills available space above CTA === */
 .hub-golfers-list-scroll {
-  /* row height ~60px; adjust if your row differs */
-  --row-h: 60px;
-  --row-gap: 6px;
-  height: calc((var(--row-h) * 2) + var(--row-gap));
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   /* avoid accidental horizontal scroll */
