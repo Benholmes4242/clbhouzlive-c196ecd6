@@ -24,17 +24,16 @@ export function calculateDistance(
 
 /**
  * Format distance for display
- * Shows miles if < 1.6km, otherwise km
+ * Shows meters if < 1km, otherwise km
  */
 export function formatDistance(distanceMeters: number): string {
   const distanceKm = distanceMeters / 1000;
   
-  if (distanceKm < 1.6) {
-    // Show in miles
-    const miles = distanceKm * 0.621371;
-    return `${miles.toFixed(1)} mi`;
+  if (distanceKm < 1) {
+    // Show in meters
+    return `${Math.round(distanceMeters)}m`;
   } else {
     // Show in km
-    return `${distanceKm.toFixed(1)} km`;
+    return `${distanceKm.toFixed(1)}km`;
   }
 }
