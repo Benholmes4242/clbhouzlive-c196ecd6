@@ -24,6 +24,8 @@ export function HubGolfersPage() {
   const queryClient = useQueryClient();
   const { golfers, isLoading } = useActiveGolfers({ limit: 50 });
   const { visibilityMode, setVisibilityMode } = useVisibility();
+  const headerRef = React.useRef<HTMLDivElement>(null);
+  const listRef = React.useRef<HTMLDivElement>(null);
 
   const handleBack = () => {
     const state = loc.state as any;
@@ -51,6 +53,23 @@ export function HubGolfersPage() {
     };
   }, [queryClient]);
 
+  // Scroll-linked header fade + parallax
+  useEffect(() => {
+    const el = listRef.current;
+    const hdr = headerRef.current;
+    if (!el || !hdr) return;
+    const onScroll = () => {
+      const y = Math.min(el.scrollTop, 60);
+      hdr.style.setProperty('--blur', String(6 + y / 6)); // 6→16px
+      hdr.style.setProperty('--op', String(Math.min(0.92, 0.6 + y / 120)));
+      hdr.style.backdropFilter = `blur(var(--blur,12px))`;
+      hdr.style.background = `rgba(20,20,20,var(--op,.6))`;
+      hdr.style.transform = `translateY(${Math.min(10, y / 8)}px)`; // tiny parallax
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
+
   const handleRefresh = () => {
     return queryClient.invalidateQueries({ queryKey: ['activeGolfers'] });
   };
@@ -65,10 +84,13 @@ export function HubGolfersPage() {
       }}
     >
       {/* Simple Header */}
-      <header className="sticky top-0 z-10 flex items-center justify-between px-4 h-14 border-b"
+      <header 
+        ref={headerRef}
+        className="sticky top-0 z-10 flex items-center justify-between px-4 h-14 border-b"
         style={{
           borderColor: 'rgba(255,255,255,0.1)',
           background: 'rgba(0,0,0,0.2)',
+          transition: 'all 160ms ease-out',
         }}
       >
         <button
@@ -83,7 +105,7 @@ export function HubGolfersPage() {
       </header>
 
       {/* Content */}
-      <div className="overflow-y-auto h-[calc(100vh-3.5rem)] pt-4">
+      <div ref={listRef} className="overflow-y-auto h-[calc(100vh-3.5rem)] pt-4">
         <PullToRefresh onRefresh={handleRefresh}>
           <div className="space-y-4 pb-6">
             {/* Status Bar (Segmented Control) */}

@@ -1,8 +1,12 @@
 import React from 'react';
 import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
+import { hapticTap } from '@/lib/ui/haptics';
 import { useGolferActions } from '../hooks/useGolferActions';
 import { formatDistance } from '../distance';
+import { GolferAvatar } from './GolferAvatar';
+import { StatusChips } from './StatusChips';
+import './nearby.css';
 
 interface NearbyGolferCardProps {
   golfer: {
@@ -23,85 +27,26 @@ interface NearbyGolferCardProps {
   index: number;
 }
 
-function StatusChip({ 
-  icon, 
-  label, 
-  tone = 'default' 
-}: {
-  icon: string;
-  label: string;
-  tone?: 'success' | 'default';
-}) {
-  return (
-    <span 
-      className={`inline-flex items-center gap-1.5 rounded-2xl text-[13px] font-semibold backdrop-blur-[20px] border transition-all duration-200`}
-      style={{
-        padding: '4px 10px',
-        borderRadius: '16px',
-        animation: 'chipAppear 120ms ease-out both',
-        ...(tone === 'success' 
-          ? {
-              background: 'linear-gradient(180deg, rgba(76,220,151,0.45), rgba(0,0,0,0.25))',
-              color: '#4cdc97',
-              borderColor: 'rgba(76,220,151,0.25)'
-            }
-          : {
-              background: 'rgba(255,255,255,0.1)',
-              color: 'rgba(255,255,255,0.90)',
-              borderColor: 'rgba(255,255,255,0.15)'
-            })
-      }}
-    >
-      <span className="text-[14px] leading-none">{icon}</span>
-      <span>{label}</span>
-    </span>
-  );
-}
-
-function PresenceRing({ status }: { status: 'openToPlay' | 'online' | 'offline' }) {
-  const colors = {
-    openToPlay: '#4ADE80',
-    online: '#3B82F6',
-    offline: 'rgba(255,255,255,0.25)'
-  };
-  
-  const shouldPulse = status === 'openToPlay';
-  
-  return (
-    <svg 
-      className="absolute inset-0 w-full h-full" 
-      style={{ overflow: 'visible' }}
-    >
-      <circle
-        cx="50%"
-        cy="50%"
-        r="48%"
-        fill="none"
-        stroke={colors[status]}
-        strokeWidth="2.5"
-        style={{
-          filter: shouldPulse ? 'drop-shadow(0 0 3px rgba(74,222,128,0.4))' : 'none'
-        }}
-        className={shouldPulse ? 'animate-[presencePulse_900ms_ease-in-out_infinite]' : ''}
-      />
-      {/* Mini dot indicator */}
-      <circle
-        cx="85%"
-        cy="85%"
-        r="4"
-        fill={colors[status]}
-        className={shouldPulse ? 'animate-[presencePulse_900ms_ease-in-out_infinite]' : ''}
-      />
-    </svg>
-  );
-}
-
 export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
   const { sendFriendRequest, toggleFollow, openMessage, isFollowing } = useGolferActions(
     golfer.id, 
     golfer.is_following, 
     index
   );
+  const ref = React.useRef<HTMLElement>(null);
+
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) el.setAttribute('data-inview', '1');
+      },
+      { rootMargin: '50px 0px' }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   const handleViewProfile = () => {
     haptic('light');
@@ -111,22 +56,21 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
   const distanceText = golfer.distanceText || 
     (golfer.distance_km ? formatDistance(golfer.distance_km * 1000) : undefined);
 
-  const presenceStatus = golfer.isOpenToPlay ? 'openToPlay' : golfer.is_online ? 'online' : 'offline';
-
   return (
     <article
-      className="rounded-[18px] backdrop-blur-[20px] border mx-3"
+      ref={ref}
+      className="golfer-card rounded-[18px] backdrop-blur-[20px] border mx-3"
       style={{
         background: 'rgba(255, 255, 255, 0.07)',
         borderColor: 'rgba(255,255,255,0.08)',
         boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
         padding: '16px 14px',
         animation: `rowFadeUp 90ms ease-out both ${index * 35}ms`,
-        contentVisibility: 'auto',
-        containIntrinsicSize: '0 140px'
       }}
       role="article"
       aria-label={`${golfer.display_name}, handicap ${golfer.handicap ? golfer.handicap.toFixed(1).replace('.', ' point ') : 'unknown'}, ${golfer.home_club || 'No home club'}, ${distanceText ? distanceText.replace('m', 'meters').replace('km', 'kilometers') : ''}, ${golfer.isOpenToPlay ? 'open to play' : ''}`}
+      onPointerDown={() => hapticTap()}
+      tabIndex={0}
     >
       {/* Main tappable area with min 44px touch target */}
       <TapButton
@@ -135,19 +79,13 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
         onPointerDown={handleViewProfile}
         aria-label={`View ${golfer.display_name}'s profile`}
       >
-        {/* Avatar with presence ring */}
-        <div className="relative shrink-0 w-[52px] h-[52px]">
-          <PresenceRing status={presenceStatus} />
-          <div className="absolute inset-[3px] rounded-full overflow-hidden">
-            <img
-              src={golfer.avatar_url || '/placeholder.svg'}
-              alt=""
-              className="w-full h-full object-cover"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-        </div>
+        {/* Avatar with parallax and presence glow */}
+        <GolferAvatar
+          avatarUrl={golfer.avatar_url}
+          displayName={golfer.display_name}
+          isOpenToPlay={golfer.isOpenToPlay}
+          size={52}
+        />
 
         {/* Content */}
         <div className="flex-1 min-w-0">
@@ -187,16 +125,10 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
 
           {/* Status chips - max 2 visible with overflow */}
           {(golfer.sameHomeClub || golfer.isOpenToPlay) && (
-            <div className="flex flex-wrap gap-1.5">
-              {/* Show max 2 chips */}
-              {golfer.isOpenToPlay && (
-                <StatusChip icon="🟢" label="Open to play" tone="success" />
-              )}
-              {golfer.sameHomeClub && (
-                <StatusChip icon="🏠" label="Same home club" />
-              )}
-              {/* In real implementation, if more than 2 chips, show +N */}
-            </div>
+            <StatusChips
+              sameHomeClub={golfer.sameHomeClub}
+              isOpenToPlay={golfer.isOpenToPlay}
+            />
           )}
         </div>
       </TapButton>
@@ -216,7 +148,7 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
             haptic('light');
             sendFriendRequest();
           }}
-          aria-label="Send friend request"
+          aria-label={`Send friend request to ${golfer.display_name}`}
         >
           Friend
         </TapButton>
@@ -244,7 +176,7 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
             haptic('light');
             toggleFollow();
           }}
-          aria-label={isFollowing ? 'Unfollow' : 'Follow'}
+          aria-label={isFollowing ? `Unfollow ${golfer.display_name}` : `Follow ${golfer.display_name}`}
           aria-pressed={isFollowing}
         >
           {isFollowing ? 'Following' : 'Follow'}
@@ -263,7 +195,7 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
             haptic('light');
             openMessage();
           }}
-          aria-label="Message"
+          aria-label={`Message ${golfer.display_name}`}
         >
           Message
         </TapButton>
