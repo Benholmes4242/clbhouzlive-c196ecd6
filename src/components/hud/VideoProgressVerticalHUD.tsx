@@ -58,9 +58,17 @@ export function VideoProgressVerticalHUD({
   const { setProgressFillRef, progress, pauseSync, resumeSync } = useVideoProgressSync(attachedVideo);
   const trackRef = React.useRef<HTMLDivElement | null>(null);
   const fillRef = React.useRef<HTMLDivElement | null>(null);
+  const knobRef = React.useRef<HTMLDivElement | null>(null);
   const previewCanvasRef = React.useRef<HTMLCanvasElement | null>(null);
   const offscreenVideoRef = React.useRef<HTMLVideoElement | null>(null);
   const offscreenHlsRef = React.useRef<Hls | null>(null);
+  
+  // rAF-based smooth scrubbing refs
+  const scrubTargetRatioRef = React.useRef<number | null>(null);
+  const scrubShownRatioRef = React.useRef(0);
+  const scrubLoopRef = React.useRef<number | null>(null);
+  const isScrubLoopOnRef = React.useRef(false);
+  const barRectRef = React.useRef<DOMRect | null>(null);
   
   // Store the current attachedVideo in a ref to ensure callbacks always use the latest value
   const attachedVideoRef = React.useRef<HTMLVideoElement | null>(null);
@@ -265,6 +273,67 @@ export function VideoProgressVerticalHUD({
       mo.disconnect();
     };
   }, [recalcRailBox]);
+  
+  // Cache bar rect to prevent layout thrashing during scrub
+  React.useLayoutEffect(() => {
+    const cacheRect = () => {
+      if (trackRef.current) {
+        barRectRef.current = trackRef.current.getBoundingClientRect();
+      }
+    };
+    cacheRect();
+    window.addEventListener('resize', cacheRect);
+    const ro = new ResizeObserver(cacheRect);
+    if (trackRef.current) ro.observe(trackRef.current);
+    return () => {
+      window.removeEventListener('resize', cacheRect);
+      ro.disconnect();
+    };
+  }, []);
+  // Smooth scrubbing rAF loop
+  const startScrubLoop = React.useCallback(() => {
+    if (isScrubLoopOnRef.current) return;
+    isScrubLoopOnRef.current = true;
+    
+    const durationRef = { current: attachedVideoRef.current?.duration || 0 };
+    
+    const step = () => {
+      const t = scrubTargetRatioRef.current;
+      let s = scrubShownRatioRef.current;
+      
+      if (t != null) {
+        // Smooth interpolation
+        s = s + (t - s) * 0.25;
+        scrubShownRatioRef.current = s;
+        
+        // Update fill
+        if (fillRef.current) {
+          fillRef.current.style.transform = `scaleY(${s})`;
+        }
+        
+        // Update knob position (0 = bottom, 1 = top)
+        if (knobRef.current) {
+          knobRef.current.style.transform = `translateY(${(1 - s) * 100}%)`;
+        }
+        
+        // Update preview time for thumbnail
+        const newTime = s * durationRef.current;
+        setPreviewTime(newTime);
+        previewTimeRef.current = newTime;
+        setScrubRatio(s);
+      }
+      
+      scrubLoopRef.current = requestAnimationFrame(step);
+    };
+    scrubLoopRef.current = requestAnimationFrame(step);
+  }, []);
+  
+  const stopScrubLoop = React.useCallback(() => {
+    isScrubLoopOnRef.current = false;
+    if (scrubLoopRef.current) cancelAnimationFrame(scrubLoopRef.current);
+    scrubLoopRef.current = null;
+  }, []);
+  
   // Helper: clear long-press timer
   const clearHold = React.useCallback(() => {
     if (holdTimerRef.current) {
@@ -314,63 +383,58 @@ export function VideoProgressVerticalHUD({
     // Show thumbnail when press starts
     setThumbVisible(true);
     
+    // Set initial target for smooth loop
+    const rect = barRectRef.current;
+    if (rect) {
+      const rel = (clientY - rect.top) / rect.height;
+      const ratio = Math.max(0, Math.min(1, 1 - rel));
+      scrubTargetRatioRef.current = ratio;
+    }
+    
     // Do NOT preventDefault here - allow feed to scroll if user just swipes
   }, [clearHold]);
 
   const handleScrubMoveInternal = React.useCallback((clientY: number) => {
-    if (!trackRef.current) return;
+    const rect = barRectRef.current;
+    if (!rect) return;
     
-    // Use the ref to ensure we always have the latest video element
     const currentVideo = attachedVideoRef.current;
     if (!currentVideo) return;
     
-    const rect = trackRef.current.getBoundingClientRect();
-    const relativeY = clientY - rect.top;
-    const ratio = clamp01(1 - (relativeY / rect.height));
+    // Compute target ratio (cheap)
+    const rel = (clientY - rect.top) / rect.height;
+    const ratio = Math.max(0, Math.min(1, 1 - rel));
+    scrubTargetRatioRef.current = ratio;
     
-    const newTime = (currentVideo?.duration || 0) * ratio;
-    setPreviewTime(newTime);
-    previewTimeRef.current = newTime;
-    setPreviewPosPx(relativeY);
-    setScrubRatio(ratio);
-    
-    // Drive fill immediately for visual feedback
-    if (fillRef.current) {
-      fillRef.current.style.transform = `scaleY(${ratio})`;
-    }
-    
-    // UPDATE THUMB POSITION near the bar
-    // Defensive positioning: fallback if railBox isn't ready yet
+    // Update thumbnail position
     const viewportW = window.innerWidth;
     const viewportH = window.innerHeight;
-    const estWidth = Math.min(Math.max(viewportW * 0.28, 96), 128); // 96–128
-    const estHeight = estWidth * 9 / 16;
+    const estWidth = 176;
+    const estHeight = 112;
     
     let barX: number;
     if (railBox) {
-      barX = window.innerWidth - railBox.right; // Convert right offset to left position
+      barX = window.innerWidth - railBox.right;
     } else {
-      // Fallback: position based on safe area + default gap
       const safeRight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sat') || '0');
-      const fallbackRight = 64 + safeRight; // 64px default gap + safe area
+      const fallbackRight = 64 + safeRight;
       barX = window.innerWidth - fallbackRight;
     }
     
     let top = clientY;
-    let left = barX - 12; // Position to left of bar with gap
-
-    // Flip to left if near right edge
+    let left = barX - 12;
+    
     const alignLeft = left + estWidth + 8 > viewportW;
     setThumbAlignLeft(alignLeft);
     
-    // Avoid bottom overflow
     if (top + estHeight / 2 + 8 > viewportH) top = viewportH - estHeight / 2 - 8;
     if (top - estHeight / 2 - 8 < 0) top = estHeight / 2 + 8;
-
+    
     setThumbTop(top);
     setThumbLeft(left);
     
-    // DRAW into canvas via offscreen video (no main video seeking)
+    // Draw canvas frame
+    const newTime = ratio * (currentVideo.duration || 0);
     const off = offscreenVideoRef.current;
     const canvas = previewCanvasRef.current;
     if (off && canvas && !drawingRef.current) {
@@ -378,30 +442,34 @@ export function VideoProgressVerticalHUD({
       
       const draw = () => {
         const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(off, 0, 0, canvas.width, canvas.height);
+        if (ctx && off.videoWidth && off.videoHeight) {
+          const cw = canvas.width;
+          const ch = canvas.height;
+          const vw = off.videoWidth;
+          const vh = off.videoHeight;
+          const scale = Math.min(cw / vw, ch / vh);
+          const dw = vw * scale;
+          const dh = vh * scale;
+          const dx = (cw - dw) / 2;
+          const dy = (ch - dh) / 2;
+          ctx.clearRect(0, 0, cw, ch);
+          ctx.drawImage(off, dx, dy, dw, dh);
         }
         drawingRef.current = false;
       };
       
-      // Wait for seek to complete before drawing
       const onSeeked = () => {
         off.removeEventListener('seeked', onSeeked);
-        
-        // Prefer requestVideoFrameCallback when available
         // @ts-ignore
         if (typeof off.requestVideoFrameCallback === 'function') {
           // @ts-ignore
           off.requestVideoFrameCallback(() => requestAnimationFrame(draw));
         } else {
-          // Small delay to ensure frame is ready
           setTimeout(() => requestAnimationFrame(draw), 16);
         }
       };
       
-      // Check readyState before seeking to prevent errors
       if (off.readyState < 2) {
-        // Need to load metadata first
         const onLoaded = () => {
           off.removeEventListener('loadeddata', onLoaded);
           off.addEventListener('seeked', onSeeked, { once: true });
@@ -410,17 +478,12 @@ export function VideoProgressVerticalHUD({
         off.addEventListener('loadeddata', onLoaded, { once: true });
       } else {
         off.addEventListener('seeked', onSeeked, { once: true });
-        off.currentTime = newTime; // Jump offscreen only
+        off.currentTime = newTime;
       }
     }
     
     setThumbVisible(true);
-    
-    // Temporary diagnostic logging
-    if (process.env.NODE_ENV !== 'production') {
-      console.debug('[vhud:scrub]', { ratio, newTime, thumbTop, thumbLeft, thumbVisible: true });
-    }
-  }, [clamp01, railBox]);
+  }, [railBox]);
 
   // Global move handler with velocity detection and scrub activation
   const handleGlobalMove = React.useCallback((clientY: number) => {
@@ -453,6 +516,7 @@ export function VideoProgressVerticalHUD({
       setIsScrubbing(true);
       pauseSync?.();
       setIsBarActive(true);
+      startScrubLoop();
       
       // Clear any pending fade timeout
       if (activeTimeoutRef.current) {
@@ -469,17 +533,20 @@ export function VideoProgressVerticalHUD({
     if (isScrubbing) {
       handleScrubMoveInternal(clientY);
     }
-  }, [isScrubbing, handleScrubMoveInternal, pauseSync, clearHold]);
+  }, [isScrubbing, handleScrubMoveInternal, pauseSync, clearHold, startScrubLoop]);
 
   const handleScrubEnd = React.useCallback(() => {
     clearHold();
     pressStartRef.current = null;
     
     if (isScrubbing) {
-      // Commit seek only if we were actually scrubbing
+      stopScrubLoop();
+      
+      // Commit seek with final ratio
+      const ratio = scrubTargetRatioRef.current ?? scrubShownRatioRef.current;
       const currentVideo = attachedVideoRef.current;
-      if (currentVideo) {
-        currentVideo.currentTime = previewTime;
+      if (currentVideo && Number.isFinite(currentVideo.duration)) {
+        currentVideo.currentTime = ratio * currentVideo.duration;
       }
       
       // Haptic feedback on scrub complete
@@ -488,8 +555,6 @@ export function VideoProgressVerticalHUD({
       }
       
       setIsScrubbing(false);
-      
-      // Hide thumbnail
       setThumbVisible(false);
       
       // Announce for screen readers
@@ -497,7 +562,6 @@ export function VideoProgressVerticalHUD({
         announceRef.current.textContent = `Seeking to ${formatTime(previewTimeRef.current || 0)}`;
       }
       
-      // Resume the sync loop
       resumeSync?.();
       
       // Clear canvas
@@ -507,13 +571,13 @@ export function VideoProgressVerticalHUD({
         ctx?.clearRect(0, 0, canvas.width, canvas.height);
       }
       
-      // Cleanup offscreen resources if any
+      // Cleanup offscreen resources
       if (offscreenHlsRef.current) {
         try { offscreenHlsRef.current.destroy(); } catch {}
         offscreenHlsRef.current = null;
       }
       
-      // Restore scroll behavior on bar wrapper
+      // Restore scroll behavior
       if (barWrapperRef.current?.style) {
         barWrapperRef.current.style.touchAction = 'pan-y';
       }
@@ -527,11 +591,9 @@ export function VideoProgressVerticalHUD({
         activeTimeoutRef.current = null;
       }, 1500);
     } else {
-      // Not scrubbing - this was just a tap/scroll, nothing to commit
-      // Still hide thumbnail in case it was shown during the press
       setThumbVisible(false);
     }
-  }, [isScrubbing, previewTime, resumeSync, clearHold]);
+  }, [isScrubbing, resumeSync, clearHold, stopScrubLoop]);
 
   // Global move/end listeners - always active once press starts
   React.useEffect(() => {
@@ -612,8 +674,8 @@ export function VideoProgressVerticalHUD({
             }}
           />
           
-          {/* Thumb - appears during scrubbing */}
-          <div ref={thumbRef} className="vhud-thumb" />
+          {/* Knob - visible during scrubbing */}
+          <div ref={knobRef} className="vhud-knob" />
         </div>
       </div>
 

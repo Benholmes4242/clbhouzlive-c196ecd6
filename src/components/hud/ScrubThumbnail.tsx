@@ -38,47 +38,40 @@ export function ScrubThumbnail({
     transition: reduced ? undefined : 'opacity 120ms ease, transform 120ms ease',
   };
 
-  // container (frame + stroke + shadow)
+  // container (frame + stroke + shadow) - Frosted White
   const frameStyle: React.CSSProperties = {
-    borderRadius: 14,
-    boxShadow: '0 6px 14px rgba(0,0,0,.25)',
-    outline: '1px solid rgba(255,255,255,.12)',
+    borderRadius: 16,
+    boxShadow: '0 4px 20px rgba(0,0,0,.35)',
+    border: '1px solid rgba(255,255,255,.40)',
     overflow: 'hidden',
-    width: 'clamp(96px, 28vw, 128px)',
-    aspectRatio: '16 / 9',
-    background: 'black',
+    width: 176,
+    height: 112,
+    background: 'rgba(255,255,255,0.10)',
+    backdropFilter: 'blur(10px) saturate(130%)',
+    WebkitBackdropFilter: 'blur(10px) saturate(130%)',
     position: 'relative',
   };
 
   const chipStyle: React.CSSProperties = {
     position: 'absolute',
-    left: '50%',
-    bottom: 6,
-    transform: 'translateX(-50%)',
+    right: 8,
+    bottom: 8,
     fontSize: 12,
-    fontWeight: 600,
-    color: 'white',
-    background: 'rgba(18,18,18,.72)',
-    border: '1px solid rgba(255,255,255,.12)',
+    lineHeight: '18px',
+    fontWeight: 500,
+    color: 'rgba(255,255,255,0.95)',
+    background: 'rgba(0,0,0,0.35)',
+    border: '1px solid rgba(255,255,255,0.35)',
     borderRadius: 10,
-    padding: '4px 8px',
-    lineHeight: 1,
-    backdropFilter: 'blur(8px)',
-    WebkitBackdropFilter: 'blur(8px)',
-  };
-
-  const ringStyle: React.CSSProperties = {
-    position: 'absolute',
-    inset: 0,
-    borderRadius: 14,
-    boxShadow: 'inset 0 0 0 2px rgba(159,214,194,.7)' /* Frosted Aqua edge */,
-    pointerEvents: 'none',
+    padding: '2px 8px',
+    backdropFilter: 'blur(4px)',
+    WebkitBackdropFilter: 'blur(4px)',
   };
 
   return (
     <div style={posStyle} aria-hidden={!visible}>
       <div style={frameStyle}>
-        {/* Show canvas when available (no flicker) */}
+        {/* Show canvas when available */}
         {canvas ? (
           <canvas
             width={canvas.width}
@@ -87,16 +80,24 @@ export function ScrubThumbnail({
               if (!el || !canvas) return;
               const ctx = el.getContext('2d');
               if (!ctx) return;
-              // draw the latest captured frame
-              ctx.clearRect(0, 0, el.width, el.height);
-              ctx.drawImage(canvas, 0, 0, el.width, el.height);
+              // Aspect-correct draw
+              const cw = el.width;
+              const ch = el.height;
+              const vw = canvas.width;
+              const vh = canvas.height;
+              if (vw && vh) {
+                const scale = Math.min(cw / vw, ch / vh);
+                const dw = vw * scale;
+                const dh = vh * scale;
+                const dx = (cw - dw) / 2;
+                const dy = (ch - dh) / 2;
+                ctx.clearRect(0, 0, cw, ch);
+                ctx.drawImage(canvas, 0, 0, vw, vh, dx, dy, dw, dh);
+              }
             }}
-            style={{ width: '100%', height: '100%', display: 'block' }}
+            style={{ width: '100%', height: '100%', display: 'block', borderRadius: 12 }}
           />
         ) : null}
-
-        {/* progress ring (subtle) */}
-        <div style={ringStyle} />
 
         {/* time chip */}
         <div style={chipStyle}>
