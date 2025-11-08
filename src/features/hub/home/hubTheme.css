@@ -360,7 +360,7 @@ html.hub-open {
   /* avoid accidental horizontal scroll */
   overflow-x: hidden;
   padding-top: 0;
-  padding-bottom: 12px;
+  padding-bottom: 0;
   overscroll-behavior: contain;
   overflow-anchor: none;
   -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
