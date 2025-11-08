@@ -6,7 +6,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { GolferRow } from '@/features/nearby/components/GolferRow';
@@ -20,9 +20,27 @@ import '../home/hubTheme.css';
 export function HubGolfersPage() {
   const nav = useNavigate();
   const loc = useLocation();
+  const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { golfers, isLoading } = useActiveGolfers({ limit: 50 });
   const { visibilityMode, setVisibilityMode } = useVisibility();
+  
+  // Read initial scope from URL parameter
+  useEffect(() => {
+    const scopeParam = searchParams.get('scope');
+    if (scopeParam) {
+      // Map URL param to VisibilityMode
+      const modeMap: Record<string, 'all' | 'friends' | 'hidden'> = {
+        'everyone': 'all',
+        'friends': 'friends',
+        'hidden': 'hidden',
+      };
+      const mappedMode = modeMap[scopeParam];
+      if (mappedMode) {
+        setVisibilityMode(mappedMode);
+      }
+    }
+  }, [searchParams, setVisibilityMode]);
 
   const handleBack = () => {
     const state = loc.state as any;

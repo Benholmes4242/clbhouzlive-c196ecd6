@@ -99,7 +99,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
         <button
           onClick={(e) => { 
             e.stopPropagation(); 
-            navigateFromHub('/hub/golfers'); 
+            navigateFromHub('/golfers'); 
           }}
           className="text-[15px] font-medium transition"
           style={{
