@@ -30,7 +30,7 @@ export function GolferStatusBar({ value, onChange }: GolferStatusBarProps) {
       case 'friends':
         return { text: 'Visible to your friends only', color: '#72ff8d' };
       case 'hidden':
-        return { text: 'Hidden from nearby golfers', color: 'rgba(255,90,90,0.6)' };
+        return { text: 'Hidden from nearby golfers', color: 'rgba(255,255,255,0.78)' };
     }
   };
 
