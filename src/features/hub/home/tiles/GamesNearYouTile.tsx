@@ -23,12 +23,52 @@ interface Game {
   status: string;
 }
 
-function GameRow({ game, open, onToggle }: { game: Game; open: boolean; onToggle: () => void }) {
+function GameRow({ 
+  game, 
+  open, 
+  onToggle,
+  scrollParentRef 
+}: { 
+  game: Game; 
+  open: boolean; 
+  onToggle: () => void;
+  scrollParentRef: React.RefObject<HTMLDivElement>;
+}) {
   const { navigateFromHub } = useHub();
   const availableSlots = game.slots_open || 0;
+  const rowRef = React.useRef<HTMLDivElement | null>(null);
+
+  // Smoothly ensure visibility when this row becomes open
+  React.useEffect(() => {
+    if (!open || !rowRef.current || !scrollParentRef.current) return;
+
+    const parent = scrollParentRef.current;
+    const el = rowRef.current;
+
+    // Wait a tick so height transition starts, then scroll just enough
+    const id = window.requestAnimationFrame(() => {
+      const parentBox = parent.getBoundingClientRect();
+      const rowBox = el.getBoundingClientRect();
+
+      const overTop = rowBox.top < parentBox.top + 12;
+      const overBottom = rowBox.bottom > parentBox.bottom - 12;
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        if (overTop) parent.scrollTop += rowBox.top - parentBox.top - 12;
+        if (overBottom) parent.scrollTop += rowBox.bottom - parentBox.bottom + 12;
+        return;
+      }
+
+      if (overTop || overBottom) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+      }
+    });
+
+    return () => window.cancelAnimationFrame(id);
+  }, [open, scrollParentRef]);
 
   return (
-    <div className={`game-row ${open ? 'open' : ''}`} role="listitem">
+    <div ref={rowRef} className={`game-row ${open ? 'open' : ''}`} role="listitem">
       <button 
         className="row-head" 
         onClick={onToggle}
@@ -80,6 +120,7 @@ export function GamesNearYouTile({
   const { navigateFromHub } = useHub();
   const { data: allGames = [], isLoading } = useGamesQuery();
   const [openGameId, setOpenGameId] = React.useState<string | null>(null);
+  const listRef = React.useRef<HTMLDivElement | null>(null);
   
   const games = allGames.slice(0, limit);
   
@@ -93,12 +134,23 @@ export function GamesNearYouTile({
     >
       <div className="flex flex-col h-full">
         {/* Game list with inline scroll */}
-        <div className="games-list" role="list">
+        <div 
+          ref={listRef}
+          className="games-list" 
+          role="list"
+          aria-label="Games near you"
+        >
           {isLoading && Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
           ))}
           {!isLoading && games.map(g => (
-            <GameRow key={g.id} game={g} open={openGameId === g.id} onToggle={() => handleToggle(g.id)} />
+            <GameRow 
+              key={g.id} 
+              game={g} 
+              open={openGameId === g.id} 
+              onToggle={() => handleToggle(g.id)}
+              scrollParentRef={listRef}
+            />
           ))}
           {!isLoading && games.length === 0 && (
             <div className="text-[13px] py-2" style={{ color: 'var(--hub-text-sub)' }}>

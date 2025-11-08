@@ -25,6 +25,7 @@
   padding: 12px 14px;
   margin: 10px 0;
   transition: background 0.2s ease, box-shadow 0.2s ease;
+  scroll-margin-block: 8px; /* helps scrollIntoView land nicely */
 }
 
 .game-row .row-head {
