@@ -39,7 +39,7 @@ export function GameExpandedRoster({ host, members }: GameExpandedRosterProps) {
                 color: 'var(--hub-text-body)',
               }}
             >
-              {host.name.charAt(0)}
+              {host.name === 'Guest' ? 'G' : host.name.charAt(0).toUpperCase()}
             </div>
           )}
           <div className="text-[14px] truncate" style={{ color: 'var(--hub-text-body)' }}>
@@ -76,7 +76,7 @@ export function GameExpandedRoster({ host, members }: GameExpandedRosterProps) {
                         color: 'var(--hub-text-body)',
                       }}
                     >
-                      {m.name.charAt(0)}
+                      {m.name === 'Guest' ? 'G' : m.name.charAt(0).toUpperCase()}
                     </div>
                   )}
                   <div className="text-[13px] truncate" style={{ color: 'var(--hub-text-body)' }}>

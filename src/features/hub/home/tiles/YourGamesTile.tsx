@@ -94,6 +94,17 @@ function GameRow({
     startRef.current = null;
   };
   
+  // Format date/time for collapsed header
+  const dt = new Date(game.start_time);
+  const when = dt.toLocaleString(undefined, {
+    weekday: 'short', 
+    day: 'numeric', 
+    month: 'short',
+    hour: '2-digit', 
+    minute: '2-digit', 
+    hour12: false
+  });
+
   return (
     <button 
       ref={rowRef}
@@ -102,44 +113,29 @@ function GameRow({
       onPointerMove={handlePointerMove}
       onPointerUp={clearTimer}
       onPointerCancel={clearTimer}
-      className="gt-row w-full rounded-[14px] px-4 py-3 text-left"
+      className="gt-row w-full rounded-[14px] px-4 py-3 text-left outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0"
       style={{ 
         background: 'rgba(255,255,255,0.06)',
         border: '1px solid rgba(255,255,255,0.12)',
+        WebkitTapHighlightColor: 'transparent',
       }}
     >
-      {/* Top line */}
-      <div className="flex items-center gap-2">
-        {/* Status pill */}
-        <span 
-          className="rounded-full px-2.5 py-1 text-[12px] leading-none shrink-0"
-          style={{
-            background: 'rgba(255,255,255,0.08)',
-            border: `1px solid ${game.kind === 'Hosting' ? 'rgba(34,197,94,0.3)' : 'rgba(59,130,246,0.3)'}`,
-            color: 'var(--hub-text-body)',
-          }}
-        >
-          {game.kind}
-        </span>
-
-        {/* Flag — always in same place */}
-        <span role="img" aria-label="flag">⛳</span>
-
-        {/* Course name */}
-        <div className="truncate flex-1 font-medium text-[15px]" style={{ color: 'var(--hub-text-bright)' }}>
-          {game.course_name || 'Golf Course'}
+      {/* Collapsed header: course name + date/time */}
+      <div className="flex items-center gap-3">
+        <div className="min-w-0 flex-1">
+          <div className="text-[16px] font-medium truncate" style={{ color: 'var(--hub-text-bright)' }}>
+            {game.course_name || 'Golf Course'}
+          </div>
+          <div className="text-[13px]" style={{ color: 'var(--hub-text-body)', opacity: 0.6 }}>
+            {when}
+          </div>
         </div>
-
-        {/* Slots */}
-        <div className="text-[12px] shrink-0 ml-2" style={{ color: 'var(--hub-text-sub)' }}>
-          {availableSlots}/{totalSlots}
-        </div>
-
         {/* Chevron */}
         <span 
-          className="ml-2 transition-transform text-[18px]"
+          className="shrink-0 transition-transform text-[18px]"
           style={{ 
             color: 'var(--hub-text-sub)',
+            opacity: 0.6,
             transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)',
           }}
         >
@@ -187,11 +183,19 @@ function GameRow({
                 ),
                 avatarUrl: game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.profile_photo_url || null,
               }}
-              members={game.participants.map(p => ({
-                id: p.user_id || '',
-                name: p.user_profiles?.display_name || 'Player',
-                avatarUrl: p.user_profiles?.profile_photo_url || null,
-              }))}
+              members={game.participants.map(p => {
+                const hasProfile = !!p.user_profiles;
+                const isGuest = !p.user_id || !hasProfile;
+                const name = isGuest 
+                  ? 'Guest' 
+                  : (p.user_profiles?.display_name || 'Player');
+                
+                return {
+                  id: p.user_id || `guest_${Math.random().toString(36).slice(2)}`,
+                  name,
+                  avatarUrl: isGuest ? null : (p.user_profiles?.profile_photo_url || null),
+                };
+              })}
             />
           </div>
 
