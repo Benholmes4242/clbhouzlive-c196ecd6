@@ -39,8 +39,8 @@ export function useActiveGolfers({ limit = 999 }: { limit?: number } = {}) {
         home_club: golfer.home_club,
         distance_km: golfer.distance_km,
         distanceText: golfer.distance_km < 1 
-          ? `${Math.round(golfer.distance_km * 1000)}m away`
-          : `${golfer.distance_km.toFixed(1)}km away`,
+          ? `${Math.round(golfer.distance_km * 1000)}m`
+          : `${golfer.distance_km.toFixed(1)}km`,
         isOpenToPlay: golfer.isOpenToPlay,
         sameHomeClub: golfer.same_club,
         eg_handicap_index: Math.floor(Math.random() * 25) + 1,
