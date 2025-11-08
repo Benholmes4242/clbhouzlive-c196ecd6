@@ -16,6 +16,7 @@ import { GameExpandedRoster } from './games/GameExpandedRoster';
 import { GameExpandedNotes } from './games/GameExpandedNotes';
 import { GameExpandedMeta } from './games/GameExpandedMeta';
 import './games/gameAnimations.css';
+import './games/gameRow.css';
 
 type GameWithDetails = {
   id: string;
@@ -51,6 +52,7 @@ function GameRow({
   const totalSlots = game.slots_total || 0;
   const availableSlots = game.slots_open || 0;
   const timerRef = React.useRef<number | null>(null);
+  const startRef = React.useRef<{x: number; y: number} | null>(null);
 
   const toggle = () => {
     const next = !expanded;
@@ -68,9 +70,21 @@ function GameRow({
   };
   
   const handlePointerDown = (e: React.PointerEvent) => {
+    startRef.current = { x: e.clientX, y: e.clientY };
     timerRef.current = window.setTimeout(() => {
       comingSoon();
     }, 420);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!startRef.current) return;
+    const dy = Math.abs(e.clientY - startRef.current.y);
+    if (dy > 6) {  // small threshold to allow scroll init
+      if (timerRef.current) {
+        window.clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    }
   };
 
   const handlePointerUp = () => {
@@ -78,6 +92,7 @@ function GameRow({
       window.clearTimeout(timerRef.current);
       timerRef.current = null;
     }
+    startRef.current = null;
   };
 
   const handlePointerCancel = () => {
@@ -85,6 +100,7 @@ function GameRow({
       window.clearTimeout(timerRef.current);
       timerRef.current = null;
     }
+    startRef.current = null;
   };
   
   return (
@@ -92,9 +108,10 @@ function GameRow({
       ref={rowRef}
       onClick={toggle}
       onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}
-      className="w-full rounded-[14px] px-4 py-3 text-left transition-all"
+      className="hub-game-row w-full rounded-[14px] px-4 py-3 text-left transition-all"
       style={{ 
         background: 'rgba(255,255,255,0.06)',
         border: '1px solid rgba(255,255,255,0.12)',
@@ -325,7 +342,7 @@ export function YourGamesTile() {
         </div>
       }
       >
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col">{/* h-full removed to allow flex shrinking */}
         <div
           ref={listRef}
           style={{ 
