@@ -53,6 +53,7 @@
   bottom: 0;
   left: 0;
   right: 0;
+  height: 100%;
   transform-origin: bottom;
   will-change: transform;
 }
