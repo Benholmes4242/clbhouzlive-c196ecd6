@@ -358,25 +358,9 @@ export function VideoProgressVerticalHUD({
         drawingRef.current = false;
       };
       
-      // Check readyState before seeking to prevent errors
-      if (off.readyState < 2) {
-        // Need to load metadata first
-        const onLoaded = () => {
-          off.removeEventListener('loadeddata', onLoaded);
-          off.currentTime = newTime;
-          
-          // Prefer requestVideoFrameCallback when available
-          // @ts-ignore
-          if (typeof off.requestVideoFrameCallback === 'function') {
-            // @ts-ignore
-            off.requestVideoFrameCallback(() => requestAnimationFrame(draw));
-          } else {
-            requestAnimationFrame(draw);
-          }
-        };
-        off.addEventListener('loadeddata', onLoaded, { once: true });
-      } else {
-        off.currentTime = newTime; // Jump offscreen only
+      // Wait for seek to complete before drawing
+      const onSeeked = () => {
+        off.removeEventListener('seeked', onSeeked);
         
         // Prefer requestVideoFrameCallback when available
         // @ts-ignore
@@ -384,8 +368,23 @@ export function VideoProgressVerticalHUD({
           // @ts-ignore
           off.requestVideoFrameCallback(() => requestAnimationFrame(draw));
         } else {
-          requestAnimationFrame(draw);
+          // Small delay to ensure frame is ready
+          setTimeout(() => requestAnimationFrame(draw), 16);
         }
+      };
+      
+      // Check readyState before seeking to prevent errors
+      if (off.readyState < 2) {
+        // Need to load metadata first
+        const onLoaded = () => {
+          off.removeEventListener('loadeddata', onLoaded);
+          off.addEventListener('seeked', onSeeked, { once: true });
+          off.currentTime = newTime;
+        };
+        off.addEventListener('loadeddata', onLoaded, { once: true });
+      } else {
+        off.addEventListener('seeked', onSeeked, { once: true });
+        off.currentTime = newTime; // Jump offscreen only
       }
     }
     
