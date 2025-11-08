@@ -198,7 +198,81 @@ export function useActiveGolfers({ limit = 20 }: { limit?: number } = {}) {
       isMock: false,
     }));
 
-    return realWithOnline;
+    // Add 5 mock profiles for testing
+    const mockGolfers: ActiveGolfer[] = [
+      {
+        id: 'mock-1',
+        display_name: 'James Morrison',
+        username: 'jmorrison',
+        home_club: 'St Andrews Links',
+        avatar_url: 'https://i.pravatar.cc/150?img=12',
+        is_online: true,
+        isMock: true,
+        distance_km: 2.3,
+        distanceText: '2.3 km',
+        isOpenToPlay: true,
+        sameHomeClub: false,
+        eg_handicap_index: 8.4,
+      },
+      {
+        id: 'mock-2',
+        display_name: 'Emma Thompson',
+        username: 'ethompson',
+        home_club: 'Muirfield',
+        avatar_url: 'https://i.pravatar.cc/150?img=45',
+        is_online: true,
+        isMock: true,
+        distance_km: 4.7,
+        distanceText: '4.7 km',
+        isOpenToPlay: true,
+        sameHomeClub: false,
+        eg_handicap_index: 12.1,
+      },
+      {
+        id: 'mock-3',
+        display_name: 'Oliver Chen',
+        username: 'ochen',
+        home_club: 'Royal Troon',
+        avatar_url: 'https://i.pravatar.cc/150?img=33',
+        is_online: true,
+        isMock: true,
+        distance_km: 5.2,
+        distanceText: '5.2 km',
+        isOpenToPlay: true,
+        sameHomeClub: false,
+        eg_handicap_index: 6.8,
+      },
+      {
+        id: 'mock-4',
+        display_name: 'Sophie Anderson',
+        username: 'sanderson',
+        home_club: 'Carnoustie',
+        avatar_url: 'https://i.pravatar.cc/150?img=27',
+        is_online: true,
+        isMock: true,
+        distance_km: 7.1,
+        distanceText: '7.1 km',
+        isOpenToPlay: true,
+        sameHomeClub: false,
+        eg_handicap_index: 15.3,
+      },
+      {
+        id: 'mock-5',
+        display_name: 'Marcus Williams',
+        username: 'mwilliams',
+        home_club: 'Turnberry',
+        avatar_url: 'https://i.pravatar.cc/150?img=51',
+        is_online: true,
+        isMock: true,
+        distance_km: 8.9,
+        distanceText: '8.9 km',
+        isOpenToPlay: true,
+        sameHomeClub: false,
+        eg_handicap_index: 4.2,
+      },
+    ];
+
+    return [...realWithOnline, ...mockGolfers];
   }, [realProfiles]);
 
   const realOnlineCount = useMemo(() => {
