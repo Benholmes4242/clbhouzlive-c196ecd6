@@ -32,9 +32,9 @@ export function formatDistance(distanceMeters: number): string {
   if (distanceKm < 1.6) {
     // Show in miles
     const miles = distanceKm * 0.621371;
-    return `${miles.toFixed(1)} mi`;
+    return `${miles.toFixed(1)}mi`;
   } else {
     // Show in km
-    return `${distanceKm.toFixed(1)} km`;
+    return `${distanceKm.toFixed(1)}km`;
   }
 }
