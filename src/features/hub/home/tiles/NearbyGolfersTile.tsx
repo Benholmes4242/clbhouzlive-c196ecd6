@@ -45,7 +45,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       align="center"
     >
       <div className="flex flex-col h-full" style={{ position: 'relative' }}>
-        <div 
+          <div 
           ref={scrollRef} 
           className="space-y-0.5 hub-golfers-list-scroll flex flex-col"
           style={{
@@ -53,8 +53,8 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',
             maxHeight: 'calc(2.4 * 52px)', // Show 2.4 rows visible
-            maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
+            maskImage: 'linear-gradient(180deg, transparent 0%, #000 8%, #000 92%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, #000 8%, #000 92%, transparent 100%)',
           }}
         >
           {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
@@ -67,20 +67,25 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
           }).map(g => (
             <button 
               key={g.id} 
-              className="ng-row"
+              className="ng-row py-[10px]"
               onClick={() => nav(`/profile/${g.username}`)}
+              aria-label={`${g.display_name || g.username}, handicap ${formatHcp(g.eg_handicap_index)}, ${g.distanceText} away`}
             >
-              <img 
-                src={g.avatar_url || '/placeholder.svg'} 
-                alt="" 
-                className="ng-avatar"
-              />
+              <div className="shrink-0 rounded-full overflow-hidden w-[38px] h-[38px]">
+                <img 
+                  src={g.avatar_url || '/placeholder.svg'} 
+                  alt={`${g.display_name || g.username} profile photo`}
+                  className="w-full h-full object-cover rounded-full"
+                  style={{ boxShadow: '0 0 0 1px rgba(255,255,255,.15)' }}
+                />
+              </div>
               <div className="ng-main">
-                <div className="hub-ellipsis-fade ng-name" title={g.display_name || g.username}>
+                <div className="hub-ellipsis-fade ng-name text-white/90" title={g.display_name || g.username}>
                   {g.display_name || g.username}
                 </div>
-                <div className="ng-distance">
-                  HCP {formatHcp(g.eg_handicap_index)} | {g.distanceText}
+                <div className="h-[2px]" />
+                <div className="ng-distance text-white/70">
+                  HCP {formatHcp(g.eg_handicap_index)} · {g.distanceText}
                 </div>
               </div>
             </button>
