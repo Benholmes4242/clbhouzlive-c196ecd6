@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 import Hls from 'hls.js';
 import './vhud.css';
+import { ScrubThumbnail } from './ScrubThumbnail';
+import { formatTime } from './time';
 
 // Long-press + drag scrubbing configuration
 const LONG_PRESS_MS = 350;              // delay before scrubbing can start
@@ -74,9 +76,48 @@ export function VideoProgressVerticalHUD({
     }
   }, [attachedVideo]);
   
+  // Build offscreen preview video when active video changes
+  React.useEffect(() => {
+    const main = attachedVideoRef.current;
+    if (!main) return;
+
+    // Duration for chip
+    const onMeta = () => setDuration(main.duration || 0);
+    main.addEventListener('loadedmetadata', onMeta);
+    setDuration(main.duration || 0);
+
+    // Create offscreen video (hidden, no layout thrash)
+    const off = document.createElement('video');
+    off.muted = true;
+    off.playsInline = true;
+    off.src = main.currentSrc || (main as HTMLVideoElement).src;
+    off.preload = 'auto';
+    off.crossOrigin = (main as HTMLVideoElement).crossOrigin || '';
+    off.load();
+    offscreenVideoRef.current = off;
+
+    // Set up a canvas we will draw into
+    const canvas = document.createElement('canvas');
+    // Match a sensible source resolution; keep tiny to avoid jank
+    canvas.width = 320;
+    canvas.height = 180;
+    previewCanvasRef.current = canvas;
+
+    return () => {
+      main.removeEventListener('loadedmetadata', onMeta);
+      off.pause();
+      off.removeAttribute('src');
+      // @ts-ignore
+      off.load();
+      offscreenVideoRef.current = null;
+      previewCanvasRef.current = null;
+    };
+  }, [attachedVideoRef.current]);
+  
 
   const [isScrubbing, setIsScrubbing] = React.useState(false);
   const [previewTime, setPreviewTime] = React.useState(0);
+  const previewTimeRef = React.useRef(0);
   const [previewPosPx, setPreviewPosPx] = React.useState(0);
   const [scrubRatio, setScrubRatio] = React.useState(0);
   const [isBarActive, setIsBarActive] = React.useState(false);
@@ -84,6 +125,15 @@ export function VideoProgressVerticalHUD({
   const activeTimeoutRef = React.useRef<number | null>(null);
   const bufferRef = React.useRef<HTMLDivElement | null>(null);
   const thumbRef = React.useRef<HTMLDivElement | null>(null);
+  
+  // Thumbnail UI state
+  const [thumbVisible, setThumbVisible] = React.useState(false);
+  const [thumbTop, setThumbTop] = React.useState(0);
+  const [thumbLeft, setThumbLeft] = React.useState(0);
+  const [thumbAlignLeft, setThumbAlignLeft] = React.useState(false);
+  const [duration, setDuration] = React.useState(0);
+  const drawingRef = React.useRef(false);
+  const announceRef = React.useRef<HTMLSpanElement | null>(null);
   
   // Long-press + velocity tracking refs
   const holdTimerRef = React.useRef<number | null>(null);
@@ -223,6 +273,9 @@ export function VideoProgressVerticalHUD({
       }
     }, LONG_PRESS_MS);
     
+    // Show thumbnail when press starts
+    setThumbVisible(true);
+    
     // Do NOT preventDefault here - allow feed to scroll if user just swipes
   }, [clearHold]);
 
@@ -239,6 +292,7 @@ export function VideoProgressVerticalHUD({
     
     const newTime = (currentVideo?.duration || 0) * ratio;
     setPreviewTime(newTime);
+    previewTimeRef.current = newTime;
     setPreviewPosPx(relativeY);
     setScrubRatio(ratio);
     
@@ -247,54 +301,58 @@ export function VideoProgressVerticalHUD({
       fillRef.current.style.transform = `scaleY(${ratio})`;
     }
     
-    // Capture frame from the current active video
-    const mainVideo = currentVideo;
-    const canvas = previewCanvasRef.current;
-    
-    if (canvas && mainVideo) {
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        // Set canvas dimensions to match aspect ratio
-        const aspectRatio = mainVideo.videoWidth / mainVideo.videoHeight;
-        if (aspectRatio && isFinite(aspectRatio)) {
-          canvas.width = 80;
-          canvas.height = Math.round(80 / aspectRatio);
-        } else {
-          canvas.width = 80;
-          canvas.height = 140;
-        }
-        
-        // Temporarily seek main video to preview time, capture frame, then restore
-        const originalTime = mainVideo.currentTime;
-        const originalPaused = mainVideo.paused;
-        
-        mainVideo.currentTime = newTime;
-        
-        // Wait for a rendered frame before drawing to canvas
-        const draw = () => {
-          if (mainVideo.readyState >= 2) {
-            ctx.drawImage(mainVideo, 0, 0, canvas.width, canvas.height);
-          }
-          // Restore original playback state
-          mainVideo.currentTime = originalTime;
-          if (!originalPaused) {
-            mainVideo.play().catch(() => {});
-          }
-        };
+    // UPDATE THUMB POSITION near the bar
+    const rail = railBox;
+    if (rail) {
+      const barX = window.innerWidth - rail.right; // Convert right offset to left position
+      let top = clientY;
+      let left = barX - 12; // Position to left of bar with gap
 
-        const rvfc = (mainVideo as any).requestVideoFrameCallback;
-        if (typeof rvfc === 'function') {
-          try {
-            rvfc(() => draw());
-          } catch {
-            requestAnimationFrame(draw);
-          }
-        } else {
-          requestAnimationFrame(draw);
+      // Edge-aware alignment
+      const viewportW = window.innerWidth;
+      const viewportH = window.innerHeight;
+      const estWidth = Math.min(Math.max(viewportW * 0.28, 96), 128); // 96–128
+      const estHeight = estWidth * 9 / 16;
+
+      // Flip to left if near right edge
+      const alignLeft = left + estWidth + 8 > viewportW;
+      setThumbAlignLeft(alignLeft);
+      
+      // Avoid bottom overflow
+      if (top + estHeight / 2 + 8 > viewportH) top = viewportH - estHeight / 2 - 8;
+      if (top - estHeight / 2 - 8 < 0) top = estHeight / 2 + 8;
+
+      setThumbTop(top);
+      setThumbLeft(left);
+    }
+    
+    // DRAW into canvas via offscreen video (no main video seeking)
+    const off = offscreenVideoRef.current;
+    const canvas = previewCanvasRef.current;
+    if (off && canvas && !drawingRef.current) {
+      drawingRef.current = true;
+      off.currentTime = newTime; // Jump offscreen only
+      
+      const draw = () => {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(off, 0, 0, canvas.width, canvas.height);
         }
+        drawingRef.current = false;
+      };
+
+      // Prefer requestVideoFrameCallback when available
+      // @ts-ignore
+      if (typeof off.requestVideoFrameCallback === 'function') {
+        // @ts-ignore
+        off.requestVideoFrameCallback(() => requestAnimationFrame(draw));
+      } else {
+        requestAnimationFrame(draw);
       }
     }
-  }, [clamp01]);
+    
+    setThumbVisible(true);
+  }, [clamp01, railBox]);
 
   // Global move handler with velocity detection and scrub activation
   const handleGlobalMove = React.useCallback((clientY: number) => {
@@ -363,6 +421,14 @@ export function VideoProgressVerticalHUD({
       
       setIsScrubbing(false);
       
+      // Hide thumbnail
+      setThumbVisible(false);
+      
+      // Announce for screen readers
+      if (announceRef.current) {
+        announceRef.current.textContent = `Seeking to ${formatTime(previewTimeRef.current || 0)}`;
+      }
+      
       // Resume the sync loop
       resumeSync?.();
       
@@ -394,6 +460,8 @@ export function VideoProgressVerticalHUD({
       }, 1500);
     } else {
       // Not scrubbing - this was just a tap/scroll, nothing to commit
+      // Still hide thumbnail in case it was shown during the press
+      setThumbVisible(false);
     }
   }, [isScrubbing, previewTime, resumeSync, clearHold]);
 
@@ -432,15 +500,8 @@ export function VideoProgressVerticalHUD({
     };
   }, [handleGlobalMove, handleScrubEnd, isScrubbing]);
 
-  // Format time display
-  const formatTime = (seconds: number) => {
-    if (!isFinite(seconds)) return '0:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const duration = attachedVideo?.duration || 0;
+  // Format time display - moved to external module for reuse
+  // (No longer needed here as it's imported from './time')
 
   // Update thumb position during scrubbing
   React.useEffect(() => {
@@ -492,38 +553,23 @@ export function VideoProgressVerticalHUD({
         </div>
       </div>
 
-      {/* Thumbnail Preview */}
-      {isScrubbing && (
-        <div
-          className="vhud-chip"
-          style={{
-            top: `${previewPosPx}px`,
-            transform: 'translateY(-50%)',
-            width: '80px',
-            height: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '4px',
-            padding: '8px',
-          }}
-        >
-          {/* Frame preview using canvas */}
-          <canvas
-            ref={previewCanvasRef}
-            className="w-full rounded-lg"
-            style={{ 
-              backgroundColor: "#000",
-              aspectRatio: '9/16',
-              maxHeight: '120px',
-            }}
-          />
-          
-          {/* Time overlay */}
-          <div className="text-center text-[10px] text-white/90 font-medium">
-            {formatTime(previewTime)} / {formatTime(duration)}
-          </div>
-        </div>
-      )}
+      {/* ARIA live region for screen readers */}
+      <span
+        ref={announceRef}
+        aria-live="polite"
+        style={{ position: 'fixed', width: 1, height: 1, overflow: 'hidden', clipPath: 'inset(50%)' }}
+      />
+
+      {/* Moving thumbnail (non-interactive) */}
+      <ScrubThumbnail
+        time={previewTime}
+        visible={thumbVisible}
+        top={thumbTop}
+        left={thumbLeft}
+        alignLeft={thumbAlignLeft}
+        canvas={previewCanvasRef.current}
+        duration={duration}
+      />
     </div>
   );
 
