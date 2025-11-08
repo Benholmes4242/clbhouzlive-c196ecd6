@@ -434,12 +434,12 @@ html, body, #root {
 @media (prefers-reduced-motion: reduce) {
   .animate-echoPulse { animation: none !important; }
   .animate-\[fadeIn_320ms_ease-out\] { animation: none !important; }
-  .animate-\[presencePulse_2s_ease-in-out_infinite\] { animation: none !important; }
+  .animate-\[presencePulse_900ms_ease-in-out_infinite\] { animation: none !important; }
   .animate-\[rowFadeUp_90ms_ease-out_both\] { animation: none !important; }
   .animate-\[chipAppear_120ms_ease-out_both\] { animation: none !important; }
 }
 
-/* Nearby Golfers Animations */
+/* Nearby Golfers Animations - Optimized for 60fps */
 @keyframes presencePulse {
   0%, 100% { 
     transform: scale(1); 

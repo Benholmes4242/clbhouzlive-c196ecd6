@@ -30,7 +30,7 @@ export function GolferStatusBar({ value, onChange }: GolferStatusBarProps) {
       case 'friends':
         return { text: 'Visible to your friends only', color: '#72ff8d' };
       case 'hidden':
-        return { text: 'Hidden from nearby golfers', color: '#999' };
+        return { text: 'Hidden from nearby golfers', color: 'rgba(255,90,90,0.6)' };
     }
   };
 
@@ -46,14 +46,13 @@ export function GolferStatusBar({ value, onChange }: GolferStatusBarProps) {
           borderColor: 'rgba(255,255,255,0.12)'
         }}
       >
-        {/* Animated slider */}
+        {/* Animated slider with spring bounce */}
         <div
-          className="absolute inset-1 w-[calc(33.33%-4px)] rounded-lg transition-all"
+          className="absolute inset-1 w-[calc(33.33%-4px)] rounded-lg"
           style={{
             transform: `translateX(calc(${getSliderPosition()} / 0.3333))`,
             background: 'rgba(255,255,255,0.20)',
-            transitionDuration: '250ms',
-            transitionTimingFunction: 'cubic-bezier(0.25, 1, 0.3, 1.05)',
+            transition: 'transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1)',
             boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
           }}
         />
@@ -76,10 +75,14 @@ export function GolferStatusBar({ value, onChange }: GolferStatusBarProps) {
         ))}
       </div>
 
-      {/* Helper text */}
+      {/* Helper text with fade transition */}
       <p
-        className="text-[13px] mt-2 text-center transition-colors duration-200"
-        style={{ color: helper.color }}
+        className="text-[13px] mt-2 text-center transition-all duration-200"
+        style={{ 
+          color: helper.color,
+          opacity: 1
+        }}
+        key={value}
       >
         {helper.text}
       </p>

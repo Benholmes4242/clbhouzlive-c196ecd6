@@ -34,13 +34,22 @@ function StatusChip({
 }) {
   return (
     <span 
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-2xl text-[13px] font-semibold backdrop-blur-[20px] border transition-all duration-200 ${
-        tone === 'success'
-          ? 'bg-[rgba(76,220,151,0.12)] text-[#4cdc97] border-[rgba(76,220,151,0.25)]'
-          : 'bg-[rgba(255,255,255,0.1)] text-white/90 border-[rgba(255,255,255,0.15)]'
-      }`}
+      className={`inline-flex items-center gap-1.5 rounded-2xl text-[13px] font-semibold backdrop-blur-[20px] border transition-all duration-200`}
       style={{
-        animation: 'chipAppear 120ms ease-out both'
+        padding: '4px 10px',
+        borderRadius: '16px',
+        animation: 'chipAppear 120ms ease-out both',
+        ...(tone === 'success' 
+          ? {
+              background: 'linear-gradient(180deg, rgba(76,220,151,0.45), rgba(0,0,0,0.25))',
+              color: '#4cdc97',
+              borderColor: 'rgba(76,220,151,0.25)'
+            }
+          : {
+              background: 'rgba(255,255,255,0.1)',
+              color: 'rgba(255,255,255,0.90)',
+              borderColor: 'rgba(255,255,255,0.15)'
+            })
       }}
     >
       <span className="text-[14px] leading-none">{icon}</span>
@@ -70,7 +79,10 @@ function PresenceRing({ status }: { status: 'openToPlay' | 'online' | 'offline' 
         fill="none"
         stroke={colors[status]}
         strokeWidth="2.5"
-        className={shouldPulse ? 'animate-[presencePulse_2s_ease-in-out_infinite]' : ''}
+        style={{
+          filter: shouldPulse ? 'drop-shadow(0 0 3px rgba(74,222,128,0.4))' : 'none'
+        }}
+        className={shouldPulse ? 'animate-[presencePulse_900ms_ease-in-out_infinite]' : ''}
       />
       {/* Mini dot indicator */}
       <circle
@@ -78,7 +90,7 @@ function PresenceRing({ status }: { status: 'openToPlay' | 'online' | 'offline' 
         cy="85%"
         r="4"
         fill={colors[status]}
-        className={shouldPulse ? 'animate-[presencePulse_2s_ease-in-out_infinite]' : ''}
+        className={shouldPulse ? 'animate-[presencePulse_900ms_ease-in-out_infinite]' : ''}
       />
     </svg>
   );
@@ -109,14 +121,17 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
         borderColor: 'rgba(255,255,255,0.08)',
         boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
         padding: '16px 14px',
-        animation: `rowFadeUp 90ms ease-out both ${index * 35}ms`
+        animation: `rowFadeUp 90ms ease-out both ${index * 35}ms`,
+        contentVisibility: 'auto',
+        containIntrinsicSize: '0 140px'
       }}
       role="article"
-      aria-label={`${golfer.display_name}, ${golfer.home_club || 'No home club'}, ${distanceText || ''}`}
+      aria-label={`${golfer.display_name}, handicap ${golfer.handicap ? golfer.handicap.toFixed(1).replace('.', ' point ') : 'unknown'}, ${golfer.home_club || 'No home club'}, ${distanceText ? distanceText.replace('m', 'meters').replace('km', 'kilometers') : ''}, ${golfer.isOpenToPlay ? 'open to play' : ''}`}
     >
-      {/* Main tappable area */}
+      {/* Main tappable area with min 44px touch target */}
       <TapButton
         className="flex items-start gap-3 w-full text-left transition-transform active:scale-[0.97] duration-[85ms]"
+        style={{ minHeight: '44px' }}
         onPointerDown={handleViewProfile}
         aria-label={`View ${golfer.display_name}'s profile`}
       >
@@ -145,8 +160,11 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
           
           {/* Meta line with pills */}
           <div 
-            className="flex items-center gap-1.5 text-[14px] mb-2 text-white/70"
-            style={{ fontFeatureSettings: '"tnum"' }}
+            className="flex items-center gap-1.5 text-[14px] text-white/70"
+            style={{ 
+              fontFeatureSettings: '"tnum"',
+              marginBottom: '8px'
+            }}
           >
             {golfer.handicap !== undefined && (
               <>
@@ -167,28 +185,32 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
             )}
           </div>
 
-          {/* Status chips - max 2 visible */}
+          {/* Status chips - max 2 visible with overflow */}
           {(golfer.sameHomeClub || golfer.isOpenToPlay) && (
             <div className="flex flex-wrap gap-1.5">
+              {/* Show max 2 chips */}
               {golfer.isOpenToPlay && (
                 <StatusChip icon="🟢" label="Open to play" tone="success" />
               )}
               {golfer.sameHomeClub && (
                 <StatusChip icon="🏠" label="Same home club" />
               )}
+              {/* In real implementation, if more than 2 chips, show +N */}
             </div>
           )}
         </div>
       </TapButton>
 
       {/* Action buttons - equal width */}
-      <div className="flex gap-2 mt-2.5">
+      <div className="flex gap-2" style={{ marginTop: '10px' }}>
         <TapButton
-          className="flex-1 h-9 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-[85ms] active:scale-[0.97]"
+          className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-[85ms] active:scale-[0.97]"
           style={{
             background: 'rgba(255,255,255,0.18)',
             borderColor: 'rgba(255,255,255,0.12)',
-            color: 'rgba(255,255,255,0.96)'
+            color: 'rgba(255,255,255,0.96)',
+            minHeight: '44px',
+            height: '36px'
           }}
           onPointerDown={() => {
             haptic('light');
@@ -200,18 +222,22 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
         </TapButton>
 
         <TapButton
-          className="flex-1 h-9 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-[85ms] active:scale-[0.97]"
+          className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-[85ms] active:scale-[0.97]"
           style={
             isFollowing
               ? {
                   background: 'rgba(76,220,151,0.18)',
                   borderColor: 'rgba(76,220,151,0.3)',
-                  color: '#4cdc97'
+                  color: '#4cdc97',
+                  minHeight: '44px',
+                  height: '36px'
                 }
               : {
                   background: 'transparent',
                   borderColor: 'rgba(255,255,255,0.12)',
-                  color: 'rgba(255,255,255,0.88)'
+                  color: 'rgba(255,255,255,0.88)',
+                  minHeight: '44px',
+                  height: '36px'
                 }
           }
           onPointerDown={() => {
@@ -225,11 +251,13 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
         </TapButton>
 
         <TapButton
-          className="flex-1 h-9 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-[85ms] active:scale-[0.97]"
+          className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-[85ms] active:scale-[0.97]"
           style={{
             background: 'transparent',
             borderColor: 'rgba(255,255,255,0.12)',
-            color: 'rgba(255,255,255,0.88)'
+            color: 'rgba(255,255,255,0.88)',
+            minHeight: '44px',
+            height: '36px'
           }}
           onPointerDown={() => {
             haptic('light');
