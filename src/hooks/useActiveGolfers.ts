@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useMemo } from 'react';
-import { calculateDistance, formatDistance } from '@/features/nearby/distance';
+import { formatDistance } from '@/features/golfers/format';
 import { NEARBY_RADIUS_METERS } from '@/features/nearby/config';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
 import { getMockNearby } from '@/features/nearby/mockNearbyGolfers';
@@ -38,9 +38,7 @@ export function useActiveGolfers({ limit = 999 }: { limit?: number } = {}) {
         avatar_url: golfer.avatar_url,
         home_club: golfer.home_club,
         distance_km: golfer.distance_km,
-        distanceText: golfer.distance_km < 1 
-          ? `${Math.round(golfer.distance_km * 1000)}m away`
-          : `${golfer.distance_km.toFixed(1)}km away`,
+        distanceText: formatDistance(golfer.distance_km * 1000),
         isOpenToPlay: golfer.isOpenToPlay,
         sameHomeClub: golfer.same_club,
         eg_handicap_index: Math.floor(Math.random() * 25) + 1,

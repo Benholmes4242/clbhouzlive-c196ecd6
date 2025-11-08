@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { useHub } from '@/features/hub/useHub';
-import { formatHcp } from '@/lib/formatHcp';
+import { formatDistanceHcp } from '@/features/golfers/format';
 
 interface NearbyGolfersTileProps {
   limit?: number;
@@ -69,7 +69,7 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
               key={g.id} 
               className="ng-row py-[10px]"
               onClick={() => nav(`/profile/${g.username}`)}
-              aria-label={`${g.display_name || g.username}, handicap ${formatHcp(g.eg_handicap_index)}, ${g.distanceText} away`}
+              aria-label={`${g.display_name || g.username}, ${formatDistanceHcp(g.distance_km ? g.distance_km * 1000 : undefined, g.eg_handicap_index)}`}
             >
               <div className="shrink-0 rounded-full overflow-hidden w-[38px] h-[38px]">
                 <img 
@@ -85,7 +85,7 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
                 </div>
                 <div className="h-[2px]" />
                 <div className="ng-distance text-white/70">
-                  {g.distanceText} · HCP {formatHcp(g.eg_handicap_index)}
+                  {formatDistanceHcp(g.distance_km ? g.distance_km * 1000 : undefined, g.eg_handicap_index)}
                 </div>
               </div>
             </button>
