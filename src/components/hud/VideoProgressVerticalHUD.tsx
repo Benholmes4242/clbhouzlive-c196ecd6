@@ -176,7 +176,15 @@ export function VideoProgressVerticalHUD({
   const hasExceededToleranceRef = React.useRef(false);
   const isEligibleToScrubRef = React.useRef(false);
   const barWrapperRef = React.useRef<HTMLDivElement | null>(null);
+  
+  // Ref to track scrubbing state for document listeners
+  const isScrubbingRef = React.useRef(false);
 
+  // Keep isScrubbingRef in sync with state
+  React.useEffect(() => {
+    isScrubbingRef.current = isScrubbing;
+  }, [isScrubbing]);
+  
   // Expose fillRef to sync hook with vertical orientation
   React.useEffect(() => {
     if (fillRef.current) {
@@ -391,7 +399,7 @@ export function VideoProgressVerticalHUD({
       scrubTargetRatioRef.current = ratio;
     }
     
-    // Do NOT preventDefault here - allow feed to scroll if user just swipes
+    // Do NOT preventDefault here - allow detection phase without blocking scroll
   }, [clearHold]);
 
   const handleScrubMoveInternal = React.useCallback((clientY: number) => {
@@ -554,8 +562,9 @@ export function VideoProgressVerticalHUD({
         try { window.navigator.vibrate(30); } catch {}
       }
       
-      setIsScrubbing(false);
       setThumbVisible(false);
+      setIsScrubbing(false);
+      scrubTargetRatioRef.current = null;
       
       // Announce for screen readers
       if (announceRef.current) {
@@ -577,10 +586,18 @@ export function VideoProgressVerticalHUD({
         offscreenHlsRef.current = null;
       }
       
-      // Restore scroll behavior
-      if (barWrapperRef.current?.style) {
-        barWrapperRef.current.style.touchAction = 'pan-y';
-      }
+      // Restore scroll behavior on next frame (after listeners are cleaned up)
+      requestAnimationFrame(() => {
+        if (barWrapperRef.current?.style) {
+          barWrapperRef.current.style.touchAction = 'pan-y';
+        }
+        
+        // Defensive: ensure feed can scroll
+        const feed = document.querySelector('.clubhouse-vertical-feed') as HTMLElement | null;
+        if (feed && getComputedStyle(feed).touchAction !== 'pan-y') {
+          feed.style.touchAction = 'pan-y';
+        }
+      });
       
       // Keep bar active for 1.5s after scrubbing ends
       if (activeTimeoutRef.current) {
@@ -595,40 +612,83 @@ export function VideoProgressVerticalHUD({
     }
   }, [isScrubbing, resumeSync, clearHold, stopScrubLoop]);
 
-  // Global move/end listeners - always active once press starts
+  // Detection phase: passive document listeners for long-press detection (no scroll blocking)
   React.useEffect(() => {
-    const handleTouchMove = (e: TouchEvent) => {
+    const pressStart = pressStartRef.current;
+    if (!pressStart || isScrubbing) return; // Only during detection phase
+    
+    const onDetectionMove = (e: TouchEvent | MouseEvent) => {
+      const clientY = 'touches' in e && e.touches.length > 0
+        ? e.touches[0].clientY
+        : 'clientY' in e
+        ? e.clientY
+        : 0;
+      
+      handleGlobalMove(clientY);
+      // NO preventDefault here - allow normal scrolling during detection
+    };
+    
+    const onDetectionEnd = () => {
+      clearHold();
+      pressStartRef.current = null;
+      setThumbVisible(false);
+    };
+    
+    // Passive listeners during detection phase
+    document.addEventListener('touchmove', onDetectionMove, { passive: true });
+    document.addEventListener('mousemove', onDetectionMove, { passive: true });
+    document.addEventListener('touchend', onDetectionEnd);
+    document.addEventListener('touchcancel', onDetectionEnd);
+    document.addEventListener('mouseup', onDetectionEnd);
+    
+    return () => {
+      document.removeEventListener('touchmove', onDetectionMove as any);
+      document.removeEventListener('mousemove', onDetectionMove as any);
+      document.removeEventListener('touchend', onDetectionEnd);
+      document.removeEventListener('touchcancel', onDetectionEnd);
+      document.removeEventListener('mouseup', onDetectionEnd);
+    };
+  }, [pressStartRef.current !== null, isScrubbing, handleGlobalMove, clearHold]);
+  
+  // Document listeners — only active while scrubbing
+  React.useEffect(() => {
+    if (!isScrubbing) return;
+    
+    // Stable handlers that check ref before preventing defaults
+    const onDocTouchMove = (e: TouchEvent) => {
+      // Only block scroll while actually scrubbing
+      if (!isScrubbingRef.current) return;
+      e.preventDefault(); // This blocks feed scroll — ONLY when scrubbing
       if (e.touches.length > 0) {
         handleGlobalMove(e.touches[0].clientY);
-        // Only prevent default if we're scrubbing or eligible to scrub
-        if (isScrubbing || isEligibleToScrubRef.current) {
-          e.preventDefault();
-        }
       }
     };
-
-    const handleMouseMove = (e: MouseEvent) => {
+    
+    const onDocMouseMove = (e: MouseEvent) => {
+      if (!isScrubbingRef.current) return;
       handleGlobalMove(e.clientY);
     };
-
-    const handleEnd = () => {
+    
+    const onDocEnd = () => {
+      if (!isScrubbingRef.current) return;
       handleScrubEnd();
     };
-
-    document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('touchend', handleEnd);
-    document.addEventListener('touchcancel', handleEnd);
-    document.addEventListener('mouseup', handleEnd);
-
+    
+    // Non-passive so we can preventDefault() while scrubbing
+    document.addEventListener('touchmove', onDocTouchMove, { passive: false });
+    document.addEventListener('mousemove', onDocMouseMove);
+    document.addEventListener('touchend', onDocEnd);
+    document.addEventListener('touchcancel', onDocEnd);
+    document.addEventListener('mouseup', onDocEnd);
+    
     return () => {
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('touchend', handleEnd);
-      document.removeEventListener('touchcancel', handleEnd);
-      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('touchmove', onDocTouchMove as any);
+      document.removeEventListener('mousemove', onDocMouseMove as any);
+      document.removeEventListener('touchend', onDocEnd as any);
+      document.removeEventListener('touchcancel', onDocEnd as any);
+      document.removeEventListener('mouseup', onDocEnd as any);
     };
-  }, [handleGlobalMove, handleScrubEnd, isScrubbing]);
+  }, [isScrubbing, handleGlobalMove, handleScrubEnd]);
 
   // Format time display - moved to external module for reuse
   // (No longer needed here as it's imported from './time')
