@@ -71,6 +71,7 @@ function GameRow({
   
   const handlePointerDown = (e: React.PointerEvent) => {
     startRef.current = { x: e.clientX, y: e.clientY };
+    rowRef.current?.setAttribute('data-pressed', 'true');
     timerRef.current = window.setTimeout(() => {
       comingSoon();
     }, 500);
@@ -87,12 +88,15 @@ function GameRow({
   };
 
   const clearTimer = () => {
+    rowRef.current?.removeAttribute('data-pressed');
     if (timerRef.current) {
       window.clearTimeout(timerRef.current);
       timerRef.current = null;
     }
     startRef.current = null;
   };
+
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   
   // Format date/time for collapsed header
   const dt = new Date(game.start_time);
@@ -113,11 +117,13 @@ function GameRow({
       onPointerMove={handlePointerMove}
       onPointerUp={clearTimer}
       onPointerCancel={clearTimer}
-      className="gt-row w-full rounded-[14px] px-4 py-3 text-left outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0"
+      className="game-row w-full rounded-[14px] px-4 py-3 text-left outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0"
       style={{ 
         background: 'rgba(255,255,255,0.06)',
         border: '1px solid rgba(255,255,255,0.12)',
         WebkitTapHighlightColor: 'transparent',
+        transition: prefersReduced ? undefined : 'transform 120ms ease, box-shadow 180ms ease',
+        transformOrigin: 'center',
       }}
     >
       {/* Collapsed header: course name + date/time */}

@@ -25,18 +25,27 @@
   touch-action: pan-y;
 }
 
+/* Press feedback */
+.game-row[data-pressed="true"] {
+  transform: scale(0.985);
+}
+
+/* Optional: tiny hover lift for desktop only */
+@media (hover: hover) and (pointer: fine) {
+  .game-row:hover {
+    background: rgba(255,255,255,0.08) !important;
+  }
+}
+
 /* Expanded section animation */
 .gt-expand {
   overflow: hidden;
-  transition: max-height 0.22s ease;
+  transition: max-height 0.22s ease, opacity 0.2s ease;
   will-change: max-height;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .gt-row {
     transition: transform 0.14s ease, background 0.14s ease;
-  }
-  .gt-row:active {
-    transform: scale(0.995);
   }
 }
