@@ -43,7 +43,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       title="Nearby Golfers"
       align="center"
     >
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full" style={{ position: 'relative' }}>
         <div ref={scrollRef} className="space-y-0.5 hub-golfers-list-scroll flex flex-col">
           {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
             <div key={i} className="h-12 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
@@ -82,8 +82,11 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
             e.stopPropagation(); 
             navigateFromHub('/hub/golfers'); 
           }}
-          className="ml-auto mt-3 block text-[15px] font-medium transition"
+          className="text-[15px] font-medium transition"
           style={{
+            position: 'absolute',
+            bottom: '0',
+            right: '0',
             background: 'transparent',
             border: 'none',
             color: 'var(--hub-text-body)',
