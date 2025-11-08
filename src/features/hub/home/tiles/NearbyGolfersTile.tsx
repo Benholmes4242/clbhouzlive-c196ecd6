@@ -45,7 +45,18 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
       align="center"
     >
       <div className="flex flex-col h-full" style={{ position: 'relative' }}>
-        <div ref={scrollRef} className="space-y-0.5 hub-golfers-list-scroll flex flex-col">
+        <div 
+          ref={scrollRef} 
+          className="space-y-0.5 hub-golfers-list-scroll flex flex-col"
+          style={{
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain',
+            maxHeight: 'calc(2.1 * 52px)', // Show 2.1 rows (each row ~52px with gap)
+            maskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
+          }}
+        >
           {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
             <div key={i} className="h-12 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
           ))}
@@ -53,7 +64,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
             const da = a.distance_km ?? Number.POSITIVE_INFINITY;
             const db = b.distance_km ?? Number.POSITIVE_INFINITY;
             return da - db;
-          }).slice(0, 3).map(g => (
+          }).map(g => (
             <button 
               key={g.id} 
               className="ng-row"
