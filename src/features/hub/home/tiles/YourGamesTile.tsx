@@ -333,15 +333,15 @@ export function YourGamesTile() {
         </div>
       }
       >
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full min-h-0">
         <div
           ref={listRef}
-          className="gt-scroll"
+          className="gt-scroll flex-1 min-h-0 -mr-1 pr-1"
           style={{ 
             marginTop: '12px',
           }}
         >
-        <div className="gt-list">
+        <ul className="gt-list">
           {isLoading && [0, 1, 2].map(i => (
             <div 
               key={i} 
@@ -380,20 +380,22 @@ export function YourGamesTile() {
           )}
 
           {!isLoading && !isError && games.map((g, i) => (
-            <GameRow
-              key={g.id}
-              game={g}
-              index={i}
-              onExpandedChange={(rowEl, expanded) => {
-                if (!expanded) return;
-                const container = listRef.current;
-                if (container && rowEl) {
-                  scrollChildIntoView(container, rowEl, 12);
-                }
-              }}
-            />
+            <li key={g.id}>
+              <GameRow
+                key={g.id}
+                game={g}
+                index={i}
+                onExpandedChange={(rowEl, expanded) => {
+                  if (!expanded) return;
+                  const container = listRef.current;
+                  if (container && rowEl) {
+                    scrollChildIntoView(container, rowEl, 12);
+                  }
+                }}
+              />
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
       </div>
     </Tile>

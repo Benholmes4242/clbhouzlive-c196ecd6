@@ -18,7 +18,7 @@ export function Tile({ title, subtitle, children, onViewAll, footer, align = 'st
 
   return (
     <section
-      className="relative rounded-3xl p-4 pt-3.5 pb-3.5 overflow-hidden flex flex-col h-full"
+      className="relative rounded-3xl p-4 pt-3.5 pb-3.5 overflow-hidden flex flex-col min-h-0 h-full"
       style={{
         background: 'var(--hub-glass-bg)',
         border: '1px solid var(--hub-stroke)',
@@ -32,7 +32,7 @@ export function Tile({ title, subtitle, children, onViewAll, footer, align = 'st
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-0">
         <div 
           className="text-[20px] font-semibold mb-0.5" 
           style={{ 
@@ -53,7 +53,7 @@ export function Tile({ title, subtitle, children, onViewAll, footer, align = 'st
             {subtitle}
           </div>
         )}
-        <div className="flex-1 flex flex-col">{children}</div>
+        <div className="flex-1 flex flex-col min-h-0">{children}</div>
       </div>
 
       {/* Footer bar with View all */}
