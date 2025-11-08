@@ -45,10 +45,12 @@ function StatusPill({ kind }: { kind: 'Hosting' | 'Joined' }) {
     <span
       className="inline-flex items-center px-[8px] py-[3px] rounded-full text-[12px] leading-[14px] border"
       style={{
-        background: 'rgba(255,255,255,0.06)',
-        borderColor: 'rgba(255,255,255,0.10)',
-        color: isHosting ? 'var(--hub-text-bright)' : 'var(--hub-text-body)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+        background: isHosting ? 'rgba(80,160,100,0.15)' : 'rgba(255,255,255,0.06)',
+        borderColor: isHosting ? 'rgba(92,200,120,0.55)' : 'rgba(255,255,255,0.10)',
+        color: isHosting ? '#9FE7B5' : 'var(--hub-text-body)',
+        boxShadow: isHosting
+          ? 'inset 0 1px 0 rgba(160,255,180,0.25)'
+          : 'inset 0 1px 0 rgba(255,255,255,0.06)',
       }}
       aria-label={isHosting ? 'Hosting' : 'Joined'}
     >
@@ -151,22 +153,16 @@ function GameRow({
         lineHeight: 1.2,
       }}
     >
-      {/* Collapsed header: course name + badge + date/time */}
+      {/* Line 1: Course name with flag */}
       <div className="flex items-center gap-2">
+        <span className="text-[15px] leading-none opacity-80" aria-hidden>⛳️</span>
         <div className="truncate text-[16px] font-medium" style={{ color: 'var(--hub-text-bright)' }}>
           {game.course_name || 'Golf Course'}
         </div>
         
-        <div className="flex items-center gap-2 ml-auto shrink-0">
-          <StatusPill kind={game.kind} />
-          <div className="text-[13px]" style={{ color: 'var(--hub-text-sub)' }}>
-            {when}
-          </div>
-        </div>
-
         {/* Chevron */}
         <span 
-          className="shrink-0 transition-transform text-[18px]"
+          className="shrink-0 ml-auto transition-transform text-[18px]"
           style={{ 
             color: 'var(--hub-text-sub)',
             opacity: 0.6,
@@ -175,6 +171,12 @@ function GameRow({
         >
           ›
         </span>
+      </div>
+
+      {/* Line 2: Hosting / Joined badge + time */}
+      <div className="mt-1 flex items-center gap-2">
+        <StatusPill kind={game.kind} />
+        <time className="text-[13px]" style={{ color: 'var(--hub-text-sub)' }}>{when}</time>
       </div>
 
       {/* Expandable detail */}
