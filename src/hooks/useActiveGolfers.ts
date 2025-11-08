@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { calculateDistance, formatDistance } from '@/features/nearby/distance';
 import { NEARBY_RADIUS_METERS } from '@/features/nearby/config';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
+import { MOCK_NEARBY } from '@/mocks/live_clubhouse';
 
 export type ActiveGolfer = {
   id: string;
@@ -17,7 +18,6 @@ export type ActiveGolfer = {
   distanceText?: string;
   isOpenToPlay?: boolean;
   sameHomeClub?: boolean;
-  eg_handicap_index?: number | null;
 };
 
 export function useActiveGolfers({ limit = 20 }: { limit?: number } = {}) {
@@ -131,7 +131,7 @@ export function useActiveGolfers({ limit = 20 }: { limit?: number } = {}) {
       // Pull profiles for remaining user_ids
       const { data: profiles, error: profilesErr } = await supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index')
+        .select('id, display_name, username, profile_photo_url, home_club')
         .in('id', candidates.map(c => c.user_id))
         .eq('is_public', true);
 
@@ -159,7 +159,6 @@ export function useActiveGolfers({ limit = 20 }: { limit?: number } = {}) {
           distanceText: match ? formatDistance(match.distance_meters) : undefined,
           isOpenToPlay: match?.isOpenToPlay || false,
           sameHomeClub,
-          eg_handicap_index: p.eg_handicap_index,
         };
       });
 
@@ -198,7 +197,22 @@ export function useActiveGolfers({ limit = 20 }: { limit?: number } = {}) {
       isMock: false,
     }));
 
-    return realWithOnline;
+    // Add mock golfers
+    const mockGolfers: ActiveGolfer[] = MOCK_NEARBY.map(m => ({
+      id: m.id,
+      display_name: m.display_name,
+      username: m.username,
+      home_club: m.home_club,
+      avatar_url: m.profile_photo_url,
+      is_online: false,
+      isMock: true,
+      distance_km: m.distance_km,
+      distanceText: formatDistance((m.distance_km || 0) * 1000),
+      isOpenToPlay: false,
+      sameHomeClub: false,
+    }));
+
+    return [...realWithOnline, ...mockGolfers];
   }, [realProfiles]);
 
   const realOnlineCount = useMemo(() => {

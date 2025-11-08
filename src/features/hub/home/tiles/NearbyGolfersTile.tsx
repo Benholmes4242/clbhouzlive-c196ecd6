@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { useHub } from '@/features/hub/useHub';
-import { formatHcp } from '@/lib/formatHcp';
 
 interface NearbyGolfersTileProps {
   limit?: number;
@@ -68,9 +67,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
                 <div className="hub-ellipsis-fade ng-name" title={g.display_name || g.username}>
                   {g.display_name || g.username}
                 </div>
-                <div className="ng-distance">
-                  HCP {formatHcp(g.eg_handicap_index)} | {g.distanceText}
-                </div>
+                <div className="ng-distance">{g.distanceText}</div>
               </div>
             </button>
           ))}

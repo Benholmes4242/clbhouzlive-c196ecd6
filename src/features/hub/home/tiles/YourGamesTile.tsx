@@ -272,46 +272,8 @@ export function YourGamesTile() {
           </button>
         </div>
       }
-      footer={
-        <div className="mt-auto">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <button
-              onClick={openSearchGames}
-              className="text-[15px] font-medium transition"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--hub-text-body)',
-                padding: 0,
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-              aria-label="Search Games"
-            >
-              ← Search Games
-            </button>
-            <button
-              ref={viewAllRef}
-              onClick={openYourGames}
-              className="text-[15px] font-medium transition"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--hub-text-body)',
-                padding: 0,
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-              aria-label="View all your games"
-              disabled={!hasAny && isLoading}
-            >
-              Your Games →
-            </button>
-          </div>
-        </div>
-      }
       >
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full" style={{ position: 'relative' }}>
         <div
           style={{ 
             overflowY: 'auto',
@@ -374,6 +336,52 @@ export function YourGamesTile() {
           ))}
         </div>
       </div>
+      </div>
+
+      {/* CTAs positioned at tile bottom */}
+      <div 
+        style={{ 
+          position: 'absolute', 
+          bottom: '0', 
+          left: '0',
+          right: '0',
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center' 
+        }}
+      >
+        <button
+          onClick={openSearchGames}
+          className="text-[15px] font-medium transition"
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--hub-text-body)',
+            padding: 0,
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+          aria-label="Search Games"
+        >
+          ← Search Games
+        </button>
+        <button
+          ref={viewAllRef}
+          onClick={openYourGames}
+          className="text-[15px] font-medium transition"
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--hub-text-body)',
+            padding: 0,
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+          aria-label="View all your games"
+          disabled={!hasAny && isLoading}
+        >
+          Your Games →
+        </button>
       </div>
     </Tile>
   );
