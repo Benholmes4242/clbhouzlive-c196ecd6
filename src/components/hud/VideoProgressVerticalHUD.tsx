@@ -2,6 +2,7 @@ import * as React from 'react';
 import { createPortal } from 'react-dom';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 import Hls from 'hls.js';
+import './vhud.css';
 
 // Long-press + drag scrubbing configuration
 const LONG_PRESS_MS = 350;              // delay before scrubbing can start
@@ -79,7 +80,10 @@ export function VideoProgressVerticalHUD({
   const [previewPosPx, setPreviewPosPx] = React.useState(0);
   const [scrubRatio, setScrubRatio] = React.useState(0);
   const [isBarActive, setIsBarActive] = React.useState(false);
+  const [isPlaying, setIsPlaying] = React.useState(false);
   const activeTimeoutRef = React.useRef<number | null>(null);
+  const bufferRef = React.useRef<HTMLDivElement | null>(null);
+  const thumbRef = React.useRef<HTMLDivElement | null>(null);
   
   // Long-press + velocity tracking refs
   const holdTimerRef = React.useRef<number | null>(null);
@@ -109,6 +113,7 @@ export function VideoProgressVerticalHUD({
       activeTimeoutRef.current = null;
     }, 1200);
     const onPlay = () => {
+      setIsPlaying(true);
       setIsBarActive(true);
       if (activeTimeoutRef.current) clearTimeout(activeTimeoutRef.current);
       activeTimeoutRef.current = window.setTimeout(() => {
@@ -116,8 +121,13 @@ export function VideoProgressVerticalHUD({
         activeTimeoutRef.current = null;
       }, 1200);
     };
+    const onPause = () => setIsPlaying(false);
     attachedVideo.addEventListener('playing', onPlay);
-    return () => attachedVideo.removeEventListener('playing', onPlay);
+    attachedVideo.addEventListener('pause', onPause);
+    return () => {
+      attachedVideo.removeEventListener('playing', onPlay);
+      attachedVideo.removeEventListener('pause', onPause);
+    };
   }, [attachedVideo]);
 
   // Helper: clamp [0..1]
@@ -345,6 +355,12 @@ export function VideoProgressVerticalHUD({
       if (currentVideo) {
         currentVideo.currentTime = previewTime;
       }
+      
+      // Haptic feedback on scrub complete
+      if (window.navigator.vibrate) {
+        try { window.navigator.vibrate(30); } catch {}
+      }
+      
       setIsScrubbing(false);
       
       // Resume the sync loop
@@ -426,76 +442,84 @@ export function VideoProgressVerticalHUD({
 
   const duration = attachedVideo?.duration || 0;
 
+  // Update thumb position during scrubbing
+  React.useEffect(() => {
+    if (!isScrubbing || !thumbRef.current || !trackRef.current) return;
+    const rect = trackRef.current.getBoundingClientRect();
+    const thumbPos = rect.height * (1 - scrubRatio);
+    thumbRef.current.style.top = `${thumbPos - 6}px`; // Center the 12px thumb
+  }, [isScrubbing, scrubRatio]);
+
   const progressBar = (!attachedVideo) ? null : (
     <div
-      className="clubhouse-progress pointer-events-none fixed z-[100]"
+      className={`vhud-wrap ${isScrubbing || isBarActive ? 'vhud-active' : 'vhud-idle'}`}
       style={{
         right: railBox ? `${railBox.right}px` : 'calc(env(safe-area-inset-right, 0px) + 64px)',
         top: railBox ? `${railBox.top}px` : '25%',
         height: railBox ? `${railBox.height}px` : '168px',
       }}
     >
-      {/* Hit area for long-press + drag scrubbing - narrower when idle, expands when active */}
+      {/* Hit area for long-press + drag scrubbing */}
       <div
         ref={barWrapperRef}
-        className="relative"
+        className="vhud-hit"
         style={{
-          pointerEvents: 'auto',
-          // Allow vertical scroll by default; we'll set 'none' dynamically once scrubbing starts
-          touchAction: 'pan-y',
           width: isScrubbing ? `${HIT_WIDTH_ACTIVE_PX}px` : `${HIT_WIDTH_IDLE_PX}px`,
-          height: '100%',
-          cursor: 'ns-resize',
-          transition: 'width 150ms cubic-bezier(0.4, 0, 0.2, 1)',
         }}
         onMouseDown={handleScrubStart}
         onTouchStart={handleScrubStart}
       >
-        {/* Visual track - slim and positioned to the right, expands when active */}
-        <div
-          ref={trackRef}
-          className="absolute right-0 top-0 rounded-full bg-white/7 backdrop-blur-sm overflow-hidden"
-          style={{
-            width: isScrubbing ? '6px' : '3px',
-            height: '100%',
-            opacity: isScrubbing || isBarActive ? 1 : 0.4,
-            transition: 'opacity 120ms ease, width 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-          }}
-        >
-          {/* Fill */}
+        {/* Visual track with frosted aqua design */}
+        <div ref={trackRef} className="vhud-track">
+          {/* Buffer (optional - can show loaded portion) */}
+          <div ref={bufferRef} className="vhud-buffer" style={{ height: '0%' }} />
+          
+          {/* Fill - synced with video progress */}
           <div
             ref={fillRef}
-            className="absolute bottom-0 left-0 w-full origin-bottom will-change-transform"
+            className="vhud-fill"
             style={{
-              height: '100%',
-              background: accent ?? 'linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%)',
-              boxShadow: '0 0 6px rgba(255,255,255,0.4)',
-              // During scrubbing, transform is set directly in handleScrubMoveInternal for smooth updates
-              // Otherwise use synced progress from the hook
               transform: isScrubbing ? undefined : `scaleY(${progress / 100})`,
               transition: isScrubbing ? 'none' : 'transform 60ms linear',
             }}
           />
+          
+          {/* Thumb - appears during scrubbing */}
+          <div ref={thumbRef} className="vhud-thumb" />
+          
+          {/* Subtle glow when playing */}
+          {isPlaying && <div className="vhud-glow" />}
         </div>
       </div>
 
       {/* Thumbnail Preview */}
       {isScrubbing && (
         <div
-          className="absolute right-full mr-2 w-[80px] h-[140px] rounded-xl bg-black/80 border border-white/15 shadow-xl overflow-hidden flex items-center justify-center"
+          className="vhud-chip"
           style={{
-            top: `calc(${previewPosPx}px - 70px)`,
+            top: `${previewPosPx}px`,
+            transform: 'translateY(-50%)',
+            width: '80px',
+            height: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+            padding: '8px',
           }}
         >
           {/* Frame preview using canvas */}
           <canvas
             ref={previewCanvasRef}
-            className="w-full h-full object-cover rounded-lg"
-            style={{ backgroundColor: "#000" }}
+            className="w-full rounded-lg"
+            style={{ 
+              backgroundColor: "#000",
+              aspectRatio: '9/16',
+              maxHeight: '120px',
+            }}
           />
           
           {/* Time overlay */}
-          <div className="absolute bottom-1 left-1 right-1 text-center text-[10px] text-white/90 font-medium bg-black/60 rounded px-1 py-0.5">
+          <div className="text-center text-[10px] text-white/90 font-medium">
             {formatTime(previewTime)} / {formatTime(duration)}
           </div>
         </div>
