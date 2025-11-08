@@ -10,12 +10,17 @@ import { useUserGames } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
 import { useHub } from '@/features/hub/useHub';
 import { devlog } from '@/utils/log';
+import { GameExpandedPrimary } from './games/GameExpandedPrimary';
+import { GameExpandedRoster } from './games/GameExpandedRoster';
+import { GameExpandedNotes } from './games/GameExpandedNotes';
+import { GameExpandedMeta } from './games/GameExpandedMeta';
 
 type GameWithDetails = {
   id: string;
   kind: 'Hosting' | 'Joined';
   course_name: string | null;
   start_time: string;
+  expires_at: string;
   slots_total: number | null;
   slots_open: number | null;
   host_user_id: string;
@@ -128,64 +133,38 @@ function GameRow({
       <div
         className="overflow-hidden transition-all duration-300 ease-out"
         style={{ 
-          maxHeight: expanded ? '200px' : '0px',
+          maxHeight: expanded ? '400px' : '0px',
           opacity: expanded ? 1 : 0,
         }}
       >
         <div 
-          className="mt-3 pt-3 grid gap-4"
+          className="mt-3 pt-3"
           style={{ 
             borderTop: '1px solid rgba(255,255,255,0.08)',
-            gridTemplateColumns: '1fr auto',
           }}
         >
-          {/* Left: Date, time, host */}
-          <div className="space-y-1 min-w-0">
-            <div className="text-[13px]" style={{ color: 'var(--hub-text-body)' }}>
-              {new Date(game.start_time).toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric',
-                hour: 'numeric',
-                minute: '2-digit',
-              })}
-            </div>
-            {(() => {
-              const hostP = game.participants.find(p => p.user_id === game.host_user_id);
-              const name = game.kind === 'Hosting' ? 'You' : (hostP?.user_profiles?.display_name || 'Host');
-              return (
-                <div className="text-[13px]" style={{ color: 'var(--hub-text-sub)' }}>
-                  Host: <span style={{ color: 'var(--hub-text-body)' }}>{name}</span>
-                </div>
-              );
-            })()}
-          </div>
-
-          {/* Right: Mini roster */}
-          <div className="flex -space-x-2 items-start">
-            {game.participants.slice(0, 4).map((p, i) => (
-              p.user_profiles?.profile_photo_url ? (
-                <img 
-                  key={i}
-                  src={p.user_profiles.profile_photo_url} 
-                  alt={p.user_profiles.display_name || 'Player'}
-                  className="w-8 h-8 rounded-full border-2"
-                  style={{ borderColor: 'rgba(255,255,255,0.18)' }}
-                />
-              ) : (
-                <div
-                  key={i}
-                  className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-[11px] font-medium"
-                  style={{ 
-                    borderColor: 'rgba(255,255,255,0.18)',
-                    background: 'rgba(255,255,255,0.1)',
-                    color: 'var(--hub-text-body)',
-                  }}
-                >
-                  {p.user_profiles?.display_name?.charAt(0) || '?'}
-                </div>
-              )
-            ))}
-          </div>
+          <GameExpandedPrimary
+            kind={game.kind}
+            courseName={game.course_name}
+            startTime={game.start_time}
+            slotsTotal={game.slots_total || 4}
+            slotsOpen={game.slots_open || 0}
+          />
+          <GameExpandedRoster
+            host={{
+              id: game.host_user_id,
+              name: game.kind === 'Hosting' ? 'You' : (
+                game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.display_name || 'Host'
+              ),
+              avatarUrl: game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.profile_photo_url || null,
+            }}
+            members={game.participants.map(p => ({
+              id: p.user_id || '',
+              name: p.user_profiles?.display_name || 'Player',
+              avatarUrl: p.user_profiles?.profile_photo_url || null,
+            }))}
+          />
+          <GameExpandedMeta expiresAt={game.expires_at} />
         </div>
       </div>
     </button>
