@@ -90,10 +90,23 @@ export function VideoProgressVerticalHUD({
     const off = document.createElement('video');
     off.muted = true;
     off.playsInline = true;
-    off.src = main.currentSrc || (main as HTMLVideoElement).src;
     off.preload = 'auto';
-    off.crossOrigin = (main as HTMLVideoElement).crossOrigin || '';
+    // IMPORTANT: set crossOrigin before setting src so canvas isn't tainted
+    off.crossOrigin = (main as HTMLVideoElement).crossOrigin || 'anonymous';
+    const src = (main as HTMLVideoElement).currentSrc || (main as HTMLVideoElement).src;
+    if (src) off.src = src;
     off.load();
+    // Attach offscreen video to DOM for Safari/iOS decode
+    try {
+      off.style.position = 'fixed';
+      off.style.left = '-9999px';
+      off.style.top = '0';
+      off.style.width = '1px';
+      off.style.height = '1px';
+      off.style.opacity = '0';
+      off.style.pointerEvents = 'none';
+      document.body.appendChild(off);
+    } catch {}
     offscreenVideoRef.current = off;
 
     // Set up a canvas we will draw into
@@ -103,12 +116,25 @@ export function VideoProgressVerticalHUD({
     canvas.height = 180;
     previewCanvasRef.current = canvas;
 
+    // Poster fallback: draw poster immediately so thumbnail isn't black
+    const poster = (main as HTMLVideoElement).poster;
+    if (poster) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+      };
+      img.src = poster;
+    }
+
     return () => {
       main.removeEventListener('loadedmetadata', onMeta);
       off.pause();
       off.removeAttribute('src');
       // @ts-ignore
       off.load();
+      try { off.remove(); } catch {}
       offscreenVideoRef.current = null;
       previewCanvasRef.current = null;
     };
