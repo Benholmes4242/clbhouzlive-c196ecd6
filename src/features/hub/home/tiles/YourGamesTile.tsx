@@ -153,9 +153,8 @@ function GameRow({
         lineHeight: 1.2,
       }}
     >
-      {/* Line 1: Course name with flag */}
+      {/* Line 1: Course name */}
       <div className="flex items-center gap-2 mb-[2px] sm:mb-[3px]">
-        <span className="text-[15px] leading-none opacity-80" aria-hidden>⛳️</span>
         <div className="truncate text-[16px] font-medium" style={{ color: 'var(--hub-text-bright)' }}>
           {game.course_name || 'Golf Course'}
         </div>
