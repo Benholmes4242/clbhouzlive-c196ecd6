@@ -8,4 +8,5 @@
   height: 100%;
   contain: content;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }

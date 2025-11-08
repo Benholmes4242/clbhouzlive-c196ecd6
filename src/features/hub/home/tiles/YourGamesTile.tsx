@@ -240,6 +240,18 @@ export function YourGamesTile() {
 
   const hasAny = games.length > 0;
 
+  // Debug scroll metrics in dev
+  React.useEffect(() => {
+    const el = listRef.current;
+    if (!el) return;
+    const cs = window.getComputedStyle(el);
+    devlog('[YourGamesTile] scroll diag', {
+      clientHeight: el.clientHeight,
+      scrollHeight: el.scrollHeight,
+      overflowY: cs.overflowY,
+    });
+  }, [isLoading, isError, games.length]);
+
   return (
     <Tile 
       title={
@@ -313,8 +325,9 @@ export function YourGamesTile() {
             minHeight: 0,
             marginTop: '12px',
             paddingRight: '4px',
-            maskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
+            // NOTE: Temporarily disable mask to rule out rare iOS mask+scroll bug
+            // maskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
+            // WebkitMaskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
           }}
         >
         <div className="space-y-3">
