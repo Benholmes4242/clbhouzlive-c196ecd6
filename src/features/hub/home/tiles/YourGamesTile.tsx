@@ -98,6 +98,12 @@ function GameRow({
 
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   
+  // Determine current user ID from participants
+  const currentUserId = game.kind === 'Hosting' ? game.host_user_id : null;
+  const isHost = game.kind === 'Hosting';
+  const statusLabel = isHost ? 'Hosting' : 'Joined';
+  const hostName = game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.display_name || 'Host';
+  
   // Format date/time for collapsed header
   const dt = new Date(game.start_time);
   const when = dt.toLocaleString(undefined, {
@@ -132,8 +138,21 @@ function GameRow({
           <div className="text-[16px] font-medium truncate" style={{ color: 'var(--hub-text-bright)' }}>
             {game.course_name || 'Golf Course'}
           </div>
-          <div className="text-[13px]" style={{ color: 'var(--hub-text-body)', opacity: 0.6 }}>
-            {when}
+          <div className="flex items-center gap-2 text-[13px] mt-[2px]" style={{ color: 'var(--hub-text-sub)' }}>
+            <span
+              className={`inline-flex items-center rounded-[12px] px-[10px] py-[3px] font-medium ${
+                isHost
+                  ? 'bg-[rgba(120,186,120,0.18)] text-[rgba(220,255,220,0.92)] border border-[rgba(120,186,120,0.35)]'
+                  : 'bg-transparent text-[rgba(255,255,255,0.82)] border border-[rgba(255,255,255,0.22)]'
+              }`}
+              aria-label={isHost ? 'You are hosting this game' : 'You have joined this game'}
+            >
+              {statusLabel}
+            </span>
+            <span aria-label="Start time">{when}</span>
+            {!isHost && (
+              <span className="opacity-75">• Host: {hostName}</span>
+            )}
           </div>
         </div>
         {/* Chevron */}
