@@ -18,6 +18,7 @@ export type ActiveGolfer = {
   distanceText?: string;
   isOpenToPlay?: boolean;
   sameHomeClub?: boolean;
+  eg_handicap_index?: number | null;
 };
 
 export function useActiveGolfers({ limit = 20 }: { limit?: number } = {}) {
@@ -131,7 +132,7 @@ export function useActiveGolfers({ limit = 20 }: { limit?: number } = {}) {
       // Pull profiles for remaining user_ids
       const { data: profiles, error: profilesErr } = await supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, home_club')
+        .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index')
         .in('id', candidates.map(c => c.user_id))
         .eq('is_public', true);
 
@@ -159,6 +160,7 @@ export function useActiveGolfers({ limit = 20 }: { limit?: number } = {}) {
           distanceText: match ? formatDistance(match.distance_meters) : undefined,
           isOpenToPlay: match?.isOpenToPlay || false,
           sameHomeClub,
+          eg_handicap_index: p.eg_handicap_index,
         };
       });
 
@@ -210,6 +212,7 @@ export function useActiveGolfers({ limit = 20 }: { limit?: number } = {}) {
       distanceText: formatDistance((m.distance_km || 0) * 1000),
       isOpenToPlay: false,
       sameHomeClub: false,
+      eg_handicap_index: m.eg_handicap_index,
     }));
 
     return [...realWithOnline, ...mockGolfers];
