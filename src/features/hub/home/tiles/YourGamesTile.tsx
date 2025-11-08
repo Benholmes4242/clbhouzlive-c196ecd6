@@ -311,7 +311,7 @@ export function YourGamesTile() {
         </div>
       }
       >
-      <div className="flex flex-col h-full" style={{ position: 'relative', paddingBottom: '32px' }}>
+      <div className="flex flex-col h-full" style={{ position: 'relative' }}>
         <div
           style={{ 
             overflowY: 'auto',
