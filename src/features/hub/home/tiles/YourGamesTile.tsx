@@ -38,6 +38,25 @@ type GameWithDetails = {
   }>;
 };
 
+// Status Pill Component
+function StatusPill({ kind }: { kind: 'Hosting' | 'Joined' }) {
+  const isHosting = kind === 'Hosting';
+  return (
+    <span
+      className="inline-flex items-center px-[8px] py-[3px] rounded-full text-[12px] leading-[14px] border"
+      style={{
+        background: 'rgba(255,255,255,0.06)',
+        borderColor: 'rgba(255,255,255,0.10)',
+        color: isHosting ? 'var(--hub-text-bright)' : 'var(--hub-text-body)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+      }}
+      aria-label={isHosting ? 'Hosting' : 'Joined'}
+    >
+      {isHosting ? 'Hosting' : 'Joined'}
+    </span>
+  );
+}
+
 function GameRow({ 
   game,
   index,
@@ -101,7 +120,6 @@ function GameRow({
   // Determine current user ID from participants
   const currentUserId = game.kind === 'Hosting' ? game.host_user_id : null;
   const isHost = game.kind === 'Hosting';
-  const statusLabel = isHost ? 'Hosting' : 'Joined';
   const hostName = game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.display_name || 'Host';
   
   // Format date/time for collapsed header
@@ -123,38 +141,29 @@ function GameRow({
       onPointerMove={handlePointerMove}
       onPointerUp={clearTimer}
       onPointerCancel={clearTimer}
-      className="game-row w-full rounded-[14px] px-4 py-3 text-left outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0"
+      className="game-row w-full rounded-[12px] px-4 py-2 text-left outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0"
       style={{ 
         background: 'rgba(255,255,255,0.06)',
         border: '1px solid rgba(255,255,255,0.12)',
         WebkitTapHighlightColor: 'transparent',
         transition: prefersReduced ? undefined : 'transform 120ms ease, box-shadow 180ms ease',
         transformOrigin: 'center',
+        lineHeight: 1.2,
       }}
     >
-      {/* Collapsed header: course name + date/time */}
-      <div className="flex items-center gap-3">
-        <div className="min-w-0 flex-1">
-          <div className="text-[16px] font-medium truncate" style={{ color: 'var(--hub-text-bright)' }}>
-            {game.course_name || 'Golf Course'}
-          </div>
-          <div className="flex items-center gap-2 text-[13px] mt-[2px]" style={{ color: 'var(--hub-text-sub)' }}>
-            <span
-              className={`inline-flex items-center rounded-[12px] px-[10px] py-[3px] font-medium ${
-                isHost
-                  ? 'bg-[rgba(120,186,120,0.18)] text-[rgba(220,255,220,0.92)] border border-[rgba(120,186,120,0.35)]'
-                  : 'bg-transparent text-[rgba(255,255,255,0.82)] border border-[rgba(255,255,255,0.22)]'
-              }`}
-              aria-label={isHost ? 'You are hosting this game' : 'You have joined this game'}
-            >
-              {statusLabel}
-            </span>
-            <span aria-label="Start time">{when}</span>
-            {!isHost && (
-              <span className="opacity-75">• Host: {hostName}</span>
-            )}
+      {/* Collapsed header: course name + badge + date/time */}
+      <div className="flex items-center gap-2">
+        <div className="truncate text-[16px] font-medium" style={{ color: 'var(--hub-text-bright)' }}>
+          {game.course_name || 'Golf Course'}
+        </div>
+        
+        <div className="flex items-center gap-2 ml-auto shrink-0">
+          <StatusPill kind={game.kind} />
+          <div className="text-[13px]" style={{ color: 'var(--hub-text-sub)' }}>
+            {when}
           </div>
         </div>
+
         {/* Chevron */}
         <span 
           className="shrink-0 transition-transform text-[18px]"
@@ -174,11 +183,13 @@ function GameRow({
         style={{ 
           maxHeight: expanded ? '360px' : '0px',
           opacity: expanded ? 1 : 0,
+          paddingTop: expanded ? '8px' : '0px',
+          paddingBottom: expanded ? '10px' : '0px',
         }}
         aria-hidden={!expanded}
       >
         <div 
-          className="mt-3 pt-3"
+          className="pt-2"
           style={{ 
             borderTop: '1px solid rgba(255,255,255,0.08)',
           }}
@@ -386,7 +397,7 @@ export function YourGamesTile() {
           ref={listRef}
           className="gt-scroll flex-1 min-h-0 -mr-1 pr-1"
           style={{ 
-            marginTop: '12px',
+            marginTop: '6px',
           }}
         >
         <ul className="gt-list">
