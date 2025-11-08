@@ -80,12 +80,12 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
                 />
               </div>
               <div className="ng-main">
-                <div className="hub-ellipsis-fade ng-name text-white/90" title={g.display_name || g.username}>
+                <div className="hub-ellipsis-fade ng-name text-white/90 font-semibold" title={g.display_name || g.username}>
                   {g.display_name || g.username}
                 </div>
                 <div className="h-[2px]" />
                 <div className="ng-distance text-white/70">
-                  HCP {formatHcp(g.eg_handicap_index)} · {g.distanceText}
+                  {g.distanceText} · HCP {formatHcp(g.eg_handicap_index)}
                 </div>
               </div>
             </button>
