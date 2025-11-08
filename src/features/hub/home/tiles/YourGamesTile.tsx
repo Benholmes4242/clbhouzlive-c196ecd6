@@ -47,12 +47,10 @@ function GameRow({
   index: number;
   onExpandedChange?: (rowEl: HTMLElement | null, expanded: boolean) => void;
 }) {
-  const rowRef = React.useRef<HTMLButtonElement | null>(null);
+  const rowRef = React.useRef<HTMLDivElement | null>(null);
   const [expanded, setExpanded] = React.useState(false);
   const totalSlots = game.slots_total || 0;
   const availableSlots = game.slots_open || 0;
-  const timerRef = React.useRef<number | null>(null);
-  const startRef = React.useRef<{x: number; y: number} | null>(null);
 
   const toggle = () => {
     const next = !expanded;
@@ -64,53 +62,14 @@ function GameRow({
       rowRef.current?.focus({ preventScroll: true });
     });
   };
-
-  const comingSoon = () => {
-    alert('Coming soon');
-  };
-  
-  const handlePointerDown = (e: React.PointerEvent) => {
-    startRef.current = { x: e.clientX, y: e.clientY };
-    timerRef.current = window.setTimeout(() => {
-      comingSoon();
-    }, 420);
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!startRef.current) return;
-    const dy = Math.abs(e.clientY - startRef.current.y);
-    if (dy > 6) {  // small threshold to allow scroll init
-      if (timerRef.current) {
-        window.clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-    }
-  };
-
-  const handlePointerUp = () => {
-    if (timerRef.current) {
-      window.clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-    startRef.current = null;
-  };
-
-  const handlePointerCancel = () => {
-    if (timerRef.current) {
-      window.clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-    startRef.current = null;
-  };
   
   return (
-    <button 
+    <div 
       ref={rowRef}
+      role="button"
+      tabIndex={0}
       onClick={toggle}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerCancel}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } }}
       className="hub-game-row w-full rounded-[14px] px-4 py-3 text-left transition-all"
       style={{ 
         background: 'rgba(255,255,255,0.06)',
@@ -221,7 +180,7 @@ function GameRow({
           </div>
         </div>
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -345,6 +304,7 @@ export function YourGamesTile() {
       <div className="flex flex-col">{/* h-full removed to allow flex shrinking */}
         <div
           ref={listRef}
+          className="games-scroll"
           style={{ 
             overflowY: 'auto',
             WebkitOverflowScrolling: 'touch',
