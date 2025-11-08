@@ -75,7 +75,11 @@ export function HubGolfersPage() {
   return (
     <div
       className="min-h-[100dvh]"
-      style={{ background: '#0a0a0a' }}
+      style={{
+        background: 'rgba(0, 0, 0, 0.25)',
+        backdropFilter: 'blur(120px)',
+        WebkitBackdropFilter: 'blur(120px)',
+      }}
     >
       <div className="mx-auto max-w-[720px] px-4 pt-3 pb-20">
         <PullToRefresh onRefresh={handleRefresh}>
