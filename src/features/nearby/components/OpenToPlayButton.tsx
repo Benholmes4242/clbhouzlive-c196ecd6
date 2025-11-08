@@ -55,19 +55,18 @@ export function OpenToPlayButton() {
         aria-label={isActive ? `Open to Play active, ${remainingMinutes} minutes remaining` : 'Activate Open to Play'}
         disabled={isSaving}
         onPointerDown={handleToggle}
-        className="relative inline-flex items-center justify-center gap-2.5 transition-all duration-100 active:scale-[0.97]"
+        className="relative inline-flex items-center justify-center gap-2.5 transition-all duration-100 active:scale-[0.97] rounded-2xl bg-white/[0.04] border border-white/10 shadow-[0_20px_48px_rgba(0,0,0,.5)]"
         style={{
           minWidth: '240px',
           height: '44px',
-          borderRadius: '22px',
           fontWeight: 600,
           fontSize: '15px',
-          background: isActive ? '#222b24' : '#1b1b1b',
-          color: isActive ? '#fff' : '#fff',
-          border: isActive ? '1px solid #335a3f' : '1px solid #2a2a2a',
-          boxShadow: isActive 
-            ? '0 0 0 4px rgba(110, 146, 119, 0.25), inset 0 1px 0 rgba(255,255,255,0.08)' 
-            : 'inset 0 1px 0 rgba(255,255,255,0.05)',
+          color: '#fff',
+          ...(isActive && {
+            background: 'rgba(110, 146, 119, 0.15)',
+            borderColor: 'rgba(110, 146, 119, 0.4)',
+            boxShadow: '0 0 0 4px rgba(110, 146, 119, 0.25), 0 20px 48px rgba(0,0,0,.5)',
+          }),
         }}
       >
         <span className="text-[16px]" aria-hidden="true">🏌️‍♂️</span>

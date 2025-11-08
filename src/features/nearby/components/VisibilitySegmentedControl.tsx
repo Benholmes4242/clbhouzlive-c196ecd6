@@ -74,8 +74,7 @@ export function VisibilitySegmentedControl({ value, onChange }: VisibilitySegmen
       <div 
         role="group" 
         aria-label="Visibility mode"
-        className="relative flex gap-1.5 w-full p-1.5 rounded-[20px] bg-[#141414] border border-[#242424]"
-        style={{ boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.3)' }}
+        className="relative flex gap-1.5 w-full p-1.5 rounded-2xl bg-white/[0.04] border border-white/10 shadow-[0_20px_48px_rgba(0,0,0,.5)]"
       >
         {/* Animated pill slider */}
         <div
