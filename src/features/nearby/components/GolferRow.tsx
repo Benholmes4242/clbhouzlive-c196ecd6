@@ -59,7 +59,7 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
 
   return (
     <article
-      className="rounded-2xl bg-[#101010] shadow-[inset_0_0_0_1px_#222,0_2px_12px_rgba(0,0,0,0.35)] p-3 mx-3 my-2.5"
+      className="rounded-2xl p-3 mx-3 my-2.5 liquid-glass liquid-glass--elevated"
       role="article"
       aria-label={`${golfer.display_name}, ${golfer.home_club || 'No home club'}, ${distanceText || ''}`}
     >
