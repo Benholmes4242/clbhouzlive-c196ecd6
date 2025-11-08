@@ -24,10 +24,7 @@ type GameWithDetails = {
   slots_total: number | null;
   slots_open: number | null;
   host_user_id: string;
-  host_profile?: Array<{
-    display_name: string | null;
-    profile_photo_url: string | null;
-  }>;
+  notes?: string | null;
   participants: Array<{
     user_id: string | null;
     user_profiles?: {
@@ -164,6 +161,7 @@ function GameRow({
               avatarUrl: p.user_profiles?.profile_photo_url || null,
             }))}
           />
+          <GameExpandedNotes notes={game.notes} />
           <GameExpandedMeta expiresAt={game.expires_at} />
         </div>
       </div>
