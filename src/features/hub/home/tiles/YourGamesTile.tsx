@@ -16,7 +16,6 @@ import { GameExpandedRoster } from './games/GameExpandedRoster';
 import { GameExpandedNotes } from './games/GameExpandedNotes';
 import { GameExpandedMeta } from './games/GameExpandedMeta';
 import './games/gameAnimations.css';
-import './games/gameRow.css';
 
 type GameWithDetails = {
   id: string;
@@ -47,10 +46,11 @@ function GameRow({
   index: number;
   onExpandedChange?: (rowEl: HTMLElement | null, expanded: boolean) => void;
 }) {
-  const rowRef = React.useRef<HTMLDivElement | null>(null);
+  const rowRef = React.useRef<HTMLButtonElement | null>(null);
   const [expanded, setExpanded] = React.useState(false);
   const totalSlots = game.slots_total || 0;
   const availableSlots = game.slots_open || 0;
+  const timerRef = React.useRef<number | null>(null);
 
   const toggle = () => {
     const next = !expanded;
@@ -62,15 +62,39 @@ function GameRow({
       rowRef.current?.focus({ preventScroll: true });
     });
   };
+
+  const comingSoon = () => {
+    alert('Coming soon');
+  };
+  
+  const handlePointerDown = (e: React.PointerEvent) => {
+    timerRef.current = window.setTimeout(() => {
+      comingSoon();
+    }, 420);
+  };
+
+  const handlePointerUp = () => {
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  const handlePointerCancel = () => {
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
   
   return (
-    <div 
+    <button 
       ref={rowRef}
-      role="button"
-      tabIndex={0}
       onClick={toggle}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } }}
-      className="hub-game-row w-full rounded-[14px] px-4 py-3 text-left transition-all"
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
+      className="w-full rounded-[14px] px-4 py-3 text-left transition-all"
       style={{ 
         background: 'rgba(255,255,255,0.06)',
         border: '1px solid rgba(255,255,255,0.12)',
@@ -180,7 +204,7 @@ function GameRow({
           </div>
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -239,18 +263,6 @@ export function YourGamesTile() {
   }, [data]);
 
   const hasAny = games.length > 0;
-
-  // Debug scroll metrics in dev
-  React.useEffect(() => {
-    const el = listRef.current;
-    if (!el) return;
-    const cs = window.getComputedStyle(el);
-    devlog('[YourGamesTile] scroll diag', {
-      clientHeight: el.clientHeight,
-      scrollHeight: el.scrollHeight,
-      overflowY: cs.overflowY,
-    });
-  }, [isLoading, isError, games.length]);
 
   return (
     <Tile 
@@ -313,10 +325,9 @@ export function YourGamesTile() {
         </div>
       }
       >
-      <div className="flex flex-col">{/* h-full removed to allow flex shrinking */}
+      <div className="flex flex-col h-full">
         <div
           ref={listRef}
-          className="games-scroll"
           style={{ 
             overflowY: 'auto',
             WebkitOverflowScrolling: 'touch',
@@ -325,9 +336,8 @@ export function YourGamesTile() {
             minHeight: 0,
             marginTop: '12px',
             paddingRight: '4px',
-            // NOTE: Temporarily disable mask to rule out rare iOS mask+scroll bug
-            // maskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
-            // WebkitMaskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
+            maskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
           }}
         >
         <div className="space-y-3">
