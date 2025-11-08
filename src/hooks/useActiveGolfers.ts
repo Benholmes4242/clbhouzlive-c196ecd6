@@ -20,7 +20,7 @@ export type ActiveGolfer = {
   eg_handicap_index?: number | null;
 };
 
-export function useActiveGolfers({ limit = 20 }: { limit?: number } = {}) {
+export function useActiveGolfers({ limit = 999 }: { limit?: number } = {}) {
   const { currentLocation, requestPermission } = useLocationPermission();
 
   // Return mock data

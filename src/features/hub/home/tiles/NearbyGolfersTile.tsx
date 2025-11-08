@@ -14,7 +14,7 @@ interface NearbyGolfersTileProps {
   limit?: number;
 }
 
-export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
+export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
   const nav = useNavigate();
   const { navigateFromHub } = useHub();
   const { golfers, isLoading } = useActiveGolfers({ limit });

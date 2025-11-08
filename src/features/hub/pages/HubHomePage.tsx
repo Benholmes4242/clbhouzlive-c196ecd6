@@ -100,7 +100,7 @@ export function HubHomePage() {
           style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem', gridAutoRows: 'var(--hub-tile-fixed-h)' }}
         >
           <div className="hub-tile-fixed">
-            <NearbyGolfersTile limit={20} />
+            <NearbyGolfersTile />
           </div>
           <div className="hub-tile-fixed">
             <EchoTile />
