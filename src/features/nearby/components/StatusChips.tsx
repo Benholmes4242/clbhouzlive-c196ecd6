@@ -11,12 +11,12 @@ interface StatusChipsProps {
 export function StatusChips({ sameHomeClub, isOpenToPlay, onExpand }: StatusChipsProps) {
   const chips = [];
   
-  if (sameHomeClub) {
-    chips.push({ icon: '🏠', label: 'Same home club', tone: 'default' as const });
+  if (isOpenToPlay) {
+    chips.push({ label: 'Open to play', type: 'open' as const });
   }
   
-  if (isOpenToPlay) {
-    chips.push({ icon: '🟢', label: 'Open to play', tone: 'success' as const });
+  if (sameHomeClub) {
+    chips.push({ label: 'Same home club', type: 'default' as const });
   }
 
   if (chips.length === 0) return null;
@@ -29,22 +29,11 @@ export function StatusChips({ sameHomeClub, isOpenToPlay, onExpand }: StatusChip
       {visibleChips.map((chip, i) => (
         <button
           key={i}
-          className={`chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[12px] font-semibold ${
-            chip.tone === 'success'
-              ? 'text-[#cfe8d6] shadow-[inset_0_0_0_1px_rgba(110,146,119,0.4)]'
-              : 'text-white/90'
-          }`}
-          style={{
-            background: chip.tone === 'success'
-              ? 'linear-gradient(180deg, rgba(76,220,151,0.45), rgba(0,0,0,0.25))'
-              : 'rgba(255,255,255,0.1)',
-            backdropFilter: 'blur(20px)',
-            border: chip.tone === 'default' ? '1px solid rgba(255,255,255,0.15)' : 'none',
-          }}
+          className={`pill ${chip.type === 'open' ? 'pill--open' : ''} text-white/90`}
           onClick={() => hapticSoft()}
-          aria-pressed={chip.tone === 'success'}
+          aria-pressed={chip.type === 'open'}
         >
-          <span className="text-[14px] leading-none">{chip.icon}</span>
+          {chip.type === 'open' && <span className="pill__dot" />}
           <span>{chip.label}</span>
         </button>
       ))}

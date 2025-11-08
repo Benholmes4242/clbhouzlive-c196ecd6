@@ -1,42 +1,44 @@
 /* golfers.css */
 
 /* === Frosted Glass Avatar Ring === */
+/* Clean, non-blurring glass ring */
 .g-avatar {
   position: relative;
   display: inline-block;
-  width: 48px;
-  height: 48px;
-  border-radius: 999px;
+  width: 48px; height: 48px;
+  border-radius: 9999px;
   overflow: hidden;
 }
 
 .g-avatar > img {
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   object-fit: cover;
   display: block;
   border-radius: inherit;
+  /* Guard against any GPU sampling blur on iOS */
+  -webkit-transform: translateZ(0);
+  image-rendering: auto;
 }
 
-/* Subtle frosted halo around avatar */
+/* Frosted micro-ring without blur */
 .g-avatar::after {
   content: "";
-  position: absolute;
-  inset: -1px; /* extends just beyond edge for smooth halo */
+  position: absolute; inset: 0;
   border-radius: inherit;
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.28),
-    inset 0 0 0 2px rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(2px);
   pointer-events: none;
+  /* subtle edge + faint inner haze */
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.28),
+    inset 0 0 8px rgba(255,255,255,0.06);
+  /* no backdrop-filter here (removes the blur) */
+  background: transparent;
 }
 
-/* Accessibility: fallback for users who reduce transparency */
+/* High-contrast fallback when transparency is reduced */
 @media (prefers-reduced-transparency: reduce) {
   .g-avatar::after {
-    backdrop-filter: none;
-    background: rgba(255, 255, 255, 0.12);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.36);
   }
 }
 
@@ -82,3 +84,34 @@
 }
 @keyframes shimmer { 0%{background-position: 200% 0} 100%{background-position: -200% 0} }
 @media (prefers-reduced-motion: reduce) { .skel { animation: none; } }
+
+/* Glass pill base (shared) */
+.pill {
+  display: inline-flex; align-items: center; gap: .5rem;
+  height: 32px; padding: 0 .75rem;
+  border-radius: 9999px;
+  font-weight: 600; font-size: 14px;
+  border: 1px solid rgba(255,255,255,0.20);
+  background: rgba(255,255,255,0.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+/* Subtle green tint for "Open to play" */
+.pill--open {
+  /* gentle tint; no outer glow */
+  background: linear-gradient(
+    to bottom,
+    rgba(78, 199, 120, 0.16),
+    rgba(78, 199, 120, 0.10)
+  );
+  border-color: rgba(78, 199, 120, 0.28);
+}
+
+/* Green dot */
+.pill__dot {
+  width: 10px; height: 10px; border-radius: 9999px;
+  background: #4EC778;         /* balanced green */
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.18) inset; /* tiny highlight ring */
+}
