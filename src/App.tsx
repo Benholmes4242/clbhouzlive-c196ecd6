@@ -157,14 +157,11 @@ function AppRoutes() {
         <Route path="/channel/:slug" element={<ChannelProfile />} />
         <Route path="/game/:id" element={<GameDetailView />} />
         
-        {/* Golfers page - standalone route */}
-        {FEATURE_FLAGS.HUB && <Route path="/golfers" element={<HubGolfersPage />} />}
-        
         {/* Hub routes - only when NOT using background location */}
         {!showHubOverlay && FEATURE_FLAGS.HUB && (
           <>
             <Route path="/hub" element={<HubHomePage />} />
-            <Route path="/hub/golfers" element={<Navigate to="/golfers" replace />} />
+            <Route path="/hub/golfers" element={<HubGolfersPage />} />
             <Route path="/hub/echo" element={<HubEchoChatPage />} />
             <Route path="/hub/create-game" element={<HubCreateGamePage />} />
             <Route path="/hub/games" element={<HubGamesPage />} />
@@ -185,7 +182,7 @@ function AppRoutes() {
       {showHubOverlay && FEATURE_FLAGS.HUB && (
         <Routes>
           <Route path="/hub" element={<HubHomePage />} />
-          <Route path="/hub/golfers" element={<Navigate to="/golfers" replace />} />
+          <Route path="/hub/golfers" element={<HubGolfersPage />} />
           <Route path="/hub/echo" element={<HubEchoChatPage />} />
           <Route path="/hub/create-game" element={<HubCreateGamePage />} />
           <Route path="/hub/games" element={<HubGamesPage />} />

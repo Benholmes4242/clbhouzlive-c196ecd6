@@ -255,6 +255,7 @@ const Clubhouse = () => {
       {showProgressBar && (
         <VideoProgressVerticalHUD 
           videoRef={activeVideoRef}
+          accent="linear-gradient(to top, rgba(110,146,119,1) 0%, rgba(255,255,255,0.6) 60%)"
           container={clubhouseRootRef.current}
         />
       )}

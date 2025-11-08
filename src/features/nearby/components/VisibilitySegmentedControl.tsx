@@ -67,56 +67,62 @@ export function VisibilitySegmentedControl({ value, onChange }: VisibilitySegmen
   };
 
   return (
-    <div className="mb-2">
+    <section aria-labelledby="vis-title" className="w-full">
+      <h2 id="vis-title" className="sr-only">Visibility</h2>
+      
+      {/* Segmented control */}
       <div 
-        className="rounded-3xl bg-[var(--hub-glass-bg)]/60 backdrop-blur-md border border-[var(--hub-stroke)]/50 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_8px_30px_rgba(0,0,0,0.35)] p-2"
+        role="group" 
+        aria-label="Visibility mode"
+        className="relative flex gap-1.5 w-full p-1.5 rounded-[20px] bg-[#141414] border border-[#242424]"
+        style={{ boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.3)' }}
       >
-        <h2 className="sr-only">Visibility</h2>
-        
-        {/* Segmented control */}
-        <div 
-          role="group" 
-          aria-label="Visibility mode"
-          className="flex gap-2"
-        >
-          {segments.map((segment) => {
-            const isActive = value === segment.mode;
-            
-            return (
-              <button
-                key={segment.mode}
-                aria-pressed={isActive}
-                onClick={() => handleChange(segment.mode)}
-                className={`
-                  flex-1 rounded-xl px-4 py-2 text-[13px] font-medium
-                  transition-colors
-                  focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/60
-                  ${isActive 
-                    ? 'bg-white/8 border border-[var(--hub-stroke)]/60 shadow-inner text-[var(--hub-text)]' 
-                    : 'bg-transparent border border-transparent text-[var(--hub-text-sub)]'
-                  }
-                `.trim().replace(/\s+/g, ' ')}
-              >
-                <span className="inline-flex items-center justify-center gap-1.5">
-                  <span className="text-[14px]" aria-hidden="true">{segment.icon}</span>
-                  <span>{segment.label}</span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
-        
-        {/* Dynamic status text with ARIA live region */}
-        <p 
-          aria-live="polite" 
-          aria-atomic="true"
-          className="mt-2 text-xs text-[var(--hub-text-dim)] text-center"
-        >
-          {value === 'all' && "Visible to all golfers nearby"}
-          {value === 'friends' && "Visible to friends nearby"}
-          {value === 'hidden' && "Hidden from nearby golfers"}
-        </p>
+        {/* Animated pill slider */}
+        <div
+          aria-hidden="true"
+          className="absolute top-1.5 bottom-1.5 rounded-[14px] transition-transform duration-[180ms] ease-out pointer-events-none"
+          style={{
+            width: 'calc(33.333% - 4px)',
+            left: '6px',
+            transform: getSliderTransform(),
+            ...getSliderStyle(),
+          }}
+        />
+
+        {/* Buttons */}
+        {segments.map((segment) => {
+          const isActive = value === segment.mode;
+          
+          return (
+            <TapButton
+              key={segment.mode}
+              aria-pressed={isActive}
+              onPointerDown={() => handleChange(segment.mode)}
+              className={`
+                relative flex-1 py-2.5 px-2 text-[13px] font-semibold rounded-[14px] 
+                transition-colors duration-100
+                ${isActive ? 'text-white' : 'text-white/60'}
+              `}
+              style={{ minHeight: '40px', zIndex: 1 }}
+            >
+              <span className="inline-flex items-center justify-center gap-1.5">
+                <span className="text-[14px]" aria-hidden="true">{segment.icon}</span>
+                <span>{segment.label}</span>
+              </span>
+            </TapButton>
+          );
+        })}
       </div>
-    </div>
+      
+      {/* Dynamic status text with ARIA live region */}
+      <p 
+        aria-live="polite" 
+        aria-atomic="true"
+        className="mt-2.5 text-center text-[13px] transition-colors duration-200"
+        style={{ color: statusInfo.color }}
+      >
+        {statusInfo.text}
+      </p>
+    </section>
   );
 }
