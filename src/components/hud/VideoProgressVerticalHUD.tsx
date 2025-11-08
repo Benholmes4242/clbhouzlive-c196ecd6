@@ -720,7 +720,7 @@ export function VideoProgressVerticalHUD({
         onMouseDown={handleScrubStart}
         onTouchStart={handleScrubStart}
       >
-        {/* Visual track with frosted aqua design */}
+        {/* Visual track with frosted white design */}
         <div ref={trackRef} className="vhud-track">
           {/* Buffer hidden - not currently used */}
           
