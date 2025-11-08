@@ -58,53 +58,38 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
     (golfer.distance_km ? formatDistance(golfer.distance_km * 1000) : undefined);
 
   return (
-    <article
-      className="rounded-2xl bg-[#101010] shadow-[inset_0_0_0_1px_#222,0_2px_12px_rgba(0,0,0,0.35)] p-3 mx-3 my-2.5"
-      role="article"
-      aria-label={`${golfer.display_name}, ${golfer.home_club || 'No home club'}, ${distanceText || ''}`}
-    >
-      {/* Main tappable area */}
-      <TapButton
-        className="flex items-center gap-3 w-full text-left transition-transform active:scale-[0.98]"
-        onPointerDown={handleViewProfile}
-        aria-label={`View ${golfer.display_name}'s profile`}
+    <li>
+      <button 
+        className="w-full flex items-center gap-3 py-3 px-2 text-left hover:bg-white/[0.03] rounded-xl transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/60"
+        onClick={handleViewProfile}
+        aria-label={`View ${golfer.display_name}'s profile. ${golfer.home_club || 'No home club'}${distanceText ? `, ${distanceText} away` : ''}`}
       >
-        {/* Avatar with optional open-to-play ring */}
-        <div 
-          className={`relative shrink-0 w-11 h-11 rounded-full overflow-hidden ${
-            golfer.isOpenToPlay ? 'shadow-[0_0_0_3px_rgba(110,146,119,0.5)]' : ''
-          }`}
-        >
-          <img
-            src={golfer.avatar_url || '/placeholder.svg'}
-            alt=""
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        {/* Name, club, badges */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <span className="text-[16px] font-bold text-white truncate">
-              {golfer.display_name}
-            </span>
-            {distanceText && (
-              <span className="ml-auto text-[#a0a0a0] text-[14px] tabular-nums shrink-0">
-                {distanceText}
-              </span>
-            )}
+        {/* Avatar */}
+        <img
+          src={golfer.avatar_url || '/placeholder.svg'}
+          className="h-10 w-10 rounded-full object-cover ring-1 ring-[var(--hub-stroke)]/40"
+          alt=""
+        />
+        
+        {/* Content */}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between">
+            <p className="truncate font-medium text-[var(--hub-text)]">{golfer.display_name}</p>
+            <svg className="h-4 w-4 opacity-70 text-[var(--hub-text-dim)]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </div>
+          <p className="mt-0.5 text-[13px] text-[var(--hub-text-sub)]">
+            {golfer.home_club && <span>{golfer.home_club}</span>}
+            {golfer.home_club && distanceText && <span aria-hidden> • </span>}
+            {distanceText && <span>{distanceText}</span>}
+          </p>
           
-          {golfer.home_club && (
-            <div className="text-[13px] text-[#b5b5b5] mb-2 truncate">
-              {golfer.home_club}
-            </div>
-          )}
-
+          {/* Badges */}
           {(golfer.sameHomeClub || golfer.isOpenToPlay) && (
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
               {golfer.sameHomeClub && (
-                <Badge icon="🏠" label="Same home club" />
+                <Badge icon="🏠" label="Same club" />
               )}
               {golfer.isOpenToPlay && (
                 <Badge icon="🟢" label="Open to play" tone="success" />
@@ -112,51 +97,7 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
             </div>
           )}
         </div>
-
-        {/* Chevron */}
-        <span className="text-[#777] text-xl shrink-0" aria-hidden="true">›</span>
-      </TapButton>
-
-      {/* Action CTAs */}
-      <div className="flex gap-2.5 mt-3">
-        <TapButton
-          className="flex-1 h-10 rounded-xl bg-[#171717] text-[#ddd] shadow-[inset_0_0_0_1px_#2b2b2b] transition-transform active:scale-[0.98] font-medium text-[13px]"
-          onPointerDown={() => {
-            haptic('light');
-            sendFriendRequest();
-          }}
-          aria-label="Send friend request"
-        >
-          Friend Request
-        </TapButton>
-
-        <TapButton
-          className={`flex-1 h-10 rounded-xl font-medium text-[13px] transition-transform active:scale-[0.98] ${
-            isFollowing
-              ? 'bg-[#1f2621] text-[#e7f3ea] shadow-[inset_0_0_0_1px_#335a3f]'
-              : 'bg-[#171717] text-[#ddd] shadow-[inset_0_0_0_1px_#2b2b2b]'
-          }`}
-          onPointerDown={() => {
-            haptic('light');
-            toggleFollow();
-          }}
-          aria-label={isFollowing ? 'Unfollow' : 'Follow'}
-          aria-pressed={isFollowing}
-        >
-          {isFollowing ? 'Following' : 'Follow'}
-        </TapButton>
-
-        <TapButton
-          className="flex-1 h-10 rounded-xl bg-[#171717] text-[#ddd] shadow-[inset_0_0_0_1px_#2b2b2b] transition-transform active:scale-[0.98] font-medium text-[13px]"
-          onPointerDown={() => {
-            haptic('light');
-            openMessage();
-          }}
-          aria-label="Message"
-        >
-          Message
-        </TapButton>
-      </div>
-    </article>
+      </button>
+    </li>
   );
 }

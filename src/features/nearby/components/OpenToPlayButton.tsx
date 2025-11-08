@@ -47,47 +47,38 @@ export function OpenToPlayButton() {
   const remainingMinutes = getRemainingMinutes();
 
   return (
-    <section aria-labelledby="otp-title" className="flex flex-col items-center mt-6 mb-2">
-      <h2 id="otp-title" className="sr-only">Open to Play</h2>
+    <div 
+      className="mb-3 rounded-3xl bg-[var(--hub-glass-bg)]/60 backdrop-blur-md border border-[var(--hub-stroke)]/50 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_8px_30px_rgba(0,0,0,0.35)] p-3"
+    >
+      <h2 className="sr-only">Open to Play</h2>
       
-      <TapButton
+      <button
         aria-pressed={isActive}
         aria-label={isActive ? `Open to Play active, ${remainingMinutes} minutes remaining` : 'Activate Open to Play'}
         disabled={isSaving}
-        onPointerDown={handleToggle}
-        className="relative inline-flex items-center justify-center gap-2.5 transition-all duration-100 active:scale-[0.97]"
-        style={{
-          minWidth: '240px',
-          height: '44px',
-          borderRadius: '22px',
-          fontWeight: 600,
-          fontSize: '15px',
-          background: isActive ? '#222b24' : '#1b1b1b',
-          color: isActive ? '#fff' : '#fff',
-          border: isActive ? '1px solid #335a3f' : '1px solid #2a2a2a',
-          boxShadow: isActive 
-            ? '0 0 0 4px rgba(110, 146, 119, 0.25), inset 0 1px 0 rgba(255,255,255,0.08)' 
-            : 'inset 0 1px 0 rgba(255,255,255,0.05)',
-        }}
+        onClick={handleToggle}
+        className="w-full rounded-2xl py-3 text-[16px] font-medium bg-white/[0.06] hover:bg-white/[0.09] border border-[var(--hub-stroke)]/60 backdrop-blur-md transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/60 disabled:opacity-50"
       >
-        <span className="text-[16px]" aria-hidden="true">🏌️‍♂️</span>
-        {isSaving ? (
-          'Updating…'
-        ) : isActive ? (
-          <>Open to Play <span className="text-white/70 text-[13px]">• {remainingMinutes}m</span></>
-        ) : (
-          'Open to Play'
-        )}
-      </TapButton>
+        <span className="inline-flex items-center justify-center gap-2">
+          <span aria-hidden="true">🏌️</span>
+          {isSaving ? (
+            'Updating…'
+          ) : isActive ? (
+            <>Open to Play <span className="text-white/70 text-[13px]">• {remainingMinutes}m</span></>
+          ) : (
+            'Open to Play'
+          )}
+        </span>
+      </button>
 
       {/* Helper copy */}
-      <p className="mt-2.5 text-[13px] text-[#9b9b9b] text-center leading-[1.35] max-w-[280px]">
+      <p className="mt-2 text-xs text-[var(--hub-text-dim)] text-center">
         {isActive ? (
           <>Nearby golfers can see you're available. <strong className="text-white/80">Tap again</strong> to turn off.</>
         ) : (
-          <>Let nearby golfers know you're ready to play — tap <strong className="text-white/80">Open to Play</strong> to show up on their radar.</>
+          <>Let nearby golfers know you're ready — tap to appear on their radar.</>
         )}
       </p>
-    </section>
+    </div>
   );
 }
