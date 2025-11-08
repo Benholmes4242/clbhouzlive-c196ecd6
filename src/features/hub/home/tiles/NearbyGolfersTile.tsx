@@ -52,7 +52,7 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
             overflowY: 'auto',
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',
-            maxHeight: 'calc(2.5 * 52px)', // Show 2.5 rows visible
+            maxHeight: 'calc(2.4 * 52px)', // Show 2.4 rows visible
             maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
             WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
           }}
