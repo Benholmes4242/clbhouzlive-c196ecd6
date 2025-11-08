@@ -321,10 +321,12 @@ const App: React.FC = () => {
                             <VideoPlaybackManagerProvider>
                               <TopTenProvider>
                                 <AuthWrapper>
-                                  <Suspense fallback={<ClbhouzPageSpinner />}>
-                                  {/* No global header - each page renders its own ClubhouseHeaderNew */}
-                                  <AppRoutes />
-                                </Suspense>
+                                   <Suspense fallback={<ClbhouzPageSpinner />}>
+                                   <div className="app-depth">
+                                   {/* No global header - each page renders its own ClubhouseHeaderNew */}
+                                   <AppRoutes />
+                                   </div>
+                                 </Suspense>
                               </AuthWrapper>
                             </TopTenProvider>
                           </VideoPlaybackManagerProvider>

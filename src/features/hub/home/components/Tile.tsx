@@ -44,7 +44,7 @@ export function Tile({ title, subtitle, children, onViewAll, footer, align = 'st
         </div>
         {subtitle && (
           <div 
-            className="text-[13px] mb-2.5 line-clamp-1" 
+            className="text-[13px] mb-2 line-clamp-1" 
             style={{ 
               color: 'var(--hub-text-sub)',
               textAlign: align === 'center' ? 'center' : 'left'
@@ -53,7 +53,7 @@ export function Tile({ title, subtitle, children, onViewAll, footer, align = 'st
             {subtitle}
           </div>
         )}
-        <div className="flex-1 flex flex-col min-h-0">{children}</div>
+        <div className="flex-1 flex flex-col min-h-0" style={{ marginTop: '2.5px' }}>{children}</div>
       </div>
 
       {/* Footer bar with View all */}

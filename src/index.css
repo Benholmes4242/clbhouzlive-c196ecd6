@@ -37,8 +37,20 @@
   .animate-out-left  { animation: slide-out-left  300ms ease both; }
   .animate-out-right { animation: slide-out-right 300ms ease both; }
 
-  /* Nuke solid Tailwind black backgrounds to new page tone */
+/* Nuke solid Tailwind black backgrounds to new page tone */
   .bg-black { --tw-bg-opacity: 1; background-color: rgb(10 10 10 / var(--tw-bg-opacity)) !important; }
+}
+
+/* Optional depth wash behind pages */
+.app-depth::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 800px at 50% -200px, rgba(255,255,255,0.06), transparent 55%),
+    radial-gradient(1000px 600px at 50% 110%, rgba(0,0,0,0.25), transparent 60%);
+  z-index: -1;
 }
 
 
@@ -114,6 +126,15 @@ html, body, #root {
   --bg-card-hover: rgba(255,255,255,0.08);
   --bg-card-subtle: rgba(255,255,255,0.03);
   --bg-modal: #1A1A1A;
+  
+  /* Hub specific tokens */
+  --hub-stroke: rgba(255,255,255,0.08);
+  --hub-text: rgba(255,255,255,0.92);
+  --hub-text-body: rgba(255,255,255,0.72);
+  --hub-text-sub: rgba(255,255,255,0.56);
+  --token-success-ink: #a6f5b7;
+  --token-success-bg: rgba(64, 160, 86, 0.18);
+  --token-success-border: rgba(64, 160, 86, 0.35);
   
   /* Overlays / translucency */
   --overlay-scrim: rgba(0,0,0,0.36);

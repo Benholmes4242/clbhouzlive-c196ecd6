@@ -44,14 +44,11 @@ function StatusPill({ kind }: { kind: 'Hosting' | 'Joined' }) {
   const isHosting = kind === 'Hosting';
   return (
     <span
-      className="inline-flex items-center px-[8px] py-[3px] rounded-full text-[12px] leading-[14px] border"
+      className="inline-flex items-center px-2.5 py-[3px] rounded-full text-[13px] leading-none"
       style={{
-        background: isHosting ? 'rgba(80,160,100,0.15)' : 'rgba(255,255,255,0.06)',
-        borderColor: isHosting ? 'rgba(92,200,120,0.55)' : 'rgba(255,255,255,0.10)',
-        color: isHosting ? '#9FE7B5' : 'var(--hub-text-body)',
-        boxShadow: isHosting
-          ? 'inset 0 1px 0 rgba(160,255,180,0.25)'
-          : 'inset 0 1px 0 rgba(255,255,255,0.06)',
+        background: isHosting ? 'var(--token-success-bg)' : 'rgba(255,255,255,0.06)',
+        border: `1px solid ${isHosting ? 'var(--token-success-border)' : 'rgba(255,255,255,0.10)'}`,
+        color: isHosting ? 'var(--token-success-ink)' : 'var(--hub-text-body)',
       }}
       aria-label={isHosting ? 'Hosting' : 'Joined'}
     >
@@ -144,7 +141,8 @@ function GameRow({
       onPointerMove={handlePointerMove}
       onPointerUp={clearTimer}
       onPointerCancel={clearTimer}
-      className="game-row w-full rounded-[12px] px-4 py-2 text-left outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0"
+      className="game-row w-full rounded-[14px] px-4 py-3.5 text-left outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0"
+      aria-label={`${game.course_name || 'Golf Course'}, ${when}. ${game.kind === 'Hosting' ? 'Hosting' : 'Joined'}`}
       style={{ 
         background: 'rgba(255,255,255,0.06)',
         border: '1px solid rgba(255,255,255,0.12)',
@@ -154,8 +152,9 @@ function GameRow({
         lineHeight: 1.2,
       }}
     >
-      {/* Line 1: Course name */}
+      {/* Line 1: flag + Course name */}
       <div className="flex items-center gap-2 mb-[2px] sm:mb-[3px]">
+        <span aria-hidden="true" style={{ fontSize: '14px' }}>⛳️</span>
         <div className="truncate text-[16px] font-medium" style={{ color: 'var(--hub-text-bright)' }}>
           {game.course_name || 'Golf Course'}
         </div>
@@ -280,14 +279,11 @@ export function YourGamesTile() {
     // Distance from child's top to container's top, plus current scroll
     const targetTop = (rRect.top - cRect.top) + container.scrollTop - padding;
 
-    const prefersReduced =
-      typeof window !== 'undefined' &&
-      window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
     container.scrollTo({
       top: Math.max(0, targetTop),
-      behavior: prefersReduced ? 'auto' : 'smooth',
+      behavior: reduceMotion ? 'auto' : 'smooth',
     });
   };
 
@@ -403,7 +399,13 @@ export function YourGamesTile() {
           ref={listRef}
           className="gt-scroll flex-1 min-h-0 -mr-1 pr-1"
           style={{ 
-            marginTop: '6px',
+            marginTop: '8px',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain',
+            touchAction: 'pan-y',
+            maskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
           }}
         >
         <ul className="gt-list">

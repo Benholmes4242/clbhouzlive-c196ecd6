@@ -58,6 +58,11 @@ export function GameExpandedRoster({ host, members }: GameExpandedRosterProps) {
                 HCP {host.handicap.toFixed(1)}
               </div>
             )}
+            {!host.homeClub && host.handicap == null && (
+              <div className="text-[13px]" style={{ color: 'var(--hub-text-sub)', opacity: 0.6 }}>
+                —
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -105,6 +110,11 @@ export function GameExpandedRoster({ host, members }: GameExpandedRosterProps) {
                     {m.handicap != null && (
                       <div className="text-[12px]" style={{ color: 'var(--hub-text-sub)', opacity: 0.65 }}>
                         HCP {m.handicap.toFixed(1)}
+                      </div>
+                    )}
+                    {!m.homeClub && m.handicap == null && (
+                      <div className="text-[13px]" style={{ color: 'var(--hub-text-sub)', opacity: 0.6 }}>
+                        —
                       </div>
                     )}
                   </div>
