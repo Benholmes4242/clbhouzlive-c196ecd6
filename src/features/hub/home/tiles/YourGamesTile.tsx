@@ -274,7 +274,7 @@ export function YourGamesTile() {
       }
       footer={
         <div className="mt-auto">
-          <div className="mt-2" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <button
               onClick={openSearchGames}
               className="text-[15px] font-medium transition"
