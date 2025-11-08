@@ -10,10 +10,12 @@ import { useUserGames } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
 import { useHub } from '@/features/hub/useHub';
 import { devlog } from '@/utils/log';
+import { scrollChildIntoView } from '../utils/scroll';
 import { GameExpandedPrimary } from './games/GameExpandedPrimary';
 import { GameExpandedRoster } from './games/GameExpandedRoster';
 import { GameExpandedNotes } from './games/GameExpandedNotes';
 import { GameExpandedMeta } from './games/GameExpandedMeta';
+import './games/gameAnimations.css';
 
 type GameWithDetails = {
   id: string;
@@ -37,27 +39,37 @@ type GameWithDetails = {
 
 function GameRow({ 
   game,
-  expanded,
-  onToggle,
-  onLongPress,
+  index,
+  onExpandedChange,
 }: { 
   game: GameWithDetails;
-  expanded: boolean;
-  onToggle: () => void;
-  onLongPress: () => void;
+  index: number;
+  onExpandedChange?: (rowEl: HTMLElement | null, expanded: boolean) => void;
 }) {
+  const rowRef = React.useRef<HTMLButtonElement | null>(null);
+  const [expanded, setExpanded] = React.useState(false);
   const totalSlots = game.slots_total || 0;
   const availableSlots = game.slots_open || 0;
-  const hostName = React.useMemo(() => {
-    if (game.kind === 'Hosting') return 'You';
-    const hostP = game.participants.find(p => p.user_id === game.host_user_id);
-    return hostP?.user_profiles?.display_name || null;
-  }, [game]);
   const timerRef = React.useRef<number | null>(null);
+
+  const toggle = () => {
+    const next = !expanded;
+    setExpanded(next);
+    // Defer until layout updates for accurate geometry
+    requestAnimationFrame(() => {
+      onExpandedChange?.(rowRef.current, next);
+      // Keep accessibility solid without jumping
+      rowRef.current?.focus({ preventScroll: true });
+    });
+  };
+
+  const comingSoon = () => {
+    alert('Coming soon');
+  };
   
   const handlePointerDown = (e: React.PointerEvent) => {
     timerRef.current = window.setTimeout(() => {
-      onLongPress();
+      comingSoon();
     }, 420);
   };
 
@@ -77,7 +89,8 @@ function GameRow({
   
   return (
     <button 
-      onClick={onToggle}
+      ref={rowRef}
+      onClick={toggle}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}
@@ -133,6 +146,7 @@ function GameRow({
           maxHeight: expanded ? '400px' : '0px',
           opacity: expanded ? 1 : 0,
         }}
+        aria-hidden={!expanded}
       >
         <div 
           className="mt-3 pt-3"
@@ -140,29 +154,54 @@ function GameRow({
             borderTop: '1px solid rgba(255,255,255,0.08)',
           }}
         >
-          <GameExpandedPrimary
-            kind={game.kind}
-            courseName={game.course_name}
-            startTime={game.start_time}
-            slotsTotal={game.slots_total || 4}
-            slotsOpen={game.slots_open || 0}
-          />
-          <GameExpandedRoster
-            host={{
-              id: game.host_user_id,
-              name: game.kind === 'Hosting' ? 'You' : (
-                game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.display_name || 'Host'
-              ),
-              avatarUrl: game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.profile_photo_url || null,
-            }}
-            members={game.participants.map(p => ({
-              id: p.user_id || '',
-              name: p.user_profiles?.display_name || 'Player',
-              avatarUrl: p.user_profiles?.profile_photo_url || null,
-            }))}
-          />
-          <GameExpandedNotes notes={game.notes} />
-          <GameExpandedMeta expiresAt={game.expires_at} />
+          <div
+            className="fade-slide-in fade-stagger"
+            style={{ '--d': '0ms' } as React.CSSProperties}
+          >
+            <GameExpandedPrimary
+              kind={game.kind}
+              courseName={game.course_name}
+              startTime={game.start_time}
+              slotsTotal={game.slots_total || 4}
+              slotsOpen={game.slots_open || 0}
+            />
+          </div>
+
+          <div
+            className="fade-slide-in fade-stagger"
+            style={{ '--d': '60ms' } as React.CSSProperties}
+          >
+            <GameExpandedRoster
+              host={{
+                id: game.host_user_id,
+                name: game.kind === 'Hosting' ? 'You' : (
+                  game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.display_name || 'Host'
+                ),
+                avatarUrl: game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.profile_photo_url || null,
+              }}
+              members={game.participants.map(p => ({
+                id: p.user_id || '',
+                name: p.user_profiles?.display_name || 'Player',
+                avatarUrl: p.user_profiles?.profile_photo_url || null,
+              }))}
+            />
+          </div>
+
+          {game.notes && (
+            <div
+              className="fade-slide-in fade-stagger"
+              style={{ '--d': '120ms' } as React.CSSProperties}
+            >
+              <GameExpandedNotes notes={game.notes} />
+            </div>
+          )}
+
+          <div
+            className="fade-slide-in fade-stagger"
+            style={{ '--d': '100ms' } as React.CSSProperties}
+          >
+            <GameExpandedMeta expiresAt={game.expires_at} />
+          </div>
         </div>
       </div>
     </button>
@@ -172,7 +211,7 @@ function GameRow({
 export function YourGamesTile() {
   const nav = useNavigate();
   const { navigateFromHub } = useHub();
-  const [openId, setOpenId] = React.useState<string | null>(null);
+  const listRef = React.useRef<HTMLDivElement | null>(null);
   const viewAllRef = React.useRef<HTMLButtonElement>(null);
   
   // Use shared hook for consistency with the sheet
@@ -222,8 +261,6 @@ export function YourGamesTile() {
       .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
     return combined as GameWithDetails[];
   }, [data]);
-
-  const toggle = (id: string) => setOpenId(o => (o === id ? null : id));
 
   const hasAny = games.length > 0;
 
@@ -290,6 +327,7 @@ export function YourGamesTile() {
       >
       <div className="flex flex-col h-full">
         <div
+          ref={listRef}
           style={{ 
             overflowY: 'auto',
             WebkitOverflowScrolling: 'touch',
@@ -340,13 +378,18 @@ export function YourGamesTile() {
             </div>
           )}
 
-          {!isLoading && !isError && games.map(g => (
+          {!isLoading && !isError && games.map((g, i) => (
             <GameRow
               key={g.id}
               game={g}
-              expanded={openId === g.id}
-              onToggle={() => toggle(g.id)}
-              onLongPress={comingSoon}
+              index={i}
+              onExpandedChange={(rowEl, expanded) => {
+                if (!expanded) return;
+                const container = listRef.current;
+                if (container && rowEl) {
+                  scrollChildIntoView(container, rowEl, 12);
+                }
+              }}
             />
           ))}
         </div>
