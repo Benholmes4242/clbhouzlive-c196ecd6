@@ -79,12 +79,11 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
         onPointerDown={handleViewProfile}
         aria-label={`View ${golfer.display_name}'s profile`}
       >
-        {/* Avatar with parallax and presence glow */}
+        {/* Avatar */}
         <GolferAvatar
           avatarUrl={golfer.avatar_url}
           displayName={golfer.display_name}
-          isOpenToPlay={golfer.isOpenToPlay}
-          size={52}
+          size={48}
         />
 
         {/* Content */}
