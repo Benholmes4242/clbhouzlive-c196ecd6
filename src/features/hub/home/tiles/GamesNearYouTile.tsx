@@ -74,7 +74,7 @@ export function GamesNearYouTile({
         </div>
 
         {/* CTAs */}
-        <div className="flex gap-2 mt-4">
+        <div className="flex gap-2 mt-3 sm:mt-4">
           <button
             onClick={comingSoon}
             className="flex-1 h-10 rounded-2xl px-4 flex items-center justify-center text-[15px] transition focus:outline-none focus-visible:ring-2"
