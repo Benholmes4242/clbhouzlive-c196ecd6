@@ -324,7 +324,7 @@ export function YourGamesTile() {
           WebkitMaskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
         }}
       >
-        <div className="space-y-3 pb-3">
+        <div className="space-y-3">
           {isLoading && [0, 1, 2].map(i => (
             <div 
               key={i} 
