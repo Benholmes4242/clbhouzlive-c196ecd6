@@ -23,8 +23,7 @@ interface Game {
   status: string;
 }
 
-function GameRow({ game }: { game: Game }) {
-  const [open, setOpen] = React.useState(false);
+function GameRow({ game, open, onToggle }: { game: Game; open: boolean; onToggle: () => void }) {
   const { navigateFromHub } = useHub();
   const availableSlots = game.slots_open || 0;
 
@@ -32,7 +31,7 @@ function GameRow({ game }: { game: Game }) {
     <div className={`game-row ${open ? 'open' : ''}`} role="listitem">
       <button 
         className="row-head" 
-        onClick={() => setOpen(o => !o)} 
+        onClick={onToggle}
         aria-expanded={open}
       >
         <span className="left">
@@ -80,11 +79,12 @@ export function GamesNearYouTile({
 }: GamesNearYouTileProps) {
   const { navigateFromHub } = useHub();
   const { data: allGames = [], isLoading } = useGamesQuery();
+  const [openGameId, setOpenGameId] = React.useState<string | null>(null);
   
   const games = allGames.slice(0, limit);
   
-  const comingSoon = () => {
-    alert('Coming soon');
+  const handleToggle = (id: string) => {
+    setOpenGameId(prev => (prev === id ? null : id)); // close others automatically
   };
 
   return (
@@ -98,7 +98,7 @@ export function GamesNearYouTile({
             <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
           ))}
           {!isLoading && games.map(g => (
-            <GameRow key={g.id} game={g} />
+            <GameRow key={g.id} game={g} open={openGameId === g.id} onToggle={() => handleToggle(g.id)} />
           ))}
           {!isLoading && games.length === 0 && (
             <div className="text-[13px] py-2" style={{ color: 'var(--hub-text-sub)' }}>
