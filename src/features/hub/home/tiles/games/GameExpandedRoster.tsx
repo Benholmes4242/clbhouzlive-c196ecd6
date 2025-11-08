@@ -7,6 +7,8 @@ type RosterPerson = {
   id: string;
   name: string;
   avatarUrl: string | null;
+  homeClub?: string | null;
+  handicap?: number | null;
 };
 
 type GameExpandedRosterProps = {
@@ -42,8 +44,20 @@ export function GameExpandedRoster({ host, members }: GameExpandedRosterProps) {
               {host.name === 'Guest' ? 'G' : host.name.charAt(0).toUpperCase()}
             </div>
           )}
-          <div className="text-[14px] truncate" style={{ color: 'var(--hub-text-body)' }}>
-            {host.name}
+          <div className="flex-1 min-w-0">
+            <div className="text-[14px] truncate" style={{ color: 'var(--hub-text-body)' }}>
+              {host.name}
+            </div>
+            {host.homeClub && (
+              <div className="text-[13px] truncate" style={{ color: 'var(--hub-text-body)', opacity: 0.9 }}>
+                {host.homeClub}
+              </div>
+            )}
+            {host.handicap != null && (
+              <div className="text-[12px]" style={{ color: 'var(--hub-text-sub)', opacity: 0.65 }}>
+                HCP {host.handicap.toFixed(1)}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -61,7 +75,7 @@ export function GameExpandedRoster({ host, members }: GameExpandedRosterProps) {
           ) : (
             <>
               {nonHostMembers.slice(0, 3).map(m => (
-                <div key={m.id} className="flex items-center gap-2">
+                <div key={m.id} className="flex items-center gap-2 mb-2 last:mb-0">
                   {m.avatarUrl ? (
                     <img 
                       className="h-6 w-6 rounded-full" 
@@ -79,8 +93,20 @@ export function GameExpandedRoster({ host, members }: GameExpandedRosterProps) {
                       {m.name === 'Guest' ? 'G' : m.name.charAt(0).toUpperCase()}
                     </div>
                   )}
-                  <div className="text-[13px] truncate" style={{ color: 'var(--hub-text-body)' }}>
-                    {m.name}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] truncate" style={{ color: 'var(--hub-text-body)' }}>
+                      {m.name}
+                    </div>
+                    {m.homeClub && (
+                      <div className="text-[13px] truncate" style={{ color: 'var(--hub-text-body)', opacity: 0.9 }}>
+                        {m.homeClub}
+                      </div>
+                    )}
+                    {m.handicap != null && (
+                      <div className="text-[12px]" style={{ color: 'var(--hub-text-sub)', opacity: 0.65 }}>
+                        HCP {m.handicap.toFixed(1)}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

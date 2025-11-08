@@ -5,6 +5,7 @@ type Profile = {
   display_name?: string | null; 
   profile_photo_url?: string | null; 
   eg_handicap_index?: number | null;
+  home_club?: string | null;
 };
 
 type Participant = { 
@@ -51,7 +52,7 @@ export function useUserGames() {
           slots_total, slots_open,
           participants:game_participants(
             user_id,
-            user_profiles(display_name, profile_photo_url, eg_handicap_index)
+            user_profiles(display_name, profile_photo_url, eg_handicap_index, home_club)
           )
         `)
         .eq('host_user_id', user.id)
@@ -78,7 +79,7 @@ export function useUserGames() {
             slots_total, slots_open,
             participants:game_participants(
               user_id,
-              user_profiles(display_name, profile_photo_url, eg_handicap_index)
+              user_profiles(display_name, profile_photo_url, eg_handicap_index, home_club)
             )
           `)
           .in('id', joinedIds)

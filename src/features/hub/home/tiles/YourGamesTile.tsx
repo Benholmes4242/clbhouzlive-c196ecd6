@@ -34,6 +34,7 @@ type GameWithDetails = {
       display_name: string | null;
       profile_photo_url: string | null;
       eg_handicap_index: number | null;
+      home_club: string | null;
     };
   }>;
 };
@@ -219,6 +220,8 @@ function GameRow({
                   game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.display_name || 'Host'
                 ),
                 avatarUrl: game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.profile_photo_url || null,
+                homeClub: game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.home_club || null,
+                handicap: game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.eg_handicap_index || null,
               }}
               members={game.participants.map(p => {
                 const hasProfile = !!p.user_profiles;
@@ -231,6 +234,8 @@ function GameRow({
                   id: p.user_id || `guest_${Math.random().toString(36).slice(2)}`,
                   name,
                   avatarUrl: isGuest ? null : (p.user_profiles?.profile_photo_url || null),
+                  homeClub: isGuest ? null : (p.user_profiles?.home_club || null),
+                  handicap: isGuest ? null : (p.user_profiles?.eg_handicap_index || null),
                 };
               })}
             />
