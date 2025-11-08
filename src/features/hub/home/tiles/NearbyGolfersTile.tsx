@@ -52,9 +52,9 @@ export function NearbyGolfersTile({ limit = 5 }: NearbyGolfersTileProps) {
             overflowY: 'auto',
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',
-            maxHeight: 'calc(2.1 * 52px)', // Show 2.1 rows (each row ~52px with gap)
-            maskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
+            maxHeight: 'calc(3 * 52px + 8px)', // Show 3 full rows + hint of next
+            maskImage: 'linear-gradient(180deg, #000 90%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(180deg, #000 90%, transparent 100%)',
           }}
         >
           {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
