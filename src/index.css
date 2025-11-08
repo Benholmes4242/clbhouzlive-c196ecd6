@@ -434,6 +434,52 @@ html, body, #root {
 @media (prefers-reduced-motion: reduce) {
   .animate-echoPulse { animation: none !important; }
   .animate-\[fadeIn_320ms_ease-out\] { animation: none !important; }
+  .animate-\[presencePulse_2s_ease-in-out_infinite\] { animation: none !important; }
+  .animate-\[rowFadeUp_90ms_ease-out_both\] { animation: none !important; }
+  .animate-\[chipAppear_120ms_ease-out_both\] { animation: none !important; }
+}
+
+/* Nearby Golfers Animations */
+@keyframes presencePulse {
+  0%, 100% { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+  50% { 
+    transform: scale(1.2); 
+    opacity: 0.4; 
+  }
+}
+
+@keyframes rowFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes chipAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
 }
 
 /* Progress shimmer */

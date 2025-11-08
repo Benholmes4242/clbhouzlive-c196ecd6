@@ -1,0 +1,88 @@
+import React from 'react';
+import { TapButton } from '@/components/ui/TapButton';
+import { haptic } from '@/utils/haptics';
+
+export type VisibilityMode = 'all' | 'friends' | 'hidden';
+
+interface GolferStatusBarProps {
+  value: VisibilityMode;
+  onChange: (mode: VisibilityMode) => void;
+}
+
+export function GolferStatusBar({ value, onChange }: GolferStatusBarProps) {
+  const handleChange = (newMode: VisibilityMode) => {
+    haptic('light');
+    onChange(newMode);
+  };
+
+  const getSliderPosition = () => {
+    switch (value) {
+      case 'all': return '0%';
+      case 'friends': return '33.33%';
+      case 'hidden': return '66.66%';
+    }
+  };
+
+  const getHelperText = () => {
+    switch (value) {
+      case 'all':
+        return { text: 'Visible to all golfers nearby', color: '#72ff8d' };
+      case 'friends':
+        return { text: 'Visible to your friends only', color: '#72ff8d' };
+      case 'hidden':
+        return { text: 'Hidden from nearby golfers', color: '#999' };
+    }
+  };
+
+  const helper = getHelperText();
+
+  return (
+    <div className="mx-3">
+      {/* Segmented control */}
+      <div
+        className="relative h-10 rounded-xl backdrop-blur-[20px] border p-1 flex"
+        style={{
+          background: 'rgba(255,255,255,0.08)',
+          borderColor: 'rgba(255,255,255,0.12)'
+        }}
+      >
+        {/* Animated slider */}
+        <div
+          className="absolute inset-1 w-[calc(33.33%-4px)] rounded-lg transition-all"
+          style={{
+            transform: `translateX(calc(${getSliderPosition()} / 0.3333))`,
+            background: 'rgba(255,255,255,0.20)',
+            transitionDuration: '250ms',
+            transitionTimingFunction: 'cubic-bezier(0.25, 1, 0.3, 1.05)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+          }}
+        />
+
+        {/* Buttons */}
+        {(['all', 'friends', 'hidden'] as const).map((mode) => (
+          <TapButton
+            key={mode}
+            className="relative flex-1 text-[14px] font-medium transition-colors duration-200"
+            style={{
+              color: value === mode ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.6)'
+            }}
+            onPointerDown={() => handleChange(mode)}
+            aria-pressed={value === mode}
+          >
+            {mode === 'all' && 'Everyone'}
+            {mode === 'friends' && 'Friends'}
+            {mode === 'hidden' && 'Hidden'}
+          </TapButton>
+        ))}
+      </div>
+
+      {/* Helper text */}
+      <p
+        className="text-[13px] mt-2 text-center transition-colors duration-200"
+        style={{ color: helper.color }}
+      >
+        {helper.text}
+      </p>
+    </div>
+  );
+}
