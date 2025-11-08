@@ -556,7 +556,7 @@ export function VideoProgressVerticalHUD({
 
   const progressBar = (!attachedVideo) ? null : (
     <div
-      className={`vhud-wrap clubhouse-progress ${isScrubbing || isBarActive || isPlaying ? 'vhud-active' : 'vhud-idle'}`}
+      className={`vhud-wrap clubhouse-progress ${isScrubbing || isBarActive || isPlaying ? 'vhud-active' : 'vhud-idle'} ${isScrubbing ? 'vhud-scrubbing' : ''}`}
       style={{
         right: railBox ? `${railBox.right}px` : 'calc(env(safe-area-inset-right, 0px) + 64px)',
         top: railBox ? `${railBox.top}px` : '25%',
