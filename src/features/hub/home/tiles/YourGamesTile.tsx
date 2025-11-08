@@ -238,12 +238,11 @@ export function YourGamesTile() {
     return () => window.removeEventListener('resize', measure);
   }, []);
 
-  // Combine hosting & joined, take top 3 by time
+  // Combine hosting & joined, sort by time (no cap for inline scroll)
   const games = React.useMemo(() => {
     if (!data) return [];
     const combined = [...data.hosting, ...data.joined]
-      .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
-      .slice(0, 3);
+      .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
     return combined as GameWithDetails[];
   }, [data]);
 
@@ -312,7 +311,19 @@ export function YourGamesTile() {
         </div>
       }
       >
-      <div className="flex flex-col h-full overflow-y-auto" style={{ ['--tile-x' as any]: '16px', marginTop: '12px' }}>
+      <div 
+        className="flex flex-col h-full"
+        style={{ 
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+          maxHeight: 'clamp(120px, 22vh, 220px)',
+          marginTop: '12px',
+          paddingRight: '4px',
+          maskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
+        }}
+      >
         <div className="space-y-3 pb-2">
           {isLoading && [0, 1, 2].map(i => (
             <div 
