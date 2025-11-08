@@ -33,10 +33,10 @@ function Badge({
 }) {
   return (
     <span 
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[12px] font-semibold ${
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[12px] font-semibold liquid-glass ${
         tone === 'success'
-          ? 'bg-[#162219] text-[#cfe8d6] shadow-[inset_0_0_0_1px_#325A3E]'
-          : 'bg-[#171717] text-[#d6d6d6] shadow-[inset_0_0_0_1px_#2a2a2a]'
+          ? 'text-[#cfe8d6] shadow-[inset_0_0_0_1px_rgba(110,146,119,0.4)]'
+          : 'text-white/90'
       }`}
     >
       <span className="text-[14px] leading-none">{icon}</span>
@@ -120,7 +120,7 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
       {/* Action CTAs */}
       <div className="flex gap-2.5 mt-3">
         <TapButton
-          className="flex-1 h-10 rounded-xl bg-[#171717] text-[#ddd] shadow-[inset_0_0_0_1px_#2b2b2b] transition-transform active:scale-[0.98] font-medium text-[13px]"
+          className="flex-1 h-10 rounded-xl liquid-glass text-white/90 transition-transform active:scale-[0.98] font-medium text-[13px]"
           onPointerDown={() => {
             haptic('light');
             sendFriendRequest();
@@ -131,10 +131,10 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
         </TapButton>
 
         <TapButton
-          className={`flex-1 h-10 rounded-xl font-medium text-[13px] transition-transform active:scale-[0.98] ${
+          className={`flex-1 h-10 rounded-xl font-medium text-[13px] transition-transform active:scale-[0.98] liquid-glass ${
             isFollowing
-              ? 'bg-[#1f2621] text-[#e7f3ea] shadow-[inset_0_0_0_1px_#335a3f]'
-              : 'bg-[#171717] text-[#ddd] shadow-[inset_0_0_0_1px_#2b2b2b]'
+              ? 'text-[#e7f3ea] shadow-[inset_0_0_0_1px_rgba(110,146,119,0.4)]'
+              : 'text-white/90'
           }`}
           onPointerDown={() => {
             haptic('light');
@@ -147,7 +147,7 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
         </TapButton>
 
         <TapButton
-          className="flex-1 h-10 rounded-xl bg-[#171717] text-[#ddd] shadow-[inset_0_0_0_1px_#2b2b2b] transition-transform active:scale-[0.98] font-medium text-[13px]"
+          className="flex-1 h-10 rounded-xl liquid-glass text-white/90 transition-transform active:scale-[0.98] font-medium text-[13px]"
           onPointerDown={() => {
             haptic('light');
             openMessage();
