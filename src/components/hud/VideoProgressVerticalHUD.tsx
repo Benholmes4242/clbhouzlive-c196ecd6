@@ -589,9 +589,6 @@ export function VideoProgressVerticalHUD({
           
           {/* Thumb - appears during scrubbing */}
           <div ref={thumbRef} className="vhud-thumb" />
-          
-          {/* Subtle glow when playing */}
-          {isPlaying && <div className="vhud-glow" />}
         </div>
       </div>
 
