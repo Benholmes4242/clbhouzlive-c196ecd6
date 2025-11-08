@@ -23,10 +23,21 @@ export function EchoTile() {
   const { navigateFromHub } = useHub();
 
   const tips = [
-    'Best drivers under £400 right now?',
-    'Plan a 3-night golf trip to Ireland',
-    'Fix my slice (driver)',
-    'Build me a 4-week practice plan',
+    'When is the next major?',
+    'Who won the Ryder Cup in 2025?',
+    'Plan me a 5-night golf trip to the USA.',
+    'Plan me a 3-day island golf tour.',
+    "What's the best driver on the market right now?",
+    'What wedges should I use?',
+    'What bounce should my wedges have?',
+    'Give me chipping tips.',
+    'How do I fix my slice?',
+    'How do I hit further?',
+    "What's a good putting drill?",
+    'Recommend a golf podcast.',
+    'Show me the top 10 courses in Scotland.',
+    'How do I play better in the wind?',
+    'Create a weekly practice plan for me.',
   ];
 
   const [tipIdx, setTipIdx] = React.useState(0);
