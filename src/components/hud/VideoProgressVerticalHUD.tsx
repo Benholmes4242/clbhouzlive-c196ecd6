@@ -575,8 +575,7 @@ export function VideoProgressVerticalHUD({
       >
         {/* Visual track with frosted aqua design */}
         <div ref={trackRef} className="vhud-track">
-          {/* Buffer (optional - can show loaded portion) */}
-          <div ref={bufferRef} className="vhud-buffer" style={{ height: '0%' }} />
+          {/* Buffer hidden - not currently used */}
           
           {/* Fill - synced with video progress */}
           <div
