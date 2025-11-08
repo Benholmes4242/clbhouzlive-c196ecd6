@@ -1,0 +1,11 @@
+/* Allow vertical panning on iOS even when element is interactive */
+.hub-game-row {
+  touch-action: pan-y;
+}
+
+/* Explicit scroll container tuning for iOS */
+.games-scroll {
+  height: 100%;
+  contain: content;
+  -webkit-overflow-scrolling: touch;
+}
