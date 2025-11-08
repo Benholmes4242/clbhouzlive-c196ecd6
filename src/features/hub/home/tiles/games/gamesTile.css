@@ -1,0 +1,42 @@
+/**
+ * Games Tile Scroll Styles
+ * Critical iOS-friendly inline scroll
+ */
+
+.gt-scroll {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+  mask-image: linear-gradient(180deg, #000 88%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 88%, transparent 100%);
+}
+
+.gt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Allow vertical pan to start scroll on iOS */
+.gt-row {
+  touch-action: pan-y;
+}
+
+/* Expanded section animation */
+.gt-expand {
+  overflow: hidden;
+  transition: max-height 0.22s ease;
+  will-change: max-height;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gt-row {
+    transition: transform 0.14s ease, background 0.14s ease;
+  }
+  .gt-row:active {
+    transform: scale(0.995);
+  }
+}

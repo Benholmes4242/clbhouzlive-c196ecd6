@@ -16,6 +16,7 @@ import { GameExpandedRoster } from './games/GameExpandedRoster';
 import { GameExpandedNotes } from './games/GameExpandedNotes';
 import { GameExpandedMeta } from './games/GameExpandedMeta';
 import './games/gameAnimations.css';
+import './games/gamesTile.css';
 
 type GameWithDetails = {
   id: string;
@@ -51,6 +52,7 @@ function GameRow({
   const totalSlots = game.slots_total || 0;
   const availableSlots = game.slots_open || 0;
   const timerRef = React.useRef<number | null>(null);
+  const startRef = React.useRef<{ x: number; y: number } | null>(null);
 
   const toggle = () => {
     const next = !expanded;
@@ -68,23 +70,28 @@ function GameRow({
   };
   
   const handlePointerDown = (e: React.PointerEvent) => {
+    startRef.current = { x: e.clientX, y: e.clientY };
     timerRef.current = window.setTimeout(() => {
       comingSoon();
-    }, 420);
+    }, 500);
   };
 
-  const handlePointerUp = () => {
-    if (timerRef.current) {
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!startRef.current) return;
+    const dy = Math.abs(e.clientY - startRef.current.y);
+    // Cancel long-press if user drags vertically (allows scroll to start)
+    if (dy > 6 && timerRef.current) {
       window.clearTimeout(timerRef.current);
       timerRef.current = null;
     }
   };
 
-  const handlePointerCancel = () => {
+  const clearTimer = () => {
     if (timerRef.current) {
       window.clearTimeout(timerRef.current);
       timerRef.current = null;
     }
+    startRef.current = null;
   };
   
   return (
@@ -92,9 +99,10 @@ function GameRow({
       ref={rowRef}
       onClick={toggle}
       onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerCancel}
-      className="w-full rounded-[14px] px-4 py-3 text-left transition-all"
+      onPointerMove={handlePointerMove}
+      onPointerUp={clearTimer}
+      onPointerCancel={clearTimer}
+      className="gt-row w-full rounded-[14px] px-4 py-3 text-left"
       style={{ 
         background: 'rgba(255,255,255,0.06)',
         border: '1px solid rgba(255,255,255,0.12)',
@@ -141,9 +149,9 @@ function GameRow({
 
       {/* Expandable detail */}
       <div
-        className="overflow-hidden transition-all duration-300 ease-out"
+        className="gt-expand"
         style={{ 
-          maxHeight: expanded ? '400px' : '0px',
+          maxHeight: expanded ? '360px' : '0px',
           opacity: expanded ? 1 : 0,
         }}
         aria-hidden={!expanded}
@@ -328,19 +336,12 @@ export function YourGamesTile() {
       <div className="flex flex-col h-full">
         <div
           ref={listRef}
+          className="gt-scroll"
           style={{ 
-            overflowY: 'auto',
-            WebkitOverflowScrolling: 'touch',
-            overscrollBehavior: 'contain',
-            flex: 1,
-            minHeight: 0,
             marginTop: '12px',
-            paddingRight: '4px',
-            maskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
           }}
         >
-        <div className="space-y-3">
+        <div className="gt-list">
           {isLoading && [0, 1, 2].map(i => (
             <div 
               key={i} 
