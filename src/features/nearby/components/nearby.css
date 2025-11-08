@@ -1,34 +1,43 @@
 /* golfers.css */
 
-/* === Avatar ring removal (global for Golfers page) === */
-.golfers-page .avatar-wrap::before,
-.golfers-page .avatar-wrap::after {
-  content: none !important;
-}
-
-.golfers-page .avatar-wrap,
-.golfers-page .avatar-img {
-  box-shadow: none !important;
-  outline: none !important;
-  border: none !important;
-}
-
-.golfers-page .avatar-ring,
-.golfers-page [class*="avatar-ring"],
-.golfers-page .avatar-wrap[data-open],
-.golfers-page .avatar-wrap[data-status],
-.golfers-page .avatar-wrap[aria-busy="true"] {
-  /* kill any pulse/animation */
-  animation: none !important;
-  background: transparent !important;
-  filter: none !important;
-}
-
-/* Keep clean circular avatars */
-.golfers-page .avatar-img {
-  width: 48px; 
-  height: 48px; 
+/* === Frosted Glass Avatar Ring === */
+.g-avatar {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 48px;
   border-radius: 999px;
+  overflow: hidden;
+}
+
+.g-avatar > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: inherit;
+}
+
+/* Subtle frosted halo around avatar */
+.g-avatar::after {
+  content: "";
+  position: absolute;
+  inset: -1px; /* extends just beyond edge for smooth halo */
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(2px);
+  pointer-events: none;
+}
+
+/* Accessibility: fallback for users who reduce transparency */
+@media (prefers-reduced-transparency: reduce) {
+  .g-avatar::after {
+    backdrop-filter: none;
+    background: rgba(255, 255, 255, 0.12);
+  }
 }
 
 .golfer-card {
