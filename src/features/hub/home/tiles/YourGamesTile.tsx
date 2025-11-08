@@ -10,24 +10,19 @@ import { useUserGames } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
 import { useHub } from '@/features/hub/useHub';
 import { devlog } from '@/utils/log';
-import { scrollChildIntoView } from '../utils/scroll';
-import { GameExpandedPrimary } from './games/GameExpandedPrimary';
-import { GameExpandedRoster } from './games/GameExpandedRoster';
-import { GameExpandedNotes } from './games/GameExpandedNotes';
-import { GameExpandedMeta } from './games/GameExpandedMeta';
-import './games/gameAnimations.css';
-import './games/gameRow.css';
 
 type GameWithDetails = {
   id: string;
   kind: 'Hosting' | 'Joined';
   course_name: string | null;
   start_time: string;
-  expires_at: string;
   slots_total: number | null;
   slots_open: number | null;
   host_user_id: string;
-  notes?: string | null;
+  host_profile?: Array<{
+    display_name: string | null;
+    profile_photo_url: string | null;
+  }>;
   participants: Array<{
     user_id: string | null;
     user_profiles?: {
@@ -40,37 +35,51 @@ type GameWithDetails = {
 
 function GameRow({ 
   game,
-  index,
-  onExpandedChange,
+  expanded,
+  onToggle,
+  onLongPress,
 }: { 
   game: GameWithDetails;
-  index: number;
-  onExpandedChange?: (rowEl: HTMLElement | null, expanded: boolean) => void;
+  expanded: boolean;
+  onToggle: () => void;
+  onLongPress: () => void;
 }) {
-  const rowRef = React.useRef<HTMLDivElement | null>(null);
-  const [expanded, setExpanded] = React.useState(false);
   const totalSlots = game.slots_total || 0;
   const availableSlots = game.slots_open || 0;
+  const hostName = React.useMemo(() => {
+    if (game.kind === 'Hosting') return 'You';
+    const hostP = game.participants.find(p => p.user_id === game.host_user_id);
+    return hostP?.user_profiles?.display_name || null;
+  }, [game]);
+  const timerRef = React.useRef<number | null>(null);
+  
+  const handlePointerDown = (e: React.PointerEvent) => {
+    timerRef.current = window.setTimeout(() => {
+      onLongPress();
+    }, 420);
+  };
 
-  const toggle = () => {
-    const next = !expanded;
-    setExpanded(next);
-    // Defer until layout updates for accurate geometry
-    requestAnimationFrame(() => {
-      onExpandedChange?.(rowRef.current, next);
-      // Keep accessibility solid without jumping
-      rowRef.current?.focus({ preventScroll: true });
-    });
+  const handlePointerUp = () => {
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  const handlePointerCancel = () => {
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
   };
   
   return (
-    <div 
-      ref={rowRef}
-      role="button"
-      tabIndex={0}
-      onClick={toggle}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } }}
-      className="hub-game-row w-full rounded-[14px] px-4 py-3 text-left transition-all"
+    <button 
+      onClick={onToggle}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
+      className="w-full rounded-[14px] px-4 py-3 text-left transition-all"
       style={{ 
         background: 'rgba(255,255,255,0.06)',
         border: '1px solid rgba(255,255,255,0.12)',
@@ -119,75 +128,74 @@ function GameRow({
       <div
         className="overflow-hidden transition-all duration-300 ease-out"
         style={{ 
-          maxHeight: expanded ? '400px' : '0px',
+          maxHeight: expanded ? '200px' : '0px',
           opacity: expanded ? 1 : 0,
         }}
-        aria-hidden={!expanded}
       >
         <div 
-          className="mt-3 pt-3"
+          className="mt-3 pt-3 grid gap-4"
           style={{ 
             borderTop: '1px solid rgba(255,255,255,0.08)',
+            gridTemplateColumns: '1fr auto',
           }}
         >
-          <div
-            className="fade-slide-in fade-stagger"
-            style={{ '--d': '0ms' } as React.CSSProperties}
-          >
-            <GameExpandedPrimary
-              kind={game.kind}
-              courseName={game.course_name}
-              startTime={game.start_time}
-              slotsTotal={game.slots_total || 4}
-              slotsOpen={game.slots_open || 0}
-            />
-          </div>
-
-          <div
-            className="fade-slide-in fade-stagger"
-            style={{ '--d': '60ms' } as React.CSSProperties}
-          >
-            <GameExpandedRoster
-              host={{
-                id: game.host_user_id,
-                name: game.kind === 'Hosting' ? 'You' : (
-                  game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.display_name || 'Host'
-                ),
-                avatarUrl: game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.profile_photo_url || null,
-              }}
-              members={game.participants.map(p => ({
-                id: p.user_id || '',
-                name: p.user_profiles?.display_name || 'Player',
-                avatarUrl: p.user_profiles?.profile_photo_url || null,
-              }))}
-            />
-          </div>
-
-          {game.notes && (
-            <div
-              className="fade-slide-in fade-stagger"
-              style={{ '--d': '120ms' } as React.CSSProperties}
-            >
-              <GameExpandedNotes notes={game.notes} />
+          {/* Left: Date, time, host */}
+          <div className="space-y-1 min-w-0">
+            <div className="text-[13px]" style={{ color: 'var(--hub-text-body)' }}>
+              {new Date(game.start_time).toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+              })}
             </div>
-          )}
+            {(() => {
+              const hostP = game.participants.find(p => p.user_id === game.host_user_id);
+              const name = game.kind === 'Hosting' ? 'You' : (hostP?.user_profiles?.display_name || 'Host');
+              return (
+                <div className="text-[13px]" style={{ color: 'var(--hub-text-sub)' }}>
+                  Host: <span style={{ color: 'var(--hub-text-body)' }}>{name}</span>
+                </div>
+              );
+            })()}
+          </div>
 
-          <div
-            className="fade-slide-in fade-stagger"
-            style={{ '--d': '100ms' } as React.CSSProperties}
-          >
-            <GameExpandedMeta expiresAt={game.expires_at} />
+          {/* Right: Mini roster */}
+          <div className="flex -space-x-2 items-start">
+            {game.participants.slice(0, 4).map((p, i) => (
+              p.user_profiles?.profile_photo_url ? (
+                <img 
+                  key={i}
+                  src={p.user_profiles.profile_photo_url} 
+                  alt={p.user_profiles.display_name || 'Player'}
+                  className="w-8 h-8 rounded-full border-2"
+                  style={{ borderColor: 'rgba(255,255,255,0.18)' }}
+                />
+              ) : (
+                <div
+                  key={i}
+                  className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-[11px] font-medium"
+                  style={{ 
+                    borderColor: 'rgba(255,255,255,0.18)',
+                    background: 'rgba(255,255,255,0.1)',
+                    color: 'var(--hub-text-body)',
+                  }}
+                >
+                  {p.user_profiles?.display_name?.charAt(0) || '?'}
+                </div>
+              )
+            ))}
           </div>
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 
 export function YourGamesTile() {
   const nav = useNavigate();
   const { navigateFromHub } = useHub();
-  const listRef = React.useRef<HTMLDivElement | null>(null);
+  const [openId, setOpenId] = React.useState<string | null>(null);
   const viewAllRef = React.useRef<HTMLButtonElement>(null);
   
   // Use shared hook for consistency with the sheet
@@ -237,6 +245,8 @@ export function YourGamesTile() {
       .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
     return combined as GameWithDetails[];
   }, [data]);
+
+  const toggle = (id: string) => setOpenId(o => (o === id ? null : id));
 
   const hasAny = games.length > 0;
 
@@ -301,10 +311,8 @@ export function YourGamesTile() {
         </div>
       }
       >
-      <div className="flex flex-col">{/* h-full removed to allow flex shrinking */}
+      <div className="flex flex-col h-full">
         <div
-          ref={listRef}
-          className="games-scroll"
           style={{ 
             overflowY: 'auto',
             WebkitOverflowScrolling: 'touch',
@@ -355,18 +363,13 @@ export function YourGamesTile() {
             </div>
           )}
 
-          {!isLoading && !isError && games.map((g, i) => (
+          {!isLoading && !isError && games.map(g => (
             <GameRow
               key={g.id}
               game={g}
-              index={i}
-              onExpandedChange={(rowEl, expanded) => {
-                if (!expanded) return;
-                const container = listRef.current;
-                if (container && rowEl) {
-                  scrollChildIntoView(container, rowEl, 12);
-                }
-              }}
+              expanded={openId === g.id}
+              onToggle={() => toggle(g.id)}
+              onLongPress={comingSoon}
             />
           ))}
         </div>
