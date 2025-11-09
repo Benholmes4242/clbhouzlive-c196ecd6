@@ -42,14 +42,21 @@ export function EchoTile() {
 
   const [tipIdx, setTipIdx] = React.useState(0);
   const [paused, setPaused] = React.useState(false);
+  const [isFirstTip, setIsFirstTip] = React.useState(true);
 
-  // Auto-advance every 7s (respect reduced motion)
+  // Auto-advance: 3s for first tip, then 7s for subsequent tips
   React.useEffect(() => {
     if (paused) return;
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-    const id = setInterval(() => setTipIdx(i => (i + 1) % tips.length), 7000);
-    return () => clearInterval(id);
-  }, [paused, tips.length]);
+    
+    const duration = isFirstTip ? 3000 : 7000;
+    const id = setTimeout(() => {
+      setTipIdx(i => (i + 1) % tips.length);
+      setIsFirstTip(false);
+    }, duration);
+    
+    return () => clearTimeout(id);
+  }, [paused, tips.length, tipIdx, isFirstTip]);
 
   const sendTip = (t: string) =>
     navigateFromHub(`/hub/echo?msg=${encodeURIComponent(t)}`);
