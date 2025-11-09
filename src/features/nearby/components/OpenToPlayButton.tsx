@@ -63,9 +63,9 @@ export function OpenToPlayButton() {
           fontSize: '15px',
           color: '#fff',
           ...(isActive && {
-            background: 'rgba(110, 146, 119, 0.15)',
-            borderColor: 'rgba(110, 146, 119, 0.4)',
-            boxShadow: '0 0 0 4px rgba(110, 146, 119, 0.25), 0 20px 48px rgba(0,0,0,.5)',
+            background: 'linear-gradient(to bottom, rgba(78, 199, 120, 0.16), rgba(78, 199, 120, 0.10))',
+            borderColor: 'rgba(78, 199, 120, 0.28)',
+            boxShadow: '0 20px 48px rgba(0,0,0,.5)',
           }),
         }}
       >

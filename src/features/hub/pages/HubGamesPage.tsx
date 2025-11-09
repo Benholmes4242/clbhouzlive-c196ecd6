@@ -38,10 +38,11 @@ export function HubGamesPage() {
       }}
     >
       {/* Simple header */}
-      <header className="sticky top-0 z-10 flex items-center justify-between px-4 h-14 border-b"
+      <header className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
         style={{
           borderColor: 'rgba(255,255,255,0.1)',
           background: 'rgba(0,0,0,0.2)',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
         }}
       >
         <button
@@ -56,7 +57,7 @@ export function HubGamesPage() {
       </header>
 
       {/* Content area - GamesTab content */}
-      <div className="overflow-y-auto h-[calc(100vh-3.5rem)]">
+      <div className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
         <GamesTab onOpenCreate={handleOpenCreate} />
       </div>
     </div>

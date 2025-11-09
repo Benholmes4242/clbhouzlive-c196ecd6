@@ -59,10 +59,11 @@ export function HubHomePage() {
     >
       {/* Header */}
       <header
-        className="sticky top-0 z-10 px-5 pt-4 pb-3"
+        className="fixed top-0 left-0 right-0 z-[10000] px-5 pt-4 pb-3"
         style={{
           background: 'transparent',
           borderBottom: '1px solid var(--hub-header-stroke)',
+          paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))',
         }}
       >
         <div className="flex items-center justify-between" style={{ userSelect: 'none' }}>
@@ -93,7 +94,8 @@ export function HubHomePage() {
       </header>
 
       {/* Hub Dashboard */}
-      <main className="w-full overflow-y-auto h-[calc(100vh-80px)] px-3.5 pt-3">
+      <main className="w-full overflow-y-auto h-screen pt-[calc(80px+env(safe-area-inset-top,0px))] px-3.5">
+        <div className="pt-3">
         {/* Top 2×2 grid */}
         <div
           className="grid"
@@ -132,6 +134,7 @@ export function HubHomePage() {
           <div className="hub-tile-fixed">
             <QuickActionsTile />
           </div>
+        </div>
         </div>
       </main>
     </div>

@@ -71,12 +71,17 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
               onClick={() => nav(`/profile/${g.username}`)}
               aria-label={`${g.display_name || g.username}, ${formatDistanceHcp(g.distance_km ? g.distance_km * 1000 : undefined, g.eg_handicap_index)}`}
             >
-              <div className="shrink-0 rounded-full overflow-hidden w-[38px] h-[38px]">
+              <div className="shrink-0 rounded-full overflow-hidden w-[38px] h-[38px] relative">
                 <img 
                   src={g.avatar_url || '/placeholder.svg'} 
                   alt={`${g.display_name || g.username} profile photo`}
                   className="w-full h-full object-cover rounded-full"
-                  style={{ boxShadow: '0 0 0 1px rgba(255,255,255,.15)' }}
+                />
+                <div 
+                  className="absolute inset-0 rounded-full pointer-events-none"
+                  style={{
+                    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.28), inset 0 0 8px rgba(255,255,255,0.06)',
+                  }}
                 />
               </div>
               <div className="ng-main">
