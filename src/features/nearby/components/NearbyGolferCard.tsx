@@ -46,15 +46,17 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
       { rootMargin: '50px 0px' }
     );
     io.observe(el);
-    return () => io.disconnect();
+    return () => { 
+      if (el) io.unobserve(el); 
+      io.disconnect(); 
+    };
   }, []);
 
   const handleViewProfile = () => {
     haptic('light');
-    console.log('View profile:', golfer.display_name);
   };
 
-  const distanceText = golfer.distanceText || 
+  const distanceText = golfer.distanceText ?? 
     (golfer.distance_km ? formatDistance(golfer.distance_km * 1000) : undefined);
 
   return (
@@ -114,7 +116,7 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
               {golfer.home_club && (
                 <>
                   <span className="truncate">{golfer.home_club}</span>
-                  {distanceText && <span className="text-white/40">•</span>}
+                  {distanceText && <span className="text-white/40" aria-hidden> • </span>}
                 </>
               )}
               {distanceText && (
@@ -135,13 +137,11 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
         {/* Action buttons - equal width */}
         <div className="flex gap-2" style={{ marginTop: '10px' }}>
           <TapButton
-            className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-[85ms] active:scale-[0.97]"
+            className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-[85ms] active:scale-[0.97] h-[44px] min-h-[44px]"
             style={{
               background: 'rgba(255,255,255,0.18)',
               borderColor: 'rgba(255,255,255,0.12)',
               color: 'rgba(255,255,255,0.96)',
-              minHeight: '44px',
-              height: '36px'
             }}
             onPointerDown={() => {
               haptic('light');
@@ -153,22 +153,18 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
           </TapButton>
 
           <TapButton
-            className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-[85ms] active:scale-[0.97]"
+            className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-[85ms] active:scale-[0.97] h-[44px] min-h-[44px]"
             style={
               isFollowing
                 ? {
                     background: 'rgba(76,220,151,0.18)',
                     borderColor: 'rgba(76,220,151,0.3)',
                     color: '#4cdc97',
-                    minHeight: '44px',
-                    height: '36px'
                   }
                 : {
                     background: 'transparent',
                     borderColor: 'rgba(255,255,255,0.12)',
                     color: 'rgba(255,255,255,0.88)',
-                    minHeight: '44px',
-                    height: '36px'
                   }
             }
             onPointerDown={() => {
@@ -182,13 +178,11 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
           </TapButton>
 
           <TapButton
-            className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-[85ms] active:scale-[0.97]"
+            className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-[85ms] active:scale-[0.97] h-[44px] min-h-[44px]"
             style={{
               background: 'transparent',
               borderColor: 'rgba(255,255,255,0.12)',
               color: 'rgba(255,255,255,0.88)',
-              minHeight: '44px',
-              height: '36px'
             }}
             onPointerDown={() => {
               haptic('light');

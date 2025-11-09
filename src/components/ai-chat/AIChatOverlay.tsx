@@ -611,7 +611,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       sendMessage(inputValue);
                     }
                   }}
-                  placeholder="Ask Echo anything..."
+                  placeholder="Ask Echo anything…"
                   className="w-full bg-transparent outline-none text-white placeholder:text-white/60 text-[15px]"
                   disabled={isLoading}
                 />
