@@ -1,8 +1,6 @@
 import React from 'react';
 import { hapticSoft } from '@/lib/ui/haptics';
 import './nearby.css';
-import '@/styles/pills.css';
-import '@/styles/tokens.css';
 
 interface StatusChipsProps {
   sameHomeClub?: boolean;
@@ -31,11 +29,11 @@ export function StatusChips({ sameHomeClub, isOpenToPlay, onExpand }: StatusChip
       {visibleChips.map((chip, i) => (
         <button
           key={i}
-          className={`${chip.type === 'open' ? 'pill-o2p px-3 py-[6px] text-[12px] font-semibold inline-flex items-center' : 'pill text-white/90'}`}
+          className={`pill ${chip.type === 'open' ? 'pill--open' : ''} text-white/90`}
           onClick={() => hapticSoft()}
           aria-pressed={chip.type === 'open'}
         >
-          {chip.type === 'open' && <span className="dot" />}
+          {chip.type === 'open' && <span className="pill__dot" />}
           <span>{chip.label}</span>
         </button>
       ))}
