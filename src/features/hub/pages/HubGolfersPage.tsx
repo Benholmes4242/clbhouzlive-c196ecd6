@@ -31,7 +31,7 @@ export function HubGolfersPage() {
   const [filters, setFilters] = useState<GolferFilters>({
     radiusKm: 0.5,
     onlyOpen: false,
-    visibility: 'everyone',
+    visibility: 'all',
   });
 
   const { golfers, isLoading } = useActiveGolfers({ limit: 50, filters });

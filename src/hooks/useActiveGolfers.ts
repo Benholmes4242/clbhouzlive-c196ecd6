@@ -21,7 +21,7 @@ export type ActiveGolfer = {
 export type GolferFilters = {
   radiusKm?: number;
   onlyOpen?: boolean;
-  visibility?: 'everyone' | 'friends' | 'all';
+  visibility?: 'all' | 'friends';
 };
 
 export function useActiveGolfers({ 
@@ -32,7 +32,7 @@ export function useActiveGolfers({
   filters?: GolferFilters;
 } = {}) {
   const { currentLocation } = useLocationPermission();
-  const { radiusKm = 10, onlyOpen = false, visibility = 'everyone' } = filters;
+  const { radiusKm = 10, onlyOpen = false, visibility = 'all' } = filters;
 
   // Fetch nearby golfers using PostGIS RPC function
   const { data: golfers = [], isLoading } = useQuery({
