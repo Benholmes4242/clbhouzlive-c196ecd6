@@ -8,6 +8,7 @@ import { SwingReview } from '@/components/swing-review/SwingReview';
 import { CoachPrompt } from '@/components/swing-review/CoachPrompt';
 import { parseSwingAnalysis } from '@/utils/swingAnalysisParser';
 import { cn } from '@/lib/utils';
+import { EchoBotIcon } from './EchoBotIcon';
 
 interface ChatMessage {
   id: string;
@@ -89,8 +90,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         <div className="relative w-full">
           {/* Avatar - only show for AI on first message in group (positioned outside flow) */}
           {!isUser && isFirstInGroup && (
-            <div className="absolute -left-9 top-2 h-7 w-7 rounded-full grid place-items-center bg-white/06 backdrop-blur border border-white/08">
-              <Bot className="h-[14px] w-[14px] text-white/80" />
+            <div className="absolute -left-9 top-2">
+              <EchoBotIcon size={28} className="text-white/90" />
             </div>
           )}
           
