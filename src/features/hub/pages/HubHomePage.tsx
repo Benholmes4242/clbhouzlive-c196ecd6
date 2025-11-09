@@ -94,7 +94,7 @@ export function HubHomePage() {
       </header>
 
       {/* Hub Dashboard */}
-      <main className="w-full overflow-y-auto h-screen pt-[calc(80px+env(safe-area-inset-top,0px))] px-3.5 pb-[calc(12px+env(safe-area-inset-bottom,0px))]">
+      <main className="w-full overflow-y-auto h-screen pt-[calc(80px+env(safe-area-inset-top,0px))] px-3.5">
         <div className="pt-3">
         {/* Top 2×2 grid */}
         <div
