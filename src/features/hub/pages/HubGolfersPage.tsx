@@ -53,7 +53,7 @@ export function HubGolfersPage() {
     };
   }, [queryClient]);
 
-  // Scroll-linked header fade + parallax
+  // Header aesthetic updates without movement
   useEffect(() => {
     const el = listRef.current;
     const hdr = headerRef.current;
@@ -64,8 +64,10 @@ export function HubGolfersPage() {
       hdr.style.setProperty('--op', String(Math.min(0.92, 0.6 + y / 120)));
       hdr.style.backdropFilter = `blur(var(--blur,12px))`;
       hdr.style.background = `rgba(20,20,20,var(--op,.6))`;
-      hdr.style.transform = `translateY(${Math.min(10, y / 8)}px)`; // tiny parallax
+      hdr.style.transform = 'translateY(0px)'; // ensure fixed header never moves
     };
+    // initialize once
+    onScroll();
     el.addEventListener('scroll', onScroll, { passive: true });
     return () => el.removeEventListener('scroll', onScroll);
   }, []);
