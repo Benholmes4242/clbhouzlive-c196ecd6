@@ -60,7 +60,7 @@ export function HubEchoChatPage() {
       </header>
 
       {/* Echo Chat - using existing system in pane mode */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
         <AIChatOverlay
           isOpen={true}
           onClose={() => {}}
