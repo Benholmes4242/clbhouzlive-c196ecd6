@@ -23,25 +23,32 @@ export type ActiveGolfer = {
 export function useActiveGolfers({ limit = 999 }: { limit?: number } = {}) {
   const { currentLocation, requestPermission } = useLocationPermission();
 
-  // Return mock data
+  // Fetch real user profiles
   const { data: realProfiles = [], isLoading } = useQuery({
     queryKey: ['activeGolfers', limit],
     queryFn: async () => {
-      // Simulate loading delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index')
+        .eq('is_public', true)
+        .not('id', 'is', null)
+        .limit(limit);
       
-      const mockGolfers = getMockNearby(limit);
-      return mockGolfers.map(golfer => ({
-        id: golfer.id,
-        display_name: golfer.display_name,
-        username: golfer.display_name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
-        avatar_url: golfer.avatar_url,
-        home_club: golfer.home_club,
-        distance_km: golfer.distance_km,
-        distanceText: formatDistance(golfer.distance_km * 1000),
-        isOpenToPlay: golfer.isOpenToPlay,
-        sameHomeClub: golfer.same_club,
-        eg_handicap_index: Math.floor(Math.random() * 25) + 1,
+      if (error) throw error;
+      
+      // Map to golfer type and randomize distance until location services are ready
+      return (data || []).map(profile => ({
+        id: profile.id,
+        display_name: profile.display_name || profile.username || 'Golfer',
+        username: profile.username,
+        avatar_url: profile.profile_photo_url,
+        home_club: profile.home_club,
+        // Randomize distance temporarily (0.5km to 15km)
+        distance_km: Math.random() * 14.5 + 0.5,
+        distanceText: formatDistance((Math.random() * 14.5 + 0.5) * 1000),
+        isOpenToPlay: Math.random() > 0.5,
+        sameHomeClub: false,
+        eg_handicap_index: profile.eg_handicap_index,
       }));
     },
     staleTime: 15_000,
