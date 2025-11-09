@@ -141,7 +141,7 @@ function GameRow({
       onPointerMove={handlePointerMove}
       onPointerUp={clearTimer}
       onPointerCancel={clearTimer}
-      className="game-row w-full rounded-[14px] px-4 py-3.5 text-left outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0"
+      className="game-row w-full rounded-[14px] px-4 py-2 text-left outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0"
       aria-label={`${game.course_name || 'Golf Course'}, ${when}. ${game.kind === 'Hosting' ? 'Hosting' : 'Joined'}`}
       style={{ 
         background: 'rgba(255,255,255,0.06)',
