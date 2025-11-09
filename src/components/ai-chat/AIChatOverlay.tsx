@@ -27,6 +27,7 @@ import { Z } from '@/config/zIndex';
 import { useAutoSendFromQuery } from './hooks/useAutoSendFromQuery';
 import { ensureThreadId, persistUserMessage, persistAssistantMessage } from '@/features/echo/services/echoPersistence';
 import { FrostedPill } from '@/components/shared/FrostedPill';
+import { GlassCard } from '@/components/shared/GlassCard';
 
 interface ChatMessageData {
   id: string;
@@ -482,9 +483,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   "flex flex-col items-center justify-center text-center space-y-6",
                   isPageMode ? "px-4 py-16" : "px-6 py-20"
                 )}>
-                  <div className="h-20 w-20 rounded-3xl bg-black/40 backdrop-blur border border-white/20 shadow-[0_30px_120px_rgba(0,0,0,1),0_0_60px_rgba(255,255,255,0.08)] grid place-items-center">
+                  <GlassCard className="h-20 w-20 rounded-3xl flex items-center justify-center">
                     <Bot className="h-9 w-9 text-white/80" />
-                  </div>
+                  </GlassCard>
                   <div className="text-[17px] font-semibold text-white">
                     Start a conversation with Echo
                   </div>
@@ -597,35 +598,33 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             )}
             
-            <div className="flex items-center gap-3">
-              <FrostedPill 
-                variant="input"
-                className="flex-1 h-[44px] flex items-center"
-              >
-                <input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      sendMessage(inputValue);
-                    }
-                  }}
-                  placeholder="Ask Echo anything..."
-                  className="w-full bg-transparent outline-none text-white placeholder:text-white/60 text-[15px]"
-                  disabled={isLoading}
-                />
-              </FrostedPill>
+            <FrostedPill 
+              variant="input"
+              className="relative flex-1 h-[44px] flex items-center pr-12"
+            >
+              <input
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage(inputValue);
+                  }
+                }}
+                placeholder="Ask Echo…"
+                className="w-full bg-transparent outline-none text-white placeholder:text-white/70 text-[15px]"
+                disabled={isLoading}
+              />
               <button
                 onClick={() => sendMessage(inputValue)}
                 disabled={!inputValue.trim() || isLoading}
-                className="shrink-0 w-[44px] h-[44px] rounded-full bg-white/10 border border-white/15 flex items-center justify-center hover:bg-white/15 active:bg-white/20 transition-colors disabled:opacity-50"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 shrink-0 w-9 h-9 rounded-full bg-white/8 border border-white/15 flex items-center justify-center hover:bg-white/12 active:bg-white/16 transition-colors disabled:opacity-50"
                 style={{ lineHeight: 0 }}
                 aria-label="Send"
               >
-                <Send className="h-5 w-5 text-white" />
+                <Send className="h-[18px] w-[18px] text-white/90" />
               </button>
-            </div>
+            </FrostedPill>
           </footer>
         )}
       </div>
@@ -733,8 +732,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         <footer className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-sm">
           <div className="w-full px-4 md:px-5 py-3" style={{ paddingBottom: `calc(12px + env(safe-area-inset-bottom))` }}>
             {activeTab === 'chat' && (
-              <div className="flex items-end gap-2">
-                <Textarea
+              <FrostedPill 
+                variant="input"
+                className="relative flex items-center pr-12"
+              >
+                <input
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={(e) => {
@@ -743,19 +745,20 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       sendMessage(inputValue);
                     }
                   }}
-                  placeholder="Message Echo…"
-                  className="flex-1 min-h-[42px] max-h-32 resize-none bg-muted/50 border-border text-foreground placeholder:text-muted-foreground"
+                  placeholder="Ask Echo…"
+                  className="w-full bg-transparent outline-none text-white placeholder:text-white/70 text-[15px] py-2"
                   disabled={isLoading}
                 />
-                <Button
+                <button
                   onClick={() => sendMessage(inputValue)}
                   disabled={!inputValue.trim() || isLoading}
-                  size="icon"
-                  className="h-[42px] w-[42px] rounded-full"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 shrink-0 w-9 h-9 rounded-full bg-white/8 border border-white/15 flex items-center justify-center hover:bg-white/12 active:bg-white/16 transition-colors disabled:opacity-50"
+                  style={{ lineHeight: 0 }}
+                  aria-label="Send"
                 >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
+                  <Send className="h-[18px] w-[18px] text-white/90" />
+                </button>
+              </FrostedPill>
             )}
             {activeTab === 'swing' && (
               <OverlayFooter onOpen={() => openHistory('swing')} isSticky={false} />
@@ -922,9 +925,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 <div>
                     {messages.length === 0 ? (
                       <div className="flex flex-col items-center justify-center text-center px-6 py-20 sm:py-28 space-y-6">
-                        <div className="h-20 w-20 rounded-3xl bg-black/40 backdrop-blur border border-white/20 shadow-[0_30px_120px_rgba(0,0,0,1),0_0_60px_rgba(255,255,255,0.08)] grid place-items-center">
+                        <GlassCard className="h-20 w-20 rounded-3xl flex items-center justify-center">
                           <Bot className="h-9 w-9 text-white/80" />
-                        </div>
+                        </GlassCard>
                         <div className="text-[17px] font-semibold text-white">
                           Start a conversation with Echo
                         </div>
