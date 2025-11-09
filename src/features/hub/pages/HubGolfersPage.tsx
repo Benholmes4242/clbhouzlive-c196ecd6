@@ -53,24 +53,6 @@ export function HubGolfersPage() {
     };
   }, [queryClient]);
 
-  // Header aesthetic updates without movement
-  useEffect(() => {
-    const el = listRef.current;
-    const hdr = headerRef.current;
-    if (!el || !hdr) return;
-    const onScroll = () => {
-      const y = Math.min(el.scrollTop, 60);
-      hdr.style.setProperty('--blur', String(6 + y / 6)); // 6→16px
-      hdr.style.setProperty('--op', String(Math.min(0.92, 0.6 + y / 120)));
-      hdr.style.backdropFilter = `blur(var(--blur,12px))`;
-      hdr.style.background = `rgba(20,20,20,var(--op,.6))`;
-      hdr.style.transform = 'translateY(0px)'; // ensure fixed header never moves
-    };
-    // initialize once
-    onScroll();
-    el.addEventListener('scroll', onScroll, { passive: true });
-    return () => el.removeEventListener('scroll', onScroll);
-  }, []);
 
   const handleRefresh = () => {
     return queryClient.invalidateQueries({ queryKey: ['activeGolfers'] });
