@@ -103,10 +103,15 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         >
           {/* Action pills removed */}
 
-          {/* Heading - only on first in group for AI */}
+          {/* Heading - only on first in group */}
           {!isUser && showHeading && isFirstInGroup && (
             <div className="mb-2 text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
               Echo
+            </div>
+          )}
+          {isUser && showHeading && isFirstInGroup && (
+            <div className="mb-2 text-[12px] font-medium text-white/70 text-right" style={{ letterSpacing: '0.2px' }}>
+              User
             </div>
           )}
           
@@ -141,9 +146,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             {children ? (
               <div style={{ padding: 'var(--bubble-pad-y) var(--bubble-pad-x)' }}>{children}</div>
             ) : (
-              <div style={{ padding: 'var(--bubble-pad-y) var(--bubble-pad-x)' }} className="first:mt-0 last:mb-0">
+              <div style={{ padding: 'var(--bubble-pad-y) var(--bubble-pad-x)' }}>
                 {isUser ? (
-                  <div className="break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{message.content}</div>
+                  <div className="break-words [&>*:first-child]:mt-0 [&>*:last-child]:mb-0" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{message.content}</div>
                 ) : swingAnalysisData ? (
                 <div className="mt-2 rounded-2xl overflow-hidden bg-white/06 backdrop-blur border border-white/08 shadow-[0_10px_30px_rgba(0,0,0,0.4)]" data-swing-card>
                   <SwingReview
