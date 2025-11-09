@@ -9,7 +9,6 @@ import { CoachPrompt } from '@/components/swing-review/CoachPrompt';
 import { parseSwingAnalysis } from '@/utils/swingAnalysisParser';
 import { cn } from '@/lib/utils';
 import { EchoBotIcon } from './EchoBotIcon';
-import { MessageAvatarChip } from './MessageAvatarChip';
 
 interface ChatMessage {
   id: string;
@@ -37,13 +36,11 @@ interface ChatMessageProps {
   onShare?: (message: ChatMessage) => void;
   onAddVoiceNote?: (message: ChatMessage) => void;
   isFirstInGroup?: boolean;
-  isLastInGroup?: boolean;
   showHeading?: boolean;
   showActions?: boolean;         // Control action pills visibility
   isUser?: boolean;              // Override user detection
   mediaTop?: React.ReactNode;    // Optional media at the top of the bubble
   children?: React.ReactNode;    // Override default content rendering
-  userAvatar?: string;           // User avatar for chip
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ 
@@ -54,13 +51,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   onShare,
   onAddVoiceNote,
   isFirstInGroup = true,
-  isLastInGroup = false,
   showHeading = true,
   showActions = true,
   isUser: isUserProp,
   mediaTop,
   children,
-  userAvatar,
 }) => {
   const isUser = isUserProp ?? message.type === 'user';
   const [showSources, setShowSources] = useState(false);
@@ -129,23 +124,22 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             role="group"
             aria-label={`Message from ${isUser ? 'You' : 'Echo'} at ${time}`}
             className={cn(
-              "text-[15px] relative overflow-hidden backdrop-blur-md echo-bubble prose-invert prose-ul:ml-4 prose-li:my-1.5 prose-p:my-2 prose-li:marker:text-white/70",
-              "max-w-[var(--msg-width-mobile)] md:max-w-[var(--msg-width-desktop)]",
-              "after:absolute after:inset-0 after:rounded-[inherit] after:pointer-events-none",
-              "before:absolute before:inset-0 before:rounded-[inherit] before:pointer-events-none",
+              "text-[15px] relative overflow-hidden backdrop-blur-[var(--glass-blur)] echo-bubble",
               isUser 
-                ? "ml-auto rounded-[var(--bubble-radius)] text-white/95 leading-[1.6] before:shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]" 
-                : "rounded-[var(--bubble-radius)] rounded-bl-[var(--bubble-radius-bl-echo)] text-white/90 leading-[1.6] before:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                ? "ml-auto rounded-2xl text-white/95 leading-[1.5]" 
+                : "rounded-2xl rounded-bl-md text-white/90 leading-[1.55]"
             )}
             style={
               isUser ? {
+                maxWidth: '84vw',
                 background: 'var(--bubble-user-bg)',
-                border: '1px solid var(--bubble-user-stroke)',
-                boxShadow: 'var(--bubble-shadow)',
+                border: '1px solid rgba(255,255,255,0.20)',
+                boxShadow: '0 10px 28px rgba(0,0,0,0.45), inset 0 0 28px rgba(255,255,255,0.14)',
               } : {
-                background: 'var(--bubble-echo-bg)',
-                border: '1px solid var(--bubble-echo-stroke)',
-                boxShadow: 'var(--bubble-shadow)',
+                maxWidth: '84vw',
+                background: 'linear-gradient(145deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.06) 100%)',
+                border: '1px solid rgba(255,255,255,0.14)',
+                boxShadow: '0 10px 28px rgba(0,0,0,0.42), var(--bubble-echo-inset)',
               }
             }
           >
@@ -154,9 +148,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             
             {/* Content wrapper - only add padding if there's actual content */}
             {children ? (
-              <div className="px-4 py-3">{children}</div>
+              <div style={{ padding: 'var(--bubble-pad-y) var(--bubble-pad-x)' }}>{children}</div>
             ) : (
-              <div className="px-4 py-3 first:mt-0 last:mb-0">
+              <div style={{ padding: 'var(--bubble-pad-y) var(--bubble-pad-x)' }} className="first:mt-0 last:mb-0">
                 {isUser ? (
                   <div className="break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{message.content}</div>
                 ) : swingAnalysisData ? (
@@ -244,7 +238,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             
             {/* Tags from metadata (wrapped with proper padding) */}
             {!children && (
-              <div className="px-4 pb-3">
+              <div style={{ paddingLeft: 'var(--bubble-pad-x)', paddingRight: 'var(--bubble-pad-x)', paddingBottom: 'var(--bubble-pad-y)' }}>
                 {message.metadata?.tags && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {message.metadata.tags.map((tag, index) => (
@@ -336,25 +330,17 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             </div>
           )}
           
-          {/* Timestamp */}
+          {/* Inline meta row - Phase 50 (timestamp + status) */}
           <div className={cn(
-            "pt-1 text-[12px] text-white/55",
-            isUser ? "text-right" : "text-left"
+            "pt-1 text-[12px] text-white/55 select-none",
+            isUser ? "text-right pr-2" : "pl-2"
           )}>
-            {time}
+            {time && (
+              <span style={{ letterSpacing: '0.2px' }}>
+                {time}
+              </span>
+            )}
           </div>
-
-          {/* Avatar chip - only on last message in group */}
-          {isLastInGroup && (
-            isUser && userAvatar ? (
-              <MessageAvatarChip side="right" src={userAvatar} alt="You" />
-            ) : !isUser ? (
-              <MessageAvatarChip 
-                side="left" 
-                icon={<EchoBotIcon size={18} className="text-white/90" />} 
-              />
-            ) : null
-          )}
         </div>
       </div>
     </div>
