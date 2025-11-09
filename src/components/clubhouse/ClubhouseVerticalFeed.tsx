@@ -559,6 +559,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   }, []);
 
   const handleLongPressEnd = useCallback((postId: string) => {
+    // Restore scroll behavior
+    document.documentElement.style.touchAction = '';
+    
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;

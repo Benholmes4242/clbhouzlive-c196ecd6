@@ -64,15 +64,15 @@ export const AppleProgressBar = ({
         bottom: 'calc(env(safe-area-inset-bottom, 0px) + clamp(72px, var(--bottom-nav-height, 72px) + 6px, calc(var(--bottom-nav-height, 72px) + 6px)))',
       }}
     >
-      {/* Track */}
+      {/* Track - frosted white subtle */}
       <div 
-        className="absolute inset-0 opacity-20"
+        className="absolute inset-0 opacity-15"
         style={{
-          background: `linear-gradient(90deg, ${accent}20, ${accent}40)`,
+          background: 'rgba(255, 255, 255, 0.2)',
         }}
       />
       
-      {/* Fill with gradient drift */}
+      {/* Fill - frosted white with soft glow */}
       <div 
         className={cn(
           "absolute left-0 top-0 bottom-0 rounded-full transition-all",
@@ -80,20 +80,10 @@ export const AppleProgressBar = ({
         )}
         style={{
           width: `${progress}%`,
-          background: `linear-gradient(90deg, ${accent}, ${accent}cc, ${accent})`,
-          backgroundSize: '200% 100%',
-          animation: 'gradient-drift 3s ease infinite',
-          boxShadow: `0 0 8px ${accent}80`,
+          background: 'rgba(255, 255, 255, 0.8)',
+          boxShadow: '0 0 8px rgba(255, 255, 255, 0.4)',
         }}
       />
-
-      {/* Animated gradient drift keyframe */}
-      <style>{`
-        @keyframes gradient-drift {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-      `}</style>
     </div>
   );
 };
