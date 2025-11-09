@@ -113,6 +113,14 @@
      LAYOUT - FIXED TILES
      ======================================== */
   --hub-tile-fixed-h: 220px;
+  
+  /* ========================================
+     BALANCED VERTICAL SPACING
+     ======================================== */
+  --hub-gutter: 12px;
+  --hub-safe-top: env(safe-area-inset-top, 0px);
+  --hub-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --hub-bottom-ui: var(--bottom-nav-height, 0px);
 }
 
 /* ========================================
