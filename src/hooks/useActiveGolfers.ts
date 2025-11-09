@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useMemo } from 'react';
 import { formatDistance } from '@/features/golfers/format';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
+import { mockGolfers } from '@/features/golfers/mockGolfers';
 
 export type ActiveGolfer = {
   id: string;
@@ -63,7 +64,7 @@ export function useActiveGolfers({
       }
 
       // Map to our golfer type
-      return (data || []).map((profile: any) => ({
+      const realGolfers = (data || []).map((profile: any) => ({
         id: profile.user_id,
         display_name: profile.display_name || profile.username || 'Unknown',
         username: profile.username,
@@ -76,6 +77,29 @@ export function useActiveGolfers({
         eg_handicap_index: profile.eg_handicap_index,
         is_online: false,
       })) as ActiveGolfer[];
+
+      // Conditionally add mock data for visual testing
+      const useMockData = import.meta.env.VITE_USE_MOCK_GOLFERS === 'true';
+      
+      if (useMockData) {
+        const mockMapped = mockGolfers.map(mock => ({
+          id: mock.id,
+          display_name: mock.display_name,
+          username: mock.username,
+          avatar_url: mock.profile_photo_url,
+          home_club: mock.home_club,
+          distance_km: mock.distance_m / 1000,
+          distanceText: formatDistance(mock.distance_m),
+          isOpenToPlay: mock.open_to_play,
+          sameHomeClub: false,
+          eg_handicap_index: mock.eg_handicap_index,
+          is_online: false,
+        })) as ActiveGolfer[];
+        
+        return [...realGolfers, ...mockMapped];
+      }
+
+      return realGolfers;
     },
     enabled: !!currentLocation,
     staleTime: 15_000,
