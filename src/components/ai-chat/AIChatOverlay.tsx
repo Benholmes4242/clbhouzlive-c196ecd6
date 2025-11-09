@@ -27,6 +27,8 @@ import { Z } from '@/config/zIndex';
 import { useAutoSendFromQuery } from './hooks/useAutoSendFromQuery';
 import { ensureThreadId, persistUserMessage, persistAssistantMessage } from '@/features/echo/services/echoPersistence';
 import { FrostedPill } from '@/components/shared/FrostedPill';
+import { EchoBotIcon } from './EchoBotIcon';
+import { EchoTypingBar } from './EchoTypingBar';
 
 interface ChatMessageData {
   id: string;
@@ -489,9 +491,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       border: '1px solid rgba(255,255,255,0.12)',
                       backdropFilter: 'blur(12px)',
                       WebkitBackdropFilter: 'blur(12px)',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.18)'
                     }}
                   >
-                    <Bot className="h-9 w-9 text-white/80" />
+                    <EchoBotIcon size={36} className="text-white/85" />
                   </div>
                   <div className="text-[17px] font-semibold text-white">
                     Start a conversation with Echo
@@ -521,17 +524,18 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     );
                   })}
                   {isLoading && (
-                    <div className="flex items-end gap-2 mt-4">
-                      <div className="shrink-0">
-                        <EchoAvatar state="processing" size={28} />
-                      </div>
-                      <div className="max-w-full flex-1">
-                        <div className="rounded-2xl rounded-bl-md bg-white/05 backdrop-blur border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2">
+                    <div className="mt-4 px-4 flex items-end gap-2">
+                      <EchoBotIcon size={28} className="text-white/90 shrink-0" />
+                      <div className="flex-1">
+                        <div className="rounded-2xl rounded-bl-md bg-white/05 border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2">
                           <div className="flex items-center gap-1.5">
                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce"></span>
                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
                           </div>
+                        </div>
+                        <div className="mt-2">
+                          <EchoTypingBar />
                         </div>
                       </div>
                     </div>
@@ -1051,20 +1055,21 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     );
                   })}
                     {isLoading && (
-                      <div className="flex items-end gap-2 mt-4">
-                        <div className="shrink-0">
-                          <EchoAvatar state="processing" size={28} />
-                        </div>
-                        <div className="max-w-full flex-1">
-                          <div className="rounded-2xl rounded-bl-md bg-white/05 backdrop-blur border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2">
-                            <div className="flex items-center gap-1.5">
-                              <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
-                              <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce"></span>
-                              <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
-                            </div>
+                    <div className="mt-4 px-4 flex items-end gap-2">
+                      <EchoBotIcon size={28} className="text-white/90 shrink-0" />
+                      <div className="flex-1">
+                        <div className="rounded-2xl rounded-bl-md bg-white/05 border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
+                            <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce"></span>
+                            <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
                           </div>
                         </div>
+                        <div className="mt-2">
+                          <EchoTypingBar />
+                        </div>
                       </div>
+                    </div>
                      )}
                          </div>
                        )}
