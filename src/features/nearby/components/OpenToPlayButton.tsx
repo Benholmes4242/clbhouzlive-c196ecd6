@@ -55,7 +55,7 @@ export function OpenToPlayButton() {
         aria-label={isActive ? `Open to Play active, ${remainingMinutes} minutes remaining` : 'Activate Open to Play'}
         disabled={isSaving}
         onPointerDown={handleToggle}
-        className="relative inline-flex items-center justify-center gap-2.5 transition-all duration-100 active:scale-[0.97] rounded-2xl bg-white/[0.04] border border-white/10 shadow-[0_20px_48px_rgba(0,0,0,.5)]"
+        className="relative inline-flex items-center justify-center gap-2.5 transition-all duration-100 active:scale-[0.97] rounded-2xl bg-white/[0.04] border border-white/10"
         style={{
           minWidth: '240px',
           height: '44px',
@@ -65,7 +65,6 @@ export function OpenToPlayButton() {
           ...(isActive && {
             background: 'linear-gradient(to bottom, rgba(78, 199, 120, 0.16), rgba(78, 199, 120, 0.10))',
             borderColor: 'rgba(78, 199, 120, 0.28)',
-            boxShadow: '0 20px 48px rgba(0,0,0,.5)',
           }),
         }}
       >
