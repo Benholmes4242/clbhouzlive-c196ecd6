@@ -1,19 +1,20 @@
 /**
  * Hub Golfers Page
  * 
- * Full-screen glass page showing nearby golfers.
+ * Full-screen glass page showing nearby golfers with filters.
  * Opens as an overlay above the origin page.
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { useActiveGolfers } from '@/hooks/useActiveGolfers';
+import { useActiveGolfers, type GolferFilters } from '@/hooks/useActiveGolfers';
 import { NearbyGolferCard } from '@/features/nearby/components/NearbyGolferCard';
 import { GolferStatusBar } from '@/features/nearby/components/GolferStatusBar';
 import { EmptyNearbyState } from '@/features/nearby/components/EmptyNearbyState';
 import { NearbySkeletonRow } from '@/features/nearby/components/NearbySkeletonRow';
 import { OpenToPlayButton } from '@/features/nearby/components/OpenToPlayButton';
+import { NearbyFilterBar } from '@/features/nearby/components/NearbyFilterBar';
 import { useVisibility } from '@/features/nearby/hooks/useVisibility';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import '../home/hubTheme.css';
@@ -22,10 +23,18 @@ export function HubGolfersPage() {
   const nav = useNavigate();
   const loc = useLocation();
   const queryClient = useQueryClient();
-  const { golfers, isLoading } = useActiveGolfers({ limit: 50 });
   const { visibilityMode, setVisibilityMode } = useVisibility();
   const headerRef = React.useRef<HTMLDivElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
+
+  // Filter state
+  const [filters, setFilters] = useState<GolferFilters>({
+    radiusKm: 10,
+    onlyOpen: false,
+    visibility: visibilityMode as 'everyone' | 'friends' | 'all',
+  });
+
+  const { golfers, isLoading } = useActiveGolfers({ limit: 50, filters });
 
   const handleBack = () => {
     const state = loc.state as any;
@@ -95,10 +104,22 @@ export function HubGolfersPage() {
       <div ref={listRef} className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
         <PullToRefresh onRefresh={handleRefresh}>
           <div className="space-y-4 pb-6 pt-4">
-            {/* Status Bar (Segmented Control) */}
+            {/* Filter Bar */}
+            <NearbyFilterBar 
+              filters={filters}
+              onFiltersChange={setFilters}
+            />
+
+            {/* Status Bar (Segmented Control) - now for display only */}
             <GolferStatusBar 
               value={visibilityMode}
-              onChange={setVisibilityMode}
+              onChange={(mode) => {
+                setVisibilityMode(mode);
+                setFilters(prev => ({
+                  ...prev,
+                  visibility: mode as 'everyone' | 'friends' | 'all'
+                }));
+              }}
             />
 
             {/* Open to Play Button */}

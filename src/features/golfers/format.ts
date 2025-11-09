@@ -1,11 +1,12 @@
 /**
- * Format distance for display
+ * Format distance for display (no space before unit)
  * Shows meters if < 950m, otherwise km
  */
 export const formatDistance = (m?: number) => {
   if (m == null) return "";
   if (m < 950) return `${Math.round(m)}m`;
-  return `${(m / 1000).toFixed(1)}km`;
+  const km = m / 1000;
+  return `${km.toFixed(km < 10 ? 1 : 0)}km`;
 };
 
 /**
