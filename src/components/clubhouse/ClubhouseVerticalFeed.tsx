@@ -21,8 +21,7 @@ import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import CommentsModal from '@/components/posts/CommentsModal';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
 import { AudioStrip } from './AudioStrip';
-import PostMetadata from './PostMetadata';
-import EngagementRail from './EngagementRail';
+import { AppleHUDOverlay } from './AppleHUDOverlay';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
@@ -803,23 +802,15 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 />
               )}
 
-              {/* Post Metadata - Bottom Left */}
-              <PostMetadata
-                title={removeGolfCourseFromContent(item.title)}
-                description={item.ctaDescription}
+              {/* Apple HUD Overlay - Replaces PostMetadata + EngagementRail */}
+              <AppleHUDOverlay
+                videoRef={{ current: videoRefs.current[item.id] || null }}
                 user={{
                   name: item.user?.name || 'Unknown User',
-                  avatar: item.user?.avatar
+                  avatar: item.user?.avatar,
+                  username: item.user?.username
                 }}
-                onUserClick={() => {
-                  setSelectedUserId(item.user?.id || null);
-                  setShowMiniProfile(true);
-                }}
-              />
-
-              {/* Per-Post Engagement Rail */}
-              <EngagementRail
-                postId={item.id}
+                caption={removeGolfCourseFromContent(item.ctaDescription)}
                 stats={{
                   likes: item.likes || 0,
                   comments: item.comments || 0,
@@ -827,15 +818,17 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 }}
                 isLiked={likedPosts?.includes(item.id) ?? false}
                 isVideo={item.media?.[0]?.media_type === 'video'}
+                isMuted={isGloballyMuted}
                 isActive={currentIndex === index}
-                onLike={() => onLike(item.id)}
-                onComment={() => {
-                  setSelectedPostId(item.id);
-                  setCommentsModalOpen(true);
+                onUserClick={() => {
+                  setSelectedUserId(item.user?.id || null);
+                  setShowMiniProfile(true);
                 }}
-                onShare={() => {
-                  console.log('Share clicked for post:', item.id);
-                }}
+                onLike={() => handleLike(item.id)}
+                onComment={() => handleComment(item.id)}
+                onShare={handleShare}
+                onMuteToggle={() => setGlobalMute(!isGloballyMuted)}
+                accentColor="#6e9277"
               />
             </div>
           );
