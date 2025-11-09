@@ -804,15 +804,18 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
               {/* Apple HUD Overlay */}
               <AppleHUDOverlay
-                authorName={item.user?.name || item.user?.username || 'Unknown'}
-                caption={removeGolfCourseFromContent(item.ctaDescription) || ''}
-                avatarUrl={item.user?.avatar}
+                authorName={item.user?.name || item.user?.username || "Unknown"}
+                caption={removeGolfCourseFromContent(item.ctaDescription) || ""}
+                avatarUrl={item.user?.avatar || '/placeholder.svg'}
                 onAuthorPress={() => {
                   setSelectedUserId(item.user?.id || null);
                   setShowMiniProfile(true);
                 }}
                 onLike={() => handleLike(item.id)}
-                onComment={() => handleComment(item.id)}
+                onComment={() => {
+                  setSelectedPostId(item.id);
+                  setCommentsModalOpen(true);
+                }}
                 onShare={handleShare}
                 onMuteToggle={() => setGlobalMute(!isGloballyMuted)}
                 isMuted={isGloballyMuted}
