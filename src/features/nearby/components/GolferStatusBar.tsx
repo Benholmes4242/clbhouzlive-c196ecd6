@@ -63,11 +63,12 @@ export function GolferStatusBar({ value, onChange }: GolferStatusBarProps) {
         {(['all', 'friends', 'hidden'] as const).map((mode) => (
           <TapButton
             key={mode}
-            className="relative flex-1 font-semibold transition-colors duration-200"
+            className="relative flex-1 font-semibold transition-colors duration-200 flex items-center justify-center"
             style={{
               color: value === mode ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.65)',
               fontSize: '17px',
               padding: '12px 16px',
+              lineHeight: 1,
             }}
             onPointerDown={() => handleChange(mode)}
             aria-pressed={value === mode}
