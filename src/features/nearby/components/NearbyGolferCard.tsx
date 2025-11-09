@@ -122,11 +122,11 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
             )}
           </div>
 
-          {/* Status chips - max 2 visible with overflow */}
-          {(golfer.sameHomeClub || golfer.isOpenToPlay) && (
+          {/* Status chips - only show when true */}
+          {(golfer.sameHomeClub || golfer.isOpenToPlay === true) && (
             <StatusChips
               sameHomeClub={golfer.sameHomeClub}
-              isOpenToPlay={golfer.isOpenToPlay}
+              isOpenToPlay={golfer.isOpenToPlay === true}
             />
           )}
         </div>

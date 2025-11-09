@@ -1,5 +1,6 @@
 import React from 'react';
 import { GolferFilters } from '@/hooks/useActiveGolfers';
+import { RADIUS_OPTIONS_KM } from '@/features/golfers/constants';
 
 type NearbyFilterBarProps = {
   filters: GolferFilters;
@@ -7,12 +8,6 @@ type NearbyFilterBarProps = {
 };
 
 export function NearbyFilterBar({ filters, onFiltersChange }: NearbyFilterBarProps) {
-  const radiusOptions = [
-    { value: 5, label: '5km' },
-    { value: 10, label: '10km' },
-    { value: 25, label: '25km' },
-  ];
-
   const visibilityOptions = [
     { value: 'everyone' as const, label: 'Everyone' },
     { value: 'friends' as const, label: 'Friends' },
@@ -21,14 +16,14 @@ export function NearbyFilterBar({ filters, onFiltersChange }: NearbyFilterBarPro
 
   return (
     <div className="px-3 space-y-2">
-      {/* Radius Selector */}
+      {/* Distance chips */}
       <div className="flex gap-2">
-        {radiusOptions.map((option) => (
+        {RADIUS_OPTIONS_KM.map((option) => (
           <button
-            key={option.value}
-            onClick={() => onFiltersChange({ ...filters, radiusKm: option.value })}
+            key={option.valueKm}
+            onClick={() => onFiltersChange({ ...filters, radiusKm: option.valueKm })}
             className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              filters.radiusKm === option.value
+              filters.radiusKm === option.valueKm
                 ? 'bg-white/20 text-white'
                 : 'bg-white/5 text-white/70 hover:bg-white/10'
             }`}
@@ -38,7 +33,7 @@ export function NearbyFilterBar({ filters, onFiltersChange }: NearbyFilterBarPro
         ))}
       </div>
 
-      {/* Visibility & Open Filter */}
+      {/* Visibility dropdown & Open to Play toggle */}
       <div className="flex gap-2">
         <select
           value={filters.visibility || 'everyone'}

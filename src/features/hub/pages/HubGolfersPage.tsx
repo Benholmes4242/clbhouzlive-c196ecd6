@@ -29,9 +29,9 @@ export function HubGolfersPage() {
 
   // Filter state
   const [filters, setFilters] = useState<GolferFilters>({
-    radiusKm: 10,
+    radiusKm: 0.5,
     onlyOpen: false,
-    visibility: visibilityMode as 'everyone' | 'friends' | 'all',
+    visibility: 'everyone',
   });
 
   const { golfers, isLoading } = useActiveGolfers({ limit: 50, filters });
@@ -103,29 +103,25 @@ export function HubGolfersPage() {
       {/* Content */}
       <div ref={listRef} className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
         <PullToRefresh onRefresh={handleRefresh}>
-          <div className="space-y-4 pb-6 pt-4">
+          <div className="space-y-3 pb-6 pt-2">
+            {/* Visibility segmented control (profile visibility) */}
+            <div className="px-4">
+              <GolferStatusBar 
+                value={visibilityMode}
+                onChange={setVisibilityMode}
+              />
+            </div>
+
+            {/* Open to Play CTA */}
+            <div className="px-4">
+              <OpenToPlayButton />
+            </div>
+
             {/* Filter Bar */}
             <NearbyFilterBar 
               filters={filters}
               onFiltersChange={setFilters}
             />
-
-            {/* Status Bar (Segmented Control) - now for display only */}
-            <GolferStatusBar 
-              value={visibilityMode}
-              onChange={(mode) => {
-                setVisibilityMode(mode);
-                setFilters(prev => ({
-                  ...prev,
-                  visibility: mode as 'everyone' | 'friends' | 'all'
-                }));
-              }}
-            />
-
-            {/* Open to Play Button */}
-            <div className="px-3">
-              <OpenToPlayButton />
-            </div>
 
             {/* Golfers List */}
             {isLoading ? (
