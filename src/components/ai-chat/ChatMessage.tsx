@@ -84,23 +84,25 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       className="animate-[fadeInUp_.18s_ease-out_both]"
     >
       <div className={cn(
-        "flex items-end gap-2",
-        isUser ? "flex-row-reverse justify-end" : "justify-start"
+        "flex items-end gap-3",
+        isUser && "flex-row-reverse justify-end"
       )}>
-        <div className="relative w-full">
-          {/* Avatar - only show for AI on first message in group (positioned outside flow) */}
-          {!isUser && isFirstInGroup && (
-            <div className="absolute -left-9 top-2">
-              <EchoBotIcon size={28} className="text-white/90" />
-            </div>
-          )}
+        {/* Avatar - inline layout for Echo */}
+        {!isUser && isFirstInGroup && (
+          <div className="shrink-0 h-7 w-7 flex items-center justify-center">
+            <EchoBotIcon size={28} className="text-white/90" />
+          </div>
+        )}
+        {!isUser && !isFirstInGroup && (
+          <div className="shrink-0 h-7 w-7" /> 
+        )}
           
-          {/* Message content - Phase 50 actions & meta */}
-          <div 
-            className={cn(
-              "relative group/message pt-2 max-w-[95%] w-fit",
-              isUser ? "user message-right ml-auto" : "echo message-left"
-            )}
+        {/* Message content - Phase 50 actions & meta */}
+        <div 
+          className={cn(
+            "relative group/message flex-1",
+            isUser && "ml-auto"
+          )}
           data-message-id={message.id}
           data-author={isUser ? "user" : "echo"}
           data-has-menu="true"
@@ -122,27 +124,31 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             role="group"
             aria-label={`Message from ${isUser ? 'You' : 'Echo'} at ${time}`}
             className={cn(
-              "text-[15px] relative",
+              "text-[15px] relative overflow-hidden backdrop-blur-[var(--glass-blur)]",
               isUser 
-                ? "inline-block max-w-[82%] md:max-w-[70%] rounded-[16px] bg-white/10 backdrop-blur-md border border-white/30 text-white shadow-[0_12px_32px_rgba(0,0,0,0.8)] overflow-hidden" 
-                : "inline-block max-w-[82%] md:max-w-[70%] rounded-[16px] bg-white/04 backdrop-blur-md border border-white/12 text-white shadow-[0_12px_32px_rgba(0,0,0,0.9)] overflow-hidden",
-              isUser ? "leading-[1.5]" : "leading-[1.55]"
+                ? "max-w-[88%] md:max-w-[72%] ml-auto rounded-[var(--bubble-radius)] text-white/95 leading-[1.5]" 
+                : "max-w-[88%] md:max-w-[72%] rounded-[var(--bubble-radius)] rounded-bl-md text-white/90 leading-[1.55]"
             )}
-            style={{
-              ...(isUser && {
-                '--glow-inset': 'inset 0 0 40px rgba(255,255,255,0.18)',
-                boxShadow: '0 12px 32px rgba(0,0,0,0.8), var(--glow-inset)',
-              } as React.CSSProperties)
-            }}
+            style={
+              isUser ? {
+                background: 'var(--bubble-user-bg)',
+                border: '1px solid var(--bubble-user-border)',
+                boxShadow: 'var(--bubble-user-shadow), var(--bubble-user-inset)',
+              } : {
+                background: 'var(--bubble-echo-bg)',
+                border: '1px solid var(--bubble-echo-border)',
+                boxShadow: 'var(--bubble-echo-shadow), var(--bubble-echo-inset)',
+              }
+            }
           >
             {/* Edge-to-edge media at top if provided */}
             {mediaTop}
             
             {/* Content wrapper - only add padding if there's actual content */}
             {children ? (
-              <div className="px-3.5 py-2.5">{children}</div>
+              <div style={{ padding: 'var(--bubble-pad-y) var(--bubble-pad-x)' }}>{children}</div>
             ) : (
-              <div className="px-3.5 py-2.5 first:mt-0 last:mb-0">
+              <div style={{ padding: 'var(--bubble-pad-y) var(--bubble-pad-x)' }} className="first:mt-0 last:mb-0">
                 {isUser ? (
                   <div className="break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{message.content}</div>
                 ) : swingAnalysisData ? (
@@ -230,7 +236,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             
             {/* Tags from metadata (wrapped with proper padding) */}
             {!children && (
-              <div className="px-3.5 pb-2.5">
+              <div style={{ paddingLeft: 'var(--bubble-pad-x)', paddingRight: 'var(--bubble-pad-x)', paddingBottom: 'var(--bubble-pad-y)' }}>
                 {message.metadata?.tags && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {message.metadata.tags.map((tag, index) => (
@@ -333,7 +339,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               </span>
             )}
           </div>
-        </div>
         </div>
       </div>
     </div>

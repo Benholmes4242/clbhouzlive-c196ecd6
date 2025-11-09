@@ -60,6 +60,32 @@
   /* Echo typing bar */
   --echo-typing-duration: 1.5s;
   --echo-typing-ease: linear;
+  
+  /* Bubbles - Apple-grade */
+  --bubble-user-bg: linear-gradient(145deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.08) 100%);
+  --bubble-user-border: rgba(255,255,255,.18);
+  --bubble-user-shadow: 0 6px 18px rgba(0,0,0,.25);
+  --bubble-user-inset: inset 0 1px 2px rgba(255,255,255,.25);
+  
+  --bubble-echo-bg: linear-gradient(145deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.04) 100%);
+  --bubble-echo-border: rgba(255,255,255,.12);
+  --bubble-echo-shadow: 0 4px 14px rgba(0,0,0,.20);
+  --bubble-echo-inset: inset 0 1px 1px rgba(255,255,255,.12);
+  
+  --bubble-radius: 22px;
+  --bubble-pad-y: 16px;
+  --bubble-pad-x: 12px;
+  
+  /* Typing bar */
+  --typing-track: rgba(0,0,0,.25);
+  --typing-fill: linear-gradient(90deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,.30) 50%, rgba(255,255,255,.10) 100%);
+  --typing-height: 12px;
+}
+
+/* Animations */
+@keyframes echo-drift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
 }
 
 /* Helper classes */

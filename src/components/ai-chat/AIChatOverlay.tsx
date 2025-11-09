@@ -473,17 +473,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             <div 
               className={cn(
                 "h-full overflow-y-auto overscroll-contain scroll-smooth",
-                isPageMode ? "px-0 pt-0 pb-0" : "px-4 pt-3 pb-4"
+                isPageMode ? "px-4 pt-2 pb-28" : "px-4 pt-3 pb-4"
               )}
               style={{ WebkitOverflowScrolling: "touch" }}
               ref={chatScrollRef}
               onScroll={handleChatScroll}
             >
                   {messages.length === 0 ? (
-                <div className={cn(
-                  "flex flex-col items-center justify-center text-center space-y-6",
-                  isPageMode ? "pl-2 pr-4 py-16" : "px-6 py-20"
-                )}>
+                <div className="flex flex-col items-center justify-center text-center space-y-6 py-16">
                   <div 
                     className="h-20 w-20 rounded-3xl flex items-center justify-center"
                     style={{
@@ -504,14 +501,20 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   </div>
                 </div>
               ) : (
-                <div className={cn("space-y-2", isPageMode && "pl-2 pr-4")}>
+                <div className="space-y-1">
                   {messages.map((message, index) => {
                     const isUser = message.type === 'user';
                     const prevMessage = index > 0 ? messages[index - 1] : null;
                     const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
                     
                     return (
-                      <div key={message.id} className={cn("w-full", isFirstInGroup && index > 0 && "mt-4")}>
+                      <div 
+                        key={message.id} 
+                        className={cn(
+                          isFirstInGroup && "mt-3",
+                          !isFirstInGroup && "mt-1"
+                        )}
+                      >
                         <ChatMessageComponent
                           message={message}
                           onSaveToInsights={saveToInsights}
@@ -524,19 +527,25 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     );
                   })}
                   {isLoading && (
-                    <div className="mt-4 pl-2 pr-4 flex items-end gap-2">
-                      <EchoBotIcon size={28} className="text-white/90 shrink-0" />
-                      <div className="flex-1">
-                        <div className="rounded-2xl rounded-bl-md bg-white/05 border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2">
+                    <div className="mt-3 flex items-end gap-3">
+                      <div className="shrink-0 h-7 w-7 flex items-center justify-center">
+                        <EchoBotIcon size={28} className="text-white/90" />
+                      </div>
+                      <div className="flex-1 max-w-[88%] md:max-w-[72%]">
+                        <div className="rounded-[var(--bubble-radius)] rounded-bl-md border overflow-hidden backdrop-blur-[var(--glass-blur)]"
+                          style={{
+                            background: 'var(--bubble-echo-bg)',
+                            borderColor: 'var(--bubble-echo-border)',
+                            boxShadow: 'var(--bubble-echo-shadow), var(--bubble-echo-inset)',
+                            padding: 'var(--bubble-pad-y) var(--bubble-pad-x)'
+                          }}>
                           <div className="flex items-center gap-1.5">
                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce"></span>
                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
                           </div>
                         </div>
-                        <div className="mt-2">
-                          <EchoTypingBar />
-                        </div>
+                        <EchoTypingBar />
                       </div>
                     </div>
                   )}
