@@ -94,13 +94,8 @@ export function HubHomePage() {
       </header>
 
       {/* Hub Dashboard */}
-      <main 
-        className="w-full overflow-y-auto h-screen px-3.5"
-        style={{
-          paddingTop: 'calc(80px + var(--hub-safe-top) + var(--hub-gutter))',
-          paddingBottom: 'calc(var(--hub-safe-bottom) + var(--hub-gutter) + var(--hub-bottom-ui))',
-        }}
-      >
+      <main className="w-full overflow-y-auto h-screen pt-[calc(80px+env(safe-area-inset-top,0px))] px-3.5">
+        <div className="pt-3">
         {/* Top 2×2 grid */}
         <div
           className="grid"
@@ -114,8 +109,13 @@ export function HubHomePage() {
           </div>
         </div>
 
-        {/* Your Games - flexible height */}
-        <div className="mt-3.5 flex-1">
+        {/* Your Games - calculated height to push bottom tiles to 12px from edge */}
+        <div 
+          className="mt-3.5" 
+          style={{ 
+            height: 'calc(100vh - 80px - var(--hub-tile-fixed-h) - var(--hub-tile-fixed-h) - 0.875rem - 0.875rem - 0.75rem - 12px)' 
+          }}
+        >
           <YourGamesTile />
         </div>
 
@@ -134,6 +134,7 @@ export function HubHomePage() {
           <div className="hub-tile-fixed">
             <QuickActionsTile />
           </div>
+        </div>
         </div>
       </main>
     </div>
