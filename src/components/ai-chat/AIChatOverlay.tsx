@@ -582,7 +582,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             className={cn(
               "sticky bottom-0 z-[2] safe-bottom",
               isPageMode 
-                ? "" 
+                ? "border-t" 
                 : "bg-gradient-to-t from-black/95 to-black/60 backdrop-blur border-t"
             )}
             style={{
@@ -596,8 +596,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: '16px 16px 0 0',
+                borderTopColor: 'rgba(255,255,255,0.12)',
+                borderLeft: 'none',
+                borderRight: 'none',
+                borderBottom: 'none',
+                contain: 'paint',
               } : {
                 borderTopColor: 'var(--header-border, rgba(255,255,255,0.1))',
               }),
