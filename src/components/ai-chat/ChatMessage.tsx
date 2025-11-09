@@ -130,20 +130,22 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             aria-label={`Message from ${isUser ? 'You' : 'Echo'} at ${time}`}
             className={cn(
               "text-[15px] relative overflow-hidden backdrop-blur-md echo-bubble prose-invert prose-ul:ml-4 prose-li:my-1.5 prose-p:my-2 prose-li:marker:text-white/70",
-              "max-w-[82%] md:max-w-[70%]",
+              "max-w-[var(--msg-width-mobile)] md:max-w-[var(--msg-width-desktop)]",
+              "after:absolute after:inset-0 after:rounded-[inherit] after:pointer-events-none",
+              "before:absolute before:inset-0 before:rounded-[inherit] before:pointer-events-none",
               isUser 
-                ? "ml-auto rounded-2xl text-white/95 leading-[1.5]" 
-                : "rounded-2xl rounded-bl-md text-white/90 leading-[1.55]"
+                ? "ml-auto rounded-[var(--bubble-radius)] text-white/95 leading-[1.6] before:shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]" 
+                : "rounded-[var(--bubble-radius)] rounded-bl-[var(--bubble-radius-bl-echo)] text-white/90 leading-[1.6] before:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
             )}
             style={
               isUser ? {
                 background: 'var(--bubble-user-bg)',
-                border: '1px solid rgba(255,255,255,0.30)',
-                boxShadow: '0 12px 32px rgba(0,0,0,0.5), inset 0 0 40px rgba(255,255,255,0.18)',
+                border: '1px solid var(--bubble-user-stroke)',
+                boxShadow: 'var(--bubble-shadow)',
               } : {
-                background: 'linear-gradient(145deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.06) 100%)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                boxShadow: '0 12px 32px rgba(0,0,0,0.55)',
+                background: 'var(--bubble-echo-bg)',
+                border: '1px solid var(--bubble-echo-stroke)',
+                boxShadow: 'var(--bubble-shadow)',
               }
             }
           >
@@ -334,30 +336,26 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             </div>
           )}
           
-          {/* Inline meta row - Phase 50 (timestamp + status) */}
+          {/* Timestamp */}
           <div className={cn(
-            "pt-1 text-[12px] text-white/55 select-none",
-            isUser ? "text-right pr-2" : "pl-2"
+            "pt-1 text-[12px] text-white/55",
+            isUser ? "text-right" : "text-left"
           )}>
-            {time && (
-              <span style={{ letterSpacing: '0.2px' }}>
-                {time}
-              </span>
-            )}
+            {time}
           </div>
-        </div>
 
-        {/* Avatar chip - only on last message in group */}
-        {isLastInGroup && (
-          isUser && userAvatar ? (
-            <MessageAvatarChip side="right" src={userAvatar} alt="You" />
-          ) : !isUser ? (
-            <MessageAvatarChip 
-              side="left" 
-              icon={<EchoBotIcon size={14} className="text-white/90" />} 
-            />
-          ) : null
-        )}
+          {/* Avatar chip - only on last message in group */}
+          {isLastInGroup && (
+            isUser && userAvatar ? (
+              <MessageAvatarChip side="right" src={userAvatar} alt="You" />
+            ) : !isUser ? (
+              <MessageAvatarChip 
+                side="left" 
+                icon={<EchoBotIcon size={18} className="text-white/90" />} 
+              />
+            ) : null
+          )}
+        </div>
       </div>
     </div>
   );

@@ -515,13 +515,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
                     const isLastInGroup = !nextMessage || nextMessage.type !== message.type;
                     
+                    const marginTop = isFirstInGroup
+                      ? (prevMessage && prevMessage.type !== message.type ? "mt-10" : "mt-14")
+                      : "mt-2";
+                    
                     return (
                       <div 
                         key={message.id} 
-                        className={cn(
-                          isFirstInGroup && "mt-4",
-                          !isFirstInGroup && "mt-2.5"
-                        )}
+                        className={marginTop}
                       >
                         <ChatMessageComponent
                           message={message}
@@ -537,30 +538,37 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     );
                   })}
                   {isLoading && (
-                    <div className="mt-4 flex items-end gap-2.5">
-                      <div className="shrink-0 h-7 w-7 flex items-center justify-center">
-                        <EchoBotIcon size={28} className="text-white/90" />
+                    <div className="flex flex-col mt-10">
+                      <div className="pl-[36px] mb-2 text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
+                        Echo
                       </div>
-                      <div className="flex-1 max-w-[82%] md:max-w-[70%]">
-                        <div className="pl-[36px] mb-2 text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
-                          Echo
-                        </div>
-                        <div 
-                          className="rounded-2xl rounded-bl-md border overflow-hidden backdrop-blur-[var(--glass-blur)] px-4 py-3"
-                          style={{
-                            background: 'linear-gradient(145deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.06) 100%)',
-                            borderColor: 'rgba(255,255,255,0.14)',
-                            boxShadow: '0 10px 28px rgba(0,0,0,0.42), inset 0 1px 1px rgba(255,255,255,.12)',
-                          }}
-                        >
-                          <div className="flex items-center gap-1.5">
-                            <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
-                            <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce"></span>
-                            <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
-                          </div>
-                          <EchoTypingBar />
+                      <div
+                        className={cn(
+                          "self-start rounded-[var(--bubble-radius)] rounded-bl-[var(--bubble-radius-bl-echo)] px-4 py-3 backdrop-blur-md relative",
+                          "max-w-[var(--msg-width-mobile)] md:max-w-[var(--msg-width-desktop)]",
+                          "bg-[var(--bubble-echo-bg)] border border-[var(--bubble-echo-stroke)]",
+                          "after:absolute after:inset-0 after:rounded-[inherit] after:pointer-events-none",
+                          "before:absolute before:inset-0 before:rounded-[inherit] before:pointer-events-none",
+                          "before:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                        )}
+                        style={{
+                          boxShadow: 'var(--bubble-shadow)',
+                        }}
+                      >
+                        <div className="flex gap-1">
+                          {[0, 1, 2].map((i) => (
+                            <div
+                              key={i}
+                              className="h-1.5 w-1.5 bg-white/70 rounded-full animate-bounce"
+                              style={{
+                                animationDelay: `${i * 0.15}s`,
+                                animationDuration: '1s',
+                              }}
+                            />
+                          ))}
                         </div>
                       </div>
+                      <EchoTypingBar />
                     </div>
                   )}
                 </div>
@@ -792,16 +800,21 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
                   const isLastInGroup = !nextMessage || nextMessage.type !== message.type;
                   
+                  const marginTop = isFirstInGroup
+                    ? (prevMessage && prevMessage.type !== message.type ? "mt-10" : "mt-14")
+                    : "mt-2";
+                  
                   return (
-                    <ChatMessageComponent
-                      key={message.id}
-                      message={message}
-                      onSaveToInsights={() => saveToInsights(message)}
-                      isFirstInGroup={isFirstInGroup}
-                      isLastInGroup={isLastInGroup}
-                      showHeading={isFirstInGroup}
-                      userAvatar={undefined}
-                    />
+                    <div key={message.id} className={marginTop}>
+                      <ChatMessageComponent
+                        message={message}
+                        onSaveToInsights={() => saveToInsights(message)}
+                        isFirstInGroup={isFirstInGroup}
+                        isLastInGroup={isLastInGroup}
+                        showHeading={isFirstInGroup}
+                        userAvatar={undefined}
+                      />
+                    </div>
                   );
                 })}
 
@@ -1054,6 +1067,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
                     const isLastInGroup = !nextMessage || nextMessage.type !== message.type;
                     
+                    const marginTop = isFirstInGroup
+                      ? (prevMessage && prevMessage.type !== message.type ? "mt-10" : "mt-14")
+                      : "mt-2";
+                    
                     // Example: mark message at index 3 as first unread (UI only)
                     const isFirstUnread = false; // Set to true on a specific message to show separator
                     
@@ -1070,12 +1087,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           </div>
                         )}
                         
-                        <div 
-                          className={cn(
-                            "w-full",
-                            isFirstInGroup && index > 0 && "mt-4"
-                          )}
-                        >
+                        <div className={marginTop}>
                           <ChatMessageComponent
                             message={message}
                             onSaveToInsights={saveToInsights}
@@ -1091,22 +1103,39 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     );
                   })}
                     {isLoading && (
-                    <div className="mt-4 px-4 flex items-end gap-2">
-                      <EchoBotIcon size={28} className="text-white/90 shrink-0" />
-                      <div className="flex-1">
-                        <div className="rounded-2xl rounded-bl-md bg-white/05 border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2">
-                          <div className="flex items-center gap-1.5">
-                            <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
-                            <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce"></span>
-                            <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                      <div className="flex flex-col mt-10">
+                        <div className="pl-[36px] mb-2 text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
+                          Echo
+                        </div>
+                        <div
+                          className={cn(
+                            "self-start rounded-[var(--bubble-radius)] rounded-bl-[var(--bubble-radius-bl-echo)] px-4 py-3 backdrop-blur-md relative",
+                            "max-w-[var(--msg-width-mobile)] md:max-w-[var(--msg-width-desktop)]",
+                            "bg-[var(--bubble-echo-bg)] border border-[var(--bubble-echo-stroke)]",
+                            "after:absolute after:inset-0 after:rounded-[inherit] after:pointer-events-none",
+                            "before:absolute before:inset-0 before:rounded-[inherit] before:pointer-events-none",
+                            "before:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                          )}
+                          style={{
+                            boxShadow: 'var(--bubble-shadow)',
+                          }}
+                        >
+                          <div className="flex gap-1">
+                            {[0, 1, 2].map((i) => (
+                              <div
+                                key={i}
+                                className="h-1.5 w-1.5 bg-white/70 rounded-full animate-bounce"
+                                style={{
+                                  animationDelay: `${i * 0.15}s`,
+                                  animationDuration: '1s',
+                                }}
+                              />
+                            ))}
                           </div>
                         </div>
-                        <div className="mt-2">
-                          <EchoTypingBar />
-                        </div>
+                        <EchoTypingBar />
                       </div>
-                    </div>
-                     )}
+                    )}
                          </div>
                        )}
 
