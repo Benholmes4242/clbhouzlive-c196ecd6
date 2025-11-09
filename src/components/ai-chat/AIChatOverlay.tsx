@@ -1030,7 +1030,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         </div>
                       </div>
                     ) : (
-                <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-5 space-y-2">
+                <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pb-5 space-y-2">
                   {messages.map((message, index) => {
                     const isUser = message.type === 'user';
                     const prevMessage = index > 0 ? messages[index - 1] : null;
