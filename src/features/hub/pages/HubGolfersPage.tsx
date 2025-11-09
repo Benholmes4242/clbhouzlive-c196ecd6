@@ -79,8 +79,9 @@ export function HubGolfersPage() {
       {/* Glass Header */}
       <header 
         ref={headerRef}
-        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
+        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 border-b"
         style={{
+          height: '56px',
           borderColor: 'var(--hub-stroke)',
           background: 'var(--hub-glass-bg)',
           backdropFilter: 'blur(20px)',
@@ -96,49 +97,60 @@ export function HubGolfersPage() {
         >
           ‹ Back
         </button>
-        <h1 className="text-white/90 text-[17px] font-semibold">Golfers</h1>
+        <h1 className="text-white/90 text-[28px] font-semibold">Golfers</h1>
         <div className="w-16" />
       </header>
 
       {/* Content */}
       <div ref={listRef} className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
         <PullToRefresh onRefresh={handleRefresh}>
-          <div className="space-y-3 pb-6 pt-2">
-            {/* Visibility segmented control (profile visibility) */}
-            <div className="px-4">
+          <div className="pb-6 pt-4 px-4">
+            {/* Visibility segmented control (profile visibility) - 16px top margin */}
+            <div className="mb-2">
               <GolferStatusBar 
                 value={visibilityMode}
                 onChange={setVisibilityMode}
               />
             </div>
 
-            {/* Open to Play CTA */}
-            <div className="px-4">
+            {/* Visibility status text - 8px gap from segmented */}
+            <p className="text-[13px] text-white/60 mb-6">
+              {visibilityMode === 'all' ? 'You\'re visible to everyone nearby' : 
+               visibilityMode === 'friends' ? 'You\'re visible to friends only' : 
+               'You\'re hidden from nearby golfers'}
+            </p>
+
+            {/* Open to Play CTA - 24px gap from status text */}
+            <div className="mb-8">
               <OpenToPlayButton />
             </div>
 
-            {/* Filter Bar */}
-            <NearbyFilterBar 
-              filters={filters}
-              onFiltersChange={setFilters}
-            />
+            {/* Filter Bar - 32px gap from button/helper */}
+            <div className="mb-10 opacity-0 animate-in fade-in duration-200">
+              <NearbyFilterBar 
+                filters={filters}
+                onFiltersChange={setFilters}
+              />
+            </div>
 
-            {/* Golfers List */}
-            {isLoading ? (
-              <NearbySkeletonRow count={5} />
-            ) : golfers.length === 0 ? (
-              <EmptyNearbyState />
-            ) : (
-              <div className="space-y-2.5">
-                {golfers.map((golfer, index) => (
-                  <NearbyGolferCard 
-                    key={golfer.id ?? index} 
-                    golfer={golfer} 
-                    index={index} 
-                  />
-                ))}
-              </div>
-            )}
+            {/* Golfers List - 40px gap from filters */}
+            <div className="opacity-0 animate-in fade-in duration-300 delay-100">
+              {isLoading ? (
+                <NearbySkeletonRow count={5} />
+              ) : golfers.length === 0 ? (
+                <EmptyNearbyState />
+              ) : (
+                <div className="space-y-2.5">
+                  {golfers.map((golfer, index) => (
+                    <NearbyGolferCard 
+                      key={golfer.id ?? index} 
+                      golfer={golfer} 
+                      index={index} 
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </PullToRefresh>
       </div>
