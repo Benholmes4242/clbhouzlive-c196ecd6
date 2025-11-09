@@ -55,13 +55,14 @@ export function OpenToPlayButton() {
         aria-label={isActive ? `Open to Play active, ${remainingMinutes} minutes remaining` : 'Activate Open to Play'}
         disabled={isSaving}
         onPointerDown={handleToggle}
-        className="relative inline-flex items-center justify-center gap-2.5 transition-all duration-100 active:scale-[0.97] rounded-2xl bg-white/[0.04] border border-white/10"
+        className="relative inline-flex items-center justify-center gap-2.5 transition-all duration-100 active:scale-[0.97] rounded-[14px] bg-white/[0.04] border border-white/10"
         style={{
           minWidth: '240px',
-          height: '44px',
+          height: '42px',
           fontWeight: 600,
-          fontSize: '15px',
+          fontSize: '16px',
           color: '#fff',
+          padding: '12px 16px',
           ...(isActive && {
             background: 'linear-gradient(to bottom, rgba(78, 199, 120, 0.16), rgba(78, 199, 120, 0.10))',
             borderColor: 'rgba(78, 199, 120, 0.28)',
@@ -79,7 +80,7 @@ export function OpenToPlayButton() {
       </TapButton>
 
       {/* Helper copy */}
-      <p className="mt-2.5 text-[13px] text-[#9b9b9b] text-center leading-[1.35] max-w-[280px]">
+      <p className="mt-2 text-[13px] text-white/60 text-center leading-[1.4] max-w-[280px] font-normal">
         {isActive ? (
           <>Nearby golfers can see you're available. <strong className="text-white/80">Tap again</strong> to turn off.</>
         ) : (

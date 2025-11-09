@@ -103,25 +103,27 @@ export function HubGolfersPage() {
       {/* Content */}
       <div ref={listRef} className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
         <PullToRefresh onRefresh={handleRefresh}>
-          <div className="space-y-3 pb-6 pt-2">
-            {/* Visibility segmented control (profile visibility) */}
-            <div className="px-4">
+          <div className="pb-6" style={{ paddingTop: '28px' }}>
+            {/* Visibility segmented control (profile visibility) - PRIMARY */}
+            <div className="px-4" style={{ marginBottom: '18px' }}>
               <GolferStatusBar 
                 value={visibilityMode}
                 onChange={setVisibilityMode}
               />
             </div>
 
-            {/* Open to Play CTA */}
-            <div className="px-4">
+            {/* Open to Play CTA - SECONDARY */}
+            <div className="px-4" style={{ marginBottom: '18px' }}>
               <OpenToPlayButton />
             </div>
 
-            {/* Filter Bar */}
-            <NearbyFilterBar 
-              filters={filters}
-              onFiltersChange={setFilters}
-            />
+            {/* Filter Bar - TERTIARY */}
+            <div style={{ marginBottom: '28px' }}>
+              <NearbyFilterBar 
+                filters={filters}
+                onFiltersChange={setFilters}
+              />
+            </div>
 
             {/* Golfers List */}
             {isLoading ? (

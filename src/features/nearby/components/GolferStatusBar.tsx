@@ -38,18 +38,20 @@ export function GolferStatusBar({ value, onChange }: GolferStatusBarProps) {
 
   return (
     <div className="mx-3">
-      {/* Segmented control */}
+      {/* Segmented control - PRIMARY hierarchy */}
       <div
-        className="relative h-10 rounded-xl backdrop-blur-[20px] border p-1 flex"
+        className="relative rounded-xl backdrop-blur-[20px] border p-1.5 flex"
         style={{
           background: 'rgba(255,255,255,0.08)',
-          borderColor: 'rgba(255,255,255,0.12)'
+          borderColor: 'rgba(255,255,255,0.12)',
+          height: '48px',
         }}
       >
         {/* Animated slider with spring bounce */}
         <div
-          className="absolute inset-1 w-[calc(33.33%-4px)] rounded-lg"
+          className="absolute inset-1.5 rounded-lg"
           style={{
+            width: 'calc(33.33% - 6px)',
             transform: `translateX(calc(${getSliderPosition()} / 0.3333))`,
             background: 'rgba(255,255,255,0.20)',
             transition: 'transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1)',
@@ -61,9 +63,11 @@ export function GolferStatusBar({ value, onChange }: GolferStatusBarProps) {
         {(['all', 'friends', 'hidden'] as const).map((mode) => (
           <TapButton
             key={mode}
-            className="relative flex-1 text-[14px] font-medium transition-colors duration-200"
+            className="relative flex-1 font-semibold transition-colors duration-200"
             style={{
-              color: value === mode ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.6)'
+              color: value === mode ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.65)',
+              fontSize: '17px',
+              padding: '12px 16px',
             }}
             onPointerDown={() => handleChange(mode)}
             aria-pressed={value === mode}
@@ -77,10 +81,11 @@ export function GolferStatusBar({ value, onChange }: GolferStatusBarProps) {
 
       {/* Helper text with fade transition */}
       <p
-        className="text-[13px] mt-2 text-center transition-all duration-200"
+        className="text-[13px] mt-3 text-center transition-all duration-200 font-normal"
         style={{ 
           color: helper.color,
-          opacity: 1
+          opacity: 1,
+          lineHeight: '1.4'
         }}
         key={value}
       >
