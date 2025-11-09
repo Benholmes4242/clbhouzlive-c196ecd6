@@ -476,7 +476,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               )}
               style={{ 
                 WebkitOverflowScrolling: "touch",
-                paddingTop: 'calc(56px + env(safe-area-inset-top, 0px) + 10px)',
+                paddingTop: '28px',
                 paddingLeft: '16px',
                 paddingRight: '16px',
                 paddingBottom: isPageMode ? '112px' : '16px',
@@ -517,7 +517,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       <div 
                         key={message.id} 
                         className={cn(
-                          isFirstInGroup && "mt-4",
+                          isFirstInGroup && index > 0 && "mt-4",
                           !isFirstInGroup && "mt-2.5"
                         )}
                       >
