@@ -110,7 +110,7 @@ export function HubGolfersPage() {
       {/* Content */}
       <div ref={listRef} className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
         <PullToRefresh onRefresh={handleRefresh}>
-          <div className="space-y-4 pb-6">
+          <div className="space-y-4 pb-6 pt-4">
             {/* Status Bar (Segmented Control) */}
             <GolferStatusBar 
               value={visibilityMode}
