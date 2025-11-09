@@ -485,8 +485,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   <div 
                     className="h-20 w-20 rounded-3xl flex items-center justify-center"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)',
+                      background: 'rgba(255,255,255,0.08)',
                       border: '1px solid rgba(255,255,255,0.12)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
                     }}
                   >
                     <Bot className="h-9 w-9 text-white/80" />
@@ -990,8 +992,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         <div 
                           className="h-20 w-20 rounded-3xl flex items-center justify-center"
                           style={{
-                            background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)',
+                            background: 'rgba(255,255,255,0.08)',
                             border: '1px solid rgba(255,255,255,0.12)',
+                            backdropFilter: 'blur(12px)',
+                            WebkitBackdropFilter: 'blur(12px)',
                           }}
                         >
                           <Bot className="h-9 w-9 text-white/80" />
