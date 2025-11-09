@@ -84,7 +84,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       className="animate-[fadeInUp_.18s_ease-out_both]"
     >
       <div className={cn(
-        "flex items-end gap-3",
+        "flex items-end gap-2.5",
         isUser && "flex-row-reverse justify-end"
       )}>
         {/* Avatar - inline layout for Echo */}
@@ -114,7 +114,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 
           {/* Heading - only on first in group for AI */}
           {!isUser && showHeading && isFirstInGroup && (
-            <div className="mb-1.5 ml-1 text-[11px] font-medium text-white/60">
+            <div className="pl-[36px] mb-2 text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
               Echo
             </div>
           )}
@@ -124,20 +124,22 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             role="group"
             aria-label={`Message from ${isUser ? 'You' : 'Echo'} at ${time}`}
             className={cn(
-              "text-[15px] relative overflow-hidden backdrop-blur-[var(--glass-blur)]",
+              "text-[15px] relative overflow-hidden backdrop-blur-[var(--glass-blur)] echo-bubble",
               isUser 
-                ? "max-w-[88%] md:max-w-[72%] ml-auto rounded-[var(--bubble-radius)] text-white/95 leading-[1.5]" 
-                : "max-w-[88%] md:max-w-[72%] rounded-[var(--bubble-radius)] rounded-bl-md text-white/90 leading-[1.55]"
+                ? "ml-auto rounded-2xl text-white/95 leading-[1.5]" 
+                : "rounded-2xl rounded-bl-md text-white/90 leading-[1.55]"
             )}
             style={
               isUser ? {
+                maxWidth: '84vw',
                 background: 'var(--bubble-user-bg)',
-                border: '1px solid var(--bubble-user-border)',
-                boxShadow: 'var(--bubble-user-shadow), var(--bubble-user-inset)',
+                border: '1px solid rgba(255,255,255,0.20)',
+                boxShadow: '0 10px 28px rgba(0,0,0,0.45), inset 0 0 28px rgba(255,255,255,0.14)',
               } : {
-                background: 'var(--bubble-echo-bg)',
-                border: '1px solid var(--bubble-echo-border)',
-                boxShadow: 'var(--bubble-echo-shadow), var(--bubble-echo-inset)',
+                maxWidth: '84vw',
+                background: 'linear-gradient(145deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.06) 100%)',
+                border: '1px solid rgba(255,255,255,0.14)',
+                boxShadow: '0 10px 28px rgba(0,0,0,0.42), var(--bubble-echo-inset)',
               }
             }
           >
@@ -181,16 +183,16 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                           {...props} 
                           target="_blank" 
                           rel="noopener noreferrer" 
-                          className="underline decoration-white/50 underline-offset-2 hover:decoration-white text-white break-words focus:outline-none focus:ring-2 focus:ring-white/30 rounded"
+                          className="underline decoration-white/50 underline-offset-2 hover:decoration-white text-white/85 break-words focus:outline-none focus:ring-[8px] focus:ring-white/[0.08] rounded"
                         />
                       ),
-                      h1: ({ children }) => <h3 className="text-[16px] font-semibold mb-2 mt-3 first:mt-0 text-white">{children}</h3>,
-                      h2: ({ children }) => <h4 className="text-[15.5px] font-semibold mb-2 mt-3 text-white">{children}</h4>,
-                      h3: ({ children }) => <h4 className="text-[15px] font-semibold mb-2 mt-2 text-white">{children}</h4>,
+                      h1: ({ children }) => <h3 className="text-[16px] font-semibold mb-2 mt-[10px] first:mt-0 text-white" style={{ letterSpacing: '0.2px' }}>{children}</h3>,
+                      h2: ({ children }) => <h4 className="text-[15.5px] font-semibold mb-2 mt-[10px] text-white" style={{ letterSpacing: '0.2px' }}>{children}</h4>,
+                      h3: ({ children }) => <h4 className="text-[15px] font-semibold mb-[6px] mt-[10px] text-white" style={{ fontWeight: 600, letterSpacing: '0.2px' }}>{children}</h4>,
                       p: ({ children }) => <p className="my-2 first:mt-0 last:mb-0 break-words">{children}</p>,
-                      ul: ({ children }) => <ul className="list-disc pl-5 space-y-1.5 my-2 marker:text-white/60">{children}</ul>,
-                      ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1.5 my-2 marker:text-white/60">{children}</ol>,
-                      li: ({ children }) => <li className="leading-[1.5]">{children}</li>,
+                      ul: ({ children }) => <ul className="list-disc pl-[18px] my-2 marker:text-white/65">{children}</ul>,
+                      ol: ({ children }) => <ol className="list-decimal pl-[18px] my-2 marker:text-white/65">{children}</ol>,
+                      li: ({ children }) => <li className="leading-[1.55] my-0.5">{children}</li>,
                       strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
                       code: ({ inline, children, ...props }: any) => 
                         inline ? (
@@ -252,10 +254,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               <div className="flex flex-wrap items-center gap-2 mt-2">
                 <Badge 
                   variant="outline" 
-                  className={`text-xs h-5 px-2 ${
+                  className={`text-xs h-5 px-2 backdrop-blur-md ${
                     message.metadata.modeUsed === 'live' 
-                      ? 'bg-green-900/20 text-green-300 border-green-500/20' 
-                      : 'bg-blue-900/20 text-blue-300 border-blue-500/20'
+                      ? 'bg-green-900/20 text-green-300 border-white/12' 
+                      : 'bg-blue-900/20 text-blue-300 border-white/12'
                   }`}
                 >
                   {message.metadata.modeUsed === 'live' ? (
@@ -272,7 +274,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 </Badge>
                 
                 {message.metadata.asOf && message.metadata.modeUsed === 'live' && (
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-[12px] text-white/55">
                     As of {message.metadata.asOf}
                   </span>
                 )}
@@ -330,12 +332,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           
           {/* Inline meta row - Phase 50 (timestamp + status) */}
           <div className={cn(
-            "pt-1 text-[11px] text-white/40 select-none",
-            isUser ? "text-right" : ""
+            "pt-1 text-[12px] text-white/55 select-none",
+            isUser ? "text-right pr-2" : "pl-2"
           )}>
             {time && (
-              <span>
-                {time} • {isUser ? "delivered" : "processed"}
+              <span style={{ letterSpacing: '0.2px' }}>
+                {time}
               </span>
             )}
           </div>

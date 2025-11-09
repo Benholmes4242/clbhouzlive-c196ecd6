@@ -6,6 +6,7 @@
 import React, { useState, useRef, KeyboardEvent } from 'react';
 import { Send, StopCircle } from 'lucide-react';
 import { TapButton } from '@/components/ui/TapButton';
+import { haptic } from '@/utils/haptics';
 
 interface ChatComposerProps {
   onSend: (content: string) => void;
@@ -22,6 +23,7 @@ export function ChatComposer({ onSend, onStop, disabled, isStreaming }: ChatComp
     const trimmed = input.trim();
     if (!trimmed || disabled) return;
     
+    haptic('light');
     onSend(trimmed);
     setInput('');
     

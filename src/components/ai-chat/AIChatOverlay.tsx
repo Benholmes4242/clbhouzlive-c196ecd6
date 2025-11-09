@@ -472,15 +472,21 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           <TabsContent value="chat" className="m-0 flex-1 overflow-hidden" style={{ minHeight: 0 }}>
             <div 
               className={cn(
-                "h-full overflow-y-auto overscroll-contain scroll-smooth",
-                isPageMode ? "px-4 pt-2 pb-28" : "px-4 pt-3 pb-4"
+                "h-full overflow-y-auto overscroll-contain scroll-smooth"
               )}
-              style={{ WebkitOverflowScrolling: "touch" }}
+              style={{ 
+                WebkitOverflowScrolling: "touch",
+                paddingTop: 'calc(56px + env(safe-area-inset-top, 0px) + 10px)',
+                paddingLeft: '16px',
+                paddingRight: '16px',
+                paddingBottom: isPageMode ? '112px' : '16px',
+                scrollPaddingBottom: '86px'
+              }}
               ref={chatScrollRef}
               onScroll={handleChatScroll}
             >
                   {messages.length === 0 ? (
-                <div className="flex flex-col items-center justify-center text-center space-y-6 py-16">
+                <div className="flex flex-col items-center justify-center text-center space-y-6" style={{ paddingTop: '64px', paddingBottom: '64px' }}>
                   <div 
                     className="h-20 w-20 rounded-3xl flex items-center justify-center"
                     style={{
@@ -511,8 +517,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       <div 
                         key={message.id} 
                         className={cn(
-                          isFirstInGroup && "mt-3",
-                          !isFirstInGroup && "mt-1"
+                          isFirstInGroup && "mt-4",
+                          !isFirstInGroup && "mt-2.5"
                         )}
                       >
                         <ChatMessageComponent
@@ -527,25 +533,28 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     );
                   })}
                   {isLoading && (
-                    <div className="mt-3 flex items-end gap-3">
+                    <div className="mt-4 flex items-end gap-2.5">
                       <div className="shrink-0 h-7 w-7 flex items-center justify-center">
                         <EchoBotIcon size={28} className="text-white/90" />
                       </div>
-                      <div className="flex-1 max-w-[88%] md:max-w-[72%]">
-                        <div className="rounded-[var(--bubble-radius)] rounded-bl-md border overflow-hidden backdrop-blur-[var(--glass-blur)]"
+                      <div className="flex-1" style={{ maxWidth: '84vw' }}>
+                        <div className="pl-[36px] mb-2 text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
+                          Echo
+                        </div>
+                        <div className="rounded-2xl rounded-bl-md border overflow-hidden backdrop-blur-[var(--glass-blur)]"
                           style={{
-                            background: 'var(--bubble-echo-bg)',
-                            borderColor: 'var(--bubble-echo-border)',
-                            boxShadow: 'var(--bubble-echo-shadow), var(--bubble-echo-inset)',
+                            background: 'linear-gradient(145deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.06) 100%)',
+                            borderColor: 'rgba(255,255,255,0.14)',
+                            boxShadow: '0 10px 28px rgba(0,0,0,0.42), inset 0 1px 1px rgba(255,255,255,.12)',
                             padding: 'var(--bubble-pad-y) var(--bubble-pad-x)'
                           }}>
                           <div className="flex items-center gap-1.5">
-                            <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
-                            <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce"></span>
-                            <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                            <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
+                            <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce"></span>
+                            <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
                           </div>
+                          <EchoTypingBar />
                         </div>
-                        <EchoTypingBar />
                       </div>
                     </div>
                   )}

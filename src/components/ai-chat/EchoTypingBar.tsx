@@ -4,19 +4,21 @@ export function EchoTypingBar() {
   return (
     <div className="w-full mt-2">
       <div
-        className="w-full rounded-full"
+        className="relative w-full rounded-full"
         style={{
           height: 'var(--typing-height)',
-          background: 'var(--typing-track)'
+          background: 'rgba(255,255,255,0.10)',
+          border: '0',
+          boxShadow: '0 8px 18px rgba(0,0,0,0.28)'
         }}
       >
         <div
-          className="h-full rounded-full"
+          className="absolute inset-y-0 left-0 rounded-full"
           style={{
-            background: 'var(--typing-fill)',
+            background: 'linear-gradient(90deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0.12) 100%)',
             width: '100%',
             backgroundSize: '200% 100%',
-            animation: 'echo-drift 1.6s linear infinite'
+            animation: 'echo-drift 1.85s linear infinite'
           }}
         />
       </div>
