@@ -482,9 +482,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   {messages.length === 0 ? (
                 <div className={cn(
                   "flex flex-col items-center justify-center text-center space-y-6",
-                  isPageMode ? "pl-6 pr-4 py-16" : "px-6 py-20"
+                  isPageMode ? "pl-10 pr-4 py-16" : "px-6 py-20"
                 )}>
-                  <div
+                  <div 
                     className="h-20 w-20 rounded-3xl flex items-center justify-center"
                     style={{
                       background: 'rgba(255,255,255,0.08)',
@@ -504,7 +504,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   </div>
                 </div>
               ) : (
-                <div className={cn("space-y-2", isPageMode && "pl-7 pr-4")}>
+                <div className={cn("space-y-2", isPageMode && "pl-10 pr-4")}>
                   {messages.map((message, index) => {
                     const isUser = message.type === 'user';
                     const prevMessage = index > 0 ? messages[index - 1] : null;
@@ -524,7 +524,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     );
                   })}
                   {isLoading && (
-                    <div className="mt-4 pl-7 pr-4 flex items-end gap-2">
+                    <div className="mt-4 pl-10 pr-4 flex items-end gap-2">
                       <EchoBotIcon size={28} className="text-white/90 shrink-0" />
                       <div className="flex-1">
                         <div className="rounded-2xl rounded-bl-md bg-white/05 border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2">
