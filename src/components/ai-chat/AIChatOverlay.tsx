@@ -973,7 +973,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             {/* Scrollable content area */}
             <TabsContent value="chat" className="m-0 flex-1 overflow-hidden" style={{ minHeight: 0 }}>
               <div 
-                className="h-full overflow-y-auto overscroll-contain scroll-smooth px-4 pt-3 pb-4"
+                className="h-full overflow-y-auto overscroll-contain scroll-smooth px-4 pt-7 pb-4"
                 style={{ WebkitOverflowScrolling: "touch" }}
                 data-echo-canvas
                 ref={chatScrollRef}
