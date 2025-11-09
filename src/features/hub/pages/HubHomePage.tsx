@@ -14,7 +14,6 @@ import { NearbyGolfersTile } from '../home/tiles/NearbyGolfersTile';
 import { YourGamesTile } from '../home/tiles/YourGamesTile';
 import { SwingQuickTile } from '../home/tiles/SwingQuickTile';
 import '../home/hubTheme.css';
-import '@/styles/glass.css';
 
 export function HubHomePage() {
   const nav = useNavigate();
@@ -50,12 +49,14 @@ export function HubHomePage() {
   };
 
   return (
-    <div className="relative z-[200]">
-      {/* Frosted sheet that sits between Clubhouse video and Hub content */}
-      <div className="hub-glass-overlay" aria-hidden="true" />
-
-      {/* Hub UI goes above the glass */}
-      <div className="hub-glass-page fixed inset-0 relative z-[1]">
+    <div
+      className="hub-glass-page fixed inset-0 z-[9999]"
+      style={{
+        background: 'rgba(0, 0, 0, 0.25)',
+        backdropFilter: 'blur(120px)',
+        WebkitBackdropFilter: 'blur(120px)',
+      }}
+    >
       {/* Header */}
       <header
         className="sticky top-0 z-10 px-5 pt-4 pb-3"
@@ -133,7 +134,6 @@ export function HubHomePage() {
           </div>
         </div>
       </main>
-      </div>
     </div>
   );
 }
