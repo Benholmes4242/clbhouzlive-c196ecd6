@@ -27,7 +27,6 @@ import { Z } from '@/config/zIndex';
 import { useAutoSendFromQuery } from './hooks/useAutoSendFromQuery';
 import { ensureThreadId, persistUserMessage, persistAssistantMessage } from '@/features/echo/services/echoPersistence';
 import { FrostedPill } from '@/components/shared/FrostedPill';
-import { GlassCard } from '@/components/shared/GlassCard';
 
 interface ChatMessageData {
   id: string;
@@ -483,9 +482,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   "flex flex-col items-center justify-center text-center space-y-6",
                   isPageMode ? "px-4 py-16" : "px-6 py-20"
                 )}>
-                  <GlassCard className="h-20 w-20 rounded-3xl flex items-center justify-center">
+                  <div 
+                    className="h-20 w-20 rounded-3xl flex items-center justify-center"
+                    style={{
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                    }}
+                  >
                     <Bot className="h-9 w-9 text-white/80" />
-                  </GlassCard>
+                  </div>
                   <div className="text-[17px] font-semibold text-white">
                     Start a conversation with Echo
                   </div>
@@ -925,9 +930,15 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 <div>
                     {messages.length === 0 ? (
                       <div className="flex flex-col items-center justify-center text-center px-6 py-20 sm:py-28 space-y-6">
-                        <GlassCard className="h-20 w-20 rounded-3xl flex items-center justify-center">
+                        <div 
+                          className="h-20 w-20 rounded-3xl flex items-center justify-center"
+                          style={{
+                            background: 'rgba(255,255,255,0.06)',
+                            border: '1px solid rgba(255,255,255,0.12)',
+                          }}
+                        >
                           <Bot className="h-9 w-9 text-white/80" />
-                        </GlassCard>
+                        </div>
                         <div className="text-[17px] font-semibold text-white">
                           Start a conversation with Echo
                         </div>
