@@ -73,7 +73,7 @@
   --bubble-echo-inset: inset 0 1px 1px rgba(255,255,255,.12);
   
   --bubble-radius: 22px;
-  --bubble-pad-y: 16px;
+  --bubble-pad-y: 8px;
   --bubble-pad-x: 12px;
   
   /* Typing bar */
