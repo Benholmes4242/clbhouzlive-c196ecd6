@@ -802,12 +802,25 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 />
               )}
 
-              {/* Apple HUD Overlay */}
+              {/* Apple HUD Overlay - Replaces PostMetadata + EngagementRail */}
               <AppleHUDOverlay
-                authorName={item.user?.name || item.user?.username || 'Unknown'}
-                caption={removeGolfCourseFromContent(item.ctaDescription) || ''}
-                avatarUrl={item.user?.avatar}
-                onAuthorPress={() => {
+                videoRef={{ current: videoRefs.current[item.id] || null }}
+                user={{
+                  name: item.user?.name || 'Unknown User',
+                  avatar: item.user?.avatar,
+                  username: item.user?.username
+                }}
+                caption={removeGolfCourseFromContent(item.ctaDescription)}
+                stats={{
+                  likes: item.likes || 0,
+                  comments: item.comments || 0,
+                  shares: item.shares || 0
+                }}
+                isLiked={likedPosts?.includes(item.id) ?? false}
+                isVideo={item.media?.[0]?.media_type === 'video'}
+                isMuted={isGloballyMuted}
+                isActive={currentIndex === index}
+                onUserClick={() => {
                   setSelectedUserId(item.user?.id || null);
                   setShowMiniProfile(true);
                 }}
@@ -815,10 +828,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 onComment={() => handleComment(item.id)}
                 onShare={handleShare}
                 onMuteToggle={() => setGlobalMute(!isGloballyMuted)}
-                isMuted={isGloballyMuted}
                 accentColor="#6e9277"
-                progress={0}
-                isActive={currentIndex === index}
               />
             </div>
           );
