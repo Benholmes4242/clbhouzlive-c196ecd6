@@ -26,6 +26,7 @@ import { subscribeAIOverlay, type AITab } from '@/controllers/aiOverlayControlle
 import { Z } from '@/config/zIndex';
 import { useAutoSendFromQuery } from './hooks/useAutoSendFromQuery';
 import { ensureThreadId, persistUserMessage, persistAssistantMessage } from '@/features/echo/services/echoPersistence';
+import { FrostedPill } from '@/components/shared/FrostedPill';
 
 interface ChatMessageData {
   id: string;
@@ -573,15 +574,19 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         {activeTab === 'chat' && (
           <footer 
             className={cn(
-              "sticky bottom-0 z-[2] border-t border-white/08",
+              "sticky bottom-0 z-[2] border-t safe-bottom",
               isPageMode 
-                ? "bg-[rgba(15,15,15,0.85)] backdrop-blur pt-2 px-4" 
-                : "bg-gradient-to-t from-black/95 to-black/60 backdrop-blur pt-3 px-4"
+                ? "bg-[var(--header-bg,rgba(15,15,15,0.95))] backdrop-blur-xl" 
+                : "bg-gradient-to-t from-black/95 to-black/60 backdrop-blur"
             )}
             style={{
+              paddingTop: isPageMode ? '12px' : '16px',
               paddingBottom: isPageMode 
                 ? 'calc(12px + env(safe-area-inset-bottom, 0px))' 
-                : 'calc(16px + env(safe-area-inset-bottom, 0px))'
+                : 'calc(16px + env(safe-area-inset-bottom, 0px))',
+              paddingLeft: '16px',
+              paddingRight: '16px',
+              borderTopColor: 'var(--header-border, rgba(255,255,255,0.1))',
             }}
             role="region"
             aria-label="Message composer"
@@ -592,27 +597,34 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             )}
             
-            <div className="flex items-end gap-2">
-              <Textarea
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage(inputValue);
-                  }
-                }}
-                placeholder="Ask Echo anything..."
-                className="flex-1 min-h-[42px] max-h-32 resize-none bg-white/05 border-white/12 text-black placeholder:text-black/40 focus:border-white/20"
-                disabled={isLoading}
-              />
-              <Button
+            <div className="flex items-center gap-3">
+              <FrostedPill 
+                variant="input"
+                className="flex-1 h-[44px] flex items-center"
+              >
+                <input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage(inputValue);
+                    }
+                  }}
+                  placeholder="Ask Echo anything..."
+                  className="w-full bg-transparent outline-none text-white placeholder:text-white/60 text-[15px]"
+                  disabled={isLoading}
+                />
+              </FrostedPill>
+              <button
                 onClick={() => sendMessage(inputValue)}
                 disabled={!inputValue.trim() || isLoading}
-                className="h-[42px] w-[42px] p-0 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 disabled:opacity-50"
+                className="shrink-0 w-[44px] h-[44px] rounded-full bg-white/10 border border-white/15 flex items-center justify-center hover:bg-white/15 active:bg-white/20 transition-colors disabled:opacity-50"
+                style={{ lineHeight: 0 }}
+                aria-label="Send"
               >
-                <Send className="h-4 w-4 text-white" />
-              </Button>
+                <Send className="h-5 w-5 text-white" />
+              </button>
             </div>
           </footer>
         )}

@@ -7,34 +7,40 @@
 .dropdown-scrim {
   position: fixed;
   inset: 0;
-  z-index: 100;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(2px);
+  z-index: var(--z-dropdown-scrim, 50);
+  background: var(--dropdown-scrim-bg, rgba(0, 0, 0, 0.28));
+  backdrop-filter: saturate(140%) blur(var(--dropdown-scrim-blur, 2px));
+  -webkit-backdrop-filter: saturate(140%) blur(var(--dropdown-scrim-blur, 2px));
   animation: fade-in 0.15s ease;
 }
 
 /* Dropdown content container */
 .dropdown-portal-content {
   position: fixed;
-  z-index: 101;
-  background: var(--bg-modal, rgba(25, 25, 25, 0.95));
+  z-index: var(--z-dropdown-menu, 60);
+  background: var(--dropdown-menu-bg, rgba(28, 28, 28, 0.92));
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--border-hairline, rgba(255, 255, 255, 0.1));
+  border: 1px solid var(--dropdown-menu-border, rgba(255, 255, 255, 0.12));
   border-radius: 12px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--dropdown-menu-shadow, 0 10px 30px rgba(0, 0, 0, 0.35));
   min-width: 160px;
   max-width: 280px;
   animation: scale-in 0.15s ease;
 }
 
+/* Override radix dropdown z-index */
+[data-radix-popper-content-wrapper] {
+  z-index: var(--z-dropdown-menu, 60) !important;
+}
+
 /* Ensure dropdowns are above other overlays */
 .dropdown-menu-overlay {
-  z-index: 100;
+  z-index: var(--z-dropdown-scrim, 50);
 }
 
 .dropdown-menu-content {
-  z-index: 101;
+  z-index: var(--z-dropdown-menu, 60);
 }
 
 /* Fade in animation */

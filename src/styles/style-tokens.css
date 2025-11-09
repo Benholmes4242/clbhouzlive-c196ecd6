@@ -1,0 +1,76 @@
+/**
+ * Style Tokens
+ * System-wide design tokens for consistency
+ */
+
+:root {
+  /* Header & Footer */
+  --header-bg: rgba(15, 15, 15, 0.95);
+  --header-border: rgba(255, 255, 255, 0.1);
+  --header-height: 56px;
+  --footer-bg: var(--header-bg);
+  
+  /* Glass surfaces */
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-blur: 12px;
+  --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  
+  /* Frosted elements */
+  --frosted-bg: rgba(255, 255, 255, 0.15);
+  --frosted-border: rgba(255, 255, 255, 0.2);
+  --frosted-blur: 8px;
+  
+  /* Dropdowns */
+  --dropdown-scrim-bg: rgba(0, 0, 0, 0.28);
+  --dropdown-scrim-blur: 2px;
+  --dropdown-menu-bg: rgba(28, 28, 28, 0.92);
+  --dropdown-menu-border: rgba(255, 255, 255, 0.12);
+  --dropdown-menu-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  
+  /* Border radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 18px;
+  --radius-pill: 999px;
+  
+  /* Z-index layers */
+  --z-base: 1;
+  --z-header: 30;
+  --z-footer: 40;
+  --z-dropdown-scrim: 50;
+  --z-dropdown-menu: 60;
+  --z-modal-scrim: 70;
+  --z-modal: 80;
+  --z-toast: 90;
+  
+  /* Spacing rhythm */
+  --page-gutter: 24px;
+  --page-gutter-sm: 20px;
+  --stack-gap: 16px;
+  --stack-gap-sm: 12px;
+  
+  /* Safe areas */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* Helper classes */
+.safe-top {
+  padding-top: calc(var(--page-gutter) + var(--safe-top));
+}
+
+.safe-bottom {
+  padding-bottom: calc(var(--page-gutter-sm) + var(--safe-bottom));
+}
+
+.safe-left {
+  padding-left: calc(var(--page-gutter) + var(--safe-left));
+}
+
+.safe-right {
+  padding-right: calc(var(--page-gutter) + var(--safe-right));
+}

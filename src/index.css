@@ -8,6 +8,7 @@
 @import './styles/chrome-autohide.css';
 @import './styles/theme-tokens.css';
 @import './styles/dropdown-portal.css';
+@import './styles/style-tokens.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

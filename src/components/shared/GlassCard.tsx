@@ -1,10 +1,8 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-interface GlassCardProps {
+interface GlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
-  className?: string;
-  onClick?: () => void;
   interactive?: boolean;
 }
 
@@ -17,7 +15,8 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   children,
   className,
   onClick,
-  interactive = false
+  interactive = false,
+  ...props
 }) => {
   return (
     <div
@@ -31,7 +30,9 @@ export const GlassCard: React.FC<GlassCardProps> = ({
         background: 'var(--glass-bg, rgba(255, 255, 255, 0.08))',
         borderColor: 'var(--border-hairline, rgba(255, 255, 255, 0.15))',
         boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+        ...props.style
       }}
+      {...props}
     >
       {children}
     </div>
