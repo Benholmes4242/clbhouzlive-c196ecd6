@@ -580,23 +580,23 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         {activeTab === 'chat' && (
           <footer 
             className={cn(
-              "sticky bottom-0 z-[2] border-t safe-bottom",
+              "sticky bottom-0 z-[2] safe-bottom",
               isPageMode 
                 ? "" 
-                : "bg-gradient-to-t from-black/95 to-black/60 backdrop-blur"
+                : "bg-gradient-to-t from-black/95 to-black/60 backdrop-blur border-t"
             )}
             style={{
-              paddingTop: isPageMode ? '12px' : '16px',
+              paddingTop: isPageMode ? '16px' : '16px',
               paddingBottom: isPageMode 
-                ? 'calc(12px + env(safe-area-inset-bottom, 0px))' 
+                ? 'calc(16px + env(safe-area-inset-bottom, 0px))' 
                 : 'calc(16px + env(safe-area-inset-bottom, 0px))',
               paddingLeft: '16px',
               paddingRight: '16px',
               ...(isPageMode ? {
-                background: 'rgba(22, 24, 27, 0.98)',
+                background: 'transparent',
                 backdropFilter: 'none',
                 WebkitBackdropFilter: 'none',
-                borderTopColor: 'var(--hub-stroke)',
+                border: 'none',
               } : {
                 borderTopColor: 'var(--header-border, rgba(255,255,255,0.1))',
               }),
@@ -610,33 +610,79 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               </div>
             )}
             
-            <FrostedPill 
-              variant="input"
-              className="relative flex-1 h-[44px] flex items-center pr-12"
-            >
-              <input
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage(inputValue);
-                  }
-                }}
-                placeholder="Ask Echo…"
-                className="w-full bg-transparent outline-none text-white placeholder:text-white/70 text-[15px]"
-                disabled={isLoading}
-              />
-              <button
-                onClick={() => sendMessage(inputValue)}
-                disabled={!inputValue.trim() || isLoading}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 shrink-0 w-9 h-9 rounded-full bg-white/8 border border-white/15 flex items-center justify-center hover:bg-white/12 active:bg-white/16 transition-colors disabled:opacity-50"
-                style={{ lineHeight: 0 }}
-                aria-label="Send"
+            {isPageMode ? (
+              <div className="relative flex items-center" style={{ height: '40px' }}>
+                <input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage(inputValue);
+                    }
+                  }}
+                  placeholder="Ask Echo…"
+                  className="w-full outline-none text-white placeholder:text-white/70 text-[15px]"
+                  style={{
+                    height: '40px',
+                    borderRadius: '14px',
+                    padding: '0 44px 0 14px',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                  }}
+                  disabled={isLoading}
+                />
+                <button
+                  onClick={() => sendMessage(inputValue)}
+                  disabled={!inputValue.trim() || isLoading}
+                  className="flex items-center justify-center transition-colors disabled:opacity-40"
+                  style={{
+                    position: 'absolute',
+                    right: '6px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '12px',
+                    border: 0,
+                    background: 'rgba(255,255,255,0.08)',
+                    cursor: inputValue.trim() ? 'pointer' : 'default',
+                    lineHeight: 0,
+                  }}
+                  aria-label="Send"
+                >
+                  <Send className="h-4 w-4 text-white/90" />
+                </button>
+              </div>
+            ) : (
+              <FrostedPill 
+                variant="input"
+                className="relative flex-1 h-[44px] flex items-center pr-12"
               >
-                <Send className="h-[18px] w-[18px] text-white/90" />
-              </button>
-            </FrostedPill>
+                <input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage(inputValue);
+                    }
+                  }}
+                  placeholder="Ask Echo…"
+                  className="w-full bg-transparent outline-none text-white placeholder:text-white/70 text-[15px]"
+                  disabled={isLoading}
+                />
+                <button
+                  onClick={() => sendMessage(inputValue)}
+                  disabled={!inputValue.trim() || isLoading}
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 shrink-0 w-9 h-9 rounded-full bg-white/8 border border-white/15 flex items-center justify-center hover:bg-white/12 active:bg-white/16 transition-colors disabled:opacity-50"
+                  style={{ lineHeight: 0 }}
+                  aria-label="Send"
+                >
+                  <Send className="h-[18px] w-[18px] text-white/90" />
+                </button>
+              </FrostedPill>
+            )}
           </footer>
         )}
       </div>
