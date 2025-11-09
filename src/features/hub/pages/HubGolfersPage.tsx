@@ -90,8 +90,10 @@ export function HubGolfersPage() {
         ref={headerRef}
         className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
         style={{
-          borderColor: 'rgba(255,255,255,0.1)',
-          background: 'rgba(0,0,0,0.2)',
+          borderColor: 'var(--hub-stroke)',
+          background: 'var(--hub-glass-bg)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           transition: 'all 160ms ease-out',
           paddingTop: 'env(safe-area-inset-top, 0px)',
         }}
