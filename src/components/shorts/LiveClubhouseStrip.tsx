@@ -28,7 +28,6 @@ export function LiveClubhouseStrip() {
   const rowRef = useRef<HTMLDivElement>(null);
   const [scrolling, setScrolling] = useState(false);
   
-  // All golfers are now real (no mocks), so we can use the full list
   const nearbyOnlineGolfers = golfers;
 
   useEffect(() => {
