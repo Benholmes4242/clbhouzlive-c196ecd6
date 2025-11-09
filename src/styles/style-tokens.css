@@ -74,27 +74,3 @@
 .safe-right {
   padding-right: calc(var(--page-gutter) + var(--safe-right));
 }
-
-/* Scroll padding for in-page anchors */
-html {
-  scroll-padding-top: var(--header-height, 56px);
-}
-
-/* Respect reduced motion preferences */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-  
-  /* Disable glass blur animations */
-  .glass-card,
-  .frosted-pill,
-  .glass {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-}
