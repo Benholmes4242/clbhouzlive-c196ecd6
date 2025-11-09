@@ -3,6 +3,8 @@ import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
 import { useOpenToPlay } from '../hooks/useOpenToPlay';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import '@/styles/pills.css';
+import '@/styles/tokens.css';
 
 export function OpenToPlayButton() {
   const { isActive, activate, cancel, getRemainingMinutes, getRemainingMs, durationMs } = useOpenToPlay();
@@ -55,18 +57,17 @@ export function OpenToPlayButton() {
         aria-label={isActive ? `Open to Play active, ${remainingMinutes} minutes remaining` : 'Activate Open to Play'}
         disabled={isSaving}
         onPointerDown={handleToggle}
-        className="relative inline-flex items-center justify-center gap-2.5 transition-all duration-100 active:scale-[0.97] rounded-2xl bg-white/[0.04] border border-white/10 shadow-[0_20px_48px_rgba(0,0,0,.5)]"
+        className={`relative inline-flex items-center justify-center gap-2.5 transition-all duration-100 active:scale-[0.97] rounded-2xl ${
+          isActive 
+            ? 'pill-o2p' 
+            : 'bg-white/[0.04] border border-white/10 shadow-[0_20px_48px_rgba(0,0,0,.5)]'
+        }`}
         style={{
           minWidth: '240px',
           height: '44px',
           fontWeight: 600,
           fontSize: '15px',
           color: '#fff',
-          ...(isActive && {
-            background: 'rgba(110, 146, 119, 0.15)',
-            borderColor: 'rgba(110, 146, 119, 0.4)',
-            boxShadow: '0 0 0 4px rgba(110, 146, 119, 0.25), 0 20px 48px rgba(0,0,0,.5)',
-          }),
         }}
       >
         <span className="text-[16px]" aria-hidden="true">🏌️‍♂️</span>

@@ -1,0 +1,6 @@
+:root {
+  --o2p-green: hsl(145, 79%, 48%);             /* #1bbf5b fill */
+  --o2p-green-ink: hsl(145, 70%, 15%);         /* #073b1f text/icon on light */
+  --o2p-green-glow: hsla(145, 79%, 48%, 0.35);
+  --o2p-green-border: hsla(145, 79%, 48%, 0.55);
+}

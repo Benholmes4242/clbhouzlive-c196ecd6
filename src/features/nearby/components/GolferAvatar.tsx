@@ -1,5 +1,6 @@
 import React from 'react';
 import './nearby.css';
+import '@/styles/avatar.css';
 
 interface GolferAvatarProps {
   avatarUrl?: string;
@@ -13,7 +14,7 @@ export function GolferAvatar({
   size = 48 
 }: GolferAvatarProps) {
   return (
-    <span className="g-avatar" style={{ width: size, height: size }}>
+    <span className="avatar-ring" style={{ width: size, height: size }}>
       <img
         src={avatarUrl || '/placeholder.svg'}
         alt=""

@@ -83,13 +83,14 @@ export function HubGolfersPage() {
         WebkitBackdropFilter: 'blur(120px)',
       }}
     >
-      {/* Simple Header */}
+      {/* Sticky Header */}
       <header 
         ref={headerRef}
-        className="sticky top-0 z-10 flex items-center justify-between px-4 h-14 border-b"
+        className="sticky z-[60] flex items-center justify-between px-4 h-14 border-b backdrop-blur-xl"
         style={{
+          top: 'calc(env(safe-area-inset-top, 0px))',
           borderColor: 'rgba(255,255,255,0.1)',
-          background: 'rgba(0,0,0,0.2)',
+          background: 'rgba(22,22,23,0.32)',
           transition: 'all 160ms ease-out',
         }}
       >
@@ -105,7 +106,8 @@ export function HubGolfersPage() {
       </header>
 
       {/* Content */}
-      <div ref={listRef} className="overflow-y-auto h-[calc(100vh-3.5rem)] pt-4">
+      <main className="relative">
+        <div ref={listRef} className="overflow-y-auto h-[calc(100vh-3.5rem)] pt-2">
         <PullToRefresh onRefresh={handleRefresh}>
           <div className="space-y-4 pb-6">
             {/* Status Bar (Segmented Control) */}
@@ -137,7 +139,8 @@ export function HubGolfersPage() {
             )}
           </div>
         </PullToRefresh>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
