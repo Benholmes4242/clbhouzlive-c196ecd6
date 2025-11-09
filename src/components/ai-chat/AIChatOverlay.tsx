@@ -511,7 +511,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   {messages.map((message, index) => {
                     const isUser = message.type === 'user';
                     const prevMessage = index > 0 ? messages[index - 1] : null;
+                    const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
                     const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
+                    const isLastInGroup = !nextMessage || nextMessage.type !== message.type;
                     
                     return (
                       <div 
@@ -526,8 +528,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           onSaveToInsights={saveToInsights}
                           onRequestDetail={requestMoreDetail}
                           isFirstInGroup={isFirstInGroup}
+                          isLastInGroup={isLastInGroup}
                           showHeading={isFirstInGroup}
                           showActions={false}
+                          userAvatar={undefined}
                         />
                       </div>
                     );
@@ -537,17 +541,18 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       <div className="shrink-0 h-7 w-7 flex items-center justify-center">
                         <EchoBotIcon size={28} className="text-white/90" />
                       </div>
-                      <div className="flex-1" style={{ maxWidth: '84vw' }}>
+                      <div className="flex-1 max-w-[82%] md:max-w-[70%]">
                         <div className="pl-[36px] mb-2 text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
                           Echo
                         </div>
-                        <div className="rounded-2xl rounded-bl-md border overflow-hidden backdrop-blur-[var(--glass-blur)]"
+                        <div 
+                          className="rounded-2xl rounded-bl-md border overflow-hidden backdrop-blur-[var(--glass-blur)] px-4 py-3"
                           style={{
                             background: 'linear-gradient(145deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.06) 100%)',
                             borderColor: 'rgba(255,255,255,0.14)',
                             boxShadow: '0 10px 28px rgba(0,0,0,0.42), inset 0 1px 1px rgba(255,255,255,.12)',
-                            padding: 'var(--bubble-pad-y) var(--bubble-pad-x)'
-                          }}>
+                          }}
+                        >
                           <div className="flex items-center gap-1.5">
                             <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
                             <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce"></span>
@@ -781,13 +786,24 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   </div>
                 )}
 
-                {messages.map((message) => (
-                  <ChatMessageComponent
-                    key={message.id}
-                    message={message}
-                    onSaveToInsights={() => saveToInsights(message)}
-                  />
-                ))}
+                {messages.map((message, index) => {
+                  const prevMessage = index > 0 ? messages[index - 1] : null;
+                  const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
+                  const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
+                  const isLastInGroup = !nextMessage || nextMessage.type !== message.type;
+                  
+                  return (
+                    <ChatMessageComponent
+                      key={message.id}
+                      message={message}
+                      onSaveToInsights={() => saveToInsights(message)}
+                      isFirstInGroup={isFirstInGroup}
+                      isLastInGroup={isLastInGroup}
+                      showHeading={isFirstInGroup}
+                      userAvatar={undefined}
+                    />
+                  );
+                })}
 
                 {isLoading && (
                   <div className="flex items-start gap-3">
@@ -1065,8 +1081,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                             onSaveToInsights={saveToInsights}
                             onRequestDetail={requestMoreDetail}
                             isFirstInGroup={isFirstInGroup}
+                            isLastInGroup={isLastInGroup}
                             showHeading={isFirstInGroup}
                             showActions={false}
+                            userAvatar={undefined}
                           />
                         </div>
                       </div>
