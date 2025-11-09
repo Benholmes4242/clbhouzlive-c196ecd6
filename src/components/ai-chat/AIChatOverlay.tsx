@@ -582,7 +582,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             className={cn(
               "sticky bottom-0 z-[2] border-t safe-bottom",
               isPageMode 
-                ? "bg-[var(--header-bg,rgba(15,15,15,0.95))] backdrop-blur-xl" 
+                ? "" 
                 : "bg-gradient-to-t from-black/95 to-black/60 backdrop-blur"
             )}
             style={{
@@ -592,7 +592,14 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 : 'calc(16px + env(safe-area-inset-bottom, 0px))',
               paddingLeft: '16px',
               paddingRight: '16px',
-              borderTopColor: 'var(--header-border, rgba(255,255,255,0.1))',
+              ...(isPageMode ? {
+                background: 'rgba(22, 24, 27, 0.98)',
+                backdropFilter: 'none',
+                WebkitBackdropFilter: 'none',
+                borderTopColor: 'var(--hub-stroke)',
+              } : {
+                borderTopColor: 'var(--header-border, rgba(255,255,255,0.1))',
+              }),
             }}
             role="region"
             aria-label="Message composer"
