@@ -42,21 +42,26 @@ export function useActiveGolfers({
   const { data: golfers = [], isLoading } = useQuery({
     queryKey: ['activeGolfers', limit, currentLocation, radiusKm, onlyOpen, visibility],
     queryFn: async () => {
-      // If using mock data, return it immediately regardless of location
+      // If using mock data, return it with filters applied
       if (useMockData) {
-        const mockMapped = mockGolfers.map(mock => ({
-          id: mock.id,
-          display_name: mock.display_name,
-          username: mock.username,
-          avatar_url: mock.profile_photo_url,
-          home_club: mock.home_club,
-          distance_km: mock.distance_m / 1000,
-          distanceText: formatDistance(mock.distance_m),
-          isOpenToPlay: mock.open_to_play,
-          sameHomeClub: false,
-          eg_handicap_index: mock.eg_handicap_index,
-          is_online: false,
-        })) as ActiveGolfer[];
+        const mockMapped = mockGolfers
+          .map(mock => ({
+            id: mock.id,
+            display_name: mock.display_name,
+            username: mock.username,
+            avatar_url: mock.profile_photo_url,
+            home_club: mock.home_club,
+            distance_km: mock.distance_m / 1000,
+            distanceText: formatDistance(mock.distance_m),
+            isOpenToPlay: mock.open_to_play,
+            sameHomeClub: false,
+            eg_handicap_index: mock.eg_handicap_index,
+            is_online: false,
+          }))
+          // Apply distance filter
+          .filter(golfer => (golfer.distance_km ?? 0) <= radiusKm)
+          // Apply open to play filter
+          .filter(golfer => !onlyOpen || golfer.isOpenToPlay === true) as ActiveGolfer[];
         
         return mockMapped;
       }
