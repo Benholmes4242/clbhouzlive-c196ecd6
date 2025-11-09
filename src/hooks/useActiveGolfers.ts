@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { formatDistance } from '@/features/golfers/format';
 import { NEARBY_RADIUS_METERS } from '@/features/nearby/config';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
+import { getMockNearby } from '@/features/nearby/mockNearbyGolfers';
 
 export type ActiveGolfer = {
   id: string;
@@ -22,38 +23,59 @@ export type ActiveGolfer = {
 export function useActiveGolfers({ limit = 999 }: { limit?: number } = {}) {
   const { currentLocation, requestPermission } = useLocationPermission();
 
-  // Fetch real nearby golfers with open-to-play status
+  // Fetch real user profiles
   const { data: realProfiles = [], isLoading } = useQuery({
     queryKey: ['activeGolfers', limit],
     queryFn: async () => {
-      // Query public_profiles view for golfers with open-to-play status
       const { data, error } = await supabase
-        .from('public_profiles')
-        .select('*')
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index')
+        .eq('is_public', true)
+        .not('id', 'is', null)
         .limit(limit);
-
-      if (error) {
-        console.error('Error fetching golfers:', error);
-        return [];
-      }
-
-      // Map to our golfer type
-      return (data || []).map((profile: any) => ({
+      
+      if (error) throw error;
+      
+      // Map to golfer type and randomize distance until location services are ready
+      return (data || []).map(profile => ({
         id: profile.id,
-        display_name: profile.display_name || profile.username || 'Unknown',
+        display_name: profile.display_name || profile.username || 'Golfer',
         username: profile.username,
-        avatar_url: profile.avatar_url,
+        avatar_url: profile.profile_photo_url,
         home_club: profile.home_club,
-        distance_km: Math.random() * 5, // Randomized until location service is integrated
-        distanceText: formatDistance(Math.random() * 5000),
-        isOpenToPlay: false, // Will be true once open_to_play fields are added to public_profiles
+        // Randomize distance temporarily (0.5km to 15km)
+        distance_km: Math.random() * 14.5 + 0.5,
+        distanceText: formatDistance((Math.random() * 14.5 + 0.5) * 1000),
+        isOpenToPlay: Math.random() > 0.5,
         sameHomeClub: false,
         eg_handicap_index: profile.eg_handicap_index,
       }));
     },
-    enabled: true,
     staleTime: 15_000,
   });
+
+  // Presence tracking disabled - no longer tracking online status
+  // useEffect(() => {
+  //   if (realProfiles.length === 0) return;
+
+  //   const channelName = 'presence:creators_online';
+  //   const channel = channelManager.createChannel(channelName);
+
+  //   channel
+  //     .on('presence', { event: 'sync' }, () => {
+  //       const state = channel.presenceState();
+  //       const onlineIds = new Set<string>();
+  //       Object.values(state).forEach((presences: any) => {
+  //         presences.forEach((p: any) => {
+  //           if (p.user_id) onlineIds.add(p.user_id);
+  //         });
+  //       });
+  //       setOnlineUserIds(onlineIds);
+  //     })
+  //     .subscribe();
+
+  //   return () => channelManager.removeChannel(channelName);
+  // }, [realProfiles.length]);
 
   const golfers = useMemo<ActiveGolfer[]>(() => {
     const realWithOnline: ActiveGolfer[] = realProfiles.map(p => ({
@@ -65,6 +87,7 @@ export function useActiveGolfers({ limit = 999 }: { limit?: number } = {}) {
   }, [realProfiles]);
 
   const realOnlineCount = useMemo(() => {
+    // All golfers are real now - return the total count
     return golfers.length;
   }, [golfers]);
 

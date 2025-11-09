@@ -53,17 +53,15 @@ export function HubGolfersPage() {
     };
   }, [queryClient]);
 
-  // Header aesthetic updates without movement
+  // Header aesthetic updates with tile-style glass
   useEffect(() => {
     const el = listRef.current;
     const hdr = headerRef.current;
     if (!el || !hdr) return;
     const onScroll = () => {
-      const y = Math.min(el.scrollTop, 60);
-      hdr.style.setProperty('--blur', String(6 + y / 6)); // 6→16px
-      hdr.style.setProperty('--op', String(Math.min(0.92, 0.6 + y / 120)));
-      hdr.style.backdropFilter = `blur(var(--blur,12px))`;
-      hdr.style.background = `rgba(20,20,20,var(--op,.6))`;
+      // Keep tile-style glass appearance always
+      hdr.style.backdropFilter = 'blur(20px)';
+      hdr.style.background = 'var(--hub-glass-bg)';
       hdr.style.transform = 'translateY(0px)'; // ensure fixed header never moves
     };
     // initialize once
@@ -85,7 +83,7 @@ export function HubGolfersPage() {
         WebkitBackdropFilter: 'blur(120px)',
       }}
     >
-      {/* Simple Header */}
+      {/* Header with tile-style glass background */}
       <header 
         ref={headerRef}
         className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
