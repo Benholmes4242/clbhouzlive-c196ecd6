@@ -34,11 +34,33 @@ export function useActiveGolfers({
 } = {}) {
   const { currentLocation } = useLocationPermission();
   const { radiusKm = 10, onlyOpen = false, visibility = 'all' } = filters;
+  
+  // Check if we're using mock data
+  const useMockData = import.meta.env.VITE_USE_MOCK_GOLFERS === 'true';
 
   // Fetch nearby golfers using PostGIS RPC function
   const { data: golfers = [], isLoading } = useQuery({
     queryKey: ['activeGolfers', limit, currentLocation, radiusKm, onlyOpen, visibility],
     queryFn: async () => {
+      // If using mock data, return it immediately regardless of location
+      if (useMockData) {
+        const mockMapped = mockGolfers.map(mock => ({
+          id: mock.id,
+          display_name: mock.display_name,
+          username: mock.username,
+          avatar_url: mock.profile_photo_url,
+          home_club: mock.home_club,
+          distance_km: mock.distance_m / 1000,
+          distanceText: formatDistance(mock.distance_m),
+          isOpenToPlay: mock.open_to_play,
+          sameHomeClub: false,
+          eg_handicap_index: mock.eg_handicap_index,
+          is_online: false,
+        })) as ActiveGolfer[];
+        
+        return mockMapped;
+      }
+      
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -64,7 +86,7 @@ export function useActiveGolfers({
       }
 
       // Map to our golfer type
-      const realGolfers = (data || []).map((profile: any) => ({
+      return (data || []).map((profile: any) => ({
         id: profile.user_id,
         display_name: profile.display_name || profile.username || 'Unknown',
         username: profile.username,
@@ -77,31 +99,8 @@ export function useActiveGolfers({
         eg_handicap_index: profile.eg_handicap_index,
         is_online: false,
       })) as ActiveGolfer[];
-
-      // Conditionally add mock data for visual testing
-      const useMockData = import.meta.env.VITE_USE_MOCK_GOLFERS === 'true';
-      
-      if (useMockData) {
-        const mockMapped = mockGolfers.map(mock => ({
-          id: mock.id,
-          display_name: mock.display_name,
-          username: mock.username,
-          avatar_url: mock.profile_photo_url,
-          home_club: mock.home_club,
-          distance_km: mock.distance_m / 1000,
-          distanceText: formatDistance(mock.distance_m),
-          isOpenToPlay: mock.open_to_play,
-          sameHomeClub: false,
-          eg_handicap_index: mock.eg_handicap_index,
-          is_online: false,
-        })) as ActiveGolfer[];
-        
-        return [...realGolfers, ...mockMapped];
-      }
-
-      return realGolfers;
     },
-    enabled: !!currentLocation,
+    enabled: useMockData || !!currentLocation, // Enable query for mocks even without location
     staleTime: 15_000,
   });
 
