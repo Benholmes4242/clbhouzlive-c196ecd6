@@ -87,15 +87,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         "flex items-end gap-2.5",
         isUser && "flex-row-reverse justify-end"
       )}>
-        {/* Avatar - inline layout for Echo */}
-        {!isUser && isFirstInGroup && (
-          <div className="shrink-0 h-7 w-7 flex items-center justify-center">
-            <EchoBotIcon size={28} className="text-white/90" />
-          </div>
-        )}
-        {!isUser && !isFirstInGroup && (
-          <div className="shrink-0 h-7 w-7" /> 
-        )}
           
         {/* Message content - Phase 50 actions & meta */}
         <div 
@@ -114,7 +105,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 
           {/* Heading - only on first in group for AI */}
           {!isUser && showHeading && isFirstInGroup && (
-            <div className="pl-[36px] mb-2 text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
+            <div className="mb-2 text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
               Echo
             </div>
           )}
@@ -254,10 +245,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               <div className="flex flex-wrap items-center gap-2 mt-2">
                 <Badge 
                   variant="outline" 
-                  className={`text-xs h-5 px-2 backdrop-blur-md ${
+                  className={`text-xs h-5 px-2 backdrop-blur-md border-0 ${
                     message.metadata.modeUsed === 'live' 
-                      ? 'bg-green-900/20 text-green-300 border-white/12' 
-                      : 'bg-blue-900/20 text-blue-300 border-white/12'
+                      ? 'bg-green-900/20 text-green-300' 
+                      : 'bg-blue-900/20 text-blue-300'
                   }`}
                 >
                   {message.metadata.modeUsed === 'live' ? (
