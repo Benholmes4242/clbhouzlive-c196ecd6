@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import AdminSidebar from './AdminSidebar';
 import AdminOverview from './AdminOverview';
-import UserManagement from './UserManagement';
 import ExcelCourseImporter from '@/components/courses/ExcelCourseImporter';
 import Analytics from './Analytics';
 import TeamManagement from './TeamManagement';
@@ -55,8 +54,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onRoleChange, us
     switch (activeTab) {
       case 'overview':
         return <AdminOverview users={users} />;
-      case 'users':
-        return <UserManagement users={users} onRoleChange={onRoleChange} />;
       case 'golf-courses':
         return <GolfCoursesManagement />;
       case 'logos':

@@ -1,0 +1,330 @@
+import React, { useState } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Loader2, Trash2, Mail } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import type { AdminUser } from '@/hooks/useAdmin';
+
+interface UsersTableProps {
+  users: AdminUser[];
+  readOnly?: boolean;
+}
+
+export function UsersTable({ users, readOnly = false }: UsersTableProps) {
+  const { toast } = useToast();
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [localUsers, setLocalUsers] = useState<AdminUser[]>(users);
+
+  // Update local users when props change
+  React.useEffect(() => {
+    setLocalUsers(users);
+  }, [users]);
+
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    if (readOnly) return;
+    
+    setActionLoading(userId);
+    
+    try {
+      // Optimistically update the local state
+      setLocalUsers(prevUsers => 
+        prevUsers.map(user => 
+          user.id === userId 
+            ? { ...user, role: newRole === 'none' ? null : newRole as 'admin' | 'moderator' | 'user' | 'limited_admin' } 
+            : user
+        )
+      );
+
+      // Handle role changes directly here instead of using the hook
+      if (newRole === 'none') {
+        // Remove all roles
+        await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', userId);
+      } else {
+        // Upsert the new role
+        const roleData = { 
+          user_id: userId, 
+          role: newRole as 'admin' | 'moderator' | 'user' | 'limited_admin'
+        };
+        await supabase
+          .from('user_roles')
+          .upsert(roleData, { onConflict: 'user_id,role' });
+      }
+    } catch (error) {
+      console.error('Error updating role:', error);
+      // Revert the optimistic update on error
+      setLocalUsers(users);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handlePasswordReset = async (userId: string, userEmail: string) => {
+    if (readOnly) return;
+    
+    setActionLoading(userId);
+    
+    try {
+      // Use secure admin operations endpoint
+      const { data, error } = await supabase.functions.invoke('secure-admin-operations', {
+        body: {
+          action: 'reset_password',
+          targetUserId: userId,
+          targetEmail: userEmail,
+          reason: 'Admin requested password reset'
+        }
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      toast({
+        title: "Success",
+        description: `Password reset email sent to ${userEmail}`,
+      });
+    } catch (error: any) {
+      console.error('Error sending password reset:', error);
+      toast({
+        title: "Error",
+        description: `Failed to send password reset: ${error.message}`,
+        variant: "destructive",
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, userEmail: string) => {
+    if (readOnly) return;
+    
+    setActionLoading(userId);
+    
+    try {
+      // Use secure admin operations endpoint with additional verification
+      const { data, error } = await supabase.functions.invoke('secure-admin-operations', {
+        body: {
+          action: 'delete_user',
+          targetUserId: userId,
+          targetEmail: userEmail,
+          reason: 'Admin requested user deletion'
+        }
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      // Remove user from local state only after successful deletion
+      setLocalUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+      
+      toast({
+        title: "Success",
+        description: `User ${userEmail} has been deleted successfully`,
+      });
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: "Error",
+        description: `Failed to delete user: ${error.message}`,
+        variant: "destructive",
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const getRoleBadgeVariant = (role: string | null) => {
+    switch (role) {
+      case 'admin': return 'destructive';
+      case 'limited_admin': return 'default';
+      case 'moderator': return 'default';
+      case 'user': return 'secondary';
+      default: return 'outline';
+    }
+  };
+
+  const getRoleDisplayName = (role: string | null) => {
+    switch (role) {
+      case 'limited_admin': return 'Limited Admin';
+      case 'admin': return 'Admin';
+      case 'moderator': return 'Moderator';
+      case 'user': return 'User';
+      default: return 'No role';
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <span>Users Management</span>
+          {readOnly && (
+            <Badge variant="secondary">Read Only</Badge>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Email</TableHead>
+              <TableHead>Display Name</TableHead>
+              <TableHead>Username</TableHead>
+              <TableHead>Home Club</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Last Sign In</TableHead>
+              {!readOnly && <TableHead>Actions</TableHead>}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {localUsers.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell className="font-medium">{user.email}</TableCell>
+                <TableCell>{user.display_name || '-'}</TableCell>
+                <TableCell>{user.username || '-'}</TableCell>
+                <TableCell>{user.home_club || '-'}</TableCell>
+                <TableCell>
+                  <Badge variant={getRoleBadgeVariant(user.role)}>
+                    {getRoleDisplayName(user.role)}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {user.last_sign_in_at 
+                    ? new Date(user.last_sign_in_at).toLocaleDateString()
+                    : 'Never'
+                  }
+                </TableCell>
+                {!readOnly && (
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Select
+                        value={user.role || 'none'}
+                        onValueChange={(value) => handleRoleChange(user.id, value)}
+                        disabled={actionLoading === user.id}
+                      >
+                        <SelectTrigger className="w-36">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">No role</SelectItem>
+                          <SelectItem value="user">User</SelectItem>
+                          <SelectItem value="moderator">Moderator</SelectItem>
+                          <SelectItem value="limited_admin">Limited Admin</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={actionLoading === user.id}
+                            className="text-blue-600 hover:text-blue-600"
+                          >
+                            <Mail className="w-4 h-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Send Password Reset</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will send a password reset email to <strong>{user.email}</strong>. 
+                              The user will receive an email with instructions to reset their password.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handlePasswordReset(user.id, user.email)}
+                            >
+                              Send Reset Email
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={actionLoading === user.id}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete User</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete the user <strong>{user.email}</strong>? 
+                              This action cannot be undone and will permanently remove the user and all their data.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteUser(user.id, user.email)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete User
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      
+                      {actionLoading === user.id && (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      )}
+                    </div>
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+}
