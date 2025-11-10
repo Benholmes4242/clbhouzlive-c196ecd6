@@ -42,7 +42,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
 
   return (
     <div
-      className="mt-2 mb-3 ml-1 pl-3"
+      className="mt-2 mb-3 ml-1 pl-3 animate-in fade-in slide-in-from-top-2 duration-150"
       style={{
         borderLeft: '1px solid var(--hub-stroke)',
       }}
