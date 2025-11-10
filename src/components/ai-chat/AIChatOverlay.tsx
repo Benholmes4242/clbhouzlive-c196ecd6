@@ -577,7 +577,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           maxWidth: '84vw',
                           background: 'linear-gradient(145deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.06) 100%)',
                           borderColor: 'rgba(255,255,255,0.14)',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.25), inset 0 1px 1px rgba(255,255,255,.12)',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.15), inset 0 1px 1px rgba(255,255,255,.12)',
                           padding: 'var(--bubble-pad-y) var(--bubble-pad-x)'
                         }}>
                         <div className="flex items-center gap-1.5">
