@@ -8,7 +8,7 @@ import { MoreHorizontal, Share2, Link2Off, FileJson, FileText, Tag as TagIcon, X
 import { exportToJSON, exportToMarkdown } from '../utils/exportConversation';
 import { createShareLink, revokeShareLink, getShareInfoForThread } from '../api/shareActions';
 import { fetchThreadDetails } from '../api/threadDetails';
-import { getTags, removeTag } from '../api/tags';
+import { getThreadTags, removeTagFromThread } from '../api/tags';
 import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
 import { toast } from '@/hooks/use-toast';
 import { TagInputPopover } from './TagInputPopover';
@@ -48,7 +48,7 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
     
     // Fetch tags if not provided
     if (tags.length === 0) {
-      getTags(threadId).then((fetchedTags) => {
+      getThreadTags(threadId).then((fetchedTags) => {
         if (mounted) setThreadTags(fetchedTags);
       });
     }
@@ -133,7 +133,7 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
     setOpen(false);
     setLoading(true);
     try {
-      await removeTag(threadId, tag);
+      await removeTagFromThread(threadId, tag);
       echoHistoryAnalytics.tagRemoved({ thread_id: threadId, tag });
       setThreadTags((prev) => prev.filter((t) => t !== tag));
       onTagsChange?.();

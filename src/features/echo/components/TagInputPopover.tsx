@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Plus } from 'lucide-react';
-import { getAllUserTags, addTag } from '../api/tags';
+import { suggestTags, addTagsToThread } from '../api/tags';
 import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
 import { toast } from '@/hooks/use-toast';
 
@@ -30,7 +30,7 @@ export const TagInputPopover: React.FC<TagInputPopoverProps> = ({
 
   // Fetch user's existing tags for autocomplete
   useEffect(() => {
-    getAllUserTags().then(setAllTags);
+    suggestTags().then(setAllTags);
   }, []);
 
   // Focus input on mount
@@ -69,7 +69,7 @@ export const TagInputPopover: React.FC<TagInputPopoverProps> = ({
 
     setLoading(true);
     try {
-      await addTag(threadId, normalizedTag);
+      await addTagsToThread(threadId, [normalizedTag]);
       echoHistoryAnalytics.tagAdded({ thread_id: threadId, tag: normalizedTag });
       onTagAdded(normalizedTag);
       toast({ description: `Tagged: ${normalizedTag}`, duration: 2000 });

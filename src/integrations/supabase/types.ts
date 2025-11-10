@@ -3471,6 +3471,24 @@ export type Database = {
         Args: { p_tag: string; p_thread: string }
         Returns: undefined
       }
+      echo_tags_add_to_thread: {
+        Args: { p_names: string[]; p_thread: string }
+        Returns: undefined
+      }
+      echo_tags_remove_from_thread: {
+        Args: { p_name: string; p_thread: string }
+        Returns: undefined
+      }
+      echo_tags_set_for_thread: {
+        Args: { p_names: string[]; p_thread: string }
+        Returns: undefined
+      }
+      echo_tags_suggest: {
+        Args: { p_limit?: number; p_prefix?: string }
+        Returns: {
+          name: string
+        }[]
+      }
       echo_thread_delete: { Args: { p_thread: string }; Returns: undefined }
       echo_thread_set_star: {
         Args: { p_star: boolean; p_thread: string }
