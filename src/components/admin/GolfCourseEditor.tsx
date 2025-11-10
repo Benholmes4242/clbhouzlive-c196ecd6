@@ -462,7 +462,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   return (
     <>
       <Dialog open={true} onOpenChange={handleCloseModal}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden p-0 my-4">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden p-0 sm:max-w-6xl">
           {/* Sticky Header */}
           <div className="sticky top-0 z-10 bg-background border-b px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
