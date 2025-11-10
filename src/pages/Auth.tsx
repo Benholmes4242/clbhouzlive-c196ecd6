@@ -36,14 +36,19 @@ const Auth: React.FC = () => {
   }
 
   useEffect(() => {
-    // Only redirect if user is already authenticated when component mounts
+    // CRITICAL: Only redirect authenticated users, no redirects during auth flow
+    // This prevents redirect loops in native WebView environments
     if (user) {
       const redirectUser = async () => {
-        const hasProfile = await checkProfileExists(user.id);
-        if (hasProfile) {
-          navigate("/", { replace: true });
-        } else {
-          navigate("/create-profile", { replace: true });
+        try {
+          const hasProfile = await checkProfileExists(user.id);
+          if (hasProfile) {
+            navigate("/", { replace: true });
+          } else {
+            navigate("/create-profile", { replace: true });
+          }
+        } catch (error) {
+          console.error('Error checking profile:', error);
         }
       };
       

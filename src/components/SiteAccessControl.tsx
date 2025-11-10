@@ -40,11 +40,14 @@ const SiteAccessControl: React.FC<SiteAccessControlProps> = ({ children }) => {
         if (storedAccessStr) {
           try {
             const accessData = JSON.parse(storedAccessStr);
-            const currentDomain = window.location.hostname;
             
-            if (accessData.granted && 
-                accessData.domain === currentDomain && 
-                accessData.expiresAt) {
+            // Accept access if granted and not expired
+            // Skip domain check for native builds (capacitor://, ionic://, etc.)
+            const isNativeOrigin = window.location.protocol === 'capacitor:' || 
+                                   window.location.protocol === 'ionic:' ||
+                                   window.location.hostname === 'localhost';
+            
+            if (accessData.granted && accessData.expiresAt) {
               const expiryDate = new Date(accessData.expiresAt);
               const now = new Date();
               

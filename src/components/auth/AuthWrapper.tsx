@@ -10,7 +10,8 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   const { user, loading } = useSupabaseSession();
   const location = useLocation();
 
-  // Show loading while checking authentication
+  // CRITICAL: Show loading while checking authentication
+  // Do NOT redirect until loading completes to prevent loops in native apps
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -25,15 +26,13 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
     );
   }
 
-  // If user is not authenticated and not on auth page, redirect to auth
-  // But only redirect after loading is complete to avoid race conditions
-  if (!loading && !user && location.pathname !== '/auth') {
+  // Only redirect after loading is complete to avoid race conditions in native WebViews
+  if (!user && location.pathname !== '/auth') {
     return <Navigate to="/auth" replace />;
   }
 
   // If user is authenticated and on auth page, redirect to main site
-  // But only redirect after loading is complete to avoid race conditions
-  if (!loading && user && location.pathname === '/auth') {
+  if (user && location.pathname === '/auth') {
     return <Navigate to="/" replace />;
   }
 
