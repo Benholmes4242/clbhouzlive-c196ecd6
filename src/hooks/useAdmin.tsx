@@ -27,7 +27,7 @@ export const useAdmin = () => {
 
   console.log('useAdmin hook - user:', !!user, 'sessionLoading:', sessionLoading);
 
-  // Check if current user is admin or limited admin
+  // Check if current user is admin or limited admin by calling edge function
   const checkAdminStatus = async () => {
     if (!user) {
       console.log('No user, setting admin status to false');
@@ -40,26 +40,23 @@ export const useAdmin = () => {
 
     console.log('Checking admin status for user:', user.id);
     try {
-      // Check for admin role
-      const { data: isAdminData, error: adminError } = await supabase.rpc('is_admin');
-      if (adminError) {
-        console.error('Error checking admin status:', adminError);
-      }
-
-      // Check for limited admin role
-      const { data: hasLimitedAdminRole, error: limitedAdminError } = await supabase.rpc('has_role', {
-        _user_id: user.id,
-        _role: 'limited_admin'
-      });
+      // Use the same edge function as the gate for consistency
+      const { data, error } = await supabase.functions.invoke('secure-site-access-check', { body: {} });
       
-      if (limitedAdminError) {
-        console.error('Error checking limited admin status:', limitedAdminError);
+      if (error) {
+        console.error('Error checking admin status via edge function:', error);
+        setIsAdmin(false);
+        setIsLimitedAdmin(false);
+        setUserRole(null);
+        setLoading(false);
+        return;
       }
 
-      const isFullAdmin = isAdminData || false;
-      const isLimitedAdminUser = hasLimitedAdminRole || false;
+      const role = data?.role || 'none';
+      const isFullAdmin = role === 'full';
+      const isLimitedAdminUser = role === 'limited';
 
-      console.log('Admin status result:', { isFullAdmin, isLimitedAdminUser });
+      console.log('Admin status result:', { isFullAdmin, isLimitedAdminUser, role });
       
       setIsAdmin(isFullAdmin);
       setIsLimitedAdmin(isLimitedAdminUser);

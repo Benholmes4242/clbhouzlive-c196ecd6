@@ -29,6 +29,12 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
       try {
         setLoading(true);
 
+        // Don't decide access until we know if there's a user or not
+        if (user === undefined) {
+          console.log('[AccessGate] User state still loading - waiting');
+          return;
+        }
+
         if (!user) {
           console.log('[AccessGate] No authenticated user - showing access form');
           setHasAccess(false);
@@ -40,12 +46,22 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
 
         if (error) {
           console.error('[AccessGate] Edge function error:', error);
+          // Retry once after refreshing session (handles token refresh races)
+          try {
+            await supabase.auth.refreshSession();
+            const retry = await supabase.functions.invoke('secure-site-access-check', { body: {} });
+            if (retry.data?.ok && retry.data?.is_admin === true) {
+              console.log('[AccessGate] Admin access granted after retry for', retry.data.user_id);
+              setHasAccess(true);
+              return;
+            }
+          } catch {}
           setHasAccess(false);
           return;
         }
 
         if (data?.ok && data?.is_admin === true) {
-          console.log('[AccessGate] Admin access granted for', data.user_id);
+          console.log('[AccessGate] Admin access granted for', data.user_id, 'role:', data.role);
           setHasAccess(true);
         } else {
           console.log('[AccessGate] Authenticated but not admin – showing access form', data);
@@ -63,6 +79,25 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
     };
 
     checkAccess();
+
+    // Re-check access when tab becomes visible (with debounce)
+    let visibilityTimeout: any;
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && user) {
+        console.log('[AccessGate] Tab became visible - rechecking access in 200ms');
+        clearTimeout(visibilityTimeout);
+        visibilityTimeout = setTimeout(() => {
+          checkAccess();
+        }, 200);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearTimeout(visibilityTimeout);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
