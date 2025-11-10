@@ -8,6 +8,7 @@ import { Star } from 'lucide-react';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import { cn } from '@/lib/utils';
 import { RowContextMenu } from './RowContextMenu';
+import { TagChip } from './TagChip';
 import { highlight } from '../utils/highlight';
 import { fetchThreadDetails } from '../api/threadDetails';
 
@@ -30,6 +31,9 @@ export interface HistoryRowProps {
   onSelectToggle?: () => void;
   // Search highlighting
   searchQuery?: string;
+  // Tags
+  tags?: string[];
+  onTagsChange?: () => void;
 }
 
 export const HistoryRow: React.FC<HistoryRowProps> = ({
@@ -49,6 +53,8 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
   selected,
   onSelectToggle,
   searchQuery,
+  tags = [],
+  onTagsChange,
 }) => {
   return (
     <div className={cn('flex items-center gap-2', className)}>
@@ -121,6 +127,20 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
             {!!message_count && <span>{message_count} msg{message_count > 1 ? 's' : ''}</span>}
             {!!mode && <span>{mode === 'live' ? 'Live' : 'Static'}</span>}
           </div>
+          
+          {/* Tags */}
+          {tags.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {tags.slice(0, 3).map((tag) => (
+                <TagChip key={tag} label={tag} />
+              ))}
+              {tags.length > 3 && (
+                <span className="text-[12px] px-2 py-1" style={{ color: 'var(--meta-dim)' }}>
+                  +{tags.length - 3}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Star button (desktop hover alternative) */}
@@ -150,6 +170,8 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
             <RowContextMenu 
               threadId={id} 
               title={title}
+              tags={tags}
+              onTagsChange={onTagsChange}
             />
           </div>
         )}

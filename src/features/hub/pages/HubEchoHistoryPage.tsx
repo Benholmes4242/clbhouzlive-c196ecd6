@@ -57,6 +57,7 @@ export function HubEchoHistoryPage() {
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const lastSelectedIndex = useRef<number | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
   
   // Shortcuts modal
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -103,12 +104,13 @@ export function HubEchoHistoryPage() {
     setFilters(prev => ({ ...prev, query: query || undefined }));
   }, []);
   
-  const handleFilterChange = useCallback((newFilters: { hasResponse?: boolean; dateFrom?: Date; starred?: boolean }) => {
+  const handleFilterChange = useCallback((newFilters: { hasResponse?: boolean; dateFrom?: Date; starred?: boolean; tag?: string }) => {
     setFilters(prev => ({
       ...prev,
       hasResponse: newFilters.hasResponse,
       dateFrom: newFilters.dateFrom,
       starred: newFilters.starred,
+      tag: newFilters.tag,
     }));
     
     // Track filter changes
@@ -117,6 +119,11 @@ export function HubEchoHistoryPage() {
       date_from: newFilters.dateFrom?.toISOString(),
       starred: newFilters.starred,
     });
+    
+    // Track tag filter separately
+    if (newFilters.tag) {
+      echoHistoryAnalytics.tagFilterApplied({ tag: newFilters.tag });
+    }
   }, []);
 
   // Star handler with optimistic updates
@@ -318,27 +325,51 @@ export function HubEchoHistoryPage() {
   
   // Bulk export ZIP
   const bulkExportZip = useCallback(async (format: 'json' | 'md') => {
-    if (selectedArray.length < 2) return;
+    if (selectedArray.length < 2 || isExporting) return;
     
-    const start = Date.now();
-    toast({ description: `Exporting ${selectedArray.length} conversations...`, duration: 3000 });
+    // Prevent double clicks
+    setIsExporting(true);
+    
+    const progressToast = toast({ 
+      description: `Preparing 0/${selectedArray.length} conversations...`, 
+      duration: Infinity 
+    });
     
     try {
-      // Fetch all thread details
-      const threads = await Promise.all(
-        selectedArray.map((id) => fetchThreadDetails(id))
-      );
+      // Fetch all thread details with progress
+      const threads = [];
+      for (let i = 0; i < selectedArray.length; i++) {
+        const thread = await fetchThreadDetails(selectedArray[i]);
+        threads.push(thread);
+        
+        // Update progress toast
+        progressToast.update({
+          id: progressToast.id,
+          description: `Preparing ${i + 1}/${selectedArray.length} conversations...`,
+        });
+      }
+      
+      // Update for ZIP generation
+      progressToast.update({
+        id: progressToast.id,
+        description: 'Generating ZIP file...',
+      });
       
       // Generate ZIP
       await bulkZipExport(threads, format);
       
+      // Success
+      progressToast.dismiss();
       echoHistoryAnalytics.exportBulkStarted({ count: selectedArray.length, format });
       toast({ description: `Exported ${selectedArray.length} conversations`, duration: 2000 });
     } catch (error) {
       console.error('Bulk export failed:', error);
+      progressToast.dismiss();
       toast({ description: 'Failed to export conversations', variant: 'destructive', duration: 3000 });
+    } finally {
+      setIsExporting(false);
     }
-  }, [selectedArray]);
+  }, [selectedArray, isExporting]);
   
   const bulkStar = useCallback(async (star: boolean) => {
     if (selectedArray.length === 0) return;
@@ -667,6 +698,7 @@ export function HubEchoHistoryPage() {
           <EchoHistorySearch
             onSearchChange={handleSearchChange}
             onFilterChange={handleFilterChange}
+            activeTag={filters.tag}
             className="mb-4"
           />
 
@@ -740,6 +772,11 @@ export function HubEchoHistoryPage() {
                         selectionMode={selectMode}
                         selected={isChecked}
                         searchQuery={filters.query}
+                        tags={item.tags || []}
+                        onTagsChange={() => {
+                          // Invalidate query to refetch with updated tags
+                          queryClient.invalidateQueries({ queryKey: ['echoHistorySearch'] });
+                        }}
                         onSelectToggle={(e?: React.MouseEvent) => {
                           // Handle shift-click range selection
                           if (e?.shiftKey && lastSelectedIndex.current !== null && isDesktop) {
@@ -852,6 +889,7 @@ export function HubEchoHistoryPage() {
         onUnstar={() => bulkStar(false)}
         onDelete={bulkDelete}
         onExportZip={selectedArray.length >= 2 ? () => bulkExportZip('json') : undefined}
+        isExporting={isExporting}
         onClear={() => {
           setSelectedIds(new Set());
           setSelectMode(false);

@@ -170,4 +170,10 @@ export const echoHistoryAnalytics = {
   }) {
     track('echo_history_tag_removed', props);
   },
+  
+  tagFilterApplied(props: {
+    tag: string;
+  }) {
+    track('echo_history_tag_filter_applied', props);
+  },
 };

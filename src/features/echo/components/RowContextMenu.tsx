@@ -4,26 +4,39 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MoreHorizontal, Share2, Link2Off, FileJson, FileText } from 'lucide-react';
+import { MoreHorizontal, Share2, Link2Off, FileJson, FileText, Tag as TagIcon, X } from 'lucide-react';
 import { exportToJSON, exportToMarkdown } from '../utils/exportConversation';
 import { createShareLink, revokeShareLink, getShareInfoForThread } from '../api/shareActions';
 import { fetchThreadDetails } from '../api/threadDetails';
+import { getTags, removeTag } from '../api/tags';
 import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
 import { toast } from '@/hooks/use-toast';
+import { TagInputPopover } from './TagInputPopover';
 
 interface RowContextMenuProps {
   threadId: string;
   title: string;
+  tags?: string[];
+  onTagsChange?: () => void;
 }
 
-export const RowContextMenu: React.FC<RowContextMenuProps> = ({ threadId, title }) => {
+export const RowContextMenu: React.FC<RowContextMenuProps> = ({ 
+  threadId, 
+  title,
+  tags = [],
+  onTagsChange,
+}) => {
   const [open, setOpen] = useState(false);
   const [hasShare, setHasShare] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showTagInput, setShowTagInput] = useState(false);
+  const [threadTags, setThreadTags] = useState<string[]>(tags);
 
-  // Check if thread has an active share link
+  // Check if thread has an active share link and fetch tags
   useEffect(() => {
     let mounted = true;
+    
+    // Fetch share info
     getShareInfoForThread(threadId)
       .then((info) => {
         if (!mounted) return;
@@ -32,10 +45,18 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({ threadId, title 
       .catch(() => {
         if (mounted) setHasShare(false);
       });
+    
+    // Fetch tags if not provided
+    if (tags.length === 0) {
+      getTags(threadId).then((fetchedTags) => {
+        if (mounted) setThreadTags(fetchedTags);
+      });
+    }
+    
     return () => {
       mounted = false;
     };
-  }, [threadId]);
+  }, [threadId, tags]);
 
   const handleExportJSON = async () => {
     setOpen(false);
@@ -108,6 +129,28 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({ threadId, title 
     }
   };
 
+  const handleRemoveTag = async (tag: string) => {
+    setOpen(false);
+    setLoading(true);
+    try {
+      await removeTag(threadId, tag);
+      echoHistoryAnalytics.tagRemoved({ thread_id: threadId, tag });
+      setThreadTags((prev) => prev.filter((t) => t !== tag));
+      onTagsChange?.();
+      toast({ description: `Removed tag: ${tag}`, duration: 2000 });
+    } catch (error) {
+      console.error('Failed to remove tag:', error);
+      toast({ description: 'Failed to remove tag', variant: 'destructive', duration: 2000 });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTagAdded = (tag: string) => {
+    setThreadTags((prev) => [...prev, tag]);
+    onTagsChange?.();
+  };
+
   return (
     <div className="relative" onClick={(e) => e.stopPropagation()}>
       <button
@@ -161,6 +204,56 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({ threadId, title 
               <FileText size={16} />
               <span>Export Markdown</span>
             </button>
+            
+            <div className="h-px my-1" style={{ background: 'var(--hub-stroke)' }} />
+            
+            {/* Tags */}
+            <div className="relative">
+              <button
+                role="menuitem"
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-left text-[14px]"
+                style={{ color: 'var(--hub-text)' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowTagInput(true);
+                  setOpen(false);
+                }}
+              >
+                <TagIcon size={16} />
+                <span>Add tag...</span>
+              </button>
+              
+              {showTagInput && (
+                <TagInputPopover
+                  threadId={threadId}
+                  existingTags={threadTags}
+                  onClose={() => setShowTagInput(false)}
+                  onTagAdded={handleTagAdded}
+                />
+              )}
+            </div>
+            
+            {threadTags.length > 0 && (
+              <div className="px-3 py-2">
+                <div className="text-[11px] font-medium mb-1.5" style={{ color: 'var(--hub-text-dim)' }}>
+                  Remove tag:
+                </div>
+                <div className="space-y-1">
+                  {threadTags.map((tag) => (
+                    <button
+                      key={tag}
+                      role="menuitem"
+                      className="w-full flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-white/10 transition-colors text-left text-[13px]"
+                      style={{ color: 'var(--hub-text)' }}
+                      onClick={() => handleRemoveTag(tag)}
+                    >
+                      <span>{tag}</span>
+                      <X size={12} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             
             <div className="h-px my-1" style={{ background: 'var(--hub-stroke)' }} />
             

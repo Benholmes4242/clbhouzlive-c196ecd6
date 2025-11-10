@@ -13,6 +13,7 @@ export interface BulkActionBarProps {
   onDelete: () => void;
   onClear: () => void;
   onExportZip?: () => void;
+  isExporting?: boolean;
 }
 
 export const BulkActionBar: React.FC<BulkActionBarProps> = ({
@@ -22,6 +23,7 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
   onDelete,
   onClear,
   onExportZip,
+  isExporting = false,
 }) => {
   if (count === 0) return null;
 
@@ -62,7 +64,8 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
             {onExportZip && count >= 2 && (
               <button
                 onClick={onExportZip}
-                className="p-2 rounded-full hover:bg-white/10 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+                disabled={isExporting}
+                className="p-2 rounded-full hover:bg-white/10 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Export selected as ZIP"
                 title="Export ZIP"
               >

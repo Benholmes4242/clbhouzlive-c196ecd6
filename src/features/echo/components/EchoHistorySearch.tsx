@@ -16,13 +16,16 @@ interface EchoHistorySearchProps {
     hasResponse?: boolean;
     dateFrom?: Date;
     starred?: boolean;
+    tag?: string;
   }) => void;
+  activeTag?: string;
   className?: string;
 }
 
 export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
   onSearchChange,
   onFilterChange,
+  activeTag,
   className = '',
 }) => {
   const [query, setQuery] = useState('');
@@ -39,7 +42,7 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
     setActiveFilter(filter);
     
     const now = new Date();
-    const filters: { hasResponse?: boolean; dateFrom?: Date; starred?: boolean } = {};
+    const filters: { hasResponse?: boolean; dateFrom?: Date; starred?: boolean; tag?: string } = {};
 
     switch (filter) {
       case 'has_response':
@@ -60,6 +63,11 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
       default:
         // 'all' - no filters
         break;
+    }
+    
+    // Preserve tag filter if active
+    if (activeTag) {
+      filters.tag = activeTag;
     }
 
     onFilterChange(filters);
@@ -152,6 +160,32 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
 
       {/* Filter Pills */}
       <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+        {/* Tag filter pill (if active) */}
+        {activeTag && (
+          <div
+            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium"
+            style={{
+              background: 'rgba(110,146,119,0.15)',
+              border: '1px solid rgba(110,146,119,0.25)',
+              color: 'var(--hub-text)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+            }}
+          >
+            <span>Tagged: {activeTag}</span>
+            <button
+              onClick={() => {
+                setActiveFilter('all');
+                onFilterChange({});
+              }}
+              className="p-0.5 rounded-full hover:bg-white/15 transition-colors"
+              aria-label="Clear tag filter"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </div>
+        )}
+        
         {filters.map((filter) => {
           const isActive = activeFilter === filter.id;
           return (
