@@ -557,10 +557,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           Echo
                         </span>
                         <div 
-                          className="flex items-center justify-center rounded-lg"
+                          className="flex items-center justify-center"
                           style={{
                             width: 28,
                             height: 28,
+                            borderRadius: '8px',
                             background: 'rgba(255,255,255,0.08)',
                             border: '1px solid rgba(255,255,255,0.12)',
                             backdropFilter: 'blur(12px)',
