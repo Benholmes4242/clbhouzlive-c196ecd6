@@ -3,12 +3,12 @@
  * Apple-level index + inline thread UX
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEchoChatHistory } from '@/features/echo/hooks/useEchoChatHistory';
 import { HistoryRow } from '@/features/echo/components/HistoryRow';
 import { HistoryThreadInline } from '@/features/echo/components/HistoryThreadInline';
-import { useVirtualization } from '@/hooks/useVirtualization';
+import { VirtualList } from '@/features/echo/components/virtual/VirtualList';
 import '../home/hubTheme.css';
 
 export function HubEchoHistoryPage() {
@@ -33,20 +33,19 @@ export function HubEchoHistoryPage() {
 
   // Data (chat-only)
   const { data: chats = [], isLoading, error } = useEchoChatHistory({ limit: 100 });
-
-  // Virtualization for large lists
-  const containerHeight = window.innerHeight - 180; // Account for header
-  const itemHeight = 72; // Estimated row height
   
-  const {
-    visibleItems,
-    containerProps,
-    innerProps,
-  } = useVirtualization(chats, {
-    itemHeight,
-    containerHeight,
-    overscan: 5,
-  });
+  // Track expanded heights for proper virtualization
+  const expandedHeightsRef = useRef<Map<string, number>>(new Map());
+  
+  // Dynamic size calculation: base row + expanded inline thread
+  const getRowSize = (index: number) => {
+    const chat = chats[index];
+    const baseHeight = 72; // Row height
+    const expandedHeight = expandedId === chat.id 
+      ? (expandedHeightsRef.current.get(chat.id) || 400) 
+      : 0;
+    return baseHeight + expandedHeight + (expandedId === chat.id ? 8 : 0); // 8px gap
+  };
 
   return (
     <div
@@ -134,53 +133,57 @@ export function HubEchoHistoryPage() {
 
           {!isLoading && !error && chats.length > 0 && (
             <div className="relative">
-              <div 
-                id="echo-history-scroll"
-                className="max-h-[min(70vh,640px)] overflow-y-auto overscroll-contain pr-1"
-                role="list"
-              >
-                <div className="space-y-2">
-                  {visibleItems.map((item) => {
-                    const isExpanded = expandedId === item.id;
-                    return (
-                      <div key={item.id} role="listitem">
-                        <HistoryRow
-                          id={item.id}
+              <VirtualList
+                count={chats.length}
+                estimateSize={72}
+                getSize={getRowSize}
+                overscan={3}
+                className="max-h-[min(70vh,640px)] pr-1"
+                render={(index) => {
+                  const item = chats[index];
+                  const isExpanded = expandedId === item.id;
+                  
+                  return (
+                    <div role="listitem" className="mb-2">
+                      <HistoryRow
+                        id={item.id}
+                        title={item.title}
+                        subtitle={item.subtitle}
+                        createdAt={item.created_at}
+                        messageCount={item.message_count}
+                        isExpanded={isExpanded}
+                        onClick={() => {
+                          if (isExpanded) {
+                            setExpandedId(null);
+                          } else {
+                            setExpandedId(item.id);
+                          }
+                        }}
+                      />
+
+                      {isExpanded && (
+                        <HistoryThreadInline
+                          threadId={item.id}
                           title={item.title}
-                          subtitle={item.subtitle}
-                          createdAt={item.created_at}
-                          messageCount={item.message_count}
-                          isExpanded={isExpanded}
-                          onClick={() => {
-                            if (isExpanded) {
-                              setExpandedId(null);
-                            } else {
-                              setExpandedId(item.id);
-                            }
+                          onCollapse={() => setExpandedId(null)}
+                          onCopyLink={() => {
+                            navigator.clipboard.writeText(window.location.origin + `/hub/echo/history/chat/${item.id}`);
+                          }}
+                          onOpenFull={() => {
+                            const state = loc.state as any;
+                            nav(`/hub/echo/history/chat/${item.id}`, {
+                              state: { backgroundLocation: state?.backgroundLocation, fromHub: true },
+                            });
+                          }}
+                          onHeightChange={(height) => {
+                            expandedHeightsRef.current.set(item.id, height);
                           }}
                         />
-
-                        {isExpanded && (
-                          <HistoryThreadInline
-                            threadId={item.id}
-                            title={item.title}
-                            onCollapse={() => setExpandedId(null)}
-                            onCopyLink={() => {
-                              navigator.clipboard.writeText(window.location.origin + `/hub/echo/history/chat/${item.id}`);
-                            }}
-                            onOpenFull={() => {
-                              const state = loc.state as any;
-                              nav(`/hub/echo/history/chat/${item.id}`, {
-                                state: { backgroundLocation: state?.backgroundLocation, fromHub: true },
-                              });
-                            }}
-                          />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+                      )}
+                    </div>
+                  );
+                }}
+              />
 
               {/* Bottom fade overlay */}
               <div

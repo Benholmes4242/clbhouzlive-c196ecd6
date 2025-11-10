@@ -3,11 +3,12 @@
  * Renders conversation replay with shared MessageBubble component
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useRef, useLayoutEffect } from 'react';
 import { X, ExternalLink, Copy } from 'lucide-react';
 import { MessageBubble } from '@/components/ai-chat/MessageBubble';
 import { groupMessages } from '@/components/ai-chat/utils/groupMessages';
 import { useEchoThreadMessages } from '../hooks/useEchoThreadMessages';
+import { VirtualList } from './virtual/VirtualList';
 
 export interface HistoryThreadInlineProps {
   threadId: string;
@@ -16,6 +17,7 @@ export interface HistoryThreadInlineProps {
   onCopyLink?: () => void;
   onOpenFull?: () => void;
   onDelete?: () => void;
+  onHeightChange?: (height: number) => void;
 }
 
 export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
@@ -24,24 +26,23 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   onCollapse,
   onCopyLink,
   onOpenFull,
+  onHeightChange,
 }) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const { data: messages = [], isLoading, error } = useEchoThreadMessages(threadId);
   const groupedMessages = groupMessages(messages);
 
-  // Auto-scroll to bottom on mount
-  useEffect(() => {
-    if (scrollRef.current && messages.length > 0) {
-      setTimeout(() => {
-        if (scrollRef.current) {
-          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-        }
-      }, 100);
+  // Report height changes to parent for virtualization
+  useLayoutEffect(() => {
+    if (containerRef.current && onHeightChange) {
+      const height = containerRef.current.offsetHeight;
+      onHeightChange(height);
     }
-  }, [messages.length]);
+  }, [messages.length, isLoading, error, onHeightChange]);
 
   return (
     <div
+      ref={containerRef}
       className="mt-2 mb-3 ml-1 pl-3 animate-in fade-in slide-in-from-top-2 duration-150"
       style={{
         borderLeft: '1px solid var(--hub-stroke)',
@@ -109,13 +110,12 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
 
       {/* Messages */}
       <div
-        ref={scrollRef}
-        className="overflow-y-auto no-scrollbar"
         style={{
           maxHeight: 'min(65vh, 600px)',
           borderRadius: '12px',
           background: 'rgba(0,0,0,0.15)',
           padding: '12px',
+          position: 'relative',
         }}
       >
         {isLoading && (
@@ -149,21 +149,30 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         )}
 
         {!isLoading && !error && groupedMessages.length > 0 && (
-          <div className="space-y-3">
-            {groupedMessages.map((msg) => (
-              <MessageBubble
-                key={msg.id}
-                role={msg.role as 'user' | 'assistant'}
-                content={msg.content}
-                timestamp={msg.created_at}
-                firstInGroup={msg.firstInGroup}
-                lastInGroup={msg.lastInGroup}
-                readOnly={true}
-                showChips={msg.firstInGroup}
-                maxWidth="desktop"
-              />
-            ))}
-          </div>
+          <VirtualList
+            count={groupedMessages.length}
+            estimateSize={120}
+            overscan={2}
+            className="h-full"
+            render={(index) => {
+              const msg = groupedMessages[index];
+              return (
+                <div className="mb-3">
+                  <MessageBubble
+                    key={msg.id}
+                    role={msg.role as 'user' | 'assistant'}
+                    content={msg.content}
+                    timestamp={msg.created_at}
+                    firstInGroup={msg.firstInGroup}
+                    lastInGroup={msg.lastInGroup}
+                    readOnly={true}
+                    showChips={msg.firstInGroup}
+                    maxWidth="desktop"
+                  />
+                </div>
+              );
+            }}
+          />
         )}
       </div>
     </div>
