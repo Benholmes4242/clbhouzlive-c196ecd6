@@ -764,6 +764,45 @@ export type Database = {
           },
         ]
       }
+      echo_thread_tags: {
+        Row: {
+          created_at: string
+          id: string
+          tag: string
+          thread_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          tag: string
+          thread_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          tag?: string
+          thread_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "echo_thread_tags_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "echo_history_enriched"
+            referencedColumns: ["thread_id"]
+          },
+          {
+            foreignKeyName: "echo_thread_tags_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "echo_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       echo_threads: {
         Row: {
           assistant_text_concat: string | null
@@ -3441,6 +3480,14 @@ export type Database = {
         }[]
       }
       echo_share_revoke: { Args: { p_token: string }; Returns: undefined }
+      echo_tag_add: {
+        Args: { p_tag: string; p_thread: string }
+        Returns: undefined
+      }
+      echo_tag_remove: {
+        Args: { p_tag: string; p_thread: string }
+        Returns: undefined
+      }
       echo_thread_delete: { Args: { p_thread: string }; Returns: undefined }
       echo_thread_set_star: {
         Args: { p_star: boolean; p_thread: string }

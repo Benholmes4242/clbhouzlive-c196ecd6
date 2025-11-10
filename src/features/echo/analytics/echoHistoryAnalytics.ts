@@ -150,4 +150,24 @@ export const echoHistoryAnalytics = {
   }) {
     track('echo_share_opened_public', props);
   },
+
+  // Keyboard shortcuts
+  shortcutsOpened() {
+    track('echo_history_shortcuts_opened', {});
+  },
+
+  // Tags
+  tagAdded(props: {
+    tag: string;
+    thread_id: string;
+  }) {
+    track('echo_history_tag_added', props);
+  },
+
+  tagRemoved(props: {
+    tag: string;
+    thread_id: string;
+  }) {
+    track('echo_history_tag_removed', props);
+  },
 };

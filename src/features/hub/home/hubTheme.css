@@ -541,3 +541,39 @@ html.hub-open {
   align-self: flex-start;
   max-width: 90%;
 }
+
+/* ========================================
+   SELECTION MODE & HIGHLIGHTING
+   ======================================== */
+
+/* Row hover in selection mode */
+.hub-row.is-select-mode:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.14);
+}
+
+/* Checkbox hover/active */
+.hub-checkbox {
+  transition: background .15s ease, border-color .15s ease, transform .08s ease;
+}
+.hub-checkbox:hover {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.18);
+}
+.hub-checkbox:active {
+  transform: scale(0.98);
+}
+
+/* Selected row emphasis */
+.hub-row.is-selected {
+  background: linear-gradient(0deg, rgba(255,255,255,0.10), rgba(255,255,255,0.10)) !important;
+  border-color: rgba(255,255,255,0.20) !important;
+}
+
+/* Search result highlighting */
+mark {
+  background: rgba(110,146,119,0.15);
+  border-radius: 4px;
+  padding: 0 2px;
+  color: inherit;
+}

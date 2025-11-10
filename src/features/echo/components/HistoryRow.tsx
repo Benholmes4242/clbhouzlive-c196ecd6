@@ -8,6 +8,8 @@ import { Star } from 'lucide-react';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import { cn } from '@/lib/utils';
 import { RowContextMenu } from './RowContextMenu';
+import { highlight } from '../utils/highlight';
+import { fetchThreadDetails } from '../api/threadDetails';
 
 export interface HistoryRowProps {
   id: string;
@@ -26,6 +28,8 @@ export interface HistoryRowProps {
   selectionMode?: boolean;
   selected?: boolean;
   onSelectToggle?: () => void;
+  // Search highlighting
+  searchQuery?: string;
 }
 
 export const HistoryRow: React.FC<HistoryRowProps> = ({
@@ -44,6 +48,7 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
   selectionMode,
   selected,
   onSelectToggle,
+  searchQuery,
 }) => {
   return (
     <div className={cn('flex items-center gap-2', className)}>
@@ -87,7 +92,7 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <div className="truncate font-medium text-[15px] leading-5" style={{ color: 'var(--hub-text)' }}>
-              {title}
+              {searchQuery ? highlight(title, searchQuery) : title}
             </div>
             {relative_date && (
               <div className="text-[12px]" style={{ color: 'var(--meta-dim)' }}>
@@ -107,7 +112,7 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
 
           {/* Line 2: subtitle/meta */}
           <div className="mt-0.5 text-[13px] leading-[18px] line-clamp-2" style={{ color: 'var(--meta-strong)' }}>
-            {subtitle}
+            {searchQuery ? highlight(subtitle, searchQuery) : subtitle}
           </div>
 
           {/* Line 3: meta chips */}
@@ -142,7 +147,10 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
         {/* Context menu (desktop) */}
         {!selectionMode && (
           <div className="pl-2">
-            <RowContextMenu threadId={id} title={title} />
+            <RowContextMenu 
+              threadId={id} 
+              title={title}
+            />
           </div>
         )}
       </div>

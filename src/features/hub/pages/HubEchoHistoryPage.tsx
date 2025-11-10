@@ -12,9 +12,12 @@ import { HistoryThreadInline } from '@/features/echo/components/HistoryThreadInl
 import { VirtualList } from '@/features/echo/components/virtual/VirtualList';
 import { EchoHistorySearch } from '@/features/echo/components/EchoHistorySearch';
 import { BulkActionBar } from '@/features/echo/components/BulkActionBar';
+import { ShortcutsModal } from '@/features/echo/components/ShortcutsModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { starThread, deleteThread } from '@/features/echo/api/threadActions';
 import { bulkStarThreads, bulkDeleteThreads } from '@/features/echo/api/bulkActions';
+import { fetchThreadDetails } from '@/features/echo/api/threadDetails';
+import { bulkZipExport } from '@/features/echo/utils/bulkZipExport';
 import { toast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { echoHistoryAnalytics } from '@/features/echo/analytics/echoHistoryAnalytics';
@@ -53,6 +56,11 @@ export function HubEchoHistoryPage() {
   // Bulk selection state
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const lastSelectedIndex = useRef<number | null>(null);
+  
+  // Shortcuts modal
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [shortcutsHintSeen, setShortcutsHintSeen] = useLocalStorage('echo.shortcutHintSeen', false);
   
   // Sort mode (persisted)
   const [sortMode, setSortMode] = useLocalStorage<'default' | 'starred' | 'relevance'>('echo.sortMode', 'default');
@@ -60,6 +68,17 @@ export function HubEchoHistoryPage() {
   
   // Data with search/filter support
   const { data: chats = [], isLoading, error } = useEchoHistorySearch(filters, { limit: 100 });
+  
+  // Auto-open shortcuts modal once for new users
+  useEffect(() => {
+    if (!shortcutsHintSeen && chats.length > 0) {
+      const timer = setTimeout(() => {
+        setShowShortcuts(true);
+        setShortcutsHintSeen(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [shortcutsHintSeen, chats.length, setShortcutsHintSeen]);
   
   // Track expanded heights for proper virtualization
   const expandedHeightsRef = useRef<Map<string, number>>(new Map());
@@ -297,6 +316,30 @@ export function HubEchoHistoryPage() {
   // Bulk action handlers
   const selectedArray = Array.from(selectedIds);
   
+  // Bulk export ZIP
+  const bulkExportZip = useCallback(async (format: 'json' | 'md') => {
+    if (selectedArray.length < 2) return;
+    
+    const start = Date.now();
+    toast({ description: `Exporting ${selectedArray.length} conversations...`, duration: 3000 });
+    
+    try {
+      // Fetch all thread details
+      const threads = await Promise.all(
+        selectedArray.map((id) => fetchThreadDetails(id))
+      );
+      
+      // Generate ZIP
+      await bulkZipExport(threads, format);
+      
+      echoHistoryAnalytics.exportBulkStarted({ count: selectedArray.length, format });
+      toast({ description: `Exported ${selectedArray.length} conversations`, duration: 2000 });
+    } catch (error) {
+      console.error('Bulk export failed:', error);
+      toast({ description: 'Failed to export conversations', variant: 'destructive', duration: 3000 });
+    }
+  }, [selectedArray]);
+  
   const bulkStar = useCallback(async (star: boolean) => {
     if (selectedArray.length === 0) return;
     
@@ -374,6 +417,16 @@ export function HubEchoHistoryPage() {
         return;
       }
 
+      // ? key - toggle shortcuts cheatsheet
+      if (e.key === '?' && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+        setShowShortcuts((v) => !v);
+        if (!showShortcuts) {
+          echoHistoryAnalytics.shortcutsOpened();
+        }
+        return;
+      }
+
       // Bulk mode shortcuts
       if (selectMode) {
         if (e.key === 's' || e.key === 'S') {
@@ -416,7 +469,7 @@ export function HubEchoHistoryPage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectMode, expandedId, chats, handleStar, handleDelete, bulkStar, bulkDelete]);
+  }, [selectMode, expandedId, chats, showShortcuts, handleStar, handleDelete, bulkStar, bulkDelete]);
   
   // Cleanup pending deletes on unmount
   useEffect(() => {
@@ -686,15 +739,27 @@ export function HubEchoHistoryPage() {
                         isPendingDelete={pendingDeletes.has(item.id)}
                         selectionMode={selectMode}
                         selected={isChecked}
-                        onSelectToggle={() => {
-                          const next = new Set(selectedIds);
-                          if (isChecked) {
-                            next.delete(item.id);
+                        searchQuery={filters.query}
+                        onSelectToggle={(e?: React.MouseEvent) => {
+                          // Handle shift-click range selection
+                          if (e?.shiftKey && lastSelectedIndex.current !== null && isDesktop) {
+                            const [start, end] = [lastSelectedIndex.current, index].sort((a, b) => a - b);
+                            const rangeIds = chats.slice(start, end + 1).map((c) => c.id);
+                            const next = new Set(selectedIds);
+                            rangeIds.forEach((id) => next.add(id));
+                            setSelectedIds(next);
+                            announce(`Selected ${rangeIds.length} conversations`);
                           } else {
-                            next.add(item.id);
+                            const next = new Set(selectedIds);
+                            if (isChecked) {
+                              next.delete(item.id);
+                            } else {
+                              next.add(item.id);
+                            }
+                            setSelectedIds(next);
+                            lastSelectedIndex.current = index;
+                            announce(isChecked ? 'Deselected' : 'Selected');
                           }
-                          setSelectedIds(next);
-                          announce(isChecked ? 'Deselected' : 'Selected');
                         }}
                         onStar={() => handleStar(item.id, item.is_starred, 'swipe', index)}
                         onDelete={() => handleDelete(item.id, 'swipe')}
@@ -786,12 +851,16 @@ export function HubEchoHistoryPage() {
         onStar={() => bulkStar(true)}
         onUnstar={() => bulkStar(false)}
         onDelete={bulkDelete}
+        onExportZip={selectedArray.length >= 2 ? () => bulkExportZip('json') : undefined}
         onClear={() => {
           setSelectedIds(new Set());
           setSelectMode(false);
           announce('Selection cleared');
         }}
       />
+
+      {/* Shortcuts modal */}
+      <ShortcutsModal open={showShortcuts} onClose={() => setShowShortcuts(false)} />
     </div>
   );
 }
