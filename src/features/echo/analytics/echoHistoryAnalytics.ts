@@ -131,6 +131,29 @@ export const echoHistoryAnalytics = {
     track('echo_history_export_bulk_started', props);
   },
 
+  exportProgress(props: {
+    current: number;
+    total: number;
+    bytes: number;
+  }) {
+    track('echo_history_export_progress', props);
+  },
+
+  exportCanceled(props: {
+    current: number;
+    total: number;
+  }) {
+    track('echo_history_export_canceled', props);
+  },
+
+  exportCompleted(props: {
+    count: number;
+    bytes: number;
+    duration_ms: number;
+  }) {
+    track('echo_history_export_completed', props);
+  },
+
   // Share
   shareCreated(props: {
     thread_id: string;

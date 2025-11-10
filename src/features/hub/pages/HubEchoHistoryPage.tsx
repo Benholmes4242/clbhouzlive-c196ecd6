@@ -18,7 +18,8 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { starThread, deleteThread } from '@/features/echo/api/threadActions';
 import { bulkStarThreads, bulkDeleteThreads } from '@/features/echo/api/bulkActions';
 import { fetchThreadDetails } from '@/features/echo/api/threadDetails';
-import { bulkZipExport } from '@/features/echo/utils/bulkZipExport';
+import { startZipExport, downloadBlob, makeExportFilename } from '@/features/echo/utils/exportOrchestrator';
+import { useExportHud } from '@/features/echo/hooks/useExportHud';
 import { toast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { echoHistoryAnalytics } from '@/features/echo/analytics/echoHistoryAnalytics';
@@ -35,6 +36,9 @@ export function HubEchoHistoryPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [pendingDeletes, setPendingDeletes] = useState<Map<string, { timer: NodeJS.Timeout; startTime: number }>>(new Map());
+  
+  // Export HUD
+  const exportHud = useExportHud();
 
   // Apply hub-open class for glass theme
   useEffect(() => {
@@ -324,53 +328,55 @@ export function HubEchoHistoryPage() {
   // Bulk action handlers
   const selectedArray = Array.from(selectedIds);
   
-  // Bulk export ZIP
-  const bulkExportZip = useCallback(async (format: 'json' | 'md') => {
-    if (selectedArray.length < 2 || isExporting) return;
+  // Bulk export ZIP with worker-based orchestrator
+  const bulkExportZip = useCallback((format: 'json' | 'md') => {
+    if (selectedArray.length < 2) return;
     
-    // Prevent double clicks
-    setIsExporting(true);
-    
-    const progressToast = toast({ 
-      description: `Preparing 0/${selectedArray.length} conversations...`, 
-      duration: Infinity 
+    const threads = selectedArray.map(id => {
+      const chat = chats.find(c => c.id === id);
+      return { id, title: chat?.title };
     });
     
-    try {
-      // Fetch all thread details with progress
-      const threads = [];
-      for (let i = 0; i < selectedArray.length; i++) {
-        const thread = await fetchThreadDetails(selectedArray[i]);
-        threads.push(thread);
-        
-        // Update progress toast
-        progressToast.update({
-          id: progressToast.id,
-          description: `Preparing ${i + 1}/${selectedArray.length} conversations...`,
+    const task = startZipExport({
+      threads,
+      format,
+      fetchThread: fetchThreadDetails,
+      filename: makeExportFilename(format, threads.length),
+      onProgress: (progress) => {
+        exportHud.update(progress);
+      },
+      onDone: (blob) => {
+        exportHud.done();
+        downloadBlob(blob, makeExportFilename(format, threads.length));
+        echoHistoryAnalytics.exportCompleted({
+          count: threads.length,
+          bytes: blob.size,
+          duration_ms: 0, // Will be tracked in orchestrator
         });
-      }
-      
-      // Update for ZIP generation
-      progressToast.update({
-        id: progressToast.id,
-        description: 'Generating ZIP file...',
-      });
-      
-      // Generate ZIP
-      await bulkZipExport(threads, format);
-      
-      // Success
-      progressToast.dismiss();
-      echoHistoryAnalytics.exportBulkStarted({ count: selectedArray.length, format });
-      toast({ description: `Exported ${selectedArray.length} conversations`, duration: 2000 });
-    } catch (error) {
-      console.error('Bulk export failed:', error);
-      progressToast.dismiss();
-      toast({ description: 'Failed to export conversations', variant: 'destructive', duration: 3000 });
-    } finally {
-      setIsExporting(false);
-    }
-  }, [selectedArray, isExporting]);
+        toast({ 
+          description: `Exported ${threads.length} conversations`, 
+          duration: 2000 
+        });
+      },
+      onError: (err) => {
+        exportHud.done();
+        if (err.message !== 'Export canceled') {
+          toast({ 
+            description: err.message || 'Failed to export conversations', 
+            variant: 'destructive', 
+            duration: 3000 
+          });
+        } else {
+          toast({ 
+            description: 'Export canceled', 
+            duration: 2000 
+          });
+        }
+      },
+    });
+    
+    exportHud.show({ total: threads.length, cancel: task.cancel });
+  }, [selectedArray, chats, exportHud]);
   
   const bulkStar = useCallback(async (star: boolean) => {
     if (selectedArray.length === 0) return;
@@ -925,15 +931,17 @@ export function HubEchoHistoryPage() {
         onStar={() => bulkStar(true)}
         onUnstar={() => bulkStar(false)}
         onDelete={bulkDelete}
-        onExportZip={selectedArray.length >= 2 ? () => bulkExportZip('json') : undefined}
-        isExporting={isExporting}
+        onExportZip={selectedArray.length >= 2 ? bulkExportZip : undefined}
         onClear={() => {
           setSelectedIds(new Set());
           setSelectMode(false);
           announce('Selection cleared');
         }}
       />
-
+      
+      {/* Export HUD */}
+      {exportHud.component}
+      
       {/* Shortcuts modal */}
       <ShortcutsModal open={showShortcuts} onClose={() => setShowShortcuts(false)} />
     </div>

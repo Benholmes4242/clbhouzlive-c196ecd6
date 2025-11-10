@@ -30,6 +30,9 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     include: ['@supabase/supabase-js', '@tanstack/react-query'],
   },
+  worker: {
+    format: 'es',
+  },
   plugins: [
     react(),
     mode === 'development' && componentTagger(),

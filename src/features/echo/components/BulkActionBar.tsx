@@ -12,8 +12,7 @@ export interface BulkActionBarProps {
   onUnstar: () => void;
   onDelete: () => void;
   onClear: () => void;
-  onExportZip?: () => void;
-  isExporting?: boolean;
+  onExportZip?: (format: 'json' | 'md') => void;
 }
 
 export const BulkActionBar: React.FC<BulkActionBarProps> = ({
@@ -23,7 +22,6 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
   onDelete,
   onClear,
   onExportZip,
-  isExporting = false,
 }) => {
   if (count === 0) return null;
 
@@ -63,11 +61,10 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
           <div className="flex items-center gap-2">
             {onExportZip && count >= 2 && (
               <button
-                onClick={onExportZip}
-                disabled={isExporting}
-                className="p-2 rounded-full hover:bg-white/10 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Export selected as ZIP"
-                title="Export ZIP"
+                onClick={() => onExportZip('json')}
+                className="p-2 rounded-full hover:bg-white/10 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+                aria-label="Export selected as JSON ZIP"
+                title="Export JSON"
               >
                 <FileDown size={18} style={{ color: 'var(--hub-text)' }} />
               </button>
