@@ -662,11 +662,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             role="region"
             aria-label="Message composer"
           >
-            {(isLoading || isProcessing) && (
-              <div className="absolute left-0 right-0 top-0 h-[2px] bg-white/20 overflow-hidden">
-                <div className="h-full bg-white/60 animate-[shimmer_1.6s_linear_infinite] w-1/3" />
-              </div>
-            )}
             
             {isPageMode ? (
               <div className="relative flex items-center" style={{ height: '40px' }}>
