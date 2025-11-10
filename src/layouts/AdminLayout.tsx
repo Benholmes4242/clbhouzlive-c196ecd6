@@ -6,7 +6,7 @@ export default function AdminLayout() {
   return (
     <div className="flex h-screen w-full bg-background">
       <aside className="w-[260px] shrink-0 border-r border-border hidden md:block">
-        <AdminSidebar activeTab="" onTabChange={() => {}} />
+        <AdminSidebar />
       </aside>
 
       {/* Mobile: sidebar can be a drawer in the AdminSidebar itself if needed */}

@@ -99,10 +99,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onRoleChange, us
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AdminSidebar 
-          activeTab={activeTab} 
-          onTabChange={handleTabChange}
-        />
+        <AdminSidebar />
         <SidebarInset className="flex-1">
           <div className="p-6">
             {renderContent()}
