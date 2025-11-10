@@ -62,7 +62,7 @@ export function HubEchoHistoryPage() {
         className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
         style={{
           borderColor: 'var(--hub-stroke)',
-          background: 'rgba(22, 24, 27, 0.98)',
+          background: 'var(--hub-header-bg-solid)',
           backdropFilter: 'none',
           WebkitBackdropFilter: 'none',
           transition: 'all 160ms ease-out',
@@ -116,7 +116,7 @@ export function HubEchoHistoryPage() {
               className="text-center py-8 text-[15px]"
               style={{ color: 'var(--hub-text-dim)' }}
             >
-              Couldn't load chat history. Please try again.
+              Couldn't load Echo history. Please try again.
             </div>
           )}
 
