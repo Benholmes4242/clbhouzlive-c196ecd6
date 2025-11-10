@@ -149,6 +149,7 @@ export function HubEchoHistoryPage() {
                           title={item.title}
                           subtitle={item.subtitle}
                           createdAt={item.created_at}
+                          messageCount={item.message_count}
                           isExpanded={isExpanded}
                           onClick={() => {
                             if (isExpanded) {

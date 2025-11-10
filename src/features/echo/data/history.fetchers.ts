@@ -11,6 +11,9 @@ export type ChatItem = {
   subtitle: string;        // First assistant reply excerpt
   preview_text: string;    // Deprecated, kept for compatibility
   created_at: string;
+  message_count?: number;  // Optional message count
+  has_response?: boolean;  // Whether thread has any assistant replies
+  relative_date?: string;  // Server-formatted relative date
 };
 
 export type SwingItem = {
@@ -67,59 +70,37 @@ async function fromConversations(limit = 20): Promise<ChatItem[]> {
 }
 
 /**
- * Fetch from new echo_threads/echo_messages tables
+ * Fetch from new echo_threads/echo_messages tables using enriched view
  */
 async function fromThreads(limit = 20): Promise<ChatItem[]> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
   
-  const { data: allMessages, error } = await supabase
-    .from('echo_messages')
-    .select('thread_id, role, content, created_at')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: true });
+  // Use the new RPC function that provides enriched data
+  const { data, error } = await supabase.rpc('echo_history_list', {
+    limit_rows: limit
+  });
   
-  if (error || !allMessages?.length) return [];
+  if (error || !data?.length) return [];
   
-  // Group messages by thread_id
-  const threadMap = new Map<string, any[]>();
-  for (const msg of allMessages) {
-    if (!threadMap.has(msg.thread_id)) {
-      threadMap.set(msg.thread_id, []);
-    }
-    threadMap.get(msg.thread_id)!.push(msg);
-  }
-  
-  // Build items with first user/assistant messages
-  const items: ChatItem[] = [];
-  const threads = Array.from(threadMap.entries())
-    .sort((a, b) => {
-      const aLast = a[1][a[1].length - 1].created_at;
-      const bLast = b[1][b[1].length - 1].created_at;
-      return bLast.localeCompare(aLast);
-    })
-    .slice(0, limit);
-  
-  for (const [threadId, messages] of threads) {
-    const firstUser = messages.find(m => m.role === 'user');
-    const firstAssistant = messages.find(m => m.role === 'assistant');
-    
-    const titleRaw = firstUser?.content ?? '(No question)';
-    const subtitleRaw = firstAssistant?.content ?? '';
+  return data.map((row: any) => {
+    const titleRaw = row.first_user_question ?? '(No question)';
+    const subtitleRaw = row.preview_snippet ?? '';
     
     const title = stripMarkdown(titleRaw).slice(0, 100);
-    const subtitle = stripMarkdown(subtitleRaw).slice(0, 120);
+    const subtitle = stripMarkdown(subtitleRaw);
     
-    items.push({
-      id: threadId,
+    return {
+      id: row.thread_id,
       title,
-      subtitle,
-      preview_text: subtitle || title,
-      created_at: messages[messages.length - 1].created_at
-    });
-  }
-  
-  return items;
+      subtitle: row.has_response ? subtitle : '(No response yet)',
+      preview_text: row.has_response ? subtitle : '(No response yet)',
+      created_at: row.last_activity_at,
+      message_count: row.message_count,
+      has_response: row.has_response,
+      relative_date: row.relative_date
+    };
+  });
 }
 
 /**

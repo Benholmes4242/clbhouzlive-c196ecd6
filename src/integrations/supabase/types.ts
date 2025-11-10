@@ -707,6 +707,13 @@ export type Database = {
             foreignKeyName: "echo_messages_thread_id_fkey"
             columns: ["thread_id"]
             isOneToOne: false
+            referencedRelation: "echo_history_enriched"
+            referencedColumns: ["thread_id"]
+          },
+          {
+            foreignKeyName: "echo_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
             referencedRelation: "echo_threads"
             referencedColumns: ["id"]
           },
@@ -1682,6 +1689,13 @@ export type Database = {
           video_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "pro_ai_analyses_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "echo_history_enriched"
+            referencedColumns: ["thread_id"]
+          },
           {
             foreignKeyName: "pro_ai_analyses_thread_id_fkey"
             columns: ["thread_id"]
@@ -2909,6 +2923,42 @@ export type Database = {
           },
         ]
       }
+      echo_first_msgs: {
+        Row: {
+          first_assistant_at: string | null
+          first_user_at: string | null
+          thread_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "echo_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "echo_history_enriched"
+            referencedColumns: ["thread_id"]
+          },
+          {
+            foreignKeyName: "echo_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "echo_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      echo_history_enriched: {
+        Row: {
+          first_assistant_answer: string | null
+          first_user_question: string | null
+          has_response: boolean | null
+          last_activity_at: string | null
+          message_count: number | null
+          preview_snippet: string | null
+          thread_id: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       geography_columns: {
         Row: {
           coord_dimension: number | null
@@ -3217,6 +3267,19 @@ export type Database = {
             }
             Returns: string
           }
+      echo_history_list: {
+        Args: { limit_rows?: number }
+        Returns: {
+          first_user_question: string
+          has_response: boolean
+          last_activity_at: string
+          message_count: number
+          preview_snippet: string
+          relative_date: string
+          thread_id: string
+          user_id: string
+        }[]
+      }
       enablelongtransactions: { Args: never; Returns: string }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       execute_sql: { Args: { params?: Json; query: string }; Returns: Json }
