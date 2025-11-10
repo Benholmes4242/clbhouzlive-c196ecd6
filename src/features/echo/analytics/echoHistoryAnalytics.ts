@@ -203,4 +203,31 @@ export const echoHistoryAnalytics = {
   }) {
     track('echo_history_tag_filter_applied', props);
   },
+
+  // Tag Browser
+  tagsBrowserOpened() {
+    track('echo_tags_browser_opened', {});
+  },
+
+  tagClicked(props: {
+    name: string;
+    threads_count: number;
+  }) {
+    track('echo_tag_clicked', props);
+  },
+
+  tagRenamed(props: {
+    old: string;
+    next: string;
+    merged: boolean;
+  }) {
+    track('echo_tag_renamed', props);
+  },
+
+  tagDeleted(props: {
+    name: string;
+    threads_count: number;
+  }) {
+    track('echo_tag_deleted', props);
+  },
 };

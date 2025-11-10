@@ -48,6 +48,17 @@ export function HubEchoHistoryPage() {
     return () => document.documentElement.classList.remove('hub-open');
   }, []);
 
+  // Apply tag filter from navigation state
+  useEffect(() => {
+    const s = (loc.state as any)?.applyTagFilter as string | undefined;
+    if (s) {
+      setFilters(prev => ({ ...prev, tag: s }));
+      // Clear state so back/forward doesn't reapply
+      window.history.replaceState({}, '');
+      announce(`Filtered by #${s}`);
+    }
+  }, [loc.state]);
+
   const handleBack = () => {
     const state = loc.state as any;
     if (state?.backgroundLocation) {
