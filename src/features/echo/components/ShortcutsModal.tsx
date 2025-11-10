@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useRef, useCallback } from 'react';
-import { X } from 'lucide-react';
+import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
 
 export interface ShortcutsModalProps {
   open: boolean;
@@ -16,12 +16,17 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ open, onClose })
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
 
+  const handleClose = useCallback(() => {
+    echoHistoryAnalytics.shortcutsClosed();
+    onClose();
+  }, [onClose]);
+
   // Close on ESC + focus trap
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        onClose();
+        handleClose();
         return;
       }
 
@@ -45,7 +50,7 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ open, onClose })
         }
       }
     },
-    [onClose]
+    [handleClose]
   );
 
   // Mount/unmount focus management
@@ -76,123 +81,125 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ open, onClose })
   if (!open) return null;
 
   return (
-    <>
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="shortcuts-title"
+      className="fixed inset-0 z-[1200] flex items-center justify-center p-4"
+    >
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-[1000] bg-black/50"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      <div className="absolute inset-0 bg-black/60" onClick={handleClose} />
 
-      {/* Dialog */}
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Echo History keyboard shortcuts"
-        className="fixed z-[1001] inset-0 flex items-center justify-center p-4"
-      >
-        <div
-          className="w-full max-w-lg rounded-2xl border"
-          style={{
-            borderColor: 'var(--hub-stroke)',
-            background: 'rgba(20, 20, 20, 0.95)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-          }}
-        >
-          {/* Header */}
-          <div
-            className="flex items-center justify-between px-5 py-4 border-b"
-            style={{ borderColor: 'var(--hub-stroke)' }}
+      {/* Card */}
+      <div className="relative w-full max-w-2xl rounded-2xl border border-white/10 bg-[rgba(20,20,20,0.85)] backdrop-blur-xl shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+          <h2 id="shortcuts-title" className="text-[15px] font-semibold text-white/90">
+            Keyboard Shortcuts
+          </h2>
+          <button
+            ref={closeBtnRef}
+            onClick={handleClose}
+            aria-label="Close"
+            className="rounded-full p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20"
           >
-            <h2 className="text-[17px] font-semibold" style={{ color: 'var(--hub-text)' }}>
-              Keyboard Shortcuts
-            </h2>
-            <button
-              ref={closeBtnRef}
-              onClick={onClose}
-              className="p-2 rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 transition-colors"
-              aria-label="Close shortcuts"
-            >
-              <X size={18} style={{ color: 'var(--hub-text)' }} />
-            </button>
-          </div>
+            ✕
+          </button>
+        </div>
 
-          {/* Shortcuts list */}
-          <div className="px-5 py-4">
-            <ul className="space-y-3" style={{ color: 'var(--hub-text)' }}>
+        {/* Body */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-5 py-4 text-[13px] text-white/80">
+          {/* General */}
+          <section aria-labelledby="sc-general">
+            <h3 id="sc-general" className="text-white/70 text-xs uppercase tracking-wide mb-2">General</h3>
+            <ul className="space-y-2">
               <li className="flex items-center justify-between">
-                <span className="text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
-                  Focus search
-                </span>
-                <kbd>/</kbd>
+                <span>Focus search</span><kbd className="kbd">/</kbd>
               </li>
               <li className="flex items-center justify-between">
-                <span className="text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
-                  Clear search / Close modals
-                </span>
-                <kbd>Esc</kbd>
+                <span>Clear search / Close modals</span><kbd className="kbd">Esc</kbd>
               </li>
               <li className="flex items-center justify-between">
-                <span className="text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
-                  Star / Unstar (when expanded)
-                </span>
-                <kbd>S</kbd>
-              </li>
-              <li className="flex items-center justify-between">
-                <span className="text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
-                  Delete (when expanded)
-                </span>
-                <div className="flex gap-2">
-                  <kbd>Del</kbd>
-                  <span style={{ color: 'var(--hub-text-dim)' }}>or</span>
-                  <kbd>⌫</kbd>
-                </div>
-              </li>
-              <li className="flex items-center justify-between">
-                <span className="text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
-                  Toggle cheatsheet
-                </span>
-                <kbd>?</kbd>
-              </li>
-              <li className="flex items-center justify-between">
-                <span className="text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
-                  Select range (desktop)
-                </span>
-                <div className="flex gap-1 items-center">
-                  <kbd>Shift</kbd>
-                  <span style={{ color: 'var(--hub-text-dim)' }}>+</span>
-                  <span className="text-[13px]" style={{ color: 'var(--hub-text-dim)' }}>Click</span>
-                </div>
+                <span>Toggle cheatsheet</span><kbd className="kbd">?</kbd>
               </li>
             </ul>
+          </section>
 
-            <div
-              className="mt-4 pt-4 border-t text-[13px]"
-              style={{ borderColor: 'var(--hub-stroke)', color: 'var(--hub-text-dim)' }}
+          {/* Chat actions */}
+          <section aria-labelledby="sc-chat">
+            <h3 id="sc-chat" className="text-white/70 text-xs uppercase tracking-wide mb-2">Chat actions</h3>
+            <ul className="space-y-2">
+              <li className="flex items-center justify-between">
+                <span>Star / Unstar (expanded)</span><kbd className="kbd">S</kbd>
+              </li>
+              <li className="flex items-center justify-between">
+                <span>Delete (expanded)</span>
+                <span className="flex items-center gap-1">
+                  <kbd className="kbd">Del</kbd><span className="text-white/40 text-[11px]">or</span><kbd className="kbd">⌫</kbd>
+                </span>
+              </li>
+            </ul>
+          </section>
+
+          {/* Selection Mode */}
+          <section aria-labelledby="sc-select">
+            <h3 id="sc-select" className="text-white/70 text-xs uppercase tracking-wide mb-2">Selection mode</h3>
+            <ul className="space-y-2">
+              <li className="flex items-center justify-between">
+                <span>Star all selected</span><kbd className="kbd">S</kbd>
+              </li>
+              <li className="flex items-center justify-between">
+                <span>Delete selected</span><kbd className="kbd">Del</kbd>
+              </li>
+              <li className="flex items-center justify-between">
+                <span>Clear selection</span><kbd className="kbd">Esc</kbd>
+              </li>
+              <li className="flex items-center justify-between">
+                <span>Select a range (desktop)</span><span className="flex items-center gap-1"><kbd className="kbd">Shift</kbd> + <span className="kbd">Click</span></span>
+              </li>
+            </ul>
+          </section>
+
+          {/* Navigation (optional, if you support it later) */}
+          <section aria-labelledby="sc-nav">
+            <h3 id="sc-nav" className="text-white/70 text-xs uppercase tracking-wide mb-2">Navigation</h3>
+            <ul className="space-y-2">
+              <li className="flex items-center justify-between">
+                <span>Next / Previous row</span><span className="flex items-center gap-1"><kbd className="kbd">J</kbd><span className="text-white/40 text-[11px]">/</span><kbd className="kbd">K</kbd></span>
+              </li>
+            </ul>
+          </section>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between gap-3 px-5 py-3 border-t border-white/10">
+          <label className="inline-flex items-center gap-2 text-white/70 text-[12px]">
+            <input
+              type="checkbox"
+              className="accent-white/80"
+              onChange={(e) => localStorage.setItem('echo.shortcutHintSeen', e.target.checked ? 'true' : 'false')}
+              defaultChecked={localStorage.getItem('echo.shortcutHintSeen') === 'true'}
+            />
+            Don&apos;t show this automatically
+          </label>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => window.print()}
+              className="px-3 py-1.5 rounded-md border border-white/10 hover:bg-white/10 text-white/85 text-[12px]"
             >
-              <div className="font-medium mb-2" style={{ color: 'var(--hub-text)' }}>
-                In Selection Mode:
-              </div>
-              <ul className="space-y-2">
-                <li className="flex items-center justify-between">
-                  <span>Star all selected</span>
-                  <kbd>S</kbd>
-                </li>
-                <li className="flex items-center justify-between">
-                  <span>Delete selected</span>
-                  <kbd>Del</kbd>
-                </li>
-                <li className="flex items-center justify-between">
-                  <span>Clear selection</span>
-                  <kbd>Esc</kbd>
-                </li>
-              </ul>
-            </div>
+              Print
+            </button>
+            <button
+              onClick={handleClose}
+              className="px-3 py-1.5 rounded-md bg-white/90 hover:bg-white text-black text-[12px]"
+            >
+              Close
+            </button>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };

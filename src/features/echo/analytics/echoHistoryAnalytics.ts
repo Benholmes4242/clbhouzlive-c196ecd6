@@ -179,6 +179,10 @@ export const echoHistoryAnalytics = {
     track('echo_history_shortcuts_opened', {});
   },
 
+  shortcutsClosed() {
+    track('echo_history_shortcuts_closed', {});
+  },
+
   // Tags
   tagAdded(props: {
     tag: string;
