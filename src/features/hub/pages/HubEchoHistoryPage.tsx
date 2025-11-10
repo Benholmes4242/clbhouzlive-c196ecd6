@@ -24,6 +24,7 @@ import { useExportHud } from '@/features/echo/hooks/useExportHud';
 import { toast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { echoHistoryAnalytics } from '@/features/echo/analytics/echoHistoryAnalytics';
+import { relevanceScore } from '@/features/echo/utils/relevance';
 import { useMedia } from '@/hooks/useMedia';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { announce } from '@/utils/a11y';
@@ -74,7 +75,28 @@ export function HubEchoHistoryPage() {
   const [showSortMenu, setShowSortMenu] = useState(false);
   
   // Data with search/filter support
-  const { data: chats = [], isLoading, error } = useEchoHistorySearch(filters, { limit: 100 });
+  const { data: rawChats = [], isLoading, error } = useEchoHistorySearch(filters, { limit: 100 });
+  
+  // Apply client-side relevance sorting when sortMode === 'relevance'
+  const chats = React.useMemo(() => {
+    if (!rawChats || rawChats.length === 0) return [];
+    if (sortMode !== 'relevance' || !filters.query) return rawChats;
+
+    // Stable copy + score
+    const scored = rawChats.map((c, originalIndex) => ({
+      ...c,
+      __score: relevanceScore(c.title || '', c.subtitle || '', String(filters.query || ''), c.is_starred),
+      __originalIndex: originalIndex,
+    }));
+
+    // Sort by score desc, then by original order as tiebreaker
+    scored.sort((a, b) => {
+      if (b.__score !== a.__score) return b.__score - a.__score;
+      return a.__originalIndex - b.__originalIndex;
+    });
+
+    return scored;
+  }, [rawChats, sortMode, filters.query]);
   
   // Auto-open shortcuts modal once for new users
   useEffect(() => {
