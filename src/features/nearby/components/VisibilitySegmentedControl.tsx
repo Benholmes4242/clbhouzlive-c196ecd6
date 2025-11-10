@@ -79,7 +79,7 @@ export function VisibilitySegmentedControl({ value, onChange }: VisibilitySegmen
         {/* Animated pill slider */}
         <div
           aria-hidden="true"
-          className="absolute top-1.5 bottom-1.5 rounded-[14px] transition-transform duration-[180ms] ease-out pointer-events-none"
+          className="absolute top-1.5 bottom-1.5 rounded-[14px] transition-transform duration-200 ease-out pointer-events-none"
           style={{
             width: 'calc(33.333% - 4px)',
             left: '6px',

@@ -74,7 +74,7 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
       >
         {/* Main tappable area with min 44px touch target */}
         <TapButton
-          className="flex items-start gap-3 w-full text-left transition-transform active:scale-[0.97] duration-[85ms]"
+          className="flex items-start gap-3 w-full text-left transition-transform active:scale-[0.97] duration-100"
           style={{ minHeight: '44px' }}
           onPointerDown={handleViewProfile}
           aria-label={`View ${golfer.display_name}'s profile`}
@@ -135,7 +135,7 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
         {/* Action buttons - equal width */}
         <div className="flex gap-2" style={{ marginTop: '10px' }}>
           <TapButton
-            className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-[85ms] active:scale-[0.97]"
+            className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-100 active:scale-[0.97]"
             style={{
               background: 'rgba(255,255,255,0.18)',
               borderColor: 'rgba(255,255,255,0.12)',
@@ -153,7 +153,7 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
           </TapButton>
 
           <TapButton
-            className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-[85ms] active:scale-[0.97]"
+            className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-100 active:scale-[0.97]"
             style={
               isFollowing
                 ? {
@@ -182,7 +182,7 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
           </TapButton>
 
           <TapButton
-            className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-[85ms] active:scale-[0.97]"
+            className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-100 active:scale-[0.97]"
             style={{
               background: 'transparent',
               borderColor: 'rgba(255,255,255,0.12)',

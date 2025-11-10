@@ -72,7 +72,7 @@ export function startZipExport(opts: ExportOptions) {
   let resolved = false;
   
   const worker = new Worker(
-    new URL('../../workers/zip.worker.ts', import.meta.url),
+    new URL('./zip.worker.ts', import.meta.url),
     { type: 'module' }
   );
   
