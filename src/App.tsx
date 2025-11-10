@@ -35,6 +35,8 @@ import AppShell from '@/components/AppShell';
 import { ReviewIslandLoader } from '@/ReviewIslandLoader';
 import { supabase } from '@/integrations/supabase/client';
 import { migrateChatHistory } from '@/utils/chatHistoryMigration';
+import { PanelGuard } from "@/components/admin/PanelGuard";
+
 
 
 // Direct import for ProfilePage and Discover to avoid dynamic import issues
@@ -76,6 +78,9 @@ const GlobalTop100 = lazy(() => import("./pages/GlobalTop100"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
+const AdminLanding = lazy(() => import("./pages/admin/AdminLanding").then(m => ({ default: m.AdminLanding })));
+const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage").then(m => ({ default: m.AdminUsersPage })));
+const AdminMembersPage = lazy(() => import("./pages/admin/AdminMembersPage").then(m => ({ default: m.AdminMembersPage })));
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
 const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 
@@ -151,9 +156,19 @@ function AppRoutes() {
         <Route path="/global-top100" element={<GlobalTop100 />} />
         <Route path="/achievements" element={<AchievementsPage />} />
         <Route path="/admin-setup" element={<AdminSetupPage />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin" element={<AdminLanding />} />
+        <Route path="/admin/users" element={
+          <PanelGuard need="users">
+            <AdminUsersPage />
+          </PanelGuard>
+        } />
+        <Route path="/admin/admins" element={
+          <PanelGuard need="admins">
+            <AdminMembersPage />
+          </PanelGuard>
+        } />
         <Route path="/admin-backfill" element={<AdminBackfill />} />
-        
+
         <Route path="/channel/:slug" element={<ChannelProfile />} />
         <Route path="/game/:id" element={<GameDetailView />} />
         

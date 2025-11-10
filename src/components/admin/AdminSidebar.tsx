@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, NavLink } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
@@ -22,7 +22,8 @@ import {
   MapPin,
   Flag,
   Image,
-  Database
+  Database,
+  Shield
 } from "lucide-react";
 import { usePanelRole } from "@/hooks/usePanelRole";
 import { panelCan } from "@/lib/panelCan";
@@ -134,8 +135,46 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChange, use
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* New role-gated navigation links */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="px-6 py-2 text-sm font-medium text-muted-foreground">
+            Admin Access
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="px-4">
+              {can.viewUsers && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <NavLink 
+                      to="/admin/users" 
+                      className="w-full justify-start gap-3 px-3 py-2 text-sm"
+                    >
+                      <Users className="h-4 w-4" />
+                      <span>Users</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+              
+              {can.manageAdmins && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <NavLink 
+                      to="/admin/admins" 
+                      className="w-full justify-start gap-3 px-3 py-2 text-sm"
+                    >
+                      <Shield className="h-4 w-4" />
+                      <span>Admin Members</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
-      
+
       <SidebarFooter className="p-6">
         <p className="text-xs text-muted-foreground">
           © 2025 clbhouz Admin Panel
