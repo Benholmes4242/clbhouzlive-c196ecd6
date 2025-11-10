@@ -4,7 +4,7 @@ export function EchoTypingBar() {
   return (
     <div className="w-full mt-2">
       <div
-        className="relative w-full rounded-xl"
+        className="relative w-full rounded-[var(--bubble-radius)]"
         style={{
           height: 'var(--typing-height)',
           background: 'rgba(255,255,255,0.10)',
@@ -13,7 +13,7 @@ export function EchoTypingBar() {
         }}
       >
         <div
-          className="absolute inset-y-0 left-0 rounded-xl"
+          className="absolute inset-y-0 left-0 rounded-[var(--bubble-radius)]"
           style={{
             background: 'linear-gradient(90deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0.12) 100%)',
             width: '100%',

@@ -584,7 +584,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           background: 'var(--bubble-echo-grad)',
                           borderColor: 'var(--bubble-echo-border)',
                           boxShadow: '0 2px 8px rgba(0,0,0,0.15), var(--bubble-echo-inset)',
-                          padding: 'var(--bubble-pad-y) var(--bubble-pad-x)'
+                          padding: 'var(--bubble-pad-y) var(--bubble-pad-x)',
+                          minHeight: 'calc(var(--bubble-pad-y) * 2 + 20px)'
                         }}>
                         <div className="flex items-center gap-1.5">
                           <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
@@ -1121,7 +1122,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     <div className="mt-4 px-4 flex items-end gap-2">
                       <EchoBotIcon size={28} className="text-white/90 shrink-0" />
                       <div className="flex-1">
-                        <div className="rounded-[var(--bubble-radius)] bg-white/05 border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2">
+                        <div className="rounded-[var(--bubble-radius)] bg-white/05 border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2" style={{ minHeight: 'calc(var(--bubble-pad-y) * 2 + 20px)' }}>
                           <div className="flex items-center gap-1.5">
                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce"></span>
