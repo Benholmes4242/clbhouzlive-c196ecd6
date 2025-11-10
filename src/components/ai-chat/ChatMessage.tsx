@@ -114,7 +114,17 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               <span className="text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
                 Echo
               </span>
-              <Bot className="w-4 h-4 text-white/70" />
+              <div 
+                className="flex items-center justify-center w-5 h-5 rounded-lg"
+                style={{
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                }}
+              >
+                <Bot className="w-3 h-3 text-white/80" />
+              </div>
             </div>
           )}
           {isUser && showHeading && isFirstInGroup && (
