@@ -13,5 +13,9 @@ export function AdminLanding() {
     else nav("/"); // or show access gate
   }, [role, loading, nav]);
 
-  return <div className="p-8 text-sm text-muted-foreground">Verifying admin access…</div>;
+  return (
+    <div className="min-h-screen overflow-x-hidden flex items-center justify-center">
+      <div className="p-8 text-sm text-muted-foreground">Verifying admin access…</div>
+    </div>
+  );
 }

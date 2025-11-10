@@ -9,15 +9,17 @@ export function AdminUsersPage() {
   const { users } = useAdmin();
 
   return (
-    <div className="p-6 space-y-4">
-      <div>
-        <h1 className="text-xl font-semibold">Users</h1>
-        <p className="text-sm text-muted-foreground">
-          All application users (visible to Limited + Full admins).
-        </p>
-      </div>
+    <div className="min-h-screen overflow-x-hidden">
+      <div className="p-4 sm:p-6 space-y-4">
+        <div>
+          <h1 className="text-xl font-semibold">Users</h1>
+          <p className="text-sm text-muted-foreground">
+            All application users (visible to Limited + Full admins).
+          </p>
+        </div>
 
-      <UsersTable users={users} readOnly={!can.dangerousOps} />
+        <UsersTable users={users} readOnly={!can.dangerousOps} />
+      </div>
     </div>
   );
 }

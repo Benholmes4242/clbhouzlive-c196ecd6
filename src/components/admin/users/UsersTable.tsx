@@ -278,27 +278,33 @@ export function UsersTable({ users, readOnly = false }: UsersTableProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Input
-          type="text"
-          placeholder="Search by email, ID, name, or username..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="max-w-md"
-        />
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Email</TableHead>
-              <TableHead>Display Name</TableHead>
-              <TableHead>Username</TableHead>
-              <TableHead>Home Club</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Last Sign In</TableHead>
-              {!readOnly && <TableHead>Actions</TableHead>}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredUsers.map((user) => (
+        {/* Sticky search bar on mobile */}
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 -mx-6 px-6 py-3 sm:mx-0 sm:px-0 sm:py-0 sm:static">
+          <Input
+            type="text"
+            placeholder="Search by email, ID, name, or username..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full sm:max-w-md"
+          />
+        </div>
+
+        {/* Desktop table view */}
+        <div className="hidden sm:block overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Email</TableHead>
+                <TableHead>Display Name</TableHead>
+                <TableHead>Username</TableHead>
+                <TableHead>Home Club</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Last Sign In</TableHead>
+                {!readOnly && <TableHead>Actions</TableHead>}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.map((user) => (
               <TableRow key={user.id}>
                 <TableCell className="font-medium">{user.email}</TableCell>
                 <TableCell>{user.display_name || '-'}</TableCell>
@@ -403,9 +409,83 @@ export function UsersTable({ users, readOnly = false }: UsersTableProps) {
                   </TableCell>
                 )}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Mobile card view */}
+        <div className="sm:hidden space-y-3">
+          {filteredUsers.map((user) => (
+            <div key={user.id} className="rounded-lg border p-4 space-y-3">
+              <div className="space-y-1">
+                <div className="text-sm font-medium break-all">{user.email}</div>
+                <div className="text-xs text-muted-foreground break-all">ID: {user.id}</div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <div className="text-muted-foreground">Display Name</div>
+                  <div className="font-medium">{user.display_name || '—'}</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground">Username</div>
+                  <div className="font-medium">{user.username || '—'}</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground">Home Club</div>
+                  <div className="font-medium">{user.home_club || '—'}</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground">Last Sign In</div>
+                  <div className="font-medium">
+                    {user.last_sign_in_at 
+                      ? new Date(user.last_sign_in_at).toLocaleDateString()
+                      : 'Never'
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Badge variant={getRoleBadgeVariant(user.role)} className="text-xs">
+                  {getRoleDisplayName(user.role)}
+                </Badge>
+              </div>
+
+              {!readOnly && (
+                <div className="flex gap-2 pt-2 border-t">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 text-xs h-9"
+                    disabled={actionLoading === user.id}
+                    onClick={() => handlePasswordReset(user.id, user.email)}
+                  >
+                    <Mail className="w-3 h-3 mr-1" />
+                    Reset Password
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="flex-1 text-xs h-9"
+                    disabled={actionLoading === user.id}
+                    onClick={() => handleDeleteUser(user.id, user.email)}
+                  >
+                    <Trash2 className="w-3 h-3 mr-1" />
+                    Delete
+                  </Button>
+                </div>
+              )}
+
+              {actionLoading === user.id && (
+                <div className="flex items-center justify-center py-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );
