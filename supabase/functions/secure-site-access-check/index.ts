@@ -50,6 +50,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     // IMPORTANT: ensure the client sends Authorization: Bearer <accessToken>
     const authHeader = req.headers.get("Authorization") ?? "";
+    console.log("[secure-site-access-check] Auth header present:", authHeader.startsWith("Bearer ") ? "yes" : "no");
+    
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } },
     });

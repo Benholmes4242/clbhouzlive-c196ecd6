@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { posthog } from "@/lib/posthog";
-import { edgePost } from "@/utils/callEdge";
+
 
 const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
@@ -29,32 +29,42 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
       try {
         // Check if user has admin privileges
         if (user) {
+          console.log('[AccessGate] User authenticated, checking admin status:', user.id);
           try {
             const { data, error } = await supabase.rpc('is_admin');
             if (!error && data === true) {
-              console.log('Admin access granted');
+              console.log('[AccessGate] Admin access granted');
               setHasAccess(true);
               setLoading(false);
               return;
             }
           } catch (error) {
-            console.error('Error checking admin status:', error);
+            console.error('[AccessGate] Error checking admin status:', error);
           }
-        }
 
-        // Check session with JWT token using resilient edge helper
-        try {
-          const data = await edgePost('secure-site-access-check', {});
-          if (data?.ok) {
-            console.log('Valid JWT session - access granted');
-            setHasAccess(true);
-          } else {
-            console.log('No valid session found - showing access form');
+          // If user is authenticated but not admin, check session via edge function
+          try {
+            console.log('[AccessGate] Calling secure-site-access-check with authenticated user');
+            const { data, error } = await supabase.functions.invoke('secure-site-access-check', {
+              body: {}
+            });
+            
+            if (error) {
+              console.error('[AccessGate] Edge function error:', error);
+              setHasAccess(false);
+            } else if (data?.ok) {
+              console.log('[AccessGate] Valid JWT session - access granted');
+              setHasAccess(true);
+            } else {
+              console.log('[AccessGate] Session check failed:', data);
+              setHasAccess(false);
+            }
+          } catch (error) {
+            console.warn('[AccessGate] Gate check error:', error);
             setHasAccess(false);
           }
-        } catch (error) {
-          console.warn('Gate check error:', error);
-          // On error, show form to allow retry
+        } else {
+          console.log('[AccessGate] No authenticated user - showing access form');
           setHasAccess(false);
         }
 
@@ -65,7 +75,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
           // Silent cleanup
         }
       } catch (error) {
-        console.error('Unexpected error in checkAccess:', error);
+        console.error('[AccessGate] Unexpected error in checkAccess:', error);
         setHasAccess(false);
       } finally {
         setLoading(false);
@@ -87,26 +97,36 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
     setSubmitting(true);
     setErrorMessage("");
     try {
-      const data = await edgePost('secure-site-access', {
-        accessCode: accessCode.toUpperCase(),
-        domain: window.location.hostname
+      const { data, error } = await supabase.functions.invoke('secure-site-access', {
+        body: {
+          accessCode: accessCode.toUpperCase(),
+          domain: window.location.hostname
+        }
       });
 
-      posthog.capture('gate_submit', { success: data?.success });
-
-      if (data?.success) {
-        toast.success("Access Granted - Welcome to clubhouz!");
-        posthog.capture('gate_access_granted');
-        setHasAccess(true);
-        setErrorMessage("");
-      } else {
-        const msg = data?.message || "Invalid access code";
+      if (error) {
+        console.error('[AccessGate] Access code validation error:', error);
+        const msg = "Failed to validate access code. Please try again.";
         setErrorMessage(msg);
         toast.error(msg);
-        setAccessCode("");
+        posthog.capture('gate_submit', { success: false, error: error.message });
+      } else {
+        posthog.capture('gate_submit', { success: data?.success });
+
+        if (data?.success) {
+          toast.success("Access Granted - Welcome to clubhouz!");
+          posthog.capture('gate_access_granted');
+          setHasAccess(true);
+          setErrorMessage("");
+        } else {
+          const msg = data?.message || "Invalid access code";
+          setErrorMessage(msg);
+          toast.error(msg);
+          setAccessCode("");
+        }
       }
     } catch (error: any) {
-      console.error('Error validating access code:', error);
+      console.error('[AccessGate] Unexpected error validating access code:', error);
       const msg = "Failed to validate access code. Please try again.";
       setErrorMessage(msg);
       toast.error(msg);
