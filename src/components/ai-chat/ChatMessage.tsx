@@ -9,6 +9,7 @@ import { CoachPrompt } from '@/components/swing-review/CoachPrompt';
 import { parseSwingAnalysis } from '@/utils/swingAnalysisParser';
 import { cn } from '@/lib/utils';
 import { EchoBotIcon } from './EchoBotIcon';
+import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 
 interface ChatMessage {
   id: string;
@@ -41,6 +42,8 @@ interface ChatMessageProps {
   isUser?: boolean;              // Override user detection
   mediaTop?: React.ReactNode;    // Optional media at the top of the bubble
   children?: React.ReactNode;    // Override default content rendering
+  userProfilePhoto?: string | null;  // User's profile photo URL
+  userDisplayName?: string;      // User's display name for fallback
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ 
@@ -56,6 +59,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   isUser: isUserProp,
   mediaTop,
   children,
+  userProfilePhoto,
+  userDisplayName,
 }) => {
   const isUser = isUserProp ?? message.type === 'user';
   const [showSources, setShowSources] = useState(false);
@@ -110,8 +115,17 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             </div>
           )}
           {isUser && showHeading && isFirstInGroup && (
-            <div className="mb-2 text-[12px] font-medium text-white/70 text-right" style={{ letterSpacing: '0.2px' }}>
-              User
+            <div className="mb-2 flex items-center justify-end gap-2">
+              <span className="text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
+                User
+              </span>
+              <OptimizedAvatar
+                src={userProfilePhoto}
+                alt={userDisplayName || 'User'}
+                size={20}
+                fallback={userDisplayName?.charAt(0) || 'U'}
+                className="ring-1 ring-white/20"
+              />
             </div>
           )}
           
