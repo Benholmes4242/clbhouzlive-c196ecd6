@@ -4,103 +4,108 @@
  */
 
 import React from 'react';
-import { GlassCard } from '@/components/shared/GlassCard';
+import { Star } from 'lucide-react';
 import { formatRelativeTime } from '@/utils/dateFormat';
+import { cn } from '@/lib/utils';
 
 export interface HistoryRowProps {
   id: string;
-  title: string;          // User's question (first user message)
-  subtitle: string;       // First assistant reply excerpt
-  createdAt: string;
-  messageCount?: number;
-  hasWebSources?: boolean;
-  isExpanded?: boolean;
-  onClick: () => void;
+  title: string;
+  subtitle?: string;
+  is_starred?: boolean;
+  has_response?: boolean;
+  message_count?: number;
+  relative_date?: string;
+  last_activity_at?: string;
+  mode?: 'live' | 'static';
+  onClick?: () => void;
+  onStarClick?: () => void;
+  className?: string;
 }
 
 export const HistoryRow: React.FC<HistoryRowProps> = ({
+  id,
   title,
-  subtitle,
-  createdAt,
-  messageCount,
-  hasWebSources,
-  isExpanded,
+  subtitle = '',
+  is_starred,
+  has_response,
+  message_count,
+  relative_date,
+  last_activity_at,
+  mode,
   onClick,
+  onStarClick,
+  className,
 }) => {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left transition-all duration-200"
-      aria-expanded={isExpanded}
-      style={{
-        padding: '12px 16px',
-        borderRadius: '18px',
-        background: 'var(--hub-glass-bg)',
-        border: '1px solid var(--hub-stroke)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = 'var(--hub-glass-bg-hover)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = 'var(--hub-glass-bg)';
-      }}
-    >
-      {/* Line 1: Title + Timestamp */}
-      <div className="flex items-baseline justify-between gap-2 mb-1 pr-6">
-        <div 
-          className="text-[15px] font-medium truncate flex-1 overflow-hidden whitespace-nowrap text-ellipsis"
-          style={{ color: 'var(--hub-text)' }}
-        >
-          {title}
-        </div>
-        <div 
-          className="text-[12px] flex-shrink-0"
-          style={{ color: 'var(--hub-text-dim)' }}
-        >
-          {formatRelativeTime(createdAt)}
-        </div>
-      </div>
-
-      {/* Line 2: Subtitle (first assistant reply) */}
-      <div 
-        className="text-[13px] line-clamp-2"
-        style={{ 
-          color: 'var(--hub-text-sub)',
-          lineHeight: '1.4'
-        }}
-      >
-        {subtitle || '(No response yet)'}
-      </div>
-
-      {/* Meta chips (optional) */}
-      {(messageCount || hasWebSources) && (
-        <div className="flex items-center gap-2 mt-2">
-          {messageCount && messageCount > 0 && (
-            <span 
-              className="text-[11px] px-2 py-0.5 rounded-full"
-              style={{
-                background: 'rgba(255,255,255,0.08)',
-                color: 'var(--hub-text-dim)',
-              }}
-            >
-              {messageCount} {messageCount === 1 ? 'message' : 'messages'}
-            </span>
-          )}
-          {hasWebSources && (
-            <span 
-              className="text-[11px] px-2 py-0.5 rounded-full"
-              style={{
-                background: 'rgba(110, 146, 119, 0.15)',
-                color: '#a6f5b7',
-              }}
-            >
-              Web-sourced
-            </span>
-          )}
-        </div>
+      aria-label={`Open conversation: ${title}`}
+      className={cn(
+        'w-full text-left rounded-[18px] p-3.5 transition-transform anim-fade',
+        'hover:translate-y-[-1px] focus:outline-none focus:ring-2 focus:ring-white/18',
+        'border border-white/10',
+        className
       )}
+      style={{ background: 'rgba(255,255,255,.06)', backdropFilter: 'blur(10px)' }}
+    >
+      {/* Line 1: title + time + star */}
+      <div className="flex items-start gap-2">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <div className="truncate font-medium text-[15px] leading-5" style={{ color: 'var(--hub-text)' }}>
+              {title}
+            </div>
+            {relative_date && (
+              <div className="text-[12px]" style={{ color: 'var(--meta-dim)' }}>
+                {relative_date || (last_activity_at && formatRelativeTime(last_activity_at))}
+              </div>
+            )}
+            {is_starred && (
+              <Star
+                className="shrink-0 anim-pop"
+                size={14}
+                aria-hidden
+                style={{ color: 'var(--hub-text)', opacity: 0.9 }}
+                fill="currentColor"
+              />
+            )}
+          </div>
+
+          {/* Line 2: subtitle/meta */}
+          <div className="mt-0.5 text-[13px] leading-[18px] line-clamp-2" style={{ color: 'var(--meta-strong)' }}>
+            {subtitle}
+          </div>
+
+          {/* Line 3: meta chips */}
+          <div className="mt-2 flex flex-wrap gap-6 text-[12px]" style={{ color: 'var(--meta-dim)' }}>
+            <span>{has_response ? 'Has response' : 'Awaiting response'}</span>
+            {!!message_count && <span>{message_count} msg{message_count > 1 ? 's' : ''}</span>}
+            {!!mode && <span>{mode === 'live' ? 'Live' : 'Static'}</span>}
+          </div>
+        </div>
+
+        {/* Star button (desktop hover alternative) */}
+        {onStarClick && (
+          <div className="pl-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onStarClick();
+              }}
+              aria-label={is_starred ? 'Unstar conversation' : 'Star conversation'}
+              className="p-2 rounded-full hover:bg-white/8 focus:outline-none focus:ring-2 focus:ring-white/18"
+            >
+              <Star
+                size={18}
+                className={cn(is_starred && 'anim-pop')}
+                style={{ color: 'var(--hub-text)', opacity: 0.9 }}
+                {...(is_starred ? { fill: 'currentColor' } : {})}
+              />
+            </button>
+          </div>
+        )}
+      </div>
     </button>
   );
 };

@@ -17,6 +17,7 @@ import { toast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { echoHistoryAnalytics } from '@/features/echo/analytics/echoHistoryAnalytics';
 import { useMedia } from '@/hooks/useMedia';
+import { announce } from '@/utils/a11y';
 import '../home/hubTheme.css';
 
 export function HubEchoHistoryPage() {
@@ -87,6 +88,13 @@ export function HubEchoHistoryPage() {
   const handleStar = useCallback(async (threadId: string, currentStarred: boolean, source: 'row-hover' | 'swipe' | 'keyboard', rankIndex?: number) => {
     const nextStarred = !currentStarred;
     
+    // Get title for a11y announcement
+    const item = chats.find(c => c.id === threadId);
+    const title = item?.title || 'Conversation';
+    
+    // A11y announcement
+    announce(`${nextStarred ? 'Starred' : 'Unstarred'} ${title}`);
+    
     // Track analytics
     echoHistoryAnalytics.starToggled({
       thread_id: threadId,
@@ -138,6 +146,13 @@ export function HubEchoHistoryPage() {
   const handleSoftDelete = useCallback((threadId: string, source: 'swipe' | 'row-hover' | 'keyboard') => {
     const startTime = Date.now();
     
+    // Get title for a11y announcement
+    const item = chats.find(c => c.id === threadId);
+    const title = item?.title || 'Conversation';
+    
+    // A11y announcement
+    announce(`Conversation ${title} deleted. Undo available for 5 seconds.`);
+    
     // Track soft delete
     echoHistoryAnalytics.deleteSoft({
       thread_id: threadId,
@@ -182,6 +197,10 @@ export function HubEchoHistoryPage() {
         <ToastAction
           altText="Undo delete"
           onClick={() => {
+            // A11y announcement
+            const item = chats.find(c => c.id === threadId);
+            announce(`Restored ${item?.title || 'conversation'}`);
+            
             // Track undo
             const elapsed = (Date.now() - startTime) / 1000;
             echoHistoryAnalytics.deleteUndo({
@@ -418,9 +437,11 @@ export function HubEchoHistoryPage() {
                         id={item.id}
                         title={item.title}
                         subtitle={item.subtitle}
-                        createdAt={item.last_activity_at}
-                        messageCount={item.message_count}
-                        isExpanded={isExpanded}
+                        last_activity_at={item.last_activity_at}
+                        relative_date={item.relative_date}
+                        message_count={item.message_count}
+                        has_response={item.has_response}
+                        is_starred={item.is_starred}
                         isStarred={item.is_starred}
                         listFilters={filters}
                         rankIndex={index}
@@ -432,6 +453,7 @@ export function HubEchoHistoryPage() {
                             setExpandedId(null);
                           } else {
                             setExpandedId(item.id);
+                            announce(`Opened conversation ${item.title}`);
                             echoHistoryAnalytics.openInline({
                               thread_id: item.id,
                               list_filters: filters,

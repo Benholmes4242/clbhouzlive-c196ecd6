@@ -452,6 +452,43 @@ html, body, #root {
   to   { opacity: 1; transform: translateY(0);   }
 }
 
+/* Micro animations for Echo History */
+@keyframes slideUp {
+  from { transform: translateY(6px); }
+  to { transform: translateY(0); }
+}
+
+@keyframes scalePop {
+  0% { transform: scale(.9); }
+  100% { transform: scale(1); }
+}
+
+.anim-fade {
+  animation: fadeIn var(--anim-fast, 140ms) var(--anim-ease, cubic-bezier(.2,.8,.2,1)) both;
+}
+
+.anim-slideUp {
+  animation: slideUp var(--anim-fast, 140ms) var(--anim-ease, cubic-bezier(.2,.8,.2,1)) both;
+}
+
+.anim-pop {
+  animation: scalePop var(--anim-fast, 140ms) var(--anim-ease, cubic-bezier(.2,.8,.2,1)) both;
+}
+
+/* A11y-only live region (visually hidden) */
+.sr-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 1px 1px);
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-echoPulse { animation: none !important; }
 }
@@ -463,6 +500,11 @@ html, body, #root {
   .animate-\[presencePulse_900ms_ease-in-out_infinite\] { animation: none !important; }
   .animate-\[rowFadeUp_90ms_ease-out_both\] { animation: none !important; }
   .animate-\[chipAppear_120ms_ease-out_both\] { animation: none !important; }
+  .anim-fade,
+  .anim-slideUp,
+  .anim-pop {
+    animation-duration: 1ms !important;
+  }
 }
 
 /* Nearby Golfers Animations - Optimized for 60fps */

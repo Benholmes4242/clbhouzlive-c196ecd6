@@ -9,6 +9,7 @@ import { MessageBubble } from '@/components/ai-chat/MessageBubble';
 import { groupMessages } from '@/components/ai-chat/utils/groupMessages';
 import { useEchoThreadMessages } from '../hooks/useEchoThreadMessages';
 import { VirtualList } from './virtual/VirtualList';
+import { timeAgo } from '@/utils/date';
 
 export interface HistoryThreadInlineProps {
   threadId: string;
@@ -43,13 +44,16 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   return (
     <div
       ref={containerRef}
-      className="mt-2 mb-3 ml-1 pl-3 animate-in fade-in slide-in-from-top-2 duration-150"
+      className="mt-2 mb-3 ml-1 pl-3 overflow-hidden transition-[height] anim-slideUp"
       style={{
         borderLeft: '1px solid var(--hub-stroke)',
+        transitionDuration: 'var(--anim-med)',
+        transitionTimingFunction: 'var(--anim-ease)',
       }}
       role="log"
       aria-live="polite"
       aria-relevant="additions"
+      aria-label="Echo conversation thread"
     >
       {/* Header */}
       <div 
@@ -169,6 +173,15 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
                     showChips={msg.firstInGroup}
                     maxWidth="desktop"
                   />
+                  
+                  {/* Meta line */}
+                  <div
+                    className="mt-1 mb-2 text-[12px] anim-slideUp"
+                    style={{ color: 'var(--meta-dim)' }}
+                    aria-label={`Sent ${timeAgo(msg.created_at)}`}
+                  >
+                    <span>{timeAgo(msg.created_at)}</span>
+                  </div>
                 </div>
               );
             }}

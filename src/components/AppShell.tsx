@@ -12,5 +12,11 @@ export default function AppShell({ children }: PropsWithChildren) {
     warmHlsJs();
   }, []);
 
-  return <div className="app-shell">{children}</div>;
+  return (
+    <>
+      <div className="app-shell">{children}</div>
+      {/* Global A11y live region for screen reader announcements */}
+      <div id="a11y-live" className="sr-live" aria-live="polite" aria-atomic="true" />
+    </>
+  );
 }
