@@ -56,6 +56,7 @@ export function HubEchoHistoryPage() {
   
   // Sort mode (persisted)
   const [sortMode, setSortMode] = useLocalStorage<'default' | 'starred' | 'relevance'>('echo.sortMode', 'default');
+  const [showSortMenu, setShowSortMenu] = useState(false);
   
   // Data with search/filter support
   const { data: chats = [], isLoading, error } = useEchoHistorySearch(filters, { limit: 100 });
@@ -457,23 +458,115 @@ export function HubEchoHistoryPage() {
         
         {/* Right controls: Sort + Select */}
         <div className="flex items-center gap-2">
-          {/* Sort dropdown */}
-          <select
-            value={sortMode}
-            onChange={(e) => {
-              const mode = e.target.value as 'default' | 'starred' | 'relevance';
-              setSortMode(mode);
-              echoHistoryAnalytics.sortChanged({ sort_mode: mode });
-              announce(`Sorted by ${mode === 'starred' ? 'Starred first' : mode === 'relevance' ? 'Relevance' : 'Default'}`);
-            }}
-            className="px-3 py-1.5 rounded-full text-[13px] border border-white/10 focus:outline-none focus:ring-2 focus:ring-white/18"
-            style={{ background: 'rgba(255,255,255,0.08)', color: 'var(--hub-text)' }}
-            aria-label="Sort conversations"
-          >
-            <option value="default">Recent</option>
-            <option value="starred">Starred</option>
-            {filters.query && <option value="relevance">Relevance</option>}
-          </select>
+          {/* Select All / Clear (only in select mode) */}
+          {selectMode && (
+            <>
+              <button
+                onClick={() => {
+                  const all = new Set(chats.map((c) => c.id));
+                  setSelectedIds(all);
+                  announce(`Selected ${all.size} conversations`);
+                }}
+                className="px-3 py-1.5 rounded-full text-[13px] border border-white/10 hover:bg-white/12 transition-colors focus:outline-none focus:ring-2 focus:ring-white/18"
+                style={{ background: 'rgba(255,255,255,0.08)', color: 'var(--hub-text)' }}
+                aria-label="Select all visible conversations"
+              >
+                Select All
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedIds(new Set());
+                  announce('Selection cleared');
+                }}
+                className="px-3 py-1.5 rounded-full text-[13px] border border-white/10 hover:bg-white/12 transition-colors focus:outline-none focus:ring-2 focus:ring-white/18"
+                style={{ background: 'rgba(255,255,255,0.08)', color: 'var(--hub-text)' }}
+                aria-label="Clear selection"
+              >
+                Clear
+              </button>
+            </>
+          )}
+          
+          {/* Sort dropdown (enhanced menu) */}
+          {!selectMode && (
+            <div className="relative">
+              <button
+                onClick={() => setShowSortMenu((v) => !v)}
+                className="px-3 py-1.5 rounded-full text-[13px] border border-white/10 hover:bg-white/12 transition-colors focus:outline-none focus:ring-2 focus:ring-white/18"
+                style={{ background: 'rgba(255,255,255,0.08)', color: 'var(--hub-text)' }}
+                aria-haspopup="menu"
+                aria-expanded={showSortMenu}
+                aria-label="Sort conversations"
+              >
+                {sortMode === 'starred' ? 'Starred' : sortMode === 'relevance' ? 'Relevance' : 'Recent'}
+              </button>
+
+              {showSortMenu && (
+                <>
+                  {/* Backdrop */}
+                  <div
+                    className="fixed inset-0 z-[9998]"
+                    onClick={() => setShowSortMenu(false)}
+                    aria-hidden="true"
+                  />
+                  
+                  {/* Menu */}
+                  <div
+                    role="menu"
+                    className="absolute right-0 mt-2 w-44 rounded-xl border shadow-xl backdrop-blur-md p-1 z-[9999]"
+                    style={{
+                      borderColor: 'var(--hub-stroke)',
+                      background: 'rgba(22, 24, 27, 0.98)',
+                    }}
+                  >
+                    <button
+                      role="menuitem"
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-[14px]"
+                      style={{ color: 'var(--hub-text)' }}
+                      onClick={() => {
+                        setSortMode('default');
+                        setShowSortMenu(false);
+                        echoHistoryAnalytics.sortChanged({ sort_mode: 'default' });
+                        announce('Sorted by Recent');
+                      }}
+                    >
+                      Recent
+                    </button>
+                    
+                    <button
+                      role="menuitem"
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-[14px]"
+                      style={{ color: 'var(--hub-text)' }}
+                      onClick={() => {
+                        setSortMode('starred');
+                        setShowSortMenu(false);
+                        echoHistoryAnalytics.sortChanged({ sort_mode: 'starred' });
+                        announce('Sorted by Starred first');
+                      }}
+                    >
+                      Starred first
+                    </button>
+                    
+                    {Boolean(filters.query) && (
+                      <button
+                        role="menuitem"
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-[14px]"
+                        style={{ color: 'var(--hub-text)' }}
+                        onClick={() => {
+                          setSortMode('relevance');
+                          setShowSortMenu(false);
+                          echoHistoryAnalytics.sortChanged({ sort_mode: 'relevance' });
+                          announce('Sorted by Relevance');
+                        }}
+                      >
+                        Relevance
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
           
           {/* Select toggle */}
           <button

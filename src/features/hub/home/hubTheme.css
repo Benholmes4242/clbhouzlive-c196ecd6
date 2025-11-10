@@ -235,6 +235,32 @@ html.hub-open {
   border-color: var(--hub-stroke);
 }
 
+/* Selection mode hover states */
+.hub-row.is-select-mode:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.14);
+}
+
+/* Selected row emphasis */
+.hub-row.is-selected {
+  background: linear-gradient(0deg, rgba(255,255,255,0.10), rgba(255,255,255,0.10)) !important;
+  border-color: rgba(255,255,255,0.20) !important;
+}
+
+/* Checkbox styles */
+.hub-checkbox {
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+}
+
+.hub-checkbox:hover {
+  background: rgba(255,255,255,0.10) !important;
+  border-color: rgba(255,255,255,0.18) !important;
+}
+
+.hub-checkbox:active {
+  transform: scale(0.98);
+}
+
 .hub-row-leading {
   flex: 0 0 auto;
   font-size: 24px;
@@ -497,7 +523,7 @@ html.hub-open {
 }
 
 .bubble { 
-  padding: 12px 14px; 
+  padding: 12px 14px;
   border-radius: 14px; 
   background: rgba(255,255,255,.06);
   color: rgba(255,255,255,.9);

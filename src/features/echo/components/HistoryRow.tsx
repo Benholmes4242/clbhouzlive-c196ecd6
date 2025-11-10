@@ -7,6 +7,7 @@ import React from 'react';
 import { Star } from 'lucide-react';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import { cn } from '@/lib/utils';
+import { RowContextMenu } from './RowContextMenu';
 
 export interface HistoryRowProps {
   id: string;
@@ -53,7 +54,10 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
             e.stopPropagation();
             onSelectToggle?.();
           }}
-          className="shrink-0 w-8 h-8 rounded-md flex items-center justify-center transition-colors"
+          className={cn(
+            'hub-checkbox shrink-0 w-8 h-8 rounded-md flex items-center justify-center transition-all',
+            selected && 'hub-checkbox-selected'
+          )}
           style={{ 
             border: '1px solid var(--hub-stroke)', 
             background: selected ? 'rgba(255,255,255,0.14)' : 'transparent' 
@@ -70,9 +74,11 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
         onClick={onClick}
         aria-label={`Open conversation: ${title}`}
         className={cn(
-          'flex-1 text-left rounded-[18px] p-3.5 transition-transform anim-fade',
+          'hub-row flex-1 text-left rounded-[18px] p-3.5 transition-all anim-fade',
           'hover:translate-y-[-1px] focus:outline-none focus:ring-2 focus:ring-white/18',
-          'border border-white/10'
+          'border border-white/10',
+          selectionMode && 'is-select-mode',
+          selected && 'is-selected'
         )}
         style={{ background: 'rgba(255,255,255,.06)', backdropFilter: 'blur(10px)' }}
       >
@@ -113,7 +119,7 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
         </div>
 
         {/* Star button (desktop hover alternative) */}
-        {onStarClick && (
+        {onStarClick && !selectionMode && (
           <div className="pl-2">
             <button
               onClick={(e) => {
@@ -130,6 +136,13 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
                 {...(is_starred ? { fill: 'currentColor' } : {})}
               />
             </button>
+          </div>
+        )}
+        
+        {/* Context menu (desktop) */}
+        {!selectionMode && (
+          <div className="pl-2">
+            <RowContextMenu threadId={id} title={title} />
           </div>
         )}
       </div>
