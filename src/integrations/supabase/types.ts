@@ -80,6 +80,27 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_memberships: {
+        Row: {
+          created_at: string | null
+          role: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          role: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          role?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       admin_profiles: {
         Row: {
           created_at: string
@@ -3278,6 +3299,10 @@ export type Database = {
         Returns: boolean
       }
       geomfromewkt: { Args: { "": string }; Returns: unknown }
+      get_admin_role: {
+        Args: never
+        Returns: Database["public"]["Enums"]["admin_role"]
+      }
       get_all_users_admin: {
         Args: never
         Returns: {
@@ -4039,6 +4064,7 @@ export type Database = {
       }
     }
     Enums: {
+      admin_role: "none" | "limited" | "full"
       app_role: "admin" | "moderator" | "user" | "limited_admin"
       badge_category: "top_100_courses" | "engagement" | "community" | "special"
       badge_tier: "bronze" | "silver" | "gold" | "platinum" | "diamond"
@@ -4201,6 +4227,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      admin_role: ["none", "limited", "full"],
       app_role: ["admin", "moderator", "user", "limited_admin"],
       badge_category: ["top_100_courses", "engagement", "community", "special"],
       badge_tier: ["bronze", "silver", "gold", "platinum", "diamond"],

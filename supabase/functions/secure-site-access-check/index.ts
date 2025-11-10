@@ -68,16 +68,19 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const { data: isAdmin, error: adminErr } = await supabase.rpc("is_admin");
-    if (adminErr) {
+    const { data: role, error: roleErr } = await supabase.rpc("get_admin_role");
+    if (roleErr) {
       return new Response(
-        JSON.stringify({ ok: false, message: "Admin check failed" }),
+        JSON.stringify({ ok: false, message: "Admin role check failed" }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
+    // Treat both 'full' and 'limited' as admin for shell access
+    const isAdmin = role === 'full' || role === 'limited';
+
     return new Response(
-      JSON.stringify({ ok: true, user_id: user.id, is_admin: !!isAdmin }),
+      JSON.stringify({ ok: true, user_id: user.id, is_admin: isAdmin, role }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   } catch (error) {
