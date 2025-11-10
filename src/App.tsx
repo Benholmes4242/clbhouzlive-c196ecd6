@@ -88,6 +88,7 @@ const InviteAcceptPage = lazy(() => import("./pages/admin/InviteAcceptPage").the
 
 // Legacy admin pages
 const GolfCoursesPage = lazy(() => import("./pages/admin/GolfCoursesPage").then(m => ({ default: m.GolfCoursesPage })));
+const GolfCourseEditorPage = lazy(() => import("./pages/admin/GolfCourseEditorPage"));
 const LogosPage = lazy(() => import("./pages/admin/LogosPage").then(m => ({ default: m.LogosPage })));
 const CountryFlagsPage = lazy(() => import("./pages/admin/CountryFlagsPage").then(m => ({ default: m.CountryFlagsPage })));
 const CourseImportPage = lazy(() => import("./pages/admin/CourseImportPage").then(m => ({ default: m.CourseImportPage })));
@@ -205,6 +206,10 @@ function AppRoutes() {
           <Route path="team" element={<TeamPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
         </Route>
+        
+        {/* Golf Course Editor - full page routes outside AdminLayout */}
+        <Route path="/admin/golf-courses/new" element={<GolfCourseEditorPage />} />
+        <Route path="/admin/golf-courses/:id/edit" element={<GolfCourseEditorPage />} />
         
         <Route path="/admin/invite-accept" element={<InviteAcceptPage />} />
         <Route path="/admin-backfill" element={<AdminBackfill />} />

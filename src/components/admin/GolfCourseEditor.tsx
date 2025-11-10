@@ -2,11 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -462,74 +457,73 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
 
   return (
     <>
-      <Dialog open={true} onOpenChange={handleCloseModal}>
-        <DialogContent className="fixed left-[50%] top-[50%] z-50 grid w-[calc(100%-2rem)] max-w-6xl translate-x-[-50%] translate-y-[-50%] gap-0 border bg-background p-0 shadow-lg duration-200 sm:rounded-lg max-h-[85vh] overflow-hidden">
-          {/* Sticky Header */}
-          <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90 border-b px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <DialogTitle className="text-xl font-semibold">
-                {isCreating ? "Add New Golf Club" : "Edit Golf Course"}
-              </DialogTitle>
-              {!isCreating && course && (
-                <div className="text-sm text-muted-foreground flex items-center gap-2">
-                  <span>ID: {course.id.slice(0, 8)}...</span>
-                  <span>•</span>
-                  {lastSavedAt && (
-                    <>
-                      <span>Last saved {formatDistanceToNow(lastSavedAt)} ago</span>
-                      <span>•</span>
-                    </>
-                  )}
-                  <span>by {lastSavedBy || 'Admin'}</span>
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              <Button 
-                type="submit" 
-                form="course-form"
-                disabled={saveMutation.isPending}
-                variant="secondary"
-                className="text-muted-foreground"
-              >
-                {saveMutation.isPending ? 'Saving...' : 'Save changes'}
-              </Button>
-              <Button variant="ghost" size="icon" onClick={handleCloseModal}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+      <div className="flex flex-col h-screen w-full bg-background">
+        {/* Sticky Header */}
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90 border-b px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-semibold">
+              {isCreating ? "Add New Golf Club" : "Edit Golf Course"}
+            </h1>
+            {!isCreating && course && (
+              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                <span>ID: {course.id.slice(0, 8)}...</span>
+                <span>•</span>
+                {lastSavedAt && (
+                  <>
+                    <span>Last saved {formatDistanceToNow(lastSavedAt)} ago</span>
+                    <span>•</span>
+                  </>
+                )}
+                <span>by {lastSavedBy || 'Admin'}</span>
+              </div>
+            )}
           </div>
+          <div className="flex items-center gap-2">
+            <Button 
+              type="submit" 
+              form="course-form"
+              disabled={saveMutation.isPending}
+              variant="secondary"
+              className="text-muted-foreground"
+            >
+              {saveMutation.isPending ? 'Saving...' : 'Save changes'}
+            </Button>
+            <Button variant="ghost" size="icon" onClick={handleCloseModal}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
 
-          <div className="flex overflow-hidden" style={{ height: 'calc(85vh - 80px)' }}>
-            {/* Left Sidebar Navigation */}
-            <div className="w-48 border-r bg-muted/20">
-              <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="h-full">
-                <TabsList className="flex flex-col h-auto w-full bg-transparent p-2 gap-1">
-                  <TabsTrigger value="details" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
-                    Details
-                  </TabsTrigger>
-                  <TabsTrigger value="location" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
-                    Location
-                  </TabsTrigger>
-                  <TabsTrigger value="rankings" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
-                    Rankings
-                  </TabsTrigger>
-                  <TabsTrigger value="media" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
-                    Media
-                  </TabsTrigger>
-                  {!isCreating && (
-                    <>
-                      <TabsTrigger value="reviews" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
-                        Reviews
-                      </TabsTrigger>
-                      <TabsTrigger value="history" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
-                        History
-                      </TabsTrigger>
-                    </>
-                  )}
-                </TabsList>
-              </Tabs>
-            </div>
+        <div className="flex flex-1 overflow-hidden">
+          {/* Left Sidebar Navigation */}
+          <div className="w-48 border-r bg-muted/20">
+            <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="h-full">
+              <TabsList className="flex flex-col h-auto w-full bg-transparent p-2 gap-1">
+                <TabsTrigger value="details" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
+                  Details
+                </TabsTrigger>
+                <TabsTrigger value="location" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
+                  Location
+                </TabsTrigger>
+                <TabsTrigger value="rankings" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
+                  Rankings
+                </TabsTrigger>
+                <TabsTrigger value="media" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
+                  Media
+                </TabsTrigger>
+                {!isCreating && (
+                  <>
+                    <TabsTrigger value="reviews" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
+                      Reviews
+                    </TabsTrigger>
+                    <TabsTrigger value="history" className="w-full justify-start text-left bg-muted/50 data-[state=active]:bg-background">
+                      History
+                    </TabsTrigger>
+                  </>
+                )}
+              </TabsList>
+            </Tabs>
+          </div>
 
             {/* Main Content Area */}
             <div className="flex-1 overflow-y-auto">
@@ -868,8 +862,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
               </form>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

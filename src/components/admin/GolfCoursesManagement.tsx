@@ -3,8 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import GolfCourseEditor from './GolfCourseEditor';
+import { useNavigate } from 'react-router-dom';
 import GolfCoursesTable from './golf-courses/GolfCoursesTable';
 import CascadingFilters from './golf-courses/CascadingFilters';
 import EmptyCoursesState from './golf-courses/EmptyCoursesState';
@@ -18,6 +17,7 @@ import { Loader2 } from 'lucide-react';
 
 const GolfCoursesManagement = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [regionalFilter, setRegionalFilter] = useState<RegionalFilter>({
     scope: 'all',
     subCountry: null,
@@ -27,9 +27,6 @@ const GolfCoursesManagement = () => {
   });
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearchTerm = useDebounce(searchInput, 300);
-  const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
 
   const { 
     data, 
@@ -60,28 +57,11 @@ const GolfCoursesManagement = () => {
 
 
   const handleEditCourse = (course: GolfCourse) => {
-    // Ensure the course has all required properties
-    const courseWithDefaults: GolfCourse = {
-      ...course,
-      latitude: course.latitude || null,
-      longitude: course.longitude || null,
-    };
-    setSelectedCourse(courseWithDefaults);
-    setIsCreating(false);
-    setIsEditorOpen(true);
+    navigate(`/admin/golf-courses/${course.id}/edit`);
   };
 
   const handleCreateCourse = () => {
-    setSelectedCourse(null);
-    setIsCreating(true);
-    setIsEditorOpen(true);
-  };
-
-  const handleCloseEditor = () => {
-    setIsEditorOpen(false);
-    setSelectedCourse(null);
-    setIsCreating(false);
-    refetch();
+    navigate('/admin/golf-courses/new');
   };
 
 
@@ -170,14 +150,6 @@ const GolfCoursesManagement = () => {
           )}
         </div>
       </div>
-
-      {isEditorOpen && (
-        <GolfCourseEditor
-          course={selectedCourse}
-          isCreating={isCreating}
-          onClose={handleCloseEditor}
-        />
-      )}
     </>
   );
 };
