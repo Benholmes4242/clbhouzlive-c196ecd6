@@ -64,7 +64,34 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
           console.log('[AccessGate] Admin access granted for', data.user_id, 'role:', data.role);
           setHasAccess(true);
         } else {
-          console.log('[AccessGate] Authenticated but not admin – showing access form', data);
+          console.log('[AccessGate] Authenticated but not admin – checking stored access');
+          
+          // Check if user has valid stored access from access code
+          try {
+            const storedAccessStr = localStorage.getItem('siteAccess');
+            if (storedAccessStr) {
+              const accessData = JSON.parse(storedAccessStr);
+              if (accessData?.granted && accessData?.expiresAt) {
+                const expiryDate = new Date(accessData.expiresAt);
+                const now = new Date();
+                
+                if (now < expiryDate) {
+                  console.log('[AccessGate] Valid stored access found – granting access');
+                  setHasAccess(true);
+                  return;
+                } else {
+                  console.log('[AccessGate] Stored access expired');
+                  localStorage.removeItem('siteAccess');
+                }
+              }
+            }
+          } catch (parseError) {
+            console.error('[AccessGate] Error parsing stored access:', parseError);
+            localStorage.removeItem('siteAccess');
+          }
+          
+          // No valid stored access
+          console.log('[AccessGate] No valid stored access – showing access form');
           setHasAccess(false);
         }
 
@@ -72,8 +99,6 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         console.error('[AccessGate] Unexpected error in checkAccess:', err);
         setHasAccess(false);
       } finally {
-        // Clean up legacy key even on success
-        try { localStorage.removeItem('siteAccess'); } catch {}
         setLoading(false);
       }
     };
@@ -129,6 +154,13 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         posthog.capture('gate_submit', { success: data?.success });
 
         if (data?.success) {
+          // Store access with 12-hour expiry
+          const accessData = {
+            granted: true,
+            expiresAt: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(),
+          };
+          localStorage.setItem('siteAccess', JSON.stringify(accessData));
+          
           toast.success("Access Granted - Welcome to clubhouz!");
           posthog.capture('gate_access_granted');
           setHasAccess(true);
