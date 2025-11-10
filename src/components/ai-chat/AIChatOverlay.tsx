@@ -503,7 +503,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-center space-y-6" style={{ paddingTop: '64px', paddingBottom: '64px' }}>
                   <div 
-                    className="h-20 w-20 rounded-3xl flex items-center justify-center"
+                    className="flex items-center justify-center w-20 h-20 rounded-3xl"
                     style={{
                       background: 'rgba(255,255,255,0.08)',
                       border: '1px solid rgba(255,255,255,0.12)',
@@ -512,7 +512,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       boxShadow: '0 8px 24px rgba(0,0,0,0.18)'
                     }}
                   >
-                    <EchoBotIcon size={36} className="text-white/85" />
+                    <Bot className="w-10 h-10 text-white/80" />
                   </div>
                   <div className="text-[17px] font-semibold text-white">
                     Start a conversation with Echo
