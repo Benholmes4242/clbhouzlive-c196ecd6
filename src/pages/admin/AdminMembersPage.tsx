@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { adminRoleManage } from "@/lib/adminRoleApi";
+import { getUserIdByEmail } from "@/lib/usersLookup";
+import { useToast } from "@/hooks/use-toast";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
 import { Loader2, Shield, Users as UsersIcon } from "lucide-react";
 
 type Membership = {
@@ -31,6 +33,11 @@ export function AdminMembersPage() {
   const [loading, setLoading] = useState(true);
   const [auditFor, setAuditFor] = useState<string | null>(null);
   const [auditRows, setAuditRows] = useState<AuditEntry[]>([]);
+  const [confirmAction, setConfirmAction] = useState<{
+    action: () => Promise<void>;
+    title: string;
+    message: string;
+  } | null>(null);
   const { toast } = useToast();
 
   const load = async () => {
@@ -49,7 +56,7 @@ export function AdminMembersPage() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [toast]);
 
   const grantLimited = async (user_id: string, notes?: string, expires_at?: string) => {
     try {
@@ -133,10 +140,10 @@ export function AdminMembersPage() {
         </p>
       </div>
 
-      {/* Quick-add by User ID */}
+      {/* Quick-add by User ID or email */}
       <AddMemberInline
-        onGrantLimited={(user_id, notes, expires_at) => grantLimited(user_id, notes, expires_at)}
-        onGrantFull={(user_id, notes) => grantFull(user_id, notes)}
+        onGrantLimited={grantLimited}
+        onGrantFull={grantFull}
       />
 
       <Card>
@@ -153,8 +160,11 @@ export function AdminMembersPage() {
               <span className="ml-2 text-sm text-muted-foreground">Loading…</span>
             </div>
           ) : rows.length === 0 ? (
-            <div className="p-8 text-center text-sm text-muted-foreground">
-              No admin members yet.
+            <div className="p-12 text-center space-y-3">
+              <div className="text-sm font-medium">No admin members yet</div>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                Use the form above to grant admin access by entering a user ID or email address.
+              </p>
             </div>
           ) : (
             <div className="rounded-md border">
@@ -192,7 +202,11 @@ export function AdminMembersPage() {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              onClick={() => downgrade(r.user_id)}
+                              onClick={() => setConfirmAction({
+                                action: () => downgrade(r.user_id),
+                                title: "Downgrade to Limited?",
+                                message: `This will restrict ${r.user_id.slice(0, 8)}… to read-only access.`
+                              })}
                             >
                               Downgrade
                             </Button>
@@ -207,8 +221,12 @@ export function AdminMembersPage() {
                           )}
                           <Button 
                             size="sm" 
-                            variant="outline" 
-                            onClick={() => revoke(r.user_id)}
+                            variant="destructive" 
+                            onClick={() => setConfirmAction({
+                              action: () => revoke(r.user_id),
+                              title: "Revoke admin access?",
+                              message: `This will remove all admin permissions for ${r.user_id.slice(0, 8)}…`
+                            })}
                           >
                             Revoke
                           </Button>
@@ -246,17 +264,68 @@ export function AdminMembersPage() {
       {auditFor && (
         <AuditModal onClose={() => setAuditFor(null)} title={`Audit for ${auditFor}`} rows={auditRows} />
       )}
+
+      {/* Confirmation modal */}
+      {confirmAction && (
+        <ConfirmModal
+          isOpen={true}
+          onClose={() => setConfirmAction(null)}
+          onConfirm={async () => {
+            await confirmAction.action();
+            setConfirmAction(null);
+          }}
+          title={confirmAction.title}
+          message={confirmAction.message}
+          confirmText="Confirm"
+          confirmVariant="destructive"
+        />
+      )}
     </div>
   );
 }
 
 /** Inline component for adding members */
 function AddMemberInline(props: {
-  onGrantLimited: (user_id: string, notes?: string, expires_at?: string) => void;
-  onGrantFull: (user_id: string, notes?: string) => void;
+  onGrantLimited: (user_id: string, notes?: string, expires_at?: string) => Promise<void>;
+  onGrantFull: (user_id: string, notes?: string) => Promise<void>;
 }) {
-  const [userId, setUserId] = useState("");
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
   
+  const handleGrant = async (type: "limited" | "full") => {
+    if (!input.trim()) {
+      toast({ title: "Please enter a user ID or email", variant: "destructive" });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      let userId = input.trim();
+      
+      // If input looks like email, resolve to UUID
+      if (input.includes("@")) {
+        const resolved = await getUserIdByEmail(input);
+        if (!resolved) {
+          toast({ title: "User not found", description: "No user with that email", variant: "destructive" });
+          setLoading(false);
+          return;
+        }
+        userId = resolved;
+      }
+
+      if (type === "limited") {
+        await props.onGrantLimited(userId);
+      } else {
+        await props.onGrantFull(userId);
+      }
+      
+      setInput("");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -265,29 +334,24 @@ function AddMemberInline(props: {
       <CardContent>
         <div className="flex items-center gap-2">
           <Input
-            className="flex-1 font-mono text-sm"
-            placeholder="Paste target user_id (UUID)"
-            value={userId}
-            onChange={e => setUserId(e.target.value)}
+            className="flex-1 text-sm"
+            placeholder="Enter user ID (UUID) or email address"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            disabled={loading}
           />
           <Button 
-            onClick={() => {
-              props.onGrantLimited(userId);
-              setUserId("");
-            }}
-            disabled={!userId}
+            onClick={() => handleGrant("limited")}
+            disabled={!input || loading}
           >
-            Grant Limited
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Grant Limited"}
           </Button>
           <Button 
-            onClick={() => {
-              props.onGrantFull(userId);
-              setUserId("");
-            }}
-            disabled={!userId}
+            onClick={() => handleGrant("full")}
+            disabled={!input || loading}
             variant="destructive"
           >
-            Grant Full
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Grant Full"}
           </Button>
         </div>
       </CardContent>

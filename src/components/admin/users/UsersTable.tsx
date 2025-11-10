@@ -192,6 +192,29 @@ export function UsersTable({ users, readOnly = false }: UsersTableProps) {
     }
   };
 
+  if (localUsers.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Users Management</span>
+            {readOnly && (
+              <Badge variant="secondary">Read Only</Badge>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-12 text-center space-y-3">
+            <div className="text-sm font-medium">No users found</div>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              Users will appear here once they sign up for the application.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
