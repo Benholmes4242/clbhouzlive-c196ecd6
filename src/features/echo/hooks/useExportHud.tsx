@@ -1,23 +1,8 @@
-/**
- * Hook for managing export HUD state
- */
-import { useState } from 'react';
+import React from 'react';
 import { ExportHud } from '../components/ExportHud';
-import type { ExportProgress } from '../utils/exportOrchestrator';
-
-interface ExportTask {
-  total: number;
-  cancel: () => void;
-}
 
 export function useExportHud() {
-  const [state, setState] = useState<{
-    visible: boolean;
-    current: number;
-    total: number;
-    bytes: number;
-    cancel?: () => void;
-  }>({
+  const [state, setState] = React.useState<{ visible: boolean; current: number; total: number; bytes: number; onCancel?: () => void; }>({
     visible: false,
     current: 0,
     total: 0,
@@ -25,36 +10,17 @@ export function useExportHud() {
   });
 
   return {
-    show(task: ExportTask) {
-      setState({
-        visible: true,
-        current: 0,
-        total: task.total,
-        bytes: 0,
-        cancel: task.cancel,
-      });
+    show(payload: { total: number; onCancel: () => void }) {
+      setState({ visible: true, current: 0, total: payload.total, bytes: 0, onCancel: payload.onCancel });
     },
-    
-    update(progress: ExportProgress) {
-      setState(prev => ({
-        ...prev,
-        current: progress.current,
-        total: progress.total,
-        bytes: progress.bytes,
-      }));
+    update(p: { current: number; total: number; bytes: number }) {
+      setState(s => ({ ...s, ...p }));
     },
-    
     done() {
-      setState(prev => ({ ...prev, visible: false }));
+      setState(s => ({ ...s, visible: false }));
     },
-    
-    component: state.visible ? (
-      <ExportHud
-        current={state.current}
-        total={state.total}
-        bytes={state.bytes}
-        onCancel={() => state.cancel?.()}
-      />
+    ui: state.visible ? (
+      <ExportHud current={state.current} total={state.total} bytes={state.bytes} onCancel={state.onCancel!} />
     ) : null,
   };
 }

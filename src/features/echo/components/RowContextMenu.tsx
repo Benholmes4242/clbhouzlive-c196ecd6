@@ -5,13 +5,50 @@
 
 import React, { useState, useEffect } from 'react';
 import { MoreHorizontal, Share2, Link2Off, FileJson, FileText, Tag as TagIcon, X } from 'lucide-react';
-import { exportToJSON, exportToMarkdown } from '../utils/exportConversation';
+import { downloadBlob } from '../utils/download';
 import { createShareLink, revokeShareLink, getShareInfoForThread } from '../api/shareActions';
 import { fetchThreadDetails } from '../api/threadDetails';
 import { getThreadTags, removeTagFromThread } from '../api/tags';
 import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
 import { toast } from '@/hooks/use-toast';
 import { TagInputPopover } from './TagInputPopover';
+
+function convertToMarkdown(thread: any): string {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  let markdown = `# Echo Conversation — ${thread.title}\n\n`;
+  markdown += `**Thread ID:** ${thread.thread_id}\n`;
+  markdown += `**Created:** ${formatDate(thread.created_at)}\n\n`;
+  markdown += `---\n\n`;
+  
+  for (const msg of thread.messages) {
+    const sender = msg.role === 'user' ? 'You' : 'Echo';
+    const time = formatTime(msg.created_at);
+    
+    markdown += `**${sender}** · ${time}\n\n`;
+    markdown += `${msg.content}\n\n`;
+    markdown += `---\n\n`;
+  }
+  
+  return markdown;
+}
 
 interface RowContextMenuProps {
   threadId: string;
@@ -64,7 +101,9 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
     try {
       const thread = await fetchThreadDetails(threadId);
       echoHistoryAnalytics.exportStarted({ thread_id: threadId, format: 'json' });
-      exportToJSON(thread);
+      const blob = new Blob([JSON.stringify(thread, null, 2)], { type: 'application/json' });
+      const filename = `${(thread.title || 'conversation_' + thread.thread_id).replace(/[\\/:"*?<>|]+/g, '_')}.json`;
+      downloadBlob(blob, filename);
       toast({ description: 'Exported to JSON', duration: 2000 });
     } catch (error) {
       console.error('Export failed:', error);
@@ -80,7 +119,10 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
     try {
       const thread = await fetchThreadDetails(threadId);
       echoHistoryAnalytics.exportStarted({ thread_id: threadId, format: 'md' });
-      exportToMarkdown(thread);
+      const md = convertToMarkdown(thread);
+      const blob = new Blob([md], { type: 'text/markdown' });
+      const filename = `${(thread.title || 'conversation_' + thread.thread_id).replace(/[\\/:"*?<>|]+/g, '_')}.md`;
+      downloadBlob(blob, filename);
       toast({ description: 'Exported to Markdown', duration: 2000 });
     } catch (error) {
       console.error('Export failed:', error);

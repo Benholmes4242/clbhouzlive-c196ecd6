@@ -18,7 +18,8 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { starThread, deleteThread } from '@/features/echo/api/threadActions';
 import { bulkStarThreads, bulkDeleteThreads } from '@/features/echo/api/bulkActions';
 import { fetchThreadDetails } from '@/features/echo/api/threadDetails';
-import { startZipExport, downloadBlob, makeExportFilename } from '@/features/echo/utils/exportOrchestrator';
+import { startZipExport } from '@/features/echo/utils/exportOrchestrator';
+import { downloadBlob, defaultZipName } from '@/features/echo/utils/download';
 import { useExportHud } from '@/features/echo/hooks/useExportHud';
 import { toast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
@@ -332,51 +333,24 @@ export function HubEchoHistoryPage() {
   const bulkExportZip = useCallback((format: 'json' | 'md') => {
     if (selectedArray.length < 2) return;
     
-    const threads = selectedArray.map(id => {
-      const chat = chats.find(c => c.id === id);
-      return { id, title: chat?.title };
-    });
-    
-    const task = startZipExport({
-      threads,
+    const controller = startZipExport({
+      threadIds: selectedArray,
       format,
-      fetchThread: fetchThreadDetails,
-      filename: makeExportFilename(format, threads.length),
-      onProgress: (progress) => {
-        exportHud.update(progress);
-      },
+      filename: defaultZipName(),
+      onProgress: (p) => exportHud.update(p),
       onDone: (blob) => {
         exportHud.done();
-        downloadBlob(blob, makeExportFilename(format, threads.length));
-        echoHistoryAnalytics.exportCompleted({
-          count: threads.length,
-          bytes: blob.size,
-          duration_ms: 0, // Will be tracked in orchestrator
-        });
-        toast({ 
-          description: `Exported ${threads.length} conversations`, 
-          duration: 2000 
-        });
+        downloadBlob(blob, defaultZipName());
+        toast({ description: `Exported ${selectedArray.length} conversations`, duration: 2000 });
       },
       onError: (err) => {
         exportHud.done();
-        if (err.message !== 'Export canceled') {
-          toast({ 
-            description: err.message || 'Failed to export conversations', 
-            variant: 'destructive', 
-            duration: 3000 
-          });
-        } else {
-          toast({ 
-            description: 'Export canceled', 
-            duration: 2000 
-          });
-        }
+        toast({ description: err.message || 'Export failed', variant: 'destructive', duration: 3000 });
       },
     });
-    
-    exportHud.show({ total: threads.length, cancel: task.cancel });
-  }, [selectedArray, chats, exportHud]);
+
+    exportHud.show({ total: selectedArray.length, onCancel: controller.cancel });
+  }, [selectedArray, exportHud]);
   
   const bulkStar = useCallback(async (star: boolean) => {
     if (selectedArray.length === 0) return;
@@ -940,7 +914,7 @@ export function HubEchoHistoryPage() {
       />
       
       {/* Export HUD */}
-      {exportHud.component}
+      {exportHud.ui}
       
       {/* Shortcuts modal */}
       <ShortcutsModal open={showShortcuts} onClose={() => setShowShortcuts(false)} />

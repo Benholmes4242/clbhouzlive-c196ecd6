@@ -2,7 +2,13 @@
  * Export Orchestrator
  * Handles bulk export with progress tracking and cancellation
  */
+import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
+import { fetchThreadDetails } from '../api/threadDetails';
 import type { ThreadDetails } from '../api/threadDetails';
+
+export type FullThread = ThreadDetails;
+
+type Progress = { current: number; total: number; bytes: number };
 
 function convertToMarkdown(thread: ThreadDetails): string {
   const formatDate = (dateString: string) => {
@@ -41,141 +47,86 @@ function convertToMarkdown(thread: ThreadDetails): string {
   return markdown;
 }
 
-function sanitizeFilename(title: string): string {
-  return title
-    .slice(0, 50)
-    .replace(/[\\/:"*?<>|]+/g, '_')
-    .replace(/\s+/g, '_')
-    .toLowerCase();
+function sanitizeFilename(name: string) {
+  return name.trim().replace(/[\\/:"*?<>|]+/g, '_').slice(0, 120);
 }
 
-export interface ExportProgress {
-  current: number;
-  total: number;
-  bytes: number;
-}
-
-export interface ExportOptions {
-  threads: Array<{ id: string; title?: string }>;
-  format: 'json' | 'md';
-  fetchThread: (id: string) => Promise<ThreadDetails>;
+export function startZipExport(opts: {
+  threadIds: string[];
+  format: 'json'|'md';
   filename?: string;
-  onProgress?: (progress: ExportProgress) => void;
+  onProgress?: (p: Progress) => void;
   onDone?: (blob: Blob) => void;
   onError?: (err: Error) => void;
-}
-
-export function startZipExport(opts: ExportOptions) {
-  const startTime = performance.now();
-  const total = opts.threads.length;
+}) {
+  const start = performance.now();
+  const total = opts.threadIds.length;
   let canceled = false;
-  let resolved = false;
-  
-  const worker = new Worker(
-    new URL('./zip.worker.ts', import.meta.url),
-    { type: 'module' }
-  );
-  
-  const files: Array<{ path: string; contents: string }> = [];
-  const errors: string[] = [];
 
+  echoHistoryAnalytics.exportBulkStarted({ count: total, format: opts.format });
+
+  const worker = new Worker(new URL('../../../workers/zip.worker.ts', import.meta.url), { type: 'module' });
+  const files: { path: string; contents: string }[] = [];
+
+  let resolved = false;
   const finish = (fn: Function, ...args: any[]) => {
     if (resolved) return;
     resolved = true;
-    worker.terminate();
+    try { worker.terminate(); } catch {}
     fn(...args);
+  };
+
+  worker.onmessage = (ev: MessageEvent) => {
+    const msg = ev.data;
+    if (msg.type === 'progress') {
+      opts.onProgress?.(msg as Progress);
+    } else if (msg.type === 'done') {
+      const blob: Blob = msg.blob;
+      echoHistoryAnalytics.exportCompleted?.({ count: total, bytes: blob.size, duration_ms: Math.round(performance.now() - start) });
+      finish(opts.onDone ?? (() => {}), blob);
+    } else if (msg.type === 'error') {
+      finish(opts.onError ?? (() => {}), new Error(msg.message));
+    }
   };
 
   (async () => {
     const batchSize = 3;
-    
+    const errors: string[] = [];
+
     for (let i = 0; i < total && !canceled; i += batchSize) {
-      const batch = opts.threads.slice(i, i + batchSize);
-      const results = await Promise.allSettled(
-        batch.map(t => opts.fetchThread(t.id))
-      );
+      const batch = opts.threadIds.slice(i, i + batchSize);
+      const results = await Promise.allSettled(batch.map(id => fetchThreadDetails(id)));
 
       results.forEach((res, idx) => {
-        const thread = batch[idx];
         if (res.status === 'fulfilled') {
-          const threadData = res.value;
-          const fileBase = sanitizeFilename(
-            thread.title || threadData.title || `conversation_${thread.id}`
-          );
-          const path = `${fileBase}.${opts.format}`;
-          const contents = opts.format === 'json'
-            ? JSON.stringify(threadData, null, 2)
-            : convertToMarkdown(threadData);
-          
+          const t = res.value as FullThread;
+          const base = sanitizeFilename(t.title || `conversation_${t.thread_id}`);
+          const path = `${base}.${opts.format}`;
+          const contents = opts.format === 'json' ? JSON.stringify(t, null, 2) : convertToMarkdown(t);
           files.push({ path, contents });
-          
-          // Emit progress after each batch
-          opts.onProgress?.({
-            current: files.length,
-            total,
-            bytes: files.reduce((sum, f) => sum + f.contents.length, 0)
-          });
+          // Lightweight progress based on files prepared:
+          opts.onProgress?.({ current: Math.min(files.length, total), total, bytes: 0 });
         } else {
-          errors.push(thread.id);
+          errors.push(batch[idx]);
         }
       });
     }
 
     if (canceled) return;
-
-    if (files.length === 0) {
-      finish(opts.onError ?? (() => {}), new Error('No conversations could be exported'));
-      return;
+    if (errors.length) {
+      console.warn('Export skipped threads:', errors);
     }
 
-    // Send to worker for zipping
-    worker.onmessage = (ev: MessageEvent) => {
-      const msg = ev.data;
-      
-      if (msg.type === 'progress') {
-        opts.onProgress?.(msg);
-      } else if (msg.type === 'done') {
-        finish(opts.onDone ?? (() => {}), msg.blob);
-      } else if (msg.type === 'error') {
-        finish(opts.onError ?? (() => {}), new Error(msg.message));
-      }
-    };
-
-    worker.postMessage({ 
-      task: { 
-        format: opts.format, 
-        files 
-      } 
-    });
-  })().catch(err => {
-    finish(opts.onError ?? (() => {}), err);
-  });
+    worker.postMessage({ task: { format: opts.format, files } });
+  })().catch((e) => finish(opts.onError ?? (() => {}), e as Error));
 
   return {
-    cancel: () => {
+    cancel() {
       if (!resolved) {
         canceled = true;
+        echoHistoryAnalytics.exportCanceled?.({ current: files.length, total });
         finish(opts.onError ?? (() => {}), new Error('Export canceled'));
       }
     }
   };
-}
-
-export function downloadBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-export function makeExportFilename(format: 'json' | 'md', count: number = 1): string {
-  const date = new Date().toISOString().split('T')[0];
-  if (count === 1) {
-    return `echo_conversation_${date}.${format}`;
-  }
-  return `echo_conversations_${date}.zip`;
 }
