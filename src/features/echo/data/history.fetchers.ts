@@ -7,7 +7,9 @@ import { supabase } from '@/integrations/supabase/client';
 
 export type ChatItem = {
   id: string;
-  preview_text: string;
+  title: string;           // First user message (question)
+  subtitle: string;        // First assistant reply excerpt
+  preview_text: string;    // Deprecated, kept for compatibility
   created_at: string;
 };
 
@@ -17,6 +19,14 @@ export type SwingItem = {
   thumbnail_url: string | null;
   created_at: string;
 };
+
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/```[\s\S]*?```/g, '')        // remove code blocks
+    .replace(/[*_#>`~\-]+/g, '')           // remove md markers
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1')    // [text](link) → text
+    .trim();
+}
 
 /**
  * Fetch from legacy conversations table
@@ -37,12 +47,20 @@ async function fromConversations(limit = 20): Promise<ChatItem[]> {
   
   return data.map((conv: any) => {
     const msgs = Array.isArray(conv.messages) ? conv.messages : [];
-    const last = msgs[msgs.length - 1] as any;
-    const raw = (last?.content ?? conv.title ?? 'Empty conversation') + '';
-    const preview = raw.replace(/\s+/g, ' ').trim();
+    const firstUser = msgs.find((m: any) => m.role === 'user');
+    const firstAssistant = msgs.find((m: any) => m.role === 'assistant');
+    
+    const titleRaw = firstUser?.content ?? conv.title ?? '(No question)';
+    const subtitleRaw = firstAssistant?.content ?? '';
+    
+    const title = stripMarkdown(titleRaw).slice(0, 100);
+    const subtitle = stripMarkdown(subtitleRaw).slice(0, 120);
+    
     return {
       id: conv.id,
-      preview_text: preview.slice(0, 80) + (preview.length > 80 ? '…' : ''),
+      title,
+      subtitle,
+      preview_text: subtitle || title, // Fallback for compatibility
       created_at: conv.updated_at ?? conv.created_at
     };
   });
@@ -55,29 +73,50 @@ async function fromThreads(limit = 20): Promise<ChatItem[]> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
   
-  const { data: latest, error } = await supabase
+  const { data: allMessages, error } = await supabase
     .from('echo_messages')
     .select('thread_id, role, content, created_at')
     .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(500);
+    .order('created_at', { ascending: true });
   
-  if (error || !latest?.length) return [];
+  if (error || !allMessages?.length) return [];
   
-  const seen = new Set<string>();
+  // Group messages by thread_id
+  const threadMap = new Map<string, any[]>();
+  for (const msg of allMessages) {
+    if (!threadMap.has(msg.thread_id)) {
+      threadMap.set(msg.thread_id, []);
+    }
+    threadMap.get(msg.thread_id)!.push(msg);
+  }
+  
+  // Build items with first user/assistant messages
   const items: ChatItem[] = [];
+  const threads = Array.from(threadMap.entries())
+    .sort((a, b) => {
+      const aLast = a[1][a[1].length - 1].created_at;
+      const bLast = b[1][b[1].length - 1].created_at;
+      return bLast.localeCompare(aLast);
+    })
+    .slice(0, limit);
   
-  for (const m of latest) {
-    if (seen.has(m.thread_id)) continue;
-    seen.add(m.thread_id);
-    const raw = (m.content ?? 'Empty conversation') + '';
-    const preview = raw.replace(/\s+/g, ' ').trim();
+  for (const [threadId, messages] of threads) {
+    const firstUser = messages.find(m => m.role === 'user');
+    const firstAssistant = messages.find(m => m.role === 'assistant');
+    
+    const titleRaw = firstUser?.content ?? '(No question)';
+    const subtitleRaw = firstAssistant?.content ?? '';
+    
+    const title = stripMarkdown(titleRaw).slice(0, 100);
+    const subtitle = stripMarkdown(subtitleRaw).slice(0, 120);
+    
     items.push({
-      id: m.thread_id,
-      preview_text: preview.slice(0, 80) + (preview.length > 80 ? '…' : ''),
-      created_at: m.created_at
+      id: threadId,
+      title,
+      subtitle,
+      preview_text: subtitle || title,
+      created_at: messages[messages.length - 1].created_at
     });
-    if (items.length >= limit) break;
   }
   
   return items;

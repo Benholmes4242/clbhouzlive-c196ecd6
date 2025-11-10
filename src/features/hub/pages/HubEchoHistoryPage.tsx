@@ -82,7 +82,13 @@ export function HubEchoHistoryPage() {
       </header>
 
       {/* Body */}
-      <main className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))] px-3.5 pb-6">
+      <main 
+        className="relative overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px)+var(--hub-pad,20px))] pb-[calc(var(--hub-pad,20px)+env(safe-area-inset-bottom,0px))] px-[var(--hub-pad,20px)]"
+        style={{
+          maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%)',
+        }}
+      >
         <div
           className="rounded-3xl p-6"
           style={{
@@ -143,8 +149,8 @@ export function HubEchoHistoryPage() {
                       <div key={item.id} role="listitem">
                         <HistoryRow
                           id={item.id}
-                          title={item.preview_text.slice(0, 60) || 'Chat with Echo'}
-                          preview={item.preview_text}
+                          title={item.title}
+                          subtitle={item.subtitle}
                           createdAt={item.created_at}
                           isExpanded={isExpanded}
                           onClick={() => {
@@ -159,7 +165,7 @@ export function HubEchoHistoryPage() {
                         {isExpanded && (
                           <HistoryThreadInline
                             threadId={item.id}
-                            title={item.preview_text.slice(0, 60) || 'Chat with Echo'}
+                            title={item.title}
                             onCollapse={() => setExpandedId(null)}
                             onCopyLink={() => {
                               navigator.clipboard.writeText(window.location.origin + `/hub/echo/history/chat/${item.id}`);

@@ -8,8 +8,6 @@ import { X, ExternalLink, Copy } from 'lucide-react';
 import { MessageBubble } from '@/components/ai-chat/MessageBubble';
 import { groupMessages } from '@/components/ai-chat/utils/groupMessages';
 import { useEchoThreadMessages } from '../hooks/useEchoThreadMessages';
-import { TapButton } from '@/components/ui/TapButton';
-import { useVirtualizedList } from '@/hooks/useVirtualizedList';
 
 export interface HistoryThreadInlineProps {
   threadId: string;
@@ -26,33 +24,17 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   onCollapse,
   onCopyLink,
   onOpenFull,
-  onDelete,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const { data: messages = [], isLoading, error } = useEchoThreadMessages(threadId);
   const groupedMessages = groupMessages(messages);
 
-  // Estimate item height for virtualization (average bubble height ~80px)
-  const estimatedItemHeight = 80;
-  const containerHeight = Math.min(window.innerHeight * 0.65, 600);
-
-  const {
-    visibleItems,
-    containerProps,
-    innerProps,
-  } = useVirtualizedList({
-    items: groupedMessages,
-    itemHeight: estimatedItemHeight,
-    containerHeight,
-    overscan: 3,
-  });
-
   // Auto-scroll to bottom on mount
   useEffect(() => {
-    if (containerRef.current && messages.length > 0) {
+    if (scrollRef.current && messages.length > 0) {
       setTimeout(() => {
-        if (containerRef.current) {
-          containerRef.current.scrollTop = containerRef.current.scrollHeight;
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
       }, 100);
     }
@@ -87,8 +69,8 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
 
         <div className="flex items-center gap-1">
           {onCopyLink && (
-            <TapButton
-              onPointerDown={onCopyLink}
+            <button
+              onClick={onCopyLink}
               className="p-1.5 rounded-lg transition-colors"
               style={{ color: 'var(--hub-text-dim)' }}
               onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
@@ -96,12 +78,12 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
               aria-label="Copy link"
             >
               <Copy className="w-4 h-4" />
-            </TapButton>
+            </button>
           )}
           
           {onOpenFull && (
-            <TapButton
-              onPointerDown={onOpenFull}
+            <button
+              onClick={onOpenFull}
               className="p-1.5 rounded-lg transition-colors"
               style={{ color: 'var(--hub-text-dim)' }}
               onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
@@ -109,11 +91,11 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
               aria-label="Open full"
             >
               <ExternalLink className="w-4 h-4" />
-            </TapButton>
+            </button>
           )}
 
-          <TapButton
-            onPointerDown={onCollapse}
+          <button
+            onClick={onCollapse}
             className="p-1.5 rounded-lg transition-colors"
             style={{ color: 'var(--hub-text-dim)' }}
             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
@@ -121,17 +103,16 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
             aria-label="Collapse"
           >
             <X className="w-4 h-4" />
-          </TapButton>
+          </button>
         </div>
       </div>
 
       {/* Messages */}
       <div
-        ref={containerRef}
-        {...containerProps}
+        ref={scrollRef}
         className="overflow-y-auto no-scrollbar"
         style={{
-          ...containerProps.style,
+          maxHeight: 'min(65vh, 600px)',
           borderRadius: '12px',
           background: 'rgba(0,0,0,0.15)',
           padding: '12px',
@@ -154,7 +135,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
             className="text-center py-8 text-[15px]"
             style={{ color: 'var(--hub-text-dim)' }}
           >
-            Couldn't load messages. Please try again.
+            Couldn't load this conversation.
           </div>
         )}
 
@@ -167,24 +148,21 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
           </div>
         )}
 
-        {!isLoading && !error && messages.length > 0 && (
-          <div {...innerProps}>
-            <div className="space-y-3">
-              {visibleItems.map(({ item: msg, index, style }) => (
-                <div key={msg.id} style={style}>
-                  <MessageBubble
-                    role={msg.role as 'user' | 'assistant'}
-                    content={msg.content}
-                    timestamp={msg.created_at}
-                    firstInGroup={msg.firstInGroup}
-                    lastInGroup={msg.lastInGroup}
-                    readOnly={true}
-                    showChips={msg.firstInGroup}
-                    maxWidth="desktop"
-                  />
-                </div>
-              ))}
-            </div>
+        {!isLoading && !error && groupedMessages.length > 0 && (
+          <div className="space-y-3">
+            {groupedMessages.map((msg) => (
+              <MessageBubble
+                key={msg.id}
+                role={msg.role as 'user' | 'assistant'}
+                content={msg.content}
+                timestamp={msg.created_at}
+                firstInGroup={msg.firstInGroup}
+                lastInGroup={msg.lastInGroup}
+                readOnly={true}
+                showChips={msg.firstInGroup}
+                maxWidth="desktop"
+              />
+            ))}
           </div>
         )}
       </div>

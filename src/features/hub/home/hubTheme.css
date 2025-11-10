@@ -9,7 +9,7 @@
      LAYOUT TOKENS (spacing, sizing)
      ======================================== */
   --hub-radius: 18px;
-  --hub-pad: 16px;
+  --hub-pad: 20px;
   --hub-gap: 14px;
   --hub-header-height: 56px;
   --hub-tile-compact: 200px;
@@ -35,6 +35,7 @@
   --hub-header-bg-start: rgba(36,36,38,0.85);
   --hub-header-bg-mid: rgba(36,36,38,0.55);
   --hub-header-bg-end: rgba(36,36,38,0.00);
+  --hub-header-bg-solid: rgba(22, 24, 27, 0.98);
   --hub-header-blur: 24px;
   --hub-header-stroke: rgba(255,255,255,0.09);
   --hub-header-highlight: rgba(255,255,255,0.10);

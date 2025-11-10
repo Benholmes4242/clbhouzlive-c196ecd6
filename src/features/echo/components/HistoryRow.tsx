@@ -9,8 +9,8 @@ import { formatRelativeTime } from '@/utils/dateFormat';
 
 export interface HistoryRowProps {
   id: string;
-  title: string;
-  preview: string;
+  title: string;          // User's question (first user message)
+  subtitle: string;       // First assistant reply excerpt
   createdAt: string;
   messageCount?: number;
   hasWebSources?: boolean;
@@ -20,7 +20,7 @@ export interface HistoryRowProps {
 
 export const HistoryRow: React.FC<HistoryRowProps> = ({
   title,
-  preview,
+  subtitle,
   createdAt,
   messageCount,
   hasWebSources,
@@ -63,7 +63,7 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
         </div>
       </div>
 
-      {/* Line 2: Preview */}
+      {/* Line 2: Subtitle (first assistant reply) */}
       <div 
         className="text-[13px] line-clamp-2"
         style={{ 
@@ -71,7 +71,7 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
           lineHeight: '1.4'
         }}
       >
-        {preview}
+        {subtitle || '(No response yet)'}
       </div>
 
       {/* Meta chips (optional) */}
