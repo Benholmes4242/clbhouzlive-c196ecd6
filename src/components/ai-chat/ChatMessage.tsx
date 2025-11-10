@@ -115,8 +115,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 Echo
               </span>
               <div 
-                className="flex items-center justify-center w-7 h-7 rounded-lg"
+                className="flex items-center justify-center rounded-lg"
                 style={{
+                  width: 28,
+                  height: 28,
                   background: 'rgba(255,255,255,0.08)',
                   border: '1px solid rgba(255,255,255,0.12)',
                   backdropFilter: 'blur(12px)',
