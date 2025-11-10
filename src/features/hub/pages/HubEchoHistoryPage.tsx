@@ -11,12 +11,15 @@ import { SwipeableHistoryRow } from '@/features/echo/components/SwipeableHistory
 import { HistoryThreadInline } from '@/features/echo/components/HistoryThreadInline';
 import { VirtualList } from '@/features/echo/components/virtual/VirtualList';
 import { EchoHistorySearch } from '@/features/echo/components/EchoHistorySearch';
+import { BulkActionBar } from '@/features/echo/components/BulkActionBar';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { starThread, deleteThread } from '@/features/echo/api/threadActions';
+import { bulkStarThreads, bulkDeleteThreads } from '@/features/echo/api/bulkActions';
 import { toast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { echoHistoryAnalytics } from '@/features/echo/analytics/echoHistoryAnalytics';
 import { useMedia } from '@/hooks/useMedia';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { announce } from '@/utils/a11y';
 import '../home/hubTheme.css';
 
@@ -47,6 +50,13 @@ export function HubEchoHistoryPage() {
   // Search & Filter state
   const [filters, setFilters] = useState<EchoHistorySearchFilters>({});
   
+  // Bulk selection state
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  
+  // Sort mode (persisted)
+  const [sortMode, setSortMode] = useLocalStorage<'default' | 'starred' | 'relevance'>('echo.sortMode', 'default');
+  
   // Data with search/filter support
   const { data: chats = [], isLoading, error } = useEchoHistorySearch(filters, { limit: 100 });
   
@@ -62,6 +72,11 @@ export function HubEchoHistoryPage() {
       : 0;
     return baseHeight + expandedHeight + (expandedId === chat.id ? 8 : 0); // 8px gap
   };
+  
+  // Inject sortMode into filters
+  useEffect(() => {
+    setFilters(prev => ({ ...prev, sortMode }));
+  }, [sortMode]);
   
   // Search & filter handlers
   const handleSearchChange = useCallback((query: string) => {
@@ -278,12 +293,102 @@ export function HubEchoHistoryPage() {
     }
   }, [handleSoftDelete]);
 
+  // Bulk action handlers
+  const selectedArray = Array.from(selectedIds);
+  
+  const bulkStar = useCallback(async (star: boolean) => {
+    if (selectedArray.length === 0) return;
+    
+    // Optimistic update
+    queryClient.setQueryData(['echoHistorySearch', filters, 100], (old: any) =>
+      (old || []).map((x: any) => selectedIds.has(x.id) ? { ...x, is_starred: star } : x)
+    );
+    
+    echoHistoryAnalytics.bulkStar({ count: selectedArray.length, starred: star });
+    
+    try {
+      await bulkStarThreads(selectedArray, star);
+      toast({ description: star ? `Starred ${selectedArray.length} conversations` : `Unstarred ${selectedArray.length} conversations`, duration: 2000 });
+    } catch {
+      queryClient.invalidateQueries({ queryKey: ['echoHistorySearch'] });
+      toast({ description: 'Failed to update starred', variant: 'destructive' });
+    }
+  }, [selectedArray, selectedIds, filters, queryClient]);
+  
+  const bulkDelete = useCallback(async () => {
+    if (selectedArray.length === 0) return;
+    
+    const snapshot = queryClient.getQueryData(['echoHistorySearch', filters, 100]) as any[] || [];
+    const start = Date.now();
+    
+    // Optimistic remove
+    queryClient.setQueryData(['echoHistorySearch', filters, 100], (old: any) =>
+      (old || []).filter((x: any) => !selectedIds.has(x.id))
+    );
+    
+    // Collapse if any selected items are expanded
+    setExpandedId(prev => (prev && selectedIds.has(prev) ? null : prev));
+    setSelectMode(false);
+    setSelectedIds(new Set());
+    
+    echoHistoryAnalytics.bulkDeleteSoft({ count: selectedArray.length });
+    announce(`Deleted ${selectedArray.length} conversations. Undo available for 5 seconds.`);
+    
+    const { dismiss } = toast({
+      description: `Deleted ${selectedArray.length} conversations`,
+      duration: 5000,
+      action: (
+        <ToastAction
+          altText="Undo bulk delete"
+          onClick={() => {
+            echoHistoryAnalytics.bulkDeleteUndo({ count: selectedArray.length, seconds_elapsed: (Date.now() - start) / 1000 });
+            queryClient.setQueryData(['echoHistorySearch', filters, 100], snapshot);
+            announce(`Restored ${selectedArray.length} conversations`);
+            dismiss();
+          }}
+        >
+          Undo
+        </ToastAction>
+      ),
+    });
+    
+    // Finalize after 5s
+    setTimeout(async () => {
+      try {
+        await bulkDeleteThreads(selectedArray);
+        echoHistoryAnalytics.bulkDeleteHard({ count: selectedArray.length, latency_ms: Date.now() - start });
+      } catch {
+        queryClient.invalidateQueries({ queryKey: ['echoHistorySearch'] });
+        toast({ description: 'Failed to delete some items', variant: 'destructive' });
+      }
+    }, 5000);
+  }, [selectedArray, selectedIds, filters, queryClient]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Only handle if not typing in an input
       if (document.activeElement?.tagName === 'INPUT' || 
           document.activeElement?.tagName === 'TEXTAREA') {
+        return;
+      }
+
+      // Bulk mode shortcuts
+      if (selectMode) {
+        if (e.key === 's' || e.key === 'S') {
+          e.preventDefault();
+          bulkStar(true);
+        }
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+          e.preventDefault();
+          bulkDelete();
+        }
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          setSelectedIds(new Set());
+          setSelectMode(false);
+          announce('Selection cleared');
+        }
         return;
       }
 
@@ -310,7 +415,7 @@ export function HubEchoHistoryPage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [expandedId, chats, handleStar, handleDelete]);
+  }, [selectMode, expandedId, chats, handleStar, handleDelete, bulkStar, bulkDelete]);
   
   // Cleanup pending deletes on unmount
   useEffect(() => {
@@ -349,7 +454,46 @@ export function HubEchoHistoryPage() {
           ‹ Back
         </button>
         <h1 className="text-white/90 text-[17px] font-semibold">Echo History</h1>
-        <div className="w-16" />
+        
+        {/* Right controls: Sort + Select */}
+        <div className="flex items-center gap-2">
+          {/* Sort dropdown */}
+          <select
+            value={sortMode}
+            onChange={(e) => {
+              const mode = e.target.value as 'default' | 'starred' | 'relevance';
+              setSortMode(mode);
+              echoHistoryAnalytics.sortChanged({ sort_mode: mode });
+              announce(`Sorted by ${mode === 'starred' ? 'Starred first' : mode === 'relevance' ? 'Relevance' : 'Default'}`);
+            }}
+            className="px-3 py-1.5 rounded-full text-[13px] border border-white/10 focus:outline-none focus:ring-2 focus:ring-white/18"
+            style={{ background: 'rgba(255,255,255,0.08)', color: 'var(--hub-text)' }}
+            aria-label="Sort conversations"
+          >
+            <option value="default">Recent</option>
+            <option value="starred">Starred</option>
+            {filters.query && <option value="relevance">Relevance</option>}
+          </select>
+          
+          {/* Select toggle */}
+          <button
+            onClick={() => {
+              const next = !selectMode;
+              setSelectMode(next);
+              setSelectedIds(new Set());
+              announce(next ? 'Selection mode enabled' : 'Selection mode disabled');
+            }}
+            className="px-3 py-1.5 rounded-full text-[13px] border border-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/18"
+            style={{ 
+              background: selectMode ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.08)', 
+              color: 'var(--hub-text)' 
+            }}
+            aria-pressed={selectMode}
+            aria-label="Select conversations"
+          >
+            {selectMode ? 'Done' : 'Select'}
+          </button>
+        </div>
       </header>
 
       {/* Body - Page shell with safe-area padding */}
@@ -430,6 +574,7 @@ export function HubEchoHistoryPage() {
                 render={(index) => {
                   const item = chats[index];
                   const isExpanded = expandedId === item.id;
+                  const isChecked = selectedIds.has(item.id);
                   
                   return (
                     <div role="listitem" className="mb-2">
@@ -446,9 +591,33 @@ export function HubEchoHistoryPage() {
                         listFilters={filters}
                         rankIndex={index}
                         isPendingDelete={pendingDeletes.has(item.id)}
+                        selectionMode={selectMode}
+                        selected={isChecked}
+                        onSelectToggle={() => {
+                          const next = new Set(selectedIds);
+                          if (isChecked) {
+                            next.delete(item.id);
+                          } else {
+                            next.add(item.id);
+                          }
+                          setSelectedIds(next);
+                          announce(isChecked ? 'Deselected' : 'Selected');
+                        }}
                         onStar={() => handleStar(item.id, item.is_starred, 'swipe', index)}
                         onDelete={() => handleDelete(item.id, 'swipe')}
                         onClick={() => {
+                          if (selectMode) {
+                            const next = new Set(selectedIds);
+                            if (isChecked) {
+                              next.delete(item.id);
+                            } else {
+                              next.add(item.id);
+                            }
+                            setSelectedIds(next);
+                            announce(isChecked ? 'Deselected' : 'Selected');
+                            return;
+                          }
+                          
                           if (isExpanded) {
                             setExpandedId(null);
                           } else {
@@ -511,11 +680,24 @@ export function HubEchoHistoryPage() {
         open={deleteConfirmId !== null}
         onOpenChange={(open) => !open && setDeleteConfirmId(null)}
         title="Delete conversation?"
-        description="This action cannot be undone. All messages in this conversation will be permanently deleted."
+        description="This will remove the conversation from your history. You'll have 5 seconds to undo."
         confirmText="Delete"
         cancelText="Cancel"
         onConfirm={handleDeleteConfirm}
         variant="destructive"
+      />
+      
+      {/* Bulk action bar */}
+      <BulkActionBar
+        count={selectedArray.length}
+        onStar={() => bulkStar(true)}
+        onUnstar={() => bulkStar(false)}
+        onDelete={bulkDelete}
+        onClear={() => {
+          setSelectedIds(new Set());
+          setSelectMode(false);
+          announce('Selection cleared');
+        }}
       />
     </div>
   );

@@ -21,6 +21,10 @@ export interface HistoryRowProps {
   onClick?: () => void;
   onStarClick?: () => void;
   className?: string;
+  // Bulk selection
+  selectionMode?: boolean;
+  selected?: boolean;
+  onSelectToggle?: () => void;
 }
 
 export const HistoryRow: React.FC<HistoryRowProps> = ({
@@ -36,21 +40,44 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
   onClick,
   onStarClick,
   className,
+  selectionMode,
+  selected,
+  onSelectToggle,
 }) => {
   return (
-    <button
-      onClick={onClick}
-      aria-label={`Open conversation: ${title}`}
-      className={cn(
-        'w-full text-left rounded-[18px] p-3.5 transition-transform anim-fade',
-        'hover:translate-y-[-1px] focus:outline-none focus:ring-2 focus:ring-white/18',
-        'border border-white/10',
-        className
+    <div className={cn('flex items-center gap-2', className)}>
+      {/* Selection checkbox */}
+      {selectionMode && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelectToggle?.();
+          }}
+          className="shrink-0 w-8 h-8 rounded-md flex items-center justify-center transition-colors"
+          style={{ 
+            border: '1px solid var(--hub-stroke)', 
+            background: selected ? 'rgba(255,255,255,0.14)' : 'transparent' 
+          }}
+          aria-pressed={!!selected}
+          aria-label={`${selected ? 'Deselect' : 'Select'} conversation ${title}`}
+        >
+          {selected && <span style={{ color: 'var(--hub-text)' }}>✓</span>}
+        </button>
       )}
-      style={{ background: 'rgba(255,255,255,.06)', backdropFilter: 'blur(10px)' }}
-    >
-      {/* Line 1: title + time + star */}
-      <div className="flex items-start gap-2">
+      
+      {/* Main row button */}
+      <button
+        onClick={onClick}
+        aria-label={`Open conversation: ${title}`}
+        className={cn(
+          'flex-1 text-left rounded-[18px] p-3.5 transition-transform anim-fade',
+          'hover:translate-y-[-1px] focus:outline-none focus:ring-2 focus:ring-white/18',
+          'border border-white/10'
+        )}
+        style={{ background: 'rgba(255,255,255,.06)', backdropFilter: 'blur(10px)' }}
+      >
+        {/* Line 1: title + time + star */}
+        <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <div className="truncate font-medium text-[15px] leading-5" style={{ color: 'var(--hub-text)' }}>
@@ -106,6 +133,7 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
           </div>
         )}
       </div>
-    </button>
+      </button>
+    </div>
   );
 };
