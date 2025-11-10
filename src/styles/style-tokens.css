@@ -68,8 +68,8 @@
   /* Bubbles - Apple-grade */
   --bubble-max-mobile: 82vw;
   --bubble-max-desktop: 70vw;
-  --bubble-radius: 16px;
-  --bubble-pad-x: 14px;
+  --bubble-radius: 18px;
+  --bubble-pad-x: 16px;
   --bubble-pad-y: 12px;
   --bubble-gap-intra: 10px;
   --bubble-gap-inter: 16px;

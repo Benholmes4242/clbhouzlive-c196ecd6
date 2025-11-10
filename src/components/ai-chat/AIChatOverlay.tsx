@@ -578,7 +578,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       </div>
                       
                       {/* Loading bubble */}
-                      <div className="rounded-2xl rounded-bl-md border overflow-hidden backdrop-blur-[var(--glass-blur)]"
+                      <div className="rounded-[18px] border overflow-hidden backdrop-blur-[var(--glass-blur)]"
                         style={{
                           maxWidth: 'var(--bubble-max-mobile)',
                           background: 'var(--bubble-echo-grad)',
@@ -1121,7 +1121,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     <div className="mt-4 px-4 flex items-end gap-2">
                       <EchoBotIcon size={28} className="text-white/90 shrink-0" />
                       <div className="flex-1">
-                        <div className="rounded-2xl rounded-bl-md bg-white/05 border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2">
+                        <div className="rounded-[18px] bg-white/05 border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2">
                           <div className="flex items-center gap-1.5">
                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
                             <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce"></span>
