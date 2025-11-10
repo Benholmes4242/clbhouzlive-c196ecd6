@@ -8,7 +8,7 @@ export function AdminLanding() {
 
   useEffect(() => {
     if (loading) return;
-    if (role === "full") nav("/admin/admins", { replace: true });
+    if (role === "full") nav("/admin/overview", { replace: true });
     else if (role === "limited") nav("/admin/users", { replace: true });
     else nav("/"); // or show access gate
   }, [role, loading, nav]);

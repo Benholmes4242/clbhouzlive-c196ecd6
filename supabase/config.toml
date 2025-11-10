@@ -1,5 +1,8 @@
 project_id = "ybxkehyomcakqjvuhnna"
 
+[functions.admin-invite-manage]
+verify_jwt = true
+
 [functions.lookup-user-by-email]
 verify_jwt = true
 

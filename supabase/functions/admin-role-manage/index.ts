@@ -215,6 +215,121 @@ serve(async (req: Request) => {
       });
     }
 
+    // Bulk operations
+    if (action === "grant_limited_bulk" || action === "grant_full_bulk") {
+      const user_ids = body?.user_ids as string[] | undefined;
+      const notes: string | undefined = body?.notes;
+      const expires_at: string | undefined = body?.expires_at;
+      
+      if (!Array.isArray(user_ids) || user_ids.length === 0) {
+        return new Response(JSON.stringify({ error: "user_ids array required" }), {
+          status: 400, headers: { ...headers, "Content-Type": "application/json" },
+        });
+      }
+
+      const role: Role = action === "grant_full_bulk" ? "full" : "limited";
+      const rows = user_ids.map(user_id => ({
+        user_id,
+        role,
+        expires_at: expires_at ?? null,
+        granted_by: actor.id,
+        notes: notes ?? null,
+      }));
+
+      const { error } = await svc.from("admin_memberships").upsert(rows, { onConflict: "user_id" });
+      if (error) throw error;
+
+      // Log bulk audit entry
+      await svc.from("admin_role_audit").insert({
+        actor_user_id: actor.id,
+        target_user_id: user_ids[0], // Use first ID as representative
+        action: action,
+        notes: `Bulk operation: ${user_ids.length} users. ${notes || ''}`,
+      });
+
+      return new Response(JSON.stringify({ ok: true, count: user_ids.length }), {
+        status: 200, headers: { ...headers, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "downgrade_bulk") {
+      const user_ids = body?.user_ids as string[] | undefined;
+      const notes: string | undefined = body?.notes;
+
+      if (!Array.isArray(user_ids) || user_ids.length === 0) {
+        return new Response(JSON.stringify({ error: "user_ids array required" }), {
+          status: 400, headers: { ...headers, "Content-Type": "application/json" },
+        });
+      }
+
+      // Prevent downgrading if it would leave no full admins
+      const { count } = await svc
+        .from("admin_memberships")
+        .select("user_id", { count: "exact", head: true })
+        .eq("role", "full")
+        .not("user_id", "in", `(${user_ids.join(',')})`);
+
+      if ((count || 0) === 0) {
+        return new Response(JSON.stringify({ error: "Cannot downgrade - would remove all full admins" }), {
+          status: 403, headers: { ...headers, "Content-Type": "application/json" },
+        });
+      }
+
+      const { error } = await svc.from("admin_memberships")
+        .update({ role: "limited", notes: notes ?? null })
+        .in("user_id", user_ids);
+      if (error) throw error;
+
+      await svc.from("admin_role_audit").insert({
+        actor_user_id: actor.id,
+        target_user_id: user_ids[0],
+        action: "downgrade_bulk",
+        notes: `Bulk operation: ${user_ids.length} users. ${notes || ''}`,
+      });
+
+      return new Response(JSON.stringify({ ok: true, count: user_ids.length }), {
+        status: 200, headers: { ...headers, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "revoke_bulk") {
+      const user_ids = body?.user_ids as string[] | undefined;
+      const notes: string | undefined = body?.notes;
+
+      if (!Array.isArray(user_ids) || user_ids.length === 0) {
+        return new Response(JSON.stringify({ error: "user_ids array required" }), {
+          status: 400, headers: { ...headers, "Content-Type": "application/json" },
+        });
+      }
+
+      // Prevent revoking if it would leave no full admins
+      const { count } = await svc
+        .from("admin_memberships")
+        .select("user_id", { count: "exact", head: true })
+        .eq("role", "full")
+        .not("user_id", "in", `(${user_ids.join(',')})`);
+
+      if ((count || 0) === 0) {
+        return new Response(JSON.stringify({ error: "Cannot revoke - would remove all full admins" }), {
+          status: 403, headers: { ...headers, "Content-Type": "application/json" },
+        });
+      }
+
+      const { error } = await svc.from("admin_memberships").delete().in("user_id", user_ids);
+      if (error) throw error;
+
+      await svc.from("admin_role_audit").insert({
+        actor_user_id: actor.id,
+        target_user_id: user_ids[0],
+        action: "revoke_bulk",
+        notes: `Bulk operation: ${user_ids.length} users. ${notes || ''}`,
+      });
+
+      return new Response(JSON.stringify({ ok: true, count: user_ids.length }), {
+        status: 200, headers: { ...headers, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "set_expiry" || action === "clear_expiry") {
       const target = ensureUserId(body?.user_id);
       const expires_at: string | undefined = body?.expires_at;

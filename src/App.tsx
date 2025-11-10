@@ -81,6 +81,7 @@ const AdminPage = lazy(() => import("./pages/AdminPage"));
 const AdminLanding = lazy(() => import("./pages/admin/AdminLanding").then(m => ({ default: m.AdminLanding })));
 const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage").then(m => ({ default: m.AdminUsersPage })));
 const AdminMembersPage = lazy(() => import("./pages/admin/AdminMembersPage").then(m => ({ default: m.AdminMembersPage })));
+const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage").then(m => ({ default: m.AdminOverviewPage })));
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
 const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 
@@ -157,6 +158,11 @@ function AppRoutes() {
         <Route path="/achievements" element={<AchievementsPage />} />
         <Route path="/admin-setup" element={<AdminSetupPage />} />
         <Route path="/admin" element={<AdminLanding />} />
+        <Route path="/admin/overview" element={
+          <PanelGuard need="admins">
+            <AdminOverviewPage />
+          </PanelGuard>
+        } />
         <Route path="/admin/users" element={
           <PanelGuard need="users">
             <AdminUsersPage />

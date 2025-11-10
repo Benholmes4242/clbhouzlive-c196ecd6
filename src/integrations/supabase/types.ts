@@ -52,31 +52,43 @@ export type Database = {
       }
       admin_invitations: {
         Row: {
+          accepted_at: string | null
           created_at: string
           email: string
           expires_at: string
           id: string
           invited_by: string
+          notes: string | null
+          role: string | null
           status: string
           token: string
+          updated_at: string
         }
         Insert: {
+          accepted_at?: string | null
           created_at?: string
           email: string
           expires_at?: string
           id?: string
           invited_by: string
+          notes?: string | null
+          role?: string | null
           status?: string
           token: string
+          updated_at?: string
         }
         Update: {
+          accepted_at?: string | null
           created_at?: string
           email?: string
           expires_at?: string
           id?: string
           invited_by?: string
+          notes?: string | null
+          role?: string | null
           status?: string
           token?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -3141,6 +3153,17 @@ export type Database = {
             }
             Returns: string
           }
+      admin_overview_metrics: {
+        Args: never
+        Returns: {
+          active_7d: number
+          expiring_7d: number
+          invites_pending: number
+          panel_full_admins: number
+          panel_limited_admins: number
+          total_users: number
+        }[]
+      }
       can_change_email: { Args: { user_id_param: string }; Returns: boolean }
       can_view_game_participant_profile: {
         Args: { _profile_user_id: string; _viewer_id: string }
@@ -3368,6 +3391,20 @@ export type Database = {
       get_user_top100_courses_count: {
         Args: { user_id_param: string }
         Returns: number
+      }
+      get_users_paged: {
+        Args: { p_limit?: number; p_offset?: number; q?: string }
+        Returns: {
+          created_at: string
+          display_name: string
+          email: string
+          home_club: string
+          id: string
+          last_sign_in_at: string
+          role: string
+          total_count: number
+          username: string
+        }[]
       }
       gettransactionid: { Args: never; Returns: unknown }
       has_role: {
