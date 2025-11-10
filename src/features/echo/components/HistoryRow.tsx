@@ -48,9 +48,9 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
       }}
     >
       {/* Line 1: Title + Timestamp */}
-      <div className="flex items-baseline justify-between gap-2 mb-1">
+      <div className="flex items-baseline justify-between gap-2 mb-1 pr-6">
         <div 
-          className="text-[15px] font-medium truncate flex-1"
+          className="text-[15px] font-medium truncate flex-1 overflow-hidden whitespace-nowrap text-ellipsis"
           style={{ color: 'var(--hub-text)' }}
         >
           {title}

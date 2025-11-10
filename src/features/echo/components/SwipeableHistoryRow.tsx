@@ -9,12 +9,17 @@ import { HistoryRow, HistoryRowProps } from './HistoryRow';
 import { haptic } from '@/utils/haptics';
 import { Star, Trash2 } from 'lucide-react';
 import { useMedia } from '@/hooks/useMedia';
+import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
+import { EchoHistorySearchFilters } from '../hooks/useEchoHistorySearch';
 
 interface SwipeableHistoryRowProps extends Omit<HistoryRowProps, 'onClick'> {
   isStarred: boolean;
   onStar: () => void;
   onDelete: () => void;
   onClick: () => void;
+  listFilters?: Partial<EchoHistorySearchFilters>;
+  rankIndex?: number;
+  isPendingDelete?: boolean;
 }
 
 export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
@@ -22,6 +27,9 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
   onStar,
   onDelete,
   onClick,
+  listFilters,
+  rankIndex,
+  isPendingDelete,
   ...historyRowProps
 }) => {
   const [swipeOffset, setSwipeOffset] = useState(0);
@@ -29,13 +37,21 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
   const isDesktop = useMedia('(min-width: 1024px)');
   const containerRef = useRef<HTMLDivElement>(null);
   const actionTriggered = useRef(false);
+  const swipeStartTime = useRef<number>(0);
+  const swipeStartX = useRef<number>(0);
 
   const SWIPE_THRESHOLD = 80;
+  const VELOCITY_THRESHOLD = 60; // Lower distance required with velocity
+  const VELOCITY_MIN = 0.20; // px/ms
   const MAX_SWIPE = 120;
 
   const handlers = useSwipeable({
+    onSwipeStart: () => {
+      swipeStartTime.current = Date.now();
+      swipeStartX.current = 0;
+    },
     onSwiping: (eventData) => {
-      if (isDesktop) return; // Disable swipe on desktop
+      if (isDesktop || isPendingDelete) return; // Disable swipe on desktop or pending delete
       
       const deltaX = eventData.deltaX;
       const direction = deltaX > 0 ? 'right' : 'left';
@@ -52,11 +68,29 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
       }
     },
     onSwiped: (eventData) => {
-      if (isDesktop) return;
+      if (isDesktop || isPendingDelete) return;
       
       const deltaX = eventData.deltaX;
+      const duration = Date.now() - swipeStartTime.current;
+      const velocity = duration > 0 ? Math.abs(deltaX) / duration : 0; // px/ms
       
-      if (Math.abs(deltaX) >= SWIPE_THRESHOLD) {
+      // Calculate distance and velocity
+      const distance = Math.abs(deltaX);
+      const velocityPxS = velocity * 1000; // Convert to px/s for analytics
+      
+      // Track swipe analytics
+      echoHistoryAnalytics.swipeAction({
+        thread_id: historyRowProps.id,
+        direction: deltaX > 0 ? 'right' : 'left',
+        distance_px: distance,
+        velocity_px_s: velocityPxS,
+      });
+      
+      // Trigger action if threshold met (distance OR velocity)
+      const thresholdMet = distance >= SWIPE_THRESHOLD || 
+        (velocity >= VELOCITY_MIN && distance >= VELOCITY_THRESHOLD);
+      
+      if (thresholdMet) {
         if (deltaX > 0) {
           // Right swipe - Star/Unstar
           haptic('medium');
@@ -80,6 +114,14 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
   const handleStarClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     haptic('light');
+    echoHistoryAnalytics.starToggled({
+      thread_id: historyRowProps.id,
+      prev_starred: isStarred,
+      next_starred: !isStarred,
+      source: 'row-hover',
+      list_filters: listFilters,
+      rank_index: rankIndex,
+    });
     onStar();
   };
 
@@ -93,7 +135,12 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
     <div 
       ref={containerRef}
       className="relative overflow-hidden group"
-      style={{ touchAction: 'pan-y' }}
+      style={{ 
+        touchAction: 'pan-y',
+        opacity: isPendingDelete ? 0.4 : 1,
+        pointerEvents: isPendingDelete ? 'none' : 'auto',
+        transition: 'opacity 200ms ease-out',
+      }}
     >
       {/* Action pills visible during swipe */}
       {swipeDirection === 'right' && swipeOffset > 20 && (
@@ -171,7 +218,7 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
           {/* Star indicator on row */}
           {isStarred && (
             <div 
-              className="absolute top-3 right-3 pointer-events-none"
+              className="absolute top-3 right-3 pointer-events-none z-10"
               style={{ color: 'var(--hub-text)' }}
             >
               <Star size={14} fill="currentColor" />
@@ -183,7 +230,7 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
             <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-2">
               <button
                 onClick={handleStarClick}
-                className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                className="p-2 rounded-full hover:bg-white/10 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
                 aria-label={isStarred ? 'Unstar conversation' : 'Star conversation'}
               >
                 <Star 
@@ -194,7 +241,7 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
               </button>
               <button
                 onClick={handleDeleteClick}
-                className="p-2 rounded-full hover:bg-red-500/20 transition-colors"
+                className="p-2 rounded-full hover:bg-red-500/20 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
                 aria-label="Delete conversation"
               >
                 <Trash2 

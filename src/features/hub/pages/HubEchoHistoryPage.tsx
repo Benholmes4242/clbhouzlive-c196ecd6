@@ -13,15 +13,20 @@ import { VirtualList } from '@/features/echo/components/virtual/VirtualList';
 import { EchoHistorySearch } from '@/features/echo/components/EchoHistorySearch';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { starThread, deleteThread } from '@/features/echo/api/threadActions';
-import { showToast } from '@/utils/toast';
+import { toast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
+import { echoHistoryAnalytics } from '@/features/echo/analytics/echoHistoryAnalytics';
+import { useMedia } from '@/hooks/useMedia';
 import '../home/hubTheme.css';
 
 export function HubEchoHistoryPage() {
   const nav = useNavigate();
   const loc = useLocation();
   const queryClient = useQueryClient();
+  const isDesktop = useMedia('(min-width: 1024px)');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [pendingDeletes, setPendingDeletes] = useState<Map<string, { timer: NodeJS.Timeout; startTime: number }>>(new Map());
 
   // Apply hub-open class for glass theme
   useEffect(() => {
@@ -69,11 +74,28 @@ export function HubEchoHistoryPage() {
       dateFrom: newFilters.dateFrom,
       starred: newFilters.starred,
     }));
+    
+    // Track filter changes
+    echoHistoryAnalytics.filterApplied({
+      has_response: newFilters.hasResponse,
+      date_from: newFilters.dateFrom?.toISOString(),
+      starred: newFilters.starred,
+    });
   }, []);
 
   // Star handler with optimistic updates
-  const handleStar = useCallback(async (threadId: string, currentStarred: boolean) => {
+  const handleStar = useCallback(async (threadId: string, currentStarred: boolean, source: 'row-hover' | 'swipe' | 'keyboard', rankIndex?: number) => {
     const nextStarred = !currentStarred;
+    
+    // Track analytics
+    echoHistoryAnalytics.starToggled({
+      thread_id: threadId,
+      prev_starred: currentStarred,
+      next_starred: nextStarred,
+      source,
+      list_filters: filters,
+      rank_index: rankIndex,
+    });
     
     // Optimistic update
     queryClient.setQueryData(
@@ -88,7 +110,10 @@ export function HubEchoHistoryPage() {
 
     try {
       await starThread(threadId, nextStarred);
-      showToast(nextStarred ? 'Starred' : 'Unstarred');
+      toast({
+        description: nextStarred ? 'Starred' : 'Unstarred',
+        duration: 2000,
+      });
     } catch (error) {
       console.error('Failed to star/unstar:', error);
       // Rollback optimistic update
@@ -101,16 +126,27 @@ export function HubEchoHistoryPage() {
           );
         }
       );
-      showToast('Failed to update star status');
+      toast({
+        description: 'Failed to update star status',
+        variant: 'destructive',
+        duration: 3000,
+      });
     }
   }, [filters, queryClient]);
 
-  // Delete handler with optimistic updates
-  const handleDeleteConfirm = useCallback(async () => {
-    if (!deleteConfirmId) return;
+  // Soft delete with undo (mobile flow)
+  const handleSoftDelete = useCallback((threadId: string, source: 'swipe' | 'row-hover' | 'keyboard') => {
+    const startTime = Date.now();
     
-    const threadId = deleteConfirmId;
-    setDeleteConfirmId(null);
+    // Track soft delete
+    echoHistoryAnalytics.deleteSoft({
+      thread_id: threadId,
+      source,
+      list_filters: filters,
+    });
+    
+    // Store original data for undo
+    const currentData = queryClient.getQueryData(['echoHistorySearch', filters, 100]) as any[];
     
     // Optimistic remove
     queryClient.setQueryData(
@@ -120,22 +156,108 @@ export function HubEchoHistoryPage() {
         return old.filter((item: any) => item.id !== threadId);
       }
     );
-
+    
+    // Collapse if expanded
+    if (expandedId === threadId) {
+      setExpandedId(null);
+    }
+    
+    // Set 5s timer for hard delete
+    const timer = setTimeout(() => {
+      handleHardDelete(threadId);
+      setPendingDeletes(prev => {
+        const next = new Map(prev);
+        next.delete(threadId);
+        return next;
+      });
+    }, 5000);
+    
+    setPendingDeletes(prev => new Map(prev).set(threadId, { timer, startTime }));
+    
+    // Show toast with undo
+    const { dismiss } = toast({
+      description: 'Conversation deleted',
+      duration: 5000,
+      action: (
+        <ToastAction
+          altText="Undo delete"
+          onClick={() => {
+            // Track undo
+            const elapsed = (Date.now() - startTime) / 1000;
+            echoHistoryAnalytics.deleteUndo({
+              thread_id: threadId,
+              seconds_elapsed: elapsed,
+            });
+            
+            // Clear timer
+            const pending = pendingDeletes.get(threadId);
+            if (pending) {
+              clearTimeout(pending.timer);
+              setPendingDeletes(prev => {
+                const next = new Map(prev);
+                next.delete(threadId);
+                return next;
+              });
+            }
+            
+            // Restore data
+            queryClient.setQueryData(['echoHistorySearch', filters, 100], currentData);
+            
+            dismiss();
+          }}
+        >
+          Undo
+        </ToastAction>
+      ),
+    });
+  }, [filters, queryClient, expandedId, pendingDeletes]);
+  
+  // Hard delete (actual deletion)
+  const handleHardDelete = useCallback(async (threadId: string) => {
+    const startTime = Date.now();
+    
     try {
       await deleteThread(threadId);
-      showToast('Conversation deleted');
+      const latency = Date.now() - startTime;
       
-      // Collapse if expanded
-      if (expandedId === threadId) {
-        setExpandedId(null);
-      }
+      // Track hard delete
+      echoHistoryAnalytics.deleteHard({
+        thread_id: threadId,
+        latency_ms: latency,
+      });
     } catch (error) {
       console.error('Failed to delete:', error);
       // Rollback - refetch data
       queryClient.invalidateQueries({ queryKey: ['echoHistorySearch'] });
-      showToast('Failed to delete conversation');
+      toast({
+        description: 'Failed to delete conversation',
+        variant: 'destructive',
+        duration: 3000,
+      });
     }
-  }, [deleteConfirmId, filters, queryClient, expandedId]);
+  }, [queryClient]);
+
+  // Delete handler with confirm (desktop flow)
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteConfirmId) return;
+    
+    const threadId = deleteConfirmId;
+    setDeleteConfirmId(null);
+    
+    // Desktop: Show undo toast after confirm
+    handleSoftDelete(threadId, 'row-hover');
+  }, [deleteConfirmId, handleSoftDelete]);
+  
+  // Delete initiation (mobile swipe vs desktop)
+  const handleDelete = useCallback((threadId: string, source: 'swipe' | 'row-hover' | 'keyboard') => {
+    if (source === 'swipe') {
+      // Mobile swipe: immediate soft delete with undo
+      handleSoftDelete(threadId, source);
+    } else {
+      // Desktop/keyboard: show confirm dialog
+      setDeleteConfirmId(threadId);
+    }
+  }, [handleSoftDelete]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -152,7 +274,8 @@ export function HubEchoHistoryPage() {
         if (expandedId) {
           const item = chats.find(c => c.id === expandedId);
           if (item) {
-            handleStar(item.id, item.is_starred);
+            const rankIndex = chats.findIndex(c => c.id === expandedId);
+            handleStar(item.id, item.is_starred, 'keyboard', rankIndex);
           }
         }
       }
@@ -161,14 +284,21 @@ export function HubEchoHistoryPage() {
       if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault();
         if (expandedId) {
-          setDeleteConfirmId(expandedId);
+          handleDelete(expandedId, 'keyboard');
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [expandedId, chats, handleStar]);
+  }, [expandedId, chats, handleStar, handleDelete]);
+  
+  // Cleanup pending deletes on unmount
+  useEffect(() => {
+    return () => {
+      pendingDeletes.forEach(({ timer }) => clearTimeout(timer));
+    };
+  }, [pendingDeletes]);
 
   return (
     <div
@@ -292,13 +422,21 @@ export function HubEchoHistoryPage() {
                         messageCount={item.message_count}
                         isExpanded={isExpanded}
                         isStarred={item.is_starred}
-                        onStar={() => handleStar(item.id, item.is_starred)}
-                        onDelete={() => setDeleteConfirmId(item.id)}
+                        listFilters={filters}
+                        rankIndex={index}
+                        isPendingDelete={pendingDeletes.has(item.id)}
+                        onStar={() => handleStar(item.id, item.is_starred, 'swipe', index)}
+                        onDelete={() => handleDelete(item.id, 'swipe')}
                         onClick={() => {
                           if (isExpanded) {
                             setExpandedId(null);
                           } else {
                             setExpandedId(item.id);
+                            echoHistoryAnalytics.openInline({
+                              thread_id: item.id,
+                              list_filters: filters,
+                              rank_index: index,
+                            });
                           }
                         }}
                       />
@@ -312,6 +450,10 @@ export function HubEchoHistoryPage() {
                             navigator.clipboard.writeText(window.location.origin + `/hub/echo/history/chat/${item.id}`);
                           }}
                           onOpenFull={() => {
+                            echoHistoryAnalytics.openFull({
+                              thread_id: item.id,
+                              from_inline: true,
+                            });
                             const state = loc.state as any;
                             nav(`/hub/echo/history/chat/${item.id}`, {
                               state: { backgroundLocation: state?.backgroundLocation, fromHub: true },

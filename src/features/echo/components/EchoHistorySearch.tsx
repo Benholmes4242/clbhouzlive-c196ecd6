@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
+import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
 
 export type FilterType = 'all' | 'has_response' | 'no_response' | 'last_7_days' | 'last_30_days' | 'starred';
 
@@ -62,6 +63,15 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
     }
 
     onFilterChange(filters);
+    
+    // Track filter analytics
+    if (filter !== 'all') {
+      echoHistoryAnalytics.filterApplied({
+        has_response: filters.hasResponse,
+        date_from: filters.dateFrom?.toISOString(),
+        starred: filters.starred,
+      });
+    }
   };
 
   // Keyboard shortcuts
