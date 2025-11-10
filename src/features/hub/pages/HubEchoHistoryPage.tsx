@@ -3,12 +3,13 @@
  * Apple-level index + inline thread UX
  */
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useEchoChatHistory } from '@/features/echo/hooks/useEchoChatHistory';
+import { useEchoHistorySearch, type EchoHistorySearchFilters } from '@/features/echo/hooks/useEchoHistorySearch';
 import { HistoryRow } from '@/features/echo/components/HistoryRow';
 import { HistoryThreadInline } from '@/features/echo/components/HistoryThreadInline';
 import { VirtualList } from '@/features/echo/components/virtual/VirtualList';
+import { EchoHistorySearch } from '@/features/echo/components/EchoHistorySearch';
 import '../home/hubTheme.css';
 
 export function HubEchoHistoryPage() {
@@ -31,8 +32,11 @@ export function HubEchoHistoryPage() {
     }
   };
 
-  // Data (chat-only)
-  const { data: chats = [], isLoading, error } = useEchoChatHistory({ limit: 100 });
+  // Search & Filter state
+  const [filters, setFilters] = useState<EchoHistorySearchFilters>({});
+  
+  // Data with search/filter support
+  const { data: chats = [], isLoading, error } = useEchoHistorySearch(filters, { limit: 100 });
   
   // Track expanded heights for proper virtualization
   const expandedHeightsRef = useRef<Map<string, number>>(new Map());
@@ -46,6 +50,19 @@ export function HubEchoHistoryPage() {
       : 0;
     return baseHeight + expandedHeight + (expandedId === chat.id ? 8 : 0); // 8px gap
   };
+  
+  // Search & filter handlers
+  const handleSearchChange = useCallback((query: string) => {
+    setFilters(prev => ({ ...prev, query: query || undefined }));
+  }, []);
+  
+  const handleFilterChange = useCallback((newFilters: { hasResponse?: boolean; dateFrom?: Date }) => {
+    setFilters(prev => ({
+      ...prev,
+      hasResponse: newFilters.hasResponse,
+      dateFrom: newFilters.dateFrom,
+    }));
+  }, []);
 
   return (
     <div
@@ -95,11 +112,18 @@ export function HubEchoHistoryPage() {
           }}
         >
           <div
-            className="text-[15px] font-medium mb-4"
+            className="text-[15px] font-medium mb-3"
             style={{ color: 'var(--hub-text)' }}
           >
             Recent chats
           </div>
+          
+          {/* Search & Filters */}
+          <EchoHistorySearch
+            onSearchChange={handleSearchChange}
+            onFilterChange={handleFilterChange}
+            className="mb-4"
+          />
 
           {isLoading && (
             <div className="space-y-2">
@@ -124,10 +148,19 @@ export function HubEchoHistoryPage() {
 
           {!isLoading && !error && chats.length === 0 && (
             <div
-              className="text-center py-8 text-[15px]"
+              className="text-center py-12 px-4"
               style={{ color: 'var(--hub-text-dim)' }}
             >
-              No Echo chats yet — ask Echo to get started.
+              <div className="text-[15px] font-medium mb-1" style={{ color: 'var(--hub-text)' }}>
+                {filters.query || filters.hasResponse !== undefined || filters.dateFrom
+                  ? 'No conversations found'
+                  : 'No Echo chats yet'}
+              </div>
+              <div className="text-[13px]">
+                {filters.query || filters.hasResponse !== undefined || filters.dateFrom
+                  ? 'Try a different search or clear filters'
+                  : 'Ask Echo to get started'}
+              </div>
             </div>
           )}
 
@@ -149,7 +182,7 @@ export function HubEchoHistoryPage() {
                         id={item.id}
                         title={item.title}
                         subtitle={item.subtitle}
-                        createdAt={item.created_at}
+                        createdAt={item.last_activity_at}
                         messageCount={item.message_count}
                         isExpanded={isExpanded}
                         onClick={() => {

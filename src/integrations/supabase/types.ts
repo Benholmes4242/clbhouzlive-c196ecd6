@@ -721,20 +721,38 @@ export type Database = {
       }
       echo_threads: {
         Row: {
+          assistant_text_concat: string | null
           created_at: string
+          first_user_question: string | null
+          has_response: boolean | null
           id: string
+          last_activity_at: string | null
+          message_count: number | null
+          tsv: unknown
           updated_at: string
           user_id: string
         }
         Insert: {
+          assistant_text_concat?: string | null
           created_at?: string
+          first_user_question?: string | null
+          has_response?: boolean | null
           id?: string
+          last_activity_at?: string | null
+          message_count?: number | null
+          tsv?: unknown
           updated_at?: string
           user_id: string
         }
         Update: {
+          assistant_text_concat?: string | null
           created_at?: string
+          first_user_question?: string | null
+          has_response?: boolean | null
           id?: string
+          last_activity_at?: string | null
+          message_count?: number | null
+          tsv?: unknown
           updated_at?: string
           user_id?: string
         }
@@ -3278,6 +3296,26 @@ export type Database = {
           relative_date: string
           thread_id: string
           user_id: string
+        }[]
+      }
+      echo_history_search: {
+        Args: {
+          date_from?: string
+          date_to?: string
+          filter_has_response?: boolean
+          limit_rows?: number
+          mode?: string
+          offset_rows?: number
+          q?: string
+        }
+        Returns: {
+          first_user_question: string
+          has_response: boolean
+          last_activity_at: string
+          message_count: number
+          preview_snippet: string
+          relative_date: string
+          thread_id: string
         }[]
       }
       enablelongtransactions: { Args: never; Returns: string }
