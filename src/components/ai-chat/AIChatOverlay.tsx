@@ -29,6 +29,7 @@ import { ensureThreadId, persistUserMessage, persistAssistantMessage } from '@/f
 import { FrostedPill } from '@/components/shared/FrostedPill';
 import { EchoBotIcon } from './EchoBotIcon';
 import { EchoTypingBar } from './EchoTypingBar';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 interface ChatMessageData {
   id: string;
@@ -70,6 +71,20 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Get current user ID for profile
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id || null);
+    };
+    fetchUser();
+  }, []);
+
+  // Fetch user profile
+  const { data: userProfile } = useUserProfile(currentUserId);
 
   // Echo Protection System
   const {
@@ -528,6 +543,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           isFirstInGroup={isFirstInGroup}
                           showHeading={isFirstInGroup}
                           showActions={false}
+                          userProfilePhoto={userProfile?.profile_photo_url || null}
+                          userDisplayName={userProfile?.display_name || userProfile?.username || 'User'}
                         />
                       </div>
                     );
