@@ -7,22 +7,28 @@ export function usePanelRole() {
   const [role, setRole] = useState<PanelRole>("none");
   const [loading, setLoading] = useState(true);
 
+  const fetchRole = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.functions.invoke("secure-site-access-check", { body: {} });
+    if (error || !data?.ok) setRole("none");
+    else setRole((data.role as PanelRole) ?? "none");
+    setLoading(false);
+  };
+
   useEffect(() => {
     let mounted = true;
 
-    const fetchRole = async () => {
-      setLoading(true);
-      const { data, error } = await supabase.functions.invoke("secure-site-access-check", { body: {} });
+    const safeFetch = async () => {
       if (!mounted) return;
-      if (error || !data?.ok) setRole("none");
-      else setRole((data.role as PanelRole) ?? "none");
-      setLoading(false);
+      await fetchRole();
     };
 
-    fetchRole();
+    safeFetch();
 
     const onVis = () => {
-      if (document.visibilityState === "visible") fetchRole();
+      if (document.visibilityState === "visible" && mounted) {
+        fetchRole();
+      }
     };
     document.addEventListener("visibilitychange", onVis);
     return () => {
@@ -31,5 +37,5 @@ export function usePanelRole() {
     };
   }, []);
 
-  return { role, loading };
+  return { role, loading, refresh: fetchRole };
 }

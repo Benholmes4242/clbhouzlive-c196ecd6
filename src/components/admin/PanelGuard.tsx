@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { usePanelRole } from "@/hooks/usePanelRole";
 import { panelCan } from "@/lib/panelCan";
 
@@ -9,11 +9,32 @@ export function PanelGuard({
   need: "users" | "admins";
   children: ReactNode;
 }) {
-  const { role, loading } = usePanelRole();
-  if (loading) return <div className="p-8 text-sm text-muted-foreground">Verifying admin access…</div>;
-
+  const { role, loading, refresh } = usePanelRole();
   const can = panelCan(role);
   const ok = need === "users" ? can.viewUsers : need === "admins" ? can.manageAdmins : false;
+
+  // Revalidate on tab focus, but keep the page mounted
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === "visible") refresh();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, [refresh]);
+
+  // While validating, show overlay but keep page mounted
+  if (loading) {
+    return (
+      <div className="relative">
+        {children}
+        <div className="fixed inset-0 z-50 grid place-items-center bg-background/70 backdrop-blur-sm">
+          <div className="rounded-lg border bg-card px-6 py-4 text-sm text-foreground">
+            Validating admin access…
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!ok) {
     return (
