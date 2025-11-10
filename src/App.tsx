@@ -78,6 +78,7 @@ const GlobalTop100 = lazy(() => import("./pages/GlobalTop100"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
+const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 const AdminLanding = lazy(() => import("./pages/admin/AdminLanding").then(m => ({ default: m.AdminLanding })));
 const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage").then(m => ({ default: m.AdminUsersPage })));
 const AdminMembersPage = lazy(() => import("./pages/admin/AdminMembersPage").then(m => ({ default: m.AdminMembersPage })));
@@ -160,27 +161,32 @@ function AppRoutes() {
         <Route path="/global-top100" element={<GlobalTop100 />} />
         <Route path="/achievements" element={<AchievementsPage />} />
         <Route path="/admin-setup" element={<AdminSetupPage />} />
-        <Route path="/admin" element={<AdminLanding />} />
-        <Route path="/admin/overview" element={
-          <PanelGuard need="admins">
-            <AdminOverviewPage />
-          </PanelGuard>
-        } />
-        <Route path="/admin/users" element={
-          <PanelGuard need="users">
-            <AdminUsersPage />
-          </PanelGuard>
-        } />
-        <Route path="/admin/admins" element={
-          <PanelGuard need="admins">
-            <AdminMembersPage />
-          </PanelGuard>
-        } />
-        <Route path="/admin/invites" element={
-          <PanelGuard need="admins">
-            <AdminInvitesPage />
-          </PanelGuard>
-        } />
+        
+        {/* Admin routes wrapped with AdminLayout */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminLanding />} />
+          <Route path="overview" element={
+            <PanelGuard need="admins">
+              <AdminOverviewPage />
+            </PanelGuard>
+          } />
+          <Route path="users" element={
+            <PanelGuard need="users">
+              <AdminUsersPage />
+            </PanelGuard>
+          } />
+          <Route path="admins" element={
+            <PanelGuard need="admins">
+              <AdminMembersPage />
+            </PanelGuard>
+          } />
+          <Route path="invites" element={
+            <PanelGuard need="admins">
+              <AdminInvitesPage />
+            </PanelGuard>
+          } />
+        </Route>
+        
         <Route path="/admin/invite-accept" element={<InviteAcceptPage />} />
         <Route path="/admin-backfill" element={<AdminBackfill />} />
 

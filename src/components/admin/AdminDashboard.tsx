@@ -102,7 +102,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onRoleChange, us
         <AdminSidebar 
           activeTab={activeTab} 
           onTabChange={handleTabChange}
-          userRole={userRole}
         />
         <SidebarInset className="flex-1">
           <div className="p-6">

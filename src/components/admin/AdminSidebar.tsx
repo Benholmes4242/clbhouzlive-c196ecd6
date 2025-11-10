@@ -1,214 +1,106 @@
 import React from 'react';
-import { useNavigate, useLocation, NavLink } from 'react-router-dom';
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarHeader,
-  SidebarFooter,
-} from "@/components/ui/sidebar";
+import { NavLink } from 'react-router-dom';
+import { usePanelRole } from "@/hooks/usePanelRole";
+import { panelCan } from "@/lib/panelCan";
 import { 
   BarChart3, 
   Users, 
-  Upload, 
-  TrendingUp, 
-  UserCheck, 
-  Settings as SettingsIcon,
-  MapPin,
-  Flag,
-  Image,
-  Database,
   Shield,
   Mail
 } from "lucide-react";
-import { usePanelRole } from "@/hooks/usePanelRole";
-import { panelCan } from "@/lib/panelCan";
-
-const menuItems = [
-  {
-    title: "Overview",
-    icon: BarChart3,
-    value: "overview",
-    requiredRole: "admin",
-  },
-  {
-    title: "User Management",
-    icon: Users,
-    value: "users",
-    requiredRole: "admin",
-  },
-  {
-    title: "Golf Courses",
-    icon: MapPin,
-    value: "golf-courses",
-    requiredRole: "limited_admin", // Available to both admin and limited_admin
-  },
-  {
-    title: "Logos",
-    icon: Image,
-    value: "logos",
-    requiredRole: "admin",
-  },
-  {
-    title: "Country Flags",
-    icon: Flag,
-    value: "country-flags",
-    requiredRole: "admin",
-  },
-  {
-    title: "Course Import",
-    icon: Upload,
-    value: "courses",
-    requiredRole: "admin",
-  },
-  {
-    title: "Analytics",
-    icon: TrendingUp,
-    value: "analytics",
-    requiredRole: "admin",
-  },
-  {
-    title: "Team Management",
-    icon: UserCheck,
-    value: "team",
-    requiredRole: "admin",
-  },
-  {
-    title: "Settings",
-    icon: SettingsIcon,
-    value: "settings",
-    requiredRole: "admin",
-  },
-];
 
 interface AdminSidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
-  userRole?: 'admin' | 'limited_admin';
 }
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChange, userRole = 'admin' }) => {
+const AdminSidebar: React.FC<AdminSidebarProps> = () => {
   const { role, loading } = usePanelRole();
   const can = panelCan(role);
-  
-  // Filter menu items based on user role
-  const filteredMenuItems = menuItems.filter(item => {
-    if (userRole === 'admin') return true; // Admin sees everything
-    if (userRole === 'limited_admin') return item.value === 'golf-courses'; // Limited admin only sees golf courses
-    return false;
-  });
 
   return (
-    <Sidebar className="border-r border-border">
-      <SidebarHeader className="p-6">
+    <div className="h-full w-full flex flex-col border-r border-border bg-background">
+      <div className="p-6 border-b border-border">
         <h2 className="text-lg font-semibold text-foreground">
-          {userRole === 'limited_admin' ? 'Golf Courses Admin' : 'Admin Panel'}
+          {can.manageAdmins ? 'Admin Panel' : 'Management'}
         </h2>
         <div className="mt-2 text-xs text-muted-foreground">
           {loading ? "Checking role…" : `Role: ${role}`}
         </div>
-      </SidebarHeader>
+      </div>
 
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className="px-6 py-2 text-sm font-medium text-muted-foreground">
-            {userRole === 'limited_admin' ? 'Golf Courses' : 'Management'}
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="px-4">
-              {filteredMenuItems.map((item) => (
-                <SidebarMenuItem key={item.value}>
-                  <SidebarMenuButton
-                    onClick={() => onTabChange(item.value)}
-                    isActive={activeTab === item.value}
-                    className="w-full justify-start gap-3 px-3 py-2 text-sm"
-                  >
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+        {can.manageAdmins && (
+          <NavLink
+            to="/admin/overview"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors ${
+                isActive
+                  ? 'bg-muted text-foreground font-medium'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+              }`
+            }
+          >
+            <BarChart3 className="h-4 w-4" />
+            <span>Overview</span>
+          </NavLink>
+        )}
 
-        {/* New role-gated navigation links */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="px-6 py-2 text-sm font-medium text-muted-foreground">
-            Admin Access
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="px-4">
-              {can.manageAdmins && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to="/admin/overview" 
-                      className="w-full justify-start gap-3 px-3 py-2 text-sm"
-                    >
-                      <BarChart3 className="h-4 w-4" />
-                      <span>Overview</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
+        {can.viewUsers && (
+          <NavLink
+            to="/admin/users"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors ${
+                isActive
+                  ? 'bg-muted text-foreground font-medium'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+              }`
+            }
+          >
+            <Users className="h-4 w-4" />
+            <span>Users</span>
+          </NavLink>
+        )}
 
-              {can.viewUsers && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to="/admin/users" 
-                      className="w-full justify-start gap-3 px-3 py-2 text-sm"
-                    >
-                      <Users className="h-4 w-4" />
-                      <span>Users</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
-              
-              {can.manageAdmins && (
-                <>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <NavLink 
-                        to="/admin/admins" 
-                        className="w-full justify-start gap-3 px-3 py-2 text-sm"
-                      >
-                        <Shield className="h-4 w-4" />
-                        <span>Admin Members</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <NavLink 
-                        to="/admin/invites" 
-                        className="w-full justify-start gap-3 px-3 py-2 text-sm"
-                      >
-                        <Mail className="h-4 w-4" />
-                        <span>Invitations</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </>
-              )}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
+        {can.manageAdmins && (
+          <>
+            <NavLink
+              to="/admin/admins"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors ${
+                  isActive
+                    ? 'bg-muted text-foreground font-medium'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`
+              }
+            >
+              <Shield className="h-4 w-4" />
+              <span>Admin Members</span>
+            </NavLink>
 
-      <SidebarFooter className="p-6">
+            <NavLink
+              to="/admin/invites"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-colors ${
+                  isActive
+                    ? 'bg-muted text-foreground font-medium'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`
+              }
+            >
+              <Mail className="h-4 w-4" />
+              <span>Invitations</span>
+            </NavLink>
+          </>
+        )}
+      </nav>
+
+      <div className="p-6 border-t border-border">
         <p className="text-xs text-muted-foreground">
           © 2025 clbhouz Admin Panel
         </p>
-      </SidebarFooter>
-    </Sidebar>
+      </div>
+    </div>
   );
 };
 
