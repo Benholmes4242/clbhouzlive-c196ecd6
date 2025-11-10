@@ -70,6 +70,28 @@ export function AdminInvitesPage() {
     }
   };
 
+  const copyLink = async (token?: string | null) => {
+    if (!token) {
+      toast({ title: "No token on invite", variant: "destructive" });
+      return;
+    }
+    const base = window?.location?.origin || "https://www.clbhouz.co.uk";
+    const url = `${base}/admin/invite-accept?token=${token}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({ title: "Invite link copied" });
+    } catch {
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = url;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+      toast({ title: "Invite link copied" });
+    }
+  };
+
   useEffect(() => {
     load();
   }, []);
@@ -139,15 +161,27 @@ export function AdminInvitesPage() {
                         <td className="p-2">{r.expires_at ? new Date(r.expires_at).toLocaleString() : "—"}</td>
                         <td className="p-2">{r.accepted_at ? new Date(r.accepted_at).toLocaleString() : "—"}</td>
                         <td className="p-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            disabled={!!r.accepted_at}
-                            onClick={() => revoke(r.id)}
-                            title={r.accepted_at ? "Already accepted" : "Revoke"}
-                          >
-                            Revoke
-                          </Button>
+                          <div className="flex gap-2">
+                            {!r.accepted_at && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => copyLink(r.token)}
+                                title="Copy invite link"
+                              >
+                                Copy Link
+                              </Button>
+                            )}
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={!!r.accepted_at}
+                              onClick={() => revoke(r.id)}
+                              title={r.accepted_at ? "Already accepted" : "Revoke"}
+                            >
+                              Revoke
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))

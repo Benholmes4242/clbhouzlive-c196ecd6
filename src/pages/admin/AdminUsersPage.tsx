@@ -88,6 +88,35 @@ export function AdminUsersPage() {
 
   const maxPage = Math.max(0, Math.ceil(total / pageSize) - 1);
 
+  const exportCsv = () => {
+    const headers = [
+      "email","display_name","username","home_club","role","last_sign_in_at","created_at","id"
+    ];
+    const lines = [headers.join(",")];
+    rows.forEach((r: any) => {
+      const vals = [
+        r.email ?? "",
+        r.display_name ?? "",
+        r.username ?? "",
+        r.home_club ?? "",
+        r.role ?? "",
+        r.last_sign_in_at ?? "",
+        r.created_at ?? "",
+        r.id
+      ].map(v => `"${String(v).replace(/"/g,'""')}"`);
+      lines.push(vals.join(","));
+    });
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `users_page_${page+1}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen overflow-x-hidden">
       <div className="p-4 sm:p-6">
@@ -130,6 +159,9 @@ export function AdminUsersPage() {
                 {total.toLocaleString()} total • page {page + 1} / {Math.max(1, maxPage + 1)}
               </div>
               <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={exportCsv} disabled={loading || rows.length === 0}>
+                  Export CSV
+                </Button>
                 <Button variant="outline" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0 || loading}>
                   Prev
                 </Button>

@@ -239,6 +239,23 @@ export function AdminMembersPage() {
   // Check if this is the last full admin (for UI protection)
   const fullAdmins = rows.filter(r => r.role === "full");
   const isLastFullAdmin = (user_id: string) => fullAdmins.length === 1 && fullAdmins[0]?.user_id === user_id;
+  
+  // Helper to calculate days until expiry
+  const daysUntil = (iso?: string | null) => {
+    if (!iso) return null;
+    const diff = new Date(iso).getTime() - Date.now();
+    return Math.floor(diff / (1000*60*60*24));
+  };
+
+  // Toast for expiring admins on load
+  useEffect(() => {
+    if (expiringSoon.length > 0 && !loading) {
+      toast({
+        title: "Admin memberships expiring soon",
+        description: `${expiringSoon.length} admin${expiringSoon.length>1?"s":""} expiring within 7 days.`,
+      });
+    }
+  }, [rows.length]); // eslint-disable-line
 
   return (
     <div className="min-h-screen overflow-x-hidden">
@@ -253,9 +270,9 @@ export function AdminMembersPage() {
           </p>
         </div>
 
-        {/* Bulk actions bar */}
+        {/* Bulk actions bar (sticky for mobile) */}
         {selected.size > 0 && (
-          <div className="mb-3 flex items-center justify-between rounded-md border p-3 bg-muted/30">
+          <div className="sticky top-0 z-20 mb-3 flex items-center justify-between rounded-md border p-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="text-sm">
               <strong>{selected.size}</strong> selected
             </div>
@@ -407,7 +424,23 @@ export function AdminMembersPage() {
                               {r.role}
                             </Badge>
                           </td>
-                          <td className="p-3">{r.expires_at ? new Date(r.expires_at).toLocaleString() : "—"}</td>
+                          <td className="p-3">
+                            {r.expires_at ? (
+                              <div className="flex items-center gap-2">
+                                <span>{new Date(r.expires_at).toLocaleString()}</span>
+                                {(() => {
+                                  const d = daysUntil(r.expires_at);
+                                  if (d === null || d < 0) return null;
+                                  const urgent = d < 3;
+                                  return (
+                                    <span className={`text-xs px-2 py-0.5 rounded ${urgent ? "bg-destructive text-destructive-foreground" : "bg-amber-500/15 text-amber-600 dark:text-amber-400"}`}>
+                                      {d}d left
+                                    </span>
+                                  );
+                                })()}
+                              </div>
+                            ) : "—"}
+                          </td>
                           <td className="p-3 max-w-xs truncate">{r.notes ?? "—"}</td>
                           <td className="p-3">
                             <div className="flex flex-wrap gap-1">
