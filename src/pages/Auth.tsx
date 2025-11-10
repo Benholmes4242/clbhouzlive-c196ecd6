@@ -35,26 +35,10 @@ const Auth: React.FC = () => {
     return !!data;
   }
 
-  useEffect(() => {
-    // CRITICAL: Only redirect authenticated users, no redirects during auth flow
-    // This prevents redirect loops in native WebView environments
-    if (user) {
-      const redirectUser = async () => {
-        try {
-          const hasProfile = await checkProfileExists(user.id);
-          if (hasProfile) {
-            navigate("/", { replace: true });
-          } else {
-            navigate("/create-profile", { replace: true });
-          }
-        } catch (error) {
-          console.error('Error checking profile:', error);
-        }
-      };
-      
-      redirectUser();
-    }
-  }, [user, navigate]);
+
+  // REMOVED: Auth redirect logic now handled by Gate component
+  // This prevents redirect loops in native WebView environments
+
 
   return (
     <>

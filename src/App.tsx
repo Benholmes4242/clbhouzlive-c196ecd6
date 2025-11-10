@@ -6,14 +6,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import ScrollToTop from '@/components/ScrollToTop';
 import { ThemeProvider } from '@/components/theme-provider';
-import SiteAccessControl from "@/components/SiteAccessControl";
-import AccessGateV2 from "@/components/AccessGateV2";
+import Gate from "@/components/Gate";
 import { SecurityHeaders } from "@/components/security/SecurityHeaders";
 import { GlobalLoadingProvider } from "@/loading/GlobalLoading";
 import GlobalSpinner from "@/loading/GlobalSpinner";
 import BindLoadingBus from "@/loading/BindLoadingBus";
 import ClbhouzPageSpinner from "@/components/ui/ClbhouzPageSpinner";
-import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 import { VideoManagerProvider } from './contexts/VideoManagerContext';
 import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
@@ -307,10 +305,6 @@ function useReauthOnFocus() {
 }
 
 const App: React.FC = () => {
-  // Feature flag for access gate version
-  const useV2Gate = import.meta.env.VITE_ACCESS_GATE_VERSION?.toString().toLowerCase() === "v2";
-  const AccessGate = useV2Gate ? AccessGateV2 : SiteAccessControl;
-  
   // Global focus re-auth hook
   useReauthOnFocus();
   
@@ -373,40 +367,38 @@ const App: React.FC = () => {
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>
               <SecurityHeaders />
-              <AccessGate>
-                <HeaderProvider>
-                  <ModalProvider>
-                    <BottomNavigationProvider>
-                      <UIProvider>
+              <HeaderProvider>
+                <ModalProvider>
+                  <BottomNavigationProvider>
+                    <UIProvider>
                       <BrowserRouter>
-                        <HubProvider>
-                        <ScrollToTop />
-                        <GlobalAudioProvider>
-                          <VideoManagerProvider>
-                            <VideoPlaybackManagerProvider>
-                              <TopTenProvider>
-                                <AuthWrapper>
-                                   <Suspense fallback={<ClbhouzPageSpinner />}>
-                                   <div className="app-depth">
-                                   {/* No global header - each page renders its own ClubhouseHeaderNew */}
-                                   <AppRoutes />
-                                   </div>
-                                 </Suspense>
-                              </AuthWrapper>
-                            </TopTenProvider>
-                          </VideoPlaybackManagerProvider>
-                        </VideoManagerProvider>
-                      </GlobalAudioProvider>
-                      <Toaster />
-                      <Sonner />
-                      <GlobalBottomNavigation />
-                        </HubProvider>
-                    </BrowserRouter>
-                  </UIProvider>
-                </BottomNavigationProvider>
+                        <Gate>
+                          <HubProvider>
+                            <ScrollToTop />
+                            <GlobalAudioProvider>
+                              <VideoManagerProvider>
+                                <VideoPlaybackManagerProvider>
+                                  <TopTenProvider>
+                                    <Suspense fallback={<ClbhouzPageSpinner />}>
+                                      <div className="app-depth">
+                                        {/* No global header - each page renders its own ClubhouseHeaderNew */}
+                                        <AppRoutes />
+                                      </div>
+                                    </Suspense>
+                                  </TopTenProvider>
+                                </VideoPlaybackManagerProvider>
+                              </VideoManagerProvider>
+                            </GlobalAudioProvider>
+                            <Toaster />
+                            <Sonner />
+                            <GlobalBottomNavigation />
+                          </HubProvider>
+                        </Gate>
+                      </BrowserRouter>
+                    </UIProvider>
+                  </BottomNavigationProvider>
                 </ModalProvider>
               </HeaderProvider>
-            </AccessGate>
         </TooltipProvider>
       </QueryClientProvider>
       </ThemeProvider>
