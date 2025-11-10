@@ -12,7 +12,7 @@ import { formatDistanceHcp } from '@/features/golfers/format';
 import SquircleImage from '@/components/ui/SquircleImage';
 
 // Mock data toggle
-const useMockData = true;
+const useMockData = false;
 
 const mockGolfers = [
   {

@@ -20,7 +20,7 @@ import { PullToRefresh } from '@/components/PullToRefresh';
 import '../home/hubTheme.css';
 
 // Mock data toggle
-const useMockData = true;
+const useMockData = false;
 
 const mockGolfers = [
   {
