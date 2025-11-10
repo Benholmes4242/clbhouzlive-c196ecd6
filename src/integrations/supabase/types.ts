@@ -719,6 +719,51 @@ export type Database = {
           },
         ]
       }
+      echo_shares: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          expires_at: string | null
+          id: string
+          revoked_at: string | null
+          thread_id: string
+          token: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          revoked_at?: string | null
+          thread_id: string
+          token: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          revoked_at?: string | null
+          thread_id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "echo_shares_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "echo_history_enriched"
+            referencedColumns: ["thread_id"]
+          },
+          {
+            foreignKeyName: "echo_shares_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "echo_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       echo_threads: {
         Row: {
           assistant_text_concat: string | null
@@ -3307,6 +3352,28 @@ export type Database = {
               date_from?: string
               date_to?: string
               filter_has_response?: boolean
+              filter_starred?: boolean
+              max_results?: number
+              mode?: string
+              q?: string
+              sort_mode?: string
+            }
+            Returns: {
+              has_response: boolean
+              id: string
+              is_starred: boolean
+              last_activity_at: string
+              message_count: number
+              relative_date: string
+              subtitle: string
+              title: string
+            }[]
+          }
+        | {
+            Args: {
+              date_from?: string
+              date_to?: string
+              filter_has_response?: boolean
               limit_rows?: number
               mode?: string
               offset_rows?: number
@@ -3344,9 +3411,44 @@ export type Database = {
               thread_id: string
             }[]
           }
+      echo_share_create: {
+        Args: { p_thread_id: string; p_ttl_seconds?: number }
+        Returns: string
+      }
+      echo_share_get_by_thread: {
+        Args: { p_thread_id: string }
+        Returns: {
+          created_at: string
+          expires_at: string
+          id: string
+          revoked_at: string
+          token: string
+        }[]
+      }
+      echo_share_get_thread: {
+        Args: { p_token: string }
+        Returns: {
+          created_at: string
+          messages: Json
+          thread_id: string
+          title: string
+        }[]
+      }
+      echo_share_resolve: {
+        Args: { p_token: string }
+        Returns: {
+          thread_id: string
+        }[]
+      }
+      echo_share_revoke: { Args: { p_token: string }; Returns: undefined }
       echo_thread_delete: { Args: { p_thread: string }; Returns: undefined }
       echo_thread_set_star: {
         Args: { p_star: boolean; p_thread: string }
+        Returns: undefined
+      }
+      echo_threads_delete_many: { Args: { ids: string[] }; Returns: undefined }
+      echo_threads_set_star: {
+        Args: { ids: string[]; starred: boolean }
         Returns: undefined
       }
       enablelongtransactions: { Args: never; Returns: string }
