@@ -85,6 +85,16 @@ const AdminMembersPage = lazy(() => import("./pages/admin/AdminMembersPage").the
 const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage").then(m => ({ default: m.AdminOverviewPage })));
 const AdminInvitesPage = lazy(() => import("./pages/admin/AdminInvitesPage").then(m => ({ default: m.AdminInvitesPage })));
 const InviteAcceptPage = lazy(() => import("./pages/admin/InviteAcceptPage").then(m => ({ default: m.InviteAcceptPage })));
+
+// Legacy admin pages
+const GolfCoursesPage = lazy(() => import("./pages/admin/GolfCoursesPage").then(m => ({ default: m.GolfCoursesPage })));
+const LogosPage = lazy(() => import("./pages/admin/LogosPage").then(m => ({ default: m.LogosPage })));
+const CountryFlagsPage = lazy(() => import("./pages/admin/CountryFlagsPage").then(m => ({ default: m.CountryFlagsPage })));
+const CourseImportPage = lazy(() => import("./pages/admin/CourseImportPage").then(m => ({ default: m.CourseImportPage })));
+const AnalyticsPage = lazy(() => import("./pages/admin/AnalyticsPage").then(m => ({ default: m.AnalyticsPage })));
+const TeamPage = lazy(() => import("./pages/admin/TeamPage").then(m => ({ default: m.TeamPage })));
+const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage").then(m => ({ default: m.AdminSettingsPage })));
+
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
 const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 
@@ -185,6 +195,15 @@ function AppRoutes() {
               <AdminInvitesPage />
             </PanelGuard>
           } />
+          
+          {/* Legacy/management sections */}
+          <Route path="golf-courses" element={<GolfCoursesPage />} />
+          <Route path="logos" element={<LogosPage />} />
+          <Route path="country-flags" element={<CountryFlagsPage />} />
+          <Route path="courses" element={<CourseImportPage />} />
+          <Route path="analytics" element={<AnalyticsPage />} />
+          <Route path="team" element={<TeamPage />} />
+          <Route path="settings" element={<AdminSettingsPage />} />
         </Route>
         
         <Route path="/admin/invite-accept" element={<InviteAcceptPage />} />

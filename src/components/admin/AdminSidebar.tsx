@@ -21,16 +21,26 @@ export const AdminSidebar: React.FC = () => {
   const { role, loading } = usePanelRole();
   const can = panelCan(role);
 
-  // Full Admin menu — all admin features
+  // FULL ADMIN — match the legacy set + new admin pages
   const fullMenu = [
-    { to: "/admin/overview",   label: "Overview" },
-    { to: "/admin/users",      label: "User Management" },
-    { to: "/admin/admins",     label: "Admin Members" },
-    { to: "/admin/invites",    label: "Invitations" },
+    { to: "/admin/overview",      label: "Overview" },
+    { to: "/admin/users",         label: "User Management" },
+    { to: "/admin/golf-courses",  label: "Golf Courses" },
+    { to: "/admin/logos",         label: "Logos" },
+    { to: "/admin/country-flags", label: "Country Flags" },
+    { to: "/admin/courses",       label: "Course Import" },
+    { to: "/admin/analytics",     label: "Analytics" },
+    { to: "/admin/team",          label: "Team Management" },
+    { to: "/admin/settings",      label: "Settings" },
+    // Phase 3 additions:
+    { to: "/admin/admins",        label: "Admin Members" },
+    { to: "/admin/invites",       label: "Invitations" },
   ];
 
-  // Limited Admin menu — restricted access (currently empty, will show golf courses when available)
-  const limitedMenu: typeof fullMenu = [];
+  // LIMITED ADMIN — per spec, at least Golf Courses
+  const limitedMenu = [
+    { to: "/admin/golf-courses", label: "Golf Courses" },
+  ];
 
   const menu = can.manageAdmins ? fullMenu : limitedMenu;
 
@@ -44,17 +54,11 @@ export const AdminSidebar: React.FC = () => {
       </div>
 
       <nav className="space-y-1">
-        {menu.length === 0 ? (
-          <div className="px-3 py-2 text-sm text-muted-foreground">
-            No sections available
-          </div>
-        ) : (
-          menu.map((item) => (
-            <LinkItem key={item.to} to={item.to}>
-              <span>{item.label}</span>
-            </LinkItem>
-          ))
-        )}
+        {menu.map((item) => (
+          <LinkItem key={item.to} to={item.to}>
+            <span>{item.label}</span>
+          </LinkItem>
+        ))}
       </nav>
     </div>
   );
