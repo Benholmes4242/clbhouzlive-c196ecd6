@@ -128,15 +128,35 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
             {!!mode && <span>{mode === 'live' ? 'Live' : 'Static'}</span>}
           </div>
           
-          {/* Tags */}
-          {tags.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {tags.slice(0, 3).map((tag) => (
-                <TagChip key={tag} label={tag} />
+          {/* Tag chips (max 2 + overflow) */}
+          {Array.isArray(tags) && tags.length > 0 && (
+            <div className="mt-1.5 flex items-center gap-1.5">
+              {tags.slice(0, 2).map((t) => (
+                <span
+                  key={t}
+                  className="text-[12px] px-2 py-[2px] rounded-full transition-colors hover:bg-white/12 hover:border-white/18"
+                  style={{
+                    background: 'rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    color: 'var(--hub-text-sub)',
+                  }}
+                  aria-label={`Tag ${t}`}
+                >
+                  #{t}
+                </span>
               ))}
-              {tags.length > 3 && (
-                <span className="text-[12px] px-2 py-1" style={{ color: 'var(--meta-dim)' }}>
-                  +{tags.length - 3}
+              {tags.length > 2 && (
+                <span
+                  className="text-[12px] px-2 py-[2px] rounded-full"
+                  style={{
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                    color: 'var(--hub-text-dim)',
+                  }}
+                  aria-label={`${tags.length - 2} more tags`}
+                  title={tags.slice(2).map(t => `#${t}`).join(' ')}
+                >
+                  +{tags.length - 2}
                 </span>
               )}
             </div>

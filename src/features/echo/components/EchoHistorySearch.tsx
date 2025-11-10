@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
 import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
+import { extractTagDirective } from '../utils/parseTagDirective';
 
 export type FilterType = 'all' | 'has_response' | 'no_response' | 'last_7_days' | 'last_30_days' | 'starred';
 
@@ -123,8 +124,22 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
           id="echo-search-input"
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search conversations..."
+          onChange={(e) => {
+            const raw = e.target.value;
+            const { cleanQuery, tag } = extractTagDirective(raw);
+            
+            // Update local query state with clean text
+            setQuery(cleanQuery);
+            
+            // If a tag directive is present, update filters
+            if (typeof tag !== 'undefined') {
+              onFilterChange({ tag });
+              if (tag) {
+                echoHistoryAnalytics.tagFilterApplied({ tag });
+              }
+            }
+          }}
+          placeholder="Search conversations... (tip: tag:#planning)"
           className="w-full h-10 pl-10 pr-10 rounded-[14px] text-[15px] transition-colors"
           style={{
             background: 'rgba(255,255,255,0.06)',
@@ -175,8 +190,7 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
             <span>Tagged: {activeTag}</span>
             <button
               onClick={() => {
-                setActiveFilter('all');
-                onFilterChange({});
+                onFilterChange({ tag: undefined });
               }}
               className="p-0.5 rounded-full hover:bg-white/15 transition-colors"
               aria-label="Clear tag filter"
