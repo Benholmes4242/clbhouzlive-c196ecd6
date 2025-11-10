@@ -134,7 +134,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               </span>
               {userProfilePhoto ? (
                 <SquircleImage
-                  size={20}
+                  size={28}
                   src={userProfilePhoto}
                   alt={userDisplayName || 'User'}
                   ringColor="rgba(255,255,255,0.2)"
@@ -142,13 +142,13 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 />
               ) : (
                 <div 
-                  className="flex items-center justify-center text-[10px] font-medium text-white/90"
+                  className="flex items-center justify-center text-[11px] font-medium text-white/90"
                   style={{
-                    width: 20,
-                    height: 20,
+                    width: 28,
+                    height: 28,
                     background: 'rgba(255,255,255,0.1)',
                     border: '1px solid rgba(255,255,255,0.2)',
-                    borderRadius: '6px',
+                    borderRadius: '8px',
                   }}
                 >
                   {userDisplayName?.charAt(0).toUpperCase() || 'U'}
