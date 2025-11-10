@@ -9,6 +9,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEchoHistorySearch, type EchoHistorySearchFilters } from '@/features/echo/hooks/useEchoHistorySearch';
 import { SwipeableHistoryRow } from '@/features/echo/components/SwipeableHistoryRow';
 import { HistoryThreadInline } from '@/features/echo/components/HistoryThreadInline';
+import { ThreadTagEditorInline } from '@/features/echo/components/tags/ThreadTagEditorInline';
 import { VirtualList } from '@/features/echo/components/virtual/VirtualList';
 import { EchoHistorySearch } from '@/features/echo/components/EchoHistorySearch';
 import { BulkActionBar } from '@/features/echo/components/BulkActionBar';
@@ -695,12 +696,38 @@ export function HubEchoHistoryPage() {
           </div>
           
           {/* Search & Filters */}
-          <EchoHistorySearch
-            onSearchChange={handleSearchChange}
-            onFilterChange={handleFilterChange}
-            activeTag={filters.tag}
-            className="mb-4"
-          />
+          <div className="mb-4 space-y-2">
+            <EchoHistorySearch
+              onSearchChange={handleSearchChange}
+              onFilterChange={handleFilterChange}
+              activeTag={filters.tag}
+            />
+            
+            {/* Active tag filter pill */}
+            {filters.tag && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs" style={{ color: 'var(--hub-text-dim)' }}>
+                  Filtered by tag:
+                </span>
+                <button
+                  onClick={() => {
+                    setFilters(prev => ({ ...prev, tag: undefined }));
+                    announce(`Cleared tag filter: ${filters.tag}`);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors hover:bg-white/12"
+                  style={{
+                    background: 'rgba(255,255,255,0.10)',
+                    border: '1px solid rgba(255,255,255,0.18)',
+                    color: 'var(--hub-text)',
+                  }}
+                  aria-label={`Clear tag filter ${filters.tag}`}
+                >
+                  <span>#{filters.tag}</span>
+                  <span aria-hidden="true">✕</span>
+                </button>
+              </div>
+            )}
+          </div>
 
           {isLoading && (
             <div className="space-y-2">
@@ -828,27 +855,37 @@ export function HubEchoHistoryPage() {
                       />
 
                       {isExpanded && (
-                        <HistoryThreadInline
-                          threadId={item.id}
-                          title={item.title}
-                          onCollapse={() => setExpandedId(null)}
-                          onCopyLink={() => {
-                            navigator.clipboard.writeText(window.location.origin + `/hub/echo/history/chat/${item.id}`);
-                          }}
-                          onOpenFull={() => {
-                            echoHistoryAnalytics.openFull({
-                              thread_id: item.id,
-                              from_inline: true,
-                            });
-                            const state = loc.state as any;
-                            nav(`/hub/echo/history/chat/${item.id}`, {
-                              state: { backgroundLocation: state?.backgroundLocation, fromHub: true },
-                            });
-                          }}
-                          onHeightChange={(height) => {
-                            expandedHeightsRef.current.set(item.id, height);
-                          }}
-                        />
+                        <>
+                          <HistoryThreadInline
+                            threadId={item.id}
+                            title={item.title}
+                            onCollapse={() => setExpandedId(null)}
+                            onCopyLink={() => {
+                              navigator.clipboard.writeText(window.location.origin + `/hub/echo/history/chat/${item.id}`);
+                            }}
+                            onOpenFull={() => {
+                              echoHistoryAnalytics.openFull({
+                                thread_id: item.id,
+                                from_inline: true,
+                              });
+                              const state = loc.state as any;
+                              nav(`/hub/echo/history/chat/${item.id}`, {
+                                state: { backgroundLocation: state?.backgroundLocation, fromHub: true },
+                              });
+                            }}
+                            onHeightChange={(height) => {
+                              expandedHeightsRef.current.set(item.id, height);
+                            }}
+                          />
+                          
+                          {/* Inline tag editor */}
+                          <div className="mt-3 px-4">
+                            <ThreadTagEditorInline
+                              threadId={item.id}
+                              initialTags={item.tags || []}
+                            />
+                          </div>
+                        </>
                       )}
                     </div>
                   );

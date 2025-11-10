@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, KeyboardEvent } from 'react';
 import { TagChip } from './TagChip';
 import { suggestTags } from '../../api/tags';
+import { trackTagSuggestShown } from '../../analytics/tags';
 import { cn } from '@/lib/utils';
 
 export interface TagInputProps {
@@ -50,6 +51,14 @@ export function TagInput({
         setSuggestions(filtered);
         setShowSuggestions(filtered.length > 0);
         setSelectedIndex(-1);
+        
+        // Track analytics for suggestions
+        if (filtered.length > 0) {
+          trackTagSuggestShown({
+            prefix: inputValue,
+            count: filtered.length,
+          });
+        }
       }, 300);
     } else {
       setSuggestions([]);
@@ -156,12 +165,16 @@ export function TagInput({
       {showSuggestions && suggestions.length > 0 && (
         <div
           ref={suggestionsRef}
+          role="listbox"
+          aria-label="Tag suggestions"
           className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-lg border border-border bg-popover shadow-lg"
         >
           {suggestions.map((suggestion, index) => (
             <button
               key={index}
               type="button"
+              role="option"
+              aria-selected={index === selectedIndex}
               onClick={() => addTag(suggestion)}
               className={cn(
                 "w-full px-3 py-2 text-left text-sm hover:bg-accent transition-colors",

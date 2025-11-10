@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { TagChip } from './TagChip';
 import { TagInput } from './TagInput';
 import { setTagsForThread, removeTagFromThread } from '../../api/tags';
+import { trackTagsSet, trackTagRemoved } from '../../analytics/tags';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Edit2, Check, X } from 'lucide-react';
@@ -30,6 +31,13 @@ export function ThreadTagEditorInline({ threadId, initialTags, className }: Thre
   const handleSave = async () => {
     try {
       await setTagsForThread(threadId, tags);
+      
+      // Track analytics
+      trackTagsSet({
+        thread_id: threadId,
+        count: tags.length,
+        source: 'inline',
+      });
       
       // Optimistic update: update cache immediately
       queryClient.setQueryData(['echoHistorySearch'], (oldData: any) => {
@@ -74,6 +82,13 @@ export function ThreadTagEditorInline({ threadId, initialTags, className }: Thre
     try {
       const newTags = tags.filter((t) => t !== tagToRemove);
       setTags(newTags);
+
+      // Track analytics
+      trackTagRemoved({
+        thread_id: threadId,
+        tag: tagToRemove,
+        source: 'inline',
+      });
 
       // Optimistic update
       queryClient.setQueryData(['echoHistorySearch'], (oldData: any) => {
