@@ -81,23 +81,41 @@ const handler = async (req: Request): Promise<Response> => {
     const svc = createClient(supabaseUrl, svcKey);
 
     // Lookup role directly from admin_memberships for this user
-    const { data: mem, error: memErr } = await svc
+    let mem = null;
+    
+    // First try with expires_at (preferred column)
+    const first = await svc
       .from("admin_memberships")
       .select("role, expires_at")
       .eq("user_id", user.id)
       .maybeSingle();
 
-    if (memErr) {
-      console.error("[secure-site-access-check] membership lookup error:", memErr);
-      return new Response(
-        JSON.stringify({ ok: false, message: "Admin role check failed" }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
+    if (first.error) {
+      console.error("[secure-site-access-check] membership lookup error (first):", first.error);
+
+      // Fallback: some environments may not have expires_at yet
+      const second = await svc
+        .from("admin_memberships")
+        .select("role")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (second.error) {
+        console.error("[secure-site-access-check] membership lookup error (fallback):", second.error);
+        return new Response(
+          JSON.stringify({ ok: false, message: "Admin role check failed" }),
+          { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+      mem = second.data;
+    } else {
+      mem = first.data;
     }
 
     // Compute effective role (honor expiry if present)
     let role: "none" | "limited" | "full" = "none";
-    if (mem?.role && (!mem.expires_at || new Date(mem.expires_at) > new Date())) {
+    const notExpired = !mem?.expires_at || new Date(mem.expires_at) > new Date();
+    if (mem?.role && notExpired) {
       role = mem.role === "full" ? "full" : "limited";
     }
 
