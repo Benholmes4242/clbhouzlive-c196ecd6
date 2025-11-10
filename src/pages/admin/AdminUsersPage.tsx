@@ -1,256 +1,143 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { UsersTable } from "@/components/admin/users/UsersTable";
 import { usePanelRole } from "@/hooks/usePanelRole";
 import { panelCan } from "@/lib/panelCan";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import { track } from "@/lib/telemetry";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Loader2 } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import type { AdminUser } from "@/hooks/useAdmin";
 
-type UserRow = {
+type AdminUserRow = {
   id: string;
   email: string;
   display_name: string | null;
   username: string | null;
   home_club: string | null;
   role: string | null;
-  created_at: string;
   last_sign_in_at: string | null;
+  created_at: string;
   total_count: number;
 };
 
 export function AdminUsersPage() {
   const { role } = usePanelRole();
   const can = panelCan(role);
-  const { toast } = useToast();
-  const [page, setPage] = useState(1);
-  const [pageSize] = useState(25);
+  const readOnly = !can.dangerousOps;
+  const [rows, setRows] = useState<AdminUser[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [q, setQ] = useState("");
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(25);
   const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [rows, setRows] = useState<UserRow[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  useEffect(() => {
-    track("admin_users_opened");
-  }, []);
+  const offset = useMemo(() => page * pageSize, [page, pageSize]);
 
-  // Debounce search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-      setPage(1); // Reset to page 1 on new search
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  const loadUsers = async () => {
+  const load = async () => {
     setLoading(true);
     try {
-      const offset = (page - 1) * pageSize;
       const { data, error } = await supabase.rpc("get_users_paged", {
-        q: debouncedSearch || null,
+        q: q || null,
         p_limit: pageSize,
         p_offset: offset,
       });
-
       if (error) throw error;
-
-      setRows(data || []);
-      setTotal(data?.[0]?.total_count ?? 0);
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: `Failed to load users: ${error.message}`,
-        variant: "destructive",
-      });
+      const typedData = (data ?? []) as AdminUserRow[];
+      
+      // Convert to AdminUser format
+      const adminUsers: AdminUser[] = typedData.map((row) => ({
+        id: row.id,
+        email: row.email,
+        auth_created_at: row.created_at,
+        last_sign_in_at: row.last_sign_in_at,
+        email_confirmed_at: null,
+        display_name: row.display_name,
+        username: row.username,
+        home_club: row.home_club,
+        is_public: null,
+        profile_created_at: null,
+        role: row.role as 'admin' | 'moderator' | 'user' | 'limited_admin' | null,
+      }));
+      
+      setRows(adminUsers);
+      setTotal(typedData?.[0]?.total_count ?? 0);
+    } catch (e) {
+      console.error("[AdminUsersPage] load failed:", e);
+      setRows([]);
+      setTotal(0);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadUsers();
-  }, [page, pageSize, debouncedSearch]);
+    track("admin_users_opened");
+  }, []);
 
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, pageSize]);
 
-  const getRoleBadgeVariant = (role: string | null) => {
-    switch (role) {
-      case "admin": return "destructive";
-      case "limited_admin": return "default";
-      case "moderator": return "default";
-      case "user": return "secondary";
-      default: return "outline";
-    }
+  const onSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPage(0);
+    load();
   };
 
-  const getRoleDisplayName = (role: string | null) => {
-    switch (role) {
-      case "limited_admin": return "Limited Admin";
-      case "admin": return "Admin";
-      case "moderator": return "Moderator";
-      case "user": return "User";
-      default: return "No role";
-    }
-  };
+  const maxPage = Math.max(0, Math.ceil(total / pageSize) - 1);
 
   return (
     <div className="min-h-screen overflow-x-hidden">
-      <div className="p-4 sm:p-6 space-y-4">
-        <div>
-          <h1 className="text-xl font-semibold">Users</h1>
-          <p className="text-sm text-muted-foreground">
-            All application users (visible to Limited + Full admins).
-          </p>
-        </div>
-
+      <div className="p-4 sm:p-6">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Users Management</span>
-              {!can.dangerousOps && <Badge variant="secondary">Read Only</Badge>}
-            </CardTitle>
+            <CardTitle>Users</CardTitle>
+            <CardDescription>All application users (paginated). {readOnly && "Read only."}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Search bar */}
-            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+          <CardContent>
+            <form onSubmit={onSearch} className="flex items-center gap-2 mb-4">
               <Input
-                type="text"
-                placeholder="Search by email, ID, name, or username..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full sm:max-w-md"
+                placeholder="Search by email, id, username…"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                className="max-w-md"
               />
+              <Button type="submit" disabled={loading}>Search</Button>
+              <div className="ml-auto flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Rows:</span>
+                <select
+                  className="border rounded px-2 py-1 bg-background"
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(parseInt(e.target.value, 10));
+                    setPage(0);
+                  }}
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
+            </form>
+
+            <UsersTable users={rows} readOnly={readOnly} />
+
+            <div className="mt-4 flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                {total.toLocaleString()} total • page {page + 1} / {Math.max(1, maxPage + 1)}
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0 || loading}>
+                  Prev
+                </Button>
+                <Button variant="outline" onClick={() => setPage((p) => Math.min(maxPage, p + 1))} disabled={page >= maxPage || loading}>
+                  Next
+                </Button>
+              </div>
             </div>
-
-            {loading ? (
-              <div className="flex items-center justify-center p-8">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                <span className="ml-2 text-sm text-muted-foreground">Loading…</span>
-              </div>
-            ) : rows.length === 0 ? (
-              <div className="p-12 text-center space-y-3">
-                <div className="text-sm font-medium">No users found</div>
-                <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                  {searchQuery ? "Try a different search term" : "Users will appear here once they sign up."}
-                </p>
-              </div>
-            ) : (
-              <>
-                {/* Desktop table view */}
-                <div className="hidden sm:block overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Display Name</TableHead>
-                        <TableHead>Username</TableHead>
-                        <TableHead>Home Club</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Last Sign In</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {rows.map((user) => (
-                        <TableRow key={user.id}>
-                          <TableCell className="font-medium">{user.email}</TableCell>
-                          <TableCell>{user.display_name || "—"}</TableCell>
-                          <TableCell>{user.username || "—"}</TableCell>
-                          <TableCell>{user.home_club || "—"}</TableCell>
-                          <TableCell>
-                            <Badge variant={getRoleBadgeVariant(user.role)}>
-                              {getRoleDisplayName(user.role)}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            {user.last_sign_in_at
-                              ? new Date(user.last_sign_in_at).toLocaleDateString()
-                              : "Never"}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-
-                {/* Mobile card view */}
-                <div className="sm:hidden space-y-3">
-                  {rows.map((user) => (
-                    <div key={user.id} className="rounded-lg border p-4 space-y-3">
-                      <div className="space-y-1">
-                        <div className="text-sm font-medium break-all">{user.email}</div>
-                        <div className="text-xs text-muted-foreground break-all">ID: {user.id}</div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                          <div className="text-muted-foreground">Display Name</div>
-                          <div className="font-medium">{user.display_name || "—"}</div>
-                        </div>
-                        <div>
-                          <div className="text-muted-foreground">Username</div>
-                          <div className="font-medium">{user.username || "—"}</div>
-                        </div>
-                        <div>
-                          <div className="text-muted-foreground">Home Club</div>
-                          <div className="font-medium">{user.home_club || "—"}</div>
-                        </div>
-                        <div>
-                          <div className="text-muted-foreground">Last Sign In</div>
-                          <div className="font-medium">
-                            {user.last_sign_in_at
-                              ? new Date(user.last_sign_in_at).toLocaleDateString()
-                              : "Never"}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <Badge variant={getRoleBadgeVariant(user.role)} className="text-xs">
-                          {getRoleDisplayName(user.role)}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Pagination */}
-                <div className="flex items-center justify-between pt-3 border-t">
-                  <div className="text-xs text-muted-foreground">
-                    Page {page} of {totalPages} ({total.toLocaleString()} total)
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      disabled={page === 1 || loading}
-                    >
-                      Prev
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => setPage((p) => (p * pageSize < total ? p + 1 : p))}
-                      disabled={page * pageSize >= total || loading}
-                    >
-                      Next
-                    </Button>
-                  </div>
-                </div>
-              </>
-            )}
           </CardContent>
         </Card>
       </div>

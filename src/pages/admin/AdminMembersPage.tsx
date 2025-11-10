@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Shield, Users as UsersIcon } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type Membership = {
   user_id: string;
@@ -214,6 +215,9 @@ export function AdminMembersPage() {
     }
   };
 
+  const selectedIds = Array.from(selected);
+  const clearSelection = () => setSelected(new Set());
+
   const openAudit = async (target_user_id: string) => {
     try {
       const res = await adminRoleManage<{ data: AuditEntry[] }>("list_audit", { target_user_id });
@@ -251,41 +255,71 @@ export function AdminMembersPage() {
 
         {/* Bulk actions bar */}
         {selected.size > 0 && (
-          <div className="sticky top-[56px] z-10 bg-background/90 backdrop-blur border-b p-3 flex flex-wrap gap-2 items-center">
-            <Button size="sm" variant="outline" onClick={() => setConfirmAction({
-              action: bulkGrantLimited,
-              title: "Grant Limited Access (Bulk)?",
-              message: `Grant limited admin access to ${selected.size} user(s)?`
-            })}>
-              Grant Limited ({selected.size})
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => setConfirmAction({
-              action: bulkGrantFull,
-              title: "Grant Full Access (Bulk)?",
-              message: `Grant full admin access to ${selected.size} user(s)?`
-            })}>
-              Grant Full ({selected.size})
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => setConfirmAction({
-              action: bulkDowngrade,
-              title: "Downgrade (Bulk)?",
-              message: `Downgrade ${selected.size} admin(s) to limited access?`
-            })}>
-              Downgrade ({selected.size})
-            </Button>
-            <Button size="sm" variant="destructive" onClick={() => setConfirmAction({
-              action: bulkRevoke,
-              title: "Revoke Access (Bulk)?",
-              message: `Revoke admin access for ${selected.size} user(s)? This cannot be undone.`
-            })}>
-              Revoke ({selected.size})
-            </Button>
-            <div className="ml-auto text-xs text-muted-foreground">
-              {selected.size} selected
+          <div className="mb-3 flex items-center justify-between rounded-md border p-3 bg-muted/30">
+            <div className="text-sm">
+              <strong>{selected.size}</strong> selected
             </div>
-            <Button size="sm" variant="ghost" onClick={() => setSelected(new Set())}>
-              Clear
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => setConfirmAction({
+                  action: async () => {
+                    await adminRoleManage("grant_limited_bulk", { user_ids: selectedIds });
+                    await load();
+                    clearSelection();
+                  },
+                  title: "Grant Limited (Bulk)?",
+                  message: `Grant limited admin to ${selected.size} users.`,
+                })}
+              >
+                Grant Limited
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => setConfirmAction({
+                  action: async () => {
+                    await adminRoleManage("grant_full_bulk", { user_ids: selectedIds });
+                    await load();
+                    clearSelection();
+                  },
+                  title: "Upgrade to Full (Bulk)?",
+                  message: `Upgrade ${selected.size} users to full admin.`,
+                })}
+              >
+                Upgrade to Full
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setConfirmAction({
+                  action: async () => {
+                    await adminRoleManage("downgrade_bulk", { user_ids: selectedIds });
+                    await load();
+                    clearSelection();
+                  },
+                  title: "Downgrade (Bulk)?",
+                  message: `Downgrade ${selected.size} users to limited admin.`,
+                })}
+              >
+                Downgrade
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={() => setConfirmAction({
+                  action: async () => {
+                    await adminRoleManage("revoke_bulk", { user_ids: selectedIds });
+                    await load();
+                    clearSelection();
+                  },
+                  title: "Revoke (Bulk)?",
+                  message: `Revoke admin access for ${selected.size} users.`,
+                })}
+              >
+                Revoke
+              </Button>
+            </div>
           </div>
         )}
 
@@ -330,11 +364,16 @@ export function AdminMembersPage() {
                     <thead className="border-b bg-muted/50">
                       <tr>
                         <th className="text-left p-3 font-medium w-12">
-                          <input
-                            type="checkbox"
-                            checked={selected.size === rows.length && rows.length > 0}
-                            onChange={toggleSelectAll}
-                            className="rounded border-border"
+                          <Checkbox
+                            checked={rows.length > 0 && rows.every((r) => selected.has(r.user_id))}
+                            onCheckedChange={(v) => {
+                              if (v) {
+                                setSelected(new Set(rows.map(r => r.user_id)));
+                              } else {
+                                setSelected(new Set());
+                              }
+                            }}
+                            aria-label="Select all"
                           />
                         </th>
                         <th className="text-left p-3 font-medium">User ID</th>
@@ -348,11 +387,18 @@ export function AdminMembersPage() {
                       {rows.map(r => (
                         <tr key={r.user_id} className="border-b last:border-0">
                           <td className="p-3">
-                            <input
-                              type="checkbox"
+                            <Checkbox
                               checked={selected.has(r.user_id)}
-                              onChange={() => toggleSelect(r.user_id)}
-                              className="rounded border-border"
+                              onCheckedChange={(v) => {
+                                if (v) {
+                                  setSelected(new Set([...selected, r.user_id]));
+                                } else {
+                                  const newSelected = new Set(selected);
+                                  newSelected.delete(r.user_id);
+                                  setSelected(newSelected);
+                                }
+                              }}
+                              aria-label={`Select ${r.user_id}`}
                             />
                           </td>
                           <td className="p-3 font-mono text-xs">{r.user_id.slice(0, 8)}…</td>
