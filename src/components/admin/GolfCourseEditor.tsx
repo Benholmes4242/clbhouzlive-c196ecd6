@@ -22,6 +22,7 @@ import { useForm } from 'react-hook-form';
 import { X, ExternalLink, ChevronRight } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { usePageDraft } from '@/hooks/usePageDraft';
 import CourseImageUpload from './golf-courses/CourseImageUpload';
 import CourseReviewsSection from './golf-courses/CourseReviewsSection';
 import { GolfCourse, CourseRating, GolfCourseEditorProps } from './golf-courses/types';
@@ -72,12 +73,51 @@ const regionalTop100Options = [
 // Generate rank options 1-100
 const rankOptions = Array.from({ length: 100 }, (_, i) => (i + 1).toString());
 
+type DraftFormShape = {
+  name: string;
+  region: string;
+  description: string;
+  website_url: string;
+  latitude: string;
+  longitude: string;
+  selectedCountry: string;
+  selectedSubCountry: string;
+  courseImageUrl: string | null;
+  activeTab: string;
+  regionalRankingRegion: string;
+  regionalRank: string;
+  globalRank: string;
+};
+
 const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating, onClose }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const { register, handleSubmit, reset, formState: { errors, isDirty } } = useForm();
   
+  // Draft persistence setup
+  const draftKey = `admin:golf-course:${isCreating ? 'new' : course?.id}:${user?.id ?? 'anon'}`;
+  const initialDraft: DraftFormShape = {
+    name: '',
+    region: '',
+    description: '',
+    website_url: '',
+    latitude: '',
+    longitude: '',
+    selectedCountry: '',
+    selectedSubCountry: '',
+    courseImageUrl: null,
+    activeTab: 'details',
+    regionalRankingRegion: '',
+    regionalRank: '',
+    globalRank: '',
+  };
+  
+  const { value: draft, save: saveDraft, clear: clearDraft, loadedOnce } = usePageDraft<DraftFormShape>({
+    key: draftKey,
+    initial: initialDraft,
+  });
+
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedSubCountry, setSelectedSubCountry] = useState('');
   const [courseImageUrl, setCourseImageUrl] = useState<string | null>(null);
@@ -130,23 +170,21 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     enabled: !isCreating && !!course?.id,
   });
 
-  // Initialize form with course data
+  // Initialize form with course data or draft
   useEffect(() => {
+    if (!loadedOnce) return;
+    
     console.log('=== EDITOR: UseEffect triggered ===');
     console.log('course:', course);
     console.log('isCreating:', isCreating);
+    console.log('draft:', draft);
     
     if (course && !isCreating) {
       console.log('=== EDITOR: Initializing form with course data ===');
-      console.log('Course data:', course);
-      console.log('Course sub_country value:', course.sub_country);
       
       // Set all state synchronously in the correct order
       const countryValue = course.country || '';
       const subCountryValue = course.sub_country || '';
-      
-      console.log('About to set selectedCountry to:', countryValue);
-      console.log('About to set selectedSubCountry to:', subCountryValue);
       
       setSelectedCountry(countryValue);
       setSelectedSubCountry(subCountryValue);
@@ -186,6 +224,28 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       
       setIsFormInitialized(true);
       
+    } else if (isCreating && draft && (draft.name || draft.selectedCountry)) {
+      console.log('=== EDITOR: Restoring from draft ===');
+      
+      // Restore from draft
+      setSelectedCountry(draft.selectedCountry);
+      setSelectedSubCountry(draft.selectedSubCountry);
+      setCourseImageUrl(draft.courseImageUrl);
+      setActiveTab(draft.activeTab || 'details');
+      setRegionalRankingRegion(draft.regionalRankingRegion);
+      setRegionalRank(draft.regionalRank);
+      setGlobalRank(draft.globalRank);
+      
+      reset({
+        name: draft.name,
+        region: draft.region,
+        description: draft.description,
+        website_url: draft.website_url,
+        latitude: draft.latitude,
+        longitude: draft.longitude,
+      });
+      
+      setIsFormInitialized(true);
     } else {
       console.log('=== EDITOR: Resetting form for new course ===');
       reset({
@@ -204,7 +264,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       setGlobalRank('');
       setIsFormInitialized(true);
     }
-  }, [course?.id, isCreating, reset]);
+  }, [course?.id, isCreating, reset, draft, loadedOnce]);
 
   // Save course mutation
   const saveMutation = useMutation({
@@ -274,6 +334,9 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       }
     },
     onSuccess: (savedCourse) => {
+      // Clear draft on successful save
+      clearDraft();
+      
       // Update last saved info
       setLastSavedAt(new Date(savedCourse.updated_at || Date.now()));
       setLastSavedBy(
@@ -420,9 +483,11 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   const handleCloseModal = () => {
     if (isDirty) {
       if (window.confirm('You have unsaved changes. Are you sure you want to close?')) {
+        clearDraft();
         onClose();
       }
     } else {
+      clearDraft();
       onClose();
     }
   };
@@ -430,16 +495,24 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   const handleCountryChange = (value: string) => {
     setSelectedCountry(value);
     const newAvailableSubCountries = subCountryOptions[value] || [];
-    if (selectedSubCountry && !newAvailableSubCountries.includes(selectedSubCountry)) {
-      setSelectedSubCountry('');
+    const newSubCountry = selectedSubCountry && !newAvailableSubCountries.includes(selectedSubCountry) ? '' : selectedSubCountry;
+    if (newSubCountry !== selectedSubCountry) {
+      setSelectedSubCountry(newSubCountry);
     }
+    
+    // Save to draft
+    saveDraft({ selectedCountry: value, selectedSubCountry: newSubCountry });
   };
 
   const handleRegionalRankingRegionChange = (value: string) => {
     setRegionalRankingRegion(value);
+    const newRank = value ? regionalRank : '';
     if (!value) {
-      setRegionalRank('');
+      setRegionalRank(newRank);
     }
+    
+    // Save to draft
+    saveDraft({ regionalRankingRegion: value, regionalRank: newRank });
   };
 
   const availableSubCountries = selectedCountry ? subCountryOptions[selectedCountry] || [] : [];
@@ -448,6 +521,9 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   const handleImageChange = (imageUrl: string | null) => {
     console.log('=== EDITOR: Image changed to:', imageUrl);
     setCourseImageUrl(imageUrl);
+    
+    // Save to draft
+    saveDraft({ courseImageUrl: imageUrl });
   };
 
   // Don't render the form until it's fully initialized
@@ -528,9 +604,12 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
             {/* Main Content Area */}
             <div className="flex-1 overflow-y-auto">
               <form id="course-form" onSubmit={handleSubmit(onSubmit)} className="h-full flex flex-col">
-                <div className="flex-1 p-6">
-                  <Tabs value={activeTab} className="h-full">
-                    <TabsContent value="details" className="mt-0 h-full">
+                 <div className="flex-1 p-6">
+                   <Tabs value={activeTab} onValueChange={(value) => {
+                     setActiveTab(value);
+                     saveDraft({ activeTab: value });
+                   }} className="h-full">
+                     <TabsContent value="details" className="mt-0 h-full">
                       <div className="grid grid-cols-3 gap-8 h-full">
                         {/* Left Column - Main Fields */}
                         <div className="col-span-2 space-y-6">
@@ -538,9 +617,12 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                             <Label htmlFor="name" className="flex items-center gap-1">
                               Golf Course Name <span className="text-red-500">*</span>
                             </Label>
-                            <Input
+                             <Input
                               id="name"
-                              {...register('name', { required: 'Golf course name is required' })}
+                              {...register('name', { 
+                                required: 'Golf course name is required',
+                                onChange: (e) => saveDraft({ name: e.target.value })
+                              })}
                               placeholder="e.g., Royal County Down Golf Club"
                               className={errors.name ? 'border-red-500' : ''}
                             />
@@ -549,24 +631,28 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                             )}
                           </div>
 
-                          <div className="space-y-2">
-                            <Label htmlFor="website_url">Website URL</Label>
-                            <Input
-                              id="website_url"
-                              {...register('website_url')}
-                              placeholder="www.example.com"
-                            />
-                          </div>
+                           <div className="space-y-2">
+                             <Label htmlFor="website_url">Website URL</Label>
+                             <Input
+                               id="website_url"
+                               {...register('website_url', {
+                                 onChange: (e) => saveDraft({ website_url: e.target.value })
+                               })}
+                               placeholder="www.example.com"
+                             />
+                           </div>
 
-                          <div className="space-y-2">
-                            <Label htmlFor="description">Description</Label>
-                            <Textarea
-                              id="description"
-                              {...register('description')}
-                              placeholder="Short overview of the club... (Markdown supported)"
-                              rows={6}
-                            />
-                          </div>
+                           <div className="space-y-2">
+                             <Label htmlFor="description">Description</Label>
+                             <Textarea
+                               id="description"
+                               {...register('description', {
+                                 onChange: (e) => saveDraft({ description: e.target.value })
+                               })}
+                               placeholder="Short overview of the club... (Markdown supported)"
+                               rows={6}
+                             />
+                           </div>
 
                           <div className="space-y-4">
                             <h3 className="font-medium">Quick actions</h3>
@@ -616,24 +702,28 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                           <div className="space-y-4">
                             <h3 className="font-medium">Map & Coordinates</h3>
                             <div className="space-y-3">
-                              <div className="space-y-2">
-                                <Label htmlFor="latitude" className="text-sm">Latitude</Label>
-                                <Input
-                                  id="latitude"
-                                  {...register('latitude')}
-                                  placeholder="Latitude"
-                                  className="text-sm"
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor="longitude" className="text-sm">Longitude</Label>
-                                <Input
-                                  id="longitude"
-                                  {...register('longitude')}
-                                  placeholder="Longitude"
-                                  className="text-sm"
-                                />
-                              </div>
+                               <div className="space-y-2">
+                                 <Label htmlFor="latitude" className="text-sm">Latitude</Label>
+                                 <Input
+                                   id="latitude"
+                                   {...register('latitude', {
+                                     onChange: (e) => saveDraft({ latitude: e.target.value })
+                                   })}
+                                   placeholder="Latitude"
+                                   className="text-sm"
+                                 />
+                               </div>
+                               <div className="space-y-2">
+                                 <Label htmlFor="longitude" className="text-sm">Longitude</Label>
+                                 <Input
+                                   id="longitude"
+                                   {...register('longitude', {
+                                     onChange: (e) => saveDraft({ longitude: e.target.value })
+                                   })}
+                                   placeholder="Longitude"
+                                   className="text-sm"
+                                 />
+                               </div>
                               <div className="h-32 bg-muted/30 rounded-md flex items-center justify-center text-sm text-muted-foreground">
                                 Map preview
                               </div>
@@ -700,36 +790,41 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                             </Select>
                           </div>
 
-                          <div className="space-y-2">
-                            <Label htmlFor="sub_country" className="flex items-center gap-1">
-                              Sub-Country <span className="text-red-500">*</span>
-                            </Label>
-                            <Select 
-                              value={selectedSubCountry} 
-                              onValueChange={setSelectedSubCountry}
-                              disabled={!selectedCountry}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder={selectedCountry ? "Select sub-country" : "Select primary region first"} />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {availableSubCountries.map((subCountry) => (
-                                  <SelectItem key={subCountry} value={subCountry}>
-                                    {subCountry}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
+                           <div className="space-y-2">
+                             <Label htmlFor="sub_country" className="flex items-center gap-1">
+                               Sub-Country <span className="text-red-500">*</span>
+                             </Label>
+                             <Select 
+                               value={selectedSubCountry} 
+                               onValueChange={(value) => {
+                                 setSelectedSubCountry(value);
+                                 saveDraft({ selectedSubCountry: value });
+                               }}
+                               disabled={!selectedCountry}
+                             >
+                               <SelectTrigger>
+                                 <SelectValue placeholder={selectedCountry ? "Select sub-country" : "Select primary region first"} />
+                               </SelectTrigger>
+                               <SelectContent>
+                                 {availableSubCountries.map((subCountry) => (
+                                   <SelectItem key={subCountry} value={subCountry}>
+                                     {subCountry}
+                                   </SelectItem>
+                                 ))}
+                               </SelectContent>
+                             </Select>
+                           </div>
 
-                          <div className="space-y-2">
-                            <Label htmlFor="region">Local Area / County / State</Label>
-                            <Input
-                              id="region"
-                              {...register('region')}
-                              placeholder="e.g. Ayrshire, California, etc."
-                            />
-                          </div>
+                           <div className="space-y-2">
+                             <Label htmlFor="region">Local Area / County / State</Label>
+                             <Input
+                               id="region"
+                               {...register('region', {
+                                 onChange: (e) => saveDraft({ region: e.target.value })
+                               })}
+                               placeholder="e.g. Ayrshire, California, etc."
+                             />
+                           </div>
                         </div>
                       </div>
                     </TabsContent>
@@ -749,18 +844,21 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                                   <SelectItem value="Worldwide">Worldwide</SelectItem>
                                 </SelectContent>
                               </Select>
-                              <Select value={globalRank} onValueChange={setGlobalRank}>
-                                <SelectTrigger className="w-24">
-                                  <SelectValue placeholder="Rank" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {rankOptions.map((rank) => (
-                                    <SelectItem key={rank} value={rank}>
-                                      {rank}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                               <Select value={globalRank} onValueChange={(value) => {
+                                 setGlobalRank(value);
+                                 saveDraft({ globalRank: value });
+                               }}>
+                                 <SelectTrigger className="w-24">
+                                   <SelectValue placeholder="Rank" />
+                                 </SelectTrigger>
+                                 <SelectContent>
+                                   {rankOptions.map((rank) => (
+                                     <SelectItem key={rank} value={rank}>
+                                       {rank}
+                                     </SelectItem>
+                                   ))}
+                                 </SelectContent>
+                               </Select>
                             </div>
                           </div>
 
@@ -779,22 +877,25 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                                   ))}
                                 </SelectContent>
                               </Select>
-                              <Select 
-                                value={regionalRank} 
-                                onValueChange={setRegionalRank}
-                                disabled={!regionalRankingRegion}
-                              >
-                                <SelectTrigger className="w-24">
-                                  <SelectValue placeholder="Rank" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {rankOptions.map((rank) => (
-                                    <SelectItem key={rank} value={rank}>
-                                      {rank}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                               <Select 
+                                 value={regionalRank} 
+                                 onValueChange={(value) => {
+                                   setRegionalRank(value);
+                                   saveDraft({ regionalRank: value });
+                                 }}
+                                 disabled={!regionalRankingRegion}
+                               >
+                                 <SelectTrigger className="w-24">
+                                   <SelectValue placeholder="Rank" />
+                                 </SelectTrigger>
+                                 <SelectContent>
+                                   {rankOptions.map((rank) => (
+                                     <SelectItem key={rank} value={rank}>
+                                       {rank}
+                                     </SelectItem>
+                                   ))}
+                                 </SelectContent>
+                               </Select>
                             </div>
                           </div>
                         </div>

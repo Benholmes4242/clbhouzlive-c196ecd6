@@ -25,14 +25,14 @@ export function PanelGuard({
   // While validating, show overlay but keep page mounted
   if (loading) {
     return (
-      <div className="relative">
+      <>
         {children}
-        <div className="fixed inset-0 z-50 grid place-items-center bg-background/70 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 grid place-items-center bg-background/60 backdrop-blur-sm">
           <div className="rounded-lg border bg-card px-6 py-4 text-sm text-foreground">
             Validating admin access…
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
