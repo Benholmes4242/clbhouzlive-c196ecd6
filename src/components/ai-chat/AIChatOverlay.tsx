@@ -550,27 +550,38 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     );
                   })}
                   {isLoading && (
-                    <div className="mt-4 flex items-end gap-2.5">
-                      <div className="shrink-0 h-7 w-7 flex items-center justify-center">
-                        <EchoBotIcon size={28} className="text-white/90" />
-                      </div>
-                      <div className="flex-1" style={{ maxWidth: '84vw' }}>
-                        <div className="pl-[36px] mb-2 text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
+                    <div className="mt-4">
+                      {/* Echo heading with squircle icon */}
+                      <div className="mb-2 flex items-center gap-2">
+                        <span className="text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
                           Echo
-                        </div>
-                        <div className="rounded-2xl rounded-bl-md border overflow-hidden backdrop-blur-[var(--glass-blur)]"
+                        </span>
+                        <div 
+                          className="flex items-center justify-center w-7 h-7 rounded-lg"
                           style={{
-                            background: 'linear-gradient(145deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.06) 100%)',
-                            borderColor: 'rgba(255,255,255,0.14)',
-                            boxShadow: '0 10px 28px rgba(0,0,0,0.42), inset 0 1px 1px rgba(255,255,255,.12)',
-                            padding: 'var(--bubble-pad-y) var(--bubble-pad-x)'
-                          }}>
-                          <div className="flex items-center gap-1.5">
-                            <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
-                            <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce"></span>
-                            <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
-                          </div>
-                          <EchoTypingBar />
+                            background: 'rgba(255,255,255,0.08)',
+                            border: '1px solid rgba(255,255,255,0.12)',
+                            backdropFilter: 'blur(12px)',
+                            WebkitBackdropFilter: 'blur(12px)',
+                          }}
+                        >
+                          <Bot className="w-5 h-5 text-white/80" />
+                        </div>
+                      </div>
+                      
+                      {/* Loading bubble */}
+                      <div className="rounded-2xl rounded-bl-md border overflow-hidden backdrop-blur-[var(--glass-blur)]"
+                        style={{
+                          maxWidth: '84vw',
+                          background: 'linear-gradient(145deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.06) 100%)',
+                          borderColor: 'rgba(255,255,255,0.14)',
+                          boxShadow: '0 10px 28px rgba(0,0,0,0.42), inset 0 1px 1px rgba(255,255,255,.12)',
+                          padding: 'var(--bubble-pad-y) var(--bubble-pad-x)'
+                        }}>
+                        <div className="flex items-center gap-1.5">
+                          <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
+                          <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce"></span>
+                          <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
                         </div>
                       </div>
                     </div>
@@ -1186,12 +1197,6 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           data-echo-composer
           data-streaming={isLoading ? "true" : "false"}
         >
-            {/* Upload progress bar (shown during processing) */}
-            {(isLoading || isProcessing) && (
-              <div className="absolute left-0 right-0 top-0 h-[2px] bg-white/20 overflow-hidden">
-                <div className="h-full bg-white/60 animate-[shimmer_1.6s_linear_infinite] w-1/3" />
-              </div>
-            )}
             
             <div className="mx-auto w-full max-w-[720px] space-y-2">
               {activeTab === 'chat' && (
