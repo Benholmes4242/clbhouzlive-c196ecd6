@@ -726,6 +726,7 @@ export type Database = {
           first_user_question: string | null
           has_response: boolean | null
           id: string
+          is_starred: boolean
           last_activity_at: string | null
           message_count: number | null
           tsv: unknown
@@ -738,6 +739,7 @@ export type Database = {
           first_user_question?: string | null
           has_response?: boolean | null
           id?: string
+          is_starred?: boolean
           last_activity_at?: string | null
           message_count?: number | null
           tsv?: unknown
@@ -750,6 +752,7 @@ export type Database = {
           first_user_question?: string | null
           has_response?: boolean | null
           id?: string
+          is_starred?: boolean
           last_activity_at?: string | null
           message_count?: number | null
           tsv?: unknown
@@ -3298,25 +3301,53 @@ export type Database = {
           user_id: string
         }[]
       }
-      echo_history_search: {
-        Args: {
-          date_from?: string
-          date_to?: string
-          filter_has_response?: boolean
-          limit_rows?: number
-          mode?: string
-          offset_rows?: number
-          q?: string
-        }
-        Returns: {
-          first_user_question: string
-          has_response: boolean
-          last_activity_at: string
-          message_count: number
-          preview_snippet: string
-          relative_date: string
-          thread_id: string
-        }[]
+      echo_history_search:
+        | {
+            Args: {
+              date_from?: string
+              date_to?: string
+              filter_has_response?: boolean
+              limit_rows?: number
+              mode?: string
+              offset_rows?: number
+              q?: string
+            }
+            Returns: {
+              first_user_question: string
+              has_response: boolean
+              last_activity_at: string
+              message_count: number
+              preview_snippet: string
+              relative_date: string
+              thread_id: string
+            }[]
+          }
+        | {
+            Args: {
+              date_from?: string
+              date_to?: string
+              filter_has_response?: boolean
+              filter_starred?: boolean
+              limit_rows?: number
+              mode?: string
+              offset_rows?: number
+              q?: string
+            }
+            Returns: {
+              first_user_question: string
+              has_response: boolean
+              is_starred: boolean
+              last_activity_at: string
+              message_count: number
+              preview_snippet: string
+              relative_date: string
+              thread_id: string
+            }[]
+          }
+      echo_thread_delete: { Args: { p_thread: string }; Returns: undefined }
+      echo_thread_set_star: {
+        Args: { p_star: boolean; p_thread: string }
+        Returns: undefined
       }
       enablelongtransactions: { Args: never; Returns: string }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }

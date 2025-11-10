@@ -5,17 +5,23 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEchoHistorySearch, type EchoHistorySearchFilters } from '@/features/echo/hooks/useEchoHistorySearch';
-import { HistoryRow } from '@/features/echo/components/HistoryRow';
+import { SwipeableHistoryRow } from '@/features/echo/components/SwipeableHistoryRow';
 import { HistoryThreadInline } from '@/features/echo/components/HistoryThreadInline';
 import { VirtualList } from '@/features/echo/components/virtual/VirtualList';
 import { EchoHistorySearch } from '@/features/echo/components/EchoHistorySearch';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { starThread, deleteThread } from '@/features/echo/api/threadActions';
+import { showToast } from '@/utils/toast';
 import '../home/hubTheme.css';
 
 export function HubEchoHistoryPage() {
   const nav = useNavigate();
   const loc = useLocation();
+  const queryClient = useQueryClient();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   // Apply hub-open class for glass theme
   useEffect(() => {
@@ -56,13 +62,113 @@ export function HubEchoHistoryPage() {
     setFilters(prev => ({ ...prev, query: query || undefined }));
   }, []);
   
-  const handleFilterChange = useCallback((newFilters: { hasResponse?: boolean; dateFrom?: Date }) => {
+  const handleFilterChange = useCallback((newFilters: { hasResponse?: boolean; dateFrom?: Date; starred?: boolean }) => {
     setFilters(prev => ({
       ...prev,
       hasResponse: newFilters.hasResponse,
       dateFrom: newFilters.dateFrom,
+      starred: newFilters.starred,
     }));
   }, []);
+
+  // Star handler with optimistic updates
+  const handleStar = useCallback(async (threadId: string, currentStarred: boolean) => {
+    const nextStarred = !currentStarred;
+    
+    // Optimistic update
+    queryClient.setQueryData(
+      ['echoHistorySearch', filters, 100],
+      (old: any) => {
+        if (!old) return old;
+        return old.map((item: any) =>
+          item.id === threadId ? { ...item, is_starred: nextStarred } : item
+        );
+      }
+    );
+
+    try {
+      await starThread(threadId, nextStarred);
+      showToast(nextStarred ? 'Starred' : 'Unstarred');
+    } catch (error) {
+      console.error('Failed to star/unstar:', error);
+      // Rollback optimistic update
+      queryClient.setQueryData(
+        ['echoHistorySearch', filters, 100],
+        (old: any) => {
+          if (!old) return old;
+          return old.map((item: any) =>
+            item.id === threadId ? { ...item, is_starred: currentStarred } : item
+          );
+        }
+      );
+      showToast('Failed to update star status');
+    }
+  }, [filters, queryClient]);
+
+  // Delete handler with optimistic updates
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteConfirmId) return;
+    
+    const threadId = deleteConfirmId;
+    setDeleteConfirmId(null);
+    
+    // Optimistic remove
+    queryClient.setQueryData(
+      ['echoHistorySearch', filters, 100],
+      (old: any) => {
+        if (!old) return old;
+        return old.filter((item: any) => item.id !== threadId);
+      }
+    );
+
+    try {
+      await deleteThread(threadId);
+      showToast('Conversation deleted');
+      
+      // Collapse if expanded
+      if (expandedId === threadId) {
+        setExpandedId(null);
+      }
+    } catch (error) {
+      console.error('Failed to delete:', error);
+      // Rollback - refetch data
+      queryClient.invalidateQueries({ queryKey: ['echoHistorySearch'] });
+      showToast('Failed to delete conversation');
+    }
+  }, [deleteConfirmId, filters, queryClient, expandedId]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle if not typing in an input
+      if (document.activeElement?.tagName === 'INPUT' || 
+          document.activeElement?.tagName === 'TEXTAREA') {
+        return;
+      }
+
+      // S key - star/unstar expanded thread
+      if (e.key === 's' || e.key === 'S') {
+        e.preventDefault();
+        if (expandedId) {
+          const item = chats.find(c => c.id === expandedId);
+          if (item) {
+            handleStar(item.id, item.is_starred);
+          }
+        }
+      }
+
+      // Delete/Backspace - delete expanded thread
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault();
+        if (expandedId) {
+          setDeleteConfirmId(expandedId);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [expandedId, chats, handleStar]);
 
   return (
     <div
@@ -178,13 +284,16 @@ export function HubEchoHistoryPage() {
                   
                   return (
                     <div role="listitem" className="mb-2">
-                      <HistoryRow
+                      <SwipeableHistoryRow
                         id={item.id}
                         title={item.title}
                         subtitle={item.subtitle}
                         createdAt={item.last_activity_at}
                         messageCount={item.message_count}
                         isExpanded={isExpanded}
+                        isStarred={item.is_starred}
+                        onStar={() => handleStar(item.id, item.is_starred)}
+                        onDelete={() => setDeleteConfirmId(item.id)}
                         onClick={() => {
                           if (isExpanded) {
                             setExpandedId(null);
@@ -232,6 +341,18 @@ export function HubEchoHistoryPage() {
           )}
         </section>
       </main>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteConfirmId !== null}
+        onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+        title="Delete conversation?"
+        description="This action cannot be undone. All messages in this conversation will be permanently deleted."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDeleteConfirm}
+        variant="destructive"
+      />
     </div>
   );
 }

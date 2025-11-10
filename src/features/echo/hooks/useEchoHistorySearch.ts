@@ -7,6 +7,7 @@ export interface EchoHistorySearchFilters {
   dateFrom?: Date;
   dateTo?: Date;
   mode?: 'live' | 'static';
+  starred?: boolean;
 }
 
 export interface EchoHistoryResult {
@@ -14,6 +15,7 @@ export interface EchoHistoryResult {
   title: string;
   subtitle: string;
   has_response: boolean;
+  is_starred: boolean;
   last_activity_at: string;
   message_count: number;
   relative_date: string;
@@ -34,6 +36,7 @@ export function useEchoHistorySearch(
         date_from: filters.dateFrom?.toISOString() || null,
         date_to: filters.dateTo?.toISOString() || null,
         mode: filters.mode || null,
+        filter_starred: filters.starred ?? null,
         limit_rows: limit,
         offset_rows: 0,
       });
@@ -45,6 +48,7 @@ export function useEchoHistorySearch(
         title: row.first_user_question,
         subtitle: row.preview_snippet,
         has_response: row.has_response,
+        is_starred: row.is_starred,
         last_activity_at: row.last_activity_at,
         message_count: row.message_count,
         relative_date: row.relative_date,

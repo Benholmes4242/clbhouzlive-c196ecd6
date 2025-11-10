@@ -7,13 +7,14 @@ import React, { useState, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
 
-export type FilterType = 'all' | 'has_response' | 'no_response' | 'last_7_days' | 'last_30_days';
+export type FilterType = 'all' | 'has_response' | 'no_response' | 'last_7_days' | 'last_30_days' | 'starred';
 
 interface EchoHistorySearchProps {
   onSearchChange: (query: string) => void;
   onFilterChange: (filters: {
     hasResponse?: boolean;
     dateFrom?: Date;
+    starred?: boolean;
   }) => void;
   className?: string;
 }
@@ -37,7 +38,7 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
     setActiveFilter(filter);
     
     const now = new Date();
-    const filters: { hasResponse?: boolean; dateFrom?: Date } = {};
+    const filters: { hasResponse?: boolean; dateFrom?: Date; starred?: boolean } = {};
 
     switch (filter) {
       case 'has_response':
@@ -51,6 +52,9 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
         break;
       case 'last_30_days':
         filters.dateFrom = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
+      case 'starred':
+        filters.starred = true;
         break;
       default:
         // 'all' - no filters
@@ -82,6 +86,7 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
 
   const filters: { id: FilterType; label: string }[] = [
     { id: 'all', label: 'All' },
+    { id: 'starred', label: '⭐ Starred' },
     { id: 'has_response', label: 'Has response' },
     { id: 'no_response', label: 'No response' },
     { id: 'last_7_days', label: 'Last 7 days' },
