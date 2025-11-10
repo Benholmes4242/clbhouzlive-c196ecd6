@@ -40,7 +40,7 @@ export function useEchoHistorySearch(
         date_to: filters.dateTo?.toISOString() || null,
         mode: filters.mode || null,
         filter_starred: filters.starred ?? null,
-        filter_tag: filters.tag || null,
+        filter_tag: filters.tag ? filters.tag.toLowerCase() : null,
         sort_mode: filters.sortMode || 'default',
         max_results: limit,
       });

@@ -3385,71 +3385,29 @@ export type Database = {
           user_id: string
         }[]
       }
-      echo_history_search:
-        | {
-            Args: {
-              date_from?: string
-              date_to?: string
-              filter_has_response?: boolean
-              filter_starred?: boolean
-              max_results?: number
-              mode?: string
-              q?: string
-              sort_mode?: string
-            }
-            Returns: {
-              has_response: boolean
-              id: string
-              is_starred: boolean
-              last_activity_at: string
-              message_count: number
-              relative_date: string
-              subtitle: string
-              title: string
-            }[]
-          }
-        | {
-            Args: {
-              date_from?: string
-              date_to?: string
-              filter_has_response?: boolean
-              limit_rows?: number
-              mode?: string
-              offset_rows?: number
-              q?: string
-            }
-            Returns: {
-              first_user_question: string
-              has_response: boolean
-              last_activity_at: string
-              message_count: number
-              preview_snippet: string
-              relative_date: string
-              thread_id: string
-            }[]
-          }
-        | {
-            Args: {
-              date_from?: string
-              date_to?: string
-              filter_has_response?: boolean
-              filter_starred?: boolean
-              limit_rows?: number
-              mode?: string
-              offset_rows?: number
-              q?: string
-            }
-            Returns: {
-              first_user_question: string
-              has_response: boolean
-              is_starred: boolean
-              last_activity_at: string
-              message_count: number
-              preview_snippet: string
-              relative_date: string
-              thread_id: string
-            }[]
-          }
+      echo_history_search: {
+        Args: {
+          date_from?: string
+          date_to?: string
+          filter_has_response?: boolean
+          filter_starred?: boolean
+          filter_tag?: string
+          max_results?: number
+          mode?: string
+          q?: string
+          sort_mode?: string
+        }
+        Returns: {
+          first_user_question: string
+          has_response: boolean
+          is_starred: boolean
+          last_activity_at: string
+          message_count: number
+          preview_snippet: string
+          relative_date: string
+          thread_id: string
+        }[]
+      }
       echo_share_create: {
         Args: { p_thread_id: string; p_ttl_seconds?: number }
         Returns: string
@@ -3886,6 +3844,7 @@ export type Database = {
               maxdecimaldigits?: number
               nprefix?: string
               options?: number
+              version: number
             }
             Returns: string
           }
@@ -3896,7 +3855,6 @@ export type Database = {
               maxdecimaldigits?: number
               nprefix?: string
               options?: number
-              version: number
             }
             Returns: string
           }
@@ -4087,11 +4045,11 @@ export type Database = {
         Returns: unknown
       }
       st_generatepoints:
+        | { Args: { area: unknown; npoints: number }; Returns: unknown }
         | {
             Args: { area: unknown; npoints: number; seed: number }
             Returns: unknown
           }
-        | { Args: { area: unknown; npoints: number }; Returns: unknown }
       st_geogfromtext: { Args: { "": string }; Returns: unknown }
       st_geographyfromtext: { Args: { "": string }; Returns: unknown }
       st_geohash:

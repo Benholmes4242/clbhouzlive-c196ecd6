@@ -1,9 +1,9 @@
 /**
  * Keyboard Shortcuts Cheatsheet Modal
- * Toggled by pressing ?
+ * Focus-trapped, ESC-to-close
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { X } from 'lucide-react';
 
 export interface ShortcutsModalProps {
@@ -12,150 +12,187 @@ export interface ShortcutsModalProps {
 }
 
 export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ open, onClose }) => {
-  // Handle ESC key to close
-  useEffect(() => {
-    if (!open) return;
-    
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-    
-    document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
-  }, [open, onClose]);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+  const previouslyFocused = useRef<HTMLElement | null>(null);
 
-  // Focus trap
-  useEffect(() => {
-    if (!open) return;
-    
-    const modal = document.querySelector('[data-shortcuts-modal]');
-    if (!modal) return;
-    
-    const focusableElements = modal.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    const firstElement = focusableElements[0] as HTMLElement;
-    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
-    
-    firstElement?.focus();
-    
-    const handleTab = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return;
-      
-      if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
+  // Close on ESC + focus trap
+  const onKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+
+      // Simple focus trap: tab cycles within modal
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusables = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusables.length) return;
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement as HTMLElement | null;
+
+        if (e.shiftKey && active === first) {
           e.preventDefault();
-          lastElement?.focus();
-        }
-      } else {
-        if (document.activeElement === lastElement) {
+          last.focus();
+        } else if (!e.shiftKey && active === last) {
           e.preventDefault();
-          firstElement?.focus();
+          first.focus();
         }
       }
+    },
+    [onClose]
+  );
+
+  // Mount/unmount focus management
+  useEffect(() => {
+    if (!open) return;
+
+    // Save current focus
+    previouslyFocused.current = document.activeElement as HTMLElement | null;
+
+    // Focus close button after render
+    const timeout = setTimeout(() => {
+      closeBtnRef.current?.focus();
+    }, 0);
+
+    // Lock body scroll
+    document.documentElement.style.overflow = 'hidden';
+    document.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      clearTimeout(timeout);
+      document.removeEventListener('keydown', onKeyDown);
+      document.documentElement.style.overflow = '';
+      // Restore previous focus
+      previouslyFocused.current?.focus?.();
     };
-    
-    document.addEventListener('keydown', handleTab);
-    return () => document.removeEventListener('keydown', handleTab);
-  }, [open]);
+  }, [open, onKeyDown]);
 
   if (!open) return null;
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="shortcuts-title"
-      data-shortcuts-modal
-      className="fixed inset-0 z-[100] flex items-center justify-center"
-      style={{ background: 'rgba(0,0,0,0.65)' }}
-      onClick={onClose}
-    >
+    <>
+      {/* Backdrop */}
       <div
-        className="mx-4 max-w-md w-full rounded-2xl border shadow-2xl p-6"
-        style={{
-          background: 'var(--hub-glass-bg)',
-          borderColor: 'var(--hub-stroke)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-        }}
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 z-[1000] bg-black/50"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Dialog */}
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Echo History keyboard shortcuts"
+        className="fixed z-[1001] inset-0 flex items-center justify-center p-4"
       >
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2
-            id="shortcuts-title"
-            className="text-xl font-semibold"
-            style={{ color: 'var(--hub-text)' }}
-          >
-            Keyboard Shortcuts
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-white/10 transition-colors"
-            aria-label="Close shortcuts"
-          >
-            <X size={20} style={{ color: 'var(--hub-text-dim)' }} />
-          </button>
-        </div>
-
-        {/* Shortcuts list */}
-        <ul className="space-y-3" style={{ color: 'var(--hub-text)' }}>
-          <li className="flex items-center justify-between">
-            <span style={{ color: 'var(--hub-text-dim)' }}>Focus search</span>
-            <kbd className="px-2 py-1 rounded text-sm font-mono" style={{ background: 'rgba(255,255,255,0.1)' }}>
-              /
-            </kbd>
-          </li>
-          <li className="flex items-center justify-between">
-            <span style={{ color: 'var(--hub-text-dim)' }}>Star / Unstar</span>
-            <kbd className="px-2 py-1 rounded text-sm font-mono" style={{ background: 'rgba(255,255,255,0.1)' }}>
-              S
-            </kbd>
-          </li>
-          <li className="flex items-center justify-between">
-            <span style={{ color: 'var(--hub-text-dim)' }}>Delete</span>
-            <kbd className="px-2 py-1 rounded text-sm font-mono" style={{ background: 'rgba(255,255,255,0.1)' }}>
-              Del
-            </kbd>
-          </li>
-          <li className="flex items-center justify-between">
-            <span style={{ color: 'var(--hub-text-dim)' }}>Toggle cheatsheet</span>
-            <kbd className="px-2 py-1 rounded text-sm font-mono" style={{ background: 'rgba(255,255,255,0.1)' }}>
-              ?
-            </kbd>
-          </li>
-          <li className="flex items-center justify-between">
-            <span style={{ color: 'var(--hub-text-dim)' }}>Range select (desktop)</span>
-            <kbd className="px-2 py-1 rounded text-sm font-mono" style={{ background: 'rgba(255,255,255,0.1)' }}>
-              Shift+Click
-            </kbd>
-          </li>
-          <li className="flex items-center justify-between">
-            <span style={{ color: 'var(--hub-text-dim)' }}>Open inline thread</span>
-            <kbd className="px-2 py-1 rounded text-sm font-mono" style={{ background: 'rgba(255,255,255,0.1)' }}>
-              Enter
-            </kbd>
-          </li>
-          <li className="flex items-center justify-between">
-            <span style={{ color: 'var(--hub-text-dim)' }}>Clear selection</span>
-            <kbd className="px-2 py-1 rounded text-sm font-mono" style={{ background: 'rgba(255,255,255,0.1)' }}>
-              Esc
-            </kbd>
-          </li>
-        </ul>
-
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="mt-6 w-full py-2 rounded-lg hover:bg-white/10 transition-colors font-medium"
-          style={{ color: 'var(--hub-text)' }}
+        <div
+          className="w-full max-w-lg rounded-2xl border"
+          style={{
+            borderColor: 'var(--hub-stroke)',
+            background: 'rgba(20, 20, 20, 0.95)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+          }}
         >
-          Got it
-        </button>
+          {/* Header */}
+          <div
+            className="flex items-center justify-between px-5 py-4 border-b"
+            style={{ borderColor: 'var(--hub-stroke)' }}
+          >
+            <h2 className="text-[17px] font-semibold" style={{ color: 'var(--hub-text)' }}>
+              Keyboard Shortcuts
+            </h2>
+            <button
+              ref={closeBtnRef}
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20 transition-colors"
+              aria-label="Close shortcuts"
+            >
+              <X size={18} style={{ color: 'var(--hub-text)' }} />
+            </button>
+          </div>
+
+          {/* Shortcuts list */}
+          <div className="px-5 py-4">
+            <ul className="space-y-3" style={{ color: 'var(--hub-text)' }}>
+              <li className="flex items-center justify-between">
+                <span className="text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
+                  Focus search
+                </span>
+                <kbd>/</kbd>
+              </li>
+              <li className="flex items-center justify-between">
+                <span className="text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
+                  Clear search / Close modals
+                </span>
+                <kbd>Esc</kbd>
+              </li>
+              <li className="flex items-center justify-between">
+                <span className="text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
+                  Star / Unstar (when expanded)
+                </span>
+                <kbd>S</kbd>
+              </li>
+              <li className="flex items-center justify-between">
+                <span className="text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
+                  Delete (when expanded)
+                </span>
+                <div className="flex gap-2">
+                  <kbd>Del</kbd>
+                  <span style={{ color: 'var(--hub-text-dim)' }}>or</span>
+                  <kbd>⌫</kbd>
+                </div>
+              </li>
+              <li className="flex items-center justify-between">
+                <span className="text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
+                  Toggle cheatsheet
+                </span>
+                <kbd>?</kbd>
+              </li>
+              <li className="flex items-center justify-between">
+                <span className="text-[14px]" style={{ color: 'var(--hub-text-dim)' }}>
+                  Select range (desktop)
+                </span>
+                <div className="flex gap-1 items-center">
+                  <kbd>Shift</kbd>
+                  <span style={{ color: 'var(--hub-text-dim)' }}>+</span>
+                  <span className="text-[13px]" style={{ color: 'var(--hub-text-dim)' }}>Click</span>
+                </div>
+              </li>
+            </ul>
+
+            <div
+              className="mt-4 pt-4 border-t text-[13px]"
+              style={{ borderColor: 'var(--hub-stroke)', color: 'var(--hub-text-dim)' }}
+            >
+              <div className="font-medium mb-2" style={{ color: 'var(--hub-text)' }}>
+                In Selection Mode:
+              </div>
+              <ul className="space-y-2">
+                <li className="flex items-center justify-between">
+                  <span>Star all selected</span>
+                  <kbd>S</kbd>
+                </li>
+                <li className="flex items-center justify-between">
+                  <span>Delete selected</span>
+                  <kbd>Del</kbd>
+                </li>
+                <li className="flex items-center justify-between">
+                  <span>Clear selection</span>
+                  <kbd>Esc</kbd>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
