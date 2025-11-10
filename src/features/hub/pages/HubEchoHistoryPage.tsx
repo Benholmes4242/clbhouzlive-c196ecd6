@@ -81,19 +81,16 @@ export function HubEchoHistoryPage() {
         <div className="w-16" />
       </header>
 
-      {/* Body */}
+      {/* Body - Page shell with safe-area padding */}
       <main 
-        className="relative overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px)+var(--hub-pad,20px))] pb-[calc(var(--hub-pad,20px)+env(safe-area-inset-bottom,0px))] px-[var(--hub-pad,20px)]"
-        style={{
-          maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%)',
-        }}
+        className="relative h-full pt-[calc(3.5rem+var(--hub-pad,20px)+env(safe-area-inset-top,0px))] pb-[calc(var(--hub-pad,20px)+env(safe-area-inset-bottom,0px))] px-[var(--hub-pad,20px)]"
       >
-        <div
-          className="rounded-3xl p-6"
+        {/* Glass container */}
+        <section
+          className="relative overflow-hidden rounded-[18px] border p-[var(--hub-pad,20px)]"
           style={{
             background: 'var(--hub-glass-bg)',
-            border: '1px solid var(--hub-stroke)',
+            borderColor: 'var(--hub-stroke)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
           }}
@@ -136,12 +133,12 @@ export function HubEchoHistoryPage() {
           )}
 
           {!isLoading && !error && chats.length > 0 && (
-            <div 
-              {...containerProps}
-              role="list"
-              className="overflow-y-auto no-scrollbar"
-            >
-              <div {...innerProps}>
+            <div className="relative">
+              <div 
+                id="echo-history-scroll"
+                className="max-h-[min(70vh,640px)] overflow-y-auto overscroll-contain pr-1"
+                role="list"
+              >
                 <div className="space-y-2">
                   {visibleItems.map((item) => {
                     const isExpanded = expandedId === item.id;
@@ -183,9 +180,20 @@ export function HubEchoHistoryPage() {
                   })}
                 </div>
               </div>
+
+              {/* Bottom fade overlay */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute left-0 right-0 bottom-0 h-12 rounded-b-[18px]"
+                style={{
+                  maskImage: 'linear-gradient(to top, black, transparent)',
+                  WebkitMaskImage: 'linear-gradient(to top, black, transparent)',
+                  background: 'rgba(0,0,0,0.35)',
+                }}
+              />
             </div>
           )}
-        </div>
+        </section>
       </main>
     </div>
   );
