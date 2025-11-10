@@ -83,18 +83,27 @@ export type Database = {
       admin_memberships: {
         Row: {
           created_at: string | null
+          expires_at: string | null
+          granted_by: string | null
+          notes: string | null
           role: string
           updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
+          expires_at?: string | null
+          granted_by?: string | null
+          notes?: string | null
           role: string
           updated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string | null
+          expires_at?: string | null
+          granted_by?: string | null
+          notes?: string | null
           role?: string
           updated_at?: string | null
           user_id?: string
