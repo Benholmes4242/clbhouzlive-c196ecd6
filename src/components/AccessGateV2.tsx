@@ -27,57 +27,37 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
   useEffect(() => {
     const checkAccess = async () => {
       try {
-        // Check if user has admin privileges
-        if (user) {
-          console.log('[AccessGate] User authenticated, checking admin status:', user.id);
-          try {
-            const { data, error } = await supabase.rpc('is_admin');
-            if (!error && data === true) {
-              console.log('[AccessGate] Admin access granted');
-              setHasAccess(true);
-              setLoading(false);
-              return;
-            }
-          } catch (error) {
-            console.error('[AccessGate] Error checking admin status:', error);
-          }
+        setLoading(true);
 
-          // If user is authenticated but not admin, check session via edge function
-          try {
-            console.log('[AccessGate] Calling secure-site-access-check with authenticated user');
-            const { data, error } = await supabase.functions.invoke('secure-site-access-check', {
-              body: {}
-            });
-            
-            if (error) {
-              console.error('[AccessGate] Edge function error:', error);
-              setHasAccess(false);
-            } else if (data?.ok) {
-              console.log('[AccessGate] Valid JWT session - access granted');
-              setHasAccess(true);
-            } else {
-              console.log('[AccessGate] Session check failed:', data);
-              setHasAccess(false);
-            }
-          } catch (error) {
-            console.warn('[AccessGate] Gate check error:', error);
-            setHasAccess(false);
-          }
-        } else {
+        if (!user) {
           console.log('[AccessGate] No authenticated user - showing access form');
+          setHasAccess(false);
+          return;
+        }
+
+        console.log('[AccessGate] Calling secure-site-access-check via supabase.functions.invoke');
+        const { data, error } = await supabase.functions.invoke('secure-site-access-check', { body: {} });
+
+        if (error) {
+          console.error('[AccessGate] Edge function error:', error);
+          setHasAccess(false);
+          return;
+        }
+
+        if (data?.ok && data?.is_admin === true) {
+          console.log('[AccessGate] Admin access granted for', data.user_id);
+          setHasAccess(true);
+        } else {
+          console.log('[AccessGate] Authenticated but not admin – showing access form', data);
           setHasAccess(false);
         }
 
-        // Clean up legacy localStorage
-        try {
-          localStorage.removeItem('siteAccess');
-        } catch (error) {
-          // Silent cleanup
-        }
-      } catch (error) {
-        console.error('[AccessGate] Unexpected error in checkAccess:', error);
+      } catch (err) {
+        console.error('[AccessGate] Unexpected error in checkAccess:', err);
         setHasAccess(false);
       } finally {
+        // Clean up legacy key even on success
+        try { localStorage.removeItem('siteAccess'); } catch {}
         setLoading(false);
       }
     };
