@@ -11,6 +11,62 @@ import { useHub } from '@/features/hub/useHub';
 import { formatDistanceHcp } from '@/features/golfers/format';
 import SquircleImage from '@/components/ui/SquircleImage';
 
+// Mock data toggle
+const useMockData = true;
+
+const mockGolfers = [
+  {
+    id: 'mock-1',
+    username: 'tiger_woods',
+    display_name: 'Tiger Woods',
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tiger',
+    home_club: 'Augusta National',
+    distance_km: 0.8,
+    eg_handicap_index: 2.1,
+    is_online: true,
+  },
+  {
+    id: 'mock-2',
+    username: 'rory_mcilroy',
+    display_name: 'Rory McIlroy',
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rory',
+    home_club: 'Royal County Down',
+    distance_km: 1.2,
+    eg_handicap_index: 1.8,
+    is_online: true,
+  },
+  {
+    id: 'mock-3',
+    username: 'phil_mickelson',
+    display_name: 'Phil Mickelson',
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Phil',
+    home_club: 'Torrey Pines',
+    distance_km: 2.5,
+    eg_handicap_index: 3.2,
+    is_online: true,
+  },
+  {
+    id: 'mock-4',
+    username: 'jordan_spieth',
+    display_name: 'Jordan Spieth',
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan',
+    home_club: 'Dallas National',
+    distance_km: 3.1,
+    eg_handicap_index: 2.5,
+    is_online: true,
+  },
+  {
+    id: 'mock-5',
+    username: 'brooks_koepka',
+    display_name: 'Brooks Koepka',
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Brooks',
+    home_club: 'Jupiter Hills',
+    distance_km: 4.2,
+    eg_handicap_index: 1.9,
+    is_online: true,
+  },
+];
+
 interface NearbyGolfersTileProps {
   limit?: number;
 }
@@ -18,7 +74,14 @@ interface NearbyGolfersTileProps {
 export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
   const nav = useNavigate();
   const { navigateFromHub } = useHub();
-  const { golfers, isLoading } = useActiveGolfers({ limit });
+  
+  // Real data fetch - wrapped in guard
+  const realData = useActiveGolfers({ limit });
+  
+  // Use mock or real data
+  const golfers = useMockData ? mockGolfers : realData.golfers;
+  const isLoading = useMockData ? false : realData.isLoading;
+  
   const scrollRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     if (scrollRef.current) {
