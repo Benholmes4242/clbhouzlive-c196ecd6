@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -462,11 +463,13 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   return (
     <>
       <Dialog open={true} onOpenChange={handleCloseModal}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden p-0 sm:max-w-6xl">
+        <DialogContent className="fixed left-[50%] top-[50%] z-50 grid w-[calc(100%-2rem)] max-w-6xl translate-x-[-50%] translate-y-[-50%] gap-0 border bg-background p-0 shadow-lg duration-200 sm:rounded-lg max-h-[85vh] overflow-hidden">
           {/* Sticky Header */}
-          <div className="sticky top-0 z-10 bg-background border-b px-6 py-4 flex items-center justify-between">
+          <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90 border-b px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <h1 className="text-xl font-semibold">Edit Golf Course</h1>
+              <DialogTitle className="text-xl font-semibold">
+                {isCreating ? "Add New Golf Club" : "Edit Golf Course"}
+              </DialogTitle>
               {!isCreating && course && (
                 <div className="text-sm text-muted-foreground flex items-center gap-2">
                   <span>ID: {course.id.slice(0, 8)}...</span>
@@ -497,7 +500,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
             </div>
           </div>
 
-          <div className="flex h-[calc(90vh-80px)]">
+          <div className="flex overflow-hidden" style={{ height: 'calc(85vh - 80px)' }}>
             {/* Left Sidebar Navigation */}
             <div className="w-48 border-r bg-muted/20">
               <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="h-full">
