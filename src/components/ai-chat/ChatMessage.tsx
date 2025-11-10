@@ -165,7 +165,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             role="group"
             aria-label={`Message from ${isUser ? 'You' : 'Echo'} at ${time}`}
             className={cn(
-              "text-[15px] relative overflow-hidden backdrop-blur-[var(--glass-blur)] bubble-prose rounded-[18px]",
+              "text-[15px] relative overflow-hidden backdrop-blur-[var(--glass-blur)] bubble-prose rounded-[var(--bubble-radius)]",
               isUser 
                 ? "ml-auto text-white/95 leading-[1.5]" 
                 : "text-white/90 leading-[1.55]"
