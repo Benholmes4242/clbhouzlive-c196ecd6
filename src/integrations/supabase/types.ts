@@ -140,6 +140,33 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_role_audit: {
+        Row: {
+          action: string
+          actor_user_id: string
+          created_at: string | null
+          id: number
+          notes: string | null
+          target_user_id: string
+        }
+        Insert: {
+          action: string
+          actor_user_id: string
+          created_at?: string | null
+          id?: number
+          notes?: string | null
+          target_user_id: string
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string
+          created_at?: string | null
+          id?: number
+          notes?: string | null
+          target_user_id?: string
+        }
+        Relationships: []
+      }
       badges: {
         Row: {
           category: Database["public"]["Enums"]["badge_category"]
@@ -3356,6 +3383,7 @@ export type Database = {
         Returns: boolean
       }
       is_mobile_device: { Args: never; Returns: boolean }
+      is_panel_admin: { Args: never; Returns: boolean }
       is_participant: {
         Args: { p_game_id: string; p_user_id: string }
         Returns: boolean
