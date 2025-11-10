@@ -3,14 +3,14 @@
  * Export Echo conversations to JSON and Markdown
  */
 
-interface ExportMessage {
+export interface ExportMessage {
   id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
   created_at: string;
 }
 
-interface ExportThread {
+export interface ExportThread {
   thread_id: string;
   title: string;
   created_at: string;
