@@ -112,22 +112,22 @@ const HeaderNavigation = () => {
         console.log('Supabase logout successful');
       }
       
-      // Clear any cached data in localStorage and sessionStorage
+      // Clear access gate and any cached data
       try {
-        localStorage.clear();
+        localStorage.removeItem('siteAccess');
         sessionStorage.clear();
       } catch (storageError) {
         console.warn('Error clearing storage:', storageError);
       }
       
-      // Force navigation to landing page and reload
-      console.log('Redirecting to landing page...');
-      window.location.href = '/';
+      // Force navigation to access page
+      console.log('Redirecting to access page...');
+      window.location.href = '/access';
       
     } catch (error) {
       console.error('Error during logout:', error);
       // Force redirect even if logout fails
-      window.location.href = '/';
+      window.location.href = '/access';
     }
   };
 

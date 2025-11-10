@@ -2,11 +2,22 @@ import { useState, useEffect, useCallback } from 'react';
 import { useOptimizedInfiniteQuery } from './useOptimizedQuery';
 import { useRealPostsFetcher } from './explore/useRealPostsFetcher';
 import { ExploreContentItem } from '@/components/explore/types';
+import { supabase } from '@/integrations/supabase/client';
 
 // NEW: Hook for Clubhouse explore feed (all users, short videos only)
 export const useInfiniteClubhouseShorts = () => {
   const { fetchClubhouseExploreShorts } = useRealPostsFetcher();
   const [allPosts, setAllPosts] = useState<ExploreContentItem[]>([]);
+  const [session, setSession] = useState<any>(null);
+
+  // Get session to enable query only when user is authenticated
+  useEffect(() => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+    };
+    getSession();
+  }, []);
 
   const {
     data,
@@ -18,7 +29,7 @@ export const useInfiniteClubhouseShorts = () => {
     error,
     refetch
   } = useOptimizedInfiniteQuery({
-    queryKey: ['clubhouse-explore-shorts'],
+    queryKey: ['clubhouse-explore-shorts', session?.user.id],
     queryFn: async ({ pageParam }: { pageParam: unknown }) => {
       const posts = await fetchClubhouseExploreShorts(30, pageParam as string | null);
       return {
@@ -31,6 +42,7 @@ export const useInfiniteClubhouseShorts = () => {
     staleTime: 30_000, // 30s for explore feed
     dedupe: true,
     ttl: 3000,
+    enabled: !!session, // Only run query when authenticated
   });
 
   // Flatten all pages

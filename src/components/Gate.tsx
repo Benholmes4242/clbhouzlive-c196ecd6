@@ -11,9 +11,8 @@ function readAccess(): boolean {
     const raw = localStorage.getItem('siteAccess');
     if (!raw) return false;
     const a = JSON.parse(raw);
-    if (!a?.granted) return false;
-    if (a?.expiresAt && new Date(a.expiresAt) <= new Date()) return false;
-    return true;
+    const notExpired = a?.granted && (!a.expiresAt || new Date(a.expiresAt) > new Date());
+    return !!notExpired;
   } catch {
     localStorage.removeItem('siteAccess');
     return false;
