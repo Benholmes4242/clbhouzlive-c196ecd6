@@ -23,6 +23,15 @@ export const Z = {
   createGame: 11800,    // Create Game modal (above Hub)
   aiOverlay: 11100,     // AI Chat overlay (above Hub)
   
+  // Echo page layers
+  page: 9999,           // Echo page glass background
+  pageHeader: 10000,    // Echo page header
+  composer: 2,          // Composer footer
+  
+  // Dropdown layers
+  dropdownScrim: 50,
+  dropdownMenu: 60,
+  
   // Utility classes for inline styles
   asStyle: {
     header: { zIndex: 1000 },
@@ -34,6 +43,11 @@ export const Z = {
     echo: { zIndex: 11500 },
     createGame: { zIndex: 11800 },
     aiOverlay: { zIndex: 11100 },
+    page: { zIndex: 9999 },
+    pageHeader: { zIndex: 10000 },
+    composer: { zIndex: 2 },
+    dropdownScrim: { zIndex: 50 },
+    dropdownMenu: { zIndex: 60 },
   }
 } as const;
 

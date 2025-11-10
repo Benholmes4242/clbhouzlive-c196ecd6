@@ -165,21 +165,21 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             role="group"
             aria-label={`Message from ${isUser ? 'You' : 'Echo'} at ${time}`}
             className={cn(
-              "text-[15px] relative overflow-hidden backdrop-blur-[var(--glass-blur)] echo-bubble",
+              "text-[15px] relative overflow-hidden backdrop-blur-[var(--glass-blur)] bubble-prose",
               isUser 
                 ? "ml-auto rounded-2xl text-white/95 leading-[1.5]" 
                 : "rounded-2xl rounded-bl-md text-white/90 leading-[1.55]"
             )}
             style={
               isUser ? {
-                maxWidth: '84vw',
+                maxWidth: 'var(--bubble-max-mobile)',
                 background: 'var(--bubble-user-bg)',
-                border: '1px solid rgba(255,255,255,0.20)',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15), inset 0 0 28px rgba(255,255,255,0.14)',
+                border: '1px solid var(--bubble-user-border)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.15), var(--bubble-user-inset)',
               } : {
-                maxWidth: '84vw',
-                background: 'linear-gradient(145deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.06) 100%)',
-                border: '1px solid rgba(255,255,255,0.14)',
+                maxWidth: 'var(--bubble-max-mobile)',
+                background: 'var(--bubble-echo-grad)',
+                border: '1px solid var(--bubble-echo-border)',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.15), var(--bubble-echo-inset)',
               }
             }

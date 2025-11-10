@@ -5,6 +5,7 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AIChatOverlay from '@/components/ai-chat/AIChatOverlay';
+import { Z } from '@/config/zIndex';
 import '../home/hubTheme.css';
 
 export function HubEchoChatPage() {
@@ -28,8 +29,9 @@ export function HubEchoChatPage() {
 
   return (
     <div
-      className="hub-glass-page fixed inset-0 z-[9999] flex flex-col"
+      className="hub-glass-page fixed inset-0 flex flex-col"
       style={{
+        zIndex: Z.page,
         background: 'rgba(0, 0, 0, 0.25)',
         backdropFilter: 'blur(120px)',
         WebkitBackdropFilter: 'blur(120px)',
@@ -37,8 +39,9 @@ export function HubEchoChatPage() {
     >
       {/* Header - matches golfers page styling */}
       <header 
-        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
+        className="fixed top-0 left-0 right-0 flex items-center justify-between px-4 h-14 border-b"
         style={{
+          zIndex: Z.pageHeader,
           borderColor: 'var(--hub-stroke)',
           background: 'rgba(22, 24, 27, 0.98)',
           backdropFilter: 'none',

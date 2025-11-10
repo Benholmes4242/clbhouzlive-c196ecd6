@@ -486,12 +486,17 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
           {/* Chat Tab */}
           <TabsContent value="chat" className="m-0 flex-1 overflow-hidden" style={{ minHeight: 0 }}>
             <div 
+              role="log"
+              aria-live="polite"
+              aria-relevant="additions"
               className={cn(
                 "h-full overflow-y-auto overscroll-contain scroll-smooth"
               )}
               style={{ 
                 WebkitOverflowScrolling: "touch",
-                paddingTop: '28px',
+                paddingTop: isPageMode 
+                  ? `calc(var(--header-h) + env(safe-area-inset-top, 0px) + 12px)`
+                  : '28px',
                 paddingLeft: '16px',
                 paddingRight: '16px',
                 paddingBottom: isPageMode ? '112px' : '16px',
@@ -575,10 +580,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       {/* Loading bubble */}
                       <div className="rounded-2xl rounded-bl-md border overflow-hidden backdrop-blur-[var(--glass-blur)]"
                         style={{
-                          maxWidth: '84vw',
-                          background: 'linear-gradient(145deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.06) 100%)',
-                          borderColor: 'rgba(255,255,255,0.14)',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.15), inset 0 1px 1px rgba(255,255,255,.12)',
+                          maxWidth: 'var(--bubble-max-mobile)',
+                          background: 'var(--bubble-echo-grad)',
+                          borderColor: 'var(--bubble-echo-border)',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.15), var(--bubble-echo-inset)',
                           padding: 'var(--bubble-pad-y) var(--bubble-pad-x)'
                         }}>
                         <div className="flex items-center gap-1.5">
@@ -635,12 +640,13 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         {activeTab === 'chat' && (
           <footer 
             className={cn(
-              "sticky bottom-0 z-[2] safe-bottom",
+              "sticky bottom-0 safe-bottom",
               isPageMode 
                 ? "border-t" 
                 : "bg-gradient-to-t from-black/95 to-black/60 backdrop-blur border-t"
             )}
             style={{
+              zIndex: Z.composer,
               paddingTop: isPageMode ? '16px' : '16px',
               paddingBottom: isPageMode 
                 ? 'calc(16px + env(safe-area-inset-bottom, 0px))' 
@@ -666,9 +672,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             {(isLoading || isProcessing) && (
               <div className="absolute left-0 right-0 top-0 h-[2px] bg-white/20 overflow-hidden">
                 <div 
-                  className="h-full bg-white/60 w-1/3"
+                  className="h-full"
                   style={{
-                    animation: 'progressSlide 1.6s ease-in-out infinite',
+                    width: '33.33%',
+                    background: 'rgba(255,255,255,0.60)',
+                    animation: 'progressShimmer 1.6s linear infinite'
                   }}
                 />
               </div>
@@ -687,7 +695,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     }
                   }}
                   placeholder="Ask Echo…"
-                  className="w-full outline-none text-white placeholder:text-white/70 text-[15px]"
+                  className="w-full outline-none text-white placeholder:text-white/70 text-[15px] focus-ring"
                   style={{
                     height: '40px',
                     borderRadius: '14px',
@@ -700,7 +708,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 <button
                   onClick={() => sendMessage(inputValue)}
                   disabled={!inputValue.trim() || isLoading}
-                  className="flex items-center justify-center transition-colors disabled:opacity-40"
+                  className="flex items-center justify-center transition-colors disabled:opacity-40 focus-ring"
                   style={{
                     position: 'absolute',
                     right: '6px',
@@ -709,8 +717,8 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     width: '34px',
                     height: '34px',
                     borderRadius: '12px',
-                    border: 0,
-                    background: 'rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    background: 'rgba(255,255,255,0.10)',
                     cursor: inputValue.trim() ? 'pointer' : 'default',
                     lineHeight: 0,
                   }}
