@@ -9,7 +9,7 @@ import { CoachPrompt } from '@/components/swing-review/CoachPrompt';
 import { parseSwingAnalysis } from '@/utils/swingAnalysisParser';
 import { cn } from '@/lib/utils';
 import { EchoBotIcon } from './EchoBotIcon';
-import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
+import SquircleImage from '@/components/ui/SquircleImage';
 
 interface ChatMessage {
   id: string;
@@ -123,7 +123,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   WebkitBackdropFilter: 'blur(12px)',
                 }}
               >
-                <Bot className="w-4 h-4 text-white/80" />
+                <Bot className="w-5 h-5 text-white/80" />
               </div>
             </div>
           )}
@@ -132,13 +132,28 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               <span className="text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
                 User
               </span>
-              <OptimizedAvatar
-                src={userProfilePhoto}
-                alt={userDisplayName || 'User'}
-                size={20}
-                fallback={userDisplayName?.charAt(0) || 'U'}
-                className="ring-1 ring-white/20"
-              />
+              {userProfilePhoto ? (
+                <SquircleImage
+                  size={20}
+                  src={userProfilePhoto}
+                  alt={userDisplayName || 'User'}
+                  ringColor="rgba(255,255,255,0.2)"
+                  ringWidth={1}
+                />
+              ) : (
+                <div 
+                  className="flex items-center justify-center text-[10px] font-medium text-white/90"
+                  style={{
+                    width: 20,
+                    height: 20,
+                    background: 'rgba(255,255,255,0.1)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: '6px',
+                  }}
+                >
+                  {userDisplayName?.charAt(0).toUpperCase() || 'U'}
+                </div>
+              )}
             </div>
           )}
           
