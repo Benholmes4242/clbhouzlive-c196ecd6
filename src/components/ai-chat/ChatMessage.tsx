@@ -110,8 +110,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 
           {/* Heading - only on first in group */}
           {!isUser && showHeading && isFirstInGroup && (
-            <div className="mb-2 text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
-              Echo
+            <div className="mb-2 flex items-center gap-2">
+              <span className="text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
+                Echo
+              </span>
+              <Bot className="w-4 h-4 text-white/70" />
             </div>
           )}
           {isUser && showHeading && isFirstInGroup && (
