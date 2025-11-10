@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -25,6 +24,8 @@ import {
   Image,
   Database
 } from "lucide-react";
+import { usePanelRole } from "@/hooks/usePanelRole";
+import { panelCan } from "@/lib/panelCan";
 
 const menuItems = [
   {
@@ -90,6 +91,9 @@ interface AdminSidebarProps {
 }
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChange, userRole = 'admin' }) => {
+  const { role, loading } = usePanelRole();
+  const can = panelCan(role);
+  
   // Filter menu items based on user role
   const filteredMenuItems = menuItems.filter(item => {
     if (userRole === 'admin') return true; // Admin sees everything
@@ -103,8 +107,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChange, use
         <h2 className="text-lg font-semibold text-foreground">
           {userRole === 'limited_admin' ? 'Golf Courses Admin' : 'Admin Panel'}
         </h2>
+        <div className="mt-2 text-xs text-muted-foreground">
+          {loading ? "Checking role…" : `Role: ${role}`}
+        </div>
       </SidebarHeader>
-      
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="px-6 py-2 text-sm font-medium text-muted-foreground">
