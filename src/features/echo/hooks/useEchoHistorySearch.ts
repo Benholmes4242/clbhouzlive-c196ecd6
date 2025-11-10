@@ -8,6 +8,7 @@ export interface EchoHistorySearchFilters {
   dateTo?: Date;
   mode?: 'live' | 'static';
   starred?: boolean;
+  sortMode?: 'default' | 'starred' | 'relevance';
 }
 
 export interface EchoHistoryResult {
@@ -37,23 +38,13 @@ export function useEchoHistorySearch(
         date_to: filters.dateTo?.toISOString() || null,
         mode: filters.mode || null,
         filter_starred: filters.starred ?? null,
-        limit_rows: limit,
-        offset_rows: 0,
+        sort_mode: filters.sortMode || 'default',
+        max_results: limit,
       });
 
       if (error) throw error;
       
-      return (data || []).map((row: any) => ({
-        id: row.thread_id,
-        title: row.first_user_question,
-        subtitle: row.preview_snippet,
-        has_response: row.has_response,
-        is_starred: row.is_starred,
-        last_activity_at: row.last_activity_at,
-        message_count: row.message_count,
-        relative_date: row.relative_date,
-        created_at: row.last_activity_at, // For compatibility
-      }));
+      return (data || []) as EchoHistoryResult[];
     },
     enabled: opts?.enabled ?? true,
     staleTime: 30_000,

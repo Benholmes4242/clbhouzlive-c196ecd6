@@ -80,4 +80,74 @@ export const echoHistoryAnalytics = {
   }) {
     track('echo_history_swipe_action', props);
   },
+
+  // Bulk actions
+  bulkStar(props: {
+    count: number;
+    starred: boolean;
+  }) {
+    track('echo_history_bulk_star', props);
+  },
+
+  bulkDeleteSoft(props: {
+    count: number;
+  }) {
+    track('echo_history_bulk_delete_soft', props);
+  },
+
+  bulkDeleteUndo(props: {
+    count: number;
+    seconds_elapsed: number;
+  }) {
+    track('echo_history_bulk_delete_undo', props);
+  },
+
+  bulkDeleteHard(props: {
+    count: number;
+    latency_ms: number;
+  }) {
+    track('echo_history_bulk_delete_hard', props);
+  },
+
+  // Sort
+  sortChanged(props: {
+    sort_mode: 'default' | 'starred' | 'relevance';
+  }) {
+    track('echo_history_sort_changed', props);
+  },
+
+  // Export
+  exportStarted(props: {
+    thread_id: string;
+    format: 'json' | 'md';
+  }) {
+    track('echo_history_export_started', props);
+  },
+
+  exportBulkStarted(props: {
+    count: number;
+    format: 'json' | 'md';
+  }) {
+    track('echo_history_export_bulk_started', props);
+  },
+
+  // Share
+  shareCreated(props: {
+    thread_id: string;
+    ttl_seconds?: number;
+  }) {
+    track('echo_share_created', props);
+  },
+
+  shareRevoked(props: {
+    thread_id: string;
+  }) {
+    track('echo_share_revoked', props);
+  },
+
+  shareOpenedPublic(props: {
+    thread_id: string;
+  }) {
+    track('echo_share_opened_public', props);
+  },
 };
