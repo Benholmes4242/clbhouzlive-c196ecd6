@@ -68,16 +68,42 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const { data: role, error: roleErr } = await supabase.rpc("get_admin_role");
-    if (roleErr) {
+    // Use service-role client to bypass RLS for reliable role lookup
+    const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!svcKey) {
+      console.error("[secure-site-access-check] Missing SUPABASE_SERVICE_ROLE_KEY");
+      return new Response(
+        JSON.stringify({ ok: false, message: "Server misconfigured: missing SERVICE_ROLE_KEY" }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    const svc = createClient(supabaseUrl, svcKey);
+
+    // Lookup role directly from admin_memberships for this user
+    const { data: mem, error: memErr } = await svc
+      .from("admin_memberships")
+      .select("role, expires_at")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (memErr) {
+      console.error("[secure-site-access-check] membership lookup error:", memErr);
       return new Response(
         JSON.stringify({ ok: false, message: "Admin role check failed" }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Treat both 'full' and 'limited' as admin for shell access
-    const isAdmin = role === 'full' || role === 'limited';
+    // Compute effective role (honor expiry if present)
+    let role: "none" | "limited" | "full" = "none";
+    if (mem?.role && (!mem.expires_at || new Date(mem.expires_at) > new Date())) {
+      role = mem.role === "full" ? "full" : "limited";
+    }
+
+    const isAdmin = role === "full" || role === "limited";
+
+    console.log("[secure-site-access-check] Role result:", { user_id: user.id, role, is_admin: isAdmin });
 
     return new Response(
       JSON.stringify({ ok: true, user_id: user.id, is_admin: isAdmin, role }),
