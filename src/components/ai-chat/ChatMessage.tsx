@@ -174,12 +174,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 maxWidth: '84vw',
                 background: 'var(--bubble-user-bg)',
                 border: '1px solid rgba(255,255,255,0.20)',
-                boxShadow: '0 10px 28px rgba(0,0,0,0.45), inset 0 0 28px rgba(255,255,255,0.14)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.25), inset 0 0 28px rgba(255,255,255,0.14)',
               } : {
                 maxWidth: '84vw',
                 background: 'linear-gradient(145deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.06) 100%)',
                 border: '1px solid rgba(255,255,255,0.14)',
-                boxShadow: '0 10px 28px rgba(0,0,0,0.42), var(--bubble-echo-inset)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.25), var(--bubble-echo-inset)',
               }
             }
           >
