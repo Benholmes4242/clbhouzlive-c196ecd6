@@ -303,13 +303,11 @@ html, body, #root {
   --echo-composer-h: 84px; /* includes padding/safe-area */
   --echo-top: 56px; /* header height on mobile */
 
-  /* Message bubble tokens */
-  --bubble-max: 92vw;             /* prevents edge-to-edge balloons on phones */
-  --bubble-max-md: 720px;         /* cap on larger screens */
-  --bubble-gap-y: 6px;            /* inter-bubble in a group */
-  --bubble-gap-x: 10px;           /* gap from avatar rail */
-  --bubble-radius: 16px;          /* base radius */
-  --bubble-radius-lg: 18px;       /* for first/last in a group */
+  /* Message bubble tokens - unified with style-tokens.css */
+  --bubble-max: 92vw;
+  --bubble-max-md: 720px;
+  --bubble-gap-y: 6px;
+  --bubble-gap-x: 10px;
   --bubble-shadow: 0 4px 16px rgba(0,0,0,.08);
 
   /* Echo (AI) bubble */

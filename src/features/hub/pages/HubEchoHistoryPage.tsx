@@ -1,20 +1,22 @@
 /**
- * AI Chat History — Chat-only list
- * Renders inside the existing /hub/new glass page.
- * No thread navigation yet; rows are non-navigating buttons.
+ * AI Chat History — Inline expansion with virtualization
+ * Apple-level index + inline thread UX
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { TapButton } from '@/components/ui/TapButton';
 import { useEchoChatHistory } from '@/features/echo/hooks/useEchoChatHistory';
-import { formatRelativeTime } from '@/utils/dateFormat';
+import { HistoryRow } from '@/features/echo/components/HistoryRow';
+import { HistoryThreadInline } from '@/features/echo/components/HistoryThreadInline';
+import { useVirtualization } from '@/hooks/useVirtualization';
 import '../home/hubTheme.css';
 
 export function HubEchoHistoryPage() {
   const nav = useNavigate();
   const loc = useLocation();
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // Apply hub-open class for glass theme
   useEffect(() => {
@@ -31,17 +33,22 @@ export function HubEchoHistoryPage() {
     }
   };
 
-  const openThread = (item: any) => {
-    const chatId = item.chat_id || item.thread_id || item.id;
-    console.debug('[Echo] navigate to chat id:', chatId);
-    const state = loc.state as any;
-    nav(`/hub/echo/history/chat/${chatId}`, {
-      state: { backgroundLocation: state?.backgroundLocation, fromHub: true },
-    });
-  };
-
   // Data (chat-only)
-  const { data: chats = [], isLoading, error } = useEchoChatHistory({ limit: 50 });
+  const { data: chats = [], isLoading, error } = useEchoChatHistory({ limit: 100 });
+
+  // Virtualization for large lists
+  const containerHeight = window.innerHeight - 180; // Account for header
+  const itemHeight = 72; // Estimated row height
+  
+  const {
+    visibleItems,
+    containerProps,
+    innerProps,
+  } = useVirtualization(chats, {
+    itemHeight,
+    containerHeight,
+    overscan: 5,
+  });
 
   return (
     <div
@@ -90,7 +97,7 @@ export function HubEchoHistoryPage() {
       </header>
 
       {/* Body */}
-      <main className="w-full h-[calc(100vh-80px)] overflow-y-auto px-3.5 pt-3 pb-6">
+      <main className="w-full h-[calc(100vh-80px)] px-3.5 pt-3 pb-6">
         <div
           className="rounded-3xl p-6"
           style={{
@@ -109,10 +116,10 @@ export function HubEchoHistoryPage() {
 
           {isLoading && (
             <div className="space-y-2">
-              {[0, 1, 2, 3, 4].map((i) => (
+              {[0, 1, 2, 3, 4, 5].map((i) => (
                 <div
                   key={i}
-                  className="h-16 rounded-2xl animate-pulse"
+                  className="h-[64px] rounded-[18px] animate-pulse"
                   style={{ background: 'var(--hub-glass-bg)' }}
                 />
               ))}
@@ -128,57 +135,63 @@ export function HubEchoHistoryPage() {
             </div>
           )}
 
-          {!isLoading && !error && (
-            <div className="space-y-2">
-              {chats.length === 0 && (
-                <div
-                  className="text-center py-8 text-[15px]"
-                  style={{ color: 'var(--hub-text-dim)' }}
-                >
-                  No Echo chats yet — ask Echo a question to get started.
-                </div>
-              )}
+          {!isLoading && !error && chats.length === 0 && (
+            <div
+              className="text-center py-8 text-[15px]"
+              style={{ color: 'var(--hub-text-dim)' }}
+            >
+              No Echo chats yet — ask Echo to get started.
+            </div>
+          )}
 
-              {chats.map((item) => (
-                <button
-                  key={item.id}
-                  className="w-full flex items-center gap-3 p-4 rounded-2xl transition-colors text-left"
-                  style={{
-                    background: 'var(--hub-glass-bg)',
-                    border: '1px solid var(--hub-stroke)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'var(--hub-hover)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'var(--hub-glass-bg)';
-                  }}
-                  onClick={() => openThread(item)}
-                  aria-label="Chat thread"
-                >
-                  <div className="text-2xl">🗨️</div>
-                  <div className="flex-1 min-w-0">
-                    <div
-                      className="text-[15px] font-medium truncate"
-                      style={{ color: 'var(--hub-text)' }}
-                    >
-                      {item.preview_text || 'Chat with Echo'}
-                    </div>
-                    <div
-                      className="text-[13px] mt-0.5"
-                      style={{ color: 'var(--hub-text-dim)' }}
-                    >
-                      {formatRelativeTime(item.created_at)}
-                    </div>
-                  </div>
-                  <div
-                    className="text-xl"
-                    style={{ color: 'var(--hub-text-dim)' }}
-                  >
-                    ›
-                  </div>
-                </button>
-              ))}
+          {!isLoading && !error && chats.length > 0 && (
+            <div 
+              {...containerProps}
+              role="list"
+              className="overflow-y-auto no-scrollbar"
+            >
+              <div {...innerProps}>
+                <div className="space-y-2">
+                  {visibleItems.map((item) => {
+                    const isExpanded = expandedId === item.id;
+                    return (
+                      <div key={item.id} role="listitem">
+                        <HistoryRow
+                          id={item.id}
+                          title={item.preview_text.slice(0, 60) || 'Chat with Echo'}
+                          preview={item.preview_text}
+                          createdAt={item.created_at}
+                          isExpanded={isExpanded}
+                          onClick={() => {
+                            if (isExpanded) {
+                              setExpandedId(null);
+                            } else {
+                              setExpandedId(item.id);
+                            }
+                          }}
+                        />
+
+                        {isExpanded && (
+                          <HistoryThreadInline
+                            threadId={item.id}
+                            title={item.preview_text.slice(0, 60) || 'Chat with Echo'}
+                            onCollapse={() => setExpandedId(null)}
+                            onCopyLink={() => {
+                              navigator.clipboard.writeText(window.location.origin + `/hub/echo/history/chat/${item.id}`);
+                            }}
+                            onOpenFull={() => {
+                              const state = loc.state as any;
+                              nav(`/hub/echo/history/chat/${item.id}`, {
+                                state: { backgroundLocation: state?.backgroundLocation, fromHub: true },
+                              });
+                            }}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           )}
         </div>

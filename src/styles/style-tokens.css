@@ -36,6 +36,9 @@
   --radius-xl: 18px;
   --radius-pill: 999px;
   
+  /* Hub header solid background */
+  --hub-header-bg-solid: rgba(22, 24, 27, 0.98);
+  
   /* Z-index layers */
   --z-base: 1;
   --z-header: 30;
