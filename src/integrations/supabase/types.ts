@@ -764,29 +764,54 @@ export type Database = {
           },
         ]
       }
-      echo_thread_tags: {
+      echo_tags: {
         Row: {
           created_at: string
           id: string
-          tag: string
-          thread_id: string
-          user_id: string
+          name: string
+          name_norm: string | null
+          owner_id: string
         }
         Insert: {
           created_at?: string
           id?: string
-          tag: string
-          thread_id: string
-          user_id: string
+          name: string
+          name_norm?: string | null
+          owner_id: string
         }
         Update: {
           created_at?: string
           id?: string
-          tag?: string
+          name?: string
+          name_norm?: string | null
+          owner_id?: string
+        }
+        Relationships: []
+      }
+      echo_thread_tags: {
+        Row: {
+          created_at: string
+          tag_id: string
+          thread_id: string
+        }
+        Insert: {
+          created_at?: string
+          tag_id: string
+          thread_id: string
+        }
+        Update: {
+          created_at?: string
+          tag_id?: string
           thread_id?: string
-          user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "echo_thread_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "echo_tags"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "echo_thread_tags_thread_id_fkey"
             columns: ["thread_id"]
