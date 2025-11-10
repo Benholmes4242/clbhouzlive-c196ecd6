@@ -39,6 +39,7 @@ export function AdminMembersPage() {
     title: string;
     message: string;
   } | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const { toast } = useToast();
 
   const load = async () => {
@@ -136,6 +137,83 @@ export function AdminMembersPage() {
     }
   };
 
+  // Bulk operations
+  const bulkGrantLimited = async () => {
+    try {
+      await adminRoleManage("grant_limited_bulk", { user_ids: Array.from(selected) });
+      toast({ title: "Success", description: `Granted limited access to ${selected.size} admins` });
+      track("admin_bulk_action", { action: "grant_limited_bulk", count: selected.size });
+      setSelected(new Set());
+      await load();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    }
+  };
+
+  const bulkGrantFull = async () => {
+    try {
+      await adminRoleManage("grant_full_bulk", { user_ids: Array.from(selected) });
+      toast({ title: "Success", description: `Granted full access to ${selected.size} admins` });
+      track("admin_bulk_action", { action: "grant_full_bulk", count: selected.size });
+      setSelected(new Set());
+      await load();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    }
+  };
+
+  const bulkDowngrade = async () => {
+    try {
+      await adminRoleManage("downgrade_bulk", { user_ids: Array.from(selected) });
+      toast({ title: "Success", description: `Downgraded ${selected.size} admins to limited` });
+      track("admin_bulk_action", { action: "downgrade_bulk", count: selected.size });
+      setSelected(new Set());
+      await load();
+    } catch (error: any) {
+      const message = error?.message || "Failed to downgrade admins";
+      toast({
+        title: message.includes("last full admin") ? "Cannot downgrade" : "Error",
+        description: message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const bulkRevoke = async () => {
+    try {
+      await adminRoleManage("revoke_bulk", { user_ids: Array.from(selected) });
+      toast({ title: "Success", description: `Revoked access for ${selected.size} admins` });
+      track("admin_bulk_action", { action: "revoke_bulk", count: selected.size });
+      setSelected(new Set());
+      await load();
+    } catch (error: any) {
+      const message = error?.message || "Failed to revoke admin roles";
+      toast({
+        title: message.includes("last full admin") ? "Cannot revoke" : "Error",
+        description: message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const toggleSelect = (user_id: string) => {
+    const newSelected = new Set(selected);
+    if (newSelected.has(user_id)) {
+      newSelected.delete(user_id);
+    } else {
+      newSelected.add(user_id);
+    }
+    setSelected(newSelected);
+  };
+
+  const toggleSelectAll = () => {
+    if (selected.size === rows.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(rows.map(r => r.user_id)));
+    }
+  };
+
   const openAudit = async (target_user_id: string) => {
     try {
       const res = await adminRoleManage<{ data: AuditEntry[] }>("list_audit", { target_user_id });
@@ -170,6 +248,46 @@ export function AdminMembersPage() {
             Panel admins & roles (Full admins only).
           </p>
         </div>
+
+        {/* Bulk actions bar */}
+        {selected.size > 0 && (
+          <div className="sticky top-[56px] z-10 bg-background/90 backdrop-blur border-b p-3 flex flex-wrap gap-2 items-center">
+            <Button size="sm" variant="outline" onClick={() => setConfirmAction({
+              action: bulkGrantLimited,
+              title: "Grant Limited Access (Bulk)?",
+              message: `Grant limited admin access to ${selected.size} user(s)?`
+            })}>
+              Grant Limited ({selected.size})
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setConfirmAction({
+              action: bulkGrantFull,
+              title: "Grant Full Access (Bulk)?",
+              message: `Grant full admin access to ${selected.size} user(s)?`
+            })}>
+              Grant Full ({selected.size})
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setConfirmAction({
+              action: bulkDowngrade,
+              title: "Downgrade (Bulk)?",
+              message: `Downgrade ${selected.size} admin(s) to limited access?`
+            })}>
+              Downgrade ({selected.size})
+            </Button>
+            <Button size="sm" variant="destructive" onClick={() => setConfirmAction({
+              action: bulkRevoke,
+              title: "Revoke Access (Bulk)?",
+              message: `Revoke admin access for ${selected.size} user(s)? This cannot be undone.`
+            })}>
+              Revoke ({selected.size})
+            </Button>
+            <div className="ml-auto text-xs text-muted-foreground">
+              {selected.size} selected
+            </div>
+            <Button size="sm" variant="ghost" onClick={() => setSelected(new Set())}>
+              Clear
+            </Button>
+          </div>
+        )}
 
         {/* Expiry warning banner */}
         {expiringSoon.length > 0 && (
@@ -211,6 +329,14 @@ export function AdminMembersPage() {
                   <table className="w-full text-sm">
                     <thead className="border-b bg-muted/50">
                       <tr>
+                        <th className="text-left p-3 font-medium w-12">
+                          <input
+                            type="checkbox"
+                            checked={selected.size === rows.length && rows.length > 0}
+                            onChange={toggleSelectAll}
+                            className="rounded border-border"
+                          />
+                        </th>
                         <th className="text-left p-3 font-medium">User ID</th>
                         <th className="text-left p-3 font-medium">Role</th>
                         <th className="text-left p-3 font-medium">Expires</th>
@@ -221,6 +347,14 @@ export function AdminMembersPage() {
                     <tbody>
                       {rows.map(r => (
                         <tr key={r.user_id} className="border-b last:border-0">
+                          <td className="p-3">
+                            <input
+                              type="checkbox"
+                              checked={selected.has(r.user_id)}
+                              onChange={() => toggleSelect(r.user_id)}
+                              className="rounded border-border"
+                            />
+                          </td>
                           <td className="p-3 font-mono text-xs">{r.user_id.slice(0, 8)}…</td>
                           <td className="p-3">
                             <Badge variant={r.role === "full" ? "destructive" : "default"}>
@@ -311,9 +445,17 @@ export function AdminMembersPage() {
                     <div key={r.user_id} className="rounded-lg border p-4 space-y-3">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-mono text-muted-foreground break-all">
-                            {r.user_id}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={selected.has(r.user_id)}
+                              onChange={() => toggleSelect(r.user_id)}
+                              className="rounded border-border"
+                            />
+                            <span className="text-xs font-mono text-muted-foreground break-all">
+                              {r.user_id}
+                            </span>
+                          </div>
                           <Badge variant={r.role === "full" ? "destructive" : "default"} className="text-xs">
                             {r.role}
                           </Badge>

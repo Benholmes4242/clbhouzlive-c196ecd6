@@ -8,7 +8,11 @@ type Action =
   | "revoke"
   | "set_expiry"
   | "clear_expiry"
-  | "list_audit";
+  | "list_audit"
+  | "grant_limited_bulk"
+  | "grant_full_bulk"
+  | "downgrade_bulk"
+  | "revoke_bulk";
 
 export async function adminRoleManage<T = any>(action: Action, body: Record<string, any> = {}) {
   const { data, error } = await supabase.functions.invoke("admin-role-manage", {

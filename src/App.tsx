@@ -82,6 +82,8 @@ const AdminLanding = lazy(() => import("./pages/admin/AdminLanding").then(m => (
 const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage").then(m => ({ default: m.AdminUsersPage })));
 const AdminMembersPage = lazy(() => import("./pages/admin/AdminMembersPage").then(m => ({ default: m.AdminMembersPage })));
 const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage").then(m => ({ default: m.AdminOverviewPage })));
+const AdminInvitesPage = lazy(() => import("./pages/admin/AdminInvitesPage").then(m => ({ default: m.AdminInvitesPage })));
+const InviteAcceptPage = lazy(() => import("./pages/admin/InviteAcceptPage").then(m => ({ default: m.InviteAcceptPage })));
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
 const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
 
@@ -173,6 +175,12 @@ function AppRoutes() {
             <AdminMembersPage />
           </PanelGuard>
         } />
+        <Route path="/admin/invites" element={
+          <PanelGuard need="admins">
+            <AdminInvitesPage />
+          </PanelGuard>
+        } />
+        <Route path="/admin/invite-accept" element={<InviteAcceptPage />} />
         <Route path="/admin-backfill" element={<AdminBackfill />} />
 
         <Route path="/channel/:slug" element={<ChannelProfile />} />

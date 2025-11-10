@@ -23,7 +23,8 @@ import {
   Flag,
   Image,
   Database,
-  Shield
+  Shield,
+  Mail
 } from "lucide-react";
 import { usePanelRole } from "@/hooks/usePanelRole";
 import { panelCan } from "@/lib/panelCan";
@@ -143,6 +144,20 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChange, use
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="px-4">
+              {can.manageAdmins && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <NavLink 
+                      to="/admin/overview" 
+                      className="w-full justify-start gap-3 px-3 py-2 text-sm"
+                    >
+                      <BarChart3 className="h-4 w-4" />
+                      <span>Overview</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+
               {can.viewUsers && (
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
@@ -158,17 +173,30 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChange, use
               )}
               
               {can.manageAdmins && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to="/admin/admins" 
-                      className="w-full justify-start gap-3 px-3 py-2 text-sm"
-                    >
-                      <Shield className="h-4 w-4" />
-                      <span>Admin Members</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                <>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <NavLink 
+                        to="/admin/admins" 
+                        className="w-full justify-start gap-3 px-3 py-2 text-sm"
+                      >
+                        <Shield className="h-4 w-4" />
+                        <span>Admin Members</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <NavLink 
+                        to="/admin/invites" 
+                        className="w-full justify-start gap-3 px-3 py-2 text-sm"
+                      >
+                        <Mail className="h-4 w-4" />
+                        <span>Invitations</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </>
               )}
             </SidebarMenu>
           </SidebarGroupContent>
