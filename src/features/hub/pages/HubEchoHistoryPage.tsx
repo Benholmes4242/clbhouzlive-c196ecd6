@@ -5,8 +5,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { X } from 'lucide-react';
-import { TapButton } from '@/components/ui/TapButton';
 import { useEchoChatHistory } from '@/features/echo/hooks/useEchoChatHistory';
 import { HistoryRow } from '@/features/echo/components/HistoryRow';
 import { HistoryThreadInline } from '@/features/echo/components/HistoryThreadInline';
@@ -59,45 +57,32 @@ export function HubEchoHistoryPage() {
         WebkitBackdropFilter: 'blur(var(--hub-backdrop-blur))',
       }}
     >
-      {/* Header */}
-      <header
-        className="sticky top-0 z-10 px-5 pt-4 pb-3"
+      {/* Opaque Header */}
+      <header 
+        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
         style={{
-          background: 'transparent',
-          borderBottom: '1px solid var(--hub-header-stroke)',
+          borderColor: 'var(--hub-stroke)',
+          background: 'rgba(22, 24, 27, 0.98)',
+          backdropFilter: 'none',
+          WebkitBackdropFilter: 'none',
+          transition: 'all 160ms ease-out',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          contain: 'paint',
         }}
       >
-        <div className="flex items-center justify-between">
-          <button
-            onClick={handleBack}
-            className="text-[15px] transition-colors"
-            style={{ color: 'var(--hub-text-body)' }}
-          >
-            ← Back
-          </button>
-
-          <h1
-            className="text-[17px] font-semibold"
-            style={{ color: 'var(--hub-text)' }}
-          >
-            AI Chat History
-          </h1>
-
-          <TapButton
-            onPointerDown={handleBack}
-            className="transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
-            style={{ color: 'var(--hub-close-idle)' }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-close-hover)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-close-idle)'}
-            aria-label="Close"
-          >
-            <X className="w-5 h-5" />
-          </TapButton>
-        </div>
+        <button
+          onClick={handleBack}
+          className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
+          aria-label="Back to Hub"
+        >
+          ‹ Back
+        </button>
+        <h1 className="text-white/90 text-[17px] font-semibold">Echo History</h1>
+        <div className="w-16" />
       </header>
 
       {/* Body */}
-      <main className="w-full h-[calc(100vh-80px)] px-3.5 pt-3 pb-6">
+      <main className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))] px-3.5 pb-6">
         <div
           className="rounded-3xl p-6"
           style={{
