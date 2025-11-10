@@ -17,6 +17,8 @@ import { ShortcutsModal } from '@/features/echo/components/ShortcutsModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { starThread, deleteThread } from '@/features/echo/api/threadActions';
 import { bulkStarThreads, bulkDeleteThreads } from '@/features/echo/api/bulkActions';
+import { bulkAddTagsToThreads, bulkRemoveTagsFromThreads } from '@/features/echo/api/bulkTags';
+import { BulkTagPopover } from '@/features/echo/components/BulkTagPopover';
 import { fetchThreadDetails } from '@/features/echo/api/threadDetails';
 import { startZipExport } from '@/features/echo/utils/exportOrchestrator';
 import { downloadBlob, defaultZipName } from '@/features/echo/utils/download';
@@ -76,6 +78,7 @@ export function HubEchoHistoryPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const lastSelectedIndex = useRef<number | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [showBulkTag, setShowBulkTag] = useState(false);
   
   // Shortcuts modal
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -451,6 +454,48 @@ export function HubEchoHistoryPage() {
         toast({ description: 'Failed to delete some items', variant: 'destructive' });
       }
     }, 5000);
+  }, [selectedArray, selectedIds, filters, queryClient]);
+
+  // Bulk tag handlers
+  const handleBulkTagAdd = useCallback(async (tags: string[]) => {
+    if (selectedArray.length === 0) return;
+    try {
+      // Optimistic: attach tags to selected items locally
+      queryClient.setQueryData(['echoHistorySearch', filters, 100], (old: any) =>
+        (old || []).map((x: any) => 
+          selectedIds.has(x.id) 
+            ? { ...x, tags: Array.from(new Set([...(x.tags || []), ...tags.map(t => t.toLowerCase())])) } 
+            : x
+        )
+      );
+      await bulkAddTagsToThreads(selectedArray, tags);
+      echoHistoryAnalytics.bulkTagsAdd({ count_threads: selectedArray.length, count_tags: tags.length });
+      toast({ description: `Added ${tags.length} tag(s) to ${selectedArray.length} conversation(s)` });
+    } catch (e) {
+      queryClient.invalidateQueries({ queryKey: ['echoHistorySearch'] });
+      toast({ description: 'Failed to add tags', variant: 'destructive' });
+    }
+  }, [selectedArray, selectedIds, filters, queryClient]);
+
+  const handleBulkTagRemove = useCallback(async (tags: string[]) => {
+    if (selectedArray.length === 0) return;
+    try {
+      // Optimistic: strip tags locally
+      const removeSet = new Set(tags.map(t => t.toLowerCase()));
+      queryClient.setQueryData(['echoHistorySearch', filters, 100], (old: any) =>
+        (old || []).map((x: any) =>
+          selectedIds.has(x.id) 
+            ? { ...x, tags: (x.tags || []).filter((t: string) => !removeSet.has(t.toLowerCase())) } 
+            : x
+        )
+      );
+      await bulkRemoveTagsFromThreads(selectedArray, tags);
+      echoHistoryAnalytics.bulkTagsRemove({ count_threads: selectedArray.length, count_tags: tags.length });
+      toast({ description: `Removed ${tags.length} tag(s) from ${selectedArray.length} conversation(s)` });
+    } catch (e) {
+      queryClient.invalidateQueries({ queryKey: ['echoHistorySearch'] });
+      toast({ description: 'Failed to remove tags', variant: 'destructive' });
+    }
   }, [selectedArray, selectedIds, filters, queryClient]);
 
   // Keyboard shortcuts
@@ -939,12 +984,26 @@ export function HubEchoHistoryPage() {
         onUnstar={() => bulkStar(false)}
         onDelete={bulkDelete}
         onExportZip={selectedArray.length >= 2 ? bulkExportZip : undefined}
+        onBulkTagClick={() => setShowBulkTag(true)}
         onClear={() => {
           setSelectedIds(new Set());
           setSelectMode(false);
           announce('Selection cleared');
         }}
       />
+      
+      {/* Bulk tagging popover */}
+      {showBulkTag && (
+        <div className="fixed bottom-24 inset-x-0 flex justify-center z-[1100] px-4" onClick={() => setShowBulkTag(false)}>
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
+            <BulkTagPopover
+              onAdd={handleBulkTagAdd}
+              onRemove={handleBulkTagRemove}
+              onClose={() => setShowBulkTag(false)}
+            />
+          </div>
+        </div>
+      )}
       
       {/* Export HUD */}
       {exportHud.ui}

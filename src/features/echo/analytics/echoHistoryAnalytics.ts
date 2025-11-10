@@ -230,4 +230,19 @@ export const echoHistoryAnalytics = {
   }) {
     track('echo_tag_deleted', props);
   },
+
+  // Bulk tag operations
+  bulkTagsAdd(props: {
+    count_threads: number;
+    count_tags: number;
+  }) {
+    track('echo_bulk_tags_add', props);
+  },
+
+  bulkTagsRemove(props: {
+    count_threads: number;
+    count_tags: number;
+  }) {
+    track('echo_bulk_tags_remove', props);
+  },
 };

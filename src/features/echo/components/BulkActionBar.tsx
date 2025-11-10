@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Star, Trash2, X, FileDown } from 'lucide-react';
+import { Star, Trash2, X, FileDown, Tag } from 'lucide-react';
 
 export interface BulkActionBarProps {
   count: number;
@@ -13,6 +13,7 @@ export interface BulkActionBarProps {
   onDelete: () => void;
   onClear: () => void;
   onExportZip?: (format: 'json' | 'md') => void;
+  onBulkTagClick?: () => void;
 }
 
 export const BulkActionBar: React.FC<BulkActionBarProps> = ({
@@ -22,6 +23,7 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
   onDelete,
   onClear,
   onExportZip,
+  onBulkTagClick,
 }) => {
   if (count === 0) return null;
 
@@ -59,6 +61,17 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            {onBulkTagClick && (
+              <button
+                onClick={onBulkTagClick}
+                className="p-2 rounded-full hover:bg-white/10 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+                aria-label="Bulk tag selected conversations"
+                title="Tag"
+              >
+                <Tag size={18} style={{ color: 'var(--hub-text)' }} />
+              </button>
+            )}
+
             {onExportZip && count >= 2 && (
               <button
                 onClick={() => onExportZip('json')}

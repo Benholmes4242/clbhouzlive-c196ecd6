@@ -3475,6 +3475,14 @@ export type Database = {
         Args: { p_names: string[]; p_thread: string }
         Returns: undefined
       }
+      echo_tags_bulk_add_to_threads: {
+        Args: { p_names: string[]; p_thread_ids: string[] }
+        Returns: undefined
+      }
+      echo_tags_bulk_remove_from_threads: {
+        Args: { p_names: string[]; p_thread_ids: string[] }
+        Returns: undefined
+      }
       echo_tags_delete_everywhere: {
         Args: { p_name: string }
         Returns: undefined
