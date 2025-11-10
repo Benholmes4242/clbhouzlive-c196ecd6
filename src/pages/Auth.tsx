@@ -35,10 +35,21 @@ const Auth: React.FC = () => {
     return !!data;
   }
 
-
-  // REMOVED: Auth redirect logic now handled by Gate component
-  // This prevents redirect loops in native WebView environments
-
+  useEffect(() => {
+    // Only redirect if user is already authenticated when component mounts
+    if (user) {
+      const redirectUser = async () => {
+        const hasProfile = await checkProfileExists(user.id);
+        if (hasProfile) {
+          navigate("/", { replace: true });
+        } else {
+          navigate("/create-profile", { replace: true });
+        }
+      };
+      
+      redirectUser();
+    }
+  }, [user, navigate]);
 
   return (
     <>

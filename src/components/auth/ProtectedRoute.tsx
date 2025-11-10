@@ -11,8 +11,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, loading } = useSupabaseSession();
   const location = useLocation();
 
-  // CRITICAL: Wait for loading to complete before any redirects
-  // This prevents redirect loops in native WebView environments
+  // Show loading while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -24,9 +23,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  // If user is not authenticated, redirect to auth page
+  // If user is not authenticated, redirect to landing page
   if (!user) {
-    return <Navigate to="/auth" state={{ from: location }} replace />;
+    console.log('User not authenticated, redirecting to landing page');
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
 
   // User is authenticated, render the protected content
