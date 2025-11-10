@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -28,9 +28,11 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Loader2, Trash2, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { track } from '@/lib/telemetry';
 import type { AdminUser } from '@/hooks/useAdmin';
 
 interface UsersTableProps {
@@ -42,11 +44,29 @@ export function UsersTable({ users, readOnly = false }: UsersTableProps) {
   const { toast } = useToast();
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [localUsers, setLocalUsers] = useState<AdminUser[]>(users);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Track page open
+  useEffect(() => {
+    track("admin_users_opened");
+  }, []);
 
   // Update local users when props change
   React.useEffect(() => {
     setLocalUsers(users);
   }, [users]);
+
+  // Filter users based on search query
+  const filteredUsers = localUsers.filter(user => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      user.email?.toLowerCase().includes(query) ||
+      user.id?.toLowerCase().includes(query) ||
+      user.display_name?.toLowerCase().includes(query) ||
+      user.username?.toLowerCase().includes(query)
+    );
+  });
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     if (readOnly) return;
@@ -117,6 +137,7 @@ export function UsersTable({ users, readOnly = false }: UsersTableProps) {
         title: "Success",
         description: `Password reset email sent to ${userEmail}`,
       });
+      track("admin_password_reset", { target_user_id: userId });
     } catch (error: any) {
       console.error('Error sending password reset:', error);
       toast({
@@ -160,6 +181,7 @@ export function UsersTable({ users, readOnly = false }: UsersTableProps) {
         title: "Success",
         description: `User ${userEmail} has been deleted successfully`,
       });
+      track("admin_user_deleted", { target_user_id: userId });
     } catch (error: any) {
       console.error('Error deleting user:', error);
       toast({
@@ -215,6 +237,36 @@ export function UsersTable({ users, readOnly = false }: UsersTableProps) {
     );
   }
 
+  if (filteredUsers.length === 0 && searchQuery.trim()) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Users Management</span>
+            {readOnly && (
+              <Badge variant="secondary">Read Only</Badge>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Input
+            type="text"
+            placeholder="Search by email, ID, name, or username..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="max-w-md"
+          />
+          <div className="p-12 text-center space-y-3">
+            <div className="text-sm font-medium">No users match your search</div>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              Try a different search term
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -225,7 +277,14 @@ export function UsersTable({ users, readOnly = false }: UsersTableProps) {
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        <Input
+          type="text"
+          placeholder="Search by email, ID, name, or username..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="max-w-md"
+        />
         <Table>
           <TableHeader>
             <TableRow>
@@ -239,7 +298,7 @@ export function UsersTable({ users, readOnly = false }: UsersTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {localUsers.map((user) => (
+            {filteredUsers.map((user) => (
               <TableRow key={user.id}>
                 <TableCell className="font-medium">{user.email}</TableCell>
                 <TableCell>{user.display_name || '-'}</TableCell>

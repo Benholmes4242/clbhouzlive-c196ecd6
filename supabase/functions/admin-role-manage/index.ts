@@ -167,6 +167,18 @@ serve(async (req: Request) => {
       const target = ensureUserId(body?.user_id);
       const notes: string | undefined = body?.notes;
 
+      // Prevent downgrading the last full admin
+      const { count } = await svc
+        .from("admin_memberships")
+        .select("user_id", { count: "exact", head: true })
+        .eq("role", "full");
+
+      if ((count || 0) <= 1) {
+        return new Response(JSON.stringify({ error: "Cannot downgrade the last full admin" }), {
+          status: 403, headers: { ...headers, "Content-Type": "application/json" },
+        });
+      }
+
       const { error } = await svc.from("admin_memberships")
         .update({ role: "limited", notes: notes ?? null })
         .eq("user_id", target);
@@ -181,6 +193,18 @@ serve(async (req: Request) => {
     if (action === "revoke") {
       const target = ensureUserId(body?.user_id);
       const notes: string | undefined = body?.notes;
+
+      // Prevent revoking the last full admin
+      const { count } = await svc
+        .from("admin_memberships")
+        .select("user_id", { count: "exact", head: true })
+        .eq("role", "full");
+
+      if ((count || 0) <= 1) {
+        return new Response(JSON.stringify({ error: "Cannot revoke the last full admin" }), {
+          status: 403, headers: { ...headers, "Content-Type": "application/json" },
+        });
+      }
 
       const { error } = await svc.from("admin_memberships").delete().eq("user_id", target);
       if (error) throw error;

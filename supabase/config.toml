@@ -1,5 +1,8 @@
 project_id = "ybxkehyomcakqjvuhnna"
 
+[functions.lookup-user-by-email]
+verify_jwt = true
+
 [functions.secure-site-access]
 verify_jwt = false
 
@@ -8,3 +11,4 @@ verify_jwt = false
 
 [functions.invite-request]
 verify_jwt = false
+

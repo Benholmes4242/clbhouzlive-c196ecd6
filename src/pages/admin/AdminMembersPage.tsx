@@ -3,6 +3,7 @@ import { adminRoleManage } from "@/lib/adminRoleApi";
 import { getUserIdByEmail } from "@/lib/usersLookup";
 import { useToast } from "@/hooks/use-toast";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { track } from "@/lib/telemetry";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -56,12 +57,16 @@ export function AdminMembersPage() {
     }
   };
 
-  useEffect(() => { load(); }, [toast]);
+  useEffect(() => {
+    load();
+    track("admin_members_opened");
+  }, [toast]);
 
   const grantLimited = async (user_id: string, notes?: string, expires_at?: string) => {
     try {
       await adminRoleManage("grant_limited", { user_id, notes, expires_at });
       toast({ title: "Success", description: "Limited admin access granted" });
+      track("admin_role_granted", { target_user_id: user_id, role: "limited", expires_at });
       await load();
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -72,6 +77,7 @@ export function AdminMembersPage() {
     try {
       await adminRoleManage("grant_full", { user_id, notes });
       toast({ title: "Success", description: "Full admin access granted" });
+      track("admin_role_granted", { target_user_id: user_id, role: "full" });
       await load();
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -82,9 +88,15 @@ export function AdminMembersPage() {
     try {
       await adminRoleManage("downgrade", { user_id, notes });
       toast({ title: "Success", description: "Admin downgraded to limited" });
+      track("admin_role_downgraded", { target_user_id: user_id });
       await load();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      const message = error?.message || "Failed to downgrade admin";
+      toast({
+        title: message.includes("last full admin") ? "Cannot downgrade" : "Error",
+        description: message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -92,9 +104,15 @@ export function AdminMembersPage() {
     try {
       await adminRoleManage("revoke", { user_id, notes });
       toast({ title: "Success", description: "Admin access revoked" });
+      track("admin_role_revoked", { target_user_id: user_id });
       await load();
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      const message = error?.message || "Failed to revoke admin role";
+      toast({
+        title: message.includes("last full admin") ? "Cannot revoke" : "Error",
+        description: message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -123,10 +141,22 @@ export function AdminMembersPage() {
       const res = await adminRoleManage<{ data: AuditEntry[] }>("list_audit", { target_user_id });
       setAuditFor(target_user_id);
       setAuditRows(res.data || []);
+      track("admin_audit_viewed", { target_user_id });
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   };
+
+  // Calculate expiring soon warnings
+  const expiringSoon = rows.filter(r => {
+    if (!r.expires_at) return false;
+    const daysUntilExpiry = (new Date(r.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+    return daysUntilExpiry > 0 && daysUntilExpiry < 7;
+  });
+
+  // Check if this is the last full admin (for UI protection)
+  const fullAdmins = rows.filter(r => r.role === "full");
+  const isLastFullAdmin = (user_id: string) => fullAdmins.length === 1 && fullAdmins[0]?.user_id === user_id;
 
   return (
     <div className="p-6 space-y-6">
@@ -139,6 +169,13 @@ export function AdminMembersPage() {
           Panel admins & roles (Full admins only).
         </p>
       </div>
+
+      {/* Expiry warning banner */}
+      {expiringSoon.length > 0 && (
+        <div className="rounded border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-900 dark:text-amber-100">
+          ⚠️ {expiringSoon.length} admin{expiringSoon.length > 1 ? 's' : ''} expiring within 7 days.
+        </div>
+      )}
 
       {/* Quick-add by User ID or email */}
       <AddMemberInline
@@ -201,12 +238,16 @@ export function AdminMembersPage() {
                           {r.role === "full" ? (
                             <Button 
                               size="sm" 
-                              variant="outline" 
+                              variant="outline"
+                              disabled={isLastFullAdmin(r.user_id)}
                               onClick={() => setConfirmAction({
                                 action: () => downgrade(r.user_id),
                                 title: "Downgrade to Limited?",
-                                message: `This will restrict ${r.user_id.slice(0, 8)}… to read-only access.`
+                                message: isLastFullAdmin(r.user_id)
+                                  ? "Cannot downgrade the last full admin. Promote another admin to full first."
+                                  : `This will restrict ${r.user_id.slice(0, 8)}… to read-only access.`
                               })}
+                              title={isLastFullAdmin(r.user_id) ? "Cannot downgrade the last full admin" : ""}
                             >
                               Downgrade
                             </Button>
@@ -221,12 +262,16 @@ export function AdminMembersPage() {
                           )}
                           <Button 
                             size="sm" 
-                            variant="destructive" 
+                            variant="destructive"
+                            disabled={isLastFullAdmin(r.user_id)}
                             onClick={() => setConfirmAction({
                               action: () => revoke(r.user_id),
                               title: "Revoke admin access?",
-                              message: `This will remove all admin permissions for ${r.user_id.slice(0, 8)}…`
+                              message: isLastFullAdmin(r.user_id)
+                                ? "Cannot revoke the last full admin. Promote another admin to full first."
+                                : `This will remove all admin permissions for ${r.user_id.slice(0, 8)}…`
                             })}
+                            title={isLastFullAdmin(r.user_id) ? "Cannot revoke the last full admin" : ""}
                           >
                             Revoke
                           </Button>
