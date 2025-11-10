@@ -40,10 +40,10 @@ const AdminRouteProtection: React.FC<AdminRouteProtectionProps> = ({
   // Check role-based access
   const hasRequiredAccess = () => {
     if (requiredRole === 'admin') {
-      return isAdmin;
+      return isAdmin; // Only full admins
     }
     if (requiredRole === 'limited_admin') {
-      return hasAdminAccess; // This includes both admin and limited_admin
+      return isAdmin || isLimitedAdmin; // Both full and limited admins can access
     }
     return false;
   };
