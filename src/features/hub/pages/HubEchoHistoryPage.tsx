@@ -15,6 +15,7 @@ import { EchoHistorySearch } from '@/features/echo/components/EchoHistorySearch'
 import { BulkActionBar } from '@/features/echo/components/BulkActionBar';
 import { ShortcutsModal } from '@/features/echo/components/ShortcutsModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { starThread, deleteThread } from '@/features/echo/api/threadActions';
 import { bulkStarThreads, bulkDeleteThreads } from '@/features/echo/api/bulkActions';
 import { bulkAddTagsToThreads, bulkRemoveTagsFromThreads } from '@/features/echo/api/bulkTags';
@@ -27,8 +28,10 @@ import { toast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { echoHistoryAnalytics } from '@/features/echo/analytics/echoHistoryAnalytics';
 import { relevanceScore } from '@/features/echo/utils/relevance';
+import { fuzzyScore } from '@/features/echo/utils/fuzzy';
 import { useMedia } from '@/hooks/useMedia';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { announce } from '@/utils/a11y';
 import { clamp, isTypingTarget, readHashIndex, writeHashIndex } from '@/features/echo/utils/focus';
 import '../home/hubTheme.css';
@@ -96,18 +99,43 @@ export function HubEchoHistoryPage() {
   const [sortMode, setSortMode] = useLocalStorage<'default' | 'starred' | 'relevance'>('echo.sortMode', 'default');
   const [showSortMenu, setShowSortMenu] = useState(false);
   
-  // Data with search/filter support
-  const { data: rawChats = [], isLoading, error } = useEchoHistorySearch(filters, { limit: 100 });
+  // Fuzzy search toggle (persisted)
+  const [fuzzy, setFuzzy] = useLocalStorage<boolean>('echo.fuzzy', false);
   
-  // Apply client-side relevance sorting when sortMode === 'relevance'
+  // Debounce query for snappier typing
+  const debouncedQuery = useDebouncedValue(filters.query, 180);
+  
+  // Data with search/filter support
+  const { data: rawChats = [], isLoading, error } = useEchoHistorySearch(
+    { ...filters, query: debouncedQuery }, 
+    { limit: 100 }
+  );
+  
+  // Apply client-side relevance sorting + fuzzy filtering
   const chats = React.useMemo(() => {
     if (!rawChats || rawChats.length === 0) return [];
-    if (sortMode !== 'relevance' || !filters.query) return rawChats;
+    
+    // Fuzzy filtering when enabled
+    if (fuzzy && debouncedQuery) {
+      const q = String(debouncedQuery);
+      const scored = rawChats.map((c, i) => ({
+        ...c,
+        __f: fuzzyScore((c.title || '') + ' ' + (c.subtitle || ''), q),
+        __r: i,
+      }));
+      scored.sort((a, b) => (b.__f - a.__f) || (a.__r - b.__r));
+      // Drop very weak matches if user typed 3+ chars
+      const threshold = q.length >= 3 ? 2 : 0;
+      return scored.filter((x) => x.__f > threshold);
+    }
+    
+    // Relevance sorting (when not in fuzzy mode)
+    if (sortMode !== 'relevance' || !debouncedQuery) return rawChats;
 
     // Stable copy + score
     const scored = rawChats.map((c, originalIndex) => ({
       ...c,
-      __score: relevanceScore(c.title || '', c.subtitle || '', String(filters.query || ''), c.is_starred),
+      __score: relevanceScore(c.title || '', c.subtitle || '', String(debouncedQuery || ''), c.is_starred),
       __originalIndex: originalIndex,
     }));
 
@@ -118,7 +146,7 @@ export function HubEchoHistoryPage() {
     });
 
     return scored;
-  }, [rawChats, sortMode, filters.query]);
+  }, [rawChats, sortMode, fuzzy, debouncedQuery]);
   
   // Auto-open shortcuts modal once for new users
   useEffect(() => {
@@ -792,8 +820,21 @@ export function HubEchoHistoryPage() {
         </button>
         <h1 className="text-white/90 text-[17px] font-semibold">Echo History</h1>
         
-        {/* Right controls: Sort + Select */}
+        {/* Right controls: Fuzzy + Sort + Select */}
         <div className="flex items-center gap-2">
+          {/* Fuzzy toggle (only when not in select mode) */}
+          {!selectMode && (
+            <button
+              onClick={() => setFuzzy(!fuzzy)}
+              className="px-3 py-1.5 rounded-full text-[13px] border border-white/10 hover:bg-white/12 transition-colors focus:outline-none focus:ring-2 focus:ring-white/18"
+              style={{ background: fuzzy ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.08)', color: 'var(--hub-text)' }}
+              aria-pressed={fuzzy}
+              aria-label="Toggle fuzzy matching"
+            >
+              {fuzzy ? 'Fuzzy: On' : 'Fuzzy: Off'}
+            </button>
+          )}
+          
           {/* Select All / Clear (only in select mode) */}
           {selectMode && (
             <>
@@ -1001,39 +1042,92 @@ export function HubEchoHistoryPage() {
             </div>
           )}
 
-          {!isLoading && !error && chats.length === 0 && (
-            <div
+          {/* Empty history (no items at all) */}
+          {!isLoading && !error && chats.length === 0 && !filters.query && !filters.tag && (
+            <div 
+              role="status" 
+              aria-live="polite"
               className="text-center py-12 px-4"
               style={{ color: 'var(--hub-text-dim)' }}
             >
               <div className="text-[15px] font-medium mb-1" style={{ color: 'var(--hub-text)' }}>
-                {filters.query || filters.hasResponse !== undefined || filters.dateFrom
-                  ? 'No conversations found'
-                  : 'No Echo chats yet'}
+                No conversations yet
               </div>
               <div className="text-[13px]">
-                {filters.query || filters.hasResponse !== undefined || filters.dateFrom
-                  ? 'Try a different search or clear filters'
-                  : 'Ask Echo to get started'}
+                Start a chat with Echo to see it here
+              </div>
+            </div>
+          )}
+
+          {/* No results for current query/tag/filters */}
+          {!isLoading && !error && chats.length === 0 && (filters.query || filters.tag || filters.hasResponse !== undefined || filters.starred || filters.dateFrom) && (
+            <div 
+              role="status" 
+              aria-live="polite"
+              className="text-center py-12 px-4"
+              style={{ color: 'var(--hub-text-dim)' }}
+            >
+              <div className="text-[15px] font-medium mb-2" style={{ color: 'var(--hub-text)' }}>
+                No results found
+              </div>
+              {filters.tag && (
+                <div className="text-[13px] mb-2">
+                  No results for <strong style={{ color: 'var(--hub-text)' }}>#{filters.tag}</strong>
+                </div>
+              )}
+              {filters.query && (
+                <div className="text-[13px] mb-2">
+                  No results for "<strong style={{ color: 'var(--hub-text)' }}>{String(filters.query)}</strong>"
+                </div>
+              )}
+              <div className="flex items-center gap-2 justify-center mt-4">
+                {filters.tag && (
+                  <button
+                    onClick={() => setFilters((p) => ({ ...p, tag: undefined }))}
+                    className="px-3 py-1.5 rounded-full text-[13px] border border-white/12 hover:bg-white/10 transition-colors"
+                    style={{ color: 'var(--hub-text)' }}
+                  >
+                    Clear tag filter
+                  </button>
+                )}
+                {filters.query && (
+                  <button
+                    onClick={() => setFilters((p) => ({ ...p, query: '' }))}
+                    className="px-3 py-1.5 rounded-full text-[13px] border border-white/12 hover:bg-white/10 transition-colors"
+                    style={{ color: 'var(--hub-text)' }}
+                  >
+                    Clear search
+                  </button>
+                )}
+                {(filters.hasResponse !== undefined || filters.starred || filters.dateFrom) && (
+                  <button
+                    onClick={() => setFilters((p) => ({ ...p, hasResponse: undefined, starred: undefined, dateFrom: undefined }))}
+                    className="px-3 py-1.5 rounded-full text-[13px] border border-white/12 hover:bg-white/10 transition-colors"
+                    style={{ color: 'var(--hub-text)' }}
+                  >
+                    Clear filters
+                  </button>
+                )}
               </div>
             </div>
           )}
 
           {!isLoading && !error && chats.length > 0 && (
-            <div 
-              ref={listRef}
-              className="relative"
-              role="listbox"
-              aria-label="Conversations"
-              aria-multiselectable={selectMode || undefined}
-            >
-              <VirtualList
-                count={chats.length}
-                estimateSize={72}
-                getSize={getRowSize}
-                overscan={3}
-                className="max-h-[min(70vh,640px)] pr-1"
-                render={(index) => {
+            <ErrorBoundary>
+              <div 
+                ref={listRef}
+                className="relative"
+                role="listbox"
+                aria-label="Conversations"
+                aria-multiselectable={selectMode || undefined}
+              >
+                <VirtualList
+                  count={chats.length}
+                  estimateSize={72}
+                  getSize={getRowSize}
+                  overscan={8}
+                  className="max-h-[min(70vh,640px)] pr-1"
+                  render={(index) => {
                   const item = chats[index];
                   const isExpanded = expandedId === item.id;
                   const isChecked = selectedIds.has(item.id);
@@ -1162,6 +1256,7 @@ export function HubEchoHistoryPage() {
                 }}
               />
             </div>
+            </ErrorBoundary>
           )}
         </section>
       </main>

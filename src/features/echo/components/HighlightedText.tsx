@@ -9,7 +9,9 @@ interface HighlightedTextProps {
   className?: string;
 }
 
-export function HighlightedText({
+export const HighlightedText = React.memo(HighlightedTextImpl);
+
+function HighlightedTextImpl({
   text,
   query,
   announceCount = false,
