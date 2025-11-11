@@ -15,6 +15,7 @@ interface SharedThread {
     role: 'user' | 'assistant' | 'system';
     content: string;
     created_at: string;
+    redacted?: boolean;
   }>;
 }
 
@@ -130,7 +131,14 @@ export function EchoSharePage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="whitespace-pre-wrap">{msg.content}</div>
+                  <div className="whitespace-pre-wrap">
+                    {msg.content}
+                    {msg.redacted && (
+                      <span className="ml-2 text-xs text-muted-foreground italic">
+                        (redacted by owner)
+                      </span>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             ))

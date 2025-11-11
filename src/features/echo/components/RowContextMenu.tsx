@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { MoreHorizontal, Share2, Link2Off, FileJson, FileText, Tag as TagIcon, X } from 'lucide-react';
+import { MoreHorizontal, Share2, Link2Off, FileJson, FileText, Tag as TagIcon, X, Settings } from 'lucide-react';
 import { downloadBlob } from '../utils/download';
 import { createShareLink, revokeShareLink, getShareInfoForThread } from '../api/shareActions';
 import { fetchThreadDetails } from '../api/threadDetails';
@@ -12,6 +12,7 @@ import { getThreadTags, removeTagFromThread } from '../api/tags';
 import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
 import { toast } from '@/hooks/use-toast';
 import { TagInputPopover } from './TagInputPopover';
+import { ShareManagementDialog } from './ShareManagementDialog';
 
 function convertToMarkdown(thread: any): string {
   const formatDate = (dateString: string) => {
@@ -68,6 +69,7 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
   const [loading, setLoading] = useState(false);
   const [showTagInput, setShowTagInput] = useState(false);
   const [threadTags, setThreadTags] = useState<string[]>(tags);
+  const [showShareDialog, setShowShareDialog] = useState(false);
 
   // Check if thread has an active share link and fetch tags
   useEffect(() => {
@@ -312,18 +314,44 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
             )}
             
             {hasShare && (
-              <button
-                role="menuitem"
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-left text-[14px]"
-                style={{ color: 'var(--hub-text)' }}
-                onClick={handleShareRevoke}
-              >
-                <Link2Off size={16} />
-                <span>Revoke share link</span>
-              </button>
+              <>
+                <button
+                  role="menuitem"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-left text-[14px]"
+                  style={{ color: 'var(--hub-text)' }}
+                  onClick={() => {
+                    setOpen(false);
+                    setShowShareDialog(true);
+                  }}
+                >
+                  <Settings size={16} />
+                  <span>Manage sharing</span>
+                </button>
+                <button
+                  role="menuitem"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-left text-[14px]"
+                  style={{ color: 'var(--hub-text)' }}
+                  onClick={handleShareRevoke}
+                >
+                  <Link2Off size={16} />
+                  <span>Revoke share link</span>
+                </button>
+              </>
             )}
           </div>
         </>
+      )}
+      
+      {showShareDialog && (
+        <ShareManagementDialog
+          threadId={threadId}
+          title={title}
+          onClose={() => setShowShareDialog(false)}
+          onShareRevoked={() => {
+            setHasShare(false);
+            setShowShareDialog(false);
+          }}
+        />
       )}
     </div>
   );

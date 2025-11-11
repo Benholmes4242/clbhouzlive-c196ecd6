@@ -106,3 +106,37 @@ export async function getSharedThread(token: string): Promise<SharedThread> {
     messages: (thread.messages as any[]) || [],
   };
 }
+
+/**
+ * Rotate share link (revoke old and create new)
+ */
+export async function rotateShareLink(threadId: string): Promise<string> {
+  const { data, error } = await supabase.rpc('echo_share_rotate' as any, {
+    p_thread: threadId,
+  });
+
+  if (error) {
+    console.error('Failed to rotate share link:', error);
+    throw new Error(error.message || 'Failed to rotate share link');
+  }
+
+  return data as string;
+}
+
+/**
+ * Set message redactions for a share link
+ */
+export async function setShareRedactions(
+  token: string,
+  pairs: Array<{ message_id: string; action: 'hide' | 'mask' }>
+): Promise<void> {
+  const { error } = await supabase.rpc('echo_share_set_redactions' as any, {
+    p_token: token,
+    p_pairs: pairs,
+  });
+
+  if (error) {
+    console.error('Failed to set redactions:', error);
+    throw new Error(error.message || 'Failed to set redactions');
+  }
+}

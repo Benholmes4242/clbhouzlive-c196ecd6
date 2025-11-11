@@ -168,6 +168,20 @@ export const echoHistoryAnalytics = {
     track('echo_share_revoked', props);
   },
 
+  shareRotated(props: {
+    thread_id: string;
+  }) {
+    track('echo_share_rotated', props);
+  },
+
+  shareRedactionsSaved(props: {
+    thread_id: string;
+    hide_count: number;
+    mask_count: number;
+  }) {
+    track('echo_share_redactions_saved', props);
+  },
+
   shareOpenedPublic(props: {
     thread_id: string;
   }) {
