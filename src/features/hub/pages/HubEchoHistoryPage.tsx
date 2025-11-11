@@ -185,18 +185,16 @@ export function HubEchoHistoryPage() {
   
   // Track expanded heights for proper virtualization
   const expandedHeightsRef = useRef<Map<string, number>>(new Map());
-  const [sizeNonce, setSizeNonce] = useState(0);
   
   // Dynamic size calculation: base row + expanded inline thread + spacing
-  const getRowSize = useCallback((index: number) => {
+  const getRowSize = (index: number) => {
+    // TEMP: force every row to reserve mock inline height for visibility testing
     const baseHeight = 72; // Row height
-    const spacing = 12; // Consistent vertical rhythm
-    const item = chats[index];
-    if (!item) return baseHeight + spacing;
-    const isExpanded = expandedId === item.id;
-    const inlineHeight = isExpanded ? (expandedHeightsRef.current.get(item.id) ?? 220) : 0; // fallback while measuring
-    return baseHeight + inlineHeight + spacing;
-  }, [chats, expandedId, sizeNonce]);
+    const spacing = 12; // 12px gap between cards (space-y-3)
+    const mockInlineHeight = 220; // fixed mock panel height
+    return baseHeight + mockInlineHeight + spacing;
+  };
+  
   // Inject sortMode into filters
   useEffect(() => {
     setFilters(prev => ({ ...prev, sortMode }));
@@ -1092,19 +1090,21 @@ export function HubEchoHistoryPage() {
                       >
                         {/* Inline expanded content - integrated within the same card */}
                         {isExpanded && (
-                          <HistoryThreadInline
-                            threadId={item.id}
-                            title={item.title}
-                            onCollapse={() => setExpandedId(null)}
-                            onHeightChange={(h) => {
-                              const prev = expandedHeightsRef.current.get(item.id) ?? 0;
-                              const next = Math.ceil(h);
-                              if (Math.abs(next - prev) > 1) {
-                                expandedHeightsRef.current.set(item.id, next);
-                                setSizeNonce((n) => n + 1);
-                              }
+                          <div
+                            style={{
+                              padding: '16px',
+                              background: 'rgba(255, 0, 255, 0.3)',
+                              border: '3px solid yellow',
+                              color: 'white',
+                              fontSize: '16px',
+                              fontWeight: 'bold',
                             }}
-                          />
+                          >
+                            🔴 TEST: Inline panel for {item.title}
+                            <div style={{ marginTop: '8px', fontSize: '14px' }}>
+                              Thread ID: {item.id}
+                            </div>
+                          </div>
                         )}
                       </SwipeableHistoryRow>
                     </div>
