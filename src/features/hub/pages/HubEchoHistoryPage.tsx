@@ -1027,13 +1027,14 @@ export function HubEchoHistoryPage() {
                 aria-label="Conversations"
                 aria-multiselectable={selectMode || undefined}
               >
-                <VirtualList
-                  count={chats.length}
-                  estimateSize={72}
-                  getSize={getRowSize}
-                  overscan={8}
-                  className="max-h-[min(70vh,640px)] pr-1"
-                  render={(index) => {
+                <div style={{ maskImage: 'none', WebkitMaskImage: 'none' }}>
+                  <VirtualList
+                    count={chats.length}
+                    estimateSize={72}
+                    getSize={getRowSize}
+                    overscan={8}
+                    className="max-h-[min(70vh,640px)] pr-1"
+                    render={(index) => {
                   const item = chats[index];
                   const isExpanded = expandedId === item.id;
                   const isChecked = selectedIds.has(item.id);
@@ -1154,17 +1155,7 @@ export function HubEchoHistoryPage() {
                   );
                 }}
               />
-
-              {/* Bottom fade overlay */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute left-0 right-0 bottom-0 h-12 rounded-b-[18px]"
-                style={{
-                  maskImage: 'linear-gradient(to top, black, transparent)',
-                  WebkitMaskImage: 'linear-gradient(to top, black, transparent)',
-                  background: 'rgba(0,0,0,0.35)',
-                }}
-              />
+            </div>
             </div>
             </ErrorBoundary>
           )}
