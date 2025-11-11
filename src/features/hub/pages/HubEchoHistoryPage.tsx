@@ -30,7 +30,7 @@ import { relevanceScore } from '@/features/echo/utils/relevance';
 import { useMedia } from '@/hooks/useMedia';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { announce } from '@/utils/a11y';
-import { clamp, isTypingTarget } from '@/features/echo/utils/focus';
+import { clamp, isTypingTarget, readHashIndex, writeHashIndex } from '@/features/echo/utils/focus';
 import '../home/hubTheme.css';
 
 export function HubEchoHistoryPage() {
@@ -49,6 +49,8 @@ export function HubEchoHistoryPage() {
   const listRef = useRef<HTMLDivElement | null>(null);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [kbNavEnabled] = useLocalStorage('echo.kbNav', true);
+  const [hashNavEnabled] = useLocalStorage('echo.kbNav.hash', true);
+  const hasRestoredFromHash = useRef(false);
 
   // Apply hub-open class for glass theme
   useEffect(() => {
@@ -167,6 +169,36 @@ export function HubEchoHistoryPage() {
     el?.focus({ preventScroll: true });
     el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }, []);
+
+  // Restore focus from hash on first data load
+  useEffect(() => {
+    if (!hashNavEnabled || hasRestoredFromHash.current) return;
+    if (!chats || chats.length === 0) return;
+
+    const fromHash = readHashIndex();
+    if (fromHash != null) {
+      const idx = clamp(fromHash, 0, chats.length - 1);
+      setFocusedIndex(idx);
+      focusRowAt(idx);
+    }
+    hasRestoredFromHash.current = true;
+  }, [hashNavEnabled, chats?.length, focusRowAt]);
+
+  // Update hash whenever focusedIndex changes
+  useEffect(() => {
+    if (!hashNavEnabled) return;
+    if (focusedIndex < 0 || !chats || chats.length === 0) return;
+    writeHashIndex(clamp(focusedIndex, 0, chats.length - 1));
+  }, [hashNavEnabled, focusedIndex, chats?.length]);
+
+  // Keep hash valid when list size shrinks
+  useEffect(() => {
+    if (!hashNavEnabled || !chats) return;
+    const idx = readHashIndex();
+    if (idx != null && idx >= chats.length) {
+      writeHashIndex(chats.length - 1);
+    }
+  }, [hashNavEnabled, chats?.length]);
   
   // Search & filter handlers
   const handleSearchChange = useCallback((query: string) => {
