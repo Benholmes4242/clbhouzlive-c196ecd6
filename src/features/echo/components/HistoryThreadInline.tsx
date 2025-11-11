@@ -8,6 +8,7 @@ import { X, ExternalLink, Copy } from 'lucide-react';
 import { MessageBubble } from '@/components/ai-chat/MessageBubble';
 import { groupMessages } from '@/components/ai-chat/utils/groupMessages';
 import { useEchoThreadMessages } from '../hooks/useEchoThreadMessages';
+import { VirtualList } from './virtual/VirtualList';
 import { timeAgo } from '@/utils/date';
 
 export interface HistoryThreadInlineProps {
@@ -32,11 +33,6 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   const { data: messages = [], isLoading, error } = useEchoThreadMessages(threadId);
   const groupedMessages = groupMessages(messages);
 
-  // Debug: visibility + data
-  if (import.meta.env.DEV) {
-    console.debug('[HistoryThreadInline] thread', threadId, 'msgs', messages?.length, messages?.[0]);
-  }
-
   // Report height changes to parent for virtualization
   useLayoutEffect(() => {
     if (containerRef.current && onHeightChange) {
@@ -48,7 +44,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   return (
     <div
       ref={containerRef}
-      className="mt-2 mb-3 ml-1 pl-3 transition-[height] anim-slideUp"
+      className="mt-2 mb-3 ml-1 pl-3 overflow-hidden transition-[height] anim-slideUp"
       style={{
         borderLeft: '1px solid var(--hub-stroke)',
         transitionDuration: 'var(--anim-med)',
@@ -112,9 +108,14 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
 
       {/* Messages */}
       <div
-        className="mt-3 overflow-y-auto pr-1"
+        className="overflow-y-auto pr-1"
         style={{
-          height: 'min(65vh, 600px)',
+          maxHeight: 'min(65vh, 600px)',
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+          maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
         }}
       >
         {isLoading && (
@@ -148,29 +149,39 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         )}
 
         {!isLoading && !error && groupedMessages.length > 0 && (
-          <div className="space-y-3">
-            {groupedMessages.map((msg) => (
-              <div key={msg.id} className="mb-3">
-                <MessageBubble
-                  role={msg.role as 'user' | 'assistant'}
-                  content={msg.content}
-                  timestamp={msg.created_at}
-                  firstInGroup={msg.firstInGroup}
-                  lastInGroup={msg.lastInGroup}
-                  readOnly={true}
-                  showChips={msg.firstInGroup}
-                  maxWidth="desktop"
-                />
-                <div
-                  className="mt-1 mb-2 text-[12px] anim-slideUp"
-                  style={{ color: 'var(--meta-dim)' }}
-                  aria-label={`Sent ${timeAgo(msg.created_at)}`}
-                >
-                  <span>{timeAgo(msg.created_at)}</span>
+          <VirtualList
+            count={groupedMessages.length}
+            estimateSize={120}
+            overscan={2}
+            className="h-full"
+            render={(index) => {
+              const msg = groupedMessages[index];
+              return (
+                <div className="mb-3">
+                  <MessageBubble
+                    key={msg.id}
+                    role={msg.role as 'user' | 'assistant'}
+                    content={msg.content}
+                    timestamp={msg.created_at}
+                    firstInGroup={msg.firstInGroup}
+                    lastInGroup={msg.lastInGroup}
+                    readOnly={true}
+                    showChips={msg.firstInGroup}
+                    maxWidth="desktop"
+                  />
+                  
+                  {/* Meta line */}
+                  <div
+                    className="mt-1 mb-2 text-[12px] anim-slideUp"
+                    style={{ color: 'var(--meta-dim)' }}
+                    aria-label={`Sent ${timeAgo(msg.created_at)}`}
+                  >
+                    <span>{timeAgo(msg.created_at)}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              );
+            }}
+          />
         )}
       </div>
     </div>

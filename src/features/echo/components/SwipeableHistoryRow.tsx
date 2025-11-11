@@ -20,7 +20,6 @@ interface SwipeableHistoryRowProps extends Omit<HistoryRowProps, 'onClick'> {
   listFilters?: Partial<EchoHistorySearchFilters>;
   rankIndex?: number;
   isPendingDelete?: boolean;
-  children?: React.ReactNode;
 }
 
 export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
@@ -31,7 +30,6 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
   listFilters,
   rankIndex,
   isPendingDelete,
-  children,
   ...historyRowProps
 }) => {
   const [swipeOffset, setSwipeOffset] = useState(0);
@@ -251,11 +249,6 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
               />
             </button>
           </div>
-          {children && (
-            <div className="mt-2">
-              {children}
-            </div>
-          )}
         </div>
       </div>
     </div>
