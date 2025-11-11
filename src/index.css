@@ -3212,28 +3212,43 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
 }
 
-/* Echo History cards (no bubbles) */
-.eh-card {
-  background: rgba(255,255,255,0.06);
-  border-radius: 14px;
-  box-shadow: 0 6px 24px rgba(0,0,0,.18);
-  transition: transform 140ms cubic-bezier(.22,.61,.36,1), background 140ms;
+/* Echo History flat rows */
+.eh-row {
+  padding: 18px 0;
+  cursor: pointer;
 }
-.eh-card:hover  { background: rgba(255,255,255,0.08); }
-.eh-card:active { transform: scale(.995); background: rgba(255,255,255,0.10); }
 
-/* Prose transcript */
-.eh-prose { max-width: 64ch; line-height: 1.45; }
-.eh-prose code {
-  background: rgba(255,255,255,.07);
-  border-radius: 10px;
-  padding: 2px 6px;
-  font-size: 12px;
+.eh-title { font-weight: 600; letter-spacing: 0.1px; }
+.eh-sub   { color: rgba(255,255,255,0.6); margin-top: 2px; }
+.eh-meta  { color: rgba(255,255,255,0.6); font-size: 12.5px; margin-top: 6px; }
+
+.eh-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  margin-left: 16px;
+  margin-right: 16px;
 }
-.eh-prose blockquote {
-  border-left: 3px solid rgba(255,255,255,.18);
-  margin: 10px 0; padding-left: 12px;
-  color: rgba(255,255,255,.8);
+
+/* Inline transcript (flat, scrollable) */
+.eh-inline {
+  margin-top: 12px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.eh-msg {
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 8px 0;
+}
+.eh-from { 
+  color: rgba(255,255,255,0.6); 
+  font-size: 12.5px; 
+  text-transform: uppercase; 
+  margin-bottom: 4px;
 }
 
 /* Inline expand animation */

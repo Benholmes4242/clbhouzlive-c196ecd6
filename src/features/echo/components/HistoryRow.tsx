@@ -1,5 +1,4 @@
 import React from 'react';
-import { ui } from '@/tokens/ui';
 
 type Props = {
   item: {
@@ -12,52 +11,32 @@ type Props = {
   };
   onToggle: () => void;
   trailing?: React.ReactNode;
-  children?: React.ReactNode; // expanded inline
+  children?: React.ReactNode;
 };
 
 export function HistoryRow({ item, onToggle, trailing, children }: Props) {
   return (
-    <article
-      role="button"
-      aria-expanded={!!children}
-      onClick={onToggle}
-      className="eh-card p-4 md:p-5"
-      style={{ borderRadius: ui.radius.md }}
-    >
-      <div className="flex items-start gap-3">
-        <div className="flex-1 min-w-0">
-          <h3
-            className="font-semibold leading-[1.2]"
-            style={{ fontSize: ui.font.title }}
-          >
-            {item.title}
-          </h3>
-
-          {item.subtitle && (
-            <p
-              className="mt-2 opacity-80 line-clamp-2"
-              style={{ fontSize: ui.font.body, lineHeight: 1.35 }}
-            >
-              {item.subtitle}
-            </p>
-          )}
-
-          <div
-            className="mt-3 opacity-70"
-            style={{ fontSize: ui.font.meta }}
-          >
-            {item.has_response ? 'Has response' : 'No response'} ·{' '}
-            {item.message_count ?? 1} msgs · {item.relative_date ?? 'Today'}
+    <div role="listitem">
+      <div className="eh-row" onClick={onToggle} aria-expanded={!!children}>
+        <div className="flex items-start justify-between gap-8">
+          <div className="flex-1 min-w-0">
+            <div className="eh-title">{item.title}</div>
+            {item.subtitle && <div className="eh-sub line-clamp-2">{item.subtitle}</div>}
+            <div className="eh-meta">
+              {item.has_response ? 'Has response' : 'No response'}
+              {item.message_count != null ? ` · ${item.message_count} msgs` : ''}
+              {item.relative_date ? ` · ${item.relative_date}` : ''}
+            </div>
+          </div>
+          <div className="flex items-center gap-3 shrink-0" onClick={(e) => e.stopPropagation()}>
+            {trailing}
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
-          {trailing}
-        </div>
+        {children && <div className="eh-inline">{children}</div>}
       </div>
-
-      {/* Expanded inline transcript lives here */}
-      {children}
-    </article>
+      
+      <div className="eh-divider" />
+    </div>
   );
 }

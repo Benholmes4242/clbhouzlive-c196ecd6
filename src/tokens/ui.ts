@@ -8,5 +8,6 @@ export const ui = {
   dur:    { fast: '140ms', base: '220ms' },
   ease:   { std: 'cubic-bezier(.22,.61,.36,1)' },
   font:   { title: 19, body: 15, meta: 13 },
-  tone:   { text: 'rgba(255,255,255,0.92)', sub: 'rgba(255,255,255,0.64)' },
+  tone:   { text: 'rgba(255,255,255,0.92)', sub: 'rgba(255,255,255,0.64)', muted: 'rgba(255,255,255,0.6)' },
+  divider: 'rgba(255,255,255,0.08)',
 };
