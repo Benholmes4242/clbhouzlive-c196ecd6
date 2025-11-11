@@ -80,44 +80,46 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
   }, [title, subtitle, searchQuery]);
   return (
     <div 
-      className={cn('flex items-center gap-2 mb-3', className)}
+      className={cn('flex flex-col mb-3', className)}
       role="option"
       data-row-index={index}
       aria-selected={selectionMode ? selected : undefined}
       aria-expanded={Boolean(children)}
       aria-controls={children ? `thread-panel-${id}` : undefined}
     >
-      {/* Selection checkbox */}
-      {selectionMode && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onSelectToggle?.();
-          }}
-          className={cn(
-            'hub-checkbox shrink-0 w-8 h-8 rounded-md flex items-center justify-center transition-all',
-            selected && 'hub-checkbox-selected'
-          )}
-          style={{ 
-            border: '1px solid var(--hub-stroke)', 
-            background: selected ? 'rgba(255,255,255,0.14)' : 'transparent' 
-          }}
-          aria-pressed={!!selected}
-          aria-label={`${selected ? 'Deselect' : 'Select'} conversation ${title}`}
-        >
-          {selected && <span style={{ color: 'var(--hub-text)' }}>✓</span>}
-        </button>
-      )}
-      
-      {/* Main row container */}
-      <div
-        className={cn(
-          'hub-row flex-1 text-left transition-all relative',
-          selectionMode && 'is-select-mode',
-          selected && 'is-selected'
+      {/* Main row container with checkbox */}
+      <div className="flex items-center gap-2">
+        {/* Selection checkbox */}
+        {selectionMode && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelectToggle?.();
+            }}
+            className={cn(
+              'hub-checkbox shrink-0 w-8 h-8 rounded-md flex items-center justify-center transition-all',
+              selected && 'hub-checkbox-selected'
+            )}
+            style={{ 
+              border: '1px solid var(--hub-stroke)', 
+              background: selected ? 'rgba(255,255,255,0.14)' : 'transparent' 
+            }}
+            aria-pressed={!!selected}
+            aria-label={`${selected ? 'Deselect' : 'Select'} conversation ${title}`}
+          >
+            {selected && <span style={{ color: 'var(--hub-text)' }}>✓</span>}
+          </button>
         )}
-        style={{ background: 'transparent', border: '0', borderRadius: 0, backdropFilter: 'none' }}
-      >
+        
+        {/* Row content */}
+        <div
+          className={cn(
+            'hub-row flex-1 text-left transition-all relative',
+            selectionMode && 'is-select-mode',
+            selected && 'is-selected'
+          )}
+          style={{ background: 'transparent', border: '0', borderRadius: 0, backdropFilter: 'none' }}
+        >
         <button
           onClick={onClick}
           aria-label={`Open conversation: ${title}`}
@@ -220,14 +222,15 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
         )}
       </div>
         </button>
-        
-        {/* Expanded content */}
-        {children && (
-          <div className="pt-2">
-            {children}
-          </div>
-        )}
+        </div>
       </div>
+      
+      {/* Expanded content below the row */}
+      {children && (
+        <div className="w-full pt-2">
+          {children}
+        </div>
+      )}
     </div>
   );
 };
