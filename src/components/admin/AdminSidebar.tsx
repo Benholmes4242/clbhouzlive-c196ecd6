@@ -30,7 +30,7 @@ export const AdminSidebar: React.FC = () => {
     { to: "/admin/country-flags", label: "Country Flags" },
     { to: "/admin/courses",       label: "Course Import" },
     { to: "/admin/analytics",     label: "Analytics" },
-    { to: "/admin/echo-analytics", label: "Echo Analytics" },
+    { to: "/admin/analytics/echo", label: "Echo Analytics" },
     { to: "/admin/team",          label: "Team Management" },
     { to: "/admin/settings",      label: "Settings" },
     // Phase 3 additions:

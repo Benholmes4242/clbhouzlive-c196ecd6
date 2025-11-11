@@ -3453,6 +3453,24 @@ export type Database = {
             }
             Returns: string
           }
+      admin_echo_kpis: {
+        Args: never
+        Returns: {
+          exports_7d: number
+          msgs_total: number
+          shares_active: number
+          threads_total: number
+          users_active_7d: number
+        }[]
+      }
+      admin_echo_rates: {
+        Args: never
+        Returns: {
+          pct_starred: number
+          pct_with_response: number
+          period: string
+        }[]
+      }
       admin_echo_summary: {
         Args: { days: number }
         Returns: {
@@ -3464,6 +3482,13 @@ export type Database = {
           starred_toggles: number
         }[]
       }
+      admin_echo_threads_timeseries: {
+        Args: never
+        Returns: {
+          threads: number
+          ts: string
+        }[]
+      }
       admin_echo_timeseries: {
         Args: { days: number; event_names: string[] }
         Returns: {
@@ -3471,13 +3496,21 @@ export type Database = {
           n: number
         }[]
       }
-      admin_echo_top_tags: {
-        Args: { days: number; limit_n: number }
-        Returns: {
-          name: string
-          threads: number
-        }[]
-      }
+      admin_echo_top_tags:
+        | {
+            Args: never
+            Returns: {
+              tag: string
+              uses: number
+            }[]
+          }
+        | {
+            Args: { days: number; limit_n: number }
+            Returns: {
+              name: string
+              threads: number
+            }[]
+          }
       admin_guard: { Args: never; Returns: undefined }
       admin_overview_metrics: {
         Args: never

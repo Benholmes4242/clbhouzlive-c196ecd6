@@ -93,7 +93,7 @@ const LogosPage = lazy(() => import("./pages/admin/LogosPage").then(m => ({ defa
 const CountryFlagsPage = lazy(() => import("./pages/admin/CountryFlagsPage").then(m => ({ default: m.CountryFlagsPage })));
 const CourseImportPage = lazy(() => import("./pages/admin/CourseImportPage").then(m => ({ default: m.CourseImportPage })));
 const AnalyticsPage = lazy(() => import("./features/admin/pages/AdminAnalyticsPage").then(m => ({ default: m.AdminAnalyticsPage })));
-const EchoAnalyticsPage = lazy(() => import("./features/admin/pages/EchoAnalyticsPage"));
+const AdminEchoAnalyticsPage = lazy(() => import("./features/admin/pages/AdminEchoAnalyticsPage").then(m => ({ default: m.AdminEchoAnalyticsPage })));
 const TeamPage = lazy(() => import("./pages/admin/TeamPage").then(m => ({ default: m.TeamPage })));
 const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage").then(m => ({ default: m.AdminSettingsPage })));
 
@@ -114,6 +114,9 @@ const HubEchoTagsPage = lazy(() => import("./features/hub/pages/HubEchoTagsPage"
 const HubSwingHistoryPage = lazy(() => import("./features/hub/pages/HubSwingHistoryPage").then(m => ({ default: m.HubSwingHistoryPage })));
 const HubSwingDetailPage = lazy(() => import("./features/hub/pages/HubSwingDetailPage").then(m => ({ default: m.HubSwingDetailPage })));
 const HubEchoHistoryDetailPage = lazy(() => import("./features/hub/pages/HubEchoHistoryDetailPage"));
+
+// Public Echo Share Page
+const EchoSharePage = lazy(() => import("./pages/EchoSharePage").then(m => ({ default: m.EchoSharePage })));
 
 // Videos2 page
 const VideosPage = lazy(() => import("./features/videos2/pages/VideosPage"));
@@ -209,14 +212,17 @@ function AppRoutes() {
               <AnalyticsPage />
             </PanelGuard>
           } />
-          <Route path="echo-analytics" element={
+          <Route path="analytics/echo" element={
             <PanelGuard need="admins">
-              <EchoAnalyticsPage />
+              <AdminEchoAnalyticsPage />
             </PanelGuard>
           } />
           <Route path="team" element={<TeamPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
         </Route>
+        
+        {/* Public Echo Share Page */}
+        <Route path="/echo/share/:token" element={<EchoSharePage />} />
         
         {/* Golf Course Editor - full page routes outside AdminLayout */}
         <Route path="/admin/golf-courses/new" element={<GolfCourseEditorPage />} />
