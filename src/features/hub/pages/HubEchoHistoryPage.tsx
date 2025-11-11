@@ -1090,14 +1090,21 @@ export function HubEchoHistoryPage() {
                       >
                         {/* Inline expanded content - integrated within the same card */}
                         {isExpanded && (
-                          <HistoryThreadInline
-                            threadId={item.id}
-                            title={item.title}
-                            onCollapse={() => setExpandedId(null)}
-                            onHeightChange={(h) => {
-                              console.log('[inline] height report:', h);
+                          <div
+                            style={{
+                              padding: '16px',
+                              background: 'rgba(255, 0, 255, 0.3)',
+                              border: '3px solid yellow',
+                              color: 'white',
+                              fontSize: '16px',
+                              fontWeight: 'bold',
                             }}
-                          />
+                          >
+                            🔴 TEST: Inline panel for {item.title}
+                            <div style={{ marginTop: '8px', fontSize: '14px' }}>
+                              Thread ID: {item.id}
+                            </div>
+                          </div>
                         )}
                       </SwipeableHistoryRow>
                     </div>
