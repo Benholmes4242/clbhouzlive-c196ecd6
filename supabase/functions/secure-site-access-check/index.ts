@@ -4,11 +4,14 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 const ALLOWED_ORIGINS = new Set([
   "https://clbhouz.com",
   "https://www.clbhouz.com",
+  "https://clbhouz.co.uk",
   "https://www.clbhouz.co.uk",
   "https://app.clbhouz.co.uk",
   "https://admin.clbhouz.co.uk",
   "http://localhost:3000",
   "http://localhost:5173",
+  "capacitor://localhost",
+  "ionic://localhost",
   // Lovable preview domains
   "https://74d6ba70-bf1d-4665-bd9a-aff281e4c1df.lovableproject.com",
   "https://id-preview--74d6ba70-bf1d-4665-bd9a-aff281e4c1df.lovable.app",

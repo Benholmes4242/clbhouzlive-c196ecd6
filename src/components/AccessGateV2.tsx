@@ -18,6 +18,8 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { user } = useSupabaseSession();
+  const checkAttempted = React.useRef(false);
+  const isChecking = React.useRef(false);
 
   useEffect(() => {
     // Track gate view
@@ -26,12 +28,21 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
 
   useEffect(() => {
     const checkAccess = async () => {
+      // Prevent concurrent checks and infinite retries
+      if (isChecking.current || checkAttempted.current) {
+        console.log('[AccessGate] Check already in progress or attempted - skipping');
+        return;
+      }
+
       try {
+        isChecking.current = true;
+        checkAttempted.current = true;
         setLoading(true);
 
         // Don't decide access until we know if there's a user or not
         if (user === undefined) {
           console.log('[AccessGate] User state still loading - waiting');
+          checkAttempted.current = false; // Allow retry when user loads
           return;
         }
 
@@ -46,7 +57,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
 
         if (error) {
           console.error('[AccessGate] Edge function error:', error);
-          // Retry once after refreshing session (handles token refresh races)
+          // Retry ONCE after refreshing session (handles token refresh races)
           try {
             await supabase.auth.refreshSession();
             const retry = await supabase.functions.invoke('secure-site-access-check', { body: {} });
@@ -55,7 +66,10 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
               setHasAccess(true);
               return;
             }
-          } catch {}
+          } catch (retryErr) {
+            console.error('[AccessGate] Retry also failed:', retryErr);
+          }
+          // After one retry, give up and show access form
           setHasAccess(false);
           return;
         }
@@ -72,6 +86,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         console.error('[AccessGate] Unexpected error in checkAccess:', err);
         setHasAccess(false);
       } finally {
+        isChecking.current = false;
         // Clean up legacy key even on success
         try { localStorage.removeItem('siteAccess'); } catch {}
         setLoading(false);
@@ -79,25 +94,6 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
     };
 
     checkAccess();
-
-    // Re-check access when tab becomes visible (with debounce)
-    let visibilityTimeout: any;
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && user) {
-        console.log('[AccessGate] Tab became visible - rechecking access in 200ms');
-        clearTimeout(visibilityTimeout);
-        visibilityTimeout = setTimeout(() => {
-          checkAccess();
-        }, 200);
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      clearTimeout(visibilityTimeout);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
   }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
