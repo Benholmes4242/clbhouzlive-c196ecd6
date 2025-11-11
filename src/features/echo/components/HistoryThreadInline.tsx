@@ -8,7 +8,6 @@ import { X, ExternalLink, Copy } from 'lucide-react';
 import { MessageBubble } from '@/components/ai-chat/MessageBubble';
 import { groupMessages } from '@/components/ai-chat/utils/groupMessages';
 import { useEchoThreadMessages } from '../hooks/useEchoThreadMessages';
-import { VirtualList } from './virtual/VirtualList';
 import { timeAgo } from '@/utils/date';
 
 export interface HistoryThreadInlineProps {
@@ -53,9 +52,6 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         transitionDuration: 'var(--anim-med)',
         transitionTimingFunction: 'var(--anim-ease)',
         minHeight: 120,
-        outline: '2px dashed rgba(255,0,0,0.5)',
-        outlineOffset: 4,
-        background: 'rgba(255,0,0,0.05)',
       }}
       role="log"
       aria-live="polite"
@@ -113,35 +109,14 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         </div>
       </div>
 
-      {/* DEBUG: Mock text to test layout with longer content */}
-      <div
-        data-debug="inline-mock-text"
-        style={{
-          padding: '16px 12px',
-          color: 'var(--hub-text)',
-          fontSize: '14px',
-          lineHeight: '1.5',
-        }}
-        aria-hidden="true"
-      >
-        <p style={{ marginBottom: '12px' }}>
-          This is a mock conversation message with exactly one hundred characters to test the inline panel layout properly.
-        </p>
-        <p style={{ marginBottom: '12px' }}>
-          Here is another message that demonstrates how multiple messages would look when displayed in the inline thread view with proper spacing.
-        </p>
-        <p>
-          And finally a third message to show scrolling behavior when there is enough content to fill the container and require vertical scrolling.
-        </p>
-      </div>
-
       {/* Messages */}
       <div
         className="overflow-y-auto pr-1"
         style={{
           display: 'block',
-          maxHeight: 'min(65vh, 600px)',
+          maxHeight: '300px',
           overflowY: 'auto',
+          overflowX: 'hidden',
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain',
           maskImage: 'linear-gradient(180deg, #000 92%, transparent 100%)',
@@ -179,39 +154,31 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         )}
 
         {!isLoading && !error && groupedMessages.length > 0 && (
-          <VirtualList
-            count={groupedMessages.length}
-            estimateSize={120}
-            overscan={2}
-            className="h-full"
-            render={(index) => {
-              const msg = groupedMessages[index];
-              return (
-                <div className="mb-3">
-                  <MessageBubble
-                    key={msg.id}
-                    role={msg.role as 'user' | 'assistant'}
-                    content={msg.content}
-                    timestamp={msg.created_at}
-                    firstInGroup={msg.firstInGroup}
-                    lastInGroup={msg.lastInGroup}
-                    readOnly={true}
-                    showChips={msg.firstInGroup}
-                    maxWidth="desktop"
-                  />
-                  
-                  {/* Meta line */}
-                  <div
-                    className="mt-1 mb-2 text-[12px] anim-slideUp"
-                    style={{ color: 'var(--meta-dim)' }}
-                    aria-label={`Sent ${timeAgo(msg.created_at)}`}
-                  >
-                    <span>{timeAgo(msg.created_at)}</span>
-                  </div>
+          <div className="space-y-3">
+            {groupedMessages.map((msg) => (
+              <div key={msg.id} className="mb-3">
+                <MessageBubble
+                  role={msg.role as 'user' | 'assistant'}
+                  content={msg.content}
+                  timestamp={msg.created_at}
+                  firstInGroup={msg.firstInGroup}
+                  lastInGroup={msg.lastInGroup}
+                  readOnly={true}
+                  showChips={msg.firstInGroup}
+                  maxWidth="desktop"
+                />
+                
+                {/* Meta line */}
+                <div
+                  className="mt-1 mb-2 text-[12px] anim-slideUp"
+                  style={{ color: 'var(--meta-dim)' }}
+                  aria-label={`Sent ${timeAgo(msg.created_at)}`}
+                >
+                  <span>{timeAgo(msg.created_at)}</span>
                 </div>
-              );
-            }}
-          />
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
