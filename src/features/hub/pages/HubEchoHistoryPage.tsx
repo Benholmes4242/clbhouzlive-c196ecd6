@@ -30,6 +30,7 @@ import { relevanceScore } from '@/features/echo/utils/relevance';
 import { useMedia } from '@/hooks/useMedia';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { announce } from '@/utils/a11y';
+import { clamp, isTypingTarget } from '@/features/echo/utils/focus';
 import '../home/hubTheme.css';
 
 export function HubEchoHistoryPage() {
@@ -43,6 +44,11 @@ export function HubEchoHistoryPage() {
   
   // Export HUD
   const exportHud = useExportHud();
+
+  // Keyboard navigation state
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const [kbNavEnabled] = useLocalStorage('echo.kbNav', true);
 
   // Apply hub-open class for glass theme
   useEffect(() => {
@@ -140,6 +146,27 @@ export function HubEchoHistoryPage() {
   useEffect(() => {
     setFilters(prev => ({ ...prev, sortMode }));
   }, [sortMode]);
+
+  // Reset focus when list changes
+  useEffect(() => {
+    if (!chats || chats.length === 0) { 
+      setFocusedIndex(-1); 
+      return; 
+    }
+    if (focusedIndex < 0 || focusedIndex >= chats.length) {
+      setFocusedIndex(0);
+    }
+  }, [chats?.length, focusedIndex]);
+
+  // Auto-scroll utility
+  const focusRowAt = useCallback((idx: number) => {
+    if (!listRef.current) return;
+    const el = listRef.current.querySelector<HTMLElement>(
+      `[data-row-index="${idx}"] [data-row-cta]`
+    );
+    el?.focus({ preventScroll: true });
+    el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, []);
   
   // Search & filter handlers
   const handleSearchChange = useCallback((query: string) => {
@@ -498,12 +525,11 @@ export function HubEchoHistoryPage() {
     }
   }, [selectedArray, selectedIds, filters, queryClient]);
 
-  // Keyboard shortcuts
+  // Enhanced keyboard shortcuts with navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Only handle if not typing in an input
-      if (document.activeElement?.tagName === 'INPUT' || 
-          document.activeElement?.tagName === 'TEXTAREA') {
+      // Skip if typing in an input
+      if (isTypingTarget(document.activeElement)) {
         return;
       }
 
@@ -517,16 +543,125 @@ export function HubEchoHistoryPage() {
         return;
       }
 
-      // Bulk mode shortcuts
+      // Keyboard navigation (J/K/Arrow keys)
+      if (!selectMode && kbNavEnabled && chats.length > 0) {
+        const maxIndex = chats.length - 1;
+        
+        // J or Down - next row
+        if ((e.key === 'j' || e.key === 'ArrowDown') && !e.metaKey && !e.ctrlKey) {
+          e.preventDefault();
+          const nextIndex = clamp(focusedIndex + 1, 0, maxIndex);
+          setFocusedIndex(nextIndex);
+          focusRowAt(nextIndex);
+          echoHistoryAnalytics.kbNavMoved({ to_index: nextIndex, key: e.key === 'j' ? 'j' : 'down' });
+          return;
+        }
+
+        // K or Up - previous row
+        if ((e.key === 'k' || e.key === 'ArrowUp') && !e.metaKey && !e.ctrlKey) {
+          e.preventDefault();
+          const nextIndex = clamp(focusedIndex - 1, 0, maxIndex);
+          setFocusedIndex(nextIndex);
+          focusRowAt(nextIndex);
+          echoHistoryAnalytics.kbNavMoved({ to_index: nextIndex, key: e.key === 'k' ? 'k' : 'up' });
+          return;
+        }
+
+        // Home - jump to first
+        if (e.key === 'Home') {
+          e.preventDefault();
+          setFocusedIndex(0);
+          focusRowAt(0);
+          echoHistoryAnalytics.kbNavMoved({ to_index: 0, key: 'home' });
+          return;
+        }
+
+        // End - jump to last
+        if (e.key === 'End') {
+          e.preventDefault();
+          setFocusedIndex(maxIndex);
+          focusRowAt(maxIndex);
+          echoHistoryAnalytics.kbNavMoved({ to_index: maxIndex, key: 'end' });
+          return;
+        }
+
+        // O or Enter - open/close focused thread
+        if ((e.key === 'o' || e.key === 'Enter') && !e.metaKey && !e.ctrlKey) {
+          e.preventDefault();
+          if (focusedIndex >= 0 && focusedIndex < chats.length) {
+            const item = chats[focusedIndex];
+            const willOpen = expandedId !== item.id;
+            setExpandedId(willOpen ? item.id : null);
+            echoHistoryAnalytics.kbNavToggledOpen({ thread_id: item.id, is_open: willOpen });
+            announce(willOpen ? `Opened ${item.title}` : 'Closed conversation');
+          }
+          return;
+        }
+      }
+
+      // Selection mode keyboard shortcuts
       if (selectMode) {
+        // Space - toggle selection on focused row
+        if (e.key === ' ') {
+          e.preventDefault();
+          if (focusedIndex >= 0 && focusedIndex < chats.length) {
+            const item = chats[focusedIndex];
+            const next = new Set(selectedIds);
+            if (selectedIds.has(item.id)) {
+              next.delete(item.id);
+              announce('Deselected');
+            } else {
+              next.add(item.id);
+              announce('Selected');
+            }
+            setSelectedIds(next);
+          }
+          return;
+        }
+
+        // Shift+J or Shift+Down - extend selection down
+        if ((e.key === 'j' || e.key === 'ArrowDown') && e.shiftKey && !e.metaKey && !e.ctrlKey) {
+          e.preventDefault();
+          const nextIndex = clamp(focusedIndex + 1, 0, chats.length - 1);
+          setFocusedIndex(nextIndex);
+          focusRowAt(nextIndex);
+          // Add to selection
+          const item = chats[nextIndex];
+          const next = new Set(selectedIds);
+          next.add(item.id);
+          setSelectedIds(next);
+          announce('Extended selection');
+          return;
+        }
+
+        // Shift+K or Shift+Up - extend selection up
+        if ((e.key === 'k' || e.key === 'ArrowUp') && e.shiftKey && !e.metaKey && !e.ctrlKey) {
+          e.preventDefault();
+          const nextIndex = clamp(focusedIndex - 1, 0, chats.length - 1);
+          setFocusedIndex(nextIndex);
+          focusRowAt(nextIndex);
+          // Add to selection
+          const item = chats[nextIndex];
+          const next = new Set(selectedIds);
+          next.add(item.id);
+          setSelectedIds(next);
+          announce('Extended selection');
+          return;
+        }
+
+        // S - bulk star
         if (e.key === 's' || e.key === 'S') {
           e.preventDefault();
           bulkStar(true);
         }
+        
+        // Delete/Backspace - bulk delete
         if (e.key === 'Delete' || e.key === 'Backspace') {
           e.preventDefault();
           bulkDelete();
         }
+        
+        // Escape - clear selection
         if (e.key === 'Escape') {
           e.preventDefault();
           setSelectedIds(new Set());
@@ -536,30 +671,46 @@ export function HubEchoHistoryPage() {
         return;
       }
 
-      // S key - star/unstar expanded thread
+      // Non-selection mode shortcuts (focused thread)
+      // S key - star/unstar focused or expanded thread
       if (e.key === 's' || e.key === 'S') {
         e.preventDefault();
-        if (expandedId) {
-          const item = chats.find(c => c.id === expandedId);
+        const targetId = expandedId || (focusedIndex >= 0 && focusedIndex < chats.length ? chats[focusedIndex].id : null);
+        if (targetId) {
+          const item = chats.find(c => c.id === targetId);
           if (item) {
-            const rankIndex = chats.findIndex(c => c.id === expandedId);
+            const rankIndex = chats.findIndex(c => c.id === targetId);
             handleStar(item.id, item.is_starred, 'keyboard', rankIndex);
           }
         }
       }
 
-      // Delete/Backspace - delete expanded thread
+      // Delete/Backspace - delete focused or expanded thread
       if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault();
-        if (expandedId) {
-          handleDelete(expandedId, 'keyboard');
+        const targetId = expandedId || (focusedIndex >= 0 && focusedIndex < chats.length ? chats[focusedIndex].id : null);
+        if (targetId) {
+          handleDelete(targetId, 'keyboard');
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectMode, expandedId, chats, showShortcuts, handleStar, handleDelete, bulkStar, bulkDelete]);
+  }, [
+    selectMode, 
+    expandedId, 
+    chats, 
+    showShortcuts, 
+    focusedIndex,
+    selectedIds,
+    kbNavEnabled,
+    handleStar, 
+    handleDelete, 
+    bulkStar, 
+    bulkDelete,
+    focusRowAt
+  ]);
   
   // Cleanup pending deletes on unmount
   useEffect(() => {
@@ -827,7 +978,13 @@ export function HubEchoHistoryPage() {
           )}
 
           {!isLoading && !error && chats.length > 0 && (
-            <div className="relative">
+            <div 
+              ref={listRef}
+              className="relative"
+              role="listbox"
+              aria-label="Conversations"
+              aria-multiselectable={selectMode || undefined}
+            >
               <VirtualList
                 count={chats.length}
                 estimateSize={72}
@@ -858,6 +1015,8 @@ export function HubEchoHistoryPage() {
                         selected={isChecked}
                         searchQuery={filters.query}
                         tags={item.tags || []}
+                        index={index}
+                        onFocusIndex={setFocusedIndex}
                         onTagsChange={() => {
                           // Invalidate query to refetch with updated tags
                           queryClient.invalidateQueries({ queryKey: ['echoHistorySearch'] });

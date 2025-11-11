@@ -35,6 +35,9 @@ export interface HistoryRowProps {
   // Tags
   tags?: string[];
   onTagsChange?: () => void;
+  // Keyboard navigation
+  index?: number;
+  onFocusIndex?: (index: number) => void;
 }
 
 export const HistoryRow: React.FC<HistoryRowProps> = ({
@@ -56,6 +59,8 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
   searchQuery,
   tags = [],
   onTagsChange,
+  index,
+  onFocusIndex,
 }) => {
   // Track highlighting analytics
   useEffect(() => {
@@ -71,7 +76,12 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
     }
   }, [title, subtitle, searchQuery]);
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div 
+      className={cn('flex items-center gap-2', className)}
+      role="option"
+      data-row-index={index}
+      aria-selected={selectionMode ? selected : undefined}
+    >
       {/* Selection checkbox */}
       {selectionMode && (
         <button
@@ -99,7 +109,7 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
         onClick={onClick}
         aria-label={`Open conversation: ${title}`}
         className={cn(
-          'hub-row flex-1 text-left rounded-[18px] p-3.5 transition-all anim-fade',
+          'hub-row flex-1 text-left rounded-[18px] p-3.5 transition-all anim-fade relative',
           'hover:translate-y-[-1px] focus:outline-none focus:ring-2 focus:ring-white/18',
           'border border-white/10',
           selectionMode && 'is-select-mode',
@@ -107,6 +117,26 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
         )}
         style={{ background: 'rgba(255,255,255,.06)', backdropFilter: 'blur(10px)' }}
       >
+        {/* Hidden focus target for keyboard navigation */}
+        <button
+          type="button"
+          data-row-cta
+          tabIndex={0}
+          className="sr-only focus:not-sr-only focus:outline-none absolute inset-0 -z-10"
+          aria-label={`Focus conversation ${title}`}
+          onFocus={() => onFocusIndex?.(index ?? 0)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') { 
+              e.preventDefault(); 
+              onClick?.(); 
+            }
+            if (e.key === ' ' && selectionMode) { 
+              e.preventDefault(); 
+              onSelectToggle?.(); 
+            }
+          }}
+        />
+        
         {/* Line 1: title + time + star */}
         <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0">

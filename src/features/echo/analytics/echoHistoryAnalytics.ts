@@ -254,4 +254,19 @@ export const echoHistoryAnalytics = {
   }) {
     track('echo_highlight_rendered', props);
   },
+
+  // Keyboard navigation
+  kbNavMoved(props: { 
+    to_index: number; 
+    key: 'j' | 'k' | 'home' | 'end' | 'up' | 'down';
+  }) {
+    track('echo_kb_nav_moved', props);
+  },
+
+  kbNavToggledOpen(props: { 
+    thread_id: string; 
+    is_open: boolean;
+  }) {
+    track('echo_kb_nav_toggle_open', props);
+  },
 };
