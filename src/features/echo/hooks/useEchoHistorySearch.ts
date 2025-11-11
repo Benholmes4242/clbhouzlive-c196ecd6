@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchChatHistory } from '../data/history.fetchers';
 
 export interface EchoHistorySearchFilters {
   query?: string;
@@ -59,7 +60,25 @@ export function useEchoHistorySearch(
         data = legacy.data;
       } else if (error) {
         // Surface error with context for debugging
-        throw new Error(`Echo history search failed: ${error.message}`);
+        console.error('[useEchoHistorySearch] RPC error', { message: error.message, details: (error as any).details, hint: (error as any).hint, code: (error as any).code, payload });
+        // Graceful fallback: use dual-read history (legacy conversations + new threads)
+        try {
+          const fallback = await fetchChatHistory(limit);
+          return fallback.map((item: any) => ({
+            id: item.id,
+            title: item.title,
+            subtitle: item.subtitle || item.preview_text || '',
+            has_response: typeof item.has_response === 'boolean' ? item.has_response : (item.subtitle ? item.subtitle !== '(No response yet)' : true),
+            is_starred: false,
+            last_activity_at: item.created_at,
+            message_count: item.message_count ?? 0,
+            relative_date: item.relative_date ?? '',
+            tags: [],
+          })) as EchoHistoryResult[];
+        } catch (fbErr) {
+          console.error('[useEchoHistorySearch] Fallback fetchChatHistory failed', fbErr);
+          throw new Error(`Echo history search failed: ${error.message}`);
+        }
       }
 
       // Map RPC result to our interface
