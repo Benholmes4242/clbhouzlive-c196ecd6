@@ -1031,8 +1031,16 @@ export function HubEchoHistoryPage() {
                   const isExpanded = expandedId === item.id;
                   const isChecked = selectedIds.has(item.id);
                   
-                  // DEBUG: log row render
-                  console.debug('[History] row render', { idx: index, id: item.id, isExpanded });
+                  // DEBUG: comprehensive expansion state
+                  console.debug('[History] row render', { 
+                    idx: index, 
+                    itemId: item.id, 
+                    expandedId, 
+                    isExpanded,
+                    comparison: `${expandedId} === ${item.id}`,
+                    typeOfExpanded: typeof expandedId,
+                    typeOfItem: typeof item.id,
+                  });
                   
                   return (
                     <div role="listitem" className="pb-3">
