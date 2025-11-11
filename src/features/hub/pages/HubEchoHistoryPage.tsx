@@ -1079,10 +1079,15 @@ export function HubEchoHistoryPage() {
 
           {!isLoading && error && (
             <div
-              className="text-center py-8 text-[15px]"
+              className="text-center py-8 px-4 space-y-2"
               style={{ color: 'var(--hub-text-dim)' }}
             >
-              Couldn't load Echo history. Please try again.
+              <div className="text-[15px]">Couldn't load Echo history. Please try again.</div>
+              {import.meta.env.DEV && error instanceof Error && (
+                <div className="text-xs font-mono text-destructive/80 max-w-2xl mx-auto break-words">
+                  {error.message}
+                </div>
+              )}
             </div>
           )}
 

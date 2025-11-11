@@ -33,20 +33,35 @@ export function useEchoHistorySearch(
   return useQuery<EchoHistoryResult[]>({
     queryKey: ['echoHistorySearch', filters, limit],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('echo_history_search', {
+      const payload = {
         q: filters.query || null,
         filter_has_response: filters.hasResponse ?? null,
         date_from: filters.dateFrom?.toISOString() || null,
         date_to: filters.dateTo?.toISOString() || null,
         mode: filters.mode || null,
         filter_starred: filters.starred ?? null,
-        filter_tag: filters.tag ? filters.tag.toLowerCase() : null,
+        filter_tag: filters.tag ? String(filters.tag).toLowerCase() : null,
         sort_mode: filters.sortMode || 'default',
         max_results: limit,
-      });
+      };
 
-      if (error) throw error;
-      
+      let { data, error } = await supabase.rpc('echo_history_search', payload);
+
+      // Fallback to legacy signature if prod DB not updated yet
+      if (error && /echo_history_search.*no function/i.test(error.message)) {
+        const legacyPayload = {
+          q: payload.q,
+          filter_starred: payload.filter_starred,
+          max_results: payload.max_results,
+        };
+        const legacy = await supabase.rpc('echo_history_search', legacyPayload);
+        if (legacy.error) throw legacy.error;
+        data = legacy.data;
+      } else if (error) {
+        // Surface error with context for debugging
+        throw new Error(`Echo history search failed: ${error.message}`);
+      }
+
       // Map RPC result to our interface
       const results = (data || []).map((row: any) => ({
         id: row.thread_id,
