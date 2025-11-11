@@ -1028,17 +1028,7 @@ export function HubEchoHistoryPage() {
                   const item = chats[index];
                   const isExpanded = expandedId === item.id;
                   const isChecked = selectedIds.has(item.id);
-                  
-                  // DEBUG: comprehensive expansion state
-                  console.debug('[History] row render', { 
-                    idx: index, 
-                    itemId: item.id, 
-                    expandedId, 
-                    isExpanded,
-                    comparison: `${expandedId} === ${item.id}`,
-                    typeOfExpanded: typeof expandedId,
-                    typeOfItem: typeof item.id,
-                  });
+                  const isPending = pendingDeletes.has(item.id);
                   
                   return (
                     <div role="listitem" className="pb-3">
@@ -1052,42 +1042,26 @@ export function HubEchoHistoryPage() {
                         has_response={item.has_response}
                         is_starred={item.is_starred}
                         isStarred={item.is_starred}
-                        listFilters={filters}
-                        rankIndex={index}
-                        isPendingDelete={pendingDeletes.has(item.id)}
+                        tags={item.tags}
                         selectionMode={selectMode}
                         selected={isChecked}
-                        searchQuery={filters.query}
-                        tags={item.tags || []}
-                        index={index}
-                        onFocusIndex={setFocusedIndex}
-                        onTagsChange={() => {
-                          // Invalidate query to refetch with updated tags
-                          queryClient.invalidateQueries({ queryKey: ['echoHistorySearch'] });
-                        }}
-                        onSelectToggle={(e?: React.MouseEvent) => {
-                          // Handle shift-click range selection
-                          if (e?.shiftKey && lastSelectedIndex.current !== null && isDesktop) {
-                            const [start, end] = [lastSelectedIndex.current, index].sort((a, b) => a - b);
-                            const rangeIds = chats.slice(start, end + 1).map((c) => c.id);
-                            const next = new Set(selectedIds);
-                            rangeIds.forEach((id) => next.add(id));
-                            setSelectedIds(next);
-                            announce(`Selected ${rangeIds.length} conversations`);
+                        onSelectToggle={() => {
+                          const next = new Set(selectedIds);
+                          if (isChecked) {
+                            next.delete(item.id);
                           } else {
-                            const next = new Set(selectedIds);
-                            if (isChecked) {
-                              next.delete(item.id);
-                            } else {
-                              next.add(item.id);
-                            }
-                            setSelectedIds(next);
-                            lastSelectedIndex.current = index;
-                            announce(isChecked ? 'Deselected' : 'Selected');
+                            next.add(item.id);
                           }
+                          setSelectedIds(next);
+                          lastSelectedIndex.current = index;
+                          announce(isChecked ? 'Deselected' : 'Selected');
                         }}
+                        searchQuery={debouncedQuery}
                         onStar={() => handleStar(item.id, item.is_starred, 'swipe', index)}
                         onDelete={() => handleDelete(item.id, 'swipe')}
+                        listFilters={filters}
+                        rankIndex={index}
+                        isPendingDelete={isPending}
                         onClick={() => {
                           if (selectMode) {
                             const next = new Set(selectedIds);
@@ -1113,25 +1087,19 @@ export function HubEchoHistoryPage() {
                             });
                           }
                         }}
-                      />
-
-                      {true && (
-                        <div className="mt-2" aria-label="Conversation preview (mock)">
-                          <div
-                            className="rounded-[14px] px-4 py-3"
-                            style={{
-                              background: 'var(--hub-glass-bg)',
-                              border: '1px solid var(--hub-stroke)',
-                              color: 'var(--hub-text)'
+                      >
+                        {/* Inline expanded content - integrated within the same card */}
+                        {isExpanded && (
+                          <HistoryThreadInline
+                            threadId={item.id}
+                            title={item.title}
+                            onCollapse={() => setExpandedId(null)}
+                            onHeightChange={(h) => {
+                              console.log('[inline] height report:', h);
                             }}
-                          >
-                            <div className="text-[14px] font-medium mb-1">Mock inline panel</div>
-                            <div className="text-[13px] opacity-80">
-                              This is mock content under every card so we can verify the inline panel mounts and is visible.
-                            </div>
-                          </div>
-                        </div>
-                      )}
+                          />
+                        )}
+                      </SwipeableHistoryRow>
                     </div>
                   );
                 }}
