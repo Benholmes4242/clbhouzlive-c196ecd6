@@ -49,6 +49,10 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         borderLeft: '1px solid var(--hub-stroke)',
         transitionDuration: 'var(--anim-med)',
         transitionTimingFunction: 'var(--anim-ease)',
+        minHeight: 120,
+        outline: '2px dashed rgba(255,0,0,0.5)',
+        outlineOffset: 4,
+        background: 'rgba(255,0,0,0.05)',
       }}
       role="log"
       aria-live="polite"
@@ -104,6 +108,28 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
             <X className="w-4 h-4" />
           </button>
         </div>
+      </div>
+
+      {/* DEBUG: inline panel beacon — remove after test */}
+      <div
+        data-debug="inline-beacon"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '24px 0',
+        }}
+        aria-hidden="true"
+      >
+        <span
+          style={{
+            width: 18,
+            height: 18,
+            borderRadius: '50%',
+            background: 'red',
+            boxShadow: '0 0 0 2px rgba(255,255,255,0.35)',
+          }}
+        />
       </div>
 
       {/* Messages */}
