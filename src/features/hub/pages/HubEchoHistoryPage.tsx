@@ -188,15 +188,35 @@ export function HubEchoHistoryPage() {
     }
   }, [chats?.length, focusedIndex]);
 
-  // Auto-scroll utility
+  // Ensure a row is visible (auto-scroll)
+  const ensureRowVisible = useCallback((idx: number) => {
+    // DOM fallback
+    const container = listRef.current;
+    if (!container) return;
+
+    const row = container.querySelector<HTMLElement>(`[data-row-index="${idx}"]`);
+    if (!row) return;
+
+    const c = container.getBoundingClientRect();
+    const r = row.getBoundingClientRect();
+    const pad = 8; // small breathing room
+
+    if (r.top < c.top + pad) {
+      container.scrollBy({ top: r.top - c.top - pad, behavior: 'smooth' });
+    } else if (r.bottom > c.bottom - pad) {
+      container.scrollBy({ top: r.bottom - c.bottom + pad, behavior: 'smooth' });
+    }
+  }, []);
+
+  // Focus a row (calls ensureRowVisible first)
   const focusRowAt = useCallback((idx: number) => {
-    if (!listRef.current) return;
-    const el = listRef.current.querySelector<HTMLElement>(
+    ensureRowVisible(idx);
+    // focus the hidden CTA/button inside the row
+    const el = listRef.current?.querySelector<HTMLElement>(
       `[data-row-index="${idx}"] [data-row-cta]`
     );
-    el?.focus({ preventScroll: true });
-    el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  }, []);
+    el?.focus();
+  }, [ensureRowVisible]);
 
   // Restore focus from hash on first data load
   useEffect(() => {
