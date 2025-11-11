@@ -51,6 +51,7 @@ function Sizer({
   children: React.ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const lastHeightRef = useRef<number>(0);
   
   useLayoutEffect(() => {
     const el = ref.current;
@@ -58,13 +59,20 @@ function Sizer({
     
     // Initial measurement
     const height = el.offsetHeight;
-    onSize(height);
+    if (height !== lastHeightRef.current) {
+      lastHeightRef.current = height;
+      onSize(height);
+    }
     
     // Watch for height changes
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        const newHeight = entry.target.getBoundingClientRect().height;
-        onSize(newHeight);
+        const newHeight = Math.round(entry.target.getBoundingClientRect().height);
+        // Only update if height actually changed
+        if (newHeight !== lastHeightRef.current) {
+          lastHeightRef.current = newHeight;
+          onSize(newHeight);
+        }
       }
     });
     
