@@ -3,27 +3,45 @@
  * Read-only view with Apple glass styling
  */
 
-import React, { useEffect, useMemo } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getSharedThread } from '@/features/echo/api/shareActions';
 import { MessageBubble } from '@/components/ai-chat/MessageBubble';
 import { groupMessages } from '@/components/ai-chat/utils/groupMessages';
 import { echoHistoryAnalytics } from '@/features/echo/analytics/echoHistoryAnalytics';
 import { HighlightedText } from '@/features/echo/components/HighlightedText';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, X } from 'lucide-react';
 import '@/features/hub/home/hubTheme.css';
 
 export function HubEchoSharePage() {
   const { token } = useParams<{ token: string }>();
   const nav = useNavigate();
-  const loc = useLocation();
 
-  // Parse ?q= search query for highlighting
-  const searchQuery = useMemo(() => {
-    const params = new URLSearchParams(loc.search);
-    return (params.get('q') || '').trim();
-  }, [loc.search]);
+  // URL <-> input state
+  const [searchParams, setSearchParams] = useSearchParams();
+  const q = useMemo(() => (searchParams.get('q') || '').trim(), [searchParams]);
+
+  // Local input (debounced to URL)
+  const [queryInput, setQueryInput] = useState(q);
+
+  // Keep input in sync if URL changes externally
+  useEffect(() => {
+    setQueryInput(q);
+  }, [q]);
+
+  // Debounce: push input -> URL (?q=) after 250ms
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const next = new URLSearchParams(searchParams);
+      if (queryInput) next.set('q', queryInput);
+      else next.delete('q');
+      // preserve token and any future params
+      setSearchParams(next, { replace: true });
+    }, 250);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryInput]);
 
   const { data: thread, isLoading, error } = useQuery({
     queryKey: ['echo-share', token],
@@ -62,7 +80,7 @@ export function HubEchoSharePage() {
     >
       {/* Header */}
       <header
-        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
+        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between gap-3 px-4 h-14 border-b"
         style={{
           borderColor: 'var(--hub-stroke)',
           background: 'var(--hub-header-bg-solid)',
@@ -71,19 +89,59 @@ export function HubEchoSharePage() {
       >
         <button
           onClick={() => nav('/')}
-          className="flex items-center gap-2 text-white/90 hover:text-white text-[15px] font-medium transition-colors"
+          className="flex items-center gap-2 text-white/90 hover:text-white text-[15px] font-medium transition-colors flex-shrink-0"
           aria-label="Go to home"
         >
           <ArrowLeft size={18} />
           Home
         </button>
-        <h1 className="text-white/90 text-[17px] font-semibold">
+        <h1 className="text-white/90 text-[17px] font-semibold truncate flex-1 text-center">
           <HighlightedText
             text={thread ? thread.title : 'Shared Conversation'}
-            query={searchQuery}
+            query={q}
           />
         </h1>
-        <div className="w-16" />
+        
+        {/* Share search */}
+        <div
+          role="search"
+          aria-label="Search within shared conversation"
+          className="flex items-center gap-2 flex-shrink-0"
+        >
+          <div
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full border"
+            style={{ 
+              background: 'rgba(255,255,255,0.06)', 
+              borderColor: 'rgba(255,255,255,0.10)',
+              color: 'var(--hub-text)'
+            }}
+          >
+            <input
+              value={queryInput}
+              onChange={(e) => setQueryInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  e.preventDefault();
+                  setQueryInput('');
+                }
+              }}
+              placeholder="Search highlights…"
+              aria-label="Search text to highlight"
+              className="bg-transparent outline-none text-[13px] placeholder:text-white/50 w-[160px]"
+            />
+            {queryInput && (
+              <button
+                type="button"
+                onClick={() => setQueryInput('')}
+                aria-label="Clear search"
+                className="opacity-70 hover:opacity-100 transition-opacity flex-shrink-0"
+                title="Clear"
+              >
+                <X size={14} className="text-white/90" />
+              </button>
+            )}
+          </div>
+        </div>
       </header>
 
       {/* Body */}
@@ -143,7 +201,7 @@ export function HubEchoSharePage() {
                   readOnly={true}
                   showChips={msg.firstInGroup}
                   maxWidth="desktop"
-                  searchQuery={searchQuery}
+                  searchQuery={q}
                 />
               ))}
             </div>
