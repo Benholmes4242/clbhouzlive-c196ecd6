@@ -64,7 +64,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
       >
         <div 
           className="text-[14px] font-medium truncate flex-1"
-          style={{ color: 'var(--hub-text)' }}
+          style={{ color: '#000' }}
         >
           {title}
         </div>
@@ -74,9 +74,9 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
             <button
               onClick={onCopyLink}
               className="p-1.5 rounded-lg transition-colors"
-              style={{ color: 'var(--hub-text-dim)' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-dim)'}
+              style={{ color: '#666' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#000'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
               aria-label="Copy link"
             >
               <Copy className="w-4 h-4" />
@@ -87,9 +87,9 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
             <button
               onClick={onOpenFull}
               className="p-1.5 rounded-lg transition-colors"
-              style={{ color: 'var(--hub-text-dim)' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-dim)'}
+              style={{ color: '#666' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#000'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
               aria-label="Open full"
             >
               <ExternalLink className="w-4 h-4" />
@@ -99,9 +99,9 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
           <button
             onClick={onCollapse}
             className="p-1.5 rounded-lg transition-colors"
-            style={{ color: 'var(--hub-text-dim)' }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-dim)'}
+            style={{ color: '#666' }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#000'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
             aria-label="Close inline preview"
           >
             <X className="w-4 h-4" />
@@ -138,7 +138,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         {!isLoading && error && (
           <div
             className="text-center py-8 text-[15px]"
-            style={{ color: 'var(--hub-text-dim)' }}
+            style={{ color: '#000' }}
           >
             Couldn't load this conversation.
           </div>
@@ -147,7 +147,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         {!isLoading && !error && messages.length === 0 && (
           <div
             className="text-center py-8 text-[15px]"
-            style={{ color: 'var(--hub-text-dim)' }}
+            style={{ color: '#666' }}
           >
             No messages in this conversation yet.
           </div>
@@ -171,7 +171,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
                 {/* Meta line */}
                 <div
                   className="mt-1 mb-2 text-[12px] anim-slideUp"
-                  style={{ color: 'var(--meta-dim)' }}
+                  style={{ color: '#666' }}
                   aria-label={`Sent ${timeAgo(msg.created_at)}`}
                 >
                   <span>{timeAgo(msg.created_at)}</span>
