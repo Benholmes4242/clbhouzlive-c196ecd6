@@ -108,14 +108,9 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
 
       {/* Messages */}
       <div
-        className="overflow-y-auto pr-1"
+        className="mt-3"
         style={{
-          maxHeight: 'min(65vh, 600px)',
-          overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'contain',
-          maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
+          height: 'min(65vh, 600px)',
         }}
       >
         {isLoading && (
