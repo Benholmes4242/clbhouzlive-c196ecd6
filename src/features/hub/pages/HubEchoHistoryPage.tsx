@@ -1031,6 +1031,9 @@ export function HubEchoHistoryPage() {
                   const isExpanded = expandedId === item.id;
                   const isChecked = selectedIds.has(item.id);
                   
+                  // DEBUG: log row render
+                  console.debug('[History] row render', { idx: index, id: item.id, isExpanded });
+                  
                   return (
                     <div role="listitem" className="pb-3">
                       <SwipeableHistoryRow

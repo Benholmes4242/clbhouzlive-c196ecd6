@@ -33,6 +33,9 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   const { data: messages = [], isLoading, error } = useEchoThreadMessages(threadId);
   const groupedMessages = groupMessages(messages);
 
+  // DEBUG: log when inline panel mounts
+  console.debug('[Inline] mount', { threadId, title, messageCount: messages?.length });
+
   // Report height changes to parent for virtualization
   useLayoutEffect(() => {
     if (containerRef.current && onHeightChange) {
