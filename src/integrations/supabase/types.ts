@@ -3535,6 +3535,15 @@ export type Database = {
           format: string
         }[]
       }
+      echo_analytics_overview_delta: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          current_value: number
+          delta: number
+          metric: string
+          previous_value: number
+        }[]
+      }
       echo_analytics_overview_guarded: {
         Args: {
           p_event?: string

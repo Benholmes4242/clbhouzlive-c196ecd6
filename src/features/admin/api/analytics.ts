@@ -55,3 +55,12 @@ export async function getTopThreads(range: DateRange) {
   if (error) throw error;
   return data ?? [];
 }
+
+export async function getOverviewDelta(range: DateRange) {
+  const { data, error } = await supabase.rpc('echo_analytics_overview_delta', {
+    p_from: range.from,
+    p_to: range.to,
+  });
+  if (error) throw error;
+  return data ?? [];
+}

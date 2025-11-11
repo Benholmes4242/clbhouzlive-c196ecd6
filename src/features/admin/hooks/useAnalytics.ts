@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getOverview, getTimeseries, getTopTags, getExportFormats, getTopThreads, DateRange } from '../api/analytics';
+import { getOverview, getTimeseries, getTopTags, getExportFormats, getTopThreads, getOverviewDelta, DateRange } from '../api/analytics';
 
 export function useAnalyticsOverview(range: DateRange, filters: { event?: string; userId?: string; tag?: string }) {
   return useQuery({
@@ -37,6 +37,14 @@ export function useAnalyticsTopThreads(range: DateRange) {
   return useQuery({
     queryKey: ['admin.analytics.topThreads', range],
     queryFn: () => getTopThreads(range),
+    staleTime: 30_000,
+  });
+}
+
+export function useAnalyticsOverviewDelta(range: DateRange) {
+  return useQuery({
+    queryKey: ['admin.analytics.overviewDelta', range],
+    queryFn: () => getOverviewDelta(range),
     staleTime: 30_000,
   });
 }
