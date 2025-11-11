@@ -8,7 +8,6 @@ import { X, ExternalLink, Copy } from 'lucide-react';
 import { MessageBubble } from '@/components/ai-chat/MessageBubble';
 import { groupMessages } from '@/components/ai-chat/utils/groupMessages';
 import { useEchoThreadMessages } from '../hooks/useEchoThreadMessages';
-import { VirtualList } from './virtual/VirtualList';
 import { timeAgo } from '@/utils/date';
 
 export interface HistoryThreadInlineProps {
@@ -113,7 +112,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
 
       {/* Messages */}
       <div
-        className="mt-3"
+        className="mt-3 overflow-y-auto pr-1"
         style={{
           height: 'min(65vh, 600px)',
         }}
@@ -149,39 +148,32 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         )}
 
         {!isLoading && !error && groupedMessages.length > 0 && (
-          <VirtualList
-            count={groupedMessages.length}
-            estimateSize={120}
-            overscan={2}
-            className="h-full"
-            render={(index) => {
-              const msg = groupedMessages[index];
-              return (
-                <div className="mb-3">
-                  <MessageBubble
-                    key={msg.id}
-                    role={msg.role as 'user' | 'assistant'}
-                    content={msg.content}
-                    timestamp={msg.created_at}
-                    firstInGroup={msg.firstInGroup}
-                    lastInGroup={msg.lastInGroup}
-                    readOnly={true}
-                    showChips={msg.firstInGroup}
-                    maxWidth="desktop"
-                  />
-                  
-                  {/* Meta line */}
-                  <div
-                    className="mt-1 mb-2 text-[12px] anim-slideUp"
-                    style={{ color: 'var(--meta-dim)' }}
-                    aria-label={`Sent ${timeAgo(msg.created_at)}`}
-                  >
-                    <span>{timeAgo(msg.created_at)}</span>
-                  </div>
+        {!isLoading && !error && groupedMessages.length > 0 && (
+          <div className="space-y-3">
+            {groupedMessages.map((msg) => (
+              <div key={msg.id} className="mb-3">
+                <MessageBubble
+                  role={msg.role as 'user' | 'assistant'}
+                  content={msg.content}
+                  timestamp={msg.created_at}
+                  firstInGroup={msg.firstInGroup}
+                  lastInGroup={msg.lastInGroup}
+                  readOnly={true}
+                  showChips={msg.firstInGroup}
+                  maxWidth="desktop"
+                />
+                <div
+                  className="mt-1 mb-2 text-[12px] anim-slideUp"
+                  style={{ color: 'var(--meta-dim)' }}
+                  aria-label={`Sent ${timeAgo(msg.created_at)}`}
+                >
+                  <span>{timeAgo(msg.created_at)}</span>
                 </div>
-              );
-            }}
-          />
+              </div>
+            ))}
+          </div>
+        )}
+
         )}
       </div>
     </div>
