@@ -104,7 +104,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
 
           {/* Inline messages: plain text log, no bubbles */}
           <div
-            className="inline-thread max-h-[60vh] overflow-y-auto rounded-xl border border-white/10 bg-black/10 p-4 backdrop-blur-sm"
+            className="inline-thread max-h-[60vh] overflow-y-auto p-3 sm:p-4"
             role="log"
             aria-live="polite"
             aria-relevant="additions"
@@ -133,13 +133,11 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
                         {new Date(m.created_at).toLocaleString()}
                       </time>
                     </div>
-                    <div
-                      className={`inline-msg-text ${
-                        m.role === 'user' ? 'is-user' : 'is-assistant'
-                      }`}
-                    >
-                      {m.content}
-                    </div>
+                <div
+                  className={"inline-msg-text"}
+                >
+                  {m.content}
+                </div>
                   </li>
                 ))}
               </ul>
