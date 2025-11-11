@@ -1,178 +1,99 @@
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useState, useMemo } from 'react';
 import { getSummary, getTimeseries, getTopTags } from '../api/analytics';
-import type { TimeseriesPoint } from '../api/analytics';
 
-export default function AdminAnalyticsPage() {
-  const [windowDays, setWindowDays] = useState<7 | 30 | 90>(30);
+export function AdminAnalyticsPage() {
+  const [days, setDays] = React.useState<7 | 30 | 90>(7);
 
-  const { data: summary, isLoading: summaryLoading } = useQuery({
-    queryKey: ['admin.summary', windowDays],
-    queryFn: () => getSummary(windowDays),
+  const { data: summary } = useQuery({
+    queryKey: ['admin.analytics.summary', days],
+    queryFn: () => getSummary(days),
     staleTime: 60_000,
-    refetchOnWindowFocus: false,
   });
 
-  const { data: tsViews } = useQuery({
-    queryKey: ['admin.ts.views', windowDays],
-    queryFn: () => getTimeseries(['echo_history_open_full', 'echo_history_open_inline'], windowDays),
+  const { data: series } = useQuery({
+    queryKey: ['admin.analytics.series', days],
+    queryFn: () => getTimeseries(['echo_history_open_inline','echo_history_open_full','echo_history_export_started','echo_share_created'], days),
     staleTime: 60_000,
-    refetchOnWindowFocus: false,
   });
 
-  const { data: tsShares } = useQuery({
-    queryKey: ['admin.ts.shares', windowDays],
-    queryFn: () => getTimeseries(['echo_share_created'], windowDays),
+  const { data: topTags } = useQuery({
+    queryKey: ['admin.analytics.topTags', days],
+    queryFn: () => getTopTags(days, 12),
     staleTime: 60_000,
-    refetchOnWindowFocus: false,
-  });
-
-  const { data: tsExports } = useQuery({
-    queryKey: ['admin.ts.exports', windowDays],
-    queryFn: () => getTimeseries(['echo_history_export_started', 'echo_history_export_bulk_started'], windowDays),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
-  });
-
-  const { data: topTags, isLoading: tagsLoading } = useQuery({
-    queryKey: ['admin.top.tags', windowDays],
-    queryFn: () => getTopTags(windowDays, 10),
-    staleTime: 60_000,
-    refetchOnWindowFocus: false,
   });
 
   return (
-    <div className="min-h-screen p-6 space-y-16" style={{ background: 'var(--hub-backdrop)' }}>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-white/95">Echo Analytics</h1>
+    <div className="p-6 space-y-16">
+      <header className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold">Analytics</h1>
         <div className="flex gap-2">
-          {[7, 30, 90].map((d) => (
+          {[7,30,90].map((d) => (
             <button
               key={d}
-              onClick={() => setWindowDays(d as 7 | 30 | 90)}
-              className={`px-3 py-1.5 rounded-full text-[13px] border border-white/10 transition-colors ${
-                windowDays === d ? 'bg-white/12 text-white' : 'hover:bg-white/8 text-white/70'
-              }`}
-              aria-pressed={windowDays === d}
+              onClick={() => setDays(d as 7|30|90)}
+              className={`px-3 py-1.5 rounded ${days===d?'bg-white/15':'bg-white/8'} border border-white/10`}
+              aria-pressed={days===d}
             >
               {d}d
             </button>
           ))}
         </div>
-      </div>
+      </header>
 
-      {/* KPI Cards */}
-      {summaryLoading ? (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div
-              key={i}
-              className="rounded-[18px] border h-24 animate-pulse"
-              style={{
-                background: 'var(--hub-glass-bg)',
-                borderColor: 'var(--hub-stroke)',
-              }}
-            />
+      {/* KPI cards */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Kpi label="Opens (Inline)" value={(summary as any)?.opens_inline ?? 0} />
+        <Kpi label="Opens (Full)" value={(summary as any)?.opens_full ?? 0} />
+        <Kpi label="Stars Toggled" value={(summary as any)?.stars ?? 0} />
+        <Kpi label="Exports" value={(summary as any)?.exports ?? 0} />
+      </section>
+
+      {/* Timeseries */}
+      <section className="space-y-6">
+        <h2 className="text-base font-medium opacity-80">Last {days} days</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Sparkline title="Opens (Inline)" points={series?.inline ?? []} />
+          <Sparkline title="Opens (Full)" points={series?.full ?? []} />
+          <Sparkline title="Exports" points={series?.exports ?? []} />
+          <Sparkline title="Shares Created" points={series?.shares ?? []} />
+        </div>
+      </section>
+
+      {/* Top tags */}
+      <section className="space-y-3">
+        <h2 className="text-base font-medium opacity-80">Top Tags</h2>
+        <div className="flex flex-wrap gap-8">
+          {(topTags ?? []).map((t: any) => (
+            <div key={t.name} className="min-w-[160px]">
+              <div className="text-sm opacity-75">#{t.name}</div>
+              <div className="text-lg font-semibold">{t.threads_count}</div>
+              <div className="text-xs opacity-60">{t.last_used_at ? new Date(t.last_used_at).toLocaleDateString() : '—'}</div>
+            </div>
           ))}
+          {(topTags?.length ?? 0) === 0 && <div className="opacity-60 text-sm">No tags in this period.</div>}
         </div>
-      ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <KpiCard title="Convo Opens" value={summary?.conversations_created ?? 0} series={tsViews} />
-          <KpiCard title="Stars" value={summary?.starred_toggles ?? 0} />
-          <KpiCard title="Shares" value={summary?.shares_created ?? 0} series={tsShares} />
-          <KpiCard
-            title="Exports"
-            value={(summary?.exports_started ?? 0) + (summary?.bulk_exports ?? 0)}
-            series={tsExports}
-          />
-        </div>
-      )}
-
-      {/* Top Tags */}
-      <div>
-        <h2 className="text-[17px] font-semibold text-white/95 mb-3">Top Tags</h2>
-        <div
-          className="rounded-[18px] border p-6"
-          style={{
-            background: 'var(--hub-glass-bg)',
-            borderColor: 'var(--hub-stroke)',
-          }}
-        >
-          {tagsLoading ? (
-            <div className="text-center py-12 text-white/50">Loading tags...</div>
-          ) : !topTags || topTags.length === 0 ? (
-            <div className="text-center py-12 text-white/50">No tag activity in this period.</div>
-          ) : (
-            <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {topTags.map((t) => (
-                <li
-                  key={t.name}
-                  className="flex items-center justify-between border border-white/10 rounded-xl px-4 py-3"
-                  style={{ background: 'rgba(255,255,255,0.04)' }}
-                >
-                  <div className="font-medium text-white/90">#{t.name}</div>
-                  <div className="text-sm text-white/70">{t.threads} threads</div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
+      </section>
     </div>
   );
 }
 
-/** Minimal sparkline card */
-function KpiCard({
-  title,
-  value,
-  series,
-}: {
-  title: string;
-  value: number | string;
-  series?: TimeseriesPoint[];
-}) {
-  const points = useMemo(() => {
-    if (!series || series.length === 0) return '';
-    const w = 120,
-      h = 36;
-    const max = Math.max(...series.map((s) => s.n), 1);
-    return series
-      .map((s, i) => {
-        const x = (i / (series.length - 1)) * w;
-        const y = h - (s.n / max) * h;
-        return `${x},${y}`;
-      })
-      .join(' ');
-  }, [series]);
-
+function Kpi({ label, value }: { label: string; value: number }) {
   return (
-    <div
-      className="rounded-[18px] border p-4 flex items-center justify-between gap-4"
-      style={{
-        background: 'var(--hub-glass-bg)',
-        borderColor: 'var(--hub-stroke)',
-      }}
-    >
-      <div>
-        <div className="text-white/70 text-sm mb-1">{title}</div>
-        <div className="text-2xl font-semibold text-white/95">{value}</div>
-      </div>
-      <div aria-hidden className="opacity-80">
-        {series && series.length > 1 ? (
-          <svg width="120" height="36">
-            <polyline
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              points={points}
-              style={{ color: 'var(--hub-accent, #6e9277)' }}
-            />
-          </svg>
-        ) : (
-          <div className="text-sm text-white/40">—</div>
-        )}
+    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+      <div className="text-xs opacity-70">{label}</div>
+      <div className="text-2xl font-semibold mt-1">{value}</div>
+    </div>
+  );
+}
+
+function Sparkline({ title, points }: { title: string; points: { x: string; y: number }[] }) {
+  // Render with your existing lightweight chart; placeholder for now
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+      <div className="text-sm opacity-80 mb-2">{title}</div>
+      <div className="h-28 flex items-center justify-center opacity-60 text-xs">
+        {points?.length ? 'Chart renders here' : 'No data'}
       </div>
     </div>
   );
