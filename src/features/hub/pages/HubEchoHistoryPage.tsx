@@ -13,7 +13,6 @@ import { ThreadTagEditorInline } from '@/features/echo/components/tags/ThreadTag
 import { VirtualList } from '@/features/echo/components/virtual/VirtualList';
 import { EchoHistorySearch } from '@/features/echo/components/EchoHistorySearch';
 import { BulkActionBar } from '@/features/echo/components/BulkActionBar';
-import { ShortcutsModal } from '@/features/echo/components/ShortcutsModal';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { starThread, deleteThread } from '@/features/echo/api/threadActions';
@@ -115,10 +114,6 @@ export function HubEchoHistoryPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [showBulkTag, setShowBulkTag] = useState(false);
   
-  // Shortcuts modal
-  const [showShortcuts, setShowShortcuts] = useState(false);
-  const [shortcutsHintSeen, setShortcutsHintSeen] = useLocalStorage('echo.shortcutHintSeen', false);
-  
   // Sort mode (persisted)
   const [sortMode, setSortMode] = useLocalStorage<'default' | 'starred' | 'relevance'>('echo.sortMode', 'default');
   const [showSortMenu, setShowSortMenu] = useState(false);
@@ -171,17 +166,6 @@ export function HubEchoHistoryPage() {
 
     return scored;
   }, [rawChats, sortMode, fuzzy, debouncedQuery]);
-  
-  // Auto-open shortcuts modal once for new users
-  useEffect(() => {
-    if (!shortcutsHintSeen && chats.length > 0) {
-      const timer = setTimeout(() => {
-        setShowShortcuts(true);
-        setShortcutsHintSeen(true);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [shortcutsHintSeen, chats.length, setShortcutsHintSeen]);
   
   // Track expanded heights for proper virtualization
   const expandedHeightsRef = useRef<Map<string, number>>(new Map());
@@ -638,16 +622,6 @@ export function HubEchoHistoryPage() {
         return;
       }
 
-      // ? key - toggle shortcuts cheatsheet
-      if (e.key === '?' && !e.metaKey && !e.ctrlKey) {
-        e.preventDefault();
-        setShowShortcuts((v) => !v);
-        if (!showShortcuts) {
-          echoHistoryAnalytics.shortcutsOpened();
-        }
-        return;
-      }
-
       // Keyboard navigation (J/K/Arrow keys)
       if (!selectMode && kbNavEnabled && chats.length > 0) {
         const maxIndex = chats.length - 1;
@@ -816,7 +790,6 @@ export function HubEchoHistoryPage() {
     selectMode, 
     expandedId, 
     chats, 
-    showShortcuts, 
     focusedIndex,
     selectedIds,
     kbNavEnabled,
@@ -1195,9 +1168,6 @@ export function HubEchoHistoryPage() {
       
       {/* Export HUD */}
       {exportHud.ui}
-      
-      {/* Shortcuts modal */}
-      <ShortcutsModal open={showShortcuts} onClose={() => setShowShortcuts(false)} />
     </div>
   );
 }
