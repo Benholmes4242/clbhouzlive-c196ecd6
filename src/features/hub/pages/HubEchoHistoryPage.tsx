@@ -1104,45 +1104,44 @@ export function HubEchoHistoryPage() {
                             });
                           }
                         }}
-                      />
-
-                      {isExpanded && (
-                        <div className="mt-2" aria-label="Conversation preview">
-                          <HistoryThreadInline
-                            threadId={item.id}
-                            title={item.title}
-                            onCollapse={() => {
-                              setExpandedId(null);
-                              announce('Closed conversation preview');
-                            }}
-                            onCopyLink={() => {
-                              navigator.clipboard.writeText(window.location.origin + `/hub/echo/history/chat/${item.id}`);
-                              announce('Link copied to clipboard');
-                            }}
-                            onOpenFull={() => {
-                              echoHistoryAnalytics.openFull({
-                                thread_id: item.id,
-                                from_inline: true,
-                              });
-                              const state = loc.state as any;
-                              nav(`/hub/echo/history/chat/${item.id}`, {
-                                state: { backgroundLocation: state?.backgroundLocation, fromHub: true },
-                              });
-                            }}
-                            onHeightChange={(height) => {
-                              expandedHeightsRef.current.set(item.id, height);
-                            }}
-                          />
-                          
-                          {/* Inline tag editor */}
-                          <div className="mt-3 px-4">
-                            <ThreadTagEditorInline
+                      >
+                        {isExpanded && (
+                          <div aria-label="Conversation preview">
+                            <HistoryThreadInline
                               threadId={item.id}
-                              initialTags={item.tags || []}
+                              title={item.title}
+                              onCollapse={() => {
+                                setExpandedId(null);
+                                announce('Closed conversation preview');
+                              }}
+                              onCopyLink={() => {
+                                navigator.clipboard.writeText(window.location.origin + `/hub/echo/history/chat/${item.id}`);
+                                announce('Link copied to clipboard');
+                              }}
+                              onOpenFull={() => {
+                                echoHistoryAnalytics.openFull({
+                                  thread_id: item.id,
+                                  from_inline: true,
+                                });
+                                const state = loc.state as any;
+                                nav(`/hub/echo/history/chat/${item.id}`, {
+                                  state: { backgroundLocation: state?.backgroundLocation, fromHub: true },
+                                });
+                              }}
+                              onHeightChange={(height) => {
+                                expandedHeightsRef.current.set(item.id, height);
+                              }}
                             />
+                            {/* Inline tag editor */}
+                            <div className="mt-3 px-4">
+                              <ThreadTagEditorInline
+                                threadId={item.id}
+                                initialTags={item.tags || []}
+                              />
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
+                      </SwipeableHistoryRow>
                     </div>
                   );
                 }}
