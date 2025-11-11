@@ -113,26 +113,26 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         </div>
       </div>
 
-      {/* DEBUG: inline panel beacon — remove after test */}
+      {/* DEBUG: Mock text to test layout with longer content */}
       <div
-        data-debug="inline-beacon"
+        data-debug="inline-mock-text"
         style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: '24px 0',
+          padding: '16px 12px',
+          color: 'var(--hub-text)',
+          fontSize: '14px',
+          lineHeight: '1.5',
         }}
         aria-hidden="true"
       >
-        <span
-          style={{
-            width: 18,
-            height: 18,
-            borderRadius: '50%',
-            background: 'red',
-            boxShadow: '0 0 0 2px rgba(255,255,255,0.35)',
-          }}
-        />
+        <p style={{ marginBottom: '12px' }}>
+          This is a mock conversation message with exactly one hundred characters to test the inline panel layout properly.
+        </p>
+        <p style={{ marginBottom: '12px' }}>
+          Here is another message that demonstrates how multiple messages would look when displayed in the inline thread view with proper spacing.
+        </p>
+        <p>
+          And finally a third message to show scrolling behavior when there is enough content to fill the container and require vertical scrolling.
+        </p>
       </div>
 
       {/* Messages */}
