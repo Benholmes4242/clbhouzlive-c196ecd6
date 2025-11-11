@@ -120,6 +120,11 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
           background: 'rgba(0,0,0,0.15)',
           padding: '12px',
           position: 'relative',
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+          maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
         }}
       >
         {isLoading && (
