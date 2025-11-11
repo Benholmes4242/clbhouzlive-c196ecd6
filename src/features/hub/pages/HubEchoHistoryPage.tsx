@@ -1097,8 +1097,12 @@ export function HubEchoHistoryPage() {
                             title={item.title}
                             onCollapse={() => setExpandedId(null)}
                             onHeightChange={(h) => {
-                              expandedHeightsRef.current.set(item.id, Math.ceil(h));
-                              setSizeNonce((n) => n + 1);
+                              const prev = expandedHeightsRef.current.get(item.id) ?? 0;
+                              const next = Math.ceil(h);
+                              if (Math.abs(next - prev) > 1) {
+                                expandedHeightsRef.current.set(item.id, next);
+                                setSizeNonce((n) => n + 1);
+                              }
                             }}
                           />
                         )}
