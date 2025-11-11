@@ -1027,8 +1027,11 @@ export function HubEchoHistoryPage() {
                 aria-label="Conversations"
                 aria-multiselectable={selectMode || undefined}
               >
-                <div style={{ maskImage: 'none', WebkitMaskImage: 'none' }}>
-                  <VirtualList
+            <div style={{ 
+              maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)', 
+              WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)' 
+            }}>
+              <VirtualList
                     count={chats.length}
                     estimateSize={72}
                     getSize={getRowSize}

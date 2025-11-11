@@ -117,8 +117,8 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',
             maxHeight: 'calc(2.4 * 52px)', // Show 2.4 rows visible
-            maskImage: 'linear-gradient(180deg, transparent 0%, #000 8%, #000 92%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, #000 8%, #000 92%, transparent 100%)',
+            maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
           }}
         >
           {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
