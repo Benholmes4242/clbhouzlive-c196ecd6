@@ -3439,6 +3439,7 @@ export type Database = {
           threads: number
         }[]
       }
+      admin_guard: { Args: never; Returns: undefined }
       admin_overview_metrics: {
         Args: never
         Returns: {
@@ -3525,6 +3526,59 @@ export type Database = {
           shares_active: number
           tags: Json
           users_active: number
+        }[]
+      }
+      echo_analytics_export_formats_guarded: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          count: number
+          format: string
+        }[]
+      }
+      echo_analytics_overview_guarded: {
+        Args: {
+          p_event?: string
+          p_from: string
+          p_tag?: string
+          p_to: string
+          p_user?: string
+        }
+        Returns: {
+          active_users: number
+          avg_latency_ms: number
+          total_exports: number
+          total_shares: number
+          total_threads: number
+        }[]
+      }
+      echo_analytics_timeseries_guarded: {
+        Args: {
+          p_event?: string
+          p_from: string
+          p_tag?: string
+          p_to: string
+          p_user?: string
+        }
+        Returns: {
+          count: number
+          day: string
+          event: string
+        }[]
+      }
+      echo_analytics_top_tags_guarded: {
+        Args: { p_from: string; p_to: string; p_user?: string }
+        Returns: {
+          last_used_at: string
+          tag: string
+          uses: number
+        }[]
+      }
+      echo_analytics_top_threads_guarded: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          last_open_at: string
+          opens: number
+          thread_id: string
         }[]
       }
       echo_history_list: {
