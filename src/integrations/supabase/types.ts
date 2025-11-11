@@ -3503,6 +3503,30 @@ export type Database = {
             }
             Returns: string
           }
+      echo_admin_insights: {
+        Args: { p_days?: number }
+        Returns: {
+          avg_query_ms: number
+          conv_24h: number
+          conv_total: number
+          export_count: number
+          shares_active: number
+          tags: Json
+          users_active: number
+        }[]
+      }
+      echo_admin_insights_guard: {
+        Args: { p_days?: number }
+        Returns: {
+          avg_query_ms: number
+          conv_24h: number
+          conv_total: number
+          export_count: number
+          shares_active: number
+          tags: Json
+          users_active: number
+        }[]
+      }
       echo_history_list: {
         Args: { limit_rows?: number }
         Returns: {

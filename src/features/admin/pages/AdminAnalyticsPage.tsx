@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getSummary, getTimeseries, getTopTags } from '../api/analytics';
 import { listViews, saveView, deleteView, getView, DashboardView } from '../api/views';
 import { SavedViewsMenu } from '../components/SavedViewsMenu';
+import { AdminInsightsCard } from '../components/AdminInsightsCard';
 import { buildHistoryUrl } from '../utils/historyLinks';
 import { toCSV, downloadCSV } from '../utils/csv';
 import { Switch } from '@/components/ui/switch';
@@ -207,10 +208,13 @@ export function AdminAnalyticsPage() {
   };
 
   return (
-    <div className="p-6 space-y-16">
+    <div className="p-6 space-y-8">
+      {/* Admin Insights Widget */}
+      <AdminInsightsCard days={days} />
+
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Analytics</h1>
+          <h1 className="text-xl font-semibold">Detailed Analytics</h1>
           {activeViewId && (
             <p className="text-sm opacity-60 mt-1">
               Loaded from: {views.find((v) => v.id === activeViewId)?.name}
