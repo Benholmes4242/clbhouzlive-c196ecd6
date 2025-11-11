@@ -110,12 +110,12 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
         aria-label={`Open conversation: ${title}`}
         className={cn(
           'hub-row flex-1 text-left rounded-[18px] p-3.5 transition-all anim-fade relative',
-          'hover:translate-y-[-1px] focus:outline-none focus:ring-2 focus:ring-black/10',
-          'border',
+          'hover:translate-y-[-1px] focus:outline-none focus:ring-2 focus:ring-white/18',
+          'border border-white/10',
           selectionMode && 'is-select-mode',
           selected && 'is-selected'
         )}
-        style={{ background: 'rgba(255,255,255,0.95)', borderColor: 'rgba(0,0,0,0.12)', backdropFilter: 'blur(10px)' }}
+        style={{ background: 'rgba(255,255,255,.06)', backdropFilter: 'blur(10px)' }}
       >
         {/* Hidden focus target for keyboard navigation */}
         <button
@@ -141,11 +141,11 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
         <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <div className="truncate font-medium text-[15px] leading-5" style={{ color: '#000' }}>
+            <div className="truncate font-medium text-[15px] leading-5" style={{ color: 'var(--hub-text)' }}>
               <HighlightedText text={title} query={searchQuery} />
             </div>
             {relative_date && (
-              <div className="text-[12px]" style={{ color: '#666' }}>
+              <div className="text-[12px]" style={{ color: 'var(--meta-dim)' }}>
                 {relative_date || (last_activity_at && formatRelativeTime(last_activity_at))}
               </div>
             )}
@@ -161,12 +161,12 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
           </div>
 
           {/* Line 2: subtitle/meta */}
-          <div className="mt-0.5 text-[13px] leading-[18px] line-clamp-2" style={{ color: '#222' }}>
+          <div className="mt-0.5 text-[13px] leading-[18px] line-clamp-2" style={{ color: 'var(--meta-strong)' }}>
             <HighlightedText text={subtitle || ''} query={searchQuery} truncate={220} />
           </div>
 
           {/* Line 3: meta chips */}
-          <div className="mt-2 flex flex-wrap gap-6 text-[12px]" style={{ color: '#666' }}>
+          <div className="mt-2 flex flex-wrap gap-6 text-[12px]" style={{ color: 'var(--meta-dim)' }}>
             <span>{has_response ? 'Has response' : 'Awaiting response'}</span>
             {!!message_count && <span>{message_count} msg{message_count > 1 ? 's' : ''}</span>}
             {!!mode && <span>{mode === 'live' ? 'Live' : 'Static'}</span>}

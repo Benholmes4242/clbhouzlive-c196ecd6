@@ -37,9 +37,7 @@ export function useEchoThreadMessages(threadId?: string | null) {
         console.warn('[inline] echo_messages fetch error', relErr);
       }
 
-      if (rel && rel.length > 0) {
-        return rel as EchoMessage[];
-      }
+      if (rel && rel.length > 0) return rel as EchoMessage[];
 
       // 2) Fallback to legacy conversations JSONB
       const { data: legacy, error: legacyErr } = await supabase
@@ -49,12 +47,11 @@ export function useEchoThreadMessages(threadId?: string | null) {
         .maybeSingle();
 
       if (legacyErr) {
-        // If both sources failed, throw the relational error if present, else legacy
-        throw relErr ?? legacyErr;
+        console.error('[inline] conversations fallback error', legacyErr);
+        return [];
       }
 
-      const mapped = mapLegacyMessages(legacy?.messages as any);
-      return mapped;
+      return mapLegacyMessages(legacy?.messages as any);
     },
   });
 }

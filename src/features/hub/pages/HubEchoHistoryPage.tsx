@@ -188,11 +188,13 @@ export function HubEchoHistoryPage() {
   
   // Dynamic size calculation: base row + expanded inline thread + spacing
   const getRowSize = (index: number) => {
-    // TEMP: force every row to reserve mock inline height for visibility testing
+    const chat = chats[index];
     const baseHeight = 72; // Row height
     const spacing = 12; // 12px gap between cards (space-y-3)
-    const mockInlineHeight = 220; // fixed mock panel height
-    return baseHeight + mockInlineHeight + spacing;
+    const expandedHeight = expandedId === chat.id 
+      ? (expandedHeightsRef.current.get(chat.id) || 400) 
+      : 0;
+    return baseHeight + expandedHeight + (expandedId === chat.id ? 8 : 0) + spacing;
   };
   
   // Inject sortMode into filters
@@ -1028,7 +1030,6 @@ export function HubEchoHistoryPage() {
                   const item = chats[index];
                   const isExpanded = expandedId === item.id;
                   const isChecked = selectedIds.has(item.id);
-                  const isPending = pendingDeletes.has(item.id);
                   
                   return (
                     <div role="listitem" className="pb-3">
@@ -1042,26 +1043,42 @@ export function HubEchoHistoryPage() {
                         has_response={item.has_response}
                         is_starred={item.is_starred}
                         isStarred={item.is_starred}
-                        tags={item.tags}
-                        selectionMode={selectMode}
-                        selected={isChecked}
-                        onSelectToggle={() => {
-                          const next = new Set(selectedIds);
-                          if (isChecked) {
-                            next.delete(item.id);
-                          } else {
-                            next.add(item.id);
-                          }
-                          setSelectedIds(next);
-                          lastSelectedIndex.current = index;
-                          announce(isChecked ? 'Deselected' : 'Selected');
-                        }}
-                        searchQuery={debouncedQuery}
-                        onStar={() => handleStar(item.id, item.is_starred, 'swipe', index)}
-                        onDelete={() => handleDelete(item.id, 'swipe')}
                         listFilters={filters}
                         rankIndex={index}
-                        isPendingDelete={isPending}
+                        isPendingDelete={pendingDeletes.has(item.id)}
+                        selectionMode={selectMode}
+                        selected={isChecked}
+                        searchQuery={filters.query}
+                        tags={item.tags || []}
+                        index={index}
+                        onFocusIndex={setFocusedIndex}
+                        onTagsChange={() => {
+                          // Invalidate query to refetch with updated tags
+                          queryClient.invalidateQueries({ queryKey: ['echoHistorySearch'] });
+                        }}
+                        onSelectToggle={(e?: React.MouseEvent) => {
+                          // Handle shift-click range selection
+                          if (e?.shiftKey && lastSelectedIndex.current !== null && isDesktop) {
+                            const [start, end] = [lastSelectedIndex.current, index].sort((a, b) => a - b);
+                            const rangeIds = chats.slice(start, end + 1).map((c) => c.id);
+                            const next = new Set(selectedIds);
+                            rangeIds.forEach((id) => next.add(id));
+                            setSelectedIds(next);
+                            announce(`Selected ${rangeIds.length} conversations`);
+                          } else {
+                            const next = new Set(selectedIds);
+                            if (isChecked) {
+                              next.delete(item.id);
+                            } else {
+                              next.add(item.id);
+                            }
+                            setSelectedIds(next);
+                            lastSelectedIndex.current = index;
+                            announce(isChecked ? 'Deselected' : 'Selected');
+                          }
+                        }}
+                        onStar={() => handleStar(item.id, item.is_starred, 'swipe', index)}
+                        onDelete={() => handleDelete(item.id, 'swipe')}
                         onClick={() => {
                           if (selectMode) {
                             const next = new Set(selectedIds);
@@ -1087,16 +1104,45 @@ export function HubEchoHistoryPage() {
                             });
                           }
                         }}
-                      >
-                        {/* Inline expanded content - integrated within the same card */}
-                        {isExpanded && (
+                      />
+
+                      {isExpanded && (
+                        <div className="mt-2" aria-label="Conversation preview">
                           <HistoryThreadInline
                             threadId={item.id}
                             title={item.title}
-                            onCollapse={() => setExpandedId(null)}
+                            onCollapse={() => {
+                              setExpandedId(null);
+                              announce('Closed conversation preview');
+                            }}
+                            onCopyLink={() => {
+                              navigator.clipboard.writeText(window.location.origin + `/hub/echo/history/chat/${item.id}`);
+                              announce('Link copied to clipboard');
+                            }}
+                            onOpenFull={() => {
+                              echoHistoryAnalytics.openFull({
+                                thread_id: item.id,
+                                from_inline: true,
+                              });
+                              const state = loc.state as any;
+                              nav(`/hub/echo/history/chat/${item.id}`, {
+                                state: { backgroundLocation: state?.backgroundLocation, fromHub: true },
+                              });
+                            }}
+                            onHeightChange={(height) => {
+                              expandedHeightsRef.current.set(item.id, height);
+                            }}
                           />
-                        )}
-                      </SwipeableHistoryRow>
+                          
+                          {/* Inline tag editor */}
+                          <div className="mt-3 px-4">
+                            <ThreadTagEditorInline
+                              threadId={item.id}
+                              initialTags={item.tags || []}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 }}

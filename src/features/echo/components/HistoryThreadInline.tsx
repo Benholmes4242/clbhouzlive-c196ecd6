@@ -8,6 +8,7 @@ import { X, ExternalLink, Copy } from 'lucide-react';
 import { MessageBubble } from '@/components/ai-chat/MessageBubble';
 import { groupMessages } from '@/components/ai-chat/utils/groupMessages';
 import { useEchoThreadMessages } from '../hooks/useEchoThreadMessages';
+import { VirtualList } from './virtual/VirtualList';
 import { timeAgo } from '@/utils/date';
 
 export interface HistoryThreadInlineProps {
@@ -32,13 +33,10 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   const { data: messages = [], isLoading, error } = useEchoThreadMessages(threadId);
   const groupedMessages = groupMessages(messages);
 
-  // DEBUG: log when inline panel mounts
-  console.debug('[Inline] mount', { threadId, title, messageCount: messages?.length });
-
   // Report height changes to parent for virtualization
   useLayoutEffect(() => {
     if (containerRef.current && onHeightChange) {
-      const height = containerRef.current.getBoundingClientRect().height;
+      const height = containerRef.current.offsetHeight;
       onHeightChange(height);
     }
   }, [messages.length, isLoading, error, onHeightChange]);
@@ -51,7 +49,6 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         borderLeft: '1px solid var(--hub-stroke)',
         transitionDuration: 'var(--anim-med)',
         transitionTimingFunction: 'var(--anim-ease)',
-        minHeight: 120,
       }}
       role="log"
       aria-live="polite"
@@ -64,7 +61,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
       >
         <div 
           className="text-[14px] font-medium truncate flex-1"
-          style={{ color: '#000' }}
+          style={{ color: 'var(--hub-text)' }}
         >
           {title}
         </div>
@@ -74,9 +71,9 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
             <button
               onClick={onCopyLink}
               className="p-1.5 rounded-lg transition-colors"
-              style={{ color: '#666' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#000'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+              style={{ color: 'var(--hub-text-dim)' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-dim)'}
               aria-label="Copy link"
             >
               <Copy className="w-4 h-4" />
@@ -87,9 +84,9 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
             <button
               onClick={onOpenFull}
               className="p-1.5 rounded-lg transition-colors"
-              style={{ color: '#666' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#000'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+              style={{ color: 'var(--hub-text-dim)' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-dim)'}
               aria-label="Open full"
             >
               <ExternalLink className="w-4 h-4" />
@@ -99,9 +96,9 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
           <button
             onClick={onCollapse}
             className="p-1.5 rounded-lg transition-colors"
-            style={{ color: '#666' }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#000'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+            style={{ color: 'var(--hub-text-dim)' }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-dim)'}
             aria-label="Close inline preview"
           >
             <X className="w-4 h-4" />
@@ -113,14 +110,12 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
       <div
         className="overflow-y-auto pr-1"
         style={{
-          display: 'block',
-          maxHeight: '300px',
+          maxHeight: 'min(65vh, 600px)',
           overflowY: 'auto',
-          overflowX: 'hidden',
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain',
-          maskImage: 'linear-gradient(180deg, #000 92%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(180deg, #000 92%, transparent 100%)',
+          maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
         }}
       >
         {isLoading && (
@@ -138,7 +133,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         {!isLoading && error && (
           <div
             className="text-center py-8 text-[15px]"
-            style={{ color: '#000' }}
+            style={{ color: 'var(--hub-text-dim)' }}
           >
             Couldn't load this conversation.
           </div>
@@ -147,38 +142,46 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         {!isLoading && !error && messages.length === 0 && (
           <div
             className="text-center py-8 text-[15px]"
-            style={{ color: '#666' }}
+            style={{ color: 'var(--hub-text-dim)' }}
           >
             No messages in this conversation yet.
           </div>
         )}
 
         {!isLoading && !error && groupedMessages.length > 0 && (
-          <div className="space-y-3">
-            {groupedMessages.map((msg) => (
-              <div key={msg.id} className="mb-3">
-                <MessageBubble
-                  role={msg.role as 'user' | 'assistant'}
-                  content={msg.content}
-                  timestamp={msg.created_at}
-                  firstInGroup={msg.firstInGroup}
-                  lastInGroup={msg.lastInGroup}
-                  readOnly={true}
-                  showChips={msg.firstInGroup}
-                  maxWidth="desktop"
-                />
-                
-                {/* Meta line */}
-                <div
-                  className="mt-1 mb-2 text-[12px] anim-slideUp"
-                  style={{ color: '#666' }}
-                  aria-label={`Sent ${timeAgo(msg.created_at)}`}
-                >
-                  <span>{timeAgo(msg.created_at)}</span>
+          <VirtualList
+            count={groupedMessages.length}
+            estimateSize={120}
+            overscan={2}
+            className="h-full"
+            render={(index) => {
+              const msg = groupedMessages[index];
+              return (
+                <div className="mb-3">
+                  <MessageBubble
+                    key={msg.id}
+                    role={msg.role as 'user' | 'assistant'}
+                    content={msg.content}
+                    timestamp={msg.created_at}
+                    firstInGroup={msg.firstInGroup}
+                    lastInGroup={msg.lastInGroup}
+                    readOnly={true}
+                    showChips={msg.firstInGroup}
+                    maxWidth="desktop"
+                  />
+                  
+                  {/* Meta line */}
+                  <div
+                    className="mt-1 mb-2 text-[12px] anim-slideUp"
+                    style={{ color: 'var(--meta-dim)' }}
+                    aria-label={`Sent ${timeAgo(msg.created_at)}`}
+                  >
+                    <span>{timeAgo(msg.created_at)}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              );
+            }}
+          />
         )}
       </div>
     </div>
