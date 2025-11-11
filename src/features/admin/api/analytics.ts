@@ -20,25 +20,25 @@ export interface TopTag {
 }
 
 export async function getSummary(periodDays: number): Promise<EchoSummary | null> {
-  const { data, error } = await supabase.rpc('admin_echo_summary', { days: periodDays });
+  const { data, error } = await supabase.rpc('admin_echo_summary' as any, { days: periodDays });
   if (error) throw error;
-  return data?.[0] || null;
+  return (data?.[0] as EchoSummary) || null;
 }
 
 export async function getTimeseries(names: string[], days: number): Promise<TimeseriesPoint[]> {
-  const { data, error } = await supabase.rpc('admin_echo_timeseries', { 
+  const { data, error } = await supabase.rpc('admin_echo_timeseries' as any, { 
     event_names: names, 
     days 
   });
   if (error) throw error;
-  return data || [];
+  return (data as TimeseriesPoint[]) || [];
 }
 
 export async function getTopTags(days: number, limit = 10): Promise<TopTag[]> {
-  const { data, error } = await supabase.rpc('admin_echo_top_tags', { 
+  const { data, error } = await supabase.rpc('admin_echo_top_tags' as any, { 
     days, 
     limit_n: limit 
   });
   if (error) throw error;
-  return data || [];
+  return (data as TopTag[]) || [];
 }

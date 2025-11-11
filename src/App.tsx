@@ -92,7 +92,7 @@ const GolfCourseEditorPage = lazy(() => import("./pages/admin/GolfCourseEditorPa
 const LogosPage = lazy(() => import("./pages/admin/LogosPage").then(m => ({ default: m.LogosPage })));
 const CountryFlagsPage = lazy(() => import("./pages/admin/CountryFlagsPage").then(m => ({ default: m.CountryFlagsPage })));
 const CourseImportPage = lazy(() => import("./pages/admin/CourseImportPage").then(m => ({ default: m.CourseImportPage })));
-const AnalyticsPage = lazy(() => import("./pages/admin/AnalyticsPage").then(m => ({ default: m.AnalyticsPage })));
+const AnalyticsPage = lazy(() => import("./features/admin/pages/AdminAnalyticsPage").then(m => ({ default: m.default })));
 const TeamPage = lazy(() => import("./pages/admin/TeamPage").then(m => ({ default: m.TeamPage })));
 const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage").then(m => ({ default: m.AdminSettingsPage })));
 
@@ -203,7 +203,11 @@ function AppRoutes() {
           <Route path="logos" element={<LogosPage />} />
           <Route path="country-flags" element={<CountryFlagsPage />} />
           <Route path="courses" element={<CourseImportPage />} />
-          <Route path="analytics" element={<AnalyticsPage />} />
+          <Route path="analytics" element={
+            <PanelGuard need="admins">
+              <AnalyticsPage />
+            </PanelGuard>
+          } />
           <Route path="team" element={<TeamPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
         </Route>

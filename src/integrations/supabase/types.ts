@@ -3357,6 +3357,31 @@ export type Database = {
             }
             Returns: string
           }
+      admin_echo_summary: {
+        Args: { days: number }
+        Returns: {
+          bulk_exports: number
+          conversations_created: number
+          exports_started: number
+          period: string
+          shares_created: number
+          starred_toggles: number
+        }[]
+      }
+      admin_echo_timeseries: {
+        Args: { days: number; event_names: string[] }
+        Returns: {
+          d: string
+          n: number
+        }[]
+      }
+      admin_echo_top_tags: {
+        Args: { days: number; limit_n: number }
+        Returns: {
+          name: string
+          threads: number
+        }[]
+      }
       admin_overview_metrics: {
         Args: never
         Returns: {
