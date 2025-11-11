@@ -1100,19 +1100,41 @@ export function HubEchoHistoryPage() {
                               fontWeight: 'bold',
                             }}
                           >
-                            🔴 TEST: Inline panel for {item.title}
-                            <div style={{ marginTop: '8px', fontSize: '14px' }}>
-                              Thread ID: {item.id}
+                            <div style={{ marginBottom: '12px' }}>
+                              🔴 TEST: Inline panel for {item.title}
+                              <div style={{ marginTop: '8px', fontSize: '14px' }}>
+                                Thread ID: {item.id}
+                              </div>
                             </div>
-                            <div style={{ marginTop: '12px', fontSize: '14px', lineHeight: 1.5 }}>
+                            
+                            {/* Scrollable content container */}
+                            <div 
+                              style={{ 
+                                maxHeight: '300px',
+                                overflowY: 'auto',
+                                overflowX: 'hidden',
+                                fontSize: '14px',
+                                lineHeight: 1.5,
+                                WebkitOverflowScrolling: 'touch',
+                              }}
+                            >
                               <p style={{ marginBottom: '10px' }}>
                                 This is a long mock message designed to be roughly one hundred characters so spacing and wrapping are clear across.
                               </p>
                               <p style={{ marginBottom: '10px' }}>
                                 Another sample paragraph shows how multiple blocks of about one hundred characters wrap nicely within the inline panel layout.
                               </p>
+                              <p style={{ marginBottom: '10px' }}>
+                                Third paragraph to add more content that will require scrolling when there are many messages in the conversation thread.
+                              </p>
+                              <p style={{ marginBottom: '10px' }}>
+                                Fourth paragraph continues the mock conversation to demonstrate the scrolling behavior works smoothly without affecting page scroll.
+                              </p>
+                              <p style={{ marginBottom: '10px' }}>
+                                Fifth paragraph adds even more content to ensure the scroll container is working properly and users can scroll within this area.
+                              </p>
                               <p>
-                                Final example paragraph demonstrates scrolling once content exceeds the card height, validating container sizing behavior.
+                                Final example paragraph demonstrates scrolling once content exceeds the card height, validating container sizing behavior works correctly.
                               </p>
                             </div>
                           </div>

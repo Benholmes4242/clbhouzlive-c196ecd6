@@ -255,10 +255,14 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
           {/* Expanded inline content */}
           {children && (
             <div
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
               style={{
                 marginTop: '12px',
                 paddingTop: '12px',
                 borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                touchAction: 'pan-y',
               }}
             >
               {children}
