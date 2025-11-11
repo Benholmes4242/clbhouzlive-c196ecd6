@@ -61,24 +61,40 @@ export function HubEchoHistoryPage() {
     return () => document.documentElement.classList.remove('hub-open');
   }, []);
 
-  // Apply tag filter from navigation state
+  // Apply filters from navigation state and query params
   useEffect(() => {
     const s = (loc.state as any) || {};
+    const params = new URLSearchParams(loc.search);
     const next: Partial<EchoHistorySearchFilters> = {};
+
+    // State-based drilldown (from charts)
     if (s.applyTagFilter) next.tag = s.applyTagFilter;
     if (s.applyQuery) next.query = s.applyQuery;
     if (s.applyDateFrom) next.dateFrom = new Date(s.applyDateFrom);
     if (s.applyDateTo) next.dateTo = new Date(s.applyDateTo);
 
+    // Query-param drilldown (?tag=foo&q=bar&from=YYYY-MM-DD&to=YYYY-MM-DD)
+    const qpTag = params.get('tag') || undefined;
+    const qpQ = params.get('q') || undefined;
+    const qpFrom = params.get('from') || undefined;
+    const qpTo = params.get('to') || undefined;
+
+    if (qpTag) next.tag = qpTag;
+    if (qpQ) next.query = qpQ;
+    if (qpFrom) next.dateFrom = new Date(qpFrom);
+    if (qpTo) next.dateTo = new Date(qpTo);
+
     if (Object.keys(next).length) {
       setFilters(prev => ({ ...prev, ...next }));
       // Clear state so back/forward doesn't reapply
-      window.history.replaceState({}, '');
+      if (s.applyTagFilter || s.applyQuery || s.applyDateFrom || s.applyDateTo) {
+        window.history.replaceState({}, '');
+      }
       if (next.tag) announce(`Filtered by #${next.tag}`);
       if (next.query) announce(`Applied search: ${next.query}`);
       if (next.dateFrom || next.dateTo) announce('Date range filter applied');
     }
-  }, [loc.state]);
+  }, [loc.state, loc.search]);
 
   const handleBack = () => {
     const state = loc.state as any;

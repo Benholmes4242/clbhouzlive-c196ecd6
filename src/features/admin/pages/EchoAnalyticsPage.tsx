@@ -5,8 +5,31 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toCSV, downloadCSV } from '../utils/csv';
+import { buildHistoryUrl } from '../utils/historyLinks';
+import { toast } from '@/hooks/use-toast';
 
 const COLORS = ['#6e9277', '#8aa491', '#b1c1b7', '#e0eee5', '#3b3b3b'];
+
+function CopyLinkButton({ url }: { url: string }) {
+  const handleCopy = () => {
+    navigator.clipboard.writeText(window.location.origin + url);
+    toast({
+      description: 'Link copied to clipboard',
+      duration: 2000,
+    });
+  };
+
+  return (
+    <Button 
+      variant="ghost" 
+      size="sm" 
+      onClick={handleCopy}
+      title="Copy shareable link"
+    >
+      Copy Link
+    </Button>
+  );
+}
 
 export default function EchoAnalyticsPage() {
   const nav = useNavigate();
@@ -23,26 +46,13 @@ export default function EchoAnalyticsPage() {
   const { data: topUsers } = useEchoTopUsers(p_from, p_to, 10);
   const { data: exports }  = useEchoExports(p_from, p_to);
 
-  // Navigation helper for drill-downs
-  const goHistory = (opts: {
-    tag?: string;
-    query?: string;
-    dayISO?: string;
-    range?: { fromISO: string; toISO: string };
-  }) => {
-    const state: any = {};
-    if (opts.tag) state.applyTagFilter = opts.tag;
-    if (opts.query) state.applyQuery = opts.query;
-    if (opts.dayISO) {
-      state.applyDateFrom = opts.dayISO;
-      state.applyDateTo = opts.dayISO;
-    }
-    if (opts.range) {
-      state.applyDateFrom = opts.range.fromISO;
-      state.applyDateTo = opts.range.toISO;
-    }
-    nav('/hub/echo/history', { state });
-  };
+  // URL builders for shareable links
+  const tagUrl = (tag: string) => buildHistoryUrl({ tag, fromISO: p_from, toISO: p_to });
+  const userUrl = (uid: string) => buildHistoryUrl({ q: `user:${uid}`, fromISO: p_from, toISO: p_to });
+  const rangeUrl = buildHistoryUrl({ fromISO: p_from, toISO: p_to });
+
+  // Navigation helper for drill-downs (now uses URL navigation)
+  const goHistory = (url: string) => nav(url);
 
   // CSV export handlers
   const exportTimeseries = () => {
@@ -127,7 +137,13 @@ export default function EchoAnalyticsPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Usage Over Time</CardTitle>
-          <Button variant="ghost" size="sm" onClick={exportTimeseries}>Export CSV</Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => goHistory(rangeUrl)}>
+              View in History
+            </Button>
+            <CopyLinkButton url={rangeUrl} />
+            <Button variant="ghost" size="sm" onClick={exportTimeseries}>Export CSV</Button>
+          </div>
         </CardHeader>
         <CardContent style={{ height: 280 }}>
           <ResponsiveContainer>
@@ -135,7 +151,7 @@ export default function EchoAnalyticsPage() {
               data={series}
               onClick={(e: any) => {
                 const day = e?.activeLabel;
-                if (day) goHistory({ dayISO: day });
+                if (day) goHistory(buildHistoryUrl({ dayISO: day }));
               }}
             >
               <XAxis dataKey="day" />
@@ -152,7 +168,9 @@ export default function EchoAnalyticsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Top Tags</CardTitle>
-            <Button variant="ghost" size="sm" onClick={exportTopTags}>Export CSV</Button>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={exportTopTags}>Export CSV</Button>
+            </div>
           </CardHeader>
           <CardContent style={{ height: 300 }}>
             <ResponsiveContainer>
@@ -160,7 +178,7 @@ export default function EchoAnalyticsPage() {
                 data={topTags}
                 onClick={(e: any) => {
                   const tag = e?.activeLabel || e?.activePayload?.[0]?.payload?.tag;
-                  if (tag) goHistory({ tag, range: { fromISO: p_from, toISO: p_to } });
+                  if (tag) goHistory(tagUrl(tag));
                 }}
               >
                 <XAxis dataKey="tag" />
@@ -175,14 +193,16 @@ export default function EchoAnalyticsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Exports Breakdown</CardTitle>
-            <Button variant="ghost" size="sm" onClick={exportExports}>Export CSV</Button>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={exportExports}>Export CSV</Button>
+            </div>
           </CardHeader>
           <CardContent style={{ height: 300 }}>
             <ResponsiveContainer>
               <PieChart
                 onClick={(e: any) => {
                   const kind = e?.activePayload?.[0]?.payload?.kind;
-                  if (kind) goHistory({ query: `export:${kind}`, range: { fromISO: p_from, toISO: p_to } });
+                  if (kind) goHistory(buildHistoryUrl({ q: `export:${kind}`, fromISO: p_from, toISO: p_to }));
                 }}
               >
                 <Pie data={exports} dataKey="total" nameKey="kind" outerRadius={100} label>
@@ -200,7 +220,9 @@ export default function EchoAnalyticsPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Top Active Users</CardTitle>
-          <Button variant="ghost" size="sm" onClick={exportTopUsers}>Export CSV</Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={exportTopUsers}>Export CSV</Button>
+          </div>
         </CardHeader>
         <CardContent style={{ height: 300 }}>
           <ResponsiveContainer>
@@ -208,7 +230,7 @@ export default function EchoAnalyticsPage() {
               data={topUsers}
               onClick={(e: any) => {
                 const uid = e?.activePayload?.[0]?.payload?.user_id;
-                if (uid) goHistory({ query: `user:${uid}`, range: { fromISO: p_from, toISO: p_to } });
+                if (uid) goHistory(userUrl(uid));
               }}
             >
               <XAxis dataKey="user_id" tick={false} />
