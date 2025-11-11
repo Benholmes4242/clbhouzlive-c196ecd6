@@ -1,14 +1,12 @@
 /**
- * SwipeableHistoryRow - History row with swipe actions for star & delete
- * Apple-style interactions with haptic feedback
+ * SwipeableHistoryRow (swipe disabled)
+ * We keep the component to preserve imports/props, but ignore all swipe logic.
+ * Row actions are now tap-only via the star/bin buttons inside HistoryRow.
  */
-
-import React, { useRef, useState } from 'react';
-import { useSwipeable } from 'react-swipeable';
+import React from 'react';
 import { HistoryRow } from './HistoryRow';
 import { haptic } from '@/utils/haptics';
 import { Star, Trash2 } from 'lucide-react';
-import { useMedia } from '@/hooks/useMedia';
 import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
 import { EchoHistorySearchFilters } from '../hooks/useEchoHistorySearch';
 
@@ -42,85 +40,6 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
   isPendingDelete,
   children,
 }) => {
-  const [swipeOffset, setSwipeOffset] = useState(0);
-  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
-  const isDesktop = useMedia('(min-width: 1024px)');
-  const containerRef = useRef<HTMLDivElement>(null);
-  const actionTriggered = useRef(false);
-  const swipeStartTime = useRef<number>(0);
-  const swipeStartX = useRef<number>(0);
-
-  const SWIPE_THRESHOLD = 80;
-  const VELOCITY_THRESHOLD = 60; // Lower distance required with velocity
-  const VELOCITY_MIN = 0.20; // px/ms
-  const MAX_SWIPE = 120;
-
-  const handlers = useSwipeable({
-    onSwipeStart: () => {
-      swipeStartTime.current = Date.now();
-      swipeStartX.current = 0;
-    },
-    onSwiping: (eventData) => {
-      if (isDesktop || isPendingDelete) return; // Disable swipe on desktop or pending delete
-      
-      const deltaX = eventData.deltaX;
-      const direction = deltaX > 0 ? 'right' : 'left';
-      
-      // Clamp swipe offset
-      const clampedOffset = Math.max(-MAX_SWIPE, Math.min(MAX_SWIPE, deltaX));
-      setSwipeOffset(clampedOffset);
-      setSwipeDirection(direction);
-      
-      // Trigger haptic at threshold
-      if (Math.abs(clampedOffset) >= SWIPE_THRESHOLD && !actionTriggered.current) {
-        haptic('light');
-        actionTriggered.current = true;
-      }
-    },
-    onSwiped: (eventData) => {
-      if (isDesktop || isPendingDelete) return;
-      
-      const deltaX = eventData.deltaX;
-      const duration = Date.now() - swipeStartTime.current;
-      const velocity = duration > 0 ? Math.abs(deltaX) / duration : 0; // px/ms
-      
-      // Calculate distance and velocity
-      const distance = Math.abs(deltaX);
-      const velocityPxS = velocity * 1000; // Convert to px/s for analytics
-      
-      // Track swipe analytics
-      echoHistoryAnalytics.swipeAction({
-        thread_id: item.id,
-        direction: deltaX > 0 ? 'right' : 'left',
-        distance_px: distance,
-        velocity_px_s: velocityPxS,
-      });
-      
-      // Trigger action if threshold met (distance OR velocity)
-      const thresholdMet = distance >= SWIPE_THRESHOLD || 
-        (velocity >= VELOCITY_MIN && distance >= VELOCITY_THRESHOLD);
-      
-      if (thresholdMet) {
-        if (deltaX > 0) {
-          // Right swipe - Star/Unstar
-          haptic('medium');
-          onStar();
-        } else {
-          // Left swipe - Delete
-          haptic('medium');
-          onDelete();
-        }
-      }
-      
-      // Reset
-      setSwipeOffset(0);
-      setSwipeDirection(null);
-      actionTriggered.current = false;
-    },
-    trackMouse: false,
-    trackTouch: true,
-  });
-
   const handleStarClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     haptic('light');
@@ -141,7 +60,7 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
     onDelete();
   };
 
-  // Trailing actions component
+  // Trailing actions (tap only)
   const trailingActions = (
     <div className="flex items-center gap-2">
       <button
@@ -169,94 +88,22 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
   );
 
   return (
-    <div 
-      ref={containerRef}
-      className="relative overflow-hidden group"
+    <div
       style={{ 
-        touchAction: 'pan-y',
         opacity: isPendingDelete ? 0.4 : 1,
         pointerEvents: isPendingDelete ? 'none' : 'auto',
         transition: 'opacity 200ms ease-out',
       }}
     >
-      {/* Action pills visible during swipe */}
-      {swipeDirection === 'right' && swipeOffset > 20 && (
-        <div 
-          className="absolute left-0 top-0 bottom-0 flex items-center justify-start pl-4"
-          style={{
-            width: `${Math.min(swipeOffset, MAX_SWIPE)}px`,
-            transition: 'opacity 160ms ease-out',
-            opacity: Math.min(swipeOffset / SWIPE_THRESHOLD, 1),
-          }}
-        >
-          <div 
-            className="flex items-center gap-2 px-3 py-2 rounded-full"
-            style={{
-              background: 'rgba(255, 255, 255, 0.10)',
-              border: '1px solid rgba(255, 255, 255, 0.18)',
-            }}
-          >
-            <Star 
-              size={16} 
-              style={{ color: 'rgba(255, 255, 255, 0.90)' }}
-              fill={isStarred ? 'rgba(255, 255, 255, 0.90)' : 'none'}
-            />
-            <span 
-              className="text-sm font-medium whitespace-nowrap"
-              style={{ color: 'rgba(255, 255, 255, 0.90)' }}
-            >
-              {isStarred ? 'Unstar' : 'Star'}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {swipeDirection === 'left' && swipeOffset < -20 && (
-        <div 
-          className="absolute right-0 top-0 bottom-0 flex items-center justify-end pr-4"
-          style={{
-            width: `${Math.min(Math.abs(swipeOffset), MAX_SWIPE)}px`,
-            transition: 'opacity 160ms ease-out',
-            opacity: Math.min(Math.abs(swipeOffset) / SWIPE_THRESHOLD, 1),
-          }}
-        >
-          <div 
-            className="flex items-center gap-2 px-3 py-2 rounded-full"
-            style={{
-              background: 'rgba(255, 59, 48, 0.22)',
-              border: '1px solid rgba(255, 255, 255, 0.16)',
-            }}
-          >
-            <Trash2 
-              size={16} 
-              style={{ color: 'rgba(255, 255, 255, 0.92)' }}
-            />
-            <span 
-              className="text-sm font-medium whitespace-nowrap"
-              style={{ color: 'rgba(255, 255, 255, 0.92)' }}
-            >
-              Delete
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Main row content */}
-      <div
-        {...handlers}
-        style={{
-          transform: `translateX(${swipeOffset}px)`,
-          transition: swipeOffset === 0 ? 'transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none',
-        }}
+      <HistoryRow 
+        item={item}
+        onToggle={onToggle}
+        trailing={trailingActions}
       >
-        <HistoryRow 
-          item={item}
-          onToggle={onToggle}
-          trailing={trailingActions}
-        >
-          {children}
-        </HistoryRow>
-      </div>
+        {children}
+      </HistoryRow>
     </div>
   );
 };
+
+export default SwipeableHistoryRow;
