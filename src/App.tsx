@@ -93,6 +93,7 @@ const LogosPage = lazy(() => import("./pages/admin/LogosPage").then(m => ({ defa
 const CountryFlagsPage = lazy(() => import("./pages/admin/CountryFlagsPage").then(m => ({ default: m.CountryFlagsPage })));
 const CourseImportPage = lazy(() => import("./pages/admin/CourseImportPage").then(m => ({ default: m.CourseImportPage })));
 const AnalyticsPage = lazy(() => import("./features/admin/pages/AdminAnalyticsPage").then(m => ({ default: m.AdminAnalyticsPage })));
+const EchoAnalyticsPage = lazy(() => import("./features/admin/pages/EchoAnalyticsPage"));
 const TeamPage = lazy(() => import("./pages/admin/TeamPage").then(m => ({ default: m.TeamPage })));
 const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage").then(m => ({ default: m.AdminSettingsPage })));
 
@@ -206,6 +207,11 @@ function AppRoutes() {
           <Route path="analytics" element={
             <PanelGuard need="admins">
               <AnalyticsPage />
+            </PanelGuard>
+          } />
+          <Route path="echo-analytics" element={
+            <PanelGuard need="admins">
+              <EchoAnalyticsPage />
             </PanelGuard>
           } />
           <Route path="team" element={<TeamPage />} />

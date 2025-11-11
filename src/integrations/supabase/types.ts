@@ -179,6 +179,36 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_events: {
+        Row: {
+          created_at: string
+          id: string
+          ip: unknown
+          name: string
+          props: Json
+          ua: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip?: unknown
+          name: string
+          props?: Json
+          ua?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip?: unknown
+          name?: string
+          props?: Json
+          ua?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       badges: {
         Row: {
           category: Database["public"]["Enums"]["badge_category"]
@@ -3512,6 +3542,43 @@ export type Database = {
         }[]
       }
       echo_share_revoke: { Args: { p_token: string }; Returns: undefined }
+      echo_stats_exports: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          kind: string
+          total: number
+        }[]
+      }
+      echo_stats_overview: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          events_count: number
+          exports: number
+          shares_created: number
+          unique_users: number
+        }[]
+      }
+      echo_stats_timeseries: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          day: string
+          events: number
+        }[]
+      }
+      echo_stats_top_tags: {
+        Args: { p_from: string; p_limit?: number; p_to: string }
+        Returns: {
+          tag: string
+          uses: number
+        }[]
+      }
+      echo_stats_top_users: {
+        Args: { p_from: string; p_limit?: number; p_to: string }
+        Returns: {
+          events: number
+          user_id: string
+        }[]
+      }
       echo_tag_add: {
         Args: { p_tag: string; p_thread: string }
         Returns: undefined
