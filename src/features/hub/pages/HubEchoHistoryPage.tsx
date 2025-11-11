@@ -1131,7 +1131,6 @@ export function HubEchoHistoryPage() {
                             </div>
                           </div>
                         </div>
-                        </div>
                       )}
                     </div>
                   );
