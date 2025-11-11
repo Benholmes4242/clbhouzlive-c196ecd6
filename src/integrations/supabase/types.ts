@@ -839,6 +839,42 @@ export type Database = {
           },
         ]
       }
+      echo_share_redactions: {
+        Row: {
+          action: string
+          created_at: string
+          message_id: string
+          token: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          message_id: string
+          token: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          message_id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "echo_share_redactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "echo_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "echo_share_redactions_token_fkey"
+            columns: ["token"]
+            isOneToOne: false
+            referencedRelation: "echo_share_links"
+            referencedColumns: ["token"]
+          },
+        ]
+      }
       echo_shares: {
         Row: {
           created_at: string | null
@@ -3741,6 +3777,11 @@ export type Database = {
         }[]
       }
       echo_share_revoke: { Args: { p_token: string }; Returns: undefined }
+      echo_share_rotate: { Args: { p_thread: string }; Returns: string }
+      echo_share_set_redactions: {
+        Args: { p_pairs: Json; p_token: string }
+        Returns: undefined
+      }
       echo_stats_exports: {
         Args: { p_from: string; p_to: string }
         Returns: {
