@@ -8,7 +8,7 @@ import { X, ExternalLink, Copy } from 'lucide-react';
 import { MessageBubble } from '@/components/ai-chat/MessageBubble';
 import { groupMessages } from '@/components/ai-chat/utils/groupMessages';
 import { useEchoThreadMessages } from '../hooks/useEchoThreadMessages';
-import { VirtualList } from './virtual/VirtualList';
+
 import { timeAgo } from '@/utils/date';
 
 export interface HistoryThreadInlineProps {
@@ -36,13 +36,21 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   // DEBUG: log when inline panel mounts
   console.debug('[Inline] mount', { threadId, title, messageCount: messages?.length });
 
-  // Report height changes to parent for virtualization
+  // Report height changes to parent for virtualization (ResizeObserver)
+  const lastHeightRef = useRef(0);
   useLayoutEffect(() => {
-    if (containerRef.current && onHeightChange) {
-      const height = containerRef.current.getBoundingClientRect().height;
-      onHeightChange(height);
-    }
-  }, [messages.length, isLoading, error, onHeightChange]);
+    if (!containerRef.current || !onHeightChange) return;
+    const el = containerRef.current;
+    const ro = new ResizeObserver((entries) => {
+      const h = Math.ceil(entries[0].contentRect.height);
+      if (Math.abs(h - lastHeightRef.current) > 1) {
+        lastHeightRef.current = h;
+        onHeightChange(h);
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [onHeightChange, isLoading, error, messages.length]);
 
   return (
     <div
@@ -179,40 +187,31 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         )}
 
         {!isLoading && !error && groupedMessages.length > 0 && (
-          <VirtualList
-            count={groupedMessages.length}
-            estimateSize={120}
-            overscan={2}
-            className="h-full"
-            render={(index) => {
-              const msg = groupedMessages[index];
-              return (
-                <div className="mb-3">
-                  <MessageBubble
-                    key={msg.id}
-                    role={msg.role as 'user' | 'assistant'}
-                    content={msg.content}
-                    timestamp={msg.created_at}
-                    firstInGroup={msg.firstInGroup}
-                    lastInGroup={msg.lastInGroup}
-                    readOnly={true}
-                    showChips={msg.firstInGroup}
-                    maxWidth="desktop"
-                  />
-                  
-                  {/* Meta line */}
-                  <div
-                    className="mt-1 mb-2 text-[12px] anim-slideUp"
-                    style={{ color: 'var(--meta-dim)' }}
-                    aria-label={`Sent ${timeAgo(msg.created_at)}`}
-                  >
-                    <span>{timeAgo(msg.created_at)}</span>
-                  </div>
+          <div role="feed">
+            {groupedMessages.map((msg) => (
+              <div key={msg.id} className="mb-3">
+                <MessageBubble
+                  role={msg.role as 'user' | 'assistant'}
+                  content={msg.content}
+                  timestamp={msg.created_at}
+                  firstInGroup={msg.firstInGroup}
+                  lastInGroup={msg.lastInGroup}
+                  readOnly={true}
+                  showChips={msg.firstInGroup}
+                  maxWidth="desktop"
+                />
+                <div
+                  className="mt-1 mb-2 text-[12px] anim-slideUp"
+                  style={{ color: 'var(--meta-dim)' }}
+                  aria-label={`Sent ${timeAgo(msg.created_at)}`}
+                >
+                  <span>{timeAgo(msg.created_at)}</span>
                 </div>
-              );
-            }}
-          />
+              </div>
+            ))}
+          </div>
         )}
+
       </div>
     </div>
   );
