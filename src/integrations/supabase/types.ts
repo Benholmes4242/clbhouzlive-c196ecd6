@@ -3603,29 +3603,54 @@ export type Database = {
           user_id: string
         }[]
       }
-      echo_history_search: {
-        Args: {
-          date_from?: string
-          date_to?: string
-          filter_has_response?: boolean
-          filter_starred?: boolean
-          filter_tag?: string
-          max_results?: number
-          mode?: string
-          q?: string
-          sort_mode?: string
-        }
-        Returns: {
-          first_user_question: string
-          has_response: boolean
-          is_starred: boolean
-          last_activity_at: string
-          message_count: number
-          preview_snippet: string
-          relative_date: string
-          thread_id: string
-        }[]
-      }
+      echo_history_search:
+        | {
+            Args: {
+              date_from?: string
+              date_to?: string
+              filter_has_response?: boolean
+              filter_starred?: boolean
+              filter_tag?: string
+              max_results?: number
+              mode?: string
+              q?: string
+              sort_mode?: string
+            }
+            Returns: {
+              first_user_question: string
+              has_response: boolean
+              is_starred: boolean
+              last_activity_at: string
+              message_count: number
+              preview_snippet: string
+              relative_date: string
+              thread_id: string
+            }[]
+          }
+        | {
+            Args: {
+              date_from?: string
+              date_to?: string
+              filter_has_response?: boolean
+              filter_starred?: boolean
+              filter_tag?: string
+              max_results?: number
+              mode?: string
+              q?: string
+              sort_mode?: string
+            }
+            Returns: {
+              first_user_question: string
+              has_response: boolean
+              is_starred: boolean
+              last_activity_at: string
+              message_count: number
+              preview_snippet: string
+              relative_date: string
+              tags: string[]
+              thread_id: string
+            }[]
+          }
       echo_share_create: {
         Args: { p_thread_id: string; p_ttl_seconds?: number }
         Returns: string

@@ -66,7 +66,7 @@ export function useEchoHistorySearch(
       const results = (data || []).map((row: any) => ({
         id: row.thread_id,
         title: row.first_user_question,
-        subtitle: row.preview_snippet,
+        subtitle: row.preview_snippet ?? row.first_user_question ?? '',
         has_response: row.has_response,
         is_starred: row.is_starred,
         last_activity_at: row.last_activity_at,
