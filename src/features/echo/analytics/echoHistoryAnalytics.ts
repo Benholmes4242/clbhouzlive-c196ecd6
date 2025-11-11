@@ -245,4 +245,13 @@ export const echoHistoryAnalytics = {
   }) {
     track('echo_bulk_tags_remove', props);
   },
+
+  // Search highlighting
+  highlightRendered(props: {
+    query: string;
+    matches_title: number;
+    matches_subtitle: number;
+  }) {
+    track('echo_highlight_rendered', props);
+  },
 };

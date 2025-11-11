@@ -3,14 +3,15 @@
  * Apple-grade glass card with title + preview + timestamp
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Star } from 'lucide-react';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import { cn } from '@/lib/utils';
 import { RowContextMenu } from './RowContextMenu';
 import { ThreadTagBar } from './tags/ThreadTagBar';
-import { highlight } from '../utils/highlight';
-import { fetchThreadDetails } from '../api/threadDetails';
+import { HighlightedText } from './HighlightedText';
+import { highlightSegments } from '../utils/highlight';
+import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
 
 export interface HistoryRowProps {
   id: string;
@@ -56,6 +57,19 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
   tags = [],
   onTagsChange,
 }) => {
+  // Track highlighting analytics
+  useEffect(() => {
+    if (!searchQuery) return;
+    const titleMatches = highlightSegments(title || '', searchQuery).filter(s => s.match).length;
+    const subMatches = highlightSegments(subtitle || '', searchQuery).filter(s => s.match).length;
+    if (titleMatches + subMatches > 0) {
+      echoHistoryAnalytics.highlightRendered({
+        query: String(searchQuery),
+        matches_title: titleMatches,
+        matches_subtitle: subMatches,
+      });
+    }
+  }, [title, subtitle, searchQuery]);
   return (
     <div className={cn('flex items-center gap-2', className)}>
       {/* Selection checkbox */}
@@ -98,7 +112,7 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <div className="truncate font-medium text-[15px] leading-5" style={{ color: 'var(--hub-text)' }}>
-              {searchQuery ? highlight(title, searchQuery) : title}
+              <HighlightedText text={title} query={searchQuery} />
             </div>
             {relative_date && (
               <div className="text-[12px]" style={{ color: 'var(--meta-dim)' }}>
@@ -118,7 +132,7 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
 
           {/* Line 2: subtitle/meta */}
           <div className="mt-0.5 text-[13px] leading-[18px] line-clamp-2" style={{ color: 'var(--meta-strong)' }}>
-            {searchQuery ? highlight(subtitle, searchQuery) : subtitle}
+            <HighlightedText text={subtitle || ''} query={searchQuery} truncate={220} />
           </div>
 
           {/* Line 3: meta chips */}
