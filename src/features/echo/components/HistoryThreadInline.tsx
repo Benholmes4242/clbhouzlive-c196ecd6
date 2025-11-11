@@ -148,7 +148,6 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         )}
 
         {!isLoading && !error && groupedMessages.length > 0 && (
-        {!isLoading && !error && groupedMessages.length > 0 && (
           <div className="space-y-3">
             {groupedMessages.map((msg) => (
               <div key={msg.id} className="mb-3">
@@ -172,8 +171,6 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
               </div>
             ))}
           </div>
-        )}
-
         )}
       </div>
     </div>
