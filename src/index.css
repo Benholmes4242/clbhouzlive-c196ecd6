@@ -498,6 +498,93 @@ html, body, #root {
   .animate-echoPulse { animation: none !important; }
   .animate-\[fadeIn_320ms_ease-out\] { animation: none !important; }
   .animate-\[presencePulse_900ms_ease-in-out_infinite\] { animation: none !important; }
+}
+
+/* ========================================
+   ECHO HISTORY - INLINE EXPANSION TOKENS
+   ======================================== */
+:root {
+  --eh-card-radius: 14px;
+  --eh-bubble-radius: 10px;
+  --eh-border: rgba(255,255,255,0.06);
+  --eh-shadow: 0 6px 16px rgba(0,0,0,0.28);
+  --eh-bg: rgba(22,22,24,0.75);
+  --eh-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --eh-h: 240ms;
+  --eh-fade: 120ms;
+}
+
+/* Card shell */
+.eh-card {
+  border: 1px solid var(--eh-border);
+  border-radius: var(--eh-card-radius);
+  background: var(--eh-bg);
+  box-shadow: var(--eh-shadow);
+  overflow: hidden;
+  -webkit-backdrop-filter: saturate(120%) blur(8px);
+          backdrop-filter: saturate(120%) blur(8px);
+}
+
+/* Height animation wrapper */
+.eh-panel {
+  height: 0;
+  transition: height var(--eh-h) var(--eh-ease);
+  will-change: height;
+}
+
+/* Content reveal */
+.eh-reveal {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--eh-fade) ease, transform var(--eh-fade) ease;
+}
+.eh-reveal--in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Sticky mini header inside expanded thread */
+.eh-miniheader {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: linear-gradient(to bottom, rgba(18,18,20,0.95), rgba(18,18,20,0.75));
+  border-bottom: 1px solid var(--eh-border);
+}
+
+/* Thread scroll area */
+.eh-thread-scroll {
+  max-height: min(60vh, 520px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 12px;
+}
+
+/* Message row reveal with micro-stagger */
+.eh-thread-scroll > * {
+  opacity: 0;
+  transform: translateY(4px);
+  animation: eh-row-in var(--eh-fade) ease forwards;
+}
+.eh-thread-scroll > *:nth-child(1) { animation-delay: 40ms; }
+.eh-thread-scroll > *:nth-child(2) { animation-delay: 60ms; }
+.eh-thread-scroll > *:nth-child(3) { animation-delay: 80ms; }
+@keyframes eh-row-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Reduce repaint cost from heavy filters on every row */
+@media (prefers-reduced-transparency: reduce) {
+  .eh-card { backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
   .animate-\[rowFadeUp_90ms_ease-out_both\] { animation: none !important; }
   .animate-\[chipAppear_120ms_ease-out_both\] { animation: none !important; }
   .anim-fade,

@@ -84,6 +84,8 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
       role="option"
       data-row-index={index}
       aria-selected={selectionMode ? selected : undefined}
+      aria-expanded={Boolean(children)}
+      aria-controls={children ? `thread-panel-${id}` : undefined}
     >
       {/* Selection checkbox */}
       {selectionMode && (
