@@ -186,14 +186,15 @@ export function HubEchoHistoryPage() {
   // Track expanded heights for proper virtualization
   const expandedHeightsRef = useRef<Map<string, number>>(new Map());
   
-  // Dynamic size calculation: base row + expanded inline thread
+  // Dynamic size calculation: base row + expanded inline thread + spacing
   const getRowSize = (index: number) => {
     const chat = chats[index];
     const baseHeight = 72; // Row height
+    const spacing = 12; // 12px gap between cards (space-y-3)
     const expandedHeight = expandedId === chat.id 
       ? (expandedHeightsRef.current.get(chat.id) || 400) 
       : 0;
-    return baseHeight + expandedHeight + (expandedId === chat.id ? 8 : 0); // 8px gap
+    return baseHeight + expandedHeight + (expandedId === chat.id ? 8 : 0) + spacing;
   };
   
   // Inject sortMode into filters
@@ -1038,7 +1039,7 @@ export function HubEchoHistoryPage() {
                   const isChecked = selectedIds.has(item.id);
                   
                   return (
-                    <div role="listitem" className="mb-3">
+                    <div role="listitem" className="pb-3">
                       <SwipeableHistoryRow
                         id={item.id}
                         title={item.title}

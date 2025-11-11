@@ -225,32 +225,30 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
             </div>
           )}
           
-          {/* Desktop hover actions */}
-          {isDesktop && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-2">
-              <button
-                onClick={handleStarClick}
-                className="p-2 rounded-full hover:bg-white/10 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
-                aria-label={isStarred ? 'Unstar conversation' : 'Star conversation'}
-              >
-                <Star 
-                  size={16} 
-                  style={{ color: 'var(--hub-text)' }}
-                  fill={isStarred ? 'currentColor' : 'none'}
-                />
-              </button>
-              <button
-                onClick={handleDeleteClick}
-                className="p-2 rounded-full hover:bg-red-500/20 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
-                aria-label="Delete conversation"
-              >
-                <Trash2 
-                  size={16} 
-                  style={{ color: 'rgba(255, 59, 48, 0.9)' }}
-                />
-              </button>
-            </div>
-          )}
+          {/* Action buttons (desktop hover, mobile always visible) */}
+          <div className={`absolute right-3 top-1/2 -translate-y-1/2 transition-opacity duration-200 flex items-center gap-2 ${isDesktop ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>
+            <button
+              onClick={handleStarClick}
+              className="p-2 rounded-full hover:bg-white/10 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+              aria-label={isStarred ? 'Unstar conversation' : 'Star conversation'}
+            >
+              <Star 
+                size={16} 
+                style={{ color: 'var(--hub-text)' }}
+                fill={isStarred ? 'currentColor' : 'none'}
+              />
+            </button>
+            <button
+              onClick={handleDeleteClick}
+              className="p-2 rounded-full hover:bg-red-500/20 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+              aria-label="Delete conversation"
+            >
+              <Trash2 
+                size={16} 
+                style={{ color: 'rgba(255, 59, 48, 0.9)' }}
+              />
+            </button>
+          </div>
         </div>
       </div>
     </div>
