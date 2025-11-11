@@ -3,19 +3,27 @@
  * Read-only view with Apple glass styling
  */
 
-import React, { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getSharedThread } from '@/features/echo/api/shareActions';
 import { MessageBubble } from '@/components/ai-chat/MessageBubble';
 import { groupMessages } from '@/components/ai-chat/utils/groupMessages';
 import { echoHistoryAnalytics } from '@/features/echo/analytics/echoHistoryAnalytics';
+import { HighlightedText } from '@/features/echo/components/HighlightedText';
 import { ArrowLeft } from 'lucide-react';
 import '@/features/hub/home/hubTheme.css';
 
 export function HubEchoSharePage() {
   const { token } = useParams<{ token: string }>();
   const nav = useNavigate();
+  const loc = useLocation();
+
+  // Parse ?q= search query for highlighting
+  const searchQuery = useMemo(() => {
+    const params = new URLSearchParams(loc.search);
+    return (params.get('q') || '').trim();
+  }, [loc.search]);
 
   const { data: thread, isLoading, error } = useQuery({
     queryKey: ['echo-share', token],
@@ -70,7 +78,10 @@ export function HubEchoSharePage() {
           Home
         </button>
         <h1 className="text-white/90 text-[17px] font-semibold">
-          {thread ? thread.title : 'Shared Conversation'}
+          <HighlightedText
+            text={thread ? thread.title : 'Shared Conversation'}
+            query={searchQuery}
+          />
         </h1>
         <div className="w-16" />
       </header>
@@ -132,6 +143,7 @@ export function HubEchoSharePage() {
                   readOnly={true}
                   showChips={msg.firstInGroup}
                   maxWidth="desktop"
+                  searchQuery={searchQuery}
                 />
               ))}
             </div>

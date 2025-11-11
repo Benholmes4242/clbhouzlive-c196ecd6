@@ -12,6 +12,7 @@ import { Bot, Globe, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import SquircleImage from '@/components/ui/SquircleImage';
+import { HighlightedText } from '@/features/echo/components/HighlightedText';
 
 export interface MessageBubbleProps {
   role: 'user' | 'assistant';
@@ -31,6 +32,7 @@ export interface MessageBubbleProps {
   userDisplayName?: string;
   mediaTop?: React.ReactNode;
   children?: React.ReactNode;
+  searchQuery?: string;
 }
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({
@@ -47,6 +49,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   userDisplayName,
   mediaTop,
   children,
+  searchQuery,
 }) => {
   const [showSources, setShowSources] = useState(false);
   const isUser = role === 'user';
@@ -161,7 +164,11 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                     className="break-words [&>*:first-child]:mt-0 [&>*:last-child]:mb-0" 
                     style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
                   >
-                    {content}
+                    <HighlightedText
+                      text={content}
+                      query={searchQuery}
+                      announceCount={!!searchQuery}
+                    />
                   </div>
                 ) : (
                   <ReactMarkdown
@@ -190,7 +197,19 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                           {children}
                         </h4>
                       ),
-                      p: ({ children }) => <p className="my-2 first:mt-0 last:mb-0 break-words">{children}</p>,
+                      p: ({ children }) => (
+                        <p className="my-2 first:mt-0 last:mb-0 break-words">
+                          {searchQuery && typeof children === 'string' ? (
+                            <HighlightedText
+                              text={children}
+                              query={searchQuery}
+                              announceCount={false}
+                            />
+                          ) : (
+                            children
+                          )}
+                        </p>
+                      ),
                       ul: ({ children }) => <ul className="list-disc pl-[18px] my-2 marker:text-white/65">{children}</ul>,
                       ol: ({ children }) => <ol className="list-decimal pl-[18px] my-2 marker:text-white/65">{children}</ol>,
                       li: ({ children }) => <li className="leading-[1.55] my-0.5">{children}</li>,
