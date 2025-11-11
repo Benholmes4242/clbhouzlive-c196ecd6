@@ -185,16 +185,18 @@ export function HubEchoHistoryPage() {
   
   // Track expanded heights for proper virtualization
   const expandedHeightsRef = useRef<Map<string, number>>(new Map());
+  const [sizeNonce, setSizeNonce] = useState(0);
   
   // Dynamic size calculation: base row + expanded inline thread + spacing
-  const getRowSize = (index: number) => {
-    // TEMP: force every row to reserve mock inline height for visibility testing
+  const getRowSize = useCallback((index: number) => {
     const baseHeight = 72; // Row height
-    const spacing = 12; // 12px gap between cards (space-y-3)
-    const mockInlineHeight = 220; // fixed mock panel height
-    return baseHeight + mockInlineHeight + spacing;
-  };
-  
+    const spacing = 12; // Consistent vertical rhythm
+    const item = chats[index];
+    if (!item) return baseHeight + spacing;
+    const isExpanded = expandedId === item.id;
+    const inlineHeight = isExpanded ? (expandedHeightsRef.current.get(item.id) ?? 220) : 0; // fallback while measuring
+    return baseHeight + inlineHeight + spacing;
+  }, [chats, expandedId, sizeNonce]);
   // Inject sortMode into filters
   useEffect(() => {
     setFilters(prev => ({ ...prev, sortMode }));
@@ -1095,7 +1097,8 @@ export function HubEchoHistoryPage() {
                             title={item.title}
                             onCollapse={() => setExpandedId(null)}
                             onHeightChange={(h) => {
-                              console.log('[inline] height report:', h);
+                              expandedHeightsRef.current.set(item.id, Math.ceil(h));
+                              setSizeNonce((n) => n + 1);
                             }}
                           />
                         )}
