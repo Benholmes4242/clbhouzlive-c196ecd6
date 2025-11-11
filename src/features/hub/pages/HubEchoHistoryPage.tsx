@@ -1005,7 +1005,7 @@ export function HubEchoHistoryPage() {
                   const isChecked = selectedIds.has(item.id);
                   
                   return (
-                    <div role="listitem" className="pb-3">
+                    <div role="listitem">
                       <SwipeableHistoryRow
                         item={{
                           id: item.id,

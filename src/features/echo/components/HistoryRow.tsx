@@ -16,7 +16,7 @@ type Props = {
 
 export function HistoryRow({ item, onToggle, trailing, children }: Props) {
   return (
-    <div role="listitem">
+    <>
       <div className="eh-row" onClick={onToggle} aria-expanded={!!children}>
         <div className="flex items-start justify-between gap-8">
           <div className="flex-1 min-w-0">
@@ -37,6 +37,6 @@ export function HistoryRow({ item, onToggle, trailing, children }: Props) {
       </div>
       
       <div className="eh-divider" />
-    </div>
+    </>
   );
 }
