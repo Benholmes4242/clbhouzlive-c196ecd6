@@ -36,7 +36,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   // Report height changes to parent for virtualization
   useLayoutEffect(() => {
     if (containerRef.current && onHeightChange) {
-      const height = containerRef.current.offsetHeight;
+      const height = containerRef.current.getBoundingClientRect().height;
       onHeightChange(height);
     }
   }, [messages.length, isLoading, error, onHeightChange]);
@@ -110,12 +110,13 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
       <div
         className="overflow-y-auto pr-1"
         style={{
+          display: 'block',
           maxHeight: 'min(65vh, 600px)',
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain',
-          maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
+          maskImage: 'linear-gradient(180deg, #000 92%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(180deg, #000 92%, transparent 100%)',
         }}
       >
         {isLoading && (
