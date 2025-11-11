@@ -3471,6 +3471,10 @@ export type Database = {
         Args: { p_tag: string; p_thread: string }
         Returns: undefined
       }
+      echo_tags_add_bulk: {
+        Args: { p_names: string[]; p_thread_ids: string[] }
+        Returns: undefined
+      }
       echo_tags_add_to_thread: {
         Args: { p_names: string[]; p_thread: string }
         Returns: undefined
@@ -3494,6 +3498,10 @@ export type Database = {
           name: string
           threads_count: number
         }[]
+      }
+      echo_tags_remove_bulk: {
+        Args: { p_names: string[]; p_thread_ids: string[] }
+        Returns: undefined
       }
       echo_tags_remove_from_thread: {
         Args: { p_name: string; p_thread: string }

@@ -601,6 +601,16 @@ export function HubEchoHistoryPage() {
 
       // Selection mode keyboard shortcuts
       if (selectMode) {
+        // T - open bulk tag dialog
+        if ((e.key === 't' || e.key === 'T') && !e.metaKey && !e.ctrlKey) {
+          e.preventDefault();
+          if (selectedArray.length > 0) {
+            setShowBulkTag(true);
+            announce(`Opened bulk tag for ${selectedArray.length} conversations`);
+          }
+          return;
+        }
+
         // Space - toggle selection on focused row
         if (e.key === ' ') {
           e.preventDefault();

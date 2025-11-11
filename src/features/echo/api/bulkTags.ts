@@ -1,7 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export async function bulkAddTagsToThreads(threadIds: string[], names: string[]) {
-  const { error } = await supabase.rpc('echo_tags_bulk_add_to_threads', {
+  const { error } = await supabase.rpc('echo_tags_add_bulk', {
     p_thread_ids: threadIds,
     p_names: names,
   });
@@ -9,7 +9,7 @@ export async function bulkAddTagsToThreads(threadIds: string[], names: string[])
 }
 
 export async function bulkRemoveTagsFromThreads(threadIds: string[], names: string[]) {
-  const { error } = await supabase.rpc('echo_tags_bulk_remove_from_threads', {
+  const { error } = await supabase.rpc('echo_tags_remove_bulk', {
     p_thread_ids: threadIds,
     p_names: names,
   });
