@@ -1,7 +1,8 @@
 import React from 'react';
 import { useAdminInsights } from '../hooks/useAdminInsights';
 import { BarChart3, MessageSquare, Share2, Users, Download } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
 
 export function AdminInsightsCard({ days = 30, className }: { days?: number; className?: string }) {
   const { data, isLoading, isError, refetch } = useAdminInsights(days);
@@ -53,6 +54,17 @@ export function AdminInsightsCard({ days = 30, className }: { days?: number; cla
           </div>
         )}
       </CardContent>
+      {data && (
+        <CardFooter className="justify-end pt-0">
+          <Link
+            to={`/admin/analytics?range=${days}d&focus=echo`}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded px-1.5 py-0.5"
+            aria-label="View full Echo analytics"
+          >
+            View full analytics →
+          </Link>
+        </CardFooter>
+      )}
     </Card>
   );
 }
