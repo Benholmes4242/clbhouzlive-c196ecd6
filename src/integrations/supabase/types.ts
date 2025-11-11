@@ -800,6 +800,45 @@ export type Database = {
           },
         ]
       }
+      echo_share_links: {
+        Row: {
+          created_at: string
+          revoked_at: string | null
+          thread_id: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          revoked_at?: string | null
+          thread_id: string
+          token: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          revoked_at?: string | null
+          thread_id?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "echo_share_links_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "echo_history_enriched"
+            referencedColumns: ["thread_id"]
+          },
+          {
+            foreignKeyName: "echo_share_links_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "echo_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       echo_shares: {
         Row: {
           created_at: string | null
@@ -3627,9 +3666,21 @@ export type Database = {
           thread_id: string
         }[]
       }
-      echo_share_create: {
-        Args: { p_thread_id: string; p_ttl_seconds?: number }
-        Returns: string
+      echo_share_create:
+        | { Args: { p_thread: string }; Returns: string }
+        | {
+            Args: { p_thread_id: string; p_ttl_seconds?: number }
+            Returns: string
+          }
+      echo_share_fetch: {
+        Args: { p_token: string }
+        Returns: {
+          created_at: string
+          messages: Json
+          tags: string[]
+          thread_id: string
+          title: string
+        }[]
       }
       echo_share_get_by_thread: {
         Args: { p_thread_id: string }
