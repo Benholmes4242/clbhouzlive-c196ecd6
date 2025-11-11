@@ -600,3 +600,12 @@ mark {
   border-radius: 4px;
   padding: 0 .5px;
 }
+
+.hl-match {
+  background: color-mix(in oklab, var(--hub-accent, #6e9277) 28%, transparent);
+  padding: 0 .02em;
+  border-radius: 2px;
+}
+.dark .hl-match {
+  background: color-mix(in oklab, var(--hub-accent, #6e9277) 38%, transparent);
+}
