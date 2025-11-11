@@ -112,17 +112,16 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
       {/* Main row container */}
       <div
         className={cn(
-          'hub-row flex-1 text-left rounded-[18px] p-3.5 transition-all anim-fade relative',
-          'border border-white/10',
+          'hub-row flex-1 text-left transition-all relative',
           selectionMode && 'is-select-mode',
           selected && 'is-selected'
         )}
-        style={{ background: 'rgba(255,255,255,.06)', backdropFilter: 'blur(10px)' }}
+        style={{ background: 'transparent', border: '0', borderRadius: 0, backdropFilter: 'none' }}
       >
         <button
           onClick={onClick}
           aria-label={`Open conversation: ${title}`}
-          className="w-full text-left focus:outline-none focus:ring-2 focus:ring-white/18 rounded-lg hover:translate-y-[-1px] transition-transform"
+          className="w-full text-left focus:outline-none"
         >
         {/* Hidden focus target for keyboard navigation */}
         <button
@@ -224,7 +223,7 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
         
         {/* Expanded content */}
         {children && (
-          <div className="px-3.5 pb-3.5">
+          <div className="pt-2">
             {children}
           </div>
         )}

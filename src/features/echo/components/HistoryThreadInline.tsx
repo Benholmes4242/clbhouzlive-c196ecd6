@@ -47,60 +47,6 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
     >
       <div ref={autoHeightRef}>
         <div ref={containerRef}>
-          {/* Separator */}
-          <div 
-            className="mb-3 mt-2"
-            style={{ borderTop: '1px solid var(--hub-stroke)' }}
-          />
-          
-          {/* Mini header */}
-          <div className="eh-miniheader">
-            <div 
-              className="text-[14px] font-medium truncate flex-1"
-              style={{ color: 'var(--hub-text)' }}
-            >
-              {title}
-            </div>
-
-            <div className="flex items-center gap-1">
-              {onCopyLink && (
-                <button
-                  onClick={onCopyLink}
-                  className="p-1.5 rounded-lg transition-colors"
-                  style={{ color: 'var(--hub-text-dim)' }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-dim)'}
-                  aria-label="Copy link"
-                >
-                  <Copy className="w-4 h-4" />
-                </button>
-              )}
-              
-              {onOpenFull && (
-                <button
-                  onClick={onOpenFull}
-                  className="p-1.5 rounded-lg transition-colors"
-                  style={{ color: 'var(--hub-text-dim)' }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-dim)'}
-                  aria-label="Open full"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                </button>
-              )}
-
-              <button
-                onClick={onCollapse}
-                className="p-1.5 rounded-lg transition-colors"
-                style={{ color: 'var(--hub-text-dim)' }}
-                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-                onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-dim)'}
-                aria-label="Close inline preview"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
 
           {/* Inline messages: plain text log, no bubbles */}
           <div
