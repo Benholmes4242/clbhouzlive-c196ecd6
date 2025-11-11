@@ -12,6 +12,7 @@ import { groupMessages } from '@/components/ai-chat/utils/groupMessages';
 import { echoHistoryAnalytics } from '@/features/echo/analytics/echoHistoryAnalytics';
 import { HighlightedText } from '@/features/echo/components/HighlightedText';
 import { ArrowLeft, X } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 import '@/features/hub/home/hubTheme.css';
 
 export function HubEchoSharePage() {
@@ -102,12 +103,30 @@ export function HubEchoSharePage() {
           />
         </h1>
         
-        {/* Share search */}
-        <div
-          role="search"
-          aria-label="Search within shared conversation"
-          className="flex items-center gap-2 flex-shrink-0"
-        >
+        {/* Copy link + Share search */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.href);
+              toast({
+                description: 'Link copied to clipboard',
+                duration: 2000,
+              });
+            }}
+            className="px-3 py-1.5 rounded-full text-[13px] border transition-colors hover:bg-white/10"
+            style={{ 
+              borderColor: 'rgba(255,255,255,0.10)',
+              color: 'var(--hub-text)'
+            }}
+            aria-label="Copy share link"
+          >
+            Copy link
+          </button>
+
+          <div
+            role="search"
+            aria-label="Search within shared conversation"
+          >
           <div
             className="flex items-center gap-2 px-3 py-1.5 rounded-full border"
             style={{ 
@@ -140,6 +159,7 @@ export function HubEchoSharePage() {
                 <X size={14} className="text-white/90" />
               </button>
             )}
+          </div>
           </div>
         </div>
       </header>
