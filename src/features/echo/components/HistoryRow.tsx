@@ -38,6 +38,8 @@ export interface HistoryRowProps {
   // Keyboard navigation
   index?: number;
   onFocusIndex?: (index: number) => void;
+  // Expansion
+  children?: React.ReactNode;
 }
 
 export const HistoryRow: React.FC<HistoryRowProps> = ({
@@ -61,6 +63,7 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
   onTagsChange,
   index,
   onFocusIndex,
+  children,
 }) => {
   // Track highlighting analytics
   useEffect(() => {
@@ -104,19 +107,21 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
         </button>
       )}
       
-      {/* Main row button */}
-      <button
-        onClick={onClick}
-        aria-label={`Open conversation: ${title}`}
+      {/* Main row container */}
+      <div
         className={cn(
           'hub-row flex-1 text-left rounded-[18px] p-3.5 transition-all anim-fade relative',
-          'hover:translate-y-[-1px] focus:outline-none focus:ring-2 focus:ring-white/18',
           'border border-white/10',
           selectionMode && 'is-select-mode',
           selected && 'is-selected'
         )}
         style={{ background: 'rgba(255,255,255,.06)', backdropFilter: 'blur(10px)' }}
       >
+        <button
+          onClick={onClick}
+          aria-label={`Open conversation: ${title}`}
+          className="w-full text-left focus:outline-none focus:ring-2 focus:ring-white/18 rounded-lg hover:translate-y-[-1px] transition-transform"
+        >
         {/* Hidden focus target for keyboard navigation */}
         <button
           type="button"
@@ -213,7 +218,15 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
           </div>
         )}
       </div>
-      </button>
+        </button>
+        
+        {/* Expanded content */}
+        {children && (
+          <div className="px-3.5 pb-3.5">
+            {children}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

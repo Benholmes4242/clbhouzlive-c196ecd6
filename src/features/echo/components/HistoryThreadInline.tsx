@@ -44,20 +44,20 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   return (
     <div
       ref={containerRef}
-      className="mt-2 mb-3 ml-1 pl-3 overflow-hidden transition-[height] anim-slideUp"
-      style={{
-        borderLeft: '1px solid var(--hub-stroke)',
-        transitionDuration: 'var(--anim-med)',
-        transitionTimingFunction: 'var(--anim-ease)',
-      }}
+      className="overflow-hidden transition-[height]"
       role="log"
       aria-live="polite"
       aria-relevant="additions"
       aria-label="Echo conversation thread"
     >
+      {/* Separator */}
+      <div 
+        className="mb-3 mt-2"
+        style={{ borderTop: '1px solid var(--hub-stroke)' }}
+      />
       {/* Header */}
       <div 
-        className="flex items-center justify-between mb-3 px-3 py-2"
+        className="flex items-center justify-between mb-3 py-2"
       >
         <div 
           className="text-[14px] font-medium truncate flex-1"
