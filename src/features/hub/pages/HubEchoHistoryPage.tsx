@@ -1104,6 +1104,17 @@ export function HubEchoHistoryPage() {
                             <div style={{ marginTop: '8px', fontSize: '14px' }}>
                               Thread ID: {item.id}
                             </div>
+                            <div style={{ marginTop: '12px', fontSize: '14px', lineHeight: 1.5 }}>
+                              <p style={{ marginBottom: '10px' }}>
+                                This is a long mock message designed to be roughly one hundred characters so spacing and wrapping are clear across.
+                              </p>
+                              <p style={{ marginBottom: '10px' }}>
+                                Another sample paragraph shows how multiple blocks of about one hundred characters wrap nicely within the inline panel layout.
+                              </p>
+                              <p>
+                                Final example paragraph demonstrates scrolling once content exceeds the card height, validating container sizing behavior.
+                              </p>
+                            </div>
                           </div>
                         )}
                       </SwipeableHistoryRow>
