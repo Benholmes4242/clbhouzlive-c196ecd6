@@ -80,7 +80,7 @@ export const HistoryRow: React.FC<HistoryRowProps> = ({
   }, [title, subtitle, searchQuery]);
   return (
     <div 
-      className={cn('flex items-center gap-2 mb-3', className)}
+      className={cn('flex items-center gap-2 mb-4', className)}
       role="option"
       data-row-index={index}
       aria-selected={selectionMode ? selected : undefined}
