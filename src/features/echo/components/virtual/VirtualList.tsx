@@ -41,6 +41,7 @@ interface VirtualListProps {
 
 /**
  * Sizer component to measure actual rendered height
+ * Uses ResizeObserver to detect dynamic height changes
  */
 function Sizer({ 
   onSize, 
@@ -52,10 +53,26 @@ function Sizer({
   const ref = useRef<HTMLDivElement>(null);
   
   useLayoutEffect(() => {
-    if (ref.current) {
-      const height = ref.current.offsetHeight;
-      onSize(height);
-    }
+    const el = ref.current;
+    if (!el) return;
+    
+    // Initial measurement
+    const height = el.offsetHeight;
+    onSize(height);
+    
+    // Watch for height changes
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const newHeight = entry.target.getBoundingClientRect().height;
+        onSize(newHeight);
+      }
+    });
+    
+    observer.observe(el);
+    
+    return () => {
+      observer.disconnect();
+    };
   }, [onSize]);
   
   return <div ref={ref}>{children}</div>;
