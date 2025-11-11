@@ -5,11 +5,7 @@
 
 import React, { useRef, useLayoutEffect } from 'react';
 import { X, ExternalLink, Copy } from 'lucide-react';
-import { MessageBubble } from '@/components/ai-chat/MessageBubble';
-import { groupMessages } from '@/components/ai-chat/utils/groupMessages';
 import { useEchoThreadMessages } from '../hooks/useEchoThreadMessages';
-import { VirtualList } from './virtual/VirtualList';
-import { timeAgo } from '@/utils/date';
 import { useAutoHeight } from '@/lib/ui/useAutoHeight';
 
 export interface HistoryThreadInlineProps {
@@ -32,7 +28,6 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { data: messages = [], isLoading, error } = useEchoThreadMessages(threadId);
-  const groupedMessages = groupMessages(messages);
   const isOpen = true; // This component only mounts when expanded
   const { ref: autoHeightRef, height } = useAutoHeight(isOpen);
 
@@ -111,73 +106,47 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
           </div>
         </div>
 
-        {/* Thread scroll area */}
-        <div className="eh-thread-scroll eh-reveal eh-reveal--in">
+        {/* Inline messages: plain text log, no bubbles */}
+        <div
+          ref={containerRef}
+          className="inline-thread max-h-[60vh] overflow-y-auto rounded-xl border border-white/10 bg-black/10 p-12 pt-8 backdrop-blur-sm"
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions"
+          aria-label="Echo conversation thread"
+        >
           {isLoading && (
-            <div className="space-y-3">
-              {[0, 1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="h-20 rounded-[18px] animate-pulse"
-                  style={{ background: 'var(--hub-glass-bg)' }}
-                />
-              ))}
-            </div>
+            <div className="text-white/60 text-sm py-3">Loading conversation…</div>
           )}
-
-          {!isLoading && error && (
-            <div
-              className="text-center py-8 text-[15px]"
-              style={{ color: 'var(--hub-text-dim)' }}
-            >
-              Couldn't load this conversation.
-            </div>
+          {error && (
+            <div className="text-red-400 text-sm py-3">Couldn't load messages.</div>
           )}
-
           {!isLoading && !error && messages.length === 0 && (
-            <div
-              className="text-center py-8 text-[15px]"
-              style={{ color: 'var(--hub-text-dim)' }}
-            >
-              No messages in this conversation yet.
-            </div>
+            <div className="text-white/60 text-sm py-3">No messages yet.</div>
           )}
 
-          {!isLoading && !error && groupedMessages.length > 0 && (
-            <VirtualList
-              count={groupedMessages.length}
-              estimateSize={120}
-              overscan={2}
-              className="h-full"
-              render={(index) => {
-                const msg = groupedMessages[index];
-                return (
-                  <div className="mb-3">
-                    <MessageBubble
-                      key={msg.id}
-                      role={msg.role as 'user' | 'assistant'}
-                      content={msg.content}
-                      timestamp={msg.created_at}
-                      firstInGroup={msg.firstInGroup}
-                      lastInGroup={msg.lastInGroup}
-                      readOnly={true}
-                      showChips={msg.firstInGroup}
-                      maxWidth="desktop"
-                    />
-                    
-                    {/* Meta line */}
-                    <div
-                      className="mt-1 mb-2 text-[12px] anim-slideUp"
-                      style={{ color: 'var(--meta-dim)' }}
-                      aria-label={`Sent ${timeAgo(msg.created_at)}`}
-                    >
-                      <span>{timeAgo(msg.created_at)}</span>
-                    </div>
-                  </div>
-                );
-              }}
-            />
-          )}
+          <ul className="space-y-6">
+            {messages.map((m) => (
+              <li key={m.id} className="inline-msg">
+                <div className="inline-msg-meta">
+                  <span className="inline-msg-role">
+                    {m.role === 'user' ? 'You' : 'Echo'}
+                  </span>
+                  <span className="inline-msg-dot">•</span>
+                  <time className="inline-msg-time">
+                    {new Date(m.created_at).toLocaleString()}
+                  </time>
+                </div>
+                <div
+                  className={`inline-msg-text ${
+                    m.role === 'user' ? 'is-user' : 'is-assistant'
+                  }`}
+                >
+                  {m.content}
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
         </div>
       </div>
