@@ -188,13 +188,11 @@ export function HubEchoHistoryPage() {
   
   // Dynamic size calculation: base row + expanded inline thread + spacing
   const getRowSize = (index: number) => {
-    const chat = chats[index];
+    // TEMP: force every row to reserve mock inline height for visibility testing
     const baseHeight = 72; // Row height
     const spacing = 12; // 12px gap between cards (space-y-3)
-    const expandedHeight = expandedId === chat.id 
-      ? (expandedHeightsRef.current.get(chat.id) || 400) 
-      : 0;
-    return baseHeight + expandedHeight + (expandedId === chat.id ? 8 : 0) + spacing;
+    const mockInlineHeight = 220; // fixed mock panel height
+    return baseHeight + mockInlineHeight + spacing;
   };
   
   // Inject sortMode into filters
@@ -1117,41 +1115,22 @@ export function HubEchoHistoryPage() {
                         }}
                       />
 
-                      {isExpanded && (
-                        <div className="mt-2" aria-label="Conversation preview">
-                          <HistoryThreadInline
-                            threadId={item.id}
-                            title={item.title}
-                            onCollapse={() => {
-                              setExpandedId(null);
-                              announce('Closed conversation preview');
+                      {true && (
+                        <div className="mt-2" aria-label="Conversation preview (mock)">
+                          <div
+                            className="rounded-[14px] px-4 py-3"
+                            style={{
+                              background: 'var(--hub-glass-bg)',
+                              border: '1px solid var(--hub-stroke)',
+                              color: 'var(--hub-text)'
                             }}
-                            onCopyLink={() => {
-                              navigator.clipboard.writeText(window.location.origin + `/hub/echo/history/chat/${item.id}`);
-                              announce('Link copied to clipboard');
-                            }}
-                            onOpenFull={() => {
-                              echoHistoryAnalytics.openFull({
-                                thread_id: item.id,
-                                from_inline: true,
-                              });
-                              const state = loc.state as any;
-                              nav(`/hub/echo/history/chat/${item.id}`, {
-                                state: { backgroundLocation: state?.backgroundLocation, fromHub: true },
-                              });
-                            }}
-                            onHeightChange={(height) => {
-                              expandedHeightsRef.current.set(item.id, height);
-                            }}
-                          />
-                          
-                          {/* Inline tag editor */}
-                          <div className="mt-3 px-4">
-                            <ThreadTagEditorInline
-                              threadId={item.id}
-                              initialTags={item.tags || []}
-                            />
+                          >
+                            <div className="text-[14px] font-medium mb-1">Mock inline panel</div>
+                            <div className="text-[13px] opacity-80">
+                              This is mock content under every card so we can verify the inline panel mounts and is visible.
+                            </div>
                           </div>
+                        </div>
                         </div>
                       )}
                     </div>
