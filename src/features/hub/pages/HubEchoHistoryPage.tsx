@@ -869,27 +869,19 @@ export function HubEchoHistoryPage() {
 
       {/* Body - Page shell with safe-area padding */}
       <main 
-        className="relative h-full pt-[calc(3.5rem+var(--hub-pad,20px)+env(safe-area-inset-top,0px))] pb-[calc(var(--hub-pad,20px)+env(safe-area-inset-bottom,0px))] px-[var(--hub-pad,20px)]"
+        className="relative h-full pt-[calc(3.5rem+var(--hub-pad,20px)+env(safe-area-inset-top,0px))] pb-[calc(var(--hub-pad,20px)+env(safe-area-inset-bottom,0px))]"
       >
-        {/* Glass container */}
-        <section
-          className="relative overflow-hidden rounded-[18px] border p-[var(--hub-pad,20px)]"
-          style={{
-            background: 'var(--hub-glass-bg)',
-            borderColor: 'var(--hub-stroke)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-          }}
-        >
-          <div
-            className="text-[15px] font-medium mb-3"
-            style={{ color: 'var(--hub-text)' }}
+        {/* Content container - direct on background */}
+        <section className="px-4 md:px-6 max-w-3xl mx-auto">
+          <h2
+            className="text-[17px] font-semibold mb-3"
+            style={{ color: 'rgba(255,255,255,0.9)' }}
           >
             Recent chats
-          </div>
+          </h2>
           
           {/* Search & Filters */}
-          <div className="mb-3 space-y-2">
+          <div className="mb-3">
             <EchoHistorySearch
               onSearchChange={handleSearchChange}
               onFilterChange={handleFilterChange}
@@ -1026,11 +1018,8 @@ export function HubEchoHistoryPage() {
                 role="listbox"
                 aria-label="Conversations"
                 aria-multiselectable={selectMode || undefined}
+                id="echo-history-list"
               >
-            <div style={{ 
-              maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)', 
-              WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)' 
-            }}>
               <VirtualList
                     count={chats.length}
                     estimateSize={72}
@@ -1158,7 +1147,6 @@ export function HubEchoHistoryPage() {
                   );
                 }}
               />
-            </div>
             </div>
             </ErrorBoundary>
           )}

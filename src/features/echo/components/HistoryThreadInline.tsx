@@ -57,13 +57,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
     >
       {/* Header */}
       <div 
-        className="flex items-center justify-between mb-3 px-2"
-        style={{
-          background: 'var(--hub-glass-bg)',
-          borderRadius: '12px',
-          padding: '8px 12px',
-          border: '1px solid var(--hub-stroke)',
-        }}
+        className="flex items-center justify-between mb-3 px-3 py-2"
       >
         <div 
           className="text-[14px] font-medium truncate flex-1"
@@ -114,12 +108,14 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
 
       {/* Messages */}
       <div
+        className="overflow-y-auto pr-1"
         style={{
           maxHeight: 'min(65vh, 600px)',
-          borderRadius: '12px',
-          background: 'rgba(0,0,0,0.15)',
-          padding: '12px',
-          position: 'relative',
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+          maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
         }}
       >
         {isLoading && (
