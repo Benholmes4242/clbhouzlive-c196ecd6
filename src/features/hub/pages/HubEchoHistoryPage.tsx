@@ -1007,52 +1007,21 @@ export function HubEchoHistoryPage() {
                   return (
                     <div role="listitem" className="pb-3">
                       <SwipeableHistoryRow
-                        id={item.id}
-                        title={item.title}
-                        subtitle={item.subtitle}
-                        last_activity_at={item.last_activity_at}
-                        relative_date={item.relative_date}
-                        message_count={item.message_count}
-                        has_response={item.has_response}
-                        is_starred={item.is_starred}
+                        item={{
+                          id: item.id,
+                          title: item.title,
+                          subtitle: item.subtitle,
+                          has_response: item.has_response,
+                          message_count: item.message_count,
+                          relative_date: item.relative_date,
+                        }}
                         isStarred={item.is_starred}
                         listFilters={filters}
                         rankIndex={index}
                         isPendingDelete={pendingDeletes.has(item.id)}
-                        selectionMode={selectMode}
-                        selected={isChecked}
-                        searchQuery={filters.query}
-                        tags={item.tags || []}
-                        index={index}
-                        onFocusIndex={setFocusedIndex}
-                        onTagsChange={() => {
-                          // Invalidate query to refetch with updated tags
-                          queryClient.invalidateQueries({ queryKey: ['echoHistorySearch'] });
-                        }}
-                        onSelectToggle={(e?: React.MouseEvent) => {
-                          // Handle shift-click range selection
-                          if (e?.shiftKey && lastSelectedIndex.current !== null && isDesktop) {
-                            const [start, end] = [lastSelectedIndex.current, index].sort((a, b) => a - b);
-                            const rangeIds = chats.slice(start, end + 1).map((c) => c.id);
-                            const next = new Set(selectedIds);
-                            rangeIds.forEach((id) => next.add(id));
-                            setSelectedIds(next);
-                            announce(`Selected ${rangeIds.length} conversations`);
-                          } else {
-                            const next = new Set(selectedIds);
-                            if (isChecked) {
-                              next.delete(item.id);
-                            } else {
-                              next.add(item.id);
-                            }
-                            setSelectedIds(next);
-                            lastSelectedIndex.current = index;
-                            announce(isChecked ? 'Deselected' : 'Selected');
-                          }
-                        }}
                         onStar={() => handleStar(item.id, item.is_starred, 'swipe', index)}
                         onDelete={() => handleDelete(item.id, 'swipe')}
-                        onClick={() => {
+                        onToggle={() => {
                           if (selectMode) {
                             const next = new Set(selectedIds);
                             if (isChecked) {
@@ -1079,41 +1048,37 @@ export function HubEchoHistoryPage() {
                         }}
                       >
                         {isExpanded && (
-                          <>
-                            <HistoryThreadInline
-                              threadId={item.id}
-                              title={item.title}
-                              onCollapse={() => {
-                                setExpandedId(null);
-                                announce('Closed conversation preview');
-                              }}
-                              onCopyLink={() => {
-                                navigator.clipboard.writeText(window.location.origin + `/hub/echo/history/chat/${item.id}`);
-                                announce('Link copied to clipboard');
-                              }}
-                              onOpenFull={() => {
-                                echoHistoryAnalytics.openFull({
-                                  thread_id: item.id,
-                                  from_inline: true,
-                                });
-                                const state = loc.state as any;
-                                nav(`/hub/echo/history/chat/${item.id}`, {
-                                  state: { backgroundLocation: state?.backgroundLocation, fromHub: true },
-                                });
-                              }}
-                              onHeightChange={(height) => {
-                                expandedHeightsRef.current.set(item.id, height);
-                              }}
-                            />
-                            
-                            {/* Inline tag editor */}
-                            <div className="mt-3">
+                          <HistoryThreadInline
+                            threadId={item.id}
+                            title={item.title}
+                            onCollapse={() => {
+                              setExpandedId(null);
+                              announce('Closed conversation preview');
+                            }}
+                            onCopyLink={() => {
+                              navigator.clipboard.writeText(window.location.origin + `/hub/echo/history/chat/${item.id}`);
+                              announce('Link copied to clipboard');
+                            }}
+                            onOpenFull={() => {
+                              echoHistoryAnalytics.openFull({
+                                thread_id: item.id,
+                                from_inline: true,
+                              });
+                              const state = loc.state as any;
+                              nav(`/hub/echo/history/chat/${item.id}`, {
+                                state: { backgroundLocation: state?.backgroundLocation, fromHub: true },
+                              });
+                            }}
+                            onHeightChange={(height) => {
+                              expandedHeightsRef.current.set(item.id, height);
+                            }}
+                            footer={
                               <ThreadTagEditorInline
                                 threadId={item.id}
                                 initialTags={item.tags || []}
                               />
-                            </div>
-                          </>
+                            }
+                          />
                         )}
                       </SwipeableHistoryRow>
                     </div>

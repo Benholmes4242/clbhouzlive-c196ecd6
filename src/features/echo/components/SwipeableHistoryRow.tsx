@@ -5,18 +5,26 @@
 
 import React, { useRef, useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
-import { HistoryRow, HistoryRowProps } from './HistoryRow';
+import { HistoryRow } from './HistoryRow';
 import { haptic } from '@/utils/haptics';
 import { Star, Trash2 } from 'lucide-react';
 import { useMedia } from '@/hooks/useMedia';
 import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
 import { EchoHistorySearchFilters } from '../hooks/useEchoHistorySearch';
 
-interface SwipeableHistoryRowProps extends Omit<HistoryRowProps, 'onClick'> {
+interface SwipeableHistoryRowProps {
+  item: {
+    id: string;
+    title: string;
+    subtitle?: string;
+    has_response?: boolean;
+    message_count?: number;
+    relative_date?: string;
+  };
   isStarred: boolean;
   onStar: () => void;
   onDelete: () => void;
-  onClick: () => void;
+  onToggle: () => void;
   listFilters?: Partial<EchoHistorySearchFilters>;
   rankIndex?: number;
   isPendingDelete?: boolean;
@@ -24,15 +32,15 @@ interface SwipeableHistoryRowProps extends Omit<HistoryRowProps, 'onClick'> {
 }
 
 export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
+  item,
   isStarred,
   onStar,
   onDelete,
-  onClick,
+  onToggle,
   listFilters,
   rankIndex,
   isPendingDelete,
   children,
-  ...historyRowProps
 }) => {
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
@@ -82,7 +90,7 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
       
       // Track swipe analytics
       echoHistoryAnalytics.swipeAction({
-        thread_id: historyRowProps.id,
+        thread_id: item.id,
         direction: deltaX > 0 ? 'right' : 'left',
         distance_px: distance,
         velocity_px_s: velocityPxS,
@@ -117,7 +125,7 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
     e.stopPropagation();
     haptic('light');
     echoHistoryAnalytics.starToggled({
-      thread_id: historyRowProps.id,
+      thread_id: item.id,
       prev_starred: isStarred,
       next_starred: !isStarred,
       source: 'row-hover',
@@ -132,6 +140,33 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
     haptic('medium');
     onDelete();
   };
+
+  // Trailing actions component
+  const trailingActions = (
+    <div className="flex items-center gap-2">
+      <button
+        onClick={handleStarClick}
+        className="p-2 rounded-full hover:bg-white/10 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+        aria-label={isStarred ? 'Unstar conversation' : 'Star conversation'}
+      >
+        <Star 
+          size={16} 
+          style={{ color: 'var(--hub-text)' }}
+          fill={isStarred ? 'currentColor' : 'none'}
+        />
+      </button>
+      <button
+        onClick={handleDeleteClick}
+        className="p-2 rounded-full hover:bg-red-500/20 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+        aria-label="Delete conversation"
+      >
+        <Trash2 
+          size={16} 
+          style={{ color: 'rgba(255, 59, 48, 0.9)' }}
+        />
+      </button>
+    </div>
+  );
 
   return (
     <div 
@@ -214,46 +249,13 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
           transition: swipeOffset === 0 ? 'transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none',
         }}
       >
-        <div className="relative">
-          <HistoryRow {...historyRowProps} onClick={onClick}>
-            {children}
-          </HistoryRow>
-          
-          {/* Star indicator on row */}
-          {isStarred && (
-            <div 
-              className="absolute top-3 right-3 pointer-events-none z-10"
-              style={{ color: 'var(--hub-text)' }}
-            >
-              <Star size={14} fill="currentColor" />
-            </div>
-          )}
-          
-          {/* Action buttons (desktop hover, mobile always visible) */}
-          <div className={`absolute right-3 top-1/2 -translate-y-1/2 transition-opacity duration-200 flex items-center gap-2 ${isDesktop ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>
-            <button
-              onClick={handleStarClick}
-              className="p-2 rounded-full hover:bg-white/10 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
-              aria-label={isStarred ? 'Unstar conversation' : 'Star conversation'}
-            >
-              <Star 
-                size={16} 
-                style={{ color: 'var(--hub-text)' }}
-                fill={isStarred ? 'currentColor' : 'none'}
-              />
-            </button>
-            <button
-              onClick={handleDeleteClick}
-              className="p-2 rounded-full hover:bg-red-500/20 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
-              aria-label="Delete conversation"
-            >
-              <Trash2 
-                size={16} 
-                style={{ color: 'rgba(255, 59, 48, 0.9)' }}
-              />
-            </button>
-          </div>
-        </div>
+        <HistoryRow 
+          item={item}
+          onToggle={onToggle}
+          trailing={trailingActions}
+        >
+          {children}
+        </HistoryRow>
       </div>
     </div>
   );

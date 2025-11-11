@@ -1,12 +1,11 @@
 /**
  * HistoryThreadInline - Inline thread expansion accordion
- * Renders conversation replay with shared MessageBubble component
+ * Renders conversation replay as prose text (no bubbles)
  */
 
-import React, { useRef, useLayoutEffect } from 'react';
-import { X, ExternalLink, Copy } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import { ui } from '@/tokens/ui';
 import { useEchoThreadMessages } from '../hooks/useEchoThreadMessages';
-import { useAutoHeight } from '@/lib/ui/useAutoHeight';
 
 export interface HistoryThreadInlineProps {
   threadId: string;
@@ -16,6 +15,7 @@ export interface HistoryThreadInlineProps {
   onOpenFull?: () => void;
   onDelete?: () => void;
   onHeightChange?: (height: number) => void;
+  footer?: React.ReactNode; // tags row
 }
 
 export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
@@ -25,71 +25,66 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   onCopyLink,
   onOpenFull,
   onHeightChange,
+  footer,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const { data: messages = [], isLoading, error } = useEchoThreadMessages(threadId);
-  const isOpen = true; // This component only mounts when expanded
-  const { ref: autoHeightRef, height } = useAutoHeight(isOpen);
 
-  // Report height changes to parent for virtualization
-  useLayoutEffect(() => {
-    if (containerRef.current && onHeightChange) {
-      const height = containerRef.current.offsetHeight;
-      onHeightChange(height);
-    }
-  }, [messages.length, isLoading, error, onHeightChange]);
+  useEffect(() => {
+    if (!ref.current || !onHeightChange) return;
+    const h = ref.current.getBoundingClientRect().height;
+    onHeightChange(h);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages?.length]);
 
   return (
-    <div
-      id={`thread-panel-${threadId}`}
-      className="eh-panel"
-      style={{ height }}
-    >
-      <div ref={autoHeightRef}>
-        <div ref={containerRef}>
+    <div className="mt-4">
+      <div
+        ref={ref}
+        className="eh-panel-inner eh-in"
+        style={{ willChange: 'transform, opacity' }}
+      >
+        <div className="px-1">
+          {isLoading && (
+            <div className="text-white/60 text-sm py-3">Loading conversation…</div>
+          )}
+          {error && (
+            <div className="text-red-400 text-sm py-3">Couldn't load messages.</div>
+          )}
+          {!isLoading && !error && messages.length === 0 && (
+            <div className="text-white/60 text-sm py-3">No messages yet.</div>
+          )}
 
-          {/* Inline messages: plain text log, no bubbles */}
-          <div
-            className="inline-thread max-h-[60vh] overflow-y-auto p-3 sm:p-4"
-            role="log"
-            aria-live="polite"
-            aria-relevant="additions"
-            aria-label="Echo conversation thread"
-          >
-            {isLoading && (
-              <div className="text-white/60 text-sm py-3">Loading conversation…</div>
-            )}
-            {error && (
-              <div className="text-red-400 text-sm py-3">Couldn't load messages.</div>
-            )}
-            {!isLoading && !error && messages.length === 0 && (
-              <div className="text-white/60 text-sm py-3">No messages yet.</div>
-            )}
-
-            {!isLoading && !error && messages.length > 0 && (
-              <ul className="space-y-6">
-                {messages.map((m) => (
-                  <li key={m.id} className="inline-msg">
-                    <div className="inline-msg-meta">
-                      <span className="inline-msg-role">
-                        {m.role === 'user' ? 'You' : 'Echo'}
-                      </span>
-                      <span className="inline-msg-dot">•</span>
-                      <time className="inline-msg-time">
-                        {new Date(m.created_at).toLocaleString()}
-                      </time>
-                    </div>
-                <div
-                  className={"inline-msg-text"}
-                >
-                  {m.content}
-                </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          {!isLoading && !error && messages.length > 0 && (
+            <div className="eh-prose mx-auto" style={{ color: ui.tone.text }}>
+              {messages.map((m, i) => (
+                <section key={m.id ?? i} className="mb-4 md:mb-5">
+                  <div
+                    className="mb-2 uppercase tracking-wide"
+                    style={{ fontSize: 12, opacity: 0.55 }}
+                  >
+                    {m.role === 'user' ? 'You' : 'Echo'} ·{' '}
+                    {m.created_at
+                      ? new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                      : ''}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: ui.font.body,
+                      lineHeight: 1.45,
+                      filter: m.role === 'user' ? 'brightness(1.05)' : 'none',
+                    }}
+                  >
+                    {m.content}
+                  </div>
+                </section>
+              ))}
+            </div>
+          )}
         </div>
+
+        {/* Optional footer: tags/editor row */}
+        {footer && <div className="mt-4">{footer}</div>}
       </div>
     </div>
   );
