@@ -33,6 +33,11 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   const { data: messages = [], isLoading, error } = useEchoThreadMessages(threadId);
   const groupedMessages = groupMessages(messages);
 
+  // Debug: visibility + data
+  if (import.meta.env.DEV) {
+    console.debug('[HistoryThreadInline] thread', threadId, 'msgs', messages?.length, messages?.[0]);
+  }
+
   // Report height changes to parent for virtualization
   useLayoutEffect(() => {
     if (containerRef.current && onHeightChange) {
@@ -44,7 +49,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   return (
     <div
       ref={containerRef}
-      className="mt-2 mb-3 ml-1 pl-3 overflow-hidden transition-[height] anim-slideUp"
+      className="mt-2 mb-3 ml-1 pl-3 transition-[height] anim-slideUp"
       style={{
         borderLeft: '1px solid var(--hub-stroke)',
         transitionDuration: 'var(--anim-med)',
