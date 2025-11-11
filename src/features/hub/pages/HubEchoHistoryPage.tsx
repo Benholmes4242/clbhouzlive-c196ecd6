@@ -63,12 +63,20 @@ export function HubEchoHistoryPage() {
 
   // Apply tag filter from navigation state
   useEffect(() => {
-    const s = (loc.state as any)?.applyTagFilter as string | undefined;
-    if (s) {
-      setFilters(prev => ({ ...prev, tag: s }));
+    const s = (loc.state as any) || {};
+    const next: Partial<EchoHistorySearchFilters> = {};
+    if (s.applyTagFilter) next.tag = s.applyTagFilter;
+    if (s.applyQuery) next.query = s.applyQuery;
+    if (s.applyDateFrom) next.dateFrom = new Date(s.applyDateFrom);
+    if (s.applyDateTo) next.dateTo = new Date(s.applyDateTo);
+
+    if (Object.keys(next).length) {
+      setFilters(prev => ({ ...prev, ...next }));
       // Clear state so back/forward doesn't reapply
       window.history.replaceState({}, '');
-      announce(`Filtered by #${s}`);
+      if (next.tag) announce(`Filtered by #${next.tag}`);
+      if (next.query) announce(`Applied search: ${next.query}`);
+      if (next.dateFrom || next.dateTo) announce('Date range filter applied');
     }
   }, [loc.state]);
 

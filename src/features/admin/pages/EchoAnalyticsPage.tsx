@@ -1,12 +1,15 @@
 import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useEchoOverview, useEchoTimeseries, useEchoTopTags, useEchoTopUsers, useEchoExports } from '../hooks/useEchoAnalytics';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, Legend } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { toCSV, downloadCSV } from '../utils/csv';
 
 const COLORS = ['#6e9277', '#8aa491', '#b1c1b7', '#e0eee5', '#3b3b3b'];
 
 export default function EchoAnalyticsPage() {
+  const nav = useNavigate();
   // default last 30 days
   const [from, setFrom] = useState(() => new Date(Date.now() - 29*24*3600*1000));
   const [to, setTo] = useState(() => new Date());
@@ -19,6 +22,67 @@ export default function EchoAnalyticsPage() {
   const { data: topTags }  = useEchoTopTags(p_from, p_to, 10);
   const { data: topUsers } = useEchoTopUsers(p_from, p_to, 10);
   const { data: exports }  = useEchoExports(p_from, p_to);
+
+  // Navigation helper for drill-downs
+  const goHistory = (opts: {
+    tag?: string;
+    query?: string;
+    dayISO?: string;
+    range?: { fromISO: string; toISO: string };
+  }) => {
+    const state: any = {};
+    if (opts.tag) state.applyTagFilter = opts.tag;
+    if (opts.query) state.applyQuery = opts.query;
+    if (opts.dayISO) {
+      state.applyDateFrom = opts.dayISO;
+      state.applyDateTo = opts.dayISO;
+    }
+    if (opts.range) {
+      state.applyDateFrom = opts.range.fromISO;
+      state.applyDateTo = opts.range.toISO;
+    }
+    nav('/hub/echo/history', { state });
+  };
+
+  // CSV export handlers
+  const exportTimeseries = () => {
+    const cols = [{key:'day',header:'Day'},{key:'events',header:'Events'}];
+    downloadCSV('echo-timeseries.csv', toCSV(series || [], cols));
+  };
+
+  const exportTopTags = () => {
+    const cols = [{key:'tag',header:'Tag'},{key:'uses',header:'Uses'}];
+    downloadCSV('echo-top-tags.csv', toCSV(topTags || [], cols));
+  };
+
+  const exportTopUsers = () => {
+    const cols = [{key:'user_id',header:'User ID'},{key:'events',header:'Events'}];
+    downloadCSV('echo-top-users.csv', toCSV(topUsers || [], cols));
+  };
+
+  const exportExports = () => {
+    const cols = [{key:'kind',header:'Type'},{key:'total',header:'Count'}];
+    downloadCSV('echo-exports.csv', toCSV(exports || [], cols));
+  };
+
+  const exportOverview = () => {
+    const rows = [{
+      from: p_from, to: p_to,
+      events_count: (overview as any)?.events_count,
+      unique_users: (overview as any)?.unique_users,
+      shares_created: (overview as any)?.shares_created,
+      exports: (overview as any)?.exports
+    }];
+    const cols = [
+      {key:'from',header:'From'},
+      {key:'to',header:'To'},
+      {key:'events_count',header:'Events'},
+      {key:'unique_users',header:'Unique Users'},
+      {key:'shares_created',header:'Shares Created'},
+      {key:'exports',header:'Exports'}
+    ];
+    downloadCSV('echo-overview.csv', toCSV(rows, cols));
+  };
 
   // Quick date range buttons
   const setLast7Days = () => {
@@ -47,7 +111,13 @@ export default function EchoAnalyticsPage() {
 
       {/* KPI Row */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card><CardHeader><CardTitle>Total Events</CardTitle></CardHeader><CardContent className="text-3xl font-bold">{(overview as any)?.events_count ?? 0}</CardContent></Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Total Events</CardTitle>
+            <Button variant="ghost" size="sm" onClick={exportOverview}>CSV</Button>
+          </CardHeader>
+          <CardContent className="text-3xl font-bold">{(overview as any)?.events_count ?? 0}</CardContent>
+        </Card>
         <Card><CardHeader><CardTitle>Unique Users</CardTitle></CardHeader><CardContent className="text-3xl font-bold">{(overview as any)?.unique_users ?? 0}</CardContent></Card>
         <Card><CardHeader><CardTitle>Shares Created</CardTitle></CardHeader><CardContent className="text-3xl font-bold">{(overview as any)?.shares_created ?? 0}</CardContent></Card>
         <Card><CardHeader><CardTitle>Exports</CardTitle></CardHeader><CardContent className="text-3xl font-bold">{(overview as any)?.exports ?? 0}</CardContent></Card>
@@ -55,10 +125,19 @@ export default function EchoAnalyticsPage() {
 
       {/* Timeseries */}
       <Card>
-        <CardHeader><CardTitle>Usage Over Time</CardTitle></CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Usage Over Time</CardTitle>
+          <Button variant="ghost" size="sm" onClick={exportTimeseries}>Export CSV</Button>
+        </CardHeader>
         <CardContent style={{ height: 280 }}>
           <ResponsiveContainer>
-            <LineChart data={series}>
+            <LineChart 
+              data={series}
+              onClick={(e: any) => {
+                const day = e?.activeLabel;
+                if (day) goHistory({ dayISO: day });
+              }}
+            >
               <XAxis dataKey="day" />
               <YAxis allowDecimals={false} />
               <Tooltip />
@@ -71,10 +150,19 @@ export default function EchoAnalyticsPage() {
       {/* Top Tags + Exports */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card>
-          <CardHeader><CardTitle>Top Tags</CardTitle></CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Top Tags</CardTitle>
+            <Button variant="ghost" size="sm" onClick={exportTopTags}>Export CSV</Button>
+          </CardHeader>
           <CardContent style={{ height: 300 }}>
             <ResponsiveContainer>
-              <BarChart data={topTags}>
+              <BarChart 
+                data={topTags}
+                onClick={(e: any) => {
+                  const tag = e?.activeLabel || e?.activePayload?.[0]?.payload?.tag;
+                  if (tag) goHistory({ tag, range: { fromISO: p_from, toISO: p_to } });
+                }}
+              >
                 <XAxis dataKey="tag" />
                 <YAxis allowDecimals={false} />
                 <Tooltip />
@@ -85,10 +173,18 @@ export default function EchoAnalyticsPage() {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>Exports Breakdown</CardTitle></CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Exports Breakdown</CardTitle>
+            <Button variant="ghost" size="sm" onClick={exportExports}>Export CSV</Button>
+          </CardHeader>
           <CardContent style={{ height: 300 }}>
             <ResponsiveContainer>
-              <PieChart>
+              <PieChart
+                onClick={(e: any) => {
+                  const kind = e?.activePayload?.[0]?.payload?.kind;
+                  if (kind) goHistory({ query: `export:${kind}`, range: { fromISO: p_from, toISO: p_to } });
+                }}
+              >
                 <Pie data={exports} dataKey="total" nameKey="kind" outerRadius={100} label>
                   {(exports || []).map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
@@ -102,10 +198,19 @@ export default function EchoAnalyticsPage() {
 
       {/* Top Users */}
       <Card>
-        <CardHeader><CardTitle>Top Active Users</CardTitle></CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Top Active Users</CardTitle>
+          <Button variant="ghost" size="sm" onClick={exportTopUsers}>Export CSV</Button>
+        </CardHeader>
         <CardContent style={{ height: 300 }}>
           <ResponsiveContainer>
-            <BarChart data={topUsers}>
+            <BarChart 
+              data={topUsers}
+              onClick={(e: any) => {
+                const uid = e?.activePayload?.[0]?.payload?.user_id;
+                if (uid) goHistory({ query: `user:${uid}`, range: { fromISO: p_from, toISO: p_to } });
+              }}
+            >
               <XAxis dataKey="user_id" tick={false} />
               <YAxis allowDecimals={false} />
               <Tooltip />
