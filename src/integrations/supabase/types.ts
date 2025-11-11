@@ -707,6 +707,33 @@ export type Database = {
           },
         ]
       }
+      echo_admin_dashboard_views: {
+        Row: {
+          created_at: string
+          id: string
+          is_default: boolean
+          name: string
+          owner: string
+          params: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name: string
+          owner: string
+          params: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          owner?: string
+          params?: Json
+        }
+        Relationships: []
+      }
       echo_events: {
         Row: {
           created_at: string
@@ -3646,6 +3673,34 @@ export type Database = {
       echo_threads_set_star: {
         Args: { ids: string[]; starred: boolean }
         Returns: undefined
+      }
+      echo_views_delete: { Args: { p_id: string }; Returns: undefined }
+      echo_views_get: { Args: { p_id: string }; Returns: Json }
+      echo_views_list: {
+        Args: never
+        Returns: {
+          created_at: string
+          id: string
+          is_default: boolean
+          name: string
+          owner: string
+          params: Json
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "echo_admin_dashboard_views"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      echo_views_save: {
+        Args: {
+          p_name: string
+          p_params: Json
+          p_set_default?: boolean
+          p_view_id?: string
+        }
+        Returns: string
       }
       enablelongtransactions: { Args: never; Returns: string }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
