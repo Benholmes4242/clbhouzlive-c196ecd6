@@ -863,151 +863,7 @@ export function HubEchoHistoryPage() {
           ‹ Back
         </button>
         <h1 className="text-white/90 text-[17px] font-semibold">Echo History</h1>
-        
-        {/* Right controls: Fuzzy + Sort + Select */}
-        <div className="flex items-center gap-2">
-          {/* Fuzzy toggle (only when not in select mode) */}
-          {!selectMode && (
-            <button
-              onClick={() => setFuzzy(!fuzzy)}
-              className="px-3 py-1.5 rounded-full text-[13px] border border-white/10 hover:bg-white/12 transition-colors focus:outline-none focus:ring-2 focus:ring-white/18"
-              style={{ background: fuzzy ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.08)', color: 'var(--hub-text)' }}
-              aria-pressed={fuzzy}
-              aria-label="Toggle fuzzy matching"
-            >
-              {fuzzy ? 'Fuzzy: On' : 'Fuzzy: Off'}
-            </button>
-          )}
-          
-          {/* Select All / Clear (only in select mode) */}
-          {selectMode && (
-            <>
-              <button
-                onClick={() => {
-                  const all = new Set(chats.map((c) => c.id));
-                  setSelectedIds(all);
-                  announce(`Selected ${all.size} conversations`);
-                }}
-                className="px-3 py-1.5 rounded-full text-[13px] border border-white/10 hover:bg-white/12 transition-colors focus:outline-none focus:ring-2 focus:ring-white/18"
-                style={{ background: 'rgba(255,255,255,0.08)', color: 'var(--hub-text)' }}
-                aria-label="Select all visible conversations"
-              >
-                Select All
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedIds(new Set());
-                  announce('Selection cleared');
-                }}
-                className="px-3 py-1.5 rounded-full text-[13px] border border-white/10 hover:bg-white/12 transition-colors focus:outline-none focus:ring-2 focus:ring-white/18"
-                style={{ background: 'rgba(255,255,255,0.08)', color: 'var(--hub-text)' }}
-                aria-label="Clear selection"
-              >
-                Clear
-              </button>
-            </>
-          )}
-          
-          {/* Sort dropdown (enhanced menu) */}
-          {!selectMode && (
-            <div className="relative">
-              <button
-                onClick={() => setShowSortMenu((v) => !v)}
-                className="px-3 py-1.5 rounded-full text-[13px] border border-white/10 hover:bg-white/12 transition-colors focus:outline-none focus:ring-2 focus:ring-white/18"
-                style={{ background: 'rgba(255,255,255,0.08)', color: 'var(--hub-text)' }}
-                aria-haspopup="menu"
-                aria-expanded={showSortMenu}
-                aria-label="Sort conversations"
-              >
-                {sortMode === 'starred' ? 'Starred' : sortMode === 'relevance' ? 'Relevance' : 'Recent'}
-              </button>
-
-              {showSortMenu && (
-                <>
-                  {/* Backdrop */}
-                  <div
-                    className="fixed inset-0 z-[9998]"
-                    onClick={() => setShowSortMenu(false)}
-                    aria-hidden="true"
-                  />
-                  
-                  {/* Menu */}
-                  <div
-                    role="menu"
-                    className="absolute right-0 mt-2 w-44 rounded-xl border shadow-xl backdrop-blur-md p-1 z-[9999]"
-                    style={{
-                      borderColor: 'var(--hub-stroke)',
-                      background: 'rgba(22, 24, 27, 0.98)',
-                    }}
-                  >
-                    <button
-                      role="menuitem"
-                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-[14px]"
-                      style={{ color: 'var(--hub-text)' }}
-                      onClick={() => {
-                        setSortMode('default');
-                        setShowSortMenu(false);
-                        echoHistoryAnalytics.sortChanged({ sort_mode: 'default' });
-                        announce('Sorted by Recent');
-                      }}
-                    >
-                      Recent
-                    </button>
-                    
-                    <button
-                      role="menuitem"
-                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-[14px]"
-                      style={{ color: 'var(--hub-text)' }}
-                      onClick={() => {
-                        setSortMode('starred');
-                        setShowSortMenu(false);
-                        echoHistoryAnalytics.sortChanged({ sort_mode: 'starred' });
-                        announce('Sorted by Starred first');
-                      }}
-                    >
-                      Starred first
-                    </button>
-                    
-                    {Boolean(filters.query) && (
-                      <button
-                        role="menuitem"
-                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-[14px]"
-                        style={{ color: 'var(--hub-text)' }}
-                        onClick={() => {
-                          setSortMode('relevance');
-                          setShowSortMenu(false);
-                          echoHistoryAnalytics.sortChanged({ sort_mode: 'relevance' });
-                          announce('Sorted by Relevance');
-                        }}
-                      >
-                        Relevance
-                      </button>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-          
-          {/* Select toggle */}
-          <button
-            onClick={() => {
-              const next = !selectMode;
-              setSelectMode(next);
-              setSelectedIds(new Set());
-              announce(next ? 'Selection mode enabled' : 'Selection mode disabled');
-            }}
-            className="px-3 py-1.5 rounded-full text-[13px] border border-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/18"
-            style={{ 
-              background: selectMode ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.08)', 
-              color: 'var(--hub-text)' 
-            }}
-            aria-pressed={selectMode}
-            aria-label="Select conversations"
-          >
-            {selectMode ? 'Done' : 'Select'}
-          </button>
-        </div>
+        <div /> {/* Spacer for flex layout */}
       </header>
 
       {/* Body - Page shell with safe-area padding */}
@@ -1032,7 +888,7 @@ export function HubEchoHistoryPage() {
           </div>
           
           {/* Search & Filters */}
-          <div className="mb-4 space-y-2">
+          <div className="mb-3 space-y-2">
             <EchoHistorySearch
               onSearchChange={handleSearchChange}
               onFilterChange={handleFilterChange}
@@ -1182,7 +1038,7 @@ export function HubEchoHistoryPage() {
                   const isChecked = selectedIds.has(item.id);
                   
                   return (
-                    <div role="listitem" className="mb-2">
+                    <div role="listitem" className="mb-3">
                       <SwipeableHistoryRow
                         id={item.id}
                         title={item.title}
@@ -1257,13 +1113,17 @@ export function HubEchoHistoryPage() {
                       />
 
                       {isExpanded && (
-                        <>
+                        <div className="mt-2" aria-label="Conversation preview">
                           <HistoryThreadInline
                             threadId={item.id}
                             title={item.title}
-                            onCollapse={() => setExpandedId(null)}
+                            onCollapse={() => {
+                              setExpandedId(null);
+                              announce('Closed conversation preview');
+                            }}
                             onCopyLink={() => {
                               navigator.clipboard.writeText(window.location.origin + `/hub/echo/history/chat/${item.id}`);
+                              announce('Link copied to clipboard');
                             }}
                             onOpenFull={() => {
                               echoHistoryAnalytics.openFull({
@@ -1287,7 +1147,7 @@ export function HubEchoHistoryPage() {
                               initialTags={item.tags || []}
                             />
                           </div>
-                        </>
+                        </div>
                       )}
                     </div>
                   );

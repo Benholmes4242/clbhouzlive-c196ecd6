@@ -105,7 +105,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
             style={{ color: 'var(--hub-text-dim)' }}
             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-dim)'}
-            aria-label="Collapse"
+            aria-label="Close inline preview"
           >
             <X className="w-4 h-4" />
           </button>

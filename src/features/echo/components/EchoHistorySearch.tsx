@@ -139,7 +139,7 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
               }
             }
           }}
-          placeholder="Search conversations... (tip: tag:#planning)"
+          placeholder="Search conversations…"
           className="w-full h-10 pl-10 pr-10 rounded-[14px] text-[15px] transition-colors"
           style={{
             background: 'rgba(255,255,255,0.06)',
