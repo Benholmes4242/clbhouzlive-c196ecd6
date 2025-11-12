@@ -1,6 +1,7 @@
 import React from 'react';
 import EchoAvatar from '@/components/ai-chat/EchoAvatar';
 import { formatSmartWhen } from '@/utils/date';
+import { formatMessageTime } from '@/utils/dateFormat';
 
 type Props = {
   item: {

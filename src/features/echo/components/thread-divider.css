@@ -1,0 +1,10 @@
+.thread-divider {
+  width: var(--echo-divider-width);
+  height: 1px;
+  opacity: var(--echo-divider-opacity);
+  background: linear-gradient(to right, transparent, var(--echo-hairline), transparent);
+
+  /* Always center it */
+  margin: 12px auto;
+  align-self: center;
+}
