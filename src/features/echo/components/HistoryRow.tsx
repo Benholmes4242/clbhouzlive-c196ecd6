@@ -33,7 +33,7 @@ export function HistoryRow({ item, onToggle, trailing, children }: Props) {
             <h3 className="eh-row__title">{item.title}</h3>
             <div className="eh-row__meta">
               {when && <time className="eh-row-when">{when}</time>}
-              <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+              <div className="eh-actions flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
                 {trailing}
               </div>
             </div>

@@ -3280,6 +3280,12 @@ html[data-immersive="true"] .app-shell--topSpacer {
   flex: 0 0 auto;
 }
 
+/* Align the rightmost action icon (🗑) flush with the container edge
+   while preserving the 8px internal button padding (p-2). */
+.eh-actions {
+  margin-right: -8px; /* cancels button right padding so glyph aligns with search bar edge */
+}
+
 .eh-row-when {
   opacity: 0.7;
   font-size: 13px;
