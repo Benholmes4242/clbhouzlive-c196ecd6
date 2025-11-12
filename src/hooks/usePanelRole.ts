@@ -17,6 +17,9 @@ export function usePanelRole() {
     // Wait for session to resolve first
     if (sessionLoading) return;
     
+    // Skip during SSR
+    if (typeof window === "undefined") return;
+    
     // If not authenticated, they're definitely not an admin
     if (!user) {
       setRole("none");

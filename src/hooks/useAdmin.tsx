@@ -34,6 +34,9 @@ export const useAdmin = () => {
     // Wait for session to resolve
     if (sessionLoading) return;
     
+    // Skip during SSR
+    if (typeof window === "undefined") return;
+    
     // If not authenticated, they're definitely not an admin
     if (!user) {
       console.log('No user, setting admin status to false');
