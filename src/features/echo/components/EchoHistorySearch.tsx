@@ -9,7 +9,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
 import { extractTagDirective } from '../utils/parseTagDirective';
 
-export type FilterType = 'all' | 'has_response' | 'no_response' | 'last_7_days' | 'last_30_days' | 'starred';
+export type FilterType = 'all' | 'last_7_days' | 'last_30_days' | 'favourite';
 
 interface EchoHistorySearchProps {
   onSearchChange: (query: string) => void;
@@ -46,19 +46,13 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
     const filters: { hasResponse?: boolean; dateFrom?: Date; starred?: boolean; tag?: string } = {};
 
     switch (filter) {
-      case 'has_response':
-        filters.hasResponse = true;
-        break;
-      case 'no_response':
-        filters.hasResponse = false;
-        break;
       case 'last_7_days':
         filters.dateFrom = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         break;
       case 'last_30_days':
         filters.dateFrom = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
         break;
-      case 'starred':
+      case 'favourite':
         filters.starred = true;
         break;
       default:
@@ -105,11 +99,7 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
 
   const filters: { id: FilterType; label: string }[] = [
     { id: 'all', label: 'All' },
-    { id: 'starred', label: '⭐ Starred' },
-    { id: 'has_response', label: 'Has response' },
-    { id: 'no_response', label: 'No response' },
-    { id: 'last_7_days', label: 'Last 7 days' },
-    { id: 'last_30_days', label: 'Last 30 days' },
+    { id: 'favourite', label: 'Favourite' },
   ];
 
   return (
