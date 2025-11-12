@@ -174,6 +174,51 @@ html.hub-open {
 }
 
 /* ========================================
+   VISIONOS-STYLE ENVIRONMENT & CARDS
+   ======================================== */
+
+/* Environment Layer - Dimmed, blurred background */
+.hub-environment-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px) saturate(0.85);
+  -webkit-backdrop-filter: blur(8px) saturate(0.85);
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+
+.hub-environment-layer--visible {
+  opacity: 1;
+}
+
+/* Hub Wrapper - Cards container */
+.hub-wrapper {
+  transform: scale(0.96);
+  opacity: 0;
+  transition: transform 180ms cubic-bezier(0.18, 0.89, 0.32, 1.28),
+              opacity 150ms ease-out;
+}
+
+.hub-wrapper--visible {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Floating Card - VisionOS-style opaque card */
+.hub-floating-card {
+  background: 
+    radial-gradient(circle at top, rgba(255,255,255,0.04), transparent 60%),
+    linear-gradient(to bottom, rgba(255,255,255,0.02), rgba(0,0,0,0.18)),
+    #1C1C1E;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+/* ========================================
    OVERLAY STACKING CONTEXT
    Ensure all overlays sit above Clubhouse elements
    ======================================== */

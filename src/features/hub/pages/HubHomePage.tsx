@@ -18,10 +18,14 @@ import '../home/hubTheme.css';
 export function HubHomePage() {
   const nav = useNavigate();
   const loc = useLocation();
+  const [isAnimating, setIsAnimating] = React.useState(true);
 
   // Mark hub-open on html while mounted
   useEffect(() => {
     document.documentElement.classList.add('hub-open');
+    // Trigger animation
+    setTimeout(() => setIsAnimating(false), 10);
+    
     return () => {
       document.documentElement.classList.remove('hub-open');
     };
@@ -49,25 +53,36 @@ export function HubHomePage() {
   };
 
   return (
-    <div
-      className="hub-glass-page fixed inset-0 z-[9999]"
-      style={{
-        background: 'rgba(0, 0, 0, 0.25)',
-        backdropFilter: 'blur(120px)',
-        WebkitBackdropFilter: 'blur(120px)',
-      }}
-    >
-      {/* Header */}
-      <header
-        className="fixed top-0 left-0 right-0 z-[10000] px-5 pt-4 pb-3"
+    <>
+      {/* Environment Layer - Dimmed background */}
+      <div
+        className={`hub-environment-layer ${isAnimating ? '' : 'hub-environment-layer--visible'}`}
+        onClick={handleBack}
+        aria-label="Close hub"
+      />
+
+      {/* Hub Cards Wrapper */}
+      <div
+        className={`hub-wrapper ${isAnimating ? '' : 'hub-wrapper--visible'}`}
         style={{
-          background: 'transparent',
-          borderBottom: '1px solid var(--hub-header-stroke)',
-          paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))',
+          position: 'fixed',
+          inset: 0,
+          zIndex: 910,
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '16px 16px 24px',
+          pointerEvents: 'none',
         }}
       >
-        <div className="flex items-center justify-between" style={{ userSelect: 'none' }}>
-          <div className="flex items-center gap-2">
+        {/* Header */}
+        <header
+          className="flex items-center justify-between mb-4"
+          style={{
+            paddingTop: 'env(safe-area-inset-top, 0px)',
+            pointerEvents: 'auto',
+          }}
+        >
+          <div className="flex items-center gap-2" style={{ userSelect: 'none' }}>
             <img
               src="/assets/logomark-orange.png"
               alt="Logo mark"
@@ -90,53 +105,51 @@ export function HubHomePage() {
           >
             <X className="w-5 h-5" />
           </TapButton>
-        </div>
-      </header>
+        </header>
 
-      {/* Hub Dashboard */}
-      <main className="w-full overflow-y-auto h-screen pt-[calc(80px+env(safe-area-inset-top,0px))] px-3.5">
-        <div className="pt-1.5">
-        {/* Top 2×2 grid */}
-        <div
-          className="grid"
-          style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem', gridAutoRows: 'var(--hub-tile-fixed-h)' }}
+        {/* Hub Dashboard - Scrollable cards */}
+        <main 
+          className="w-full overflow-y-auto overflow-x-hidden flex-1"
+          style={{ pointerEvents: 'auto' }}
         >
-          <div className="hub-tile-fixed">
-            <NearbyGolfersTile />
-          </div>
-          <div className="hub-tile-fixed">
-            <EchoTile />
-          </div>
-        </div>
+          <div className="flex flex-col gap-3.5 pb-4">
+            {/* Top 2×2 grid */}
+            <div
+              className="grid"
+              style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem', gridAutoRows: 'var(--hub-tile-fixed-h)' }}
+            >
+              <div className="hub-tile-fixed hub-floating-card">
+                <NearbyGolfersTile />
+              </div>
+              <div className="hub-tile-fixed hub-floating-card">
+                <EchoTile />
+              </div>
+            </div>
 
-        {/* Your Games - calculated height to push bottom tiles to 12px from edge */}
-        <div 
-          className="mt-3.5" 
-          style={{ 
-            height: 'calc(100vh - 80px - var(--hub-tile-fixed-h) - var(--hub-tile-fixed-h) - 0.875rem - 0.875rem - 0.75rem - 12px)' 
-          }}
-        >
-          <YourGamesTile />
-        </div>
+            {/* Your Games */}
+            <div className="hub-floating-card" style={{ minHeight: '320px' }}>
+              <YourGamesTile />
+            </div>
 
-        {/* Echo & Quick Actions 2×2 grid */}
-        <div
-          className="grid mt-3.5"
-          style={{ 
-            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
-            gap: '0.875rem', 
-            gridAutoRows: 'var(--hub-tile-fixed-h)',
-          }}
-        >
-          <div className="hub-tile-fixed">
-            <SwingQuickTile />
+            {/* Bottom 2×2 grid */}
+            <div
+              className="grid"
+              style={{ 
+                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
+                gap: '0.875rem', 
+                gridAutoRows: 'var(--hub-tile-fixed-h)',
+              }}
+            >
+              <div className="hub-tile-fixed hub-floating-card">
+                <SwingQuickTile />
+              </div>
+              <div className="hub-tile-fixed hub-floating-card">
+                <QuickActionsTile />
+              </div>
+            </div>
           </div>
-          <div className="hub-tile-fixed">
-            <QuickActionsTile />
-          </div>
-        </div>
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </>
   );
 }
