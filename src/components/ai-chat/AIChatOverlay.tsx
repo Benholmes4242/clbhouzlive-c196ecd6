@@ -29,10 +29,6 @@ import { ensureThreadId, persistUserMessage, persistAssistantMessage } from '@/f
 import { FrostedPill } from '@/components/shared/FrostedPill';
 import { EchoTypingBar } from './EchoTypingBar';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import MessageTurn from '@/features/echo/components/MessageTurn';
-import ThreadDivider from '@/features/echo/components/ThreadDivider';
-import { formatMessageTime } from '@/utils/dateFormat';
-import SquircleImage from '@/components/ui/SquircleImage';
 
 interface ChatMessageData {
   id: string;
@@ -521,77 +517,60 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   </div>
                 </div>
               ) : (
-                <div className="space-y-1" style={{ padding: '8px 16px 120px' }}>
+                <div className="space-y-1">
                   {messages.map((message, index) => {
                     const isUser = message.type === 'user';
-
-                    // User avatar fallback
-                    const userAvatarFallback = (
+                    const prevMessage = index > 0 ? messages[index - 1] : null;
+                    const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
+                    
+                    return (
                       <div 
-                        className="flex items-center justify-center text-[11px] font-medium text-white/90"
-                        style={{
-                          width: 28,
-                          height: 28,
-                          background: 'rgba(255,255,255,0.1)',
-                          border: '1px solid rgba(255,255,255,0.2)',
-                          borderRadius: '8px',
-                        }}
+                        key={message.id} 
+                        className={cn(
+                          isFirstInGroup && index > 0 && "mt-4",
+                          !isFirstInGroup && "mt-2.5"
+                        )}
                       >
-                        {userProfile?.display_name?.[0]?.toUpperCase() || userProfile?.username?.[0]?.toUpperCase() || 'U'}
+                        <ChatMessageComponent
+                          message={message}
+                          onSaveToInsights={saveToInsights}
+                          onRequestDetail={requestMoreDetail}
+                          isFirstInGroup={isFirstInGroup}
+                          showHeading={isFirstInGroup}
+                          showActions={false}
+                          userProfilePhoto={userProfile?.profile_photo_url || null}
+                          userDisplayName={userProfile?.display_name || userProfile?.username || 'User'}
+                        />
                       </div>
                     );
-
-                    const elements: React.ReactNode[] = [];
-
-                    elements.push(
-                      <MessageTurn
-                        key={message.id}
-                        role={isUser ? 'you' : 'echo'}
-                        avatarUrl={isUser ? (userProfile?.profile_photo_url || undefined) : undefined}
-                        avatarFallback={isUser ? userAvatarFallback : <EchoAvatar state="idle" size={28} />}
-                        nameLabel={isUser ? 'YOU' : 'ECHO'}
-                        timestamp={formatMessageTime(message.timestamp.toISOString())}
-                        text={message.content}
-                      />
-                    );
-
-                    if (index < messages.length - 1) {
-                      elements.push(<ThreadDivider key={`div-${message.id}`} />);
-                    }
-
-                    return <React.Fragment key={`group-${message.id}`}>{elements}</React.Fragment>;
                   })}
-
                   {isLoading && (
-                    <>
-                      <ThreadDivider />
-                      <div className="mt-4">
-                        {/* Echo heading with squircle icon */}
-                        <div className="mb-2 flex items-center gap-2">
-                          <span className="text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
-                            Echo
-                          </span>
-                          <EchoAvatar state="idle" size={28} />
-                        </div>
-                        
-                        {/* Loading bubble */}
-                        <div className="rounded-[var(--bubble-radius)] border overflow-hidden backdrop-blur-[var(--glass-blur)]"
-                          style={{
-                            maxWidth: 'var(--bubble-max-mobile)',
-                            background: 'var(--bubble-echo-grad)',
-                            borderColor: 'var(--bubble-echo-border)',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.15), var(--bubble-echo-inset)',
-                            padding: 'var(--bubble-pad-y) var(--bubble-pad-x)',
-                            minHeight: 'calc(var(--bubble-pad-y) * 2 + 20px)'
-                          }}>
-                          <div className="flex items-center gap-1.5">
-                            <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
-                            <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce"></span>
-                            <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
-                          </div>
+                    <div className="mt-4">
+                      {/* Echo heading with squircle icon */}
+                      <div className="mb-2 flex items-center gap-2">
+                        <span className="text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
+                          Echo
+                        </span>
+                      <EchoAvatar state="idle" size={28} />
+                      </div>
+                      
+                      {/* Loading bubble */}
+                      <div className="rounded-[var(--bubble-radius)] border overflow-hidden backdrop-blur-[var(--glass-blur)]"
+                        style={{
+                          maxWidth: 'var(--bubble-max-mobile)',
+                          background: 'var(--bubble-echo-grad)',
+                          borderColor: 'var(--bubble-echo-border)',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.15), var(--bubble-echo-inset)',
+                          padding: 'var(--bubble-pad-y) var(--bubble-pad-x)',
+                          minHeight: 'calc(var(--bubble-pad-y) * 2 + 20px)'
+                        }}>
+                        <div className="flex items-center gap-1.5">
+                          <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
+                          <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce"></span>
+                          <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
                         </div>
                       </div>
-                    </>
+                    </div>
                   )}
                 </div>
               )}
@@ -1064,69 +1043,67 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         </div>
                       </div>
                     ) : (
-                <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pb-5" style={{ padding: '8px 16px 120px' }}>
+                <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pb-5 space-y-2">
                   {messages.map((message, index) => {
                     const isUser = message.type === 'user';
-
-                    // User avatar fallback
-                    const userAvatarFallback = (
-                      <div 
-                        className="flex items-center justify-center text-[11px] font-medium text-white/90"
-                        style={{
-                          width: 28,
-                          height: 28,
-                          background: 'rgba(255,255,255,0.1)',
-                          border: '1px solid rgba(255,255,255,0.2)',
-                          borderRadius: '8px',
-                        }}
-                      >
-                        {userProfile?.display_name?.[0]?.toUpperCase() || userProfile?.username?.[0]?.toUpperCase() || 'U'}
-                      </div>
-                    );
-
-                    const elements: React.ReactNode[] = [];
-
-                    elements.push(
-                      <MessageTurn
-                        key={message.id}
-                        role={isUser ? 'you' : 'echo'}
-                        avatarUrl={isUser ? (userProfile?.profile_photo_url || undefined) : undefined}
-                        avatarFallback={isUser ? userAvatarFallback : <EchoAvatar state="idle" size={28} />}
-                        nameLabel={isUser ? 'YOU' : 'ECHO'}
-                        timestamp={formatMessageTime(message.timestamp.toISOString())}
-                        text={message.content}
-                      />
-                    );
-
-                    if (index < messages.length - 1) {
-                      elements.push(<ThreadDivider key={`div-${message.id}`} />);
-                    }
-
-                    return <React.Fragment key={`group-${message.id}`}>{elements}</React.Fragment>;
-                  })}
-
-                  {isLoading && (
-                    <>
-                      <ThreadDivider />
-                      <div className="mt-4 px-4 flex items-end gap-2">
-                        <EchoAvatar state="processing" size={28} />
-                        <div className="flex-1">
-                          <div className="rounded-[var(--bubble-radius)] bg-white/05 border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2" style={{ minHeight: 'calc(var(--bubble-pad-y) * 2 + 20px)' }}>
-                            <div className="flex items-center gap-1.5">
-                              <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
-                              <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce"></span>
-                              <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                    const prevMessage = index > 0 ? messages[index - 1] : null;
+                    const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
+                    const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
+                    const isLastInGroup = !nextMessage || nextMessage.type !== message.type;
+                    
+                    // Example: mark message at index 3 as first unread (UI only)
+                    const isFirstUnread = false; // Set to true on a specific message to show separator
+                    
+                    return (
+                      <div key={message.id}>
+                        {/* "Unread" divider - Phase 59 */}
+                        {isFirstUnread && (
+                          <div className="relative my-6 flex items-center gap-3" role="separator" aria-label="Unread messages">
+                            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/15 to-transparent"></div>
+                            <div className="px-2 py-0.5 rounded-full bg-white/85 backdrop-blur border border-black/10 text-[11px] text-gray-600 shadow-sm">
+                              Unread
                             </div>
+                            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/15 to-transparent"></div>
                           </div>
-                          <div className="mt-2">
-                            <EchoTypingBar />
-                          </div>
+                        )}
+                        
+                        <div 
+                          className={cn(
+                            "w-full",
+                            isFirstInGroup && index > 0 && "mt-4"
+                          )}
+                        >
+                          <ChatMessageComponent
+                            message={message}
+                            onSaveToInsights={saveToInsights}
+                            onRequestDetail={requestMoreDetail}
+                            isFirstInGroup={isFirstInGroup}
+                            showHeading={isFirstInGroup}
+                            showActions={false}
+                          />
                         </div>
                       </div>
-                    </>
-                  )}
-                </div>
-              )}
+                    );
+                  })}
+                    {isLoading && (
+                    <div className="mt-4 px-4 flex items-end gap-2">
+                      <EchoAvatar state="processing" size={28} />
+                      <div className="flex-1">
+                        <div className="rounded-[var(--bubble-radius)] bg-white/05 border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2" style={{ minHeight: 'calc(var(--bubble-pad-y) * 2 + 20px)' }}>
+                          <div className="flex items-center gap-1.5">
+                            <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
+                            <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce"></span>
+                            <span className="h-1.5 w-1.5 rounded-full bg-white/80 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                          </div>
+                        </div>
+                        <div className="mt-2">
+                          <EchoTypingBar />
+                        </div>
+                      </div>
+                    </div>
+                     )}
+                         </div>
+                       )}
 
                 {/* "New since you left" banner (optional header slot) */}
                 {false && ( /* Set to true to show header banner style */
