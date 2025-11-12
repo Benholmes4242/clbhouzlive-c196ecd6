@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useEchoThreadMessages } from '../hooks/useEchoThreadMessages';
 import EchoAvatar from '@/components/ai-chat/EchoAvatar';
 import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { useProfileData } from '@/hooks/useProfileData';
 
 export interface HistoryThreadInlineProps {
   threadId: string;
@@ -21,6 +22,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const { data: messages = [], isLoading, error } = useEchoThreadMessages(threadId);
+  const { profile } = useProfileData();
 
   useEffect(() => {
     if (!ref.current || !onHeightChange) return;
@@ -35,28 +37,51 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   return (
     <div ref={ref} role="log" aria-live="polite">
       <ul className="list-none p-0 m-0">
-        {messages.map((m) => (
-          <li 
-            key={m.id} 
-            className={m.role === 'user' ? 'eh-msg eh-msg--right' : 'eh-msg'}
-          >
-            <div className="eh-msg__avatar" aria-label={m.role === 'user' ? 'You' : 'Echo'}>
-              {m.role === 'user' ? (
-                <AvatarSquircle size={36} className="bg-gradient-to-br from-purple-500 to-blue-500">
-                  <div className="absolute inset-0 flex items-center justify-center text-white text-sm font-semibold">
-                    U
-                  </div>
-                </AvatarSquircle>
+        {messages.map((m) => {
+          const isUser = m.role === 'user';
+          return (
+            <li 
+              key={m.id} 
+              className={isUser ? 'eh-line eh-line--user' : 'eh-line eh-line--echo'}
+              aria-label={isUser ? 'You' : 'Echo'}
+            >
+              {/* Left side: Echo avatar or spacer */}
+              {!isUser ? (
+                <div className="eh-line__avatar">
+                  <EchoAvatar state="idle" size={28} />
+                </div>
               ) : (
-                <EchoAvatar state="idle" size={36} />
+                <div className="eh-line__pad" />
               )}
-            </div>
-            <div className="eh-msg__body flex-1 min-w-0">
-              <div className="eh-msg__label">{m.role === 'user' ? 'YOU' : 'ECHO'}</div>
-              <div className="eh-msg__text">{m.content}</div>
-            </div>
-          </li>
-        ))}
+
+              {/* Content */}
+              <div className="eh-bubble">
+                <div className="eh-msg__label">{isUser ? 'YOU' : 'ECHO'}</div>
+                <div className="eh-text">{m.content}</div>
+              </div>
+
+              {/* Right side: User avatar or spacer */}
+              {isUser ? (
+                <div className="eh-line__avatar">
+                  <AvatarSquircle 
+                    size={28} 
+                    src={profile?.profile_photo_url}
+                    alt="Your profile"
+                    className="bg-gradient-to-br from-purple-500 to-blue-500"
+                  >
+                    {!profile?.profile_photo_url && (
+                      <div className="absolute inset-0 flex items-center justify-center text-white text-xs font-semibold">
+                        {profile?.display_name?.[0]?.toUpperCase() || profile?.username?.[0]?.toUpperCase() || 'U'}
+                      </div>
+                    )}
+                  </AvatarSquircle>
+                </div>
+              ) : (
+                <div className="eh-line__pad" />
+              )}
+            </li>
+          );
+        })}
       </ul>
       {footer && <div className="mt-4">{footer}</div>}
     </div>

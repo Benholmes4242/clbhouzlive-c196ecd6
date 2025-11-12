@@ -3276,24 +3276,37 @@ html[data-immersive="true"] .app-shell--topSpacer {
   -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 92%, rgba(0,0,0,0));
 }
 
-.eh-msg { 
-  display: flex; 
-  align-items: flex-start; 
-  gap: 10px; 
-  margin: 12px 0; 
+/* Role-based message line layout */
+.eh-line {
+  display: grid;
+  grid-template-columns: 28px 1fr 28px;
+  gap: 10px;
+  align-items: start;
+  margin: 10px 0;
 }
 
-.eh-msg--right { 
-  flex-direction: row-reverse; 
+.eh-line--echo {
+  /* Echo: avatar left, content center, pad right */
 }
 
-.eh-msg__avatar { 
-  flex: 0 0 36px; 
+.eh-line--user {
+  /* User: pad left, content center, avatar right */
+  justify-items: end;
 }
 
-.eh-msg__body {
-  flex: 1 1 auto;
-  min-width: 0;
+.eh-line__avatar {
+  width: 28px;
+  height: 28px;
+}
+
+.eh-line__pad {
+  width: 28px;
+  height: 28px;
+}
+
+.eh-bubble {
+  max-width: min(90vw, 620px);
+  line-height: 1.5;
 }
 
 .eh-msg__label { 
@@ -3304,7 +3317,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
   text-transform: uppercase; 
 }
 
-.eh-msg__text { 
+.eh-text { 
   font-size: 15px; 
   line-height: 1.6; 
   color: var(--eh-title); 
