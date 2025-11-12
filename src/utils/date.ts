@@ -48,3 +48,19 @@ export const formatSmartWhen = (d?: string | Date): string => {
     return '';
   }
 };
+
+export const formatAbsoluteDateTime = (d?: string | Date): string => {
+  if (!d) return '';
+  
+  try {
+    return new Intl.DateTimeFormat(undefined, { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      hour: '2-digit', 
+      minute: '2-digit' 
+    }).format(new Date(d));
+  } catch {
+    return '';
+  }
+};

@@ -4,10 +4,13 @@ import EchoAvatar from '@/components/ai-chat/EchoAvatar';
 import SquircleImage from '@/components/ui/SquircleImage';
 import { useProfileData } from '@/hooks/useProfileData';
 import { MarkdownMessage } from '@/components/ai-chat/MarkdownMessage';
+import { formatAbsoluteDateTime } from '@/utils/date';
 
 export interface HistoryThreadInlineProps {
   threadId: string;
   title: string;
+  createdAt?: string;
+  messageCount?: number;
   onCollapse: () => void;
   onCopyLink?: () => void;
   onOpenFull?: () => void;
@@ -18,6 +21,8 @@ export interface HistoryThreadInlineProps {
 
 export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   threadId,
+  createdAt,
+  messageCount,
   onHeightChange,
   footer,
 }) => {
@@ -96,6 +101,16 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
           );
         })}
       </ul>
+      
+      {/* Footer meta */}
+      <div className="my-12 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
+      <div className="pb-6 flex items-center justify-between text-[13px]" style={{ color: 'var(--eh-meta)' }}>
+        <div className="flex items-center gap-8">
+          {createdAt && <time aria-label="Conversation time">{formatAbsoluteDateTime(createdAt)}</time>}
+          {messageCount != null && <span>{messageCount} msgs</span>}
+        </div>
+      </div>
+      
       {footer && <div className="mt-4">{footer}</div>}
     </div>
   );

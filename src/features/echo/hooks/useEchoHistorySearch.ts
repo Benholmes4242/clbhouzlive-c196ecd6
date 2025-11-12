@@ -20,6 +20,7 @@ export interface EchoHistoryResult {
   has_response: boolean;
   is_starred: boolean;
   last_activity_at: string;
+  created_at: string;
   message_count: number;
   relative_date: string;
   tags?: string[];
@@ -71,6 +72,7 @@ export function useEchoHistorySearch(
             has_response: typeof item.has_response === 'boolean' ? item.has_response : (item.subtitle ? item.subtitle !== '(No response yet)' : true),
             is_starred: false,
             last_activity_at: item.created_at,
+            created_at: item.created_at,
             message_count: item.message_count ?? 0,
             relative_date: item.relative_date ?? '',
             tags: [],
@@ -89,6 +91,7 @@ export function useEchoHistorySearch(
         has_response: row.has_response,
         is_starred: row.is_starred,
         last_activity_at: row.last_activity_at,
+        created_at: row.created_at || row.last_activity_at,
         message_count: row.message_count,
         relative_date: row.relative_date,
         tags: row.tags || [],

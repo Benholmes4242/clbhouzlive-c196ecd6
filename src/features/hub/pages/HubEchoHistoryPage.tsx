@@ -1012,6 +1012,7 @@ export function HubEchoHistoryPage() {
                           has_response: item.has_response,
                           message_count: item.message_count,
                           relative_date: item.relative_date,
+                          created_at: item.created_at,
                         }}
                         isStarred={item.is_starred}
                         listFilters={filters}
@@ -1049,6 +1050,8 @@ export function HubEchoHistoryPage() {
                           <HistoryThreadInline
                             threadId={item.id}
                             title={item.title}
+                            createdAt={item.created_at}
+                            messageCount={item.message_count}
                             onCollapse={() => {
                               setExpandedId(null);
                               announce('Closed conversation preview');

@@ -18,6 +18,7 @@ interface SwipeableHistoryRowProps {
     has_response?: boolean;
     message_count?: number;
     relative_date?: string;
+    created_at?: string;
   };
   isStarred: boolean;
   onStar: () => void;
