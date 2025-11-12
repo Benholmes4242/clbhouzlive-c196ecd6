@@ -3361,7 +3361,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
   font-size: 12px; 
   letter-spacing: .4px; 
   color: var(--eh-meta); 
-  margin-bottom: 6px; 
+  margin-bottom: 8px; 
   text-transform: uppercase; 
 }
 
