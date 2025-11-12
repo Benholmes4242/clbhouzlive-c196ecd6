@@ -226,6 +226,9 @@ html, body, #root {
   --safe-left: 0px; 
   --safe-right: 0px;
   
+  /* Echo History safe-area alignment */
+  --eh-safe-right: max(env(safe-area-inset-right), 16px);
+  
   /* Bottom nav height for consistent spacing */
   --bottom-nav-height: 64px;
   
@@ -3275,6 +3278,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
   align-items: center; 
   gap: 10px;
   flex: 0 0 auto;
+  padding-right: calc(var(--eh-safe-right) + 8px);
 }
 
 .eh-row-when {
@@ -3328,6 +3332,10 @@ html[data-immersive="true"] .app-shell--topSpacer {
 .eh-line--user {
   /* User: pad left, content center, avatar right */
   justify-items: end;
+}
+
+.eh-line--user .eh-line__avatar {
+  margin-right: var(--eh-safe-right);
 }
 
 .eh-line__avatar {
