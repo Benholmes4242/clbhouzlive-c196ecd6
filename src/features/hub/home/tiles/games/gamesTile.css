@@ -17,7 +17,6 @@
 .gt-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
 /* Allow vertical pan to start scroll on iOS */
@@ -30,12 +29,7 @@
   transform: scale(0.985);
 }
 
-/* Optional: tiny hover lift for desktop only */
-@media (hover: hover) and (pointer: fine) {
-  .game-row:hover {
-    background: rgba(255,255,255,0.08) !important;
-  }
-}
+/* No hover effects - flat design */
 
 /* Expanded section animation */
 .gt-expand {

@@ -18,14 +18,17 @@
   height: 0;
 }
 
-/* Each row */
+/* Each row - flat design */
 .game-row {
-  background: var(--hub-card-inner);
-  border-radius: 16px;
-  padding: 12px 14px;
-  margin: 10px 0;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
-  scroll-margin-block: 8px; /* helps scrollIntoView land nicely */
+  background: transparent;
+  padding: 14px 0 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  transition: opacity 0.2s ease;
+  scroll-margin-block: 8px;
+}
+
+.game-row:last-child {
+  border-bottom: none;
 }
 
 .game-row .row-head {
