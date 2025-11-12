@@ -14,6 +14,9 @@ import CaddieLogs from './CaddieLogs';
 import SwingCoach from './SwingCoach';
 import EchoAvatar from './EchoAvatar';
 import { OverlayFooter } from './OverlayFooter';
+import ThreadDivider from '@/features/echo/components/ThreadDivider';
+import SquircleImage from '@/components/ui/SquircleImage';
+import { MarkdownMessage } from './MarkdownMessage';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
@@ -517,62 +520,91 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   </div>
                 </div>
               ) : (
-                <div className="space-y-1">
+                <ul className="list-none p-0 m-0">
                   {messages.map((message, index) => {
                     const isUser = message.type === 'user';
-                    const prevMessage = index > 0 ? messages[index - 1] : null;
-                    const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
                     
                     return (
-                      <div 
-                        key={message.id} 
-                        className={cn(
-                          isFirstInGroup && index > 0 && "mt-4",
-                          !isFirstInGroup && "mt-2.5"
-                        )}
-                      >
-                        <ChatMessageComponent
-                          message={message}
-                          onSaveToInsights={saveToInsights}
-                          onRequestDetail={requestMoreDetail}
-                          isFirstInGroup={isFirstInGroup}
-                          showHeading={isFirstInGroup}
-                          showActions={false}
-                          userProfilePhoto={userProfile?.profile_photo_url || null}
-                          userDisplayName={userProfile?.display_name || userProfile?.username || 'User'}
-                        />
-                      </div>
+                      <React.Fragment key={message.id}>
+                        <li 
+                          className={isUser ? 'eh-line eh-line--user' : 'eh-line eh-line--echo'}
+                          aria-label={isUser ? 'You' : 'Echo'}
+                        >
+                          {/* Left side: Echo avatar or spacer */}
+                          {!isUser ? (
+                            <div className="eh-line__avatar">
+                              <EchoAvatar state="idle" size={28} />
+                            </div>
+                          ) : (
+                            <div className="eh-line__pad" />
+                          )}
+
+                          {/* Content */}
+                          <div className="eh-bubble">
+                            <div className="eh-msg__label">{isUser ? 'YOU' : 'ECHO'}</div>
+                            <div className="eh-text">
+                              <MarkdownMessage content={message.content} />
+                            </div>
+                          </div>
+
+                          {/* Right side: User avatar or spacer */}
+                          {isUser ? (
+                            <div className="eh-line__avatar">
+                              {userProfile?.profile_photo_url ? (
+                                <SquircleImage
+                                  size={28}
+                                  src={userProfile.profile_photo_url}
+                                  alt={userProfile?.display_name || userProfile?.username || 'User'}
+                                  ringColor="rgba(255,255,255,0.2)"
+                                  ringWidth={1}
+                                />
+                              ) : (
+                                <div 
+                                  className="flex items-center justify-center text-[11px] font-medium text-white/90"
+                                  style={{
+                                    width: 28,
+                                    height: 28,
+                                    background: 'rgba(255,255,255,0.1)',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    borderRadius: '8px',
+                                  }}
+                                >
+                                  {userProfile?.display_name?.[0]?.toUpperCase() || userProfile?.username?.[0]?.toUpperCase() || 'U'}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="eh-line__pad" />
+                          )}
+                        </li>
+                        
+                        {/* Add divider between messages, but not after the last one */}
+                        {index < messages.length - 1 && <ThreadDivider />}
+                      </React.Fragment>
                     );
                   })}
                   {isLoading && (
-                    <div className="mt-4">
-                      {/* Echo heading with squircle icon */}
-                      <div className="mb-2 flex items-center gap-2">
-                        <span className="text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
-                          Echo
-                        </span>
-                      <EchoAvatar state="idle" size={28} />
-                      </div>
-                      
-                      {/* Loading bubble */}
-                      <div className="rounded-[var(--bubble-radius)] border overflow-hidden backdrop-blur-[var(--glass-blur)]"
-                        style={{
-                          maxWidth: 'var(--bubble-max-mobile)',
-                          background: 'var(--bubble-echo-grad)',
-                          borderColor: 'var(--bubble-echo-border)',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.15), var(--bubble-echo-inset)',
-                          padding: 'var(--bubble-pad-y) var(--bubble-pad-x)',
-                          minHeight: 'calc(var(--bubble-pad-y) * 2 + 20px)'
-                        }}>
-                        <div className="flex items-center gap-1.5">
-                          <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
-                          <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce"></span>
-                          <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                    <>
+                      {messages.length > 0 && <ThreadDivider />}
+                      <li className="eh-line eh-line--echo" aria-label="Echo">
+                        <div className="eh-line__avatar">
+                          <EchoAvatar state="idle" size={28} />
                         </div>
-                      </div>
-                    </div>
+                        <div className="eh-bubble">
+                          <div className="eh-msg__label">ECHO</div>
+                          <div className="eh-text">
+                            <div className="flex items-center gap-1.5">
+                              <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
+                              <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce"></span>
+                              <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="eh-line__pad" />
+                      </li>
+                    </>
                   )}
-                </div>
+                </ul>
               )}
 
               {/* Scroll to bottom button */}
