@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useEchoThreadMessages } from '../hooks/useEchoThreadMessages';
 import EchoAvatar from '@/components/ai-chat/EchoAvatar';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import SquircleImage from '@/components/ui/SquircleImage';
 import { useProfileData } from '@/hooks/useProfileData';
 
 export interface HistoryThreadInlineProps {
@@ -63,18 +63,28 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
               {/* Right side: User avatar or spacer */}
               {isUser ? (
                 <div className="eh-line__avatar">
-                  <AvatarSquircle 
-                    size={28} 
-                    src={profile?.profile_photo_url}
-                    alt="Your profile"
-                    className="bg-gradient-to-br from-purple-500 to-blue-500"
-                  >
-                    {!profile?.profile_photo_url && (
-                      <div className="absolute inset-0 flex items-center justify-center text-white text-xs font-semibold">
-                        {profile?.display_name?.[0]?.toUpperCase() || profile?.username?.[0]?.toUpperCase() || 'U'}
-                      </div>
-                    )}
-                  </AvatarSquircle>
+                  {profile?.profile_photo_url ? (
+                    <SquircleImage
+                      size={28}
+                      src={profile.profile_photo_url}
+                      alt={profile?.display_name || profile?.username || 'User'}
+                      ringColor="rgba(255,255,255,0.2)"
+                      ringWidth={1}
+                    />
+                  ) : (
+                    <div 
+                      className="flex items-center justify-center text-[11px] font-medium text-white/90"
+                      style={{
+                        width: 28,
+                        height: 28,
+                        background: 'rgba(255,255,255,0.1)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '8px',
+                      }}
+                    >
+                      {profile?.display_name?.[0]?.toUpperCase() || profile?.username?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="eh-line__pad" />
