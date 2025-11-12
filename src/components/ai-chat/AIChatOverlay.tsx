@@ -499,7 +499,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 paddingLeft: '16px',
                 paddingRight: '16px',
                 paddingBottom: isPageMode ? '112px' : '16px',
-                scrollPaddingBottom: '86px'
+                scrollPaddingBottom: '86px',
+                maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
               }}
               ref={chatScrollRef}
               onScroll={handleChatScroll}
