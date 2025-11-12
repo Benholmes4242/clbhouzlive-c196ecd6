@@ -813,7 +813,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               ref={chatScrollRef}
               onScroll={handleChatScroll}
             >
-              <div className="w-full max-w-3xl mx-auto pt-[10px] pb-6 space-y-4">
+              <div className="w-full max-w-3xl mx-auto pb-6 space-y-4">
                 {/* Messages */}
                 {messages.length === 0 && (
                   <div className="text-center py-12 space-y-6">
