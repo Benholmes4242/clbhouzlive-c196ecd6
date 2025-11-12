@@ -49,22 +49,18 @@ const EchoAvatar: React.FC<EchoAvatarProps> = ({ state, size = 32 }) => {
         <clipPath id={id} clipPathUnits="userSpaceOnUse">
           <path d={d} />
         </clipPath>
-        <linearGradient id={`${id}-grad`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#1D3557" />
-          <stop offset="100%" stopColor="#2A9D8F" />
-        </linearGradient>
         <linearGradient id={`${id}-highlight`} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="rgba(255,255,255,0.2)" />
-          <stop offset="50%" stopColor="rgba(255,255,255,0.1)" />
+          <stop offset="0%" stopColor="rgba(255,255,255,0.3)" />
+          <stop offset="50%" stopColor="rgba(255,255,255,0.15)" />
           <stop offset="100%" stopColor="transparent" />
         </linearGradient>
       </defs>
 
-      {/* Background with gradient */}
-      <path d={d} fill={`url(#${id}-grad)`} />
+      {/* Frosted white background */}
+      <path d={d} fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
       
       {/* Inner highlight */}
-      <path d={d} fill={`url(#${id}-highlight)`} opacity="0.6" />
+      <path d={d} fill={`url(#${id}-highlight)`} opacity="0.8" />
       
       {/* Icon */}
       <foreignObject width={size} height={size} clipPath={`url(#${id})`}>
@@ -79,7 +75,7 @@ const EchoAvatar: React.FC<EchoAvatarProps> = ({ state, size = 32 }) => {
         >
           <PiWaveform 
             size={getIconSize()} 
-            className="text-white/90 transition-all duration-200 ease-in-out"
+            className="text-black/80 transition-all duration-200 ease-in-out"
             style={{
               animation: `echoWave ${getAnimationDuration()} ease-in-out infinite`
             }}
