@@ -1,10 +1,12 @@
 import React from 'react';
+import EchoAvatar from '@/components/ai-chat/EchoAvatar';
 
 type Props = {
   item: {
     id: string;
     title: string;
     subtitle?: string;
+    preview_snippet?: string;
     has_response?: boolean;
     message_count?: number;
     relative_date?: string;
@@ -18,23 +20,26 @@ export function HistoryRow({ item, onToggle, trailing, children }: Props) {
   return (
     <>
       <div className="eh-row" onClick={onToggle} aria-expanded={!!children}>
-        <div className="flex items-start justify-between gap-8">
-          <div className="flex-1 min-w-0">
-            <div className="eh-title">{item.title}</div>
-            {item.subtitle && <div className="eh-sub line-clamp-2">{item.subtitle}</div>}
-            <div className="eh-meta">
-              {item.has_response ? 'Has response' : 'No response'}
-              {item.message_count != null ? ` · ${item.message_count} msgs` : ''}
-              {item.relative_date ? ` · ${item.relative_date}` : ''}
-            </div>
-          </div>
-          <div className="flex items-center gap-3 shrink-0" onClick={(e) => e.stopPropagation()}>
+        <div className="eh-row__avatar">
+          <EchoAvatar state="idle" size={36} />
+        </div>
+
+        <div className="eh-row__content">
+          <div className="eh-row__title">{item.title}</div>
+          {item.preview_snippet && (
+            <div className="eh-row__preview">{item.preview_snippet}</div>
+          )}
+        </div>
+
+        <div className="eh-row__meta">
+          {item.relative_date && <time>{item.relative_date}</time>}
+          <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
             {trailing}
           </div>
         </div>
-
-        {children && <div className="eh-inline">{children}</div>}
       </div>
+
+      {children && <div className="eh-thread">{children}</div>}
       
       <div className="eh-divider" />
     </>

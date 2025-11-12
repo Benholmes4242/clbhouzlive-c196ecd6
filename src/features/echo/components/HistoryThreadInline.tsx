@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useEchoThreadMessages } from '../hooks/useEchoThreadMessages';
+import EchoAvatar from '@/components/ai-chat/EchoAvatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 
 export interface HistoryThreadInlineProps {
   threadId: string;
@@ -26,18 +28,36 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
     onHeightChange(h);
   }, [messages?.length, onHeightChange]);
 
-  if (isLoading) return <div className="eh-msg eh-sub">Loading…</div>;
-  if (error) return <div className="eh-msg eh-sub">Couldn't load messages.</div>;
-  if (!messages.length) return <div className="eh-msg eh-sub">No messages in this conversation yet.</div>;
+  if (isLoading) return <div className="text-[var(--eh-preview)] text-sm p-3">Loading…</div>;
+  if (error) return <div className="text-[var(--eh-preview)] text-sm p-3">Couldn't load messages.</div>;
+  if (!messages.length) return <div className="text-[var(--eh-preview)] text-sm p-3">No messages in this conversation yet.</div>;
 
   return (
-    <div ref={ref}>
-      {messages.map((m) => (
-        <div key={m.id} className="eh-msg">
-          <div className="eh-from">{m.role === 'user' ? 'You' : 'Echo'}</div>
-          <div>{m.content}</div>
-        </div>
-      ))}
+    <div ref={ref} role="log" aria-live="polite">
+      <ul className="list-none p-0 m-0">
+        {messages.map((m) => (
+          <li 
+            key={m.id} 
+            className={m.role === 'user' ? 'eh-msg eh-msg--right' : 'eh-msg'}
+          >
+            <div className="eh-msg__avatar" aria-label={m.role === 'user' ? 'You' : 'Echo'}>
+              {m.role === 'user' ? (
+                <AvatarSquircle size={36} className="bg-gradient-to-br from-purple-500 to-blue-500">
+                  <div className="absolute inset-0 flex items-center justify-center text-white text-sm font-semibold">
+                    U
+                  </div>
+                </AvatarSquircle>
+              ) : (
+                <EchoAvatar state="idle" size={36} />
+              )}
+            </div>
+            <div className="eh-msg__body flex-1 min-w-0">
+              <div className="eh-msg__label">{m.role === 'user' ? 'YOU' : 'ECHO'}</div>
+              <div className="eh-msg__text">{m.content}</div>
+            </div>
+          </li>
+        ))}
+      </ul>
       {footer && <div className="mt-4">{footer}</div>}
     </div>
   );

@@ -3212,42 +3212,104 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
 }
 
-/* Echo History flat rows */
-.eh-row {
-  padding: 20px 0;
+/* Echo History — Apple finish */
+:root {
+  --eh-divider: rgba(255,255,255,.07);
+  --eh-title: rgba(255,255,255,.95);
+  --eh-preview: rgba(255,255,255,.65);
+  --eh-meta: rgba(255,255,255,.55);
+}
+
+.eh-divider { 
+  height: 1px; 
+  background: var(--eh-divider); 
+  width: 100%;
+}
+
+/* Collapsed row */
+.eh-row { 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  padding: 14px 0 12px; 
   cursor: pointer;
 }
 
-.eh-title { font-weight: 600; letter-spacing: 0.1px; font-size: 16px; }
-.eh-sub   { color: rgba(255,255,255,0.6); margin-top: 4px; font-size: 15px; }
-.eh-meta  { color: rgba(255,255,255,0.6); font-size: 13px; margin-top: 8px; }
-
-.eh-divider {
-  height: 1px;
-  background: rgba(255,255,255,0.12);
-  margin: 0;
+.eh-row__avatar { 
+  flex: 0 0 36px; 
 }
 
-/* Inline transcript (flat, scrollable) */
-.eh-inline {
-  margin-top: 12px;
-  max-height: 60vh;
-  overflow-y: auto;
-  padding-right: 4px;
-  -webkit-overflow-scrolling: touch;
+.eh-row__content { 
+  flex: 1 1 auto; 
+  min-width: 0; 
 }
 
-.eh-msg {
-  line-height: 1.55;
+.eh-row__title { 
+  font-size: 17px; 
+  font-weight: 600; 
+  color: var(--eh-title); 
+}
+
+.eh-row__preview { 
+  font-size: 15px; 
+  color: var(--eh-preview); 
+  white-space: nowrap; 
+  text-overflow: ellipsis; 
+  overflow: hidden; 
+  margin-top: 2px; 
+}
+
+.eh-row__meta { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  color: var(--eh-meta); 
+  font-size: 13px; 
+}
+
+/* Expanded transcript */
+.eh-thread { 
+  max-height: 60vh; 
+  overflow: auto; 
+  padding: 10px 4px 14px; 
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 92%, rgba(0,0,0,0)); 
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 92%, rgba(0,0,0,0));
+}
+
+.eh-msg { 
+  display: flex; 
+  align-items: flex-start; 
+  gap: 10px; 
+  margin: 12px 0; 
+}
+
+.eh-msg--right { 
+  flex-direction: row-reverse; 
+}
+
+.eh-msg__avatar { 
+  flex: 0 0 36px; 
+}
+
+.eh-msg__body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.eh-msg__label { 
+  font-size: 12px; 
+  letter-spacing: .4px; 
+  color: var(--eh-meta); 
+  margin-bottom: 6px; 
+  text-transform: uppercase; 
+}
+
+.eh-msg__text { 
+  font-size: 15px; 
+  line-height: 1.6; 
+  color: var(--eh-title); 
   white-space: pre-wrap;
   word-break: break-word;
-  margin: 8px 0;
-}
-.eh-from { 
-  color: rgba(255,255,255,0.6); 
-  font-size: 12.5px; 
-  text-transform: uppercase; 
-  margin-bottom: 4px;
 }
 
 /* Inline expand animation */
