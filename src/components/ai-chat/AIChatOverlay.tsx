@@ -784,7 +784,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
           {/* Tabs */}
           <div className="sticky top-0 z-[1] bg-background/95 backdrop-blur-sm border-b border-border">
-            <div className="w-full px-4 md:px-5 py-3">
+            <div className="w-full px-4 md:px-5 py-0">
               <TabsList className="h-11 w-full rounded-full bg-muted/50 border border-border/50 flex p-1">
                 <TabsTrigger
                   value="chat"
