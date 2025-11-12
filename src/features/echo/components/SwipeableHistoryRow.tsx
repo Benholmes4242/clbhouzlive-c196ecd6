@@ -78,7 +78,7 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
       <button
         onClick={handleDeleteClick}
         className="p-2 rounded-full min-w-[40px] min-h-[40px] flex items-center justify-center"
-        style={{ marginLeft: '-1px' }}
+        style={{ marginLeft: '-6px' }}
         aria-label="Delete conversation"
       >
         <Trash2 
