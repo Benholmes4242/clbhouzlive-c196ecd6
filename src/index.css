@@ -3280,10 +3280,9 @@ html[data-immersive="true"] .app-shell--topSpacer {
   flex: 0 0 auto;
 }
 
-/* Align the rightmost action icon flush with the container edge.
-   Button has p-2 (8px) + gap-2 (8px) = 16px extra spacing to cancel. */
+/* Align the rightmost action icon closer to the container edge without clipping. */
 .eh-actions {
-  margin-right: -16px; /* cancels button right padding + gap so icon aligns with search bar edge */
+  margin-right: -12px; /* reduces extra spacing while keeping icon visible */
 }
 
 .eh-row-when {
