@@ -843,7 +843,7 @@ export function HubEchoHistoryPage() {
         className="relative h-full pt-[calc(3.5rem+var(--hub-pad,20px)+env(safe-area-inset-top,0px))] pb-[calc(var(--hub-pad,20px)+env(safe-area-inset-bottom,0px))]"
       >
         {/* Content container - direct on background */}
-        <section className="px-4 md:px-6 max-w-3xl mx-auto">
+        <section className="px-4 md:px-6 max-w-3xl mx-auto eh-fixedLayer">
           <h2
             className="text-[17px] font-semibold mb-3"
             style={{ color: 'rgba(255,255,255,0.9)' }}
@@ -985,7 +985,7 @@ export function HubEchoHistoryPage() {
             <ErrorBoundary>
               <div 
                 ref={listRef}
-                className="relative"
+                className="relative eh-listScroll"
                 role="listbox"
                 aria-label="Conversations"
                 aria-multiselectable={selectMode || undefined}

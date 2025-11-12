@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Search, X, Calendar } from 'lucide-react';
+import { Search, X, Calendar, ChevronDown } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
 import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
 import { extractTagDirective } from '../utils/parseTagDirective';
@@ -329,10 +329,11 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
                 backdropFilter: 'blur(8px)',
                 WebkitBackdropFilter: 'blur(8px)',
               }}
+              aria-haspopup="dialog"
               aria-label="Filter by date"
             >
-              {datePresetLabel ? `Date: ${datePresetLabel}` : 'Date'}
-              {datePresetLabel && (
+              <span>{datePresetLabel ? `Date: ${datePresetLabel}` : 'Date'}</span>
+              {datePresetLabel ? (
                 <X 
                   className="w-3.5 h-3.5" 
                   onClick={(e) => {
@@ -340,13 +341,15 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
                     handleClearDate();
                   }}
                 />
+              ) : (
+                <ChevronDown className="w-3 h-3 opacity-80" aria-hidden />
               )}
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
             align="start"
             className="min-w-[240px] backdrop-blur-xl bg-background/95 border-white/10"
-            style={{ zIndex: 1000 }}
+            style={{ zIndex: 1200 }}
           >
             {!showCustomPicker ? (
               <>
