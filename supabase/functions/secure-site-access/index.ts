@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 function pickAllowedOrigin(req: Request): string {
-  const origin = req.headers.get('origin') || '';
+  const origin = req.headers.get('origin') || req.headers.get('Origin') || '';
   const allowList = [
     'https://clbhouz.co.uk',
     'https://www.clbhouz.co.uk',
@@ -115,7 +115,7 @@ async function signToken(payload: string, key: string): Promise<string> {
 const handler = async (req: Request): Promise<Response> => {
   const corsHeaders = makeCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
   try {
@@ -248,7 +248,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     return new Response(
-      JSON.stringify({ success: true, message: "Access granted" }),
+      JSON.stringify({ success: true, message: "Access granted", sessionToken: signedToken, expiresAt: new Date(sessionPayload.exp).toISOString() }),
       { status: 200, headers }
     );
 
