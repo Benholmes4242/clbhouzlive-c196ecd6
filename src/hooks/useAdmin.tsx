@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { invokeWithAuth } from '@/lib/invokeWithAuth';
 
 export interface AdminUser {
   id: string;
@@ -30,6 +31,10 @@ export const useAdmin = () => {
 
   // Check if current user is admin or limited admin by calling edge function
   const checkAdminStatus = async () => {
+    // Wait for session to resolve
+    if (sessionLoading) return;
+    
+    // If not authenticated, they're definitely not an admin
     if (!user) {
       console.log('No user, setting admin status to false');
       setIsAdmin(false);
@@ -40,24 +45,33 @@ export const useAdmin = () => {
       return;
     }
 
+    // Authenticated: safe to invoke
     console.log('Checking admin status for user:', user.id);
     try {
-      // Explicit auth header fallback
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const { data, error } = await supabase.functions.invoke('secure-site-access-check', { 
-        body: {},
-        headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
-      });
+      const { data, error } = await invokeWithAuth<{ ok: boolean; role: string; user_id: string; is_admin: boolean }>(
+        supabase, 
+        'secure-site-access-check', 
+        { body: {} }
+      );
       
       if (error) {
         console.error('[AdminAccess] Error checking admin status via edge function:', error);
         console.error('[AdminAccess] Error details:', JSON.stringify(error, null, 2));
-        console.error('[AdminAccess] This may be a CORS/network issue. Check browser console for preflight errors.');
-        setIsAdmin(false);
-        setIsLimitedAdmin(false);
-        setUserRole(null);
-        setNetworkError(true);
+        
+        // 401 = unauthenticated/expired token = not admin
+        // Other errors = network/CORS/server issues
+        if ((error as any).status === 401) {
+          setIsAdmin(false);
+          setIsLimitedAdmin(false);
+          setUserRole(null);
+          setNetworkError(false);
+        } else {
+          console.error('[AdminAccess] This may be a CORS/network issue. Check browser console for preflight errors.');
+          setIsAdmin(false);
+          setIsLimitedAdmin(false);
+          setUserRole(null);
+          setNetworkError(true);
+        }
         setLoading(false);
         return;
       }

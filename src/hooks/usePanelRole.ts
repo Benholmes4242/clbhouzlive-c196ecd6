@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSupabaseSession } from "@/hooks/useSupabaseSession";
+import { invokeWithAuth } from "@/lib/invokeWithAuth";
 
 export type PanelRole = "none" | "limited" | "full" | "unknown";
 
@@ -7,33 +9,45 @@ export type PanelRole = "none" | "limited" | "full" | "unknown";
 type PanelRoleServer = "full" | "limited" | "none";
 
 export function usePanelRole() {
+  const { user, loading: sessionLoading } = useSupabaseSession();
   const [role, setRole] = useState<PanelRole>("none");
   const [loading, setLoading] = useState(true);
 
   const fetchRole = async () => {
+    // Wait for session to resolve first
+    if (sessionLoading) return;
+    
+    // If not authenticated, they're definitely not an admin
+    if (!user) {
+      setRole("none");
+      setLoading(false);
+      return;
+    }
+
+    // Authenticated: safe to invoke
     setLoading(true);
     try {
-      // Explicit auth header fallback (supabase-js v2 includes it automatically, but just in case)
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const { data, error } = await supabase.functions.invoke("secure-site-access-check", { 
-        body: {},
-        headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
-      });
+      const { data, error } = await invokeWithAuth<{ ok: boolean; role: PanelRoleServer; user_id: string; is_admin: boolean }>(
+        supabase, 
+        "secure-site-access-check", 
+        { body: {} }
+      );
       
       if (error) {
         console.error('[AdminAccess] Role check failed:', error);
-        console.error('[AdminAccess] Error details:', JSON.stringify(error, null, 2));
-        // CORS/network failures will show here - don't silently fail
-        setRole("unknown");
+        // 401 = unauthenticated/expired token = not admin
+        // Other errors = network/CORS/server issues
+        if ((error as any).status === 401) {
+          setRole("none");
+        } else {
+          setRole("unknown");
+        }
       } else {
-        // Simplified: key off role directly, treating missing/invalid as unknown
-        const serverRole = (data?.role ?? "unknown") as PanelRole;
+        const serverRole = (data?.role ?? "none") as PanelRoleServer;
         console.log('[AdminAccess] Role check success:', { serverRole, data });
         setRole(serverRole);
       }
     } catch (e) {
-      // Network/CORS errors that bypass the error callback
       console.error('[AdminAccess] Role check exception (likely CORS/network):', e);
       setRole("unknown");
     }
@@ -41,26 +55,23 @@ export function usePanelRole() {
   };
 
   useEffect(() => {
-    let mounted = true;
+    // Only fetch when session is ready
+    if (!sessionLoading) {
+      fetchRole();
+    }
+  }, [sessionLoading, user?.id]);
 
-    const safeFetch = async () => {
-      if (!mounted) return;
-      await fetchRole();
-    };
-
-    safeFetch();
-
+  useEffect(() => {
     const onVis = () => {
-      if (document.visibilityState === "visible" && mounted) {
+      if (document.visibilityState === "visible" && !sessionLoading) {
         fetchRole();
       }
     };
     document.addEventListener("visibilitychange", onVis);
     return () => {
-      mounted = false;
       document.removeEventListener("visibilitychange", onVis);
     };
-  }, []);
+  }, [sessionLoading, user?.id]);
 
   return { role, loading, refresh: fetchRole };
 }
