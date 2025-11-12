@@ -57,7 +57,7 @@ const EchoAvatar: React.FC<EchoAvatarProps> = ({ state, size = 32 }) => {
       </defs>
 
       {/* Frosted white background */}
-      <path d={d} fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
+      <path d={d} fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.35)" strokeWidth="1" />
       
       {/* Inner highlight */}
       <path d={d} fill={`url(#${id}-highlight)`} opacity="0.8" />
