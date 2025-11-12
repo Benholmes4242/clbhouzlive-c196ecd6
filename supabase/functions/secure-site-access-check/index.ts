@@ -1,39 +1,46 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
-const ALLOWED_ORIGINS = new Set([
-  "https://clbhouz.com",
-  "https://www.clbhouz.com",
-  "https://clbhouz.co.uk",
-  "https://www.clbhouz.co.uk",
-  "https://app.clbhouz.co.uk",
-  "https://admin.clbhouz.co.uk",
-  "http://localhost:3000",
-  "http://localhost:5173",
-  "capacitor://localhost",
-  "ionic://localhost",
-  // Lovable preview domains
-  "https://74d6ba70-bf1d-4665-bd9a-aff281e4c1df.lovableproject.com",
-  "https://id-preview--74d6ba70-bf1d-4665-bd9a-aff281e4c1df.lovable.app",
-]);
+function pickAllowedOrigin(req: Request): string {
+  const origin = req.headers.get('origin') || req.headers.get('Origin') || '';
+  const allowList = [
+    'https://clbhouz.co.uk',
+    'https://www.clbhouz.co.uk',
+    'https://clbhouz.com',
+    'https://www.clbhouz.com',
+    'https://app.clbhouz.co.uk',
+    'https://admin.clbhouz.co.uk',
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'capacitor://localhost',
+    'ionic://localhost',
+  ];
+  // Allow Lovable preview & app subdomains
+  if (origin.endsWith('.lovable.app') || origin.endsWith('.lovableproject.com')) {
+    return origin;
+  }
+  if (allowList.includes(origin)) {
+    return origin;
+  }
+  // Safe fallback
+  return allowList[0];
+}
 
-function makeCorsHeaders(origin: string | null): HeadersInit {
-  const allowOrigin =
-    origin && ALLOWED_ORIGINS.has(origin) ? origin : ""; // never '*'
+function makeCorsHeaders(req: Request): HeadersInit {
+  const origin = pickAllowedOrigin(req);
   return {
-    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Credentials": "true",
     "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
     "Access-Control-Allow-Headers":
       "authorization, x-client-info, apikey, content-type, x-requested-with",
-    "Access-Control-Max-Age": "86400", // 24h
+    "Access-Control-Max-Age": "86400",
     "Vary": "Origin",
   };
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  const origin = req.headers.get("Origin");
-  const corsHeaders = makeCorsHeaders(origin);
+  const corsHeaders = makeCorsHeaders(req);
 
   // Preflight
   if (req.method === "OPTIONS") {

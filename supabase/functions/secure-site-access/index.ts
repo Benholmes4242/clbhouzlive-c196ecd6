@@ -1,14 +1,37 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+function pickAllowedOrigin(req: Request): string {
+  const origin = req.headers.get('origin') || '';
+  const allowList = [
+    'https://clbhouz.co.uk',
+    'https://www.clbhouz.co.uk',
+    'https://clbhouz.com',
+    'https://www.clbhouz.com',
+    'https://app.clbhouz.co.uk',
+    'https://admin.clbhouz.co.uk',
+    'http://localhost:3000',
+    'http://localhost:5173',
+  ];
+  // Allow Lovable preview & app subdomains
+  if (origin.endsWith('.lovable.app') || origin.endsWith('.lovableproject.com')) {
+    return origin;
+  }
+  if (allowList.includes(origin)) {
+    return origin;
+  }
+  // Safe fallback
+  return allowList[0];
+}
+
 function makeCorsHeaders(req: Request) {
-  const origin = req.headers.get('origin') ?? '*';
+  const origin = pickAllowedOrigin(req);
   return {
     'Access-Control-Allow-Origin': origin,
     'Vary': 'Origin',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
     'Access-Control-Allow-Credentials': 'true',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   };
 }
 
