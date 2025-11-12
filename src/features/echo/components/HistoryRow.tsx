@@ -1,6 +1,6 @@
 import React from 'react';
 import EchoAvatar from '@/components/ai-chat/EchoAvatar';
-import { formatShortWhen } from '@/utils/date';
+import { formatSmartWhen } from '@/utils/date';
 
 type Props = {
   item: {
@@ -19,7 +19,7 @@ type Props = {
 };
 
 export function HistoryRow({ item, onToggle, trailing, children }: Props) {
-  const when = formatShortWhen(item.created_at);
+  const when = formatSmartWhen(item.created_at);
   
   return (
     <>

@@ -3278,11 +3278,17 @@ html[data-immersive="true"] .app-shell--topSpacer {
 }
 
 .eh-row-when {
-  opacity: 0.6;
-  font-size: 12px;
-  letter-spacing: 0.02em;
+  opacity: 0.7;
+  font-size: 13px;
+  letter-spacing: 0.01em;
   white-space: nowrap;
   color: var(--eh-meta);
+  font-weight: 400;
+  transition: opacity 0.25s ease;
+}
+
+.eh-row-when:hover {
+  opacity: 1;
 }
 
 /* Small screens: stack timestamp below title */
