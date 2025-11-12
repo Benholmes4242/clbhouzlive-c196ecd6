@@ -3348,6 +3348,10 @@ html[data-immersive="true"] .app-shell--topSpacer {
   margin: 10px 0;
 }
 
+.eh-line:first-child {
+  margin-top: 0;
+}
+
 .eh-line--echo {
   /* Echo: avatar left, content center, pad right */
 }
