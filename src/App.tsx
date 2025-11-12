@@ -36,6 +36,7 @@ import { ReviewIslandLoader } from '@/ReviewIslandLoader';
 import { supabase } from '@/integrations/supabase/client';
 import { migrateChatHistory } from '@/utils/chatHistoryMigration';
 import { PanelGuard } from "@/components/admin/PanelGuard";
+import { ToastHost } from '@/components/toast/ToastHost';
 
 
 
@@ -394,34 +395,36 @@ const App: React.FC = () => {
                   <ModalProvider>
                     <BottomNavigationProvider>
                       <UIProvider>
-                      <BrowserRouter>
-                        <HubProvider>
-                        <ScrollToTop />
-                        <GlobalAudioProvider>
-                          <VideoManagerProvider>
-                            <VideoPlaybackManagerProvider>
-                              <TopTenProvider>
-                                <AuthWrapper>
-                                   <Suspense fallback={<ClbhouzPageSpinner />}>
-                                   <div className="app-depth">
-                                   {/* No global header - each page renders its own ClubhouseHeaderNew */}
-                                   <AppRoutes />
-                                   </div>
-                                 </Suspense>
-                              </AuthWrapper>
-                            </TopTenProvider>
-                          </VideoPlaybackManagerProvider>
-                        </VideoManagerProvider>
-                      </GlobalAudioProvider>
-                      <Toaster />
-                      <Sonner />
-                      <GlobalBottomNavigation />
-                        </HubProvider>
-                    </BrowserRouter>
-                  </UIProvider>
-                </BottomNavigationProvider>
-                </ModalProvider>
-              </HeaderProvider>
+                        <ToastHost>
+                          <BrowserRouter>
+                            <HubProvider>
+                              <ScrollToTop />
+                              <GlobalAudioProvider>
+                                <VideoManagerProvider>
+                                  <VideoPlaybackManagerProvider>
+                                    <TopTenProvider>
+                                      <AuthWrapper>
+                                        <Suspense fallback={<ClbhouzPageSpinner />}>
+                                          <div className="app-depth">
+                                            {/* No global header - each page renders its own ClubhouseHeaderNew */}
+                                            <AppRoutes />
+                                          </div>
+                                        </Suspense>
+                                      </AuthWrapper>
+                                    </TopTenProvider>
+                                  </VideoPlaybackManagerProvider>
+                                </VideoManagerProvider>
+                              </GlobalAudioProvider>
+                              <Toaster />
+                              <Sonner />
+                              <GlobalBottomNavigation />
+                            </HubProvider>
+                          </BrowserRouter>
+                        </ToastHost>
+                      </UIProvider>
+                    </BottomNavigationProvider>
+                  </ModalProvider>
+                </HeaderProvider>
             </AccessGate>
         </TooltipProvider>
       </QueryClientProvider>

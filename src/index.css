@@ -3229,14 +3229,15 @@ html[data-immersive="true"] .app-shell--topSpacer {
 /* Collapsed row */
 .eh-row { 
   display: flex; 
-  align-items: center; 
+  align-items: flex-start; 
   gap: 12px; 
   padding: 14px 0 12px; 
   cursor: pointer;
 }
 
 .eh-row__avatar { 
-  flex: 0 0 36px; 
+  flex: 0 0 36px;
+  margin-top: 2px;
 }
 
 .eh-row__content { 
@@ -3244,10 +3245,20 @@ html[data-immersive="true"] .app-shell--topSpacer {
   min-width: 0; 
 }
 
+.eh-row-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
 .eh-row__title { 
+  flex: 1 1 auto;
   font-size: 17px; 
   font-weight: 600; 
-  color: var(--eh-title); 
+  color: var(--eh-title);
+  line-height: 1.25;
+  min-width: 0;
 }
 
 .eh-row__preview { 
@@ -3262,9 +3273,28 @@ html[data-immersive="true"] .app-shell--topSpacer {
 .eh-row__meta { 
   display: flex; 
   align-items: center; 
-  gap: 10px; 
-  color: var(--eh-meta); 
-  font-size: 13px; 
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.eh-row-when {
+  opacity: 0.6;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: var(--eh-meta);
+}
+
+/* Small screens: stack timestamp below title */
+@media (max-width: 360px) {
+  .eh-row-head {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .eh-row__meta {
+    align-self: flex-end;
+  }
 }
 
 /* Expanded transcript */

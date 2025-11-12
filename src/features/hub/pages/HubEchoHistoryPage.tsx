@@ -24,6 +24,7 @@ import { startZipExport } from '@/features/echo/utils/exportOrchestrator';
 import { downloadBlob, defaultZipName } from '@/features/echo/utils/download';
 import { useExportHud } from '@/features/echo/hooks/useExportHud';
 import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/components/toast/ToastHost';
 import { ToastAction } from '@/components/ui/toast';
 import { echoHistoryAnalytics } from '@/features/echo/analytics/echoHistoryAnalytics';
 import { relevanceScore } from '@/features/echo/utils/relevance';
@@ -43,6 +44,9 @@ export function HubEchoHistoryPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [pendingDeletes, setPendingDeletes] = useState<Map<string, { timer: NodeJS.Timeout; startTime: number }>>(new Map());
+  
+  // Apple-style toast
+  const { show: showToast } = useToast();
   
   // Export HUD
   const exportHud = useExportHud();
@@ -319,10 +323,7 @@ export function HubEchoHistoryPage() {
 
     try {
       await starThread(threadId, nextStarred);
-      toast({
-        description: nextStarred ? 'Starred' : 'Unstarred',
-        duration: 2000,
-      });
+      showToast(nextStarred ? 'Added to Favourites' : 'Removed from Favourites');
     } catch (error) {
       console.error('Failed to star/unstar:', error);
       // Rollback optimistic update
@@ -335,13 +336,9 @@ export function HubEchoHistoryPage() {
           );
         }
       );
-      toast({
-        description: 'Failed to update star status',
-        variant: 'destructive',
-        duration: 3000,
-      });
+      showToast('Failed to update');
     }
-  }, [filters, queryClient]);
+  }, [filters, queryClient, showToast, chats]);
 
   // Soft delete with undo (mobile flow)
   const handleSoftDelete = useCallback((threadId: string, source: 'swipe' | 'row-hover' | 'keyboard') => {
@@ -1058,6 +1055,7 @@ export function HubEchoHistoryPage() {
                             }}
                             onCopyLink={() => {
                               navigator.clipboard.writeText(window.location.origin + `/hub/echo/history/chat/${item.id}`);
+                              showToast('Link copied');
                               announce('Link copied to clipboard');
                             }}
                             onOpenFull={() => {

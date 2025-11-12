@@ -1,0 +1,53 @@
+/* Apple-style toast notifications */
+
+.eh-toast-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 84px; /* above bottom nav */
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 60;
+}
+
+.eh-toast {
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  background: color-mix(in oklab, rgba(255,255,255,0.10), rgba(0,0,0,0.30) 30%);
+  border: 1px solid rgba(255,255,255,0.14);
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: rgba(255,255,255,0.92);
+  box-shadow: 
+    0 6px 24px rgba(0,0,0,0.35), 
+    inset 0 1px rgba(255,255,255,0.06);
+  animation: eh-toast-in 0.22s ease-out, eh-toast-out 0.18s ease-in 1.7s forwards;
+}
+
+@keyframes eh-toast-in {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes eh-toast-out {
+  to {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+}
+
+/* Small screens: adjust position */
+@media (max-width: 768px) {
+  .eh-toast-wrap {
+    bottom: 74px;
+  }
+}
