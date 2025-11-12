@@ -35,10 +35,11 @@ const handler = async (req: Request): Promise<Response> => {
     // Get Supabase client with user's auth
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      console.log(JSON.stringify({ rid, status: 401, code: 'MISSING_AUTH' }));
+      console.log(JSON.stringify({ rid, status: 200, code: 'NO_AUTH_SOFT' }));
+      const response = { ok: true, role: 'none' as PanelRoleServer, user_id: null, is_admin: false };
       return new Response(
-        JSON.stringify({ ok: false, code: 'MISSING_AUTH', message: 'No authorization header' }),
-        { status: 401, headers: { 'Content-Type': 'application/json', ...headers } }
+        JSON.stringify(response),
+        { status: 200, headers: { 'Content-Type': 'application/json', ...headers } }
       );
     }
 
