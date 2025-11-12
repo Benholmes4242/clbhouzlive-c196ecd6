@@ -6,7 +6,23 @@ interface EchoAvatarProps {
   size?: number; // in pixels
 }
 
+function superellipsePath(w: number, h: number, n = 5, steps = 200) {
+  const a = w / 2, b = h / 2, m = 2 / n;
+  const pts: string[] = [];
+  for (let i = 0; i < steps; i++) {
+    const t = (i / steps) * Math.PI * 2;
+    const ct = Math.cos(t), st = Math.sin(t);
+    const x = Math.sign(ct) * a * Math.pow(Math.abs(ct), m) + a;
+    const y = Math.sign(st) * b * Math.pow(Math.abs(st), m) + b;
+    pts.push(`${x},${y}`);
+  }
+  return `M ${pts.join(" L ")} Z`;
+}
+
 const EchoAvatar: React.FC<EchoAvatarProps> = ({ state, size = 32 }) => {
+  const id = React.useId();
+  const d = superellipsePath(size, size, 5, 220);
+
   const getAnimationDuration = () => {
     switch (state) {
       case 'idle': return '3s';
@@ -21,32 +37,68 @@ const EchoAvatar: React.FC<EchoAvatarProps> = ({ state, size = 32 }) => {
   };
 
   return (
-    <div 
-      className="relative flex items-center justify-center rounded-full bg-gradient-to-br from-[#1D3557] to-[#2A9D8F] shadow-lg overflow-hidden"
-      style={{ width: size, height: size }}
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      style={{ display: "block" }}
+      aria-label="Echo AI Assistant"
+      role="img"
     >
-      <PiWaveform 
-        size={getIconSize()} 
-        className="text-white/90 transition-all duration-200 ease-in-out"
-        style={{
-          animation: `echoWave ${getAnimationDuration()} ease-in-out infinite`
-        }}
-      />
+      <defs>
+        <clipPath id={id} clipPathUnits="userSpaceOnUse">
+          <path d={d} />
+        </clipPath>
+        <linearGradient id={`${id}-grad`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#1D3557" />
+          <stop offset="100%" stopColor="#2A9D8F" />
+        </linearGradient>
+        <linearGradient id={`${id}-highlight`} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="rgba(255,255,255,0.2)" />
+          <stop offset="50%" stopColor="rgba(255,255,255,0.1)" />
+          <stop offset="100%" stopColor="transparent" />
+        </linearGradient>
+      </defs>
+
+      {/* Background with gradient */}
+      <path d={d} fill={`url(#${id}-grad)`} />
       
+      {/* Inner highlight */}
+      <path d={d} fill={`url(#${id}-highlight)`} opacity="0.6" />
+      
+      {/* Icon */}
+      <foreignObject width={size} height={size} clipPath={`url(#${id})`}>
+        <div
+          style={{
+            width: size,
+            height: size,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <PiWaveform 
+            size={getIconSize()} 
+            className="text-white/90 transition-all duration-200 ease-in-out"
+            style={{
+              animation: `echoWave ${getAnimationDuration()} ease-in-out infinite`
+            }}
+          />
+        </div>
+      </foreignObject>
+
       {/* Shimmer effect for processing state */}
       {state === 'processing' && (
-        <div 
-          className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"
+        <path 
+          d={d} 
+          fill="url(#shimmer-grad)"
+          opacity="0.3"
           style={{
-            animation: 'shimmer 2s ease-in-out infinite',
-            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)'
+            animation: 'shimmer 2s ease-in-out infinite'
           }}
         />
       )}
-      
-      {/* Inner highlight */}
-      <div className="absolute inset-0 rounded-full bg-gradient-to-t from-transparent via-white/10 to-white/20 opacity-60" />
-    </div>
+    </svg>
   );
 };
 
