@@ -29,12 +29,6 @@ import { ensureThreadId, persistUserMessage, persistAssistantMessage } from '@/f
 import { FrostedPill } from '@/components/shared/FrostedPill';
 import { EchoTypingBar } from './EchoTypingBar';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import MessageTurn from '@/features/echo/components/MessageTurn';
-import ThreadDivider from '@/features/echo/components/ThreadDivider';
-import { formatMessageTime } from '@/utils/dateFormat';
-import '@/features/echo/components/message-turn.css';
-import '@/features/echo/components/thread-divider.css';
-import '@/design/tokens/echo-thread.css';
 
 interface ChatMessageData {
   id: string;
@@ -523,68 +517,60 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   </div>
                 </div>
               ) : (
-                <div>
-                  {(() => {
-                    const messageRows: React.ReactNode[] = [];
-
-                    for (let i = 0; i < messages.length; i++) {
-                      const m = messages[i];
-                      const isYou = m.type === 'user';
-
-                      messageRows.push(
-                        <MessageTurn
-                          key={m.id}
-                          role={isYou ? 'you' : 'echo'}
-                          avatarUrl={isYou ? (userProfile?.profile_photo_url || undefined) : undefined}
-                          avatarFallback={
-                            isYou ? (
-                              userProfile?.profile_photo_url ? undefined : (
-                                <div 
-                                  className="flex items-center justify-center text-[11px] font-medium text-white/90"
-                                  style={{
-                                    width: 28,
-                                    height: 28,
-                                    background: 'rgba(255,255,255,0.1)',
-                                    border: '1px solid rgba(255,255,255,0.2)',
-                                    borderRadius: '8px',
-                                  }}
-                                >
-                                  {userProfile?.display_name?.[0]?.toUpperCase() || userProfile?.username?.[0]?.toUpperCase() || 'U'}
-                                </div>
-                              )
-                            ) : (
-                              <EchoAvatar state="idle" size={28} />
-                            )
-                          }
-                          nameLabel={isYou ? 'YOU' : 'ECHO'}
-                          timestamp={formatMessageTime(m.timestamp.toISOString())}
-                          text={m.content}
-                        />
-                      );
-
-                      if (i < messages.length - 1) {
-                        messageRows.push(<ThreadDivider key={`div-${messages[i + 1].id}`} />);
-                      }
-                    }
-
-                    return messageRows;
-                  })()}
-                  
-                  {isLoading && (
-                    <>
-                      <ThreadDivider />
-                      <MessageTurn
-                        role="echo"
-                        avatarFallback={<EchoAvatar state="idle" size={28} />}
-                        nameLabel="ECHO"
+                <div className="space-y-1">
+                  {messages.map((message, index) => {
+                    const isUser = message.type === 'user';
+                    const prevMessage = index > 0 ? messages[index - 1] : null;
+                    const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
+                    
+                    return (
+                      <div 
+                        key={message.id} 
+                        className={cn(
+                          isFirstInGroup && index > 0 && "mt-4",
+                          !isFirstInGroup && "mt-2.5"
+                        )}
                       >
+                        <ChatMessageComponent
+                          message={message}
+                          onSaveToInsights={saveToInsights}
+                          onRequestDetail={requestMoreDetail}
+                          isFirstInGroup={isFirstInGroup}
+                          showHeading={isFirstInGroup}
+                          showActions={false}
+                          userProfilePhoto={userProfile?.profile_photo_url || null}
+                          userDisplayName={userProfile?.display_name || userProfile?.username || 'User'}
+                        />
+                      </div>
+                    );
+                  })}
+                  {isLoading && (
+                    <div className="mt-4">
+                      {/* Echo heading with squircle icon */}
+                      <div className="mb-2 flex items-center gap-2">
+                        <span className="text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
+                          Echo
+                        </span>
+                      <EchoAvatar state="idle" size={28} />
+                      </div>
+                      
+                      {/* Loading bubble */}
+                      <div className="rounded-[var(--bubble-radius)] border overflow-hidden backdrop-blur-[var(--glass-blur)]"
+                        style={{
+                          maxWidth: 'var(--bubble-max-mobile)',
+                          background: 'var(--bubble-echo-grad)',
+                          borderColor: 'var(--bubble-echo-border)',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.15), var(--bubble-echo-inset)',
+                          padding: 'var(--bubble-pad-y) var(--bubble-pad-x)',
+                          minHeight: 'calc(var(--bubble-pad-y) * 2 + 20px)'
+                        }}>
                         <div className="flex items-center gap-1.5">
                           <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '-0.2s' }}></span>
                           <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce"></span>
                           <span className="h-1.5 w-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
                         </div>
-                      </MessageTurn>
-                    </>
+                      </div>
+                    </div>
                   )}
                 </div>
               )}

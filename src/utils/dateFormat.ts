@@ -60,20 +60,3 @@ export const formatLikes = (n: number): string => {
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return `${n}`;
 };
-
-export const formatMessageTime = (iso?: string) => {
-  if (!iso) return '';
-  const d = new Date(iso);
-  const now = new Date();
-
-  const sameDay = d.toDateString() === now.toDateString();
-  const y = d.getFullYear();
-  const optsTime: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' };
-
-  if (sameDay) return `Today · ${d.toLocaleTimeString([], optsTime)}`;
-
-  const optsDate: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short' };
-  const base = d.toLocaleDateString([], optsDate);
-  if (y !== now.getFullYear()) return `${base} ${y} · ${d.toLocaleTimeString([], optsTime)}`;
-  return `${base} · ${d.toLocaleTimeString([], optsTime)}`;
-};
