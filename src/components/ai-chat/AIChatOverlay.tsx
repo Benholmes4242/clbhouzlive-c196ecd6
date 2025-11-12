@@ -13,6 +13,7 @@ import AIChatHistory from './AIChatHistory';
 import CaddieLogs from './CaddieLogs';
 import SwingCoach from './SwingCoach';
 import EchoAvatar from './EchoAvatar';
+import SquircleImage from '@/components/ui/SquircleImage';
 import { OverlayFooter } from './OverlayFooter';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -29,6 +30,9 @@ import { ensureThreadId, persistUserMessage, persistAssistantMessage } from '@/f
 import { FrostedPill } from '@/components/shared/FrostedPill';
 import { EchoTypingBar } from './EchoTypingBar';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import MessageTurn from '@/features/echo/components/MessageTurn';
+import ThreadDivider from '@/features/echo/components/ThreadDivider';
+import { formatMessageTime } from '@/utils/dateFormat';
 
 interface ChatMessageData {
   id: string;
@@ -517,34 +521,59 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   </div>
                 </div>
               ) : (
-                <div className="space-y-1">
-                  {messages.map((message, index) => {
-                    const isUser = message.type === 'user';
-                    const prevMessage = index > 0 ? messages[index - 1] : null;
-                    const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
-                    
-                    return (
+                (() => {
+                  const messageRows: React.ReactNode[] = [];
+                  
+                  for (let i = 0; i < messages.length; i++) {
+                    const m = messages[i];
+                    const isUser = m.type === 'user';
+
+                    const userAvatar = userProfile?.profile_photo_url ? (
+                      <SquircleImage
+                        size={28}
+                        src={userProfile.profile_photo_url}
+                        alt={userProfile?.display_name || userProfile?.username || 'User'}
+                        ringColor="rgba(255,255,255,0.2)"
+                        ringWidth={1}
+                      />
+                    ) : (
                       <div 
-                        key={message.id} 
-                        className={cn(
-                          isFirstInGroup && index > 0 && "mt-4",
-                          !isFirstInGroup && "mt-2.5"
-                        )}
+                        className="flex items-center justify-center text-[11px] font-medium text-white/90"
+                        style={{
+                          width: 28,
+                          height: 28,
+                          background: 'rgba(255,255,255,0.1)',
+                          border: '1px solid rgba(255,255,255,0.2)',
+                          borderRadius: '8px',
+                        }}
                       >
-                        <ChatMessageComponent
-                          message={message}
-                          onSaveToInsights={saveToInsights}
-                          onRequestDetail={requestMoreDetail}
-                          isFirstInGroup={isFirstInGroup}
-                          showHeading={isFirstInGroup}
-                          showActions={false}
-                          userProfilePhoto={userProfile?.profile_photo_url || null}
-                          userDisplayName={userProfile?.display_name || userProfile?.username || 'User'}
-                        />
+                        {userProfile?.display_name?.[0]?.toUpperCase() || userProfile?.username?.[0]?.toUpperCase() || 'U'}
                       </div>
                     );
-                  })}
-                  {isLoading && (
+
+                    const echoAvatar = <EchoAvatar state="idle" size={28} />;
+
+                    messageRows.push(
+                      <MessageTurn
+                        key={m.id}
+                        role={isUser ? 'you' : 'echo'}
+                        avatarFallback={isUser ? userAvatar : echoAvatar}
+                        nameLabel={isUser ? 'YOU' : 'ECHO'}
+                        timestamp={formatMessageTime(m.timestamp.toISOString())}
+                        text={m.content}
+                      />
+                    );
+
+                    if (i < messages.length - 1) {
+                      messageRows.push(<ThreadDivider key={`div-${messages[i + 1].id}`} />);
+                    }
+                  }
+
+                  return <div className="space-y-1">{messageRows}</div>;
+                })()
+              )}
+              
+              {isLoading && (
                     <div className="mt-4">
                       {/* Echo heading with squircle icon */}
                       <div className="mb-2 flex items-center gap-2">
@@ -572,8 +601,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                       </div>
                     </div>
                   )}
-                </div>
-              )}
+            </div>
 
               {/* Scroll to bottom button */}
               {showScrollToBottom && (
@@ -804,13 +832,56 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   </div>
                 )}
 
-                {messages.map((message) => (
-                  <ChatMessageComponent
-                    key={message.id}
-                    message={message}
-                    onSaveToInsights={() => saveToInsights(message)}
-                  />
-                ))}
+                {(() => {
+                  const messageRows: React.ReactNode[] = [];
+                  
+                  for (let i = 0; i < messages.length; i++) {
+                    const m = messages[i];
+                    const isUser = m.type === 'user';
+
+                    const userAvatar = userProfile?.profile_photo_url ? (
+                      <SquircleImage
+                        size={28}
+                        src={userProfile.profile_photo_url}
+                        alt={userProfile?.display_name || userProfile?.username || 'User'}
+                        ringColor="rgba(255,255,255,0.2)"
+                        ringWidth={1}
+                      />
+                    ) : (
+                      <div 
+                        className="flex items-center justify-center text-[11px] font-medium text-white/90"
+                        style={{
+                          width: 28,
+                          height: 28,
+                          background: 'rgba(255,255,255,0.1)',
+                          border: '1px solid rgba(255,255,255,0.2)',
+                          borderRadius: '8px',
+                        }}
+                      >
+                        {userProfile?.display_name?.[0]?.toUpperCase() || userProfile?.username?.[0]?.toUpperCase() || 'U'}
+                      </div>
+                    );
+
+                    const echoAvatar = <EchoAvatar state="idle" size={28} />;
+
+                    messageRows.push(
+                      <MessageTurn
+                        key={m.id}
+                        role={isUser ? 'you' : 'echo'}
+                        avatarFallback={isUser ? userAvatar : echoAvatar}
+                        nameLabel={isUser ? 'YOU' : 'ECHO'}
+                        timestamp={formatMessageTime(m.timestamp.toISOString())}
+                        text={m.content}
+                      />
+                    );
+
+                    if (i < messages.length - 1) {
+                      messageRows.push(<ThreadDivider key={`div-${messages[i + 1].id}`} />);
+                    }
+                  }
+
+                  return messageRows;
+                })()}
 
                 {isLoading && (
                   <div className="flex items-start gap-3">
@@ -1043,48 +1114,62 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         </div>
                       </div>
                     ) : (
-                <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pb-5 space-y-2">
-                  {messages.map((message, index) => {
-                    const isUser = message.type === 'user';
-                    const prevMessage = index > 0 ? messages[index - 1] : null;
-                    const isFirstInGroup = !prevMessage || prevMessage.type !== message.type;
-                    const nextMessage = index < messages.length - 1 ? messages[index + 1] : null;
-                    const isLastInGroup = !nextMessage || nextMessage.type !== message.type;
-                    
-                    // Example: mark message at index 3 as first unread (UI only)
-                    const isFirstUnread = false; // Set to true on a specific message to show separator
-                    
-                    return (
-                      <div key={message.id}>
-                        {/* "Unread" divider - Phase 59 */}
-                        {isFirstUnread && (
-                          <div className="relative my-6 flex items-center gap-3" role="separator" aria-label="Unread messages">
-                            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/15 to-transparent"></div>
-                            <div className="px-2 py-0.5 rounded-full bg-white/85 backdrop-blur border border-black/10 text-[11px] text-gray-600 shadow-sm">
-                              Unread
-                            </div>
-                            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/15 to-transparent"></div>
-                          </div>
-                        )}
-                        
-                        <div 
-                          className={cn(
-                            "w-full",
-                            isFirstInGroup && index > 0 && "mt-4"
-                          )}
-                        >
-                          <ChatMessageComponent
-                            message={message}
-                            onSaveToInsights={saveToInsights}
-                            onRequestDetail={requestMoreDetail}
-                            isFirstInGroup={isFirstInGroup}
-                            showHeading={isFirstInGroup}
-                            showActions={false}
-                          />
-                        </div>
+                (() => {
+                  const messageRows: React.ReactNode[] = [];
+                  
+                  for (let i = 0; i < messages.length; i++) {
+                    const m = messages[i];
+                    const isUser = m.type === 'user';
+
+                    const userAvatar = userProfile?.profile_photo_url ? (
+                      <SquircleImage
+                        size={28}
+                        src={userProfile.profile_photo_url}
+                        alt={userProfile?.display_name || userProfile?.username || 'User'}
+                        ringColor="rgba(255,255,255,0.2)"
+                        ringWidth={1}
+                      />
+                    ) : (
+                      <div 
+                        className="flex items-center justify-center text-[11px] font-medium text-white/90"
+                        style={{
+                          width: 28,
+                          height: 28,
+                          background: 'rgba(255,255,255,0.1)',
+                          border: '1px solid rgba(255,255,255,0.2)',
+                          borderRadius: '8px',
+                        }}
+                      >
+                        {userProfile?.display_name?.[0]?.toUpperCase() || userProfile?.username?.[0]?.toUpperCase() || 'U'}
                       </div>
                     );
-                  })}
+
+                    const echoAvatar = <EchoAvatar state="idle" size={28} />;
+
+                    messageRows.push(
+                      <MessageTurn
+                        key={m.id}
+                        role={isUser ? 'you' : 'echo'}
+                        avatarFallback={isUser ? userAvatar : echoAvatar}
+                        nameLabel={isUser ? 'YOU' : 'ECHO'}
+                        timestamp={formatMessageTime(m.timestamp.toISOString())}
+                        text={m.content}
+                      />
+                    );
+
+                    if (i < messages.length - 1) {
+                      messageRows.push(<ThreadDivider key={`div-${messages[i + 1].id}`} />);
+                    }
+                  }
+
+                  return (
+                    <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 pb-5 space-y-2">
+                      {messageRows}
+                    </div>
+                  );
+                })()
+                    )}
+                    
                     {isLoading && (
                     <div className="mt-4 px-4 flex items-end gap-2">
                       <EchoAvatar state="processing" size={28} />
@@ -1103,7 +1188,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     </div>
                      )}
                          </div>
-                       )}
+                </div>
 
                 {/* "New since you left" banner (optional header slot) */}
                 {false && ( /* Set to true to show header banner style */

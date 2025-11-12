@@ -1,0 +1,17 @@
+:root {
+  --echo-hairline: rgba(255,255,255,0.08);
+  --echo-prose: rgba(255,255,255,0.94);
+  --echo-muted: rgba(255,255,255,0.55);
+
+  --echo-avatar-sz: 28px;
+  --echo-line-height: 1.42;
+  --echo-paragraph-gap: 10px;
+
+  --echo-divider-width: 56%;
+  --echo-divider-opacity: 0.32;
+}
+
+.hr-hairline {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--echo-hairline), transparent);
+}
