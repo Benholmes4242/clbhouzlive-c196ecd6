@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Bookmark, MoreHorizontal, User, Bot, Globe, Zap, ChevronDown, ChevronUp } from 'lucide-react';
+import { Bookmark, MoreHorizontal, User, ChevronDown, ChevronUp, Globe, Zap } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { SwingReview } from '@/components/swing-review/SwingReview';
 import { CoachPrompt } from '@/components/swing-review/CoachPrompt';
 import { parseSwingAnalysis } from '@/utils/swingAnalysisParser';
 import { cn } from '@/lib/utils';
-import { EchoBotIcon } from './EchoBotIcon';
+import EchoAvatar from './EchoAvatar';
 import SquircleImage from '@/components/ui/SquircleImage';
 
 interface ChatMessage {
@@ -114,20 +114,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               <span className="text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
                 Echo
               </span>
-              <div 
-                className="flex items-center justify-center"
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '8px',
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)',
-                }}
-              >
-                <Bot className="w-5 h-5 text-white/80" />
-              </div>
+              <EchoAvatar state="idle" size={28} />
             </div>
           )}
           {isUser && showHeading && isFirstInGroup && (

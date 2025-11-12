@@ -8,10 +8,11 @@ import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { cn } from '@/lib/utils';
-import { Bot, Globe, Zap, ChevronDown, ChevronUp } from 'lucide-react';
+import { Globe, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import SquircleImage from '@/components/ui/SquircleImage';
+import EchoAvatar from './EchoAvatar';
 import { HighlightedText } from '@/features/echo/components/HighlightedText';
 
 export interface MessageBubbleProps {
@@ -113,20 +114,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                   </div>
                 )
               ) : (
-                <div 
-                  className="flex items-center justify-center"
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: '8px',
-                    background: 'rgba(255,255,255,0.08)',
-                    border: '1px solid rgba(255,255,255,0.12)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                  }}
-                >
-                  <Bot className="w-5 h-5 text-white/80" />
-                </div>
+                <EchoAvatar state="idle" size={28} />
               )}
             </div>
           )}

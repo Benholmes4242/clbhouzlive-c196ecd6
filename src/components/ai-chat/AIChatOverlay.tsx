@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen, Bot, Paperclip, ArrowUpRight, Settings, Camera, ChevronDown } from 'lucide-react';
+import { X, Send, History, Bookmark, MapPin, Mic, MicOff, BookOpen, Paperclip, ArrowUpRight, Settings, Camera, ChevronDown } from 'lucide-react';
 import { PiWaveform } from 'react-icons/pi';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -27,7 +27,6 @@ import { Z } from '@/config/zIndex';
 import { useAutoSendFromQuery } from './hooks/useAutoSendFromQuery';
 import { ensureThreadId, persistUserMessage, persistAssistantMessage } from '@/features/echo/services/echoPersistence';
 import { FrostedPill } from '@/components/shared/FrostedPill';
-import { EchoBotIcon } from './EchoBotIcon';
 import { EchoTypingBar } from './EchoTypingBar';
 import { useUserProfile } from '@/hooks/useUserProfile';
 
@@ -507,18 +506,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
             >
                   {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-center space-y-6" style={{ paddingTop: '64px', paddingBottom: '64px' }}>
-                  <div 
-                    className="flex items-center justify-center w-20 h-20 rounded-3xl"
-                    style={{
-                      background: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.12)',
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.18)'
-                    }}
-                  >
-                    <Bot className="w-10 h-10 text-white/80" />
-                  </div>
+                  <EchoAvatar state="idle" size={80} />
                   <div className="text-[17px] font-semibold text-white">
                     Start a conversation with Echo
                   </div>
@@ -561,20 +549,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         <span className="text-[12px] font-medium text-white/70" style={{ letterSpacing: '0.2px' }}>
                           Echo
                         </span>
-                        <div 
-                          className="flex items-center justify-center"
-                          style={{
-                            width: 28,
-                            height: 28,
-                            borderRadius: '8px',
-                            background: 'rgba(255,255,255,0.08)',
-                            border: '1px solid rgba(255,255,255,0.12)',
-                            backdropFilter: 'blur(12px)',
-                            WebkitBackdropFilter: 'blur(12px)',
-                          }}
-                        >
-                          <Bot className="w-5 h-5 text-white/80" />
-                        </div>
+                      <EchoAvatar state="idle" size={28} />
                       </div>
                       
                       {/* Loading bubble */}
@@ -1057,17 +1032,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 <div>
                     {messages.length === 0 ? (
                       <div className="flex flex-col items-center justify-center text-center px-6 py-20 sm:py-28 space-y-6">
-                        <div 
-                          className="h-20 w-20 rounded-3xl flex items-center justify-center"
-                          style={{
-                            background: 'rgba(255,255,255,0.08)',
-                            border: '1px solid rgba(255,255,255,0.12)',
-                            backdropFilter: 'blur(12px)',
-                            WebkitBackdropFilter: 'blur(12px)',
-                          }}
-                        >
-                          <Bot className="h-9 w-9 text-white/80" />
-                        </div>
+                        <EchoAvatar state="idle" size={72} />
                         <div className="text-[17px] font-semibold text-white">
                           Start a conversation with Echo
                         </div>
@@ -1120,7 +1085,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   })}
                     {isLoading && (
                     <div className="mt-4 px-4 flex items-end gap-2">
-                      <EchoBotIcon size={28} className="text-white/90 shrink-0" />
+                      <EchoAvatar state="processing" size={28} />
                       <div className="flex-1">
                         <div className="rounded-[var(--bubble-radius)] bg-white/05 border border-white/12 shadow-[0_10px_28px_rgba(0,0,0,0.4)] px-3 py-2" style={{ minHeight: 'calc(var(--bubble-pad-y) * 2 + 20px)' }}>
                           <div className="flex items-center gap-1.5">
