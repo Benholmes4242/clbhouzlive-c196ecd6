@@ -66,7 +66,7 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
     <div className="flex items-center gap-2">
       <button
         onClick={handleStarClick}
-        className="p-2 rounded-full hover:bg-white/10 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+        className="p-2 rounded-full min-w-[40px] min-h-[40px] flex items-center justify-center"
         aria-label={isStarred ? 'Unstar conversation' : 'Star conversation'}
       >
         <Star 
@@ -77,7 +77,7 @@ export const SwipeableHistoryRow: React.FC<SwipeableHistoryRowProps> = ({
       </button>
       <button
         onClick={handleDeleteClick}
-        className="p-2 rounded-full hover:bg-red-500/20 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+        className="p-2 rounded-full min-w-[40px] min-h-[40px] flex items-center justify-center"
         aria-label="Delete conversation"
       >
         <Trash2 
