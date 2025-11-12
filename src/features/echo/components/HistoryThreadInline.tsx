@@ -108,7 +108,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
       </ul>
       
       {/* Footer meta */}
-      <div className="mt-4 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
+      <div className="mt-4 mx-auto h-px" style={{ width: '70%', background: 'rgba(255,255,255,0.12)' }} />
       <div className="pt-2 pb-1 flex items-center text-[12.5px]" style={{ color: 'var(--eh-meta)', opacity: 0.85 }}>
         {createdAt && <time aria-label="Conversation time">{formatAbsoluteDateTime(createdAt)}</time>}
       </div>

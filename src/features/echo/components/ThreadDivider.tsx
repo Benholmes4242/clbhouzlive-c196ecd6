@@ -4,7 +4,7 @@ export const ThreadDivider: React.FC = () => (
   <div 
     className="my-3 mx-auto" 
     style={{ 
-      width: '50%', 
+      width: '70%', 
       height: '1px', 
       background: 'rgba(255,255,255,0.12)' 
     }} 
