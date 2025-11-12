@@ -996,7 +996,7 @@ export function HubEchoHistoryPage() {
                     estimateSize={72}
                     getSize={getRowSize}
                     overscan={8}
-                    className="max-h-[min(70vh,640px)] pr-1"
+                    className="max-h-[min(70vh,640px)]"
                     render={(index) => {
                   const item = chats[index];
                   const isExpanded = expandedId === item.id;
