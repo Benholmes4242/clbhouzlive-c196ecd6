@@ -152,13 +152,11 @@ function GameRow({
         lineHeight: 1.2,
       }}
     >
-      {/* Line 1: Course name + badge + chevron */}
+      {/* Line 1: Course name + chevron */}
       <div className="flex items-center gap-2 mb-[2px] sm:mb-[3px]">
         <div className="truncate text-[16px] font-medium" style={{ color: 'var(--hub-text-bright)' }}>
           {game.course_name || 'Golf Course'}
         </div>
-        
-        <StatusPill kind={game.kind} />
         
         {/* Chevron */}
         <span 
@@ -173,9 +171,10 @@ function GameRow({
         </span>
       </div>
 
-      {/* Line 2: time only */}
-      <div className="mt-1">
+      {/* Line 2: time + badge on right */}
+      <div className="mt-1 flex items-center justify-between">
         <time className="text-[13px]" style={{ color: 'var(--hub-text-sub)' }}>{when}</time>
+        <StatusPill kind={game.kind} />
       </div>
 
       {/* Expandable detail */}
