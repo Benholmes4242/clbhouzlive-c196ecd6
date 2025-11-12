@@ -44,7 +44,8 @@ export const useAdmin = () => {
       const { data, error } = await supabase.functions.invoke('secure-site-access-check', { body: {} });
       
       if (error) {
-        console.error('Error checking admin status via edge function:', error);
+        console.error('[AdminAccess] Error checking admin status via edge function:', error);
+        console.error('[AdminAccess] This may be a CORS/network issue. Check browser console for preflight errors.');
         setIsAdmin(false);
         setIsLimitedAdmin(false);
         setUserRole(null);
@@ -70,7 +71,7 @@ export const useAdmin = () => {
         setUserRole(null);
       }
     } catch (error) {
-      console.error('Exception checking admin status:', error);
+      console.error('[AdminAccess] Exception checking admin status (likely CORS/network):', error);
       setIsAdmin(false);
       setIsLimitedAdmin(false);
       setUserRole(null);

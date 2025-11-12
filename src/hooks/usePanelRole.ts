@@ -9,9 +9,24 @@ export function usePanelRole() {
 
   const fetchRole = async () => {
     setLoading(true);
-    const { data, error } = await supabase.functions.invoke("secure-site-access-check", { body: {} });
-    if (error || !data?.ok) setRole("none");
-    else setRole((data.role as PanelRole) ?? "none");
+    try {
+      const { data, error } = await supabase.functions.invoke("secure-site-access-check", { body: {} });
+      
+      if (error) {
+        console.error('[AdminAccess] Role check failed:', error);
+        // CORS/network failures will show here - don't silently fail
+        setRole("none");
+      } else if (!data?.ok) {
+        console.warn('[AdminAccess] Role check returned not ok:', data);
+        setRole("none");
+      } else {
+        setRole((data.role as PanelRole) ?? "none");
+      }
+    } catch (e) {
+      // Network/CORS errors that bypass the error callback
+      console.error('[AdminAccess] Role check exception (likely CORS/network):', e);
+      setRole("none");
+    }
     setLoading(false);
   };
 

@@ -10,7 +10,14 @@ export function cors(origin: string | null | undefined) {
   return {
     'Access-Control-Allow-Origin': allow,
     'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-client-info, apikey',
+    'Access-Control-Allow-Headers': [
+      'authorization',
+      'x-client-info',
+      'apikey',
+      'content-type',
+      'x-supabase-api-version',
+      'x-supabase-auth'
+    ].join(', '),
     'Access-Control-Max-Age': '86400',
     'Vary': 'Origin',
   };
