@@ -1,39 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-function pickAllowedOrigin(req: Request): string {
-  const origin = req.headers.get('origin') || req.headers.get('Origin') || '';
-  const allowList = [
-    'https://clbhouz.co.uk',
-    'https://www.clbhouz.co.uk',
-    'https://clbhouz.com',
-    'https://www.clbhouz.com',
-    'https://app.clbhouz.co.uk',
-    'https://admin.clbhouz.co.uk',
-    'http://localhost:3000',
-    'http://localhost:5173',
-  ];
-  // Allow Lovable preview & app subdomains
-  if (origin.endsWith('.lovable.app') || origin.endsWith('.lovableproject.com')) {
-    return origin;
-  }
-  if (allowList.includes(origin)) {
-    return origin;
-  }
-  // Safe fallback
-  return allowList[0];
-}
-
-function makeCorsHeaders(req: Request) {
-  const origin = pickAllowedOrigin(req);
-  return {
-    "Access-Control-Allow-Origin": origin,
-    "Vary": "Origin",
-    "Access-Control-Allow-Credentials": "true",
-    "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  };
-}
+import { cors } from "../_shared/cors.ts";
 
 async function hashIP(ip: string): Promise<string> {
   const data = new TextEncoder().encode(ip);
@@ -59,7 +26,9 @@ async function verifyTurnstile(token: string, secret: string, ip?: string): Prom
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  const corsHeaders = makeCorsHeaders(req);
+  const rid = crypto.randomUUID();
+  const corsHeaders = cors(req.headers.get('Origin'));
+  
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });
   }

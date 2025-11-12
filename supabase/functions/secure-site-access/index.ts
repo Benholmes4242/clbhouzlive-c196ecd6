@@ -1,39 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-function pickAllowedOrigin(req: Request): string {
-  const origin = req.headers.get('origin') || req.headers.get('Origin') || '';
-  const allowList = [
-    'https://clbhouz.co.uk',
-    'https://www.clbhouz.co.uk',
-    'https://clbhouz.com',
-    'https://www.clbhouz.com',
-    'https://app.clbhouz.co.uk',
-    'https://admin.clbhouz.co.uk',
-    'http://localhost:3000',
-    'http://localhost:5173',
-  ];
-  // Allow Lovable preview & app subdomains
-  if (origin.endsWith('.lovable.app') || origin.endsWith('.lovableproject.com')) {
-    return origin;
-  }
-  if (allowList.includes(origin)) {
-    return origin;
-  }
-  // Safe fallback
-  return allowList[0];
-}
-
-function makeCorsHeaders(req: Request) {
-  const origin = pickAllowedOrigin(req);
-  return {
-    'Access-Control-Allow-Origin': origin,
-    'Vary': 'Origin',
-    'Access-Control-Allow-Credentials': 'true',
-    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  };
-}
+import { cors } from "../_shared/cors.ts";
+import { signGateToken } from "../_shared/tokens.ts";
 
 const BACKOFF_STEPS = [1, 2, 4, 8, 16]; // seconds
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -43,19 +11,6 @@ interface AccessValidationRequest {
   domain: string;
 }
 
-// Base64url helpers
-function b64urlToBytes(b64: string) {
-  const pad = '='.repeat((4 - (b64.length % 4)) % 4);
-  const s = (b64 + pad).replace(/-/g, '+').replace(/_/g, '/');
-  const bin = atob(s);
-  return Uint8Array.from(bin, c => c.charCodeAt(0));
-}
-
-function bytesToB64url(bytes: Uint8Array) {
-  const bin = String.fromCharCode(...bytes);
-  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
 // Verify a hash in the form: pbkdf2$sha256$<iters>$<salt_b64>$<dk_b64>
 async function verifyPBKDF2(scheme: string, rawCode: string) {
   try {
@@ -63,7 +18,21 @@ async function verifyPBKDF2(scheme: string, rawCode: string) {
     if (alg !== 'sha256' || !iterStr || !saltB64 || !dkB64) return false;
 
     const iterations = parseInt(iterStr, 10);
-    const salt = b64urlToBytes(saltB64);
+    
+    // Base64url decode
+    const base64Decode = (str: string): Uint8Array => {
+      const base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, '=');
+      const binary = atob(padded);
+      return Uint8Array.from(binary, c => c.charCodeAt(0));
+    };
+    
+    const base64Encode = (bytes: Uint8Array): string => {
+      const bin = String.fromCharCode(...bytes);
+      return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    };
+    
+    const salt = base64Decode(saltB64);
     const codeKey = await crypto.subtle.importKey(
       'raw',
       new TextEncoder().encode(rawCode.toUpperCase()),
@@ -82,41 +51,31 @@ async function verifyPBKDF2(scheme: string, rawCode: string) {
       256 // 32 bytes
     );
     const derived = new Uint8Array(bits);
-    const derivedB64 = bytesToB64url(derived);
+    const derivedB64 = base64Encode(derived);
     return crypto.timingSafeEqual
-      ? crypto.timingSafeEqual(b64urlToBytes(derivedB64), b64urlToBytes(dkB64))
+      ? crypto.timingSafeEqual(base64Decode(derivedB64), base64Decode(dkB64))
       : derivedB64 === dkB64; // fallback if timingSafeEqual not present
   } catch {
     return false;
   }
 }
 
-// Simple HMAC signing for session tokens
-async function signToken(payload: string, key: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const keyData = encoder.encode(key);
-  const messageData = encoder.encode(payload);
-  
-  const cryptoKey = await crypto.subtle.importKey(
-    "raw",
-    keyData,
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  
-  const signature = await crypto.subtle.sign("HMAC", cryptoKey, messageData);
-  return btoa(String.fromCharCode(...new Uint8Array(signature)))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
-}
-
 const handler = async (req: Request): Promise<Response> => {
-  const corsHeaders = makeCorsHeaders(req);
+  const rid = crypto.randomUUID();
+  const corsHeaders = cors(req.headers.get('Origin'));
+  
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
+  
+  console.log(JSON.stringify({
+    rid,
+    fn: 'secure-site-access',
+    method: req.method,
+    origin: req.headers.get('Origin'),
+    time: new Date().toISOString(),
+    note: 'begin'
+  }));
 
   try {
     const { accessCode, domain }: AccessValidationRequest = await req.json();
@@ -213,28 +172,19 @@ const handler = async (req: Request): Promise<Response> => {
       .delete()
       .eq("ip", clientIP);
 
-    console.log(`Valid access granted - IP: ${clientIP}, domain: ${domain}`);
+    console.log(`✅ Valid access granted - IP: ${clientIP}, domain: ${domain}, rid: ${rid}`);
 
-    // Create signed session token
-    const sessionPayload = {
-      jti: crypto.randomUUID(),
-      exp: Date.now() + SESSION_TTL_MS,
-      dom: domain ?? null,
-    };
-
-    const header = btoa(JSON.stringify({ alg: "HS256", typ: "CLUBHOUZ" }))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
+    // Create signed JWT session token (with proper claims structure)
+    const signedToken = await signGateToken(
+      clientIP, // Using IP as subject for now (could be user ID if authenticated)
+      'admin', // Grant admin role for valid access codes
+      SESSION_TTL_MS / 1000 // Convert ms to seconds
+    );
     
-    const payload = btoa(JSON.stringify(sessionPayload))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
-
-    const signingKey = Deno.env.get("SITE_ACCESS_SIGNING_KEY")!;
-    const signature = await signToken(`${header}.${payload}`, signingKey);
-    const signedToken = `${header}.${payload}.${signature}`;
+    // Verify token to get expiry time
+    const { verifyGateToken } = await import("../_shared/tokens.ts");
+    const claims = await verifyGateToken(signedToken);
+    const expiresAt = new Date(claims.exp * 1000).toISOString();
 
     // Set HttpOnly cookie
     const headers = new Headers();
@@ -247,8 +197,20 @@ const handler = async (req: Request): Promise<Response> => {
       headers.append(key, value);
     });
 
+    console.log(JSON.stringify({
+      rid,
+      status: 200,
+      code: 'ACCESS_GRANTED',
+      expiresAt
+    }));
+
     return new Response(
-      JSON.stringify({ success: true, message: "Access granted", sessionToken: signedToken, expiresAt: new Date(sessionPayload.exp).toISOString() }),
+      JSON.stringify({ 
+        success: true, 
+        message: "Access granted", 
+        sessionToken: signedToken, 
+        expiresAt 
+      }),
       { status: 200, headers }
     );
 

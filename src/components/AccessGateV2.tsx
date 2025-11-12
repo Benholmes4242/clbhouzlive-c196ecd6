@@ -1,14 +1,101 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { posthog } from "@/lib/posthog";
-
 
 const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 interface AccessGateV2Props {
   children: React.ReactNode;
+}
+
+// ===== Session Storage Utils =====
+const KEY = 'clubhouz_gate_session';
+type GateSession = { token: string; expiresAt: string };
+
+const getSession = (): GateSession | null => {
+  try {
+    return JSON.parse(localStorage.getItem(KEY) || 'null');
+  } catch {
+    return null;
+  }
+};
+
+const setSession = (s: GateSession | null) => {
+  if (!s) {
+    localStorage.removeItem(KEY);
+  } else {
+    localStorage.setItem(KEY, JSON.stringify(s));
+  }
+  // Notify other tabs
+  window.dispatchEvent(new StorageEvent('storage', { key: KEY }));
+};
+
+// ===== Single-flight + Retry Utils =====
+let inflight: Promise<void> | null = null;
+let renewTimer: any;
+const SAFETY_MS = 60_000; // Renew 60s before expiry
+
+async function singleFlight(fn: () => Promise<void>) {
+  if (inflight) return inflight;
+  inflight = fn().finally(() => (inflight = null));
+  return inflight;
+}
+
+const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
+
+async function retry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
+  let delay = 500;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      if (i === attempts - 1) throw e;
+      await sleep(delay);
+      delay *= 2;
+    }
+  }
+  throw new Error('Retry failed');
+}
+
+// ===== Schedule Renewal =====
+function scheduleRenew(expiresAtIso: string, checkFn: () => Promise<void>) {
+  const t = new Date(expiresAtIso).getTime() - Date.now() - SAFETY_MS;
+  clearTimeout(renewTimer);
+  renewTimer = setTimeout(() => {
+    singleFlight(checkFn);
+  }, Math.max(15_000, t)); // Never less than 15s
+}
+
+// ===== Check/Refresh Token =====
+async function checkOrRefresh(): Promise<void> {
+  const sess = getSession();
+  if (!sess?.token) throw new Error('NO_SESSION');
+
+  const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/secure-site-access-check`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: sess.token }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  
+  if (!res.ok) {
+    if (data.code === 'TOKEN_EXPIRED' || data.code === 'INVALID_TOKEN') {
+      setSession(null);
+      throw new Error('EXPIRED');
+    }
+    // Transient edge/network error - retry
+    throw new Error('TRANSIENT');
+  }
+
+  const next: GateSession = {
+    token: data.sessionToken || sess.token,
+    expiresAt: data.expiresAt || sess.expiresAt,
+  };
+  
+  setSession(next);
+  scheduleRenew(next.expiresAt, checkOrRefresh);
 }
 
 const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
@@ -17,84 +104,94 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const { user } = useSupabaseSession();
-  const checkAttempted = React.useRef(false);
-  const isChecking = React.useRef(false);
+  const cancelledRef = useRef(false);
 
   useEffect(() => {
-    // Track gate view
     posthog.capture('gate_view');
   }, []);
 
+  // ===== Boot Sequence =====
   useEffect(() => {
-    const checkAccess = async () => {
-      // Prevent concurrent checks and infinite retries
-      if (isChecking.current || checkAttempted.current) {
-        console.log('[AccessGate] Check already in progress or attempted - skipping');
+    cancelledRef.current = false;
+
+    const boot = async () => {
+      const sess = getSession();
+      
+      if (!sess) {
+        console.log('[AccessGate] No session found - showing gate');
+        setLoading(false);
+        setHasAccess(false);
         return;
       }
 
       try {
-        isChecking.current = true;
-        checkAttempted.current = true;
-        setLoading(true);
-
-        // Don't decide access until we know if there's a user or not
-        if (user === undefined) {
-          console.log('[AccessGate] User state still loading - waiting');
-          checkAttempted.current = false; // Allow retry when user loads
-          return;
-        }
-
-        if (!user) {
-          console.log('[AccessGate] No authenticated user - showing access form');
-          setHasAccess(false);
-          return;
-        }
-
-        console.log('[AccessGate] Calling secure-site-access-check via supabase.functions.invoke');
-        const { data, error } = await supabase.functions.invoke('secure-site-access-check', { body: {} });
-
-        if (error) {
-          console.error('[AccessGate] Edge function error:', error);
-          // Retry ONCE after refreshing session (handles token refresh races)
-          try {
-            await supabase.auth.refreshSession();
-            const retry = await supabase.functions.invoke('secure-site-access-check', { body: {} });
-            if (retry.data?.ok && retry.data?.is_admin === true) {
-              console.log('[AccessGate] Admin access granted after retry for', retry.data.user_id);
-              setHasAccess(true);
-              return;
-            }
-          } catch (retryErr) {
-            console.error('[AccessGate] Retry also failed:', retryErr);
-          }
-          // After one retry, give up and show access form
-          setHasAccess(false);
-          return;
-        }
-
-        if (data?.ok && data?.is_admin === true) {
-          console.log('[AccessGate] Admin access granted for', data.user_id, 'role:', data.role);
+        console.log('[AccessGate] Session found, validating...');
+        await retry(() => singleFlight(checkOrRefresh), 3);
+        
+        if (!cancelledRef.current) {
+          console.log('[AccessGate] Session valid - granting access');
           setHasAccess(true);
-        } else {
-          console.log('[AccessGate] Authenticated but not admin – showing access form', data);
-          setHasAccess(false);
         }
-
-      } catch (err) {
-        console.error('[AccessGate] Unexpected error in checkAccess:', err);
-        setHasAccess(false);
+      } catch (e: any) {
+        if (cancelledRef.current) return;
+        
+        if (e?.message === 'EXPIRED') {
+          console.log('[AccessGate] Session expired - showing gate');
+          setSession(null);
+          setHasAccess(false);
+        } else {
+          console.warn('[AccessGate] Transient error, staying in last-known-good state:', e);
+          // Keep user in, schedule another check
+          setTimeout(() => singleFlight(checkOrRefresh).catch(() => {}), 10_000);
+          setHasAccess(true); // Optimistic: stay in
+        }
       } finally {
-        isChecking.current = false;
-        // Clean up legacy key even on success
-        try { localStorage.removeItem('siteAccess'); } catch {}
-        setLoading(false);
+        if (!cancelledRef.current) {
+          setLoading(false);
+        }
       }
     };
 
-    checkAccess();
-  }, [user]);
+    boot();
+
+    // ===== Visibility Change Handler =====
+    let visTimer: any;
+    const onVis = () => {
+      if (document.visibilityState !== 'visible') return;
+      clearTimeout(visTimer);
+      visTimer = setTimeout(() => {
+        if (getSession()) {
+          singleFlight(checkOrRefresh).catch(() => {});
+        }
+      }, 800); // Debounce
+    };
+    document.addEventListener('visibilitychange', onVis);
+
+    // ===== Multi-Tab Sync =====
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== KEY) return;
+      
+      const sess = getSession();
+      if (!sess) {
+        console.log('[AccessGate] Other tab logged out - showing gate');
+        setHasAccess(false);
+        return;
+      }
+      
+      console.log('[AccessGate] Session updated by other tab');
+      scheduleRenew(sess.expiresAt, checkOrRefresh);
+      // Don't refetch immediately; let renew timer manage cadence
+    };
+    window.addEventListener('storage', onStorage);
+
+    return () => {
+      cancelledRef.current = true;
+      document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener('storage', onStorage);
+      clearTimeout(renewTimer);
+      clearTimeout(visTimer);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,34 +204,38 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
 
     setSubmitting(true);
     setErrorMessage("");
+    
     try {
-      const { data, error } = await supabase.functions.invoke('secure-site-access', {
-        body: {
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/secure-site-access`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           accessCode: accessCode.toUpperCase(),
           domain: window.location.hostname
-        }
+        })
       });
 
-      if (error) {
-        console.error('[AccessGate] Access code validation error:', error);
-        const msg = "Failed to validate access code. Please try again.";
+      const data = await res.json();
+
+      if (!res.ok || !data?.success) {
+        const msg = data?.message || "Invalid access code";
         setErrorMessage(msg);
         toast.error(msg);
-        posthog.capture('gate_submit', { success: false, error: error.message });
+        setAccessCode("");
+        posthog.capture('gate_submit', { success: false, error: msg });
       } else {
-        posthog.capture('gate_submit', { success: data?.success });
-
-        if (data?.success) {
-          toast.success("Access Granted - Welcome to clubhouz!");
-          posthog.capture('gate_access_granted');
-          setHasAccess(true);
-          setErrorMessage("");
-        } else {
-          const msg = data?.message || "Invalid access code";
-          setErrorMessage(msg);
-          toast.error(msg);
-          setAccessCode("");
-        }
+        // Success - store session and schedule renewal
+        const { sessionToken, expiresAt } = data;
+        
+        setSession({ token: sessionToken, expiresAt });
+        scheduleRenew(expiresAt, checkOrRefresh);
+        
+        toast.success("Access Granted - Welcome to clubhouz!");
+        posthog.capture('gate_submit', { success: true });
+        posthog.capture('gate_access_granted');
+        
+        setHasAccess(true);
+        setErrorMessage("");
       }
     } catch (error: any) {
       console.error('[AccessGate] Unexpected error validating access code:', error);
