@@ -3,6 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type PanelRole = "none" | "limited" | "full" | "unknown";
 
+// Server returns: "full" | "limited" | "none"
+type PanelRoleServer = "full" | "limited" | "none";
+
 export function usePanelRole() {
   const [role, setRole] = useState<PanelRole>("none");
   const [loading, setLoading] = useState(true);
@@ -10,17 +13,23 @@ export function usePanelRole() {
   const fetchRole = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("secure-site-access-check", { body: {} });
+      const { data, error } = await supabase.functions.invoke("secure-site-access-check", { 
+        body: {},
+        method: 'POST'
+      });
       
       if (error) {
         console.error('[AdminAccess] Role check failed:', error);
+        console.error('[AdminAccess] Error details:', JSON.stringify(error, null, 2));
         // CORS/network failures will show here - don't silently fail
         setRole("unknown");
       } else if (!data?.ok) {
         console.warn('[AdminAccess] Role check returned not ok:', data);
         setRole("none");
       } else {
-        setRole((data.role as PanelRole) ?? "none");
+        const serverRole = data.role as PanelRoleServer;
+        console.log('[AdminAccess] Role check success:', { serverRole, data });
+        setRole(serverRole);
       }
     } catch (e) {
       // Network/CORS errors that bypass the error callback

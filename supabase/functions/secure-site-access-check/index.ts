@@ -1,11 +1,15 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { cors } from "../_shared/cors.ts";
-import { verifyGateToken, signGateToken } from "../_shared/tokens.ts";
+
+type PanelRoleServer = "full" | "limited" | "none";
 
 const handler = async (req: Request): Promise<Response> => {
   const rid = crypto.randomUUID();
-  const headers = cors(req.headers.get('Origin'));
+  const headers = {
+    ...cors(req.headers.get('Origin')),
+    'X-Debug-Function': 'secure-site-access-check@2025-01-12'
+  };
 
   // Preflight
   if (req.method === "OPTIONS") {
@@ -22,94 +26,81 @@ const handler = async (req: Request): Promise<Response> => {
   }));
 
   try {
-    const { token } = await req.json();
-    
-    if (!token) {
-      console.log(JSON.stringify({ rid, status: 400, code: 'MISSING_TOKEN' }));
+    // Get Supabase client with user's auth
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.log(JSON.stringify({ rid, status: 401, code: 'MISSING_AUTH' }));
       return new Response(
-        JSON.stringify({ ok: false, code: 'MISSING_TOKEN', message: 'No token provided' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...headers } }
+        JSON.stringify({ ok: false, code: 'MISSING_AUTH', message: 'No authorization header' }),
+        { status: 401, headers: { 'Content-Type': 'application/json', ...headers } }
       );
     }
 
-    // 1) Validate token signature + expiry (with ±60s skew tolerance)
-    let claims;
-    try {
-      claims = await verifyGateToken(token, 60);
-    } catch (e: any) {
-      const code = String(e?.message || e);
-      const status = code === 'TOKEN_EXPIRED' ? 401 : 401;
-      
-      console.log(JSON.stringify({ rid, status, code }));
-      
-      return new Response(
-        JSON.stringify({ ok: false, code, message: `Token validation failed: ${code}` }),
-        { status, headers: { 'Content-Type': 'application/json', ...headers } }
-      );
-    }
-
-    // 2) Optional: Verify admin role in database (for extra security)
-    // This ensures token wasn't forged and user still has admin access
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
     
-    if (supabaseUrl && svcKey) {
-      const svc = createClient(supabaseUrl, svcKey);
-      
-      // Check if user still has admin membership
-      const { data: mem } = await svc
-        .from("admin_memberships")
-        .select("role, expires_at")
-        .eq("user_id", claims.sub)
-        .maybeSingle();
-      
-      // If membership exists, verify it's still valid
-      if (mem) {
-        const notExpired = !mem.expires_at || new Date(mem.expires_at) > new Date();
-        if (!notExpired) {
-          console.log(JSON.stringify({ rid, status: 401, code: 'MEMBERSHIP_EXPIRED' }));
-          return new Response(
-            JSON.stringify({ ok: false, code: 'MEMBERSHIP_EXPIRED', message: 'Admin membership has expired' }),
-            { status: 401, headers: { 'Content-Type': 'application/json', ...headers } }
-          );
-        }
-      }
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.log(JSON.stringify({ rid, status: 500, code: 'CONFIG_ERROR' }));
+      return new Response(
+        JSON.stringify({ ok: false, code: 'CONFIG_ERROR', message: 'Server configuration error' }),
+        { status: 500, headers: { 'Content-Type': 'application/json', ...headers } }
+      );
     }
 
-    // 3) Re-issue a fresh token for sliding sessions
-    // Renew if < 30 minutes remain
-    const now = Math.floor(Date.now() / 1000);
-    const secondsLeft = claims.exp - now;
-    const shouldRenew = secondsLeft < 60 * 30; // <30m left
-    
-    const renewed = shouldRenew
-      ? await signGateToken(claims.sub, claims.role, 60 * 60 * 24) // new 24h token
-      : null;
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: {
+        headers: { Authorization: authHeader }
+      }
+    });
 
-    // Calculate final expiry
-    let finalExp: number;
-    if (renewed) {
-      const renewedClaims = await verifyGateToken(renewed);
-      finalExp = renewedClaims.exp;
-    } else {
-      finalExp = claims.exp;
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.log(JSON.stringify({ rid, status: 401, code: 'AUTH_FAILED', error: authError?.message }));
+      return new Response(
+        JSON.stringify({ ok: false, code: 'AUTH_FAILED', message: 'Authentication failed' }),
+        { status: 401, headers: { 'Content-Type': 'application/json', ...headers } }
+      );
+    }
+
+    // Check user's admin roles
+    const { data: roles, error: rolesError } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    if (rolesError) {
+      console.log(JSON.stringify({ rid, status: 500, code: 'DB_ERROR', error: rolesError.message }));
+      return new Response(
+        JSON.stringify({ ok: false, code: 'DB_ERROR', message: 'Database error' }),
+        { status: 500, headers: { 'Content-Type': 'application/json', ...headers } }
+      );
+    }
+
+    // Determine role based on user_roles
+    let role: PanelRoleServer = "none";
+    const rolesList = (roles || []).map(r => r.role);
+    
+    if (rolesList.includes('admin')) {
+      role = "full";
+    } else if (rolesList.includes('limited_admin')) {
+      role = "limited";
     }
 
     const response = {
       ok: true,
-      sessionToken: renewed || undefined,
-      expiresAt: new Date(finalExp * 1000).toISOString(),
-      user_id: claims.sub,
-      role: claims.role,
-      is_admin: true,
+      role,
+      user_id: user.id,
+      is_admin: role !== "none"
     };
 
     console.log(JSON.stringify({
       rid,
       status: 200,
       code: 'OK',
-      renewed: !!renewed,
-      expiresAt: response.expiresAt
+      role,
+      user_id: user.id
     }));
 
     return new Response(JSON.stringify(response), {

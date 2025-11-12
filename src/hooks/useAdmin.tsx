@@ -43,10 +43,14 @@ export const useAdmin = () => {
     console.log('Checking admin status for user:', user.id);
     try {
       // Use the same edge function as the gate for consistency
-      const { data, error } = await supabase.functions.invoke('secure-site-access-check', { body: {} });
+      const { data, error } = await supabase.functions.invoke('secure-site-access-check', { 
+        body: {},
+        method: 'POST'
+      });
       
       if (error) {
         console.error('[AdminAccess] Error checking admin status via edge function:', error);
+        console.error('[AdminAccess] Error details:', JSON.stringify(error, null, 2));
         console.error('[AdminAccess] This may be a CORS/network issue. Check browser console for preflight errors.');
         setIsAdmin(false);
         setIsLimitedAdmin(false);
@@ -60,7 +64,7 @@ export const useAdmin = () => {
       const isFullAdmin = role === 'full';
       const isLimitedAdminUser = role === 'limited';
 
-      console.log('Admin status result:', { isFullAdmin, isLimitedAdminUser, role });
+      console.log('Admin status result:', { isFullAdmin, isLimitedAdminUser, role, data });
       
       setIsAdmin(isFullAdmin);
       setIsLimitedAdmin(isLimitedAdminUser);
