@@ -188,13 +188,16 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       
       setSelectedCountry(countryValue);
       setSelectedSubCountry(subCountryValue);
-      setCourseImageUrl(course.thumbnail_image || null);
+      // Only set course image from DB if we don't have a draft value (preserve uploaded images)
+      setCourseImageUrl(draft.courseImageUrl || course.thumbnail_image || null);
       
-      // Set Top 100s values
-      if (course.regional_rank) {
-        setRegionalRank(course.regional_rank.toString());
+      // Set Top 100s values - prioritize draft over database
+      if (draft.regionalRank || course.regional_rank) {
+        setRegionalRank(draft.regionalRank || (course.regional_rank ? course.regional_rank.toString() : ''));
         // Map country to regional ranking region
-        if (course.country === 'Britain & Ireland') {
+        if (draft.regionalRankingRegion) {
+          setRegionalRankingRegion(draft.regionalRankingRegion);
+        } else if (course.country === 'Britain & Ireland') {
           setRegionalRankingRegion('Great Britain and Ireland');
         } else if (course.country === 'USA') {
           setRegionalRankingRegion('USA');
@@ -206,8 +209,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         setRegionalRank('');
       }
       
-      if (course.global_rank) {
-        setGlobalRank(course.global_rank.toString());
+      if (draft.globalRank || course.global_rank) {
+        setGlobalRank(draft.globalRank || (course.global_rank ? course.global_rank.toString() : ''));
       } else {
         setGlobalRank('');
       }
