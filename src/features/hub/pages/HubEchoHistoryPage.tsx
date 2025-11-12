@@ -262,11 +262,12 @@ export function HubEchoHistoryPage() {
     setFilters(prev => ({ ...prev, query: query || undefined }));
   }, []);
   
-  const handleFilterChange = useCallback((newFilters: { hasResponse?: boolean; dateFrom?: Date; starred?: boolean; tag?: string }) => {
+  const handleFilterChange = useCallback((newFilters: { hasResponse?: boolean; dateFrom?: Date; dateTo?: Date; starred?: boolean; tag?: string }) => {
     setFilters(prev => ({
       ...prev,
       hasResponse: newFilters.hasResponse,
       dateFrom: newFilters.dateFrom,
+      dateTo: newFilters.dateTo,
       starred: newFilters.starred,
       tag: newFilters.tag,
     }));

@@ -8,14 +8,18 @@ import { Search, X } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
 import { echoHistoryAnalytics } from '../analytics/echoHistoryAnalytics';
 import { extractTagDirective } from '../utils/parseTagDirective';
+import { DateFilterSheet } from './DateFilterSheet';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
-export type FilterType = 'all' | 'last_7_days' | 'last_30_days' | 'favourite';
+export type FilterType = 'all' | 'favourite';
 
 interface EchoHistorySearchProps {
   onSearchChange: (query: string) => void;
   onFilterChange: (filters: {
     hasResponse?: boolean;
     dateFrom?: Date;
+    dateTo?: Date;
     starred?: boolean;
     tag?: string;
   }) => void;
@@ -31,6 +35,10 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
 }) => {
   const [query, setQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [showDateFilter, setShowDateFilter] = useState(false);
+  const [datePresetLabel, setDatePresetLabel] = useState<string | null>(null);
+  const [currentDateFrom, setCurrentDateFrom] = useState<Date | null>(null);
+  const [currentDateTo, setCurrentDateTo] = useState<Date | null>(null);
   const debouncedQuery = useDebounce(query, 200);
 
   // Propagate debounced search query
@@ -38,31 +46,40 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
     onSearchChange(debouncedQuery);
   }, [debouncedQuery, onSearchChange]);
 
-  // Handle filter changes
-  const handleFilterClick = (filter: FilterType) => {
-    setActiveFilter(filter);
-    
-    const now = new Date();
-    const filters: { hasResponse?: boolean; dateFrom?: Date; starred?: boolean; tag?: string } = {};
+  // Get filter values based on current state
+  const getFilterValues = () => {
+    const filters: { 
+      hasResponse?: boolean; 
+      dateFrom?: Date; 
+      dateTo?: Date;
+      starred?: boolean; 
+      tag?: string;
+    } = {};
 
-    switch (filter) {
-      case 'last_7_days':
-        filters.dateFrom = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        break;
-      case 'last_30_days':
-        filters.dateFrom = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        break;
-      case 'favourite':
-        filters.starred = true;
-        break;
-      default:
-        // 'all' - no filters
-        break;
+    if (activeFilter === 'favourite') {
+      filters.starred = true;
     }
+    
+    if (currentDateFrom) filters.dateFrom = currentDateFrom;
+    if (currentDateTo) filters.dateTo = currentDateTo;
     
     // Preserve tag filter if active
     if (activeTag) {
       filters.tag = activeTag;
+    }
+
+    return filters;
+  };
+
+  // Handle filter changes
+  const handleFilterClick = (filter: FilterType) => {
+    setActiveFilter(filter);
+    
+    const filters = getFilterValues();
+    if (filter === 'favourite') {
+      filters.starred = true;
+    } else {
+      filters.starred = undefined;
     }
 
     onFilterChange(filters);
@@ -70,11 +87,42 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
     // Track filter analytics
     if (filter !== 'all') {
       echoHistoryAnalytics.filterApplied({
-        has_response: filters.hasResponse,
-        date_from: filters.dateFrom?.toISOString(),
         starred: filters.starred,
       });
     }
+  };
+
+  const handleDateApply = (from: Date | null, to: Date | null, preset: string | null) => {
+    const labels: Record<string, string> = {
+      today: 'Today',
+      this_week: 'This week',
+      last_week: 'Last week',
+      last_30d: 'Last 30 days',
+      custom: from && to ? `${format(from, 'MMM d')} - ${format(to, 'MMM d')}` : 'Custom',
+    };
+    
+    setDatePresetLabel(preset ? labels[preset] || null : null);
+    setCurrentDateFrom(from);
+    setCurrentDateTo(to);
+    
+    const newFilters = getFilterValues();
+    newFilters.dateFrom = from || undefined;
+    newFilters.dateTo = to || undefined;
+    onFilterChange(newFilters);
+
+    echoHistoryAnalytics.filterApplied({
+      date_from: from?.toISOString(),
+    });
+  };
+
+  const handleClearDate = () => {
+    setDatePresetLabel(null);
+    setCurrentDateFrom(null);
+    setCurrentDateTo(null);
+    const newFilters = getFilterValues();
+    delete newFilters.dateFrom;
+    delete newFilters.dateTo;
+    onFilterChange(newFilters);
   };
 
   // Keyboard shortcuts
@@ -215,7 +263,47 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
             </button>
           );
         })}
+        
+        {/* Date Filter Pill */}
+        <button
+          onClick={() => setShowDateFilter(true)}
+          className={cn(
+            "flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium transition-all",
+          )}
+          style={{
+            background: datePresetLabel
+              ? 'rgba(255,255,255,0.12)'
+              : 'rgba(255,255,255,0.04)',
+            border: `1px solid ${
+              datePresetLabel ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.08)'
+            }`,
+            color: datePresetLabel ? 'var(--hub-text)' : 'var(--hub-text-dim)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+          }}
+          aria-label="Filter by date"
+        >
+          {datePresetLabel || 'Date'}
+          {datePresetLabel && (
+            <X 
+              className="w-3.5 h-3.5" 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClearDate();
+              }}
+            />
+          )}
+        </button>
       </div>
+
+      {/* Date Filter Sheet */}
+      <DateFilterSheet
+        isOpen={showDateFilter}
+        onClose={() => setShowDateFilter(false)}
+        onApply={handleDateApply}
+        currentFrom={currentDateFrom}
+        currentTo={currentDateTo}
+      />
     </div>
   );
 };

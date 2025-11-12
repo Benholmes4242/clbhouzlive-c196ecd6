@@ -3,6 +3,7 @@ import { useEchoThreadMessages } from '../hooks/useEchoThreadMessages';
 import EchoAvatar from '@/components/ai-chat/EchoAvatar';
 import SquircleImage from '@/components/ui/SquircleImage';
 import { useProfileData } from '@/hooks/useProfileData';
+import { MarkdownMessage } from '@/components/ai-chat/MarkdownMessage';
 
 export interface HistoryThreadInlineProps {
   threadId: string;
@@ -57,7 +58,9 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
               {/* Content */}
               <div className="eh-bubble">
                 <div className="eh-msg__label">{isUser ? 'YOU' : 'ECHO'}</div>
-                <div className="eh-text">{m.content}</div>
+                <div className="eh-text">
+                  <MarkdownMessage content={m.content} />
+                </div>
               </div>
 
               {/* Right side: User avatar or spacer */}
