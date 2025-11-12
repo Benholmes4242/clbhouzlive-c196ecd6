@@ -3340,7 +3340,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
 .eh-line--user .eh-line__avatar {
   margin-right: var(--eh-safe-right);
-  padding-left: 10px;
+  padding-left: 15px;
 }
 
 .eh-line__avatar {
