@@ -141,13 +141,13 @@ function GameRow({
       onPointerMove={handlePointerMove}
       onPointerUp={clearTimer}
       onPointerCancel={clearTimer}
-      className="game-row w-full rounded-[14px] px-4 py-2 text-left outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0"
+      className="game-row w-full py-3 text-left outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0"
       aria-label={`${game.course_name || 'Golf Course'}, ${when}. ${game.kind === 'Hosting' ? 'Hosting' : 'Joined'}`}
       style={{ 
-        background: 'rgba(255,255,255,0.06)',
-        border: '1px solid rgba(255,255,255,0.12)',
+        background: 'transparent',
+        borderBottom: '1px solid rgba(255,255,255,0.12)',
         WebkitTapHighlightColor: 'transparent',
-        transition: prefersReduced ? undefined : 'transform 120ms ease, box-shadow 180ms ease',
+        transition: prefersReduced ? undefined : 'transform 120ms ease, opacity 180ms ease',
         transformOrigin: 'center',
         lineHeight: 1.2,
       }}
@@ -412,10 +412,10 @@ export function YourGamesTile() {
           {isLoading && [0, 1, 2].map(i => (
             <div 
               key={i} 
-              className="h-12 rounded-[14px] animate-pulse" 
+              className="h-12 animate-pulse" 
               style={{ 
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.12)',
+                background: 'transparent',
+                borderBottom: '1px solid rgba(255,255,255,0.12)',
               }} 
             />
           ))}

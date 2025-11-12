@@ -19,6 +19,10 @@
   flex-direction: column;
 }
 
+.gt-list > li:last-child .game-row {
+  border-bottom: none;
+}
+
 /* Allow vertical pan to start scroll on iOS */
 .gt-row {
   touch-action: pan-y;
