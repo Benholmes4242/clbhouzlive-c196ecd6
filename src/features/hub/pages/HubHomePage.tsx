@@ -107,12 +107,12 @@ export function HubHomePage() {
           </TapButton>
         </header>
 
-        {/* Hub Dashboard - Scrollable cards */}
+        {/* Hub Dashboard - Viewport locked */}
         <main 
-          className="w-full overflow-y-auto overflow-x-hidden flex-1"
+          className="w-full overflow-hidden flex-1"
           style={{ pointerEvents: 'auto' }}
         >
-          <div className="flex flex-col gap-3.5 pb-4">
+          <div className="flex flex-col gap-3.5 h-full">
             {/* Top 2×2 grid */}
             <div
               className="grid"
