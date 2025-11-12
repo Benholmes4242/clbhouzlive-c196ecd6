@@ -3273,11 +3273,12 @@ html[data-immersive="true"] .app-shell--topSpacer {
   margin-top: 2px; 
 }
 
-.eh-row__meta {
+.eh-row__meta { 
   display: flex; 
   align-items: center; 
   gap: 10px;
   flex: 0 0 auto;
+  padding-right: calc(var(--eh-safe-right) + 8px);
 }
 
 .eh-row-when {
