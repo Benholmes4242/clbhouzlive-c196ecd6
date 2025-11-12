@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export type PanelRole = "none" | "limited" | "full";
+export type PanelRole = "none" | "limited" | "full" | "unknown";
 
 export function usePanelRole() {
   const [role, setRole] = useState<PanelRole>("none");
@@ -15,7 +15,7 @@ export function usePanelRole() {
       if (error) {
         console.error('[AdminAccess] Role check failed:', error);
         // CORS/network failures will show here - don't silently fail
-        setRole("none");
+        setRole("unknown");
       } else if (!data?.ok) {
         console.warn('[AdminAccess] Role check returned not ok:', data);
         setRole("none");
@@ -25,7 +25,7 @@ export function usePanelRole() {
     } catch (e) {
       // Network/CORS errors that bypass the error callback
       console.error('[AdminAccess] Role check exception (likely CORS/network):', e);
-      setRole("none");
+      setRole("unknown");
     }
     setLoading(false);
   };

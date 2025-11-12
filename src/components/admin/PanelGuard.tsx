@@ -36,6 +36,21 @@ export function PanelGuard({
     );
   }
 
+  // Network error - show banner but keep page mounted
+  if (role === "unknown") {
+    return (
+      <>
+        {children}
+        <div className="fixed inset-0 z-50 grid place-items-center bg-background/80 backdrop-blur-sm">
+          <div className="max-w-md p-6 rounded-lg border bg-card space-y-3">
+            <h2 className="text-lg font-semibold">Can't verify admin access</h2>
+            <p className="text-sm text-muted-foreground">Network or CORS error. Please refresh and try again.</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   if (!ok) {
     return (
       <div role="alert" className="p-6 max-w-md mx-auto">

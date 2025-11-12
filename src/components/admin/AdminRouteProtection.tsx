@@ -16,7 +16,7 @@ const AdminRouteProtection: React.FC<AdminRouteProtectionProps> = ({
   requiredRole = 'limited_admin' 
 }) => {
   const { user, loading: sessionLoading } = useSupabaseSession();
-  const { isAdmin, isLimitedAdmin, loading: adminLoading, hasAdminAccess } = useAdmin();
+  const { isAdmin, isLimitedAdmin, loading: adminLoading, networkError } = useAdmin();
   const location = useLocation();
 
   // Show loading while checking authentication and authorization
@@ -35,6 +35,36 @@ const AdminRouteProtection: React.FC<AdminRouteProtectionProps> = ({
   if (!user) {
     console.log('User not authenticated, redirecting to auth');
     return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  // Network error - show banner instead of redirecting
+  if (networkError) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-orange-500/10 flex items-center justify-center">
+                <AlertTriangle className="h-8 w-8 text-orange-500" />
+              </div>
+            </div>
+            <CardTitle className="text-xl">Can't Verify Admin Access</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-muted-foreground">
+              Network or CORS error prevented admin verification.
+            </p>
+            <Button 
+              onClick={() => window.location.reload()} 
+              variant="default" 
+              className="w-full"
+            >
+              Refresh Page
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   // Check role-based access

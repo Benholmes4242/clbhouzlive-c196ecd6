@@ -24,6 +24,7 @@ export const useAdmin = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLimitedAdmin, setIsLimitedAdmin] = useState(false);
   const [userRole, setUserRole] = useState<'admin' | 'limited_admin' | null>(null);
+  const [networkError, setNetworkError] = useState(false);
 
   console.log('useAdmin hook - user:', !!user, 'sessionLoading:', sessionLoading);
 
@@ -34,6 +35,7 @@ export const useAdmin = () => {
       setIsAdmin(false);
       setIsLimitedAdmin(false);
       setUserRole(null);
+      setNetworkError(false);
       setLoading(false);
       return;
     }
@@ -49,6 +51,7 @@ export const useAdmin = () => {
         setIsAdmin(false);
         setIsLimitedAdmin(false);
         setUserRole(null);
+        setNetworkError(true);
         setLoading(false);
         return;
       }
@@ -61,6 +64,7 @@ export const useAdmin = () => {
       
       setIsAdmin(isFullAdmin);
       setIsLimitedAdmin(isLimitedAdminUser);
+      setNetworkError(false);
       
       // Set user role for easier access
       if (isFullAdmin) {
@@ -75,6 +79,7 @@ export const useAdmin = () => {
       setIsAdmin(false);
       setIsLimitedAdmin(false);
       setUserRole(null);
+      setNetworkError(true);
     }
     setLoading(false);
   };
@@ -163,6 +168,7 @@ export const useAdmin = () => {
     isAdmin,
     isLimitedAdmin,
     userRole,
+    networkError,
     hasAdminAccess: isAdmin || isLimitedAdmin, // Helper to check if user has any admin access
     fetchUsers,
     assignRole,
