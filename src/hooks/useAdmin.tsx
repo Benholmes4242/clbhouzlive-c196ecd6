@@ -42,10 +42,12 @@ export const useAdmin = () => {
 
     console.log('Checking admin status for user:', user.id);
     try {
-      // Use the same edge function as the gate for consistency
+      // Explicit auth header fallback
+      const { data: { session } } = await supabase.auth.getSession();
+      
       const { data, error } = await supabase.functions.invoke('secure-site-access-check', { 
         body: {},
-        method: 'POST'
+        headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
       });
       
       if (error) {

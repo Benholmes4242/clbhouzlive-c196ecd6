@@ -4,6 +4,12 @@ import { cors } from "../_shared/cors.ts";
 
 type PanelRoleServer = "full" | "limited" | "none";
 
+const mapDbRoleToClient = (roles: string[]): PanelRoleServer => {
+  if (roles.includes("admin")) return "full";
+  if (roles.includes("limited_admin")) return "limited";
+  return "none";
+};
+
 const handler = async (req: Request): Promise<Response> => {
   const rid = crypto.randomUUID();
   const headers = {
@@ -78,15 +84,9 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Determine role based on user_roles
-    let role: PanelRoleServer = "none";
+    // Map DB roles to client role
     const rolesList = (roles || []).map(r => r.role);
-    
-    if (rolesList.includes('admin')) {
-      role = "full";
-    } else if (rolesList.includes('limited_admin')) {
-      role = "limited";
-    }
+    const role = mapDbRoleToClient(rolesList);
 
     const response = {
       ok: true,
@@ -100,7 +100,8 @@ const handler = async (req: Request): Promise<Response> => {
       status: 200,
       code: 'OK',
       role,
-      user_id: user.id
+      user_id: user.id,
+      db_roles: rolesList
     }));
 
     return new Response(JSON.stringify(response), {

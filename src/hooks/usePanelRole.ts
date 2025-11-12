@@ -13,9 +13,12 @@ export function usePanelRole() {
   const fetchRole = async () => {
     setLoading(true);
     try {
+      // Explicit auth header fallback (supabase-js v2 includes it automatically, but just in case)
+      const { data: { session } } = await supabase.auth.getSession();
+      
       const { data, error } = await supabase.functions.invoke("secure-site-access-check", { 
         body: {},
-        method: 'POST'
+        headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
       });
       
       if (error) {
@@ -23,11 +26,9 @@ export function usePanelRole() {
         console.error('[AdminAccess] Error details:', JSON.stringify(error, null, 2));
         // CORS/network failures will show here - don't silently fail
         setRole("unknown");
-      } else if (!data?.ok) {
-        console.warn('[AdminAccess] Role check returned not ok:', data);
-        setRole("none");
       } else {
-        const serverRole = data.role as PanelRoleServer;
+        // Simplified: key off role directly, treating missing/invalid as unknown
+        const serverRole = (data?.role ?? "unknown") as PanelRole;
         console.log('[AdminAccess] Role check success:', { serverRole, data });
         setRole(serverRole);
       }
