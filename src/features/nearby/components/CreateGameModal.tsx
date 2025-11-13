@@ -332,7 +332,7 @@ export function CreateGameModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-4 pt-4 pb-5">
+        <div className="px-5 pt-4">
           {/* Title + Close */}
           <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
             {/* Left spacer */}
@@ -356,11 +356,6 @@ export function CreateGameModal({
               </TapButton>
             </div>
           </div>
-          
-          {/* Subtitle */}
-          <p className="text-[14px] text-white/60 text-center mt-4">
-            Let nearby golfers know you're looking to play
-          </p>
         </div>
 
         {/* Divider */}
@@ -497,7 +492,7 @@ export function CreateGameModal({
               {/* Timing */}
               <div className="space-y-2">
                 <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
-                  📅 When
+                  When
                 </h3>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   {TIMING_OPTIONS.map(option => (
