@@ -138,12 +138,7 @@ export function UserSearchTypeahead({
       {/* Search input */}
       {remainingSlots > 0 && (
         <div className="relative">
-          <div className="relative flex items-center gap-10px rounded-[14px] px-4 py-3 transition-colors"
-            style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
-          >
+          <div className="searchBox">
             <Search className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
             <input
               ref={searchInputRef}
@@ -159,10 +154,8 @@ export function UserSearchTypeahead({
               onFocus={() => {
                 if (searchTerm.trim() || results.length > 0) setShowDropdown(true);
               }}
-              className="flex-1 bg-transparent border-0 outline-none text-[15px] placeholder:opacity-60"
-              style={{
-                color: 'var(--hub-text)',
-              }}
+              className="flex-1 bg-transparent border-0 outline-none text-[15px]"
+              style={{ color: 'var(--hub-text)' }}
             />
           </div>
 
