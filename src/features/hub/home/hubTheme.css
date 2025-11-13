@@ -607,6 +607,7 @@ body.hub-open {
    ======================================== */
 .ng-player-list {
   margin-top: 18px;
+  gap: 16px;
 }
 
 /* ========================================
@@ -632,13 +633,7 @@ body.hub-open {
 /* ========================================
    PLAYER CARD SPACING
    ======================================== */
-.ng-player-card {
-  margin-bottom: 16px;
-}
-
-.ng-player-card:last-child {
-  margin-bottom: 0;
-}
+/* Card spacing handled by parent .ng-player-list gap */
 
 /* ========================================
    NEARBY GOLFERS ROW

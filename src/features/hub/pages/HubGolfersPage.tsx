@@ -244,7 +244,7 @@ export function HubGolfersPage() {
 
           {/* Golfers List or Empty State */}
           {isLoading ? (
-            <div className="ng-player-list space-y-4">
+            <div className="ng-player-list flex flex-col">
               {Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="h-16 rounded-2xl bg-white/5 animate-pulse" />
               ))}
@@ -257,7 +257,7 @@ export function HubGolfersPage() {
               </p>
             </div>
           ) : (
-            <div className="ng-player-list space-y-4">
+            <div className="ng-player-list flex flex-col">
               {golfers.map((golfer, index) => (
                 <NearbyGolferCard 
                   key={golfer.id ?? index} 
