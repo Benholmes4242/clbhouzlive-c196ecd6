@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Search } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
@@ -81,7 +82,7 @@ export function PeopleSearchInput({ selectedUser, onSelect }: PeopleSearchInputP
         <>
           <label className="findLabel">Find a players games</label>
           <div className="searchBox">
-            <span className="glass">🔎</span>
+            <Search size={18} style={{ color: 'white', flexShrink: 0 }} />
             <input
               placeholder="Search for a golfer..."
               value={query}
