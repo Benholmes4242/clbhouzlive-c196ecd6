@@ -118,7 +118,7 @@ export function HubSwingHistoryPage() {
               {items.map((item, index) => (
                 <button
                   key={item.id}
-                  className="hub-row swing-row"
+                  className="w-full flex items-center gap-3 text-left transition-transform active:scale-[0.985]"
                   style={{
                     background: 'transparent',
                     padding: '14px 16px 12px',
@@ -128,11 +128,15 @@ export function HubSwingHistoryPage() {
                   aria-label="Open swing analysis"
                 >
                   <Thumb src={item.thumbnail_url} />
-                  <div className="hub-row-main">
-                    <div className="hub-row-title">{item.title || 'Swing analysis'}</div>
-                    <div className="hub-row-sub">{formatRelativeTime(item.created_at)}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-white/95 font-semibold text-[15px] truncate">
+                      {item.title || 'Swing analysis'}
+                    </div>
+                    <div className="text-white/60 text-[13px] mt-0.5">
+                      {formatRelativeTime(item.created_at)}
+                    </div>
                   </div>
-                  <div className="hub-row-trailing">›</div>
+                  <div className="text-white/40 text-xl">›</div>
                 </button>
               ))}
             </div>
