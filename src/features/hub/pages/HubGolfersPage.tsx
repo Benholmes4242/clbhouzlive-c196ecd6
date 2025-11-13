@@ -164,7 +164,7 @@ export function HubGolfersPage() {
 
   return (
     <div
-      className="golfers-page hub-glass-page fixed inset-0 z-[9999]"
+      className="golfers-page hub-glass-page fixed inset-0 z-[9999] overflow-hidden"
       style={{
         background: 'rgba(0, 0, 0, 0.25)',
         backdropFilter: 'blur(120px)',
@@ -197,24 +197,20 @@ export function HubGolfersPage() {
       </header>
 
       {/* Content */}
-      <div ref={listRef} className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
+      <div ref={listRef} className="h-full overflow-y-auto overscroll-none pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
         <PullToRefresh onRefresh={handleRefresh}>
-          <div className="pb-6" style={{ paddingTop: '28px' }}>
-            {/* Visibility segmented control (profile visibility) - PRIMARY */}
-            <div className="px-4" style={{ marginBottom: '18px' }}>
+          <div className="px-4 pt-[calc(env(safe-area-inset-top,0px)+16px)] pb-6 space-y-4">
+            {/* A. Availability controls */}
+            <div className="space-y-3">
               <GolferStatusBar 
                 value={visibilityMode}
                 onChange={setVisibilityMode}
               />
-            </div>
-
-            {/* Open to Play CTA - SECONDARY */}
-            <div className="px-4" style={{ marginBottom: '18px' }}>
               <OpenToPlayButton />
             </div>
 
-            {/* Filter Bar - TERTIARY */}
-            <div style={{ marginBottom: '28px' }}>
+            {/* B. Discovery controls */}
+            <div className="space-y-3">
               <NearbyFilterBar 
                 filters={filters}
                 onFiltersChange={setFilters}
@@ -223,11 +219,15 @@ export function HubGolfersPage() {
 
             {/* Golfers List */}
             {isLoading ? (
-              <NearbySkeletonRow count={5} />
+              <div className="mt-3">
+                <NearbySkeletonRow count={5} />
+              </div>
             ) : golfers.length === 0 ? (
-              <EmptyNearbyState />
+              <div className="mt-3">
+                <EmptyNearbyState />
+              </div>
             ) : (
-              <div className="space-y-2.5">
+              <div className="mt-3 space-y-3">
                 {golfers.map((golfer, index) => (
                   <NearbyGolferCard 
                     key={golfer.id ?? index} 

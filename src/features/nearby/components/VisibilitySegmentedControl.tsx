@@ -61,7 +61,7 @@ export function VisibilitySegmentedControl({ value, onChange }: VisibilitySegmen
 
   const handleChange = (mode: VisibilityMode) => {
     if (mode !== value) {
-      haptic('light');
+      (navigator as any)?.vibrate?.(4);
       onChange(mode);
     }
   };
@@ -115,10 +115,15 @@ export function VisibilitySegmentedControl({ value, onChange }: VisibilitySegmen
       
       {/* Dynamic status text with ARIA live region */}
       <p 
+        key={value}
         aria-live="polite" 
         aria-atomic="true"
-        className="mt-2.5 text-center text-[13px] transition-colors duration-200"
-        style={{ color: statusInfo.color }}
+        className="text-xs text-center transition-colors duration-200"
+        style={{ 
+          color: statusInfo.color,
+          fontWeight: 500,
+          letterSpacing: '0.01em'
+        }}
       >
         {statusInfo.text}
       </p>

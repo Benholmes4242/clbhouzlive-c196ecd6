@@ -47,7 +47,7 @@ export function OpenToPlayButton() {
   const remainingMinutes = getRemainingMinutes();
 
   return (
-    <section aria-labelledby="otp-title" className="flex flex-col items-center mt-6 mb-2">
+    <section aria-labelledby="otp-title" className="flex flex-col items-center">
       <h2 id="otp-title" className="sr-only">Open to Play</h2>
       
       <TapButton
@@ -80,11 +80,11 @@ export function OpenToPlayButton() {
       </TapButton>
 
       {/* Helper copy */}
-      <p className="mt-2 text-[13px] text-white/60 text-center leading-[1.4] max-w-[280px] font-normal">
+      <p className="mt-1 text-[13px] leading-[1.5] text-center max-w-xs mx-auto font-normal" style={{ color: 'var(--hub-text-muted)' }}>
         {isActive ? (
-          <>Nearby golfers can see you're available. <strong className="text-white/80">Tap again</strong> to turn off.</>
+          <>Nearby golfers can see you're available. <span className="font-medium">Tap again</span> to turn off.</>
         ) : (
-          <>Let nearby golfers know you're ready to play — tap <strong className="text-white/80">Open to Play</strong> to show up on their radar.</>
+          <>Let nearby golfers know you're ready to play — tap <span className="font-medium">Open to Play</span> to show up on their radar.</>
         )}
       </p>
     </section>

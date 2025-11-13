@@ -59,9 +59,9 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
 
   return (
     <GlassCard
-      className="mx-3"
       style={{
-        padding: '16px 14px',
+        padding: '14px 16px',
+        borderRadius: '18px',
         animation: `rowFadeUp 90ms ease-out both ${index * 35}ms`,
       }}
     >
@@ -83,24 +83,24 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
           <GolferAvatar
             avatarUrl={golfer.avatar_url}
             displayName={golfer.display_name}
-            size={48}
+            size={52}
           />
 
           {/* Content */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 space-y-[3px]">
             {/* Name line */}
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-[17px] font-semibold text-white truncate">
+            <div className="flex items-center gap-2">
+              <h3 className="text-[16px] font-semibold truncate" style={{ color: 'var(--hub-text)' }}>
                 {golfer.display_name}
               </h3>
             </div>
             
-            {/* Meta line with pills */}
+            {/* Meta line */}
             <div 
-              className="flex items-center gap-1.5 text-[14px] text-white/70"
+              className="flex items-center gap-1.5 text-[13px]"
               style={{ 
                 fontFeatureSettings: '"tnum"',
-                marginBottom: '8px'
+                color: 'var(--hub-text-sub)'
               }}
             >
               {golfer.handicap !== undefined && (
@@ -118,7 +118,7 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
                 </>
               )}
               {distanceText && (
-                <span className="shrink-0 tabular-nums">{distanceText}</span>
+                <span className="shrink-0 tabular-nums" style={{ color: 'var(--hub-text-muted)' }}>{distanceText}</span>
               )}
             </div>
 
@@ -132,46 +132,31 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
           </div>
         </TapButton>
 
-        {/* Action buttons - equal width */}
-        <div className="flex gap-2" style={{ marginTop: '10px' }}>
-          <TapButton
-            className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-100 active:scale-[0.97]"
-            style={{
-              background: 'rgba(255,255,255,0.18)',
-              borderColor: 'rgba(255,255,255,0.12)',
-              color: 'rgba(255,255,255,0.96)',
-              minHeight: '44px',
-              height: '36px'
-            }}
-            onPointerDown={() => {
+        {/* Divider */}
+        <div className="h-px mx-1 mb-3 bg-white/5" />
+
+        {/* Action buttons */}
+        <div className="flex gap-2">
+          <button
+            className="flex-1 h-[40px] rounded-[14px] border border-white/8 bg-white/[0.02] text-[14px] font-medium shadow-[0_1px_0_rgba(255,255,255,0.04)] transition-all duration-[120ms] hover:bg-white/[0.06] active:scale-[0.97] active:bg-white/[0.09]"
+            style={{ color: 'var(--hub-text-body)' }}
+            onClick={() => {
               haptic('light');
               sendFriendRequest();
             }}
             aria-label={`Send friend request to ${golfer.display_name}`}
           >
             Friend
-          </TapButton>
+          </button>
 
-          <TapButton
-            className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-100 active:scale-[0.97]"
-            style={
+          <button
+            className={`flex-1 h-[40px] rounded-[14px] border text-[14px] font-medium shadow-[0_1px_0_rgba(255,255,255,0.04)] transition-all duration-[120ms] active:scale-[0.97] ${
               isFollowing
-                ? {
-                    background: 'rgba(76,220,151,0.18)',
-                    borderColor: 'rgba(76,220,151,0.3)',
-                    color: '#4cdc97',
-                    minHeight: '44px',
-                    height: '36px'
-                  }
-                : {
-                    background: 'transparent',
-                    borderColor: 'rgba(255,255,255,0.12)',
-                    color: 'rgba(255,255,255,0.88)',
-                    minHeight: '44px',
-                    height: '36px'
-                  }
-            }
-            onPointerDown={() => {
+                ? 'bg-emerald-500/18 border-emerald-400/40 text-emerald-200 hover:bg-emerald-500/24'
+                : 'bg-transparent border-white/12 hover:bg-white/[0.06] active:bg-white/[0.09]'
+            }`}
+            style={!isFollowing ? { color: 'var(--hub-text-body)' } : undefined}
+            onClick={() => {
               haptic('light');
               toggleFollow();
             }}
@@ -179,25 +164,19 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
             aria-pressed={isFollowing}
           >
             {isFollowing ? 'Following' : 'Follow'}
-          </TapButton>
+          </button>
 
-          <TapButton
-            className="flex-1 rounded-xl backdrop-blur-[20px] border font-medium text-[13px] transition-all duration-100 active:scale-[0.97]"
-            style={{
-              background: 'transparent',
-              borderColor: 'rgba(255,255,255,0.12)',
-              color: 'rgba(255,255,255,0.88)',
-              minHeight: '44px',
-              height: '36px'
-            }}
-            onPointerDown={() => {
+          <button
+            className="flex-1 h-[40px] rounded-[14px] border border-white/12 bg-transparent text-[14px] font-medium shadow-[0_1px_0_rgba(255,255,255,0.04)] transition-all duration-[120ms] hover:bg-white/[0.06] active:scale-[0.97] active:bg-white/[0.09]"
+            style={{ color: 'var(--hub-text-body)' }}
+            onClick={() => {
               haptic('light');
               openMessage();
             }}
             aria-label={`Message ${golfer.display_name}`}
           >
             Message
-          </TapButton>
+          </button>
         </div>
       </article>
     </GlassCard>
