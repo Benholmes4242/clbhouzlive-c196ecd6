@@ -138,14 +138,13 @@ export function HubHomePage() {
               className="grid"
               style={{ 
                 gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
-                gap: '0.875rem', 
-                gridAutoRows: 'var(--hub-tile-fixed-h)',
+                gap: '0.875rem',
               }}
             >
-              <div className="hub-tile-fixed hub-floating-card">
+              <div className="hub-tile-square hub-floating-card">
                 <SwingQuickTile />
               </div>
-              <div className="hub-tile-fixed hub-floating-card">
+              <div className="hub-tile-square hub-floating-card">
                 <QuickActionsTile />
               </div>
             </div>
