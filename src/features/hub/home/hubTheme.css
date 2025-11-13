@@ -472,6 +472,12 @@ body.hub-open {
 
 .nearby-golfers-panel {
   align-self: flex-start;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 16px 16px 18px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ========================================
@@ -603,10 +609,21 @@ body.hub-open {
 }
 
 /* ========================================
+   CONTROLS BLOCK
+   ======================================== */
+.ng-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ========================================
    PLAYER LIST
    ======================================== */
 .ng-player-list {
   margin-top: 18px;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
 }
 
