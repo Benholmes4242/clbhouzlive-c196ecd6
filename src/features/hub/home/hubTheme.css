@@ -423,8 +423,8 @@ body.hub-open {
   padding: 0 16px;
   height: 56px;
   padding-top: env(safe-area-inset-top, 0px);
-  background: rgba(22, 24, 27, 0.98);
-  border-bottom: 1px solid var(--hub-stroke);
+  background: transparent;
+  border-bottom: none;
 }
 
 .apple-glass-panel {
