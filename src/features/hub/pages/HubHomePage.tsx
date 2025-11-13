@@ -20,14 +20,16 @@ export function HubHomePage() {
   const loc = useLocation();
   const [isAnimating, setIsAnimating] = React.useState(true);
 
-  // Mark hub-open on html while mounted
+  // Mark hub-open on html and body while mounted
   useEffect(() => {
     document.documentElement.classList.add('hub-open');
+    document.body.classList.add('hub-open');
     // Trigger animation
     setTimeout(() => setIsAnimating(false), 10);
     
     return () => {
       document.documentElement.classList.remove('hub-open');
+      document.body.classList.remove('hub-open');
     };
   }, []);
 
@@ -76,7 +78,7 @@ export function HubHomePage() {
       >
         {/* Header */}
         <header
-          className="flex items-center justify-between mb-4"
+          className="hub-header flex items-center justify-between"
           style={{
             paddingTop: 'env(safe-area-inset-top, 0px)',
             pointerEvents: 'auto',
@@ -109,11 +111,11 @@ export function HubHomePage() {
 
         {/* Hub Dashboard - Viewport locked */}
         <main 
-          className="w-full overflow-hidden flex-1"
+          className="hub-content w-full overflow-hidden flex-1"
           style={{ pointerEvents: 'auto' }}
         >
-          <div className="flex flex-col gap-3.5 h-full">
-            {/* Top 2×2 grid */}
+          {/* Top 2×2 grid */}
+          <section className="hub-top-row">
             <div
               className="grid"
               style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem', gridAutoRows: 'var(--hub-tile-fixed-h)' }}
@@ -125,29 +127,32 @@ export function HubHomePage() {
                 <EchoTile />
               </div>
             </div>
+          </section>
 
-            {/* Your Games */}
+          {/* Your Games */}
+          <section className="hub-games-row">
             <div className="hub-floating-card" style={{ minHeight: '320px' }}>
               <YourGamesTile />
             </div>
+          </section>
 
-            {/* Bottom 2×2 grid */}
+          {/* Bottom 2×2 grid */}
+          <section className="hub-bottom-row">
             <div
-              className="grid"
+              className="grid h-full"
               style={{ 
                 gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
                 gap: '0.875rem', 
-                gridAutoRows: 'var(--hub-tile-fixed-h)',
               }}
             >
-              <div className="hub-tile-fixed hub-floating-card">
+              <div className="hub-floating-card h-full">
                 <SwingQuickTile />
               </div>
-              <div className="hub-tile-fixed hub-floating-card">
+              <div className="hub-floating-card h-full">
                 <QuickActionsTile />
               </div>
             </div>
-          </div>
+          </section>
         </main>
       </div>
     </>

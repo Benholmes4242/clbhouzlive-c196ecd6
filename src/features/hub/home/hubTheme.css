@@ -209,17 +209,65 @@ html.hub-open {
   opacity: 1;
 }
 
-/* Hub Wrapper - Cards container */
+/* Hub Wrapper - Cards container with viewport locking */
 .hub-wrapper {
   transform: scale(0.96);
   opacity: 0;
   transition: transform 180ms cubic-bezier(0.18, 0.89, 0.32, 1.28),
               opacity 150ms ease-out;
+  height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overscroll-behavior: contain;
 }
 
 .hub-wrapper--visible {
   transform: scale(1);
   opacity: 1;
+}
+
+/* Prevent background page scroll + iOS rubber band while Hub is open */
+body.hub-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* Hub sections layout */
+.hub-header {
+  flex: 0 0 auto;
+}
+
+.hub-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.hub-top-row {
+  flex: 0 0 auto;
+}
+
+.hub-games-row {
+  flex: 0 0 auto;
+}
+
+.hub-bottom-row {
+  flex: 0 0 auto;
+}
+
+/* Mobile: shrink bottom tiles to fit viewport */
+@media (max-width: 768px) {
+  .hub-bottom-row {
+    flex: 0 0 150px;
+    display: flex;
+  }
+  
+  .hub-bottom-row .hub-floating-card {
+    height: 100%;
+  }
 }
 
 /* Floating Card - VisionOS-style opaque card */
