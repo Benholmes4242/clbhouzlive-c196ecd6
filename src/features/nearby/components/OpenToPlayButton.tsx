@@ -1,12 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
 import { useOpenToPlay } from '../hooks/useOpenToPlay';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import '../../hub/pages/nearbyGolfers.css';
 
 export function OpenToPlayButton() {
-  const { isActive, activate, cancel, getRemainingMinutes } = useOpenToPlay();
+  const { isActive, activate, cancel, getRemainingMinutes, getRemainingMs, durationMs } = useOpenToPlay();
+  const [progress, setProgress] = useState(100);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Update progress every second
+  useEffect(() => {
+    if (!isActive) {
+      setProgress(100);
+      return;
+    }
+
+    const updateProgress = () => {
+      const remaining = getRemainingMs();
+      const percentage = (remaining / durationMs) * 100;
+      setProgress(percentage);
+    };
+
+    updateProgress();
+    const interval = setInterval(updateProgress, 1000);
+
+    return () => clearInterval(interval);
+  }, [isActive, getRemainingMs, durationMs]);
 
   const handleToggle = async () => {
     setIsSaving(true);
@@ -27,26 +47,46 @@ export function OpenToPlayButton() {
   const remainingMinutes = getRemainingMinutes();
 
   return (
-    <button
-      className={`ng-otp-banner ${isActive ? 'ng-otp-banner--active' : ''}`}
-      onClick={handleToggle}
-      disabled={isSaving}
-      aria-pressed={isActive}
-      aria-label={isActive ? `Open to Play active, ${remainingMinutes} minutes remaining` : 'Activate Open to Play'}
-    >
-      <span className="text-[16px]" aria-hidden="true">🏌️‍♂️</span>
-      <span className="ng-otp-banner__text">
+    <section aria-labelledby="otp-title" className="flex flex-col items-center mt-6 mb-2">
+      <h2 id="otp-title" className="sr-only">Open to Play</h2>
+      
+      <TapButton
+        aria-pressed={isActive}
+        aria-label={isActive ? `Open to Play active, ${remainingMinutes} minutes remaining` : 'Activate Open to Play'}
+        disabled={isSaving}
+        onPointerDown={handleToggle}
+        className="relative inline-flex items-center justify-center gap-2.5 transition-all duration-100 active:scale-[0.97] rounded-[14px] bg-white/[0.04] border border-white/10"
+        style={{
+          minWidth: '240px',
+          height: '42px',
+          fontWeight: 600,
+          fontSize: '16px',
+          color: '#fff',
+          padding: '12px 16px',
+          ...(isActive && {
+            background: 'linear-gradient(to bottom, rgba(78, 199, 120, 0.16), rgba(78, 199, 120, 0.10))',
+            borderColor: 'rgba(78, 199, 120, 0.28)',
+          }),
+        }}
+      >
+        <span className="text-[16px]" aria-hidden="true">🏌️‍♂️</span>
         {isSaving ? (
           'Updating…'
         ) : isActive ? (
-          'Open to Play'
+          <>Open to Play <span className="text-white/70 text-[13px]">• {remainingMinutes}m</span></>
         ) : (
           'Open to Play'
         )}
-      </span>
-      {isActive && (
-        <span className="ng-otp-banner__meta">{remainingMinutes}m</span>
-      )}
-    </button>
+      </TapButton>
+
+      {/* Helper copy */}
+      <p className="mt-2 text-[13px] text-white/60 text-center leading-[1.4] max-w-[280px] font-normal">
+        {isActive ? (
+          <>Nearby golfers can see you're available. <strong className="text-white/80">Tap again</strong> to turn off.</>
+        ) : (
+          <>Let nearby golfers know you're ready to play — tap <strong className="text-white/80">Open to Play</strong> to show up on their radar.</>
+        )}
+      </p>
+    </section>
   );
 }
