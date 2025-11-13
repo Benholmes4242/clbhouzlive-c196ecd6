@@ -34,6 +34,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { announce } from '@/utils/a11y';
 import { clamp, isTypingTarget, readHashIndex, writeHashIndex } from '@/features/echo/utils/focus';
+import { AppleGlassScreen, AppleGlassHeader } from '../components/AppleGlassScreen';
 import '../home/hubTheme.css';
 
 export function HubEchoHistoryPage() {
@@ -806,41 +807,12 @@ export function HubEchoHistoryPage() {
   }, [pendingDeletes]);
 
   return (
-    <div
-      className="hub-glass-page fixed inset-0 z-[9999]"
-      style={{
-        background: 'var(--hub-backdrop)',
-        backdropFilter: 'blur(var(--hub-backdrop-blur))',
-        WebkitBackdropFilter: 'blur(var(--hub-backdrop-blur))',
-      }}
-    >
-      {/* Opaque Header */}
-      <header 
-        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
-        style={{
-          borderColor: 'var(--hub-stroke)',
-          background: 'var(--hub-header-bg-solid)',
-          backdropFilter: 'none',
-          WebkitBackdropFilter: 'none',
-          transition: 'all 160ms ease-out',
-          paddingTop: 'env(safe-area-inset-top, 0px)',
-          contain: 'paint',
-        }}
-      >
-        <button
-          onClick={handleBack}
-          className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
-          aria-label="Back to Hub"
-        >
-          ‹ Back
-        </button>
-        <h1 className="text-white/90 text-[17px] font-semibold">Echo History</h1>
-        <div /> {/* Spacer for flex layout */}
-      </header>
+    <AppleGlassScreen>
+      <AppleGlassHeader onBack={handleBack} title="Echo History" />
 
       {/* Body - Page shell with safe-area padding */}
       <main 
-        className="relative h-full pt-[calc(3.5rem+var(--hub-pad,20px)+env(safe-area-inset-top,0px))] pb-[calc(var(--hub-pad,20px)+env(safe-area-inset-bottom,0px))]"
+        className="relative h-full pt-[calc(var(--hub-pad,20px))] pb-[calc(var(--hub-pad,20px)+env(safe-area-inset-bottom,0px))]"
       >
         {/* Content container - direct on background */}
         <section className="px-4 md:px-6 max-w-3xl mx-auto eh-fixedLayer">
@@ -1135,6 +1107,6 @@ export function HubEchoHistoryPage() {
       
       {/* Export HUD */}
       {exportHud.ui}
-    </div>
+    </AppleGlassScreen>
   );
 }

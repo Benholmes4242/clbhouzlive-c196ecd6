@@ -6,6 +6,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { GamesTab } from '@/features/nearby/GamesTab';
 import { useHub } from '@/features/hub/useHub';
+import { AppleGlassScreen, AppleGlassHeader } from '../components/AppleGlassScreen';
 import '../home/hubTheme.css';
 
 export function HubGamesPage() {
@@ -29,37 +30,13 @@ export function HubGamesPage() {
   };
 
   return (
-    <div
-      className="hub-glass-page fixed inset-0 z-[9999]"
-      style={{
-        background: 'rgba(0, 0, 0, 0.25)',
-        backdropFilter: 'blur(120px)',
-        WebkitBackdropFilter: 'blur(120px)',
-      }}
-    >
-      {/* Simple header */}
-      <header className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
-        style={{
-          borderColor: 'rgba(255,255,255,0.1)',
-          background: 'rgba(0,0,0,0.2)',
-          paddingTop: 'env(safe-area-inset-top, 0px)',
-        }}
-      >
-        <button
-          onClick={goBack}
-          className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
-          aria-label="Back to Hub"
-        >
-          ‹ Back
-        </button>
-        <h1 className="text-white/90 text-[17px] font-semibold">Games</h1>
-        <div className="w-16" />
-      </header>
+    <AppleGlassScreen>
+      <AppleGlassHeader onBack={goBack} title="Games" />
 
       {/* Content area - GamesTab content */}
-      <div className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
+      <div className="overflow-y-auto" style={{ height: 'calc(100vh - 56px)' }}>
         <GamesTab onOpenCreate={handleOpenCreate} />
       </div>
-    </div>
+    </AppleGlassScreen>
   );
 }
