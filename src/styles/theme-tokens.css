@@ -255,9 +255,7 @@ button.ghost:hover,
 }
 
 .chip[aria-pressed="true"] {
-  outline: 2px solid var(--hub-brand-echo);
-  background: rgba(52, 211, 153, 0.15);
-  border-color: var(--hub-brand-echo);
+  outline: 2px solid red; /* temp debug to identify extra ring */
 }
 
 .chip:disabled {
