@@ -63,10 +63,21 @@ export function ClubSearchInput({ onClubSelect, onClear, selectedClub }: ClubSea
             setShowDropdown(!showDropdown);
             setTimeout(() => inputRef.current?.focus(), 100);
           }}
-          className="w-full rounded-xl bg-white/5 backdrop-blur-md border border-white/10 px-4 py-3 flex items-center gap-3 hover:bg-white/10 transition-colors"
+          className="w-full h-10 rounded-[14px] px-4 flex items-center gap-3 transition-colors text-[15px]"
+          style={{
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            color: 'var(--hub-text)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+          }}
         >
-          <Search className="w-4 h-4 text-white/50" />
-          <span className="text-sm text-white/50">Search golf club...</span>
+          <Search className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
+          <span style={{ color: 'var(--hub-text-dim)' }}>Search golf club...</span>
         </button>
 
         {showDropdown && (
@@ -75,24 +86,41 @@ export function ClubSearchInput({ onClubSelect, onClear, selectedClub }: ClubSea
               className="fixed inset-0 z-20"
               onClick={() => setShowDropdown(false)}
             />
-            <div className="absolute z-30 w-full mt-2 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">
-              <div className="p-3 border-b border-neutral-800">
+            <div className="absolute z-30 w-full mt-2 rounded-[14px] shadow-2xl overflow-hidden"
+              style={{
+                background: 'rgba(18, 18, 20, 0.98)',
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}
+            >
+              <div className="p-3">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
                   <input
                     ref={inputRef}
                     type="text"
                     placeholder="Type club name..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full py-2 pl-10 pr-4 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20"
+                    className="w-full h-10 pl-10 pr-4 rounded-[14px] text-[15px] transition-colors"
+                    style={{
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      color: 'var(--hub-text)',
+                      outline: 'none',
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                    }}
                   />
                 </div>
               </div>
 
               <div className="max-h-64 overflow-y-auto">
                 {isLoading ? (
-                  <div className="px-4 py-8 text-center text-sm text-white/50">
+                  <div className="px-4 py-8 text-center text-sm" style={{ color: 'var(--hub-text-dim)' }}>
                     Searching...
                   </div>
                 ) : courses.length > 0 ? (
@@ -100,22 +128,31 @@ export function ClubSearchInput({ onClubSelect, onClear, selectedClub }: ClubSea
                     <button
                       key={course.id}
                       onClick={() => handleSelect(course)}
-                      className="w-full text-left px-4 py-3 hover:bg-neutral-800 transition-colors border-b border-neutral-800 last:border-b-0"
+                      className="w-full text-left px-4 py-3 transition-colors"
+                      style={{
+                        borderBottom: '1px solid rgba(255,255,255,0.06)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
                     >
-                      <div className="text-white text-sm font-medium">{course.name}</div>
+                      <div className="text-sm font-medium" style={{ color: 'var(--hub-text)' }}>{course.name}</div>
                       {course.region && (
-                        <div className="text-white/60 text-xs mt-0.5">
+                        <div className="text-xs mt-0.5" style={{ color: 'var(--hub-text-sub)' }}>
                           {course.region}, {course.country}
                         </div>
                       )}
                     </button>
                   ))
                 ) : searchTerm.length >= 2 ? (
-                  <div className="px-4 py-8 text-center text-sm text-white/50">
+                  <div className="px-4 py-8 text-center text-sm" style={{ color: 'var(--hub-text-dim)' }}>
                     No clubs found
                   </div>
                 ) : (
-                  <div className="px-4 py-8 text-center text-sm text-white/50">
+                  <div className="px-4 py-8 text-center text-sm" style={{ color: 'var(--hub-text-dim)' }}>
                     Type at least 2 characters
                   </div>
                 )}
