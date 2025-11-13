@@ -32,6 +32,17 @@ const mockClubs = [
   'Turnberry',
 ];
 
+// Assign clubs so multiple golfers share the same home club
+const clubAssignments = [
+  'Sunningdale', 'Sunningdale', 'Sunningdale', // 3 at Sunningdale
+  'Wentworth', 'Wentworth',                    // 2 at Wentworth
+  'The Wisley', 'The Wisley', 'The Wisley',    // 3 at The Wisley
+  'St Andrews', 'St Andrews',                  // 2 at St Andrews
+  'Royal Birkdale',                            // 1 at Royal Birkdale
+  'Muirfield', 'Muirfield',                    // 2 at Muirfield
+  'Turnberry', 'Turnberry',                    // 2 at Turnberry
+];
+
 export const mockGolfers = Array.from({ length: 15 }, (_, i) => ({
   id: `mock-${i + 1}`,
   user_id: `mock-${i + 1}`,
@@ -39,7 +50,7 @@ export const mockGolfers = Array.from({ length: 15 }, (_, i) => ({
   username: mockNames[i].toLowerCase().replace(' ', '_'),
   profile_photo_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${mockNames[i]}`,
   eg_handicap_index: Number((Math.random() * 20 + 1).toFixed(1)),
-  home_club: mockClubs[i % mockClubs.length],
+  home_club: clubAssignments[i],
   distance_m: 200 + i * 150 + Math.floor(Math.random() * 100),
   open_to_play: i % 3 === 0,
   latitude: 51.4 + Math.random() * 0.02,
