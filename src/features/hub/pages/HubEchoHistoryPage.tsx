@@ -104,7 +104,8 @@ export function HubEchoHistoryPage() {
     if (state?.backgroundLocation) {
       nav(-1);
     } else {
-      nav('/clubhouse', { replace: true });
+      // Deep link fallback - return to Hub
+      nav('/hub', { replace: true });
     }
   };
 

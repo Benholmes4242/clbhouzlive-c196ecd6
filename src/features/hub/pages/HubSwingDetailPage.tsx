@@ -26,7 +26,7 @@ export function HubSwingDetailPage() {
   const cameFromHub = Boolean((loc.state as any)?.backgroundLocation);
   const goBack = () => {
     if (cameFromHub) nav(-1);
-    else nav('/clubhouse', { replace: true });
+    else nav('/hub', { replace: true }); // Deep link fallback - return to Hub
   };
 
   const renderVideo = () => {
