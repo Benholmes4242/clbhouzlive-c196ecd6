@@ -113,25 +113,24 @@ export function HubHomePage() {
         <div 
           className="mt-3.5" 
           style={{ 
-            height: 'calc(100vh - 80px - var(--hub-tile-fixed-h) - var(--hub-tile-fixed-h) - 0.875rem - 0.875rem - 0.75rem - 12px)' 
+            height: 'calc(100vh - 80px - var(--hub-tile-fixed-h) - 0.875rem - 0.875rem - 0.75rem - 12px - ((100vw - 28px - 0.875rem) / 2))' 
           }}
         >
           <YourGamesTile />
         </div>
 
-        {/* Echo & Quick Actions 2×2 grid */}
+        {/* Echo & Quick Actions 2×2 grid - Square tiles */}
         <div
           className="grid mt-3.5"
           style={{ 
             gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
-            gap: '0.875rem', 
-            gridAutoRows: 'var(--hub-tile-fixed-h)',
+            gap: '0.875rem',
           }}
         >
-          <div className="hub-tile-fixed">
+          <div style={{ aspectRatio: '1', width: '100%' }}>
             <SwingQuickTile />
           </div>
-          <div className="hub-tile-fixed">
+          <div style={{ aspectRatio: '1', width: '100%' }}>
             <QuickActionsTile />
           </div>
         </div>
