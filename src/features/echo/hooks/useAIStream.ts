@@ -4,7 +4,7 @@
  */
 
 import { useRef, useCallback } from 'react';
-import { edgePost } from '@/utils/callEdge';
+import { supabase } from '@/integrations/supabase/client';
 import type { EchoMessage } from '../state/echoTypes';
 
 interface StreamOptions {
@@ -52,28 +52,29 @@ export function useAIStream() {
             ? Intl.DateTimeFormat().resolvedOptions().timeZone
             : 'UTC';
 
-        const data = await edgePost('clbhouz-pro-ai', {
-          message: last.content,
-          conversation,
-          mode: 'chat',
-          isEcho: true,
-          timezone,
+        const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
+          body: {
+            message: last.content,
+            conversation,
+            mode: 'chat',
+            isEcho: true,
+            timezone,
+          },
         });
 
-        // Handle streaming response
-        if (data && typeof data === 'object' && 'text' in data) {
-          // Non-streaming response (fallback)
-          options.onChunk(data.text as string);
-          const latency = performance.now() - t0;
-          options.onComplete({ latency });
-        } else if (data && typeof data === 'string') {
-          // Streamed response came through as string
-          options.onChunk(data);
-          const latency = performance.now() - t0;
-          options.onComplete({ latency });
-        } else {
-          throw new Error('Unexpected response format');
+        if (error) {
+          throw new Error(error.message || 'Echo request failed');
         }
+
+        // Expecting `{ text: string }` from the function
+        if (!data || typeof data.text !== 'string') {
+          throw new Error('Unexpected Echo response');
+        }
+
+        // Send the complete response
+        options.onChunk(data.text);
+        const latency = performance.now() - t0;
+        options.onComplete({ latency });
       } catch (error: any) {
         if (error.name === 'AbortError') {
           console.log('[AIStream] Request aborted');

@@ -33,13 +33,14 @@ export function HubEchoChatPage() {
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   
-  const { messages, sendMessage, isStreaming, abortStream } = useEchoConversation();
+  const { messages, sendMessage, isStreaming, abortStream, resetConversation } = useEchoConversation();
 
-  // Apply hub-open class for glass theme
+  // Apply hub-open class for glass theme and reset conversation on mount
   useEffect(() => {
     document.documentElement.classList.add('hub-open');
+    resetConversation();
     return () => document.documentElement.classList.remove('hub-open');
-  }, []);
+  }, [resetConversation]);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
