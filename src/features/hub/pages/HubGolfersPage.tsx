@@ -19,95 +19,6 @@ import { useVisibility } from '@/features/nearby/hooks/useVisibility';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import '../home/hubTheme.css';
 
-// Mock data toggle
-const useMockData = false;
-
-const mockGolfers = [
-  {
-    id: 'mock-1',
-    username: 'tiger_woods',
-    display_name: 'Tiger Woods',
-    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tiger',
-    home_club: 'Augusta National',
-    distance_km: 0.8,
-    eg_handicap_index: 2.1,
-    is_online: true,
-    isOpenToPlay: true,
-    sameHomeClub: false,
-    is_following: false,
-    handicap: 2.1,
-  },
-  {
-    id: 'mock-2',
-    username: 'rory_mcilroy',
-    display_name: 'Rory McIlroy',
-    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rory',
-    home_club: 'Royal County Down',
-    distance_km: 1.2,
-    eg_handicap_index: 1.8,
-    is_online: true,
-    isOpenToPlay: true,
-    sameHomeClub: true,
-    is_following: true,
-    handicap: 1.8,
-  },
-  {
-    id: 'mock-3',
-    username: 'phil_mickelson',
-    display_name: 'Phil Mickelson',
-    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Phil',
-    home_club: 'Torrey Pines',
-    distance_km: 2.5,
-    eg_handicap_index: 3.2,
-    is_online: true,
-    isOpenToPlay: false,
-    sameHomeClub: false,
-    is_following: false,
-    handicap: 3.2,
-  },
-  {
-    id: 'mock-4',
-    username: 'jordan_spieth',
-    display_name: 'Jordan Spieth',
-    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan',
-    home_club: 'Dallas National',
-    distance_km: 3.1,
-    eg_handicap_index: 2.5,
-    is_online: true,
-    isOpenToPlay: true,
-    sameHomeClub: false,
-    is_following: false,
-    handicap: 2.5,
-  },
-  {
-    id: 'mock-5',
-    username: 'brooks_koepka',
-    display_name: 'Brooks Koepka',
-    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Brooks',
-    home_club: 'Jupiter Hills',
-    distance_km: 4.2,
-    eg_handicap_index: 1.9,
-    is_online: true,
-    isOpenToPlay: false,
-    sameHomeClub: false,
-    is_following: true,
-    handicap: 1.9,
-  },
-  {
-    id: 'mock-6',
-    username: 'dustin_johnson',
-    display_name: 'Dustin Johnson',
-    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Dustin',
-    home_club: 'The Bears Club',
-    distance_km: 5.0,
-    eg_handicap_index: 2.0,
-    is_online: true,
-    isOpenToPlay: true,
-    sameHomeClub: false,
-    is_following: false,
-    handicap: 2.0,
-  },
-];
 
 export function HubGolfersPage() {
   const nav = useNavigate();
@@ -125,11 +36,7 @@ export function HubGolfersPage() {
   });
 
   // Real data fetch - wrapped in guard
-  const realData = useActiveGolfers({ limit: 50, filters });
-  
-  // Use mock or real data
-  const golfers = useMockData ? mockGolfers : realData.golfers;
-  const isLoading = useMockData ? false : realData.isLoading;
+  const { golfers, isLoading } = useActiveGolfers({ limit: 50, filters });
 
   const handleBack = () => {
     const state = loc.state as any;
