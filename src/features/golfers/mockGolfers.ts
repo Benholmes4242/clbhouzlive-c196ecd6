@@ -41,7 +41,8 @@ export const mockGolfers = Array.from({ length: 15 }, (_, i) => ({
   eg_handicap_index: Number((Math.random() * 20 + 1).toFixed(1)),
   home_club: mockClubs[i % mockClubs.length],
   distance_m: 200 + i * 150 + Math.floor(Math.random() * 100),
-  open_to_play: i % 3 === 0,
+  open_to_play: i % 2 === 0, // More golfers open to play (every other one)
+  same_club: i % 4 === 0, // Some golfers from same club
   latitude: 51.4 + Math.random() * 0.02,
   longitude: -0.6 + Math.random() * 0.02,
   updated_at: new Date().toISOString(),
