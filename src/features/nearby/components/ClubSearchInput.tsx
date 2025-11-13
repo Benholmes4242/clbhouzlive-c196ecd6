@@ -86,9 +86,9 @@ export function ClubSearchInput({ onClubSelect, onClear, selectedClub }: ClubSea
               className="fixed inset-0 z-20"
               onClick={() => setShowDropdown(false)}
             />
-            <div className="absolute z-30 w-full mt-2 rounded-[14px] shadow-2xl overflow-hidden"
+            <div className="absolute z-30 w-full mt-2 rounded-[14px] shadow-2xl overflow-hidden backdrop-blur-xl"
               style={{
-                background: 'rgba(18, 18, 20, 0.98)',
+                background: 'rgba(255,255,255,0.06)',
                 border: '1px solid rgba(255,255,255,0.08)',
               }}
             >
