@@ -90,7 +90,7 @@ export function useActiveGolfers({
           distance_km: mock.distance_m / 1000,
           distanceText: formatDistance(mock.distance_m),
           isOpenToPlay: mock.open_to_play,
-          sameHomeClub: false,
+          sameHomeClub: mock.same_club,
           eg_handicap_index: mock.eg_handicap_index,
           is_online: false,
         }));
