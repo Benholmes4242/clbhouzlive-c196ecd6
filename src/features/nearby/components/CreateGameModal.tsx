@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, ChevronDown, AlertCircle, Search } from 'lucide-react';
+import { X, ChevronDown, AlertCircle, Search, MapPin } from 'lucide-react';
 import { GameBeacon } from '../hooks/useGameBeacon';
 import { useCourseSearch } from '../hooks/useCourseSearch';
 import { UserSearchTypeahead } from './UserSearchTypeahead';
@@ -438,7 +438,7 @@ export function CreateGameModal({
                                 setCourseError('');
                               }}
                             >
-                              <span className="pin">📍</span>
+                              <MapPin className="w-4 h-4" style={{ color: 'white' }} />
                               <div className="rMid">
                                 <div className="rTitle">{c.name}</div>
                                 <div className="rSub">{c.region || c.country}</div>
