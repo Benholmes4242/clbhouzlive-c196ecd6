@@ -19,8 +19,8 @@ export function HubYourGamesPage() {
       // Navigate back to close this overlay
       nav(-1);
     } else {
-      // Deep link fallback
-      nav('/clubhouse', { replace: true });
+      // Deep link fallback - return to Hub
+      nav('/hub', { replace: true });
     }
   };
 

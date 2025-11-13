@@ -134,11 +134,11 @@ export function HubGolfersPage() {
   const handleBack = () => {
     const state = loc.state as any;
     if (state?.backgroundLocation) {
-      // Return to Hub overlay
+      // Return to previous page
       nav(-1);
     } else {
-      // Deep link fallback
-      nav('/clubhouse', { replace: true });
+      // Deep link fallback - return to Hub
+      nav('/hub', { replace: true });
     }
   };
 
