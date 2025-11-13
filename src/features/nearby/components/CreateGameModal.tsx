@@ -469,7 +469,7 @@ export function CreateGameModal({
                   Note
                 </h3>
                 <textarea
-                  placeholder="2 spots free, off 12hcp, casual vibes"
+                  placeholder="We are looking for a fourth player, casual round, money match - who's in?"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   rows={2}
