@@ -108,6 +108,25 @@
      SEMANTIC SURFACES (legacy compat)
      ======================================== */
   --hub-surface: var(--hub-glass-bg-hover);
+
+  /* ========================================
+     ECHO CHAT SPECIFIC TOKENS
+     ======================================== */
+  /* Echo-specific subtle glass */
+  --echo-glass-bg: rgba(18, 18, 18, 0.24);
+  --echo-glass-bg-soft: rgba(18, 18, 18, 0.18);
+  --echo-glass-border: rgba(255, 255, 255, 0.10);
+  --echo-glass-border-soft: rgba(255, 255, 255, 0.08);
+  --echo-glass-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  --echo-glass-inner: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* Text */
+  --echo-text-primary: rgba(255,255,255,0.95);
+  --echo-text-muted: rgba(255,255,255,0.68);
+  --echo-text-soft: rgba(255,255,255,0.5);
+
+  /* Accent for thinking / typing */
+  --echo-accent: #6e9277;
   --hub-surface-2: var(--hub-glass-bg-subtle);
 
   /* ========================================
@@ -521,8 +540,98 @@ html.hub-open {
 .shimmer.video { border-radius: 18px; max-height: 40vh; }
 
 /* ========================================
-   ECHO CHAT BUBBLES
+   ECHO CHAT GLASS COMPONENTS
    ======================================== */
+
+/* Echo card (assistant messages) */
+.echo-card {
+  background: var(--echo-glass-bg);
+  border-radius: 18px;
+  border: 1px solid var(--echo-glass-border);
+  box-shadow: var(--echo-glass-shadow);
+  box-sizing: border-box;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  color: var(--echo-text-primary);
+}
+
+/* User bubble */
+.echo-bubble-user {
+  background: var(--echo-glass-bg-soft);
+  border-radius: 22px;
+  border: 1px solid var(--echo-glass-border-soft);
+  box-shadow: var(--echo-glass-shadow);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+/* Divider */
+.echo-divider {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Typing animation */
+@keyframes echoTypingDot {
+  0%   { transform: translateY(0); opacity: 0.4; }
+  40%  { transform: translateY(-2px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 0.4; }
+}
+
+.echo-typing-dot {
+  animation: echoTypingDot 1s infinite;
+}
+
+.echo-typing-dot:nth-child(2) { animation-delay: 0.16s; }
+.echo-typing-dot:nth-child(3) { animation-delay: 0.32s; }
+
+/* Shimmer bar under header when thinking */
+@keyframes echoShimmer {
+  0%   { transform: translateX(-40%); opacity: 0; }
+  15%  { opacity: 0.7; }
+  100% { transform: translateX(120%); opacity: 0; }
+}
+
+.echo-thinking-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  overflow: hidden;
+}
+
+.echo-thinking-bar::before {
+  content: '';
+  position: absolute;
+  left: -40%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.7),
+    transparent
+  );
+  animation: echoShimmer 1.4s infinite;
+}
+
+/* Fade in up animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.echo-fade-in-up {
+  animation: fadeInUp 0.18s ease-out;
+}
+
+/* Legacy Echo thread styles for backward compatibility */
 .echo-thread { 
   display: flex; 
   flex-direction: column; 
