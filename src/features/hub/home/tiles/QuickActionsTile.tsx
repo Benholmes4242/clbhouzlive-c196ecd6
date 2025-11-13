@@ -80,7 +80,7 @@ export function QuickActionsTile() {
             gridTemplateColumns: '1fr 1fr',
             gap: '10px',
             width: '100%',
-            maxWidth: '280px',
+            maxWidth: '320px',
           }}
         >
           <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />
