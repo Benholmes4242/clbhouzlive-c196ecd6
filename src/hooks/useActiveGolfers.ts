@@ -36,7 +36,7 @@ export function useActiveGolfers({
   const { radiusKm = 10, onlyOpen = false, visibility = 'all' } = filters;
   
   // Check if we're using mock data
-  const useMockData = import.meta.env.VITE_USE_MOCK_GOLFERS === 'true';
+  const useMockData = false; // Disabled mock data
 
   // Fetch nearby golfers using PostGIS RPC function
   const { data: golfers = [], isLoading } = useQuery({
