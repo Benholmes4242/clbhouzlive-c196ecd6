@@ -10,7 +10,7 @@ export function EmptyNearbyState({ variant = 'default' }: EmptyNearbyStateProps)
     : "No golfers in range";
 
   const body = variant === 'hidden'
-    ? "Switch to Everyone or Friends and tap Open to Play to show up for nearby golfers."
+    ? "Switch to Everyone or Friends to show up for nearby golfers."
     : "Try increasing your distance or checking back a little later.";
 
   return (
