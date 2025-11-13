@@ -275,11 +275,15 @@ export function CreateGameModal({
   };
 
 
-  // Hub mode uses same glass as HubGolfersPage (120px blur backdrop)
-  const containerStyle = {
+  // Hub mode uses same glass as HubGolfersPage
+  const containerStyle = hubMode ? {
     background: 'rgba(0, 0, 0, 0.25)',
     backdropFilter: 'blur(120px)',
     WebkitBackdropFilter: 'blur(120px)',
+  } : {
+    backgroundColor: 'rgba(0,0,0,0)',
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
   };
 
   const modalStyle = hubMode ? {
@@ -298,12 +302,12 @@ export function CreateGameModal({
     maxHeight: '100vh',
     pointerEvents: 'auto' as const,
     overscrollBehavior: 'contain' as const,
-    background: 'transparent',
-    backdropFilter: 'none',
-    WebkitBackdropFilter: 'none',
-    border: 'none',
+    background: 'rgba(15, 15, 15, 0.75)',
+    backdropFilter: 'blur(40px)',
+    WebkitBackdropFilter: 'blur(40px)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
     borderRadius: '0',
-    boxShadow: 'none',
+    boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9)',
   };
 
   return (
@@ -332,7 +336,7 @@ export function CreateGameModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-4 pt-4 pb-5">
+        <div className="px-5 pt-4 pb-5">
           {/* Title + Close */}
           <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
             {/* Left spacer */}
@@ -368,7 +372,7 @@ export function CreateGameModal({
 
         {/* Content */}
         <div 
-          className="flex-1 overflow-y-auto px-4 pt-4 pb-6 space-y-3"
+          className="flex-1 overflow-y-auto px-5 pt-4 pb-6 space-y-5"
           style={{
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',

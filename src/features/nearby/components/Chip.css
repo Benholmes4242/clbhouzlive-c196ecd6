@@ -1,9 +1,9 @@
 .chip {
   height: 40px;
   border-radius: 12px;
-  border: 1px solid var(--hub-stroke);
-  background: var(--hub-glass);
-  color: var(--hub-text);
+  border: 1px solid #242424;
+  background: #141414;
+  color: #e9e9e9;
   padding: 0 12px;
   display: flex;
   align-items: center;
@@ -19,8 +19,8 @@
 }
 
 .chip.is-active {
-  background: var(--hub-glass-hover);
-  border-color: var(--hub-stroke-mid);
+  background: #191d1b;
+  border-color: #353535;
 }
 
 .chipIcon {
@@ -34,6 +34,6 @@
 }
 
 .chipValue {
-  color: var(--hub-text-sub);
+  color: #9aa0a6;
   white-space: nowrap;
 }

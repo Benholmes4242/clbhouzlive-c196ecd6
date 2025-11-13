@@ -1,5 +1,14 @@
-/* Create Game Modal - now uses hubTheme.css tokens */
+/* Create Game Modal Design Tokens */
 :root {
+  --modal-bg: #0c0c0d;
+  --modal-panel: #111214;
+  --modal-text: #e9e9e9;
+  --modal-muted: #a0a0a0;
+  --modal-border: #242424;
+  --modal-accent: #6e9277;
+  --modal-accent-ink: #d7eadf;
+  --modal-danger: #de4a4a;
+  
   /* Z-index layers */
   --z-app: 0;
   --z-toast: 900;
@@ -39,14 +48,14 @@ button {
 
 /* Section Labels */
 .sectionLabel {
-  color: var(--hub-text-muted);
+  color: var(--modal-muted);
   font-size: 13px;
   margin: 12px 2px 8px;
 }
 
 /* Helper Text */
 .helper {
-  color: var(--hub-text-sub);
+  color: #8d9398;
   font-size: 12px;
 }
 
@@ -54,15 +63,11 @@ button {
 .btnPrimary {
   height: 52px;
   border-radius: 16px;
-  background: var(--hub-glass-bg-button);
-  border: 1px solid var(--hub-stroke);
-  color: var(--hub-text);
+  background: #1a1d1b;
+  border: 1px solid #2a2f2c;
+  color: #fff;
   font-weight: 700;
-  transition: transform 0.06s ease, background 0.12s;
-}
-
-.btnPrimary:hover:not(:disabled) {
-  background: var(--hub-glass-bg-button-hover);
+  transition: transform 0.06s ease;
 }
 
 .btnPrimary:active:not(:disabled) {
