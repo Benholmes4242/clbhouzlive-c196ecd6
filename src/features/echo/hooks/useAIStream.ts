@@ -33,11 +33,31 @@ export function useAIStream() {
       const t0 = performance.now();
 
       try {
+        // Extract the last message as the current user message
+        const last = messages[messages.length - 1];
+        
+        if (!last || last.role !== 'user') {
+          throw new Error('Missing user message');
+        }
+
+        // Everything before the last message is the conversation history
+        const conversation = messages.slice(0, -1).map((m) => ({
+          role: m.role,
+          content: m.content,
+        }));
+
+        // Get timezone
+        const timezone =
+          typeof Intl !== 'undefined'
+            ? Intl.DateTimeFormat().resolvedOptions().timeZone
+            : 'UTC';
+
         const data = await edgePost('clbhouz-pro-ai', {
-          messages: messages.map(m => ({ role: m.role, content: m.content })),
-          conversation_id: conversationId,
-          stream: true,
+          message: last.content,
+          conversation,
           mode: 'chat',
+          isEcho: true,
+          timezone,
         });
 
         // Handle streaming response
