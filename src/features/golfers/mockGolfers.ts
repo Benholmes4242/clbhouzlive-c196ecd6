@@ -34,13 +34,14 @@ const mockClubs = [
 
 // Assign clubs so multiple golfers share the same home club
 const clubAssignments = [
-  'Sunningdale', 'Sunningdale', 'Sunningdale', // 3 at Sunningdale
+  'Sundridge Park Golf Club', 'Sundridge Park Golf Club', // 2 at Sundridge Park (for badge testing)
+  'Sunningdale',                               // 1 at Sunningdale
   'Wentworth', 'Wentworth',                    // 2 at Wentworth
   'The Wisley', 'The Wisley', 'The Wisley',    // 3 at The Wisley
   'St Andrews', 'St Andrews',                  // 2 at St Andrews
   'Royal Birkdale',                            // 1 at Royal Birkdale
   'Muirfield', 'Muirfield',                    // 2 at Muirfield
-  'Turnberry', 'Turnberry',                    // 2 at Turnberry
+  'Turnberry',                                 // 1 at Turnberry
 ];
 
 export const mockGolfers = Array.from({ length: 15 }, (_, i) => ({
