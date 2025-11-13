@@ -119,7 +119,7 @@ export function HubGolfersPage() {
 
   // Filter state
   const [filters, setFilters] = useState<GolferFilters>({
-    radiusKm: 0.5,
+    radiusKm: 10,
     onlyOpen: false,
     visibility: 'all',
   });
