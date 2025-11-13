@@ -72,7 +72,7 @@ export function HubHomePage() {
           zIndex: 910,
           display: 'flex',
           flexDirection: 'column',
-          padding: '16px 16px 24px',
+          padding: '16px',
           pointerEvents: 'none',
         }}
       >
@@ -139,13 +139,13 @@ export function HubHomePage() {
               style={{ 
                 gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
                 gap: '0.875rem', 
-                gridAutoRows: 'var(--hub-tile-fixed-h)',
+                gridAutoRows: '150px',
               }}
             >
-              <div className="hub-tile-fixed hub-floating-card">
+              <div className="hub-floating-card" style={{ height: '150px' }}>
                 <SwingQuickTile />
               </div>
-              <div className="hub-tile-fixed hub-floating-card">
+              <div className="hub-floating-card" style={{ height: '150px' }}>
                 <QuickActionsTile />
               </div>
             </div>
