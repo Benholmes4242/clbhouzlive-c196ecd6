@@ -73,9 +73,11 @@ export function HubHomePage() {
           display: 'flex',
           flexDirection: 'column',
           padding: '16px',
+          paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
           pointerEvents: 'none',
           height: '100vh',
           maxHeight: '100vh',
+          overflow: 'hidden',
         }}
       >
         {/* Header */}
@@ -114,65 +116,59 @@ export function HubHomePage() {
 
         {/* Hub Dashboard - Viewport locked */}
         <main 
-          className="w-full overflow-hidden"
+          className="w-full"
           style={{ 
             pointerEvents: 'auto',
             flex: '1 1 auto',
             minHeight: 0,
-            display: 'flex',
-            flexDirection: 'column',
+            display: 'grid',
+            gridTemplateRows: '170px 1fr 130px',
+            gap: '0.875rem',
+            overflow: 'hidden',
           }}
         >
-          <div className="flex flex-col h-full" style={{ gap: '0.875rem' }}>
-            {/* Top 2×2 grid */}
-            <div
-              className="grid"
-              style={{ 
-                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
-                gap: '0.875rem', 
-                gridAutoRows: 'minmax(0, 1fr)',
-                flex: '0 0 auto',
-                height: 'clamp(180px, 22vh, 220px)',
-              }}
-            >
-              <div className="hub-floating-card" style={{ height: '100%' }}>
-                <NearbyGolfersTile />
-              </div>
-              <div className="hub-floating-card" style={{ height: '100%' }}>
-                <EchoTile />
-              </div>
+          {/* Top 2×2 grid */}
+          <div
+            className="grid"
+            style={{ 
+              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
+              gap: '0.875rem',
+            }}
+          >
+            <div className="hub-floating-card" style={{ height: '100%' }}>
+              <NearbyGolfersTile />
             </div>
-
-            {/* Your Games */}
-            <div 
-              className="hub-floating-card" 
-              style={{ 
-                flex: '1 1 auto',
-                minHeight: 0,
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <YourGamesTile />
+            <div className="hub-floating-card" style={{ height: '100%' }}>
+              <EchoTile />
             </div>
+          </div>
 
-            {/* Bottom 2×2 grid */}
-            <div
-              className="grid"
-              style={{ 
-                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
-                gap: '0.875rem', 
-                gridAutoRows: 'minmax(0, 1fr)',
-                flex: '0 0 auto',
-                height: 'clamp(130px, 16vh, 150px)',
-              }}
-            >
-              <div className="hub-floating-card" style={{ height: '100%' }}>
-                <SwingQuickTile />
-              </div>
-              <div className="hub-floating-card" style={{ height: '100%' }}>
-                <QuickActionsTile />
-              </div>
+          {/* Your Games - Flexible */}
+          <div 
+            className="hub-floating-card" 
+            style={{ 
+              minHeight: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+            }}
+          >
+            <YourGamesTile />
+          </div>
+
+          {/* Bottom 2×2 grid */}
+          <div
+            className="grid"
+            style={{ 
+              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
+              gap: '0.875rem',
+            }}
+          >
+            <div className="hub-floating-card" style={{ height: '100%' }}>
+              <SwingQuickTile />
+            </div>
+            <div className="hub-floating-card" style={{ height: '100%' }}>
+              <QuickActionsTile />
             </div>
           </div>
         </main>
