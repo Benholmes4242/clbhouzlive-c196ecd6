@@ -19,10 +19,10 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '6px',
-        padding: '10px',
-        aspectRatio: '1 / 1',
-        width: '100%',
+        gap: '4px',
+        padding: '6px 8px',
+        minWidth: 0,
+        minHeight: 0,
         borderRadius: '16px',
         background: 'rgba(255,255,255,0.10)',
         border: '1px solid rgba(255,255,255,0.15)',
@@ -33,16 +33,30 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
       onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
       onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.10)')}
     >
-      <div className="qa-icon" style={{ fontSize: '20px', lineHeight: 1 }} aria-hidden="true">{icon}</div>
+      <div 
+        className="qa-icon" 
+        style={{ 
+          fontSize: 'clamp(20px, 5vw, 28px)',
+          width: 'clamp(26px, 5vw, 32px)',
+          height: 'clamp(26px, 5vw, 32px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          lineHeight: 1 
+        }} 
+        aria-hidden="true"
+      >
+        {icon}
+      </div>
       <div className="qa-label" style={{ 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
         fontWeight: 600, 
-        lineHeight: 1.15 
+        lineHeight: 1.2 
       }}>
-        <span style={{ fontSize: '12.5px', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelTop}</span>
-        <span style={{ fontSize: '12.5px', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelBottom}</span>
+        <span style={{ fontSize: 'clamp(11px, 2.7vw, 13px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelTop}</span>
+        <span style={{ fontSize: 'clamp(11px, 2.7vw, 13px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelBottom}</span>
       </div>
     </button>
   );
@@ -64,28 +78,20 @@ export function QuickActionsTile() {
   return (
     <Tile title="Quick Actions" align="center">
       <div 
-        className="qa-wrap" 
+        className="hub-quick-actions" 
         style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gridTemplateRows: 'repeat(2, 1fr)',
+          gap: '8px',
+          height: '100%',
+          padding: '0',
         }}
       >
-        <div 
-          className="quick-grid" 
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '10px',
-            width: '100%',
-          }}
-        >
-          <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />
-          <QA labelTop="Ask" labelBottom="Echo" onClick={() => navigateFromHub('/hub/echo')} icon="💬" />
-          <QA labelTop="Upload" labelBottom="Swing" onClick={openSwing} icon="🏌️" />
-          <QA labelTop="Your" labelBottom="Profile" onClick={openProfile} icon="👤" />
-        </div>
+        <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />
+        <QA labelTop="Ask" labelBottom="Echo" onClick={() => navigateFromHub('/hub/echo')} icon="💬" />
+        <QA labelTop="Upload" labelBottom="Swing" onClick={openSwing} icon="🏌️" />
+        <QA labelTop="Your" labelBottom="Profile" onClick={openProfile} icon="👤" />
       </div>
     </Tile>
   );
