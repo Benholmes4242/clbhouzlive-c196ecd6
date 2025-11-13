@@ -237,19 +237,19 @@ function GameCard({ game }: { game: Game }) {
   };
 
   return (
-    <div className="gameCard" role="article" aria-label={`${game.course_name || 'Golf game'}, ${formatDate(game.start_time)}, ${filledLabel}`}>
-      <div className="gcTop">
-        <div className="gcTitle">{game.course_name || 'Golf Game'}</div>
+    <div className="gameRow" role="article" aria-label={`${game.course_name || 'Golf game'}, ${formatDate(game.start_time)}, ${filledLabel}`}>
+      <div className="gameRow__top">
+        <div className="gameRow__title">{game.course_name || 'Golf Game'}</div>
       </div>
 
-      <div className="gcMeta">
-        <span className="m">🗓 {formatDate(game.start_time)} • {formatTime(game.start_time)}</span>
-        <span className={`badge ${seatsLeft > 0 ? 'ok' : 'full'}`}>{filledLabel}</span>
+      <div className="gameRow__meta">
+        <span className="gameRow__time">🗓 {formatDate(game.start_time)} • {formatTime(game.start_time)}</span>
+        <span className={`gameRow__badge ${seatsLeft > 0 ? 'gameRow__badge--ok' : 'gameRow__badge--full'}`}>{filledLabel}</span>
       </div>
 
-      <div className="gcActions">
+      <div className="gameRow__actions">
         <TapButton
-          className="primary"
+          className="gameRow__btn"
           disabled={isPending || seatsLeft <= 0}
           onClick={handleJoin}
         >
@@ -265,7 +265,7 @@ function GamesList({ games, isLoading }: { games: Game[]; isLoading: boolean }) 
     return (
       <div className="list">
         {[1, 2, 3].map(i => (
-          <div key={i} className="gameCard skeleton">
+          <div key={i} className="gameRow gameRow--skeleton">
             <div className="skeletonLine" style={{ width: '60%' }} />
             <div className="skeletonLine" style={{ width: '40%' }} />
           </div>
