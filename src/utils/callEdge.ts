@@ -28,7 +28,19 @@ export async function callEdge(path: string, init: RequestInit = {}, retry = tru
   }
 
   if (!res.ok) {
-    throw new Error(`[callEdge] ${path} failed (${res.status}): ${await res.text().catch(() => res.statusText)}`);
+    let errorMessage = `[callEdge] ${path} failed (${res.status})`;
+    
+    try {
+      const errJson = await res.json();
+      if (errJson?.error) {
+        errorMessage = errJson.error;
+      }
+    } catch {
+      // If JSON parsing fails, use default message with status text
+      errorMessage += `: ${res.statusText}`;
+    }
+    
+    throw new Error(errorMessage);
   }
   return parseResponse(res);
 }
