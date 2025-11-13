@@ -65,10 +65,12 @@ export function HubYourGamesPage() {
 
       {/* Content area - YourGamesList content */}
       <div className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
-        <YourGamesList
-          onCreateGame={handleCreateGame}
-          onFindGame={handleFindGame}
-        />
+        <div style={{ paddingTop: '28px' }}>
+          <YourGamesList
+            onCreateGame={handleCreateGame}
+            onFindGame={handleFindGame}
+          />
+        </div>
       </div>
     </div>
   );
