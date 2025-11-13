@@ -263,7 +263,7 @@ html.hub-open {
 
 /* Focus ring for keyboard navigation */
 .hub-row:focus-within {
-  outline: 2px solid color-mix(in oklab, var(--hub-accent, #6e9277) 60%, #fff 0%);
+  outline: 2px solid rgba(255, 255, 255, 0.3);
   outline-offset: 2px;
   border-radius: 14px;
 }
