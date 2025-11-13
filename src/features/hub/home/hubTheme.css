@@ -648,9 +648,17 @@ body.hub-open {
 }
 
 /* ========================================
-   PLAYER CARD SPACING
+   PLAYER CARD SPACING & VISUALS
    ======================================== */
-/* Card spacing handled by parent .ng-player-list gap */
+/* Spacing handled by parent .ng-player-list gap */
+.ng-player-card {
+  /* Strong, opaque tile inside the panel to read as a separate card */
+  --glass-bg: #232326; /* solid surface, no transparency */
+  --border-hairline: rgba(255,255,255,0.06);
+  border-radius: 22px; /* override rounded-xl from GlassCard */
+  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+}
+
 
 /* ========================================
    NEARBY GOLFERS ROW
