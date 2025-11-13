@@ -199,7 +199,7 @@ export function HubGolfersPage() {
       {/* Content */}
       <div ref={listRef} className="h-full overflow-y-auto overscroll-none pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
         <PullToRefresh onRefresh={handleRefresh}>
-          <div className="px-4 pt-[calc(env(safe-area-inset-top,0px)+16px)] pb-6 space-y-4">
+          <div className="px-4 pt-[calc(env(safe-area-inset-top,0px)+24px)] pb-6 space-y-4">
             {/* A. Availability controls */}
             <div className="space-y-3">
               <GolferStatusBar 
