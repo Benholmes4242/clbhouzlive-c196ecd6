@@ -19,13 +19,11 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 'clamp(3px, 1vw, 5px)',
-        padding: 'clamp(6px, 2vw, 10px)',
+        gap: '6px',
+        padding: '10px',
         aspectRatio: '1 / 1',
         width: '100%',
-        minWidth: 0,
-        minHeight: 0,
-        borderRadius: 'clamp(12px, 3vw, 16px)',
+        borderRadius: '16px',
         background: 'rgba(255,255,255,0.10)',
         border: '1px solid rgba(255,255,255,0.15)',
         cursor: 'pointer',
@@ -35,41 +33,16 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
       onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
       onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.10)')}
     >
-      <div 
-        className="qa-icon" 
-        style={{ 
-          fontSize: 'clamp(18px, 4.5vw, 24px)', 
-          lineHeight: 1,
-          flexShrink: 0
-        }} 
-        aria-hidden="true"
-      >
-        {icon}
-      </div>
+      <div className="qa-icon" style={{ fontSize: '20px', lineHeight: 1 }} aria-hidden="true">{icon}</div>
       <div className="qa-label" style={{ 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
         fontWeight: 600, 
-        lineHeight: 1.15,
-        minWidth: 0
+        lineHeight: 1.15 
       }}>
-        <span style={{ 
-          fontSize: 'clamp(10px, 2.5vw, 12.5px)', 
-          textAlign: 'center', 
-          color: 'var(--hub-text-body)',
-          whiteSpace: 'nowrap'
-        }}>
-          {labelTop}
-        </span>
-        <span style={{ 
-          fontSize: 'clamp(10px, 2.5vw, 12.5px)', 
-          textAlign: 'center', 
-          color: 'var(--hub-text-body)',
-          whiteSpace: 'nowrap'
-        }}>
-          {labelBottom}
-        </span>
+        <span style={{ fontSize: '12.5px', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelTop}</span>
+        <span style={{ fontSize: '12.5px', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelBottom}</span>
       </div>
     </button>
   );
@@ -104,12 +77,8 @@ export function QuickActionsTile() {
           style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            gridTemplateRows: '1fr 1fr',
-            gap: 'clamp(6px, 2vw, 10px)',
+            gap: '10px',
             width: '100%',
-            height: '100%',
-            maxWidth: '280px',
-            margin: '0 auto'
           }}
         >
           <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />

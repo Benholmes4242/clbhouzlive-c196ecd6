@@ -59,7 +59,7 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
 
   return (
     <GlassCard
-      className="ng-player-card"
+      className="mx-3"
       style={{
         padding: '16px 14px',
         animation: `rowFadeUp 90ms ease-out both ${index * 35}ms`,
