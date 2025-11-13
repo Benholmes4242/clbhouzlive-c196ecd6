@@ -6,9 +6,9 @@
 .seg {
   height: 44px;
   border-radius: 12px;
-  border: 1px solid #242424;
-  background: #141414;
-  color: #e9e9e9;
+  border: 1px solid var(--hub-stroke);
+  background: var(--hub-glass);
+  color: var(--hub-text);
   font-weight: 600;
   transition: transform 0.06s ease, background 0.12s, border-color 0.12s;
   touch-action: manipulation;
@@ -19,9 +19,9 @@
 }
 
 .seg.is-active {
-  background: #1c1e1c;
-  border-color: #353535;
-  box-shadow: inset 0 0 0 1px #353535;
+  background: var(--hub-glass-hover);
+  border-color: var(--hub-stroke-mid);
+  box-shadow: inset 0 0 0 1px var(--hub-stroke-mid);
 }
 
 .seg:disabled {
