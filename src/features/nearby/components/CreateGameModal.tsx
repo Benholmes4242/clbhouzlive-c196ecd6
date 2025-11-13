@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, ChevronDown, AlertCircle } from 'lucide-react';
+import { X, ChevronDown, AlertCircle, Search } from 'lucide-react';
 import { GameBeacon } from '../hooks/useGameBeacon';
 import { useCourseSearch } from '../hooks/useCourseSearch';
 import { UserSearchTypeahead } from './UserSearchTypeahead';
@@ -417,7 +417,7 @@ export function CreateGameModal({
                   <>
                     <label className="findLabel">Host a game at</label>
                     <div className="searchBox">
-                      <span className="glass">🔎</span>
+                      <Search className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
                       <input
                         placeholder="Search golf club..."
                         value={courseQuery}
