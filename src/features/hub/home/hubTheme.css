@@ -470,7 +470,7 @@ body.hub-open {
   overflow-y: auto;
 }
 
-.nearby-golfers-panel {
+.nearby-golfers-panel, .ng-controls-panel {
   align-self: flex-start;
   width: 100%;
   max-width: 420px;
