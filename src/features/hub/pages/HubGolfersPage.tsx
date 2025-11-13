@@ -174,99 +174,104 @@ export function HubGolfersPage() {
       {/* Main Content */}
       <main className="nearby-golfers-main">
         <section className="apple-glass-panel nearby-golfers-panel">
-          {/* Segmented Control - Everyone / Friends / Hidden */}
-          <div className="ng-segmented">
-            <button 
-              className={`ng-segmented__item ${visibilityMode === 'all' ? 'ng-segmented__item--active' : ''}`}
-              onClick={() => setVisibilityMode('all')}
-            >
-              Everyone
-            </button>
-            <button 
-              className={`ng-segmented__item ${visibilityMode === 'friends' ? 'ng-segmented__item--active' : ''}`}
-              onClick={() => setVisibilityMode('friends')}
-            >
-              Friends
-            </button>
-            <button 
-              className={`ng-segmented__item ${visibilityMode === 'hidden' ? 'ng-segmented__item--active' : ''}`}
-              onClick={() => setVisibilityMode('hidden')}
-            >
-              Hidden
-            </button>
-          </div>
-
-          {/* Visibility Label */}
-          <p className="ng-visibility-label">
-            {visibilityMode === 'all' && 'Visible to everyone'}
-            {visibilityMode === 'friends' && 'Visible to your friends only'}
-            {visibilityMode === 'hidden' && 'Hidden from all golfers'}
-          </p>
-
-          {/* Open to Play Banner */}
-          <div className="ng-otp-banner">
-            <span className="ng-otp-emoji">🏌️‍♂️</span>
-            <span className="ng-otp-label">Open to Play</span>
-          </div>
-
-          {/* Distance Chips */}
-          <div className="ng-distance-row">
-            <button 
-              className={`ng-chip ${filters.radiusKm === 0.5 ? 'ng-chip--active' : ''}`}
-              onClick={() => setFilters({ ...filters, radiusKm: 0.5 })}
-            >
-              500m
-            </button>
-            <button 
-              className={`ng-chip ${filters.radiusKm === 1 ? 'ng-chip--active' : ''}`}
-              onClick={() => setFilters({ ...filters, radiusKm: 1 })}
-            >
-              1km
-            </button>
-            <button 
-              className={`ng-chip ${filters.radiusKm === 3 ? 'ng-chip--active' : ''}`}
-              onClick={() => setFilters({ ...filters, radiusKm: 3 })}
-            >
-              3km
-            </button>
-          </div>
-
-          {/* Filter Row - Dropdown + Open to Play CTA */}
-          <div className="ng-filter-row">
-            <button className="ng-filter-select">
-              All Golfers
-              <span className="ng-filter-chevron">⌄</span>
-            </button>
-            <button className="ng-primary-btn">
-              Open to Play
-            </button>
-          </div>
-
-          {/* Golfers List or Empty State */}
-          {isLoading ? (
-            <div className="ng-player-list flex flex-col">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-16 rounded-2xl bg-white/5 animate-pulse" />
-              ))}
+          {/* Controls Block */}
+          <div className="ng-controls">
+            {/* Segmented Control - Everyone / Friends / Hidden */}
+            <div className="ng-segmented">
+              <button 
+                className={`ng-segmented__item ${visibilityMode === 'all' ? 'ng-segmented__item--active' : ''}`}
+                onClick={() => setVisibilityMode('all')}
+              >
+                Everyone
+              </button>
+              <button 
+                className={`ng-segmented__item ${visibilityMode === 'friends' ? 'ng-segmented__item--active' : ''}`}
+                onClick={() => setVisibilityMode('friends')}
+              >
+                Friends
+              </button>
+              <button 
+                className={`ng-segmented__item ${visibilityMode === 'hidden' ? 'ng-segmented__item--active' : ''}`}
+                onClick={() => setVisibilityMode('hidden')}
+              >
+                Hidden
+              </button>
             </div>
-          ) : golfers.length === 0 ? (
-            <div className="ng-empty-state">
-              <p className="ng-empty-title">No golfers nearby</p>
-              <p className="ng-empty-subtitle">
-                Check back soon to see who's nearby.
-              </p>
+
+            {/* Visibility Label */}
+            <p className="ng-visibility-label">
+              {visibilityMode === 'all' && 'Visible to everyone'}
+              {visibilityMode === 'friends' && 'Visible to your friends only'}
+              {visibilityMode === 'hidden' && 'Hidden from all golfers'}
+            </p>
+
+            {/* Open to Play Banner */}
+            <div className="ng-otp-banner">
+              <span className="ng-otp-emoji">🏌️‍♂️</span>
+              <span className="ng-otp-label">Open to Play</span>
             </div>
-          ) : (
-            <div className="ng-player-list flex flex-col">
-              {golfers.map((golfer, index) => (
-                <NearbyGolferCard 
-                  key={golfer.id ?? index} 
-                  golfer={golfer} 
-                  index={index} 
-                />
-              ))}
+
+            {/* Distance Chips */}
+            <div className="ng-distance-row">
+              <button 
+                className={`ng-chip ${filters.radiusKm === 0.5 ? 'ng-chip--active' : ''}`}
+                onClick={() => setFilters({ ...filters, radiusKm: 0.5 })}
+              >
+                500m
+              </button>
+              <button 
+                className={`ng-chip ${filters.radiusKm === 1 ? 'ng-chip--active' : ''}`}
+                onClick={() => setFilters({ ...filters, radiusKm: 1 })}
+              >
+                1km
+              </button>
+              <button 
+                className={`ng-chip ${filters.radiusKm === 3 ? 'ng-chip--active' : ''}`}
+                onClick={() => setFilters({ ...filters, radiusKm: 3 })}
+              >
+                3km
+              </button>
             </div>
-          )}
+
+            {/* Filter Row - Dropdown + Open to Play CTA */}
+            <div className="ng-filter-row">
+              <button className="ng-filter-select">
+                All Golfers
+                <span className="ng-filter-chevron">⌄</span>
+              </button>
+              <button className="ng-primary-btn">
+                Open to Play
+              </button>
+            </div>
+          </div>
+
+          {/* Players Block */}
+          <div className="ng-player-list">
+            {isLoading ? (
+              <>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="h-16 rounded-2xl bg-white/5 animate-pulse" />
+                ))}
+              </>
+            ) : golfers.length === 0 ? (
+              <div className="ng-empty-state">
+                <p className="ng-empty-title">No golfers nearby</p>
+                <p className="ng-empty-subtitle">
+                  Check back soon to see who's nearby.
+                </p>
+              </div>
+            ) : (
+              <>
+                {golfers.map((golfer, index) => (
+                  <NearbyGolferCard 
+                    key={golfer.id ?? index} 
+                    golfer={golfer} 
+                    index={index} 
+                  />
+                ))}
+              </>
+            )}
+          </div>
         </section>
       </main>
     </div>
