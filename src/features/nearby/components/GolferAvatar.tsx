@@ -11,15 +11,17 @@ interface GolferAvatarProps {
 export function GolferAvatar({ 
   avatarUrl, 
   displayName, 
-  size = 48 
+  size = 52 
 }: GolferAvatarProps) {
   return (
-    <SquircleImage
-      size={size}
-      src={avatarUrl || '/placeholder.svg'}
-      alt={displayName}
-      ringColor="rgba(255,255,255,0.28)"
-      ringWidth={1}
-    />
+    <div style={{ borderRadius: '14px' }}>
+      <SquircleImage
+        size={size}
+        src={avatarUrl || '/placeholder.svg'}
+        alt={displayName}
+        ringColor="rgba(255,255,255,0.28)"
+        ringWidth={1}
+      />
+    </div>
   );
 }

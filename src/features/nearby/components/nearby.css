@@ -88,30 +88,28 @@
 /* Glass pill base (shared) */
 .pill {
   display: inline-flex; align-items: center; gap: .5rem;
-  height: 32px; padding: 0 .75rem;
+  height: 28px; padding: 0 .75rem;
   border-radius: 9999px;
-  font-weight: 600; font-size: 14px;
-  border: 1px solid rgba(255,255,255,0.20);
-  background: rgba(255,255,255,0.06);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  font-weight: 600; font-size: 13px;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.08);
+  box-shadow: 0 0 16px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.10);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  color: rgba(255,255,255,0.92);
 }
 
-/* Subtle green tint for "Open to play" */
+/* Open to play pill */
 .pill--open {
-  /* gentle tint; no outer glow */
-  background: linear-gradient(
-    to bottom,
-    rgba(78, 199, 120, 0.16),
-    rgba(78, 199, 120, 0.10)
-  );
-  border-color: rgba(78, 199, 120, 0.28);
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(52, 211, 153, 0.40);
+  box-shadow: 0 0 18px rgba(16, 185, 129, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  color: rgb(209, 250, 229);
 }
 
 /* Green dot */
 .pill__dot {
-  width: 10px; height: 10px; border-radius: 9999px;
-  background: #4EC778;         /* balanced green */
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.18) inset; /* tiny highlight ring */
+  width: 8px; height: 8px; border-radius: 9999px;
+  background: rgb(52, 211, 153);
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.8);
 }
