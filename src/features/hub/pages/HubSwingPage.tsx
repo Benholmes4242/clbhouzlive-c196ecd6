@@ -32,17 +32,19 @@ export function HubSwingPage() {
         WebkitBackdropFilter: 'blur(120px)',
       }}
     >
-      {/* Simple header */}
+      {/* Header */}
       <header className="sticky top-0 z-10 flex items-center justify-between px-4 h-14 border-b"
         style={{
-          borderColor: 'rgba(255,255,255,0.1)',
-          background: 'rgba(0,0,0,0.2)',
+          borderColor: 'var(--hub-stroke)',
+          background: 'rgba(22, 24, 27, 0.98)',
+          backdropFilter: 'none',
+          WebkitBackdropFilter: 'none',
         }}
       >
         <button
           onClick={goBack}
           className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
-          aria-label="Back to Hub"
+          aria-label="Back"
         >
           ‹ Back
         </button>
@@ -50,8 +52,8 @@ export function HubSwingPage() {
         <div className="w-16" />
       </header>
 
-      {/* Swing Coach content */}
-      <div className="flex-1 overflow-hidden">
+      {/* Content */}
+      <div className="flex-1 overflow-hidden" style={{ paddingTop: '28px' }}>
         <SwingCoach
           onAnalysisTextChange={setAnalysisText}
           analysisText={analysisText}
