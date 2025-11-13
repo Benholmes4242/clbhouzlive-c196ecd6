@@ -1372,10 +1372,16 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
 
             <div className="flex gap-2 mt-6 justify-center">
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={() => fileInputRef.current?.click()}
-                className="text-xs hover:border-[#2A9D8F] hover:bg-[#2A9D8F]/5 hover:text-[#1D3557] active:bg-[#2A9D8F]/10 focus:border-[#2A9D8F] focus:ring-[#2A9D8F]/20"
+                className="h-[56px] rounded-2xl bg-white/[0.08] border border-white/10 py-[10px] px-6 text-[15px] font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:bg-white/[0.12] active:scale-[0.98] transition-all"
+                style={{ 
+                  userSelect: 'none', 
+                  WebkitTapHighlightColor: 'transparent', 
+                  WebkitTouchCallout: 'none', 
+                  WebkitUserSelect: 'none',
+                }}
               >
                 <Upload className="h-4 w-4 mr-1" />
                 Upload Swing Video
