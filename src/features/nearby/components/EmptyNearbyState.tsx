@@ -1,17 +1,26 @@
 import React from 'react';
-import { TapButton } from '@/components/ui/TapButton';
-import { haptic } from '@/utils/haptics';
 
 interface EmptyNearbyStateProps {
-  onOpenToPlay?: () => void;
+  variant?: 'default' | 'hidden';
 }
 
-export function EmptyNearbyState({ onOpenToPlay }: EmptyNearbyStateProps) {
+export function EmptyNearbyState({ variant = 'default' }: EmptyNearbyStateProps) {
+  const title = variant === 'hidden' 
+    ? "You're currently hidden"
+    : "No golfers in range";
+
+  const body = variant === 'hidden'
+    ? "Switch to Everyone or Friends and tap Open to Play to show up for nearby golfers."
+    : "Try increasing your distance or checking back a little later.";
+
   return (
-    <div className="px-6 py-16 text-center">
-      <div className="text-2xl font-semibold mb-2 text-white/90">No golfers nearby</div>
-      <p className="text-white/60">
-        Check back soon to see who's nearby.
+    <div className="flex flex-col items-center text-center mt-16 px-4">
+      <h2 className="text-[20px] font-semibold text-[color:var(--hub-text)] mb-1">
+        {title}
+      </h2>
+
+      <p className="text-[14px] text-[color:var(--hub-text-muted)] leading-[1.5] max-w-xs">
+        {body}
       </p>
     </div>
   );
