@@ -332,38 +332,33 @@ export function CreateGameModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-5 pt-4">
-          {/* Title + Close */}
-          <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
-            {/* Left spacer */}
-            <div />
-            
-            {/* Title */}
-            <div className="text-center">
-              <h2 className="text-white text-[17px] font-semibold">
-                Create a Game
-              </h2>
-            </div>
-            
-            {/* Close button */}
-            <div className="flex justify-end">
-              <TapButton
-                onClick={onClose}
-                className="text-white/60 hover:text-white/90 transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
-                aria-label="Close"
-              >
-                <X className="w-5 h-5" />
-              </TapButton>
-            </div>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="w-full" style={{ height: '1px', background: 'rgba(255,255,255,0.08)' }} />
+        <header
+          className="fixed top-0 left-0 right-0 flex items-center justify-between px-4 h-14 border-b"
+          style={{
+            zIndex: 10,
+            borderColor: 'var(--hub-stroke)',
+            background: 'rgba(22, 24, 27, 0.98)',
+            backdropFilter: 'none',
+            WebkitBackdropFilter: 'none',
+            transition: 'all 160ms ease-out',
+            paddingTop: 'env(safe-area-inset-top, 0px)',
+            contain: 'paint',
+          }}
+        >
+          <button
+            onClick={onClose}
+            className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
+            aria-label="Back to Hub"
+          >
+            ‹ Back
+          </button>
+          <h1 className="text-white/90 text-[17px] font-semibold">Create a game</h1>
+          <div className="w-16" />
+        </header>
 
         {/* Content */}
         <div 
-          className="flex-1 overflow-y-auto px-4 pt-4 pb-6 space-y-3"
+          className="flex-1 overflow-y-auto px-4 pt-[calc(3.5rem+env(safe-area-inset-top,0px))] pb-6 space-y-3"
           style={{
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',
