@@ -53,7 +53,7 @@ export function SwingQuickTile() {
         {/* Upload pill with inline icon */}
         <button
           onClick={openSwingPage}
-          className="mt-3 h-10 w-full rounded-2xl px-4 flex items-center justify-between text-[14px] leading-[14px] transition focus:outline-none focus-visible:ring-2 whitespace-nowrap"
+          className="mt-3 h-11 w-full rounded-2xl px-4 flex items-center justify-between text-[15px] leading-[15px] transition focus:outline-none focus-visible:ring-2 whitespace-nowrap"
           style={{
             background: 'rgba(255,255,255,0.12)',
             border: '1px solid rgba(255,255,255,0.22)',
@@ -67,7 +67,7 @@ export function SwingQuickTile() {
           onMouseUp={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}
         >
           <span className="truncate">Upload swing</span>
-          <ArrowUpTrayIcon className="w-[16px] h-[16px] opacity-80 mr-[-2px] shrink-0" />
+          <ArrowUpTrayIcon className="w-[18px] h-[18px] opacity-80 mr-[-2px] shrink-0" />
         </button>
 
         {/* View swings CTA */}

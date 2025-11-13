@@ -33,7 +33,7 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
       onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
       onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.10)')}
     >
-      <div className="qa-icon" style={{ fontSize: '16px', lineHeight: 1 }} aria-hidden="true">{icon}</div>
+      <div className="qa-icon" style={{ fontSize: '20px', lineHeight: 1 }} aria-hidden="true">{icon}</div>
       <div className="qa-label" style={{ 
         display: 'flex', 
         flexDirection: 'column', 
@@ -41,8 +41,8 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
         fontWeight: 600, 
         lineHeight: 1.15 
       }}>
-        <span style={{ fontSize: '10.5px', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelTop}</span>
-        <span style={{ fontSize: '10.5px', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelBottom}</span>
+        <span style={{ fontSize: '12.5px', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelTop}</span>
+        <span style={{ fontSize: '12.5px', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelBottom}</span>
       </div>
     </button>
   );
