@@ -202,9 +202,15 @@ export function YourGamesList({
           onFindGame={!isHostingTab ? onFindGame : undefined}
         />
       ) : (
-        <div className="space-y-3">
-          {currentGames.map((game) => (
-            <div key={game.id} data-game-id={game.id}>
+        <div>
+          {currentGames.map((game, index) => (
+            <div 
+              key={game.id} 
+              data-game-id={game.id}
+              style={{
+                borderBottom: index === currentGames.length - 1 ? 'none' : undefined
+              }}
+            >
               <GameCard
                 game={toCardGame(game)}
                 variant={isHostingTab ? 'hosting' : 'joined'}

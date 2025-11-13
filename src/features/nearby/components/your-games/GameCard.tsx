@@ -4,7 +4,6 @@ import { formatExpires } from '@/lib/formatExpires';
 import { PlayerRow } from './PlayerRow';
 import { SlotsPill } from './SlotsPill';
 import { useMinuteTick } from '@/hooks/useMinuteTick';
-import { GlassCard } from '@/components/shared/GlassCard';
 
 interface GameCardProps {
   game: GameType;
@@ -59,15 +58,19 @@ export const GameCard: React.FC<GameCardProps> = ({
   const expiresLabel = formatExpires(game.expires_at);
 
   return (
-    <GlassCard
-      className="px-4 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/40"
-      interactive
-      onClick={toggle}
+    <div
+      className="yourGameCard"
+      style={{
+        background: 'transparent',
+        padding: '14px 16px 12px',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+      }}
     >
       <section
         role="button"
         aria-expanded={open}
         tabIndex={0}
+        onClick={toggle}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
@@ -228,6 +231,6 @@ export const GameCard: React.FC<GameCardProps> = ({
           </div>
         </div>
       </section>
-    </GlassCard>
+    </div>
   );
 };
