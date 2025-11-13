@@ -407,7 +407,7 @@ export function CreateGameModal({
                 ) : (
                   <>
                     <label className="findLabel">Host a game at</label>
-                    <div className="searchBox">
+                    <div className="searchBox" style={{ margin: 0 }}>
                       <Search className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
                       <input
                         placeholder="Search golf club..."
