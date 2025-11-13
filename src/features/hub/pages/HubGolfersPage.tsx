@@ -10,13 +10,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useActiveGolfers, type GolferFilters } from '@/hooks/useActiveGolfers';
 import { NearbyGolferCard } from '@/features/nearby/components/NearbyGolferCard';
-import { GolferStatusBar } from '@/features/nearby/components/GolferStatusBar';
-import { EmptyNearbyState } from '@/features/nearby/components/EmptyNearbyState';
-import { NearbySkeletonRow } from '@/features/nearby/components/NearbySkeletonRow';
-import { OpenToPlayButton } from '@/features/nearby/components/OpenToPlayButton';
-import { NearbyFilterBar } from '@/features/nearby/components/NearbyFilterBar';
 import { useVisibility } from '@/features/nearby/hooks/useVisibility';
-import { PullToRefresh } from '@/components/PullToRefresh';
 import '../home/hubTheme.css';
 
 // Mock data toggle
@@ -163,28 +157,9 @@ export function HubGolfersPage() {
   };
 
   return (
-    <div
-      className="golfers-page hub-glass-page fixed inset-0 z-[9999]"
-      style={{
-        background: 'rgba(0, 0, 0, 0.25)',
-        backdropFilter: 'blur(120px)',
-        WebkitBackdropFilter: 'blur(120px)',
-      }}
-    >
-      {/* Opaque Header */}
-      <header 
-        ref={headerRef}
-        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
-        style={{
-          borderColor: 'var(--hub-stroke)',
-          background: 'rgba(22, 24, 27, 0.98)',
-          backdropFilter: 'none',
-          WebkitBackdropFilter: 'none',
-          transition: 'all 160ms ease-out',
-          paddingTop: 'env(safe-area-inset-top, 0px)',
-          contain: 'paint',
-        }}
-      >
+    <div className="apple-glass-screen">
+      {/* Header */}
+      <header className="apple-glass-header">
         <button
           onClick={handleBack}
           className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
@@ -196,50 +171,98 @@ export function HubGolfersPage() {
         <div className="w-16" />
       </header>
 
-      {/* Content */}
-      <div ref={listRef} className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
-        <PullToRefresh onRefresh={handleRefresh}>
-          <div className="pb-6" style={{ paddingTop: '28px' }}>
-            {/* Visibility segmented control (profile visibility) - PRIMARY */}
-            <div className="px-4" style={{ marginBottom: '18px' }}>
-              <GolferStatusBar 
-                value={visibilityMode}
-                onChange={setVisibilityMode}
-              />
-            </div>
-
-            {/* Open to Play CTA - SECONDARY */}
-            <div className="px-4" style={{ marginBottom: '18px' }}>
-              <OpenToPlayButton />
-            </div>
-
-            {/* Filter Bar - TERTIARY */}
-            <div style={{ marginBottom: '28px' }}>
-              <NearbyFilterBar 
-                filters={filters}
-                onFiltersChange={setFilters}
-              />
-            </div>
-
-            {/* Golfers List */}
-            {isLoading ? (
-              <NearbySkeletonRow count={5} />
-            ) : golfers.length === 0 ? (
-              <EmptyNearbyState />
-            ) : (
-              <div className="space-y-2.5">
-                {golfers.map((golfer, index) => (
-                  <NearbyGolferCard 
-                    key={golfer.id ?? index} 
-                    golfer={golfer} 
-                    index={index} 
-                  />
-                ))}
-              </div>
-            )}
+      {/* Main Content */}
+      <main className="nearby-golfers-main">
+        <section className="apple-glass-panel nearby-golfers-panel">
+          {/* Segmented Control - Everyone / Friends / Hidden */}
+          <div className="ng-segmented">
+            <button 
+              className={`ng-segmented__item ${visibilityMode === 'all' ? 'ng-segmented__item--active' : ''}`}
+              onClick={() => setVisibilityMode('all')}
+            >
+              Everyone
+            </button>
+            <button 
+              className={`ng-segmented__item ${visibilityMode === 'friends' ? 'ng-segmented__item--active' : ''}`}
+              onClick={() => setVisibilityMode('friends')}
+            >
+              Friends
+            </button>
+            <button 
+              className={`ng-segmented__item ${visibilityMode === 'hidden' ? 'ng-segmented__item--active' : ''}`}
+              onClick={() => setVisibilityMode('hidden')}
+            >
+              Hidden
+            </button>
           </div>
-        </PullToRefresh>
-      </div>
+
+          {/* Visibility Label */}
+          <p className="ng-visibility-label">
+            {visibilityMode === 'all' && 'Visible to everyone'}
+            {visibilityMode === 'friends' && 'Visible to your friends only'}
+            {visibilityMode === 'hidden' && 'Hidden from all golfers'}
+          </p>
+
+          {/* Distance Chips */}
+          <div className="ng-distance-row">
+            <button 
+              className={`ng-chip ${filters.radiusKm === 0.5 ? 'ng-chip--active' : ''}`}
+              onClick={() => setFilters({ ...filters, radiusKm: 0.5 })}
+            >
+              500m
+            </button>
+            <button 
+              className={`ng-chip ${filters.radiusKm === 1 ? 'ng-chip--active' : ''}`}
+              onClick={() => setFilters({ ...filters, radiusKm: 1 })}
+            >
+              1km
+            </button>
+            <button 
+              className={`ng-chip ${filters.radiusKm === 3 ? 'ng-chip--active' : ''}`}
+              onClick={() => setFilters({ ...filters, radiusKm: 3 })}
+            >
+              3km
+            </button>
+          </div>
+
+          {/* Filter Row - Dropdown + Open to Play CTA */}
+          <div className="ng-filter-row">
+            <button className="ng-filter-select">
+              All Golfers
+              <span className="ng-filter-chevron">⌄</span>
+            </button>
+            <button className="ng-primary-btn">
+              Open to Play
+            </button>
+          </div>
+
+          {/* Golfers List or Empty State */}
+          {isLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="h-16 rounded-2xl bg-white/5 animate-pulse" />
+              ))}
+            </div>
+          ) : golfers.length === 0 ? (
+            <div className="ng-empty-state">
+              <p className="ng-empty-title">No golfers nearby</p>
+              <p className="ng-empty-subtitle">
+                Check back soon to see who's nearby.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {golfers.map((golfer, index) => (
+                <NearbyGolferCard 
+                  key={golfer.id ?? index} 
+                  golfer={golfer} 
+                  index={index} 
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      </main>
     </div>
   );
 }
