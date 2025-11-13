@@ -37,11 +37,14 @@ export function HubGamesPage() {
         WebkitBackdropFilter: 'blur(120px)',
       }}
     >
-      {/* Simple header */}
-      <header className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
+      {/* Header */}
+      <header 
+        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
         style={{
-          borderColor: 'rgba(255,255,255,0.1)',
-          background: 'rgba(0,0,0,0.2)',
+          borderColor: 'var(--hub-stroke)',
+          background: 'rgba(22, 24, 27, 0.98)',
+          backdropFilter: 'none',
+          WebkitBackdropFilter: 'none',
           paddingTop: 'env(safe-area-inset-top, 0px)',
         }}
       >
