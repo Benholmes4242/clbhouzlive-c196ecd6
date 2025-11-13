@@ -4,7 +4,7 @@
  */
 
 import { useRef, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { edgePost } from '@/utils/callEdge';
 import type { EchoMessage } from '../state/echoTypes';
 
 interface StreamOptions {
@@ -33,48 +33,27 @@ export function useAIStream() {
       const t0 = performance.now();
 
       try {
-        // Extract the last message as the current user message
-        const last = messages[messages.length - 1];
-        
-        if (!last || last.role !== 'user') {
-          throw new Error('Missing user message');
-        }
-
-        // Everything before the last message is the conversation history
-        const conversation = messages.slice(0, -1).map((m) => ({
-          role: m.role,
-          content: m.content,
-        }));
-
-        // Get timezone
-        const timezone =
-          typeof Intl !== 'undefined'
-            ? Intl.DateTimeFormat().resolvedOptions().timeZone
-            : 'UTC';
-
-        const { data, error } = await supabase.functions.invoke('clbhouz-pro-ai', {
-          body: {
-            message: last.content,
-            conversation,
-            mode: 'chat',
-            isEcho: true,
-            timezone,
-          },
+        const data = await edgePost('clbhouz-pro-ai', {
+          messages: messages.map(m => ({ role: m.role, content: m.content })),
+          conversation_id: conversationId,
+          stream: true,
+          mode: 'chat',
         });
 
-        if (error) {
-          throw new Error(error.message || 'Echo request failed');
+        // Handle streaming response
+        if (data && typeof data === 'object' && 'text' in data) {
+          // Non-streaming response (fallback)
+          options.onChunk(data.text as string);
+          const latency = performance.now() - t0;
+          options.onComplete({ latency });
+        } else if (data && typeof data === 'string') {
+          // Streamed response came through as string
+          options.onChunk(data);
+          const latency = performance.now() - t0;
+          options.onComplete({ latency });
+        } else {
+          throw new Error('Unexpected response format');
         }
-
-        // Expecting `{ text: string }` from the function
-        if (!data || typeof data.text !== 'string') {
-          throw new Error('Unexpected Echo response');
-        }
-
-        // Send the complete response
-        options.onChunk(data.text);
-        const latency = performance.now() - t0;
-        options.onComplete({ latency });
       } catch (error: any) {
         if (error.name === 'AbortError') {
           console.log('[AIStream] Request aborted');
