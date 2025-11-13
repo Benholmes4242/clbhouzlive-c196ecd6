@@ -57,4 +57,5 @@ export const mockGolfers = Array.from({ length: 15 }, (_, i) => ({
   latitude: 51.4 + Math.random() * 0.02,
   longitude: -0.6 + Math.random() * 0.02,
   updated_at: new Date().toISOString(),
+  same_club: i < 2, // First two golfers have same club badge
 }));
