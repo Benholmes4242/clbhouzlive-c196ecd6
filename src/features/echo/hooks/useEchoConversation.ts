@@ -14,25 +14,7 @@ export function useEchoConversation() {
   const [streamingContent, setStreamingContent] = useState('');
   const { sendMessage: sendToAI, abort } = useAIStream();
 
-  // Load messages from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem('echo-current-conversation');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setMessages(parsed);
-      } catch (e) {
-        console.error('Failed to load conversation:', e);
-      }
-    }
-  }, []);
-
-  // Save messages to localStorage
-  useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem('echo-current-conversation', JSON.stringify(messages));
-    }
-  }, [messages]);
+  // No localStorage persistence - fresh conversation each time
 
   const sendMessage = useCallback(async (content: string) => {
     const userMessage: EchoMessage = {
@@ -96,11 +78,18 @@ export function useEchoConversation() {
     setStreamingContent('');
   }, [abort]);
 
+  const resetConversation = useCallback(() => {
+    setMessages([]);
+    setStreamingContent('');
+    setIsStreaming(false);
+  }, []);
+
   return {
     messages,
     sendMessage,
     isStreaming,
     streamingContent,
     abortStream,
+    resetConversation,
   };
 }
