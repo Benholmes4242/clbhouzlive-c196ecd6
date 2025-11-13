@@ -23,11 +23,13 @@ export function HubHomePage() {
   // Mark hub-open on html while mounted
   useEffect(() => {
     document.documentElement.classList.add('hub-open');
+    document.body.classList.add('hub-open');
     // Trigger animation
     setTimeout(() => setIsAnimating(false), 10);
     
     return () => {
       document.documentElement.classList.remove('hub-open');
+      document.body.classList.remove('hub-open');
     };
   }, []);
 
