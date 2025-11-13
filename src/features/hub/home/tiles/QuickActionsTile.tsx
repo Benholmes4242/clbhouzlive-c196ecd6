@@ -70,6 +70,7 @@ export function QuickActionsTile() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          padding: '0 20px',
         }}
       >
         <div 
@@ -79,6 +80,7 @@ export function QuickActionsTile() {
             gridTemplateColumns: '1fr 1fr',
             gap: '10px',
             width: '100%',
+            maxWidth: '240px',
           }}
         >
           <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />
