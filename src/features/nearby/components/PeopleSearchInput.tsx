@@ -131,40 +131,39 @@ export function PeopleSearchInput({ selectedUser, onSelect }: PeopleSearchInputP
                       placeholder="Type golfer name..."
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
-                      className="w-full h-9 pl-10 pr-3 rounded-lg text-sm outline-none"
+                      className="w-full h-10 pl-10 pr-4 rounded-[14px] text-[15px] transition-colors"
                       style={{
-                        background: 'rgba(255,255,255,0.04)',
-                        border: '1px solid rgba(255,255,255,0.06)',
+                        background: 'rgba(255,255,255,0.06)',
+                        border: '1px solid rgba(255,255,255,0.08)',
                         color: 'var(--hub-text)',
+                        outline: 'none',
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
                       }}
                     />
                   </div>
                 </div>
 
                 <div className="max-h-64 overflow-y-auto">
-                  {query.length < 2 ? (
-                    <div className="px-4 py-3 text-sm" style={{ color: 'var(--hub-text-muted)' }}>
-                      Type at least 2 characters
-                    </div>
-                  ) : isLoading ? (
-                    <div className="px-4 py-3 text-sm" style={{ color: 'var(--hub-text-muted)' }}>
+                  {isLoading ? (
+                    <div className="px-4 py-8 text-center text-sm" style={{ color: 'var(--hub-text-dim)' }}>
                       Searching...
                     </div>
-                  ) : results.length === 0 ? (
-                    <div className="px-4 py-3 text-sm" style={{ color: 'var(--hub-text-muted)' }}>
-                      No golfers found
-                    </div>
-                  ) : (
+                  ) : results.length > 0 ? (
                     results.map(user => (
                       <button
                         key={user.id}
                         onClick={() => handleSelect(user)}
-                        className="w-full px-4 py-2.5 flex items-center gap-3 transition-colors text-left"
+                        className="w-full px-4 py-3 flex items-center gap-3 transition-colors text-left"
                         style={{
-                          borderTop: '1px solid rgba(255,255,255,0.06)',
+                          borderBottom: '1px solid rgba(255,255,255,0.06)',
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+                          e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.background = 'transparent';
@@ -173,7 +172,7 @@ export function PeopleSearchInput({ selectedUser, onSelect }: PeopleSearchInputP
                         <img 
                           src={user.profile_photo_url || '/placeholder.svg'} 
                           alt={user.display_name}
-                          className="w-9 h-9 rounded-full object-cover"
+                          className="w-9 h-9 rounded-full object-cover flex-shrink-0"
                         />
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-medium truncate" style={{ color: 'var(--hub-text)' }}>
@@ -185,6 +184,14 @@ export function PeopleSearchInput({ selectedUser, onSelect }: PeopleSearchInputP
                         </div>
                       </button>
                     ))
+                  ) : query.length >= 2 ? (
+                    <div className="px-4 py-8 text-center text-sm" style={{ color: 'var(--hub-text-dim)' }}>
+                      No golfers found
+                    </div>
+                  ) : (
+                    <div className="px-4 py-8 text-center text-sm" style={{ color: 'var(--hub-text-dim)' }}>
+                      Type at least 2 characters
+                    </div>
                   )}
                 </div>
               </div>
