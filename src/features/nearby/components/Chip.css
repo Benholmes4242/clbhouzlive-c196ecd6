@@ -1,16 +1,15 @@
 .chip {
-  height: 36px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.05);
-  color: rgba(255,255,255,0.85);
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--hub-stroke);
+  background: var(--hub-glass);
+  color: var(--hub-text);
   padding: 0 12px;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background 120ms ease, border-color 120ms ease, transform 60ms ease;
+  font-weight: 600;
+  transition: transform 0.06s ease, background 0.12s;
   touch-action: manipulation;
   white-space: nowrap;
 }
@@ -20,9 +19,8 @@
 }
 
 .chip.is-active {
-  background: rgba(255,255,255,0.18);
-  border-color: rgba(255,255,255,0.24);
-  color: rgba(255,255,255,1);
+  background: var(--hub-glass-hover);
+  border-color: var(--hub-stroke-mid);
 }
 
 .chipIcon {
@@ -36,6 +34,6 @@
 }
 
 .chipValue {
-  color: #9aa0a6;
+  color: var(--hub-text-sub);
   white-space: nowrap;
 }
