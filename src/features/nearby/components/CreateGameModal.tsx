@@ -275,19 +275,15 @@ export function CreateGameModal({
   };
 
 
-  // Hub mode uses same glass as HubGolfersPage
-  const containerStyle = hubMode ? {
+  // Both hub and standard mode use same environment
+  const containerStyle = {
     background: 'rgba(0, 0, 0, 0.25)',
     backdropFilter: 'blur(120px)',
     WebkitBackdropFilter: 'blur(120px)',
-  } : {
-    backgroundColor: 'rgba(0,0,0,0)',
-    backdropFilter: 'blur(8px)',
-    WebkitBackdropFilter: 'blur(8px)',
   };
 
-  const modalStyle = hubMode ? {
-    height: '100vh',
+  const modalStyle = {
+    height: hubMode ? '100vh' : 'calc(100vh - env(safe-area-inset-top))',
     maxHeight: '100vh',
     pointerEvents: 'auto' as const,
     overscrollBehavior: 'contain' as const,
@@ -295,19 +291,8 @@ export function CreateGameModal({
     backdropFilter: 'none',
     WebkitBackdropFilter: 'none',
     border: 'none',
-    borderRadius: '0',
+    borderRadius: 0,
     boxShadow: 'none',
-  } : {
-    height: 'calc(100vh - env(safe-area-inset-top))',
-    maxHeight: '100vh',
-    pointerEvents: 'auto' as const,
-    overscrollBehavior: 'contain' as const,
-    background: 'rgba(15, 15, 15, 0.75)',
-    backdropFilter: 'blur(40px)',
-    WebkitBackdropFilter: 'blur(40px)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
-    borderRadius: '0',
-    boxShadow: '0 30px 80px rgba(0, 0, 0, 0.9)',
   };
 
   return (
@@ -331,12 +316,13 @@ export function CreateGameModal({
       
       {/* Modal */}
       <div 
-        className="relative w-full max-w-lg flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-200"
+        className="relative w-full max-w-lg px-4 animate-in slide-in-from-bottom-4 duration-200"
         style={modalStyle}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="px-5 pt-4 pb-5">
+        <div className="hub-glass-panel flex flex-col overflow-hidden">
+          {/* Header */}
+          <div className="px-4 pt-4 pb-4">
           {/* Title + Close */}
           <div className="grid grid-cols-3 items-center mb-3" style={{ userSelect: 'none' }}>
             {/* Left spacer */}
@@ -362,7 +348,7 @@ export function CreateGameModal({
           </div>
           
           {/* Subtitle */}
-          <p className="text-[14px] text-white/60 text-center mt-4">
+          <p className="text-[13px] text-white/60 text-center mt-4">
             Let nearby golfers know you're looking to play
           </p>
         </div>
@@ -372,7 +358,7 @@ export function CreateGameModal({
 
         {/* Content */}
         <div 
-          className="flex-1 overflow-y-auto px-5 pt-4 pb-6 space-y-5"
+          className="flex-1 overflow-y-auto px-4 pt-4 pb-6 space-y-4"
           style={{
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',
@@ -382,9 +368,10 @@ export function CreateGameModal({
           <>
             {/* Game Type */}
               <div className="space-y-2">
-                <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
+                <h3 className="text-[15px] font-semibold text-white/90 tracking-[-0.01em]">
                   Game type
                 </h3>
+                <p className="text-[13px] text-white/60">Choose your format</p>
                 <Segmented
                   ariaLabel="Game type"
                   columns={2}
@@ -500,9 +487,10 @@ export function CreateGameModal({
 
               {/* Timing */}
               <div className="space-y-2">
-                <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
+                <h3 className="text-[15px] font-semibold text-white/90 tracking-[-0.01em]">
                   📅 When
                 </h3>
+                <p className="text-[13px] text-white/60">Choose your tee time</p>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   {TIMING_OPTIONS.map(option => (
                     <Chip
@@ -523,7 +511,7 @@ export function CreateGameModal({
               {/* Tag Players */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
+                  <h3 className="text-[15px] font-semibold text-white/90 tracking-[-0.01em]">
                     Tag players (optional)
                   </h3>
                   <div className="text-xs text-white/50">
@@ -541,9 +529,10 @@ export function CreateGameModal({
               {/* Available Slots */}
               {maxAvailableSlots > 0 && (
                 <div className="space-y-2">
-                  <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
+                  <h3 className="text-[15px] font-semibold text-white/90 tracking-[-0.01em]">
                     Available slots
                   </h3>
+                  <p className="text-[13px] text-white/60">Spots open for joining</p>
                   <Segmented
                     ariaLabel="Available slots"
                     columns={3}
@@ -578,7 +567,7 @@ export function CreateGameModal({
               <TapButton
                 onClick={handleSubmit}
                 disabled={!gameType || !courseId || isSubmitting}
-                className="w-full h-[56px] rounded-2xl bg-white/[0.08] border border-white/10 py-[10px] text-[15px] font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:bg-white/[0.12] active:scale-[0.98] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="hub-btn-primary w-full"
                 style={{ 
                   userSelect: 'none', 
                   WebkitTapHighlightColor: 'transparent', 
@@ -589,6 +578,7 @@ export function CreateGameModal({
                 {isSubmitting ? 'Creating…' : 'Create Game'}
               </TapButton>
             </>
+          </div>
         </div>
       </div>
     </div>
