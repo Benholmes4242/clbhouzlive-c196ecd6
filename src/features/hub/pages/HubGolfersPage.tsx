@@ -163,41 +163,65 @@ export function HubGolfersPage() {
   };
 
   return (
-    <div
-      className="golfers-page hub-glass-page fixed inset-0 z-[9999]"
-      style={{
-        background: 'rgba(0, 0, 0, 0.25)',
-        backdropFilter: 'blur(120px)',
-        WebkitBackdropFilter: 'blur(120px)',
-      }}
-    >
-      {/* Transparent Header */}
-      <header 
-        ref={headerRef}
-        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
+    <>
+      {/* Environment Layer - Same as Hub */}
+      <div
+        className="hub-environment-layer"
         style={{
-          borderColor: 'var(--hub-stroke)',
-          background: 'transparent',
-          backdropFilter: 'none',
-          WebkitBackdropFilter: 'none',
-          transition: 'all 160ms ease-out',
-          paddingTop: 'env(safe-area-inset-top, 0px)',
-          contain: 'paint',
+          position: 'fixed',
+          inset: 0,
+          zIndex: 900,
+          background: 'rgba(0, 0, 0, 0.82)',
+          backdropFilter: 'saturate(0.8)',
+          WebkitBackdropFilter: 'saturate(0.8)',
+          opacity: 1,
+          pointerEvents: 'none',
         }}
       >
-        <button
-          onClick={handleBack}
-          className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
-          aria-label="Back to Hub"
-        >
-          ‹ Back
-        </button>
-        <h1 className="text-white/90 text-[17px] font-semibold">Golfers</h1>
-        <div className="w-16" />
-      </header>
+        {/* Vignette overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            background: 'radial-gradient(circle at center, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.25) 55%, rgba(0, 0, 0, 0.45) 100%)',
+          }}
+        />
+      </div>
 
-      {/* Content */}
-      <div ref={listRef} className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
+      {/* Content Container */}
+      <div
+        className="golfers-page fixed inset-0"
+        style={{
+          zIndex: 910,
+        }}
+      >
+        {/* Header - Transparent like Hub */}
+        <header 
+          ref={headerRef}
+          className="fixed top-0 left-0 right-0 flex items-center justify-between px-4 h-14"
+          style={{
+            zIndex: 10,
+            background: 'transparent',
+            backdropFilter: 'none',
+            WebkitBackdropFilter: 'none',
+            transition: 'all 160ms ease-out',
+            paddingTop: 'env(safe-area-inset-top, 0px)',
+          }}
+        >
+          <button
+            onClick={handleBack}
+            className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
+            aria-label="Back to Hub"
+          >
+            ‹ Back
+          </button>
+          <h1 className="text-white/90 text-[17px] font-semibold">Golfers</h1>
+          <div className="w-16" />
+        </header>
+
+        {/* Content */}
+        <div ref={listRef} className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
         <PullToRefresh onRefresh={handleRefresh}>
           <div className="pb-6" style={{ paddingTop: '28px' }}>
             {/* Visibility segmented control (profile visibility) - PRIMARY */}
@@ -239,7 +263,8 @@ export function HubGolfersPage() {
             )}
           </div>
         </PullToRefresh>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
