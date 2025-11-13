@@ -138,8 +138,13 @@ export function UserSearchTypeahead({
       {/* Search input */}
       {remainingSlots > 0 && (
         <div className="relative">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <div className="relative flex items-center gap-10px rounded-[14px] px-4 py-3 transition-colors"
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            <Search className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
             <input
               ref={searchInputRef}
               type="text"
@@ -154,7 +159,10 @@ export function UserSearchTypeahead({
               onFocus={() => {
                 if (searchTerm.trim() || results.length > 0) setShowDropdown(true);
               }}
-              className="w-full pl-10 pr-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-white/20"
+              className="flex-1 bg-transparent border-0 outline-none text-[15px] placeholder:opacity-60"
+              style={{
+                color: 'var(--hub-text)',
+              }}
             />
           </div>
 
@@ -165,11 +173,26 @@ export function UserSearchTypeahead({
                 className="fixed inset-0 z-10"
                 onClick={() => setShowDropdown(false)}
               />
-              <div className="absolute z-20 w-full mt-1 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl max-h-64 overflow-y-auto backdrop-blur-xl">
+              <div className="absolute z-20 w-full mt-2 rounded-[14px] shadow-2xl max-h-64 overflow-y-auto backdrop-blur-xl"
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}
+              >
                 {/* Add Guest option - ALWAYS pinned at top, regardless of search state */}
                 <button
                   onClick={handleAddGuest}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-neutral-800 transition-colors border-b border-neutral-800 bg-white/5"
+                  className="w-full flex items-center gap-3 px-4 py-3 transition-colors"
+                  style={{
+                    borderBottom: '1px solid rgba(255,255,255,0.06)',
+                    background: 'rgba(255,255,255,0.05)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                  }}
                 >
                   <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
                     <UserPlus className="w-4 h-4 text-white/70" />
@@ -184,7 +207,12 @@ export function UserSearchTypeahead({
                 
                 {/* Loading indicator */}
                 {isSearching && (
-                  <div className="px-4 py-3 text-sm text-white/60 text-center border-b border-neutral-800">
+                  <div className="px-4 py-3 text-sm text-center"
+                    style={{
+                      color: 'var(--hub-text-dim)',
+                      borderBottom: '1px solid rgba(255,255,255,0.06)',
+                    }}
+                  >
                     Searching for users...
                   </div>
                 )}
@@ -194,7 +222,16 @@ export function UserSearchTypeahead({
                   <button
                     key={user.id}
                     onClick={() => handleUserSelect(user)}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-neutral-800 transition-colors border-b border-neutral-800 last:border-b-0"
+                    className="w-full flex items-center gap-3 px-4 py-3 transition-colors last:border-b-0"
+                    style={{
+                      borderBottom: '1px solid rgba(255,255,255,0.06)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                    }}
                   >
                     <div className="w-8 h-8 rounded-full overflow-hidden bg-neutral-700/50 flex items-center justify-center shrink-0">
                       {user.profile_photo_url ? (
@@ -218,7 +255,9 @@ export function UserSearchTypeahead({
                 
                 {/* No user results message - only show when search complete */}
                 {!isSearching && results.length === 0 && (
-                  <div className="px-4 py-3 text-sm text-white/60 text-center">
+                  <div className="px-4 py-3 text-sm text-center"
+                    style={{ color: 'var(--hub-text-dim)' }}
+                  >
                     No users found matching "{searchTerm}"
                   </div>
                 )}

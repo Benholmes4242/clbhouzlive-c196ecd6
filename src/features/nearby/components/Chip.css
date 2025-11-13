@@ -19,8 +19,9 @@
 }
 
 .chip.is-active {
-  background: var(--hub-glass-hover);
-  border-color: var(--hub-stroke-mid);
+  background: linear-gradient(to bottom right, #6E9277, #89A78C);
+  border-color: transparent;
+  color: white;
 }
 
 .chipIcon {
