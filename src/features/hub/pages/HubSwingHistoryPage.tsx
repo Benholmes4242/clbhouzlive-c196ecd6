@@ -64,11 +64,13 @@ export function HubSwingHistoryPage() {
         WebkitBackdropFilter: 'blur(120px)',
       }}
     >
-      {/* Simple Header */}
+      {/* Header */}
       <header className="sticky top-0 z-10 flex items-center justify-between px-4 h-14 border-b"
         style={{
-          borderColor: 'rgba(255,255,255,0.1)',
-          background: 'rgba(0,0,0,0.2)',
+          borderColor: 'var(--hub-stroke)',
+          background: 'rgba(22, 24, 27, 0.98)',
+          backdropFilter: 'none',
+          WebkitBackdropFilter: 'none',
         }}
       >
         <button
@@ -83,44 +85,58 @@ export function HubSwingHistoryPage() {
       </header>
 
       {/* Content */}
-      <div className="overflow-y-auto h-[calc(100vh-3.5rem)] px-4 pt-4">
-        <div className="space-y-4 pb-6">
-          <div className="hub-card">
-            <div className="hub-card-title">Recent swings</div>
+      <div className="overflow-y-auto h-[calc(100vh-3.5rem)]" style={{ paddingTop: '28px' }}>
+        <div className="pb-6">
+          {isLoading && (
+            <div>
+              {[0,1,2,3,4].map(i => (
+                <div 
+                  key={i} 
+                  className="hub-skel-row"
+                  style={{
+                    padding: '14px 16px 12px',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+                  }}
+                />
+              ))}
+            </div>
+          )}
 
-            {isLoading && (
-              <div className="hub-list">
-                {[0,1,2,3,4].map(i => <div key={i} className="hub-skel-row" />)}
-              </div>
-            )}
+          {!isLoading && error && (
+            <div className="hub-msg" style={{ padding: '14px 16px 12px' }}>
+              Couldn't load swing history. Please try again.
+            </div>
+          )}
 
-            {!isLoading && error && (
-              <div className="hub-msg">Couldn't load swing history. Please try again.</div>
-            )}
-
-            {!isLoading && !error && (
-              <div className="hub-list">
-                {items.length === 0 && (
-                  <div className="hub-msg">No swing videos yet — upload one to get started.</div>
-                )}
-                {items.map(item => (
-                  <button
-                    key={item.id}
-                    className="hub-row swing-row"
-                    onClick={() => nav(`/hub/swing/history/${item.id}`, { state: loc.state })}
-                    aria-label="Open swing analysis"
-                  >
-                    <Thumb src={item.thumbnail_url} />
-                    <div className="hub-row-main">
-                      <div className="hub-row-title">{item.title || 'Swing analysis'}</div>
-                      <div className="hub-row-sub">{formatRelativeTime(item.created_at)}</div>
-                    </div>
-                    <div className="hub-row-trailing">›</div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          {!isLoading && !error && (
+            <div>
+              {items.length === 0 && (
+                <div className="hub-msg" style={{ padding: '14px 16px 12px' }}>
+                  No swing videos yet — upload one to get started.
+                </div>
+              )}
+              {items.map((item, index) => (
+                <button
+                  key={item.id}
+                  className="hub-row swing-row"
+                  style={{
+                    background: 'transparent',
+                    padding: '14px 16px 12px',
+                    borderBottom: index === items.length - 1 ? 'none' : '1px solid rgba(255, 255, 255, 0.12)',
+                  }}
+                  onClick={() => nav(`/hub/swing/history/${item.id}`, { state: loc.state })}
+                  aria-label="Open swing analysis"
+                >
+                  <Thumb src={item.thumbnail_url} />
+                  <div className="hub-row-main">
+                    <div className="hub-row-title">{item.title || 'Swing analysis'}</div>
+                    <div className="hub-row-sub">{formatRelativeTime(item.created_at)}</div>
+                  </div>
+                  <div className="hub-row-trailing">›</div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
