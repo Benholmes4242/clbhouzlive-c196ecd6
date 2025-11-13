@@ -72,7 +72,7 @@ export function HubHomePage() {
           zIndex: 910,
           display: 'flex',
           flexDirection: 'column',
-          padding: '16px 16px 24px',
+          padding: '16px',
           pointerEvents: 'none',
         }}
       >
@@ -114,38 +114,50 @@ export function HubHomePage() {
           className="w-full overflow-hidden flex-1"
           style={{ pointerEvents: 'auto' }}
         >
-          <div className="flex flex-col gap-3.5 h-full">
-            {/* Top 2×2 grid */}
+          <div className="flex flex-col h-full">
+            {/* Top 2×2 grid - Fixed */}
             <div
-              className="grid"
-              style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem', gridAutoRows: 'var(--hub-tile-fixed-h)' }}
+              className="mb-4"
+              style={{ flex: '0 0 auto' }}
             >
-              <div className="hub-tile-fixed hub-floating-card">
-                <NearbyGolfersTile />
-              </div>
-              <div className="hub-tile-fixed hub-floating-card">
-                <EchoTile />
+              <div
+                className="grid"
+                style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem', gridAutoRows: 'var(--hub-tile-fixed-h)' }}
+              >
+                <div className="hub-tile-fixed hub-floating-card">
+                  <NearbyGolfersTile />
+                </div>
+                <div className="hub-tile-fixed hub-floating-card">
+                  <EchoTile />
+                </div>
               </div>
             </div>
 
-            {/* Your Games */}
-            <div className="hub-floating-card" style={{ minHeight: '320px' }}>
+            {/* Your Games - Flexible */}
+            <div 
+              className="hub-floating-card mb-4" 
+              style={{ flex: '1 1 auto', minHeight: '200px', overflow: 'hidden' }}
+            >
               <YourGamesTile />
             </div>
 
-            {/* Bottom 2×2 grid */}
+            {/* Bottom 2×2 grid - Fixed at bottom */}
             <div
-              className="grid"
-              style={{ 
-                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
-                gap: '0.875rem',
-              }}
+              style={{ flex: '0 0 auto' }}
             >
-              <div className="hub-tile-square hub-floating-card">
-                <SwingQuickTile />
-              </div>
-              <div className="hub-tile-square hub-floating-card">
-                <QuickActionsTile />
+              <div
+                className="grid"
+                style={{ 
+                  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
+                  gap: '0.875rem',
+                }}
+              >
+                <div className="hub-tile-square hub-floating-card">
+                  <SwingQuickTile />
+                </div>
+                <div className="hub-tile-square hub-floating-card">
+                  <QuickActionsTile />
+                </div>
               </div>
             </div>
           </div>
