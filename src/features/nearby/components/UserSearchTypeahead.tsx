@@ -3,6 +3,7 @@ import { Search, X, UserPlus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import HcpBadge from '@/components/HcpBadge';
+import '../GamesTab.css'; // Import for resultsSheet and resultRow styles
 
 interface UserProfile {
   id: string;
@@ -166,48 +167,25 @@ export function UserSearchTypeahead({
                 className="fixed inset-0 z-10"
                 onClick={() => setShowDropdown(false)}
               />
-              <div className="absolute z-20 w-full mt-2 rounded-[14px] shadow-2xl max-h-64 overflow-y-auto backdrop-blur-xl"
-                style={{
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                }}
-              >
-                {/* Add Guest option - ALWAYS pinned at top, regardless of search state */}
+              <div className="resultsSheet">
+                {/* Add Guest option - ALWAYS pinned at top */}
                 <button
                   onClick={handleAddGuest}
-                  className="w-full flex items-center gap-3 px-4 py-3 transition-colors"
-                  style={{
-                    borderBottom: '1px solid rgba(255,255,255,0.06)',
-                    background: 'rgba(255,255,255,0.05)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                  }}
+                  className="resultRow"
+                  style={{ marginBottom: '8px' }}
                 >
                   <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
                     <UserPlus className="w-4 h-4 text-white/70" />
                   </div>
-                  <div className="flex-1 text-left">
-                    <div className="text-white text-sm font-medium">
-                      ➕ Add Guest
-                    </div>
-                    <div className="text-white/60 text-xs">Add an unnamed player</div>
+                  <div className="rMid">
+                    <div className="rTitle">➕ Add Guest</div>
+                    <div className="rSub">Add an unnamed player</div>
                   </div>
                 </button>
                 
                 {/* Loading indicator */}
                 {isSearching && (
-                  <div className="px-4 py-3 text-sm text-center"
-                    style={{
-                      color: 'var(--hub-text-dim)',
-                      borderBottom: '1px solid rgba(255,255,255,0.06)',
-                    }}
-                  >
-                    Searching for users...
-                  </div>
+                  <div className="hint">Searching for users...</div>
                 )}
                 
                 {/* User results - only show when not searching */}
@@ -215,16 +193,7 @@ export function UserSearchTypeahead({
                   <button
                     key={user.id}
                     onClick={() => handleUserSelect(user)}
-                    className="w-full flex items-center gap-3 px-4 py-3 transition-colors last:border-b-0"
-                    style={{
-                      borderBottom: '1px solid rgba(255,255,255,0.06)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'transparent';
-                    }}
+                    className="resultRow"
                   >
                     <div className="w-8 h-8 rounded-full overflow-hidden bg-neutral-700/50 flex items-center justify-center shrink-0">
                       {user.profile_photo_url ? (
@@ -233,43 +202,28 @@ export function UserSearchTypeahead({
                         <span className="text-primary font-semibold text-sm">{user.display_name[0]}</span>
                       )}
                     </div>
-                    <div className="flex-1 text-left">
-                      <div className="flex items-center gap-2 text-white text-sm font-medium">
+                    <div className="rMid">
+                      <div className="rTitle flex items-center gap-2">
                         <span>{user.display_name}</span>
                         <HcpBadge value={user.eg_handicap_index} show={user.show_handicap ?? true} className="text-white/60" />
                       </div>
                       {user.username && (
-                        <div className="text-white/60 text-xs">@{user.username}</div>
+                        <div className="rSub">@{user.username}</div>
                       )}
                     </div>
                     <UserPlus className="w-4 h-4 text-white/40" />
                   </button>
                 ))}
                 
-                {/* No user results message - only show when search complete */}
+                {/* No results message */}
                 {!isSearching && results.length === 0 && (
-                  <div className="px-4 py-3 text-sm text-center"
-                    style={{ color: 'var(--hub-text-dim)' }}
-                  >
-                    No users found matching "{searchTerm}"
-                  </div>
+                  <div className="hint">No users found matching "{searchTerm}"</div>
                 )}
               </div>
             </>
           )}
 
-          {/* No results */}
-          {showDropdown && !isSearching && searchTerm && results.length === 0 && (
-            <>
-              <div
-                className="fixed inset-0 z-10"
-                onClick={() => setShowDropdown(false)}
-              />
-              <div className="absolute z-20 w-full mt-1 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl backdrop-blur-xl p-4">
-                <p className="text-sm text-white/60 text-center">No users found</p>
-              </div>
-            </>
-          )}
+          {/* Removed duplicate no results section */}
         </div>
       )}
     </div>
