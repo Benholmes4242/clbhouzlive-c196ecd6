@@ -6,7 +6,6 @@ import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AIChatOverlay from '@/components/ai-chat/AIChatOverlay';
 import { Z } from '@/config/zIndex';
-import { AppleGlassScreen, AppleGlassHeader } from '../components/AppleGlassScreen';
 import '../home/hubTheme.css';
 
 export function HubEchoChatPage() {
@@ -29,11 +28,42 @@ export function HubEchoChatPage() {
   };
 
   return (
-    <AppleGlassScreen>
-      <AppleGlassHeader onBack={handleBack} title="Echo" />
+    <div
+      className="hub-glass-page fixed inset-0 flex flex-col"
+      style={{
+        zIndex: Z.page,
+        background: 'rgba(0, 0, 0, 0.25)',
+        backdropFilter: 'blur(120px)',
+        WebkitBackdropFilter: 'blur(120px)',
+      }}
+    >
+      {/* Header - matches golfers page styling */}
+      <header 
+        className="fixed top-0 left-0 right-0 flex items-center justify-between px-4 h-14 border-b"
+        style={{
+          zIndex: Z.pageHeader,
+          borderColor: 'var(--hub-stroke)',
+          background: 'rgba(22, 24, 27, 0.98)',
+          backdropFilter: 'none',
+          WebkitBackdropFilter: 'none',
+          transition: 'all 160ms ease-out',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          contain: 'paint',
+        }}
+      >
+        <button
+          onClick={handleBack}
+          className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
+          aria-label="Back to Hub"
+        >
+          ‹ Back
+        </button>
+        <h1 className="text-white/90 text-[17px] font-semibold">Echo</h1>
+        <div className="w-16" />
+      </header>
 
       {/* Echo Chat - using existing system in pane mode */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
         <AIChatOverlay
           isOpen={true}
           onClose={() => {}}
@@ -42,6 +72,6 @@ export function HubEchoChatPage() {
           layout="page"
         />
       </div>
-    </AppleGlassScreen>
+    </div>
   );
 }

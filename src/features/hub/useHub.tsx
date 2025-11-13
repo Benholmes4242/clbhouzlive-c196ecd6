@@ -24,7 +24,7 @@ export function HubProvider({ children }: { children: React.ReactNode }) {
   const navigateFromHub = (to: string) => {
     const backgroundLocation = (loc.state as any)?.backgroundLocation || loc;
     // Navigate to target page as an overlay over origin (not over Hub)
-    nav(to, { state: { backgroundLocation } });
+    nav(to, { state: { backgroundLocation, fromHub: true } });
   };
 
   return (
