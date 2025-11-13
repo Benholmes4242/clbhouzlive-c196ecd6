@@ -9,12 +9,25 @@ import { useSwingHistory } from '@/features/echo/hooks/useSwingHistory';
 import { formatRelativeTime } from '@/utils/dateFormat';
 
 function Thumb({ src }: { src?: string | null }) {
-  const [ready, setReady] = React.useState(!src); // If no src, show fallback immediately
+  const [ready, setReady] = React.useState(!src);
   const [error, setError] = React.useState(false);
 
   return (
-    <div className="thumb">
-      {!ready && <div className="shimmer thumb" aria-hidden="true" />}
+    <div 
+      className="thumb"
+      style={{
+        width: '52px',
+        height: '52px',
+        borderRadius: '8px',
+        overflow: 'hidden',
+        flexShrink: 0,
+        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {!ready && <div className="shimmer" style={{ width: '100%', height: '100%' }} aria-hidden="true" />}
       {src ? (
         <img
           src={src}
@@ -22,11 +35,16 @@ function Thumb({ src }: { src?: string | null }) {
           loading="lazy"
           onLoad={() => setReady(true)}
           onError={() => { setError(true); setReady(true); }}
-          style={{ display: ready && !error ? 'block' : 'none' }}
+          style={{ 
+            display: ready && !error ? 'block' : 'none',
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
         />
       ) : null}
       {(error || !src) && ready && (
-        <div className="thumb-fallback">
+        <div style={{ fontSize: '24px' }}>
           🏌️‍♂️
         </div>
       )}
