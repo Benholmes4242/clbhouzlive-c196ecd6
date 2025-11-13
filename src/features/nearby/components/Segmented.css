@@ -1,16 +1,17 @@
 .segRow {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .seg {
-  height: 44px;
-  border-radius: 12px;
-  border: 1px solid #242424;
-  background: #141414;
-  color: #e9e9e9;
-  font-weight: 600;
-  transition: transform 0.06s ease, background 0.12s, border-color 0.12s;
+  height: 40px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.85);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 120ms ease, border-color 120ms ease, transform 60ms ease;
   touch-action: manipulation;
 }
 
@@ -19,9 +20,9 @@
 }
 
 .seg.is-active {
-  background: #1c1e1c;
-  border-color: #353535;
-  box-shadow: inset 0 0 0 1px #353535;
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.24);
+  color: rgba(255,255,255,1);
 }
 
 .seg:disabled {
