@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
+import { Search, MapPin, Calendar, ArrowUpDown } from 'lucide-react';
 import { useCourseSearch, GolfCourse } from '@/features/nearby/hooks/useCourseSearch';
 import { useGameFilters } from './hooks/useGameFilters';
 import { useGamesQuery } from './hooks/useGamesQuery';
@@ -71,7 +72,7 @@ function FindAGame({
             onSearchModeChange('clubs');
           }}
         >
-          🏌️ Clubs
+          Clubs
         </TapButton>
         <TapButton
           className={`modeChip ${searchMode === 'people' ? 'modeChip--active' : ''}`}
@@ -80,7 +81,7 @@ function FindAGame({
             onSearchModeChange('people');
           }}
         >
-          👥 People
+          People
         </TapButton>
       </div>
 
@@ -97,7 +98,7 @@ function FindAGame({
           <>
             <label className="findLabel">Find a Game</label>
             <div className="searchBox">
-              <span className="glass">🔎</span>
+              <Search size={18} style={{ color: 'white', flexShrink: 0 }} />
               <input
                 placeholder="Search golf club..."
                 value={query}
@@ -115,7 +116,7 @@ function FindAGame({
                 ) : (
                   courses.map(c => (
                     <TapButton key={c.id} className="resultRow" onClick={() => handleSelect(c)}>
-                      <span className="pin">📍</span>
+                      <MapPin size={18} style={{ color: 'white', flexShrink: 0 }} />
                       <div className="rMid">
                         <div className="rTitle">{c.name}</div>
                         <div className="rSub">{c.region || c.country}</div>
@@ -148,17 +149,17 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
   
   // Apple-style chip labels: emoji + title when unset, value only when set
   const getWhenLabel = () => {
-    if (filters.when === null) return '📅 When';
+    if (filters.when === null) return 'When';
     return labelWhen(filters.when);
   };
   
   const getDistanceLabel = () => {
-    if (filters.distanceKm === null) return '📍 Distance';
+    if (filters.distanceKm === null) return 'Distance';
     return `${filters.distanceKm} km`;
   };
   
   const getSortLabel = () => {
-    if (filters.sort === null) return '↕️ Sort';
+    if (filters.sort === null) return 'Sort';
     return filters.sort === 'soonest' ? 'Soonest' : filters.sort === 'distance' ? 'Nearest' : 'Most Available Slots';
   };
   
@@ -173,6 +174,7 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
         onClick={() => openWhenSheet(filters)}
         aria-label="Filter by date & time"
       >
+        {filters.when === null && <Calendar size={16} style={{ color: 'white', flexShrink: 0 }} />}
         <span className="chip__text">{getWhenLabel()}</span>
       </TapButton>
       
@@ -182,6 +184,7 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
           onClick={() => openDistanceSheet(filters)}
           aria-label="Filter by distance"
         >
+          {filters.distanceKm === null && <MapPin size={16} style={{ color: 'white', flexShrink: 0 }} />}
           <span className="chip__text">{getDistanceLabel()}</span>
         </TapButton>
       )}
@@ -191,6 +194,7 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
         onClick={() => openSortSheet(filters)}
         aria-label="Sort games"
       >
+        {filters.sort === null && <ArrowUpDown size={16} style={{ color: 'white', flexShrink: 0 }} />}
         <span className="chip__text">{getSortLabel()}</span>
       </TapButton>
     </div>
