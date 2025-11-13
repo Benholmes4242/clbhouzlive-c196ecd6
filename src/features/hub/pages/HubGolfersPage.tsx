@@ -224,7 +224,7 @@ export function HubGolfersPage() {
               </div>
             ) : golfers.length === 0 ? (
               <div className="mt-3">
-                <EmptyNearbyState />
+                <EmptyNearbyState variant={visibilityMode === 'hidden' ? 'hidden' : 'default'} />
               </div>
             ) : (
               <div className="mt-3 space-y-3">
