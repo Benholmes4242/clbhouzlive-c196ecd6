@@ -18,6 +18,7 @@ import { NearbyFilterBar } from '@/features/nearby/components/NearbyFilterBar';
 import { useVisibility } from '@/features/nearby/hooks/useVisibility';
 import { PullToRefresh } from '@/components/PullToRefresh';
 import '../home/hubTheme.css';
+import './nearbyGolfers.css';
 
 // Mock data toggle
 const useMockData = false;
@@ -220,50 +221,49 @@ export function HubGolfersPage() {
           <div className="w-16" />
         </header>
 
-        {/* Content */}
-        <div ref={listRef} className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
-        <PullToRefresh onRefresh={handleRefresh}>
-          <div className="pb-6" style={{ paddingTop: '28px' }}>
-            {/* Visibility segmented control (profile visibility) - PRIMARY */}
-            <div className="px-4" style={{ marginBottom: '18px' }}>
-              <GolferStatusBar 
-                value={visibilityMode}
-                onChange={setVisibilityMode}
-              />
-            </div>
+        {/* Content - Unified Panel */}
+        <main 
+          ref={listRef} 
+          className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]"
+        >
+          <PullToRefresh onRefresh={handleRefresh}>
+            <div className="nearby-golfers-container">
+              <section className="nearby-golfers-panel apple-glass-panel">
+                {/* 1. Segmented control */}
+                <GolferStatusBar 
+                  value={visibilityMode}
+                  onChange={setVisibilityMode}
+                />
 
-            {/* Open to Play CTA - SECONDARY */}
-            <div className="px-4" style={{ marginBottom: '18px' }}>
-              <OpenToPlayButton />
-            </div>
+                {/* 2. Open to Play banner */}
+                <OpenToPlayButton />
 
-            {/* Filter Bar - TERTIARY */}
-            <div style={{ marginBottom: '28px' }}>
-              <NearbyFilterBar 
-                filters={filters}
-                onFiltersChange={setFilters}
-              />
-            </div>
+                {/* 3. Distance chips + Filter row */}
+                <NearbyFilterBar 
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                />
 
-            {/* Golfers List */}
-            {isLoading ? (
-              <NearbySkeletonRow count={5} />
-            ) : golfers.length === 0 ? (
-              <EmptyNearbyState />
-            ) : (
-              <div className="space-y-2.5">
-                {golfers.map((golfer, index) => (
-                  <NearbyGolferCard 
-                    key={golfer.id ?? index} 
-                    golfer={golfer} 
-                    index={index} 
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </PullToRefresh>
-        </div>
+                {/* 4. Golfers List */}
+                {isLoading ? (
+                  <NearbySkeletonRow count={5} />
+                ) : golfers.length === 0 ? (
+                  <EmptyNearbyState />
+                ) : (
+                  <div className="ng-golfers-list">
+                    {golfers.map((golfer, index) => (
+                      <NearbyGolferCard 
+                        key={golfer.id ?? index} 
+                        golfer={golfer} 
+                        index={index} 
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+            </div>
+          </PullToRefresh>
+        </main>
       </div>
     </>
   );

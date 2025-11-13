@@ -1,24 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { GolferFilters } from '@/hooks/useActiveGolfers';
 import { RADIUS_OPTIONS_KM, GOLFERS_VISIBILITY_FILTERS } from '@/features/golfers/constants';
 import clsx from 'clsx';
+import '../../hub/pages/nearbyGolfers.css';
 
 type NearbyFilterBarProps = {
   filters: GolferFilters;
   onFiltersChange: (filters: GolferFilters) => void;
 };
-
-function useOutsideClose(ref: React.RefObject<HTMLElement>, onClose: () => void) {
-  useEffect(() => {
-    function handle(e: MouseEvent) {
-      if (!ref.current) return;
-      if (!ref.current.contains(e.target as Node)) onClose();
-    }
-    document.addEventListener('mousedown', handle);
-    return () => document.removeEventListener('mousedown', handle);
-  }, [onClose, ref]);
-}
 
 function VisibilityDropdown({
   value,
@@ -129,31 +119,22 @@ function VisibilityDropdown({
 export function NearbyFilterBar({ filters, onFiltersChange }: NearbyFilterBarProps) {
 
   return (
-    <div className="px-4 space-y-3">
+    <div>
       {/* Distance chips */}
-      <div className="flex gap-2">
+      <div className="ng-distance-row">
         {RADIUS_OPTIONS_KM.map((option) => (
           <button
             key={option.valueKm}
             onClick={() => onFiltersChange({ ...filters, radiusKm: option.valueKm })}
-            className={`flex-1 rounded-lg text-sm font-medium transition-colors ${
-              filters.radiusKm === option.valueKm
-                ? 'bg-white/20 text-white'
-                : 'bg-white/5 text-white/70 hover:bg-white/10'
-            }`}
-            style={{
-              height: '34px',
-              padding: '8px 12px',
-              fontSize: '14px',
-            }}
+            className={`ng-chip ${filters.radiusKm === option.valueKm ? 'ng-chip--active' : ''}`}
           >
             {option.label}
           </button>
         ))}
       </div>
 
-      {/* Visibility dropdown & Open to Play toggle */}
-      <div className="flex gap-2">
+      {/* Filter row */}
+      <div className="ng-filter-row">
         <VisibilityDropdown
           value={filters.visibility || 'all'}
           onChange={(v) => onFiltersChange({ ...filters, visibility: v })}
@@ -161,16 +142,7 @@ export function NearbyFilterBar({ filters, onFiltersChange }: NearbyFilterBarPro
 
         <button
           onClick={() => onFiltersChange({ ...filters, onlyOpen: !filters.onlyOpen })}
-          className={`rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-            filters.onlyOpen
-              ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-              : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10'
-          }`}
-          style={{
-            height: '34px',
-            padding: '8px 16px',
-            fontSize: '14px',
-          }}
+          className={filters.onlyOpen ? 'ng-primary-btn ng-primary-btn--active' : 'ng-select'}
         >
           {filters.onlyOpen ? '✓ Open' : 'Open to Play'}
         </button>
