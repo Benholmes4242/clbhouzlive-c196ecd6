@@ -171,15 +171,15 @@ export function HubGolfersPage() {
         WebkitBackdropFilter: 'blur(120px)',
       }}
     >
-      {/* Opaque Header */}
+      {/* Glass Header */}
       <header 
         ref={headerRef}
         className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
         style={{
           borderColor: 'var(--hub-stroke)',
-          background: 'rgba(22, 24, 27, 0.98)',
-          backdropFilter: 'none',
-          WebkitBackdropFilter: 'none',
+          background: 'rgba(0, 0, 0, 0.15)',
+          backdropFilter: 'blur(40px) saturate(1.2)',
+          WebkitBackdropFilter: 'blur(40px) saturate(1.2)',
           transition: 'all 160ms ease-out',
           paddingTop: 'env(safe-area-inset-top, 0px)',
           contain: 'paint',
