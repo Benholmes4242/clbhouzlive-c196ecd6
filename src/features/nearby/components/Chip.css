@@ -20,7 +20,7 @@
 
 .chip.is-active {
   background: transparent;
-  border-color: #6E9277;
+  border-color: rgba(255, 255, 255, 0.3);
   border-width: 2px;
   color: var(--hub-text);
 }
