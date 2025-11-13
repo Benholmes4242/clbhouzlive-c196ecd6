@@ -19,11 +19,11 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '4px',
-        padding: '6px',
+        gap: '6px',
+        padding: '10px',
         aspectRatio: '1 / 1',
         width: '100%',
-        borderRadius: '12px',
+        borderRadius: '16px',
         background: 'rgba(255,255,255,0.10)',
         border: '1px solid rgba(255,255,255,0.15)',
         cursor: 'pointer',
@@ -33,7 +33,7 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
       onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
       onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.10)')}
     >
-      <div className="qa-icon" style={{ fontSize: '16px', lineHeight: 1 }} aria-hidden="true">{icon}</div>
+      <div className="qa-icon" style={{ fontSize: '20px', lineHeight: 1 }} aria-hidden="true">{icon}</div>
       <div className="qa-label" style={{ 
         display: 'flex', 
         flexDirection: 'column', 
@@ -41,8 +41,8 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
         fontWeight: 600, 
         lineHeight: 1.15 
       }}>
-        <span style={{ fontSize: '11px', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelTop}</span>
-        <span style={{ fontSize: '11px', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelBottom}</span>
+        <span style={{ fontSize: '12.5px', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelTop}</span>
+        <span style={{ fontSize: '12.5px', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelBottom}</span>
       </div>
     </button>
   );
@@ -70,7 +70,6 @@ export function QuickActionsTile() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '0 20px',
         }}
       >
         <div 
@@ -80,7 +79,6 @@ export function QuickActionsTile() {
             gridTemplateColumns: '1fr 1fr',
             gap: '10px',
             width: '100%',
-            maxWidth: '320px',
           }}
         >
           <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />
