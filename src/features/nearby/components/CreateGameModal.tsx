@@ -358,16 +358,17 @@ export function CreateGameModal({
 
         {/* Content */}
         <div 
-          className="flex-1 overflow-y-auto px-4 pt-[calc(3.5rem+env(safe-area-inset-top,0px))] pb-6 space-y-3"
+          className="flex-1 overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]"
           style={{
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',
           }}
         >
-          {/* Create new beacon form */}
-          <>
-            {/* Game Type */}
-              <div className="space-y-2">
+          <div className="px-4 pb-6 space-y-3" style={{ paddingTop: '28px' }}>
+            {/* Create new beacon form */}
+            <>
+              {/* Game Type */}
+                <div className="space-y-2">
                 <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
                   Game type
                 </h3>
@@ -575,6 +576,7 @@ export function CreateGameModal({
                 {isSubmitting ? 'Creating…' : 'Create Game'}
               </TapButton>
             </>
+          </div>
         </div>
       </div>
     </div>
