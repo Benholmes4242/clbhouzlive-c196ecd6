@@ -6,6 +6,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { YourGamesList } from '@/features/nearby/components/YourGamesList';
 import { useHub } from '@/features/hub/useHub';
+import { HubHeader } from '@/features/hub/components/HubHeader';
 import '../home/hubTheme.css';
 
 export function HubYourGamesPage() {
@@ -41,30 +42,13 @@ export function HubYourGamesPage() {
         WebkitBackdropFilter: 'blur(120px)',
       }}
     >
-      {/* Header */}
-      <header 
-        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
-        style={{
-          borderColor: 'var(--hub-stroke)',
-          background: 'rgba(22, 24, 27, 0.98)',
-          backdropFilter: 'none',
-          WebkitBackdropFilter: 'none',
-          paddingTop: 'env(safe-area-inset-top, 0px)',
-        }}
-      >
-        <button
-          onClick={goBack}
-          className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
-          aria-label="Back to Hub"
-        >
-          ‹ Back
-        </button>
-        <h1 className="text-white/90 text-[17px] font-semibold">Your Games</h1>
-        <div className="w-16" />
-      </header>
+      <HubHeader title="Your Games" onBack={goBack} />
 
       {/* Content area - YourGamesList content */}
-      <div className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
+      <div 
+        id="your-games-scroll"
+        className="yourGames__scroll overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]"
+      >
         <div style={{ paddingTop: '28px' }}>
           <YourGamesList
             onCreateGame={handleCreateGame}

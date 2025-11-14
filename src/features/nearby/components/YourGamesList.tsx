@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { GameCard } from './your-games/GameCard';
-import { EmptyState } from './your-games/EmptyState';
+import { EmptyJoinedState } from './your-games/EmptyJoinedState';
 import { Segmented, SegmentItem } from './Segmented';
-import { TapButton } from '@/components/ui/TapButton';
+import { PrimaryCTAButton } from '@/features/hub/components/HubButtons';
 import { YourGamesSkeleton } from './your-games/YourGamesSkeleton';
 import { HostApprovalSheet } from './HostApprovalSheet';
+import { YourGameRow } from './your-games/YourGameRow';
 import type { Game as CardGame, Participant } from './your-games/types';
 import { useUserGames, type UserGame } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
+import './your-games/YourGames.css';
 
 interface YourGamesListProps {
   activeTab?: 'golfers' | 'games' | 'your-games';
@@ -37,7 +38,17 @@ export function YourGamesList({
 
   const [activeTab, setActiveTab] = useState<'hosting' | 'joined'>('hosting');
   const [approvalSheetGameId, setApprovalSheetGameId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
+
+  // Scroll to top when switching tabs
+  useEffect(() => {
+    const el = document.getElementById('your-games-scroll');
+    if (el) {
+      el.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    setExpandedId(null); // Collapse all on tab switch
+  }, [activeTab]);
 
   // Notify parent of total count
   useEffect(() => {
@@ -154,73 +165,76 @@ export function YourGamesList({
   // If no games found at all
   if (hostedGames.length === 0 && joinedGames.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="text-5xl mb-3">⛳</div>
-        <h3 className="text-lg font-semibold text-white/90 mb-2">No games yet</h3>
-        <p className="text-sm text-white/60 max-w-xs mb-4">
+      <div className="yourGamesEmpty">
+        <div className="yourGamesEmpty__icon">⛳</div>
+        <h2 className="yourGamesEmpty__title">No games yet</h2>
+        <p className="yourGamesEmpty__body">
           You haven't hosted or joined any games. Create one to get started!
         </p>
         {onCreateGame && (
-          <TapButton
+          <PrimaryCTAButton
             onClick={onCreateGame}
-            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/14 active:bg-white/18 border border-white/15 text-sm font-medium text-white/90"
-          >
-            Create a Game
-          </TapButton>
+            label="Create a Game"
+          />
         )}
       </div>
     );
   }
 
   return (
-    <div ref={listRef} className="space-y-4">
+    <div ref={listRef}>
       {/* Segmented tabs */}
-      <Segmented
-        items={segmentItems}
-        value={activeTab}
-        onChange={(val) => setActiveTab(val as 'hosting' | 'joined')}
-        columns={2}
-        ariaLabel="Your games view"
-        className="mb-3"
-      />
+      <div className="yourGames__toggleRow">
+        <Segmented
+          items={segmentItems}
+          value={activeTab}
+          onChange={(val) => setActiveTab(val as 'hosting' | 'joined')}
+          columns={2}
+          ariaLabel="Your games view"
+        />
+      </div>
 
       {/* Create a Game CTA */}
       {isHostingTab && onCreateGame && (
-        <TapButton
-          onClick={onCreateGame}
-          className="w-full px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/14 active:bg-white/18 border border-white/15 text-sm font-medium text-white/90 transition-colors"
-        >
-          Create a Game
-        </TapButton>
+        <div className="yourGames__cta">
+          <PrimaryCTAButton
+            onClick={onCreateGame}
+            label="Create a Game"
+          />
+        </div>
       )}
 
       {/* Games list */}
       {currentGames.length === 0 ? (
-        <EmptyState 
-          type={activeTab}
-          onCreateGame={isHostingTab ? onCreateGame : undefined}
-          onFindGame={!isHostingTab ? onFindGame : undefined}
-        />
+        !isHostingTab && onFindGame ? (
+          <EmptyJoinedState onFindGame={onFindGame} />
+        ) : (
+          <div className="yourGamesEmpty">
+            <div className="yourGamesEmpty__icon">⛳</div>
+            <h2 className="yourGamesEmpty__title">
+              You're not hosting any games yet.
+            </h2>
+            <p className="yourGamesEmpty__body">
+              Create a game to start hosting.
+            </p>
+          </div>
+        )
       ) : (
         <div>
           {currentGames.map((game, index) => (
-            <div 
-              key={game.id} 
-              data-game-id={game.id}
-              style={{
-                borderBottom: index === currentGames.length - 1 ? 'none' : undefined
-              }}
-            >
-              <GameCard
-                game={toCardGame(game)}
-                variant={isHostingTab ? 'hosting' : 'joined'}
-                host={extractHost(game)}
-                members={extractMembers(game)}
-                onCancel={() => handleCancel(game.id)}
-                onLeave={() => handleLeave(game.id)}
-                onViewRequests={isHostingTab ? (gameId) => setApprovalSheetGameId(gameId) : undefined}
-              />
-            </div>
+            <YourGameRow
+              key={game.id}
+              game={toCardGame(game)}
+              variant={isHostingTab ? 'hosting' : 'joined'}
+              host={extractHost(game)}
+              members={extractMembers(game)}
+              expanded={expandedId === game.id}
+              onToggle={() => setExpandedId(expandedId === game.id ? null : game.id)}
+              onCancel={handleCancel}
+              onLeave={handleLeave}
+              onViewRequests={isHostingTab ? setApprovalSheetGameId : undefined}
+              index={index}
+            />
           ))}
         </div>
       )}
