@@ -37,7 +37,7 @@ export function useAIStream() {
           messages: messages.map(m => ({ role: m.role, content: m.content })),
           conversation_id: conversationId,
           stream: true,
-          mode: 'chat',
+          mode: 'auto',
         });
 
         // Normalize the answer text
