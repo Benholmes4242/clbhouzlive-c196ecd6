@@ -63,7 +63,7 @@ export function HubHomePage() {
         style={{
           background: 'transparent',
           borderBottom: '1px solid var(--hub-header-stroke)',
-          paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))',
+          paddingTop: 'calc(1.25rem + env(safe-area-inset-top, 0px))',
         }}
       >
         <div className="flex items-center justify-between" style={{ userSelect: 'none' }}>
@@ -76,7 +76,8 @@ export function HubHomePage() {
             <img
               src="/assets/clbhouz-white.png"
               alt="clbhouz"
-              className="h-10 md:h-12 w-auto object-contain"
+              className="h-11 md:h-[52px] w-auto object-contain"
+              style={{ letterSpacing: '-0.03em' }}
             />
           </div>
           
