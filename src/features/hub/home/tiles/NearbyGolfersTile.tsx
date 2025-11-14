@@ -10,6 +10,8 @@ import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { useHub } from '@/features/hub/useHub';
 import { formatDistanceHcp } from '@/features/golfers/format';
 import SquircleImage from '@/components/ui/SquircleImage';
+import { useNearbySquircle } from '@/hooks/useNearbySquircle';
+import { useOpenToPlay } from '@/features/nearby/hooks/useOpenToPlay';
 
 // Mock data toggle
 const useMockData = false;
@@ -77,6 +79,8 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
   
   // Real data fetch - wrapped in guard
   const realData = useActiveGolfers({ limit });
+  const { isOpenToPlay } = useNearbySquircle();
+  const { activate } = useOpenToPlay();
   
   // Use mock or real data
   const golfers = useMockData ? mockGolfers : realData.golfers;
@@ -156,8 +160,49 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
             </button>
           ))}
           {!isLoading && golfers.length === 0 && (
-            <div className="text-[13px] py-2 text-center" style={{ color: 'var(--hub-text-sub)' }}>
-              No active golfers nearby
+            <div className="mt-4 flex flex-col items-center text-center gap-3">
+              {/* Status line */}
+              <p className="px-6 text-[13px] leading-snug" style={{ color: 'var(--hub-text-muted)' }}>
+                {isOpenToPlay
+                  ? "No golfers nearby right now."
+                  : "You're currently hidden from nearby golfers."}
+              </p>
+
+              {/* Actions */}
+              <div className="flex flex-wrap items-center justify-center gap-8 mt-1">
+                {/* Primary */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isOpenToPlay) {
+                      navigateFromHub('/hub/create-game');
+                    } else {
+                      activate();
+                    }
+                  }}
+                  className="rounded-full px-4 py-1.5 text-[13px] font-semibold shadow-sm active:scale-[0.97] transition-transform"
+                  style={{
+                    color: 'var(--hub-on-accent)',
+                    background: 'var(--hub-accent)',
+                  }}
+                >
+                  {isOpenToPlay ? "Create a game" : "Open to Play"}
+                </button>
+
+                {/* Secondary link-style */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigateFromHub('/hub/golfers');
+                  }}
+                  className="text-[13px] font-medium underline-offset-2 hover:underline active:opacity-70"
+                  style={{ color: 'var(--hub-text-muted)' }}
+                >
+                  Search golfers →
+                </button>
+              </div>
             </div>
           )}
         </div>

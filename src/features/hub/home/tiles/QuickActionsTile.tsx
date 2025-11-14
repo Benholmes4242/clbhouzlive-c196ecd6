@@ -77,21 +77,57 @@ export function QuickActionsTile() {
 
   return (
     <Tile title="Quick Actions" align="center">
-      <div 
-        className="hub-quick-actions" 
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gridTemplateRows: 'repeat(2, 1fr)',
-          gap: '8px',
-          height: '100%',
-          padding: '0',
-        }}
-      >
-        <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />
-        <QA labelTop="Ask" labelBottom="Echo" onClick={() => navigateFromHub('/hub/echo')} icon="💬" />
-        <QA labelTop="Upload" labelBottom="Swing" onClick={openSwing} icon="🏌️" />
-        <QA labelTop="Your" labelBottom="Profile" onClick={openProfile} icon="👤" />
+      <div className="flex h-full flex-col">
+        {/* 2×2 grid */}
+        <div className="grid flex-1 grid-cols-2 gap-2 pt-1 pb-1">
+          <button
+            type="button"
+            onClick={openCreateGame}
+            className="hub-quick-squircle flex flex-col items-center justify-center gap-1"
+            aria-label="Create Game"
+          >
+            <span className="text-[22px] leading-none">⛳</span>
+            <span className="text-[11px] leading-tight text-center" style={{ color: 'var(--hub-text-muted)' }}>
+              Create Game
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigateFromHub('/hub/echo')}
+            className="hub-quick-squircle flex flex-col items-center justify-center gap-1"
+            aria-label="Ask Echo"
+          >
+            <span className="text-[22px] leading-none">💬</span>
+            <span className="text-[11px] leading-tight text-center" style={{ color: 'var(--hub-text-muted)' }}>
+              Ask Echo
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={openSwing}
+            className="hub-quick-squircle flex flex-col items-center justify-center gap-1"
+            aria-label="Upload Swing"
+          >
+            <span className="text-[22px] leading-none">🏌️</span>
+            <span className="text-[11px] leading-tight text-center" style={{ color: 'var(--hub-text-muted)' }}>
+              Upload Swing
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={openProfile}
+            className="hub-quick-squircle flex flex-col items-center justify-center gap-1"
+            aria-label="Your Profile"
+          >
+            <span className="text-[22px] leading-none">👤</span>
+            <span className="text-[11px] leading-tight text-center" style={{ color: 'var(--hub-text-muted)' }}>
+              Your Profile
+            </span>
+          </button>
+        </div>
       </div>
     </Tile>
   );

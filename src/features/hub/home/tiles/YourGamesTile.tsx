@@ -124,14 +124,18 @@ function GameRow({
   
   // Format date/time for collapsed header
   const dt = new Date(game.start_time);
-  const when = dt.toLocaleString(undefined, {
-    weekday: 'short', 
-    day: 'numeric', 
-    month: 'short',
+  const formatDate = (d: Date) => d.toLocaleDateString(undefined, { 
+    month: 'short', 
+    day: 'numeric' 
+  });
+  const formatTime = (d: Date) => d.toLocaleTimeString(undefined, { 
     hour: '2-digit', 
     minute: '2-digit', 
-    hour12: false
+    hour12: false 
   });
+  const holeCount = 18; // Default to 18 holes for now
+  const currentPlayers = game.participants.length;
+  const maxPlayers = game.slots_total || 4;
 
   return (
     <button 
@@ -142,7 +146,7 @@ function GameRow({
       onPointerUp={clearTimer}
       onPointerCancel={clearTimer}
       className="game-row w-full py-3 text-left outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0"
-      aria-label={`${game.course_name || 'Golf Course'}, ${when}. ${game.kind === 'Hosting' ? 'Hosting' : 'Joined'}`}
+      aria-label={`${game.course_name || 'Golf Course'}, ${formatDate(dt)} ${formatTime(dt)}. ${game.kind === 'Hosting' ? 'Hosting' : 'Joined'}`}
       style={{ 
         background: 'transparent',
         borderBottom: '1px solid rgba(255,255,255,0.12)',
@@ -171,9 +175,11 @@ function GameRow({
         </span>
       </div>
 
-      {/* Line 2: time + badge on right */}
-      <div className="mt-1 flex items-center justify-between">
-        <time className="text-[13px]" style={{ color: 'var(--hub-text-sub)' }}>{when}</time>
+      {/* Line 2: meta line with date · time · holes · players */}
+      <div className="mt-1 flex items-center justify-between gap-2">
+        <p className="text-[11px]" style={{ color: 'var(--hub-text-muted)' }}>
+          {formatDate(dt)} · {formatTime(dt)} · {holeCount} holes · {currentPlayers}/{maxPlayers} players
+        </p>
         <StatusPill kind={game.kind} />
       </div>
 
@@ -181,9 +187,9 @@ function GameRow({
       <div
         className="gt-expand"
         style={{ 
-          maxHeight: expanded ? '360px' : '0px',
+          maxHeight: expanded ? '400px' : '0px',
           opacity: expanded ? 1 : 0,
-          paddingTop: expanded ? '8px' : '0px',
+          paddingTop: expanded ? '12px' : '0px',
           paddingBottom: expanded ? '10px' : '0px',
         }}
         aria-hidden={!expanded}
@@ -191,68 +197,88 @@ function GameRow({
         <div 
           className="pt-2"
           style={{ 
-            borderTop: '1px solid rgba(255,255,255,0.08)',
+            borderTop: '1px solid rgba(255,255,255,0.06)',
           }}
         >
-          <div
-            className="fade-slide-in fade-stagger"
-            style={{ '--d': '0ms' } as React.CSSProperties}
-          >
-            <GameExpandedPrimary
-              kind={game.kind}
-              courseName={game.course_name}
-              startTime={game.start_time}
-              slotsTotal={game.slots_total || 4}
-              slotsOpen={game.slots_open || 0}
-            />
-          </div>
-
-          <div
-            className="fade-slide-in fade-stagger"
-            style={{ '--d': '60ms' } as React.CSSProperties}
-          >
-            <GameExpandedRoster
-              host={{
-                id: game.host_user_id,
-                name: game.kind === 'Hosting' ? 'You' : (
-                  game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.display_name || 'Host'
-                ),
-                avatarUrl: game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.profile_photo_url || null,
-                homeClub: game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.home_club || null,
-                handicap: game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.eg_handicap_index || null,
-              }}
-              members={game.participants.map(p => {
-                const hasProfile = !!p.user_profiles;
-                const isGuest = !p.user_id || !hasProfile;
-                const name = isGuest 
-                  ? 'Guest' 
-                  : (p.user_profiles?.display_name || 'Player');
-                
-                return {
-                  id: p.user_id || `guest_${Math.random().toString(36).slice(2)}`,
-                  name,
-                  avatarUrl: isGuest ? null : (p.user_profiles?.profile_photo_url || null),
-                  homeClub: isGuest ? null : (p.user_profiles?.home_club || null),
-                  handicap: isGuest ? null : (p.user_profiles?.eg_handicap_index || null),
-                };
-              })}
-            />
-          </div>
-
-          {game.notes && (
-            <div
-              className="fade-slide-in fade-stagger"
-              style={{ '--d': '120ms' } as React.CSSProperties}
-            >
-              <GameExpandedNotes notes={game.notes} />
+          {/* Host & Members two-column grid */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Host column */}
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-[0.09em] mb-1" style={{ color: 'var(--hub-text-muted)' }}>
+                Host
+              </p>
+              <div className="flex items-center gap-2">
+                <div 
+                  className="shrink-0 w-9 h-9 rounded-full bg-cover bg-center"
+                  style={{ 
+                    backgroundImage: `url(${game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.profile_photo_url || '/placeholder.svg'})`,
+                    border: '1px solid rgba(255,255,255,0.2)'
+                  }}
+                />
+                <div className="min-w-0">
+                  <p className="truncate text-[13px] font-semibold" style={{ color: 'var(--hub-text-body)' }}>
+                    {game.kind === 'Hosting' ? 'You' : (
+                      game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.display_name || 'Host'
+                    )}
+                  </p>
+                  <p className="truncate text-[11px]" style={{ color: 'var(--hub-text-muted)' }}>
+                    {game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.home_club || 'Club'} · HCP {game.participants.find(p => p.user_id === game.host_user_id)?.user_profiles?.eg_handicap_index?.toFixed(1) || '-'}
+                  </p>
+                </div>
+              </div>
             </div>
-          )}
 
-          <div
-            className="fade-slide-in fade-stagger"
-            style={{ '--d': '100ms' } as React.CSSProperties}
-          >
-            <GameExpandedMeta expiresAt={game.expires_at} />
+            {/* Members column */}
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-[0.09em] mb-1" style={{ color: 'var(--hub-text-muted)' }}>
+                Members
+              </p>
+
+              {game.participants.filter(p => p.user_id !== game.host_user_id).length === 0 && (
+                <p className="text-[11px]" style={{ color: 'var(--hub-text-muted)' }}>
+                  No members yet.
+                </p>
+              )}
+
+              <div className="flex flex-col gap-1">
+                {game.participants.filter(p => p.user_id !== game.host_user_id).map((m) => (
+                  <div key={m.user_id} className="flex items-center gap-2">
+                    <div 
+                      className="shrink-0 w-7 h-7 rounded-full bg-cover bg-center"
+                      style={{ 
+                        backgroundImage: `url(${m.user_profiles?.profile_photo_url || '/placeholder.svg'})`,
+                        border: '1px solid rgba(255,255,255,0.2)'
+                      }}
+                    />
+                    <div className="min-w-0">
+                      <p className="truncate text-[12px]" style={{ color: 'var(--hub-text-body)' }}>
+                        {m.user_profiles?.display_name || 'Guest'}
+                      </p>
+                      <p className="truncate text-[11px]" style={{ color: 'var(--hub-text-muted)' }}>
+                        {m.user_profiles?.home_club ?? `HCP ${m.user_profiles?.eg_handicap_index?.toFixed(1) || '-'}`}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Expiry row */}
+          <div className="mt-3 flex items-center justify-end">
+            <p className="inline-flex items-center gap-1 text-[11px]" style={{ color: 'var(--hub-text-muted)' }}>
+              <span>⏱</span>
+              <span>Expires in {(() => {
+                const expiresAt = new Date(game.expires_at);
+                const now = new Date();
+                const diffMs = expiresAt.getTime() - now.getTime();
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                if (diffHours > 24) return `${Math.floor(diffHours / 24)}d`;
+                if (diffHours > 0) return `${diffHours}h`;
+                return `${diffMins}m`;
+              })()}</span>
+            </p>
           </div>
         </div>
       </div>
