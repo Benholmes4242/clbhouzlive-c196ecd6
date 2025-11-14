@@ -39,6 +39,22 @@
   .animate-out-left  { animation: slide-out-left  300ms ease both; }
   .animate-out-right { animation: slide-out-right 300ms ease both; }
 
+  /* Echo bubble fade-in animation - Apple-style */
+  @keyframes echo-bubble-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px) scale(0.99);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  .echo-bubble-enter {
+    animation: echo-bubble-in 150ms ease-out;
+    will-change: opacity, transform;
+  }
+
 /* Nuke solid Tailwind black backgrounds to new page tone */
   .bg-black { --tw-bg-opacity: 1; background-color: rgb(10 10 10 / var(--tw-bg-opacity)) !important; }
 }

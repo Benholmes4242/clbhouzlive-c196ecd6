@@ -82,7 +82,22 @@ export function useEchoConversation(opts?: { resetOnMount?: boolean }) {
               content: accumulatedContent,
               createdAt: new Date().toISOString(),
             };
-            setMessages(prev => [...prev, assistantMessage]);
+            setMessages(prev => {
+              const next = [...prev, assistantMessage];
+              
+              // Smooth scroll to bottom after message is added
+              requestAnimationFrame(() => {
+                const container = document.querySelector('[data-echo-scroll-container]');
+                if (container) {
+                  container.scrollTo({
+                    top: (container as HTMLElement).scrollHeight,
+                    behavior: 'smooth',
+                  });
+                }
+              });
+              
+              return next;
+            });
             setIsStreaming(false);
             setStreamingContent('');
           },
