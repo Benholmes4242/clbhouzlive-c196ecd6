@@ -44,15 +44,15 @@ function StatusPill({ kind }: { kind: 'Hosting' | 'Joined' }) {
   const isHosting = kind === 'Hosting';
   return (
     <span
-      className="inline-flex items-center px-2.5 py-[3px] rounded-full text-[13px] leading-none"
+      className="inline-flex items-center px-2.5 py-[3px] rounded-full text-[13px] leading-none backdrop-blur-md"
       style={{
-        background: isHosting ? 'var(--token-success-bg)' : 'rgba(255,255,255,0.06)',
-        border: `1px solid ${isHosting ? 'var(--token-success-border)' : 'rgba(255,255,255,0.10)'}`,
-        color: isHosting ? 'var(--token-success-ink)' : 'var(--hub-text-body)',
+        background: 'rgba(255,255,255,0.15)',
+        border: '1px solid rgba(255,255,255,0.20)',
+        color: 'var(--hub-text-body)',
       }}
-      aria-label={isHosting ? 'Hosting' : 'Joined'}
+      aria-label={isHosting ? 'Host' : 'Joined'}
     >
-      {isHosting ? 'Hosting' : 'Joined'}
+      {isHosting ? 'Host' : 'Joined'}
     </span>
   );
 }
