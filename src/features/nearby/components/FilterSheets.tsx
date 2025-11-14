@@ -7,7 +7,6 @@ import { openTimePicker } from './TimePicker';
 type FilterSheetItem = {
   label: string;
   onPress: () => void;
-  isSelected?: boolean;
 };
 
 type ActionSheetConfig = {
@@ -71,16 +70,15 @@ function openActionSheet(config: ActionSheetConfig) {
   config.items.forEach((item, i) => {
     const button = document.createElement('button');
     button.textContent = item.label;
-    const isSelected = item.isSelected ?? false;
     button.style.cssText = `
       width: 100%;
       padding: 16px;
-      background: ${isSelected ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.06)'};
-      color: ${isSelected ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.75)'};
+      background: #252525;
+      color: #eaeaea;
       border: 0;
       border-radius: 12px;
       font-size: 16px;
-      font-weight: ${isSelected ? '600' : '500'};
+      font-weight: 600;
       margin-bottom: 8px;
       cursor: pointer;
       touch-action: manipulation;
@@ -139,16 +137,13 @@ export function openWhenSheet(f: Filters) {
   const today = new Date();
   const tomorrow = addDays(today, 1);
   
-  const isToday = f.when?.date?.toDateString() === today.toDateString();
-  const isTomorrow = f.when?.date?.toDateString() === tomorrow.toDateString();
-  
   openActionSheet({
     title: 'Select Date & Time',
     items: [
       // Quick picks
-      { label: 'Any', onPress: () => f.setWhen(null), isSelected: f.when === null },
-      { label: 'Today', onPress: () => f.setWhen({ date: today, window: 'any', exactTime: null }), isSelected: isToday },
-      { label: 'Tomorrow', onPress: () => f.setWhen({ date: tomorrow, window: 'any', exactTime: null }), isSelected: isTomorrow },
+      { label: 'Any', onPress: () => f.setWhen(null) },
+      { label: 'Today', onPress: () => f.setWhen({ date: today, window: 'any', exactTime: null }) },
+      { label: 'Tomorrow', onPress: () => f.setWhen({ date: tomorrow, window: 'any', exactTime: null }) },
       
       // Custom date/time
       { label: 'Choose Date', onPress: () => openCalendarPicker({
@@ -167,11 +162,10 @@ export function openDistanceSheet(f: Filters) {
   openActionSheet({
     title: 'Distance',
     items: [
-      { label: 'Any', onPress: () => f.setDistanceKm(null), isSelected: f.distanceKm === null },
+      { label: 'Any', onPress: () => f.setDistanceKm(null) },
       ...([5, 10, 20, 50].map(km => ({
         label: `${km} km`,
         onPress: () => f.setDistanceKm(km),
-        isSelected: f.distanceKm === km,
       }))),
     ],
   });
@@ -181,9 +175,9 @@ export function openSortSheet(f: Filters) {
   openActionSheet({
     title: 'Sort By',
     items: [
-      { label: 'Soonest', onPress: () => f.setSort('soonest'), isSelected: f.sort === 'soonest' },
-      { label: 'Nearest', onPress: () => f.setSort('distance'), isSelected: f.sort === 'distance' },
-      { label: 'Most Available Slots', onPress: () => f.setSort('seats'), isSelected: f.sort === 'seats' },
+      { label: 'Soonest', onPress: () => f.setSort('soonest') },
+      { label: 'Nearest', onPress: () => f.setSort('distance') },
+      { label: 'Most Available Slots', onPress: () => f.setSort('seats') },
     ],
   });
 }
