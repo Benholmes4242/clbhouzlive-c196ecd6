@@ -34,6 +34,7 @@ interface VirtualListProps {
   count: number;
   estimateSize: number;
   getSize?: (index: number) => number;
+  getItemKey?: (index: number) => string | number;
   overscan?: number;
   className?: string;
   render: (index: number) => React.ReactNode;
@@ -98,6 +99,7 @@ export function VirtualList({
   count,
   estimateSize,
   getSize,
+  getItemKey,
   overscan = 8,
   className = '',
   render,
@@ -180,9 +182,10 @@ export function VirtualList({
         {Array.from({ length: visEnd - visStart }, (_, k) => {
           const i = visStart + k;
           const top = prefix[i];
+          const itemKey = getItemKey ? getItemKey(i) : i;
           return (
             <div
-              key={i}
+              key={itemKey}
               style={{ position: 'absolute', top, left: 0, right: 0, minWidth: 0 }}
               role="listitem"
             >
