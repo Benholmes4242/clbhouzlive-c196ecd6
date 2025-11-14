@@ -21,12 +21,17 @@ type Game = {
 
 function CreateGameCTA({ onOpen }: { onOpen: () => void }) {
   return (
-    <TapButton 
-      className="ctaHero" 
-      onClick={() => { haptic('light'); onOpen(); }}
-    >
-      Create a Game
-    </TapButton>
+    <>
+      <p className="mt-1 text-[13px] text-white/60 leading-snug text-center px-4">
+        Browse games nearby or at your favourite clubs.
+      </p>
+      <TapButton 
+        className="ctaHero" 
+        onClick={() => { haptic('light'); onOpen(); }}
+      >
+        <span>Create a Game</span>
+      </TapButton>
+    </>
   );
 }
 
@@ -64,25 +69,29 @@ function FindAGame({
   return (
     <div className="findBlock">
       {/* Search mode toggle */}
-      <div className="searchModeToggle">
-        <TapButton
-          className={`modeChip ${searchMode === 'clubs' ? 'modeChip--active' : ''}`}
-          onClick={() => {
-            haptic('light');
-            onSearchModeChange('clubs');
-          }}
-        >
-          Clubs
-        </TapButton>
-        <TapButton
-          className={`modeChip ${searchMode === 'people' ? 'modeChip--active' : ''}`}
-          onClick={() => {
-            haptic('light');
-            onSearchModeChange('people');
-          }}
-        >
-          People
-        </TapButton>
+      <div className="mb-3 flex items-center justify-center">
+        <div className="inline-flex rounded-full bg-white/4 p-[3px] border border-white/10">
+          {(['clubs', 'people'] as const).map((mode) => {
+            const isActive = searchMode === mode;
+            return (
+              <TapButton
+                key={mode}
+                onClick={() => {
+                  haptic('light');
+                  onSearchModeChange(mode);
+                }}
+                className={
+                  'min-w-[92px] px-3 py-1.5 text-[12px] font-medium rounded-full transition-all duration-150 ' +
+                  (isActive
+                    ? 'bg-black/80 text-white shadow-[0_6px_18px_rgba(0,0,0,0.6)]'
+                    : 'bg-transparent text-white/55')
+                }
+              >
+                {mode === 'clubs' ? 'Clubs' : 'People'}
+              </TapButton>
+            );
+          })}
+        </div>
       </div>
 
       {searchMode === 'clubs' ? (
@@ -96,15 +105,15 @@ function FindAGame({
           </div>
         ) : (
           <>
-            <label className="findLabel">Find a Game</label>
-            <div className="searchBox">
-              <Search size={18} style={{ color: 'white', flexShrink: 0 }} />
+            <div className="mb-3 flex items-center rounded-[14px] bg-black/35 border border-white/10 px-3 py-2 shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
+              <span className="mr-2 text-[15px] text-white/60">🔍</span>
               <input
-                placeholder="Search golf club..."
+                placeholder="Search golf club…"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onFocus={() => setOpen(true)}
                 onBlur={() => setTimeout(() => setOpen(false), 200)}
+                className="flex-1 bg-transparent outline-none text-[14px] text-white/90 placeholder:text-white/35"
               />
             </div>
             {isOpen && query.length >= 2 && (
@@ -163,39 +172,64 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
     return filters.sort === 'soonest' ? 'Soonest' : filters.sort === 'distance' ? 'Nearest' : 'Most Available Slots';
   };
   
+  const isWhenActive = filters.when !== null;
+  const isDistanceActive = filters.distanceKm !== null;
+  const isSortActive = filters.sort !== null;
+
   return (
     <div 
-      className={`chipsRow ${showDistance ? 'cols-3' : 'cols-2'}`} 
+      className="flex gap-3 py-3 w-full"
       role="group" 
       aria-label="Game filters"
     >
       <TapButton 
-        className={`chip ${filters.when === null ? 'chip--placeholder' : ''}`}
+        className={
+          'flex-1 flex items-center justify-center gap-1.5 rounded-[999px] border px-3 py-1.5 text-[12px] ' +
+          (isWhenActive
+            ? 'border-white/40 bg-white/16 text-white'
+            : 'border-white/16 bg-black/28 text-white/70')
+        }
         onClick={() => openWhenSheet(filters)}
         aria-label="Filter by date & time"
       >
-        {filters.when === null && <Calendar size={16} style={{ color: 'white', flexShrink: 0 }} />}
-        <span className="chip__text">{getWhenLabel()}</span>
+        <span className="text-[14px]">
+          <Calendar size={14} style={{ color: 'white', flexShrink: 0 }} />
+        </span>
+        <span className="truncate">{getWhenLabel()}</span>
       </TapButton>
       
       {showDistance && (
         <TapButton 
-          className={`chip ${filters.distanceKm === null ? 'chip--placeholder' : ''}`}
+          className={
+            'flex-1 flex items-center justify-center gap-1.5 rounded-[999px] border px-3 py-1.5 text-[12px] ' +
+            (isDistanceActive
+              ? 'border-white/40 bg-white/16 text-white'
+              : 'border-white/16 bg-black/28 text-white/70')
+          }
           onClick={() => openDistanceSheet(filters)}
           aria-label="Filter by distance"
         >
-          {filters.distanceKm === null && <MapPin size={16} style={{ color: 'white', flexShrink: 0 }} />}
-          <span className="chip__text">{getDistanceLabel()}</span>
+          <span className="text-[14px]">
+            <MapPin size={14} style={{ color: 'white', flexShrink: 0 }} />
+          </span>
+          <span className="truncate">{getDistanceLabel()}</span>
         </TapButton>
       )}
       
       <TapButton 
-        className={`chip ${filters.sort === null ? 'chip--placeholder' : ''}`}
+        className={
+          'flex-1 flex items-center justify-center gap-1.5 rounded-[999px] border px-3 py-1.5 text-[12px] ' +
+          (isSortActive
+            ? 'border-white/40 bg-white/16 text-white'
+            : 'border-white/16 bg-black/28 text-white/70')
+        }
         onClick={() => openSortSheet(filters)}
         aria-label="Sort games"
       >
-        {filters.sort === null && <ArrowUpDown size={16} style={{ color: 'white', flexShrink: 0 }} />}
-        <span className="chip__text">{getSortLabel()}</span>
+        <span className="text-[14px]">
+          <ArrowUpDown size={14} style={{ color: 'white', flexShrink: 0 }} />
+        </span>
+        <span className="truncate">{getSortLabel()}</span>
       </TapButton>
     </div>
   );
@@ -237,57 +271,82 @@ function GameCard({ game }: { game: Game }) {
   };
 
   return (
-    <div className="gameRow" role="article" aria-label={`${game.course_name || 'Golf game'}, ${formatDate(game.start_time)}, ${filledLabel}`}>
-      <div className="gameRow__top">
-        <div className="gameRow__title">{game.course_name || 'Golf Game'}</div>
-      </div>
+    <li className="mt-2 rounded-[16px] border border-white/10 bg-black/35 px-3.5 py-3.5 shadow-[0_10px_28px_rgba(0,0,0,0.5)]">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-[14px] font-semibold text-white truncate">
+            {game.course_name || 'Golf Game'}
+          </p>
+          <p className="mt-0.5 text-[12px] text-white/65 flex items-center gap-1.5">
+            <span>📅</span>
+            <span className="truncate">
+              {formatDate(game.start_time)} • {formatTime(game.start_time)}
+            </span>
+          </p>
+        </div>
 
-      <div className="gameRow__meta">
-        <span className="gameRow__time">🗓 {formatDate(game.start_time)} • {formatTime(game.start_time)}</span>
-        <span className={`gameRow__badge ${seatsLeft > 0 ? 'gameRow__badge--ok' : 'gameRow__badge--full'}`}>{filledLabel}</span>
-      </div>
-
-      <div className="gameRow__actions">
-        <TapButton
-          className="gameRow__btn"
-          disabled={isPending || seatsLeft <= 0}
-          onClick={handleJoin}
+        <span
+          className={`
+            shrink-0 rounded-full px-3 py-[4px]
+            text-[11px] font-semibold tracking-[0.08em] uppercase
+            ${seatsLeft > 0
+              ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/50'
+              : 'bg-white/8 text-white/55 border border-white/20'}
+          `}
         >
-          {seatsLeft <= 0 ? 'Full' : isPending ? 'Requesting…' : 'Request to Join'}
-        </TapButton>
+          {filledLabel}
+        </span>
       </div>
-    </div>
+
+      <TapButton
+        className="
+          mt-3 w-full rounded-[999px]
+          border border-white/18 bg-white/4
+          text-[13px] font-medium text-white
+          py-2.5 active:scale-[0.98] transition-transform duration-120
+          disabled:opacity-50 disabled:cursor-not-allowed
+        "
+        disabled={isPending || seatsLeft <= 0}
+        onClick={handleJoin}
+      >
+        {seatsLeft <= 0 ? 'Full' : isPending ? 'Requesting…' : 'Request to Join'}
+      </TapButton>
+    </li>
   );
 }
 
-function GamesList({ games, isLoading }: { games: Game[]; isLoading: boolean }) {
+function GamesList({ games, isLoading, selectedClub }: { games: Game[]; isLoading: boolean; selectedClub: GolfCourse | null }) {
   if (isLoading) {
     return (
-      <div className="list">
+      <ul className="space-y-2 px-3">
         {[1, 2, 3].map(i => (
-          <div key={i} className="gameRow gameRow--skeleton">
-            <div className="skeletonLine" style={{ width: '60%' }} />
-            <div className="skeletonLine" style={{ width: '40%' }} />
-          </div>
+          <li key={i} className="rounded-[16px] border border-white/10 bg-black/35 px-3.5 py-3.5 animate-pulse">
+            <div className="h-4 bg-white/10 rounded w-2/3 mb-2" />
+            <div className="h-3 bg-white/10 rounded w-1/2" />
+          </li>
         ))}
-      </div>
+      </ul>
     );
   }
 
   if (!games || games.length === 0) {
     return (
-      <div className="empty">
-        <div className="emoji">📍</div>
-        <div className="title">No games found</div>
-        <div className="sub">Be the first to start one — tap <strong>Create a Game</strong>.</div>
+      <div className="mt-8 flex flex-col items-center text-center text-white/70 px-4">
+        <div className="text-[32px] mb-2">📍</div>
+        <p className="text-[14px] font-semibold">
+          {selectedClub ? `No games found at ${selectedClub.name}.` : 'No games found.'}
+        </p>
+        <p className="mt-1 text-[12px] text-white/55 max-w-[260px]">
+          Be the first to start one — tap <span className="font-semibold">Create a Game</span> above.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="list">
+    <ul className="space-y-2 px-3">
       {games.map(g => <GameCard key={g.id} game={g} />)}
-    </div>
+    </ul>
   );
 }
 
@@ -324,10 +383,10 @@ export function GamesTab({ onOpenCreate }: { onOpenCreate: () => void }) {
           onSelectUser={setSelectedUser}
         />
         <FiltersRow selectedClub={selectedClub} />
-        <div className="scopedHeading">
+        <h2 className="mt-4 mb-1 px-3 text-[14px] font-semibold text-white">
           {selectedClub ? `Games at ${selectedClub.name}` : 'Games Near You'}
-        </div>
-        <GamesList games={games || []} isLoading={isLoading} />
+        </h2>
+        <GamesList games={games || []} isLoading={isLoading} selectedClub={selectedClub} />
       </div>
     </div>
   );

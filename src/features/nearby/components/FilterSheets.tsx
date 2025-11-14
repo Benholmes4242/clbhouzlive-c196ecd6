@@ -70,18 +70,23 @@ function openActionSheet(config: ActionSheetConfig) {
   config.items.forEach((item, i) => {
     const button = document.createElement('button');
     button.textContent = item.label;
+    const isSelected = item.label.includes('✓') || (config.title.includes('Sort') && i === 0); // Rough heuristic
     button.style.cssText = `
       width: 100%;
+      text-align: left;
+      border-radius: 14px;
       padding: 16px;
-      background: #252525;
-      color: #eaeaea;
-      border: 0;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 600;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 500;
       margin-bottom: 8px;
       cursor: pointer;
       touch-action: manipulation;
+      border: 0;
+      transition: all 0.15s ease;
+      background: ${isSelected ? 'rgba(255, 255, 255, 0.14)' : 'rgba(255, 255, 255, 0.04)'};
+      color: ${isSelected ? '#fff' : 'rgba(255, 255, 255, 0.8)'};
+      box-shadow: ${isSelected ? '0 10px 24px rgba(0,0,0,0.6)' : 'none'};
     `;
     
     button.onclick = () => {
@@ -138,10 +143,10 @@ export function openWhenSheet(f: Filters) {
   const tomorrow = addDays(today, 1);
   
   openActionSheet({
-    title: 'Select Date & Time',
+    title: 'When',
     items: [
       // Quick picks
-      { label: 'Any', onPress: () => f.setWhen(null) },
+      { label: 'Any time', onPress: () => f.setWhen(null) },
       { label: 'Today', onPress: () => f.setWhen({ date: today, window: 'any', exactTime: null }) },
       { label: 'Tomorrow', onPress: () => f.setWhen({ date: tomorrow, window: 'any', exactTime: null }) },
       
