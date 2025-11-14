@@ -1,33 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { X, ChevronDown, AlertCircle, Search, MapPin } from 'lucide-react';
-import { GameBeacon } from '../hooks/useGameBeacon';
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, AlertCircle, Search, MapPin } from 'lucide-react';
 import { useCourseSearch } from '../hooks/useCourseSearch';
 import { UserSearchTypeahead } from './UserSearchTypeahead';
 import { GameVisibilitySelector } from './GameVisibilitySelector';
-import { Segmented } from './Segmented';
-import { Chip } from './Chip';
-import { Token } from './Token';
 import type { GameVisibility } from '../types';
 import { format } from 'date-fns';
-import { supabase } from '@/integrations/supabase/client';
 import { TapButton } from '@/components/ui/TapButton';
 import { openCalendarPicker } from './CalendarPicker';
 import { openTimePicker } from './TimePicker';
 import { haptic } from '@/utils/haptics';
+import { cn } from '@/lib/utils';
 import './CreateGame.css';
 import '../GamesTab.css';
 import { Z } from '@/config/zIndex';
-
-// Format game type for display
-function formatGameTypeDisplay(gameType: string): string {
-  const typeMap: Record<string, string> = {
-    '9_holes': '9 holes',
-    '18_holes': '18 holes',
-    'casual_golf': 'Casual golf',
-    'practice': 'Practice',
-  };
-  return typeMap[gameType] || gameType;
-}
 
 interface CreateGameModalProps {
   isOpen: boolean;
@@ -53,8 +38,9 @@ interface CreateGameModalProps {
 interface ValidationErrors {
   slotsTotal?: string;
   startTime?: string;
-  expiresAt?: string;
 }
+
+type PresetId = 'be_my_fourth' | 'practice_session' | 'money_match' | null;
 
 const GAME_TYPES = [
   { value: '9_holes', label: '9 holes' },
@@ -69,9 +55,6 @@ const TIMING_OPTIONS = [
   { value: '60', label: 'In 1 hour' },
   { value: 'choose', label: 'Choose' },
 ];
-
-const PLAYERS_OPTIONS = [1, 2, 3];
-const SLOTS_TOTAL_OPTIONS = [2, 3, 4]; // Common golf game sizes
 
 export function CreateGameModal({
   isOpen,
@@ -95,10 +78,20 @@ export function CreateGameModal({
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const [courseError, setCourseError] = useState<string>('');
   
-  // Course search state (matching GamesTab pattern)
+  // Course search state
   const [courseQuery, setCourseQuery] = useState('');
   const [isCourseDropdownOpen, setIsCourseDropdownOpen] = useState(false);
   const { courses, isLoading: isSearchingCourses } = useCourseSearch(courseQuery);
+
+  // Preset state
+  const [activePreset, setActivePreset] = useState<PresetId>(null);
+  const [touchedFields, setTouchedFields] = useState({
+    gameType: false,
+    visibility: false,
+    note: false,
+    when: false,
+    slots: false,
+  });
 
   // Calculate current players (host + tagged)
   const currentPlayers = 1 + selectedUsers.length;
@@ -108,7 +101,7 @@ export function CreateGameModal({
   
   // Get game size label
   const gameSizeLabels = ['One-ball', 'Two-ball', 'Three-ball', 'Four-ball'];
-  const gameSizeLabel = currentPlayers <= 4 ? `${gameSizeLabels[currentPlayers - 1]} game` : 'Full game';
+  const gameSizeLabel = gameSizeLabels[Math.min(currentPlayers + availableSlots - 1, 3)] || 'Four-ball';
 
   // Pre-fill club if provided
   useEffect(() => {
@@ -139,11 +132,64 @@ export function CreateGameModal({
 
   if (!isOpen) return null;
 
+  const handlePresetSelect = (presetId: PresetId) => {
+    if (activePreset === presetId) {
+      setActivePreset(null);
+      haptic('light');
+      return;
+    }
+
+    setActivePreset(presetId);
+    haptic('medium');
+
+    // Apply preset defaults only to untouched fields
+    switch (presetId) {
+      case 'be_my_fourth':
+        if (!touchedFields.gameType) setGameType('18_holes');
+        if (!touchedFields.visibility) setVisibility('public');
+        if (!touchedFields.note && note === '') {
+          setNote("We're looking for a fourth player for a casual 18-hole round – who's in?");
+        }
+        if (!touchedFields.when) {
+          setTiming('60');
+          setCustomDateTime(null);
+        }
+        if (!touchedFields.slots) setAvailableSlots(Math.min(1, maxAvailableSlots));
+        break;
+
+      case 'practice_session':
+        if (!touchedFields.gameType) setGameType('practice');
+        if (!touchedFields.visibility) setVisibility('friends');
+        if (!touchedFields.note && note === '') {
+          setNote("Practice session – working on my game and looking for someone to join for drills and a few relaxed holes.");
+        }
+        if (!touchedFields.when) {
+          const today = new Date();
+          setCustomDateTime(today);
+          setTiming('choose');
+        }
+        if (!touchedFields.slots) setAvailableSlots(Math.min(2, maxAvailableSlots));
+        break;
+
+      case 'money_match':
+        if (!touchedFields.gameType) setGameType('casual_golf');
+        if (!touchedFields.visibility) setVisibility('public');
+        if (!touchedFields.note && note === '') {
+          setNote("Money match – friendly but competitive round, small stakes, all handicaps welcome. Who's in?");
+        }
+        if (!touchedFields.when) {
+          setTiming('30');
+          setCustomDateTime(null);
+        }
+        if (!touchedFields.slots) setAvailableSlots(Math.min(3, maxAvailableSlots));
+        break;
+    }
+  };
+
   const validateForm = (): boolean => {
     const errors: ValidationErrors = {};
     let isValid = true;
 
-    // Validate course selection (must have courseId)
     if (!courseId) {
       setCourseError('Please pick a club from the list.');
       isValid = false;
@@ -151,7 +197,6 @@ export function CreateGameModal({
       setCourseError('');
     }
 
-    // Validate start_time is in the future
     let startTime: Date;
     if (timing === 'now') {
       startTime = new Date();
@@ -169,7 +214,6 @@ export function CreateGameModal({
       startTime = new Date();
     }
 
-    // Validate total doesn't exceed 4
     const totalSlots = currentPlayers + availableSlots;
     if (totalSlots > 4) {
       errors.slotsTotal = `Total cannot exceed 4 players`;
@@ -182,9 +226,11 @@ export function CreateGameModal({
 
   const handleSubmit = async () => {
     if (!gameType) return;
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      haptic('medium');
+      return;
+    }
 
-    // Calculate start_time based on timing selection
     let startTime: Date;
     if (timing === 'now') {
       startTime = new Date();
@@ -199,10 +245,10 @@ export function CreateGameModal({
     }
 
     setIsSubmitting(true);
+    haptic('medium');
+    
     try {
       const totalSlots = currentPlayers + availableSlots;
-      
-      // Separate users and guests
       const taggedUserIds = selectedUsers.filter(u => !u.guest_name).map(u => u.id);
       const guestParticipants = selectedUsers
         .filter(u => u.guest_name)
@@ -221,7 +267,7 @@ export function CreateGameModal({
         guest_participants: guestParticipants.length > 0 ? guestParticipants : undefined,
       });
       
-      // Reset form after successful creation
+      // Reset form
       setGameType('9_holes');
       setCourseId('');
       setCourseName('');
@@ -232,8 +278,18 @@ export function CreateGameModal({
       setCustomDateTime(null);
       setAvailableSlots(3);
       setSelectedUsers([]);
-      setValidationErrors({});
-      setCourseError('');
+      setActivePreset(null);
+      setTouchedFields({
+        gameType: false,
+        visibility: false,
+        note: false,
+        when: false,
+        slots: false,
+      });
+      
+      onClose();
+    } catch (error) {
+      console.error('Error creating beacon:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -241,6 +297,9 @@ export function CreateGameModal({
 
   const handleTimingChange = (value: string) => {
     setTiming(value);
+    setTouchedFields(prev => ({ ...prev, when: true }));
+    haptic('light');
+    
     if (value === 'choose') {
       openCustomTimePicker();
     }
@@ -252,7 +311,7 @@ export function CreateGameModal({
       onSelect: (date) => {
         setCustomDateTime(date);
         setTiming('choose');
-        // Then open time picker
+        setTouchedFields(prev => ({ ...prev, when: true }));
         openTimePicker({
           initial: customDateTime ? format(customDateTime, 'HH:mm') : '08:00',
           onSelect: (time) => {
@@ -266,16 +325,26 @@ export function CreateGameModal({
     });
   };
 
-
   const getTimingDisplay = () => {
     if (timing === 'choose' && customDateTime) {
-      return format(customDateTime, "MMM d • h:mm a");
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      const isToday = customDateTime.toDateString() === today.toDateString();
+      const isTomorrow = customDateTime.toDateString() === tomorrow.toDateString();
+      
+      if (isToday) {
+        return `Today • ${format(customDateTime, 'HH:mm')}`;
+      } else if (isTomorrow) {
+        return `Tomorrow • ${format(customDateTime, 'HH:mm')}`;
+      } else {
+        return format(customDateTime, "EEE dd MMM • HH:mm");
+      }
     }
-    return TIMING_OPTIONS.find(opt => opt.value === timing)?.label || 'Now';
+    return null;
   };
 
-
-  // Hub mode uses same glass as HubGolfersPage (120px blur backdrop)
   const containerStyle = {
     background: 'rgba(0, 0, 0, 0.25)',
     backdropFilter: 'blur(120px)',
@@ -306,6 +375,15 @@ export function CreateGameModal({
     boxShadow: 'none',
   };
 
+  const getTaggedPlayersSummary = () => {
+    if (selectedUsers.length === 0) return null;
+    if (selectedUsers.length === 1) return selectedUsers[0].username || selectedUsers[0].guest_name;
+    if (selectedUsers.length === 2) {
+      return `${selectedUsers[0].username || selectedUsers[0].guest_name}, ${selectedUsers[1].username || selectedUsers[1].guest_name}`;
+    }
+    return `${selectedUsers[0].username || selectedUsers[0].guest_name}, ${selectedUsers[1].username || selectedUsers[1].guest_name} +${selectedUsers.length - 2} more`;
+  };
+
   return (
     <div 
       className="fixed inset-0 flex items-end sm:items-center sm:justify-center animate-fade-in"
@@ -316,7 +394,6 @@ export function CreateGameModal({
         pointerEvents: 'auto',
       }}
     >
-      {/* Backdrop */}
       {!hubMode && (
         <div 
           className="absolute inset-0"
@@ -325,261 +402,373 @@ export function CreateGameModal({
         />
       )}
       
-      {/* Modal */}
       <div 
         className="relative w-full max-w-lg flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-200"
-        style={modalStyle}
+        style={{
+          ...modalStyle,
+          touchAction: 'pan-y',
+          overflowX: 'hidden',
+          minWidth: 0,
+          width: '100%',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <header
-          className="fixed top-0 left-0 right-0 flex items-center justify-between px-4 h-14 border-b"
+          className="sticky top-0 z-50 flex items-center justify-between h-14 px-4 border-b"
           style={{
-            zIndex: 10,
             borderColor: 'var(--hub-stroke)',
             background: 'rgba(22, 24, 27, 0.98)',
-            backdropFilter: 'none',
-            WebkitBackdropFilter: 'none',
-            transition: 'all 160ms ease-out',
-            paddingTop: 'env(safe-area-inset-top, 0px)',
-            contain: 'paint',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            paddingTop: 'max(16px, env(safe-area-inset-top))',
           }}
         >
           <button
             onClick={onClose}
-            className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
-            aria-label="Back to Hub"
+            className="flex items-center gap-1 text-white/90 hover:text-white text-[15px] font-medium transition-colors -ml-1"
+            aria-label="Back"
           >
-            ‹ Back
+            <ChevronLeft className="w-5 h-5" />
+            Back
           </button>
           <h1 className="text-white/90 text-[17px] font-semibold">Create a game</h1>
           <div className="w-16" />
         </header>
 
-        {/* Content */}
         <div 
-          className="flex-1 overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]"
+          className="flex-1 overflow-y-auto"
           style={{
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',
+            touchAction: 'pan-y',
+            overscrollBehaviorX: 'none',
+            overflowX: 'hidden',
+            paddingBottom: '120px',
           }}
         >
-          <div className="px-4 pb-6 space-y-3" style={{ paddingTop: '28px' }}>
-            {/* Create new beacon form */}
-            <>
-              {/* Game Type */}
-                <div className="space-y-2">
-                <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
-                  Game type
-                </h3>
-                <Segmented
-                  ariaLabel="Game type"
-                  columns={2}
-                  items={GAME_TYPES}
-                  value={gameType}
-                  onChange={(v) => setGameType(String(v))}
-                />
-              </div>
-
-              {/* Golf course - matching GamesTab styling */}
-              <div className="findBlock">
-                {selectedClub ? (
-                  <div className="selectedClubRow">
-                    <span className="prefix">Hosting at</span>
-                    <div className="clubPill">
-                      <span className="clubName">{selectedClub.name}</span>
-                      <TapButton 
-                        className="x" 
-                        aria-label="Clear" 
-                        onClick={() => {
-                          haptic('light');
-                          setCourseId('');
-                          setCourseName('');
-                          setSelectedClub(null);
-                          setCourseQuery('');
-                          setCourseError('');
-                        }}
-                      >
-                        ✕
-                      </TapButton>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <label className="findLabel">Host a game at</label>
-                    <div className="searchBox" style={{ margin: 0 }}>
-                      <Search className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
-                      <input
-                        placeholder="Search golf club..."
-                        value={courseQuery}
-                        onChange={(e) => setCourseQuery(e.target.value)}
-                        onFocus={() => setIsCourseDropdownOpen(true)}
-                        onBlur={() => setTimeout(() => setIsCourseDropdownOpen(false), 200)}
-                      />
-                    </div>
-                    {isCourseDropdownOpen && courseQuery.length >= 2 && (
-                      <div className="resultsSheet">
-                        {isSearchingCourses ? (
-                          <div className="hint">Searching...</div>
-                        ) : courses.length === 0 ? (
-                          <div className="hint">No clubs found</div>
-                        ) : (
-                          courses.map(c => (
-                            <TapButton 
-                              key={c.id} 
-                              className="resultRow" 
-                              onClick={() => {
-                                haptic('light');
-                                setCourseId(c.id);
-                                setCourseName(c.name);
-                                setSelectedClub({ id: c.id, name: c.name });
-                                setCourseQuery('');
-                                setIsCourseDropdownOpen(false);
-                                setCourseError('');
-                              }}
-                            >
-                              <MapPin className="w-4 h-4" style={{ color: 'white' }} />
-                              <div className="rMid">
-                                <div className="rTitle">{c.name}</div>
-                                <div className="rSub">{c.region || c.country}</div>
-                              </div>
-                            </TapButton>
-                          ))
-                        )}
-                      </div>
+          <div className="px-4 pt-6 space-y-5">
+            {/* Game Type - 2x2 Grid */}
+            <div className="space-y-2">
+              <label className="sectionLabel">Game type</label>
+              <div className="grid grid-cols-2 gap-2">
+                {GAME_TYPES.map((type) => (
+                  <button
+                    key={type.value}
+                    type="button"
+                    onClick={() => {
+                      setGameType(type.value);
+                      setTouchedFields(prev => ({ ...prev, gameType: true }));
+                      haptic('light');
+                    }}
+                    className={cn(
+                      "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                      "border backdrop-blur-sm",
+                      gameType === type.value
+                        ? "bg-white/[0.12] border-white/20 text-white shadow-sm"
+                        : "bg-white/[0.04] border-white/[0.08] text-white/70 hover:bg-white/[0.08]"
                     )}
-                    {isCourseDropdownOpen && courseQuery.length > 0 && courseQuery.length < 2 && (
-                      <div className="resultsSheet">
-                        <div className="hint">Type at least 2 characters</div>
-                      </div>
-                    )}
-                  </>
-                )}
-                {courseError && (
-                  <div className="flex items-center gap-2 text-red-400 text-sm mt-2">
-                    <AlertCircle className="w-4 h-4" />
-                    {courseError}
+                  >
+                    {type.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Presets */}
+            <div className="space-y-2">
+              <label className="sectionLabel">Quick presets</label>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => handlePresetSelect('be_my_fourth')}
+                  className={cn(
+                    "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                    "border backdrop-blur-sm",
+                    activePreset === 'be_my_fourth'
+                      ? "bg-white/[0.12] border-white/20 text-white shadow-sm"
+                      : "bg-white/[0.04] border-white/[0.08] text-white/70 hover:bg-white/[0.08]"
+                  )}
+                >
+                  Be my fourth
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePresetSelect('practice_session')}
+                  className={cn(
+                    "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                    "border backdrop-blur-sm",
+                    activePreset === 'practice_session'
+                      ? "bg-white/[0.12] border-white/20 text-white shadow-sm"
+                      : "bg-white/[0.04] border-white/[0.08] text-white/70 hover:bg-white/[0.08]"
+                  )}
+                >
+                  Practice session
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePresetSelect('money_match')}
+                  className={cn(
+                    "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                    "border backdrop-blur-sm",
+                    activePreset === 'money_match'
+                      ? "bg-white/[0.12] border-white/20 text-white shadow-sm"
+                      : "bg-white/[0.04] border-white/[0.08] text-white/70 hover:bg-white/[0.08]"
+                  )}
+                >
+                  Money match
+                </button>
+              </div>
+            </div>
+
+            {/* Golf course */}
+            <div className="findBlock">
+              {selectedClub ? (
+                <div className="selectedClubRow">
+                  <span className="prefix">Hosting at</span>
+                  <div className="clubPill">
+                    <span className="clubName">{selectedClub.name}</span>
+                    <TapButton 
+                      className="x" 
+                      aria-label="Clear" 
+                      onClick={() => {
+                        haptic('light');
+                        setCourseId('');
+                        setCourseName('');
+                        setSelectedClub(null);
+                        setCourseQuery('');
+                        setCourseError('');
+                      }}
+                    >
+                      ✕
+                    </TapButton>
                   </div>
-                )}
-              </div>
-
-              {/* Note */}
-              <div className="space-y-2">
-                <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
-                  Note
-                </h3>
-                <textarea
-                  placeholder="We are looking for a fourth player, casual round, money match - who's in?"
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  rows={2}
-                  className="w-full py-3 px-4 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 resize-none"
-                />
-              </div>
-
-              {/* Visibility */}
-              <div className="space-y-3">
-                <GameVisibilitySelector
-                  value={visibility}
-                  onChange={setVisibility}
-                />
-              </div>
-
-              {/* Timing */}
-              <div className="space-y-2">
-                <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
-                  When
-                </h3>
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  {TIMING_OPTIONS.map(option => (
-                    <Chip
-                      key={option.value}
-                      label={option.label}
-                      active={timing === option.value}
-                      onClick={() => handleTimingChange(option.value)}
+                </div>
+              ) : (
+                <>
+                  <label className="findLabel">Host a game at</label>
+                  <div className="searchBox" style={{ margin: 0 }}>
+                    <Search className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
+                    <input
+                      placeholder="Search golf club…"
+                      value={courseQuery}
+                      onChange={(e) => setCourseQuery(e.target.value)}
+                      onFocus={() => setIsCourseDropdownOpen(true)}
+                      onBlur={() => setTimeout(() => setIsCourseDropdownOpen(false), 200)}
                     />
-                  ))}
-                </div>
-                {timing === 'choose' && customDateTime && (
-                  <div className="text-sm text-white/80 text-center mt-2">
-                    Selected • {getTimingDisplay()}
                   </div>
-                )}
-              </div>
-
-              {/* Tag Players */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
-                    Tag players (optional)
-                  </h3>
-                  <div className="text-xs text-white/50">
-                    {gameSizeLabel}
-                  </div>
-                </div>
-                <UserSearchTypeahead
-                  selectedUsers={selectedUsers}
-                  onUserAdd={(user) => setSelectedUsers([...selectedUsers, user])}
-                  onUserRemove={(userId) => setSelectedUsers(selectedUsers.filter(u => u.id !== userId))}
-                  maxUsers={3} // Max 3 tagged (host + 3 = 4 total)
-                />
-              </div>
-
-              {/* Available Slots */}
-              {maxAvailableSlots > 0 && (
-                <div className="space-y-2">
-                  <h3 className="text-[17px] font-semibold text-white tracking-[-0.01em]">
-                    Available slots
-                  </h3>
-                  <Segmented
-                    ariaLabel="Available slots"
-                    columns={3}
-                    items={[1, 2, 3].map(num => ({
-                      value: num,
-                      label: String(num),
-                      disabled: num > maxAvailableSlots
-                    }))}
-                    value={availableSlots}
-                    onChange={(v) => setAvailableSlots(Number(v))}
-                  />
-                  <div className="text-xs text-center text-white/60">
-                    {availableSlots === 1 ? '1 slot available' : `${availableSlots} slots available`}
-                  </div>
-                  {validationErrors.slotsTotal && (
-                    <div className="flex items-center gap-2 text-red-400 text-sm">
-                      <AlertCircle className="w-4 h-4" />
-                      {validationErrors.slotsTotal}
+                  {isCourseDropdownOpen && courseQuery.length >= 2 && (
+                    <div className="resultsSheet">
+                      {isSearchingCourses ? (
+                        <div className="hint">Searching...</div>
+                      ) : courses.length === 0 ? (
+                        <div className="hint">No clubs found</div>
+                      ) : (
+                        courses.map(c => (
+                          <TapButton 
+                            key={c.id} 
+                            className="resultRow" 
+                            onClick={() => {
+                              haptic('light');
+                              setCourseId(c.id);
+                              setCourseName(c.name);
+                              setSelectedClub({ id: c.id, name: c.name });
+                              setCourseQuery('');
+                              setIsCourseDropdownOpen(false);
+                              setCourseError('');
+                            }}
+                          >
+                            <MapPin className="w-4 h-4" style={{ color: 'white' }} />
+                            <div className="rMid">
+                              <div className="rTitle">{c.name}</div>
+                              <div className="rSub">{c.region || c.country}</div>
+                            </div>
+                          </TapButton>
+                        ))
+                      )}
                     </div>
                   )}
-                </div>
+                  {isCourseDropdownOpen && courseQuery.length > 0 && courseQuery.length < 2 && (
+                    <div className="resultsSheet">
+                      <div className="hint">Type at least 2 characters</div>
+                    </div>
+                  )}
+                </>
               )}
-
-              {/* Timing validation error */}
-              {validationErrors.startTime && (
-                <div className="flex items-center gap-2 text-red-400 text-sm">
+              {courseError && (
+                <div className="flex items-center gap-2 text-red-400 text-sm mt-2">
                   <AlertCircle className="w-4 h-4" />
-                  {validationErrors.startTime}
+                  {courseError}
                 </div>
               )}
+            </div>
 
-              <TapButton
-                onClick={handleSubmit}
-                disabled={!gameType || !courseId || isSubmitting}
-                className="w-full h-[56px] rounded-2xl bg-white/[0.08] border border-white/10 py-[10px] text-[15px] font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:bg-white/[0.12] active:scale-[0.98] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                style={{ 
-                  userSelect: 'none', 
-                  WebkitTapHighlightColor: 'transparent', 
-                  WebkitTouchCallout: 'none', 
-                  WebkitUserSelect: 'none',
+            {/* Note */}
+            <div className="space-y-2">
+              <label className="sectionLabel">Note</label>
+              <div 
+                className="rounded-2xl p-4 backdrop-blur-sm border"
+                style={{
+                  background: 'var(--hub-glass-bg-card)',
+                  borderColor: 'var(--hub-stroke)',
                 }}
               >
-                {isSubmitting ? 'Creating…' : 'Create Game'}
-              </TapButton>
-            </>
+                <textarea
+                  placeholder="We are looking for a fourth player, casual round, money match – who's in?"
+                  value={note}
+                  onChange={(e) => {
+                    setNote(e.target.value);
+                    setTouchedFields(prev => ({ ...prev, note: true }));
+                  }}
+                  rows={3}
+                  className="w-full bg-transparent text-white/90 placeholder:text-white/40 focus:outline-none resize-none text-[15px] leading-relaxed"
+                  style={{ minHeight: '80px', maxHeight: '160px' }}
+                />
+              </div>
+            </div>
+
+            {/* Visibility */}
+            <div className="space-y-2">
+              <GameVisibilitySelector
+                value={visibility}
+                onChange={(v) => {
+                  setVisibility(v);
+                  setTouchedFields(prev => ({ ...prev, visibility: true }));
+                  haptic('light');
+                }}
+              />
+            </div>
+
+            {/* Timing */}
+            <div className="space-y-2">
+              <label className="sectionLabel">When</label>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                {TIMING_OPTIONS.map(option => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => handleTimingChange(option.value)}
+                    className={cn(
+                      "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                      "border backdrop-blur-sm",
+                      timing === option.value
+                        ? "bg-white/[0.12] border-white/20 text-white shadow-sm"
+                        : "bg-white/[0.04] border-white/[0.08] text-white/70 hover:bg-white/[0.08]"
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              {timing === 'choose' && customDateTime && (
+                <div className="helper mt-2 text-center">
+                  {getTimingDisplay()}
+                </div>
+              )}
+            </div>
+
+            {/* Tag Players */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="sectionLabel" style={{ margin: 0 }}>Tag players (optional)</label>
+                <div className="text-xs text-white/50">
+                  {gameSizeLabel}
+                </div>
+              </div>
+              <UserSearchTypeahead
+                selectedUsers={selectedUsers}
+                onUserAdd={(user) => setSelectedUsers([...selectedUsers, user])}
+                onUserRemove={(userId) => setSelectedUsers(selectedUsers.filter(u => u.id !== userId))}
+                maxUsers={3}
+              />
+              {selectedUsers.length > 0 && (
+                <div className="helper mt-1">
+                  {getTaggedPlayersSummary()}
+                </div>
+              )}
+            </div>
+
+            {/* Available Slots */}
+            {maxAvailableSlots > 0 && (
+              <div className="space-y-2">
+                <label className="sectionLabel">Available slots</label>
+                <div className="flex gap-2">
+                  {[1, 2, 3].map(num => (
+                    <button
+                      key={num}
+                      type="button"
+                      disabled={num > maxAvailableSlots}
+                      onClick={() => {
+                        setAvailableSlots(num);
+                        setTouchedFields(prev => ({ ...prev, slots: true }));
+                        haptic('light');
+                      }}
+                      className={cn(
+                        "flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                        "border backdrop-blur-sm",
+                        availableSlots === num
+                          ? "bg-white/[0.12] border-white/20 text-white shadow-sm"
+                          : num > maxAvailableSlots
+                          ? "bg-white/[0.02] border-white/[0.04] text-white/30 cursor-not-allowed"
+                          : "bg-white/[0.04] border-white/[0.08] text-white/70 hover:bg-white/[0.08]"
+                      )}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+                <div className="helper text-center">
+                  {availableSlots === 1 ? '1 slot available' : `${availableSlots} slots available`}
+                </div>
+                {validationErrors.slotsTotal && (
+                  <div className="flex items-center gap-2 text-red-400 text-sm">
+                    <AlertCircle className="w-4 h-4" />
+                    {validationErrors.slotsTotal}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {validationErrors.startTime && (
+              <div className="flex items-center gap-2 text-red-400 text-sm">
+                <AlertCircle className="w-4 h-4" />
+                {validationErrors.startTime}
+              </div>
+            )}
           </div>
+        </div>
+
+        {/* Sticky Footer CTA */}
+        <div 
+          className="sticky bottom-0 left-0 right-0 px-4 pt-3 pb-4 border-t"
+          style={{
+            background: 'rgba(22, 24, 27, 0.98)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            borderColor: 'var(--hub-stroke)',
+            paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
+          }}
+        >
+          <button
+            onClick={handleSubmit}
+            disabled={!gameType || !courseId || isSubmitting}
+            className={cn(
+              "w-full h-[52px] rounded-2xl text-[15px] font-semibold transition-all duration-150",
+              "border backdrop-blur-sm",
+              !gameType || !courseId || isSubmitting
+                ? "bg-white/[0.04] border-white/[0.08] text-white/30 cursor-not-allowed"
+                : "bg-white/[0.12] border-white/20 text-white shadow-lg hover:bg-white/[0.16] active:scale-[0.98]"
+            )}
+            style={{ 
+              userSelect: 'none', 
+              WebkitTapHighlightColor: 'transparent', 
+              WebkitTouchCallout: 'none', 
+              WebkitUserSelect: 'none',
+            }}
+          >
+            {isSubmitting ? 'Creating…' : 'Create Game'}
+          </button>
         </div>
       </div>
     </div>
   );
 }
-
