@@ -153,7 +153,7 @@ export function EchoTile() {
             e.stopPropagation(); 
             navigateFromHub('/hub/echo/history'); 
           }}
-          className="mt-3 self-end text-[12px] font-medium inline-flex items-center gap-1"
+          className="mt-3 self-end text-[15px] font-medium inline-flex items-center gap-1"
           style={{ color: 'var(--hub-text-bright)' }}
         >
           View Chats
