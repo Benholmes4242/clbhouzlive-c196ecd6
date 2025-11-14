@@ -41,14 +41,17 @@ function openActionSheet(config: ActionSheetConfig) {
 
   // Create sheet
   const sheet = document.createElement('div');
+  const hubGlassElevated = getComputedStyle(document.documentElement).getPropertyValue('--hub-glass-bg-elevated') || 'rgba(255,255,255,0.10)';
   sheet.style.cssText = `
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
-    background: #111214;
+    background: ${hubGlassElevated};
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
     border-radius: 20px 20px 0 0;
     padding: 20px;
-    animation: slideUp 0.3s ease;
+    animation: slideUp 0.26s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 -8px 24px rgba(0,0,0,0.5);
     max-height: 75vh;
     overflow: auto;
@@ -70,20 +73,30 @@ function openActionSheet(config: ActionSheetConfig) {
   config.items.forEach((item, i) => {
     const button = document.createElement('button');
     button.textContent = item.label;
+    const hubGlassButton = getComputedStyle(document.documentElement).getPropertyValue('--hub-glass-bg-button') || 'rgba(255,255,255,0.10)';
+    const hubStroke = getComputedStyle(document.documentElement).getPropertyValue('--hub-stroke') || 'rgba(255,255,255,0.14)';
+    const hubText = getComputedStyle(document.documentElement).getPropertyValue('--hub-text') || '#eaeaea';
     button.style.cssText = `
       width: 100%;
       padding: 16px;
-      background: #252525;
-      color: #eaeaea;
-      border: 0;
+      background: ${hubGlassButton};
+      border: 1px solid ${hubStroke};
+      color: ${hubText};
       border-radius: 12px;
       font-size: 16px;
       font-weight: 600;
       margin-bottom: 8px;
       cursor: pointer;
       touch-action: manipulation;
+      transition: background 160ms ease, transform 90ms ease;
     `;
     
+    button.onmousedown = () => {
+      button.style.transform = 'scale(0.98)';
+    };
+    button.onmouseup = () => {
+      button.style.transform = 'scale(1)';
+    };
     button.onclick = () => {
       haptic('medium');
       item.onPress();
@@ -97,13 +110,13 @@ function openActionSheet(config: ActionSheetConfig) {
   document.body.appendChild(overlay);
 
   const closeSheet = () => {
-    overlay.style.animation = 'fadeOut 0.2s ease';
-    sheet.style.animation = 'slideDown 0.2s ease';
+    overlay.style.animation = 'fadeOut 0.16s ease';
+    sheet.style.animation = 'slideDown 0.26s cubic-bezier(0.4, 0, 0.2, 1)';
     setTimeout(() => {
       overlay.remove();
       // Restore body scroll
       document.documentElement.style.overflow = originalOverflow;
-    }, 200);
+    }, 260);
     currentSheet = null;
   };
 
