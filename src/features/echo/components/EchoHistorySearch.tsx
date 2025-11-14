@@ -354,7 +354,7 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
             <button
               key={filter.id}
               onClick={() => handleFilterClick(filter.id)}
-              className="flex-shrink-0 px-3 py-1.5 rounded-full text-[13px] font-medium transition-all"
+              className="flex-shrink-0 h-[34px] px-3 rounded-[10px] text-[14px] font-medium transition-all"
               style={{
                 background: isActive
                   ? 'rgba(255,255,255,0.12)'
