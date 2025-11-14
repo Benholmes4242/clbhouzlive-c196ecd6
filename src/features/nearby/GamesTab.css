@@ -122,6 +122,11 @@
   color: var(--hub-text-placeholder);
 }
 
+.searchBox__icon {
+  color: white;
+  flex-shrink: 0;
+}
+
 .resultsSheet {
   position: relative;
   z-index: 60;
@@ -285,6 +290,11 @@
 
 .chip:active {
   transform: translateY(1px);
+}
+
+.chip__icon {
+  color: white;
+  flex-shrink: 0;
 }
 
 .chip:focus-visible {
@@ -470,6 +480,14 @@
   animation: shimmer 1.5s infinite;
   border-radius: 8px;
   margin-bottom: 8px;
+}
+
+.skeletonLine--wide {
+  width: 60%;
+}
+
+.skeletonLine--narrow {
+  width: 40%;
 }
 
 @keyframes shimmer {
