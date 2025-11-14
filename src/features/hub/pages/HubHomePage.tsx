@@ -14,7 +14,6 @@ import { NearbyGolfersTile } from '../home/tiles/NearbyGolfersTile';
 import { YourGamesTile } from '../home/tiles/YourGamesTile';
 import { SwingQuickTile } from '../home/tiles/SwingQuickTile';
 import '../home/hubTheme.css';
-import '../home/hubGrid.css';
 
 export function HubHomePage() {
   const nav = useNavigate();
@@ -95,29 +94,47 @@ export function HubHomePage() {
       </header>
 
       {/* Hub Dashboard */}
-      <main className="w-full overflow-hidden h-screen pt-[calc(80px+env(safe-area-inset-top,0px))] px-3.5">
-        <section className="hub-grid">
-          {/* Row 1 – full-width Echo tile */}
-          <div className="hub-tile hub-tile--wide">
-            <EchoTile />
-          </div>
-
-          {/* Row 2–3 – hero tiles (Nearby Golfers + Games) */}
-          <div className="hub-tile hub-tile--tall">
+      <main className="w-full overflow-y-auto h-screen pt-[calc(80px+env(safe-area-inset-top,0px))] px-3.5">
+        <div className="pt-1.5">
+        {/* Top 2×2 grid */}
+        <div
+          className="grid"
+          style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem', gridAutoRows: 'var(--hub-tile-fixed-h)' }}
+        >
+          <div className="hub-tile-fixed">
             <NearbyGolfersTile />
           </div>
-          <div className="hub-tile hub-tile--tall">
-            <YourGamesTile />
+          <div className="hub-tile-fixed">
+            <EchoTile />
           </div>
+        </div>
 
-          {/* Row 4 – utility tiles */}
-          <div className="hub-tile">
-            <QuickActionsTile />
-          </div>
-          <div className="hub-tile">
+        {/* Your Games - calculated height to push bottom tiles to 12px from edge */}
+        <div 
+          className="mt-3.5" 
+          style={{ 
+            height: 'calc(100vh - 80px - var(--hub-tile-fixed-h) - 0.875rem - 0.875rem - 0.75rem - 12px - ((100vw - 28px - 0.875rem) / 2))' 
+          }}
+        >
+          <YourGamesTile />
+        </div>
+
+        {/* Echo & Quick Actions 2×2 grid - Square tiles */}
+        <div
+          className="grid mt-3.5"
+          style={{ 
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
+            gap: '0.875rem',
+          }}
+        >
+          <div style={{ aspectRatio: '1', width: '100%' }}>
             <SwingQuickTile />
           </div>
-        </section>
+          <div style={{ aspectRatio: '1', width: '100%' }}>
+            <QuickActionsTile />
+          </div>
+        </div>
+        </div>
       </main>
     </div>
   );
