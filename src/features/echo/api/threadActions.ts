@@ -14,3 +14,10 @@ export async function deleteThread(threadId: string) {
   });
   if (error) throw error;
 }
+
+export async function updateLastOpened(threadId: string) {
+  const { error } = await supabase.rpc('echo_thread_update_last_opened', { 
+    p_thread: threadId 
+  });
+  if (error) throw error;
+}
