@@ -8,31 +8,48 @@ import { nanoid } from 'nanoid';
 import type { EchoMessage } from '../state/echoTypes';
 import { useAIStream } from './useAIStream';
 
-export function useEchoConversation() {
+export function useEchoConversation(opts?: { resetOnMount?: boolean }) {
+  const resetOnMount = opts?.resetOnMount ?? false;
+
   const [messages, setMessages] = useState<EchoMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
   const { sendMessage: sendToAI, abort } = useAIStream();
 
-  // Load messages from localStorage on mount
+  // Load messages from localStorage on mount (or reset if resetOnMount is true)
   useEffect(() => {
-    const stored = localStorage.getItem('echo-current-conversation');
-    if (stored) {
+    if (resetOnMount) {
+      // Fresh conversation: clear storage and in-memory state
       try {
-        const parsed = JSON.parse(stored);
-        setMessages(parsed);
+        localStorage.removeItem('echo-current-conversation');
       } catch (e) {
-        console.error('Failed to load conversation:', e);
+        console.warn('[Echo] Failed to clear stored conversation', e);
       }
+      setMessages([]);
+      return;
     }
-  }, []);
 
-  // Save messages to localStorage
+    // Legacy behaviour: load from storage if present
+    try {
+      const stored = localStorage.getItem('echo-current-conversation');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          setMessages(parsed);
+        }
+      }
+    } catch (e) {
+      console.error('[Echo] Failed to load conversation from storage', e);
+    }
+  }, [resetOnMount]);
+
+  // Save messages to localStorage (skip if resetOnMount is true)
   useEffect(() => {
+    if (resetOnMount) return; // don't persist in "fresh" mode
     if (messages.length > 0) {
       localStorage.setItem('echo-current-conversation', JSON.stringify(messages));
     }
-  }, [messages]);
+  }, [messages, resetOnMount]);
 
   const sendMessage = useCallback(async (content: string) => {
     const userMessage: EchoMessage = {

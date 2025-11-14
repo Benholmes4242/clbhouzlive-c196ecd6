@@ -33,7 +33,13 @@ export function HubEchoChatPage() {
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   
-  const { messages, sendMessage, isStreaming, abortStream } = useEchoConversation();
+  const {
+    messages,
+    isStreaming,
+    streamingContent,
+    sendMessage,
+    abortStream,
+  } = useEchoConversation({ resetOnMount: true });
 
   // Apply hub-open class for glass theme
   useEffect(() => {
