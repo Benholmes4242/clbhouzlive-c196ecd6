@@ -113,8 +113,8 @@
      ECHO CHAT SPECIFIC TOKENS
      ======================================== */
   /* Echo-specific subtle glass */
-  --echo-glass-bg: rgba(18, 18, 18, 0.24);
-  --echo-glass-bg-soft: rgba(18, 18, 18, 0.18);
+  --echo-glass-bg: rgba(18, 18, 18, 0.18);
+  --echo-glass-bg-soft: rgba(18, 18, 18, 0.14);
   --echo-glass-border: rgba(255, 255, 255, 0.10);
   --echo-glass-border-soft: rgba(255, 255, 255, 0.08);
   --echo-glass-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);

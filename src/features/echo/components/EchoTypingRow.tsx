@@ -7,7 +7,7 @@ import React from 'react';
 
 export function EchoTypingRow() {
   return (
-    <div className="flex justify-start">
+    <div className="flex justify-start mt-3 translate-y-[2px]">
       <div className="max-w-[70%] flex items-start gap-3">
         {/* Echo icon */}
         <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[color:var(--echo-accent)]/20 border border-[color:var(--echo-accent)]/30 flex items-center justify-center">

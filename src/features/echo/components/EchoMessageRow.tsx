@@ -24,9 +24,9 @@ export function EchoMessageRow({ message, onContextMenu }: EchoMessageRowProps) 
 
   if (isUser) {
     return (
-      <div className="flex justify-end" data-msg-id={message.id}>
+      <div className="flex justify-end mt-3" data-msg-id={message.id}>
         <div className="max-w-[80%] flex items-start gap-3">
-          <div className="echo-bubble-user px-4 py-3 text-[15px] leading-relaxed text-[color:var(--echo-text-primary)] echo-fade-in-up">
+          <div className="echo-bubble-user px-4 py-3 text-[15px] leading-relaxed text-[color:var(--echo-text-primary)] echo-bubble-enter">
             {message.content}
           </div>
           <div className="flex-shrink-0 w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-xs font-medium text-white/90 overflow-hidden">
@@ -42,13 +42,13 @@ export function EchoMessageRow({ message, onContextMenu }: EchoMessageRowProps) 
   }
 
   return (
-    <div className="flex justify-start" data-msg-id={message.id}>
+    <div className="flex justify-start mt-3" data-msg-id={message.id}>
       <div className="max-w-[92%] flex items-start gap-3">
         <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[color:var(--echo-accent)]/20 border border-[color:var(--echo-accent)]/30 flex items-center justify-center">
           <span className="text-[10px] font-semibold text-[color:var(--echo-accent)]">e</span>
         </div>
         <div className="flex-1">
-          <div className="echo-card px-4 py-3 text-[15px] leading-relaxed text-[color:var(--echo-text-primary)] echo-fade-in-up">
+          <div className="echo-card px-4 py-3 text-[15px] leading-relaxed text-[color:var(--echo-text-primary)] echo-bubble-enter">
             <div className="whitespace-pre-wrap break-words">{message.content}</div>
             {message.meta?.error && <div className="mt-2 text-xs text-red-400">Error: {message.meta.error}</div>}
           </div>
