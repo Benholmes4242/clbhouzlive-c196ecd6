@@ -200,7 +200,7 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
   return (
     <div className={className}>
       {/* Search Input */}
-      <div className="relative mb-3">
+      <div className="relative mb-2">
         <Search
           className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
           style={{ color: 'var(--hub-text-dim)' }}

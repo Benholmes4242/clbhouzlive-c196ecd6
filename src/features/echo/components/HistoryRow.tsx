@@ -23,14 +23,18 @@ export function HistoryRow({ item, onToggle, trailing, children }: Props) {
   
   return (
     <>
-      <div className="eh-row" onClick={onToggle} aria-expanded={!!children}>
+      <div 
+        className="eh-row transition-all duration-200 active:scale-[1.01]" 
+        onClick={onToggle} 
+        aria-expanded={!!children}
+      >
         <div className="eh-row__avatar">
           <EchoAvatar state="idle" size={36} />
         </div>
 
         <div className="eh-row__content">
           <div className="eh-row-head">
-            <h3 className="eh-row__title">{item.title}</h3>
+            <h3 className="eh-row__title line-clamp-2">{item.title}</h3>
             <div className="eh-row__meta">
               {when && <time className="eh-row-when">{when}</time>}
               <div className="eh-actions flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
@@ -39,7 +43,7 @@ export function HistoryRow({ item, onToggle, trailing, children }: Props) {
             </div>
           </div>
           {item.preview_snippet && (
-            <div className="eh-row__preview">{item.preview_snippet}</div>
+            <div className="eh-row__preview line-clamp-2">{item.preview_snippet}</div>
           )}
         </div>
       </div>

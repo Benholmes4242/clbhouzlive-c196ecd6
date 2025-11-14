@@ -15,7 +15,7 @@ import { EchoHistorySearch } from '@/features/echo/components/EchoHistorySearch'
 import { BulkActionBar } from '@/features/echo/components/BulkActionBar';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { starThread, deleteThread } from '@/features/echo/api/threadActions';
+import { starThread, deleteThread, updateLastOpened } from '@/features/echo/api/threadActions';
 import { bulkStarThreads, bulkDeleteThreads } from '@/features/echo/api/bulkActions';
 import { bulkAddTagsToThreads, bulkRemoveTagsFromThreads } from '@/features/echo/api/bulkTags';
 import { BulkTagPopover } from '@/features/echo/components/BulkTagPopover';
@@ -853,7 +853,7 @@ export function HubEchoHistoryPage() {
           </h2>
           
           {/* Search & Filters */}
-          <div className="mb-3">
+          <div className="mb-2">
             <EchoHistorySearch
               onSearchChange={handleSearchChange}
               onFilterChange={handleFilterChange}
@@ -1021,7 +1021,7 @@ export function HubEchoHistoryPage() {
                         isPendingDelete={pendingDeletes.has(item.id)}
                         onStar={() => handleStar(item.id, item.is_starred, 'swipe', index)}
                         onDelete={() => handleDelete(item.id, 'swipe')}
-                        onToggle={() => {
+                        onToggle={async () => {
                           if (selectMode) {
                             const next = new Set(selectedIds);
                             if (isChecked) {
@@ -1044,6 +1044,32 @@ export function HubEchoHistoryPage() {
                               list_filters: filters,
                               rank_index: index,
                             });
+                            
+                            // Update last_opened_at and move to top
+                            try {
+                              // Optimistically update the cache
+                              const now = new Date().toISOString();
+                              queryClient.setQueryData(['echoHistorySearch', filters, 100], (old: any) => {
+                                if (!old) return old;
+                                const updated = old.map((t: any) => 
+                                  t.id === item.id ? { ...t, last_opened_at: now } : t
+                                );
+                                // Sort: last_opened_at desc (nulls last), then last_activity_at desc
+                                return [...updated].sort((a: any, b: any) => {
+                                  const aOpen = a.last_opened_at ?? '';
+                                  const bOpen = b.last_opened_at ?? '';
+                                  if (aOpen !== bOpen) return bOpen.localeCompare(aOpen);
+                                  const aActivity = a.last_activity_at ?? a.created_at ?? '';
+                                  const bActivity = b.last_activity_at ?? b.created_at ?? '';
+                                  return bActivity.localeCompare(aActivity);
+                                });
+                              });
+                              
+                              // Persist to database
+                              await updateLastOpened(item.id);
+                            } catch (error) {
+                              console.error('Failed to update last_opened_at:', error);
+                            }
                           }
                         }}
                       >
