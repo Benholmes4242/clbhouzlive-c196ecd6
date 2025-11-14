@@ -8,6 +8,7 @@ import { Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Z } from '@/config/zIndex';
 import { useEchoConversation } from '@/features/echo/hooks/useEchoConversation';
+import { useAutoSendFromQuery } from '@/components/ai-chat/hooks/useAutoSendFromQuery';
 import { EchoMessageRow } from '@/features/echo/components/EchoMessageRow';
 import { EchoTypingRow } from '@/features/echo/components/EchoTypingRow';
 import { EchoContextMenu } from '@/features/echo/components/EchoContextMenu';
@@ -40,6 +41,17 @@ export function HubEchoChatPage() {
     sendMessage,
     abortStream,
   } = useEchoConversation({ resetOnMount: true });
+
+  // Auto-send from query param (tooltips & Hub search)
+  useAutoSendFromQuery(
+    (msg) => {
+      console.log('[Echo] useAutoSendFromQuery fired with:', msg);
+      if (msg?.trim()) {
+        void sendMessage(msg.trim());
+      }
+    },
+    { param: 'msg', maxLen: 800, stripOn: 'always' }
+  );
 
   // Apply hub-open class for glass theme
   useEffect(() => {

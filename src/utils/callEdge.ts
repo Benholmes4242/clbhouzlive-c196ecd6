@@ -13,7 +13,24 @@ async function withAuthHeaders(init: RequestInit = {}) {
 /** Call any Supabase Edge function with a one-time silent retry on 401 */
 export async function callEdge(path: string, init: RequestInit = {}, retry = true) {
   const req = await withAuthHeaders(init);
-  const res = await fetch(`${EDGE_BASE}/${path}`, req);
+  const url = `${EDGE_BASE}/${path}`;
+  const res = await fetch(url, req);
+
+  // Read response body once
+  let bodyText = '';
+  try {
+    bodyText = await res.text();
+  } catch (e) {
+    console.error('[callEdge] Failed to read response text', e);
+  }
+
+  // Log everything for debugging
+  console.log('[callEdge] Response', {
+    path,
+    status: res.status,
+    ok: res.ok,
+    bodyText: bodyText.substring(0, 500), // First 500 chars
+  });
 
   // Silent retry: stale/paused sessions → refresh once, then re-call
   if (res.status === 401 && retry) {
@@ -21,21 +38,63 @@ export async function callEdge(path: string, init: RequestInit = {}, retry = tru
     const { error } = await supabase.auth.refreshSession();
     if (!error) {
       const req2 = await withAuthHeaders(init);
-      const res2 = await fetch(`${EDGE_BASE}/${path}`, req2);
-      if (!res2.ok) throw new Error(`[callEdge] ${path} failed (${res2.status}): ${await res2.text().catch(() => res2.statusText)}`);
-      return parseResponse(res2);
+      const res2 = await fetch(url, req2);
+      
+      let bodyText2 = '';
+      try {
+        bodyText2 = await res2.text();
+      } catch (e) {
+        console.error('[callEdge] Failed to read retry response text', e);
+      }
+
+      console.log('[callEdge] Retry response', {
+        path,
+        status: res2.status,
+        ok: res2.ok,
+        bodyText: bodyText2.substring(0, 500),
+      });
+
+      if (!res2.ok) {
+        let json: any = null;
+        try {
+          json = bodyText2 ? JSON.parse(bodyText2) : null;
+        } catch (e) {
+          // non-JSON error
+        }
+        const msg = json?.error || json?.message || `Edge request failed with status ${res2.status}`;
+        throw new Error(msg);
+      }
+
+      if (!bodyText2) return null;
+      try {
+        return JSON.parse(bodyText2);
+      } catch (e) {
+        console.error('[callEdge] JSON parse failed on retry', { path, bodyText: bodyText2, error: e });
+        throw new Error('Invalid JSON from edge function');
+      }
     }
   }
 
   if (!res.ok) {
-    throw new Error(`[callEdge] ${path} failed (${res.status}): ${await res.text().catch(() => res.statusText)}`);
-  }
-  return parseResponse(res);
-}
+    let json: any = null;
+    try {
+      json = bodyText ? JSON.parse(bodyText) : null;
+    } catch (e) {
+      // non-JSON / HTML error page etc
+    }
 
-async function parseResponse(res: Response) {
-  const ct = res.headers.get('content-type') || '';
-  return ct.includes('application/json') ? res.json() : res.text();
+    const msg = json?.error || json?.message || `Edge request failed with status ${res.status}`;
+    throw new Error(msg);
+  }
+
+  if (!bodyText) return null;
+
+  try {
+    return JSON.parse(bodyText);
+  } catch (e) {
+    console.error('[callEdge] JSON parse failed', { path, bodyText, error: e });
+    throw new Error('Invalid JSON from edge function');
+  }
 }
 
 // Optional convenience wrappers
