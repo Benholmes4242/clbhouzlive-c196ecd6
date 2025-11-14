@@ -83,15 +83,7 @@ export function CreateGameModal({
   const [isCourseDropdownOpen, setIsCourseDropdownOpen] = useState(false);
   const { courses, isLoading: isSearchingCourses } = useCourseSearch(courseQuery);
 
-  // Preset state
-  const [activePreset, setActivePreset] = useState<PresetId>(null);
-  const [touchedFields, setTouchedFields] = useState({
-    gameType: false,
-    visibility: false,
-    note: false,
-    when: false,
-    slots: false,
-  });
+  // Remove preset state - feature removed per ticket
 
   // Calculate current players (host + tagged)
   const currentPlayers = 1 + selectedUsers.length;
@@ -132,59 +124,7 @@ export function CreateGameModal({
 
   if (!isOpen) return null;
 
-  const handlePresetSelect = (presetId: PresetId) => {
-    if (activePreset === presetId) {
-      setActivePreset(null);
-      haptic('light');
-      return;
-    }
-
-    setActivePreset(presetId);
-    haptic('medium');
-
-    // Apply preset defaults only to untouched fields
-    switch (presetId) {
-      case 'be_my_fourth':
-        if (!touchedFields.gameType) setGameType('18_holes');
-        if (!touchedFields.visibility) setVisibility('public');
-        if (!touchedFields.note && note === '') {
-          setNote("We're looking for a fourth player for a casual 18-hole round – who's in?");
-        }
-        if (!touchedFields.when) {
-          setTiming('60');
-          setCustomDateTime(null);
-        }
-        if (!touchedFields.slots) setAvailableSlots(Math.min(1, maxAvailableSlots));
-        break;
-
-      case 'practice_session':
-        if (!touchedFields.gameType) setGameType('practice');
-        if (!touchedFields.visibility) setVisibility('friends');
-        if (!touchedFields.note && note === '') {
-          setNote("Practice session – working on my game and looking for someone to join for drills and a few relaxed holes.");
-        }
-        if (!touchedFields.when) {
-          const today = new Date();
-          setCustomDateTime(today);
-          setTiming('choose');
-        }
-        if (!touchedFields.slots) setAvailableSlots(Math.min(2, maxAvailableSlots));
-        break;
-
-      case 'money_match':
-        if (!touchedFields.gameType) setGameType('casual_golf');
-        if (!touchedFields.visibility) setVisibility('public');
-        if (!touchedFields.note && note === '') {
-          setNote("Money match – friendly but competitive round, small stakes, all handicaps welcome. Who's in?");
-        }
-        if (!touchedFields.when) {
-          setTiming('30');
-          setCustomDateTime(null);
-        }
-        if (!touchedFields.slots) setAvailableSlots(Math.min(3, maxAvailableSlots));
-        break;
-    }
-  };
+  // Preset handler removed per ticket
 
   const validateForm = (): boolean => {
     const errors: ValidationErrors = {};
@@ -278,14 +218,6 @@ export function CreateGameModal({
       setCustomDateTime(null);
       setAvailableSlots(3);
       setSelectedUsers([]);
-      setActivePreset(null);
-      setTouchedFields({
-        gameType: false,
-        visibility: false,
-        note: false,
-        when: false,
-        slots: false,
-      });
       
       onClose();
     } catch (error) {
@@ -297,7 +229,6 @@ export function CreateGameModal({
 
   const handleTimingChange = (value: string) => {
     setTiming(value);
-    setTouchedFields(prev => ({ ...prev, when: true }));
     haptic('light');
     
     if (value === 'choose') {
@@ -311,7 +242,6 @@ export function CreateGameModal({
       onSelect: (date) => {
         setCustomDateTime(date);
         setTiming('choose');
-        setTouchedFields(prev => ({ ...prev, when: true }));
         openTimePicker({
           initial: customDateTime ? format(customDateTime, 'HH:mm') : '08:00',
           onSelect: (time) => {
@@ -457,66 +387,21 @@ export function CreateGameModal({
                     type="button"
                     onClick={() => {
                       setGameType(type.value);
-                      setTouchedFields(prev => ({ ...prev, gameType: true }));
                       haptic('light');
                     }}
                     className={cn(
-                      "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                      "px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150",
                       "border backdrop-blur-sm",
+                      "active:scale-[0.97]",
                       gameType === type.value
                         ? "bg-white/[0.12] border-white/20 text-white shadow-sm"
                         : "bg-white/[0.04] border-white/[0.08] text-white/70 hover:bg-white/[0.08]"
                     )}
+                    style={{ letterSpacing: '0.2px' }}
                   >
                     {type.label}
                   </button>
                 ))}
-              </div>
-            </div>
-
-            {/* Quick Presets */}
-            <div className="space-y-2">
-              <label className="sectionLabel">Quick presets</label>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => handlePresetSelect('be_my_fourth')}
-                  className={cn(
-                    "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
-                    "border backdrop-blur-sm",
-                    activePreset === 'be_my_fourth'
-                      ? "bg-white/[0.12] border-white/20 text-white shadow-sm"
-                      : "bg-white/[0.04] border-white/[0.08] text-white/70 hover:bg-white/[0.08]"
-                  )}
-                >
-                  Be my fourth
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handlePresetSelect('practice_session')}
-                  className={cn(
-                    "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
-                    "border backdrop-blur-sm",
-                    activePreset === 'practice_session'
-                      ? "bg-white/[0.12] border-white/20 text-white shadow-sm"
-                      : "bg-white/[0.04] border-white/[0.08] text-white/70 hover:bg-white/[0.08]"
-                  )}
-                >
-                  Practice session
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handlePresetSelect('money_match')}
-                  className={cn(
-                    "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
-                    "border backdrop-blur-sm",
-                    activePreset === 'money_match'
-                      ? "bg-white/[0.12] border-white/20 text-white shadow-sm"
-                      : "bg-white/[0.04] border-white/[0.08] text-white/70 hover:bg-white/[0.08]"
-                  )}
-                >
-                  Money match
-                </button>
               </div>
             </div>
 
@@ -525,7 +410,13 @@ export function CreateGameModal({
               {selectedClub ? (
                 <div className="selectedClubRow">
                   <span className="prefix">Hosting at</span>
-                  <div className="clubPill">
+                  <div 
+                    className="clubPill"
+                    style={{
+                      padding: '6px 10px 6px 14px',
+                      borderColor: 'rgba(255, 255, 255, 0.18)',
+                    }}
+                  >
                     <span className="clubName">{selectedClub.name}</span>
                     <TapButton 
                       className="x" 
@@ -537,6 +428,14 @@ export function CreateGameModal({
                         setSelectedClub(null);
                         setCourseQuery('');
                         setCourseError('');
+                      }}
+                      style={{
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        width: '24px',
+                        height: '24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                       }}
                     >
                       ✕
@@ -615,10 +514,7 @@ export function CreateGameModal({
                 <textarea
                   placeholder="We are looking for a fourth player, casual round, money match – who's in?"
                   value={note}
-                  onChange={(e) => {
-                    setNote(e.target.value);
-                    setTouchedFields(prev => ({ ...prev, note: true }));
-                  }}
+                  onChange={(e) => setNote(e.target.value)}
                   rows={3}
                   className="w-full bg-transparent text-white/90 placeholder:text-white/40 focus:outline-none resize-none text-[15px] leading-relaxed"
                   style={{ minHeight: '80px', maxHeight: '160px' }}
@@ -632,7 +528,6 @@ export function CreateGameModal({
                 value={visibility}
                 onChange={(v) => {
                   setVisibility(v);
-                  setTouchedFields(prev => ({ ...prev, visibility: true }));
                   haptic('light');
                 }}
               />
@@ -648,12 +543,17 @@ export function CreateGameModal({
                     type="button"
                     onClick={() => handleTimingChange(option.value)}
                     className={cn(
-                      "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
-                      "border backdrop-blur-sm",
+                      "px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150",
+                      "border backdrop-blur-sm flex items-center justify-center",
+                      "active:scale-[0.97]",
                       timing === option.value
                         ? "bg-white/[0.12] border-white/20 text-white shadow-sm"
                         : "bg-white/[0.04] border-white/[0.08] text-white/70 hover:bg-white/[0.08]"
                     )}
+                    style={{ 
+                      letterSpacing: '0.2px',
+                      minHeight: '44px',
+                    }}
                   >
                     {option.label}
                   </button>
@@ -699,18 +599,20 @@ export function CreateGameModal({
                       disabled={num > maxAvailableSlots}
                       onClick={() => {
                         setAvailableSlots(num);
-                        setTouchedFields(prev => ({ ...prev, slots: true }));
                         haptic('light');
                       }}
                       className={cn(
-                        "flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
-                        "border backdrop-blur-sm",
+                        "flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150",
+                        "border backdrop-blur-sm active:scale-[0.97]",
                         availableSlots === num
-                          ? "bg-white/[0.12] border-white/20 text-white shadow-sm"
+                          ? "bg-white/[0.14] border-white/[0.22] text-white shadow-lg"
                           : num > maxAvailableSlots
-                          ? "bg-white/[0.02] border-white/[0.04] text-white/30 cursor-not-allowed"
-                          : "bg-white/[0.04] border-white/[0.08] text-white/70 hover:bg-white/[0.08]"
+                          ? "bg-white/[0.02] border-white/[0.06] text-white/30 cursor-not-allowed"
+                          : "bg-white/[0.04] border-white/[0.12] text-white/70 hover:bg-white/[0.08]"
                       )}
+                      style={{
+                        boxShadow: availableSlots === num ? '0 0 12px rgba(255, 255, 255, 0.08), inset 0 1px 2px rgba(255, 255, 255, 0.12)' : 'none',
+                      }}
                     >
                       {num}
                     </button>
@@ -755,14 +657,15 @@ export function CreateGameModal({
               "w-full h-[52px] rounded-2xl text-[15px] font-semibold transition-all duration-150",
               "border backdrop-blur-sm",
               !gameType || !courseId || isSubmitting
-                ? "bg-white/[0.04] border-white/[0.08] text-white/30 cursor-not-allowed"
-                : "bg-white/[0.12] border-white/20 text-white shadow-lg hover:bg-white/[0.16] active:scale-[0.98]"
+                ? "bg-white/[0.04] border-white/[0.08] text-white/40 cursor-not-allowed opacity-55"
+                : "bg-white/[0.12] border-white/20 text-white shadow-lg hover:bg-white/[0.16] active:scale-[0.97]"
             )}
             style={{ 
               userSelect: 'none', 
               WebkitTapHighlightColor: 'transparent', 
               WebkitTouchCallout: 'none', 
               WebkitUserSelect: 'none',
+              transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           >
             {isSubmitting ? 'Creating…' : 'Create Game'}
