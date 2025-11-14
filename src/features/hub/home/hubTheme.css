@@ -725,3 +725,24 @@ mark {
 .dark .hl-match {
   background: color-mix(in oklab, var(--hub-accent, #6e9277) 38%, transparent);
 }
+
+/* Quick Actions squircle styles */
+.hub-quick-squircle {
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.85));
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+  padding: 10px 8px;
+  min-height: 64px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.hub-quick-squircle:hover {
+  transform: scale(1.02);
+  background: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.75));
+}
+
+.hub-quick-squircle:active {
+  transform: scale(0.98);
+}
