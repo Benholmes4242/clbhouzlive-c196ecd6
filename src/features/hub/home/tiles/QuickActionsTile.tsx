@@ -3,60 +3,51 @@ import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useHub } from '@/features/hub/useHub';
 
+// Quick Action Button - Apple-style compact glass button
 function QA({ labelTop, labelBottom, onClick, icon }: { 
   labelTop: string; 
   labelBottom: string; 
   onClick: () => void; 
   icon: React.ReactNode;
 }) {
+  const lightTap = () => {
+    try {
+      (window.navigator as any)?.vibrate?.(5);
+    } catch {}
+  };
+
   return (
-    <button 
-      className="qa" 
-      onClick={(e) => { e.stopPropagation(); onClick(); }} 
-      aria-label={`${labelTop} ${labelBottom}`}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '4px',
-        padding: '6px 8px',
-        minWidth: 0,
-        minHeight: 0,
-        borderRadius: '16px',
-        background: 'rgba(255,255,255,0.10)',
-        border: '1px solid rgba(255,255,255,0.15)',
-        cursor: 'pointer',
-        transition: 'background 0.2s',
-        overflow: 'hidden',
+    <button
+      type="button"
+      onClick={() => {
+        lightTap();
+        onClick();
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
-      onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.10)')}
+      className="flex-1 min-w-0 flex flex-col items-center justify-center gap-1 rounded-[12px] border border-[color:var(--hub-stroke-subtle)] bg-[color:var(--hub-glass-bg-subtle)] px-2 py-2.5 text-center transition-transform duration-100 active:scale-[0.97]"
+      style={{
+        backdropFilter: 'blur(28px)',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = 'rgba(255,255,255,0.12)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = 'var(--hub-glass-bg-subtle)';
+      }}
+      aria-label={`${labelTop} ${labelBottom}`}
     >
-      <div 
-        className="qa-icon" 
-        style={{ 
-          fontSize: 'clamp(18px, 5vw, 26px)',
-          width: 'clamp(24px, 5vw, 30px)',
-          height: 'clamp(24px, 5vw, 30px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          lineHeight: 1 
-        }} 
-        aria-hidden="true"
-      >
+      {/* Icon */}
+      <span className="text-[18px] leading-none" style={{ color: 'var(--hub-text)' }}>
         {icon}
-      </div>
-      <div className="qa-label" style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        fontWeight: 600, 
-        lineHeight: 1.2 
-      }}>
-        <span style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelTop}</span>
-        <span style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelBottom}</span>
+      </span>
+
+      {/* Labels stacked */}
+      <div className="flex flex-col items-center">
+        <span className="text-[11px] leading-tight font-medium" style={{ color: 'var(--hub-text-body)' }}>
+          {labelTop}
+        </span>
+        <span className="text-[11px] leading-tight text-[color:var(--hub-text-muted)]">
+          {labelBottom}
+        </span>
       </div>
     </button>
   );
@@ -77,17 +68,7 @@ export function QuickActionsTile() {
 
   return (
     <Tile title="Quick Actions" align="center">
-      <div 
-        className="hub-quick-actions" 
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gridTemplateRows: 'repeat(2, 1fr)',
-          gap: '8px',
-          height: '100%',
-          padding: '0',
-        }}
-      >
+      <div className="mt-1 grid grid-cols-2 gap-2">
         <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />
         <QA labelTop="Ask" labelBottom="Echo" onClick={() => navigateFromHub('/hub/echo')} icon="💬" />
         <QA labelTop="Upload" labelBottom="Swing" onClick={openSwing} icon="🏌️" />

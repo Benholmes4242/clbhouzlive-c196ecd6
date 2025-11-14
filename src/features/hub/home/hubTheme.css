@@ -16,6 +16,13 @@
   --hub-tile-content: 312px;
   --hub-blur: 28px;
   
+  /* ========================================
+     MOTION TOKENS
+     ======================================== */
+  --hub-ease-out: cubic-bezier(0.19, 1, 0.22, 1);
+  --hub-anim-fast: 120ms;
+  --hub-anim-med: 220ms;
+  
   /* Nearby Golfers spacing (matches Ask Echo pill) */
   --hub-pill-pad-x: 14px;
   --hub-tile-pad-x: 18px;

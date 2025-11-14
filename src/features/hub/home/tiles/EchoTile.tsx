@@ -69,6 +69,12 @@ export function EchoTile() {
     }
   };
 
+  const lightTap = () => {
+    try {
+      (window.navigator as any)?.vibrate?.(5);
+    } catch {}
+  };
+
   return (
     <Tile 
       title="Echo" 
@@ -83,13 +89,18 @@ export function EchoTile() {
           position: 'relative',
         }}
       >
+        {/* Subtitle */}
+        <p className="mt-0.5 text-[12px] text-[color:var(--hub-text-muted)] leading-snug">
+          Ask Echo anything — golf tips, trips, rules and more.
+        </p>
         {/* View Chats CTA - positioned on tile */}
         <button
           onClick={(e) => { 
-            e.stopPropagation(); 
+            e.stopPropagation();
+            lightTap();
             navigateFromHub('/hub/echo/history'); 
           }}
-          className="text-[15px] font-medium transition"
+          className="text-[15px] font-medium transition hub-tile-pressable"
           style={{
             position: 'absolute',
             bottom: '0',
@@ -108,8 +119,8 @@ export function EchoTile() {
         </button>
         {/* Ask input with send button */}
         <form 
-          onSubmit={(e) => { e.preventDefault(); handleSend(); e.stopPropagation(); }}
-          style={{ position: 'relative', marginTop: '8px' }}
+          onSubmit={(e) => { e.preventDefault(); lightTap(); handleSend(); e.stopPropagation(); }}
+          style={{ position: 'relative', marginTop: '12px' }}
         >
           <input
             aria-label="Ask Echo"
