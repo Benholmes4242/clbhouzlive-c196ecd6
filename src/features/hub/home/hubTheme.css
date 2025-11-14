@@ -15,6 +15,49 @@
   --hub-tile-compact: 200px;
   --hub-tile-content: 312px;
   --hub-blur: 28px;
+
+/* Nearby Golfers Tile Highlight */
+.hub-tile--nearby-highlight {
+  position: relative;
+  overflow: hidden;
+}
+
+.hub-tile--nearby-highlight::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(
+    circle at 0% 0%,
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0.03) 40%,
+    transparent 60%
+  );
+  opacity: 0.75;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* Echo Tile Input Breathing Animation */
+@keyframes hubEchoBreath {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+  40% {
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.0);
+    border-color: rgba(255, 255, 255, 0.28);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.0);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-echo-mini-input {
+    animation: none !important;
+  }
+}
   
   /* Nearby Golfers spacing (matches Ask Echo pill) */
   --hub-pill-pad-x: 14px;

@@ -107,6 +107,7 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
     <Tile 
       title="Nearby Golfers"
       align="center"
+      className="hub-tile--nearby-highlight"
     >
       <div className="flex flex-col h-full" style={{ position: 'relative' }}>
           <div 
