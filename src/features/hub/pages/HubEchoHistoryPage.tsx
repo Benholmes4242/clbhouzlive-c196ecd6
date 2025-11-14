@@ -1003,6 +1003,7 @@ export function HubEchoHistoryPage() {
                     count={chats.length}
                     estimateSize={72}
                     getSize={getRowSize}
+                    getItemKey={(index) => chats[index]?.id || index}
                     overscan={8}
                     className="max-h-[min(70vh,640px)]"
                     render={(index) => {
