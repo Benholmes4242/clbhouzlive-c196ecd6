@@ -97,14 +97,15 @@ function FindAGame({
         ) : (
           <>
             <label className="findLabel">Find a Game</label>
-            <div className="searchBox">
-              <Search size={18} style={{ color: 'white', flexShrink: 0 }} />
+            <div className="searchBox" role="search">
+              <Search size={18} className="searchBox__icon" />
               <input
                 placeholder="Search golf club..."
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onFocus={() => setOpen(true)}
                 onBlur={() => setTimeout(() => setOpen(false), 200)}
+                aria-label="Search golf clubs"
               />
             </div>
             {isOpen && query.length >= 2 && (
@@ -170,31 +171,31 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
       aria-label="Game filters"
     >
       <TapButton 
-        className={`chip ${filters.when === null ? 'chip--placeholder' : ''}`}
+        className={`chip ${filters.when === null ? 'chip--placeholder' : 'chip--active'}`}
         onClick={() => openWhenSheet(filters)}
         aria-label="Filter by date & time"
       >
-        {filters.when === null && <Calendar size={16} style={{ color: 'white', flexShrink: 0 }} />}
+        {filters.when === null && <Calendar size={16} className="chip__icon" />}
         <span className="chip__text">{getWhenLabel()}</span>
       </TapButton>
       
       {showDistance && (
         <TapButton 
-          className={`chip ${filters.distanceKm === null ? 'chip--placeholder' : ''}`}
+          className={`chip ${filters.distanceKm === null ? 'chip--placeholder' : 'chip--active'}`}
           onClick={() => openDistanceSheet(filters)}
           aria-label="Filter by distance"
         >
-          {filters.distanceKm === null && <MapPin size={16} style={{ color: 'white', flexShrink: 0 }} />}
+          {filters.distanceKm === null && <MapPin size={16} className="chip__icon" />}
           <span className="chip__text">{getDistanceLabel()}</span>
         </TapButton>
       )}
       
       <TapButton 
-        className={`chip ${filters.sort === null ? 'chip--placeholder' : ''}`}
+        className={`chip ${filters.sort === null ? 'chip--placeholder' : 'chip--active'}`}
         onClick={() => openSortSheet(filters)}
         aria-label="Sort games"
       >
-        {filters.sort === null && <ArrowUpDown size={16} style={{ color: 'white', flexShrink: 0 }} />}
+        {filters.sort === null && <ArrowUpDown size={16} className="chip__icon" />}
         <span className="chip__text">{getSortLabel()}</span>
       </TapButton>
     </div>
@@ -266,8 +267,8 @@ function GamesList({ games, isLoading }: { games: Game[]; isLoading: boolean }) 
       <div className="list">
         {[1, 2, 3].map(i => (
           <div key={i} className="gameRow gameRow--skeleton">
-            <div className="skeletonLine" style={{ width: '60%' }} />
-            <div className="skeletonLine" style={{ width: '40%' }} />
+            <div className="skeletonLine skeletonLine--wide" />
+            <div className="skeletonLine skeletonLine--narrow" />
           </div>
         ))}
       </div>
@@ -276,7 +277,7 @@ function GamesList({ games, isLoading }: { games: Game[]; isLoading: boolean }) 
 
   if (!games || games.length === 0) {
     return (
-      <div className="empty">
+      <div className="empty" role="status">
         <div className="emoji">📍</div>
         <div className="title">No games found</div>
         <div className="sub">Be the first to start one — tap <strong>Create a Game</strong>.</div>
