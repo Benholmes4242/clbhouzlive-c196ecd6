@@ -75,7 +75,7 @@ export function EchoTile() {
         {/* Top section */}
         <div>
           {/* Title */}
-          <h3 className="text-[20px] font-semibold text-center" style={{ color: 'var(--hub-text-bright)' }}>
+          <h3 className="text-[20px] font-semibold text-center -mt-2" style={{ color: 'var(--hub-text-bright)' }}>
             Echo
           </h3>
 
