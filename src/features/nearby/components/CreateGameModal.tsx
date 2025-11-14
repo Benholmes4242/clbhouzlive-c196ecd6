@@ -511,7 +511,7 @@ export function CreateGameModal({
               >
                 <textarea
                   data-keyboard-aware
-                  placeholder="We are looking for a fourth player, casual round, money match – who's in?"
+                  placeholder="Share the vibe — casual round, matchplay, practice, money match…"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   rows={3}
