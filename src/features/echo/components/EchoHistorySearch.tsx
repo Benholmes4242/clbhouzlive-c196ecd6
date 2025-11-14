@@ -42,7 +42,7 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
 }) => {
   const [query, setQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
-  const [datePresetLabel, setDatePresetLabel] = useState<string | null>(null);
+  const [datePresetLabel, setDatePresetLabel] = useState<string | null>('Most recent');
   const [currentDateFrom, setCurrentDateFrom] = useState<Date | null>(null);
   const [currentDateTo, setCurrentDateTo] = useState<Date | null>(null);
   const [showCustomPicker, setShowCustomPicker] = useState(false);
@@ -104,6 +104,8 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
   const getPresetDates = (preset: string): { from: Date; to: Date } | null => {
     const today = startOfToday();
     switch (preset) {
+      case 'most_recent':
+        return null; // No date filtering for "Most recent"
       case 'today':
         return { from: startOfDay(today), to: endOfDay(today) };
       case 'this_week':
@@ -122,7 +124,18 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
 
   const handlePresetClick = (preset: string, label: string) => {
     const dates = getPresetDates(preset);
-    if (dates) {
+    if (preset === 'most_recent') {
+      // Clear date filters for "Most recent"
+      setDatePresetLabel('Most recent');
+      setCurrentDateFrom(null);
+      setCurrentDateTo(null);
+      setShowCustomPicker(false);
+      
+      const newFilters = getFilterValues();
+      delete newFilters.dateFrom;
+      delete newFilters.dateTo;
+      onFilterChange(newFilters);
+    } else if (dates) {
       setDatePresetLabel(label);
       setCurrentDateFrom(dates.from);
       setCurrentDateTo(dates.to);
@@ -332,7 +345,7 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
               aria-haspopup="dialog"
               aria-label="Filter by date"
             >
-              <span>{datePresetLabel ? `Date: ${datePresetLabel}` : 'Date'}</span>
+              <span>{datePresetLabel || 'Most recent'}</span>
               {datePresetLabel ? (
                 <X 
                   className="w-3.5 h-3.5" 
@@ -348,32 +361,86 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent 
             align="start"
-            className="min-w-[240px] backdrop-blur-xl bg-background/95 border-white/10"
-            style={{ zIndex: 1200 }}
+            className="min-w-[240px] border-white/6 shadow-[0_10px_30px_rgba(0,0,0,0.35)] py-1"
+            style={{ 
+              zIndex: 1200,
+              background: 'rgba(32,37,41,0.96)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+            }}
           >
             {!showCustomPicker ? (
               <>
-                <DropdownMenuItem onClick={() => handlePresetClick('today', 'Today')}>
+                <DropdownMenuItem 
+                  onClick={() => handlePresetClick('most_recent', 'Most recent')}
+                  className={cn(
+                    "text-sm transition rounded-lg mx-1",
+                    datePresetLabel === 'Most recent'
+                      ? "bg-white/18 text-white font-medium"
+                      : "text-white/85 hover:bg-white/10"
+                  )}
+                >
+                  Most recent
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => handlePresetClick('today', 'Today')}
+                  className={cn(
+                    "text-sm transition rounded-lg mx-1",
+                    datePresetLabel === 'Today'
+                      ? "bg-white/18 text-white font-medium"
+                      : "text-white/85 hover:bg-white/10"
+                  )}
+                >
                   Today
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handlePresetClick('this_week', 'This week')}>
+                <DropdownMenuItem 
+                  onClick={() => handlePresetClick('this_week', 'This week')}
+                  className={cn(
+                    "text-sm transition rounded-lg mx-1",
+                    datePresetLabel === 'This week'
+                      ? "bg-white/18 text-white font-medium"
+                      : "text-white/85 hover:bg-white/10"
+                  )}
+                >
                   This week
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handlePresetClick('last_week', 'Last week')}>
+                <DropdownMenuItem 
+                  onClick={() => handlePresetClick('last_week', 'Last week')}
+                  className={cn(
+                    "text-sm transition rounded-lg mx-1",
+                    datePresetLabel === 'Last week'
+                      ? "bg-white/18 text-white font-medium"
+                      : "text-white/85 hover:bg-white/10"
+                  )}
+                >
                   Last week
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handlePresetClick('last_30d', 'Last 30 days')}>
+                <DropdownMenuItem 
+                  onClick={() => handlePresetClick('last_30d', 'Last 30 days')}
+                  className={cn(
+                    "text-sm transition rounded-lg mx-1",
+                    datePresetLabel === 'Last 30 days'
+                      ? "bg-white/18 text-white font-medium"
+                      : "text-white/85 hover:bg-white/10"
+                  )}
+                >
                   Last 30 days
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setShowCustomPicker(true)} className="flex items-center gap-2">
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem 
+                  onClick={() => setShowCustomPicker(true)} 
+                  className="flex items-center gap-2 text-sm transition rounded-lg mx-1 text-white/85 hover:bg-white/10"
+                >
                   <Calendar className="w-4 h-4" />
                   Custom range
                 </DropdownMenuItem>
-                {datePresetLabel && (
+                {datePresetLabel && datePresetLabel !== 'Most recent' && (
                   <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleClearDate} className="text-destructive">
+                    <DropdownMenuSeparator className="bg-white/10" />
+                    <DropdownMenuItem 
+                      onClick={handleClearDate} 
+                      className="text-sm transition rounded-lg mx-1 text-destructive hover:bg-white/10"
+                    >
                       Clear filter
                     </DropdownMenuItem>
                   </>

@@ -16,8 +16,9 @@ export async function deleteThread(threadId: string) {
 }
 
 export async function updateLastOpened(threadId: string) {
-  const { error } = await supabase.rpc('echo_thread_update_last_opened', { 
-    p_thread: threadId 
-  });
+  const { error } = await supabase
+    .from('echo_threads')
+    .update({ last_opened_at: new Date().toISOString() } as any)
+    .eq('id', threadId);
   if (error) throw error;
 }
