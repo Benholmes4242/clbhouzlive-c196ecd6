@@ -84,7 +84,8 @@ export function QuickActionsTile() {
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
           gridTemplateRows: 'repeat(2, 1fr)',
-          gap: '4px',
+          columnGap: '4px',
+          rowGap: '2px',
           height: '100%',
           padding: '0',
         }}
