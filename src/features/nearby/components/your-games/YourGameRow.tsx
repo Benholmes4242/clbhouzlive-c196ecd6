@@ -8,6 +8,7 @@ import { GameStatusPill } from '@/features/hub/components/GameStatusPill';
 import { YourGameDetails } from './YourGameDetails';
 import type { Game, Participant } from './types';
 import { haptic } from '@/utils/haptics';
+import { formatExpires } from '@/lib/formatExpires';
 
 interface YourGameRowProps {
   game: Game;
@@ -52,18 +53,8 @@ export function YourGameRow({
     minute: '2-digit' 
   });
   
-  const expires = new Date(game.expires_at);
-  const now = new Date();
-  const diffMs = expires.getTime() - now.getTime();
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const expiryLabel = diffHours > 0 ? `Expires in ${diffHours}h` : 'Expired';
+  const expiryLabel = formatExpires(game.expires_at);
 
-  // Status logic
-  const getStatus = (): 'open' | 'full' | 'almost' => {
-    if (game.slots_open === 0) return 'full';
-    if (game.slots_open === 1) return 'almost';
-    return 'open';
-  };
 
   return (
     <article
@@ -82,19 +73,20 @@ export function YourGameRow({
         </div>
 
         <div className="yourGameRow__right">
-          <GameStatusPill
-            filled={filled}
-            total={game.slots_total}
-            status={getStatus()}
-          />
-          <ChevronDown
-            className={cn(
-              'yourGameRow__chevron',
-              expanded && 'yourGameRow__chevron--expanded'
-            )}
-            size={16}
-            aria-hidden="true"
-          />
+          <div className={cn('yourGameRow__statusGroup', expanded && 'yourGameRow__statusGroup--lifted')}>
+            <GameStatusPill
+              filled={filled}
+              total={game.slots_total}
+            />
+            <ChevronDown
+              className={cn(
+                'yourGameRow__chevron',
+                expanded && 'yourGameRow__chevron--expanded'
+              )}
+              size={16}
+              aria-hidden="true"
+            />
+          </div>
         </div>
       </div>
 
