@@ -32,9 +32,9 @@ export function HubGamesPage() {
     <div
       className="hub-glass-page fixed inset-0 z-[9999]"
       style={{
-        background: 'rgba(0, 0, 0, 0.25)',
-        backdropFilter: 'blur(120px)',
-        WebkitBackdropFilter: 'blur(120px)',
+        background: 'var(--hub-overlay-bg)',
+        backdropFilter: 'blur(var(--hub-overlay-blur))',
+        WebkitBackdropFilter: 'blur(var(--hub-overlay-blur))',
       }}
     >
       {/* Header */}
@@ -42,9 +42,9 @@ export function HubGamesPage() {
         className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
         style={{
           borderColor: 'var(--hub-stroke)',
-          background: 'rgba(22, 24, 27, 0.98)',
-          backdropFilter: 'none',
-          WebkitBackdropFilter: 'none',
+          background: 'var(--hub-header-bg)',
+          backdropFilter: 'blur(var(--hub-overlay-blur))',
+          WebkitBackdropFilter: 'blur(var(--hub-overlay-blur))',
           paddingTop: 'env(safe-area-inset-top, 0px)',
         }}
       >
