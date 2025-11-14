@@ -170,7 +170,11 @@ export function UserSearchTypeahead({
               <div className="resultsSheet">
                 {/* Add Guest option - ALWAYS pinned at top */}
                 <button
-                  onClick={handleAddGuest}
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleAddGuest();
+                  }}
                   className="resultRow"
                   style={{ marginBottom: '8px' }}
                 >
@@ -192,7 +196,11 @@ export function UserSearchTypeahead({
                 {!isSearching && results.map((user) => (
                   <button
                     key={user.id}
-                    onClick={() => handleUserSelect(user)}
+                    onPointerDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleUserSelect(user);
+                    }}
                     className="resultRow"
                   >
                     <div className="w-8 h-8 rounded-full overflow-hidden bg-neutral-700/50 flex items-center justify-center shrink-0">
