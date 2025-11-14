@@ -21,9 +21,8 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
         justifyContent: 'center',
         gap: '4px',
         padding: '6px 8px',
-        width: '80%',
+        width: '100%',
         aspectRatio: '1',
-        margin: 'auto',
         borderRadius: '16px',
         background: 'rgba(255,255,255,0.10)',
         border: '1px solid rgba(255,255,255,0.15)',
@@ -37,9 +36,9 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
       <div 
         className="qa-icon" 
         style={{ 
-          fontSize: 'clamp(14px, 3.5vw, 20px)',
-          width: 'clamp(18px, 3.5vw, 24px)',
-          height: 'clamp(18px, 3.5vw, 24px)',
+          fontSize: 'clamp(18px, 5vw, 26px)',
+          width: 'clamp(24px, 5vw, 30px)',
+          height: 'clamp(24px, 5vw, 30px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -56,8 +55,8 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
         fontWeight: 600, 
         lineHeight: 1.2 
       }}>
-        <span style={{ fontSize: 'clamp(8px, 1.8vw, 10px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelTop}</span>
-        <span style={{ fontSize: 'clamp(8px, 1.8vw, 10px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelBottom}</span>
+        <span style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelTop}</span>
+        <span style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelBottom}</span>
       </div>
     </button>
   );
@@ -84,8 +83,7 @@ export function QuickActionsTile() {
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
           gridTemplateRows: 'repeat(2, 1fr)',
-          columnGap: '4px',
-          rowGap: '2px',
+          gap: '8px',
           height: '100%',
           padding: '0',
         }}
