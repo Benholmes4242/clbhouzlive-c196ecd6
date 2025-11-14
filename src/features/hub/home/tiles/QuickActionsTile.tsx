@@ -36,9 +36,9 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
       <div 
         className="qa-icon" 
         style={{ 
-          fontSize: 'clamp(16px, 4vw, 22px)',
-          width: 'clamp(20px, 4vw, 26px)',
-          height: 'clamp(20px, 4vw, 26px)',
+          fontSize: 'clamp(14px, 3.5vw, 20px)',
+          width: 'clamp(18px, 3.5vw, 24px)',
+          height: 'clamp(18px, 3.5vw, 24px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -55,8 +55,8 @@ function QA({ labelTop, labelBottom, onClick, icon }: {
         fontWeight: 600, 
         lineHeight: 1.2 
       }}>
-        <span style={{ fontSize: 'clamp(9px, 2vw, 11px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelTop}</span>
-        <span style={{ fontSize: 'clamp(9px, 2vw, 11px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelBottom}</span>
+        <span style={{ fontSize: 'clamp(8px, 1.8vw, 10px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelTop}</span>
+        <span style={{ fontSize: 'clamp(8px, 1.8vw, 10px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelBottom}</span>
       </div>
     </button>
   );
