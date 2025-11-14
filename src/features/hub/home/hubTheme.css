@@ -103,6 +103,16 @@
   /* Close button */
   --hub-close-idle: rgba(255,255,255,0.60);
   --hub-close-hover: rgba(255,255,255,0.90);
+  
+  /* Dividers */
+  --hub-divider-soft: rgba(255,255,255,0.06);
+
+  /* ========================================
+     MOTION & ANIMATION
+     ======================================== */
+  --hub-ease-out: cubic-bezier(0.19, 1, 0.22, 1);
+  --hub-anim-fast: 120ms;
+  --hub-anim-med: 220ms;
 
   /* ========================================
      SEMANTIC SURFACES (legacy compat)
@@ -446,6 +456,23 @@ html.hub-open {
 }
 .hub-golfers-list-scroll.no-snap {
   scroll-snap-type: none !important;
+}
+
+/* ========================================
+   MOTION & PRESSABLE ELEMENTS
+   ======================================== */
+
+.hub-tile-pressable {
+  transition:
+    transform var(--hub-anim-fast) var(--hub-ease-out),
+    box-shadow var(--hub-anim-med) var(--hub-ease-out),
+    border-color var(--hub-anim-med) var(--hub-ease-out),
+    background var(--hub-anim-med) var(--hub-ease-out);
+}
+
+.hub-tile-pressable:active {
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.7);
 }
 
 /* ========================================

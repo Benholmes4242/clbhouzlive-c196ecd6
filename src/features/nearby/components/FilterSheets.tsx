@@ -39,32 +39,68 @@ function openActionSheet(config: ActionSheetConfig) {
     -webkit-backdrop-filter: saturate(120%) blur(6px);
   `;
 
-  // Create sheet
+  // Create sheet with new styling
   const sheet = document.createElement('div');
   sheet.style.cssText = `
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
-    background: #111214;
-    border-radius: 20px 20px 0 0;
-    padding: 20px;
+    background: rgba(10, 10, 10, 0.96);
+    border-radius: 24px 24px 0 0;
+    border-top: 1px solid rgba(255,255,255,0.06);
     animation: slideUp 0.3s ease;
-    box-shadow: 0 -8px 24px rgba(0,0,0,0.5);
+    box-shadow: 0 -22px 50px rgba(0,0,0,0.85);
     max-height: 75vh;
     overflow: auto;
   `;
+  
+  // Add handle
+  const handle = document.createElement('div');
+  handle.style.cssText = `
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 12px;
+    padding-bottom: 8px;
+  `;
+  const handleBar = document.createElement('div');
+  handleBar.style.cssText = `
+    height: 4px;
+    width: 40px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.2);
+  `;
+  handle.appendChild(handleBar);
+  sheet.appendChild(handle);
 
   // Title
   const title = document.createElement('div');
   title.textContent = config.title;
   title.style.cssText = `
-    font-size: 18px;
-    font-weight: 700;
-    color: #eaeaea;
-    margin-bottom: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.96);
+    padding: 0 16px 8px;
     text-align: center;
   `;
   sheet.appendChild(title);
+  
+  // Divider
+  const divider = document.createElement('div');
+  divider.style.cssText = `
+    height: 1px;
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    margin-bottom: 8px;
+  `;
+  sheet.appendChild(divider);
+  
+  // Container for buttons
+  const buttonContainer = document.createElement('div');
+  buttonContainer.style.cssText = `
+    padding: 8px 16px 16px;
+  `;
+  sheet.appendChild(buttonContainer);
 
   // Items
   config.items.forEach((item, i) => {
@@ -72,17 +108,31 @@ function openActionSheet(config: ActionSheetConfig) {
     button.textContent = item.label;
     button.style.cssText = `
       width: 100%;
-      padding: 16px;
-      background: #252525;
-      color: #eaeaea;
-      border: 0;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 600;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.46);
+      border: 1px solid transparent;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 500;
       margin-bottom: 8px;
       cursor: pointer;
       touch-action: manipulation;
+      text-align: left;
+      transition: all 0.15s ease;
     `;
+    
+    button.onmouseover = () => {
+      button.style.background = 'rgba(255,255,255,0.12)';
+      button.style.color = 'rgba(255,255,255,0.96)';
+      button.style.borderColor = 'rgba(142, 255, 169, 0.4)';
+    };
+    
+    button.onmouseout = () => {
+      button.style.background = 'rgba(255,255,255,0.04)';
+      button.style.color = 'rgba(255,255,255,0.46)';
+      button.style.borderColor = 'transparent';
+    };
     
     button.onclick = () => {
       haptic('medium');
@@ -90,7 +140,7 @@ function openActionSheet(config: ActionSheetConfig) {
       closeSheet();
     };
     
-    sheet.appendChild(button);
+    buttonContainer.appendChild(button);
   });
 
   overlay.appendChild(sheet);
