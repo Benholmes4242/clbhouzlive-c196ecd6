@@ -1,0 +1,39 @@
+/**
+ * Games Theme CSS
+ * Additional tokens and styles for Search Games page
+ */
+
+:root {
+  /* Games page background */
+  --games-bg: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.05), rgba(0,0,0,0.95));
+  
+  /* Bottom sheet */
+  --hub-bottomsheet-bg: rgba(10,10,10,0.96);
+  
+  /* Dividers */
+  --hub-divider-soft: rgba(255,255,255,0.06);
+  
+  /* Motion tokens */
+  --hub-ease-out: cubic-bezier(0.19, 1, 0.22, 1);
+  --hub-anim-fast: 120ms;
+  --hub-anim-med: 220ms;
+}
+
+/* Pressable tile animation */
+.hub-tile-pressable {
+  transition:
+    transform var(--hub-anim-fast) var(--hub-ease-out),
+    box-shadow var(--hub-anim-med) var(--hub-ease-out),
+    border-color var(--hub-anim-med) var(--hub-ease-out),
+    background var(--hub-anim-med) var(--hub-ease-out);
+}
+
+.hub-tile-pressable:active {
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.7);
+}
+
+/* Glass surface strong variant */
+:root {
+  --hub-glass-bg-strong: rgba(255,255,255,0.12);
+}
