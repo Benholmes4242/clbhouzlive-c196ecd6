@@ -202,7 +202,6 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
 
   const filters: { id: FilterType; label: string }[] = [
     { id: 'all', label: 'All' },
-    { id: 'favourite', label: 'Favourite' },
   ];
 
   return (
@@ -417,6 +416,18 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
                 >
                   <Calendar className="w-4 h-4" />
                   Custom range
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem 
+                  onClick={() => handleFilterClick('favourite')}
+                  className={cn(
+                    "text-sm transition rounded-lg mx-1",
+                    activeFilter === 'favourite'
+                      ? "bg-white/18 text-white font-medium"
+                      : "text-white/85 hover:bg-white/10"
+                  )}
+                >
+                  Favourite
                 </DropdownMenuItem>
                 {datePresetLabel && datePresetLabel !== 'Most recent' && (
                   <>
