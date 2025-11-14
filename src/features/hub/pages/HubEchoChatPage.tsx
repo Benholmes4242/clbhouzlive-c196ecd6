@@ -186,7 +186,7 @@ export function HubEchoChatPage() {
         ref={messagesContainerRef}
         onScroll={handleScroll}
         data-echo-scroll-container
-        className="relative flex-1 overflow-y-auto px-5 pb-4 pt-3 scroll-smooth"
+        className="relative flex-1 overflow-y-auto px-5 pb-[96px] pt-3 scroll-smooth"
         style={{
           paddingTop: 'calc(3.5rem + env(safe-area-inset-top, 0px) + 12px)',
         }}
