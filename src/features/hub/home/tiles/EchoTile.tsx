@@ -133,7 +133,7 @@ export function EchoTile() {
 
           {/* Sample question */}
           <p 
-            className="mt-2 text-[12px] leading-snug line-clamp-2 cursor-pointer"
+            className="mt-2 text-[12px] leading-snug line-clamp-2 cursor-pointer text-center"
             style={{ color: 'var(--hub-text-muted)' }}
             onClick={(e) => { e.stopPropagation(); sendTip(tips[tipIdx]); }}
             onMouseEnter={() => setPaused(true)}
@@ -153,7 +153,7 @@ export function EchoTile() {
             e.stopPropagation(); 
             navigateFromHub('/hub/echo/history'); 
           }}
-          className="mt-3 self-start text-[12px] font-medium inline-flex items-center gap-1"
+          className="mt-3 self-end text-[12px] font-medium inline-flex items-center gap-1"
           style={{ color: 'var(--hub-text-bright)' }}
         >
           View Chats
