@@ -4,14 +4,15 @@
  */
 
 import React from 'react';
+import EchoAvatar from '@/components/ai-chat/EchoAvatar';
 
 export function EchoTypingRow() {
   return (
     <div className="flex justify-start mt-3 translate-y-[2px]">
       <div className="max-w-[70%] flex items-start gap-3">
-        {/* Echo icon */}
-        <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[color:var(--echo-accent)]/20 border border-[color:var(--echo-accent)]/30 flex items-center justify-center">
-          <span className="text-[10px] font-semibold text-[color:var(--echo-accent)]">e</span>
+        {/* Echo avatar */}
+        <div className="flex-shrink-0">
+          <EchoAvatar state="processing" size={28} />
         </div>
 
         <div className="echo-card px-3 py-2 flex items-center gap-1.5 w-[72px] justify-center">

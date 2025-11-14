@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import type { EchoMessage } from '../state/echoTypes';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { supabase } from '@/integrations/supabase/client';
+import EchoAvatar from '@/components/ai-chat/EchoAvatar';
 
 interface EchoMessageRowProps {
   message: EchoMessage;
@@ -44,8 +45,8 @@ export function EchoMessageRow({ message, onContextMenu }: EchoMessageRowProps) 
   return (
     <div className="flex justify-start mt-3" data-msg-id={message.id}>
       <div className="max-w-[92%] flex items-start gap-3">
-        <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[color:var(--echo-accent)]/20 border border-[color:var(--echo-accent)]/30 flex items-center justify-center">
-          <span className="text-[10px] font-semibold text-[color:var(--echo-accent)]">e</span>
+        <div className="flex-shrink-0">
+          <EchoAvatar state="idle" size={28} />
         </div>
         <div className="flex-1">
           <div className="echo-card px-4 py-3 text-[15px] leading-relaxed text-[color:var(--echo-text-primary)] echo-bubble-enter">
