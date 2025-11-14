@@ -326,17 +326,24 @@
   font-size: 18px;
 }
 
-/* Games List */
+/* Games List - FLAT, NO CONTAINER STYLING */
 .list {
   display: flex;
   flex-direction: column;
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
-/* Game Row - flat design matching Your Games */
+/* Game Row - FLAT DESIGN, NO BUBBLES/CARDS */
 .gameRow {
   padding: 12px max(16px, env(safe-area-inset-left)) 14px max(16px, env(safe-area-inset-right));
   border-bottom: 1px solid var(--hub-stroke-subtle);
   cursor: pointer;
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   transition:
     background-color var(--hub-anim-fast) ease-out,
     transform var(--hub-anim-fast) ease-out;
