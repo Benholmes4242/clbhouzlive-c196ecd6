@@ -65,33 +65,44 @@ export function HudDropdown({
         type="button"
         onClick={() => setOpen(o => !o)}
         className="
-          inline-flex items-center gap-1.5
-          px-3.5 py-2
-          rounded-full
-          bg-white/4
-          border border-white/8
-          text-sm text-white/80
-          backdrop-blur-md
-          active:bg-white/8
+          w-full h-[34px] px-3 rounded-[10px] 
+          border border-white/10 
+          bg-white/[0.06] 
+          backdrop-blur-md 
+          flex items-center justify-between 
+          text-[14px] font-medium 
+          transition-all duration-[120ms] 
+          focus:outline-none focus:ring-2 focus:ring-white/20 
+          hover:bg-white/[0.10] 
+          active:scale-[0.98]
         "
+        style={{ color: 'var(--hub-text-body)' }}
       >
-        {iconLeft && <span className="text-white/60">{iconLeft}</span>}
-        <span>{label ?? selected?.label ?? 'Select'}</span>
-        <span className="ml-0.5 text-xs text-white/50">⌄</span>
+        {iconLeft && <span className="text-white/60 mr-1.5">{iconLeft}</span>}
+        <span className="flex-1 text-left">{label ?? selected?.label ?? 'Select'}</span>
+        <svg 
+          className={`w-3.5 h-3.5 text-white/60 transition-transform duration-150 ${open ? 'rotate-180' : ''}`}
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
       </button>
 
       {/* Popover list */}
       {open && (
         <div
           className="
-            absolute left-0 mt-1.5 w-56
-            rounded-2xl
-            bg-black/88
-            text-sm text-white/90
-            shadow-[0_18px_40px_rgba(0,0,0,0.55)]
-            overflow-hidden
-            z-50
-            backdrop-blur-xl
+            absolute left-0 mt-1.5
+            min-w-[220px]
+            rounded-[14px]
+            bg-[rgba(32,37,41,0.96)]
+            border border-white/6
+            shadow-[0_10px_30px_rgba(0,0,0,0.35)]
+            py-1
+            z-[999]
+            animate-fade-in
           "
         >
           {options.map(option => (
@@ -106,8 +117,9 @@ export function HudDropdown({
                 setOpen(false);
               }}
               className={`
-                w-full text-left px-3.5 py-2.5
-                ${option.value === value ? 'bg-white/10 font-medium' : 'bg-transparent hover:bg-white/5'}
+                w-full text-left px-3 py-2.5 rounded-lg
+                text-sm transition
+                ${option.value === value ? 'bg-white/18 text-white font-medium' : 'text-white/85 hover:bg-white/10'}
               `}
             >
               {option.label}
