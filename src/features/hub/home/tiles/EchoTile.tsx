@@ -70,112 +70,95 @@ export function EchoTile() {
   };
 
   return (
-    <Tile 
-      title="Echo" 
-      align="center"
-    >
-      <div 
-        className="echo-body"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          position: 'relative',
-        }}
-      >
-        {/* View Chats CTA - positioned on tile */}
+    <Tile title="" align="center">
+      <div className="flex h-full flex-col justify-between">
+        {/* Top section */}
+        <div>
+          {/* Title */}
+          <h3 className="text-[15px] font-semibold" style={{ color: 'var(--hub-text-bright)' }}>
+            Echo
+          </h3>
+
+          {/* Ask Echo input */}
+          <div className="mt-2">
+            <form 
+              onSubmit={(e) => { e.preventDefault(); handleSend(); e.stopPropagation(); }}
+              style={{ position: 'relative' }}
+            >
+              <input
+                aria-label="Ask Echo"
+                placeholder="Ask Echo"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  width: '100%',
+                  height: '40px',
+                  borderRadius: '14px',
+                  padding: '0 44px 0 14px',
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  outline: 0,
+                  fontSize: '15px',
+                  color: 'var(--hub-text)',
+                }}
+              />
+              <button
+                type="submit"
+                disabled={!input.trim()}
+                aria-label="Send"
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  position: 'absolute',
+                  right: '6px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '12px',
+                  border: 0,
+                  background: 'rgba(255,255,255,0.08)',
+                  fontSize: '16px',
+                  cursor: input.trim() ? 'pointer' : 'default',
+                  opacity: input.trim() ? 1 : 0.4,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Send size={16} />
+              </button>
+            </form>
+          </div>
+
+          {/* Sample question */}
+          <p 
+            className="mt-2 text-[12px] leading-snug line-clamp-2 cursor-pointer"
+            style={{ color: 'var(--hub-text-muted)' }}
+            onClick={(e) => { e.stopPropagation(); sendTip(tips[tipIdx]); }}
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter') sendTip(tips[tipIdx]); }}
+          >
+            "{tips[tipIdx]}"
+          </p>
+        </div>
+
+        {/* Bottom link */}
         <button
+          type="button"
           onClick={(e) => { 
             e.stopPropagation(); 
             navigateFromHub('/hub/echo/history'); 
           }}
-          className="text-[15px] font-medium transition"
-          style={{
-            position: 'absolute',
-            bottom: '0',
-            right: '0',
-            background: 'transparent',
-            border: 'none',
-            color: 'var(--hub-text-body)',
-            padding: 0,
-            zIndex: 1,
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-          aria-label="View echo history"
+          className="mt-3 self-start text-[12px] font-medium inline-flex items-center gap-1"
+          style={{ color: 'var(--hub-text-bright)' }}
         >
-          View Chats →
+          View Chats
+          <span aria-hidden>→</span>
         </button>
-        {/* Ask input with send button */}
-        <form 
-          onSubmit={(e) => { e.preventDefault(); handleSend(); e.stopPropagation(); }}
-          style={{ position: 'relative', marginTop: '8px' }}
-        >
-          <input
-            aria-label="Ask Echo"
-            placeholder="Ask Echo"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: '100%',
-              height: '40px',
-              borderRadius: '14px',
-              padding: '0 44px 0 14px',
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              outline: 0,
-              fontSize: '15px',
-              color: 'var(--hub-text)',
-            }}
-          />
-          <button
-            type="submit"
-            disabled={!input.trim()}
-            aria-label="Send"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              position: 'absolute',
-              right: '6px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              width: '34px',
-              height: '34px',
-              borderRadius: '12px',
-              border: 0,
-              background: 'rgba(255,255,255,0.08)',
-              fontSize: '16px',
-              cursor: input.trim() ? 'pointer' : 'default',
-              opacity: input.trim() ? 1 : 0.4,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Send size={16} />
-          </button>
-        </form>
-
-        {/* Tip carousel – text only, centered, two-line clamp, clickable */}
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={(e) => { e.stopPropagation(); sendTip(tips[tipIdx]); }}
-          onKeyDown={(e) => { if (e.key === 'Enter') sendTip(tips[tipIdx]); }}
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
-          onTouchStart={() => setPaused(true)}
-          onTouchEnd={() => setPaused(false)}
-          aria-label={`Ask Echo: ${tips[tipIdx]}`}
-          style={{
-            marginTop: 12,
-            marginBottom: 'auto',
-            padding: '2px 8px',
-            cursor: 'pointer',
-          }}
-        >
-          <div className="echo-tip-line">"{tips[tipIdx]}"</div>
-        </div>
       </div>
     </Tile>
   );
