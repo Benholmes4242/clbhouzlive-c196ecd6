@@ -808,7 +808,7 @@ export function HubEchoHistoryPage() {
 
   return (
     <div
-      className="hub-glass-page fixed inset-0 z-[9999]"
+      className="hub-glass-page fixed inset-0 z-[9999] flex flex-col overflow-x-hidden overflow-y-auto"
       style={{
         background: 'var(--hub-backdrop)',
         backdropFilter: 'blur(var(--hub-backdrop-blur))',
@@ -841,10 +841,10 @@ export function HubEchoHistoryPage() {
 
       {/* Body - Page shell with safe-area padding */}
       <main 
-        className="relative h-full pt-[calc(3.5rem+var(--hub-pad,20px)+env(safe-area-inset-top,0px))] pb-[calc(var(--hub-pad,20px)+env(safe-area-inset-bottom,0px))]"
+        className="relative flex-1 min-w-0 pt-[calc(3.5rem+var(--hub-pad,20px)+env(safe-area-inset-top,0px))] pb-[calc(var(--hub-pad,20px)+env(safe-area-inset-bottom,0px))] overflow-y-auto overflow-x-hidden"
       >
         {/* Content container - direct on background */}
-        <section className="px-4 md:px-6 max-w-3xl mx-auto eh-fixedLayer">
+        <section className="px-4 md:px-6 max-w-3xl mx-auto eh-fixedLayer min-w-0">
           <h2
             className="text-[17px] font-semibold mb-3"
             style={{ color: 'rgba(255,255,255,0.9)' }}
