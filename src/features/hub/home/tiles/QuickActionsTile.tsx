@@ -86,7 +86,10 @@ export function QuickActionsTile() {
           rowGap: '16px',
           columnGap: '16px',
           height: '100%',
-          padding: '12px',
+          paddingTop: '0',
+          paddingBottom: '12px',
+          paddingLeft: '12px',
+          paddingRight: '12px',
         }}
       >
         <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />
