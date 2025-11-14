@@ -42,10 +42,21 @@ export function SwingQuickTile() {
   });
 
   const thumbnail = lastSwing?.video_url;
+  const isProcessing = false; // Can be determined by checking if analysis is recent
 
   return (
     <Tile 
-      title="Swing Coach" 
+      title={
+        <div className="flex items-center justify-between gap-2 w-full">
+          <span>Swing Coach</span>
+          {isProcessing && (
+            <div className="hub-swing-live-pill">
+              <span className="hub-swing-live-dot" />
+              Processing…
+            </div>
+          )}
+        </div>
+      }
       subtitle="Upload your swing"
       align="center"
     >
@@ -70,22 +81,28 @@ export function SwingQuickTile() {
           <ArrowUpTrayIcon className="w-[18px] h-[18px] opacity-80 mr-[-2px] shrink-0" />
         </button>
 
-        {/* View swings CTA */}
-        <button
-          onClick={openSwingHistory}
-          className="ml-auto mt-3 block text-[15px] font-medium transition"
-          style={{
-            background: 'transparent',
-            border: 'none',
-            color: 'var(--hub-text-body)',
-            padding: 0,
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-          aria-label="View swing history"
-        >
-          View swings →
-        </button>
+        {/* Empty state or View swings CTA */}
+        {!lastSwing ? (
+          <div className="mt-2 rounded-[14px] border border-dashed border-white/10 bg-black/25 px-3 py-3 text-[12px] leading-snug text-white/70">
+            No swings analysed yet — upload your first one and Echo will break it down for you.
+          </div>
+        ) : (
+          <button
+            onClick={openSwingHistory}
+            className="ml-auto mt-3 block text-[15px] font-medium transition"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            aria-label="View swing history"
+          >
+            View swings →
+          </button>
+        )}
       </div>
     </Tile>
   );

@@ -117,6 +117,7 @@ export function EchoTile() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onClick={(e) => e.stopPropagation()}
+            className="hub-echo-mini-input"
             style={{
               width: '100%',
               height: '40px',
