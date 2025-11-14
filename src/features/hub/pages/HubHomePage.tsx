@@ -12,7 +12,6 @@ import { EchoTile } from '../home/tiles/EchoTile';
 import { QuickActionsTile } from '../home/tiles/QuickActionsTile';
 import { NearbyGolfersTile } from '../home/tiles/NearbyGolfersTile';
 import { YourGamesTile } from '../home/tiles/YourGamesTile';
-import { SwingQuickTile } from '../home/tiles/SwingQuickTile';
 import '../home/hubTheme.css';
 
 export function HubHomePage() {
@@ -96,17 +95,9 @@ export function HubHomePage() {
       {/* Hub Dashboard */}
       <main className="w-full overflow-y-auto h-screen pt-[calc(80px+env(safe-area-inset-top,0px))] px-3.5">
         <div className="pt-1.5">
-        {/* Top 2×2 grid */}
-        <div
-          className="grid"
-          style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.875rem', gridAutoRows: 'var(--hub-tile-fixed-h)' }}
-        >
-          <div className="hub-tile-fixed">
-            <NearbyGolfersTile />
-          </div>
-          <div className="hub-tile-fixed">
-            <EchoTile />
-          </div>
+        {/* Nearby Golfers - Full width */}
+        <div style={{ height: 'var(--hub-tile-fixed-h)' }}>
+          <NearbyGolfersTile />
         </div>
 
         {/* Your Games - calculated height to push bottom tiles to 12px from edge */}
@@ -128,7 +119,7 @@ export function HubHomePage() {
           }}
         >
           <div style={{ aspectRatio: '1', width: '100%' }}>
-            <SwingQuickTile />
+            <EchoTile />
           </div>
           <div style={{ aspectRatio: '1', width: '100%' }}>
             <QuickActionsTile />
