@@ -3,61 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useHub } from '@/features/hub/useHub';
 
-function QA({ labelTop, labelBottom, onClick, icon }: { 
-  labelTop: string; 
-  labelBottom: string; 
+function QA({ label, onClick, icon }: { 
+  label: string; 
   onClick: () => void; 
   icon: React.ReactNode;
 }) {
   return (
     <button 
-      className="qa" 
+      type="button"
+      className="hub-quick-squircle" 
       onClick={(e) => { e.stopPropagation(); onClick(); }} 
-      aria-label={`${labelTop} ${labelBottom}`}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '4px',
-        padding: '6px 8px',
-        width: '100%',
-        aspectRatio: '1',
-        borderRadius: '16px',
-        background: 'rgba(255,255,255,0.10)',
-        border: '1px solid rgba(255,255,255,0.15)',
-        cursor: 'pointer',
-        transition: 'background 0.2s',
-        overflow: 'hidden',
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
-      onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.10)')}
+      aria-label={label}
     >
-      <div 
-        className="qa-icon" 
-        style={{ 
-          fontSize: 'clamp(18px, 5vw, 26px)',
-          width: 'clamp(24px, 5vw, 30px)',
-          height: 'clamp(24px, 5vw, 30px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          lineHeight: 1 
-        }} 
-        aria-hidden="true"
-      >
+      <span className="text-[22px] leading-none" aria-hidden="true">
         {icon}
-      </div>
-      <div className="qa-label" style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        fontWeight: 600, 
-        lineHeight: 1.2 
-      }}>
-        <span style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelTop}</span>
-        <span style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelBottom}</span>
-      </div>
+      </span>
+      <span className="text-[11px] leading-tight text-center" style={{ color: 'var(--hub-text-muted)' }}>
+        {label}
+      </span>
     </button>
   );
 }
@@ -75,23 +38,32 @@ export function QuickActionsTile() {
   const openCreateGame = () => navigateFromHub('/hub/create-game');
   const openSwing = () => navigateFromHub('/hub/swing');
 
+  const actions = [
+    { id: 'create-game', label: 'Create Game', icon: '⛳', onPress: openCreateGame },
+    { id: 'ask-echo', label: 'Ask Echo', icon: '💬', onPress: () => navigateFromHub('/hub/echo') },
+    { id: 'upload-swing', label: 'Upload Swing', icon: '🏌️', onPress: openSwing },
+    { id: 'profile', label: 'Your Profile', icon: '👤', onPress: openProfile },
+  ];
+
   return (
-    <Tile title="Quick Actions" align="center">
-      <div 
-        className="hub-quick-actions" 
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gridTemplateRows: 'repeat(2, 1fr)',
-          gap: '8px',
-          height: '100%',
-          padding: '0',
-        }}
-      >
-        <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />
-        <QA labelTop="Ask" labelBottom="Echo" onClick={() => navigateFromHub('/hub/echo')} icon="💬" />
-        <QA labelTop="Upload" labelBottom="Swing" onClick={openSwing} icon="🏌️" />
-        <QA labelTop="Your" labelBottom="Profile" onClick={openProfile} icon="👤" />
+    <Tile title="" align="center">
+      <div className="flex h-full flex-col">
+        {/* Header */}
+        <h3 className="text-[15px] font-semibold mb-2" style={{ color: 'var(--hub-text-bright)' }}>
+          Quick Actions
+        </h3>
+
+        {/* 2×2 grid */}
+        <div className="grid flex-1 grid-cols-2 gap-8 pt-1 pb-1">
+          {actions.map((action) => (
+            <QA
+              key={action.id}
+              label={action.label}
+              icon={action.icon}
+              onClick={action.onPress}
+            />
+          ))}
+        </div>
       </div>
     </Tile>
   );
