@@ -993,7 +993,6 @@ export type Database = {
           id: string
           is_starred: boolean
           last_activity_at: string | null
-          last_opened_at: string | null
           message_count: number | null
           tsv: unknown
           updated_at: string
@@ -1007,7 +1006,6 @@ export type Database = {
           id?: string
           is_starred?: boolean
           last_activity_at?: string | null
-          last_opened_at?: string | null
           message_count?: number | null
           tsv?: unknown
           updated_at?: string
@@ -1021,7 +1019,6 @@ export type Database = {
           id?: string
           is_starred?: boolean
           last_activity_at?: string | null
-          last_opened_at?: string | null
           message_count?: number | null
           tsv?: unknown
           updated_at?: string
@@ -3883,10 +3880,6 @@ export type Database = {
       echo_thread_delete: { Args: { p_thread: string }; Returns: undefined }
       echo_thread_set_star: {
         Args: { p_star: boolean; p_thread: string }
-        Returns: undefined
-      }
-      echo_thread_update_last_opened: {
-        Args: { p_thread: string }
         Returns: undefined
       }
       echo_threads_delete_many: { Args: { ids: string[] }; Returns: undefined }

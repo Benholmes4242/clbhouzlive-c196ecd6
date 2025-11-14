@@ -37,9 +37,9 @@ export function HubGamesPage() {
         WebkitBackdropFilter: 'blur(120px)',
       }}
     >
-      {/* Minimal top bar with back only */}
+      {/* Header */}
       <header 
-        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-12 border-b"
+        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
         style={{
           borderColor: 'var(--hub-stroke)',
           background: 'rgba(22, 24, 27, 0.98)',
@@ -55,11 +55,12 @@ export function HubGamesPage() {
         >
           ‹ Back
         </button>
+        <h1 className="text-white/90 text-[17px] font-semibold">Games</h1>
         <div className="w-16" />
       </header>
 
       {/* Content area - GamesTab content */}
-      <div className="overflow-y-auto h-screen pt-[calc(3rem+env(safe-area-inset-top,0px))]">
+      <div className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
         <GamesTab onOpenCreate={handleOpenCreate} />
       </div>
     </div>
