@@ -66,7 +66,7 @@ export function HubHomePage() {
           paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))',
         }}
       >
-        <div className="flex items-center justify-between" style={{ userSelect: 'none' }}>
+        <div className="flex items-center justify-between mb-3" style={{ userSelect: 'none' }}>
           <div className="flex items-center gap-2">
             <img
               src="/assets/logomark-orange.png"
@@ -91,10 +91,20 @@ export function HubHomePage() {
             <X className="w-5 h-5" />
           </TapButton>
         </div>
+        
+        {/* Hub Title & Subtitle */}
+        <div>
+          <h1 className="text-[17px] font-semibold tracking-[-0.01em] text-[color:var(--hub-text-bright)]">
+            Clubhouse Hub
+          </h1>
+          <p className="mt-1 text-[13px] text-[color:var(--hub-text-muted)] leading-snug">
+            Jump back into games, golfers and Echo in one place.
+          </p>
+        </div>
       </header>
 
       {/* Hub Dashboard */}
-      <main className="w-full overflow-y-auto h-screen pt-[calc(80px+env(safe-area-inset-top,0px))] px-3.5">
+      <main className="h-full w-full overflow-y-auto pt-[calc(8.5rem+env(safe-area-inset-top,0px))] pb-[env(safe-area-inset-bottom,0px)] px-4">
         <div className="pt-1.5">
         {/* Top 2×2 grid */}
         <div
