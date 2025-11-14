@@ -17,7 +17,6 @@ import { GameExpandedNotes } from './games/GameExpandedNotes';
 import { GameExpandedMeta } from './games/GameExpandedMeta';
 import './games/gameAnimations.css';
 import './games/gamesTile.css';
-import './games/gamesTilePolish.css';
 
 type GameWithDetails = {
   id: string;
@@ -40,47 +39,20 @@ type GameWithDetails = {
   }>;
 };
 
-// Status Pill Component - Apple-style
-function StatusPill({ kind, status }: { kind: 'Hosting' | 'Joined'; status?: 'live' | 'upcoming' | 'past' }) {
+// Status Pill Component
+function StatusPill({ kind }: { kind: 'Hosting' | 'Joined' }) {
   const isHosting = kind === 'Hosting';
-  
-  // If no explicit status, determine from kind
-  const displayStatus = status || (isHosting ? 'upcoming' : 'past');
-  
-  const styles = {
-    live: {
-      bg: 'rgba(16, 185, 129, 0.15)',
-      border: 'rgba(16, 185, 129, 0.4)',
-      color: 'rgb(167, 243, 208)',
-      text: 'LIVE',
-    },
-    upcoming: {
-      bg: 'rgba(255,255,255,0.05)',
-      border: 'rgba(255,255,255,0.10)',
-      color: 'var(--hub-text-muted)',
-      text: isHosting ? 'HOST' : 'JOINED',
-    },
-    past: {
-      bg: 'rgba(255,255,255,0.04)',
-      border: 'rgba(255,255,255,0.08)',
-      color: 'var(--hub-text-muted)',
-      text: 'PAST',
-    },
-  };
-  
-  const style = styles[displayStatus];
-  
   return (
     <span
-      className="rounded-full px-2 py-[3px] text-[10px] font-medium uppercase tracking-[0.09em]"
+      className="inline-flex items-center px-2.5 py-[3px] rounded-full text-[13px] leading-none"
       style={{
-        background: style.bg,
-        border: `1px solid ${style.border}`,
-        color: style.color,
+        background: isHosting ? 'var(--token-success-bg)' : 'rgba(255,255,255,0.06)',
+        border: `1px solid ${isHosting ? 'var(--token-success-border)' : 'rgba(255,255,255,0.10)'}`,
+        color: isHosting ? 'var(--token-success-ink)' : 'var(--hub-text-body)',
       }}
-      aria-label={style.text}
+      aria-label={isHosting ? 'Hosting' : 'Joined'}
     >
-      {style.text}
+      {isHosting ? 'Hosting' : 'Joined'}
     </span>
   );
 }

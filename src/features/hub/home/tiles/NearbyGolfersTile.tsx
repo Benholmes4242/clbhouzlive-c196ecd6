@@ -75,21 +75,12 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
   const nav = useNavigate();
   const { navigateFromHub } = useHub();
   
-  const lightTap = () => {
-    try {
-      (window.navigator as any)?.vibrate?.(5);
-    } catch {}
-  };
-  
   // Real data fetch - wrapped in guard
   const realData = useActiveGolfers({ limit });
   
   // Use mock or real data
   const golfers = useMockData ? mockGolfers : realData.golfers;
   const isLoading = useMockData ? false : realData.isLoading;
-  
-  // Calculate open to play count
-  const openCount = golfers.filter(g => 'isOpenToPlay' in g && g.isOpenToPlay).length;
   
   const scrollRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
@@ -116,54 +107,7 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
     <Tile 
       title="Nearby Golfers"
       align="center"
-      footer={
-        <button 
-          className="row link hub-tile-pressable" 
-          onClick={() => {
-            lightTap();
-            navigateFromHub('/hub/golfers');
-          }}
-          aria-label="View all nearby golfers"
-        >
-          View all <span className="chev">›</span>
-        </button>
-      }
     >
-      {/* Peek bar - Avatar preview */}
-      <div className="mt-1 flex items-center gap-2 mb-2">
-        <div className="flex -space-x-2">
-          {golfers.slice(0, 4).map((g) => (
-            <div
-              key={g.id}
-              className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/70 bg-black/40 overflow-hidden"
-            >
-              {g.profile_photo_url ? (
-                <img 
-                  src={g.profile_photo_url} 
-                  alt={g.display_name || 'Golfer'} 
-                  className="h-full w-full object-cover" 
-                />
-              ) : (
-                <span className="text-[11px] font-semibold text-white/80">
-                  {(g.display_name || 'U').substring(0, 2).toUpperCase()}
-                </span>
-              )}
-            </div>
-          ))}
-          {golfers.length > 4 && (
-            <div className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/70 bg-white/10 text-[10px] font-medium text-[color:var(--hub-text-muted)]">
-              +{golfers.length - 4}
-            </div>
-          )}
-        </div>
-
-        <p className="ml-1 flex-1 truncate text-[12px] text-[color:var(--hub-text-muted)]">
-          {golfers.length === 0
-            ? 'No one nearby just yet.'
-            : `${golfers.length} golfer${golfers.length === 1 ? '' : 's'} nearby • ${openCount} open to play`}
-        </p>
-      </div>
-      
       <div className="flex flex-col h-full" style={{ position: 'relative' }}>
           <div 
           ref={scrollRef} 
