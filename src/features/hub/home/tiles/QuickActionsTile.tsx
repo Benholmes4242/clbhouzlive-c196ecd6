@@ -83,9 +83,9 @@ export function QuickActionsTile() {
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
           gridTemplateRows: 'repeat(2, 1fr)',
-          gap: '8px',
+          gap: '16px',
           height: '100%',
-          padding: '0',
+          padding: '12px',
         }}
       >
         <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />
