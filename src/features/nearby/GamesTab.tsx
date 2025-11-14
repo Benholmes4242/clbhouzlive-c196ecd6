@@ -98,7 +98,7 @@ function FindAGame({
           <>
             <label className="findLabel">Find a Game</label>
             <div className="searchBox">
-              <Search size={18} style={{ color: 'white', flexShrink: 0 }} />
+              <Search size={18} style={{ color: 'rgba(255, 255, 255, 0.55)', flexShrink: 0 }} />
               <input
                 placeholder="Search golf club..."
                 value={query}
