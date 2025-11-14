@@ -9,7 +9,7 @@ import type { EchoMessage } from '../state/echoTypes';
 
 interface StreamOptions {
   onChunk: (content: string) => void;
-  onComplete: (meta: { latency: number }) => void;
+  onComplete: (meta: { latency: number; meta?: any; modeUsed?: string }) => void;
   onError: (error: string) => void;
 }
 
@@ -40,20 +40,27 @@ export function useAIStream() {
           mode: 'chat',
         });
 
-        // Handle streaming response
-        if (data && typeof data === 'object' && 'text' in data) {
-          // Non-streaming response (fallback)
-          options.onChunk(data.text as string);
-          const latency = performance.now() - t0;
-          options.onComplete({ latency });
-        } else if (data && typeof data === 'string') {
-          // Streamed response came through as string
-          options.onChunk(data);
-          const latency = performance.now() - t0;
-          options.onComplete({ latency });
-        } else {
-          throw new Error('Unexpected response format');
+        // Normalize the answer text
+        const answer =
+          typeof data === 'string'
+            ? data
+            : (data?.text as string) ??
+              (data?.response as string) ??
+              '';
+
+        if (!answer) {
+          throw new Error('Empty AI response');
         }
+
+        // Single-chunk "stream"
+        options.onChunk(answer);
+
+        const latency = performance.now() - t0;
+        options.onComplete({
+          latency,
+          meta: data?.meta,
+          modeUsed: data?.modeUsed,
+        });
       } catch (error: any) {
         if (error.name === 'AbortError') {
           console.log('[AIStream] Request aborted');

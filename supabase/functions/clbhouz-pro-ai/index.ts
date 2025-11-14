@@ -11,7 +11,17 @@ const OPENAI_MODEL = "gpt-4o-mini";
 const PERPLEXITY_MODEL = "sonar";
 const DEFAULT_TIMEZONE = "Europe/London";
 
-interface EchoRequestBody {
+// Echo v2 contract (preferred)
+interface EchoV2RequestBody {
+  messages: Array<{ role: "user" | "assistant" | "system"; content: string }>;
+  conversation_id?: string | null;
+  stream?: boolean;
+  mode?: Mode | "chat";
+  timezone?: string;
+}
+
+// Echo v1 contract (legacy, still supported)
+interface EchoV1RequestBody {
   message: string;
   conversation?: Array<{ role: "user" | "assistant" | "system"; content: string }>;
   images?: string[];
@@ -22,6 +32,8 @@ interface EchoRequestBody {
   nowIso?: string;
   timezone?: string;
 }
+
+type EchoRequestBody = EchoV1RequestBody | EchoV2RequestBody;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -112,7 +124,49 @@ serve(async (req: Request) => {
 
   try {
     const body = await req.json() as EchoRequestBody;
-    const { message, conversation = [], images, detailMode, isEcho, swingContext, mode = "auto", timezone = DEFAULT_TIMEZONE } = body;
+
+    // Normalize input: support both v1 and v2 contracts
+    let message: string | undefined;
+    let conversation: Array<{ role: "user" | "assistant" | "system"; content: string }> = [];
+    let conversationId: string | null = null;
+    let images: string[] | undefined;
+    let detailMode: boolean | undefined;
+    let isEcho: boolean | undefined;
+    let swingContext: any;
+    let mode: Mode | "chat" = "auto";
+    let timezone = DEFAULT_TIMEZONE;
+
+    // 1) New v2-style contract: messages[]
+    if ('messages' in body && Array.isArray(body.messages) && body.messages.length > 0) {
+      const msgs = body.messages;
+      const last = msgs[msgs.length - 1];
+
+      // Last message is treated as the "current" user prompt
+      message = last.content;
+
+      // Everything before that is "conversation"
+      conversation = msgs.slice(0, -1);
+
+      conversationId = body.conversation_id ?? null;
+      mode = (body.mode as Mode | "chat") || "auto";
+      timezone = body.timezone || DEFAULT_TIMEZONE;
+    }
+
+    // 2) Legacy v1-style contract: message + conversation
+    if (!message && 'message' in body && typeof body.message === 'string' && body.message.trim().length > 0) {
+      message = body.message.trim();
+    }
+
+    if (conversation.length === 0 && 'conversation' in body && Array.isArray(body.conversation)) {
+      conversation = body.conversation;
+    }
+
+    if ('images' in body) images = body.images;
+    if ('detailMode' in body) detailMode = body.detailMode;
+    if ('isEcho' in body) isEcho = body.isEcho;
+    if ('swingContext' in body) swingContext = body.swingContext;
+    if (!mode && 'mode' in body) mode = (body.mode as Mode) || "auto";
+    if ('timezone' in body) timezone = body.timezone || DEFAULT_TIMEZONE;
 
     // 🐛 DEBUGGING: Log incoming request details
     console.log('🔍 EDGE FUNCTION DEBUG - Request Details:', { 
@@ -121,17 +175,22 @@ serve(async (req: Request) => {
       imagesCount: images?.length || 0,
       detailMode,
       isEcho,
-      hasMessage: !!message
+      hasMessage: !!message,
+      conversationId,
+      isV2: 'messages' in body
     });
 
     if (!message?.trim()) {
-      return new Response(JSON.stringify({ error: "Empty message" }), { 
+      return new Response(JSON.stringify({ 
+        error: "Empty message",
+        text: "I didn't receive a message. Please try again."
+      }), { 
         status: 400, 
         headers: { ...corsHeaders, "Content-Type": "application/json" } 
       });
     }
 
-    const now = body.nowIso ?? nowISO();
+    const now = ('nowIso' in body && body.nowIso) ? body.nowIso : nowISO();
 
     // Priority 1: SwingCoach analysis (UNCHANGED - preserves existing functionality)
     if (images && images.length > 0) {
@@ -236,7 +295,8 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
         console.log('[SC-EDGE]', JSON.stringify({ evt: 'done', totalMs: Date.now() - edgeT0 }));
 
         return new Response(JSON.stringify({ 
-          response: finalResponse, 
+          text: finalResponse,          // NEW canonical field
+          response: finalResponse,       // keep for legacy callers
           metadata: { timeout: false, quick: false, timedOut: false, tokenCount },
           mode: 'full'
         }), {
@@ -264,7 +324,8 @@ Based on the submitted frames, I can see:
 *This is a condensed analysis due to processing time. For detailed breakdown, try uploading a shorter video clip or use the "Refine Details" option.*`;
 
         return new Response(JSON.stringify({ 
-          response: quickAnalysis,
+          text: quickAnalysis,           // NEW canonical field
+          response: quickAnalysis,       // keep for legacy callers
           metadata: { timeout: true, quick: true, timedOut: true },
           mode: 'quick'
         }), {
@@ -380,7 +441,8 @@ Based on the submitted frames, I can see:
     console.log('📤 EDGE FUNCTION DEBUG - Sending response back to client');
 
     return new Response(JSON.stringify({ 
-      response: answer,
+      text: answer,                      // NEW canonical field
+      response: answer,                  // keep for legacy callers
       modeUsed: provider === 'perplexity' ? 'live' : 'static',
       sources,
       meta: { 
@@ -402,6 +464,7 @@ Based on the submitted frames, I can see:
     });
     return new Response(JSON.stringify({
       error: String(err?.message || err),
+      text: "I'm having trouble processing your request right now. Please try again in a moment.",
       response: "I'm having trouble processing your request right now. Please try again in a moment."
     }), {
       status: 500,
