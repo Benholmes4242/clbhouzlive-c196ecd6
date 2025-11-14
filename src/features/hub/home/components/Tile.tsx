@@ -11,15 +11,14 @@ type TileProps = React.PropsWithChildren<{
   onViewAll?: () => void;
   footer?: React.ReactNode;
   align?: 'start' | 'center';
-  className?: string;
 }>;
 
-export function Tile({ title, subtitle, children, onViewAll, footer, align = 'start', className }: TileProps) {
+export function Tile({ title, subtitle, children, onViewAll, footer, align = 'start' }: TileProps) {
   const [isHovered, setIsHovered] = React.useState(false);
 
   return (
     <section
-      className={`relative rounded-3xl p-4 pt-3.5 pb-3.5 overflow-hidden flex flex-col min-h-0 h-full ${className || ''}`}
+      className="relative rounded-3xl p-4 pt-3.5 pb-3.5 overflow-hidden flex flex-col min-h-0 h-full"
       style={{
         background: 'var(--hub-glass-bg)',
         border: '1px solid var(--hub-stroke)',
