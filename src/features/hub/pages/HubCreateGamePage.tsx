@@ -6,12 +6,18 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CreateGameModal } from '@/features/nearby/components/CreateGameModal';
 import { useGameBeacon } from '@/features/nearby/hooks/useGameBeacon';
+import { useKeyboardAwareScroll } from '@/hooks/useKeyboardAwareScroll';
 import '../home/hubTheme.css';
 
 export function HubCreateGamePage() {
   const nav = useNavigate();
   const loc = useLocation();
   const { createBeacon } = useGameBeacon();
+  
+  // Watch for focus on any keyboard-aware inputs / textareas
+  useKeyboardAwareScroll(
+    'input[data-keyboard-aware], textarea[data-keyboard-aware]'
+  );
 
   const handleBack = () => {
     const state = loc.state as any;

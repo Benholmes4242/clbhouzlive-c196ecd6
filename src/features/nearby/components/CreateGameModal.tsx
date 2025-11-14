@@ -363,6 +363,7 @@ export function CreateGameModal({
 
         <div 
           className="flex-1 overflow-y-auto"
+          data-scroll-container
           style={{
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',
@@ -444,6 +445,7 @@ export function CreateGameModal({
                   <div className="searchBox" style={{ margin: 0 }}>
                     <Search className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
                     <input
+                      data-keyboard-aware
                       placeholder="Search golf club…"
                       value={courseQuery}
                       onChange={(e) => setCourseQuery(e.target.value)}
@@ -508,6 +510,7 @@ export function CreateGameModal({
                 }}
               >
                 <textarea
+                  data-keyboard-aware
                   placeholder="We are looking for a fourth player, casual round, money match – who's in?"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}

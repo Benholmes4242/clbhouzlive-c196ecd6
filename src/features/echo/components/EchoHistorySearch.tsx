@@ -18,6 +18,7 @@ import {
   DropdownMenuSeparator 
 } from '@/components/ui/dropdown-menu';
 import { Calendar as CalendarPicker } from '@/components/ui/calendar';
+import { HudDropdown, HudDropdownOption } from '@/components/hud/HudDropdown';
 
 export type FilterType = 'all' | 'favourite';
 
@@ -43,12 +44,21 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
   const [query, setQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [datePresetLabel, setDatePresetLabel] = useState<string | null>('Most recent');
+  const [datePresetValue, setDatePresetValue] = useState<string>('recent');
   const [currentDateFrom, setCurrentDateFrom] = useState<Date | null>(null);
   const [currentDateTo, setCurrentDateTo] = useState<Date | null>(null);
   const [showCustomPicker, setShowCustomPicker] = useState(false);
   const [customFrom, setCustomFrom] = useState<Date | undefined>();
   const [customTo, setCustomTo] = useState<Date | undefined>();
   const debouncedQuery = useDebounce(query, 200);
+  
+  // Date filter options for HudDropdown
+  const dateOptions: HudDropdownOption[] = [
+    { label: 'Most recent', value: 'recent' },
+    { label: 'Today', value: 'today' },
+    { label: 'This week', value: 'week' },
+    { label: 'Last 30 days', value: 'last30' },
+  ];
 
   // Propagate debounced search query
   useEffect(() => {
@@ -104,16 +114,55 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
   const getPresetDates = (preset: string): { from: Date; to: Date } | null => {
     const today = startOfToday();
     switch (preset) {
+      case 'recent':
       case 'most_recent':
         return null; // No date filtering for "Most recent"
       case 'today':
         return { from: startOfDay(today), to: endOfDay(today) };
+      case 'week':
       case 'this_week':
         return { from: startOfWeek(today, { weekStartsOn: 1 }), to: endOfWeek(today, { weekStartsOn: 1 }) };
+      case 'last30':
       case 'last_30d':
         return { from: startOfDay(subDays(today, 30)), to: endOfDay(today) };
       default:
         return null;
+    }
+  };
+  
+  const handleDatePresetChange = (value: string) => {
+    setDatePresetValue(value);
+    
+    const labelMap: Record<string, string> = {
+      'recent': 'Most recent',
+      'today': 'Today',
+      'week': 'This week',
+      'last30': 'Last 30 days',
+    };
+    
+    const preset = value;
+    const label = labelMap[value];
+    const dates = getPresetDates(preset);
+    
+    if (preset === 'recent') {
+      // Clear date filters for "Most recent"
+      setDatePresetLabel('Most recent');
+      setCurrentDateFrom(null);
+      setCurrentDateTo(null);
+      onFilterChange({
+        ...getFilterValues(),
+        dateFrom: undefined,
+        dateTo: undefined,
+      });
+    } else if (dates) {
+      setDatePresetLabel(label);
+      setCurrentDateFrom(dates.from);
+      setCurrentDateTo(dates.to);
+      onFilterChange({
+        ...getFilterValues(),
+        dateFrom: dates.from,
+        dateTo: dates.to,
+      });
     }
   };
 
@@ -325,178 +374,13 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
           );
         })}
         
-        {/* Date Filter Pill with Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className={cn(
-                "flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium transition-all",
-              )}
-              style={{
-                background: datePresetLabel
-                  ? 'rgba(255,255,255,0.12)'
-                  : 'rgba(255,255,255,0.04)',
-                border: `1px solid ${
-                  datePresetLabel ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.08)'
-                }`,
-                color: datePresetLabel ? 'var(--hub-text)' : 'var(--hub-text-dim)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-              }}
-              aria-haspopup="dialog"
-              aria-label="Filter by date"
-            >
-              <span>{datePresetLabel || 'Most recent'}</span>
-              {datePresetLabel ? (
-                <X 
-                  className="w-3.5 h-3.5" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleClearDate();
-                  }}
-                />
-              ) : (
-                <ChevronDown className="w-3 h-3 opacity-80" aria-hidden />
-              )}
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            align="start"
-            className="min-w-[240px] border-white/6 shadow-[0_10px_30px_rgba(0,0,0,0.35)] py-1"
-            style={{ 
-              zIndex: 1200,
-              background: 'rgba(32,37,41,0.96)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-            }}
-          >
-            {!showCustomPicker ? (
-              <>
-                <DropdownMenuItem 
-                  onClick={() => handlePresetClick('most_recent', 'Most recent')}
-                  className={cn(
-                    "text-sm transition rounded-lg mx-1",
-                    datePresetLabel === 'Most recent'
-                      ? "bg-white/18 text-white font-medium"
-                      : "text-white/85 hover:bg-white/10"
-                  )}
-                >
-                  Most recent
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => handlePresetClick('today', 'Today')}
-                  className={cn(
-                    "text-sm transition rounded-lg mx-1",
-                    datePresetLabel === 'Today'
-                      ? "bg-white/18 text-white font-medium"
-                      : "text-white/85 hover:bg-white/10"
-                  )}
-                >
-                  Today
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => handlePresetClick('this_week', 'This week')}
-                  className={cn(
-                    "text-sm transition rounded-lg mx-1",
-                    datePresetLabel === 'This week'
-                      ? "bg-white/18 text-white font-medium"
-                      : "text-white/85 hover:bg-white/10"
-                  )}
-                >
-                  This week
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => handlePresetClick('last_30d', 'Last 30 days')}
-                  className={cn(
-                    "text-sm transition rounded-lg mx-1",
-                    datePresetLabel === 'Last 30 days'
-                      ? "bg-white/18 text-white font-medium"
-                      : "text-white/85 hover:bg-white/10"
-                  )}
-                >
-                  Last 30 days
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem 
-                  onClick={() => setShowCustomPicker(true)} 
-                  className="flex items-center gap-2 text-sm transition rounded-lg mx-1 text-white/85 hover:bg-white/10"
-                >
-                  <Calendar className="w-4 h-4" />
-                  Custom range
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem 
-                  onClick={() => handleFilterClick('favourite')}
-                  className={cn(
-                    "text-sm transition rounded-lg mx-1",
-                    activeFilter === 'favourite'
-                      ? "bg-white/18 text-white font-medium"
-                      : "text-white/85 hover:bg-white/10"
-                  )}
-                >
-                  Favourite
-                </DropdownMenuItem>
-                {datePresetLabel && datePresetLabel !== 'Most recent' && (
-                  <>
-                    <DropdownMenuSeparator className="bg-white/10" />
-                    <DropdownMenuItem 
-                      onClick={handleClearDate} 
-                      className="text-sm transition rounded-lg mx-1 text-destructive hover:bg-white/10"
-                    >
-                      Clear filter
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </>
-            ) : (
-              <div className="p-3 space-y-3">
-                <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">From</label>
-                  <CalendarPicker
-                    mode="single"
-                    selected={customFrom}
-                    onSelect={setCustomFrom}
-                    className="pointer-events-auto"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">To</label>
-                  <CalendarPicker
-                    mode="single"
-                    selected={customTo}
-                    onSelect={setCustomTo}
-                    disabled={(date) => customFrom ? date < customFrom : false}
-                    className="pointer-events-auto"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      setShowCustomPicker(false);
-                      setCustomFrom(undefined);
-                      setCustomTo(undefined);
-                    }}
-                    className="flex-1 px-3 py-2 text-sm rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-                  >
-                    Back
-                  </button>
-                  <button
-                    onClick={handleCustomApply}
-                    disabled={!customFrom || !customTo}
-                    className={cn(
-                      "flex-1 px-3 py-2 text-sm rounded-lg font-medium transition-colors",
-                      customFrom && customTo
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                        : "bg-muted text-muted-foreground cursor-not-allowed"
-                    )}
-                  >
-                    Apply
-                  </button>
-                </div>
-              </div>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Date Filter Pill with HudDropdown */}
+        <HudDropdown
+          value={datePresetValue}
+          options={dateOptions}
+          onChange={handleDatePresetChange}
+          className="flex-shrink-0"
+        />
       </div>
     </div>
   );
