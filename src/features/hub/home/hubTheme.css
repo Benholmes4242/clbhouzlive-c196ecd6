@@ -121,11 +121,15 @@
   --hub-status-neutral-bg: rgba(158, 158, 158, 0.15);
   --hub-status-neutral-border: rgba(158, 158, 158, 0.3);
   --hub-status-neutral-text: #9E9E9E;
+  --hub-status-warn-bg: rgba(234, 179, 8, 0.15);
+  --hub-status-warn-border: rgba(234, 179, 8, 0.4);
+  --hub-status-warn-text: #fde047;
   
   /* Animation timings */
   --hub-anim-fast: 90ms;
   --hub-anim-default: 160ms;
   --hub-anim-slow: 260ms;
+  --hub-anim-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   
   /* Primary button tokens */
   --hub-primary-bg: var(--hub-glass-bg-button);
