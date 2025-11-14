@@ -110,11 +110,6 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
         return { from: startOfDay(today), to: endOfDay(today) };
       case 'this_week':
         return { from: startOfWeek(today, { weekStartsOn: 1 }), to: endOfWeek(today, { weekStartsOn: 1 }) };
-      case 'last_week': {
-        const lastWeekStart = startOfWeek(subDays(today, 7), { weekStartsOn: 1 });
-        const lastWeekEnd = endOfWeek(subDays(today, 7), { weekStartsOn: 1 });
-        return { from: lastWeekStart, to: lastWeekEnd };
-      }
       case 'last_30d':
         return { from: startOfDay(subDays(today, 30)), to: endOfDay(today) };
       default:
@@ -403,17 +398,6 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
                   )}
                 >
                   This week
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => handlePresetClick('last_week', 'Last week')}
-                  className={cn(
-                    "text-sm transition rounded-lg mx-1",
-                    datePresetLabel === 'Last week'
-                      ? "bg-white/18 text-white font-medium"
-                      : "text-white/85 hover:bg-white/10"
-                  )}
-                >
-                  Last week
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={() => handlePresetClick('last_30d', 'Last 30 days')}
