@@ -9,10 +9,16 @@
   cursor: pointer;
   transition:
     background-color var(--hub-anim-fast) ease-out,
-    transform var(--hub-anim-fast) ease-out;
+    transform var(--hub-anim-fast) ease-out,
+    border-color var(--hub-anim-fast) ease-out;
   opacity: 0;
   transform: translateY(6px);
   animation: yourGameRowIn 0.22s var(--hub-anim-ease-out) forwards;
+}
+
+.yourGameRow--expanded {
+  background: rgba(255, 255, 255, 0.03);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 @keyframes yourGameRowIn {
@@ -70,6 +76,17 @@
   flex-shrink: 0;
 }
 
+.yourGameRow__statusGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform var(--hub-anim-default) ease-out;
+}
+
+.yourGameRow__statusGroup--lifted {
+  transform: translateY(-1px);
+}
+
 /* Chevron */
 .yourGameRow__chevron {
   color: var(--hub-text-sub);
@@ -106,7 +123,7 @@
 
 .gameStatusPill--almost {
   background: var(--hub-status-warn-bg);
-  border: 1px solid var(--hub-status-warn-border);
+  border: 1.5px solid var(--hub-status-warn-border);
   color: var(--hub-status-warn-text);
 }
 
@@ -118,6 +135,16 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  opacity: 0;
+  transform: translateY(4px);
+  animation: detailsFadeIn 0.22s ease forwards;
+}
+
+@keyframes detailsFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .yourGameRow__section {
@@ -219,6 +246,16 @@
   margin-top: 40px;
   padding-inline: max(24px, env(safe-area-inset-left));
   text-align: center;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: emptyStateFadeIn 0.25s ease 0.05s forwards;
+}
+
+@keyframes emptyStateFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .yourGamesEmpty__icon {

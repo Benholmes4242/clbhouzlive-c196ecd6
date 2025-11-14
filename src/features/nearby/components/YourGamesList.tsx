@@ -8,6 +8,7 @@ import { YourGameRow } from './your-games/YourGameRow';
 import type { Game as CardGame, Participant } from './your-games/types';
 import { useUserGames, type UserGame } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
+import { haptic } from '@/utils/haptics';
 import './your-games/YourGames.css';
 
 interface YourGamesListProps {
@@ -188,7 +189,10 @@ export function YourGamesList({
         <Segmented
           items={segmentItems}
           value={activeTab}
-          onChange={(val) => setActiveTab(val as 'hosting' | 'joined')}
+          onChange={(val) => {
+            haptic('light');
+            setActiveTab(val as 'hosting' | 'joined');
+          }}
           columns={2}
           ariaLabel="Your games view"
         />
