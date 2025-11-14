@@ -143,6 +143,7 @@ export function UserSearchTypeahead({
             <Search className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
             <input
               ref={searchInputRef}
+              data-keyboard-aware
               type="text"
               placeholder="Search by name or add a guest"
               value={searchTerm}
