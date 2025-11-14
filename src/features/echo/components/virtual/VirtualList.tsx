@@ -166,18 +166,24 @@ export function VirtualList({
       ref={containerRef}
       onScroll={handleScroll}
       className={className}
-      style={{ overflowY: 'auto', height: '100%' }}
+      style={{ 
+        overflowY: 'auto', 
+        overflowX: 'hidden',
+        height: '100%',
+        touchAction: 'pan-y',
+        overscrollBehaviorX: 'none',
+      }}
       role="list"
     >
       {/* Spacer to create the full scroll range */}
-      <div style={{ height: totalHeight, position: 'relative' }}>
+      <div style={{ height: totalHeight, position: 'relative', minWidth: 0, width: '100%' }}>
         {Array.from({ length: visEnd - visStart }, (_, k) => {
           const i = visStart + k;
           const top = prefix[i];
           return (
             <div
               key={i}
-              style={{ position: 'absolute', top, left: 0, right: 0 }}
+              style={{ position: 'absolute', top, left: 0, right: 0, minWidth: 0 }}
               role="listitem"
             >
               <Sizer onSize={h => measure(i, h)}>

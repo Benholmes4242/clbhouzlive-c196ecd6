@@ -813,6 +813,8 @@ export function HubEchoHistoryPage() {
         background: 'var(--hub-backdrop)',
         backdropFilter: 'blur(var(--hub-backdrop-blur))',
         WebkitBackdropFilter: 'blur(var(--hub-backdrop-blur))',
+        touchAction: 'pan-y',
+        overscrollBehaviorX: 'none',
       }}
     >
       {/* Opaque Header */}
@@ -842,9 +844,13 @@ export function HubEchoHistoryPage() {
       {/* Body - Page shell with safe-area padding */}
       <main 
         className="relative flex-1 min-w-0 pt-[calc(3.5rem+var(--hub-pad,20px)+env(safe-area-inset-top,0px))] pb-[calc(var(--hub-pad,20px)+env(safe-area-inset-bottom,0px))] overflow-y-auto overflow-x-hidden"
+        style={{
+          touchAction: 'pan-y',
+          overscrollBehaviorX: 'none',
+        }}
       >
         {/* Content container - direct on background */}
-        <section className="px-4 md:px-6 max-w-3xl mx-auto eh-fixedLayer min-w-0">
+        <section className="px-4 md:px-6 max-w-3xl mx-auto eh-fixedLayer min-w-0" style={{ touchAction: 'pan-y' }}>
           <h2
             className="text-[17px] font-semibold mb-3"
             style={{ color: 'rgba(255,255,255,0.9)' }}
@@ -991,6 +997,7 @@ export function HubEchoHistoryPage() {
                 aria-label="Conversations"
                 aria-multiselectable={selectMode || undefined}
                 id="echo-history-list"
+                style={{ touchAction: 'pan-y', overscrollBehaviorX: 'none' }}
               >
               <VirtualList
                     count={chats.length}

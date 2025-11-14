@@ -205,7 +205,7 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
   ];
 
   return (
-    <div className={className}>
+    <div className={className} style={{ minWidth: 0, overflowX: 'hidden', touchAction: 'pan-y' }}>
       {/* Search Input */}
       <div className="relative mb-2">
         <Search
@@ -266,7 +266,14 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
       </div>
 
       {/* Filter Pills */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+      <div 
+        className="flex gap-2 overflow-x-auto no-scrollbar pb-1" 
+        style={{ touchAction: 'pan-x', overscrollBehaviorY: 'none' }}
+        onTouchStart={(e) => {
+          // Prevent parent scroll while scrolling chips
+          e.currentTarget.style.pointerEvents = 'auto';
+        }}
+      >
         {/* Tag filter pill (if active) */}
         {activeTag && (
           <div
