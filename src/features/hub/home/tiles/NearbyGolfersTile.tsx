@@ -157,8 +157,19 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
             </button>
           ))}
           {!isLoading && golfers.length === 0 && (
-            <div className="text-[13px] py-2 text-center" style={{ color: 'var(--hub-text-sub)' }}>
-              No active golfers nearby
+            <div className="mt-2 rounded-[14px] border border-dashed border-white/10 bg-black/25 px-3 py-3 text-[12px] leading-snug text-white/70">
+              No golfers nearby just yet.
+              <div className="mt-1.5">
+                <button
+                  type="button"
+                  onClick={() => nav('/settings')}
+                  className="text-[12px] font-medium underline-offset-2 hover:underline"
+                  style={{ color: 'var(--hub-accent)' }}
+                >
+                  Invite friends to Clbhouz
+                </button>
+                <span className="text-white/40"> to see more locals here.</span>
+              </div>
             </div>
           )}
         </div>

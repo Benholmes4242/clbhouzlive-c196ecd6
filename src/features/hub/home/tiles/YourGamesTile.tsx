@@ -44,15 +44,16 @@ function StatusPill({ kind }: { kind: 'Hosting' | 'Joined' }) {
   const isHosting = kind === 'Hosting';
   return (
     <span
-      className="inline-flex items-center px-2.5 py-[3px] rounded-full text-[13px] leading-none"
-      style={{
-        background: isHosting ? 'var(--token-success-bg)' : 'rgba(255,255,255,0.06)',
-        border: `1px solid ${isHosting ? 'var(--token-success-border)' : 'rgba(255,255,255,0.10)'}`,
-        color: isHosting ? 'var(--token-success-ink)' : 'var(--hub-text-body)',
-      }}
+      className={isHosting ? 'hub-games-host-pill' : 'inline-flex items-center px-2.5 py-[3px] rounded-full text-[13px] leading-none'}
+      style={!isHosting ? {
+        background: 'rgba(255,255,255,0.06)',
+        border: '1px solid rgba(255,255,255,0.10)',
+        color: 'var(--hub-text-body)',
+      } : {}}
       aria-label={isHosting ? 'Hosting' : 'Joined'}
     >
-      {isHosting ? 'Hosting' : 'Joined'}
+      {isHosting && <span className="hub-games-host-dot" />}
+      {isHosting ? 'Host' : 'Joined'}
     </span>
   );
 }
@@ -433,20 +434,24 @@ export function YourGamesTile() {
           )}
           
           {!isLoading && !isError && games.length === 0 && (
-            <div className="text-[14px]" style={{ color: 'var(--hub-text-sub)' }}>
-              No games yet.{' '}
-              <button 
+            <div className="mt-2 rounded-[14px] border border-dashed border-white/10 bg-black/25 px-3 py-3 text-[12px] leading-snug text-white/70">
+              No games scheduled — want to organise one?
+              <button
+                type="button"
                 onClick={openCreateGame}
-                className="underline underline-offset-2"
-                style={{ color: 'var(--hub-accent-orange)' }}
+                className="ml-1 text-[12px] font-medium underline-offset-2 hover:underline"
+                style={{ color: 'var(--hub-accent)' }}
               >
-                Create one
+                Create a game
               </button>
             </div>
           )}
 
           {!isLoading && !isError && games.map((g, i) => (
-            <li key={g.id}>
+            <li 
+              key={g.id}
+              className={i < games.length - 1 ? 'border-b border-white/[0.03]' : ''}
+            >
               <GameRow
                 key={g.id}
                 game={g}

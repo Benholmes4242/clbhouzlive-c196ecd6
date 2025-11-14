@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { TapButton } from '@/components/ui/TapButton';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useHub } from '@/features/hub/useHub';
 import { EchoTile } from '../home/tiles/EchoTile';
 import { QuickActionsTile } from '../home/tiles/QuickActionsTile';
 import { NearbyGolfersTile } from '../home/tiles/NearbyGolfersTile';
@@ -18,6 +19,7 @@ import '../home/hubTheme.css';
 export function HubHomePage() {
   const nav = useNavigate();
   const loc = useLocation();
+  const { navigateFromHub } = useHub();
 
   // Mark hub-open on html while mounted
   useEffect(() => {
@@ -46,6 +48,10 @@ export function HubHomePage() {
       // Deep link fallback
       nav('/clubhouse', { replace: true });
     }
+  };
+
+  const handleCreateGame = () => {
+    navigateFromHub('/hub/create-game');
   };
 
   return (
@@ -81,16 +87,26 @@ export function HubHomePage() {
             />
           </div>
           
-          <TapButton
-            onPointerDown={handleBack}
-            className="transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
-            style={{ color: 'var(--hub-close-idle)' }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-close-hover)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-close-idle)'}
-            aria-label="Close hub"
-          >
-            <X className="w-5 h-5" />
-          </TapButton>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleCreateGame}
+              className="hub-header-plus"
+              aria-label="Create a game"
+            >
+              <span className="text-[18px] leading-none">+</span>
+            </button>
+            
+            <TapButton
+              onPointerDown={handleBack}
+              className="transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
+              style={{ color: 'var(--hub-close-idle)' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-close-hover)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-close-idle)'}
+              aria-label="Close hub"
+            >
+              <X className="w-5 h-5" />
+            </TapButton>
+          </div>
         </div>
       </header>
 

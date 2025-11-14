@@ -3,61 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useHub } from '@/features/hub/useHub';
 
-function QA({ labelTop, labelBottom, onClick, icon }: { 
-  labelTop: string; 
-  labelBottom: string; 
+function QA({ label, onClick, icon }: { 
+  label: string; 
   onClick: () => void; 
   icon: React.ReactNode;
 }) {
   return (
     <button 
-      className="qa" 
+      className="hub-quick-squircle" 
       onClick={(e) => { e.stopPropagation(); onClick(); }} 
-      aria-label={`${labelTop} ${labelBottom}`}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '4px',
-        padding: '6px 8px',
-        minWidth: 0,
-        minHeight: 0,
-        borderRadius: '16px',
-        background: 'rgba(255,255,255,0.10)',
-        border: '1px solid rgba(255,255,255,0.15)',
-        cursor: 'pointer',
-        transition: 'background 0.2s',
-        overflow: 'hidden',
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
-      onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.10)')}
+      aria-label={label}
     >
-      <div 
-        className="qa-icon" 
-        style={{ 
-          fontSize: 'clamp(18px, 5vw, 26px)',
-          width: 'clamp(24px, 5vw, 30px)',
-          height: 'clamp(24px, 5vw, 30px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          lineHeight: 1 
-        }} 
-        aria-hidden="true"
-      >
+      <span className="hub-quick-squircle-icon">
         {icon}
-      </div>
-      <div className="qa-label" style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        fontWeight: 600, 
-        lineHeight: 1.2 
-      }}>
-        <span style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelTop}</span>
-        <span style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelBottom}</span>
-      </div>
+      </span>
+      <span className="hub-quick-squircle-label">
+        {label}
+      </span>
     </button>
   );
 }
@@ -81,17 +43,15 @@ export function QuickActionsTile() {
         className="hub-quick-actions" 
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gridTemplateRows: 'repeat(2, 1fr)',
+          gridTemplateColumns: 'repeat(4, 1fr)',
           gap: '8px',
-          height: '100%',
-          padding: '0',
+          marginTop: '8px',
         }}
       >
-        <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />
-        <QA labelTop="Ask" labelBottom="Echo" onClick={() => navigateFromHub('/hub/echo')} icon="💬" />
-        <QA labelTop="Upload" labelBottom="Swing" onClick={openSwing} icon="🏌️" />
-        <QA labelTop="Your" labelBottom="Profile" onClick={openProfile} icon="👤" />
+        <QA label="Create Game" onClick={openCreateGame} icon="⛳" />
+        <QA label="Ask Echo" onClick={() => navigateFromHub('/hub/echo')} icon="💬" />
+        <QA label="Upload Swing" onClick={openSwing} icon="🏌️" />
+        <QA label="Your Profile" onClick={openProfile} icon="👤" />
       </div>
     </Tile>
   );
