@@ -90,10 +90,6 @@ export function CreateGameModal({
   
   // Calculate max available slots based on current players
   const maxAvailableSlots = 4 - currentPlayers;
-  
-  // Get game size label
-  const gameSizeLabels = ['One-ball', 'Two-ball', 'Three-ball', 'Four-ball'];
-  const gameSizeLabel = gameSizeLabels[Math.min(currentPlayers + availableSlots - 1, 3)] || 'Four-ball';
 
   // Pre-fill club if provided
   useEffect(() => {
@@ -568,12 +564,7 @@ export function CreateGameModal({
 
             {/* Tag Players */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="sectionLabel" style={{ margin: 0 }}>Tag players (optional)</label>
-                <div className="text-xs text-white/50">
-                  {gameSizeLabel}
-                </div>
-              </div>
+              <label className="sectionLabel">Tag players (optional)</label>
               <UserSearchTypeahead
                 selectedUsers={selectedUsers}
                 onUserAdd={(user) => setSelectedUsers([...selectedUsers, user])}
