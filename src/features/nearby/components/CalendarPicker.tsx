@@ -23,13 +23,13 @@ export function openCalendarPicker(opts: CalendarPickerOpts) {
   overlay.style.cssText = `
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.7);
     z-index: 11000;
     display: flex;
     align-items: flex-end;
     animation: fadeIn 0.2s ease;
-    backdrop-filter: saturate(120%) blur(6px);
-    -webkit-backdrop-filter: saturate(120%) blur(6px);
+    backdrop-filter: saturate(120%) blur(20px);
+    -webkit-backdrop-filter: saturate(120%) blur(20px);
   `;
 
   const sheet = document.createElement('div');
@@ -37,35 +37,43 @@ export function openCalendarPicker(opts: CalendarPickerOpts) {
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
-    background: #111214;
+    background: rgba(22, 24, 27, 0.95);
+    border: 0.5px solid rgba(255, 255, 255, 0.15);
     border-radius: 20px 20px 0 0;
     padding: 20px;
-    animation: slideUp 0.3s ease;
-    box-shadow: 0 -8px 24px rgba(0,0,0,0.5);
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255, 255, 255, 0.08);
     max-height: 75vh;
     overflow: auto;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   `;
 
   const title = document.createElement('div');
   title.textContent = 'Select Date';
   title.style.cssText = `
-    font-size: 18px;
-    font-weight: 700;
-    color: #eaeaea;
-    margin-bottom: 16px;
+    font-size: 17px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+    margin-bottom: 20px;
     text-align: center;
+    letter-spacing: 0.2px;
   `;
   sheet.appendChild(title);
 
   const inputRow = document.createElement('div');
   inputRow.style.cssText = `
-    background: #141414;
-    border: 1px solid #2a2a2a;
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
     display: flex;
     align-items: center;
-    padding: 8px 12px;
-    margin-bottom: 12px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05);
   `;
 
   const input = document.createElement('input');
@@ -77,27 +85,28 @@ export function openCalendarPicker(opts: CalendarPickerOpts) {
     width: 100%;
     background: transparent;
     border: 0;
-    color: #e9e9e9;
+    color: rgba(255, 255, 255, 0.9);
     outline: none;
     font-size: 16px;
-    height: 28px;
+    height: 32px;
   `;
   inputRow.appendChild(input);
   sheet.appendChild(inputRow);
 
   const helper = document.createElement('div');
-  helper.textContent = 'Tip: selecting a date updates the "When" filter.';
+  helper.textContent = 'Selecting a date updates the "When" filter.';
   helper.style.cssText = `
-    color: #9aa4a8;
-    font-size: 12px;
-    margin-bottom: 16px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+    margin-bottom: 20px;
+    text-align: center;
   `;
   sheet.appendChild(helper);
 
   const actions = document.createElement('div');
   actions.style.cssText = `
     display: flex;
-    gap: 10px;
+    gap: 12px;
   `;
 
   overlay.appendChild(sheet);
@@ -116,31 +125,52 @@ export function openCalendarPicker(opts: CalendarPickerOpts) {
   const cancelBtn = document.createElement('button');
   cancelBtn.textContent = 'Cancel';
   cancelBtn.style.cssText = `
-    height: 44px;
-    border-radius: 12px;
-    padding: 0 14px;
-    border: 1px solid #262626;
-    background: #171717;
-    color: #e9e9e9;
+    height: 48px;
+    border-radius: 14px;
+    padding: 0 16px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.9);
     font-weight: 600;
+    font-size: 15px;
     flex: 1;
     cursor: pointer;
+    transition: all 150ms;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   `;
+  cancelBtn.onpointerdown = () => {
+    cancelBtn.style.transform = 'scale(0.97)';
+  };
+  cancelBtn.onpointerup = () => {
+    cancelBtn.style.transform = 'scale(1)';
+  };
   cancelBtn.onclick = closeSheet;
 
   const doneBtn = document.createElement('button');
   doneBtn.textContent = 'Done';
   doneBtn.style.cssText = `
-    height: 44px;
-    border-radius: 12px;
-    padding: 0 14px;
-    border: 1px solid #2b2b2b;
-    background: #1f2621;
-    color: #e7f3ea;
+    height: 48px;
+    border-radius: 14px;
+    padding: 0 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.92);
     font-weight: 600;
+    font-size: 15px;
     flex: 1;
     cursor: pointer;
+    transition: all 150ms;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.08), inset 0 1px 2px rgba(255, 255, 255, 0.1);
   `;
+  doneBtn.onpointerdown = () => {
+    doneBtn.style.transform = 'scale(0.97)';
+  };
+  doneBtn.onpointerup = () => {
+    doneBtn.style.transform = 'scale(1)';
+  };
   doneBtn.onclick = () => {
     haptic('medium');
     const d = new Date(input.value + 'T00:00:00');
