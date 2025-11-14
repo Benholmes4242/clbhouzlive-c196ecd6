@@ -7,7 +7,8 @@ async function withAuthHeaders(init: RequestInit = {}) {
   const headers = new Headers(init.headers || {});
   headers.set('Content-Type', 'application/json');
   if (session?.access_token) headers.set('Authorization', `Bearer ${session.access_token}`);
-  return { ...init, headers, credentials: 'include' as RequestCredentials };
+  // IMPORTANT: do NOT include credentials for cross-origin edge calls (breaks CORS when origin is *)
+  return { ...init, headers };
 }
 
 /** Call any Supabase Edge function with a one-time silent retry on 401 */
