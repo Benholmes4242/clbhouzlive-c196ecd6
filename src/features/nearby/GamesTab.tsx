@@ -8,6 +8,9 @@ import { useGamesQuery } from './hooks/useGamesQuery';
 import { useJoinGame } from './hooks/useJoinGame';
 import { openWhenSheet, openDistanceSheet, openSortSheet, labelWhen } from './components/FilterSheets';
 import { PeopleSearchInput } from './components/PeopleSearchInput';
+import { GameStatusPill } from '@/features/hub/components/GameStatusPill';
+import { SecondaryButton } from '@/features/hub/components/HubButtons';
+import { formatExpires } from '@/lib/formatExpires';
 import './GamesTab.css';
 
 type Game = {
@@ -205,16 +208,8 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
 function GameCard({ game }: { game: Game }) {
   const { requestJoin, isPending } = useJoinGame(game.id);
   
-  const seatsFilled = game.slots_total - game.slots_open;
-  const filledLabel = `${seatsFilled}/${game.slots_total} filled`;
-  const seatsLeft = game.slots_open;
+  const filled = game.slots_total - game.slots_open;
   
-  const formatDistance = (meters?: number) => {
-    if (!meters) return '';
-    if (meters < 1000) return `${Math.round(meters)}m`;
-    return `${(meters / 1000).toFixed(1)}km`;
-  };
-
   const formatTime = (isoTime: string) => {
     const date = new Date(isoTime);
     return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
@@ -229,8 +224,10 @@ function GameCard({ game }: { game: Game }) {
     if (date.toDateString() === today.toDateString()) return 'Today';
     if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
     
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   };
+
+  const expiryLabel = formatExpires(game.start_time); // Using start_time as proxy for expiry
 
   const handleJoin = () => {
     haptic('medium');
@@ -238,26 +235,37 @@ function GameCard({ game }: { game: Game }) {
   };
 
   return (
-    <div className="gameRow" role="article" aria-label={`${game.course_name || 'Golf game'}, ${formatDate(game.start_time)}, ${filledLabel}`}>
-      <div className="gameRow__top">
-        <div className="gameRow__title">{game.course_name || 'Golf Game'}</div>
-      </div>
+    <article 
+      className="gameRow" 
+      role="article" 
+      aria-label={`${game.course_name || 'Golf game'}, ${formatDate(game.start_time)}, ${filled}/${game.slots_total} filled`}
+    >
+      <div className="gameRow__header">
+        <div className="gameRow__left">
+          <div className="gameRow__courseName">{game.course_name || 'Golf Game'}</div>
+          
+          <div className="gameRow__meta">
+            <span className="gameRow__metaLine">🗓️ {formatDate(game.start_time)} • {formatTime(game.start_time)}</span>
+            <span className="gameRow__metaLine">⏳ {expiryLabel}</span>
+          </div>
+        </div>
 
-      <div className="gameRow__meta">
-        <span className="gameRow__time">🗓 {formatDate(game.start_time)} • {formatTime(game.start_time)}</span>
-        <span className={`gameRow__badge ${seatsLeft > 0 ? 'gameRow__badge--ok' : 'gameRow__badge--full'}`}>{filledLabel}</span>
+        <div className="gameRow__right">
+          <GameStatusPill
+            filled={filled}
+            total={game.slots_total}
+          />
+        </div>
       </div>
 
       <div className="gameRow__actions">
-        <TapButton
-          className="gameRow__btn"
-          disabled={isPending || seatsLeft <= 0}
+        <SecondaryButton
+          label={game.slots_open <= 0 ? 'Full' : isPending ? 'Requesting…' : 'Request to Join'}
           onClick={handleJoin}
-        >
-          {seatsLeft <= 0 ? 'Full' : isPending ? 'Requesting…' : 'Request to Join'}
-        </TapButton>
+          disabled={isPending || game.slots_open <= 0}
+        />
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -277,10 +285,10 @@ function GamesList({ games, isLoading }: { games: Game[]; isLoading: boolean }) 
 
   if (!games || games.length === 0) {
     return (
-      <div className="empty" role="status">
-        <div className="emoji">📍</div>
-        <div className="title">No games found</div>
-        <div className="sub">Be the first to start one — tap <strong>Create a Game</strong>.</div>
+      <div className="gamesEmpty" role="status">
+        <div className="gamesEmpty__icon">📍</div>
+        <h2 className="gamesEmpty__title">No games found</h2>
+        <p className="gamesEmpty__body">Be the first to start one — tap <strong>Create a Game</strong>.</p>
       </div>
     );
   }
