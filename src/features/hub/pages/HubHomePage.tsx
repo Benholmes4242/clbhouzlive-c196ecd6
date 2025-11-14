@@ -93,38 +93,26 @@ export function HubHomePage() {
       </header>
 
       {/* Hub Dashboard */}
-      <main className="w-full overflow-y-auto h-screen pt-[calc(80px+env(safe-area-inset-top,0px))] px-3.5">
-        <div className="pt-1.5">
-        {/* Nearby Golfers - Full width */}
-        <div style={{ height: 'var(--hub-tile-fixed-h)' }}>
-          <NearbyGolfersTile />
-        </div>
+      <main className="w-full overflow-y-auto h-screen pt-[calc(80px+env(safe-area-inset-top,0px))] px-3.5 pb-3.5">
+        <div className="pt-1.5 flex flex-col gap-3.5">
+          {/* 1. Nearby Golfers - Full width */}
+          <section aria-label="Nearby golfers">
+            <NearbyGolfersTile />
+          </section>
 
-        {/* Your Games - calculated height to push bottom tiles to 12px from edge */}
-        <div 
-          className="mt-3.5" 
-          style={{ 
-            height: 'calc(100vh - 80px - var(--hub-tile-fixed-h) - 0.875rem - 0.875rem - 0.75rem - 12px - ((100vw - 28px - 0.875rem) / 2))' 
-          }}
-        >
-          <YourGamesTile />
-        </div>
+          {/* 2. Your Games - Middle section */}
+          <section aria-label="Your games">
+            <YourGamesTile />
+          </section>
 
-        {/* Echo & Quick Actions 2×2 grid - Square tiles */}
-        <div
-          className="grid mt-3.5"
-          style={{ 
-            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
-            gap: '0.875rem',
-          }}
-        >
-          <div style={{ aspectRatio: '1', width: '100%' }}>
+          {/* 3. Bottom row: Echo + Quick Actions */}
+          <section 
+            aria-label="Echo and quick actions"
+            className="grid gap-3.5 grid-cols-1 md:grid-cols-2"
+          >
             <EchoTile />
-          </div>
-          <div style={{ aspectRatio: '1', width: '100%' }}>
             <QuickActionsTile />
-          </div>
-        </div>
+          </section>
         </div>
       </main>
     </div>
