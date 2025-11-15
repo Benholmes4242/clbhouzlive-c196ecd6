@@ -1,61 +1,58 @@
 /**
  * Mock golfer data for front-end visual testing
- * To enable: set VITE_USE_MOCK_GOLFERS=true in your environment
- * To remove: delete this file and remove the mock logic from useActiveGolfers.ts
+ * Now fetches from mock_profile_clones table (real user data clones)
+ * To disable: set mock flag to false in mockSwitch.ts
  */
 
-const mockNames = [
-  'James Thompson',
-  'Sarah Mitchell',
-  'Michael Chen',
-  'Emma Wilson',
-  'David Roberts',
-  'Olivia Garcia',
-  'Thomas Anderson',
-  'Sophia Martinez',
-  'William Taylor',
-  'Isabella Brown',
-  'Alexander Lee',
-  'Charlotte Davis',
-  'Benjamin White',
-  'Amelia Johnson',
-  'Daniel Moore',
-];
+import { supabase } from '@/integrations/supabase/client';
 
-const mockClubs = [
-  'Sunningdale',
-  'Wentworth',
-  'The Wisley',
-  'St Andrews',
-  'Royal Birkdale',
-  'Muirfield',
-  'Turnberry',
-];
+// Fetch mock golfers from the database
+let cachedMockGolfers: any[] = [];
+let cacheTimestamp = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-// Assign clubs so multiple golfers share the same home club
-const clubAssignments = [
-  'Sundridge Park Golf Club', 'Sundridge Park Golf Club', // 2 at Sundridge Park (for badge testing)
-  'Sunningdale',                               // 1 at Sunningdale
-  'Wentworth', 'Wentworth',                    // 2 at Wentworth
-  'The Wisley', 'The Wisley', 'The Wisley',    // 3 at The Wisley
-  'St Andrews', 'St Andrews',                  // 2 at St Andrews
-  'Royal Birkdale',                            // 1 at Royal Birkdale
-  'Muirfield', 'Muirfield',                    // 2 at Muirfield
-  'Turnberry',                                 // 1 at Turnberry
-];
+export async function fetchMockGolfers() {
+  const now = Date.now();
+  
+  // Return cached data if still fresh
+  if (cachedMockGolfers.length > 0 && now - cacheTimestamp < CACHE_DURATION) {
+    return cachedMockGolfers;
+  }
 
-export const mockGolfers = Array.from({ length: 15 }, (_, i) => ({
-  id: `mock-${i + 1}`,
-  user_id: `mock-${i + 1}`,
-  display_name: mockNames[i],
-  username: mockNames[i].toLowerCase().replace(' ', '_'),
-  profile_photo_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${mockNames[i]}`,
-  eg_handicap_index: Number((Math.random() * 20 + 1).toFixed(1)),
-  home_club: clubAssignments[i],
-  distance_m: 200 + i * 150 + Math.floor(Math.random() * 100),
-  open_to_play: i % 3 === 0,
-  latitude: 51.4 + Math.random() * 0.02,
-  longitude: -0.6 + Math.random() * 0.02,
-  updated_at: new Date().toISOString(),
-  same_club: i < 2, // First two golfers have same club badge
-}));
+  try {
+    const { data: mockClones, error } = await supabase
+      .from('mock_profile_clones')
+      .select('*')
+      .limit(15);
+
+    if (error) {
+      console.error('Error fetching mock profile clones for golfers:', error);
+      return [];
+    }
+
+    // Transform to golfer format with randomized data
+    const transformed = (mockClones || []).map((clone, i) => ({
+      id: clone.id,
+      display_name: clone.display_name || 'User',
+      username: clone.username,
+      profile_photo_url: clone.profile_photo_url,
+      home_club: clone.home_club || null,
+      distance_m: Math.floor(Math.random() * 15000) + 500, // 0.5km - 15km
+      open_to_play: Math.random() > 0.7, // 30% are open to play
+      same_club: Math.random() > 0.8, // 20% same club
+      eg_handicap_index: Math.random() > 0.5 ? Math.floor(Math.random() * 30) : null,
+    }));
+
+    cachedMockGolfers = transformed;
+    cacheTimestamp = now;
+    
+    return transformed;
+  } catch (err) {
+    console.error('Failed to fetch mock golfers:', err);
+    return [];
+  }
+}
+
+// For backwards compatibility, export a sync getter that returns cached data
+// Components should call fetchMockGolfers() once on mount
+export const mockGolfers: any[] = cachedMockGolfers;
