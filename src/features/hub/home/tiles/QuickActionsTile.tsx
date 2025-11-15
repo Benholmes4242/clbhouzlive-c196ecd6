@@ -87,7 +87,7 @@ export function QuickActionsTile() {
             label="Ask Echo"
             Icon={SparklesIcon}
             onClick={openEcho}
-            iconSize="h-9 w-9"
+            iconSize="h-10 w-10"
           />
           <QuickActionButton
             label="Swing Coach"
