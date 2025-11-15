@@ -1,9 +1,9 @@
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistance } from '@/features/golfers/format';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
-import { fetchMockGolfers } from '@/features/golfers/mockGolfers';
+import { mockGolfers } from '@/features/golfers/mockGolfers';
 
 export type ActiveGolfer = {
   id: string;
@@ -34,17 +34,9 @@ export function useActiveGolfers({
 } = {}) {
   const { currentLocation } = useLocationPermission();
   const { radiusKm = 10, onlyOpen = false, visibility = 'all' } = filters;
-  const [mockGolfers, setMockGolfers] = useState<any[]>([]);
   
   // Check if we're using mock data
   const useMockData = true; // Enabled mock data for testing
-
-  // Fetch mock golfers on mount
-  useEffect(() => {
-    if (useMockData) {
-      fetchMockGolfers().then(setMockGolfers);
-    }
-  }, [useMockData]);
 
   // Fetch nearby golfers using PostGIS RPC function
   const { data: golfers = [], isLoading } = useQuery({
