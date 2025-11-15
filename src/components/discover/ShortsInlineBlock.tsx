@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { Heart, Flame } from 'lucide-react';
 import { formatLikes } from '@/utils/dateFormat';
 import { useInView } from 'react-intersection-observer';
@@ -145,15 +145,12 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
           <div className="flex items-center gap-2 min-w-0 flex-1">
             {short.user && (
               <>
-                <Avatar className="w-6 h-6 flex-shrink-0">
-                  <AvatarImage 
-                    src={short.user.avatar} 
-                    alt={short.user.name} 
-                  />
-                  <AvatarFallback className="text-[11px]">
-                    {short.user.name[0].toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+                <AvatarSquircle
+                  size={24}
+                  src={short.user.avatar}
+                  alt={short.user.name}
+                  fallback={short.user.name[0].toUpperCase()}
+                />
                 <span className="truncate">
                   {short.user.name}
                 </span>

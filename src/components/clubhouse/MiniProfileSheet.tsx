@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFollowUser } from '@/hooks/useFollowUser';
 import { useUserProfilePosts } from '@/hooks/useUserProfilePosts';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
-import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 import { SheetPlaybackProvider, useSheetPlayback } from './SheetPlaybackContext';
 import { VideoThumbPlayer } from './VideoThumbPlayer';
@@ -322,12 +322,13 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
                   )}
                   disabled={!user?.id}
                 >
-                  <OptimizedAvatar
+                  <AvatarSquircle
+                    size="lg"
                     src={user.avatar}
                     alt={user.name}
-                    size={64}
                     fallback={user.name?.charAt(0)}
-                    className="ring-2 ring-white/20"
+                    ringColor="rgba(255,255,255,0.2)"
+                    ringWidth={2}
                   />
                 </button>
                 
