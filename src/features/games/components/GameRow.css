@@ -6,15 +6,25 @@
 /* Row animations */
 .gameRow {
   padding: 12px 16px 14px;
-  border-bottom: 1px solid var(--hub-stroke-subtle);
   cursor: pointer;
+  position: relative;
   transition:
     background-color var(--hub-anim-fast) ease-out,
-    transform var(--hub-anim-fast) ease-out,
-    border-color var(--hub-anim-fast) ease-out;
+    transform var(--hub-anim-fast) ease-out;
   opacity: 0;
   transform: translateY(6px);
   animation: gameRowIn 0.22s var(--hub-anim-ease-out) forwards;
+}
+
+.gameRow::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 0.5px;
+  background: var(--hub-stroke-subtle);
 }
 
 .gameRow--expanded {
