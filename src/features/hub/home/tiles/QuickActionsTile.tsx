@@ -81,9 +81,9 @@ export function QuickActionsTile() {
             onClick={openCreateGame}
           />
           <QuickActionButton
-            label="Ask Echo"
-            Icon={SparklesIcon}
-            onClick={openEcho}
+            label="Your Profile"
+            Icon={PersonIcon}
+            onClick={openProfile}
           />
           <QuickActionButton
             label="Upload Swing"
@@ -91,9 +91,9 @@ export function QuickActionsTile() {
             onClick={openSwing}
           />
           <QuickActionButton
-            label="Your Profile"
-            Icon={PersonIcon}
-            onClick={openProfile}
+            label="Ask Echo"
+            Icon={SparklesIcon}
+            onClick={openEcho}
           />
         </div>
       </div>
