@@ -4,7 +4,7 @@ import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 import { Volume2, VolumeX, Heart } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { formatRelativeTime, formatLikes } from '@/utils/dateFormat';
 import { clsx } from 'clsx';
 import ClubTagPill from '@/components/clubhouse/ClubTagPill';
@@ -143,15 +143,12 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
         <div className="mt-1 grid grid-cols-[auto_1fr_auto] items-center gap-3 text-[14px] text-muted-foreground">
           {/* Avatar + Handle */}
           <div className="flex items-center gap-2 truncate max-w-[45vw]">
-            <Avatar className="w-6 h-6 flex-shrink-0">
-              <AvatarImage 
-                src={item.user?.avatar || ''} 
-                alt={item.user?.username || item.user?.name || 'User'} 
-              />
-              <AvatarFallback className="text-xs">
-                {(item.user?.username?.[0] || item.user?.name?.[0] || 'U').toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+            <AvatarSquircle
+              size={24}
+              src={item.user?.avatar}
+              alt={item.user?.username || item.user?.name || 'User'}
+              fallback={(item.user?.username?.[0] || item.user?.name?.[0] || 'U').toUpperCase()}
+            />
             <span className="truncate">
               @{item.user?.username || item.user?.name || 'unknown'}
             </span>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MapPin, UserPlus, MessageCircle, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
@@ -124,15 +124,12 @@ const ImmersiveIdentityDock: React.FC<ImmersiveIdentityDockProps> = ({
         <div className="px-4 py-1">
           <div className="flex items-center gap-2">
             {/* Avatar - smaller size */}
-            <Avatar className="w-14 h-14 rounded-full">
-              <AvatarImage 
-                src={profile.profile_photo_url || undefined}
-                alt={profile.display_name || 'User'}
-              />
-              <AvatarFallback className="rounded-full bg-primary/20 text-primary font-semibold text-lg">
-                {(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+            <AvatarSquircle
+              size={56}
+              src={profile.profile_photo_url}
+              alt={profile.display_name || 'User'}
+              fallback={(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
+            />
 
             {/* Profile Info - brought closer with reduced spacing */}
             <div className="flex-1 min-w-0 -ml-1">

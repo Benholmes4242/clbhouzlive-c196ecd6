@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -68,15 +68,12 @@ const PremiumStickyHeader: React.FC<PremiumStickyHeaderProps> = ({
         <div className="flex items-center justify-between">
           {/* Profile Info */}
           <div className="flex items-center gap-3">
-            <Avatar className="w-10 h-10 rounded-xl">
-              <AvatarImage 
-                src={profile.profile_photo_url || undefined}
-                alt={profile.display_name || 'User'}
-              />
-              <AvatarFallback className="rounded-xl bg-primary/20 text-primary font-semibold text-sm">
-                {(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+            <AvatarSquircle
+              size="sm"
+              src={profile.profile_photo_url}
+              alt={profile.display_name || 'User'}
+              fallback={(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
+            />
             
             <div className="min-w-0">
               <div className="text-white font-bold text-base truncate">

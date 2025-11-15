@@ -1,50 +1,136 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Squircle } from "./squircle";
+import { getDirectImageUrl } from '@/utils/r2ImageUtils';
+
+// Size variants mapping
+const SIZE_MAP = {
+  xs: 28,
+  sm: 40,
+  md: 56,
+  lg: 80,
+  xl: 112,
+} as const;
+
+type SizeVariant = keyof typeof SIZE_MAP;
 
 type Props = {
-  size: number;               // e.g., 32, 40, 48, 64, 80
-  src?: string;               // optional - if not provided, only children will be rendered
+  size?: number | SizeVariant;  // pixel value or variant (default: 'md')
+  src?: string | null;          // optional - if not provided, fallback will be shown
   alt?: string;
-  ringColor?: string;         // optional border ring
-  ringWidth?: number;         // default 0 = no ring
-  className?: string;         // extra positioning classes
-  children?: React.ReactNode; // badges (e.g., status dot) or full content if no src
-  onLoad?: () => void;        // callback when image loads
+  ringColor?: string;           // optional border ring
+  ringWidth?: number;           // default 0 = no ring
+  className?: string;           // extra positioning classes
+  fallback?: string;            // fallback text (e.g., initials)
+  children?: React.ReactNode;   // badges (e.g., status dot) or custom content
+  onLoad?: () => void;          // callback when image loads
+  priority?: boolean;           // eager loading for above-fold avatars
 };
 
 /**
- * Avatar with iOS-style squircle (continuous corner smoothing via superellipse n=5)
- * Use this instead of circular avatars for authentic Apple-like appearance
+ * CANONICAL USER AVATAR COMPONENT
+ * 
+ * iOS-style squircle avatar (continuous corner smoothing via superellipse n=5)
+ * with optimized image loading, R2 support, and fallback handling.
+ * 
+ * THIS IS THE SINGLE SOURCE OF TRUTH FOR ALL USER AVATARS.
+ * Use this instead of circular avatars everywhere in the app.
+ * 
+ * @example
+ * <AvatarSquircle size="md" src={user.avatar} alt={user.name} fallback="JD" />
+ * <AvatarSquircle size={64} src={user.avatar} ringColor="rgba(255,255,255,0.28)" ringWidth={1} />
  */
 export default function AvatarSquircle({
-  size,
+  size = 'md',
   src,
   alt = "",
   ringColor,
   ringWidth = 0,
   className = "",
+  fallback,
   children,
-  onLoad
+  onLoad,
+  priority = false
 }: Props) {
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [showFallback, setShowFallback] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  // Convert size variant to pixel value
+  const pixelSize = typeof size === 'string' ? SIZE_MAP[size] : size;
+
+  // Optimize image URL (R2, responsive sizes)
+  useEffect(() => {
+    if (!src) {
+      setImageSrc(null);
+      setShowFallback(true);
+      return;
+    }
+
+    const directUrl = getDirectImageUrl(src);
+    
+    // If it's a placeholder (R2 blocked in preview), show fallback
+    if (directUrl === '/placeholder.svg') {
+      setImageSrc(null);
+      setShowFallback(true);
+      return;
+    }
+    
+    setImageSrc(directUrl);
+    setShowFallback(false);
+    setImageLoaded(false);
+  }, [src]);
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+    setShowFallback(false);
+    onLoad?.();
+  };
+
+  const handleImageError = () => {
+    console.warn('Avatar image failed to load:', imageSrc);
+    setShowFallback(true);
+    setImageLoaded(false);
+  };
+
+  // Fallback content (initials or first letter)
+  const fallbackContent = fallback || alt.charAt(0).toUpperCase() || '?';
+
   const inner = (
     <>
-      {src && (
+      {imageSrc && !showFallback && (
         <img
-          src={src}
+          src={imageSrc}
           alt={alt}
           style={{ 
             width: "100%", 
             height: "100%", 
             objectFit: "cover", 
-            display: "block" 
+            display: "block",
+            opacity: imageLoaded ? 1 : 0,
+            transition: 'opacity 0.2s ease'
           }}
-          loading="lazy"
-          onLoad={onLoad}
-          onError={(e) => {
-            // Silently handle error - fallback will be shown via children
-            console.warn('Avatar image failed to load:', src);
-          }}
+          loading={priority ? 'eager' : 'lazy'}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
         />
+      )}
+      {showFallback && (
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "var(--hub-glass-bg-elevated, rgba(255,255,255,0.1))",
+            color: "var(--hub-text-bright, rgba(255,255,255,0.9))",
+            fontSize: `${pixelSize * 0.4}px`,
+            fontWeight: 600,
+            userSelect: "none"
+          }}
+        >
+          {fallbackContent}
+        </div>
       )}
       {children}
     </>
@@ -55,15 +141,16 @@ export default function AvatarSquircle({
       className={className}
       style={{
         position: "relative",
-        width: size,
-        height: size,
-        // If a ring is requested, draw it behind via box-shadow so the squircle mask stays clean
+        width: pixelSize,
+        height: pixelSize,
+        flexShrink: 0,
+        // If a ring is requested, draw it behind via box-shadow
         boxShadow: ringWidth && ringColor ? `0 0 0 ${ringWidth}px ${ringColor} inset` : undefined,
-        borderRadius: 0, // ensure no residual rounding
+        borderRadius: 0,
         overflow: "visible"
       }}
     >
-      <Squircle width={size} height={size}>{inner}</Squircle>
+      <Squircle width={pixelSize} height={pixelSize}>{inner}</Squircle>
     </div>
   );
 }
