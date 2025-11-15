@@ -132,7 +132,7 @@ export function GamesNearYouTile({
     <Tile 
       title="Games"
     >
-      <div className="flex flex-col h-full" style={{ position: 'relative', paddingTop: '3.5px', paddingBottom: '29px' }}>
+      <div className="flex flex-col h-full" style={{ position: 'relative', paddingTop: '1.5px', paddingBottom: '29px' }}>
         {/* Game list with inline scroll */}
         <div 
           ref={listRef}
