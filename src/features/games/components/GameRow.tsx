@@ -150,8 +150,8 @@ export function GameRow({
         <div className="gameRow__titleBlock">
           <div className="gameRow__courseName">{game.course_name || 'Golf Game'}</div>
           <div className="gameRow__timeLine">
-            <span className="gameRow__metaLine">🗓️ {dateStr} • {timeStr}</span>
-            <span className="gameRow__metaLine">⏳ {expiryLabel}</span>
+            <span className="gameRow__metaLine">{dateStr} • {timeStr}</span>
+            <span className="gameRow__metaLine">{expiryLabel}</span>
           </div>
         </div>
 
