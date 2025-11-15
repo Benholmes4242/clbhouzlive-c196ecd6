@@ -27,17 +27,21 @@ type Props = {
 };
 
 /**
- * CANONICAL USER AVATAR COMPONENT
+ * ⚠️ DEPRECATED - USE <Squircle /> DIRECTLY INSTEAD ⚠️
  * 
- * iOS-style squircle avatar (continuous corner smoothing via superellipse n=5)
- * with optimized image loading, R2 support, and fallback handling.
+ * ❌ DO NOT use AvatarSquircle - it adds unnecessary wrapper complexity
+ * ✅ MUST use <Squircle> from @/components/ui/squircle.tsx directly
  * 
- * THIS IS THE SINGLE SOURCE OF TRUTH FOR ALL USER AVATARS.
- * Use this instead of circular avatars everywhere in the app.
+ * This wrapper component is DEPRECATED. All user avatars must use 
+ * <Squircle> directly as the single source of truth for avatar geometry.
  * 
- * @example
- * <AvatarSquircle size="md" src={user.avatar} alt={user.name} fallback="JD" />
- * <AvatarSquircle size={64} src={user.avatar} ringColor="rgba(255,255,255,0.28)" ringWidth={1} />
+ * @deprecated Use <Squircle> from @/components/ui/squircle.tsx instead
+ * @see src/components/ui/squircle.tsx - The ONLY allowed component for user avatars
+ * 
+ * @example CORRECT usage with <Squircle>
+ * <Squircle width={56} height={56}>
+ *   <img src={user.avatar} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+ * </Squircle>
  */
 export default function AvatarSquircle({
   size = 'md',
@@ -51,6 +55,14 @@ export default function AvatarSquircle({
   onLoad,
   priority = false
 }: Props) {
+  // FORBIDDEN for new code - strict warning in development
+  if (process.env.NODE_ENV === 'development') {
+    console.error(
+      '❌ DEPRECATED: AvatarSquircle is deprecated!\n' +
+      '✅ Use <Squircle> from @/components/ui/squircle.tsx directly instead.\n' +
+      'All user avatars must use <Squircle> as the single source of truth.'
+    );
+  }
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [showFallback, setShowFallback] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
