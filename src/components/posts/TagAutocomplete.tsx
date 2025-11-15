@@ -1,5 +1,5 @@
 import React from 'react';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Squircle } from '@/components/ui/squircle';
 import { Building2, MapPin, User } from 'lucide-react';
 
 interface TaggableEntity {
@@ -93,18 +93,18 @@ const TagAutocomplete: React.FC<TagAutocompleteProps> = ({
               onMouseDown={(e) => e.preventDefault()} // Prevent input blur
             >
               <div className="flex-shrink-0">
-                <AvatarSquircle
-                  size="md"
-                  src={entity.profile_image_url || ''}
-                  alt={entity.name}
-                  fallback={entity.name.charAt(0).toUpperCase()}
-                >
-                  {!entity.profile_image_url && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      {getEntityIcon(entity.entity_type)}
+                <Squircle width={56} height={56}>
+                  {entity.profile_image_url ? (
+                    <img src={entity.profile_image_url} alt={entity.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '22px', fontWeight: 600 }}>
+                      {entity.name.charAt(0).toUpperCase()}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        {getEntityIcon(entity.entity_type)}
+                      </div>
                     </div>
                   )}
-                </AvatarSquircle>
+                </Squircle>
               </div>
               
               <div className="flex-1 min-w-0">

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFollowUser } from '@/hooks/useFollowUser';
 import { useUserProfilePosts } from '@/hooks/useUserProfilePosts';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Squircle } from '@/components/ui/squircle';
 import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 import { SheetPlaybackProvider, useSheetPlayback } from './SheetPlaybackContext';
 import { VideoThumbPlayer } from './VideoThumbPlayer';
@@ -322,14 +322,15 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
                   )}
                   disabled={!user?.id}
                 >
-                  <AvatarSquircle
-                    size="lg"
-                    src={user.avatar}
-                    alt={user.name}
-                    fallback={user.name?.charAt(0)}
-                    ringColor="rgba(255,255,255,0.2)"
-                    ringWidth={2}
-                  />
+                  <Squircle width={80} height={80}>
+                    {user.avatar ? (
+                      <img src={user.avatar} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '32px', fontWeight: 600 }}>
+                        {user.name?.charAt(0) || '?'}
+                      </div>
+                    )}
+                  </Squircle>
                 </button>
                 
                   <div className="flex-1 min-w-0">

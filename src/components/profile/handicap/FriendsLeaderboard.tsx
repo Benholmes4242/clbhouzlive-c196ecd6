@@ -1,5 +1,5 @@
 import React from 'react';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Squircle } from '@/components/ui/squircle';
 
 type Row = { userId: string; displayName: string; avatarUrl: string; monthDelta: number; rank: number };
 
@@ -15,12 +15,15 @@ export default function FriendsLeaderboard({ rows }: { rows: Row[] }) {
           {rows.map(r => (
             <li key={r.userId} className="flex items-center gap-3 py-3">
               <span className="w-6 text-sm font-semibold">{r.rank}</span>
-              <AvatarSquircle 
-                size="sm"
-                src={r.avatarUrl}
-                alt={r.displayName}
-                fallback={r.displayName?.charAt(0)?.toUpperCase() || '?'}
-              />
+              <Squircle width={40} height={40}>
+                {r.avatarUrl ? (
+                  <img src={r.avatarUrl} alt={r.displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '16px', fontWeight: 600 }}>
+                    {r.displayName?.charAt(0)?.toUpperCase() || '?'}
+                  </div>
+                )}
+              </Squircle>
               <div className="flex-1">
                 <div className="text-sm font-medium">{r.displayName}</div>
               </div>

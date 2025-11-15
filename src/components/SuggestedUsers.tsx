@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Squircle } from '@/components/ui/squircle';
 import { getAvatarSize } from '@/utils/imageOptimization';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { supabase } from "@/integrations/supabase/client";
@@ -164,12 +164,15 @@ const SuggestedUsers = () => {
         <div className="space-y-3">
           {suggestedUsers.map((suggestedUser) => (
             <div key={suggestedUser.id} className="flex items-center space-x-3">
-              <AvatarSquircle
-                src={suggestedUser.profile_photo_url}
-                alt={suggestedUser.display_name}
-                size="sm"
-                fallback={suggestedUser.display_name?.charAt(0)}
-              />
+              <Squircle width={40} height={40}>
+                {suggestedUser.profile_photo_url ? (
+                  <img src={suggestedUser.profile_photo_url} alt={suggestedUser.display_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '16px', fontWeight: 600 }}>
+                    {suggestedUser.display_name?.charAt(0) || '?'}
+                  </div>
+                )}
+              </Squircle>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">
                   {suggestedUser.display_name}

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Squircle } from '@/components/ui/squircle';
 import { useNavigate } from 'react-router-dom';
 
 interface TagNotificationProps {
@@ -39,12 +39,15 @@ const TagNotification: React.FC<TagNotificationProps> = ({ notification }) => {
       onClick={handleClick}
     >
       <div className="flex items-start gap-3">
-        <AvatarSquircle 
-          size="md"
-          src={tagger_photo}
-          alt={tagger_name}
-          fallback={tagger_name?.charAt(0)?.toUpperCase() || '?'}
-        />
+        <Squircle width={56} height={56}>
+          {tagger_photo ? (
+            <img src={tagger_photo} alt={tagger_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '22px', fontWeight: 600 }}>
+              {tagger_name?.charAt(0)?.toUpperCase() || '?'}
+            </div>
+          )}
+        </Squircle>
         <div className="flex-1">
           <h4 className="font-semibold text-sm text-muted-foreground mb-1">You were tagged</h4>
           <p className="text-sm">
