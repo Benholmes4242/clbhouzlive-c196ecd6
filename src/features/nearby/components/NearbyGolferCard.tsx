@@ -133,9 +133,6 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
           </div>
         </TapButton>
 
-        {/* Divider */}
-        <div className="h-px mx-1 mb-3 bg-white/5" />
-
         {/* Action buttons */}
         <div className="flex gap-2 mt-3">
           <button
