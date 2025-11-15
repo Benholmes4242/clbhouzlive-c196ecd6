@@ -170,3 +170,71 @@
   gap: 10px;
   margin-top: 8px;
 }
+
+/* Mini profile row styles (for host/member avatars) */
+.miniProfileRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.miniProfileRow__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--hub-glass-bg-button);
+  border: 1px solid var(--hub-stroke-subtle);
+}
+
+.miniProfileRow__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.miniProfileRow__avatarPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--hub-text-bright);
+  background: var(--hub-glass-bg-elevated);
+}
+
+.miniProfileRow__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.miniProfileRow__name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--hub-text-bright);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.miniProfileRow__badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--hub-primary-bg);
+  color: var(--hub-primary-text);
+  border: 1px solid var(--hub-primary-border);
+}
+
+.miniProfileRow__subtitle {
+  font-size: 12px;
+  color: var(--hub-text-muted);
+  margin-top: 2px;
+}
