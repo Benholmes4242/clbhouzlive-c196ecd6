@@ -109,18 +109,26 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
       align="center"
     >
       <div className="flex flex-col h-full" style={{ position: 'relative' }}>
+          {/* Container matching Note input styling from CreateGameModal */}
           <div 
-          ref={scrollRef} 
-          className="space-y-0.5 hub-golfers-list-scroll flex flex-col"
-          style={{
-            overflowY: 'auto',
-            WebkitOverflowScrolling: 'touch',
-            overscrollBehavior: 'contain',
-            maxHeight: 'calc(2.4 * 52px)', // Show 2.4 rows visible
-            maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
-          }}
-        >
+            className="rounded-2xl p-4 backdrop-blur-sm border"
+            style={{
+              background: 'var(--hub-glass-bg-card)',
+              borderColor: 'var(--hub-stroke)',
+            }}
+          >
+            <div 
+              ref={scrollRef} 
+              className="space-y-0.5 hub-golfers-list-scroll flex flex-col"
+              style={{
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain',
+                maxHeight: 'calc(2.4 * 52px)', // Show 2.4 rows visible
+                maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
+              }}
+            >
           {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
             <div key={i} className="h-12 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
           ))}
@@ -160,28 +168,29 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
               No active golfers nearby
             </div>
           )}
-        </div>
-        <button
-          onClick={(e) => { 
-            e.stopPropagation(); 
-            navigateFromHub('/hub/golfers'); 
-          }}
-          className="text-[15px] font-medium transition"
-          style={{
-            position: 'absolute',
-            bottom: '0',
-            right: '0',
-            background: 'transparent',
-            border: 'none',
-            color: 'var(--hub-text-body)',
-            padding: 0,
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-          aria-label="View all golfers"
-        >
-          View all →
-        </button>
+            </div>
+          </div>
+          <button
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              navigateFromHub('/hub/golfers'); 
+            }}
+            className="text-[15px] font-medium transition"
+            style={{
+              position: 'absolute',
+              bottom: '0',
+              right: '0',
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            aria-label="View all golfers"
+          >
+            View all →
+          </button>
       </div>
     </Tile>
   );
