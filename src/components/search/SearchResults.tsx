@@ -1,7 +1,7 @@
 import React from 'react';
 import { User, MapPin, Clock, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { Button } from '@/components/ui/button';
 import TrendingTags from './TrendingTags';
 import RecentSearches from './RecentSearches';
@@ -140,12 +140,12 @@ const SearchResults: React.FC<SearchResultsProps> = ({
           >
             <div className="mr-3">
               {result.type === 'user' ? (
-                <Avatar className="w-12 h-12">
-                  <AvatarImage src={result.image} alt={result.title} />
-                  <AvatarFallback>
-                    <User className="w-6 h-6 text-gray-400" />
-                  </AvatarFallback>
-                </Avatar>
+                <AvatarSquircle
+                  size={48}
+                  src={result.image}
+                  alt={result.title}
+                  fallback={result.title.charAt(0).toUpperCase()}
+                />
               ) : (
                 <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
                   {result.image ? (

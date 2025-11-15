@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { Building2, MapPin, User } from 'lucide-react';
 
 interface TaggableEntity {
@@ -93,15 +93,18 @@ const TagAutocomplete: React.FC<TagAutocompleteProps> = ({
               onMouseDown={(e) => e.preventDefault()} // Prevent input blur
             >
               <div className="flex-shrink-0">
-                <Avatar className="w-10 h-10">
-                  <AvatarImage 
-                    src={entity.profile_image_url || ''} 
-                    alt={entity.name}
-                  />
-                  <AvatarFallback className="text-xs bg-gray-100">
-                    {getEntityIcon(entity.entity_type)}
-                  </AvatarFallback>
-                </Avatar>
+                <AvatarSquircle
+                  size="md"
+                  src={entity.profile_image_url || ''}
+                  alt={entity.name}
+                  fallback={entity.name.charAt(0).toUpperCase()}
+                >
+                  {!entity.profile_image_url && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      {getEntityIcon(entity.entity_type)}
+                    </div>
+                  )}
+                </AvatarSquircle>
               </div>
               
               <div className="flex-1 min-w-0">
