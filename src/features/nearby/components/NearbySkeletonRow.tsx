@@ -21,7 +21,7 @@ export function NearbySkeletonRow({ count = 3 }: NearbySkeletonRowProps) {
         >
           <div className="flex items-start gap-3">
             {/* Avatar skeleton */}
-            <div className="skel shrink-0 w-[52px] h-[52px] rounded-full" />
+            <div className="skel shrink-0 w-[52px] h-[52px]" style={{ borderRadius: '28%' }} />
 
             {/* Content skeleton */}
             <div className="flex-1 min-w-0 space-y-2">
