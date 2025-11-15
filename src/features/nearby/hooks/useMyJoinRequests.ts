@@ -36,6 +36,11 @@ export function useMyJoinRequests() {
 
         // Handle Edge Function errors explicitly
         if (error) {
+          // Handle 401 specifically to prevent blank screens
+          if ((error as any).status === 401 || error.message?.includes('Unauthorized')) {
+            console.warn('[useMyJoinRequests] Unauthorized (401) – returning empty list');
+            return [];
+          }
           console.error('[useMyJoinRequests] Edge function error:', error);
           return [];
         }
@@ -45,7 +50,7 @@ export function useMyJoinRequests() {
       } catch (err: any) {
         // Catch any other errors (network, parsing, etc.)
         if (err?.message?.includes('Unauthorized') || err?.status === 401) {
-          console.warn('[useMyJoinRequests] Unauthorized error caught, skipping notifications');
+          console.warn('[useMyJoinRequests] Unauthorized error caught in catch block');
           return [];
         }
         console.error('[useMyJoinRequests] Unexpected error:', err);
