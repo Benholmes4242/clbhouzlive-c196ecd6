@@ -140,10 +140,12 @@ export function HubHomePage() {
     setHasEntered(false);
     setTranslateY(window.innerHeight);
 
-    // Next frame: enable transition + slide up to 0
+    // Double RAF: ensure browser paints off-screen state before animating
     requestAnimationFrame(() => {
-      setHasEntered(true);
-      setTranslateY(0);
+      requestAnimationFrame(() => {
+        setHasEntered(true);
+        setTranslateY(0);
+      });
     });
   }, []);
 
