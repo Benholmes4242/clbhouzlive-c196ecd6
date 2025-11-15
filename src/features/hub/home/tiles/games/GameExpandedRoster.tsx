@@ -3,6 +3,8 @@
  * Shows host and members with avatars
  */
 
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
+
 type RosterPerson = {
   id: string;
   name: string;
@@ -27,23 +29,13 @@ export function GameExpandedRoster({ host, members }: GameExpandedRosterProps) {
           Host
         </div>
         <div className="flex items-center gap-2">
-          {host.avatarUrl ? (
-            <img 
-              className="h-7 w-7 rounded-full" 
-              src={host.avatarUrl} 
-              alt=""
-            />
-          ) : (
-            <div 
-              className="h-7 w-7 rounded-full flex items-center justify-center text-[11px] font-medium"
-              style={{ 
-                background: 'rgba(255,255,255,0.1)',
-                color: 'var(--hub-text-body)',
-              }}
-            >
-              {host.name === 'Guest' ? 'G' : host.name.charAt(0).toUpperCase()}
-            </div>
-          )}
+          <AvatarSquircle
+            src={host.avatarUrl}
+            alt={host.name}
+            fallback={host.name}
+            size={28}
+            ringWidth={0}
+          />
           <div className="flex-1 min-w-0">
             <div className="text-[14px] truncate" style={{ color: 'var(--hub-text-body)' }}>
               {host.name}
@@ -81,23 +73,13 @@ export function GameExpandedRoster({ host, members }: GameExpandedRosterProps) {
             <>
               {nonHostMembers.slice(0, 3).map(m => (
                 <div key={m.id} className="flex items-center gap-2 mb-2 last:mb-0">
-                  {m.avatarUrl ? (
-                    <img 
-                      className="h-6 w-6 rounded-full" 
-                      src={m.avatarUrl} 
-                      alt=""
-                    />
-                  ) : (
-                    <div 
-                      className="h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-medium"
-                      style={{ 
-                        background: 'rgba(255,255,255,0.1)',
-                        color: 'var(--hub-text-body)',
-                      }}
-                    >
-                      {m.name === 'Guest' ? 'G' : m.name.charAt(0).toUpperCase()}
-                    </div>
-                  )}
+                  <AvatarSquircle
+                    src={m.avatarUrl}
+                    alt={m.name}
+                    fallback={m.name}
+                    size={24}
+                    ringWidth={0}
+                  />
                   <div className="flex-1 min-w-0">
                     <div className="text-[13px] truncate" style={{ color: 'var(--hub-text-body)' }}>
                       {m.name}

@@ -8,6 +8,7 @@ import { useGameParticipants } from '@/features/game/hooks/useGameParticipants';
 import { useNavigate } from 'react-router-dom';
 import { formatHcp } from '@/lib/formatHcp';
 import { TapButton } from '@/components/ui/TapButton';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 
 interface HostGameViewProps {
   game: GameBeacon;
@@ -68,13 +69,13 @@ export function HostGameView({ game, onCancelBeacon }: HostGameViewProps) {
                     onClick={() => navigate(`/profile/${p.username || p.user_id}`)}
                     className="flex items-center gap-1.5 px-2 py-1 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all"
                   >
-                    <div className="w-5 h-5 rounded-full overflow-hidden bg-neutral-700/50 flex items-center justify-center shrink-0">
-                      {p.profile_photo_url ? (
-                        <img src={p.profile_photo_url} alt={p.display_name} className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-primary font-semibold text-xs">{p.display_name[0]}</span>
-                      )}
-                    </div>
+                    <AvatarSquircle
+                      src={p.profile_photo_url}
+                      alt={p.display_name}
+                      fallback={p.display_name}
+                      size={20}
+                      ringWidth={0}
+                    />
                     <span className="text-[11px] text-white/90">{p.display_name}</span>
                     {p.show_handicap && p.eg_handicap_index != null && (
                       <span className="text-[10px] text-white/60">({formatHcp(p.eg_handicap_index)})</span>
