@@ -7,6 +7,7 @@ import type { EchoMessage } from '../state/echoTypes';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { supabase } from '@/integrations/supabase/client';
 import EchoAvatar from '@/components/ai-chat/EchoAvatar';
+import { Squircle } from '@/components/ui/squircle';
 
 interface EchoMessageRowProps {
   message: EchoMessage;
@@ -30,12 +31,16 @@ export function EchoMessageRow({ message, onContextMenu }: EchoMessageRowProps) 
           <div className="echo-bubble-user px-4 py-3 text-[15px] leading-relaxed text-[color:var(--echo-text-primary)] echo-bubble-enter">
             {message.content}
           </div>
-          <div className="flex-shrink-0 w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-xs font-medium text-white/90 overflow-hidden">
-            {userProfile?.profile_photo_url ? (
-              <img src={userProfile.profile_photo_url} alt="You" className="w-full h-full object-cover" />
-            ) : (
-              <span>{userProfile?.display_name?.[0]?.toUpperCase() || 'Y'}</span>
-            )}
+          <div className="flex-shrink-0">
+            <Squircle width={28} height={28}>
+              {userProfile?.profile_photo_url ? (
+                <img src={userProfile.profile_photo_url} alt="You" className="w-full h-full object-cover" />
+              ) : (
+                <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12}}>
+                  {userProfile?.display_name?.[0]?.toUpperCase() || 'Y'}
+                </div>
+              )}
+            </Squircle>
           </div>
         </div>
       </div>
