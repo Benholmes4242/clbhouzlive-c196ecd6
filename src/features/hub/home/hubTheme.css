@@ -462,10 +462,9 @@ html.hub-open {
 
 /* === Inline scroll: constrained height for scroll behavior === */
 .hub-golfers-list-scroll {
-  /* Fill space but leave room for CTA at bottom */
+  /* Fill available space */
   flex: 1;
   min-height: 0;
-  max-height: calc(100% - 32px); /* Reserve space for CTA height */
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   /* avoid accidental horizontal scroll */
