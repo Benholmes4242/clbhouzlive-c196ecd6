@@ -160,11 +160,16 @@ Deno.serve(async (req) => {
 
     console.log(`[decide-join-request] Request ${action}d successfully`);
 
+    // Calculate the updated slots_open value to return
+    const updatedSlotsOpen = action === 'approve' 
+      ? Math.max(0, joinRequest.games.slots_open - 1)
+      : joinRequest.games.slots_open;
+
     return new Response(
       JSON.stringify({
         success: true,
         status: action === 'approve' ? 'approved' : 'declined',
-        slots_open: action === 'approve' ? joinRequest.games.slots_open - 1 : joinRequest.games.slots_open,
+        slots_open: updatedSlotsOpen,
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
