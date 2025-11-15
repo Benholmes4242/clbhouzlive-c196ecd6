@@ -87,7 +87,7 @@ export function QuickActionsTile() {
             onClick={openProfile}
           />
           <QuickActionButton
-            label="Upload Swing"
+            label="Swing Coach"
             Icon={CameraIcon}
             onClick={openSwing}
           />
