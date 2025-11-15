@@ -70,6 +70,10 @@ export interface GameRowProps {
   
   // Request state (for search mode)
   isRequesting?: boolean;
+  requestState?: 'idle' | 'pending' | 'requested' | 'error';
+  
+  // Pending request count (for hosting mode)
+  pendingRequestCount?: number;
 }
 
 export function GameRow({
@@ -89,6 +93,8 @@ export function GameRow({
   readOnly = false,
   index = 0,
   isRequesting = false,
+  requestState = 'idle',
+  pendingRequestCount = 0,
 }: GameRowProps) {
   const [isExpanded, setIsExpanded] = React.useState(defaultExpanded);
 
@@ -160,6 +166,13 @@ export function GameRow({
             'gameRow__statusGroup',
             isExpanded && 'gameRow__statusGroup--lifted'
           )}>
+            {/* Pending requests indicator (Hosting mode) */}
+            {mode === 'yourGames' && isHost && pendingRequestCount > 0 && (
+              <span className="text-xs font-medium text-white/70 mr-2">
+                Requests · {pendingRequestCount}
+              </span>
+            )}
+            
             <GameStatusPill
               filled={filled}
               total={game.slots_total}
@@ -189,9 +202,10 @@ export function GameRow({
             label={
               game.slots_open === 0 ? 'Full' :
               isRequesting ? 'Requesting…' :
+              requestState === 'requested' ? 'Requested' :
               'Request to Join'
             }
-            disabled={game.slots_open === 0 || isRequesting}
+            disabled={game.slots_open === 0 || isRequesting || requestState === 'requested'}
           />
         </div>
       )}
@@ -237,7 +251,7 @@ export function GameRow({
                   {onViewRequests && (
                     <SecondaryButton
                       onClick={() => onViewRequests()}
-                      label="Requests"
+                      label={pendingRequestCount > 0 ? `Requests (${pendingRequestCount})` : 'Requests'}
                     />
                   )}
                   {onCancelGame && (

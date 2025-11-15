@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { TapButton } from '@/components/ui/TapButton';
@@ -27,6 +28,7 @@ interface HostApprovalSheetProps {
 }
 
 export function HostApprovalSheet({ gameId, open, onOpenChange }: HostApprovalSheetProps) {
+  const queryClient = useQueryClient();
   const [requests, setRequests] = useState<JoinRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState<string | null>(null);
@@ -107,6 +109,12 @@ export function HostApprovalSheet({ gameId, open, onOpenChange }: HostApprovalSh
 
       // Optimistically remove the request from the list
       setRequests((prev) => prev.filter((r) => r.id !== requestId));
+      
+      // Invalidate queries to refresh all related data
+      queryClient.invalidateQueries({ queryKey: ['userGames'] });
+      queryClient.invalidateQueries({ queryKey: ['games'] });
+      queryClient.invalidateQueries({ queryKey: ['pendingRequestCount', gameId] });
+      queryClient.invalidateQueries({ queryKey: ['gameJoinRequests', gameId] });
       
       // Show success message
       if (approve) {

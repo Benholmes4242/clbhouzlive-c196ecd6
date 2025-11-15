@@ -4,10 +4,12 @@ import { Segmented, SegmentItem } from './Segmented';
 import { PrimaryCTAButton } from '@/features/hub/components/HubButtons';
 import { YourGamesSkeleton } from './your-games/YourGamesSkeleton';
 import { HostApprovalSheet } from './HostApprovalSheet';
-import { GameRow, type GameData } from '@/features/games/components/GameRow';
+import { GameRowWithRequestCount } from './GameRowWithRequestCount';
+import type { GameData } from '@/features/games/components/GameRow';
 import type { Participant } from './your-games/types';
 import { useUserGames, type UserGame } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
+import { usePendingRequestCount } from '@/features/nearby/hooks/usePendingRequestCount';
 import { haptic } from '@/utils/haptics';
 import '@/features/games/components/GameRow.css';
 import './your-games/YourGames.css';
@@ -205,7 +207,7 @@ export function YourGamesList({
       ) : (
         <div>
           {currentGames.map((game, index) => (
-            <GameRow
+            <GameRowWithRequestCount
               key={game.id}
               mode="yourGames"
               game={toGameData(game)}

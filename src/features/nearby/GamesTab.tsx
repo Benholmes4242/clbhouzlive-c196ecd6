@@ -205,7 +205,7 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
 }
 
 function GameCard({ game, index }: { game: Game; index: number }) {
-  const { requestJoin, isPending } = useJoinGame(game.id);
+  const { requestJoin, isPending, state } = useJoinGame(game.id);
 
   // Convert to GameData format
   const gameData: GameData = {
@@ -229,6 +229,7 @@ function GameCard({ game, index }: { game: Game; index: number }) {
       onRequestToJoin={requestJoin}
       index={index}
       isRequesting={isPending}
+      requestState={state}
     />
   );
 }
