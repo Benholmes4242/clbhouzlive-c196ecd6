@@ -9,7 +9,6 @@ import { Tile } from '../components/Tile';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { useHub } from '@/features/hub/useHub';
 import { formatDistanceHcpClub } from '@/features/golfers/format';
-import SquircleImage from '@/components/ui/SquircleImage';
 
 // Mock data toggle
 const useMockData = false;
@@ -132,13 +131,12 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
               onClick={() => nav(`/profile/${g.username}`)}
               aria-label={`${g.display_name || g.username}, ${formatDistanceHcpClub(g.distance_km ? g.distance_km * 1000 : undefined, g.eg_handicap_index, g.home_club)}`}
             >
-              <div className="shrink-0">
-                <SquircleImage
-                  size={38}
+              <div className="shrink-0" style={{ width: 38, height: 38 }}>
+                <img
                   src={g.avatar_url || '/placeholder.svg'}
                   alt={`${g.display_name || g.username} profile photo`}
-                  ringColor="rgba(255,255,255,0.28)"
-                  ringWidth={1}
+                  className="w-full h-full rounded-full object-cover"
+                  style={{ border: '1px solid rgba(255,255,255,0.28)' }}
                 />
               </div>
               <div className="ng-main">
