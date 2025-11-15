@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { isMockLiveEnabled } from '@/mocks/mockSwitch';
 
 interface SuggestedUser {
   id: string;
@@ -20,12 +21,44 @@ export const useSuggestedUsers = () => {
   const fetchSuggestedUsers = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
+      const useMockProfiles = isMockLiveEnabled();
+      
+      if (!user && !useMockProfiles) {
         setLoading(false);
         return;
       }
 
-      // Get users that the current user is NOT following
+      if (useMockProfiles) {
+        // Fetch cloned profiles from mock_profile_clones table
+        const { data: mockClones, error: mockError } = await supabase
+          .from('mock_profile_clones')
+          .select('*')
+          .limit(20);
+
+        if (mockError) {
+          console.error('Error fetching mock profile clones:', mockError);
+          setUsers([]);
+          return;
+        }
+
+        const transformedMockUsers: SuggestedUser[] = (mockClones || []).map(clone => ({
+          id: clone.id,
+          displayName: clone.display_name || 'User',
+          username: clone.username ? `@${clone.username}` : '@user',
+          profileImage: clone.profile_photo_url || 'https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=100&h=100&fit=crop&crop=face',
+          bio: clone.bio || '',
+          followersCount: clone.followers_count || 0,
+          isVerified: clone.is_verified || false,
+          isReal: false, // These are mock clones
+          lastPortraitVideo: clone.profile_video_url
+        }));
+
+        setUsers(transformedMockUsers);
+        setLoading(false);
+        return;
+      }
+
+      // Real users flow (when mock flag is false)
       const { data: realUsers, error } = await supabase
         .from('user_profiles')
         .select(`
@@ -36,7 +69,7 @@ export const useSuggestedUsers = () => {
           bio,
           profile_video_url
         `)
-        .neq('id', user.id) // Exclude current user
+        .neq('id', user!.id) // Exclude current user
         .eq('is_public', true)
         .limit(15);
 
@@ -66,7 +99,7 @@ export const useSuggestedUsers = () => {
       const { data: followingData } = await supabase
         .from('user_follows')
         .select('following_id')
-        .eq('follower_id', user.id);
+        .eq('follower_id', user!.id);
       
       followingData?.forEach(follow => followedUserIds.add(follow.following_id));
 
@@ -85,114 +118,7 @@ export const useSuggestedUsers = () => {
         lastPortraitVideo: user.profile_video_url
       }));
 
-      // Mock users to fill out suggestions if needed
-      const mockUsers: SuggestedUser[] = [
-        {
-          id: 'mock-1',
-          displayName: 'Sarah Johnson',
-          username: '@sarahjgolf',
-          profileImage: 'https://images.unsplash.com/photo-1494790108755-2616b612d7c5?w=100&h=100&fit=crop&crop=face',
-          bio: 'Weekend warrior golfer',
-          followersCount: 1240,
-          isVerified: false,
-          isReal: false,
-          lastPortraitVideo: undefined
-        },
-        {
-          id: 'mock-2',
-          displayName: 'Mike Chen',
-          username: '@mikechengolf',
-          profileImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-          bio: 'Scratch golfer & coach',
-          followersCount: 3420,
-          isVerified: true,
-          isReal: false
-        },
-        {
-          id: 'mock-3',
-          displayName: 'Emma Wilson',
-          username: '@emmawgolf',
-          profileImage: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
-          bio: 'Golf fitness enthusiast',
-          followersCount: 890,
-          isVerified: false,
-          isReal: false
-        },
-        {
-          id: 'mock-4',
-          displayName: 'David Rodriguez',
-          username: '@davidrgolf',
-          profileImage: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-          bio: 'Course photographer',
-          followersCount: 2150,
-          isVerified: false,
-          isReal: false
-        },
-        {
-          id: 'mock-5',
-          displayName: 'Lisa Park',
-          username: '@lisaparkgolf',
-          profileImage: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face',
-          bio: 'Junior golf instructor',
-          followersCount: 1580,
-          isVerified: true,
-          isReal: false
-        },
-        {
-          id: 'mock-6',
-          displayName: 'James Miller',
-          username: '@jamesmgolf',
-          profileImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
-          bio: 'Golf equipment reviewer',
-          followersCount: 4230,
-          isVerified: true,
-          isReal: false
-        },
-        {
-          id: 'mock-7',
-          displayName: 'Rachel Green',
-          username: '@rachelggolf',
-          profileImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face',
-          bio: 'Golf course designer',
-          followersCount: 980,
-          isVerified: false,
-          isReal: false
-        },
-        {
-          id: 'mock-8',
-          displayName: 'Alex Thompson',
-          username: '@alextgolf',
-          profileImage: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face',
-          bio: 'PGA Tour analyst',
-          followersCount: 6740,
-          isVerified: true,
-          isReal: false
-        },
-        {
-          id: 'mock-9',
-          displayName: 'Nicole Davis',
-          username: '@nicoledgolf',
-          profileImage: 'https://images.unsplash.com/photo-1557296387-5358ad7997bb?w=100&h=100&fit=crop&crop=face',
-          bio: 'Golf mental coach',
-          followersCount: 1320,
-          isVerified: false,
-          isReal: false
-        },
-        {
-          id: 'mock-10',
-          displayName: 'Ryan Kim',
-          username: '@ryankgolf',
-          profileImage: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop&crop=face',
-          bio: 'Golf swing analyst',
-          followersCount: 2890,
-          isVerified: true,
-          isReal: false
-        }
-      ];
-
-      // Combine real users first, then mock users
-      const combinedUsers = [...transformedRealUsers, ...mockUsers];
-      setUsers(combinedUsers);
+      setUsers(transformedRealUsers);
 
     } catch (error) {
       console.error('Error in fetchSuggestedUsers:', error);

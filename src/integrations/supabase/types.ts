@@ -1515,6 +1515,60 @@ export type Database = {
         }
         Relationships: []
       }
+      mock_profile_clones: {
+        Row: {
+          background_image_url: string | null
+          bio: string | null
+          cloned_from_user_id: string | null
+          created_at: string | null
+          display_name: string | null
+          followers_count: number | null
+          header_photo_url: string | null
+          home_club: string | null
+          id: string
+          is_verified: boolean | null
+          profile_photo_url: string | null
+          profile_video_thumbnail_url: string | null
+          profile_video_url: string | null
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          background_image_url?: string | null
+          bio?: string | null
+          cloned_from_user_id?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          followers_count?: number | null
+          header_photo_url?: string | null
+          home_club?: string | null
+          id?: string
+          is_verified?: boolean | null
+          profile_photo_url?: string | null
+          profile_video_thumbnail_url?: string | null
+          profile_video_url?: string | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          background_image_url?: string | null
+          bio?: string | null
+          cloned_from_user_id?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          followers_count?: number | null
+          header_photo_url?: string | null
+          home_club?: string | null
+          id?: string
+          is_verified?: boolean | null
+          profile_photo_url?: string | null
+          profile_video_thumbnail_url?: string | null
+          profile_video_url?: string | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
       news_articles: {
         Row: {
           created_at: string
@@ -3579,6 +3633,10 @@ export type Database = {
       }
       cleanup_expired_dismissals: { Args: never; Returns: undefined }
       cleanup_old_gate_attempts: { Args: never; Returns: undefined }
+      clone_real_profiles_to_mock: {
+        Args: { limit_count?: number }
+        Returns: number
+      }
       current_auth_uid: { Args: never; Returns: string }
       decrement_slots_if_available: {
         Args: { p_game_id: string }
