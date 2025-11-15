@@ -45,7 +45,7 @@
 }
 
 .gameRow:hover {
-  background: rgba(0, 0, 0, 0.14);
+  background: var(--hub-glass-bg-hover);
 }
 
 .gameRow:active {
