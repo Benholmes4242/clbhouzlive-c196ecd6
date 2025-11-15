@@ -42,7 +42,7 @@ const SkeletonCard: React.FC = () => {
       <div className="space-y-2">
         <div className="h-3 w-16 rounded-md bg-white/8 skeleton-shimmer" />
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-full bg-white/10 skeleton-shimmer" />
+          <div className="h-9 w-9 bg-white/10 skeleton-shimmer" style={{ borderRadius: '28%' }} />
           <div className="flex-1 space-y-2">
             <div className="h-3.5 w-40 rounded-md bg-white/10 skeleton-shimmer" />
             <div className="h-3 w-28 rounded-md bg-white/8 skeleton-shimmer" />
