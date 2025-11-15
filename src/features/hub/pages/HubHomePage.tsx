@@ -28,9 +28,20 @@ export function HubHomePage() {
 
   // Animation & swipe-to-dismiss state
   const [dragStartY, setDragStartY] = useState<number | null>(null);
-  const [translateY, setTranslateY] = useState(0);
+  const [translateY, setTranslateY] = useState(() => {
+    if (typeof window === 'undefined') return 0;
+    const reduced = prefersReduced();
+    // If user prefers reduced motion, start at rest (no animation)
+    if (reduced) return 0;
+    // Otherwise, start off-screen at the bottom
+    return window.innerHeight;
+  });
   const [isDragging, setIsDragging] = useState(false);
-  const [hasEntered, setHasEntered] = useState(false);
+  const [hasEntered, setHasEntered] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    // If reduced motion, we never animate, so we consider it "entered"
+    return prefersReduced();
+  });
   const [isExiting, setIsExiting] = useState(false);
   
   const sheetRef = useRef<HTMLDivElement | null>(null);
@@ -131,16 +142,15 @@ export function HubHomePage() {
     const reduced = prefersReduced();
 
     if (reduced || typeof window === 'undefined') {
+      // No animation path: just appear in place
       setTranslateY(0);
       setHasEntered(true);
       return;
     }
 
-    // Start off-screen at the bottom with no transition
-    setHasEntered(false);
-    setTranslateY(window.innerHeight);
-
-    // Next frame: enable transition + slide up to 0
+    // At this point, translateY is already window.innerHeight from initial state,
+    // and hasEntered is false, so there's no transition yet.
+    // Next frame: enable transition and slide up to 0
     requestAnimationFrame(() => {
       setHasEntered(true);
       setTranslateY(0);
