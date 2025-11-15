@@ -10,6 +10,7 @@ import type { Participant } from './your-games/types';
 import { useUserGames, type UserGame } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
 import { usePendingRequestCount } from '@/features/nearby/hooks/usePendingRequestCount';
+import { useMyJoinRequests } from '@/features/nearby/hooks/useMyJoinRequests';
 import { haptic } from '@/utils/haptics';
 import '@/features/games/components/GameRow.css';
 import './your-games/YourGames.css';
@@ -36,6 +37,9 @@ export function YourGamesList({
   // Use shared hook for consistency with the tile
   const { data, isLoading } = useUserGames();
   useUserGamesRealtime();
+  
+  // Fetch user's join requests for "Awaiting approval" panel
+  const { data: myRequests = [] } = useMyJoinRequests();
 
   const hostedGames = data?.hosting || [];
   const joinedGames = data?.joined || [];
@@ -138,6 +142,9 @@ export function YourGamesList({
 
   const currentGames = activeTab === 'hosting' ? hostedGames : joinedGames;
   const isHostingTab = activeTab === 'hosting';
+  
+  // Filter pending join requests for "Awaiting approval" panel
+  const pendingRequests = myRequests.filter((r) => r.status === 'pending' && r.games);
 
   // Show loading skeleton while fetching
   if (isLoading) {
@@ -187,6 +194,49 @@ export function YourGamesList({
             label="Create a Game"
           />
         </div>
+      )}
+
+      {/* "Awaiting approval" panel (Joined tab only) */}
+      {!isHostingTab && pendingRequests.length > 0 && (
+        <section className="yourGames__pendingPanel">
+          <div className="yourGames__pendingHeader">
+            <span className="yourGames__pendingDot" />
+            <span>Awaiting approval</span>
+          </div>
+          <div className="yourGames__pendingList">
+            {pendingRequests.map((req) => {
+              const game = req.games;
+              if (!game) return null;
+              
+              const start = new Date(game.start_time);
+              const dateStr = start.toLocaleDateString(undefined, { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric' 
+              });
+              const timeStr = start.toLocaleTimeString(undefined, { 
+                hour: 'numeric', 
+                minute: '2-digit' 
+              });
+              
+              return (
+                <div key={req.id} className="yourGames__pendingItem">
+                  <div className="yourGames__pendingMain">
+                    <div className="yourGames__pendingTitle">
+                      {game.course_name || 'Golf game'}
+                    </div>
+                    <div className="yourGames__pendingMeta">
+                      {dateStr} • {timeStr}
+                    </div>
+                  </div>
+                  <div className="yourGames__pendingStatus">
+                    Pending
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
       )}
 
       {/* Games list */}
