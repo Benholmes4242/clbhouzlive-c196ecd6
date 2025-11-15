@@ -129,7 +129,7 @@ export function GameRow({
 
   // Show action buttons based on mode
   const showActions = showDetails && !readOnly;
-  const showRequestButton = mode === 'search' && !anonymous;
+  const showRequestButton = mode === 'search' && !!onRequestToJoin;
 
   return (
     <article
