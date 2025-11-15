@@ -1,5 +1,5 @@
 import React from 'react';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Squircle } from '@/components/ui/squircle';
 import './nearby.css';
 
 interface GolferAvatarProps {
@@ -14,13 +14,12 @@ export function GolferAvatar({
   size = 52 
 }: GolferAvatarProps) {
   return (
-    <AvatarSquircle
-      src={avatarUrl}
-      alt={displayName}
-      fallback={displayName}
-      size={size}
-      ringWidth={1}
-      ringColor="rgba(255,255,255,0.28)"
-    />
+    <Squircle width={size} height={size}>
+      <img
+        src={avatarUrl || '/placeholder.svg'}
+        alt={displayName}
+        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+      />
+    </Squircle>
   );
 }

@@ -3,7 +3,7 @@ import { Search, X, UserPlus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import HcpBadge from '@/components/HcpBadge';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Squircle } from '@/components/ui/squircle';
 import '../GamesTab.css'; // Import for resultsSheet and resultRow styles
 
 interface UserProfile {
@@ -117,13 +117,9 @@ export function UserSearchTypeahead({
                     <UserPlus className="w-3 h-3 text-white/60" />
                   </div>
                 ) : (
-                  <AvatarSquircle
-                    src={user.profile_photo_url}
-                    alt={user.display_name}
-                    fallback={user.display_name}
-                    size={20}
-                    ringWidth={0}
-                  />
+                  <Squircle width={20} height={20}>
+                    <img src={user.profile_photo_url || '/placeholder.svg'} alt={user.display_name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                  </Squircle>
                 )}
                 <span>{user.display_name}</span>
                 {!user.guest_name && (
@@ -209,13 +205,9 @@ export function UserSearchTypeahead({
                     }}
                     className="resultRow"
                   >
-                    <AvatarSquircle
-                      src={user.profile_photo_url}
-                      alt={user.display_name}
-                      fallback={user.display_name}
-                      size={32}
-                      ringWidth={0}
-                    />
+                    <Squircle width={32} height={32}>
+                      <img src={user.profile_photo_url || '/placeholder.svg'} alt={user.display_name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                    </Squircle>
                     <div className="rMid">
                       <div className="rTitle flex items-center gap-2">
                         <span>{user.display_name}</span>

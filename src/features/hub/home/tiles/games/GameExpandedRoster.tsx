@@ -3,7 +3,7 @@
  * Shows host and members with avatars
  */
 
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Squircle } from '@/components/ui/squircle';
 
 type RosterPerson = {
   id: string;
@@ -29,13 +29,9 @@ export function GameExpandedRoster({ host, members }: GameExpandedRosterProps) {
           Host
         </div>
         <div className="flex items-center gap-2">
-          <AvatarSquircle
-            src={host.avatarUrl}
-            alt={host.name}
-            fallback={host.name}
-            size={28}
-            ringWidth={0}
-          />
+          <Squircle width={28} height={28}>
+            <img src={host.avatarUrl || '/placeholder.svg'} alt={host.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+          </Squircle>
           <div className="flex-1 min-w-0">
             <div className="text-[14px] truncate" style={{ color: 'var(--hub-text-body)' }}>
               {host.name}
@@ -73,13 +69,9 @@ export function GameExpandedRoster({ host, members }: GameExpandedRosterProps) {
             <>
               {nonHostMembers.slice(0, 3).map(m => (
                 <div key={m.id} className="flex items-center gap-2 mb-2 last:mb-0">
-                  <AvatarSquircle
-                    src={m.avatarUrl}
-                    alt={m.name}
-                    fallback={m.name}
-                    size={24}
-                    ringWidth={0}
-                  />
+                  <Squircle width={24} height={24}>
+                    <img src={m.avatarUrl || '/placeholder.svg'} alt={m.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                  </Squircle>
                   <div className="flex-1 min-w-0">
                     <div className="text-[13px] truncate" style={{ color: 'var(--hub-text-body)' }}>
                       {m.name}
