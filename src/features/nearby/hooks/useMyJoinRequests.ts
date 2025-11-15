@@ -34,22 +34,14 @@ export function useMyJoinRequests() {
           },
         });
 
-        // Handle 401 specifically (auth issues)
+        // Handle Edge Function errors explicitly
         if (error) {
-          if (error.message?.includes('Unauthorized') || error.message?.includes('401')) {
-            console.warn('[useMyJoinRequests] Unauthorized, user may not be logged in');
-            return [];
-          }
-          console.error('[useMyJoinRequests] Error:', error);
+          console.error('[useMyJoinRequests] Edge function error:', error);
           return [];
         }
 
-        if (!data?.success) {
-          console.warn('[useMyJoinRequests] Request failed:', data);
-          return [];
-        }
-
-        return (data.requests || []) as MyJoinRequest[];
+        // Return data safely with fallback
+        return data?.requests ?? [];
       } catch (err: any) {
         // Catch any other errors (network, parsing, etc.)
         if (err?.message?.includes('Unauthorized') || err?.status === 401) {
