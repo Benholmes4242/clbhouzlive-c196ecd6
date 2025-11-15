@@ -8,9 +8,8 @@ import { useGamesQuery } from './hooks/useGamesQuery';
 import { useJoinGame } from './hooks/useJoinGame';
 import { openWhenSheet, openDistanceSheet, openSortSheet, labelWhen } from './components/FilterSheets';
 import { PeopleSearchInput } from './components/PeopleSearchInput';
-import { GameStatusPill } from '@/features/hub/components/GameStatusPill';
-import { SecondaryButton } from '@/features/hub/components/HubButtons';
-import { formatExpires } from '@/lib/formatExpires';
+import { GameRow, type GameData } from '@/features/games/components/GameRow';
+import '@/features/games/components/GameRow.css';
 import './GamesTab.css';
 
 type Game = {
@@ -205,67 +204,32 @@ function FiltersRow({ selectedClub }: { selectedClub: GolfCourse | null }) {
   );
 }
 
-function GameCard({ game }: { game: Game }) {
+function GameCard({ game, index }: { game: Game; index: number }) {
   const { requestJoin, isPending } = useJoinGame(game.id);
-  
-  const filled = game.slots_total - game.slots_open;
-  
-  const formatTime = (isoTime: string) => {
-    const date = new Date(isoTime);
-    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-  };
 
-  const formatDate = (isoTime: string) => {
-    const date = new Date(isoTime);
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    if (date.toDateString() === today.toDateString()) return 'Today';
-    if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
-    
-    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-  };
-
-  const expiryLabel = formatExpires(game.start_time); // Using start_time as proxy for expiry
-
-  const handleJoin = () => {
-    haptic('medium');
-    requestJoin();
+  // Convert to GameData format
+  const gameData: GameData = {
+    id: game.id,
+    course_name: game.course_name || null,
+    start_time: game.start_time,
+    expires_at: game.start_time, // Using start_time as proxy for expiry
+    slots_total: game.slots_total,
+    slots_open: game.slots_open,
+    host_user_id: game.host_user_id,
   };
 
   return (
-    <article 
-      className="gameRow" 
-      role="article" 
-      aria-label={`${game.course_name || 'Golf game'}, ${formatDate(game.start_time)}, ${filled}/${game.slots_total} filled`}
-    >
-      <div className="gameRow__header">
-        <div className="gameRow__left">
-          <div className="gameRow__courseName">{game.course_name || 'Golf Game'}</div>
-          
-          <div className="gameRow__meta">
-            <span className="gameRow__metaLine">🗓️ {formatDate(game.start_time)} • {formatTime(game.start_time)}</span>
-            <span className="gameRow__metaLine">⏳ {expiryLabel}</span>
-          </div>
-        </div>
-
-        <div className="gameRow__right">
-          <GameStatusPill
-            filled={filled}
-            total={game.slots_total}
-          />
-        </div>
-      </div>
-
-      <div className="gameRow__actions">
-        <SecondaryButton
-          label={game.slots_open <= 0 ? 'Full' : isPending ? 'Requesting…' : 'Request to Join'}
-          onClick={handleJoin}
-          disabled={isPending || game.slots_open <= 0}
-        />
-      </div>
-    </article>
+    <GameRow
+      mode="search"
+      game={gameData}
+      isHost={false}
+      isJoined={false}
+      anonymous
+      canExpand={false}
+      onRequestToJoin={requestJoin}
+      index={index}
+      isRequesting={isPending}
+    />
   );
 }
 
@@ -295,7 +259,7 @@ function GamesList({ games, isLoading }: { games: Game[]; isLoading: boolean }) 
 
   return (
     <div className="list">
-      {games.map(g => <GameCard key={g.id} game={g} />)}
+      {games.map((g, index) => <GameCard key={g.id} game={g} index={index} />)}
     </div>
   );
 }

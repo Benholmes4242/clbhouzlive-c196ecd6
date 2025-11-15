@@ -4,11 +4,12 @@ import { Segmented, SegmentItem } from './Segmented';
 import { PrimaryCTAButton } from '@/features/hub/components/HubButtons';
 import { YourGamesSkeleton } from './your-games/YourGamesSkeleton';
 import { HostApprovalSheet } from './HostApprovalSheet';
-import { YourGameRow } from './your-games/YourGameRow';
-import type { Game as CardGame, Participant } from './your-games/types';
+import { GameRow, type GameData } from '@/features/games/components/GameRow';
+import type { Participant } from './your-games/types';
 import { useUserGames, type UserGame } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
 import { haptic } from '@/utils/haptics';
+import '@/features/games/components/GameRow.css';
 import './your-games/YourGames.css';
 
 interface YourGamesListProps {
@@ -95,8 +96,8 @@ export function YourGamesList({
     }
   };
 
-  // Map UserGame to CardGame format
-  const toCardGame = (g: UserGame): CardGame => ({
+  // Map UserGame to GameData format
+  const toGameData = (g: UserGame): GameData => ({
     id: g.id,
     course_name: g.course_name || 'Course TBD',
     course_id: null,
@@ -108,39 +109,17 @@ export function YourGamesList({
     host_user_id: g.host_user_id,
     visibility: 'public',
     note: null,
-  });
-
-  // Extract host from participants
-  const extractHost = (game: UserGame): Participant | null => {
-    const hostParticipant = game.participants?.find(p => p.user_id === game.host_user_id);
-    if (hostParticipant?.user_profiles) {
-      return {
-        user_id: hostParticipant.user_id,
-        username: null,
-        display_name: hostParticipant.user_profiles.display_name,
-        profile_photo_url: hostParticipant.user_profiles.profile_photo_url,
-        home_club: null,
-        eg_handicap_index: hostParticipant.user_profiles.eg_handicap_index,
-        role: 'host' as const,
-      };
-    }
-    return null;
-  };
-
-  // Extract members (players excluding host)
-  const extractMembers = (game: UserGame): Participant[] => {
-    const participants = game.participants?.filter(p => p.user_id !== game.host_user_id) || [];
-
-    return participants.map(p => ({
+    participants: g.participants?.map(p => ({
       user_id: p.user_id,
       username: null,
-      display_name: p.user_profiles?.display_name || 'Player',
-      profile_photo_url: p.user_profiles?.profile_photo_url,
+      display_name: p.user_profiles?.display_name || null,
+      profile_photo_url: p.user_profiles?.profile_photo_url || null,
       home_club: null,
-      eg_handicap_index: p.user_profiles?.eg_handicap_index,
-      role: 'player' as const,
-    }));
-  };
+      eg_handicap_index: p.user_profiles?.eg_handicap_index || null,
+      role: p.user_id === g.host_user_id ? 'host' : 'player',
+    })),
+  });
+
 
   const segmentItems: SegmentItem[] = [
     { 
@@ -226,17 +205,18 @@ export function YourGamesList({
       ) : (
         <div>
           {currentGames.map((game, index) => (
-            <YourGameRow
+            <GameRow
               key={game.id}
-              game={toCardGame(game)}
-              variant={isHostingTab ? 'hosting' : 'joined'}
-              host={extractHost(game)}
-              members={extractMembers(game)}
-              expanded={expandedId === game.id}
-              onToggle={() => setExpandedId(expandedId === game.id ? null : game.id)}
-              onCancel={handleCancel}
-              onLeave={handleLeave}
-              onViewRequests={isHostingTab ? setApprovalSheetGameId : undefined}
+              mode="yourGames"
+              game={toGameData(game)}
+              isHost={isHostingTab}
+              isJoined={!isHostingTab}
+              canExpand
+              defaultExpanded={expandedId === game.id}
+              onToggleExpand={() => setExpandedId(expandedId === game.id ? null : game.id)}
+              onViewRequests={isHostingTab ? () => setApprovalSheetGameId(game.id) : undefined}
+              onCancelGame={isHostingTab ? () => handleCancel(game.id) : undefined}
+              onLeaveGame={!isHostingTab ? () => handleLeave(game.id) : undefined}
               index={index}
             />
           ))}
