@@ -19,21 +19,45 @@ export function useMyJoinRequests() {
   return useQuery({
     queryKey: ['myJoinRequests'],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('get-my-join-requests', {
-        body: {},
-      });
+      try {
+        // Check if user is authenticated first
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          console.warn('[useMyJoinRequests] No authenticated user, skipping');
+          return [];
+        }
 
-      if (error) {
-        console.error('[useMyJoinRequests] Error:', error);
+        const { data, error } = await supabase.functions.invoke('get-my-join-requests', {
+          body: {},
+        });
+
+        // Handle 401 specifically (auth issues)
+        if (error) {
+          if (error.message?.includes('Unauthorized') || error.message?.includes('401')) {
+            console.warn('[useMyJoinRequests] Unauthorized, user may not be logged in');
+            return [];
+          }
+          console.error('[useMyJoinRequests] Error:', error);
+          return [];
+        }
+
+        if (!data?.success) {
+          console.warn('[useMyJoinRequests] Request failed:', data);
+          return [];
+        }
+
+        return (data.requests || []) as MyJoinRequest[];
+      } catch (err: any) {
+        // Catch any other errors (network, parsing, etc.)
+        if (err?.message?.includes('Unauthorized') || err?.status === 401) {
+          console.warn('[useMyJoinRequests] Unauthorized error caught, skipping notifications');
+          return [];
+        }
+        console.error('[useMyJoinRequests] Unexpected error:', err);
         return [];
       }
-
-      if (!data?.success) {
-        console.error('[useMyJoinRequests] Request failed:', data);
-        return [];
-      }
-
-      return (data.requests || []) as MyJoinRequest[];
     },
+    retry: false,
+    staleTime: 30_000,
   });
 }
