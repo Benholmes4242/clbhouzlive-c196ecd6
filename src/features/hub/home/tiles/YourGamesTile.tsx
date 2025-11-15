@@ -9,6 +9,8 @@ import { Tile } from '../components/Tile';
 import { useUserGames } from '@/features/hub/hooks/useUserGames';
 import { useUserGamesRealtime } from '@/features/hub/hooks/useUserGamesRealtime';
 import { useHub } from '@/features/hub/useHub';
+import { useTotalPendingHostRequests } from '../hooks/useTotalPendingHostRequests';
+import { supabase } from '@/integrations/supabase/client';
 import { devlog } from '@/utils/log';
 import { scrollChildIntoView } from '../utils/scroll';
 import { GameRow, type GameData } from '@/features/games/components/GameRow';
@@ -42,10 +44,18 @@ export function YourGamesTile() {
   const listRef = React.useRef<HTMLDivElement | null>(null);
   const viewAllRef = React.useRef<HTMLButtonElement>(null);
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = React.useState<string | undefined>();
   
   // Use shared hook for consistency with the sheet
   const { data, isLoading, isError, refetch } = useUserGames();
   useUserGamesRealtime();
+
+  // Get current user for pending request count
+  React.useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setCurrentUserId(user?.id);
+    });
+  }, []);
 
   // Scroll helper: snap expanded row to top of container
   const scrollChildToTop = (container: HTMLDivElement, child: HTMLElement, padding = 12) => {
@@ -139,13 +149,23 @@ export function YourGamesTile() {
     // TODO: Implement hide functionality
   }, []);
 
+  // Calculate total pending requests across all hosting games
+  const totalPendingRequests = useTotalPendingHostRequests(games, currentUserId);
+
   const hasAny = games.length > 0;
 
   return (
     <Tile 
       title={
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '12px' }}>
-          <h3>Games</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h3>Games</h3>
+            {totalPendingRequests > 0 && (
+              <div className="yourGamesTile__badge">
+                Requests · {totalPendingRequests}
+              </div>
+            )}
+          </div>
           <button
             onClick={openCreateGame}
             className="text-[15px] font-medium transition"

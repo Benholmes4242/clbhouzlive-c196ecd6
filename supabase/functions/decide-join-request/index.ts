@@ -138,6 +138,21 @@ Deno.serve(async (req) => {
         .from('games')
         .update({ slots_open: newSlotsOpen })
         .eq('id', joinRequest.game_id);
+
+      // If game is now full, auto-decline all other pending requests
+      if (newSlotsOpen === 0) {
+        console.log(`[decide-join-request] Game ${joinRequest.game_id} is now full, declining all other pending requests`);
+        await supabase
+          .from('game_join_requests')
+          .update({
+            status: 'declined',
+            decided_at: new Date().toISOString(),
+            decided_by: user.id,
+          })
+          .eq('game_id', joinRequest.game_id)
+          .eq('status', 'pending')
+          .neq('id', request_id);
+      }
     }
 
     // Update request status
@@ -160,16 +175,10 @@ Deno.serve(async (req) => {
 
     console.log(`[decide-join-request] Request ${action}d successfully`);
 
-    // Calculate the updated slots_open value to return
-    const updatedSlotsOpen = action === 'approve' 
-      ? Math.max(0, joinRequest.games.slots_open - 1)
-      : joinRequest.games.slots_open;
-
     return new Response(
       JSON.stringify({
         success: true,
         status: action === 'approve' ? 'approved' : 'declined',
-        slots_open: updatedSlotsOpen,
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
