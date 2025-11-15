@@ -251,8 +251,6 @@
   border-radius: 0;
   overflow: visible;
   flex-shrink: 0;
-  background: var(--hub-glass-bg-button);
-  border: 1px solid var(--hub-stroke-subtle);
 }
 
 .miniProfileRow__avatar img {
