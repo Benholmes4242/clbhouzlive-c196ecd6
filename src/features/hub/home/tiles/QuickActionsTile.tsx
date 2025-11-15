@@ -58,7 +58,7 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
     className="flex flex-col items-center justify-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
     aria-label={label}
   >
-    <Icon className="h-7 w-7 text-white" aria-hidden="true" />
+    <Icon className="h-8 w-8 text-white" aria-hidden="true" />
     <span className="text-[12px] leading-tight font-medium text-white/90 whitespace-nowrap">{label}</span>
   </button>
 );
