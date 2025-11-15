@@ -3,99 +3,99 @@ import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useHub } from '@/features/hub/useHub';
 
-function QA({ labelTop, labelBottom, onClick, icon }: { 
-  labelTop: string; 
-  labelBottom: string; 
-  onClick: () => void; 
-  icon: React.ReactNode;
-}) {
-  return (
-    <button 
-      className="qa" 
-      onClick={(e) => { e.stopPropagation(); onClick(); }} 
-      aria-label={`${labelTop} ${labelBottom}`}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '4px',
-        padding: '6px 8px',
-        width: '100%',
-        aspectRatio: '1',
-        borderRadius: '16px',
-        background: 'rgba(255,255,255,0.10)',
-        border: '1px solid rgba(255,255,255,0.15)',
-        cursor: 'pointer',
-        transition: 'background 0.2s',
-        overflow: 'hidden',
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
-      onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.10)')}
-    >
-      <div 
-        className="qa-icon" 
-        style={{ 
-          fontSize: 'clamp(18px, 5vw, 26px)',
-          width: 'clamp(24px, 5vw, 30px)',
-          height: 'clamp(24px, 5vw, 30px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          lineHeight: 1 
-        }} 
-        aria-hidden="true"
-      >
-        {icon}
-      </div>
-      <div className="qa-label" style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        fontWeight: 600, 
-        lineHeight: 1.2 
-      }}>
-        <span style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelTop}</span>
-        <span style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', textAlign: 'center', color: 'var(--hub-text-body)' }}>{labelBottom}</span>
-      </div>
-    </button>
-  );
-}
+/* --- SF-style icons (inline SVGs) --- */
+const FlagIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg viewBox="0 0 24 24" {...props}>
+    <path
+      fill="currentColor"
+      d="M6 3.5v17a1 1 0 0 1-2 0v-17a1 1 0 0 1 2 0Zm2 .5h7.2a1 1 0 0 1 .8 1.6L15 8l1.8 2.4A1 1 0 0 1 16 12H8a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"
+    />
+  </svg>
+);
+
+const SparklesIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg viewBox="0 0 24 24" {...props}>
+    <path
+      fill="currentColor"
+      d="M12 3 10.5 8.5 5 10 10.5 11.5 12 17l1.5-5.5L19 10l-5.5-1.5L12 3Zm6 10.5.7-2.2.8 2.2 2.2.7-2.2.8-.8 2.2-.7-2.2-2.2-.8 2.2-.7ZM5 11l.5-1.4.5 1.4 1.4.5-1.4.5L5 13l-.5-1.5L3 11.5 4.5 11Z"
+    />
+  </svg>
+);
+
+const CameraIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg viewBox="0 0 24 24" {...props}>
+    <path
+      fill="currentColor"
+      d="M9 4.5 10.4 3h3.2L15 4.5h3A2.5 2.5 0 0 1 20.5 7v9.5A2.5 2.5 0 0 1 18 19H6a2.5 2.5 0 0 1-2.5-2.5V7A2.5 2.5 0 0 1 6 4.5h3Zm3 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0-2.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Z"
+    />
+  </svg>
+);
+
+const PersonIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg viewBox="0 0 24 24" {...props}>
+    <path
+      fill="currentColor"
+      d="M12 4.5a3.25 3.25 0 1 1 0 6.5 3.25 3.25 0 0 1 0-6.5Zm0 7.75c3.04 0 5.5 2.09 5.5 4.67 0 .86-.7 1.58-1.56 1.58H8.06A1.58 1.58 0 0 1 6.5 16.9c0-2.58 2.46-4.65 5.5-4.65Z"
+    />
+  </svg>
+);
+
+type QuickActionButtonProps = {
+  label: string;
+  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  onClick: () => void;
+};
+
+const QuickActionButton: React.FC<QuickActionButtonProps> = ({
+  label,
+  Icon,
+  onClick,
+}) => (
+  <button
+    type="button"
+    onClick={(e) => { e.stopPropagation(); onClick(); }}
+    className="flex flex-col items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+    aria-label={label}
+  >
+    <Icon className="h-[clamp(20px,5vw,28px)] w-[clamp(20px,5vw,28px)] text-white" aria-hidden="true" />
+    <span className="text-[clamp(11px,2.5vw,13px)] font-semibold text-white/90 leading-tight text-center">{label}</span>
+  </button>
+);
 
 export function QuickActionsTile() {
   const navigate = useNavigate();
   const { navigateFromHub } = useHub();
 
-  const comingSoon = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    alert('Coming soon');
-  };
-
   const openProfile = () => navigate('/profile');
   const openCreateGame = () => navigateFromHub('/hub/create-game');
   const openSwing = () => navigateFromHub('/hub/swing');
+  const openEcho = () => navigateFromHub('/hub/echo');
 
   return (
     <Tile title="Quick Actions" align="center">
       <div 
-        className="hub-quick-actions" 
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gridTemplateRows: 'repeat(2, 1fr)',
-          rowGap: '16px',
-          columnGap: '16px',
-          height: '100%',
-          paddingTop: '0',
-          paddingBottom: '12px',
-          paddingLeft: '12px',
-          paddingRight: '12px',
-        }}
+        className="hub-quick-actions grid grid-cols-2 gap-x-8 gap-y-6 pt-2 pb-1 px-3"
       >
-        <QA labelTop="Create" labelBottom="Game" onClick={openCreateGame} icon="⛳" />
-        <QA labelTop="Ask" labelBottom="Echo" onClick={() => navigateFromHub('/hub/echo')} icon="💬" />
-        <QA labelTop="Upload" labelBottom="Swing" onClick={openSwing} icon="🏌️" />
-        <QA labelTop="Your" labelBottom="Profile" onClick={openProfile} icon="👤" />
+        <QuickActionButton
+          label="Create Game"
+          Icon={FlagIcon}
+          onClick={openCreateGame}
+        />
+        <QuickActionButton
+          label="Ask Echo"
+          Icon={SparklesIcon}
+          onClick={openEcho}
+        />
+        <QuickActionButton
+          label="Upload Swing"
+          Icon={CameraIcon}
+          onClick={openSwing}
+        />
+        <QuickActionButton
+          label="Your Profile"
+          Icon={PersonIcon}
+          onClick={openProfile}
+        />
       </div>
     </Tile>
   );
