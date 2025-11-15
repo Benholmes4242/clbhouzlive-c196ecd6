@@ -3,6 +3,7 @@ import { Search, X, UserPlus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import HcpBadge from '@/components/HcpBadge';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import '../GamesTab.css'; // Import for resultsSheet and resultRow styles
 
 interface UserProfile {
@@ -111,15 +112,19 @@ export function UserSearchTypeahead({
               className="flex items-center gap-2 px-3 py-1.5 bg-white/10 border border-white/20 rounded-full text-sm text-white"
             >
               <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full overflow-hidden bg-neutral-700/50 flex items-center justify-center shrink-0">
-                  {user.guest_name ? (
+                {user.guest_name ? (
+                  <div className="w-5 h-5 rounded-full overflow-hidden bg-neutral-700/50 flex items-center justify-center shrink-0">
                     <UserPlus className="w-3 h-3 text-white/60" />
-                  ) : user.profile_photo_url ? (
-                    <img src={user.profile_photo_url} alt={user.display_name} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-primary font-semibold text-xs">{user.display_name[0]}</span>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <AvatarSquircle
+                    src={user.profile_photo_url}
+                    alt={user.display_name}
+                    fallback={user.display_name}
+                    size={20}
+                    ringWidth={0}
+                  />
+                )}
                 <span>{user.display_name}</span>
                 {!user.guest_name && (
                   <HcpBadge value={user.eg_handicap_index} show={user.show_handicap ?? true} />
@@ -204,13 +209,13 @@ export function UserSearchTypeahead({
                     }}
                     className="resultRow"
                   >
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-neutral-700/50 flex items-center justify-center shrink-0">
-                      {user.profile_photo_url ? (
-                        <img src={user.profile_photo_url} alt={user.display_name} className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-primary font-semibold text-sm">{user.display_name[0]}</span>
-                      )}
-                    </div>
+                    <AvatarSquircle
+                      src={user.profile_photo_url}
+                      alt={user.display_name}
+                      fallback={user.display_name}
+                      size={32}
+                      ringWidth={0}
+                    />
                     <div className="rMid">
                       <div className="rTitle flex items-center gap-2">
                         <span>{user.display_name}</span>

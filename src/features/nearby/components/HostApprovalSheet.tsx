@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
 import { toast } from 'sonner';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 
 interface JoinRequest {
   id: string;
@@ -158,10 +159,12 @@ export function HostApprovalSheet({ gameId, open, onOpenChange }: HostApprovalSh
                 key={r.id}
                 className="flex items-center gap-3 p-3 bg-neutral-800 rounded-xl border border-neutral-700"
               >
-                <img
-                  src={r.requester?.profile_photo_url || '/placeholder.svg'}
+                <AvatarSquircle
+                  src={r.requester?.profile_photo_url}
                   alt={r.requester?.display_name || 'User'}
-                  className="h-10 w-10 rounded-full object-cover bg-neutral-700"
+                  fallback={r.requester?.display_name || 'User'}
+                  size={40}
+                  ringWidth={0}
                 />
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-white truncate">
