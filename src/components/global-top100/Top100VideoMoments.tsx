@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { Play, Heart, MessageCircle, Share, MapPin } from 'lucide-react';
 
 const videoMomentsData = [
@@ -129,12 +129,12 @@ const Top100VideoMoments = () => {
               <div className="p-4">
                 {/* User Info */}
                 <div className="flex items-center gap-3 mb-3">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={video.user.avatar || undefined} />
-                    <AvatarFallback className="text-xs">
-                      {video.user.name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
+                  <AvatarSquircle
+                    src={video.user.avatar || undefined}
+                    alt={video.user.name}
+                    size="sm"
+                    fallback={video.user.name.split(' ').map(n => n[0]).join('')}
+                  />
                   <div>
                     <p className="font-medium text-sm">{video.user.name}</p>
                     <p className="text-xs text-muted-foreground">@{video.user.username}</p>

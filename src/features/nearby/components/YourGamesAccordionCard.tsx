@@ -7,7 +7,7 @@ import { formatHcp } from '@/lib/formatHcp';
 import { formatExpires } from '@/lib/formatExpires';
 import { useMinuteTick } from '@/hooks/useMinuteTick';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import type { GameParticipant as Participant } from '@/features/game/hooks/useGameParticipants';
@@ -139,12 +139,12 @@ export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: Y
         }}
         className="w-full flex items-center gap-3 p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all text-left"
       >
-        <Avatar className="w-10 h-10">
-          <AvatarImage src={p.profile_photo_url || undefined} alt={p.display_name} />
-          <AvatarFallback className="bg-neutral-700/50 text-white text-sm">
-            {p.display_name[0]}
-          </AvatarFallback>
-        </Avatar>
+        <AvatarSquircle
+          src={p.profile_photo_url || undefined}
+          alt={p.display_name}
+          size="md"
+          fallback={p.display_name?.[0] || '?'}
+        />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className="text-[13px] text-white/90 font-medium truncate">

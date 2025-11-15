@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { Heart, MessageCircle, Share, MapPin, Play } from 'lucide-react';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
@@ -232,12 +232,12 @@ const CommunityTop100Moments = () => {
               <div className="p-4">
                 {/* User Info */}
                 <div className="flex items-center gap-3 mb-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={post.user.avatar || undefined} />
-                    <AvatarFallback>
-                      {post.user.name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
+                  <AvatarSquircle
+                    src={post.user.avatar || undefined}
+                    alt={post.user.name}
+                    size="md"
+                    fallback={post.user.name.split(' ').map(n => n[0]).join('')}
+                  />
                   <div className="flex-1">
                     <p className="font-medium">{post.user.name}</p>
                     <p className="text-sm text-muted-foreground">@{post.user.username}</p>

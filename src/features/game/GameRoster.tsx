@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GameParticipant } from '@/features/nearby/types';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import HcpBadge from '@/components/HcpBadge';
 
 interface GameRosterProps {
@@ -42,15 +42,15 @@ export function GameRoster({ participants, hostUserId }: GameRosterProps) {
               className="relative group"
               style={{ zIndex: sortedParticipants.length - index }}
             >
-              <Avatar className="w-10 h-10 border-2 border-background ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all">
-                <AvatarImage 
-                  src={profile?.profile_photo_url || undefined} 
-                  alt={profile?.display_name || 'Player'}
-                />
-                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                  {profile?.display_name?.[0] || '?'}
-                </AvatarFallback>
-              </Avatar>
+              <AvatarSquircle
+                src={profile?.profile_photo_url || undefined}
+                alt={profile?.display_name || 'Player'}
+                size={40}
+                fallback={profile?.display_name?.[0] || '?'}
+                ringColor="rgba(var(--primary-rgb), 0.2)"
+                ringWidth={2}
+                className="border-2 border-background hover:ring-[rgba(var(--primary-rgb),0.4)] transition-all"
+              />
               {isHost && (
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-primary-foreground border border-background">
                   H

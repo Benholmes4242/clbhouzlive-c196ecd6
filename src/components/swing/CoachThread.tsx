@@ -3,7 +3,7 @@ import { Clock, User, RefreshCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { CoachReviewThread } from '@/types/coach';
 
 interface CoachThreadProps {
@@ -115,14 +115,12 @@ export const CoachThread: React.FC<CoachThreadProps> = ({
           {thread.feedback.map((feedback) => (
             <Card key={feedback.id} className="p-4">
               <div className="flex items-start gap-3">
-                <Avatar className="w-8 h-8">
-                  <AvatarFallback className="text-xs">
-                    {feedback.author === 'coach' ? 
-                      thread.coach.name.charAt(0).toUpperCase() : 
-                      'S'
-                    }
-                  </AvatarFallback>
-                </Avatar>
+                <AvatarSquircle
+                  size="sm"
+                  fallback={feedback.author === 'coach' ? 
+                    thread.coach.name.charAt(0).toUpperCase() : 
+                    'S'}
+                />
                 
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center gap-2">

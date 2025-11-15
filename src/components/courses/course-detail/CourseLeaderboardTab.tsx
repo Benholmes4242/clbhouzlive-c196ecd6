@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Trophy, Medal, Award, Users, Camera, Star } from 'lucide-react';
-import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -183,11 +183,10 @@ const CourseLeaderboardTab = ({ courseId }: CourseLeaderboardTabProps) => {
             </div>
 
             {/* User Avatar */}
-            <OptimizedAvatar
+            <AvatarSquircle
               src={user.profile_photo_url}
               alt={getUserDisplayName(user)}
               size={48}
-              className="w-12 h-12"
               fallback={getUserInitials(user)}
             />
 

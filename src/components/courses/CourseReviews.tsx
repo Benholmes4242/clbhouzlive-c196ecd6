@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronUp, Star, Edit } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import EditRatingModal from './EditRatingModal';
 import ReviewMediaDisplay from './ReviewMediaDisplay';
 
@@ -150,18 +150,17 @@ const CourseReviews = ({ courseId, courseName, currentUser }: CourseReviewsProps
             ) : (
               <div className="space-y-4 max-h-96 overflow-y-auto">
                 {reviews?.map((review) => (
-                  <div key={review.id} className="border-b pb-4 last:border-b-0">
-                    <div className="flex items-start gap-3">
-                      {/* User Avatar with Profile Photo */}
-                      <OptimizedAvatar
-                        src={review.profile_photo_url}
-                        alt={getUserDisplayName(review)}
-                        size={40}
-                        className="w-10 h-10 flex-shrink-0"
-                        fallback={getUserInitials(review)}
-                      />
-                      
-                      <div className="flex-1 space-y-2">
+                    <div key={review.id} className="border-b pb-4 last:border-b-0">
+                      <div className="flex items-start gap-3">
+                        {/* User Avatar with Profile Photo */}
+                        <AvatarSquircle
+                          src={review.profile_photo_url}
+                          alt={getUserDisplayName(review)}
+                          size="md"
+                          fallback={getUserInitials(review)}
+                        />
+                        
+                        <div className="flex-1 space-y-2">
                         {/* User Name and Rating */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
