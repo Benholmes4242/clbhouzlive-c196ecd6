@@ -136,7 +136,7 @@ export function GamesNearYouTile({
         {/* Game list with inline scroll */}
         <div 
           ref={listRef}
-          className="hub-golfers-list-scroll games-list" 
+          className="hub-golfers-list-scroll flex flex-col flex-1" 
           role="list"
           aria-label="Games near you"
           data-hub-scroll-container="true"
@@ -144,8 +144,6 @@ export function GamesNearYouTile({
             overflowY: 'auto',
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',
-            maskImage: 'none',
-            WebkitMaskImage: 'none',
           }}
         >
           {isLoading && Array.from({ length: 3 }).map((_, i) => (
