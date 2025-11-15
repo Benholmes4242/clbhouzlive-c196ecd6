@@ -74,7 +74,7 @@ export function QuickActionsTile() {
   return (
     <Tile title="Quick Actions" align="center">
       <div className="h-full flex items-center justify-center">
-        <div className="hub-quick-actions grid grid-cols-2 gap-x-6 gap-y-1">
+        <div className="hub-quick-actions grid grid-cols-2 gap-x-6 gap-y-3">
           <QuickActionButton
             label="Create Game"
             Icon={FlagIcon}
