@@ -139,6 +139,10 @@ export function GamesNearYouTile({
           className="games-list" 
           role="list"
           aria-label="Games near you"
+          style={{
+            maskImage: 'none',
+            WebkitMaskImage: 'none',
+          }}
         >
           {isLoading && Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-16 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
