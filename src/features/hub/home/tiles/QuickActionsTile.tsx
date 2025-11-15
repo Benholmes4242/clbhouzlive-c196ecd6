@@ -54,11 +54,11 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
   <button
     type="button"
     onClick={(e) => { e.stopPropagation(); onClick(); }}
-    className="flex flex-col items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+    className="flex flex-col items-center justify-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
     aria-label={label}
   >
-    <Icon className="h-[clamp(20px,5vw,28px)] w-[clamp(20px,5vw,28px)] text-white" aria-hidden="true" />
-    <span className="text-[clamp(11px,2.5vw,13px)] font-semibold text-white/90 leading-tight text-center">{label}</span>
+    <Icon className="h-5 w-5 text-white" aria-hidden="true" />
+    <span className="text-[11px] leading-tight font-medium text-white/90">{label}</span>
   </button>
 );
 
@@ -74,7 +74,7 @@ export function QuickActionsTile() {
   return (
     <Tile title="Quick Actions" align="center">
       <div 
-        className="hub-quick-actions grid grid-cols-2 gap-x-8 gap-y-6 pt-2 pb-1 px-3"
+        className="hub-quick-actions grid grid-cols-2 gap-x-4 gap-y-2 py-1"
       >
         <QuickActionButton
           label="Create Game"
