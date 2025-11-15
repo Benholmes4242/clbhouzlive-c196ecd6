@@ -473,8 +473,6 @@ html.hub-open {
   padding-bottom: 0;
   overscroll-behavior: contain;
   overflow-anchor: none;
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
 }
 .hub-golfers-list-scroll::-webkit-scrollbar {
   width: 0;
