@@ -20,10 +20,12 @@ export function HubHomePage() {
   // Subscribe to realtime join request notifications
   useJoinRequestNotifications();
 
-  // Swipe-to-dismiss state
+  // Animation & swipe-to-dismiss state
   const [dragStartY, setDragStartY] = useState<number | null>(null);
   const [translateY, setTranslateY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
   
   const sheetRef = useRef<HTMLDivElement | null>(null);
   const DRAG_THRESHOLD = 120; // px to trigger dismiss
@@ -34,13 +36,35 @@ export function HubHomePage() {
     return !!target.closest('[data-hub-scroll-container="true"]');
   };
 
-  // Centralized close handler
-  const handleClose = useCallback(() => {
-    close();
+  // Animated close with slide-down
+  const animateAndClose = useCallback(() => {
+    const reduced = prefersReduced();
+
+    if (reduced) {
+      // no animation for users who prefer reduced motion
+      close();
+      return;
+    }
+
+    if (typeof window === 'undefined') {
+      close();
+      return;
+    }
+
+    setIsExiting(true);
+    // slide down off-screen
+    setTranslateY(window.innerHeight);
+
+    // match transition duration below (260ms)
+    window.setTimeout(() => {
+      close();
+    }, 260);
   }, [close]);
 
   // Touch handlers for swipe-to-dismiss
   const handleTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
+    if (isExiting) return;
+
     const touch = e.touches[0];
     const target = e.target;
 
@@ -54,7 +78,7 @@ export function HubHomePage() {
   };
 
   const handleTouchMove: React.TouchEventHandler<HTMLDivElement> = (e) => {
-    if (!isDragging || dragStartY == null) return;
+    if (!isDragging || dragStartY == null || isExiting) return;
 
     const touch = e.touches[0];
     const deltaY = touch.clientY - dragStartY;
@@ -70,10 +94,10 @@ export function HubHomePage() {
   };
 
   const handleTouchEnd: React.TouchEventHandler<HTMLDivElement> = () => {
-    if (!isDragging) return;
+    if (!isDragging || isExiting) return;
 
     if (translateY > DRAG_THRESHOLD) {
-      handleClose();
+      animateAndClose();
     } else {
       // Snap back
       setTranslateY(0);
@@ -88,31 +112,33 @@ export function HubHomePage() {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        handleClose();
+        animateAndClose();
       }
     };
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [handleClose]);
+  }, [animateAndClose]);
 
-  // One-time elastic bounce on first open
+  // Slide-in from bottom on mount
   useEffect(() => {
-    if (prefersReduced()) return;
+    const reduced = prefersReduced();
 
-    const key = 'hub-first-open-v1';
-    if (typeof window === 'undefined') return;
-    if (window.localStorage.getItem(key)) return;
-
-    // small initial bounce
-    setTranslateY(10);
-
-    const id = window.setTimeout(() => {
+    if (reduced || typeof window === 'undefined') {
       setTranslateY(0);
-      window.localStorage.setItem(key, 'true');
-    }, 220);
+      setHasEntered(true);
+      return;
+    }
 
-    return () => window.clearTimeout(id);
+    // Start off-screen at the bottom with no transition
+    setHasEntered(false);
+    setTranslateY(window.innerHeight);
+
+    // Next frame: enable transition + slide up to 0
+    requestAnimationFrame(() => {
+      setHasEntered(true);
+      setTranslateY(0);
+    });
   }, []);
 
   // Mark hub-open on html while mounted
@@ -142,11 +168,11 @@ export function HubHomePage() {
         backdropFilter: 'blur(120px)',
         WebkitBackdropFilter: 'blur(120px)',
         transform: `translateY(${translateY}px)`,
-        transition: isDragging
-          ? 'none'
-          : prefersReduced()
-          ? 'transform 0.001ms linear'
-          : 'transform 220ms cubic-bezier(.2,.8,.2,1)',
+        transition:
+          // no transition while dragging or before first frame
+          isDragging || !hasEntered || prefersReduced()
+            ? 'none'
+            : 'transform 260ms cubic-bezier(.2,.8,.2,1)',
       }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
