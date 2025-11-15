@@ -15,8 +15,8 @@ import { YourGamesTile } from '../home/tiles/YourGamesTile';
 import '../home/hubTheme.css';
 
 // Animation constants
-const HUB_ENTRY_DURATION = 260; // ms – smooth slide-up timing
-const HUB_EXIT_DURATION = 190;  // ms – snappier slide-down
+const HUB_ENTRY_DURATION = 240; // ms – smooth slide-up timing
+const HUB_EXIT_DURATION = 240;  // ms – snappier slide-down
 const HUB_ENTRY_EASING = 'cubic-bezier(.2,.8,.2,1)'; // springy entry
 const HUB_EXIT_EASING = 'cubic-bezier(.4,0,.2,1)';   // punchy exit
 
