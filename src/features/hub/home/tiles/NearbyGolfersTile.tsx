@@ -112,6 +112,7 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
           <div 
           ref={scrollRef} 
           className="space-y-0.5 hub-golfers-list-scroll flex flex-col flex-1"
+          data-hub-scroll-container="true"
           style={{
             overflowY: 'auto',
             WebkitOverflowScrolling: 'touch',
