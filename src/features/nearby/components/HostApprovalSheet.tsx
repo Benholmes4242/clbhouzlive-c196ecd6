@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
+import { toast } from 'sonner';
 
 interface JoinRequest {
   id: string;
@@ -35,27 +36,17 @@ export function HostApprovalSheet({ gameId, open, onOpenChange }: HostApprovalSh
     
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('join_requests')
-        .select(`
-          id,
-          state,
-          requester_id,
-          created_at,
-          requester:requester_id (
-            id,
-            display_name,
-            username,
-            profile_photo_url,
-            home_club,
-            eg_handicap_index
-          )
-        `)
-        .eq('game_id', gameId)
-        .order('created_at', { ascending: true });
+      const { data, error } = await supabase.functions.invoke('list-join-requests', {
+        body: { game_id: gameId },
+      });
 
-      if (!error && data) {
-        setRequests(data as JoinRequest[]);
+      if (error) {
+        console.error('Error fetching requests:', error);
+        return;
+      }
+
+      if (data && data.success) {
+        setRequests(data.requests || []);
       }
     } catch (err) {
       console.error('Error fetching requests:', err);
@@ -99,28 +90,32 @@ export function HostApprovalSheet({ gameId, open, onOpenChange }: HostApprovalSh
     haptic('medium');
     setProcessing(requestId);
 
-    // Optimistic update
-    setRequests((prev) =>
-      prev.map((r) =>
-        r.id === requestId ? { ...r, state: approve ? 'approved' : 'rejected' } : r
-      )
-    );
-
     try {
-      const { error } = await supabase.functions.invoke('approve-join', {
-        body: { requestId, approve },
+      const { data, error } = await supabase.functions.invoke('decide-join-request', {
+        body: { 
+          request_id: requestId, 
+          action: approve ? 'approve' : 'decline' 
+        },
       });
 
-      if (error) {
+      if (error || !data?.success) {
         console.error('Approval error:', error);
-        // Rollback on error
+        toast.error('Failed to process request. Please try again.');
         await fetchRequests();
-        alert('Failed to process request. Please try again.');
+        return;
+      }
+
+      // Optimistically remove the request from the list
+      setRequests((prev) => prev.filter((r) => r.id !== requestId));
+      
+      // Show success message
+      if (approve) {
+        toast.success('Player added to game');
       }
     } catch (err) {
       console.error('Unexpected error:', err);
+      toast.error('Something went wrong. Please try again.');
       await fetchRequests();
-      alert('Something went wrong. Please try again.');
     } finally {
       setProcessing(null);
     }
