@@ -58,7 +58,7 @@ export function Tile({ title, subtitle, children, onViewAll, footer, align = 'st
 
       {/* Footer bar with View all */}
       {(footer || onViewAll) && (
-        <div className="mt-3 flex items-center gap-2">
+        <div className="mt-1.5 flex items-center gap-2">
           <div className="flex-1 min-w-0">{footer}</div>
           {onViewAll && (
             <button
