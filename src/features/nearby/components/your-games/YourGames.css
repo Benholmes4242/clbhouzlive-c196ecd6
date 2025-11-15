@@ -247,8 +247,9 @@
 .miniProfileRow__avatar {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  overflow: hidden;
+  /* Allow Squircle clipping to show; do not force circle */
+  border-radius: 0;
+  overflow: visible;
   flex-shrink: 0;
   background: var(--hub-glass-bg-button);
   border: 1px solid var(--hub-stroke-subtle);
