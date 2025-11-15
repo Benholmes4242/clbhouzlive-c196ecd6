@@ -10,6 +10,32 @@ export const formatDistance = (m?: number) => {
 };
 
 /**
+ * Format distance with "away", handicap, and home club
+ * Returns: "294m away • HCP 9.0 • Augusta National"
+ */
+export const formatDistanceHcpClub = (meters?: number, hcp?: number | null, homeClub?: string | null) => {
+  const parts: string[] = [];
+  
+  // Distance with "away"
+  if (meters != null) {
+    const d = formatDistance(meters);
+    if (d) parts.push(`${d} away`);
+  }
+  
+  // Handicap
+  if (hcp !== null && hcp !== undefined) {
+    parts.push(`HCP ${Number(hcp).toFixed(1)}`);
+  }
+  
+  // Home club
+  if (homeClub) {
+    parts.push(homeClub);
+  }
+  
+  return parts.join(" • ");
+};
+
+/**
  * Format distance and handicap on one line
  * Returns: "300m • HCP 9.0" or "1.4km • HCP 2.0"
  */

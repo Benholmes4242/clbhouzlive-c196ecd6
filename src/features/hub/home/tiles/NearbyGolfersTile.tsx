@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { Tile } from '../components/Tile';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { useHub } from '@/features/hub/useHub';
-import { formatDistanceHcp } from '@/features/golfers/format';
+import { formatDistanceHcpClub } from '@/features/golfers/format';
 import SquircleImage from '@/components/ui/SquircleImage';
 
 // Mock data toggle
@@ -133,7 +133,7 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
               key={g.id} 
               className="ng-row py-[10px]"
               onClick={() => nav(`/profile/${g.username}`)}
-              aria-label={`${g.display_name || g.username}, ${formatDistanceHcp(g.distance_km ? g.distance_km * 1000 : undefined, g.eg_handicap_index)}`}
+              aria-label={`${g.display_name || g.username}, ${formatDistanceHcpClub(g.distance_km ? g.distance_km * 1000 : undefined, g.eg_handicap_index, g.home_club)}`}
             >
               <div className="shrink-0">
                 <SquircleImage
@@ -149,8 +149,8 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
                   {g.display_name || g.username}
                 </div>
                 <div className="h-[2px]" />
-                <div className="ng-distance text-white/70">
-                  {formatDistanceHcp(g.distance_km ? g.distance_km * 1000 : undefined, g.eg_handicap_index)}
+                <div className="ng-distance text-white/70 hub-ellipsis-fade" title={formatDistanceHcpClub(g.distance_km ? g.distance_km * 1000 : undefined, g.eg_handicap_index, g.home_club)}>
+                  {formatDistanceHcpClub(g.distance_km ? g.distance_km * 1000 : undefined, g.eg_handicap_index, g.home_club)}
                 </div>
               </div>
             </button>
