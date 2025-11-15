@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { invokeWithAuth } from '@/lib/invokeWithAuth';
 
 interface MyJoinRequest {
   id: string;
@@ -15,13 +16,20 @@ interface MyJoinRequest {
   } | null;
 }
 
+interface GetMyJoinRequestsResponse {
+  success: boolean;
+  requests: MyJoinRequest[];
+}
+
 export function useMyJoinRequests() {
   return useQuery({
     queryKey: ['myJoinRequests'],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('get-my-join-requests', {
-        body: {},
-      });
+      const { data, error } = await invokeWithAuth<GetMyJoinRequestsResponse>(
+        supabase, 
+        'get-my-join-requests', 
+        { body: {} }
+      );
 
       if (error) {
         console.error('[useMyJoinRequests] Error:', error);
@@ -33,7 +41,7 @@ export function useMyJoinRequests() {
         return [];
       }
 
-      return (data.requests || []) as MyJoinRequest[];
+      return data.requests || [];
     },
   });
 }
