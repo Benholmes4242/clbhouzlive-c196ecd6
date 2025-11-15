@@ -139,8 +139,8 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
         {/* Action buttons */}
         <div className="flex gap-2 mt-3">
           <button
-            className="flex-1 h-[40px] rounded-[14px] border border-white/8 bg-white/[0.02] text-[14px] font-medium shadow-[0_1px_0_rgba(255,255,255,0.04)] transition-all duration-[120ms] hover:bg-white/[0.06] active:scale-[0.97] active:bg-white/[0.09]"
-            style={{ color: 'var(--hub-text-body)' }}
+            className="flex-1 h-[40px] rounded-[14px] border bg-white/[0.02] text-[14px] font-medium shadow-[0_1px_0_rgba(255,255,255,0.04)] transition-all duration-[120ms] hover:bg-white/[0.06] active:scale-[0.97] active:bg-white/[0.09]"
+            style={{ color: 'var(--hub-text-body)', borderColor: 'var(--hub-stroke)' }}
             onClick={() => {
               haptic('light');
               sendFriendRequest();
@@ -154,9 +154,9 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
             className={`flex-1 h-[40px] rounded-[14px] border text-[14px] font-medium shadow-[0_1px_0_rgba(255,255,255,0.04)] transition-all duration-[120ms] active:scale-[0.97] ${
               isFollowing
                 ? 'bg-emerald-500/18 border-emerald-400/40 text-emerald-200 hover:bg-emerald-500/24 active:bg-emerald-500/26'
-                : 'bg-transparent border-white/12 hover:bg-white/[0.06] active:bg-white/[0.09]'
+                : 'bg-transparent hover:bg-white/[0.06] active:bg-white/[0.09]'
             }`}
-            style={!isFollowing ? { color: 'var(--hub-text-body)' } : undefined}
+            style={isFollowing ? undefined : { color: 'var(--hub-text-body)', borderColor: 'var(--hub-stroke)' }}
             onClick={() => {
               haptic('light');
               toggleFollow();
@@ -168,8 +168,8 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
           </button>
 
           <button
-            className="flex-1 h-[40px] rounded-[14px] border border-white/12 bg-transparent text-[14px] font-medium shadow-[0_1px_0_rgba(255,255,255,0.04)] transition-all duration-[120ms] hover:bg-white/[0.06] active:scale-[0.97] active:bg-white/[0.09]"
-            style={{ color: 'var(--hub-text-body)' }}
+            className="flex-1 h-[40px] rounded-[14px] border bg-transparent text-[14px] font-medium shadow-[0_1px_0_rgba(255,255,255,0.04)] transition-all duration-[120ms] hover:bg-white/[0.06] active:scale-[0.97] active:bg-white/[0.09]"
+            style={{ color: 'var(--hub-text-body)', borderColor: 'var(--hub-stroke)' }}
             onClick={() => {
               haptic('light');
               openMessage();
