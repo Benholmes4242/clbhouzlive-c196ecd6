@@ -3,14 +3,19 @@ import { getDirectImageUrl, isR2Url, isPreviewEnvironment } from '@/utils/r2Imag
 import { Avatar, AvatarImage, AvatarFallback } from './avatar';
 
 /**
- * ⚠️ DEPRECATED FOR USER AVATARS
+ * ⚠️ FORBIDDEN FOR USER AVATARS - USE <Squircle /> ONLY ⚠️
  * 
- * This circular OptimizedAvatar component should NO LONGER be used for user avatars.
- * Use <AvatarSquircle> from @/components/ui/AvatarSquircle instead.
+ * ❌ DO NOT use this component for user avatars/profile photos
+ * ✅ MUST use <Squircle> from @/components/ui/squircle.tsx instead
  * 
- * All user avatars must use the superellipse squircle shape (n=5) for consistency.
+ * ALL user avatars across the entire application MUST use the superellipse 
+ * squircle shape (n=5) for visual consistency. This is the ONLY allowed 
+ * geometry for user photos.
  * 
- * This component may remain for non-avatar use cases (e.g., system icons, brand logos).
+ * This OptimizedAvatar component is DEPRECATED and FORBIDDEN for user avatars.
+ * It may only be used for non-user content (system icons, brand logos, etc.).
+ * 
+ * @see src/components/ui/squircle.tsx - The ONLY source of truth for user avatars
  */
 
 interface OptimizedAvatarProps {
@@ -30,10 +35,12 @@ const OptimizedAvatarComponent: React.FC<OptimizedAvatarProps> = ({
   fallback,
   priority = false
 }) => {
-  // Deprecation warning in development
+  // FORBIDDEN for user avatars - strict warning in development
   if (process.env.NODE_ENV === 'development') {
-    console.warn(
-      '⚠️ Deprecated: OptimizedAvatar is deprecated for user avatars. Use <AvatarSquircle> instead.'
+    console.error(
+      '❌ FORBIDDEN: OptimizedAvatar component must NOT be used for user avatars!\n' +
+      '✅ Use <Squircle> from @/components/ui/squircle.tsx instead.\n' +
+      'All user avatars must use the superellipse squircle shape (n=5).'
     );
   }
 

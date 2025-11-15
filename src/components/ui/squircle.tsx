@@ -33,8 +33,26 @@ interface SquircleProps {
 }
 
 /**
+ * 🎯 SINGLE SOURCE OF TRUTH FOR USER AVATARS 🎯
+ * 
  * iOS-style squircle container with continuous corner smoothing (superellipse n=5)
- * Use this instead of border-radius for authentic Apple-like corners
+ * 
+ * ✅ THIS IS THE ONLY ALLOWED COMPONENT FOR USER AVATARS
+ * ❌ DO NOT use Avatar, OptimizedAvatar, AvatarSquircle, or any other avatar components
+ * ❌ DO NOT use rounded-full, rounded-lg, or custom border-radius for user photos
+ * 
+ * ALL user avatars across the entire application MUST use this component directly
+ * for visual consistency with Apple's design language.
+ * 
+ * @example User avatar
+ * <Squircle width={48} height={48}>
+ *   <img src={user.avatar} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+ * </Squircle>
+ * 
+ * @param width - Width in pixels
+ * @param height - Height in pixels  
+ * @param children - Content to display (typically an img element)
+ * @param className - Optional additional CSS classes
  */
 export const Squircle: React.FC<SquircleProps> = ({ 
   width = 80, 
