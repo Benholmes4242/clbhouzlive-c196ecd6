@@ -14,6 +14,12 @@ import { NearbyGolfersTile } from '../home/tiles/NearbyGolfersTile';
 import { YourGamesTile } from '../home/tiles/YourGamesTile';
 import '../home/hubTheme.css';
 
+// Animation constants
+const HUB_ENTRY_DURATION = 260; // ms – smooth slide-up timing
+const HUB_EXIT_DURATION = 190;  // ms – snappier slide-down
+const HUB_ENTRY_EASING = 'cubic-bezier(.2,.8,.2,1)'; // springy entry
+const HUB_EXIT_EASING = 'cubic-bezier(.4,0,.2,1)';   // punchy exit
+
 export function HubHomePage() {
   const { close } = useHub();
   
@@ -55,10 +61,10 @@ export function HubHomePage() {
     // slide down off-screen
     setTranslateY(window.innerHeight);
 
-    // match transition duration below (260ms)
+    // match exit duration
     window.setTimeout(() => {
       close();
-    }, 260);
+    }, HUB_EXIT_DURATION);
   }, [close]);
 
   // Touch handlers for swipe-to-dismiss
@@ -172,7 +178,9 @@ export function HubHomePage() {
           // no transition while dragging or before first frame
           isDragging || !hasEntered || prefersReduced()
             ? 'none'
-            : 'transform 260ms cubic-bezier(.2,.8,.2,1)',
+            : isExiting
+              ? `transform ${HUB_EXIT_DURATION}ms ${HUB_EXIT_EASING}`
+              : `transform ${HUB_ENTRY_DURATION}ms ${HUB_ENTRY_EASING}`,
       }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
