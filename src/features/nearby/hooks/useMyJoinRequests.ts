@@ -20,15 +20,18 @@ export function useMyJoinRequests() {
     queryKey: ['myJoinRequests'],
     queryFn: async () => {
       try {
-        // Check if user is authenticated first
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          console.warn('[useMyJoinRequests] No authenticated user, skipping');
+        // Get the current session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !session) {
+          console.warn('[useMyJoinRequests] No active session, skipping');
           return [];
         }
 
+        // Call the edge function with explicit Authorization header
         const { data, error } = await supabase.functions.invoke('get-my-join-requests', {
-          body: {},
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
         });
 
         // Handle 401 specifically (auth issues)
