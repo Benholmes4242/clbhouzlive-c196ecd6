@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { Trophy, Medal, Award, Crown } from 'lucide-react';
 
 const leaderboardData = [
@@ -77,12 +77,12 @@ const CommunityLeaderboards = () => {
                       <Badge variant="outline" className="w-6 h-6 rounded-full p-0 flex items-center justify-center text-xs">
                         {index + 1}
                       </Badge>
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={leader.avatar || undefined} />
-                        <AvatarFallback className="text-xs">
-                          {leader.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
+                      <AvatarSquircle 
+                        size="sm"
+                        src={leader.avatar || undefined}
+                        alt={leader.name}
+                        fallback={leader.name.split(' ').map(n => n[0]).join('')}
+                      />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{leader.name}</p>
                         <p className="text-xs text-muted-foreground">{leader.courses} courses</p>

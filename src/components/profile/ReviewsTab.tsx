@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { OptimizedAvatar } from "@/components/ui/optimized-avatar";
+import AvatarSquircle from "@/components/ui/AvatarSquircle";
 import ClubhouseLogo from "@/components/ui/clubhouse-logo";
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -249,11 +249,10 @@ function ReviewCard({
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <OptimizedAvatar
+            <AvatarSquircle
               src={review.user.avatarUrl}
               alt={`${review.user.name} avatar`}
               size={48}
-              className="h-12 w-12 rounded-full object-cover ring-1 ring-black/5"
               fallback={getInitials(review.user.name)}
             />
             <div className="min-w-0">

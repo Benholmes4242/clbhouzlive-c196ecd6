@@ -11,8 +11,7 @@ import { useConversation } from '@/hooks/useConversation';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import BottomNavigation from '@/components/BottomNavigation';
 import { formatDistanceToNow } from 'date-fns';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 
 const MessagesPage = () => {
   const navigate = useNavigate();
@@ -111,11 +110,10 @@ const MessagesPage = () => {
                           onClick={() => handleConversationSelect(conversation.friend_id)}
                         >
                           <div className="flex items-start gap-3">
-                            <OptimizedAvatar
+                            <AvatarSquircle
                               src={conversation.friend_photo_url}
                               alt={conversation.friend_name || 'User'}
-                              size={40}
-                              className="w-10 h-10"
+                              size="md"
                               fallback={(conversation.friend_name || 'U').charAt(0)}
                             />
                             <div className="flex-1 min-w-0">
@@ -156,11 +154,10 @@ const MessagesPage = () => {
                     {/* Chat Header */}
                     <div className="p-4 border-b">
                       <div className="flex items-center gap-3">
-                        <OptimizedAvatar
+                        <AvatarSquircle
                           src={selectedConversation.friend_photo_url}
                           alt={selectedConversation.friend_name || 'User'}
-                          size={40}
-                          className="w-10 h-10"
+                          size="md"
                           fallback={(selectedConversation.friend_name || 'U').charAt(0)}
                         />
                         <div>
