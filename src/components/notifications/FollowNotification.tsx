@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -41,12 +41,12 @@ const FollowNotification: React.FC<FollowNotificationProps> = ({
   return (
     <div className="p-4 border-b border-border bg-background">
       <div className="flex items-start gap-3">
-        <Avatar className="h-10 w-10 flex-shrink-0">
-          <AvatarImage src={followerPhoto} alt={followerName} />
-          <AvatarFallback className="bg-blue-100 text-blue-700">
-            {followerName?.charAt(0)?.toUpperCase() || '?'}
-          </AvatarFallback>
-        </Avatar>
+        <AvatarSquircle 
+          size="md"
+          src={followerPhoto}
+          alt={followerName}
+          fallback={followerName?.charAt(0)?.toUpperCase() || '?'}
+        />
         <div className="flex-1 min-w-0">
           <div className="mb-3">
             <h4 className="font-semibold text-sm text-blue-600 mb-1">New Follower</h4>

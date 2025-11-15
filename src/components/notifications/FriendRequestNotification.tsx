@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { UserCheck, X } from 'lucide-react';
 
 interface FriendRequestNotificationProps {
@@ -38,12 +38,12 @@ const FriendRequestNotification: React.FC<FriendRequestNotificationProps> = ({
   return (
     <div className="p-4 border-b border-border bg-background">
       <div className="flex items-start gap-3">
-        <Avatar className="h-10 w-10 flex-shrink-0">
-          <AvatarImage src={requesterPhoto} alt={requesterName} />
-          <AvatarFallback className="bg-blue-100 text-blue-700">
-            {requesterName?.charAt(0)?.toUpperCase() || '?'}
-          </AvatarFallback>
-        </Avatar>
+        <AvatarSquircle 
+          size="md"
+          src={requesterPhoto}
+          alt={requesterName}
+          fallback={requesterName?.charAt(0)?.toUpperCase() || '?'}
+        />
         <div className="flex-1 min-w-0">
           <div className="mb-3">
             <h4 className="font-semibold text-sm text-blue-600 mb-1">Friend Request</h4>

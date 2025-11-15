@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import { Card } from '@/components/ui/card';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { Progress } from '@/components/ui/progress';
 import { AlertCircle, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -42,15 +42,12 @@ const OptimisticPostCard = ({ post, onRetry }: OptimisticPostCardProps) => {
       <div className="p-4">
         {/* Header */}
         <div className="flex items-center gap-3 mb-3">
-          <div className="h-10 w-10 rounded-full overflow-hidden">
-            <HighQualityImage
-              src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-              alt={post.user.display_name || post.user.username || 'User'}
-              className="w-full h-full"
-              width={40}
-              height={40}
-            />
-          </div>
+          <AvatarSquircle 
+            size="md"
+            src={post.user.profile_photo_url}
+            alt={post.user.display_name || post.user.username || 'User'}
+            fallback={(post.user.display_name || post.user.username || 'U').charAt(0).toUpperCase()}
+          />
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-sm">

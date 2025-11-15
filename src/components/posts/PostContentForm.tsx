@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useToast } from '@/hooks/use-toast';
 import { X, ImagePlus, Loader2 } from 'lucide-react';
