@@ -57,8 +57,8 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
     className="flex flex-col items-center justify-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
     aria-label={label}
   >
-    <Icon className="h-5 w-5 text-white" aria-hidden="true" />
-    <span className="text-[11px] leading-tight font-medium text-white/90 max-w-[60px] text-center">{label}</span>
+    <Icon className="h-7 w-7 text-white" aria-hidden="true" />
+    <span className="text-[12px] leading-tight font-medium text-white/90 max-w-[60px] text-center">{label}</span>
   </button>
 );
 
@@ -73,29 +73,29 @@ export function QuickActionsTile() {
 
   return (
     <Tile title="Quick Actions" align="center">
-      <div 
-        className="hub-quick-actions grid grid-cols-2 gap-x-4 gap-y-2 py-1"
-      >
-        <QuickActionButton
-          label="Create Game"
-          Icon={FlagIcon}
-          onClick={openCreateGame}
-        />
-        <QuickActionButton
-          label="Ask Echo"
-          Icon={SparklesIcon}
-          onClick={openEcho}
-        />
-        <QuickActionButton
-          label="Upload Swing"
-          Icon={CameraIcon}
-          onClick={openSwing}
-        />
-        <QuickActionButton
-          label="Your Profile"
-          Icon={PersonIcon}
-          onClick={openProfile}
-        />
+      <div className="h-full flex items-center justify-center">
+        <div className="hub-quick-actions grid grid-cols-2 gap-x-6 gap-y-1">
+          <QuickActionButton
+            label="Create Game"
+            Icon={FlagIcon}
+            onClick={openCreateGame}
+          />
+          <QuickActionButton
+            label="Ask Echo"
+            Icon={SparklesIcon}
+            onClick={openEcho}
+          />
+          <QuickActionButton
+            label="Upload Swing"
+            Icon={CameraIcon}
+            onClick={openSwing}
+          />
+          <QuickActionButton
+            label="Your Profile"
+            Icon={PersonIcon}
+            onClick={openProfile}
+          />
+        </div>
       </div>
     </Tile>
   );
