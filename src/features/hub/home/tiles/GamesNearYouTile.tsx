@@ -136,10 +136,14 @@ export function GamesNearYouTile({
         {/* Game list with inline scroll */}
         <div 
           ref={listRef}
-          className="games-list" 
+          className="hub-golfers-list-scroll games-list" 
           role="list"
           aria-label="Games near you"
+          data-hub-scroll-container="true"
           style={{
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain',
             maskImage: 'none',
             WebkitMaskImage: 'none',
           }}
