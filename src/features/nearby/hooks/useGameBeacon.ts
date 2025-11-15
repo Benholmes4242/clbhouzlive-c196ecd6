@@ -534,6 +534,18 @@ export function useGameBeacon(discoveryFilters?: DiscoveryFilters) {
 
       if (error) throw error;
 
+      // Auto-decline all pending join requests for this game
+      const now = new Date().toISOString();
+      await supabase
+        .from('game_join_requests')
+        .update({
+          status: 'declined',
+          decided_at: now,
+          decided_by: user.user.id,
+        })
+        .eq('game_id', beaconId)
+        .eq('status', 'pending');
+
       // Emit hub event for instant local UI update
       emitHub('game:cancelled', { gameId: beaconId });
 
