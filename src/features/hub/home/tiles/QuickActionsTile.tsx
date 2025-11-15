@@ -45,12 +45,14 @@ type QuickActionButtonProps = {
   label: string;
   Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   onClick: () => void;
+  iconSize?: string;
 };
 
 const QuickActionButton: React.FC<QuickActionButtonProps> = ({
   label,
   Icon,
   onClick,
+  iconSize = "h-8 w-8",
 }) => (
   <button
     type="button"
@@ -58,7 +60,7 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
     className="flex flex-col items-center justify-center gap-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
     aria-label={label}
   >
-    <Icon className="h-8 w-8 text-white" aria-hidden="true" />
+    <Icon className={`${iconSize} text-white`} aria-hidden="true" />
     <span className="text-[12px] leading-tight font-medium text-white/90 whitespace-nowrap">{label}</span>
   </button>
 );
@@ -85,6 +87,7 @@ export function QuickActionsTile() {
             label="Ask Echo"
             Icon={SparklesIcon}
             onClick={openEcho}
+            iconSize="h-9 w-9"
           />
           <QuickActionButton
             label="Swing Coach"
@@ -95,6 +98,7 @@ export function QuickActionsTile() {
             label="Your Profile"
             Icon={PersonIcon}
             onClick={openProfile}
+            iconSize="h-9 w-9"
           />
         </div>
       </div>
