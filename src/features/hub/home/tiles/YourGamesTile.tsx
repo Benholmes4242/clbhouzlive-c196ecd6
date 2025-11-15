@@ -233,8 +233,6 @@ export function YourGamesTile() {
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',
             touchAction: 'pan-y',
-            maskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(180deg, #000 85%, transparent 100%)',
           }}
         >
         <ul className="gt-list">
