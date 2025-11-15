@@ -58,10 +58,11 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
     (golfer.distance_km ? formatDistance(golfer.distance_km * 1000) : undefined);
 
   return (
-    <GlassCard
-      className="px-4 pt-4 pb-5"
+    <div
+      className="px-4 pt-4 pb-5 rounded-2xl backdrop-blur-sm border"
       style={{
-        borderRadius: '18px',
+        background: 'var(--hub-glass-bg-card)',
+        borderColor: 'var(--hub-stroke)',
         animation: `rowFadeUp 90ms ease-out both ${index * 35}ms`,
       }}
     >
@@ -179,6 +180,6 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
           </button>
         </div>
       </article>
-    </GlassCard>
+    </div>
   );
 }

@@ -109,26 +109,18 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
       align="center"
     >
       <div className="flex flex-col h-full" style={{ position: 'relative' }}>
-          {/* Container matching Note input styling from CreateGameModal */}
           <div 
-            className="rounded-2xl p-4 backdrop-blur-sm border"
-            style={{
-              background: 'var(--hub-glass-bg-card)',
-              borderColor: 'var(--hub-stroke)',
-            }}
-          >
-            <div 
-              ref={scrollRef} 
-              className="space-y-0.5 hub-golfers-list-scroll flex flex-col"
-              style={{
-                overflowY: 'auto',
-                WebkitOverflowScrolling: 'touch',
-                overscrollBehavior: 'contain',
-                maxHeight: 'calc(2.4 * 52px)', // Show 2.4 rows visible
-                maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
-                WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
-              }}
-            >
+          ref={scrollRef} 
+          className="space-y-0.5 hub-golfers-list-scroll flex flex-col"
+          style={{
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain',
+            maxHeight: 'calc(2.4 * 52px)', // Show 2.4 rows visible
+            maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
+          }}
+        >
           {isLoading && Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
             <div key={i} className="h-12 rounded-2xl animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
           ))}
@@ -168,9 +160,8 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
               No active golfers nearby
             </div>
           )}
-            </div>
-          </div>
-          <button
+        </div>
+        <button
             onClick={(e) => { 
               e.stopPropagation(); 
               navigateFromHub('/hub/golfers'); 
