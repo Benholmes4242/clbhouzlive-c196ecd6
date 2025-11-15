@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { X } from 'lucide-react';
 import { useMyJoinRequests } from '../hooks/useMyJoinRequests';
@@ -7,6 +7,21 @@ import { cn } from '@/lib/utils';
 import '../components/your-games/YourGames.css';
 
 type TabValue = 'all' | 'pending' | 'approved' | 'declined';
+
+function formatRequestedAgo(iso: string) {
+  const created = new Date(iso);
+  const now = new Date();
+  const diffMs = now.getTime() - created.getTime();
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMinutes < 1) return 'just now';
+  if (diffMinutes < 60) return `${diffMinutes} min${diffMinutes === 1 ? '' : 's'} ago`;
+  if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+  if (diffDays === 1) return 'yesterday';
+  return `${diffDays} days ago`;
+}
 
 interface JoinRequestsInboxSheetProps {
   open: boolean;
@@ -29,6 +44,36 @@ export function JoinRequestsInboxSheet({
     if (activeTab === 'all') return true;
     return req.status === activeTab;
   });
+
+  // Group by time for "All" tab
+  const groupedByTime = useMemo(() => {
+    if (activeTab !== 'all') return null;
+
+    const today: typeof requests = [];
+    const thisWeek: typeof requests = [];
+    const earlier: typeof requests = [];
+
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfWeek = new Date(startOfToday);
+    // Assuming week starts Monday:
+    const day = startOfWeek.getDay() || 7; // Sunday -> 7
+    if (day > 1) startOfWeek.setDate(startOfWeek.getDate() - (day - 1));
+
+    filteredRequests.forEach((req) => {
+      const created = new Date(req.created_at);
+
+      if (created >= startOfToday) {
+        today.push(req);
+      } else if (created >= startOfWeek) {
+        thisWeek.push(req);
+      } else {
+        earlier.push(req);
+      }
+    });
+
+    return { today, thisWeek, earlier };
+  }, [filteredRequests, activeTab, requests]);
 
   // Format date/time like GameRow
   const formatDateTime = (isoString: string) => {
@@ -79,6 +124,71 @@ export function JoinRequestsInboxSheet({
         return '';
     }
   };
+
+  const RequestCard = ({ 
+    request, 
+    formatDateTime, 
+    getStatusPillClass, 
+    getStatusLabel, 
+    getMetaText, 
+    onViewGame,
+    onOpenChange
+  }: { 
+    request: any;
+    formatDateTime: (iso: string) => string;
+    getStatusPillClass: (status: string) => string;
+    getStatusLabel: (status: string) => string;
+    getMetaText: (status: string) => string;
+    onViewGame?: (gameId: string) => void;
+    onOpenChange: (open: boolean) => void;
+  }) => (
+    <div
+      className="rounded-xl p-4"
+      style={{
+        background: 'var(--hub-glass-bg-button)',
+        border: '1px solid var(--hub-stroke-subtle)',
+      }}
+    >
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <div className="flex-1 min-w-0">
+          <div className="font-medium mb-1" style={{ color: 'var(--hub-text-bright)' }}>
+            {request.games?.course_name || 'Golf game'}
+          </div>
+          <div className="text-sm" style={{ color: 'var(--hub-text-muted)' }}>
+            {request.games ? formatDateTime(request.games.start_time) : 'Date TBD'}
+          </div>
+          <div className="text-[12px] text-[color:var(--hub-text-muted)] mt-1">
+            Requested {formatRequestedAgo(request.created_at)}
+          </div>
+        </div>
+        <div
+          className={cn(
+            'px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide border shrink-0',
+            getStatusPillClass(request.status)
+          )}
+        >
+          {getStatusLabel(request.status)}
+        </div>
+      </div>
+
+      {/* Meta text */}
+      <div className="text-xs mb-3" style={{ color: 'var(--hub-text-sub)' }}>
+        {getMetaText(request.status)}
+      </div>
+
+      {/* CTA for approved games */}
+      {request.status === 'approved' && request.games && onViewGame && (
+        <SecondaryButton
+          onClick={() => {
+            onViewGame(request.game_id);
+            onOpenChange(false);
+          }}
+          label="View Game"
+          className="w-full"
+        />
+      )}
+    </div>
+  );
 
   const EmptyState = ({ tab }: { tab: TabValue }) => {
     if (tab === 'pending') {
@@ -179,60 +289,101 @@ export function JoinRequestsInboxSheet({
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 pb-6">
           {isLoading ? (
-            <div className="flex items-center justify-center py-16">
-              <div className="text-sm" style={{ color: 'var(--hub-text-sub)' }}>
-                Loading...
-              </div>
+            <div className="space-y-3 mt-2">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="rounded-xl border border-[color:var(--hub-stroke-subtle)] bg-[color:var(--hub-glass-bg-elevated)] p-3"
+                >
+                  <div className="h-4 w-1/2 rounded-md bg-white/10 animate-pulse mb-2" />
+                  <div className="h-3 w-1/3 rounded-md bg-white/8 animate-pulse mb-1" />
+                  <div className="h-3 w-2/3 rounded-md bg-white/8 animate-pulse" />
+                </div>
+              ))}
             </div>
           ) : filteredRequests.length === 0 ? (
             <EmptyState tab={activeTab} />
+          ) : activeTab === 'all' && groupedByTime ? (
+            <div className="space-y-6">
+              {groupedByTime.today.length > 0 && (
+                <section>
+                  <div className="mb-2 text-[13px] font-semibold text-[color:var(--hub-text-muted)]">
+                    Today
+                  </div>
+                  <div className="space-y-3">
+                    {groupedByTime.today.map((request) => (
+                      <RequestCard
+                        key={request.id}
+                        request={request}
+                        formatDateTime={formatDateTime}
+                        getStatusPillClass={getStatusPillClass}
+                        getStatusLabel={getStatusLabel}
+                        getMetaText={getMetaText}
+                        onViewGame={onViewGame}
+                        onOpenChange={onOpenChange}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {groupedByTime.thisWeek.length > 0 && (
+                <section>
+                  <div className="mb-2 text-[13px] font-semibold text-[color:var(--hub-text-muted)]">
+                    This week
+                  </div>
+                  <div className="space-y-3">
+                    {groupedByTime.thisWeek.map((request) => (
+                      <RequestCard
+                        key={request.id}
+                        request={request}
+                        formatDateTime={formatDateTime}
+                        getStatusPillClass={getStatusPillClass}
+                        getStatusLabel={getStatusLabel}
+                        getMetaText={getMetaText}
+                        onViewGame={onViewGame}
+                        onOpenChange={onOpenChange}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {groupedByTime.earlier.length > 0 && (
+                <section>
+                  <div className="mb-2 text-[13px] font-semibold text-[color:var(--hub-text-muted)]">
+                    Earlier
+                  </div>
+                  <div className="space-y-3">
+                    {groupedByTime.earlier.map((request) => (
+                      <RequestCard
+                        key={request.id}
+                        request={request}
+                        formatDateTime={formatDateTime}
+                        getStatusPillClass={getStatusPillClass}
+                        getStatusLabel={getStatusLabel}
+                        getMetaText={getMetaText}
+                        onViewGame={onViewGame}
+                        onOpenChange={onOpenChange}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
           ) : (
             <div className="space-y-3">
               {filteredRequests.map((request) => (
-                <div
+                <RequestCard
                   key={request.id}
-                  className="rounded-xl p-4"
-                  style={{
-                    background: 'var(--hub-glass-bg-button)',
-                    border: '1px solid var(--hub-stroke-subtle)',
-                  }}
-                >
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium mb-1" style={{ color: 'var(--hub-text-bright)' }}>
-                        {request.games?.course_name || 'Golf game'}
-                      </div>
-                      <div className="text-sm" style={{ color: 'var(--hub-text-muted)' }}>
-                        {request.games ? formatDateTime(request.games.start_time) : 'Date TBD'}
-                      </div>
-                    </div>
-                    <div
-                      className={cn(
-                        'px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide border shrink-0',
-                        getStatusPillClass(request.status)
-                      )}
-                    >
-                      {getStatusLabel(request.status)}
-                    </div>
-                  </div>
-
-                  {/* Meta text */}
-                  <div className="text-xs mb-3" style={{ color: 'var(--hub-text-sub)' }}>
-                    {getMetaText(request.status)}
-                  </div>
-
-                  {/* CTA for approved games */}
-                  {request.status === 'approved' && request.games && onViewGame && (
-                    <SecondaryButton
-                      onClick={() => {
-                        onViewGame(request.game_id);
-                        onOpenChange(false);
-                      }}
-                      label="View Game"
-                      className="w-full"
-                    />
-                  )}
-                </div>
+                  request={request}
+                  formatDateTime={formatDateTime}
+                  getStatusPillClass={getStatusPillClass}
+                  getStatusLabel={getStatusLabel}
+                  getMetaText={getMetaText}
+                  onViewGame={onViewGame}
+                  onOpenChange={onOpenChange}
+                />
               ))}
             </div>
           )}

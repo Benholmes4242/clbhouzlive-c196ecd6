@@ -2,10 +2,11 @@
  * Hub Your Games Page
  * Full-screen glass page overlaying the origin page.
  */
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { YourGamesList } from '@/features/nearby/components/YourGamesList';
 import { JoinRequestsInboxSheet } from '@/features/nearby/components/JoinRequestsInboxSheet';
+import { useMyJoinRequests } from '@/features/nearby/hooks/useMyJoinRequests';
 import { useHub } from '@/features/hub/useHub';
 import { HubHeader } from '@/features/hub/components/HubHeader';
 import '../home/hubTheme.css';
@@ -16,6 +17,13 @@ export function HubYourGamesPage() {
   const { navigateFromHub } = useHub();
   const [joinRequestsOpen, setJoinRequestsOpen] = useState(false);
   const [focusedGameId, setFocusedGameId] = useState<string | undefined>();
+
+  const { data: myRequests = [] } = useMyJoinRequests();
+
+  const pendingCount = useMemo(
+    () => myRequests.filter((r) => r.status === 'pending').length,
+    [myRequests]
+  );
 
   const goBack = () => {
     const state = loc.state as any;
@@ -56,8 +64,9 @@ export function HubYourGamesPage() {
         onBack={goBack}
         rightAction={
           <button
+            type="button"
             onClick={() => setJoinRequestsOpen(true)}
-            className="text-[15px] font-medium transition"
+            className="flex items-center gap-2 text-[15px] font-medium transition"
             style={{
               background: 'transparent',
               border: 'none',
@@ -69,6 +78,22 @@ export function HubYourGamesPage() {
             aria-label="View join requests"
           >
             Join Requests
+            {pendingCount > 0 && (
+              <span
+                className="inline-flex items-center justify-center text-[11px] font-semibold"
+                style={{
+                  minWidth: 18,
+                  height: 18,
+                  padding: '0 6px',
+                  borderRadius: 999,
+                  background: 'rgba(255,255,255,0.12)',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  color: 'var(--hub-text-bright)',
+                }}
+              >
+                {pendingCount}
+              </span>
+            )}
           </button>
         }
       />
