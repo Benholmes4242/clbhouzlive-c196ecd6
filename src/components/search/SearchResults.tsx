@@ -1,7 +1,7 @@
 import React from 'react';
 import { User, MapPin, Clock, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Squircle } from '@/components/ui/squircle';
 import { Button } from '@/components/ui/button';
 import TrendingTags from './TrendingTags';
 import RecentSearches from './RecentSearches';
@@ -140,12 +140,15 @@ const SearchResults: React.FC<SearchResultsProps> = ({
           >
             <div className="mr-3">
               {result.type === 'user' ? (
-                <AvatarSquircle
-                  size={48}
-                  src={result.image}
-                  alt={result.title}
-                  fallback={result.title.charAt(0).toUpperCase()}
-                />
+                <Squircle width={48} height={48}>
+                  {result.image ? (
+                    <img src={result.image} alt={result.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '18px', fontWeight: 600 }}>
+                      {result.title.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </Squircle>
               ) : (
                 <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
                   {result.image ? (

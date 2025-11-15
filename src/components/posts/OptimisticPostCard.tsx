@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import { Card } from '@/components/ui/card';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Squircle } from '@/components/ui/squircle';
 import { Progress } from '@/components/ui/progress';
 import { AlertCircle, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -42,12 +42,15 @@ const OptimisticPostCard = ({ post, onRetry }: OptimisticPostCardProps) => {
       <div className="p-4">
         {/* Header */}
         <div className="flex items-center gap-3 mb-3">
-          <AvatarSquircle 
-            size="md"
-            src={post.user.profile_photo_url}
-            alt={post.user.display_name || post.user.username || 'User'}
-            fallback={(post.user.display_name || post.user.username || 'U').charAt(0).toUpperCase()}
-          />
+          <Squircle width={56} height={56}>
+            {post.user.profile_photo_url ? (
+              <img src={post.user.profile_photo_url} alt={post.user.display_name || post.user.username || 'User'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '22px', fontWeight: 600 }}>
+                {(post.user.display_name || post.user.username || 'U').charAt(0).toUpperCase()}
+              </div>
+            )}
+          </Squircle>
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-sm">

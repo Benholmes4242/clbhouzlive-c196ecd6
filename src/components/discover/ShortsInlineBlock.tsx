@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Squircle } from '@/components/ui/squircle';
 import { Heart, Flame } from 'lucide-react';
 import { formatLikes } from '@/utils/dateFormat';
 import { useInView } from 'react-intersection-observer';
@@ -145,12 +145,15 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
           <div className="flex items-center gap-2 min-w-0 flex-1">
             {short.user && (
               <>
-                <AvatarSquircle
-                  size={24}
-                  src={short.user.avatar}
-                  alt={short.user.name}
-                  fallback={short.user.name[0].toUpperCase()}
-                />
+                <Squircle width={24} height={24}>
+                  {short.user.avatar ? (
+                    <img src={short.user.avatar} alt={short.user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '10px', fontWeight: 600 }}>
+                      {short.user.name[0].toUpperCase()}
+                    </div>
+                  )}
+                </Squircle>
                 <span className="truncate">
                   {short.user.name}
                 </span>

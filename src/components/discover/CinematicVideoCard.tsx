@@ -4,7 +4,7 @@ import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 import { Volume2, VolumeX, Heart } from 'lucide-react';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Squircle } from '@/components/ui/squircle';
 import { formatRelativeTime, formatLikes } from '@/utils/dateFormat';
 import { clsx } from 'clsx';
 import ClubTagPill from '@/components/clubhouse/ClubTagPill';
@@ -143,12 +143,15 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
         <div className="mt-1 grid grid-cols-[auto_1fr_auto] items-center gap-3 text-[14px] text-muted-foreground">
           {/* Avatar + Handle */}
           <div className="flex items-center gap-2 truncate max-w-[45vw]">
-            <AvatarSquircle
-              size={24}
-              src={item.user?.avatar}
-              alt={item.user?.username || item.user?.name || 'User'}
-              fallback={(item.user?.username?.[0] || item.user?.name?.[0] || 'U').toUpperCase()}
-            />
+            <Squircle width={24} height={24}>
+              {item.user?.avatar ? (
+                <img src={item.user.avatar} alt={item.user?.username || item.user?.name || 'User'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '10px', fontWeight: 600 }}>
+                  {(item.user?.username?.[0] || item.user?.name?.[0] || 'U').toUpperCase()}
+                </div>
+              )}
+            </Squircle>
             <span className="truncate">
               @{item.user?.username || item.user?.name || 'unknown'}
             </span>

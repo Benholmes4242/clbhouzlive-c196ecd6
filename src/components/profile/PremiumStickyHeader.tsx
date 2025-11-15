@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Squircle } from '@/components/ui/squircle';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -68,12 +68,15 @@ const PremiumStickyHeader: React.FC<PremiumStickyHeaderProps> = ({
         <div className="flex items-center justify-between">
           {/* Profile Info */}
           <div className="flex items-center gap-3">
-            <AvatarSquircle
-              size="sm"
-              src={profile.profile_photo_url}
-              alt={profile.display_name || 'User'}
-              fallback={(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
-            />
+            <Squircle width={40} height={40}>
+              {profile.profile_photo_url ? (
+                <img src={profile.profile_photo_url} alt={profile.display_name || 'User'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '16px', fontWeight: 600 }}>
+                  {(profile.display_name || profile.username || 'U').charAt(0).toUpperCase()}
+                </div>
+              )}
+            </Squircle>
             
             <div className="min-w-0">
               <div className="text-white font-bold text-base truncate">
