@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Squircle } from '@/components/ui/squircle';
 import { Participant } from './types';
 import { formatHcp } from '@/lib/formatHcp';
 
@@ -17,12 +18,14 @@ export const PlayerRow: React.FC<PlayerRowProps> = ({ p, isHost }) => {
       role="listitem"
     >
       {/* Avatar */}
-      <img
-        src={p.profile_photo_url || '/placeholder.svg'}
-        alt=""
-        className="h-9 w-9 rounded-full object-cover bg-white/10"
-        loading="lazy"
-      />
+      <Squircle width={36} height={36}>
+        <img
+          src={p.profile_photo_url || '/placeholder.svg'}
+          alt=""
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          loading="lazy"
+        />
+      </Squircle>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="truncate text-[15px] font-medium text-white/90">{name}</span>
