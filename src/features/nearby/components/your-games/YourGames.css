@@ -5,12 +5,10 @@
 /* Row animations */
 .yourGameRow {
   padding: 12px 16px 14px;
-  border-bottom: 1px solid var(--hub-stroke-subtle);
   cursor: pointer;
   transition:
     background-color var(--hub-anim-fast) ease-out,
-    transform var(--hub-anim-fast) ease-out,
-    border-color var(--hub-anim-fast) ease-out;
+    transform var(--hub-anim-fast) ease-out;
   opacity: 0;
   transform: translateY(6px);
   animation: yourGameRowIn 0.22s var(--hub-anim-ease-out) forwards;
