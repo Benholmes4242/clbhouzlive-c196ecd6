@@ -9,6 +9,7 @@ const FlagIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <path
       fill="currentColor"
       d="M6 3.5v17a1 1 0 0 1-2 0v-17a1 1 0 0 1 2 0Zm2 .5h7.2a1 1 0 0 1 .8 1.6L15 8l1.8 2.4A1 1 0 0 1 16 12H8a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"
+      transform="translate(7, 0)"
     />
   </svg>
 );
