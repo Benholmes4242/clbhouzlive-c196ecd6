@@ -108,15 +108,14 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
       title="Nearby Golfers"
       align="center"
     >
-      <div className="flex flex-col h-full" style={{ position: 'relative' }}>
+      <div className="flex flex-col h-full" style={{ position: 'relative', paddingTop: '15px', paddingBottom: '15px' }}>
           <div 
           ref={scrollRef} 
-          className="space-y-0.5 hub-golfers-list-scroll flex flex-col"
+          className="space-y-0.5 hub-golfers-list-scroll flex flex-col flex-1"
           style={{
             overflowY: 'auto',
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'contain',
-            maxHeight: 'calc(2.4 * 52px)', // Show 2.4 rows visible
             maskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
             WebkitMaskImage: 'linear-gradient(180deg, #000 88%, transparent 100%)',
           }}
