@@ -2,9 +2,10 @@
  * Hub Your Games Page
  * Full-screen glass page overlaying the origin page.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { YourGamesList } from '@/features/nearby/components/YourGamesList';
+import { JoinRequestsInboxSheet } from '@/features/nearby/components/JoinRequestsInboxSheet';
 import { useHub } from '@/features/hub/useHub';
 import { HubHeader } from '@/features/hub/components/HubHeader';
 import '../home/hubTheme.css';
@@ -13,6 +14,8 @@ export function HubYourGamesPage() {
   const nav = useNavigate();
   const loc = useLocation();
   const { navigateFromHub } = useHub();
+  const [joinRequestsOpen, setJoinRequestsOpen] = useState(false);
+  const [focusedGameId, setFocusedGameId] = useState<string | undefined>();
 
   const goBack = () => {
     const state = loc.state as any;
@@ -33,6 +36,12 @@ export function HubYourGamesPage() {
     navigateFromHub('/hub/games');
   };
 
+  const handleViewGame = (gameId: string) => {
+    setJoinRequestsOpen(false);
+    setFocusedGameId(gameId);
+    // The YourGamesList will automatically switch to Joined tab and focus on this game
+  };
+
   return (
     <div
       className="hub-glass-page fixed inset-0 z-[9999]"
@@ -42,7 +51,27 @@ export function HubYourGamesPage() {
         WebkitBackdropFilter: 'blur(120px)',
       }}
     >
-      <HubHeader title="Your Games" onBack={goBack} />
+      <HubHeader 
+        title="Your Games" 
+        onBack={goBack}
+        rightAction={
+          <button
+            onClick={() => setJoinRequestsOpen(true)}
+            className="text-[15px] font-medium transition"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            aria-label="View join requests"
+          >
+            Join Requests
+          </button>
+        }
+      />
 
       {/* Content area - YourGamesList content */}
       <div 
@@ -53,9 +82,18 @@ export function HubYourGamesPage() {
           <YourGamesList
             onCreateGame={handleCreateGame}
             onFindGame={handleFindGame}
+            focusId={focusedGameId}
           />
         </div>
       </div>
+
+      {/* Join Requests Inbox Sheet */}
+      <JoinRequestsInboxSheet
+        open={joinRequestsOpen}
+        onOpenChange={setJoinRequestsOpen}
+        onViewGame={handleViewGame}
+        onFindGame={handleFindGame}
+      />
     </div>
   );
 }

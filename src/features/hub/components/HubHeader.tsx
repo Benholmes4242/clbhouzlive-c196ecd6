@@ -6,9 +6,10 @@ import React from 'react';
 interface HubHeaderProps {
   title: string;
   onBack: () => void;
+  rightAction?: React.ReactNode;
 }
 
-export function HubHeader({ title, onBack }: HubHeaderProps) {
+export function HubHeader({ title, onBack, rightAction }: HubHeaderProps) {
   return (
     <header 
       id="hub-header"
@@ -29,7 +30,9 @@ export function HubHeader({ title, onBack }: HubHeaderProps) {
         ‹ Back
       </button>
       <h1 className="text-white/90 text-[17px] font-semibold">{title}</h1>
-      <div className="w-16" />
+      <div className={rightAction ? '' : 'w-16'}>
+        {rightAction || null}
+      </div>
     </header>
   );
 }
