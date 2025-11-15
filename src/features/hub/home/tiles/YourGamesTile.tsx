@@ -226,7 +226,8 @@ export function YourGamesTile() {
         <div
           ref={listRef}
           className="gt-scroll flex-1 min-h-0 -mr-1 pr-1"
-          style={{ 
+          data-hub-scroll-container="true"
+          style={{
             marginTop: '8px',
             overflowY: 'auto',
             WebkitOverflowScrolling: 'touch',

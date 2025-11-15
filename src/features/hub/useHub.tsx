@@ -9,6 +9,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 type HubContextType = {
   open: () => void;
   navigateFromHub: (to: string) => void;
+  close: () => void;
 };
 
 const HubContext = createContext<HubContextType | null>(null);
@@ -27,8 +28,29 @@ export function HubProvider({ children }: { children: React.ReactNode }) {
     nav(to, { state: { backgroundLocation, fromHub: true } });
   };
 
+  const close = () => {
+    const state = loc.state as any;
+    const backgroundLocation = state?.backgroundLocation;
+
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'hub_closed', {
+        event_category: 'hub',
+        event_label: 'Hub closed',
+      });
+    }
+
+    if (backgroundLocation) {
+      nav(backgroundLocation.pathname + backgroundLocation.search, {
+        replace: true,
+      });
+    } else {
+      // Fallback if no background location is found
+      nav('/clubhouse', { replace: true });
+    }
+  };
+
   return (
-    <HubContext.Provider value={{ open, navigateFromHub }}>
+    <HubContext.Provider value={{ open, navigateFromHub, close }}>
       {children}
     </HubContext.Provider>
   );
