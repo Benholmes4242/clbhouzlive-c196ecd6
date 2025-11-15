@@ -187,9 +187,11 @@
 .resultRow .userAvatar {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
+  /* Squircle look */
+  border-radius: 28%;
   object-fit: cover;
-  background: #2a2a2a;
+  background: transparent;
+  overflow: hidden;
 }
 
 .selectedClubRow {
