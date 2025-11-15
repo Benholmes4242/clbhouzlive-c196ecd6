@@ -171,6 +171,71 @@
   margin-top: 8px;
 }
 
+/* Awaiting approval panel */
+.yourGames__pendingPanel {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding: 10px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.yourGames__pendingHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--hub-text-sub);
+  margin-bottom: 6px;
+}
+
+.yourGames__pendingDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--hub-status-warn-bg);
+}
+
+.yourGames__pendingList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.yourGames__pendingItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.yourGames__pendingMain {
+  flex: 1;
+  min-width: 0;
+}
+
+.yourGames__pendingTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--hub-text-bright);
+}
+
+.yourGames__pendingMeta {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--hub-text-muted);
+}
+
+.yourGames__pendingStatus {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--hub-text-sub);
+  flex-shrink: 0;
+}
+
 /* Mini profile row */
 .miniProfileRow {
   display: flex;

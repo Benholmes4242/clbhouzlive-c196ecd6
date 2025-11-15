@@ -159,6 +159,14 @@ export function GameRow({
             <span className="gameRow__metaLine">{dateStr} • {timeStr}</span>
             <span className="gameRow__metaLine">{expiryLabel}</span>
           </div>
+          {/* Pending request hint (Hosting mode) */}
+          {mode === 'yourGames' && isHost && pendingRequestCount > 0 && (
+            <div className="text-xs mt-1 opacity-70">
+              {pendingRequestCount === 1
+                ? '1 player waiting for approval'
+                : `${pendingRequestCount} players waiting for approval`}
+            </div>
+          )}
         </div>
 
         <div className="gameRow__right">

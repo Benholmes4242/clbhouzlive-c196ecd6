@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { TapButton } from '@/components/ui/TapButton';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { useJoinRequestNotifications } from '@/features/nearby/hooks/useJoinRequestNotifications';
 import { EchoTile } from '../home/tiles/EchoTile';
 import { QuickActionsTile } from '../home/tiles/QuickActionsTile';
 import { NearbyGolfersTile } from '../home/tiles/NearbyGolfersTile';
@@ -17,6 +18,9 @@ import '../home/hubTheme.css';
 export function HubHomePage() {
   const nav = useNavigate();
   const loc = useLocation();
+  
+  // Subscribe to realtime join request notifications
+  useJoinRequestNotifications();
 
   // Mark hub-open on html while mounted
   useEffect(() => {
