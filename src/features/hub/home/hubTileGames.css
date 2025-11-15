@@ -1,16 +1,14 @@
 /* Games Tile - Inline scroll with expandable rows */
 
-/* List container: fixed viewport inside tile with inline scroll */
+/* List container: fills available space with scroll */
 .games-list {
-  max-height: clamp(120px, 22vh, 220px); /* shows ~2.1 rows on small screens */
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding-right: 4px; /* space for fade */
-  mask-image: linear-gradient(180deg, #000 85%, transparent 100%); /* bottom fade hint */
-  -webkit-mask-image: linear-gradient(180deg, #000 85%, transparent 100%);
+  padding-right: 4px;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   overflow-x: hidden;
-  padding-bottom: 8px;
 }
 
 .games-list::-webkit-scrollbar {
@@ -140,16 +138,23 @@
 .tile-divider {
   height: 1px;
   background: var(--hub-divider);
-  margin: 12px 0;
+  margin: 6px 0 6px 0;
+  position: absolute;
+  bottom: 29px;
+  left: 0;
+  right: 0;
 }
 
 .tile-link {
-  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   text-align: center;
   background: transparent;
   border: 0;
   color: var(--hub-text-body);
-  padding: 8px 0;
+  padding: 0;
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
