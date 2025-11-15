@@ -4,9 +4,6 @@
  */
 
 import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { X } from 'lucide-react';
-import { TapButton } from '@/components/ui/TapButton';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useJoinRequestNotifications } from '@/features/nearby/hooks/useJoinRequestNotifications';
 import { EchoTile } from '../home/tiles/EchoTile';
@@ -16,8 +13,6 @@ import { YourGamesTile } from '../home/tiles/YourGamesTile';
 import '../home/hubTheme.css';
 
 export function HubHomePage() {
-  const nav = useNavigate();
-  const loc = useLocation();
   
   // Subscribe to realtime join request notifications
   useJoinRequestNotifications();
@@ -40,17 +35,6 @@ export function HubHomePage() {
     }
   }, []);
 
-  const handleBack = () => {
-    const state = loc.state as any;
-    if (state?.backgroundLocation) {
-      // Return to origin page
-      nav(-1);
-    } else {
-      // Deep link fallback
-      nav('/clubhouse', { replace: true });
-    }
-  };
-
   return (
     <div
       className="hub-glass-page fixed inset-0 z-[9999]"
@@ -60,44 +44,8 @@ export function HubHomePage() {
         WebkitBackdropFilter: 'blur(120px)',
       }}
     >
-      {/* Header */}
-      <header
-        className="fixed top-0 left-0 right-0 z-[10000] px-5 pt-4 pb-3"
-        style={{
-          background: 'transparent',
-          borderBottom: '1px solid var(--hub-header-stroke)',
-          paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))',
-        }}
-      >
-        <div className="flex items-center justify-between" style={{ userSelect: 'none' }}>
-          <div className="flex items-center gap-2">
-            <img
-              src="/assets/logomark-orange.png"
-              alt="Logo mark"
-              className="h-10 md:h-12 w-auto object-contain"
-            />
-            <img
-              src="/assets/clbhouz-white.png"
-              alt="clbhouz"
-              className="h-10 md:h-12 w-auto object-contain"
-            />
-          </div>
-          
-          <TapButton
-            onPointerDown={handleBack}
-            className="transition-colors active:scale-95 w-11 h-11 flex items-center justify-center -mr-2"
-            style={{ color: 'var(--hub-close-idle)' }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-close-hover)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-close-idle)'}
-            aria-label="Close hub"
-          >
-            <X className="w-5 h-5" />
-          </TapButton>
-        </div>
-      </header>
-
       {/* Hub Dashboard */}
-      <main className="w-full overflow-y-auto h-screen pt-[calc(80px+env(safe-area-inset-top,0px))] px-3.5">
+      <main className="w-full overflow-y-auto h-screen pt-[env(safe-area-inset-top,0px)] px-3.5">
         <div className="pt-1.5">
         {/* Nearby Golfers - Full width */}
         <div style={{ height: 'var(--hub-tile-fixed-h)' }}>
@@ -108,7 +56,7 @@ export function HubHomePage() {
         <div 
           className="mt-3.5" 
           style={{ 
-            height: 'calc(100vh - 80px - var(--hub-tile-fixed-h) - 0.875rem - 0.875rem - 0.75rem - 12px - ((100vw - 28px - 0.875rem) / 2))' 
+            height: 'calc(100vh - var(--hub-tile-fixed-h) - 0.875rem - 0.875rem - 0.75rem - 12px - env(safe-area-inset-top, 0px) - ((100vw - 28px - 0.875rem) / 2))' 
           }}
         >
           <YourGamesTile />
