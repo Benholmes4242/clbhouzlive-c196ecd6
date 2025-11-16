@@ -3634,6 +3634,16 @@ export type Database = {
           total_users: number
         }[]
       }
+      backfill_course_top100_memberships: {
+        Args: never
+        Returns: {
+          courses_added: number
+          courses_skipped: number
+          details: string
+          list_slug: string
+          status: string
+        }[]
+      }
       can_change_email: { Args: { user_id_param: string }; Returns: boolean }
       can_view_game_participant_profile: {
         Args: { _profile_user_id: string; _viewer_id: string }
@@ -4285,6 +4295,37 @@ export type Database = {
       recalculate_review_vote_counts: {
         Args: { review_id_param: string }
         Returns: undefined
+      }
+      search_golf_courses: {
+        Args: {
+          country_filter?: string
+          limit_count?: number
+          list_slug?: string
+          offset_count?: number
+          region_slug?: string
+          search_query?: string
+        }
+        Returns: {
+          continent: string
+          country: string
+          country_rank: number
+          created_at: string
+          description: string
+          global_rank: number
+          id: string
+          latitude: number
+          list_memberships: Json
+          longitude: number
+          name: string
+          region: string
+          regional_rank: number
+          sub_country: string
+          thumbnail_image: string
+          top100_url: string
+          updated_at: string
+          usa_rank: number
+          website_url: string
+        }[]
       }
       send_push_notification: {
         Args: {
