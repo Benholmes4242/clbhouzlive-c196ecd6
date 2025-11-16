@@ -7,7 +7,6 @@ import ConnectHandicapPrompt from './handicap/ConnectHandicapPrompt';
 
 // NEW
 import StoriesRow from './handicap/StoriesRow';
-import XpToast from './handicap/XpToast';
 import AnalyticsTabs from './handicap/AnalyticsTabs';
 import FriendsLeaderboard from './handicap/FriendsLeaderboard';
 import AchievementsSpotlight from './handicap/AchievementsSpotlight';
@@ -123,8 +122,7 @@ const HandicapSection: React.FC<HandicapSectionProps> = ({ userId, profile }) =>
         ]}
       />
 
-      {/* 2) XP TOAST */}
-      <XpToast event={{ id: 'xp1', createdAt: new Date().toISOString(), amount: 150, reason: 'Improved 3-round average' }} />
+      {/* XP Toast removed */}
 
       {/* 3) SUMMARY CARDS (unchanged) */}
       <HandicapSummaryStats

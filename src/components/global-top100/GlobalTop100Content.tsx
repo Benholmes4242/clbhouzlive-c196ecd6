@@ -1,8 +1,5 @@
 import React from 'react';
 import Top100CourseLists from './Top100CourseLists';
-import CommunityLeaderboards from './CommunityLeaderboards';
-import Top100VideoMoments from './Top100VideoMoments';
-import CommunityTop100Moments from './CommunityTop100Moments';
 
 const GlobalTop100Content = () => {
   return (
@@ -10,14 +7,7 @@ const GlobalTop100Content = () => {
       {/* Top 100 Course Lists */}
       <Top100CourseLists />
       
-      {/* Community Top 100 Leaderboards */}
-      <CommunityLeaderboards />
-      
-      {/* Top 100 Video Moments */}
-      <Top100VideoMoments />
-      
-      {/* Community Top 100 Moments */}
-      <CommunityTop100Moments />
+      {/* Mock sections removed - coming in Phase 2 */}
     </div>
   );
 };
