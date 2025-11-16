@@ -211,7 +211,7 @@ export function HubHomePage() {
         <div 
           className="mt-3.5" 
           style={{ 
-            height: 'calc(100vh - var(--hub-tile-fixed-h) - 0.875rem - 0.875rem - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - ((100vw - 28px - 0.875rem) / 2))' 
+            height: 'calc(100vh - var(--hub-tile-fixed-h) - 0.875rem - 0.875rem - 0.75rem - 12px - env(safe-area-inset-top, 0px) - ((100vw - 28px - 0.875rem) / 2))' 
           }}
         >
           <YourGamesTile />
