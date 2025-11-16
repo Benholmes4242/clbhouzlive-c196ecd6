@@ -105,8 +105,29 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
 
   return (
     <Tile 
-      title="Nearby Golfers"
-      align="center"
+      title={
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+          <h3>Nearby Golfers</h3>
+          <button
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              navigateFromHub('/hub/golfers'); 
+            }}
+            className="text-[15px] font-medium transition"
+            style={{ 
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+            aria-label="View all golfers"
+          >
+            See all →
+          </button>
+        </div>
+      }
     >
       <div className="flex flex-col h-full" style={{ position: 'relative', paddingTop: '1.5px', paddingBottom: '6px' }}>
           <div 
@@ -155,27 +176,6 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
             </div>
           )}
         </div>
-        <button
-            onClick={(e) => { 
-              e.stopPropagation(); 
-              navigateFromHub('/hub/golfers'); 
-            }}
-            className="text-[15px] font-medium transition"
-            style={{
-              position: 'absolute',
-              bottom: '0',
-              right: '0',
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--hub-text-body)',
-              padding: 0,
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
-            aria-label="View all golfers"
-          >
-            View all →
-          </button>
       </div>
     </Tile>
   );
