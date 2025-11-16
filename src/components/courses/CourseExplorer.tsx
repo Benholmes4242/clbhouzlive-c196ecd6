@@ -1,66 +1,37 @@
 
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import React, { useState, useEffect } from 'react';
+import { useGolfCoursesSearch } from '@/hooks/useGolfCoursesSearch';
+import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Search, MapPin } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const CourseExplorer = () => {
-  const [selectedRegion, setSelectedRegion] = useState<string>('all');
+  const [selectedRegion, setSelectedRegion] = useState<string>('');
+  const [selectedList, setSelectedList] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  // Fetch courses based on selected region using correct filtering logic
-  const { data: courses = [], isLoading } = useQuery({
-    queryKey: ['courses', selectedRegion],
-    queryFn: async () => {
-      let query = supabase
-        .from('golf_courses')
-        .select('*');
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-      if (selectedRegion === 'all') {
-        // Show all courses in randomized order - no filtering needed
-        query = query.order('created_at', { ascending: false });
-      } else if (selectedRegion === 'britain-ireland') {
-        // Show courses where primary country is "Britain & Ireland" and have regional rank
-        query = query
-          .eq('country', 'Britain & Ireland')
-          .not('regional_rank', 'is', null)
-          .order('regional_rank', { ascending: true });
-      } else if (selectedRegion === 'usa') {
-        // Show courses where primary country is "USA" and have regional rank
-        query = query
-          .eq('country', 'USA')
-          .not('regional_rank', 'is', null)
-          .order('regional_rank', { ascending: true });
-      } else if (selectedRegion === 'europe') {
-        // Show courses where primary country is "Continental Europe" and have regional rank
-        query = query
-          .eq('country', 'Continental Europe')
-          .not('regional_rank', 'is', null)
-          .order('regional_rank', { ascending: true });
-      } else if (selectedRegion === 'global') {
-        // Global - show all courses with global ranks
-        query = query
-          .not('global_rank', 'is', null)
-          .order('global_rank', { ascending: true });
-      }
+  // Fetch available lists
+  const { data: lists = [] } = useTop100Lists();
 
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    },
+  // Use the new search hook
+  const { data: courses = [], isLoading } = useGolfCoursesSearch({
+    searchQuery: debouncedSearch,
+    regionSlug: selectedRegion || undefined,
+    listSlug: selectedList || undefined,
+    limit: 100,
   });
-
-  // Filter courses based on search term
-  const filteredCourses = courses.filter(course => 
-    course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    course.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    course.region?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -75,33 +46,19 @@ const CourseExplorer = () => {
   );
 
   const regionOptions = [
-    { value: 'all', label: 'All Courses' },
-    { value: 'britain-ireland', label: 'Britain & Ireland' },
+    { value: '', label: 'All Regions' },
+    { value: 'gb-i', label: 'Britain & Ireland' },
     { value: 'usa', label: 'United States' },
     { value: 'europe', label: 'Continental Europe' },
-    { value: 'global', label: 'Worldwide' }
   ];
 
-  const currentRegion = regionOptions.find(r => r.value === selectedRegion);
-
-  // Map selectedRegion to viewContext
-  const getViewContext = () => {
-    switch (selectedRegion) {
-      case 'britain-ireland':
-        return 'regional';
-      case 'usa':
-        return 'usa';
-      case 'europe':
-        return 'europe';  
-      case 'global':
-        return 'global';
-      default:
-        return 'global';
-    }
-  };
+  const listOptions = [
+    { value: '', label: 'All Courses' },
+    ...lists.map(list => ({ value: list.slug, label: list.short_label }))
+  ];
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-6">
       {/* Search */}
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -109,56 +66,60 @@ const CourseExplorer = () => {
           placeholder="Search courses, countries, or regions..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 border-border focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#b66b41]"
+          className="pl-10"
         />
       </div>
 
-      {/* Region Selection */}
-      <div className="flex items-center gap-4">
+      {/* Filters */}
+      <div className="flex gap-4">
         <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-          <SelectTrigger className="w-[200px] focus:ring-[#b66b41] focus:border-[#b66b41]">
-            <SelectValue />
+          <SelectTrigger className="w-[200px]">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-muted-foreground" />
+              <SelectValue placeholder="Region" />
+            </div>
           </SelectTrigger>
           <SelectContent>
-            {regionOptions.map((region) => (
-              <SelectItem 
-                key={region.value} 
-                value={region.value}
-                className="hover:text-[#b66b41] focus:text-[#b66b41]"
-              >
-                {region.label}
+            {regionOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={selectedList} onValueChange={setSelectedList}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="All Lists" />
+          </SelectTrigger>
+          <SelectContent>
+            {listOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
 
-      {/* Course Grid */}
+      {/* Results */}
       {isLoading ? (
         <LoadingSkeleton />
-      ) : filteredCourses.length > 0 ? (
+      ) : courses.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">No courses found matching your search.</p>
+        </div>
+      ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCourses.map((course) => (
+          {courses.map((course) => (
             <CourseCard 
               key={course.id} 
-              course={course} 
-              viewContext={getViewContext()}
+              course={course}
+              viewContext="global"
             />
           ))}
         </div>
-      ) : (
-        <div className="text-center py-12">
-          <MapPin className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-semibold mb-2">No courses found</h3>
-          <p className="text-muted-foreground">
-            {searchTerm 
-              ? `No courses match "${searchTerm}" in ${currentRegion?.label}`
-              : `No courses available for ${currentRegion?.label}`
-            }
-          </p>
-        </div>
       )}
-
     </div>
   );
 };
