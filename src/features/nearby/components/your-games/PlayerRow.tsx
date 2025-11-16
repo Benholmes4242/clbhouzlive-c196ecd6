@@ -18,7 +18,7 @@ export const PlayerRow: React.FC<PlayerRowProps> = ({ p, isHost }) => {
       role="listitem"
     >
       {/* Avatar */}
-      <Squircle width={36} height={36}>
+      <Squircle width={42} height={42}>
         <img
           src={p.profile_photo_url || '/placeholder.svg'}
           alt=""
