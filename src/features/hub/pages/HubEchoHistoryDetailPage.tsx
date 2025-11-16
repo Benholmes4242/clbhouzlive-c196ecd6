@@ -1,24 +1,31 @@
 /**
  * Echo Chat Thread (read-only) – overlays origin; back returns to History list
  */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../home/hubTheme.css';
 import { useEchoChatThread } from '@/features/echo/hooks/useEchoChatThread';
 import { formatDateTime } from '@/utils/dateFormat';
+import { Squircle } from '@/components/ui/squircle';
+import EchoAvatar from '@/components/ai-chat/EchoAvatar';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function HubEchoHistoryDetailPage() {
   const { id } = useParams<{ id: string }>();
   const nav = useNavigate();
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
     document.documentElement.classList.add('hub-open');
+    supabase.auth.getUser().then(({ data: { user } }) => setCurrentUserId(user?.id || null));
     return () => document.documentElement.classList.remove('hub-open');
   }, []);
 
   const goBack = () => nav(-1);
 
   const { data, isLoading, error } = useEchoChatThread(id);
+  const { data: userProfile } = useUserProfile(currentUserId);
 
   return (
     <div
@@ -68,15 +75,38 @@ export default function HubEchoHistoryDetailPage() {
               {(data.messages ?? []).length === 0 ? (
                 <div className="hub-msg">No messages in this chat yet.</div>
               ) : (
-                <div className="echo-thread">
-                  {(data.messages ?? []).map((m, i) => (
-                    <div
-                      key={m.id ?? i}
-                      className={`bubble ${m.role === 'user' ? 'me' : 'bot'}`}
-                    >
-                      {m.content}
-                    </div>
-                  ))}
+                <div className="space-y-3">
+                  {(data.messages ?? []).map((m, i) => {
+                    const isUser = m.role === 'user';
+                    return (
+                      <div
+                        key={m.id ?? i}
+                        className={`flex items-start gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}
+                      >
+                        {!isUser && (
+                          <div className="flex-shrink-0">
+                            <EchoAvatar state="idle" size={42} />
+                          </div>
+                        )}
+                        <div className={`bubble ${isUser ? 'me' : 'bot'} max-w-[80%]`}>
+                          {m.content}
+                        </div>
+                        {isUser && (
+                          <div className="flex-shrink-0">
+                            <Squircle width={42} height={42}>
+                              {userProfile?.profile_photo_url ? (
+                                <img src={userProfile.profile_photo_url} alt="You" className="w-full h-full object-cover" />
+                              ) : (
+                                <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,background:'rgba(255,255,255,0.1)'}}>
+                                  {userProfile?.display_name?.[0]?.toUpperCase() || 'Y'}
+                                </div>
+                              )}
+                            </Squircle>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
