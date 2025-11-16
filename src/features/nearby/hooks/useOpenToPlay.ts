@@ -50,7 +50,23 @@ export function useOpenToPlay() {
   const activate = useCallback(async () => {
     if (!user?.id) return;
 
-    // STEP 1: Check location FIRST before any UI update
+    // STEP 1: Check visibility FIRST - cannot be Open to Play when hidden
+    const { data: statusData } = await supabase
+      .from('user_nearby_status')
+      .select('visibility_mode')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (statusData?.visibility_mode === 'hidden') {
+      toast({
+        title: 'Change visibility first',
+        description: 'You need to be visible to use Open to Play.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // STEP 2: Check location SECOND before any UI update
     const loc = await getCurrentLocation();
     if (!loc) {
       // Block immediately - no optimistic update
@@ -64,7 +80,7 @@ export function useOpenToPlay() {
 
     const expiresAtMs = Date.now() + DURATION_MINUTES * 60_000;
 
-    // STEP 2: Now do optimistic UI update (location is OK)
+    // STEP 3: Now do optimistic UI update (visibility and location are OK)
     persistLocal({
       active: true,
       expiresAt: expiresAtMs,
