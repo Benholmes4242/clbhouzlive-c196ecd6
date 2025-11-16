@@ -172,10 +172,10 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
           ))}
           {!isLoading && golfers.length === 0 && (
             <div className="flex flex-col items-center text-center mt-8 px-4">
-              <h2 className="text-[16px] font-semibold mb-1" style={{ color: 'var(--hub-text)' }}>
+              <h2 className="text-[20px] font-semibold mb-1" style={{ color: 'var(--hub-text)' }}>
                 No golfers in range
               </h2>
-              <p className="text-[13px] leading-[1.5]" style={{ color: 'var(--hub-text-muted)' }}>
+              <p className="text-[14px] leading-[1.5]" style={{ color: 'var(--hub-text-muted)' }}>
                 Try increasing your distance or checking back a little later.
               </p>
             </div>
