@@ -16,7 +16,7 @@ import { getMobileCropPosition } from '@/utils/mobileCropUtils';
 import { useTabSlideTransition, TransitionDirection } from '@/hooks/useTabSlideTransition';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-import CoursesJourney from './CoursesJourney';
+import { ProfileCoursesTab } from './ProfileCoursesTab';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { useStaggeredInView } from '@/hooks/useInViewAnimation';
@@ -267,7 +267,10 @@ const HeroProfileHeader = ({
           );
         case 'courses':
           return (
-            <div></div> // CoursesJourney is already shown in the main content area
+            <ProfileCoursesTab 
+              userId={profile?.id || ''}
+              isOwnProfile={isOwnProfile}
+            />
           );
         case 'achievements':
           return (
@@ -1180,22 +1183,14 @@ const HeroProfileHeader = ({
                 activeSection === 'activity' ? (
                   <div></div> // Achievements moved to dedicated tab
                 ) : activeSection === 'courses' ? (
-                  <CoursesJourney 
-                    userId={profile?.id}
-                    userDisplayName={profile?.display_name || 'User'}
-                    isOwnProfile={isOwnProfile}
-                  />
+                  null // Courses content is in the tab content area
                 ) : (
                   <div></div> // stats section has no hero content
                 )
               ) : (
                 /* Moving to current section from right */
                 activeSection === 'courses' ? (
-                  <CoursesJourney 
-                    userId={profile?.id}
-                    userDisplayName={profile?.display_name || 'User'}
-                    isOwnProfile={isOwnProfile}
-                  />
+                  null // Courses content is in the tab content area
                 ) : activeSection === 'stats' ? (
                   <div></div> // stats section has no hero content
                 ) : (
@@ -1209,11 +1204,7 @@ const HeroProfileHeader = ({
               {transitionDirection === 'right' ? (
                 /* Moving to next section */
                 activeSection === 'courses' ? (
-                  <CoursesJourney 
-                    userId={profile?.id}
-                    userDisplayName={profile?.display_name || 'User'}
-                    isOwnProfile={isOwnProfile}
-                  />
+                  null // Courses content is in the tab content area
                 ) : activeSection === 'stats' ? (
                   <div></div> // stats section has no hero content
                 ) : (
@@ -1224,11 +1215,7 @@ const HeroProfileHeader = ({
                 activeSection === 'activity' ? (
                   <div></div> // Achievements moved to dedicated tab
                 ) : activeSection === 'courses' ? (
-                  <CoursesJourney 
-                    userId={profile?.id}
-                    userDisplayName={profile?.display_name || 'User'}
-                    isOwnProfile={isOwnProfile}
-                  />
+                  null // Courses content is in the tab content area
                 ) : (
                   <div></div> // stats section has no hero content
                 )
@@ -1239,11 +1226,7 @@ const HeroProfileHeader = ({
           /* Normal state - only show active section */
           <>
             {activeSection === 'courses' ? (
-              <CoursesJourney 
-                userId={profile?.id}
-                userDisplayName={profile?.display_name || 'User'}
-                isOwnProfile={isOwnProfile}
-              />
+              null // Courses content is in the tab content area
             ) : activeSection === 'stats' ? (
               // No hero section for handicap tab - achievements are removed
               <div></div>

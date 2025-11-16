@@ -3360,6 +3360,41 @@ export type Database = {
         }
         Relationships: []
       }
+      user_top_ten_courses: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          position: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          position: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          position?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_top_ten_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_top_ten_lists: {
         Row: {
           courses: Json
@@ -3633,6 +3668,33 @@ export type Database = {
           u2: string | null
         }
         Relationships: []
+      }
+      user_top_ten_courses_view: {
+        Row: {
+          country: string | null
+          course_id: string | null
+          created_at: string | null
+          global_rank: number | null
+          id: string | null
+          name: string | null
+          position: number | null
+          region: string | null
+          regional_rank: number | null
+          sub_country: string | null
+          thumbnail_image: string | null
+          updated_at: string | null
+          usa_rank: number | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_top_ten_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
