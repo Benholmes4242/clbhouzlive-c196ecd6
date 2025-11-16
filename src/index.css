@@ -3255,7 +3255,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 }
 
 .eh-row__avatar { 
-  flex: 0 0 42px;
+  flex: 0 0 36px;
   margin-top: 2px;
 }
 
@@ -3358,11 +3358,10 @@ html[data-immersive="true"] .app-shell--topSpacer {
 /* Role-based message line layout */
 .eh-line {
   display: grid;
-  grid-template-columns: 42px 1fr 42px;
-  gap: 12px;
+  grid-template-columns: 28px 1fr 28px;
+  gap: 10px;
   align-items: start;
   margin: 10px 0;
-  padding: 0 8px;
 }
 
 .eh-line:first-child {
@@ -3379,25 +3378,23 @@ html[data-immersive="true"] .app-shell--topSpacer {
 }
 
 .eh-line--user .eh-line__avatar {
-  margin-right: var(--eh-safe-right, 0);
+  margin-right: var(--eh-safe-right);
+  padding-left: 15px;
 }
 
 .eh-line__avatar {
-  width: 42px;
-  height: 42px;
-  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
 }
 
 .eh-line__pad {
-  width: 42px;
-  height: 42px;
-  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
 }
 
 .eh-bubble {
   max-width: min(90vw, 620px);
   line-height: 1.5;
-  width: fit-content;
 }
 
 .eh-msg__label { 

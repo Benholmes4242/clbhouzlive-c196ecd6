@@ -29,7 +29,7 @@ export function HistoryRow({ item, onToggle, trailing, children }: Props) {
         aria-expanded={!!children}
       >
         <div className="eh-row__avatar">
-          <EchoAvatar state="idle" size={42} />
+          <EchoAvatar state="idle" size={36} />
         </div>
 
         <div className="eh-row__content">
