@@ -11,6 +11,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
 import CourseMediaTab from '@/components/courses/course-detail/CourseMediaTab';
+import Top100Pills from '@/components/courses/Top100Pills';
+import { useCourseTop100Memberships } from '@/hooks/useCourseTop100Memberships';
 
 
 interface GolfClubViewProps {
@@ -39,6 +41,9 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     },
     enabled: !!courseId,
   });
+
+  // Fetch Top 100 memberships
+  const { data: top100Memberships = [] } = useCourseTop100Memberships(courseId);
 
 
   const { data: ratingStats } = useQuery({
@@ -135,38 +140,15 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         
         {/* Course Title & Location - Bottom Left */}
         <div className="absolute bottom-14 left-6 text-white z-10">
-          <h1 className="text-3xl font-bold mb-2">{course.name}</h1>
-          <p className="text-lg opacity-90 mb-3">
+          <h1 className="text-4xl md:text-5xl font-bold mb-3 drop-shadow-2xl">{course.name}</h1>
+          <p className="text-lg md:text-xl opacity-90 mb-4 drop-shadow-lg">
             {[course.country, course.sub_country, course.region].filter(Boolean).join(', ')}
           </p>
           
-          {/* Ranking badges */}
-          <div className="flex gap-2 flex-wrap [--badge-w:60px] md:[--badge-w:64px] lg:[--badge-w:64px] mb-3">
-            {course.global_rank && (
-              <div className="glass-badge-tight shadow-lg">
-                <Earth className="h-5 w-5 text-white" />
-                <span className="text-sm font-bold text-white">{course.global_rank}</span>
-              </div>
-            )}
-            {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
-              <div className="glass-badge-tight shadow-lg">
-                <CountryFlag country="Britain & Ireland" size="md" />
-                <span className="text-sm font-bold text-white">{course.regional_rank}</span>
-              </div>
-            )}
-            {(course.country === 'USA' && course.usa_rank) && (
-              <div className="glass-badge-tight shadow-lg">
-                <CountryFlag country="USA" size="md" />
-                <span className="text-sm font-bold text-white">{course.usa_rank}</span>
-              </div>
-            )}
-            {(course.country === 'Continental Europe' && course.regional_rank) && (
-              <div className="glass-badge-tight shadow-lg">
-                <CountryFlag country="Continental Europe" size="md" />
-                <span className="text-sm font-bold text-white">{course.regional_rank}</span>
-              </div>
-            )}
-          </div>
+          {/* Top 100 Pills */}
+          {top100Memberships.length > 0 && (
+            <Top100Pills memberships={top100Memberships} variant="overlay" size="md" />
+          )}
         </div>
 
         {/* Liquid Glass Tab Navigation - overlaid on hero */}

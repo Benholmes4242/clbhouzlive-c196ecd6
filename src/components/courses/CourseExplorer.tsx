@@ -30,7 +30,7 @@ const CourseExplorer = () => {
     searchQuery: debouncedSearch,
     regionSlug: selectedRegion === 'all' ? undefined : selectedRegion,
     listSlug: selectedList === 'all' ? undefined : selectedList,
-    limit: 100,
+    limit: 200,
   });
 
   const LoadingSkeleton = () => (
@@ -59,21 +59,21 @@ const CourseExplorer = () => {
 
   return (
     <div className="space-y-6">
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+      {/* Search - Apple-like dark input */}
+      <div className="relative max-w-2xl">
+        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
         <Input
-          placeholder="Search courses, countries, or regions..."
+          placeholder="Search golf courses..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
+          className="pl-12 h-12 bg-card border-border/50 rounded-xl shadow-sm focus:shadow-md transition-shadow"
         />
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-4">
+      {/* Filters - Styled dropdowns */}
+      <div className="flex flex-wrap gap-3">
         <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-[200px] bg-card border-border/50 rounded-lg">
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-muted-foreground" />
               <SelectValue placeholder="Region" />
@@ -89,8 +89,8 @@ const CourseExplorer = () => {
         </Select>
 
         <Select value={selectedList} onValueChange={setSelectedList}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="All Lists" />
+          <SelectTrigger className="w-[200px] bg-card border-border/50 rounded-lg">
+            <SelectValue placeholder="Top 100 List" />
           </SelectTrigger>
           <SelectContent>
             {listOptions.map((option) => (
@@ -106,16 +106,23 @@ const CourseExplorer = () => {
       {isLoading ? (
         <LoadingSkeleton />
       ) : courses.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">No courses found matching your search.</p>
+        <div className="text-center py-16">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
+            <Search className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <h3 className="text-lg font-semibold mb-2">No courses found</h3>
+          <p className="text-muted-foreground">
+            Try adjusting filters or searching another location
+          </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {courses.map((course) => (
             <CourseCard 
               key={course.id} 
               course={course}
               viewContext="global"
+              customHeight="h-72"
             />
           ))}
         </div>

@@ -7,6 +7,9 @@ import CourseCardAIQuote from './CourseCardAIQuote';
 import CourseCardLocation from './CourseCardLocation';
 import { useMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import Top100Pills from './Top100Pills';
+import { useCourseTop100Memberships } from '@/hooks/useCourseTop100Memberships';
+import CountryFlag from '@/components/ui/country-flag';
 
 interface Course {
   id: string;
@@ -84,6 +87,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
   // Check if we're on a profile page to determine modal vs direct navigation
   const isProfilePage = location.pathname.includes('/profile');
 
+  // Fetch Top 100 memberships for this course
+  const { data: top100Memberships = [] } = useCourseTop100Memberships(course.id);
+
   const handleCardClick = useCallback(() => {
     if (!disableClick) {
       if (isProfilePage) {
@@ -109,10 +115,15 @@ const CourseCard: React.FC<CourseCardProps> = ({
           disableLazyLoading={isFromUserCoursesPage}
         />
 
-        {/* Enhanced bottom gradient for better text readability when badges are on top */}
-        {badgesOnTop && (
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/20 via-black/5 to-transparent pointer-events-none z-0" />
+        {/* Top 100 Pills Overlay - Top Left */}
+        {!hideRankingBadges && top100Memberships.length > 0 && (
+          <div className="absolute top-3 left-3 z-10 pointer-events-none">
+            <Top100Pills memberships={top100Memberships} variant="overlay" size="sm" />
+          </div>
         )}
+
+        {/* Enhanced bottom gradient for better text readability */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none z-0" />
 
         {/* Course ranking badges - new split layout for badgesOnTop */}
         {badgesOnTop ? (
