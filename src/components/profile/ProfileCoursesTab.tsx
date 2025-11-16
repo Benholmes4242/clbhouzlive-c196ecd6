@@ -8,6 +8,7 @@ import { FriendComparisonSection } from './courses/FriendComparisonSection';
 import { ProfileRecentAchievementsStrip } from './ProfileRecentAchievementsStrip';
 import { ProfileAchievementsPanel } from './ProfileAchievementsPanel';
 import { GolfJourneyXPChip } from './GolfJourneyXPChip';
+import { SeasonStatusCard } from './SeasonStatusCard';
 import { Button } from '@/components/ui/button';
 import { useAchievementSharing } from '@/hooks/useAchievementSharing';
 import { useQuery } from '@tanstack/react-query';
@@ -105,6 +106,9 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
 
       {/* Recent Achievements Strip */}
       <ProfileRecentAchievementsStrip userId={userId} isOwnProfile={isOwnProfile} />
+
+      {/* Season Status - Own Profile Only */}
+      {isOwnProfile && <SeasonStatusCard userId={userId} />}
 
       {/* Full Achievements Panel */}
       <div className="space-y-4">

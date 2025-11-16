@@ -5,6 +5,9 @@ import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { useRecentAchievements } from '@/hooks/useRecentAchievements';
 import { useUserXPOverview } from '@/hooks/useUserXPOverview';
+import { useCurrentSeason } from '@/hooks/useCurrentSeason';
+import { useUserSeasonXP } from '@/hooks/useUserSeasonXP';
+import { useSeasonLeaderboard } from '@/hooks/useSeasonLeaderboard';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { MapPin, Globe, Trophy, ArrowRight, Share2 } from 'lucide-react';
@@ -13,6 +16,7 @@ import { Progress } from '@/components/ui/progress';
 import { useAchievementSharing } from '@/hooks/useAchievementSharing';
 import { formatDistanceToNow } from 'date-fns';
 import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
+import { getSeasonLevel } from '@/utils/seasonLevels';
 
 interface UserProfile {
   id: string;
@@ -76,6 +80,9 @@ const AchievementsHub = () => {
   const { data: achievements } = useUserAchievements(userId);
   const { data: recentAchievements } = useRecentAchievements(userId, 10);
   const xpOverview = useUserXPOverview(userId);
+  const { data: currentSeason } = useCurrentSeason();
+  const { data: seasonXP } = useUserSeasonXP(userId, currentSeason?.id);
+  const { data: leaderboard = [] } = useSeasonLeaderboard(currentSeason?.id, 20);
   const { totalCoursesPlayed, countriesPlayed, top100Progress, isLoading: isLoadingSummary } =
     useUserCourseSummary(userId || '');
 
@@ -159,33 +166,68 @@ const AchievementsHub = () => {
 
             {/* Right: XP & Level */}
             {xpOverview && (
-              <div className="flex-1 bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 shadow-lg">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-1">Current Level</div>
-                    <div className="text-2xl font-bold" style={{ color: xpOverview.currentLevelColor }}>
-                      {xpOverview.currentLevel} Ring
+              <div className="flex-1 space-y-4">
+                {/* Global XP & Level */}
+                <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 shadow-lg">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <div className="text-sm text-muted-foreground mb-1">Global Level</div>
+                      <div className="text-2xl font-bold" style={{ color: xpOverview.currentLevelColor }}>
+                        {xpOverview.currentLevel} Ring
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm text-muted-foreground mb-1">Total XP</div>
+                      <div className="text-2xl font-bold">{xpOverview.totalXP.toLocaleString()}</div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-sm text-muted-foreground mb-1">Total XP</div>
-                    <div className="text-2xl font-bold">{xpOverview.totalXP.toLocaleString()}</div>
-                  </div>
+
+                  {xpOverview.nextLevel && (
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Progress to {xpOverview.nextLevel.name}</span>
+                        <span className="font-medium">{xpOverview.nextLevel.remainingXP.toLocaleString()} XP to go</span>
+                      </div>
+                      <Progress value={xpOverview.nextLevel.progressPercent} className="h-3" />
+                    </div>
+                  )}
+
+                  {!xpOverview.nextLevel && (
+                    <div className="text-center text-sm text-muted-foreground">
+                      🏆 Maximum level reached!
+                    </div>
+                  )}
                 </div>
 
-                {xpOverview.nextLevel && (
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Progress to {xpOverview.nextLevel.name}</span>
-                      <span className="font-medium">{xpOverview.nextLevel.remainingXP.toLocaleString()} XP to go</span>
+                {/* Season XP & Level */}
+                {currentSeason && (
+                  <div className="bg-gradient-to-br from-primary/10 via-card/50 to-card/50 backdrop-blur-sm border border-primary/30 rounded-2xl p-6 shadow-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <div className="text-xs text-primary uppercase font-semibold mb-1">Current Season</div>
+                        <div className="text-lg font-bold">{currentSeason.name}</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {getSeasonLevel(seasonXP?.total_xp || 0)}
+                        </div>
+                      </div>
+                      {seasonXP?.season_rank && (
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-primary">#{seasonXP.season_rank}</div>
+                          <div className="text-xs text-muted-foreground">Season Rank</div>
+                        </div>
+                      )}
                     </div>
-                    <Progress value={xpOverview.nextLevel.progressPercent} className="h-3" />
-                  </div>
-                )}
 
-                {!xpOverview.nextLevel && (
-                  <div className="text-center text-sm text-muted-foreground">
-                    🏆 Maximum level reached!
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Season XP</span>
+                        <span className="font-medium">{(seasonXP?.total_xp || 0).toLocaleString()} XP</span>
+                      </div>
+                      <Progress value={Math.min(100, ((seasonXP?.total_xp || 0) / 2000) * 100)} className="h-3" />
+                      <p className="text-xs text-muted-foreground">
+                        Keep earning XP to climb the seasonal leaderboard!
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -280,6 +322,77 @@ const AchievementsHub = () => {
                 Many exploration achievements are tied to your Top 100 progress.
               </p>
             )}
+          </section>
+        )}
+
+        {/* Season Leaderboard */}
+        {currentSeason && leaderboard.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">This Season's Leaderboard</h2>
+              <div className="text-sm text-muted-foreground">
+                {currentSeason.name}
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              {leaderboard.map((row) => (
+                <button
+                  key={row.user_id}
+                  className="w-full flex items-center justify-between rounded-xl bg-card/50 border border-border/50 px-4 py-3 hover:bg-card/70 transition-all text-left group"
+                  onClick={() => navigate(`/profile/${row.profile?.username || row.user_id}`)}
+                >
+                  <div className="flex items-center gap-4">
+                    {/* Rank */}
+                    <div className={`text-sm font-bold w-8 text-center ${
+                      row.season_rank === 1 ? 'text-yellow-500' :
+                      row.season_rank === 2 ? 'text-gray-400' :
+                      row.season_rank === 3 ? 'text-orange-600' :
+                      'text-muted-foreground'
+                    }`}>
+                      #{row.season_rank}
+                    </div>
+
+                    {/* Avatar */}
+                    <div className="w-10 h-10 rounded-full bg-muted overflow-hidden flex items-center justify-center flex-shrink-0">
+                      {row.profile?.profile_photo_url ? (
+                        <img
+                          src={row.profile.profile_photo_url}
+                          alt={row.profile.display_name || row.profile.username}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-sm font-medium">
+                          {(row.profile?.display_name?.[0] || row.profile?.username?.[0] || 'G').toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Name & Club */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate group-hover:text-primary transition-colors">
+                        {row.profile?.display_name || row.profile?.username || 'Golfer'}
+                      </p>
+                      {row.profile?.home_club && (
+                        <p className="text-xs text-muted-foreground truncate">
+                          {row.profile.home_club}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* XP */}
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-sm font-bold text-primary">
+                      {row.total_xp.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Season XP
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
           </section>
         )}
 

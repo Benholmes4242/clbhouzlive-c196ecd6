@@ -2401,6 +2401,45 @@ export type Database = {
         }
         Relationships: []
       }
+      seasons: {
+        Row: {
+          created_at: string
+          description: string | null
+          ends_at: string
+          id: string
+          is_active: boolean
+          is_default: boolean
+          name: string
+          slug: string
+          starts_at: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          ends_at: string
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name: string
+          slug: string
+          starts_at: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          ends_at?: string
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name?: string
+          slug?: string
+          starts_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_gate_attempts: {
         Row: {
           fail_count: number
@@ -3743,6 +3782,17 @@ export type Database = {
         }
         Relationships: []
       }
+      season_leaderboard_view: {
+        Row: {
+          season_id: string | null
+          season_name: string | null
+          season_rank: number | null
+          season_slug: string | null
+          total_xp: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       user_achievements_view: {
         Row: {
           achievement_id: string | null
@@ -3786,6 +3836,16 @@ export type Database = {
         Row: {
           u1: string | null
           u2: string | null
+        }
+        Relationships: []
+      }
+      user_season_xp_view: {
+        Row: {
+          season_id: string | null
+          season_name: string | null
+          season_slug: string | null
+          total_xp: number | null
+          user_id: string | null
         }
         Relationships: []
       }
