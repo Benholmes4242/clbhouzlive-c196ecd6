@@ -155,7 +155,7 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
               aria-label={`${g.display_name || g.username}, ${formatDistanceHcpClub(g.distance_km ? g.distance_km * 1000 : undefined, g.eg_handicap_index, g.home_club)}`}
             >
               <div className="shrink-0">
-                <Squircle width={38} height={38}>
+                <Squircle width={42} height={42}>
                   <img src={g.avatar_url || '/placeholder.svg'} alt={`${g.display_name || g.username} profile photo`} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                 </Squircle>
               </div>
