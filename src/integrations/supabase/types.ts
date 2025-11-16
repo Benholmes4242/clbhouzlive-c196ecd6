@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          category: string
+          code: string
+          created_at: string | null
+          description: string
+          icon_key: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          points: number | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          code: string
+          created_at?: string | null
+          description: string
+          icon_key?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          points?: number | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          code?: string
+          created_at?: string | null
+          description?: string
+          icon_key?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          points?: number | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       admin_audit_log: {
         Row: {
           action: string
@@ -2748,30 +2790,42 @@ export type Database = {
       }
       user_achievements: {
         Row: {
-          achievement_data: Json
-          achievement_type: string
-          created_at: string
+          achievement_id: string
           id: string
-          updated_at: string
+          source_context: Json | null
+          unlocked_at: string | null
           user_id: string
         }
         Insert: {
-          achievement_data: Json
-          achievement_type: string
-          created_at?: string
+          achievement_id: string
           id?: string
-          updated_at?: string
+          source_context?: Json | null
+          unlocked_at?: string | null
           user_id: string
         }
         Update: {
-          achievement_data?: Json
-          achievement_type?: string
-          created_at?: string
+          achievement_id?: string
           id?: string
-          updated_at?: string
+          source_context?: Json | null
+          unlocked_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "user_achievements_view"
+            referencedColumns: ["achievement_id"]
+          },
+        ]
       }
       user_badge_pins: {
         Row: {
@@ -3668,6 +3722,23 @@ export type Database = {
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
           website_url?: string | null
+        }
+        Relationships: []
+      }
+      user_achievements_view: {
+        Row: {
+          achievement_id: string | null
+          category: string | null
+          code: string | null
+          description: string | null
+          icon_key: string | null
+          is_unlocked: boolean | null
+          name: string | null
+          points: number | null
+          sort_order: number | null
+          source_context: Json | null
+          unlocked_at: string | null
+          user_id: string | null
         }
         Relationships: []
       }

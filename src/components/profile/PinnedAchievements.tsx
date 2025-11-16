@@ -37,7 +37,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
   userProfilePhotoUrl
 }) => {
   const { user } = useSupabaseSession();
-  const { achievements } = useUserAchievements();
+  const { data: achievements = [] } = useUserAchievements(user?.id);
   const isMobile = useIsMobile();
   
   // State for pinned achievements settings

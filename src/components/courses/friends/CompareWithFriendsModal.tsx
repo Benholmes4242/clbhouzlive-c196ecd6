@@ -33,7 +33,7 @@ const CompareWithFriendsModal: React.FC<CompareWithFriendsModalProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const { data: friends = [] } = useFriendsLeaderboard(user?.id);
-  const { achievements } = useUserAchievements();
+  const { data: achievements = [] } = useUserAchievements(user?.id);
 
   const getDisplayName = (friend: any) => {
     return friend.display_name || friend.username || 'Golf Friend';

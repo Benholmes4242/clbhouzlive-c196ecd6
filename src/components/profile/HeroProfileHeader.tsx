@@ -319,7 +319,7 @@ const HeroProfileHeader = ({
   });
   
   // Fetch user achievements for current user
-  const { achievements } = useUserAchievements();
+  const { data: achievements = [] } = useUserAchievements(profile?.id);
   
   // Activity posts logic
   const { posts, loading: postsLoading, fetchUserPosts } = useActivityPosts(profile?.id);
