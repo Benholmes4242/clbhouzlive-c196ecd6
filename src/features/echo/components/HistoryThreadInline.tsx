@@ -48,7 +48,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
         {messages.map((m, index) => {
           const isUser = m.role === 'user';
           return (
-            <React.Fragment key={m.id}>
+            <div key={m.id}>
               <li 
                 className={isUser ? 'eh-line eh-line--user' : 'eh-line eh-line--echo'}
                 aria-label={isUser ? 'You' : 'Echo'}
@@ -128,7 +128,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
               
               {/* Add divider between messages, but not after the last one */}
               {index < messages.length - 1 && <ThreadDivider />}
-            </React.Fragment>
+            </div>
           );
         })}
       </ul>
