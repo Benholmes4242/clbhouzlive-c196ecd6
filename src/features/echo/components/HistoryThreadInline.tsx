@@ -55,7 +55,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
                 {/* Left side: Echo avatar or spacer */}
                 {!isUser ? (
                   <div className="eh-line__avatar">
-                    <EchoAvatar state="idle" size={28} />
+                    <EchoAvatar state="idle" size={42} />
                   </div>
                 ) : (
                   <div className="eh-line__pad" />
@@ -74,7 +74,7 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
                   <div className="eh-line__avatar">
                     {profile?.profile_photo_url ? (
                       <SquircleImage
-                        size={28}
+                        size={42}
                         src={profile.profile_photo_url}
                         alt={profile?.display_name || profile?.username || 'User'}
                         ringColor="rgba(255,255,255,0.2)"
@@ -84,8 +84,8 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
                       <div 
                         className="flex items-center justify-center text-[11px] font-medium text-white/90"
                         style={{
-                          width: 28,
-                          height: 28,
+                          width: 42,
+                          height: 42,
                           background: 'rgba(255,255,255,0.1)',
                           border: '1px solid rgba(255,255,255,0.2)',
                           borderRadius: '8px',
