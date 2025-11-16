@@ -15,6 +15,7 @@ interface PostSubmissionData {
     name: string;
     country: string;
   } | null;
+  achievementId?: string | null;
   onSuccess?: () => void;
   onError?: () => void;
 }
@@ -30,6 +31,7 @@ export const useOptimisticPostSubmission = () => {
     mediaFiles,
     selectedTags,
     courseInfo,
+    achievementId,
     onSuccess,
     onError
   }: PostSubmissionData) => {
@@ -61,8 +63,8 @@ export const useOptimisticPostSubmission = () => {
         }))
       });
 
-      // Validate media files
-      if (mediaFiles.length === 0) {
+      // Validate media files (allow achievement posts without media)
+      if (mediaFiles.length === 0 && !achievementId) {
         console.error('No media files provided for post submission');
         toast({
           title: "Upload Error",
@@ -78,7 +80,8 @@ export const useOptimisticPostSubmission = () => {
         .from('posts')
         .insert({
           user_id: user.id,
-          content: content || null
+          content: content || null,
+          achievement_id: achievementId || null
         })
         .select()
         .single();

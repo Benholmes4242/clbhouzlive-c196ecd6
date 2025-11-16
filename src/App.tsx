@@ -37,6 +37,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { migrateChatHistory } from '@/utils/chatHistoryMigration';
 import { PanelGuard } from "@/components/admin/PanelGuard";
 import { ToastHost } from '@/components/toast/ToastHost';
+import { AchievementToastContainer } from '@/components/achievements/AchievementToastContainer';
+import { useAchievementSharing } from '@/hooks/useAchievementSharing';
 
 
 
@@ -327,6 +329,12 @@ function useReauthOnFocus() {
   }, []);
 }
 
+// Achievement Toast Wrapper Component
+const AchievementToastWrapper: React.FC = () => {
+  const { prepareAchievementShare } = useAchievementSharing();
+  return <AchievementToastContainer onShare={prepareAchievementShare} />;
+};
+
 const App: React.FC = () => {
   // Feature flag for access gate version
   const useV2Gate = import.meta.env.VITE_ACCESS_GATE_VERSION?.toString().toLowerCase() === "v2";
@@ -399,32 +407,33 @@ const App: React.FC = () => {
                   <ModalProvider>
                     <BottomNavigationProvider>
                       <UIProvider>
-                        <ToastHost>
-                          <BrowserRouter>
-                            <HubProvider>
-                              <ScrollToTop />
-                              <GlobalAudioProvider>
-                                <VideoManagerProvider>
-                                  <VideoPlaybackManagerProvider>
-                                    <TopTenProvider>
-                                      <AuthWrapper>
-                                        <Suspense fallback={<ClbhouzPageSpinner />}>
-                                          <div className="app-depth">
-                                            {/* No global header - each page renders its own ClubhouseHeaderNew */}
-                                            <AppRoutes />
-                                          </div>
-                                        </Suspense>
-                                      </AuthWrapper>
-                                    </TopTenProvider>
-                                  </VideoPlaybackManagerProvider>
-                                </VideoManagerProvider>
-                              </GlobalAudioProvider>
-                              <Toaster />
-                              <Sonner />
-                              <GlobalBottomNavigation />
-                            </HubProvider>
-                          </BrowserRouter>
-                        </ToastHost>
+              <ToastHost>
+                <BrowserRouter>
+                  <HubProvider>
+                    <ScrollToTop />
+                    <GlobalAudioProvider>
+                      <VideoManagerProvider>
+                        <VideoPlaybackManagerProvider>
+                          <TopTenProvider>
+                            <AuthWrapper>
+                              <AchievementToastWrapper />
+                              <Suspense fallback={<ClbhouzPageSpinner />}>
+                                <div className="app-depth">
+                                  {/* No global header - each page renders its own ClubhouseHeaderNew */}
+                                  <AppRoutes />
+                                </div>
+                              </Suspense>
+                            </AuthWrapper>
+                          </TopTenProvider>
+                        </VideoPlaybackManagerProvider>
+                      </VideoManagerProvider>
+                    </GlobalAudioProvider>
+                    <Toaster />
+                    <Sonner />
+                    <GlobalBottomNavigation />
+                  </HubProvider>
+                </BrowserRouter>
+              </ToastHost>
                       </UIProvider>
                     </BottomNavigationProvider>
                   </ModalProvider>
