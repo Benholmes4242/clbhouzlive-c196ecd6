@@ -18,3 +18,6 @@ verify_jwt = false
 [functions.cleanup-open-to-play]
 verify_jwt = false
 
+[functions.process-ended-seasons]
+verify_jwt = false
+
