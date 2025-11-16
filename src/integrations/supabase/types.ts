@@ -2145,6 +2145,7 @@ export type Database = {
       }
       posts: {
         Row: {
+          achievement_id: string | null
           content: string | null
           created_at: string
           id: string
@@ -2152,6 +2153,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          achievement_id?: string | null
           content?: string | null
           created_at?: string
           id?: string
@@ -2159,13 +2161,29 @@ export type Database = {
           user_id: string
         }
         Update: {
+          achievement_id?: string | null
           content?: string | null
           created_at?: string
           id?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "posts_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "user_achievements_view"
+            referencedColumns: ["achievement_id"]
+          },
+        ]
       }
       pro_ai_analyses: {
         Row: {

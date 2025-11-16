@@ -1,12 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { useUserAchievements } from '@/hooks/useUserAchievements';
-import { Check } from 'lucide-react';
+import { useUserAchievements, type UserAchievement } from '@/hooks/useUserAchievements';
+import { Check, Share2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 interface ProfileAchievementsPanelProps {
   userId: string;
   isOwnProfile: boolean;
+  onShareAchievement?: (achievement: UserAchievement) => void;
 }
 
 type CategoryFilter = 'all' | 'skill' | 'exploration' | 'social';
@@ -27,6 +29,7 @@ const getCategoryEmoji = (category: string): string => {
 export const ProfileAchievementsPanel: React.FC<ProfileAchievementsPanelProps> = ({
   userId,
   isOwnProfile,
+  onShareAchievement,
 }) => {
   const { data: achievements = [], isLoading } = useUserAchievements(userId);
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
