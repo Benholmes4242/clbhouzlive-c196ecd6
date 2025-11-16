@@ -16,6 +16,7 @@ import { useUserPlayedCourse } from '@/hooks/useUserPlayedCourse';
 import EditRatingModal from '@/components/courses/EditRatingModal';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 
 interface Course {
   id: string;
@@ -178,6 +179,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             )}
           </Button>
         </div>
+
+        {/* Friends Who've Played */}
+        <CourseFriendsStrip courseId={course.id} courseName={course.name} />
         
         {ratingAggregates && ratingAggregates.review_count > 0 ? (
           <div className="space-y-5">

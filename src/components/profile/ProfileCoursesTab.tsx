@@ -4,6 +4,7 @@ import { MapPin, Trophy, Globe } from 'lucide-react';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
 import { TopTenEditor } from './courses/TopTenEditor';
 import { CoursesPlayedGrid } from './courses/CoursesPlayedGrid';
+import { FriendComparisonSection } from './courses/FriendComparisonSection';
 
 interface ProfileCoursesTabProps {
   userId: string;
@@ -76,6 +77,11 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
           ))}
         </div>
       </div>
+
+      {/* Friend Comparison - only for own profile */}
+      {isOwnProfile && (
+        <FriendComparisonSection userId={userId} />
+      )}
 
       {/* Top 10 Editor */}
       <TopTenEditor userId={userId} isOwnProfile={isOwnProfile} />
