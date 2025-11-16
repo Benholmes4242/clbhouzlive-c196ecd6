@@ -12,7 +12,7 @@ export function EchoTypingRow() {
       <div className="max-w-[70%] flex items-start gap-3">
         {/* Echo avatar */}
         <div className="flex-shrink-0">
-          <EchoAvatar state="processing" size={36} />
+          <EchoAvatar state="processing" size={42} />
         </div>
 
         <div className="echo-card px-3 py-2 flex items-center gap-1.5 w-[72px] justify-center">
