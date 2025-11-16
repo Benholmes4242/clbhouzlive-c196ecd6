@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Star } from 'lucide-react';
+import { Star, MessageSquare } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import EditRatingModal from '@/components/courses/EditRatingModal';
 import ReviewsTab from '@/components/profile/ReviewsTab';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem } from '@/types/media';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 
 interface CourseReviewsTabProps {
   courseId: string;
@@ -30,8 +34,14 @@ interface ReviewData {
 
 const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
   const { user } = useSupabaseSession();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState<ReviewData | null>(null);
+  
+  // Fetch user's rating
+  const { data: userRating } = useUserCourseRating(courseId, user?.id);
+  const hasUserReviewed = !!userRating?.review;
 
   const { data: reviewsData, isLoading } = useQuery({
     queryKey: ['course-reviews-detailed', courseId],
