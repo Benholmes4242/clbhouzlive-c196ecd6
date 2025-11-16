@@ -96,7 +96,9 @@ export function useOpenToPlay() {
       .upsert(
         {
           user_id: user.id,
-          // do not change visibility_mode here (user controls that separately)
+          // ensure DB sees current visibility state to satisfy trigger
+          visibility_mode: statusData?.visibility_mode || 'all',
+          is_hidden: false,
           open_to_play_active: true,
           open_to_play_expires_at: expiresAtISO,
           lat: loc.lat,
