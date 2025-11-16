@@ -5,6 +5,9 @@ import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
 import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
+import { LoadoutModal } from '@/components/cosmetics/LoadoutModal';
+import { Button } from '@/components/ui/button';
+import { Sparkles } from 'lucide-react';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -14,6 +17,7 @@ const ProfilePage = () => {
     return searchParams.get('tab') || 'activity';
   });
   const queryClient = useQueryClient();
+  const [loadoutModalOpen, setLoadoutModalOpen] = useState(false);
   
   // Only invalidate profile cache on initial page load, not on remounts
   useEffect(() => {
@@ -91,13 +95,29 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-background page-with-header relative">
+      {/* Floating Customise Look Button */}
+      <Button
+        onClick={() => setLoadoutModalOpen(true)}
+        className="fixed bottom-24 right-4 z-40 rounded-full shadow-lg bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+        size="lg"
+      >
+        <Sparkles className="w-5 h-5 mr-2" />
+        Customise Look
+      </Button>
+
+      <LoadoutModal
+        open={loadoutModalOpen}
+        onOpenChange={setLoadoutModalOpen}
+        userId={user?.id}
+      />
+
       <ClubhouseHeaderNew />
       
       {/* Add spacing for fixed header */}
       <div className="h-16 md:h-18" />
       
-      <HeroProfileHeader 
+      <HeroProfileHeader
         profile={profile}
         isOwnProfile={true} // This is always the user's own profile on this route
         onProfileUpdate={refreshProfile}
