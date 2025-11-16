@@ -17,11 +17,15 @@ interface GolfCourse {
 }
 
 interface AchievementData {
-  achievementId: string;
+  type?: 'achievement' | 'level_up';
+  achievementId?: string;
   name: string;
   description: string;
-  category: string;
-  points: number;
+  category?: string;
+  points?: number;
+  levelName?: string;
+  totalXP?: number;
+  levelColor?: string;
 }
 
 export const usePostFlow = () => {

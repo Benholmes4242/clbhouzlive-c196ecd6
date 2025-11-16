@@ -38,6 +38,7 @@ import { migrateChatHistory } from '@/utils/chatHistoryMigration';
 import { PanelGuard } from "@/components/admin/PanelGuard";
 import { ToastHost } from '@/components/toast/ToastHost';
 import { AchievementToastContainer } from '@/components/achievements/AchievementToastContainer';
+import { LevelUpToastContainer } from '@/components/achievements/LevelUpToastContainer';
 import { useAchievementSharing } from '@/hooks/useAchievementSharing';
 
 
@@ -332,7 +333,12 @@ function useReauthOnFocus() {
 // Achievement Toast Wrapper Component
 const AchievementToastWrapper: React.FC = () => {
   const { prepareAchievementShare } = useAchievementSharing();
-  return <AchievementToastContainer onShare={prepareAchievementShare} />;
+  return (
+    <>
+      <AchievementToastContainer onShare={prepareAchievementShare} />
+      <LevelUpToastContainer onShare={prepareAchievementShare} />
+    </>
+  );
 };
 
 const App: React.FC = () => {

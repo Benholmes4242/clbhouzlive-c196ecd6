@@ -7,6 +7,7 @@ import { CoursesPlayedGrid } from './courses/CoursesPlayedGrid';
 import { FriendComparisonSection } from './courses/FriendComparisonSection';
 import { ProfileRecentAchievementsStrip } from './ProfileRecentAchievementsStrip';
 import { ProfileAchievementsPanel } from './ProfileAchievementsPanel';
+import { GolfJourneyXPChip } from './GolfJourneyXPChip';
 
 interface ProfileCoursesTabProps {
   userId: string;
@@ -33,7 +34,10 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
     <div className="space-y-8 pb-8">
       {/* Golf Journey Summary */}
       <div>
-        <h2 className="text-xl font-semibold mb-4">Golf Journey</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Golf Journey</h2>
+          <GolfJourneyXPChip userId={userId} />
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Courses Played */}
           <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6">

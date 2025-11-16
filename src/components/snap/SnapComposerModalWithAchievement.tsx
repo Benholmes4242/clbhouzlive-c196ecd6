@@ -21,11 +21,15 @@ interface GolfCourse {
 }
 
 interface AchievementData {
-  achievementId: string;
+  type?: 'achievement' | 'level_up';
+  achievementId?: string;
   name: string;
   description: string;
-  category: string;
-  points: number;
+  category?: string;
+  points?: number;
+  levelName?: string;
+  totalXP?: number;
+  levelColor?: string;
 }
 
 interface SnapComposerModalWithAchievementProps {
@@ -69,16 +73,45 @@ const SnapComposerModalWithAchievement = ({
         </DialogHeader>
         
         <div className="space-y-4">
-          {/* Achievement Card (if present) */}
+          {/* Achievement or Level-Up Card (if present) */}
           {achievementData && (
             <div className="mb-4">
-              <AchievementCard
-                name={achievementData.name}
-                description={achievementData.description}
-                category={achievementData.category}
-                points={achievementData.points}
-                compact
-              />
+              {achievementData.type === 'level_up' ? (
+                <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 mb-3">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className="w-16 h-16 rounded-full flex items-center justify-center shrink-0"
+                      style={{
+                        background: `conic-gradient(${achievementData.levelColor} 0deg, ${achievementData.levelColor} 360deg)`,
+                        boxShadow: `0 0 15px ${achievementData.levelColor}30`,
+                      }}
+                    >
+                      <div className="w-12 h-12 rounded-full bg-card flex items-center justify-center">
+                        <span className="text-2xl">🏆</span>
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-medium text-muted-foreground mb-1">
+                        Level Up
+                      </div>
+                      <div className="text-lg font-bold" style={{ color: achievementData.levelColor }}>
+                        {achievementData.levelName}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {achievementData.totalXP?.toLocaleString()} Total XP
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <AchievementCard
+                  name={achievementData.name}
+                  description={achievementData.description}
+                  category={achievementData.category || ''}
+                  points={achievementData.points}
+                  compact
+                />
+              )}
             </div>
           )}
 

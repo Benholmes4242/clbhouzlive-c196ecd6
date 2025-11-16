@@ -6,21 +6,41 @@ import type { UserAchievement } from './useUserAchievements';
 export function useAchievementSharing() {
   const navigate = useNavigate();
   const [achievementToShare, setAchievementToShare] = useState<{
-    achievementId: string;
+    achievementId?: string;
     name: string;
     description: string;
-    category: string;
-    points: number;
+    category?: string;
+    points?: number;
+    type?: 'achievement' | 'level_up';
+    levelName?: string;
+    totalXP?: number;
+    levelColor?: string;
   } | null>(null);
 
-  const prepareAchievementShare = useCallback((achievement: AchievementToastData | UserAchievement) => {
-    const achievementData = {
-      achievementId: achievement.achievementId,
-      name: achievement.name,
-      description: achievement.description,
-      category: achievement.category,
-      points: achievement.points,
-    };
+  const prepareAchievementShare = useCallback((achievement: AchievementToastData | UserAchievement | any) => {
+    let achievementData;
+
+    // Check if this is a level-up share
+    if (achievement.type === 'level_up') {
+      achievementData = {
+        type: 'level_up',
+        levelName: achievement.levelName,
+        totalXP: achievement.totalXP,
+        levelColor: achievement.levelColor,
+        name: `Level Up: ${achievement.levelName}`,
+        description: `Just reached ${achievement.levelName}!`,
+      };
+    } else {
+      // Regular achievement share
+      achievementData = {
+        type: 'achievement',
+        achievementId: achievement.achievementId,
+        name: achievement.name,
+        description: achievement.description,
+        category: achievement.category,
+        points: achievement.points,
+      };
+    }
 
     // Store in sessionStorage so it persists across navigation
     sessionStorage.setItem('pendingAchievementShare', JSON.stringify(achievementData));
