@@ -3,13 +3,19 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Check, Target } from 'lucide-react';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AboutMediaStrip from './AboutMediaStrip';
 import MapThumbnail from '@/components/ui/map-thumbnail';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { Progress } from '@/components/ui/progress';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useUserCourseRating } from '@/hooks/useUserCourseRating';
+import { useUserPlayedCourse } from '@/hooks/useUserPlayedCourse';
+import EditRatingModal from '@/components/courses/EditRatingModal';
+import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface Course {
   id: string;
@@ -47,10 +53,20 @@ const formatDescription = (description: string) => {
 
 const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { user } = useSupabaseSession();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Fetch rating aggregates using the new hook
   const { data: ratingAggregates } = useCourseRatingAggregates(course.id);
+  
+  // Fetch user's rating if logged in
+  const { data: userRating } = useUserCourseRating(course.id, user?.id);
+  
+  // Fetch and toggle played status
+  const { hasPlayed, togglePlayed, isToggling } = useUserPlayedCourse(course.id, user?.id);
 
   const handleWebsiteClick = () => {
     if (course.website_url) {
@@ -76,7 +92,43 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     return score % 1 === 0 ? score.toString() : score.toFixed(1);
   };
 
+  const handleRateClick = () => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to rate courses",
+      });
+      navigate('/auth');
+      return;
+    }
+    setIsRatingModalOpen(true);
+  };
+
+  const handlePlayedToggle = () => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to track courses",
+      });
+      navigate('/auth');
+      return;
+    }
+    togglePlayed({ played: !hasPlayed });
+  };
+
   return (
+    <>
+      <EditRatingModal
+        courseId={course.id}
+        courseName={course.name}
+        currentRating={userRating?.rating || 5}
+        currentReview={userRating?.review || null}
+        currentDesignScore={userRating?.design_score}
+        currentConditionScore={userRating?.condition_score}
+        currentFacilitiesScore={userRating?.facilities_score}
+        isOpen={isRatingModalOpen}
+        onClose={() => setIsRatingModalOpen(false)}
+      />
     <div className="space-y-6">
       {/* Community Score Section */}
       <div className="bg-card rounded-lg border p-6">
@@ -97,6 +149,34 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               Based on {ratingAggregates?.review_count || 0} {ratingAggregates?.review_count === 1 ? 'rating' : 'ratings'}
             </div>
           </div>
+        </div>
+        
+        {/* Action Buttons */}
+        <div className="flex gap-3 mb-6">
+          <Button 
+            onClick={handleRateClick}
+            className="flex-1"
+          >
+            {userRating ? 'Edit Your Rating' : 'Rate this Course'}
+          </Button>
+          <Button 
+            onClick={handlePlayedToggle}
+            disabled={isToggling}
+            variant={hasPlayed ? "default" : "outline"}
+            className={hasPlayed ? "flex-1" : "flex-1"}
+          >
+            {hasPlayed ? (
+              <>
+                <Check className="h-4 w-4 mr-2" />
+                You've Played Here
+              </>
+            ) : (
+              <>
+                <Target className="h-4 w-4 mr-2" />
+                Mark as Played
+              </>
+            )}
+          </Button>
         </div>
         
         {ratingAggregates && ratingAggregates.review_count > 0 ? (
@@ -268,6 +348,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </div>
       )}
     </div>
+    </>
   );
 };
 
