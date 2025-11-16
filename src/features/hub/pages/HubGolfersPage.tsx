@@ -32,10 +32,6 @@ export function HubGolfersPage() {
     userLng: currentLocation?.lng,
   });
 
-  useEffect(() => {
-    document.documentElement.classList.add('hub-open');
-    return () => document.documentElement.classList.remove('hub-open');
-  }, []);
 
   const handleRefresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ['nearbyGolfers', 'live'] });
