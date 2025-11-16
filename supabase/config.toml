@@ -15,3 +15,6 @@ verify_jwt = false
 [functions.invite-request]
 verify_jwt = false
 
+[functions.cleanup-open-to-play]
+verify_jwt = false
+

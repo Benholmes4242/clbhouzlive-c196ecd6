@@ -2730,6 +2730,24 @@ export type Database = {
           },
         ]
       }
+      user_blocks: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       user_course_tracker: {
         Row: {
           checked: boolean | null
@@ -3632,6 +3650,7 @@ export type Database = {
         }[]
       }
       cleanup_expired_dismissals: { Args: never; Returns: undefined }
+      cleanup_expired_open_to_play: { Args: never; Returns: undefined }
       cleanup_old_gate_attempts: { Args: never; Returns: undefined }
       clone_real_profiles_to_mock: {
         Args: { limit_count?: number }
