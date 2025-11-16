@@ -108,7 +108,7 @@ export function NearbyGolfersTile({ limit = 999 }: NearbyGolfersTileProps) {
       title="Nearby Golfers"
       align="center"
     >
-      <div className="flex flex-col h-full" style={{ position: 'relative', paddingTop: '1.5px', paddingBottom: '28px' }}>
+      <div className="flex flex-col h-full" style={{ position: 'relative', paddingTop: '1.5px', paddingBottom: '6px' }}>
           <div 
           ref={scrollRef} 
           className="space-y-0.5 hub-golfers-list-scroll flex flex-col flex-1"

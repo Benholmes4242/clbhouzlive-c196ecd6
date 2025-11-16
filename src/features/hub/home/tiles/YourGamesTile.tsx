@@ -222,7 +222,7 @@ export function YourGamesTile() {
         </div>
       }
       >
-      <div className="flex flex-col h-full min-h-0">
+      <div className="flex flex-col h-full min-h-0" style={{ paddingBottom: '6px' }}>
         <div
           ref={listRef}
           className="gt-scroll flex-1 min-h-0 -mr-1 pr-1"
