@@ -1,0 +1,73 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+export interface SeasonPassTier {
+  id: string;
+  user_id: string;
+  season_id: string;
+  tier: 'free' | 'premium';
+  purchased_at: string;
+}
+
+export function useSeasonPass(userId?: string, seasonId?: string) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['season-pass', userId, seasonId],
+    enabled: !!userId && !!seasonId,
+    queryFn: async (): Promise<SeasonPassTier | null> => {
+      if (!userId || !seasonId) return null;
+
+      const { data, error } = await supabase
+        .from('season_pass_tiers')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('season_id', seasonId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data as SeasonPassTier;
+    },
+    staleTime: 60_000,
+  });
+
+  const upgradeMutation = useMutation({
+    mutationFn: async () => {
+      if (!seasonId) throw new Error('Season ID required');
+
+      const { data, error } = await supabase.functions.invoke('process-season-pass', {
+        body: { seasonId },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['season-pass', userId, seasonId] });
+      queryClient.invalidateQueries({ queryKey: ['user-cosmetics', userId] });
+      queryClient.invalidateQueries({ queryKey: ['user-season-currency', userId] });
+      
+      toast({
+        title: 'Premium Pass Activated!',
+        description: 'You now have access to premium rewards and exclusive cosmetics!',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Upgrade Failed',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  return {
+    hasPremiumPass: data?.tier === 'premium',
+    tier: data?.tier || 'free',
+    isLoading,
+    upgrade: upgradeMutation.mutate,
+    isUpgrading: upgradeMutation.isPending,
+  };
+}

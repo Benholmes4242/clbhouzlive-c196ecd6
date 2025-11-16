@@ -18,6 +18,8 @@ import { formatDistanceToNow } from 'date-fns';
 import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
 import { getSeasonLevel } from '@/utils/seasonLevels';
 import { SeasonTrophyCabinet } from '@/components/achievements/SeasonTrophyCabinet';
+import { SeasonPassHeader } from '@/components/season-pass/SeasonPassHeader';
+import { PremiumRewardsTrack } from '@/components/season-pass/PremiumRewardsTrack';
 
 interface UserProfile {
   id: string;
