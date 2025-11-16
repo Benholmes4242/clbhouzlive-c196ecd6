@@ -3,18 +3,37 @@ import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { NearbyGolfer } from './types';
 import { calculateDistance } from './distance';
-import { NEARBY_RADIUS_METERS } from './config';
 import { sortGolfers } from './utils/sortGolfers';
 
-async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<NearbyGolfer[]> {
+/**
+ * Configuration options for the Nearby Golfers hook
+ */
+export type NearbyGolfersOptions = {
+  radiusKm: number;       // 0.5 | 1 | 3 etc.
+  onlyOpen?: boolean;     // filter to Open to Play only
+  visibilityMode?: 'all' | 'friends' | 'everyone';
+  limit?: number;         // default 999
+  userLat?: number;
+  userLng?: number;
+};
+
+/**
+ * Fetches nearby golfers from user_nearby_status table with filters
+ */
+async function fetchLiveNearby(options: NearbyGolfersOptions): Promise<NearbyGolfer[]> {
+  const { userLat, userLng, radiusKm, onlyOpen = false, visibilityMode = 'all', limit = 999 } = options;
+  
   if (!userLat || !userLng) return [];
 
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return [];
 
-    // Fetch nearby users from user_nearby_status within the last 5 minutes
-    const { data, error } = await supabase
+    const radiusMeters = radiusKm * 1000;
+    const staleThreshold = new Date(Date.now() - 5 * 60 * 1000).toISOString(); // 5 minutes
+
+    // Build query
+    let query = supabase
       .from('user_nearby_status')
       .select(`
         user_id,
@@ -23,6 +42,7 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
         updated_at,
         open_to_play_active,
         open_to_play_expires_at,
+        visibility_mode,
         user_profiles:user_id (
           id,
           display_name,
@@ -33,9 +53,21 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
           home_club
         )
       `)
-      .eq('is_hidden', false)
-      .gte('updated_at', new Date(Date.now() - 5 * 60 * 1000).toISOString())
-      .neq('user_id', user.id); // Exclude self
+      .neq('user_id', user.id) // Exclude self
+      .gte('last_location_update', staleThreshold); // Ignore stale locations
+
+    // Apply visibility filter
+    if (visibilityMode === 'friends') {
+      // TODO: Add friends-only filter when friends system is ready
+      query = query.in('visibility_mode', ['friends', 'all']);
+    } else if (visibilityMode === 'everyone') {
+      query = query.eq('visibility_mode', 'all');
+    } else {
+      // 'all' mode: show everyone except hidden
+      query = query.neq('visibility_mode', 'hidden');
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.error('[NearbyGolfers] Fetch error:', error);
@@ -51,12 +83,15 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
         if (!profile) return null;
 
         const distanceMeters = calculateDistance(userLat, userLng, item.lat, item.lng);
-        if (distanceMeters > NEARBY_RADIUS_METERS) return null;
+        if (distanceMeters > radiusMeters) return null;
 
         // Check if open_to_play is active and not expired
         const isOpenToPlay = item.open_to_play_active && 
           item.open_to_play_expires_at && 
           new Date(item.open_to_play_expires_at) > new Date();
+
+        // Apply onlyOpen filter
+        if (onlyOpen && !isOpenToPlay) return null;
 
         return {
           id: profile.id,
@@ -70,7 +105,8 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
         };
       })
       .filter((g: NearbyGolfer | null): g is NearbyGolfer => g !== null)
-      .sort((a, b) => (a.distance_km || 0) - (b.distance_km || 0));
+      .sort((a, b) => (a.distance_km || 0) - (b.distance_km || 0))
+      .slice(0, limit); // Apply limit
 
     return nearby;
   } catch (error) {
@@ -79,24 +115,32 @@ async function fetchLiveNearby(userLat?: number, userLng?: number): Promise<Near
   }
 }
 
-export function useNearbyGolfers(userLat?: number, userLng?: number) {
+/**
+ * Hook to fetch and subscribe to nearby golfers in real-time
+ * This is the single source of truth for both Hub tile and Nearby page
+ */
+export function useNearbyGolfers(options: NearbyGolfersOptions) {
+  const { radiusKm, onlyOpen = false, visibilityMode = 'all', limit = 999, userLat, userLng } = options;
   const queryClient = useQueryClient();
   const DEBUG_REALTIME = process.env.NODE_ENV !== 'production';
 
+  // Create a stable query key that includes all filter options
+  const queryKey = ['nearbyGolfers', 'live', radiusKm, onlyOpen, visibilityMode, limit];
+
   const query = useQuery({
-    queryKey: ['nearbyGolfers', 'live'],
-    queryFn: () => fetchLiveNearby(userLat, userLng),
+    queryKey,
+    queryFn: () => fetchLiveNearby(options),
     select: (golfers) => sortGolfers(golfers),
     staleTime: 15_000,
     enabled: !!userLat && !!userLng,
   });
 
-  // Phase 3: Realtime subscription for nearby presence
+  // Realtime subscription for nearby presence
   useEffect(() => {
     if (!userLat || !userLng) return;
 
     const channel = supabase
-      .channel('nearby_presence')
+      .channel('nearby_presence_realtime')
       .on(
         'postgres_changes',
         {
@@ -107,44 +151,25 @@ export function useNearbyGolfers(userLat?: number, userLng?: number) {
         (payload) => {
           if (DEBUG_REALTIME) {
             const userId = payload.new && typeof payload.new === 'object' && 'user_id' in payload.new ? payload.new.user_id : 'unknown';
-            console.log('[NearbyGolfers] event', new Date().toISOString(), payload.eventType, userId);
+            console.log('[NearbyGolfers] realtime event', new Date().toISOString(), payload.eventType, userId);
           }
-          // Refetch when any user's location updates
+          // Invalidate all nearby golfers queries to trigger refetch
           queryClient.invalidateQueries({ queryKey: ['nearbyGolfers', 'live'] });
         }
       )
       .subscribe((status) => {
         if (DEBUG_REALTIME) {
-          console.log('[NearbyGolfers] status', status, new Date().toISOString());
+          console.log('[NearbyGolfers] subscription status', status);
         }
       });
 
     return () => {
+      if (DEBUG_REALTIME) {
+        console.log('[NearbyGolfers] unsubscribing from realtime');
+      }
       supabase.removeChannel(channel);
     };
   }, [userLat, userLng, queryClient, DEBUG_REALTIME]);
-
-  // Refetch on window focus (safety net)
-  useEffect(() => {
-    const handleFocus = () => {
-      if (DEBUG_REALTIME) {
-        console.log('[NearbyGolfers] Refetch on focus');
-      }
-      queryClient.invalidateQueries({ queryKey: ['nearbyGolfers', 'live'] });
-    };
-    
-    window.addEventListener('focus', handleFocus);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        handleFocus();
-      }
-    });
-    
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleFocus);
-    };
-  }, [queryClient, DEBUG_REALTIME]);
 
   return query;
 }
