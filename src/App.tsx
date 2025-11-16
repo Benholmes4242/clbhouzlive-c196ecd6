@@ -127,6 +127,7 @@ const EchoSharePage = lazy(() => import("./pages/EchoSharePage").then(m => ({ de
 
 // Videos2 page
 const VideosPage = lazy(() => import("./features/videos2/pages/VideosPage"));
+const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -174,6 +175,7 @@ function AppRoutes() {
         <Route path="/news" element={<News />} />
         <Route path="/tour-central" element={<TourCentral />} />
         <Route path="/videos" element={<VideosPage />} />
+        <Route path="/season-shop" element={<SeasonShop />} />
         
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />

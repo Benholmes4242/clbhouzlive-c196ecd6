@@ -583,6 +583,86 @@ export type Database = {
         }
         Relationships: []
       }
+      cosmetic_loadouts: {
+        Row: {
+          equipped_post_frame: string | null
+          equipped_profile_ring: string | null
+          equipped_reaction_pack: string | null
+          equipped_theme: string | null
+          equipped_title: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          equipped_post_frame?: string | null
+          equipped_profile_ring?: string | null
+          equipped_reaction_pack?: string | null
+          equipped_theme?: string | null
+          equipped_title?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          equipped_post_frame?: string | null
+          equipped_profile_ring?: string | null
+          equipped_reaction_pack?: string | null
+          equipped_theme?: string | null
+          equipped_title?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cosmetic_loadouts_equipped_post_frame_fkey"
+            columns: ["equipped_post_frame"]
+            isOneToOne: false
+            referencedRelation: "season_shop_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cosmetic_loadouts_equipped_profile_ring_fkey"
+            columns: ["equipped_profile_ring"]
+            isOneToOne: false
+            referencedRelation: "season_shop_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cosmetic_loadouts_equipped_reaction_pack_fkey"
+            columns: ["equipped_reaction_pack"]
+            isOneToOne: false
+            referencedRelation: "season_shop_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cosmetic_loadouts_equipped_theme_fkey"
+            columns: ["equipped_theme"]
+            isOneToOne: false
+            referencedRelation: "season_shop_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cosmetic_loadouts_equipped_title_fkey"
+            columns: ["equipped_title"]
+            isOneToOne: false
+            referencedRelation: "season_shop_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cosmetic_loadouts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cosmetic_loadouts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       country_flags: {
         Row: {
           country_code: string
@@ -2401,6 +2481,66 @@ export type Database = {
         }
         Relationships: []
       }
+      season_pass_tiers: {
+        Row: {
+          id: string
+          purchased_at: string | null
+          season_id: string | null
+          tier: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          purchased_at?: string | null
+          season_id?: string | null
+          tier?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          purchased_at?: string | null
+          season_id?: string | null
+          tier?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "season_pass_tiers_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "season_leaderboard_view"
+            referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "season_pass_tiers_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "season_pass_tiers_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "user_season_xp_view"
+            referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "season_pass_tiers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "season_pass_tiers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       season_rewards: {
         Row: {
           badge_icon: string | null
@@ -2449,6 +2589,76 @@ export type Database = {
           },
           {
             foreignKeyName: "season_rewards_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "user_season_xp_view"
+            referencedColumns: ["season_id"]
+          },
+        ]
+      }
+      season_shop_items: {
+        Row: {
+          category: string | null
+          cost: number
+          created_at: string | null
+          description: string | null
+          icon_url: string | null
+          id: string
+          is_active: boolean | null
+          is_premium_only: boolean | null
+          name: string
+          preview_url: string | null
+          rarity: string | null
+          season_id: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          category?: string | null
+          cost?: number
+          created_at?: string | null
+          description?: string | null
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_premium_only?: boolean | null
+          name: string
+          preview_url?: string | null
+          rarity?: string | null
+          season_id?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          category?: string | null
+          cost?: number
+          created_at?: string | null
+          description?: string | null
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_premium_only?: boolean | null
+          name?: string
+          preview_url?: string | null
+          rarity?: string | null
+          season_id?: string | null
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "season_shop_items_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "season_leaderboard_view"
+            referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "season_shop_items_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "season_shop_items_season_id_fkey"
             columns: ["season_id"]
             isOneToOne: false
             referencedRelation: "user_season_xp_view"
@@ -3081,6 +3291,49 @@ export type Database = {
         }
         Relationships: []
       }
+      user_cosmetic_unlocks: {
+        Row: {
+          id: string
+          item_id: string | null
+          unlocked_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          item_id?: string | null
+          unlocked_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          item_id?: string | null
+          unlocked_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_cosmetic_unlocks_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "season_shop_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_cosmetic_unlocks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_cosmetic_unlocks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_course_tracker: {
         Row: {
           checked: boolean | null
@@ -3532,6 +3785,42 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_season_currency: {
+        Row: {
+          balance: number | null
+          lifetime_earned: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          balance?: number | null
+          lifetime_earned?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          balance?: number | null
+          lifetime_earned?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_season_currency_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_season_currency_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_season_results: {
         Row: {
