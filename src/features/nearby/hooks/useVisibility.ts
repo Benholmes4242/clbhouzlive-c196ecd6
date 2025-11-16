@@ -25,12 +25,14 @@ export function useVisibility() {
 
       const { data, error } = await supabase
         .from('user_nearby_status')
-        .select('visibility_mode')
+        .select('visibility_mode, is_hidden')
         .eq('user_id', user.id)
         .single();
 
-      if (!error && data?.visibility_mode) {
-        setMode(data.visibility_mode as VisibilityMode);
+      if (!error && data) {
+        // Use visibility_mode if set, otherwise derive from is_hidden
+        const derivedMode = data.visibility_mode || (data.is_hidden ? 'hidden' : 'all');
+        setMode(derivedMode as VisibilityMode);
       }
 
       setLoading(false);
@@ -77,6 +79,7 @@ export function useVisibility() {
           {
             user_id: user.id,
             visibility_mode: newMode,
+            is_hidden: newMode === 'hidden', // Keep is_hidden in sync with visibility_mode
             lat: newMode === 'hidden' ? null : lat,
             lng: newMode === 'hidden' ? null : lng,
             last_location_update:
