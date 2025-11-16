@@ -19,11 +19,7 @@ export const NewSeasonBanner: React.FC = () => {
   return (
     <button
       onClick={() => {
-        navigate('/achievements');
-        setTimeout(() => {
-          const seasonSection = document.querySelector('[data-season-info]');
-          seasonSection?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
+        navigate('/achievements#season-pass');
       }}
       className="w-full bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border border-primary/20 rounded-xl p-4 mb-6 hover:from-primary/15 hover:via-primary/10 hover:to-primary/15 transition-all group"
     >
@@ -37,7 +33,7 @@ export const NewSeasonBanner: React.FC = () => {
             {currentSeason.name} has begun!
           </h3>
           <p className="text-sm text-muted-foreground">
-            Climb the ladder and earn this season's badge
+            Explore Season Pass, shop cosmetics, and climb the leaderboard
           </p>
         </div>
         <div className="text-primary">→</div>

@@ -247,6 +247,16 @@ const AchievementsHub = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
+        {/* Season Pass Section */}
+        {isOwnProfile && currentSeason && (
+          <section id="season-pass">
+            <SeasonPassHeader />
+            <div className="mt-6">
+              <PremiumRewardsTrack />
+            </div>
+          </section>
+        )}
+
         {/* Global Journey Snapshot */}
         <section>
           <h2 className="text-2xl font-bold mb-6">Golf Journey Snapshot</h2>
