@@ -5,6 +5,8 @@ import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
 import { TopTenEditor } from './courses/TopTenEditor';
 import { CoursesPlayedGrid } from './courses/CoursesPlayedGrid';
 import { FriendComparisonSection } from './courses/FriendComparisonSection';
+import { ProfileRecentAchievementsStrip } from './ProfileRecentAchievementsStrip';
+import { ProfileAchievementsPanel } from './ProfileAchievementsPanel';
 
 interface ProfileCoursesTabProps {
   userId: string;
@@ -77,6 +79,12 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
           ))}
         </div>
       </div>
+
+      {/* Recent Achievements Strip */}
+      <ProfileRecentAchievementsStrip userId={userId} isOwnProfile={isOwnProfile} />
+
+      {/* Full Achievements Panel */}
+      <ProfileAchievementsPanel userId={userId} isOwnProfile={isOwnProfile} />
 
       {/* Friend Comparison - only for own profile */}
       {isOwnProfile && (
