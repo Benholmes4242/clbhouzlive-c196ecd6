@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Trophy, Globe } from 'lucide-react';
+import { MapPin, Trophy, Globe, ArrowRight } from 'lucide-react';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
 import { TopTenEditor } from './courses/TopTenEditor';
 import { CoursesPlayedGrid } from './courses/CoursesPlayedGrid';
@@ -8,6 +8,10 @@ import { FriendComparisonSection } from './courses/FriendComparisonSection';
 import { ProfileRecentAchievementsStrip } from './ProfileRecentAchievementsStrip';
 import { ProfileAchievementsPanel } from './ProfileAchievementsPanel';
 import { GolfJourneyXPChip } from './GolfJourneyXPChip';
+import { Button } from '@/components/ui/button';
+import { useAchievementSharing } from '@/hooks/useAchievementSharing';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ProfileCoursesTabProps {
   userId: string;
@@ -19,8 +23,23 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   isOwnProfile,
 }) => {
   const navigate = useNavigate();
+  const { prepareAchievementShare } = useAchievementSharing();
   const { totalCoursesPlayed, countriesPlayed, top100Progress, isLoading } =
     useUserCourseSummary(userId);
+
+  // Fetch username for navigation
+  const { data: profile } = useQuery<{ username: string } | null>({
+    queryKey: ['profile-username', userId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('user_profiles' as any)
+        .select('username')
+        .eq('id', userId)
+        .single();
+      return data ? (data as unknown as { username: string }) : null;
+    },
+    enabled: !!userId,
+  });
 
   if (isLoading) {
     return (
@@ -88,7 +107,21 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
       <ProfileRecentAchievementsStrip userId={userId} isOwnProfile={isOwnProfile} />
 
       {/* Full Achievements Panel */}
-      <ProfileAchievementsPanel userId={userId} isOwnProfile={isOwnProfile} />
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">All Achievements</h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(isOwnProfile ? '/achievements' : `/achievements/${profile?.username}`)}
+            className="text-sm"
+          >
+            View Full Achievements Hub
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        </div>
+        <ProfileAchievementsPanel userId={userId} isOwnProfile={isOwnProfile} onShareAchievement={prepareAchievementShare} />
+      </div>
 
       {/* Friend Comparison - only for own profile */}
       {isOwnProfile && (

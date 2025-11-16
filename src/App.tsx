@@ -82,6 +82,7 @@ const GlobalTop100 = lazy(() => import("./pages/GlobalTop100"));
 const Top100Hub = lazy(() => import("./pages/Top100Hub"));
 const Top100List = lazy(() => import("./pages/Top100List"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
+const AchievementsHub = lazy(() => import("./pages/AchievementsHub"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
@@ -183,7 +184,8 @@ function AppRoutes() {
         <Route path="/global-top100" element={<GlobalTop100 />} />
         <Route path="/top100" element={<Top100Hub />} />
         <Route path="/top100/:slug" element={<Top100List />} />
-        <Route path="/achievements" element={<AchievementsPage />} />
+        <Route path="/achievements" element={<AchievementsHub />} />
+        <Route path="/achievements/:username" element={<AchievementsHub />} />
         <Route path="/admin-setup" element={<AdminSetupPage />} />
         
         {/* Admin routes wrapped with AdminLayout */}
