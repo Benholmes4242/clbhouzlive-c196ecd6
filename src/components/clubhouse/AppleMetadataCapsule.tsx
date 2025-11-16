@@ -17,9 +17,11 @@ interface AppleMetadataCapsuleProps {
   caption?: string;
   createdAt?: string;
   courseName?: string;
+  courseRating?: number;
   tags?: string[];
-  onUserClick?: () => void;
+  onProfileSheetOpen?: () => void;
   onMoreClick?: () => void;
+  onCourseClick?: () => void;
   isActive?: boolean;
   className?: string;
 }
@@ -29,9 +31,11 @@ export const AppleMetadataCapsule = ({
   caption,
   createdAt,
   courseName,
+  courseRating,
   tags,
-  onUserClick,
+  onProfileSheetOpen,
   onMoreClick,
+  onCourseClick,
   isActive = false,
   className
 }: AppleMetadataCapsuleProps) => {
@@ -58,17 +62,12 @@ export const AppleMetadataCapsule = ({
       )}
     >
       {/* Glass panel */}
-      <div
-        className="flex items-start gap-2 px-3 py-2 rounded-2xl backdrop-blur-[18px] border border-white/10 max-w-[calc(100vw-120px)]"
-        style={{
-          background: 'rgba(30,30,30,0.35)',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-        }}
-      >
+      <div className="glass-panel flex items-start gap-2 px-3 py-2 max-w-[calc(100vw-120px)]">
         {/* Avatar with subtle ring */}
         <button
-          onClick={onUserClick}
-          className="flex-shrink-0"
+          type="button"
+          onClick={onProfileSheetOpen}
+          className="flex-shrink-0 mt-0.5"
           aria-label={`View ${user.name}'s profile`}
         >
           <div 
@@ -87,17 +86,17 @@ export const AppleMetadataCapsule = ({
 
         {/* Content */}
         <div className="flex flex-col gap-1 min-w-0 flex-1">
-          {/* Line 1: name + timestamp */}
+          {/* Row 1: name · time */}
           <div className="flex items-center gap-1 text-[13px] font-semibold text-white">
-            <button onClick={onUserClick} className="truncate hover:opacity-80 transition-opacity">
-              {user.name}
-            </button>
+            <span className="truncate">{user.name}</span>
             {createdAt && (
-              <span className="text-white/60 flex-shrink-0">· {relativeTime(createdAt)}</span>
+              <span className="text-[12px] font-normal text-white/60 flex-shrink-0">
+                · {relativeTime(createdAt)}
+              </span>
             )}
           </div>
 
-          {/* Line 2: caption */}
+          {/* Row 2: caption (2-line clamp + More) */}
           {caption && (
             <button
               type="button"
@@ -108,23 +107,21 @@ export const AppleMetadataCapsule = ({
             </button>
           )}
 
-          {/* Row 3: course + tags */}
-          {(courseName || (tags && tags.length > 0)) && (
-            <div className="flex flex-wrap items-center gap-1 mt-1">
-              {courseName && (
-                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] text-white/80 flex-shrink-0">
-                  {courseName}
+          {/* Row 3: course pill only */}
+          {courseName && (
+            <button
+              type="button"
+              onClick={onCourseClick}
+              className="mt-1 inline-flex max-w-full items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[11px] text-white/80"
+            >
+              <span className="truncate">{courseName}</span>
+              {typeof courseRating === 'number' && (
+                <span className="flex items-center gap-0.5 flex-shrink-0">
+                  <span>·</span>
+                  <span>★ {courseRating.toFixed(1)}</span>
                 </span>
               )}
-              {tags?.slice(0, 2).map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full bg-white/6 px-2 py-0.5 text-[11px] text-white/70 flex-shrink-0"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
+            </button>
           )}
         </div>
       </div>

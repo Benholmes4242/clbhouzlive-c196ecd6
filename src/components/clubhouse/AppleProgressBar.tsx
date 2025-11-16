@@ -1,84 +1,70 @@
 /**
- * AppleProgressBar - Horizontal gradient progress bar
+ * AppleProgressBar - Horizontal gradient progress bar with scrubbing
  * Part of the Apple-style Clubhouse redesign
  */
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface AppleProgressBarProps {
-  videoRef: React.RefObject<HTMLVideoElement | null>;
-  accent?: string;
+  progress: number; // 0-100
+  onScrubStart?: () => void;
+  onScrubMove?: (percent: number) => void;
+  onScrubEnd?: () => void;
   isActive?: boolean;
   className?: string;
 }
 
 export const AppleProgressBar = ({
-  videoRef,
-  accent = '#6e9277',
+  progress,
+  onScrubStart,
+  onScrubMove,
+  onScrubEnd,
   isActive = false,
   className
 }: AppleProgressBarProps) => {
-  const [progress, setProgress] = useState(0);
-  const [isNewClip, setIsNewClip] = useState(false);
-  const requestRef = useRef<number>();
+  const trackRef = useRef<HTMLDivElement | null>(null);
 
-  // Sync progress with video
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!trackRef.current) return;
+    trackRef.current.setPointerCapture(e.pointerId);
+    onScrubStart?.();
+    handlePointerMove(e);
+  };
 
-    const updateProgress = () => {
-      if (video.duration && isFinite(video.duration)) {
-        const percent = (video.currentTime / video.duration) * 100;
-        setProgress(percent);
-      }
-      requestRef.current = requestAnimationFrame(updateProgress);
-    };
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!trackRef.current) return;
+    const rect = trackRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percent = Math.min(100, Math.max(0, (x / rect.width) * 100));
+    onScrubMove?.(percent);
+  };
 
-    requestRef.current = requestAnimationFrame(updateProgress);
-
-    return () => {
-      if (requestRef.current) {
-        cancelAnimationFrame(requestRef.current);
-      }
-    };
-  }, [videoRef]);
-
-  // Pulse animation when new clip loads
-  useEffect(() => {
-    if (isActive) {
-      setIsNewClip(true);
-      const timer = setTimeout(() => setIsNewClip(false), 200);
-      return () => clearTimeout(timer);
-    }
-  }, [isActive]);
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!trackRef.current) return;
+    trackRef.current.releasePointerCapture(e.pointerId);
+    onScrubEnd?.();
+  };
 
   return (
-    <div 
+    <div
+      ref={trackRef}
       className={cn(
-        "w-[160px] h-[3px] rounded-full bg-white/20 overflow-hidden",
+        "mt-1 h-[3px] w-[160px] max-w-[60vw] cursor-pointer overflow-hidden rounded-full bg-white/15 transition-opacity duration-200",
+        isActive ? "opacity-100" : "opacity-0",
         className
       )}
+      onPointerDown={handlePointerDown}
+      onPointerMove={(e) => {
+        if (e.buttons === 1) handlePointerMove(e);
+      }}
+      onPointerUp={handlePointerUp}
     >
-      {/* Track - frosted white subtle */}
-      <div 
-        className="absolute inset-0 opacity-15"
-        style={{
-          background: 'rgba(255, 255, 255, 0.2)',
-        }}
-      />
-      
-      {/* Fill - frosted white with soft glow */}
-      <div 
-        className={cn(
-          "h-full rounded-full transition-all",
-          isNewClip ? "animate-pulse duration-200" : "duration-75 ease-linear"
-        )}
-        style={{
+      <div
+        className="h-full rounded-full bg-white transition-all duration-75 ease-linear"
+        style={{ 
           width: `${progress}%`,
-          background: 'rgba(255, 255, 255, 0.8)',
-          boxShadow: '0 0 8px rgba(255, 255, 255, 0.4)',
+          boxShadow: '0 0 8px rgba(255, 255, 255, 0.4)'
         }}
       />
     </div>

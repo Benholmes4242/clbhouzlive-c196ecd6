@@ -38,7 +38,8 @@ interface AppleHUDOverlayProps {
   isActive?: boolean;
   
   // Handlers
-  onUserClick?: () => void;
+  onProfileSheetOpen?: () => void;
+  onCourseClick?: () => void;
   onMoreClick?: () => void;
   onLike: () => void;
   onComment: () => void;
@@ -65,7 +66,8 @@ export const AppleHUDOverlay = ({
   isVideo = false,
   isMuted = false,
   isActive = false,
-  onUserClick,
+  onProfileSheetOpen,
+  onCourseClick,
   onMoreClick,
   onLike,
   onComment,
@@ -88,14 +90,14 @@ export const AppleHUDOverlay = ({
           createdAt={createdAt}
           courseName={courseName}
           tags={tags}
-          onUserClick={onUserClick}
+          onProfileSheetOpen={onProfileSheetOpen}
+          onCourseClick={onCourseClick}
           onMoreClick={onMoreClick}
           isActive={isActive}
         />
         
         <AppleProgressBar
-          videoRef={videoRef}
-          accent={accentColor}
+          progress={0}
           isActive={isActive}
         />
       </div>
