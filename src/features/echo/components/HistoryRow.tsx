@@ -1,5 +1,6 @@
 import React from 'react';
-import EchoAvatar from '@/components/ai-chat/EchoAvatar';
+import { Squircle } from '@/components/ui/squircle';
+import { PiWaveform } from 'react-icons/pi';
 import { formatSmartWhen } from '@/utils/date';
 
 type Props = {
@@ -29,7 +30,32 @@ export function HistoryRow({ item, onToggle, trailing, children }: Props) {
         aria-expanded={!!children}
       >
         <div className="eh-row__avatar">
-          <EchoAvatar state="idle" size={36} />
+          <Squircle width={42} height={42}>
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'rgba(255,255,255,0.45)',
+                border: '1px solid rgba(255,255,255,0.55)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+                  opacity: 0.8,
+                  pointerEvents: 'none'
+                }}
+              />
+              <PiWaveform size={29} className="text-black/80" style={{ position: 'relative', zIndex: 1 }} />
+            </div>
+          </Squircle>
         </div>
 
         <div className="eh-row__content">
