@@ -62,7 +62,7 @@ const ActionButton = ({
     >
       <div 
         className={cn(
-          "relative w-11 h-11 rounded-full flex items-center justify-center",
+          "relative w-10 h-10 rounded-full flex items-center justify-center",
           "transition-all duration-200",
           isActive && "scale-110"
         )}
@@ -72,7 +72,7 @@ const ActionButton = ({
       >
         <Icon 
           className={cn(
-            "w-[22px] h-[22px] transition-all duration-200",
+            "w-5 h-5 transition-all duration-200",
             isActive 
               ? "text-[#6e9277] fill-[#6e9277] stroke-[#6e9277]" 
               : "text-white/90"
@@ -127,7 +127,7 @@ export const AppleEngagementRail = ({
   return (
     <div 
       className={cn(
-        "fixed right-4 z-[50] flex flex-col items-center gap-6 px-2.5 py-3 rounded-[20px] transition-all duration-300 ease-out",
+        "fixed right-4 z-[50] flex flex-col items-center gap-6 px-2 py-3 rounded-[20px] transition-all duration-300 ease-out",
         isVisible ? "translate-x-0 opacity-100" : "translate-x-8 opacity-0",
         className
       )}

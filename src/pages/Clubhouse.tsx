@@ -10,7 +10,7 @@ import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigat
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { useChromeState } from '@/hooks/useChromeState';
 import { useChromeAnchors } from '@/hooks/useChromeAnchors';
-import { VideoProgressVerticalHUD } from '@/components/hud/VideoProgressVerticalHUD';
+
 
 import { useInfiniteClubhouseShorts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -271,14 +271,6 @@ const Clubhouse = () => {
         )}
       </div>
 
-      {/* Video Progress Vertical HUD - Pulse Line beside engagement icons (Clubhouse-only) */}
-      {showProgressBar && (
-        <VideoProgressVerticalHUD 
-          videoRef={activeVideoRef}
-          accent="linear-gradient(to top, rgba(110,146,119,1) 0%, rgba(255,255,255,0.6) 60%)"
-          container={clubhouseRootRef.current}
-        />
-      )}
       
       {/* Post Submission Handler */}
       <PostSubmissionHandler

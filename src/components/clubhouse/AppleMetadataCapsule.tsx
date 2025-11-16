@@ -1,19 +1,25 @@
 /**
- * AppleMetadataCapsule - Bottom-left glass capsule with user info
- * Part of the Apple-style Clubhouse redesign
+ * AppleMetadataCapsule - Bottom-left glass panel with user info, caption, course, and tags
+ * Part of the Apple-style Clubhouse redesign (upgraded to two-line info panel)
  */
 
 import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { relativeTime } from '@/utils/relativeTime';
 
 interface AppleMetadataCapsuleProps {
   user: {
+    id: string;
     name: string;
     avatar?: string;
     username?: string;
   };
   caption?: string;
+  createdAt?: string;
+  courseName?: string;
+  tags?: string[];
   onUserClick?: () => void;
+  onMoreClick?: () => void;
   isActive?: boolean;
   className?: string;
 }
@@ -21,7 +27,11 @@ interface AppleMetadataCapsuleProps {
 export const AppleMetadataCapsule = ({
   user,
   caption,
+  createdAt,
+  courseName,
+  tags,
   onUserClick,
+  onMoreClick,
   isActive = false,
   className
 }: AppleMetadataCapsuleProps) => {
@@ -30,7 +40,6 @@ export const AppleMetadataCapsule = ({
   // Slide up + fade in animation when active
   useEffect(() => {
     if (isActive) {
-      // Small delay to let video settle
       const timer = setTimeout(() => setIsVisible(true), 100);
       return () => clearTimeout(timer);
     } else {
@@ -41,59 +50,84 @@ export const AppleMetadataCapsule = ({
   return (
     <div 
       className={cn(
-        "fixed z-[50] transition-all duration-300 ease-out",
+        "transition-all duration-300 ease-out",
         isVisible 
           ? "translate-y-0 opacity-100" 
           : "translate-y-8 opacity-0",
         className
       )}
-      style={{
-        bottom: 'calc(env(safe-area-inset-bottom, 0px) + clamp(82px, var(--bottom-nav-height, 72px) + 22px, calc(var(--bottom-nav-height, 72px) + 22px)))',
-        left: 'calc(env(safe-area-inset-left, 0px) + 16px)',
-      }}
     >
-      {/* Glass capsule */}
-      <button
-        onClick={onUserClick}
-        className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl backdrop-blur-[18px] border border-white/10 hover:opacity-90 transition-opacity"
+      {/* Glass panel */}
+      <div
+        className="flex items-start gap-2 px-3 py-2 rounded-2xl backdrop-blur-[18px] border border-white/10 max-w-[calc(100vw-120px)]"
         style={{
           background: 'rgba(30,30,30,0.35)',
           boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
         }}
-        aria-label={`View ${user.name}'s profile`}
       >
         {/* Avatar with subtle ring */}
-        <div 
-          className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0"
-          style={{
-            boxShadow: '0 0 4px rgba(255,255,255,0.5), inset 0 0 0 1px #6e9277',
-          }}
+        <button
+          onClick={onUserClick}
+          className="flex-shrink-0"
+          aria-label={`View ${user.name}'s profile`}
         >
-          <img 
-            src={user.avatar || '/placeholder.svg'} 
-            alt={user.name}
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        {/* Text */}
-        <div className="flex flex-col items-start">
-          <span 
-            className="text-[15px] font-semibold text-white leading-tight"
-            style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
+          <div 
+            className="relative w-10 h-10 rounded-full overflow-hidden"
+            style={{
+              boxShadow: '0 0 4px rgba(255,255,255,0.5), inset 0 0 0 1px #6e9277',
+            }}
           >
-            {user.name}
-          </span>
+            <img 
+              src={user.avatar || '/placeholder.svg'} 
+              alt={user.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </button>
+
+        {/* Content */}
+        <div className="flex flex-col gap-1 min-w-0 flex-1">
+          {/* Line 1: name + timestamp */}
+          <div className="flex items-center gap-1 text-[13px] font-semibold text-white">
+            <button onClick={onUserClick} className="truncate hover:opacity-80 transition-opacity">
+              {user.name}
+            </button>
+            {createdAt && (
+              <span className="text-white/60 flex-shrink-0">· {relativeTime(createdAt)}</span>
+            )}
+          </div>
+
+          {/* Line 2: caption */}
           {caption && (
-            <span 
-              className="text-[14px] text-white/85 leading-tight max-w-[200px] truncate"
-              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
+            <button
+              type="button"
+              className="text-[13px] text-white/80 text-left line-clamp-2 hover:opacity-80 transition-opacity"
+              onClick={onMoreClick}
             >
               {caption}
-            </span>
+            </button>
+          )}
+
+          {/* Row 3: course + tags */}
+          {(courseName || (tags && tags.length > 0)) && (
+            <div className="flex flex-wrap items-center gap-1 mt-1">
+              {courseName && (
+                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] text-white/80 flex-shrink-0">
+                  {courseName}
+                </span>
+              )}
+              {tags?.slice(0, 2).map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-white/6 px-2 py-0.5 text-[11px] text-white/70 flex-shrink-0"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
           )}
         </div>
-      </button>
+      </div>
     </div>
   );
 };
