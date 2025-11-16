@@ -3358,8 +3358,8 @@ html[data-immersive="true"] .app-shell--topSpacer {
 /* Role-based message line layout */
 .eh-line {
   display: grid;
-  grid-template-columns: 28px 1fr 28px;
-  gap: 10px;
+  grid-template-columns: 42px 1fr 42px;
+  gap: 14px;
   align-items: start;
   margin: 10px 0;
 }
