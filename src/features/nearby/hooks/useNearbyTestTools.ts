@@ -7,7 +7,7 @@ const TEST_USER_ID = '00000000-0000-0000-0000-000000000001';
 
 // List of authorized tester emails
 const AUTHORIZED_TESTERS = [
-  'ben@clbhouz.com',
+  'benjamin@clbhouz.co.uk',
   // Add more authorized emails here
 ];
 
