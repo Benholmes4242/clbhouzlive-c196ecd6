@@ -16,6 +16,14 @@ interface GolfCourse {
   region?: string;
 }
 
+interface AchievementData {
+  achievementId: string;
+  name: string;
+  description: string;
+  category: string;
+  points: number;
+}
+
 export const usePostFlow = () => {
   const captionInputRef = useRef<HTMLDivElement>(null);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
@@ -33,6 +41,7 @@ export const usePostFlow = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
+  const [achievementData, setAchievementData] = useState<AchievementData | null>(null);
 
   // Clean up preview URLs when component unmounts or files change
   useEffect(() => {
@@ -165,6 +174,8 @@ export const usePostFlow = () => {
     toastMessage,
     selectedCourse,
     setSelectedCourse,
+    achievementData,
+    setAchievementData,
     openGallery,
     closeGallery,
     openComposer,
