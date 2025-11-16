@@ -90,6 +90,11 @@ export const ProfileAchievementsPanel: React.FC<ProfileAchievementsPanelProps> =
             ? 'Track milestones from your Golf Journey, Top 100 exploration, and social activity.'
             : 'See what this golfer has unlocked so far.'}
         </p>
+        {isOwnProfile && (
+          <p className="text-xs text-muted-foreground/80 mt-3 italic">
+            💡 Tip: Many achievements are tied to Top 100 lists and course reviews. Keep exploring and logging rounds.
+          </p>
+        )}
       </div>
 
       {/* Category Filters */}

@@ -17,6 +17,7 @@ import EditRatingModal from '@/components/courses/EditRatingModal';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
+import { CourseMilestonesCard } from '@/components/courses/CourseMilestonesCard';
 
 interface Course {
   id: string;
@@ -276,6 +277,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           </div>
         </div>
       )}
+
+      {/* Milestones Card */}
+      <CourseMilestonesCard courseId={course.id} />
 
       {/* Location and Media sections - side by side on desktop, stacked on mobile */}
       <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
