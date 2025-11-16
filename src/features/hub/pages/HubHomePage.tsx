@@ -207,11 +207,11 @@ export function HubHomePage() {
           <NearbyGolfersTile />
         </div>
 
-        {/* Your Games - calculated height to push bottom tiles to 12px from edge */}
+        {/* Your Games - calculated height to push bottom tiles to 25px from edge */}
         <div 
           className="mt-3.5" 
           style={{ 
-            height: 'calc(100vh - var(--hub-tile-fixed-h) - 0.875rem - 0.875rem - 0.75rem - 12px - env(safe-area-inset-top, 0px) - ((100vw - 28px - 0.875rem) / 2))' 
+            height: 'calc(100vh - var(--hub-tile-fixed-h) - 0.875rem - 0.875rem - 0.75rem - 25px - env(safe-area-inset-top, 0px) - ((100vw - 28px - 0.875rem) / 2))' 
           }}
         >
           <YourGamesTile />
