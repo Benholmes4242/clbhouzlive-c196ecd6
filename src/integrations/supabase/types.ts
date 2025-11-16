@@ -754,6 +754,38 @@ export type Database = {
           },
         ]
       }
+      course_review_votes: {
+        Row: {
+          created_at: string
+          id: string
+          rating_id: string
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rating_id: string
+          user_id: string
+          vote_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rating_id?: string
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_review_votes_rating_id_fkey"
+            columns: ["rating_id"]
+            isOneToOne: false
+            referencedRelation: "course_ratings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_top100_memberships: {
         Row: {
           added_at: string | null
