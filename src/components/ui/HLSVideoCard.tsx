@@ -55,6 +55,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   const [attached, setAttached] = useState(false);
   const [ready, setReady] = useState(false);
   const [overlayHidden, setOverlayHidden] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(true);
 
   // Sync internal muted state with prop changes
   useEffect(() => {
@@ -159,30 +160,54 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     setupHls();
   }, [hlsUrl, shouldAttach, attached]);
 
-  // Mark "ready" on first decodable frame
+  // Mark "ready" on first decodable frame and wire video events for loading/error states
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
+
+    const handlePlaying = () => {
+      console.log('[OpenFlow]', 'playing', performance.now());
+      setIsBuffering(false);
+      setHasError(false);
+    };
+
+    const handleWaiting = () => {
+      setIsBuffering(true);
+    };
+
+    const handleStalled = () => {
+      setIsBuffering(true);
+    };
+
+    const handleError = () => {
+      setHasError(true);
+      setIsBuffering(false);
+    };
 
     const onLoadedData = () => {
       console.log('[OpenFlow]', 'metadataLoaded', performance.now());
       setReady(true);
     };
+    
     const onCanPlay = () => {
       console.log('[OpenFlow]', 'canplay', performance.now());
       setReady(true);
     };
-    const onPlaying = () => {
-      console.log('[OpenFlow]', 'playing', performance.now());
-    };
 
     v.addEventListener('loadeddata', onLoadedData);
     v.addEventListener('canplay', onCanPlay);
-    v.addEventListener('playing', onPlaying);
+    v.addEventListener('playing', handlePlaying);
+    v.addEventListener('waiting', handleWaiting);
+    v.addEventListener('stalled', handleStalled);
+    v.addEventListener('error', handleError);
+    
     return () => {
       v.removeEventListener('loadeddata', onLoadedData);
       v.removeEventListener('canplay', onCanPlay);
-      v.removeEventListener('playing', onPlaying);
+      v.removeEventListener('playing', handlePlaying);
+      v.removeEventListener('waiting', handleWaiting);
+      v.removeEventListener('stalled', handleStalled);
+      v.removeEventListener('error', handleError);
     };
   }, []);
 

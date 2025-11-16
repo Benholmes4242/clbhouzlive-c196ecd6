@@ -881,10 +881,11 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 isVideo={item.media?.[0]?.media_type === 'video'}
                 isMuted={isGloballyMuted}
                 isActive={currentIndex === index}
-                onUserClick={() => {
+                onProfileSheetOpen={() => {
                   setSelectedUserId(item.user?.id || null);
                   setShowMiniProfile(true);
                 }}
+                onCourseClick={() => {}}
                 onMoreClick={() => handleComment(item.id)}
                 onLike={() => handleLike(item.id)}
                 onComment={() => handleComment(item.id)}
