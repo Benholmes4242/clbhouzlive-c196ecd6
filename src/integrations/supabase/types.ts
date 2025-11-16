@@ -826,6 +826,13 @@ export type Database = {
             referencedRelation: "top100_lists"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "course_top100_memberships_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["list_id"]
+          },
         ]
       }
       echo_admin_dashboard_views: {
@@ -3719,6 +3726,17 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_top100_progress_view: {
+        Row: {
+          courses_played_in_list: number | null
+          list_id: string | null
+          list_name: string | null
+          list_slug: string | null
+          total_courses_in_list: number | null
+          user_id: string | null
+        }
+        Relationships: []
       }
     }
     Functions: {

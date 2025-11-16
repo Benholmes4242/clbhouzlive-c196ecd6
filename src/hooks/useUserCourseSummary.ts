@@ -1,12 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-
-interface Top100Progress {
-  listSlug: string;
-  listName: string;
-  played: number;
-  total: number;
-}
+import { useUserTop100Progress } from './useUserTop100Progress';
 
 export function useUserCourseSummary(userId: string | undefined) {
   const { data: coursesPlayed = 0, isLoading: coursesLoading } = useQuery({
@@ -44,7 +38,7 @@ export function useUserCourseSummary(userId: string | undefined) {
 
       const { data: courses, error: courseError } = await supabase
         .from('golf_courses')
-        .select('country')
+        .select('id, country')
         .in('id', courseIds);
 
       if (courseError) throw courseError;
@@ -55,60 +49,8 @@ export function useUserCourseSummary(userId: string | undefined) {
     staleTime: 60_000,
   });
 
-  const { data: top100Progress = [], isLoading: progressLoading } = useQuery({
-    queryKey: ['user-top100-progress-summary', userId],
-    enabled: !!userId,
-    queryFn: async () => {
-      if (!userId) return [];
-
-      // Get all active lists
-      const { data: lists, error: listsError } = await supabase
-        .from('top100_lists' as any)
-        .select('id, slug, name')
-        .eq('is_active', true);
-
-      if (listsError) throw listsError;
-
-      // Get user's played courses
-      const { data: userActivity, error: activityError } = await supabase
-        .from('user_course_activity' as any)
-        .select('course_id')
-        .eq('user_id', userId);
-
-      if (activityError) throw activityError;
-
-      const playedCourseIds = new Set(
-        (userActivity || []).map((a: any) => a.course_id)
-      );
-
-      // For each list, count total and played
-      const progress: Top100Progress[] = [];
-
-      for (const list of (lists as any) || []) {
-        const { data: memberships, error: membershipError } = await supabase
-          .from('course_top100_memberships')
-          .select('course_id')
-          .eq('list_id', list.id);
-
-        if (membershipError) throw membershipError;
-
-        const total = memberships?.length || 0;
-        const played = memberships?.filter((m) =>
-          playedCourseIds.has(m.course_id)
-        ).length || 0;
-
-        progress.push({
-          listSlug: list.slug,
-          listName: list.name,
-          played,
-          total,
-        });
-      }
-
-      return progress;
-    },
-    staleTime: 60_000,
-  });
+  // Reuse the optimized Top 100 progress hook
+  const { data: top100Progress = [], isLoading: progressLoading } = useUserTop100Progress(userId);
 
   return {
     totalCoursesPlayed: coursesPlayed,
