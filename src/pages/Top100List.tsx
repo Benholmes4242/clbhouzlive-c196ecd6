@@ -17,6 +17,7 @@ import GolfClubView from '@/components/golf-club/GolfClubView';
 import Top100Pills from '@/components/courses/Top100Pills';
 import { useCourseTop100Memberships } from '@/hooks/useCourseTop100Memberships';
 import { FriendsTop100Panel } from '@/components/top100/FriendsTop100Panel';
+import { Top100AchievementsBlock } from '@/components/top100/Top100AchievementsBlock';
 
 type SortMode = 'rank' | 'alphabetical' | 'country';
 type FilterMode = 'all' | 'played' | 'unplayed';
@@ -190,6 +191,11 @@ const Top100List = () => {
           {/* Friends on this list */}
           {currentList && session && (
             <FriendsTop100Panel listId={currentList.id} listName={currentList.name} />
+          )}
+
+          {/* Achievements tied to this list */}
+          {currentList && session && (
+            <Top100AchievementsBlock listId={currentList.id} />
           )}
 
           {/* Controls */}
