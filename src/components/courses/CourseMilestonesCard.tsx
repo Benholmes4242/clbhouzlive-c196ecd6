@@ -24,7 +24,7 @@ export const CourseMilestonesCard: React.FC<CourseMilestonesCardProps> = ({ cour
   if (!user || prompts.length === 0) return null;
 
   const handlePromptClick = () => {
-    navigate(`/profile/${user.id}?tab=courses&section=achievements`);
+    navigate('/achievements');
   };
 
   return (
@@ -67,6 +67,15 @@ export const CourseMilestonesCard: React.FC<CourseMilestonesCardProps> = ({ cour
             </div>
           </button>
         ))}
+      </div>
+      
+      <div className="mt-4 pt-4 border-t border-border/30">
+        <button
+          onClick={handlePromptClick}
+          className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+        >
+          See all your achievements →
+        </button>
       </div>
     </div>
   );
