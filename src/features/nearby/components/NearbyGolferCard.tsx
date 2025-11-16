@@ -84,7 +84,7 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
           <GolferAvatar
             avatarUrl={golfer.avatar_url}
             displayName={golfer.display_name}
-            size={68}
+            size={72}
           />
 
           {/* Content */}
