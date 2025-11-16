@@ -175,7 +175,8 @@ function AppRoutes() {
         <Route path="/news" element={<News />} />
         <Route path="/tour-central" element={<TourCentral />} />
         <Route path="/videos" element={<VideosPage />} />
-        <Route path="/season-shop" element={<SeasonShop />} />
+          <Route path="/season-shop" element={<SeasonShop />} />
+          <Route path="/challenges" element={<ChallengesPage />} />
         
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />

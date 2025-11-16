@@ -27,3 +27,15 @@ verify_jwt = true
 [functions.refresh-season-shop]
 verify_jwt = false
 
+[functions.generate-weekly-challenges]
+verify_jwt = false
+
+[functions.reset-weekly-challenge-ladders]
+verify_jwt = false
+
+[functions.calculate-streaks]
+verify_jwt = false
+
+[functions.generate-season-wrap]
+verify_jwt = true
+

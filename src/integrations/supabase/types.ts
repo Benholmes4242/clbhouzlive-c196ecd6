@@ -341,6 +341,101 @@ export type Database = {
         }
         Relationships: []
       }
+      challenge_requirements: {
+        Row: {
+          challenge_id: string
+          created_at: string | null
+          id: string
+          metric: string
+          target: number
+        }
+        Insert: {
+          challenge_id: string
+          created_at?: string | null
+          id?: string
+          metric: string
+          target: number
+        }
+        Update: {
+          challenge_id?: string
+          created_at?: string | null
+          id?: string
+          metric?: string
+          target?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_requirements_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenges: {
+        Row: {
+          auto_generated: boolean | null
+          category: string
+          created_at: string | null
+          created_by: string | null
+          description: string
+          end_at: string
+          id: string
+          is_active: boolean | null
+          shop_currency_reward: number | null
+          start_at: string
+          title: string
+          type: string
+          xp_reward: number
+        }
+        Insert: {
+          auto_generated?: boolean | null
+          category: string
+          created_at?: string | null
+          created_by?: string | null
+          description: string
+          end_at: string
+          id?: string
+          is_active?: boolean | null
+          shop_currency_reward?: number | null
+          start_at: string
+          title: string
+          type: string
+          xp_reward: number
+        }
+        Update: {
+          auto_generated?: boolean | null
+          category?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string
+          end_at?: string
+          id?: string
+          is_active?: boolean | null
+          shop_currency_reward?: number | null
+          start_at?: string
+          title?: string
+          type?: string
+          xp_reward?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenges_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenges_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coach_feedback: {
         Row: {
           attachments: Json | null
@@ -2481,6 +2576,56 @@ export type Database = {
         }
         Relationships: []
       }
+      rivals: {
+        Row: {
+          created_at: string | null
+          id: string
+          rival_user_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          rival_user_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          rival_user_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rivals_rival_user_id_fkey"
+            columns: ["rival_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rivals_rival_user_id_fkey"
+            columns: ["rival_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rivals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rivals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       season_pass_tiers: {
         Row: {
           id: string
@@ -2666,6 +2811,69 @@ export type Database = {
           },
         ]
       }
+      season_wrap_cards: {
+        Row: {
+          cards: Json
+          generated_at: string | null
+          id: string
+          season_id: string
+          user_id: string
+          viewed: boolean | null
+        }
+        Insert: {
+          cards?: Json
+          generated_at?: string | null
+          id?: string
+          season_id: string
+          user_id: string
+          viewed?: boolean | null
+        }
+        Update: {
+          cards?: Json
+          generated_at?: string | null
+          id?: string
+          season_id?: string
+          user_id?: string
+          viewed?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "season_wrap_cards_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "season_leaderboard_view"
+            referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "season_wrap_cards_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "season_wrap_cards_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "user_season_xp_view"
+            referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "season_wrap_cards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "season_wrap_cards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       seasons: {
         Row: {
           created_at: string
@@ -2749,6 +2957,54 @@ export type Database = {
           srtext?: string | null
         }
         Relationships: []
+      }
+      streaks: {
+        Row: {
+          daily_streak: number | null
+          last_daily_action: string | null
+          last_monthly_action: string | null
+          last_weekly_action: string | null
+          monthly_streak: number | null
+          updated_at: string | null
+          user_id: string
+          weekly_streak: number | null
+        }
+        Insert: {
+          daily_streak?: number | null
+          last_daily_action?: string | null
+          last_monthly_action?: string | null
+          last_weekly_action?: string | null
+          monthly_streak?: number | null
+          updated_at?: string | null
+          user_id: string
+          weekly_streak?: number | null
+        }
+        Update: {
+          daily_streak?: number | null
+          last_daily_action?: string | null
+          last_monthly_action?: string | null
+          last_weekly_action?: string | null
+          monthly_streak?: number | null
+          updated_at?: string | null
+          user_id?: string
+          weekly_streak?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "streaks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "streaks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       swing_coach_outreach: {
         Row: {
@@ -3290,6 +3546,58 @@ export type Database = {
           created_at?: string
         }
         Relationships: []
+      }
+      user_challenge_progress: {
+        Row: {
+          challenge_id: string
+          completed_at: string | null
+          current_value: number | null
+          id: string
+          is_completed: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed_at?: string | null
+          current_value?: number | null
+          id?: string
+          is_completed?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed_at?: string | null
+          current_value?: number | null
+          id?: string
+          is_completed?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_challenge_progress_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_challenge_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_challenge_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_cosmetic_unlocks: {
         Row: {
@@ -4037,6 +4345,78 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      weekly_challenge_ladder: {
+        Row: {
+          created_at: string | null
+          id: string
+          points: number | null
+          rank: number | null
+          season_id: string
+          updated_at: string | null
+          user_id: string
+          week_end: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          points?: number | null
+          rank?: number | null
+          season_id: string
+          updated_at?: string | null
+          user_id: string
+          week_end: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          points?: number | null
+          rank?: number | null
+          season_id?: string
+          updated_at?: string | null
+          user_id?: string
+          week_end?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_challenge_ladder_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "season_leaderboard_view"
+            referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "weekly_challenge_ladder_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weekly_challenge_ladder_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "user_season_xp_view"
+            referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "weekly_challenge_ladder_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weekly_challenge_ladder_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
         ]
