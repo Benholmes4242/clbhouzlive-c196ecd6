@@ -3397,6 +3397,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 .eh-bubble {
   max-width: min(90vw, 620px);
   line-height: 1.5;
+  width: fit-content;
 }
 
 .eh-msg__label { 
