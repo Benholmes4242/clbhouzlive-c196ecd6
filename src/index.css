@@ -3255,7 +3255,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 }
 
 .eh-row__avatar { 
-  flex: 0 0 36px;
+  flex: 0 0 42px;
   margin-top: 2px;
 }
 
@@ -3383,13 +3383,13 @@ html[data-immersive="true"] .app-shell--topSpacer {
 }
 
 .eh-line__avatar {
-  width: 28px;
-  height: 28px;
+  width: 42px;
+  height: 42px;
 }
 
 .eh-line__pad {
-  width: 28px;
-  height: 28px;
+  width: 42px;
+  height: 42px;
 }
 
 .eh-bubble {
@@ -3401,7 +3401,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
   font-size: 12px; 
   letter-spacing: .4px; 
   color: var(--eh-meta); 
-  margin-bottom: 10px; 
+  margin-bottom: 12px; 
   text-transform: uppercase; 
 }
 
