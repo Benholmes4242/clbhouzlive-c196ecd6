@@ -117,7 +117,7 @@ export function UserSearchTypeahead({
                     <UserPlus className="w-3 h-3 text-white/60" />
                   </div>
                 ) : (
-                  <Squircle width={20} height={20}>
+                  <Squircle width={24} height={24}>
                     <img src={user.profile_photo_url || '/placeholder.svg'} alt={user.display_name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                   </Squircle>
                 )}
@@ -205,7 +205,7 @@ export function UserSearchTypeahead({
                     }}
                     className="resultRow"
                   >
-                    <Squircle width={32} height={32}>
+                    <Squircle width={36} height={36}>
                       <img src={user.profile_photo_url || '/placeholder.svg'} alt={user.display_name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                     </Squircle>
                     <div className="rMid">
