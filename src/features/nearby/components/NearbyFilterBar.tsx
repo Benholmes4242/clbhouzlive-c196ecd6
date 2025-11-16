@@ -131,7 +131,7 @@ export function NearbyFilterBar({ filters, onFiltersChange }: NearbyFilterBarPro
             onClick={() => onFiltersChange({ ...filters, radiusKm: option.valueKm })}
             className={`flex-1 h-[34px] rounded-[10px] text-[14px] font-medium transition-colors ${
               filters.radiusKm === option.valueKm
-                ? 'bg-white/20 text-white shadow-[0_0_14px_rgba(0,0,0,0.35)]'
+                ? 'bg-white/20 text-white shadow-[0_0_8px_rgba(0,0,0,0.20)]'
                 : 'bg-white/6 text-white/70 hover:bg-white/10'
             }`}
           >
