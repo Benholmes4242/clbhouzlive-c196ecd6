@@ -58,7 +58,8 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   isMobile?: boolean;
   shouldAttach?: boolean;
   autoplay?: boolean;
-}>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false }, ref) => {
+  isNearby?: boolean;
+}>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true }, ref) => {
   // Generate HLS URL from source
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
@@ -83,6 +84,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             showMuteButton={false}
             externallyManaged={true}
             fit="cover"
+            isNearby={isNearby}
           />
         </div>
       ) : (
@@ -603,7 +605,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     const nextPost = filteredPosts[nextIndex];
     if (!nextPost || nextPost.media?.[0]?.media_type !== 'video') return;
 
-    const src = nextPost.media[0]?.url;
+    const src = nextPost.media[0]?.media_url;
     if (!src) return;
 
     const uid = uidFromNode({ src });
@@ -658,6 +660,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       >
 
         {filteredPosts.map((item, index) => {
+          // Virtualization: calculate distance from current index
+          const distance = Math.abs(index - currentIndex);
+          const isNearby = distance <= 1;
+
           // Get media array for this item
           const mediaItems = item.media && item.media.length > 0 ? item.media : [{
             id: `${item.id}-single`,
@@ -686,7 +692,34 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
             }));
           };
 
+          // Render lightweight placeholder for off-screen items
+          if (!isNearby) {
+            return (
+              <div
+                key={item.id}
+                data-postid={item.id}
+                ref={(el) => {
+                  if (el) {
+                    itemRefs.current[index] = el;
+                    nearRef.current?.observe(el);
+                    playRef.current?.observe(el);
+                  }
+                }}
+                className="relative w-full snap-start snap-always bg-black"
+                style={{ 
+                  height: '100svh',
+                  minHeight: '100svh',
+                  maxHeight: '100svh',
+                  width: '100vw',
+                  maxWidth: '100vw',
+                  scrollSnapAlign: 'start',
+                  scrollSnapStop: 'always'
+                }}
+              />
+            );
+          }
 
+          // Render full card for nearby items
           return (
             <div
               key={item.id}
@@ -762,6 +795,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     isMobile={isMobile}
                     shouldAttach={!!shouldAttachMap[item.id]}
                     autoplay={!!autoplayMap[item.id]}
+                    isNearby={isNearby}
                   />
                 ) : (
                   <div className="relative w-full h-full bg-black overflow-hidden">
