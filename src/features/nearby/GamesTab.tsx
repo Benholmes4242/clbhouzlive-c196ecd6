@@ -251,7 +251,9 @@ function GamesList({ games, isLoading }: { games: Game[]; isLoading: boolean }) 
   if (!games || games.length === 0) {
     return (
       <div className="gamesEmpty" role="status">
-        <div className="gamesEmpty__icon">📍</div>
+        <div className="gamesEmpty__icon">
+          <MapPin size={32} className="text-white" strokeWidth={2} />
+        </div>
         <h2 className="gamesEmpty__title">No games found</h2>
         <p className="gamesEmpty__body">Be the first to start one — tap <strong>Create a Game</strong>.</p>
       </div>
