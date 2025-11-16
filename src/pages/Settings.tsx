@@ -8,6 +8,7 @@ import EmailChangeSection from '@/components/profile/EmailChangeSection';
 import NotificationSettings from '@/components/settings/NotificationSettings';
 import ThemeToggle from '@/components/ui/theme-toggle';
 import { useProfileData } from '@/hooks/useProfileData';
+import { NearbyTestToolsPanel } from '@/features/nearby/components/NearbyTestToolsPanel';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -83,6 +84,8 @@ const Settings = () => {
         <NotificationSettings />
         
         <ThemeToggle />
+        
+        <NearbyTestToolsPanel />
         
         <EmailChangeSection currentEmail={user?.email} />
 
