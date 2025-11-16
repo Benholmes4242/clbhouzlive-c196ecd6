@@ -9,8 +9,8 @@ import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const CourseExplorer = () => {
-  const [selectedRegion, setSelectedRegion] = useState<string>('');
-  const [selectedList, setSelectedList] = useState<string>('');
+  const [selectedRegion, setSelectedRegion] = useState<string>('all');
+  const [selectedList, setSelectedList] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -28,8 +28,8 @@ const CourseExplorer = () => {
   // Use the new search hook
   const { data: courses = [], isLoading } = useGolfCoursesSearch({
     searchQuery: debouncedSearch,
-    regionSlug: selectedRegion || undefined,
-    listSlug: selectedList || undefined,
+    regionSlug: selectedRegion === 'all' ? undefined : selectedRegion,
+    listSlug: selectedList === 'all' ? undefined : selectedList,
     limit: 100,
   });
 
@@ -46,14 +46,14 @@ const CourseExplorer = () => {
   );
 
   const regionOptions = [
-    { value: '', label: 'All Regions' },
+    { value: 'all', label: 'All Regions' },
     { value: 'gb-i', label: 'Britain & Ireland' },
     { value: 'usa', label: 'United States' },
     { value: 'europe', label: 'Continental Europe' },
   ];
 
   const listOptions = [
-    { value: '', label: 'All Courses' },
+    { value: 'all', label: 'All Courses' },
     ...lists.map(list => ({ value: list.slug, label: list.short_label }))
   ];
 
