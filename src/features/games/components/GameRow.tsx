@@ -227,7 +227,7 @@ export function GameRow({
               <h3 className="gameRow__sectionTitle">Host</h3>
               <MiniProfileRow
                 avatarUrl={host.profile_photo_url}
-                name={host.display_name || 'Unknown'}
+                name={host.display_name || (host.user_id ? 'Unknown' : 'Guest')}
                 subtitle={host.eg_handicap_index ? `HCP ${host.eg_handicap_index}` : undefined}
                 badgeLabel="Host"
               />
@@ -244,7 +244,7 @@ export function GameRow({
                 <MiniProfileRow
                   key={member.user_id || idx}
                   avatarUrl={member.profile_photo_url}
-                  name={member.display_name || 'Unknown'}
+                  name={member.display_name || (member.user_id ? 'Unknown' : 'Guest')}
                   subtitle={member.eg_handicap_index ? `HCP ${member.eg_handicap_index}` : undefined}
                 />
               ))}

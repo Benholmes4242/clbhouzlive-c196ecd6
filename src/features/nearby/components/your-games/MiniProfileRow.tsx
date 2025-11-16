@@ -15,7 +15,7 @@ export function MiniProfileRow({ avatarUrl, name, subtitle, badgeLabel }: MiniPr
   return (
     <div className="miniProfileRow">
       <div className="miniProfileRow__avatar">
-        <Squircle width={40} height={40}>
+        <Squircle width={42} height={42}>
           {avatarUrl ? (
             <img src={avatarUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
