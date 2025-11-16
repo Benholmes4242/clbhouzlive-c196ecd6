@@ -1,6 +1,7 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, Target, BarChart3, Trophy } from 'lucide-react';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface HandicapSummaryStatsProps {
   currentHandicap: number | null;
@@ -87,7 +88,8 @@ const HandicapSummaryStats: React.FC<HandicapSummaryStatsProps> = ({
   isLoading = false,
   onAchievementsClick
 }) => {
-  const { achievements } = useUserAchievements();
+  const { user } = useSupabaseSession();
+  const { data: achievements = [] } = useUserAchievements(user?.id);
   const achievementsCount = achievements.length;
 
   return (

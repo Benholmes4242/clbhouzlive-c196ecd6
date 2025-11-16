@@ -164,12 +164,12 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
   // Mobile detection
   const isMobile = useIsMobile();
 
-  // Fetch real user achievements
-  const { achievements, loading: achievementsLoading } = useUserAchievements(5);
-  
   // Fetch friends data for progress markers
   const { user } = useSupabaseSession();
   const { data: friends = [] } = useFriendsLeaderboard(user?.id);
+
+  // Fetch real user achievements
+  const { data: achievements = [], isLoading: achievementsLoading } = useUserAchievements(user?.id);
 
   // Visual theme based on progress
   const getProgressTheme = (courses: number) => {
