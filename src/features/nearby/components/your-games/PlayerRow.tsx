@@ -14,7 +14,7 @@ export const PlayerRow: React.FC<PlayerRowProps> = ({ p, isHost }) => {
   
   return (
     <div
-      className="flex items-center gap-3 rounded-xl bg-white/[0.03] border border-white/10 px-3 py-2"
+      className="flex items-center gap-3.5 rounded-xl bg-white/[0.03] border border-white/10 px-3 py-2"
       role="listitem"
     >
       {/* Avatar */}
