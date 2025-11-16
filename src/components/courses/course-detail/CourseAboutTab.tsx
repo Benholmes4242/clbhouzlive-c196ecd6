@@ -8,6 +8,8 @@ import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AboutMediaStrip from './AboutMediaStrip';
 import MapThumbnail from '@/components/ui/map-thumbnail';
+import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
+import { Progress } from '@/components/ui/progress';
 
 interface Course {
   id: string;
@@ -47,31 +49,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const isMobile = useIsMobile();
 
-  // Fetch rating stats for community score
-  const { data: ratingStats } = useQuery({
-    queryKey: ['course-rating-stats', course.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('course_ratings')
-        .select('rating, review')
-        .eq('course_id', course.id);
-
-      if (error) throw error;
-
-      if (!data || data.length === 0) {
-        return { average_rating: 0, total_ratings: 0 };
-      }
-
-      const totalRatings = data.length;
-      const averageRating = data.reduce((sum, rating) => sum + rating.rating, 0) / totalRatings;
-
-      return {
-        average_rating: Math.round(averageRating * 10) / 10,
-        total_ratings: totalRatings
-      };
-    },
-    enabled: !!course.id,
-  });
+  // Fetch rating aggregates using the new hook
+  const { data: ratingAggregates } = useCourseRatingAggregates(course.id);
 
   const handleWebsiteClick = () => {
     if (course.website_url) {
@@ -91,13 +70,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     ? truncateDescription(course.description, 50)
     : course.description;
 
-  // Mock community score data - in real app this would come from rating breakdown
-  const communityScores = {
-    courseDesign: 8.4,
-    courseCondition: 8.8,
-    facilities: 7.7
-  };
-
   const getScorePercentage = (score: number) => (score / 10) * 100;
   
   const formatScore = (score: number) => {
@@ -108,87 +80,99 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     <div className="space-y-6">
       {/* Community Score Section */}
       <div className="bg-card rounded-lg border p-6">
-        <div className="mb-4">
-          <div className="flex items-center justify-between">
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
             <h3 className="text-xl font-semibold">Community Score</h3>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <ClubhouseLogo size="lg" />
-              <div className="text-3xl font-bold">
-                {ratingStats?.average_rating || 0}/10
+              <div className="text-4xl font-bold">
+                {ratingAggregates?.avg_overall_score 
+                  ? formatScore(ratingAggregates.avg_overall_score) 
+                  : '—'}<span className="text-2xl text-muted-foreground">/10</span>
               </div>
             </div>
           </div>
-          <div className="flex justify-end mr-3">
-            <div className="text-sm text-muted-foreground text-center">
-              {ratingStats?.total_ratings || 0} {ratingStats?.total_ratings === 1 ? 'review' : 'reviews'}
+          <div className="flex justify-end">
+            <div className="text-sm text-muted-foreground">
+              Based on {ratingAggregates?.review_count || 0} {ratingAggregates?.review_count === 1 ? 'rating' : 'ratings'}
             </div>
           </div>
         </div>
         
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Course Design</span>
-            </div>
-            <div className="relative w-full bg-muted h-2 rounded-full">
-              <div 
-                className="bg-foreground h-2 rounded-full transition-all duration-300"
-                style={{ width: `${getScorePercentage(communityScores.courseDesign)}%` }}
-              />
-              <div 
-                className="absolute top-1/2 -translate-y-1/2 bg-background border border-border rounded-full px-3 py-1 text-sm font-medium shadow-sm"
-                style={{ 
-                  left: `${Math.min(getScorePercentage(communityScores.courseDesign), 85)}%`,
-                  transform: 'translateY(-50%) translateX(-50%)'
-                }}
-              >
-                {formatScore(communityScores.courseDesign)}/10
+        {ratingAggregates && ratingAggregates.review_count > 0 ? (
+          <div className="space-y-5">
+            {/* Course Design */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-sm font-medium">Course Design</span>
+                {ratingAggregates.avg_design_score && (
+                  <span className="text-sm font-semibold">
+                    {formatScore(ratingAggregates.avg_design_score)}/10
+                  </span>
+                )}
               </div>
+              {ratingAggregates.avg_design_score ? (
+                <Progress 
+                  value={getScorePercentage(ratingAggregates.avg_design_score)} 
+                  className="h-2"
+                />
+              ) : (
+                <div className="h-2 bg-muted rounded-full flex items-center justify-center">
+                  <span className="text-xs text-muted-foreground">Not yet rated</span>
+                </div>
+              )}
+            </div>
+
+            {/* Course Condition */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-sm font-medium">Course Condition</span>
+                {ratingAggregates.avg_condition_score && (
+                  <span className="text-sm font-semibold">
+                    {formatScore(ratingAggregates.avg_condition_score)}/10
+                  </span>
+                )}
+              </div>
+              {ratingAggregates.avg_condition_score ? (
+                <Progress 
+                  value={getScorePercentage(ratingAggregates.avg_condition_score)} 
+                  className="h-2"
+                />
+              ) : (
+                <div className="h-2 bg-muted rounded-full flex items-center justify-center">
+                  <span className="text-xs text-muted-foreground">Not yet rated</span>
+                </div>
+              )}
+            </div>
+
+            {/* Facilities */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-sm font-medium">Facilities</span>
+                {ratingAggregates.avg_facilities_score && (
+                  <span className="text-sm font-semibold">
+                    {formatScore(ratingAggregates.avg_facilities_score)}/10
+                  </span>
+                )}
+              </div>
+              {ratingAggregates.avg_facilities_score ? (
+                <Progress 
+                  value={getScorePercentage(ratingAggregates.avg_facilities_score)} 
+                  className="h-2"
+                />
+              ) : (
+                <div className="h-2 bg-muted rounded-full flex items-center justify-center">
+                  <span className="text-xs text-muted-foreground">Not yet rated</span>
+                </div>
+              )}
             </div>
           </div>
-          
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Course Condition</span>
-            </div>
-            <div className="relative w-full bg-muted h-2 rounded-full">
-              <div 
-                className="bg-foreground h-2 rounded-full transition-all duration-300"
-                style={{ width: `${getScorePercentage(communityScores.courseCondition)}%` }}
-              />
-              <div 
-                className="absolute top-1/2 -translate-y-1/2 bg-background border border-border rounded-full px-3 py-1 text-sm font-medium shadow-sm"
-                style={{ 
-                  left: `${Math.min(getScorePercentage(communityScores.courseCondition), 85)}%`,
-                  transform: 'translateY(-50%) translateX(-50%)'
-                }}
-              >
-                {formatScore(communityScores.courseCondition)}/10
-              </div>
-            </div>
+        ) : (
+          <div className="text-center py-8 text-muted-foreground">
+            <p className="text-sm">No ratings yet</p>
+            <p className="text-xs mt-1">Be the first to rate this course!</p>
           </div>
-          
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Facilities</span>
-            </div>
-            <div className="relative w-full bg-muted h-2 rounded-full">
-              <div 
-                className="bg-foreground h-2 rounded-full transition-all duration-300"
-                style={{ width: `${getScorePercentage(communityScores.facilities)}%` }}
-              />
-              <div 
-                className="absolute top-1/2 -translate-y-1/2 bg-background border border-border rounded-full px-3 py-1 text-sm font-medium shadow-sm"
-                style={{ 
-                  left: `${Math.min(getScorePercentage(communityScores.facilities), 85)}%`,
-                  transform: 'translateY(-50%) translateX(-50%)'
-                }}
-              >
-                {formatScore(communityScores.facilities)}/10
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* About Section */}
