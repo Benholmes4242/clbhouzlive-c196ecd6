@@ -186,7 +186,7 @@ const CourseDetailModal = ({
             />
 
             {/* Community Rating moved above About This Course for better visibility */}
-            <CourseRatingStats ratingStats={ratingStats} />
+            <CourseRatingStats courseId={course.id} />
 
             {/* About This Course section with Add to My Played button */}
             <div className="flex items-center justify-between">
