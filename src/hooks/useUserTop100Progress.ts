@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface ListProgress {
   listId: string;
+  listSlug: string;
+  listName: string;
   played: number;
   total: number;
 }
@@ -14,51 +16,21 @@ export function useUserTop100Progress(userId: string | undefined) {
     queryFn: async () => {
       if (!userId) return [];
 
-      // Get all courses in each list
-      const { data: lists, error: listsError } = await supabase
-        .from('top100_lists' as any)
-        .select('id, slug')
-        .eq('is_active', true);
-
-      if (listsError) throw listsError;
-
-      // Get user's played courses from user_course_activity
-      const { data: userActivity, error: activityError } = await supabase
-        .from('user_course_activity' as any)
-        .select('course_id')
+      const { data, error } = await supabase
+        .from('user_top100_progress_view' as any)
+        .select('list_id, list_slug, list_name, courses_played_in_list, total_courses_in_list')
         .eq('user_id', userId);
 
-      if (activityError) throw activityError;
+      if (error) throw error;
 
-      const playedCourseIds = new Set(
-        (userActivity || []).map((a: any) => a.course_id)
-      );
-
-      // For each list, count total courses and played courses
-      const progress: ListProgress[] = [];
-
-      for (const list of (lists as any) || []) {
-        const { data: memberships, error: membershipError } = await supabase
-          .from('course_top100_memberships')
-          .select('course_id')
-          .eq('list_id', (list as any).id);
-
-        if (membershipError) throw membershipError;
-
-        const total = memberships?.length || 0;
-        const played = memberships?.filter((m) =>
-          playedCourseIds.has(m.course_id)
-        ).length || 0;
-
-        progress.push({
-          listId: list.id,
-          played,
-          total,
-        });
-      }
-
-      return progress;
+      return (data || []).map((row: any) => ({
+        listId: row.list_id,
+        listSlug: row.list_slug,
+        listName: row.list_name,
+        played: row.courses_played_in_list || 0,
+        total: row.total_courses_in_list || 0,
+      })) as ListProgress[];
     },
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: 60_000,
   });
 }

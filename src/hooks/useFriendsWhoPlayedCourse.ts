@@ -33,7 +33,7 @@ export function useFriendsWhoPlayedCourse(userId: string | undefined, courseId: 
       const friendIds = (relationships || []).map((r: any) => r.following_id);
       if (friendIds.length === 0) return [];
 
-      // Get their activity for this course
+      // Get their activity for this course with profile data in one query
       const { data: activity, error: actError } = await supabase
         .from('user_course_activity' as any)
         .select(`
@@ -42,7 +42,13 @@ export function useFriendsWhoPlayedCourse(userId: string | undefined, courseId: 
           first_played_at,
           last_played_at,
           has_review,
-          has_rating
+          has_rating,
+          user_profiles (
+            id,
+            username,
+            display_name,
+            profile_photo_url
+          )
         `)
         .eq('course_id', courseId)
         .in('user_id', friendIds);
@@ -50,22 +56,15 @@ export function useFriendsWhoPlayedCourse(userId: string | undefined, courseId: 
       if (actError) throw actError;
       if (!activity || activity.length === 0) return [];
 
-      // Get profiles for these users
-      const userIds = activity.map((a: any) => a.user_id);
-      const { data: profiles, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('id, username, display_name, profile_photo_url')
-        .in('id', userIds);
-
-      if (profileError) throw profileError;
-
-      // Merge activity with profiles
-      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
-      
+      // Map to the expected interface
       return activity
         .map((a: any) => ({
-          ...a,
-          profile: profileMap.get(a.user_id)
+          user_id: a.user_id,
+          first_played_at: a.first_played_at,
+          last_played_at: a.last_played_at,
+          has_review: a.has_review,
+          has_rating: a.has_rating,
+          profile: a.user_profiles,
         }))
         .filter((a: any) => a.profile) as FriendCourseActivity[];
     },

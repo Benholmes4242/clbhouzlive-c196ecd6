@@ -272,7 +272,7 @@ interface CourseListItemProps {
   onClick: () => void;
 }
 
-const CourseListItem: React.FC<CourseListItemProps> = ({ course, isPlayed, onClick }) => {
+const CourseListItem: React.FC<CourseListItemProps> = React.memo(({ course, isPlayed, onClick }) => {
   const { data: memberships } = useCourseTop100Memberships(course.id);
 
   return (
@@ -328,6 +328,6 @@ const CourseListItem: React.FC<CourseListItemProps> = ({ course, isPlayed, onCli
       </div>
     </div>
   );
-};
+});
 
 export default Top100List;
