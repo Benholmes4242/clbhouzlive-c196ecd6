@@ -3805,7 +3805,6 @@ export type Database = {
         Args: never
         Returns: {
           courses_added: number
-          courses_skipped: number
           details: string
           list_slug: string
           status: string
