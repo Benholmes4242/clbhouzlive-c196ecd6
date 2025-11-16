@@ -568,6 +568,44 @@ export type Database = {
         }
         Relationships: []
       }
+      course_change_log: {
+        Row: {
+          admin_user_id: string
+          change_details: Json | null
+          change_summary: string
+          change_type: string
+          course_id: string
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          admin_user_id: string
+          change_details?: Json | null
+          change_summary: string
+          change_type: string
+          course_id: string
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          admin_user_id?: string
+          change_details?: Json | null
+          change_summary?: string
+          change_type?: string
+          course_id?: string
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_change_log_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_media: {
         Row: {
           course_id: string
@@ -618,8 +656,11 @@ export type Database = {
       }
       course_ratings: {
         Row: {
+          condition_score: number | null
           course_id: string
           created_at: string
+          design_score: number | null
+          facilities_score: number | null
           helpful_count: number | null
           id: string
           rating: number
@@ -630,8 +671,11 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          condition_score?: number | null
           course_id: string
           created_at?: string
+          design_score?: number | null
+          facilities_score?: number | null
           helpful_count?: number | null
           id?: string
           rating: number
@@ -642,8 +686,11 @@ export type Database = {
           user_id: string
         }
         Update: {
+          condition_score?: number | null
           course_id?: string
           created_at?: string
+          design_score?: number | null
+          facilities_score?: number | null
           helpful_count?: number | null
           id?: string
           rating?: number
@@ -703,6 +750,48 @@ export type Database = {
             columns: ["review_id"]
             isOneToOne: false
             referencedRelation: "course_ratings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      course_top100_memberships: {
+        Row: {
+          added_at: string | null
+          course_id: string
+          id: string
+          list_id: string
+          rank: number
+          updated_at: string | null
+        }
+        Insert: {
+          added_at?: string | null
+          course_id: string
+          id?: string
+          list_id: string
+          rank: number
+          updated_at?: string | null
+        }
+        Update: {
+          added_at?: string | null
+          course_id?: string
+          id?: string
+          list_id?: string
+          rank?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_top100_memberships_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_top100_memberships_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "top100_lists"
             referencedColumns: ["id"]
           },
         ]
@@ -2582,6 +2671,42 @@ export type Database = {
         }
         Relationships: []
       }
+      top100_lists: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          short_label: string
+          slug: string
+          sort_order: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          short_label: string
+          slug: string
+          sort_order: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          short_label?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_data: Json
@@ -3267,6 +3392,26 @@ export type Database = {
       }
     }
     Views: {
+      course_rating_aggregates: {
+        Row: {
+          avg_condition_score: number | null
+          avg_design_score: number | null
+          avg_facilities_score: number | null
+          avg_overall_score: number | null
+          course_id: string | null
+          review_count: number | null
+          text_review_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_ratings_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_rating_stats: {
         Row: {
           average_rating: number | null
@@ -3427,6 +3572,28 @@ export type Database = {
           website_url?: string | null
         }
         Relationships: []
+      }
+      user_course_activity: {
+        Row: {
+          course_id: string | null
+          first_played_at: string | null
+          has_rating: boolean | null
+          has_review: boolean | null
+          in_top_ten: boolean | null
+          is_top100: boolean | null
+          last_played_at: string | null
+          rating_value: number | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_ratings_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_friend_pairs: {
         Row: {
