@@ -110,6 +110,19 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
       {/* Season Status - Own Profile Only */}
       {isOwnProfile && <SeasonStatusCard userId={userId} />}
 
+      {/* Trophy Cabinet Link */}
+      {profile && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate(`/achievements/${profile.username}#trophies`)}
+          className="w-full"
+        >
+          <Trophy className="w-4 h-4 mr-2" />
+          {isOwnProfile ? 'View Trophy Cabinet' : 'View Season Trophies'}
+        </Button>
+      )}
+
       {/* Full Achievements Panel */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">

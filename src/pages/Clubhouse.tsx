@@ -19,6 +19,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import CommentsModal from '@/components/posts/CommentsModal';
+import { NewSeasonBanner } from '@/components/feed/NewSeasonBanner';
+import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
+import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
 const Clubhouse = () => {
   // Set header variant for clubhouse (glass-dark)
@@ -77,6 +80,16 @@ const Clubhouse = () => {
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
+
+  // Season Recap Modal
+  const { data: seasonRecap } = useSeasonRecap(user?.id);
+  const [showRecapModal, setShowRecapModal] = React.useState(false);
+
+  React.useEffect(() => {
+    if (seasonRecap) {
+      setShowRecapModal(true);
+    }
+  }, [seasonRecap]);
   
   // Chrome auto-hide state
   const chromeControls = useChromeState({
@@ -223,6 +236,13 @@ const Clubhouse = () => {
 
       {/* Main Content - Fullscreen Vertical Feed */}
       <div className="clubhouse-scroll">
+        {/* New Season Banner */}
+        {user && (
+          <div className="px-4 pt-20">
+            <NewSeasonBanner />
+          </div>
+        )}
+
         {posts.length > 0 ? (
           <ClubhouseVerticalFeed
             posts={posts}
@@ -289,6 +309,20 @@ const Clubhouse = () => {
             setCommentsModalOpen(false);
             setSelectedPostId('');
           }}
+        />
+      )}
+
+      {/* Season Recap Modal */}
+      {seasonRecap && user && (
+        <SeasonRecapModal
+          isOpen={showRecapModal}
+          onClose={() => setShowRecapModal(false)}
+          seasonName={seasonRecap.seasonName}
+          finalRank={seasonRecap.finalRank}
+          finalXP={seasonRecap.finalXP}
+          rewardTier={seasonRecap.rewardTier}
+          seasonId={seasonRecap.seasonId}
+          userId={user.id}
         />
       )}
     </div>

@@ -2401,6 +2401,61 @@ export type Database = {
         }
         Relationships: []
       }
+      season_rewards: {
+        Row: {
+          badge_icon: string | null
+          created_at: string | null
+          id: string
+          label: string
+          max_rank: number
+          min_rank: number
+          season_id: string
+          tier: string
+        }
+        Insert: {
+          badge_icon?: string | null
+          created_at?: string | null
+          id?: string
+          label: string
+          max_rank: number
+          min_rank: number
+          season_id: string
+          tier: string
+        }
+        Update: {
+          badge_icon?: string | null
+          created_at?: string | null
+          id?: string
+          label?: string
+          max_rank?: number
+          min_rank?: number
+          season_id?: string
+          tier?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "season_rewards_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "season_leaderboard_view"
+            referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "season_rewards_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "season_rewards_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "user_season_xp_view"
+            referencedColumns: ["season_id"]
+          },
+        ]
+      }
       seasons: {
         Row: {
           created_at: string
@@ -2410,6 +2465,7 @@ export type Database = {
           is_active: boolean
           is_default: boolean
           name: string
+          processing_flag: boolean | null
           slug: string
           starts_at: string
           updated_at: string
@@ -2422,6 +2478,7 @@ export type Database = {
           is_active?: boolean
           is_default?: boolean
           name: string
+          processing_flag?: boolean | null
           slug: string
           starts_at: string
           updated_at?: string
@@ -2434,6 +2491,7 @@ export type Database = {
           is_active?: boolean
           is_default?: boolean
           name?: string
+          processing_flag?: boolean | null
           slug?: string
           starts_at?: string
           updated_at?: string
@@ -3474,6 +3532,101 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_season_results: {
+        Row: {
+          badge_icon: string | null
+          created_at: string | null
+          final_rank: number
+          final_xp: number
+          id: string
+          reward_tier: string
+          season_id: string
+          user_id: string
+        }
+        Insert: {
+          badge_icon?: string | null
+          created_at?: string | null
+          final_rank: number
+          final_xp: number
+          id?: string
+          reward_tier: string
+          season_id: string
+          user_id: string
+        }
+        Update: {
+          badge_icon?: string | null
+          created_at?: string | null
+          final_rank?: number
+          final_xp?: number
+          id?: string
+          reward_tier?: string
+          season_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_season_results_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "season_leaderboard_view"
+            referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "user_season_results_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_season_results_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "user_season_xp_view"
+            referencedColumns: ["season_id"]
+          },
+        ]
+      }
+      user_seen_season_recaps: {
+        Row: {
+          season_id: string
+          seen_at: string | null
+          user_id: string
+        }
+        Insert: {
+          season_id: string
+          seen_at?: string | null
+          user_id: string
+        }
+        Update: {
+          season_id?: string
+          seen_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_seen_season_recaps_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "season_leaderboard_view"
+            referencedColumns: ["season_id"]
+          },
+          {
+            foreignKeyName: "user_seen_season_recaps_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_seen_season_recaps_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "user_season_xp_view"
+            referencedColumns: ["season_id"]
+          },
+        ]
       }
       user_suggestion_dismissals: {
         Row: {
