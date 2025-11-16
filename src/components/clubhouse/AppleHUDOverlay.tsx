@@ -14,11 +14,15 @@ interface AppleHUDOverlayProps {
   
   // User info
   user: {
+    id: string;
     name: string;
     avatar?: string;
     username?: string;
   };
   caption?: string;
+  createdAt?: string;
+  courseName?: string;
+  tags?: string[];
   
   // Engagement stats
   stats: {
@@ -35,6 +39,7 @@ interface AppleHUDOverlayProps {
   
   // Handlers
   onUserClick?: () => void;
+  onMoreClick?: () => void;
   onLike: () => void;
   onComment: () => void;
   onShare: () => void;
@@ -46,18 +51,22 @@ interface AppleHUDOverlayProps {
 
 /**
  * Complete HUD overlay for Clubhouse vertical feed
- * Includes metadata capsule, progress bar, and engagement rail
+ * Includes metadata capsule, progress bar (integrated), and engagement rail
  */
 export const AppleHUDOverlay = ({
   videoRef,
   user,
   caption,
+  createdAt,
+  courseName,
+  tags,
   stats,
   isLiked = false,
   isVideo = false,
   isMuted = false,
   isActive = false,
   onUserClick,
+  onMoreClick,
   onLike,
   onComment,
   onShare,
@@ -66,20 +75,30 @@ export const AppleHUDOverlay = ({
 }: AppleHUDOverlayProps) => {
   return (
     <>
-      {/* Bottom-left metadata capsule */}
-      <AppleMetadataCapsule
-        user={user}
-        caption={caption}
-        onUserClick={onUserClick}
-        isActive={isActive}
-      />
-
-      {/* Horizontal progress bar */}
-      <AppleProgressBar
-        videoRef={videoRef}
-        accent={accentColor}
-        isActive={isActive}
-      />
+      {/* Bottom-left: metadata capsule + progress bar */}
+      <div
+        className="fixed left-[16px] z-[50] flex flex-col gap-2"
+        style={{
+          bottom: `calc(env(safe-area-inset-bottom) + var(--bottom-nav-height, 72px) + 22px)`,
+        }}
+      >
+        <AppleMetadataCapsule
+          user={user}
+          caption={caption}
+          createdAt={createdAt}
+          courseName={courseName}
+          tags={tags}
+          onUserClick={onUserClick}
+          onMoreClick={onMoreClick}
+          isActive={isActive}
+        />
+        
+        <AppleProgressBar
+          videoRef={videoRef}
+          accent={accentColor}
+          isActive={isActive}
+        />
+      </div>
 
       {/* Right-side engagement rail */}
       <AppleEngagementRail

@@ -57,12 +57,9 @@ export const AppleProgressBar = ({
   return (
     <div 
       className={cn(
-        "fixed left-0 right-0 z-[45] h-0.5 overflow-hidden",
+        "w-[160px] h-[3px] rounded-full bg-white/20 overflow-hidden",
         className
       )}
-      style={{
-        bottom: 'calc(env(safe-area-inset-bottom, 0px) + clamp(72px, var(--bottom-nav-height, 72px) + 6px, calc(var(--bottom-nav-height, 72px) + 6px)))',
-      }}
     >
       {/* Track - frosted white subtle */}
       <div 
@@ -75,7 +72,7 @@ export const AppleProgressBar = ({
       {/* Fill - frosted white with soft glow */}
       <div 
         className={cn(
-          "absolute left-0 top-0 bottom-0 rounded-full transition-all",
+          "h-full rounded-full transition-all",
           isNewClip ? "animate-pulse duration-200" : "duration-75 ease-linear"
         )}
         style={{

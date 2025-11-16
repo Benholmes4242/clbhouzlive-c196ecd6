@@ -25,6 +25,7 @@ import { AppleHUDOverlay } from './AppleHUDOverlay';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { 
   auditComponentMount, 
   auditIntersectionObserver,
@@ -592,6 +593,26 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     setShowReactionTray(false);
   }, []);
 
+  // Preload next video HLS manifest
+  useEffect(() => {
+    if (!filteredPosts || filteredPosts.length === 0) return;
+
+    const nextIndex = currentIndex + 1;
+    if (nextIndex >= filteredPosts.length) return;
+
+    const nextPost = filteredPosts[nextIndex];
+    if (!nextPost || nextPost.media?.[0]?.media_type !== 'video') return;
+
+    const src = nextPost.media[0]?.url;
+    if (!src) return;
+
+    const uid = uidFromNode({ src });
+    if (!uid) return;
+
+    const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+    preloadHlsManifest(hlsUrl);
+  }, [currentIndex, filteredPosts]);
+
   // Audit on mount
   useEffect(() => {
     markPerformance('feed-mount-start');
@@ -809,11 +830,14 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               <AppleHUDOverlay
                 videoRef={{ current: videoRefs.current[item.id] || null }}
                 user={{
+                  id: item.user?.id || '',
                   name: item.user?.name || 'Unknown User',
                   avatar: item.user?.avatar,
                   username: item.user?.username
                 }}
                 caption={removeGolfCourseFromContent(item.ctaDescription)}
+                createdAt={typeof item.createdAt === 'string' ? item.createdAt : item.createdAt?.toISOString()}
+                courseName={item.golfCourse?.name}
                 stats={{
                   likes: item.likes || 0,
                   comments: item.comments || 0,
@@ -827,6 +851,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   setSelectedUserId(item.user?.id || null);
                   setShowMiniProfile(true);
                 }}
+                onMoreClick={() => handleComment(item.id)}
                 onLike={() => handleLike(item.id)}
                 onComment={() => handleComment(item.id)}
                 onShare={handleShare}

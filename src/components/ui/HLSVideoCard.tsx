@@ -18,6 +18,7 @@ interface HLSVideoCardProps {
   onEnded?: () => void;
   externallyManaged?: boolean; // Disable internal autoplay when externally managed
   shouldAttach?: boolean; // Prebuffer when near viewport
+  isNearby?: boolean; // For off-screen cleanup
 }
 
 declare global {
@@ -42,7 +43,8 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   onClick,
   onEnded,
   externallyManaged = false,
-  shouldAttach = false
+  shouldAttach = false,
+  isNearby = true
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -211,6 +213,44 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     }
   }, [autoplay, attached, ready, onPlay, onPause]);
 
+  // Manual seamless loop handler (fixes black flicker)
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || !loop) return;
+
+    const handleEnded = () => {
+      v.currentTime = 0;
+      const playPromise = v.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {
+          // Ignore autoplay errors
+        });
+      }
+    };
+
+    v.addEventListener('ended', handleEnded);
+    return () => v.removeEventListener('ended', handleEnded);
+  }, [loop]);
+
+  // Off-screen cleanup (frees memory)
+  useEffect(() => {
+    if (isNearby) return;
+
+    const v = videoRef.current;
+    if (!v) return;
+
+    v.pause();
+
+    if (hlsInstanceRef.current) {
+      hlsInstanceRef.current.destroy();
+      hlsInstanceRef.current = null;
+    }
+
+    v.removeAttribute('src');
+    v.load();
+    setAttached(false);
+  }, [isNearby]);
+
   // Intersection observer for autoplay - only when NOT externally managed
   useEffect(() => {
     const container = containerRef.current;
@@ -226,13 +266,14 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
             onPlay?.();
           } catch (error) {
             // Autoplay failed, which is expected in some browsers
+            console.error('Autoplay failed:', error);
           }
         } else {
           video.pause();
           onPause?.();
         }
       },
-      { threshold: 0.1 } // Changed to start autoplay as soon as video comes into view
+      { threshold: 0.5 }
     );
 
     observer.observe(container);
@@ -298,7 +339,6 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
         className={`videoEl absolute inset-0 w-full h-full ${videoFitClass}`}
         playsInline
         muted={isMuted}
-        loop={loop}
         controls={showControls}
         poster={poster}
         preload="metadata"
