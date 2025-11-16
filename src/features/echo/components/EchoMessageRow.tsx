@@ -32,7 +32,7 @@ export function EchoMessageRow({ message, onContextMenu }: EchoMessageRowProps) 
             {message.content}
           </div>
           <div className="flex-shrink-0">
-            <Squircle width={28} height={28}>
+            <Squircle width={36} height={36}>
               {userProfile?.profile_photo_url ? (
                 <img src={userProfile.profile_photo_url} alt="You" className="w-full h-full object-cover" />
               ) : (
@@ -51,7 +51,7 @@ export function EchoMessageRow({ message, onContextMenu }: EchoMessageRowProps) 
     <div className="flex justify-start mt-3" data-msg-id={message.id}>
       <div className="max-w-[92%] flex items-start gap-3">
         <div className="flex-shrink-0">
-          <EchoAvatar state="idle" size={28} />
+          <EchoAvatar state="idle" size={36} />
         </div>
         <div className="flex-1">
           <div className="echo-card px-4 py-3 text-[15px] leading-relaxed text-[color:var(--echo-text-primary)] echo-bubble-enter">
