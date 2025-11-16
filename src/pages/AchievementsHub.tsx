@@ -17,6 +17,7 @@ import { useAchievementSharing } from '@/hooks/useAchievementSharing';
 import { formatDistanceToNow } from 'date-fns';
 import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
 import { getSeasonLevel } from '@/utils/seasonLevels';
+import { SeasonTrophyCabinet } from '@/components/achievements/SeasonTrophyCabinet';
 
 interface UserProfile {
   id: string;
@@ -322,6 +323,13 @@ const AchievementsHub = () => {
                 Many exploration achievements are tied to your Top 100 progress.
               </p>
             )}
+          </section>
+        )}
+
+        {/* Season Trophy Cabinet */}
+        {userId && (
+          <section>
+            <SeasonTrophyCabinet userId={userId} isOwnProfile={isOwnProfile} />
           </section>
         )}
 
