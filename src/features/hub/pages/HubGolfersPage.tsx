@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNearbyGolfers } from '@/features/nearby/useNearbyGolfers';
@@ -38,16 +38,35 @@ export function HubGolfersPage() {
   };
 
   return (
-    <div className="hub-page hub-glass-page">
-      <header className="hub-header" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, paddingTop: 'max(env(safe-area-inset-top, 0px), 0.5rem)', paddingBottom: '0.5rem', paddingLeft: '1rem', paddingRight: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(0,0,0,0.2)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <button onClick={() => nav(-1)} className="flex items-center gap-1.5 text-[17px] transition-opacity hover:opacity-70" style={{ color: 'var(--hub-link)' }}>
-          <svg width="13" height="21" fill="none"><path d="M11.5 1.5L2 10.5l9.5 9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          Back
+    <div
+      className="hub-glass-page fixed inset-0 z-[9999]"
+      style={{
+        background: 'rgba(0, 0, 0, 0.25)',
+        backdropFilter: 'blur(120px)',
+        WebkitBackdropFilter: 'blur(120px)',
+      }}
+    >
+      <header 
+        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
+        style={{
+          borderColor: 'var(--hub-stroke)',
+          background: 'rgba(22, 24, 27, 0.98)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+        }}
+      >
+        <button
+          onClick={() => nav(-1)}
+          className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
+          aria-label="Back to Hub"
+        >
+          ‹ Back
         </button>
         <h1 className="text-white/90 text-[17px] font-semibold">Golfers</h1>
         <div className="w-16" />
       </header>
-      <div ref={listRef} className="h-full overflow-y-auto overscroll-none pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
+      <div ref={listRef} className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
         <PullToRefresh onRefresh={handleRefresh}>
           <div className="px-4 pt-[calc(env(safe-area-inset-top,0px)+16px)] pb-6 space-y-4">
             <div className="space-y-3">
