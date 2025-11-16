@@ -128,8 +128,12 @@ const EchoSharePage = lazy(() => import("./pages/EchoSharePage").then(m => ({ de
 // Videos2 page
 const VideosPage = lazy(() => import("./features/videos2/pages/VideosPage"));
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
+const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
+
+// Import season wrap modal
+import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
 
 // Routes component that handles background location pattern for Hub overlays
 function AppRoutes() {
@@ -427,6 +431,7 @@ const App: React.FC = () => {
                         <VideoPlaybackManagerProvider>
                           <TopTenProvider>
                             <AuthWrapper>
+                              <SeasonWrapModal />
                               <AchievementToastWrapper />
                               <Suspense fallback={<ClbhouzPageSpinner />}>
                                 <div className="app-depth">
