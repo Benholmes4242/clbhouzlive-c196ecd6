@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffect } from 'react';
 import { splitName } from '@/utils/name';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
+import { XPRingPopover } from './XPRingPopover';
 import { Button } from '@/components/ui/button';
 import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
@@ -813,25 +814,27 @@ const HeroProfileHeader = ({
             >
               <div className="relative">
                 {/* Mini profile card */}
-                <button
-                  data-mini-card
-                  type="button"
-                  aria-label="Open mini profile media"
-                  className="mini-card cursor-pointer"
-                  onClick={() => openImmersive?.(0)}
-                  style={{ padding: 0, border: 'none', background: 'none', overflow: 'visible' }}
-                >
-                  {profile?.profile_photo_url && (
-                    <div style={{ width: '100%', height: '100%' }}>
-                      <AvatarSquircle
-                        size={255}
-                        src={profile.profile_photo_url}
-                        alt={profile.display_name || 'Profile'}
-                        className="w-full h-full"
-                      />
-                    </div>
-                  )}
-                </button>
+                <XPRingPopover userId={profile?.id || ''}>
+                  <button
+                    data-mini-card
+                    type="button"
+                    aria-label="Open mini profile media"
+                    className="mini-card cursor-pointer"
+                    onClick={() => openImmersive?.(0)}
+                    style={{ padding: 0, border: 'none', background: 'none', overflow: 'visible' }}
+                  >
+                    {profile?.profile_photo_url && (
+                      <div style={{ width: '100%', height: '100%' }}>
+                        <AvatarSquircle
+                          size={255}
+                          src={profile.profile_photo_url}
+                          alt={profile.display_name || 'Profile'}
+                          className="w-full h-full"
+                        />
+                      </div>
+                    )}
+                  </button>
+                </XPRingPopover>
 
                 {/* Name & handle block */}
                 <div className="name-wrap relative top-6 md:top-0" data-nameblock>
