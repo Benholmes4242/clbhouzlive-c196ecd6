@@ -196,8 +196,8 @@ html, body, #root {
      CLBHOUZ DARK THEME - CORE TOKENS
      ======================================== */
   
-  /* Core surfaces - Phase 1: Pastel Grey Migration */
-  --bg-page: #B1C3CB;
+  /* Core surfaces - Global Background: #F4F5F7 */
+  --bg-page: #F4F5F7;
   --bg-surface: #0F0F0F;
   --bg-card: rgba(255,255,255,0.06);
   --bg-card-hover: rgba(255,255,255,0.08);
@@ -253,8 +253,8 @@ html, body, #root {
   /* Overlays */
   --hover-overlay: rgba(255,255,255,0.05);
 
-  /* Dark Mode Discover Navigation Tokens - Phase 1: Pastel Grey Migration */
-  --bg-app: #B1C3CB;
+  /* Dark Mode Discover Navigation Tokens - Global Background: #F4F5F7 */
+  --bg-app: #F4F5F7;
   --bg-header: #B1C3CB;
   
   /* Tab text colors - Phase 2: Dark slate on pastel */
@@ -1559,31 +1559,31 @@ html[data-immersive="true"] .app-shell--topSpacer {
     }
   }
   :root {
-    /* Phase 1: Global Pastel Grey Migration - #B1C3CB */
-    --background: 198 20% 74%;
-    /* Phase 2: Dark slate text on pastel background */
+    /* Global Background: #F4F5F7 - Neutral Light Grey */
+    --background: 210 20% 96%;
+    /* Dark slate text for excellent contrast */
     --foreground: 210 13% 18%;           /* #2A2F33 */
     
-    /* Phase 3: Light elevated surfaces */
-    --card: 204 26% 83%;                 /* #D0DDE4 - light card surface */
+    /* Light elevated surfaces - white cards */
+    --card: 0 0% 100%;                   /* #FFFFFF - pure white cards */
     --card-foreground: 210 13% 18%;      /* #2A2F33 */
     
     /* Header & nav surfaces */
-    --surface-header: #B6C7CF;           /* slightly darker than background */
-    --surface-nav: #C1D0D8;              /* nav bar strip */
+    --surface-header: #ECEEF0;           /* slightly darker than background */
+    --surface-nav: #E8EAEC;              /* nav bar strip */
     
     /* Borders & hairlines */
-    --border: 210 11% 82%;               /* #D3DEE5 - soft light border */
+    --border: 210 11% 88%;               /* #E3E5E7 - soft light border */
     --border-subtle: rgba(0, 0, 0, 0.08); /* hairline 1px lines */
     
     /* Shadows for light mode */
-    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.14);
-    --shadow-card: 0 4px 10px rgba(0, 0, 0, 0.12);
+    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.10);
+    --shadow-card: 0 4px 10px rgba(0, 0, 0, 0.08);
     
-    /* Phase 4: Input / search / dropdown surfaces on pastel background */
-    --surface-input: #A6B6C0;               /* slightly darker than page */
-    --surface-input-hover: #A0B0BA;        /* tiny step darker */
-    --surface-input-focus: #9AAAB5;
+    /* Input / search / dropdown surfaces */
+    --surface-input: #E8EAEC;               /* slightly darker than page */
+    --surface-input-hover: #E0E2E4;        /* hover state */
+    --surface-input-focus: #D8DADC;        /* focus state */
     
     /* Placeholder / helper text */
     --placeholder-foreground: rgba(42, 47, 51, 0.48);  /* softer slate */
@@ -1922,7 +1922,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
   .dark {
     /* Dark mode tokens (currently disabled - app is dark-only) */
-    --background: 198 20% 74%;
+    --background: 210 20% 96%;
     --foreground: 0 0% 100%;
     --card: 0 0% 7.8%;
     --card-foreground: 0 0% 100%;
