@@ -35,7 +35,7 @@ interface GlobalBottomNavigationProps {
 const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeState = 'visible' }) => {
   const location = useLocation();
   const { isVisible, setNavRef } = useBottomNavigation();
-  const { shouldHideBottomNav } = useModalContext();
+  const { shouldHideHeader } = useModalContext(); // Removed shouldHideBottomNav - ECM now uses chrome auto-hide system
   const { activeTab, handleTabClick } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
@@ -61,8 +61,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname);
   const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
   
-  // Final visibility state - chrome state handles drawer hiding now
-  const showNavigation = isVisible && !shouldHideForRoute && !shouldHideBottomNav;
+  // Final visibility state - chrome auto-hide system now handles ECM footer behavior
+  const showNavigation = isVisible && !shouldHideForRoute;
   
   // Composer state management
   const {

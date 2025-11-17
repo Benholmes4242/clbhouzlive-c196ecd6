@@ -4,7 +4,6 @@ interface ModalContextType {
   isCreateMomentModalOpen: boolean;
   setCreateMomentModalOpen: (open: boolean) => void;
   shouldHideHeader: boolean;
-  shouldHideBottomNav: boolean;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -25,7 +24,6 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const [isCreateMomentModalOpen, setIsCreateMomentModalOpen] = useState(false);
 
   const shouldHideHeader = isCreateMomentModalOpen;
-  const shouldHideBottomNav = isCreateMomentModalOpen;
 
   const setCreateMomentModalOpen = useCallback((open: boolean) => {
     setIsCreateMomentModalOpen(open);
@@ -37,7 +35,6 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
         isCreateMomentModalOpen,
         setCreateMomentModalOpen,
         shouldHideHeader,
-        shouldHideBottomNav,
       }}
     >
       {children}
