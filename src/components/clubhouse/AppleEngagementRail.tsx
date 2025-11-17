@@ -83,22 +83,22 @@ export const AppleEngagementRail = ({
         <button
           type="button"
           onClick={onMuteToggle}
-          className="rail-btn rail-btn--mute flex items-center justify-center"
+          className="flex items-center justify-center"
           style={{ width: HIT_AREA, height: HIT_AREA }}
           aria-label={isMuted ? 'Unmute' : 'Mute'}
         >
           <div
             className={cn(
-              'rail-btn-icon flex items-center justify-center rounded-full transition-all',
+              'flex items-center justify-center rounded-full transition-all',
               'bg-black/30 border border-white/10',
               !isMuted && 'bg-white/14'
             )}
             style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
           >
             {isMuted ? (
-              <VolumeX className="w-[18px] h-[18px] text-white/80" />
+              <VolumeX size={18} className="text-white/80" style={{ display: 'block' }} />
             ) : (
-              <Volume2 className="w-[18px] h-[18px] text-white/80" />
+              <Volume2 size={18} className="text-white/80" style={{ display: 'block' }} />
             )}
           </div>
         </button>
@@ -109,23 +109,25 @@ export const AppleEngagementRail = ({
         <button
           type="button"
           onClick={onLike}
-          className="rail-btn rail-btn--like flex items-center justify-center"
+          className="flex items-center justify-center"
           style={{ width: HIT_AREA, height: HIT_AREA }}
           aria-label={isLiked ? 'Unlike' : 'Like'}
         >
           <div
             className={cn(
-              'rail-btn-icon flex items-center justify-center rounded-full transition-all',
+              'flex items-center justify-center rounded-full transition-all',
               'bg-black/30 border border-white/10',
               isLiked && 'bg-white/14'
             )}
             style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
           >
             <Heart
+              size={18}
               className={cn(
-                'w-[18px] h-[18px] transition-all',
+                'transition-all',
                 isLiked ? 'fill-white text-white' : 'text-white/80'
               )}
+              style={{ display: 'block' }}
             />
           </div>
         </button>
@@ -139,19 +141,19 @@ export const AppleEngagementRail = ({
         <button
           type="button"
           onClick={onComment}
-          className="rail-btn rail-btn--comment flex items-center justify-center"
+          className="flex items-center justify-center"
           style={{ width: HIT_AREA, height: HIT_AREA }}
           aria-label="Comment"
         >
           <div
             className={cn(
-              'rail-btn-icon flex items-center justify-center rounded-full transition-all',
+              'flex items-center justify-center rounded-full transition-all',
               'bg-black/30 border border-white/10',
               hasCommented && 'bg-white/14'
             )}
             style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
           >
-            <MessageCircle className="w-[18px] h-[18px] text-white/80" />
+            <MessageCircle size={18} className="text-white/80" style={{ display: 'block' }} />
           </div>
         </button>
         <span className="text-[11px] text-white/80 font-medium">
@@ -164,21 +166,21 @@ export const AppleEngagementRail = ({
         <button
           type="button"
           onClick={handleShare}
-          className="rail-btn rail-btn--share flex items-center justify-center"
+          className="flex items-center justify-center"
           style={{ width: HIT_AREA, height: HIT_AREA }}
           aria-label="Share"
         >
           <div
             className={cn(
-              'rail-btn-icon flex items-center justify-center rounded-full transition-all',
+              'flex items-center justify-center rounded-full transition-all',
               'bg-black/30 border border-white/10'
             )}
             style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
           >
             {showShareCheck ? (
-              <Check className="w-[18px] h-[18px] text-white/80" />
+              <Check size={18} className="text-white/80" style={{ display: 'block' }} />
             ) : (
-              <Share2 className="w-[18px] h-[18px] text-white/80" />
+              <Share2 size={18} className="text-white/80" style={{ display: 'block' }} />
             )}
           </div>
         </button>
