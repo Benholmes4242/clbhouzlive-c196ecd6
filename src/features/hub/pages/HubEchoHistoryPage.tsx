@@ -992,12 +992,12 @@ export function HubEchoHistoryPage() {
             <ErrorBoundary>
               <div 
                 ref={listRef}
-                className="relative eh-listScroll"
+                className="eh-listScroll"
                 role="listbox"
                 aria-label="Conversations"
                 aria-multiselectable={selectMode || undefined}
                 id="echo-history-list"
-                style={{ touchAction: 'pan-y', overscrollBehaviorX: 'none' }}
+                data-hub-scroll-container="true"
               >
               <VirtualList
                     count={chats.length}
