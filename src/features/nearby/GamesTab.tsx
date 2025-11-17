@@ -10,6 +10,7 @@ import { openWhenSheet, openDistanceSheet, openSortSheet, labelWhen } from './co
 import { PeopleSearchInput } from './components/PeopleSearchInput';
 import { GameRow, type GameData } from '@/features/games/components/GameRow';
 import '@/features/games/components/GameRow.css';
+import '@/features/nearby/components/your-games/YourGames.css';
 import './GamesTab.css';
 
 type Game = {
