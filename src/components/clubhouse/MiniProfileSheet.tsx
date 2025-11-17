@@ -283,7 +283,8 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
           paddingBottom: 'env(safe-area-inset-bottom)',
           maxHeight: '72vh',
           width: '100%',
-          maxWidth: '100vw'
+          maxWidth: '100vw',
+          boxShadow: 'none'
         }}
         onClick={(e) => e.stopPropagation()}
       >

@@ -41,12 +41,28 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
   
+  // Check if drawer is active (for clubhouse mini profile or comments)
+  const [isDrawerActive, setIsDrawerActive] = useState(false);
+  
+  useEffect(() => {
+    const checkDrawer = () => {
+      setIsDrawerActive(document.body.classList.contains('drawer-active'));
+    };
+    
+    // Check immediately and set up observer
+    checkDrawer();
+    const observer = new MutationObserver(checkDrawer);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    
+    return () => observer.disconnect();
+  }, []);
+  
   // Determine if current route should hide navigation
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname);
   const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
   
-  // Final visibility state - hide for routes, modals, or manual control
-  const showNavigation = isVisible && !shouldHideForRoute && !shouldHideBottomNav;
+  // Final visibility state - hide for routes, modals, or manual control, or when drawer is active
+  const showNavigation = isVisible && !shouldHideForRoute && !shouldHideBottomNav && !isDrawerActive;
   
   // Composer state management
   const {
