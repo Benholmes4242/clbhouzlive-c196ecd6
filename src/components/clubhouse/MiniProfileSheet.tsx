@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFollowUser } from '@/hooks/useFollowUser';
 import { useUserProfilePosts } from '@/hooks/useUserProfilePosts';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
-import { Squircle } from '@/components/ui/squircle';
+import SquircleImage from '@/components/ui/SquircleImage';
 import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 import { SheetPlaybackProvider, useSheetPlayback } from './SheetPlaybackContext';
 import { VideoThumbPlayer } from './VideoThumbPlayer';
@@ -264,210 +264,182 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >
-      {/* Enhanced Backdrop with more dimming - make it clickable */}
+      {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/60 backdrop-blur-md cursor-pointer" 
         onClick={handleBackdropClick}
       />
       
-      {/* Liquid Glass Sheet with Fixed Height */}
+      {/* Dark Glass Sheet */}
       <div 
         className={cn(
-          "mini-profile-sheet relative flex flex-col overflow-hidden",
-          "bg-black/20 backdrop-blur-xl border border-white/10",
-          "rounded-t-3xl shadow-2xl shadow-black/50",
-          "transition-transform duration-300 ease-out",
-          isClosing ? "animate-slide-out-down" : "animate-slide-in-up",
-          // Glass surface styling
-          "before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/5 before:to-transparent before:pointer-events-none"
+          "clubhouse-profile-sheet glass-dark rounded-t-[24px] relative flex flex-col overflow-hidden",
+          "transition-all duration-[280ms] ease-[cubic-bezier(0.19,1,0.22,1)]",
+          isClosing ? "translate-y-4 opacity-0" : "translate-y-0 opacity-100"
         )}
         style={{
-          paddingBottom: 'var(--bottom-nav-height)'
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          maxHeight: '72vh',
+          width: '100%',
+          maxWidth: '100vw'
         }}
-        onClick={(e) => e.stopPropagation()} // Prevent backdrop click when clicking on the sheet
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button - moved further to top right and smaller */}
-        <div className="absolute top-2 right-2 z-10">
-          <button
-            onClick={handleClose}
-            className={cn(
-              "p-1 rounded-full transition-all duration-200",
-              "bg-black/20 backdrop-blur-sm border border-white/10",
-              "hover:bg-white/10 hover:scale-105",
-              "focus:ring-2 focus:ring-white/30 focus:outline-none"
-            )}
-            aria-label="Close profile"
-          >
-            <X className="w-3 h-3 text-white" />
-          </button>
-        </div>
-
-        <div className="flex flex-col h-full">
-          {/* Header Section with Fixed Height */}
-          <div ref={headerRef} className="sheet-header flex-shrink-0">
-            {/* Single Handle */}
-            <div className="flex justify-center pt-4 pb-2">
-              <div className="w-12 h-1.5 bg-white/30 rounded-full" />
-            </div>
-            {/* User Info */}
-            <div className="px-6 pt-2 pb-6">
-              <div className="flex items-start gap-4">
-                {/* Clickable Avatar */}
-                <button
-                  onClick={handleAvatarClick}
-                  className={cn(
-                    "flex-shrink-0 transition-transform duration-200",
-                    "hover:scale-105 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-full",
-                    user?.id ? "cursor-pointer" : "cursor-default"
-                  )}
-                  disabled={!user?.id}
-                >
-                  <Squircle width={80} height={80}>
-                    {user.avatar ? (
-                      <img src={user.avatar} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '32px', fontWeight: 600 }}>
-                        {user.name?.charAt(0) || '?'}
-                      </div>
-                    )}
-                  </Squircle>
-                </button>
-                
-                  <div className="flex-1 min-w-0">
-                    {/* Clickable Name - Single Line with Ellipsis */}
-                    <div className="flex items-center gap-2 mb-1">
-                      <button
-                        onClick={handleNameClick}
-                        className={cn(
-                          "text-left transition-colors duration-200 flex-1 min-w-0",
-                          "hover:text-white/80 focus:text-white/80 focus:outline-none",
-                          user?.id ? "cursor-pointer" : "cursor-default"
-                        )}
-                        disabled={!user?.id}
-                      >
-                        <h3 className="sheet-title font-semibold text-lg text-white">
-                          {user.name}
-                        </h3>
-                    </button>
-                    {user.isVerified && (
-                      <CheckCircle className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                    )}
-                  </div>
-                  
-                  {user.username && (
-                    <p className="text-white/60 text-sm mb-2 truncate">@{user.username}</p>
-                  )}
-                  
-                  {/* Conditional Metadata - Single Line */}
-                  <div className="flex items-center gap-4 text-sm text-white/60">
-                    {user.homeClub && user.homeClub !== 'Example Golf Club' && (
-                      <div className="flex items-center gap-1 flex-1 min-w-0">
-                        <MapPin className="w-4 h-4 flex-shrink-0" />
-                        <span className="truncate">{user.homeClub}</span>
-                      </div>
-                    )}
-                    {user.handicap !== undefined && user.handicap !== null && (
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <Target className="w-4 h-4" />
-                        <span>{user.handicap} HCP</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Follow Button - Fixed Width */}
-                <button
-                  onClick={handleFollowClick}
-                  disabled={followLoading || optimisticFollowing}
-                  className={cn(
-                    "follow-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 min-w-[80px] flex-shrink-0",
-                    "disabled:opacity-50 disabled:cursor-not-allowed",
-                    isFollowing
-                      ? "bg-white/10 border border-white/20 text-white hover:bg-white/20"
-                      : "border border-orange-400/50 text-orange-300 bg-orange-500/10 hover:bg-orange-500/20 hover:border-orange-400/70"
-                  )}
-                >
-                  {followLoading || optimisticFollowing ? '...' : (isFollowing ? 'Following' : 'Follow')}
-                </button>
-              </div>
-            </div>
-
-            {/* Subtle Divider */}
-            <div className="mx-6 mb-4 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div className="flex flex-col h-full px-4 pt-3 pb-6 md:px-6">
+          {/* Handle */}
+          <div className="flex justify-center pb-3">
+            <div className="w-12 h-1.5 bg-white/30 rounded-full" />
           </div>
 
-          {/* Recent Posts Section - Scrollable */}
-          <div className="flex-1 flex flex-col min-h-0">
-            <section aria-labelledby="recent-posts-title" className="px-6 flex-1 flex flex-col min-h-0">
-              <h4 id="recent-posts-title" className="font-medium text-white mb-4 flex-shrink-0">Recent Posts</h4>
-              
-              <div
-                id="recent-posts-scroll"
-                ref={scrollRef}
-                role="region"
-                aria-label="Recent Posts, scrollable"
-                tabIndex={0}
-                className="sheet-scroll flex-1"
-                style={scrollMaxHeight ? { maxHeight: `${scrollMaxHeight}px` } : undefined}
+          {/* Header / Hero Row */}
+          <div ref={headerRef} className="flex items-start justify-between gap-3 pb-3">
+            {/* Left: avatar + name + meta */}
+            <div className="flex flex-1 items-start gap-3 min-w-0">
+              {/* Avatar */}
+              <button
+                onClick={handleAvatarClick}
+                className={cn(
+                  "flex-shrink-0 transition-transform duration-200",
+                  "hover:scale-105 focus:scale-105 focus:outline-none",
+                  user?.id ? "cursor-pointer" : "cursor-default"
+                )}
+                disabled={!user?.id}
               >
-                {/* Loading State */}
-                {postsLoading && (
-                  <div className={cn(
-                    "grid gap-2 p-2",
-                    isMobile ? "grid-cols-2" : "grid-cols-3"
-                  )}>
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="aspect-square bg-white/5 rounded-2xl animate-pulse"
-                      />
-                    ))}
-                  </div>
-                )}
+                <div className="h-14 w-14 overflow-hidden">
+                  <SquircleImage
+                    size={56}
+                    src={user.avatar || '/placeholder.svg'}
+                    alt={user.name}
+                    ringWidth={0}
+                  />
+                </div>
+              </button>
 
-                {/* Error State */}
-                {postsError && !postsLoading && (
-                  <div className="text-center py-8 text-white/60">
-                    <p className="mb-2">Couldn't load posts</p>
-                    <button 
-                      onClick={() => window.location.reload()}
-                      className="text-sm text-orange-300 hover:text-orange-200 transition-colors"
-                    >
-                      Retry
-                    </button>
-                  </div>
-                )}
+              {/* Name, handle, location */}
+              <div className="flex flex-col min-w-0">
+                <button
+                  type="button"
+                  onClick={handleNameClick}
+                  className="text-left text-[16px] font-semibold text-white truncate hover:text-white/80 transition-colors"
+                  disabled={!user?.id}
+                >
+                  {user.name}
+                  {user.isVerified && <CheckCircle className="inline-block w-4 h-4 ml-1 text-blue-400" />}
+                </button>
+                <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px] text-white/70">
+                  {user.username && <span>@{user.username}</span>}
+                  {user.homeClub && user.homeClub !== 'Example Golf Club' && (
+                    <>
+                      {user.username && <span>·</span>}
+                      <span className="truncate">{user.homeClub}</span>
+                    </>
+                  )}
+                  {user.handicap !== undefined && user.handicap !== null && (
+                    <>
+                      {(user.username || user.homeClub) && <span>·</span>}
+                      <span>{user.handicap} HCP</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
 
-                {/* Empty State */}
-                {isEmpty && !postsLoading && !postsError && (
-                  <div className="text-center py-8 text-white/60">
-                    <p>No posts yet</p>
-                  </div>
+            {/* Right: Follow + Close */}
+            <div className="flex flex-col items-end gap-2">
+              <button
+                type="button"
+                onClick={handleFollowClick}
+                disabled={followLoading || optimisticFollowing}
+                className={cn(
+                  "btn-frosted-white px-4 py-1.5 text-[13px] font-semibold rounded-full",
+                  "bg-white/16 backdrop-blur-[18px] border border-white/45 text-white",
+                  "shadow-[0_0_12px_rgba(0,0,0,0.35)]",
+                  "transition-all duration-150",
+                  "hover:bg-white/22 hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.45)]",
+                  "active:translate-y-0 active:shadow-[0_2px_8px_rgba(0,0,0,0.35)]",
+                  "disabled:opacity-50 disabled:cursor-not-allowed"
                 )}
+              >
+                {followLoading || optimisticFollowing ? '...' : (isFollowing ? 'Following' : 'Follow')}
+              </button>
 
-                {/* Posts Grid */}
-                {!postsLoading && !postsError && posts.length > 0 && (
-                  <div className={cn(
-                    "grid gap-2 p-2",
-                    isMobile ? "grid-cols-2" : "grid-cols-3"
-                  )}>
-                    {posts.slice(0, isMobile ? 6 : 9).map((post) => {
-                      const media = post.post_media[0];
-                      if (!media) return null;
+              <button
+                type="button"
+                onClick={handleClose}
+                className="h-8 w-8 flex items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-white/10 transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Recent Posts Section */}
+          <div className="flex-1 flex flex-col min-h-0">
+            <h3 className="pb-2 text-[14px] font-semibold text-white">Recent Posts</h3>
+            
+            <div
+              ref={scrollRef}
+              className="flex-1 overflow-y-auto"
+              style={scrollMaxHeight ? { maxHeight: `${scrollMaxHeight}px` } : undefined}
+            >
+              {/* Loading State */}
+              {postsLoading && (
+                <div className="grid grid-cols-2 gap-3 pb-2">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="aspect-square bg-black/40 rounded-[18px] animate-pulse"
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Error State */}
+              {postsError && !postsLoading && (
+                <div className="text-center py-8 text-white/60">
+                  <p className="mb-2">Couldn't load posts</p>
+                  <button 
+                    onClick={() => window.location.reload()}
+                    className="text-sm text-white/80 hover:text-white transition-colors"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
+
+              {/* Empty State */}
+              {isEmpty && !postsLoading && !postsError && (
+                <div className="text-center py-8 text-white/60">
+                  <p>No posts yet</p>
+                </div>
+              )}
+
+              {/* Posts Grid */}
+              {!postsLoading && !postsError && posts.length > 0 && (
+                <div className="grid grid-cols-2 gap-3 pb-2">
+                  {posts.slice(0, 6).map((post) => {
+                    const media = post.post_media[0];
+                    if (!media) return null;
 
                     return (
-                      <RecentPostTile
+                      <button
                         key={post.id}
-                        media={media}
-                        onTileClick={() => handlePostClick(post)}
-                        ioRoot={scrollRef.current}
-                      />
+                        type="button"
+                        onClick={() => handlePostClick(post)}
+                        className="relative overflow-hidden rounded-[18px] bg-black/40 aspect-square"
+                      >
+                        <RecentPostTile
+                          media={media}
+                          onTileClick={() => {}}
+                          ioRoot={scrollRef.current}
+                        />
+                      </button>
                     );
-                    })}
-                  </div>
-                )}
-              </div>
-            </section>
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
