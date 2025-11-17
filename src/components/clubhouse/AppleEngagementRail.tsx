@@ -32,7 +32,7 @@ const formatCount = (count: number): string => {
 };
 
 const BUTTON_SIZE = 30;
-const HIT_AREA = 35;
+const HIT_AREA = 44;
 
 export const AppleEngagementRail = ({
   stats,
