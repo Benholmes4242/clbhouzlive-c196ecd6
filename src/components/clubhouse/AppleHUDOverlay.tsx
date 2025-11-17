@@ -85,10 +85,7 @@ export const AppleHUDOverlay = ({
     <>
       {/* Bottom-left: metadata capsule + progress bar */}
       <div
-        className="fixed left-[12px] z-[50] flex flex-col gap-2"
-        style={{
-          bottom: HUD_BOTTOM,
-        }}
+        className="clubhouse-hud fixed left-[12px] z-[50] flex flex-col gap-2"
       >
         <AppleMetadataCapsule
           user={user}
