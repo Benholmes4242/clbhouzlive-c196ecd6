@@ -48,6 +48,8 @@ interface ClubhouseVerticalFeedProps {
   onTouchMove?: (event: React.TouchEvent) => void;
   onTouchEnd?: (event: React.TouchEvent) => void;
   onActiveVideoRefChange?: (ref: HTMLVideoElement | null) => void;
+  onCommentsOpenChange?: (isOpen: boolean) => void;
+  onProfileOpenChange?: (isOpen: boolean) => void;
 }
 
 // VideoWithAutoplay component moved outside to prevent recreation on re-renders
@@ -119,7 +121,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onTouchStart,
   onTouchMove,
   onTouchEnd,
-  onActiveVideoRefChange
+  onActiveVideoRefChange,
+  onCommentsOpenChange,
+  onProfileOpenChange
 }) => {
   const { user } = useSupabaseSession();
   
@@ -187,12 +191,14 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [showMiniProfile, setShowMiniProfile] = useState(false);
 
-  // Track when any drawer is open to hide footer
+  // Notify parent when drawer states change
   useEffect(() => {
-    const isAnyDrawerOpen = commentsModalOpen || showMiniProfile;
-    document.body.classList.toggle('drawer-active', isAnyDrawerOpen);
-    return () => document.body.classList.remove('drawer-active');
-  }, [commentsModalOpen, showMiniProfile]);
+    onCommentsOpenChange?.(commentsModalOpen);
+  }, [commentsModalOpen, onCommentsOpenChange]);
+
+  useEffect(() => {
+    onProfileOpenChange?.(showMiniProfile);
+  }, [showMiniProfile, onProfileOpenChange]);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});

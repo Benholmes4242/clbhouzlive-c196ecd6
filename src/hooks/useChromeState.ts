@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 export type ChromeState = 'visible' | 'hidden';
 
 interface UseChromeStateOptions {
-  isModalOpen?: boolean;
+  forceHidden?: boolean;
   disabled?: boolean;
 }
 
@@ -19,13 +19,14 @@ const HIDE_DEBOUNCE_MS = 140;
 const REVEAL_DEBOUNCE_MS = 140;
 const REVEAL_DEBOUNCE_AT_TOP_MS = 0; // Instant reveal at top
 
-export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChromeStateOptions = {}) => {
+export const useChromeState = ({ forceHidden = false, disabled = false }: UseChromeStateOptions = {}) => {
   const [chromeState, setChromeState] = useState<ChromeState>('visible');
   const scrollMetricsRef = useRef<ScrollMetrics>({ deltaY: 0, scrollTop: 0, velocity: 0 });
   const lastScrollTop = useRef(0);
   const lastScrollTime = useRef(Date.now());
   const revealTimer = useRef<number | null>(null);
   const hideTimer = useRef<number | null>(null);
+  const forceHiddenRef = useRef(false);
   
   // Edge swipe detection
   const edgeSwipeRef = useRef<{
@@ -35,12 +36,18 @@ export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChr
     startY: number;
   }>({ isEdge: false, isTop: false, isBottom: false, startY: 0 });
 
-  // Show chrome immediately when modal opens
+  // Handle forceHidden state changes
   useEffect(() => {
-    if (isModalOpen) {
+    forceHiddenRef.current = forceHidden;
+    
+    if (forceHidden) {
+      // When overlay opens, hide chrome immediately
+      setChromeState('hidden');
+    } else {
+      // When overlay closes, show chrome
       setChromeState('visible');
     }
-  }, [isModalOpen]);
+  }, [forceHidden]);
 
   // Apply chrome state to body class
   useEffect(() => {
@@ -61,7 +68,7 @@ export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChr
   }, [chromeState, disabled]);
 
   const scheduleHide = useCallback((ms: number) => {
-    if (isModalOpen || disabled) return;
+    if (forceHiddenRef.current || disabled) return;
     if (revealTimer.current) {
       clearTimeout(revealTimer.current);
       revealTimer.current = null;
@@ -70,7 +77,7 @@ export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChr
     hideTimer.current = window.setTimeout(() => {
       setChromeState('hidden');
     }, ms);
-  }, [isModalOpen, disabled]);
+  }, [disabled]);
 
   const scheduleReveal = useCallback((ms: number) => {
     if (disabled) return;
@@ -88,7 +95,7 @@ export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChr
   const showChrome = useCallback(() => scheduleReveal(REVEAL_DEBOUNCE_MS), [scheduleReveal]);
 
   const toggleChrome = useCallback(() => {
-    if (isModalOpen || disabled) return;
+    if (forceHiddenRef.current || disabled) return;
     
     // Clear any pending timers
     if (hideTimer.current) clearTimeout(hideTimer.current);
@@ -106,11 +113,11 @@ export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChr
     } else {
       revealTimer.current = timer;
     }
-  }, [isModalOpen, disabled, chromeState]);
+  }, [disabled, chromeState]);
 
   // Scroll handler (to be called from rAF)
   const handleScroll = useCallback((scrollTop: number) => {
-    if (isModalOpen || disabled) return;
+    if (forceHiddenRef.current || disabled) return;
 
     const now = Date.now();
     const timeDelta = now - lastScrollTime.current;
@@ -140,11 +147,11 @@ export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChr
     else if (deltaY < -6 && timeDelta < 120) {
       scheduleReveal(REVEAL_DEBOUNCE_MS);
     }
-  }, [isModalOpen, disabled, scheduleHide, scheduleReveal]);
+  }, [disabled, scheduleHide, scheduleReveal]);
 
   // Tap toggle handler
   const handleTap = useCallback((event: React.MouseEvent | React.TouchEvent) => {
-    if (isModalOpen || disabled) return;
+    if (forceHiddenRef.current || disabled) return;
 
     const target = event.target as HTMLElement;
     
@@ -156,11 +163,11 @@ export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChr
     if (isActionTarget) return;
     
     toggleChrome();
-  }, [isModalOpen, disabled, toggleChrome]);
+  }, [disabled, toggleChrome]);
 
   // Edge swipe handlers
   const handleTouchStart = useCallback((event: React.TouchEvent) => {
-    if (isModalOpen || disabled) return;
+    if (forceHiddenRef.current || disabled) return;
 
     const touch = event.touches[0];
     const y = touch.clientY;
@@ -176,10 +183,10 @@ export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChr
       isBottom,
       startY: y
     };
-  }, [isModalOpen, disabled]);
+  }, [disabled]);
 
   const handleTouchMove = useCallback((event: React.TouchEvent) => {
-    if (isModalOpen || disabled) return;
+    if (forceHiddenRef.current || disabled) return;
     if (!edgeSwipeRef.current.isEdge) return;
 
     const touch = event.touches[0];
@@ -199,7 +206,7 @@ export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChr
       showChrome();
       edgeSwipeRef.current.isEdge = false;
     }
-  }, [isModalOpen, disabled, showChrome]);
+  }, [disabled, showChrome]);
 
   const handleTouchEnd = useCallback(() => {
     edgeSwipeRef.current = { isEdge: false, isTop: false, isBottom: false, startY: 0 };
@@ -208,14 +215,14 @@ export const useChromeState = ({ isModalOpen = false, disabled = false }: UseChr
   // Keyboard escape to reveal (desktop helper)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !isModalOpen && !disabled) {
+      if (e.key === 'Escape' && !forceHiddenRef.current && !disabled) {
         showChrome();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isModalOpen, disabled, showChrome]);
+  }, [disabled, showChrome]);
 
   return {
     chromeState,

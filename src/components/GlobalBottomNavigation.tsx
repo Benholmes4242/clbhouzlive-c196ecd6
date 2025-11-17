@@ -61,8 +61,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname);
   const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
   
-  // Final visibility state - hide for routes, modals, or manual control, or when drawer is active
-  const showNavigation = isVisible && !shouldHideForRoute && !shouldHideBottomNav && !isDrawerActive;
+  // Final visibility state - chrome state handles drawer hiding now
+  const showNavigation = isVisible && !shouldHideForRoute && !shouldHideBottomNav;
   
   // Composer state management
   const {
