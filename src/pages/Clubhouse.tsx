@@ -22,6 +22,8 @@ import CommentsModal from '@/components/posts/CommentsModal';
 import { NewSeasonBanner } from '@/components/feed/NewSeasonBanner';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
+import MiniProfileSheetWithData from '@/components/clubhouse/MiniProfileSheetWithData';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 const Clubhouse = () => {
   // Set header variant for clubhouse (glass-dark)
@@ -77,9 +79,12 @@ const Clubhouse = () => {
   const [localSelectedTags, setLocalSelectedTags] = useState<any[]>([]);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
+  const [showMiniProfile, setShowMiniProfile] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
+  const { hideBottomNav, showBottomNav } = useBottomNavigation();
 
   // Season Recap Modal
   const { data: seasonRecap } = useSeasonRecap(user?.id);
@@ -222,6 +227,16 @@ const Clubhouse = () => {
     return () => document.body.classList.remove('route-clubhouse');
   }, []);
 
+  // Hide footer when any sheet is open
+  useEffect(() => {
+    const isAnySheetOpen = commentsModalOpen || showMiniProfile;
+    if (isAnySheetOpen) {
+      hideBottomNav();
+    } else {
+      showBottomNav();
+    }
+  }, [commentsModalOpen, showMiniProfile, hideBottomNav, showBottomNav]);
+
   // Show loading state only for initial posts fetch
   if (isLoading && posts.length === 0) {
     return <ClubhouzLoading />;
@@ -267,6 +282,14 @@ const Clubhouse = () => {
             onActiveVideoRefChange={(ref) => {
               activeVideoRef.current = ref;
             }}
+            onOpenMiniProfile={(userId) => {
+              setSelectedUserId(userId);
+              setShowMiniProfile(true);
+            }}
+            onOpenComments={(postId) => {
+              setSelectedPostId(postId);
+              setCommentsModalOpen(true);
+            }}
           />
         ) : isLoading ? (
           <div className="flex items-center justify-center min-h-screen">
@@ -311,6 +334,16 @@ const Clubhouse = () => {
           }}
         />
       )}
+
+      {/* Mini Profile Sheet */}
+      <MiniProfileSheetWithData
+        userId={selectedUserId}
+        isOpen={showMiniProfile}
+        onClose={() => setShowMiniProfile(false)}
+        onFollow={() => {
+          // Handle follow action
+        }}
+      />
 
       {/* Season Recap Modal */}
       {seasonRecap && user && (
