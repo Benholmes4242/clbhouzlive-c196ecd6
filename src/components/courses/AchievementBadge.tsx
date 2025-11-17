@@ -146,7 +146,7 @@ const AchievementBadge: React.FC<AchievementBadgeProps> = ({
         {showLabel && (
           <div className="text-center">
             <p className={`text-xs font-medium ${
-              badge.isUnlocked ? 'text-white' : 'text-muted-foreground'
+              badge.isUnlocked ? 'text-foreground' : 'text-muted-foreground'
             }`}>
               {badge.name}
             </p>

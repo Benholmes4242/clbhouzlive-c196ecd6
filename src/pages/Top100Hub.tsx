@@ -104,23 +104,23 @@ const Top100Hub = () => {
                   <div className="relative h-full flex flex-col justify-between p-6">
                     {/* Icon */}
                     <div className="flex justify-end">
-                      <div className="text-white/90">{getRegionIcon(list.slug)}</div>
+                      <div className="text-foreground/90">{getRegionIcon(list.slug)}</div>
                     </div>
 
                     {/* Text Content */}
                     <div className="space-y-3">
-                      <h2 className="font-display text-3xl font-bold text-white">
+                      <h2 className="font-display text-3xl font-bold text-foreground">
                         {list.short_label}
                       </h2>
                       
                       {list.description && (
-                        <p className="text-white/80 text-lg">{list.description}</p>
+                        <p className="text-foreground/80 text-lg">{list.description}</p>
                       )}
 
                       {/* Progress Pill */}
                       {progressData && session && (
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
-                          <span className="text-white font-medium">
+                          <span className="text-foreground font-medium">
                             You've played {progressData.played} of {progressData.total}
                           </span>
                         </div>
@@ -128,7 +128,7 @@ const Top100Hub = () => {
 
                       {/* CTA */}
                       <div className="pt-2">
-                        <span className="text-white/90 text-lg font-medium group-hover:text-white transition-colors">
+                        <span className="text-foreground/90 text-lg font-medium group-hover:text-foreground transition-colors">
                           Explore List →
                         </span>
                       </div>

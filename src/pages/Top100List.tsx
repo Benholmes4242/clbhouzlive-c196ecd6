@@ -164,22 +164,22 @@ const Top100List = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/top100')}
-                className="self-start text-white hover:bg-white/20"
+                className="self-start text-foreground hover:bg-white/20"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Hub
               </Button>
 
               <div className="space-y-2">
-                <h1 className="font-display text-4xl font-bold text-white">
+                <h1 className="font-display text-4xl font-bold text-foreground">
                   {currentList?.name}
                 </h1>
                 {currentList?.description && (
-                  <p className="text-white/90 text-lg">{currentList.description}</p>
+                  <p className="text-foreground/90 text-lg">{currentList.description}</p>
                 )}
                 {progressData && session && (
                   <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
-                    <span className="text-white font-medium">
+                    <span className="text-foreground font-medium">
                       You've played {progressData.played} of {progressData.total}
                     </span>
                   </div>
