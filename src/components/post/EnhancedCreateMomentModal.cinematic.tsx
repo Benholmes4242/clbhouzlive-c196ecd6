@@ -373,13 +373,13 @@ export default function EnhancedCreateMomentModalCinematic({
           />
 
           {/* modal shell - full screen on mobile, centered on desktop */}
-          <div className="absolute inset-0 flex items-center justify-center touch-none" onClick={close} style={{ touchAction: 'none' }}>
+          <div className="absolute inset-0 flex items-start justify-center touch-none" onClick={close} style={{ touchAction: 'none' }}>
             <motion.div
               ref={wrapperRef}
               role="dialog"
               aria-modal="true"
               aria-label="Create a Moment"
-              className="relative w-full max-w-md h-[100dvh] md:h-[90vh] md:rounded-3xl overflow-hidden"
+              className="relative w-full max-w-md h-[100dvh] md:h-[100vh] md:rounded-3xl overflow-hidden"
               style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
