@@ -437,6 +437,21 @@ export default function EnhancedCreateMomentModalCinematic({
     }, 10);
   };
 
+  // Handle media item removal
+  const handleRemoveMedia = () => {
+    if (media.length === 0) return;
+    
+    const newMedia = media.filter((_, idx) => idx !== activeIndex);
+    onMediaChange?.(newMedia);
+    
+    // Adjust active index if needed
+    if (activeIndex >= newMedia.length && newMedia.length > 0) {
+      setActiveIndex(newMedia.length - 1);
+    } else if (newMedia.length === 0) {
+      setActiveIndex(0);
+    }
+  };
+
   const handlePost = async () => {
     if (!canPost) return;
     
@@ -779,109 +794,3 @@ export default function EnhancedCreateMomentModalCinematic({
   );
 }
 
-// Segmented Control Component - matches Snap Modal style
-interface SegmentedOption {
-  value: string;
-  label: string;
-  icon: React.ComponentType<any>;
-}
-
-interface SegmentedProps {
-  options: SegmentedOption[];
-  value: string;
-  onChange: (value: string) => void;
-}
-
-const Segmented = ({ options, value, onChange }: SegmentedProps) => {
-  return (
-    <div className="flex rounded-lg bg-white/5 border border-white/10 p-1">
-      {options.map((option) => {
-        const isActive = value === option.value;
-        const Icon = option.icon;
-        
-        return (
-          <button
-            key={option.value}
-            onClick={() => onChange(option.value)}
-            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-              isActive
-                ? 'bg-brand-orange/20 text-brand-orange border border-brand-orange/30'
-                : 'text-white/70 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <Icon className="w-4 h-4" />
-            <span>{option.label}</span>
-          </button>
-        );
-      })}
-    </div>
-  );
-};
-
-// Enhanced Media Carousel Component - simplified for this modal
-interface EnhancedMediaCarouselProps {
-  items: Array<{
-    id: string;
-    type: 'image' | 'video';
-    previewUrl?: string;
-    url?: string;
-    file?: File;
-  }>;
-  activeIndex: number;
-  onIndexChange: (index: number) => void;
-  onClose?: () => void;
-}
-
-const EnhancedMediaCarousel = ({ 
-  items, 
-  activeIndex, 
-  onIndexChange, 
-  onClose 
-}: EnhancedMediaCarouselProps) => {
-  const currentItem = items[activeIndex];
-  
-  if (!currentItem) return null;
-
-  const imageUrl = currentItem.previewUrl || currentItem.url || (currentItem.file ? URL.createObjectURL(currentItem.file) : '');
-
-  return (
-    <div className="relative w-full h-full bg-black rounded-xl overflow-hidden">
-
-      {/* Media display */}
-      <div className="w-full h-full flex items-center justify-center">
-        {currentItem.type === 'video' ? (
-          <video
-            src={imageUrl}
-            className="max-w-full max-h-full object-contain"
-            controls
-            muted
-            playsInline
-          />
-        ) : (
-          <img
-            src={imageUrl}
-            alt={`Media item ${currentItem.id}`}
-            className="max-w-full max-h-full object-contain"
-          />
-        )}
-      </div>
-
-      {/* Navigation dots */}
-      {items.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-          {items.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => onIndexChange(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                index === activeIndex
-                  ? 'bg-white'
-                  : 'bg-white/50 hover:bg-white/70'
-              }`}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
