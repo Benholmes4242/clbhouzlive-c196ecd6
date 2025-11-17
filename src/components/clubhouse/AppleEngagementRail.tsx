@@ -1,6 +1,6 @@
 /**
- * AppleEngagementRail - Right-side frosted glass action rail
- * Part of the Apple-style Clubhouse redesign
+ * AppleEngagementRail - Slimmer, dark glass action rail
+ * Apple-level visual polish with premium interactions
  */
 
 import React, { useState, useEffect } from 'react';
@@ -31,6 +31,8 @@ const formatCount = (count: number): string => {
   return count.toString();
 };
 
+const BUTTON_SIZE = 36;
+
 export const AppleEngagementRail = ({
   stats,
   isLiked = false,
@@ -50,114 +52,139 @@ export const AppleEngagementRail = ({
   // Stagger entrance when active
   useEffect(() => {
     if (isActive) {
-      const timer = setTimeout(() => setIsVisible(true), 120);
+      const timer = setTimeout(() => setIsVisible(true), 100);
       return () => clearTimeout(timer);
     } else {
       setIsVisible(false);
     }
   }, [isActive]);
 
-  const handleComment = () => {
-    // Haptic feedback
-    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-      navigator.vibrate?.(10);
-    }
-    onComment();
-  };
-
-  const handleShare = async () => {
-    await onShare();
+  const handleShare = () => {
+    onShare();
     setShowShareCheck(true);
-    setTimeout(() => setShowShareCheck(false), 800);
+    setTimeout(() => setShowShareCheck(false), 2000);
   };
 
   return (
     <div 
       className={cn(
-        'fixed right-4 z-[50] flex flex-col items-center gap-6 px-2 py-3 glass-panel transition-all duration-300 ease-out',
+        'fixed z-50 flex flex-col items-center gap-4 px-2 py-3 glass-dark transition-all duration-300 ease-out',
         isVisible ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0',
         className
       )}
       style={{
-        bottom: 'calc(env(safe-area-inset-bottom, 0px) + clamp(82px, var(--bottom-nav-height, 72px) + 22px, calc(var(--bottom-nav-height, 72px) + 22px)))',
+        right: 12,
+        bottom: 'calc(env(safe-area-inset-bottom) + var(--bottom-nav-height, 72px) + 22px)',
       }}
     >
-      {/* Like button */}
-      <button
-        className={cn(
-          'rail-btn rail-btn--like',
-          isLiked && 'bg-white/14 shadow-[0_0_16px_rgba(255,255,255,0.35)]'
-        )}
-        onClick={onLike}
-        aria-label="Like this round"
-      >
-        <Heart
-          className={cn(
-            'rail-btn-icon w-5 h-5',
-            isLiked ? 'fill-white text-white' : 'text-white/80'
-          )}
-        />
-      </button>
-      {stats.likes > 0 && (
-        <span className="text-[11px] font-medium text-white/75 -mt-4">
-          {formatCount(stats.likes)}
-        </span>
-      )}
-
-      {/* Comment button */}
-      <button 
-        className="rail-btn rail-btn--comment" 
-        onClick={handleComment}
-        aria-label="Open comments"
-      >
-        <div className="relative">
-          <MessageCircle className="rail-btn-icon w-5 h-5 text-white/80" />
-          {hasCommented && (
-            <span className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-white/80" />
-          )}
-        </div>
-      </button>
-      {stats.comments > 0 && (
-        <span className="text-[11px] font-medium text-white/75 -mt-4">
-          {formatCount(stats.comments)}
-        </span>
-      )}
-
-      {/* Share button */}
-      <button 
-        className="rail-btn rail-btn--share" 
-        onClick={handleShare}
-        aria-label="Share this round"
-      >
-        <div className="relative">
-          <Share2 className="rail-btn-icon w-5 h-5 text-white/80" />
-          {showShareCheck && (
-            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white/90 text-[10px] text-black">
-              <Check className="w-3 h-3" />
-            </span>
-          )}
-        </div>
-      </button>
-      {stats.shares > 0 && (
-        <span className="text-[11px] font-medium text-white/75 -mt-4">
-          {formatCount(stats.shares)}
-        </span>
-      )}
-
-      {/* Mute/Unmute button (only for videos) */}
+      {/* Mute Button (video only) */}
       {isVideo && onMuteToggle && (
         <button
-          className="rail-btn mt-2"
+          type="button"
           onClick={onMuteToggle}
+          className="rail-btn rail-btn--mute flex items-center justify-center"
+          style={{ width: 44, height: 44 }}
           aria-label={isMuted ? 'Unmute' : 'Mute'}
         >
-          {isMuted ? (
-            <VolumeX className="rail-btn-icon w-5 h-5 text-white/80" />
-          ) : (
-            <Volume2 className="rail-btn-icon w-5 h-5 text-white/80" />
-          )}
+          <div
+            className={cn(
+              'rail-btn-icon flex items-center justify-center rounded-full transition-all',
+              'bg-black/30 border border-white/10',
+              !isMuted && 'bg-white/14'
+            )}
+            style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
+          >
+            {isMuted ? (
+              <VolumeX className="w-[18px] h-[18px] text-white/80" />
+            ) : (
+              <Volume2 className="w-[18px] h-[18px] text-white/80" />
+            )}
+          </div>
         </button>
       )}
+
+      {/* Like Button */}
+      <div className="flex flex-col items-center gap-1">
+        <button
+          type="button"
+          onClick={onLike}
+          className="rail-btn rail-btn--like flex items-center justify-center"
+          style={{ width: 44, height: 44 }}
+          aria-label={isLiked ? 'Unlike' : 'Like'}
+        >
+          <div
+            className={cn(
+              'rail-btn-icon flex items-center justify-center rounded-full transition-all',
+              'bg-black/30 border border-white/10',
+              isLiked && 'bg-white/14'
+            )}
+            style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
+          >
+            <Heart
+              className={cn(
+                'w-[18px] h-[18px] transition-all',
+                isLiked ? 'fill-white text-white' : 'text-white/80'
+              )}
+            />
+          </div>
+        </button>
+        <span className="text-[11px] text-white/80 font-medium">
+          {formatCount(stats.likes)}
+        </span>
+      </div>
+
+      {/* Comment Button */}
+      <div className="flex flex-col items-center gap-1">
+        <button
+          type="button"
+          onClick={onComment}
+          className="rail-btn rail-btn--comment flex items-center justify-center"
+          style={{ width: 44, height: 44 }}
+          aria-label="Comment"
+        >
+          <div
+            className={cn(
+              'rail-btn-icon flex items-center justify-center rounded-full transition-all',
+              'bg-black/30 border border-white/10',
+              hasCommented && 'bg-white/14'
+            )}
+            style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
+          >
+            <MessageCircle className="w-[18px] h-[18px] text-white/80" />
+          </div>
+        </button>
+        <span className="text-[11px] text-white/80 font-medium">
+          {formatCount(stats.comments)}
+        </span>
+      </div>
+
+      {/* Share Button */}
+      <div className="flex flex-col items-center gap-1">
+        <button
+          type="button"
+          onClick={handleShare}
+          className="rail-btn rail-btn--share flex items-center justify-center"
+          style={{ width: 44, height: 44 }}
+          aria-label="Share"
+        >
+          <div
+            className={cn(
+              'rail-btn-icon flex items-center justify-center rounded-full transition-all',
+              'bg-black/30 border border-white/10'
+            )}
+            style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
+          >
+            {showShareCheck ? (
+              <Check className="w-[18px] h-[18px] text-white/80" />
+            ) : (
+              <Share2 className="w-[18px] h-[18px] text-white/80" />
+            )}
+          </div>
+        </button>
+        <span className="text-[11px] text-white/80 font-medium">
+          {formatCount(stats.shares)}
+        </span>
+      </div>
     </div>
   );
 };

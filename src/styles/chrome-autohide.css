@@ -36,20 +36,20 @@ body.chrome-hidden {
   will-change: transform, opacity;
   transform: translateZ(0);
   transition: 
-    transform var(--chrome-trans-ms) var(--chrome-ease), 
-    opacity var(--chrome-trans-ms);
+    transform 0.22s cubic-bezier(0.19, 1, 0.22, 1),
+    opacity 0.18s ease-out;
 }
 
 /* Hidden state transforms */
 body.chrome-hidden .chrome-header {
   transform: translateY(-100%) translateZ(0);
-  opacity: 0.96;
+  opacity: 0;
   pointer-events: none;
 }
 
 body.chrome-hidden .chrome-bottom-nav {
   transform: translateY(100%) translateZ(0);
-  opacity: 0.96;
+  opacity: 0;
   pointer-events: none;
 }
 

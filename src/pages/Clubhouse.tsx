@@ -234,6 +234,14 @@ const Clubhouse = () => {
       
       <ClubhouseHeaderNew />
 
+      {/* Edge gradients when chrome is hidden (Apple-level polish) */}
+      {chromeControls.chromeState === 'hidden' && (
+        <>
+          <div className="pointer-events-none fixed inset-x-0 top-0 h-12 bg-gradient-to-b from-black/40 via-black/10 to-transparent z-[45]" />
+          <div className="pointer-events-none fixed inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 via-black/10 to-transparent z-[45]" />
+        </>
+      )}
+
       {/* Main Content - Fullscreen Vertical Feed */}
       <div className="clubhouse-scroll">
         {/* New Season Banner */}

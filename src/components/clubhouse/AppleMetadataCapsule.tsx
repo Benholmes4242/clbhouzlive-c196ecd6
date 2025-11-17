@@ -61,8 +61,8 @@ export const AppleMetadataCapsule = ({
         className
       )}
     >
-      {/* Glass panel */}
-      <div className="glass-panel flex items-start gap-2 px-3 py-2 max-w-[calc(100vw-120px)]">
+      {/* Dark glass panel */}
+      <div className="glass-dark flex items-start gap-2 px-3 py-2 max-w-[calc(100vw-120px)]">
         {/* Avatar with subtle ring */}
         <button
           type="button"

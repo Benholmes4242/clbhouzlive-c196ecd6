@@ -391,15 +391,31 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
         </button>
       )}
 
+      {/* Buffering/Loading overlay */}
+      {isBuffering && !hasError && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/40 via-transparent to-black/40">
+          <div className="h-7 w-7 animate-spin rounded-full border border-white/20 border-t-white/80 opacity-80" />
+        </div>
+      )}
+
       {/* Error overlay - only show if video completely failed to load */}
-      {hasError && !isLoaded && (
-        <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
-          <div className="text-center text-white p-4">
-            <div className="text-sm opacity-80 mb-2">⚠️ Video Error</div>
-            <div className="text-xs opacity-60">
-              Unable to load video source
-            </div>
-          </div>
+      {hasError && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 px-6 text-center text-[14px] text-white/85">
+          <p className="mb-3">Couldn't load this round.</p>
+          <button
+            type="button"
+            onClick={() => {
+              setHasError(false);
+              setIsBuffering(true);
+              const v = videoRef.current;
+              if (v) {
+                v.load();
+              }
+            }}
+            className="rounded-full bg-white px-4 py-1.5 text-[13px] font-medium text-black"
+          >
+            Tap to try again
+          </button>
         </div>
       )}
     </div>
