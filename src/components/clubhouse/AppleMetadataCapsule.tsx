@@ -68,10 +68,10 @@ export const AppleMetadataCapsule = ({
       </button>
 
       {/* Text column */}
-      <div className="flex min-w-0 flex-col gap-1">
+      <div className="flex min-w-0 flex-col gap-1 items-center">
         {/* Row 1: name */}
         <div className="flex items-center gap-1 text-[13px] font-semibold text-white">
-          <span className="truncate">{user?.name ?? 'Golfer'}</span>
+          <span className="truncate text-center">{user?.name ?? 'Golfer'}</span>
         </div>
 
         {/* Row 2: caption (2-line clamp) */}
@@ -79,7 +79,7 @@ export const AppleMetadataCapsule = ({
           <button
             type="button"
             onClick={onMoreClick}
-            className="text-left text-[12px] text-white/80 line-clamp-2 hover:opacity-80 transition-opacity"
+            className="text-center text-[12px] text-white/80 line-clamp-2 hover:opacity-80 transition-opacity"
           >
             {caption}
           </button>
