@@ -451,7 +451,7 @@ const TopTenSlot: React.FC<{
               ${isTopThree ? 'ring-1 ring-white/20' : ''}
             `}>
               <span className={`
-                ${isTopThree ? 'text-white' : 'text-black'} font-medium text-sm leading-none
+                ${isTopThree ? 'text-white' : 'text-foreground'} font-medium text-sm leading-none
                 ${isTopThree ? 'drop-shadow-sm' : ''}
               `}>
                 {rank}
