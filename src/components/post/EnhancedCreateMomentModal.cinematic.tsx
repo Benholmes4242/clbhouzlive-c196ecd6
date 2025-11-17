@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Layers, Camera } from "lucide-react";
+import { ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Layers, Camera, X } from "lucide-react";
 import { prefersReduced } from '@/lib/ui/motion';
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
@@ -101,7 +101,6 @@ export default function EnhancedCreateMomentModalCinematic({
   const [aiLoading, setAiLoading] = useState(false);
   const [visibility, setVisibility] = useState<"public" | "private">("public");
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
-  const [activeCard, setActiveCard] = useState<'caption' | 'course'>('caption');
   const prefersReducedMotion = useReducedMotion();
   
   // Hub-style animation constants
@@ -207,6 +206,28 @@ export default function EnhancedCreateMomentModalCinematic({
   const course = selectedCourse || snapCourse;
 
   const canPost = useMemo(() => media?.length > 0 && !isSubmitting, [media, isSubmitting]);
+  const hasMedia = media.length > 0;
+
+  // Format video duration helper
+  const formatDuration = (seconds: number | undefined): string => {
+    if (!seconds || !isFinite(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Remove current media item
+  const handleRemoveMedia = () => {
+    if (!onMediaChange || media.length === 0) return;
+    
+    const newMedia = media.filter((_, idx) => idx !== activeIndex);
+    onMediaChange(newMedia);
+    
+    // Adjust active index if necessary
+    if (activeIndex >= newMedia.length) {
+      setActiveIndex(Math.max(0, newMedia.length - 1));
+    }
+  };
 
   // Helper: is this touch inside a scroll container?
   const isInsideScrollContainer = (target: EventTarget | null) => {
@@ -601,7 +622,7 @@ export default function EnhancedCreateMomentModalCinematic({
                 {/* Media counter - top left, 8px from top - only show when media exists */}
                 {media.length > 0 && (
                   <div 
-                    className="absolute left-4 z-20"
+                    className="absolute left-4 z-20 flex items-center gap-2"
                     style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
                   >
                     <div className="rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] text-xs px-3 py-1.5 flex items-center gap-1">
@@ -610,13 +631,29 @@ export default function EnhancedCreateMomentModalCinematic({
                   </div>
                 )}
 
+                {/* Remove media button - top right */}
+                {media.length > 0 && (
+                  <div 
+                    className="absolute right-4 z-20"
+                    style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
+                  >
+                    <button
+                      onClick={handleRemoveMedia}
+                      className="rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] w-8 h-8 flex items-center justify-center transition-all hover:bg-white/70 active:scale-95"
+                      aria-label="Remove current media"
+                    >
+                      <X className="w-4 h-4 text-[rgba(25,25,28,0.85)]" />
+                    </button>
+                  </div>
+                )}
+
 
                 {/* Video duration - bottom left, 8px from media bottom, frosted white */}
-                {media[activeIndex]?.type === 'video' && (
+                {media[activeIndex]?.type === 'video' && (media[activeIndex] as ComposerMediaItem)?.duration && (
                   <div className="absolute bottom-[8px] left-4 z-20">
                     <div className="rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] text-xs px-3 py-1.5 flex items-center gap-1.5">
                       <Play className="w-2.5 h-2.5" />
-                      <span className="font-medium">00:09</span>
+                      <span className="font-medium">{formatDuration((media[activeIndex] as ComposerMediaItem)?.duration)}</span>
                     </div>
                   </div>
                 )}
@@ -655,94 +692,96 @@ export default function EnhancedCreateMomentModalCinematic({
                     touchAction: 'pan-y'
                   }}
                 >
-                  {/* Tab chips */}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setActiveCard('caption')}
-                      className={`flex-1 px-3 py-2 rounded-xl text-base font-medium transition-all duration-200 ${
-                        activeCard === 'caption'
-                          ? 'bg-white border border-[rgba(255,156,64,0.35)] shadow-[0_1px_6px_rgba(0,0,0,0.06)] text-zinc-900'
-                          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
-                      }`}
-                    >
-                      Caption
-                    </button>
-                    <button
-                      onClick={() => setActiveCard('course')}
-                      className={`flex-1 px-3 py-2 rounded-xl text-base font-medium transition-all duration-200 ${
-                        activeCard === 'course'
-                          ? 'bg-white border border-[rgba(255,156,64,0.35)] shadow-[0_1px_6px_rgba(0,0,0,0.06)] text-zinc-900'
-                          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
-                      }`}
-                    >
-                      Tag a course
-                    </button>
-                    <button
-                      onClick={openStudio}
-                      disabled={media.length === 0}
-                      className={`flex-1 px-3 py-2 rounded-xl text-base font-medium transition-all duration-200 ${
-                        media.length === 0
-                          ? 'border border-zinc-200 bg-zinc-100 text-zinc-400 cursor-not-allowed'
-                          : 'border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 hover:shadow-sm'
-                      }`}
-                      title={media.length === 0 ? 'Add media to open Studio' : 'Open Studio to edit your media'}
-                    >
-                      <div className="flex items-center justify-center gap-1.5">
-                        <Sparkles className="w-4 h-4" />
-                        <span>Studio</span>
-                      </div>
-                    </button>
-                  </div>
-
-                  {/* Sliding cards container */}
-                  <div className="relative flex-1 overflow-hidden">
-                    {/* CAPTION CARD */}
-                    <motion.div
-                      className="absolute inset-0 w-full flex flex-col"
-                      initial={{ x: 0 }}
-                      animate={{ 
-                        x: activeCard === 'caption' ? 0 : '-100%',
-                        opacity: activeCard === 'caption' ? 1 : 0
-                      }}
-                      transition={{ 
-                        type: "spring", 
-                        stiffness: 300, 
-                        damping: 30
-                      }}
-                    >
+                  {/* Unified Details Section - No tabs, everything visible */}
+                  <div className="flex flex-col gap-4 flex-1">
+                    {/* Caption Section */}
+                    <div className="flex flex-col">
                       <label className="block text-base font-semibold text-white mb-3">Add a caption</label>
                       
                       <textarea
-                        className="caption-input flex-1 w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 text-[15px] leading-snug resize-none placeholder:text-zinc-400 text-zinc-900 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)] transition-all duration-200"
-                        placeholder="Write a caption…"
+                        className="caption-input w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 text-[15px] leading-snug resize-none placeholder:text-zinc-400 text-zinc-900 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)] transition-all duration-200 min-h-[100px]"
+                        placeholder="Write a caption..."
                         value={caption}
                         onChange={(e) => setCaption(e.target.value)}
-                        style={{
-                          overscrollBehavior: 'contain'
-                        }}
+                        rows={4}
                       />
-                    </motion.div>
 
-                    {/* COURSE CARD */}
-                    <motion.div
-                      className="absolute inset-0 w-full"
-                      initial={{ x: '100%' }}
-                      animate={{ 
-                        x: activeCard === 'course' ? 0 : '100%',
-                        opacity: activeCard === 'course' ? 1 : 0
-                      }}
-                      transition={{ 
-                        type: "spring", 
-                        stiffness: 300, 
-                        damping: 30
-                      }}
-                    >
+                      {/* AI Caption Button */}
+                      <button
+                        type="button"
+                        onClick={handleAICaption}
+                        disabled={aiLoading || !hasMedia}
+                        className="mt-2 self-start inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-300 bg-white text-zinc-700 text-sm font-medium hover:bg-zinc-50 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                        aria-label={aiLoading ? "Generating AI caption..." : "Generate AI caption"}
+                      >
+                        {aiLoading ? <StarsLoading /> : (
+                          <>
+                            <Sparkles className="w-3.5 h-3.5" />
+                            <span>AI Caption</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Course Tagging Section */}
+                    <div className="flex flex-col">
                       <CourseTagInput
                         onCourseSelect={onCourseSelect}
                         selectedCourse={course}
                       />
-                    </motion.div>
+                      <p className="mt-2 text-xs text-white/60">
+                        Tag a course to help other golfers discover your round
+                      </p>
+                    </div>
+
+                    {/* Studio Entry Row */}
+                    <button
+                      onClick={openStudio}
+                      disabled={media.length === 0}
+                      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-200 ${
+                        media.length === 0
+                          ? 'border-zinc-200 bg-zinc-100 cursor-not-allowed'
+                          : 'border-zinc-300 bg-white hover:bg-zinc-50 hover:shadow-sm'
+                      }`}
+                      title={media.length === 0 ? 'Add media to open Studio' : 'Open Studio to edit your media'}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                          <Sparkles className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <div className={`text-sm font-semibold ${media.length === 0 ? 'text-zinc-400' : 'text-zinc-900'}`}>
+                            Open Studio
+                          </div>
+                          <div className={`text-xs ${media.length === 0 ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                            Add music, text, filters and edits
+                          </div>
+                        </div>
+                      </div>
+                      <ChevronRight className={`w-5 h-5 ${media.length === 0 ? 'text-zinc-300' : 'text-zinc-400'}`} />
+                    </button>
                   </div>
+
+                  {/* Visibility status line */}
+                  {hasMedia && (
+                    <div className="flex items-center justify-center gap-2 text-xs text-white/70">
+                      <span>Sharing to: Clubhouse</span>
+                      <span>·</span>
+                      <div className="flex items-center gap-1">
+                        {visibility === 'public' ? (
+                          <>
+                            <Globe className="w-3 h-3" />
+                            <span>Public</span>
+                          </>
+                        ) : (
+                          <>
+                            <Lock className="w-3 h-3" />
+                            <span>Private</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Primary Share button */}
                   <button
