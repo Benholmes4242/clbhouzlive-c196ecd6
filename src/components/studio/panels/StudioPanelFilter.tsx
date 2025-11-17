@@ -11,11 +11,9 @@ type StudioPanelFilterProps = {
 
 const FILTER_OPTIONS: { id: FilterId; label: string }[] = [
   { id: 'normal', label: 'Normal' },
-  { id: 'fade', label: 'Fade' },
-  { id: 'warm', label: 'Warm' },
-  { id: 'cool', label: 'Cool' },
-  { id: 'dusky', label: 'Dusky' },
-  { id: 'mono', label: 'Mono' },
+  { id: 'vivid', label: 'Vivid' },
+  { id: 'bw', label: 'B&W' },
+  { id: 'dramatic', label: 'Dramatic' },
 ];
 
 export default function StudioPanelFilter({ edits, updateEdits, onApply, onReset }: StudioPanelFilterProps) {

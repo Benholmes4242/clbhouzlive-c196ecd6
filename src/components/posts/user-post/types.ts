@@ -2,6 +2,9 @@ export interface PostMedia {
   id: string;
   media_type: 'image' | 'video';
   media_url: string;
+  studio_edits?: {
+    filter?: string;
+  } | null;
 }
 
 export interface PostTag {

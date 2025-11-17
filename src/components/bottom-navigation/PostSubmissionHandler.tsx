@@ -85,8 +85,10 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
         user,
         content: data.caption,
         mediaFiles: files,
+        mediaItems,
         selectedTags: data.tags ?? [],
         courseInfo: data.selectedCourse ?? data.course,
+        studioEditsByMediaId: data.studioEditsByMediaId ?? {},
         onSuccess: () => {
           console.log('Post submission successful - background upload completed');
           setIsSubmitting(false);

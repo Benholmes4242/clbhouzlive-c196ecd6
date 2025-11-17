@@ -9,6 +9,7 @@
 @import './styles/theme-tokens.css';
 @import './styles/dropdown-portal.css';
 @import './styles/style-tokens.css';
+@import './styles/studio-filters.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

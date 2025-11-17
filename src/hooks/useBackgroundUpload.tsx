@@ -18,6 +18,7 @@ interface BackgroundUploadData {
   postId: string;
   mediaFiles: File[];
   userId: string;
+  studioEditsByIndex?: ({ filter?: string } | null)[];
 }
 
 export const useBackgroundUpload = () => {
@@ -31,7 +32,8 @@ export const useBackgroundUpload = () => {
   const startBackgroundUpload = useCallback(async ({
     postId,
     mediaFiles,
-    userId
+    userId,
+    studioEditsByIndex
   }: BackgroundUploadData) => {
     console.log(`Starting background upload for post ${postId} with ${mediaFiles.length} files`);
     
@@ -173,13 +175,17 @@ export const useBackgroundUpload = () => {
           }
         }
 
-        // Create media record
+        // Create media record with studio edits
+        const editsForThisIndex = studioEditsByIndex?.[index] ?? null;
+        
         const { data: mediaData, error: mediaError } = await supabase
           .from('post_media')
           .insert({
             post_id: postId,
             media_type: mediaType,
-            media_url: publicUrl
+            media_url: publicUrl,
+            display_order: index,
+            studio_edits: editsForThisIndex
           })
           .select()
           .single();
