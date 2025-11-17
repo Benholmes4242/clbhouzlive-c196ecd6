@@ -61,19 +61,19 @@ export const AppleMetadataCapsule = ({
         className
       )}
     >
-      {/* Dark glass panel */}
-      <div className="glass-dark flex items-start gap-2 px-3 py-2 max-w-[calc(100vw-120px)]">
+      {/* Dark glass panel - 3x scale */}
+      <div className="glass-dark flex items-start gap-6 px-9 py-6 max-w-[calc(100vw-120px)]">
         {/* Avatar with subtle ring */}
         <button
           type="button"
           onClick={onProfileSheetOpen}
-          className="flex-shrink-0 mt-0.5"
+          className="flex-shrink-0 mt-1.5"
           aria-label={`View ${user.name}'s profile`}
         >
           <div 
-            className="relative w-10 h-10 rounded-full overflow-hidden"
+            className="relative w-30 h-30 rounded-full overflow-hidden"
             style={{
-              boxShadow: '0 0 4px rgba(255,255,255,0.5), inset 0 0 0 1px #6e9277',
+              boxShadow: '0 0 12px rgba(255,255,255,0.5), inset 0 0 0 3px #6e9277',
             }}
           >
             <img 
@@ -85,12 +85,12 @@ export const AppleMetadataCapsule = ({
         </button>
 
         {/* Content */}
-        <div className="flex flex-col gap-1 min-w-0 flex-1">
+        <div className="flex flex-col gap-3 min-w-0 flex-1">
           {/* Row 1: name · time */}
-          <div className="flex items-center gap-1 text-[13px] font-semibold text-white">
+          <div className="flex items-center gap-3 text-[39px] font-semibold text-white">
             <span className="truncate">{user.name}</span>
             {createdAt && (
-              <span className="text-[12px] font-normal text-white/60 flex-shrink-0">
+              <span className="text-[36px] font-normal text-white/60 flex-shrink-0">
                 · {relativeTime(createdAt)}
               </span>
             )}
@@ -100,7 +100,7 @@ export const AppleMetadataCapsule = ({
           {caption && (
             <button
               type="button"
-              className="text-[13px] text-white/80 text-left line-clamp-2 hover:opacity-80 transition-opacity"
+              className="text-[39px] text-white/80 text-left line-clamp-2 hover:opacity-80 transition-opacity"
               onClick={onMoreClick}
             >
               {caption}
@@ -112,11 +112,11 @@ export const AppleMetadataCapsule = ({
             <button
               type="button"
               onClick={onCourseClick}
-              className="mt-1 inline-flex max-w-full items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[11px] text-white/80"
+              className="mt-3 inline-flex max-w-full items-center gap-3 rounded-full bg-white/10 px-6 py-1.5 text-[33px] text-white/80"
             >
               <span className="truncate">{courseName}</span>
               {typeof courseRating === 'number' && (
-                <span className="flex items-center gap-0.5 flex-shrink-0">
+                <span className="flex items-center gap-1.5 flex-shrink-0">
                   <span>·</span>
                   <span>★ {courseRating.toFixed(1)}</span>
                 </span>
