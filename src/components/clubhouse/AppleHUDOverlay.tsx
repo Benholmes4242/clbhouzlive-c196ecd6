@@ -84,20 +84,20 @@ export const AppleHUDOverlay = ({
   return (
     <>
       {/* Bottom-left: metadata capsule + progress bar */}
-      <div
-        className="clubhouse-hud fixed left-[12px] z-[50] flex flex-col gap-2"
-      >
-        <AppleMetadataCapsule
-          user={user}
-          caption={caption}
-          createdAt={createdAt}
-          courseName={courseName}
-          courseRating={courseRating}
-          onProfileSheetOpen={onProfileSheetOpen}
-          onCourseClick={onCourseClick}
-          onMoreClick={onMoreClick}
-        />
-        <AppleProgressBar progress={videoProgress} />
+      <div className="clubhouse-hud fixed left-[12px] z-[50]">
+        <div className="flex flex-col gap-2 w-[260px] max-w-[80vw]">
+          <AppleMetadataCapsule
+            user={user}
+            caption={caption}
+            createdAt={createdAt}
+            courseName={courseName}
+            courseRating={courseRating}
+            onProfileSheetOpen={onProfileSheetOpen}
+            onCourseClick={onCourseClick}
+            onMoreClick={onMoreClick}
+          />
+          <AppleProgressBar progress={videoProgress} />
+        </div>
       </div>
 
       {/* Right-side engagement rail */}
