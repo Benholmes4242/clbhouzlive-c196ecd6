@@ -1,6 +1,8 @@
 /**
  * AppleHUDOverlay - Complete Apple-style HUD combining capsule, progress, and rail
  * Part of the Apple-style Clubhouse redesign
+ * 
+ * Z-index: 40 (clubhouseHud) - See src/constants/zIndex.ts for full hierarchy
  */
 
 import React from 'react';
@@ -84,7 +86,7 @@ export const AppleHUDOverlay = ({
   return (
     <>
       {/* Bottom-left: metadata capsule + progress bar */}
-      <div className="clubhouse-hud fixed left-[12px] z-[50]">
+      <div className="clubhouse-hud fixed left-[12px] z-[40]">
         <div className="flex flex-col gap-2 w-[260px] max-w-[80vw]">
           <AppleMetadataCapsule
             user={user}
