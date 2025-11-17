@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
+import { useMemo, useState, useEffect, useRef, useLayoutEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Layers, Camera } from "lucide-react";
+import { prefersReduced } from '@/lib/ui/motion';
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
@@ -102,6 +103,28 @@ export default function EnhancedCreateMomentModalCinematic({
   const [activeCard, setActiveCard] = useState<'caption' | 'course'>('caption');
   const prefersReducedMotion = useReducedMotion();
   
+  // Hub-style animation constants
+  const ECM_ENTRY_DURATION = 240;
+  const ECM_EXIT_DURATION = 240;
+  const ECM_ENTRY_EASING = 'cubic-bezier(.2,.8,.2,1)';
+  const ECM_EXIT_EASING = 'cubic-bezier(.2,.8,.2,1)';
+  const DRAG_THRESHOLD = 120;
+  
+  // Hub-style animation state
+  const [dragStartY, setDragStartY] = useState<number | null>(null);
+  const [translateY, setTranslateY] = useState(() => {
+    if (typeof window === 'undefined') return 0;
+    const reduced = prefersReduced();
+    if (reduced) return 0;
+    return window.innerHeight;
+  });
+  const [isDragging, setIsDragging] = useState(false);
+  const [hasEntered, setHasEntered] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return prefersReduced();
+  });
+  const [isExiting, setIsExiting] = useState(false);
+  
   // Studio hook integration
   const {
     studioOpen,
@@ -178,21 +201,88 @@ export default function EnhancedCreateMomentModalCinematic({
 
   const canPost = useMemo(() => media?.length > 0 && !isSubmitting, [media, isSubmitting]);
 
-  // Close handler
-  const close = () => onClose?.();
+  // Helper: is this touch inside a scroll container?
+  const isInsideScrollContainer = (target: EventTarget | null) => {
+    if (!(target instanceof HTMLElement)) return false;
+    return !!target.closest('[data-ecm-scroll-container="true"]');
+  };
 
-  // Listen for close modal events from carousel slides
-  useEffect(() => {
-    const handleCloseModal = () => close();
-    window.addEventListener('closeModal', handleCloseModal);
-    return () => window.removeEventListener('closeModal', handleCloseModal);
-  }, []);
+  // Animated close with slide-down (Hub-style)
+  const animateAndClose = useCallback(() => {
+    const reduced = prefersReduced();
+
+    if (reduced) {
+      onClose();
+      return;
+    }
+
+    if (typeof window === 'undefined') {
+      onClose();
+      return;
+    }
+
+    setIsExiting(true);
+    setTranslateY(window.innerHeight);
+
+    window.setTimeout(() => {
+      onClose();
+    }, ECM_EXIT_DURATION);
+  }, [onClose, ECM_EXIT_DURATION]);
+
+  // Close handler
+  const close = () => animateAndClose();
+
+  // Touch handlers for swipe-to-dismiss (Hub-style)
+  const handleSheetTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
+    if (isExiting) return;
+
+    const touch = e.touches[0];
+    const target = e.target;
+
+    // Ignore touches starting inside scroll containers
+    if (isInsideScrollContainer(target)) {
+      return;
+    }
+
+    setIsDragging(true);
+    setDragStartY(touch.clientY);
+  };
+
+  const handleSheetTouchMove: React.TouchEventHandler<HTMLDivElement> = (e) => {
+    if (!isDragging || dragStartY == null || isExiting) return;
+
+    const touch = e.touches[0];
+    const deltaY = touch.clientY - dragStartY;
+
+    if (deltaY <= 0) {
+      // Don't drag upwards
+      setTranslateY(0);
+      return;
+    }
+
+    // Directly follow the finger
+    setTranslateY(deltaY);
+  };
+
+  const handleSheetTouchEnd: React.TouchEventHandler<HTMLDivElement> = () => {
+    if (!isDragging || isExiting) return;
+
+    if (translateY > DRAG_THRESHOLD) {
+      animateAndClose();
+    } else {
+      // Snap back
+      setTranslateY(0);
+    }
+
+    setIsDragging(false);
+    setDragStartY(null);
+  };
 
   // Carousel navigation
   const prevMedia = () => setActiveIndex((i) => (i - 1 + media.length) % media.length);
   const nextMedia = () => setActiveIndex((i) => (i + 1) % media.length);
 
-  // Touch handlers for mobile swipe
+  // Touch handlers for mobile swipe (media carousel)
   const onTouchStart = (e: React.TouchEvent) => {
     startX.current = e.touches[0].clientX;
   };
@@ -206,8 +296,7 @@ export default function EnhancedCreateMomentModalCinematic({
     startX.current = null;
   };
 
-  // Measure and set media height so it ends just beneath the caption,
-  // leaving only a small CAPTION_OVERLAP_PX overlap.
+  // Measure and set media height
   useLayoutEffect(() => {
     const el = wrapperRef.current;
     const cap = captionRef.current;
@@ -216,7 +305,6 @@ export default function EnhancedCreateMomentModalCinematic({
     const measure = () => {
       const wrapperH = el.clientHeight;
       const captionH = cap.clientHeight;
-      // media area should be wrapper height minus caption height + small overlap
       const h = Math.max(120, wrapperH - (captionH - CAPTION_OVERLAP_PX));
       setMediaHeight(h);
     };
@@ -228,16 +316,54 @@ export default function EnhancedCreateMomentModalCinematic({
     return () => ro.disconnect();
   }, []);
 
-  // Keyboard handlers
+  // Listen for close modal events from carousel slides
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+    const handleCloseModal = () => animateAndClose();
+    window.addEventListener('closeModal', handleCloseModal);
+    return () => window.removeEventListener('closeModal', handleCloseModal);
+  }, [animateAndClose]);
+
+  // Slide-in from bottom on mount (Hub-style)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const reduced = prefersReduced();
+
+    if (reduced || typeof window === 'undefined') {
+      setTranslateY(0);
+      setHasEntered(true);
+      return;
+    }
+
+    // Reset state for fresh entry
+    setTranslateY(window.innerHeight);
+    setIsExiting(false);
+    setHasEntered(false);
+
+    // Next frame: enable transition and slide up to 0
+    requestAnimationFrame(() => {
+      setHasEntered(true);
+      setTranslateY(0);
+    });
+  }, [isOpen]);
+
+  // Escape key to close (Hub-style with animation)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        animateAndClose();
+      }
+      // Carousel navigation still available
       if (canSlide && e.key === "ArrowLeft") prevMedia();
       if (canSlide && e.key === "ArrowRight") nextMedia();
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [canSlide]);
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [animateAndClose, canSlide, isOpen]);
 
   // AI Caption Generation
   const handleAICaption = async () => {
@@ -329,74 +455,42 @@ export default function EnhancedCreateMomentModalCinematic({
     }, 100);
   };
 
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div 
-          className="ecm-root fixed inset-0 z-[1000]" 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          exit={{ opacity: 0 }}
-          transition={{ 
-            duration: 0.18, 
-            ease: "easeIn"
-          }}
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: '100dvh',
-            width: '100%',
-            overflow: 'hidden',
-            overscrollBehavior: 'none',
-            WebkitOverflowScrolling: 'auto',
-            touchAction: 'none'
-          }}
-        >
-          {/* Backdrop - matching Hub page */}
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-md touch-none" onClick={close} style={{ touchAction: 'none' }} />
-          
-          {/* Glass layer - matching Hub page */}
-          <div 
-            className="absolute inset-0 touch-none" 
-            style={{ 
-              background: 'rgba(0, 0, 0, 0.28)',
-              backdropFilter: 'blur(22px)',
-              WebkitBackdropFilter: 'blur(22px)',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
-              boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
-              touchAction: 'none'
-            }}
-          />
+  if (!isOpen) return null;
 
-          {/* modal shell - full screen on mobile, centered on desktop */}
-          <div className="absolute inset-0 flex items-start justify-center touch-none" onClick={close} style={{ touchAction: 'none' }}>
-            <motion.div
-              ref={wrapperRef}
-              role="dialog"
-              aria-modal="true"
-              aria-label="Create a Moment"
-              className="relative w-full max-w-md h-[100dvh] md:h-[100vh] md:rounded-3xl overflow-hidden"
-              style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
-              initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0, scale: 0.95 }}
-              animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
-              exit={prefersReducedMotion ? { opacity: 0 } : { y: 12, opacity: 0, scale: 0.98 }}
-              transition={prefersReducedMotion ? 
-                { duration: 0.18 } : 
-                { 
-                  type: "spring", 
-                  stiffness: 300, 
-                  damping: 25,
-                  duration: 0.18
-                }
-              }
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Grabber bar - matching Hub page */}
-              <div className="hub-grabber" />
+  return (
+    <div className="fixed inset-0 z-[9999]">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+      
+      {/* Glass Sheet with Hub-style slide animation */}
+      <div 
+        ref={wrapperRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Create a Moment"
+        className="ecm-glass-sheet fixed inset-0"
+        style={{
+          background: 'rgba(0, 0, 0, 0.28)',
+          backdropFilter: 'blur(22px)',
+          WebkitBackdropFilter: 'blur(22px)',
+          border: '1px solid rgba(255, 255, 255, 0.06)',
+          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
+          transform: `translateY(${translateY}px)`,
+          transition:
+            // no transition while dragging or before first frame
+            isDragging || !hasEntered || prefersReduced()
+              ? 'none'
+              : isExiting
+                ? `transform ${ECM_EXIT_DURATION}ms ${ECM_EXIT_EASING}`
+                : `transform ${ECM_ENTRY_DURATION}ms ${ECM_ENTRY_EASING}`,
+        }}
+        onTouchStart={handleSheetTouchStart}
+        onTouchMove={handleSheetTouchMove}
+        onTouchEnd={handleSheetTouchEnd}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Grabber bar - matching Hub page */}
+        <div className="hub-grabber" />
 
               {/* MEDIA STAGE - full-bleed, top-anchored */}
               <section
@@ -654,16 +748,13 @@ export default function EnhancedCreateMomentModalCinematic({
                   </button>
                 </div>
               </section>
-            </motion.div>
-          </div>
 
           {/* Success overlay */}
           <PostSuccessOverlay 
             isVisible={showSuccessOverlay} 
             onComplete={handleSuccessComplete}
           />
-        </motion.div>
-      )}
+        </div>
 
       {/* Studio Shelf */}
       <StudioShelf
@@ -677,7 +768,7 @@ export default function EnhancedCreateMomentModalCinematic({
         updateEdits={(patch) => updateEdits(media[activeIndex]?.id || '', patch)}
         clearEdits={() => clearEdits(media[activeIndex]?.id || '')}
       />
-    </AnimatePresence>
+    </div>
   );
 }
 
