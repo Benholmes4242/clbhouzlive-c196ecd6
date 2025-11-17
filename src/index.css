@@ -1068,21 +1068,6 @@ html.overlay-open .clubhouse-progress {
   padding-bottom: max(8px, env(safe-area-inset-bottom));
 }
 
-/* Hide global header when EnhancedCreateMoment modal is active - CRITICAL RULE */
-body.ecm-open .global-header,
-body.ecm-open header.global-header,
-body.ecm-open [class*="global-header"] {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-/* Remove top padding when ECM modal is open (header is hidden) */
-body.ecm-open .app-shell--with-header-padding {
-  padding-top: 0 !important;
-}
-
 /* Clubhouse header: anchored to top with safe-area handling */
 .clubhouse-header {
   position: relative;
