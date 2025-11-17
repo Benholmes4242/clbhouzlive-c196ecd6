@@ -91,9 +91,14 @@ const Clubhouse = () => {
     }
   }, [seasonRecap]);
   
-  // Chrome auto-hide state
+  // Track overlay states
+  const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
+  const [isCommentsDrawerOpen, setIsCommentsDrawerOpen] = useState(false);
+  
+  // Chrome auto-hide state - force hidden when any overlay is open
+  const isAnyOverlayOpen = isProfileDrawerOpen || isCommentsDrawerOpen || isComposerOpen;
   const chromeControls = useChromeState({
-    isModalOpen: isComposerOpen,
+    forceHidden: isAnyOverlayOpen,
     disabled: false // Set to true via env var for emergency rollback
   });
   
@@ -267,6 +272,8 @@ const Clubhouse = () => {
             onActiveVideoRefChange={(ref) => {
               activeVideoRef.current = ref;
             }}
+            onCommentsOpenChange={setIsCommentsDrawerOpen}
+            onProfileOpenChange={setIsProfileDrawerOpen}
           />
         ) : isLoading ? (
           <div className="flex items-center justify-center min-h-screen">
