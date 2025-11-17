@@ -79,15 +79,11 @@ export const AppleMetadataCapsule = ({
           <span className="truncate text-center">{user?.name ?? 'Golfer'}</span>
         </button>
 
-        {/* Row 2: caption (2-line clamp) */}
+        {/* Row 2: caption (2-line clamp) - non-interactive */}
         {caption && (
-          <button
-            type="button"
-            onClick={onMoreClick}
-            className="text-center text-[12px] text-white/80 line-clamp-2 hover:opacity-80 transition-opacity"
-          >
+          <p className="text-center text-[12px] text-white/80 line-clamp-2">
             {caption}
-          </button>
+          </p>
         )}
 
         {/* Row 3: course pill (optional) */}

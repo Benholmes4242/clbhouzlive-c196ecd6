@@ -900,7 +900,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   setShowMiniProfile(true);
                 }}
                 onCourseClick={() => {}}
-                onMoreClick={() => handleComment(item.id)}
                 onLike={() => handleLike(item.id)}
                 onComment={() => handleComment(item.id)}
                 onShare={handleShare}

@@ -156,36 +156,47 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/50 z-50 transition-opacity duration-300"
+        className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 transition-opacity duration-300"
         onClick={onClose}
       />
       
-      {/* Modal */}
-      <div className="fixed inset-x-0 bottom-0 z-[60] animate-slide-in-up">
+      {/* Comments Sheet - Dark Glass */}
+      <div className="fixed inset-x-0 bottom-0 z-[60] flex items-end justify-center">
         <div 
-          className="bg-[#1C1C1E] rounded-t-3xl shadow-2xl flex flex-col relative"
-          style={{ height: '75vh', maxHeight: '75vh', marginBottom: '64px' }}
+          className="clubhouse-comments-sheet glass-dark rounded-t-[24px] flex flex-col relative w-full"
+          style={{ 
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            height: '80vh',
+            maxHeight: '80vh'
+          }}
         >
-          {/* Drag Handle */}
-          <div className="flex justify-center pt-2 pb-1">
-            <div className="w-10 h-1 bg-gray-500 rounded-full" />
+          {/* Handle */}
+          <div className="flex justify-center pt-3 pb-2">
+            <div className="w-12 h-1 bg-white/30 rounded-full" />
           </div>
 
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-            <h2 className="text-lg font-semibold text-white">Comments</h2>
+          <div className="flex items-center justify-between px-4 md:px-6 pb-3 border-b border-white/5">
+            <h2 className="text-[14px] font-semibold text-white">Comments</h2>
             <button
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-white/10 transition-colors"
+              className="h-9 w-9 flex items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+              aria-label="Close comments"
             >
-              <X className="w-5 h-5 text-gray-400" />
+              <X className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Comments List */}
-          <div className="flex-1 overflow-y-auto px-4 py-2">
+          {/* Comments List - Scrollable */}
+          <div 
+            className="clubhouse-comments-scroll flex-1 overflow-y-auto px-4 md:px-6 py-3"
+            style={{
+              WebkitOverflowScrolling: 'touch',
+              overscrollBehavior: 'contain'
+            }}
+          >
             {comments.map((comment) => (
-              <div key={comment.id} className="flex items-start space-x-3 py-3">
+              <div key={comment.id} className="flex gap-3 pb-3">
                 <img
                   src={comment.user.avatar}
                   alt={comment.user.username}
@@ -195,28 +206,26 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
                   }}
                 />
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <span className="font-semibold text-white text-sm">
-                      {comment.user.username}
-                    </span>
-                    <span className="text-xs text-gray-400">
+                  <div className="flex items-center gap-2 text-[13px] text-white font-semibold">
+                    <span className="truncate">{comment.user.username}</span>
+                    <span className="text-[11px] text-white/50 whitespace-nowrap">
                       {comment.timestamp}
                     </span>
                   </div>
-                  <p className="text-white text-sm leading-relaxed mb-2">
+                  <p className="mt-0.5 text-[13px] leading-snug text-white/85">
                     {comment.content}
                   </p>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center gap-4 mt-2">
                     <button
                       onClick={() => handleLike(comment.id)}
-                      className="flex items-center space-x-1 text-xs text-gray-400 hover:text-white transition-colors"
+                      className="flex items-center gap-1 text-[11px] text-white/60 hover:text-white transition-colors"
                     >
                       <Heart 
-                        className={`w-4 h-4 ${comment.isLiked ? 'fill-red-500 text-red-500' : ''}`} 
+                        className={`w-3.5 h-3.5 ${comment.isLiked ? 'fill-red-500 text-red-500' : ''}`} 
                       />
                       <span>{comment.likes}</span>
                     </button>
-                    <button className="text-xs text-gray-400 hover:text-white transition-colors">
+                    <button className="text-[11px] text-white/60 hover:text-white transition-colors">
                       Reply
                     </button>
                   </div>
@@ -225,41 +234,44 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
             ))}
           </div>
 
-          {/* Comment Input - Fixed to bottom above nav bar */}
-          <div className="sticky bottom-0 bg-[#1C1C1E] border-t border-gray-700 p-4 pb-6">
-            <div className="flex items-center space-x-3">
-              {/* User Profile Picture - Left */}
+          {/* Comment Input - Fixed Bottom */}
+          <div className="border-t border-white/5 bg-black/40 backdrop-blur-xl px-4 md:px-6 py-3">
+            <div className="flex items-center gap-2">
+              {/* User avatar */}
               <img
                 src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
                 alt="Your avatar"
                 className="w-8 h-8 rounded-full object-cover flex-shrink-0"
               />
               
-              {/* Text Input - Center */}
+              {/* Input pill */}
               <div className="flex-1">
-                <Input
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Leave your thoughts here..."
-                  className="w-full bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 rounded-full px-4 py-2 focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-colors"
-                />
+                <div className="flex items-center gap-2 rounded-full bg-white/5 border border-white/15 px-3 py-2">
+                  <input
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Leave your thoughts here..."
+                    className="w-full bg-transparent text-[13px] text-white/90 placeholder:text-white/45 outline-none"
+                  />
+                  <button
+                    type="button"
+                    className="text-white/60 hover:text-white/90 transition-colors"
+                  >
+                    <span className="text-[14px]">@</span>
+                  </button>
+                </div>
               </div>
               
-              {/* Right Side Icons */}
-              <div className="flex items-center space-x-2">
-                <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                  <span className="text-gray-400 text-lg">@</span>
-                </button>
-                <Button
-                  onClick={handleSubmitComment}
-                  disabled={!newComment.trim()}
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-full w-8 h-8 p-0"
-                >
-                  <Send className="w-4 h-4" />
-                </Button>
-              </div>
+              {/* Send button - frosted white */}
+              <button
+                onClick={handleSubmitComment}
+                disabled={!newComment.trim()}
+                className="btn-frosted-white h-9 w-9 flex items-center justify-center rounded-full bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] transition-all duration-150 hover:bg-white/22 hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.45)] active:translate-y-0 active:shadow-[0_2px_8px_rgba(0,0,0,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Send comment"
+              >
+                <Send className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
