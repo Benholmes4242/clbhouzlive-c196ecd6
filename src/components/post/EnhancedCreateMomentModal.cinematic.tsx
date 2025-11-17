@@ -356,15 +356,19 @@ export default function EnhancedCreateMomentModalCinematic({
             touchAction: 'none'
           }}
         >
-          {/* backdrop - Hub Glass effect */}
+          {/* Backdrop - matching Hub page */}
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md touch-none" onClick={close} style={{ touchAction: 'none' }} />
+          
+          {/* Glass layer - matching Hub page */}
           <div 
             className="absolute inset-0 touch-none" 
-            onClick={close}
             style={{ 
-              background: 'rgba(0, 0, 0, 0.25)',
-              backdropFilter: 'blur(120px)',
-              WebkitBackdropFilter: 'blur(120px)',
-              touchAction: 'none' 
+              background: 'rgba(0, 0, 0, 0.28)',
+              backdropFilter: 'blur(22px)',
+              WebkitBackdropFilter: 'blur(22px)',
+              border: '1px solid rgba(255, 255, 255, 0.06)',
+              boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
+              touchAction: 'none'
             }}
           />
 
