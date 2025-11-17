@@ -931,13 +931,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         )}
       </div>
 
-      {/* Comments Modal */}
-      <CommentsModal
-        isOpen={commentsModalOpen}
-        onClose={() => setCommentsModalOpen(false)}
-        postId={selectedPostId}
-      />
-
       {/* Emoji Reaction Tray */}
       <EmojiReactionTray
         isVisible={showReactionTray}
