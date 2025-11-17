@@ -334,7 +334,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
                   {user.username && <span>@{user.username}</span>}
                   {user.username && user.handicap !== undefined && user.handicap !== null && <span>·</span>}
                   {user.handicap !== undefined && user.handicap !== null && (
-                    <span>Hcp {user.handicap}</span>
+                    <span>HCP {user.handicap}</span>
                   )}
                 </div>
                 
