@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Heart, Send, Smile } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -152,7 +153,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <>
       {/* Backdrop */}
       <div 
@@ -269,7 +270,8 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 };
 
