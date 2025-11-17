@@ -57,18 +57,7 @@ export const AppleEngagementRail = ({
   bottom,
   className
 }: AppleEngagementRailProps) => {
-  const [isVisible, setIsVisible] = useState(false);
   const [showShareCheck, setShowShareCheck] = useState(false);
-
-  // Stagger entrance when active
-  useEffect(() => {
-    if (isActive) {
-      const timer = setTimeout(() => setIsVisible(true), 100);
-      return () => clearTimeout(timer);
-    } else {
-      setIsVisible(false);
-    }
-  }, [isActive]);
 
   const handleShare = () => {
     onShare();
@@ -79,8 +68,7 @@ export const AppleEngagementRail = ({
   return (
     <div 
       className={cn(
-        'clubhouse-rail fixed right-[12px] z-50 flex flex-col items-center gap-3 px-1 py-2 glass-dark transition-all duration-300 ease-out',
-        isVisible ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0',
+        'clubhouse-rail fixed right-[12px] z-50 flex flex-col items-center gap-3 px-1 py-2 glass-dark',
         className
       )}
       style={{
