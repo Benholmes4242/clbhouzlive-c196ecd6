@@ -64,7 +64,7 @@ export const AppleProgressBar = ({
         className="h-full rounded-full bg-white transition-all duration-75 ease-linear"
         style={{ 
           width: `${progress}%`,
-          boxShadow: '0 0 8px rgba(255, 255, 255, 0.4)'
+          boxShadow: '0 0 8px rgba(255, 255, 255, 0.45)'
         }}
       />
     </div>

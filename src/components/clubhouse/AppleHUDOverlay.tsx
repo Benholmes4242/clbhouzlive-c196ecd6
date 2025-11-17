@@ -73,15 +73,15 @@ export const AppleHUDOverlay = ({
   onComment,
   onShare,
   onMuteToggle,
-  accentColor = '#6e9277'
+  accentColor = '#ffffff'
 }: AppleHUDOverlayProps) => {
   return (
     <>
       {/* Bottom-left: metadata capsule + progress bar */}
       <div
-        className="fixed left-[16px] z-[50] flex flex-col gap-2"
+        className="fixed left-[12px] z-[50] flex flex-col gap-2"
         style={{
-          bottom: `calc(env(safe-area-inset-bottom) + var(--bottom-nav-height, 72px) + 22px)`,
+          bottom: `calc(env(safe-area-inset-bottom) + var(--bottom-nav-height, 72px) + 18px)`,
         }}
       >
         <AppleMetadataCapsule
