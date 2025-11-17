@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Heart, Send, Smile } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Z } from '@/config/zIndex';
 
 interface Comment {
   id: string;
@@ -156,21 +157,22 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 transition-opacity duration-300"
+        className="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300"
+        style={{ zIndex: Z.sheetBackdrop }}
         onClick={onClose}
       />
       
       {/* Comments Sheet - Dark Glass */}
-      <div className="fixed inset-x-0 bottom-0 z-[60] flex items-end justify-center">
-        <div 
-          className="clubhouse-comments-sheet glass-dark rounded-t-[24px] flex flex-col relative w-full"
-          style={{ 
-            paddingBottom: 'env(safe-area-inset-bottom)',
-            height: '80vh',
-            maxHeight: '80vh',
-            boxShadow: 'none'
-          }}
-        >
+      <div 
+        className="clubhouse-comments-sheet glass-dark rounded-t-[24px] flex flex-col fixed inset-x-0 bottom-0 w-full"
+        style={{ 
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          height: '80vh',
+          maxHeight: '80vh',
+          boxShadow: 'none',
+          zIndex: Z.sheet
+        }}
+      >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-2">
             <div className="w-12 h-1 bg-white/30 rounded-full" />
@@ -268,7 +270,6 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
               </button>
             </div>
           </div>
-        </div>
       </div>
     </>
   );
