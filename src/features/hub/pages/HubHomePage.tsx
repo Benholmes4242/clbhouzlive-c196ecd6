@@ -176,13 +176,15 @@ export function HubHomePage() {
   }, []);
 
   return (
-    <div
+    <div 
       ref={sheetRef}
       className="hub-glass-page fixed inset-0 z-[9999]"
       style={{
-        background: 'rgba(0, 0, 0, 0.25)',
-        backdropFilter: 'blur(120px)',
-        WebkitBackdropFilter: 'blur(120px)',
+        background: 'rgba(0, 0, 0, 0.28)',
+        backdropFilter: 'blur(22px)',
+        WebkitBackdropFilter: 'blur(22px)',
+        border: '1px solid rgba(255, 255, 255, 0.06)',
+        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
         transform: `translateY(${translateY}px)`,
         transition:
           // no transition while dragging or before first frame
