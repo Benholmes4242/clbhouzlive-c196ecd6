@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, MapPin, Target, Play, CheckCircle } from 'lucide-react';
+import { X, MapPin, Target, Play, CheckCircle, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ import SquircleImage from '@/components/ui/SquircleImage';
 import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 import { SheetPlaybackProvider, useSheetPlayback } from './SheetPlaybackContext';
 import { VideoThumbPlayer } from './VideoThumbPlayer';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface UserProfile {
   id: string;
@@ -114,6 +115,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
   const { followUser, unfollowUser, loading: followLoading } = useFollowUser();
   const { posts, loading: postsLoading, error: postsError, isEmpty } = useUserProfilePosts(user?.id);
   const { openMedia } = useFullscreenMedia();
+  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
   const [isFollowing, setIsFollowing] = useState(user?.isFollowing || false);
   const [optimisticFollowing, setOptimisticFollowing] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -292,7 +294,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
           </div>
 
           {/* Header / Hero Row */}
-          <div ref={headerRef} className="flex items-start justify-between gap-3 pb-3">
+          <div ref={headerRef} className="flex items-start justify-between gap-3 pb-3 border-b border-white/5">
             {/* Left: avatar + name + meta */}
             <div className="flex flex-1 items-start gap-3 min-w-0">
               {/* Avatar */}
@@ -315,7 +317,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
                 </div>
               </button>
 
-              {/* Name, handle, location */}
+              {/* Name, handle, handicap, home club */}
               <div className="flex flex-col min-w-0">
                 <button
                   type="button"
@@ -326,52 +328,81 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
                   {user.name}
                   {user.isVerified && <CheckCircle className="inline-block w-4 h-4 ml-1 text-blue-400" />}
                 </button>
+                
+                {/* Row 2: @handle + handicap */}
                 <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px] text-white/70">
                   {user.username && <span>@{user.username}</span>}
-                  {user.homeClub && user.homeClub !== 'Example Golf Club' && (
-                    <>
-                      {user.username && <span>·</span>}
-                      <span className="truncate">{user.homeClub}</span>
-                    </>
-                  )}
+                  {user.username && user.handicap !== undefined && user.handicap !== null && <span>·</span>}
                   {user.handicap !== undefined && user.handicap !== null && (
-                    <>
-                      {(user.username || user.homeClub) && <span>·</span>}
-                      <span>{user.handicap} HCP</span>
-                    </>
+                    <span>Hcp {user.handicap}</span>
                   )}
                 </div>
+                
+                {/* Row 3: home club */}
+                {user.homeClub && user.homeClub !== 'Example Golf Club' && (
+                  <div className="mt-0.5 text-[13px] text-white/70 truncate">
+                    {user.homeClub}
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Right: Follow */}
-            <button
-              type="button"
-              onClick={handleFollowClick}
-              disabled={followLoading || optimisticFollowing}
-              className={cn(
-                "btn-frosted-white px-4 py-1.5 text-[13px] font-semibold rounded-full",
-                "bg-white/16 backdrop-blur-[18px] border border-white/45 text-white",
-                "shadow-[0_0_12px_rgba(0,0,0,0.35)]",
-                "transition-all duration-150",
-                "hover:bg-white/22 hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.45)]",
-                "active:translate-y-0 active:shadow-[0_2px_8px_rgba(0,0,0,0.35)]",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
-              )}
-            >
-              {followLoading || optimisticFollowing ? '...' : (isFollowing ? 'Following' : 'Follow')}
-            </button>
+            {/* Right: Follow + Controls */}
+            <div className="flex flex-col items-end gap-2">
+              {/* Follow button */}
+              <button
+                type="button"
+                onClick={handleFollowClick}
+                disabled={followLoading || optimisticFollowing}
+                className={cn(
+                  "btn-frosted-white px-4 py-1.5 text-[13px] font-semibold rounded-full",
+                  "bg-white/16 backdrop-blur-[18px] border border-white/45 text-white",
+                  "shadow-[0_0_12px_rgba(0,0,0,0.35)]",
+                  "transition-all duration-150",
+                  "hover:bg-white/22 hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.45)]",
+                  "active:translate-y-0 active:shadow-[0_2px_8px_rgba(0,0,0,0.35)]",
+                  "disabled:opacity-50 disabled:cursor-not-allowed"
+                )}
+              >
+                {followLoading || optimisticFollowing ? '...' : (isFollowing ? 'Following' : 'Follow')}
+              </button>
+
+              {/* Controls row: mute + close */}
+              <div className="flex items-center gap-2">
+                {/* Mute / Unmute */}
+                <button
+                  type="button"
+                  onClick={toggleGlobalMute}
+                  className="glass-dark h-9 w-9 flex items-center justify-center rounded-full text-white/80 hover:text-white transition-colors"
+                  aria-label={isGloballyMuted ? 'Unmute videos' : 'Mute videos'}
+                >
+                  {isGloballyMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                </button>
+
+                {/* Close */}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="h-9 w-9 flex items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+                  aria-label="Close"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* Recent Posts Section */}
-          <div className="flex-1 flex flex-col min-h-0">
-            <h3 className="pb-2 text-[14px] font-semibold text-white">Recent Posts</h3>
-            
-            <div
-              ref={scrollRef}
-              className="flex-1 overflow-y-auto"
-              style={scrollMaxHeight ? { maxHeight: `${scrollMaxHeight}px` } : undefined}
+          {/* Scrollable Recent Posts Section */}
+          <div className="pt-3">
+            <div 
+              className="clubhouse-profile-scroll max-h-[60vh] overflow-y-auto overscroll-contain"
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                scrollBehavior: 'smooth'
+              }}
             >
+              <h3 className="pb-2 text-[14px] font-semibold text-white">Recent Posts</h3>
+              
               {/* Loading State */}
               {postsLoading && (
                 <div className="grid grid-cols-2 gap-3 pb-2">
