@@ -790,7 +790,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           <div className="flex justify-between items-center">
             {/* Left side - Title and subtitle */}
             <div className="text-left">
-              <DialogTitle className={`font-display ${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
+              <DialogTitle className={`font-display ${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-foreground`}>
                 Achievements
               </DialogTitle>
               <DialogDescription className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>
@@ -812,7 +812,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                 )}
               </div>
               <div className="text-left">
-                <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>{userDisplayName}</h3>
+                <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold text-foreground`}>{userDisplayName}</h3>
                 <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
                   {userHandicap ? `${typeof userHandicap === 'number' ? userHandicap.toFixed(1) : userHandicap} Handicap` : 'No handicap set'}
                 </p>
@@ -1037,13 +1037,13 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                             
                             {/* Center content */}
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <div className="font-display text-2xl font-bold text-black mb-1">
+                              <div className="font-display text-2xl font-bold text-foreground mb-1">
                                 {(nextTier.minXP - totalXP).toLocaleString()}
                               </div>
-                              <div className="text-xs text-black text-center mb-2">
+                              <div className="text-xs text-muted-foreground text-center mb-2">
                                 XP to next ring
                               </div>
-                              <div className="text-xs font-medium text-black">
+                              <div className="text-xs font-medium text-foreground">
                                 {Math.round(progressPercentage)}% Complete
                               </div>
                             </div>
@@ -1053,16 +1053,16 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         {/* Ring Info */}
                         <div className="w-64 space-y-4">
                           <div className="space-y-2">
-                            <h3 className="font-display font-semibold text-xl text-black">
+                            <h3 className="font-display font-semibold text-xl text-foreground">
                               {currentTier ? currentTier.name : 'No Ring Achieved'}
                             </h3>
-                            <p className="text-sm text-black">
+                            <p className="text-sm text-muted-foreground">
                               {currentTier ? 
                                 `Congratulations! You've earned the ${currentTier.name}!` :
                                 `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
                               }
                             </p>
-                            <div className="flex items-center gap-2 text-sm font-medium text-black">
+                            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                               <Trophy className="w-4 h-4" />
                               Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
                             </div>
@@ -1077,7 +1077,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                 {/* Ring Progression Section - Same width as badges */}
                 <div className="px-0 pb-8 max-w-none w-full">
                   <div className="p-6">
-                    <h4 className="text-sm font-medium text-black mb-3 text-center">Ring Progression</h4>
+                    <h4 className="text-sm font-medium text-foreground mb-3 text-center">Ring Progression</h4>
                     <div className="relative flex justify-between items-center gap-2">
                       {/* Connector lines */}
                        <div className="absolute top-10 left-0 right-0 h-px bg-gray-300 dark:bg-gray-600 z-0" style={{

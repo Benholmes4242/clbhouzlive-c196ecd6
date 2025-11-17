@@ -272,23 +272,23 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
       <div className="fixed inset-0 bg-black/60 backdrop-blur-md" />
       
       {/* Content Card */}
-      <section className="relative z-10 w-[90%] max-w-[360px] rounded-[18px] bg-black/35 backdrop-blur-xl p-8 text-center">
+      <section className="relative z-10 w-[90%] max-w-[360px] rounded-[18px] bg-[color:var(--surface-card)] border border-[color:var(--border)] shadow-[var(--shadow-medium)] p-8 text-center">
         {/* Logo */}
         <div className="flex justify-center items-center mb-6">
           <img
-            src="/images/brand/clubhouz-mark-white.svg"
+            src="/images/brand/clubhouz-mark-dark.svg"
             alt="clubhouz"
             className="w-auto h-16 object-contain"
           />
         </div>
 
         {/* Headline */}
-        <h1 className="font-display text-white text-[34px] font-semibold tracking-[.02em] leading-[1.2] mb-3">
+        <h1 className="font-display text-[color:var(--text-primary)] text-[34px] font-semibold tracking-[.02em] leading-[1.2] mb-3">
           YOUR HOME<br/>OF GOLF
         </h1>
 
         {/* Subtitle */}
-        <p className="text-white/80 text-[15px] mb-6">
+        <p className="text-[color:var(--text-secondary)] text-[15px] mb-6">
           Enter access code to continue
         </p>
 
@@ -297,7 +297,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
           <div 
             role="alert" 
             aria-live="polite"
-            className="text-red-400 text-sm mb-3"
+            className="text-destructive text-sm mb-3"
           >
             {errorMessage}
           </div>
@@ -317,24 +317,24 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
             onChange={(e) => setAccessCode(e.target.value)}
             placeholder="••••••••••"
             disabled={submitting}
-            className="w-full rounded-lg bg-white/10 text-white placeholder-white/40
-                     border border-white/15 px-4 py-3 text-[15px] outline-none
-                     focus:border-white/35 focus:ring-0 transition-colors
+            className="w-full rounded-lg bg-[color:var(--surface-alt)] text-[color:var(--text-primary)] placeholder:text-[color:var(--text-tertiary)]
+                     border border-[color:var(--border)] px-4 py-3 text-[15px] outline-none
+                     focus:border-[color:var(--primary-accent)] focus:ring-1 focus:ring-[color:var(--primary-accent)] transition-colors
                      disabled:opacity-60"
           />
           <button
             type="submit"
             disabled={submitting}
             aria-label="Submit access code"
-            className="w-full rounded-lg bg-white text-black py-3 font-medium text-[15px]
-                     hover:bg-white/90 disabled:opacity-60 transition-colors"
+            className="w-full rounded-lg bg-[color:var(--surface-slate)] text-white py-3 font-medium text-[15px]
+                     hover:opacity-90 disabled:opacity-60 transition-opacity"
           >
             {submitting ? "Checking..." : "ENTER"}
           </button>
         </form>
 
         {/* Footer */}
-        <p className="mt-6 text-xs text-white/60">
+        <p className="mt-6 text-xs text-[color:var(--text-tertiary)]">
           © 2025 clubhouz
         </p>
       </section>
