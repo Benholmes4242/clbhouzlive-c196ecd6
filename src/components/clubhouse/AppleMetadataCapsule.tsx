@@ -64,7 +64,7 @@ export const AppleMetadataCapsule = ({
     >
       {/* Dark glass panel - 3x larger */}
       <div className="glass-dark flex items-start gap-4 px-6 py-4 max-w-[calc(100vw-100px)]">
-        {/* Avatar with subtle ring - 3x larger */}
+        {/* Avatar - 3x larger */}
         <button
           type="button"
           onClick={onProfileSheetOpen}
@@ -78,8 +78,7 @@ export const AppleMetadataCapsule = ({
             size={120}
             src={user.avatar || '/placeholder.svg'}
             alt={user.name}
-            ringColor="#6e9277"
-            ringWidth={2}
+            ringWidth={0}
           />
         </button>
 
