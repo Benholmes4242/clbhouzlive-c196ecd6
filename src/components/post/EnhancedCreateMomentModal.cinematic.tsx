@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
-import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Layers, Camera } from "lucide-react";
+import { ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Layers, Camera } from "lucide-react";
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
 import { supabase } from "@/integrations/supabase/client";
@@ -506,15 +506,8 @@ export default function EnhancedCreateMomentModalCinematic({
                 )}
 
 
-                {/* Close button - top right, 8px from top */}
-                <button 
-                  onClick={close}
-                  className="absolute right-4 z-20 w-8 h-8 rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[rgba(25,25,28,0.85)] hover:bg-white/65 transition-all flex items-center justify-center"
-                  style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
-                  aria-label="Close"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
+                {/* Grabber bar - matching Hub page */}
+                <div className="hub-grabber" style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top, 0px) + 8px)', left: '50%', transform: 'translateX(-50%)', zIndex: 20 }} />
 
                 {/* Video duration - bottom left, 8px from media bottom, frosted white */}
                 {media[activeIndex]?.type === 'video' && (
