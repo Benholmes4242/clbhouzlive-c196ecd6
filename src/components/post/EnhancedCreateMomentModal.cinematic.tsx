@@ -394,6 +394,9 @@ export default function EnhancedCreateMomentModalCinematic({
               }
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Grabber bar - matching Hub page */}
+              <div className="hub-grabber" />
+
               {/* MEDIA STAGE - full-bleed, top-anchored */}
               <section
                 id="media" 
@@ -505,9 +508,6 @@ export default function EnhancedCreateMomentModalCinematic({
                   </div>
                 )}
 
-
-                {/* Grabber bar - matching Hub page */}
-                <div className="hub-grabber" style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top, 0px) + 8px)', left: '50%', transform: 'translateX(-50%)', zIndex: 20 }} />
 
                 {/* Video duration - bottom left, 8px from media bottom, frosted white */}
                 {media[activeIndex]?.type === 'video' && (
