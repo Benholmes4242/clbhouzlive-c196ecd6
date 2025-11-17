@@ -38,7 +38,20 @@ export const useOptimisticPostSubmission = () => {
     setIsSubmitting(true);
 
     try {
-      // Quick validation (no size limits, just format check)
+      // CRITICAL: Media validation first (before any other checks)
+      // No media, no post (except for achievement posts)
+      if ((!mediaFiles || mediaFiles.length === 0) && !achievementId) {
+        console.error('No media files provided for post submission');
+        toast({
+          title: "Upload Error",
+          description: "Please select at least one photo or video",
+          variant: "destructive"
+        });
+        onError?.();
+        return;
+      }
+
+      // File format validation (no size limits, just format check)
       const validation = validateFiles(mediaFiles);
       if (!validation.isValid) {
         toast({
@@ -63,18 +76,6 @@ export const useOptimisticPostSubmission = () => {
         }))
       });
 
-      // Validate media files (allow achievement posts without media)
-      if (mediaFiles.length === 0 && !achievementId) {
-        console.error('No media files provided for post submission');
-        toast({
-          title: "Upload Error",
-          description: "Please select at least one photo or video",
-          variant: "destructive"
-        });
-        onError?.();
-        return;
-      }
-
       // Create the post first
       const { data: postData, error: postError } = await supabase
         .from('posts')
@@ -94,6 +95,7 @@ export const useOptimisticPostSubmission = () => {
       
       try {
         // Upload media files immediately (not in background) - required for post completion
+        // Note: For non-achievement posts, mediaFiles.length > 0 is guaranteed by validation above
         if (mediaFiles.length > 0) {
           console.log('Uploading media files for post creation...');
           
@@ -106,8 +108,9 @@ export const useOptimisticPostSubmission = () => {
           console.log('Media upload completed successfully');
           uploadSuccess = true;
         } else {
-          console.warn('No media files to upload');
-          uploadSuccess = true; // No files to upload is considered success
+          // This branch should only be reachable for achievement posts
+          console.log('No media files to upload (achievement post)');
+          uploadSuccess = true;
         }
       } catch (uploadError) {
         console.error('Media upload failed, rolling back post:', uploadError);
