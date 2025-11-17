@@ -143,15 +143,22 @@ export function HubEchoChatPage() {
   };
 
   return (
-    <div
-      className="hub-glass-page fixed inset-0 flex flex-col"
-      style={{
-        zIndex: Z.page,
-        background: 'rgba(0, 0, 0, 0.25)',
-        backdropFilter: 'blur(120px)',
-        WebkitBackdropFilter: 'blur(120px)',
-      }}
-    >
+    <div className="fixed inset-0 z-[9999]">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+      
+      {/* Glass Sheet */}
+      <div
+        className="hub-glass-page fixed inset-0 flex flex-col"
+        style={{
+          zIndex: Z.page,
+          background: 'rgba(0, 0, 0, 0.28)',
+          backdropFilter: 'blur(22px)',
+          WebkitBackdropFilter: 'blur(22px)',
+          border: '1px solid rgba(255, 255, 255, 0.06)',
+          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
+        }}
+      >
       {/* Header */}
       <header 
         className={cn(
@@ -291,6 +298,7 @@ export function HubEchoChatPage() {
           onShare={handleShare}
         />
       )}
+      </div>
     </div>
   );
 }
