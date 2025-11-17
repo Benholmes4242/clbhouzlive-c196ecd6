@@ -93,7 +93,7 @@ const Clubhouse = () => {
   
   // Chrome auto-hide state
   const chromeControls = useChromeState({
-    isModalOpen: isComposerOpen,
+    isModalOpen: isComposerOpen || commentsModalOpen,
     disabled: false // Set to true via env var for emergency rollback
   });
   
