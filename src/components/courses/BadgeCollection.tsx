@@ -68,10 +68,10 @@ const BadgeCollection: React.FC<BadgeCollectionProps> = ({
       <div className={`space-y-3 ${className}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h4 className="text-lg font-semibold text-white">
+            <h4 className="text-lg font-semibold text-foreground">
               Achievements
             </h4>
-            <div className="text-sm text-white/70">
+            <div className="text-sm text-muted-foreground">
               {unlockedBadges.length}/{badges.length} unlocked
             </div>
           </div>
@@ -80,7 +80,7 @@ const BadgeCollection: React.FC<BadgeCollectionProps> = ({
             variant="ghost"
             size="sm"
             onClick={() => setIsExpanded(true)}
-            className="text-white/70 hover:text-white"
+            className="text-muted-foreground hover:text-foreground"
           >
             <ChevronDown className="h-4 w-4" />
           </Button>
@@ -97,7 +97,7 @@ const BadgeCollection: React.FC<BadgeCollectionProps> = ({
             />
           ))}
           {unlockedBadges.length === 0 && (
-            <p className="text-sm text-white/50 italic">
+            <p className="text-sm text-muted-foreground italic">
               Complete 10 courses to earn your first badge!
             </p>
           )}
@@ -110,10 +110,10 @@ const BadgeCollection: React.FC<BadgeCollectionProps> = ({
     <div className={`space-y-4 ${className}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h4 className="text-lg font-semibold text-white">
+          <h4 className="text-lg font-semibold text-foreground">
             Achievement Badges
           </h4>
-          <div className="text-sm text-white/70">
+          <div className="text-sm text-muted-foreground">
             {unlockedBadges.length}/{badges.length} unlocked
           </div>
         </div>
@@ -123,7 +123,7 @@ const BadgeCollection: React.FC<BadgeCollectionProps> = ({
             variant="ghost"
             size="sm"
             onClick={() => setIsExpanded(false)}
-            className="text-white/70 hover:text-white"
+            className="text-muted-foreground hover:text-foreground"
           >
             <ChevronUp className="h-4 w-4" />
           </Button>
@@ -133,9 +133,9 @@ const BadgeCollection: React.FC<BadgeCollectionProps> = ({
       {/* Progress message */}
       {nextBadge && (
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-3">
-          <p className="text-sm text-white/80">
+          <p className="text-sm text-foreground/80">
             <span className="font-medium">{nextBadge.requiredCount - completedCount} more courses</span> 
-            {' '}to unlock <span className="font-medium text-white">{nextBadge.name}</span>
+            {' '}to unlock <span className="font-medium text-foreground">{nextBadge.name}</span>
           </p>
         </div>
       )}
@@ -155,8 +155,8 @@ const BadgeCollection: React.FC<BadgeCollectionProps> = ({
       {/* All badges unlocked message */}
       {unlockedBadges.length === badges.length && completedCount >= 75 && (
         <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 rounded-lg p-4 text-center">
-          <h5 className="font-bold text-white mb-1">🏆 Legendary Status Achieved!</h5>
-          <p className="text-sm text-white/80">
+          <h5 className="font-bold text-foreground mb-1">🏆 Legendary Status Achieved!</h5>
+          <p className="text-sm text-foreground/80">
             You've unlocked all achievement badges. You're among the elite golf course explorers!
           </p>
         </div>
