@@ -9,6 +9,7 @@ interface HLSVideoCardProps {
   fit?: 'cover' | 'contain';
   showControls?: boolean;
   showMuteButton?: boolean;
+  showCenterSpinner?: boolean; // Show loading spinner (default: false for Clubhouse)
   autoplay?: boolean;
   muted?: boolean;
   loop?: boolean;
@@ -35,6 +36,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   fit = 'cover',
   showControls = false,
   showMuteButton = false,
+  showCenterSpinner = false,
   autoplay = false,
   muted = true,
   loop = true,
@@ -392,7 +394,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
       )}
 
       {/* Buffering/Loading overlay */}
-      {isBuffering && !hasError && (
+      {showCenterSpinner && isBuffering && !hasError && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/40 via-transparent to-black/40">
           <div className="h-7 w-7 animate-spin rounded-full border border-white/20 border-t-white/80 opacity-80" />
         </div>

@@ -99,8 +99,8 @@ export const AppleEngagementRail = ({
           <div
             className={cn(
               'flex items-center justify-center rounded-full transition-all',
-              'bg-black/30 border border-white/10',
-              !isMuted && 'bg-white/14'
+              'bg-white/10 border border-white/25 shadow-[0_0_18px_rgba(0,0,0,0.45)] backdrop-blur-xl',
+              !isMuted && 'bg-white/18'
             )}
             style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
           >
@@ -125,8 +125,8 @@ export const AppleEngagementRail = ({
           <div
             className={cn(
               'flex items-center justify-center rounded-full transition-all',
-              'bg-black/30 border border-white/10',
-              isLiked && 'bg-white/14'
+              'bg-white/10 border border-white/25 shadow-[0_0_18px_rgba(0,0,0,0.45)] backdrop-blur-xl',
+              isLiked && 'bg-white/18'
             )}
             style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
           >
@@ -157,8 +157,8 @@ export const AppleEngagementRail = ({
           <div
             className={cn(
               'flex items-center justify-center rounded-full transition-all',
-              'bg-black/30 border border-white/10',
-              hasCommented && 'bg-white/14'
+              'bg-white/10 border border-white/25 shadow-[0_0_18px_rgba(0,0,0,0.45)] backdrop-blur-xl',
+              hasCommented && 'bg-white/18'
             )}
             style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
           >
@@ -189,7 +189,7 @@ export const AppleEngagementRail = ({
           <div
             className={cn(
               'flex items-center justify-center rounded-full transition-all',
-              'bg-black/30 border border-white/10'
+              'bg-white/10 border border-white/25 shadow-[0_0_18px_rgba(0,0,0,0.45)] backdrop-blur-xl'
             )}
             style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
           >
