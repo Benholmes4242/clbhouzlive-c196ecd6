@@ -60,7 +60,7 @@ export const AppleProgressBar = ({
       onPointerUp={handlePointerUp}
     >
       <div
-        className="h-full rounded-full bg-white transition-all duration-75 ease-linear"
+        className="h-full rounded-full bg-white transition-[width] duration-[120ms] ease-linear"
         style={{ 
           width: `${progress}%`,
           boxShadow: '0 0 8px rgba(255, 255, 255, 0.45)'
