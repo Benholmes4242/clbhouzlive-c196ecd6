@@ -3,6 +3,19 @@ import { useEchoThreadMessages } from '../hooks/useEchoThreadMessages';
 import { EchoMessageRow } from '@/features/echo/components/EchoMessageRow';
 import type { EchoMessage as EchoRowMessage } from '@/features/echo/state/echoTypes';
 
+export interface HistoryThreadInlineProps {
+  threadId: string;
+  title: string;
+  createdAt?: string;
+  messageCount?: number;
+  onCollapse: () => void;
+  onCopyLink?: () => void;
+  onOpenFull?: () => void;
+  onDelete?: () => void;
+  onHeightChange?: (height: number) => void;
+  footer?: React.ReactNode;
+}
+
 export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
   threadId,
   createdAt,
@@ -39,7 +52,5 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
       </div>
       {footer && <div className="mt-3">{footer}</div>}
     </div>
-  );
-};
   );
 };
