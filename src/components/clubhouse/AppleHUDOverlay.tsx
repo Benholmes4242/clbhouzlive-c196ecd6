@@ -96,7 +96,9 @@ export const AppleHUDOverlay = ({
             onCourseClick={onCourseClick}
             onMoreClick={onMoreClick}
           />
-          <AppleProgressBar progress={videoProgress} />
+          <div className="px-4">
+            <AppleProgressBar progress={videoProgress} />
+          </div>
         </div>
       </div>
 
