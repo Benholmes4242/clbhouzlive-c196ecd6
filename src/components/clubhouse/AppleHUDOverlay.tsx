@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { AppleMetadataCapsule } from './AppleMetadataCapsule';
-import { AppleProgressBar } from './AppleProgressBar';
 import { AppleEngagementRail } from './AppleEngagementRail';
 
 interface AppleHUDOverlayProps {
