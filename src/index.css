@@ -1568,6 +1568,14 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.14);
     --shadow-card: 0 4px 10px rgba(0, 0, 0, 0.12);
     
+    /* Phase 4: Input / search / dropdown surfaces on pastel background */
+    --surface-input: #A6B6C0;               /* slightly darker than page */
+    --surface-input-hover: #A0B0BA;        /* tiny step darker */
+    --surface-input-focus: #9AAAB5;
+    
+    /* Placeholder / helper text */
+    --placeholder-foreground: rgba(42, 47, 51, 0.48);  /* softer slate */
+    
     --popover: 0 0% 10.2%;
     --popover-foreground: 0 0% 100%;
     --primary: 262.1 83.3% 57.8%;
@@ -1580,7 +1588,8 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 20% 98%;
-    --input: 0 0% 14.9%;
+    --input: 210 11% 82%;                  /* same family as --border */
+    --input-focus: 142 30% 41%;            /* accent green for focus */
     --ring: 0 0% 14.9%;
     --radius: 0.5rem;
     --chart-1: 12 76% 61%;
