@@ -171,11 +171,12 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
         style={{ zIndex: Z.sheet }}
       >
         <div 
-          className="clubhouse-comments-sheet glass-dark rounded-t-[24px] flex flex-col w-full max-w-5xl"
+          className="clubhouse-comments-sheet glass-dark rounded-t-[24px] flex flex-col w-full"
           style={{ 
             paddingBottom: 'env(safe-area-inset-bottom)',
-            height: '80vh',
-            maxHeight: '80vh',
+            maxHeight: '72vh',
+            width: '100%',
+            maxWidth: '100vw',
             boxShadow: 'none'
           }}
         >
