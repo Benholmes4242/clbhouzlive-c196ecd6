@@ -102,3 +102,15 @@ body.chrome-hidden .chrome-bottom-nav {
 .chrome-follow-bottom {
   transform: translate3d(0, var(--chrome-bottom-shift), 0);
 }
+
+/* Clubhouse HUD + Rail: dynamic positioning based on chrome visibility */
+.clubhouse-hud,
+.clubhouse-rail {
+  bottom: calc(env(safe-area-inset-bottom) + var(--bottom-nav-height) + 16px);
+  transition: bottom 0.24s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+body.chrome-hidden .clubhouse-hud,
+body.chrome-hidden .clubhouse-rail {
+  bottom: calc(env(safe-area-inset-bottom) + 10px);
+}
