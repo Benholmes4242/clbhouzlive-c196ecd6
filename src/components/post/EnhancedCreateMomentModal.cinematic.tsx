@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import PostSuccessOverlay from './PostSuccessOverlay';
 import { useModalContext } from '@/contexts/ModalContext';
 import { useImmersiveHeader } from '@/hooks/useImmersiveHeader';
+import { useChromeState } from '@/hooks/useChromeState';
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 import MediaCarousel from "@/components/posts/MediaCarousel";
@@ -149,6 +150,12 @@ export default function EnhancedCreateMomentModalCinematic({
 
   // Global header hiding for reliable cross-environment support
   useImmersiveHeader(Boolean(isOpen));
+
+  // Chrome auto-hide integration - force hidden when ECM is open (matches Hub behavior)
+  useChromeState({
+    forceHidden: isOpen,
+    disabled: false,
+  });
 
   // Hide global header while modal is active (body class approach)
   useEffect(() => {
