@@ -25,6 +25,9 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
       style={{
         // Safe area handling moved to parent
         minHeight: '44px',
+        background: isClubhouse ? undefined : 'var(--surface-nav)',
+        borderTop: isClubhouse ? undefined : '1px solid var(--border-subtle)',
+        boxShadow: isClubhouse ? undefined : 'var(--shadow-soft)',
       }}
     >
       <div className="w-full px-2">
@@ -48,7 +51,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                   // Active state uses accent color for all tabs
                   isActive && "text-accent",
                   // Inactive state
-                  !isActive && (isClubhouse ? "text-white/80" : "text-foreground/60"),
+                  !isActive && (isClubhouse ? "text-white/80" : "text-muted-foreground"),
                   // Hover state
                   !isActive && "hover:text-foreground"
                 )}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { useAppLogo } from '@/hooks/useAppLogo';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -18,17 +18,23 @@ interface ClubhouseHeaderNewProps {
 
 const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = 'visible' }: ClubhouseHeaderNewProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentLogo } = useAppLogo();
   const isMobile = useIsMobile();
   const [searchOpen, setSearchOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
 
-  // ALWAYS use glass-dark style (ignore variant context - force consistency)
-  const isGlassDark = true;
-  const isSolidLight = false;
+  // Detect if we're on Clubhouse or Hub routes
+  const isClubhouseRoute = location.pathname === '/' || location.pathname === '/clubhouse';
+  const isHubRoute = location.pathname.startsWith('/hub');
+  const isDarkContext = isClubhouseRoute || isHubRoute;
   
-  // ALWAYS use white logo
-  const logoSrc = "/assets/clbhouz-white-logo.png";
+  // Use glass-dark style for Clubhouse/Hub, light style for other pages
+  const isGlassDark = isDarkContext;
+  const isSolidLight = !isDarkContext;
+  
+  // Use white logo for dark contexts, adjust for light contexts
+  const logoSrc = isDarkContext ? "/assets/clbhouz-white-logo.png" : "/assets/clbhouz-white-logo.png";
 
   const handleLogoClick = () => {
     navigate('/clubhouse');
@@ -104,14 +110,17 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
           "chrome-header", // Chrome auto-hide class
           "relative z-header", // Remove transition, handled by chrome-autohide.css
           "h-16 md:h-18", // 64px mobile, 72px desktop
-          // Keep original variant-specific backgrounds for clubhouse
-          isGlassDark && "backdrop-blur-md bg-[#0a0a0a]/60",
-          isSolidLight && "bg-white/95 backdrop-blur-sm border-b border-gray-200/50 shadow-sm",
           className
         )}
         data-hides-on-scroll
         data-chrome="header"
-        style={{ '--header-h-mobile': '60px' } as any}
+        style={{ 
+          '--header-h-mobile': '60px',
+          background: isDarkContext ? 'rgba(10, 10, 10, 0.6)' : 'var(--surface-header)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: isDarkContext ? 'none' : '1px solid var(--border-subtle)',
+        } as any}
       >
         <div className="mx-auto flex h-full items-center justify-between px-4 md:px-6">
           {/* Logo */}
@@ -134,8 +143,8 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
           <div className="hidden md:flex flex-1 justify-center px-4">
             <SearchPill 
               className="w-full max-w-xl" 
-              variant="glass-dark"
-              isClubhousePage={true}
+              variant={isDarkContext ? "glass-dark" : "solid-light"}
+              isClubhousePage={isDarkContext}
             />
           </div>
 
@@ -146,8 +155,8 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
               data-action="search"
               className={cn(
                 "md:hidden p-2 md:p-3 flex-shrink-0 mt-3 transition-colors",
-                isGlassDark && "hover:bg-white/10 text-white/80 hover:text-white",
-                isSolidLight && "hover:bg-[#0a0a0a]/10 text-black/70 hover:text-black"
+                isDarkContext && "hover:bg-white/10 text-white/80 hover:text-white",
+                !isDarkContext && "hover:bg-black/10 text-foreground/80 hover:text-foreground"
               )}
               onClick={() => setSearchOpen(true)}
             >
@@ -173,15 +182,15 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
           <div className="fixed inset-x-0 top-0 z-[70] p-3">
             <div className={cn(
               "rounded-full backdrop-blur-2xl border shadow-hud",
-              isGlassDark && "bg-hud-bg border-hud-border",
-              isSolidLight && "bg-white/95 border-gray-200"
+              isDarkContext && "bg-hud-bg border-hud-border",
+              !isDarkContext && "bg-card border-border"
             )}>
               <SearchPill 
                 autoFocus 
                 onClose={() => setSearchOpen(false)}
                 placeholder="Search clbhouz..."
-                variant="glass-dark"
-                isClubhousePage={true}
+                variant={isDarkContext ? "glass-dark" : "solid-light"}
+                isClubhousePage={isDarkContext}
               />
             </div>
           </div>

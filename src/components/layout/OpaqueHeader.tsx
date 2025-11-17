@@ -24,12 +24,13 @@ export const OpaqueHeader: React.FC<OpaqueHeaderProps> = ({
     <header
       className={cn(
         "sticky top-0 z-50 flex items-center justify-between h-14 px-4 border-b",
-        "backdrop-blur-xl bg-background/95",
+        "backdrop-blur-xl",
         className
       )}
       style={{
         paddingTop: 'max(16px, env(safe-area-inset-top))',
-        borderColor: 'var(--border-hairline, rgba(255,255,255,0.1))',
+        background: 'var(--surface-header)',
+        borderColor: 'var(--border-subtle)',
       }}
     >
       {onBack ? (
