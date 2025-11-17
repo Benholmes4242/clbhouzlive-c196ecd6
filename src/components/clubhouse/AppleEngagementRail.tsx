@@ -92,24 +92,15 @@ export const AppleEngagementRail = ({
         <button
           type="button"
           onClick={onMuteToggle}
-          className="flex items-center justify-center"
+          className="flex items-center justify-center transition-transform active:scale-95"
           style={{ width: HIT_AREA, height: HIT_AREA }}
           aria-label={isMuted ? 'Unmute' : 'Mute'}
         >
-          <div
-            className={cn(
-              'flex items-center justify-center rounded-full transition-all',
-              'bg-white/10 border border-white/25 shadow-[0_0_18px_rgba(0,0,0,0.45)] backdrop-blur-xl',
-              !isMuted && 'bg-white/18'
-            )}
-            style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
-          >
-            {isMuted ? (
-              <VolumeX size={ICON_SIZE} className="text-white/80" style={{ display: 'block' }} />
-            ) : (
-              <Volume2 size={ICON_SIZE} className="text-white/80" style={{ display: 'block' }} />
-            )}
-          </div>
+          {isMuted ? (
+            <VolumeX size={ICON_SIZE} className="text-white transition-colors" style={{ display: 'block' }} />
+          ) : (
+            <Volume2 size={ICON_SIZE} className="text-white transition-colors" style={{ display: 'block' }} />
+          )}
         </button>
       )}
 
@@ -118,27 +109,15 @@ export const AppleEngagementRail = ({
         <button
           type="button"
           onClick={onLike}
-          className="flex items-center justify-center"
+          className="flex items-center justify-center transition-transform active:scale-95"
           style={{ width: HIT_AREA, height: HIT_AREA }}
           aria-label={isLiked ? 'Unlike' : 'Like'}
         >
-          <div
-            className={cn(
-              'flex items-center justify-center rounded-full transition-all',
-              'bg-white/10 border border-white/25 shadow-[0_0_18px_rgba(0,0,0,0.45)] backdrop-blur-xl',
-              isLiked && 'bg-white/18'
-            )}
-            style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
-          >
-            <Heart
-              size={ICON_SIZE}
-              className={cn(
-                'transition-all',
-                isLiked ? 'fill-white text-white' : 'text-white/80'
-              )}
-              style={{ display: 'block' }}
-            />
-          </div>
+          <Heart
+            size={ICON_SIZE}
+            className={cn('transition-all text-white', isLiked && 'fill-white')}
+            style={{ display: 'block' }}
+          />
         </button>
         <span className="text-[11px] text-white/80 font-medium">
           {formatCount(stats.likes)}
@@ -150,27 +129,15 @@ export const AppleEngagementRail = ({
         <button
           type="button"
           onClick={onComment}
-          className="flex items-center justify-center"
+          className="flex items-center justify-center transition-transform active:scale-95"
           style={{ width: HIT_AREA, height: HIT_AREA }}
           aria-label="Comment"
         >
-          <div
-            className={cn(
-              'flex items-center justify-center rounded-full transition-all',
-              'bg-white/10 border border-white/25 shadow-[0_0_18px_rgba(0,0,0,0.45)] backdrop-blur-xl',
-              hasCommented && 'bg-white/18'
-            )}
-            style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
-          >
-            <MessageCircle
-              size={ICON_SIZE}
-              className={cn(
-                'transition-all',
-                hasCommented ? 'fill-white text-white' : 'text-white/80'
-              )}
-              style={{ display: 'block' }}
-            />
-          </div>
+          <MessageCircle
+            size={ICON_SIZE}
+            className="text-white transition-colors"
+            style={{ display: 'block' }}
+          />
         </button>
         <span className="text-[11px] text-white/80 font-medium">
           {formatCount(stats.comments)}
@@ -182,23 +149,15 @@ export const AppleEngagementRail = ({
         <button
           type="button"
           onClick={handleShare}
-          className="flex items-center justify-center"
+          className="flex items-center justify-center transition-transform active:scale-95"
           style={{ width: HIT_AREA, height: HIT_AREA }}
           aria-label="Share"
         >
-          <div
-            className={cn(
-              'flex items-center justify-center rounded-full transition-all',
-              'bg-white/10 border border-white/25 shadow-[0_0_18px_rgba(0,0,0,0.45)] backdrop-blur-xl'
-            )}
-            style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
-          >
-            {showShareCheck ? (
-              <Check size={ICON_SIZE} className="text-white" style={{ display: 'block' }} />
-            ) : (
-              <Share2 size={ICON_SIZE} className="text-white/80" style={{ display: 'block' }} />
-            )}
-          </div>
+          {showShareCheck ? (
+            <Check size={ICON_SIZE} className="text-white transition-colors" style={{ display: 'block' }} />
+          ) : (
+            <Share2 size={ICON_SIZE} className="text-white transition-colors" style={{ display: 'block' }} />
+          )}
         </button>
         <span className="text-[11px] text-white/80 font-medium">
           {formatCount(stats.shares)}
