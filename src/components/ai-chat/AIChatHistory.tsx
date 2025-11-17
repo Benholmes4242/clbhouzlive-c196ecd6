@@ -10,6 +10,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Hls from 'hls.js';
 import EchoAvatar from './EchoAvatar';
 import ChatMessage from './ChatMessage';
+import { EchoMessageRow } from '@/features/echo/components/EchoMessageRow';
+import type { EchoMessage as EchoRowMessage } from '@/features/echo/state/echoTypes';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1477,18 +1479,19 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                            </button>
                                          </div>
 
-                                          <div className="space-y-3 max-h-80 overflow-y-auto">
-                                            {conversation.messages.map((message) => (
-                                              <div key={message.id} className="w-full">
-                                                <ChatMessage
-                                                  message={message}
-                                                  showActions={false}
-                                                  isFirstInGroup={false}
-                                                  showHeading={false}
-                                                />
-                                              </div>
-                                            ))}
-                                          </div>
+         <div className="space-y-3 max-h-80 overflow-y-auto">
+            {conversation.messages.map((message, idx) => {
+              const row: EchoRowMessage = {
+                id: (message as any).id ?? String(idx),
+                role: ((message as any).type === 'user' ? 'user' : 'assistant'),
+                content: (message as any).content ?? '',
+                createdAt: (message as any).timestamp ?? new Date().toISOString(),
+              };
+              return (
+                <EchoMessageRow key={row.id} message={row} />
+              );
+            })}
+          </div>
 
                                          <div className="mt-3 flex justify-end">
                                            <button 
@@ -1591,18 +1594,19 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                            </button>
                                          </div>
 
-                                         <div className="space-y-3 max-h-80 overflow-y-auto">
-                                           {conversation.messages.map((message) => (
-                                             <div key={message.id} className="w-full">
-                                               <ChatMessage
-                                                 message={message}
-                                                 showActions={false}
-                                                 isFirstInGroup={false}
-                                                 showHeading={false}
-                                               />
-                                             </div>
-                                           ))}
-                                         </div>
+         <div className="space-y-3 max-h-80 overflow-y-auto">
+            {conversation.messages.map((message, idx) => {
+              const row: EchoRowMessage = {
+                id: (message as any).id ?? String(idx),
+                role: ((message as any).type === 'user' ? 'user' : 'assistant'),
+                content: (message as any).content ?? '',
+                createdAt: (message as any).timestamp ?? new Date().toISOString(),
+              };
+              return (
+                <EchoMessageRow key={row.id} message={row} />
+              );
+            })}
+          </div>
 
                                          <div className="mt-3 flex justify-end">
                                            <button 
@@ -1705,18 +1709,19 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                            </button>
                                          </div>
 
-                                         <div className="space-y-3 max-h-80 overflow-y-auto">
-                                           {conversation.messages.map((message) => (
-                                             <div key={message.id} className="w-full">
-                                               <ChatMessage
-                                                 message={message}
-                                                 showActions={false}
-                                                 isFirstInGroup={false}
-                                                 showHeading={false}
-                                               />
-                                             </div>
-                                           ))}
-                                         </div>
+         <div className="space-y-3 max-h-80 overflow-y-auto">
+            {conversation.messages.map((message, idx) => {
+              const row: EchoRowMessage = {
+                id: (message as any).id ?? String(idx),
+                role: ((message as any).type === 'user' ? 'user' : 'assistant'),
+                content: (message as any).content ?? '',
+                createdAt: (message as any).timestamp ?? new Date().toISOString(),
+              };
+              return (
+                <EchoMessageRow key={row.id} message={row} />
+              );
+            })}
+          </div>
 
                                          <div className="mt-3 flex justify-end">
                                            <button 
