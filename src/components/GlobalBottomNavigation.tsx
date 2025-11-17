@@ -167,7 +167,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
             className={cn(
               "global-bottom-nav bottom-nav-fixed",
               "fixed! bottom-0! left-0! right-0! w-full",
-              "z-[100]!",
+              "z-[50]!",
               "m-0!" // Ensure no margins
             )}
             initial={{ opacity: 0 }}
