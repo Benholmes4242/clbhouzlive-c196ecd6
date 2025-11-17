@@ -12,11 +12,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import ClubTagPill from './ClubTagPill';
+import MiniProfileSheetWithData from './MiniProfileSheetWithData';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import CommentsModal from '@/components/posts/CommentsModal';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
 import { AudioStrip } from './AudioStrip';
 import { AppleHUDOverlay } from './AppleHUDOverlay';
@@ -46,8 +48,6 @@ interface ClubhouseVerticalFeedProps {
   onTouchMove?: (event: React.TouchEvent) => void;
   onTouchEnd?: (event: React.TouchEvent) => void;
   onActiveVideoRefChange?: (ref: HTMLVideoElement | null) => void;
-  onOpenMiniProfile?: (userId: string) => void;
-  onOpenComments?: (postId: string) => void;
 }
 
 // VideoWithAutoplay component moved outside to prevent recreation on re-renders
@@ -119,9 +119,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onTouchStart,
   onTouchMove,
   onTouchEnd,
-  onActiveVideoRefChange,
-  onOpenMiniProfile,
-  onOpenComments
+  onActiveVideoRefChange
 }) => {
   const { user } = useSupabaseSession();
   
@@ -184,6 +182,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   const { setActiveVideo } = useVideoManager();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [commentsModalOpen, setCommentsModalOpen] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string>('');
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [showMiniProfile, setShowMiniProfile] = useState(false);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
@@ -557,7 +559,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   };
 
   const handleComment = (postId: string) => {
-    onOpenComments?.(postId);
+    setSelectedPostId(postId);
+    setCommentsModalOpen(true);
   };
 
   // Long press handlers for reaction tray
@@ -893,10 +896,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 isActive={currentIndex === index}
                 videoProgress={currentIndex === index ? videoProgress : 0}
                 onProfileSheetOpen={() => {
-                  const userId = item.user?.id || null;
-                  if (userId) {
-                    onOpenMiniProfile?.(userId);
-                  }
+                  setSelectedUserId(item.user?.id || null);
+                  setShowMiniProfile(true);
                 }}
                 onCourseClick={() => {}}
                 onLike={() => handleLike(item.id)}
@@ -916,6 +917,13 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           </div>
         )}
       </div>
+
+      {/* Comments Modal */}
+      <CommentsModal
+        isOpen={commentsModalOpen}
+        onClose={() => setCommentsModalOpen(false)}
+        postId={selectedPostId}
+      />
 
       {/* Emoji Reaction Tray */}
       <EmojiReactionTray
@@ -964,6 +972,27 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         }
       `}</style>
 
+      {/* Comments Modal */}
+      {commentsModalOpen && selectedPostId && (
+        <CommentsModal
+          isOpen={commentsModalOpen}
+          postId={selectedPostId}
+          onClose={() => {
+            setCommentsModalOpen(false);
+            setSelectedPostId('');
+          }}
+        />
+      )}
+
+      {/* Mini Profile Sheet */}
+      <MiniProfileSheetWithData
+        userId={selectedUserId}
+        isOpen={showMiniProfile}
+        onClose={() => setShowMiniProfile(false)}
+        onFollow={() => {
+          // Handle follow action - could update local state or refetch
+        }}
+      />
     </div>
   );
 };
