@@ -21,6 +21,7 @@ interface AppleHUDOverlayProps {
   caption?: string;
   createdAt?: string;
   courseName?: string;
+  courseRating?: number;
   tags?: string[];
   
   // Engagement stats
@@ -59,6 +60,7 @@ export const AppleHUDOverlay = ({
   caption,
   createdAt,
   courseName,
+  courseRating,
   tags,
   stats,
   isLiked = false,
@@ -80,7 +82,7 @@ export const AppleHUDOverlay = ({
       <div
         className="fixed left-[12px] z-[50]"
         style={{
-          bottom: `calc(env(safe-area-inset-bottom) + var(--bottom-nav-height, 72px) + 18px)`,
+          bottom: `calc(env(safe-area-inset-bottom) + var(--bottom-nav-height, 72px) + 16px)`,
         }}
       >
         <AppleMetadataCapsule
@@ -88,11 +90,10 @@ export const AppleHUDOverlay = ({
           caption={caption}
           createdAt={createdAt}
           courseName={courseName}
-          tags={tags}
+          courseRating={courseRating}
           onProfileSheetOpen={onProfileSheetOpen}
           onCourseClick={onCourseClick}
           onMoreClick={onMoreClick}
-          isActive={isActive}
         />
       </div>
 

@@ -1,9 +1,14 @@
 /**
- * AppleMetadataCapsule - Bottom-left glass panel with user info, caption, course, and tags
- * Part of the Apple-style Clubhouse redesign (upgraded to two-line info panel)
+ * AppleMetadataCapsule - Compact mini-player style glass card
+ * Sits bottom-left, ~70% width on phones
+ * 
+ * Layout:
+ * - 40px squircle avatar (no ring)
+ * - Text column: name · time, caption (2-line), course pill
+ * - Overall height: 72-80px depending on content
  */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { relativeTime } from '@/utils/relativeTime';
 import SquircleImage from '@/components/ui/SquircleImage';
@@ -19,11 +24,9 @@ interface AppleMetadataCapsuleProps {
   createdAt?: string;
   courseName?: string;
   courseRating?: number;
-  tags?: string[];
   onProfileSheetOpen?: () => void;
   onMoreClick?: () => void;
   onCourseClick?: () => void;
-  isActive?: boolean;
   className?: string;
 }
 
@@ -33,95 +36,77 @@ export const AppleMetadataCapsule = ({
   createdAt,
   courseName,
   courseRating,
-  tags,
   onProfileSheetOpen,
   onMoreClick,
   onCourseClick,
-  isActive = false,
   className
 }: AppleMetadataCapsuleProps) => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  // Slide up + fade in animation when active
-  useEffect(() => {
-    if (isActive) {
-      const timer = setTimeout(() => setIsVisible(true), 100);
-      return () => clearTimeout(timer);
-    } else {
-      setIsVisible(false);
-    }
-  }, [isActive]);
+  const timeLabel = createdAt ? relativeTime(createdAt) : null;
 
   return (
-    <div 
+    <div
       className={cn(
-        "transition-all duration-300 ease-out",
-        isVisible 
-          ? "translate-y-0 opacity-100" 
-          : "translate-y-8 opacity-0",
+        'glass-dark flex min-w-0 items-center gap-3 px-3 py-2',
+        'w-[260px] max-w-[80vw]',
         className
       )}
     >
-      {/* Dark glass panel - 3x larger */}
-      <div className="glass-dark flex items-start gap-4 px-6 py-4 max-w-[calc(100vw-100px)]">
-        {/* Avatar - 3x larger */}
-        <button
-          type="button"
-          onClick={onProfileSheetOpen}
-          className="flex-shrink-0 mt-1"
-          aria-label={`View ${user.name}'s profile`}
-          style={{
-            filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.5))',
-          }}
-        >
+      {/* Avatar – 40px squircle, no ring */}
+      <button
+        type="button"
+        onClick={onProfileSheetOpen}
+        className="flex-shrink-0"
+        aria-label={user?.name ? `View profile for ${user.name}` : 'View profile'}
+      >
+        <div className="h-10 w-10 overflow-hidden">
           <SquircleImage
-            size={120}
-            src={user.avatar || '/placeholder.svg'}
-            alt={user.name}
+            size={40}
+            src={user?.avatar || '/placeholder.svg'}
+            alt={user?.name ?? 'Golfer'}
             ringWidth={0}
           />
-        </button>
+        </div>
+      </button>
 
-        {/* Content */}
-        <div className="flex flex-col gap-2 min-w-0 flex-1">
-          {/* Row 1: name · time */}
-          <div className="flex items-center gap-2 text-[20px] font-semibold text-white">
-            <span className="truncate">{user.name}</span>
-            {createdAt && (
-              <span className="text-[16px] font-normal text-white/60 flex-shrink-0">
-                · {relativeTime(createdAt)}
-              </span>
-            )}
-          </div>
-
-          {/* Row 2: caption (2-line clamp + More) */}
-          {caption && (
-            <button
-              type="button"
-              className="text-[17px] leading-relaxed text-white/80 text-left line-clamp-2 hover:opacity-80 transition-opacity"
-              onClick={onMoreClick}
-            >
-              {caption}
-            </button>
-          )}
-
-          {/* Row 3: course pill only */}
-          {courseName && (
-            <button
-              type="button"
-              onClick={onCourseClick}
-              className="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-[14px] text-white/80"
-            >
-              <span className="truncate">{courseName}</span>
-              {typeof courseRating === 'number' && (
-                <span className="flex items-center gap-1 flex-shrink-0">
-                  <span>·</span>
-                  <span>★ {courseRating.toFixed(1)}</span>
-                </span>
-              )}
-            </button>
+      {/* Text column */}
+      <div className="flex min-w-0 flex-col gap-1">
+        {/* Row 1: name · time */}
+        <div className="flex items-center gap-1 text-[13px] font-semibold text-white">
+          <span className="truncate">{user?.name ?? 'Golfer'}</span>
+          {timeLabel && (
+            <span className="text-[12px] font-normal text-white/60">
+              · {timeLabel}
+            </span>
           )}
         </div>
+
+        {/* Row 2: caption (2-line clamp) */}
+        {caption && (
+          <button
+            type="button"
+            onClick={onMoreClick}
+            className="text-left text-[12px] text-white/80 line-clamp-2 hover:opacity-80 transition-opacity"
+          >
+            {caption}
+          </button>
+        )}
+
+        {/* Row 3: course pill (optional) */}
+        {courseName && (
+          <button
+            type="button"
+            onClick={onCourseClick}
+            className="mt-0.5 inline-flex max-w-full items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[11px] text-white/80 hover:bg-white/15 transition-colors"
+          >
+            <span className="truncate">{courseName}</span>
+            {typeof courseRating === 'number' && (
+              <span className="flex items-center gap-0.5 flex-shrink-0">
+                <span>·</span>
+                <span>★ {courseRating.toFixed(1)}</span>
+              </span>
+            )}
+          </button>
+        )}
       </div>
     </div>
   );
