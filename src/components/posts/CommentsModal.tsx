@@ -176,15 +176,8 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
           </div>
 
           {/* Header */}
-          <div className="flex items-center justify-between px-4 md:px-6 pb-3 border-b border-white/5">
+          <div className="flex items-center justify-center px-4 md:px-6 pb-3 border-b border-white/5">
             <h2 className="text-[14px] font-semibold text-white">Comments</h2>
-            <button
-              onClick={onClose}
-              className="h-9 w-9 flex items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-white/10 hover:text-white transition-colors"
-              aria-label="Close comments"
-            >
-              <X className="w-4 h-4" />
-            </button>
           </div>
 
           {/* Comments List - Scrollable */}
