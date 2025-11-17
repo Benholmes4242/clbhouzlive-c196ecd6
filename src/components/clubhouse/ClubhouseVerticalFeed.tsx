@@ -871,17 +871,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* Club Tag Pill - Positioned above content */}
-              {item.golfCourse && (
-                <ClubTagPill 
-                  course={{
-                    id: item.golfCourse.id,
-                    name: item.golfCourse.name,
-                    country: item.golfCourse.country
-                  }}
-                />
-              )}
-
               {/* Apple HUD Overlay - Replaces PostMetadata + EngagementRail */}
               <AppleHUDOverlay
                 videoRef={{ current: videoRefs.current[item.id] || null }}
