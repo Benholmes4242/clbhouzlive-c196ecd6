@@ -102,8 +102,8 @@
     will-change: opacity, transform;
   }
 
-/* Nuke solid Tailwind black backgrounds to new page tone */
-  .bg-black { --tw-bg-opacity: 1; background-color: rgb(10 10 10 / var(--tw-bg-opacity)) !important; }
+/* Nuke solid Tailwind black backgrounds to new page tone - REMOVED in Phase 1 */
+  /* .bg-black was forcing dark backgrounds - now removed to allow global pastel base */
 }
 
 /* Optional depth wash behind pages */
@@ -184,8 +184,8 @@ html, body, #root {
      CLBHOUZ DARK THEME - CORE TOKENS
      ======================================== */
   
-  /* Core surfaces */
-  --bg-page: #0a0a0a;
+  /* Core surfaces - Phase 1: Pastel Grey Migration */
+  --bg-page: #B1C3CB;
   --bg-surface: #0F0F0F;
   --bg-card: rgba(255,255,255,0.06);
   --bg-card-hover: rgba(255,255,255,0.08);
@@ -241,9 +241,9 @@ html, body, #root {
   /* Overlays */
   --hover-overlay: rgba(255,255,255,0.05);
 
-  /* Dark Mode Discover Navigation Tokens */
-  --bg-app: #0a0a0a;
-  --bg-header: #0a0a0a;
+  /* Dark Mode Discover Navigation Tokens - Phase 1: Pastel Grey Migration */
+  --bg-app: #B1C3CB;
+  --bg-header: #B1C3CB;
   
   /* Tab text colors */
   --text-tab-active: #ffffff;
@@ -1547,8 +1547,8 @@ html[data-immersive="true"] .app-shell--topSpacer {
     }
   }
   :root {
-    /* Disable old light mode design system colors */
-    --background: 0 0% 4%;
+    /* Phase 1: Global Pastel Grey Migration - #B1C3CB */
+    --background: 198 20% 74%;
     --foreground: 0 0% 100%;
     --card: 0 0% 7.8%;
     --card-foreground: 0 0% 100%;
@@ -1847,7 +1847,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
   .dark {
     /* Dark mode tokens (currently disabled - app is dark-only) */
-    --background: 0 0% 4%;
+    --background: 198 20% 74%;
     --foreground: 0 0% 100%;
     --card: 0 0% 7.8%;
     --card-foreground: 0 0% 100%;
