@@ -28,6 +28,7 @@ interface AppleEngagementRailProps {
   onComment: () => void;
   onShare: () => void;
   onMuteToggle?: () => void;
+  bottom?: string;
   className?: string;
 }
 
@@ -53,6 +54,7 @@ export const AppleEngagementRail = ({
   onComment,
   onShare,
   onMuteToggle,
+  bottom,
   className
 }: AppleEngagementRailProps) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -84,7 +86,7 @@ export const AppleEngagementRail = ({
       style={{
         width: GLASS_RAIL_WIDTH,
         right: 12,
-        bottom: 'calc(env(safe-area-inset-bottom) + var(--bottom-nav-height, 72px) + 22px)',
+        bottom: bottom || 'calc(env(safe-area-inset-bottom) + var(--bottom-nav-height, 72px) + 16px)',
       }}
     >
       {/* Mute Button (video only) */}

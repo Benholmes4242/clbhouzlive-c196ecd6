@@ -76,13 +76,15 @@ export const AppleHUDOverlay = ({
   onMuteToggle,
   accentColor = '#ffffff'
 }: AppleHUDOverlayProps) => {
+  const HUD_BOTTOM = 'calc(env(safe-area-inset-bottom) + var(--bottom-nav-height, 72px) + 16px)';
+
   return (
     <>
       {/* Bottom-left: metadata capsule */}
       <div
         className="fixed left-[12px] z-[50]"
         style={{
-          bottom: `calc(env(safe-area-inset-bottom) + var(--bottom-nav-height, 72px) + 16px)`,
+          bottom: HUD_BOTTOM,
         }}
       >
         <AppleMetadataCapsule
@@ -108,6 +110,7 @@ export const AppleHUDOverlay = ({
         onComment={onComment}
         onShare={onShare}
         onMuteToggle={onMuteToggle}
+        bottom={HUD_BOTTOM}
       />
     </>
   );
