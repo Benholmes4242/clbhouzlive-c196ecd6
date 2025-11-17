@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Heart, Send, Smile } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -153,26 +154,31 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
 
   if (!isOpen) return null;
 
-  return (
-    <>
+  const modalContent = (
+    <div 
+      className="fixed inset-0 pointer-events-auto"
+      style={{ zIndex: Z.sheetBackdrop }}
+    >
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300"
-        style={{ zIndex: Z.sheetBackdrop }}
+        className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300"
         onClick={onClose}
       />
       
       {/* Comments Sheet - Dark Glass */}
       <div 
-        className="clubhouse-comments-sheet glass-dark rounded-t-[24px] flex flex-col fixed inset-x-0 bottom-0 w-full"
-        style={{ 
-          paddingBottom: 'env(safe-area-inset-bottom)',
-          height: '80vh',
-          maxHeight: '80vh',
-          boxShadow: 'none',
-          zIndex: Z.sheet
-        }}
+        className="absolute inset-x-0 bottom-0 flex items-end justify-center"
+        style={{ zIndex: Z.sheet }}
       >
+        <div 
+          className="clubhouse-comments-sheet glass-dark rounded-t-[24px] flex flex-col w-full max-w-5xl"
+          style={{ 
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            height: '80vh',
+            maxHeight: '80vh',
+            boxShadow: 'none'
+          }}
+        >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-2">
             <div className="w-12 h-1 bg-white/30 rounded-full" />
@@ -244,35 +250,36 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
               <div className="flex-1">
                 <div className="flex items-center gap-2 rounded-full bg-white/5 border border-white/15 px-3 py-2">
                   <input
+                    type="text"
+                    placeholder="Add a comment..."
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Leave your thoughts here..."
-                    className="w-full bg-transparent text-[13px] text-white/90 placeholder:text-white/45 outline-none"
+                    onKeyDown={handleKeyPress}
+                    className="flex-1 bg-transparent text-[13px] text-white placeholder:text-white/50 outline-none border-none"
+                    style={{ caretColor: 'white' }}
                   />
-                  <button
-                    type="button"
-                    className="text-white/60 hover:text-white/90 transition-colors"
-                  >
-                    <span className="text-[14px]">@</span>
+                  <button className="text-white/50 hover:text-white transition-colors">
+                    <Smile className="w-4 h-4" />
                   </button>
                 </div>
               </div>
               
-              {/* Send button - frosted white */}
+              {/* Send button - Frosted White */}
               <button
                 onClick={handleSubmitComment}
                 disabled={!newComment.trim()}
-                className="btn-frosted-white h-9 w-9 flex items-center justify-center rounded-full bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] transition-all duration-150 hover:bg-white/22 hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.45)] active:translate-y-0 active:shadow-[0_2px_8px_rgba(0,0,0,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Send comment"
+                className="btn-frosted-white px-4 py-1.5 text-[13px] font-semibold rounded-full bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] transition-all duration-150 hover:bg-white/22 hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.45)] active:translate-y-0 active:shadow-[0_2px_8px_rgba(0,0,0,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Send className="w-4 h-4" />
+                Send
               </button>
             </div>
           </div>
+        </div>
       </div>
-    </>
+    </div>
   );
+
+  return typeof window !== 'undefined' ? createPortal(modalContent, document.body) : null;
 };
 
 export default CommentsModal;
