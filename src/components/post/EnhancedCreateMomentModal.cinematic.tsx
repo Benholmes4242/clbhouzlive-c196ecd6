@@ -126,6 +126,16 @@ export default function EnhancedCreateMomentModalCinematic({
 
   // Global header hiding for reliable cross-environment support
   useImmersiveHeader(Boolean(isOpen));
+
+  // Hide global header while modal is active (body class approach)
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('ecm-open');
+    }
+    return () => {
+      document.body.classList.remove('ecm-open');
+    };
+  }, [isOpen]);
   
   console.log('🔍 EnhancedCreateMomentModal state:', { isOpen, hasDataImmersive: document.documentElement.hasAttribute('data-immersive') });
 

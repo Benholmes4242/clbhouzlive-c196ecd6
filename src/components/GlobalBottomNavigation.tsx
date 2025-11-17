@@ -181,20 +181,17 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
         {showNavigation && (
           <motion.div
             className={cn(
-              "global-bottom-nav bottom-nav-fixed chrome-bottom-nav",
+              "global-bottom-nav bottom-nav-fixed",
               "fixed! bottom-0! left-0! right-0! w-full",
               "z-[100]!",
               "m-0!" // Ensure no margins
             )}
             initial={{ opacity: 0 }}
-            animate={{ 
-              opacity: 1,
-              // Don't animate transform here - let CSS handle chrome-hidden animations
-            }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             style={{
-              transform: 'none', // Let CSS chrome animations take over
+              transform: 'none', // Prevent Framer Motion from adding transforms that might cause floating
             }}
           >
             <div
@@ -203,6 +200,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 setNavRef(el);
               }}
               className={cn(
+                "chrome-bottom-nav", // Chrome auto-hide class lives on inner element to avoid Framer inline transform conflicts
                 "backdrop-blur-md",
                 isClubhouseRoute ? "bg-black/60" : "",
                 // Top border/shadow for separation
