@@ -344,34 +344,23 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
               </div>
             </div>
 
-            {/* Right: Follow + Close */}
-            <div className="flex flex-col items-end gap-2">
-              <button
-                type="button"
-                onClick={handleFollowClick}
-                disabled={followLoading || optimisticFollowing}
-                className={cn(
-                  "btn-frosted-white px-4 py-1.5 text-[13px] font-semibold rounded-full",
-                  "bg-white/16 backdrop-blur-[18px] border border-white/45 text-white",
-                  "shadow-[0_0_12px_rgba(0,0,0,0.35)]",
-                  "transition-all duration-150",
-                  "hover:bg-white/22 hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.45)]",
-                  "active:translate-y-0 active:shadow-[0_2px_8px_rgba(0,0,0,0.35)]",
-                  "disabled:opacity-50 disabled:cursor-not-allowed"
-                )}
-              >
-                {followLoading || optimisticFollowing ? '...' : (isFollowing ? 'Following' : 'Follow')}
-              </button>
-
-              <button
-                type="button"
-                onClick={handleClose}
-                className="h-8 w-8 flex items-center justify-center rounded-full bg-white/5 text-white/70 hover:bg-white/10 transition-colors"
-                aria-label="Close"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+            {/* Right: Follow */}
+            <button
+              type="button"
+              onClick={handleFollowClick}
+              disabled={followLoading || optimisticFollowing}
+              className={cn(
+                "btn-frosted-white px-4 py-1.5 text-[13px] font-semibold rounded-full",
+                "bg-white/16 backdrop-blur-[18px] border border-white/45 text-white",
+                "shadow-[0_0_12px_rgba(0,0,0,0.35)]",
+                "transition-all duration-150",
+                "hover:bg-white/22 hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.45)]",
+                "active:translate-y-0 active:shadow-[0_2px_8px_rgba(0,0,0,0.35)]",
+                "disabled:opacity-50 disabled:cursor-not-allowed"
+              )}
+            >
+              {followLoading || optimisticFollowing ? '...' : (isFollowing ? 'Following' : 'Follow')}
+            </button>
           </div>
 
           {/* Recent Posts Section */}
