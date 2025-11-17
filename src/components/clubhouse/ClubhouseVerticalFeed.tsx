@@ -869,9 +869,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   avatar: item.user?.avatar,
                   username: item.user?.username
                 }}
-                caption={removeGolfCourseFromContent(
-                  (item.title as string | null) ?? (item.ctaDescription as string | null) ?? ''
-                )}
+                caption={removeGolfCourseFromContent(item.ctaDescription)}
                 createdAt={typeof item.createdAt === 'string' ? item.createdAt : item.createdAt?.toISOString()}
                 courseName={item.golfCourse?.name}
                 stats={{
@@ -893,7 +891,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 onComment={() => handleComment(item.id)}
                 onShare={handleShare}
                 onMuteToggle={() => setGlobalMute(!isGloballyMuted)}
-                accentColor="#ffffff"
+                accentColor="#6e9277"
               />
             </div>
           );
