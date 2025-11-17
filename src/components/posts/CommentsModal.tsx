@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { X, Heart, Send, Smile } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
-import { CLUBHOUSE_SHEET_HEIGHT, CLUBHOUSE_SHEET_BACKDROP_CLASS } from '@/constants/clubhouseSheets';
 
 interface Comment {
   id: string;
@@ -158,7 +156,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
     <>
       {/* Backdrop */}
       <div 
-        className={cn("fixed inset-0 z-50 transition-opacity duration-300", CLUBHOUSE_SHEET_BACKDROP_CLASS)}
+        className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 transition-opacity duration-300"
         onClick={onClose}
       />
       
@@ -168,7 +166,8 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
           className="clubhouse-comments-sheet glass-dark rounded-t-[24px] flex flex-col relative w-full"
           style={{ 
             paddingBottom: 'env(safe-area-inset-bottom)',
-            maxHeight: CLUBHOUSE_SHEET_HEIGHT
+            height: '80vh',
+            maxHeight: '80vh'
           }}
         >
           {/* Handle */}

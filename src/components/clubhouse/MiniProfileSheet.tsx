@@ -11,7 +11,6 @@ import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 import { SheetPlaybackProvider, useSheetPlayback } from './SheetPlaybackContext';
 import { VideoThumbPlayer } from './VideoThumbPlayer';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
-import { CLUBHOUSE_SHEET_HEIGHT, CLUBHOUSE_SHEET_BACKDROP_CLASS } from '@/constants/clubhouseSheets';
 
 interface UserProfile {
   id: string;
@@ -269,7 +268,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
     >
       {/* Backdrop */}
       <div 
-        className={cn("absolute inset-0 cursor-pointer", CLUBHOUSE_SHEET_BACKDROP_CLASS)}
+        className="absolute inset-0 bg-black/60 backdrop-blur-md cursor-pointer" 
         onClick={handleBackdropClick}
       />
       
@@ -282,7 +281,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
         )}
         style={{
           paddingBottom: 'env(safe-area-inset-bottom)',
-          maxHeight: CLUBHOUSE_SHEET_HEIGHT,
+          maxHeight: '72vh',
           width: '100%',
           maxWidth: '100vw'
         }}
