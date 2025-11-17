@@ -1,10 +1,3 @@
-/**
- * GlobalBottomNavigation - App-wide bottom navigation
- * 
- * Z-index: 30 (clubhouseFooter) - See src/constants/zIndex.ts for full hierarchy
- * Must stay below HUD (40) and sheets (60) to prevent overlap when sliding in/out
- */
-
 import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -190,7 +183,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
             className={cn(
               "global-bottom-nav bottom-nav-fixed",
               "fixed! bottom-0! left-0! right-0! w-full",
-              "z-[30]!",
+              "z-[100]!",
               "m-0!" // Ensure no margins
             )}
             initial={{ opacity: 0 }}

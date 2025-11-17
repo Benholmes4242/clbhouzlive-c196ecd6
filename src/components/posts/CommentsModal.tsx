@@ -1,9 +1,3 @@
-/**
- * CommentsModal - Clubhouse comments drawer
- * 
- * Z-index: 60 (clubhouseSheet) - See src/constants/zIndex.ts for full hierarchy
- */
-
 import React, { useState } from 'react';
 import { X, Heart, Send, Smile } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -162,7 +156,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] transition-opacity duration-300"
+        className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 transition-opacity duration-300"
         onClick={onClose}
       />
       

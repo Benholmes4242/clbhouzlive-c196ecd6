@@ -1,10 +1,3 @@
-/**
- * EnhancedCreateMomentModal - Full-screen Create Moment composer
- * 
- * Z-index: 70 (globalModal) - See src/constants/zIndex.ts for full hierarchy
- * Sits above all Clubhouse elements including HUD (40) and sheets (60)
- */
-
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
 import { X, ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Layers, Camera } from "lucide-react";
@@ -340,7 +333,7 @@ export default function EnhancedCreateMomentModalCinematic({
     <AnimatePresence>
       {isOpen && (
         <motion.div 
-          className="ecm-root fixed inset-0 z-[70]" 
+          className="ecm-root fixed inset-0 z-[1000]" 
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
           exit={{ opacity: 0 }}

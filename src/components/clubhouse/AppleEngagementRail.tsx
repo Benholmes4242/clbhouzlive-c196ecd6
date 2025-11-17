@@ -2,8 +2,6 @@
  * AppleEngagementRail - Dark glass action rail
  * Apple-level visual polish with premium interactions
  * 
- * Z-index: 40 (clubhouseHud) - See src/constants/zIndex.ts for full hierarchy
- * 
  * Sizing:
  * - Outer container width: 44px (hit area)
  * - Inner glass rail: 34px (visible container)
@@ -81,7 +79,7 @@ export const AppleEngagementRail = ({
   return (
     <div 
       className={cn(
-        'clubhouse-rail fixed right-[12px] z-[40] flex flex-col items-center gap-3 px-1 py-2 glass-dark transition-all duration-300 ease-out',
+        'clubhouse-rail fixed right-[12px] z-50 flex flex-col items-center gap-3 px-1 py-2 glass-dark transition-all duration-300 ease-out',
         isVisible ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0',
         className
       )}
