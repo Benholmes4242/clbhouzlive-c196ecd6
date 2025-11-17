@@ -47,7 +47,6 @@ export const AppleMetadataCapsule = ({
     <div
       className={cn(
         'glass-dark flex min-w-0 items-center gap-3 px-3 py-2',
-        'w-[260px] max-w-[80vw]',
         className
       )}
     >
@@ -70,14 +69,9 @@ export const AppleMetadataCapsule = ({
 
       {/* Text column */}
       <div className="flex min-w-0 flex-col gap-1">
-        {/* Row 1: name · time */}
+        {/* Row 1: name */}
         <div className="flex items-center gap-1 text-[13px] font-semibold text-white">
           <span className="truncate">{user?.name ?? 'Golfer'}</span>
-          {timeLabel && (
-            <span className="text-[12px] font-normal text-white/60">
-              · {timeLabel}
-            </span>
-          )}
         </div>
 
         {/* Row 2: caption (2-line clamp) */}
