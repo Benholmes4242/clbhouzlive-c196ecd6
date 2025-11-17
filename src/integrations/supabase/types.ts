@@ -2197,6 +2197,7 @@ export type Database = {
           post_id: string
           poster_url: string | null
           stream_id: string | null
+          studio_edits: Json | null
           width: number | null
         }
         Insert: {
@@ -2216,6 +2217,7 @@ export type Database = {
           post_id: string
           poster_url?: string | null
           stream_id?: string | null
+          studio_edits?: Json | null
           width?: number | null
         }
         Update: {
@@ -2235,6 +2237,7 @@ export type Database = {
           post_id?: string
           poster_url?: string | null
           stream_id?: string | null
+          studio_edits?: Json | null
           width?: number | null
         }
         Relationships: [

@@ -1,12 +1,10 @@
 import { FilterId } from '@/types/studio';
 
 export const FILTERS: Record<FilterId, string> = {
-  normal: 'none',
-  fade:   'contrast(0.95) saturate(0.9) brightness(1.02)',
-  warm:   'contrast(1.05) saturate(1.1) sepia(0.12) hue-rotate(-8deg)',
-  cool:   'contrast(1.03) saturate(0.95) hue-rotate(8deg)',
-  dusky:  'brightness(0.95) contrast(1.1) saturate(0.85)',
-  mono:   'grayscale(1) contrast(1.05)',
+  normal:    'none',
+  vivid:     'contrast(1.1) saturate(1.15)',
+  bw:        'grayscale(1) contrast(1.05)',
+  dramatic:  'contrast(1.25) saturate(1.05) brightness(0.95)',
 };
 
 export function cssForFilter(filterId?: FilterId): string {

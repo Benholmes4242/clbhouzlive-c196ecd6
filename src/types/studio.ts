@@ -1,4 +1,4 @@
-export type FilterId = 'normal' | 'fade' | 'warm' | 'cool' | 'dusky' | 'mono';
+export type FilterId = 'normal' | 'vivid' | 'bw' | 'dramatic';
 
 export type TextOverlay = {
   id: string;

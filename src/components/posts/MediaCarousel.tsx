@@ -11,6 +11,7 @@ interface MediaItem {
   url?: string;
   file?: File;
   alt?: string;
+  filterId?: string; // Studio filter to apply
 }
 
 interface MediaCarouselProps {

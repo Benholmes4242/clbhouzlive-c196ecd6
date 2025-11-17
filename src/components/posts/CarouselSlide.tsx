@@ -4,6 +4,8 @@ import { useLongPress } from '@/hooks/useLongPress';
 import { useCappedLoading } from '@/hooks/useCappedLoading';
 import { haptic } from '@/utils/haptics';
 import { useToast } from '@/hooks/use-toast';
+import { getFilterClass } from '@/utils/studioFilters';
+import { cn } from '@/lib/utils';
 
 interface CarouselSlideProps {
   item: {
@@ -13,6 +15,7 @@ interface CarouselSlideProps {
     url?: string;
     file?: File;
     alt?: string;
+    filterId?: string;
   };
   index?: number;
   isActive: boolean;
@@ -29,6 +32,7 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
   const { toast } = useToast();
   
   const showSkeleton = useCappedLoading(loaded, 600);
+  const filterClass = getFilterClass(item.filterId);
   
   const longPressProps = useLongPress(() => {
     onSetCover?.(index);
@@ -115,9 +119,10 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
           }}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
-          className={`w-full h-full object-cover transition-all duration-300 ${
-            loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm'
-          }`}
+          className={cn("w-full h-full object-cover transition-all duration-300", 
+            loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
+            filterClass
+          )}
         />
 
         {/* Play overlay */}
@@ -149,9 +154,10 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
         src={src}
         alt={item.alt || `Media item ${item.id}`}
         onLoad={() => setLoaded(true)}
-        className={`w-full h-full object-cover transition-all duration-300 ${
-          loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm'
-        }`}
+        className={cn("w-full h-full object-cover transition-all duration-300",
+          loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
+          filterClass
+        )}
         draggable={false}
       />
     </div>

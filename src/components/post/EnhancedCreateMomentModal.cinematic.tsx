@@ -458,14 +458,25 @@ export default function EnhancedCreateMomentModalCinematic({
     // Derive files from media (single source of truth)
     const files = media.map(item => item.file);
     
+    // Build studio edits mapping keyed by media ID
+    const studioEditsByMediaId = media.reduce((acc, item) => {
+      const edits = getEdits?.(item.id);
+      if (edits?.filter) {
+        acc[item.id] = { filter: edits.filter };
+      }
+      return acc;
+    }, {} as Record<string, { filter: string }>);
+    
     onSubmit({
       caption,
       files,
+      mediaItems: media,
       selectedCourse: course,
       visibility,
       isPrivate: visibility === "private",
-      backgroundMusic: null, // Default for now
-      coverIndex // NEW: thumbnail source for feeds
+      backgroundMusic: null,
+      coverIndex,
+      studioEditsByMediaId
     });
   };
 
@@ -594,13 +605,17 @@ export default function EnhancedCreateMomentModalCinematic({
                     </div>
                   ) : (
                     <MediaCarousel
-                      items={media.map((item, index) => ({
-                        id: item.id,
-                        type: item.type,
-                        previewUrl: item.previewUrl,
-                        file: item.file,
-                        alt: `Media item ${item.id}`
-                      }))}
+                      items={media.map((item, index) => {
+                        const edits = getEdits?.(item.id);
+                        return {
+                          id: item.id,
+                          type: item.type,
+                          previewUrl: item.previewUrl,
+                          file: item.file,
+                          alt: `Media item ${item.id}`,
+                          filterId: edits?.filter
+                        };
+                      })}
                       initialIndex={0}
                       onIndexChange={setActiveIndex}
                       onSetCover={setCoverIndex}

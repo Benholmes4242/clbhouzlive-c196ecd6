@@ -1,0 +1,28 @@
+/**
+ * Studio Filter CSS Classes
+ * Applied to media elements (images/videos) to show filter effects
+ */
+
+.clb-filter-normal {
+  filter: none;
+}
+
+.clb-filter-vivid {
+  filter: contrast(1.1) saturate(1.15);
+}
+
+.clb-filter-bw {
+  filter: grayscale(1) contrast(1.05);
+}
+
+.clb-filter-dramatic {
+  filter: contrast(1.25) saturate(1.05) brightness(0.95);
+}
+
+/* Ensure smooth transitions when switching filters */
+.clb-filter-normal,
+.clb-filter-vivid,
+.clb-filter-bw,
+.clb-filter-dramatic {
+  transition: filter 0.2s ease-out;
+}

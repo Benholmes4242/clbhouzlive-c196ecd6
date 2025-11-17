@@ -9,6 +9,7 @@ interface PostSubmissionData {
   user: any;
   content: string;
   mediaFiles: File[];
+  mediaItems?: Array<{ id: string; file: File }>;
   selectedTags: any[];
   courseInfo?: {
     id: string;
@@ -16,6 +17,7 @@ interface PostSubmissionData {
     country: string;
   } | null;
   achievementId?: string | null;
+  studioEditsByMediaId?: Record<string, { filter?: string }>;
   onSuccess?: () => void;
   onError?: () => void;
 }
@@ -29,9 +31,11 @@ export const useOptimisticPostSubmission = () => {
     user,
     content,
     mediaFiles,
+    mediaItems,
     selectedTags,
     courseInfo,
     achievementId,
+    studioEditsByMediaId,
     onSuccess,
     onError
   }: PostSubmissionData) => {
@@ -99,10 +103,19 @@ export const useOptimisticPostSubmission = () => {
         if (mediaFiles.length > 0) {
           console.log('Uploading media files for post creation...');
           
+          // Build studio edits array aligned with mediaFiles order
+          const studioEditsByIndex = mediaFiles.map((file, index) => {
+            const mediaItem = mediaItems?.[index];
+            const mediaId = mediaItem?.id;
+            const edits = mediaId ? studioEditsByMediaId?.[mediaId] : undefined;
+            return edits && edits.filter ? { filter: edits.filter } : null;
+          });
+          
           await startBackgroundUpload({
             postId: postData.id,
             mediaFiles,
-            userId: user.id
+            userId: user.id,
+            studioEditsByIndex
           });
           
           console.log('Media upload completed successfully');
