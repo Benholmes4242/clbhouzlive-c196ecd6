@@ -45,12 +45,14 @@ export function HubHomePage() {
   });
   const [isExiting, setIsExiting] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [revealChrome, setRevealChrome] = useState(false);
+
+  const CHROME_REVEAL_OFFSET = 40; // Reveal chrome 40ms before Hub finishes sliding down
 
   // Wire Hub into chrome auto-hide system
-  // While Hub is open and not closing, chrome should be hidden
-  // When closing starts, forceHidden becomes false → chrome animates back
+  // Keep chrome hidden until near the end of close animation
   useChromeState({
-    forceHidden: !isClosing,
+    forceHidden: !revealChrome,
     disabled: false,
   });
   
@@ -78,11 +80,16 @@ export function HubHomePage() {
       return;
     }
 
-    // Start closing sequence: this makes chrome visible via useChromeState
+    // Start closing sequence
     setIsClosing(true);
     setIsExiting(true);
     // slide down off-screen
     setTranslateY(window.innerHeight);
+
+    // Reveal chrome near the end of the slide-down so footer/HUD bounce after Hub is mostly gone
+    window.setTimeout(() => {
+      setRevealChrome(true);
+    }, HUB_EXIT_DURATION - CHROME_REVEAL_OFFSET);
 
     // Wait for Hub slide-down animation to complete before navigating
     window.setTimeout(() => {
