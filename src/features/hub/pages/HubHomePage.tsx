@@ -8,6 +8,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useJoinRequestNotifications } from '@/features/nearby/hooks/useJoinRequestNotifications';
 import { useHub } from '../useHub';
 import { prefersReduced } from '@/lib/ui/motion';
+import { useChromeState } from '@/hooks/useChromeState';
 import { EchoTile } from '../home/tiles/EchoTile';
 import { QuickActionsTile } from '../home/tiles/QuickActionsTile';
 import { NearbyGolfersTile } from '../home/tiles/NearbyGolfersTile';
@@ -43,6 +44,15 @@ export function HubHomePage() {
     return prefersReduced();
   });
   const [isExiting, setIsExiting] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  // Wire Hub into chrome auto-hide system
+  // While Hub is open and not closing, chrome should be hidden
+  // When closing starts, forceHidden becomes false → chrome animates back
+  useChromeState({
+    forceHidden: !isClosing,
+    disabled: false,
+  });
   
   const sheetRef = useRef<HTMLDivElement | null>(null);
   const DRAG_THRESHOLD = 120; // px to trigger dismiss
@@ -68,11 +78,13 @@ export function HubHomePage() {
       return;
     }
 
+    // Start closing sequence: this makes chrome visible via useChromeState
+    setIsClosing(true);
     setIsExiting(true);
     // slide down off-screen
     setTranslateY(window.innerHeight);
 
-    // match exit duration
+    // Wait for Hub slide-down animation to complete before navigating
     window.setTimeout(() => {
       close();
     }, HUB_EXIT_DURATION);
