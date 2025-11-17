@@ -262,7 +262,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
 
   return (
     <div 
-      className="fixed inset-0 z-[70] flex items-end justify-center"
+      className="fixed inset-0 z-[150] flex items-end justify-center"
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >
