@@ -67,40 +67,42 @@ export const AppleMetadataCapsule = ({
         </div>
       </button>
 
-      {/* Text column */}
-      <div className="flex min-w-0 flex-col gap-1 items-center">
+      {/* Text column - centered within remaining space */}
+      <div className="flex flex-1 min-w-0 flex-col items-center text-center gap-1">
         {/* Row 1: name (tap → mini profile) */}
         <button
           type="button"
           onClick={onProfileSheetOpen}
-          className="flex items-center gap-1 text-[13px] font-semibold text-white"
+          className="w-full truncate text-[13px] font-semibold text-white"
           aria-label={user?.name ? `View profile for ${user.name}` : 'View profile'}
         >
-          <span className="truncate text-center">{user?.name ?? 'Golfer'}</span>
+          {user?.name ?? 'Golfer'}
         </button>
 
         {/* Row 2: caption (2-line clamp) - non-interactive */}
         {caption && (
-          <p className="text-center text-[12px] text-white/80 line-clamp-2">
+          <p className="w-full text-[12px] text-white/80 line-clamp-2">
             {caption}
           </p>
         )}
 
         {/* Row 3: course pill (optional) */}
         {courseName && (
-          <button
-            type="button"
-            onClick={onCourseClick}
-            className="course-pill mt-0.5 inline-flex items-center justify-center rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] text-white/80 hover:bg-white/15 transition-colors"
-          >
-            <span className="course-pill-label truncate text-center">{courseName}</span>
-            {typeof courseRating === 'number' && (
-              <span className="flex items-center gap-0.5 flex-shrink-0 ml-1">
-                <span>·</span>
-                <span>★ {courseRating.toFixed(1)}</span>
-              </span>
-            )}
-          </button>
+          <div className="mt-0.5 flex w-full justify-center">
+            <button
+              type="button"
+              onClick={onCourseClick}
+              className="course-pill inline-flex items-center justify-center rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] text-white/80 hover:bg-white/15 transition-colors"
+            >
+              <span className="course-pill-label truncate">{courseName}</span>
+              {typeof courseRating === 'number' && (
+                <span className="flex items-center gap-0.5 flex-shrink-0 ml-1">
+                  <span>·</span>
+                  <span>★ {courseRating.toFixed(1)}</span>
+                </span>
+              )}
+            </button>
+          </div>
         )}
       </div>
     </div>
