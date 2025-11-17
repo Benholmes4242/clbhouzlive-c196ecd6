@@ -59,6 +59,15 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				clbhouzBg: 'var(--bg-page)',
+				'surface-slate': 'var(--surface-slate)',
+				'surface-card': 'var(--surface-card)',
+				'surface-alt': 'var(--surface-alt)',
+				'text-primary': 'var(--text-primary)',
+				'text-secondary': 'var(--text-secondary)',
+				'text-tertiary': 'var(--text-tertiary)',
+				'icon-primary': 'var(--icon-primary)',
+				'icon-secondary': 'var(--icon-secondary)',
+				'primary-accent': 'var(--primary-accent)',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
