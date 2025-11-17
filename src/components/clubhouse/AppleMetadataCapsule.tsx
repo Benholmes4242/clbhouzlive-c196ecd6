@@ -6,6 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { relativeTime } from '@/utils/relativeTime';
+import SquircleImage from '@/components/ui/SquircleImage';
 
 interface AppleMetadataCapsuleProps {
   user: {
@@ -69,19 +70,17 @@ export const AppleMetadataCapsule = ({
           onClick={onProfileSheetOpen}
           className="flex-shrink-0 mt-1"
           aria-label={`View ${user.name}'s profile`}
+          style={{
+            filter: 'drop-shadow(0 0 8px rgba(255,255,255,0.5))',
+          }}
         >
-          <div 
-            className="relative w-[120px] h-[120px] rounded-full overflow-hidden"
-            style={{
-              boxShadow: '0 0 8px rgba(255,255,255,0.5), inset 0 0 0 2px #6e9277',
-            }}
-          >
-            <img 
-              src={user.avatar || '/placeholder.svg'} 
-              alt={user.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <SquircleImage
+            size={120}
+            src={user.avatar || '/placeholder.svg'}
+            alt={user.name}
+            ringColor="#6e9277"
+            ringWidth={2}
+          />
         </button>
 
         {/* Content */}
