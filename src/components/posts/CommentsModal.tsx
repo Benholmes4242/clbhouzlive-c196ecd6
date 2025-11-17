@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { createPortal } from 'react-dom';
 import { X, Heart, Send, Smile } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -153,16 +152,16 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
 
   if (!isOpen) return null;
 
-  return createPortal(
+  return (
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] transition-opacity duration-300"
+        className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 transition-opacity duration-300"
         onClick={onClose}
       />
       
       {/* Comments Sheet - Dark Glass */}
-      <div className="fixed inset-x-0 bottom-0 z-[70] flex items-end justify-center">
+      <div className="fixed inset-x-0 bottom-0 z-[60] flex items-end justify-center">
         <div 
           className="clubhouse-comments-sheet glass-dark rounded-t-[24px] flex flex-col relative w-full"
           style={{ 
@@ -270,8 +269,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
           </div>
         </div>
       </div>
-    </>,
-    document.body
+    </>
   );
 };
 

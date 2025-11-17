@@ -3,10 +3,6 @@ import React, { createContext, useContext, useState, ReactNode, useCallback } fr
 interface ModalContextType {
   isCreateMomentModalOpen: boolean;
   setCreateMomentModalOpen: (open: boolean) => void;
-  isCommentsDrawerOpen: boolean;
-  setCommentsDrawerOpen: (open: boolean) => void;
-  isMiniProfileDrawerOpen: boolean;
-  setMiniProfileDrawerOpen: (open: boolean) => void;
   shouldHideHeader: boolean;
   shouldHideBottomNav: boolean;
 }
@@ -27,22 +23,12 @@ interface ModalProviderProps {
 
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const [isCreateMomentModalOpen, setIsCreateMomentModalOpen] = useState(false);
-  const [isCommentsDrawerOpen, setIsCommentsDrawerOpenState] = useState(false);
-  const [isMiniProfileDrawerOpen, setIsMiniProfileDrawerOpenState] = useState(false);
 
   const shouldHideHeader = isCreateMomentModalOpen;
-  const shouldHideBottomNav = isCreateMomentModalOpen || isCommentsDrawerOpen || isMiniProfileDrawerOpen;
+  const shouldHideBottomNav = isCreateMomentModalOpen;
 
   const setCreateMomentModalOpen = useCallback((open: boolean) => {
     setIsCreateMomentModalOpen(open);
-  }, []);
-
-  const setCommentsDrawerOpen = useCallback((open: boolean) => {
-    setIsCommentsDrawerOpenState(open);
-  }, []);
-
-  const setMiniProfileDrawerOpen = useCallback((open: boolean) => {
-    setIsMiniProfileDrawerOpenState(open);
   }, []);
 
   return (
@@ -50,10 +36,6 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
       value={{
         isCreateMomentModalOpen,
         setCreateMomentModalOpen,
-        isCommentsDrawerOpen,
-        setCommentsDrawerOpen,
-        isMiniProfileDrawerOpen,
-        setMiniProfileDrawerOpen,
         shouldHideHeader,
         shouldHideBottomNav,
       }}

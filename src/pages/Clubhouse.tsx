@@ -18,7 +18,7 @@ import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-// import CommentsModal from '@/components/posts/CommentsModal';
+import CommentsModal from '@/components/posts/CommentsModal';
 import { NewSeasonBanner } from '@/components/feed/NewSeasonBanner';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
@@ -75,6 +75,8 @@ const Clubhouse = () => {
   const [headerActiveTab, setHeaderActiveTab] = useState('Following');
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [localSelectedTags, setLocalSelectedTags] = useState<any[]>([]);
+  const [commentsModalOpen, setCommentsModalOpen] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string>('');
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
@@ -180,7 +182,10 @@ const Clubhouse = () => {
     setCurrentPostIndex(index);
   };
 
-  // Comment handling is managed inside ClubhouseVerticalFeed now
+  const handleComment = (postId: string) => {
+    setSelectedPostId(postId);
+    setCommentsModalOpen(true);
+  };
 
   const handleShare = () => {
     console.log('Share clicked');
@@ -294,6 +299,18 @@ const Clubhouse = () => {
         isVisible={showToast}
         onHide={hideToast}
       />
+
+      {/* Comments Modal */}
+      {commentsModalOpen && selectedPostId && (
+        <CommentsModal
+          isOpen={commentsModalOpen}
+          postId={selectedPostId}
+          onClose={() => {
+            setCommentsModalOpen(false);
+            setSelectedPostId('');
+          }}
+        />
+      )}
 
       {/* Season Recap Modal */}
       {seasonRecap && user && (

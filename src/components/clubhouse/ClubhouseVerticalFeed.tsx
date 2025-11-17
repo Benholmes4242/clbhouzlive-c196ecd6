@@ -26,7 +26,6 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
-import { useModalContext } from '@/contexts/ModalContext';
 import { 
   auditComponentMount, 
   auditIntersectionObserver,
@@ -182,7 +181,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const isMobile = useIsMobile();
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   const { setActiveVideo } = useVideoManager();
-  const { setCommentsDrawerOpen, setMiniProfileDrawerOpen } = useModalContext();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
@@ -563,7 +561,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const handleComment = (postId: string) => {
     setSelectedPostId(postId);
     setCommentsModalOpen(true);
-    setCommentsDrawerOpen(true);
   };
 
   // Long press handlers for reaction tray
@@ -901,7 +898,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 onProfileSheetOpen={() => {
                   setSelectedUserId(item.user?.id || null);
                   setShowMiniProfile(true);
-                  setMiniProfileDrawerOpen(true);
                 }}
                 onCourseClick={() => {}}
                 onLike={() => handleLike(item.id)}
@@ -983,7 +979,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           postId={selectedPostId}
           onClose={() => {
             setCommentsModalOpen(false);
-            setCommentsDrawerOpen(false);
             setSelectedPostId('');
           }}
         />
@@ -993,10 +988,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       <MiniProfileSheetWithData
         userId={selectedUserId}
         isOpen={showMiniProfile}
-        onClose={() => {
-          setShowMiniProfile(false);
-          setMiniProfileDrawerOpen(false);
-        }}
+        onClose={() => setShowMiniProfile(false)}
         onFollow={() => {
           // Handle follow action - could update local state or refetch
         }}
