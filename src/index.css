@@ -1551,8 +1551,23 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --background: 198 20% 74%;
     /* Phase 2: Dark slate text on pastel background */
     --foreground: 210 13% 18%;           /* #2A2F33 */
-    --card: 0 0% 7.8%;
+    
+    /* Phase 3: Light elevated surfaces */
+    --card: 204 26% 83%;                 /* #D0DDE4 - light card surface */
     --card-foreground: 210 13% 18%;      /* #2A2F33 */
+    
+    /* Header & nav surfaces */
+    --surface-header: #B6C7CF;           /* slightly darker than background */
+    --surface-nav: #C1D0D8;              /* nav bar strip */
+    
+    /* Borders & hairlines */
+    --border: 210 11% 82%;               /* #D3DEE5 - soft light border */
+    --border-subtle: rgba(0, 0, 0, 0.08); /* hairline 1px lines */
+    
+    /* Shadows for light mode */
+    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.14);
+    --shadow-card: 0 4px 10px rgba(0, 0, 0, 0.12);
+    
     --popover: 0 0% 10.2%;
     --popover-foreground: 0 0% 100%;
     --primary: 262.1 83.3% 57.8%;
@@ -1565,7 +1580,6 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 20% 98%;
-    --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 14.9%;
     --radius: 0.5rem;
@@ -1647,12 +1661,14 @@ html[data-immersive="true"] .app-shell--topSpacer {
     }
   }
 
-  /* Phase 2: Clubhouse & Hub text overrides - keep light-on-dark */
+  /* Phase 2 & 3: Clubhouse & Hub overrides - keep dark theme */
   body.route-clubhouse,
   .clubhouse-root {
     --foreground: 0 0% 98%;
+    --card: 0 0% 6.3%;               /* #101010 */
     --card-foreground: 0 0% 98%;
     --muted-foreground: 0 0% 64%;
+    --border: 0 0% 14.9%;            /* #262626 */
 
     --text-primary: rgba(255, 255, 255, 0.88);
     --text-secondary: rgba(255, 255, 255, 0.64);
@@ -1660,13 +1676,18 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
     --text-tab-active: #ffffff;
     --text-tab-inactive: rgba(255, 255, 255, 0.55);
+    
+    --surface-header: rgba(10, 10, 10, 0.9);
+    --surface-nav: rgba(10, 10, 10, 0.95);
   }
 
   body.route-hub,
   .route-hub .app-shell {
     --foreground: 0 0% 98%;
+    --card: 0 0% 6.3%;               /* #101010 */
     --card-foreground: 0 0% 98%;
     --muted-foreground: 0 0% 64%;
+    --border: 0 0% 14.9%;            /* #262626 */
 
     --text-primary: rgba(255, 255, 255, 0.88);
     --text-secondary: rgba(255, 255, 255, 0.64);
@@ -1674,6 +1695,9 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
     --text-tab-active: #ffffff;
     --text-tab-inactive: rgba(255, 255, 255, 0.55);
+    
+    --surface-header: rgba(22, 24, 27, 0.98);
+    --surface-nav: rgba(10, 10, 10, 0.98);
   }
 
 /* Hide scrollbars for Netflix-style carousels */

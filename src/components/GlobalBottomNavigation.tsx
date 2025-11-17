@@ -186,14 +186,17 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               className={cn(
                 "chrome-bottom-nav", // Chrome auto-hide class lives on inner element to avoid Framer inline transform conflicts
                 "backdrop-blur-md",
-                isClubhouseRoute ? "bg-black/60" : "bg-background/95",
+                isClubhouseRoute ? "bg-black/60" : "",
                 // Top border/shadow for separation
                 "relative before:absolute before:inset-x-0 before:top-0 before:h-px",
-                isClubhouseRoute ? "before:bg-white/10" : "before:bg-border/50"
+                isClubhouseRoute ? "before:bg-white/10" : ""
               )}
               data-chrome="bottom-nav"
               style={{
-                paddingBottom: 'var(--safe-bottom, 0px)'
+                paddingBottom: 'var(--safe-bottom, 0px)',
+                background: isClubhouseRoute ? undefined : 'var(--surface-nav)',
+                borderTop: isClubhouseRoute ? undefined : '1px solid var(--border-subtle)',
+                boxShadow: isClubhouseRoute ? undefined : 'var(--shadow-soft)',
               }}
             >
               <NavigationBar
