@@ -4939,6 +4939,7 @@ export type Database = {
         Args: { limit_count?: number }
         Returns: number
       }
+      count_orphan_posts: { Args: never; Returns: number }
       current_auth_uid: { Args: never; Returns: string }
       decrement_slots_if_available: {
         Args: { p_game_id: string }
