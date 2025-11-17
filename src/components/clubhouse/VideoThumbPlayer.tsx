@@ -314,7 +314,7 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
       <div className="absolute inset-0 flex items-center justify-center">
         <div 
           className={cn(
-            "w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20 transition-opacity duration-200",
+            "glass-dark w-10 h-10 rounded-full flex items-center justify-center transition-opacity duration-200",
             playing && !loading && !error ? "opacity-0" : "opacity-100"
           )}
         >
