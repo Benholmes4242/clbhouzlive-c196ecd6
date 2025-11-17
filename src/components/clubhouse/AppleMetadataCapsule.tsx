@@ -90,9 +90,9 @@ export const AppleMetadataCapsule = ({
           <button
             type="button"
             onClick={onCourseClick}
-            className="course-pill mt-0.5 inline-flex items-center rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] text-white/80 hover:bg-white/15 transition-colors"
+            className="course-pill mt-0.5 inline-flex items-center justify-center rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] text-white/80 hover:bg-white/15 transition-colors"
           >
-            <span className="course-pill-label truncate">{courseName}</span>
+            <span className="course-pill-label truncate text-center">{courseName}</span>
             {typeof courseRating === 'number' && (
               <span className="flex items-center gap-0.5 flex-shrink-0 ml-1">
                 <span>·</span>
