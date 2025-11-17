@@ -1,5 +1,36 @@
 /* Clubhouse Engagement Rail - No entrance animations */
 
+/* Course pill fade-out for long club names */
+.course-pill {
+  position: relative;
+  max-width: 220px;
+}
+
+.course-pill-label {
+  display: block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fade on the right edge */
+.course-pill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  pointer-events: none;
+  border-radius: 0 9999px 9999px 0;
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   /* Ensure all transitions respect user preference */
