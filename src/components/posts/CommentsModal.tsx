@@ -156,13 +156,13 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 transition-opacity duration-300"
+        className="fixed inset-0 bg-black/60 backdrop-blur-md z-[65] transition-opacity duration-300"
         onClick={onClose}
       />
       
       {/* Comments Sheet - Dark Glass */}
-      <div className="fixed inset-x-0 bottom-0 z-[60] flex items-end justify-center">
-        <div 
+      <div className="fixed inset-x-0 bottom-0 z-[70] flex items-end justify-center">
+        <div
           className="clubhouse-comments-sheet glass-dark rounded-t-[24px] flex flex-col relative w-full"
           style={{ 
             paddingBottom: 'env(safe-area-inset-bottom)',
