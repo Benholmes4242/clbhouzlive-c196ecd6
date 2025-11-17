@@ -50,8 +50,7 @@ export const AppleProgressBar = ({
     <div
       ref={trackRef}
       className={cn(
-        "mt-1 h-[3px] w-[160px] max-w-[60vw] cursor-pointer overflow-hidden rounded-full bg-white/15 transition-opacity duration-200",
-        isActive ? "opacity-100" : "opacity-0",
+        "h-[3px] w-[160px] max-w-[70vw] cursor-pointer overflow-hidden rounded-full bg-white/15",
         className
       )}
       onPointerDown={handlePointerDown}
