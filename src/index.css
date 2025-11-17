@@ -3444,13 +3444,14 @@ html[data-immersive="true"] .app-shell--topSpacer {
   touch-action: pan-y;
 }
 
-/* VirtualList container: keep vertical scroll smooth, disable horizontal */
+/* VirtualList container: matches Games Tile scroll container exactly */
 .eh-listScroll {
   overflow-y: auto;
-  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  touch-action: pan-y;
+  padding-right: 0;
 }
 
 /* Expanded transcript */
