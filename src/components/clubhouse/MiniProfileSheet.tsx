@@ -288,7 +288,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
         <div className="flex flex-col h-full px-4 pt-3 pb-6 md:px-6">
           {/* Handle */}
           <div className="flex justify-center pb-3">
-            <div className="w-12 h-1.5 bg-white/30 rounded-full" />
+            <div className="w-12 h-1 bg-white/30 rounded-full" />
           </div>
 
           {/* Header / Hero Row */}
