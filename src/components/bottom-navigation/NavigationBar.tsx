@@ -25,9 +25,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
       style={{
         // Safe area handling moved to parent
         minHeight: '44px',
-        background: isClubhouse ? undefined : 'var(--surface-nav)',
-        borderTop: isClubhouse ? undefined : '1px solid var(--border-subtle)',
-        boxShadow: isClubhouse ? undefined : 'var(--shadow-soft)',
+        background: isClubhouse ? undefined : 'transparent',
+        borderTop: isClubhouse ? undefined : '1px solid rgba(0, 0, 0, 0.1)',
       }}
     >
       <div className="w-full px-2">
@@ -49,11 +48,11 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                   "flex items-center justify-center relative focus:outline-none",
                   "min-h-[44px] min-w-[44px] p-2 transition-colors duration-200",
                   // Active state uses accent color for all tabs
-                  isActive && "text-accent",
+                  isActive && "text-[color:var(--primary-accent)]",
                   // Inactive state
-                  !isActive && (isClubhouse ? "text-white/80" : "text-muted-foreground"),
+                  !isActive && (isClubhouse ? "text-white/80" : "text-white/85"),
                   // Hover state
-                  !isActive && "hover:text-foreground"
+                  !isActive && (isClubhouse ? "hover:text-white" : "hover:text-white")
                 )}
                 aria-label={tab.label}
                 style={{ minWidth: '44px', minHeight: '44px' }}

@@ -131,7 +131,7 @@ const MessagesPage = () => {
                                   {conversation.last_message}
                                 </p>
                                 {conversation.unread_count > 0 && (
-                                  <span className="bg-blue-600 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
+                                  <span className="bg-primary text-primary-foreground text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
                                     {conversation.unread_count}
                                   </span>
                                 )}
@@ -196,13 +196,13 @@ const MessagesPage = () => {
                               <div
                                 className={`rounded-lg p-3 max-w-xs lg:max-w-md ${
                                   message.sender_id === user.id
-                                    ? 'bg-blue-600 text-white'
+                                    ? 'bg-primary text-primary-foreground'
                                     : 'bg-muted'
                                 }`}
                               >
                                 <p className="text-sm">{message.content}</p>
                                 <p className={`text-xs mt-1 ${
-                                  message.sender_id === user.id ? 'text-blue-100' : 'text-muted-foreground'
+                                  message.sender_id === user.id ? 'text-primary-foreground/80' : 'text-muted-foreground'
                                 }`}>
                                   {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
                                 </p>

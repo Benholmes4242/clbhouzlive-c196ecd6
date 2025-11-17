@@ -100,7 +100,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-black/90 backdrop-blur-xl border-white/20 text-white sm:max-w-md">
+      <DialogContent className="bg-card backdrop-blur-xl border text-foreground sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold tracking-wide">
             Request Invite
@@ -109,8 +109,8 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
         
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           <div className="space-y-2">
-            <label htmlFor="email" className="text-sm text-white/80">
-              Email <span className="text-red-400">*</span>
+            <label htmlFor="email" className="text-sm text-muted-foreground">
+              Email <span className="text-destructive">*</span>
             </label>
             <input
               id="email"
@@ -120,16 +120,16 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               placeholder="your@email.com"
               disabled={submitting}
               required
-              className="w-full rounded-lg bg-white/10 text-white placeholder-white/40
-                       border border-white/15 px-4 py-3 text-[15px] outline-none
-                       focus:border-white/35 focus:ring-0 transition-colors
+              className="w-full rounded-lg bg-[color:var(--surface-input)] text-foreground placeholder:text-[color:var(--placeholder-foreground)]
+                       border border-[color:hsl(var(--input))] px-4 py-3 text-[15px] outline-none
+                       focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-colors
                        disabled:opacity-60"
             />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="name" className="text-sm text-white/80">
-              Name <span className="text-white/40">(optional)</span>
+            <label htmlFor="name" className="text-sm text-muted-foreground">
+              Name <span className="text-muted-foreground/60">(optional)</span>
             </label>
             <input
               id="name"
@@ -138,16 +138,16 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
               disabled={submitting}
-              className="w-full rounded-lg bg-white/10 text-white placeholder-white/40
-                       border border-white/15 px-4 py-3 text-[15px] outline-none
-                       focus:border-white/35 focus:ring-0 transition-colors
+              className="w-full rounded-lg bg-[color:var(--surface-input)] text-foreground placeholder:text-[color:var(--placeholder-foreground)]
+                       border border-[color:hsl(var(--input))] px-4 py-3 text-[15px] outline-none
+                       focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-colors
                        disabled:opacity-60"
             />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="club" className="text-sm text-white/80">
-              Home Club <span className="text-white/40">(optional)</span>
+            <label htmlFor="club" className="text-sm text-muted-foreground">
+              Home Club <span className="text-muted-foreground/60">(optional)</span>
             </label>
             <input
               id="club"
@@ -156,22 +156,22 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               onChange={(e) => setClub(e.target.value)}
               placeholder="Your golf club"
               disabled={submitting}
-              className="w-full rounded-lg bg-white/10 text-white placeholder-white/40
-                       border border-white/15 px-4 py-3 text-[15px] outline-none
-                       focus:border-white/35 focus:ring-0 transition-colors
+              className="w-full rounded-lg bg-[color:var(--surface-input)] text-foreground placeholder:text-[color:var(--placeholder-foreground)]
+                       border border-[color:hsl(var(--input))] px-4 py-3 text-[15px] outline-none
+                       focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-colors
                        disabled:opacity-60"
             />
           </div>
 
-          <p className="text-xs text-white/60 leading-relaxed">
+          <p className="text-xs text-muted-foreground leading-relaxed">
             We'll only use this to contact you about beta access.
           </p>
 
           <button
             type="submit"
             disabled={submitting || !turnstileLoaded}
-            className="w-full rounded-lg bg-white text-black py-3 font-medium text-[15px]
-                     hover:bg-white/90 disabled:opacity-60 transition-colors"
+            className="w-full rounded-lg bg-[color:var(--surface-slate)] text-white py-3 font-medium text-[15px]
+                     hover:bg-[color:var(--surface-slate)]/90 disabled:opacity-60 transition-colors"
           >
             {submitting ? "Submitting..." : "Request Invite"}
           </button>
