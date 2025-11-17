@@ -78,8 +78,8 @@ type Props = {
   onClose: () => void;
   onSubmit: (data: any) => void;
   isSubmitting: boolean;
-  initialFiles?: File[];
-  mediaItems?: ComposerMediaItem[];
+  initialFiles?: File[]; // Deprecated: kept for backward compatibility but not used
+  mediaItems?: ComposerMediaItem[]; // Single source of truth
   selectedCourse?: any;
   onCourseSelect?: (course: any) => void;
   onMediaChange?: (items: ComposerMediaItem[]) => void;
@@ -168,18 +168,10 @@ export default function EnhancedCreateMomentModalCinematic({
   
   console.log('🔍 EnhancedCreateMomentModal state:', { isOpen, hasDataImmersive: document.documentElement.hasAttribute('data-immersive') });
 
-  // Media carousel state - use mediaItems if available, fallback to initialFiles
+  // Media carousel state - use mediaItems as single source of truth
   const media = useMemo(() => {
-    if (mediaItems?.length > 0) {
-      return mediaItems.slice(0, 5);
-    }
-    return (initialFiles || []).slice(0, 5).map(file => ({
-      id: crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
-      type: file.type.startsWith('video') ? 'video' as const : 'image' as const,
-      file,
-      previewUrl: URL.createObjectURL(file)
-    }));
-  }, [mediaItems, initialFiles]);
+    return (mediaItems || []).slice(0, 5);
+  }, [mediaItems]);
   
   const [activeIndex, setActiveIndex] = useState(0);
   const [coverIndex, setCoverIndex] = useState(0);
@@ -201,8 +193,7 @@ export default function EnhancedCreateMomentModalCinematic({
     openComposerWithFiles
   } = useSnapModal();
 
-  // Use the media items or files and course from props
-  const files = mediaItems?.length > 0 ? mediaItems.map(item => item.file) : initialFiles;
+  // Use the media items from props
   const course = selectedCourse || snapCourse;
 
   const canPost = useMemo(() => media?.length > 0 && !isSubmitting, [media, isSubmitting]);
@@ -464,6 +455,9 @@ export default function EnhancedCreateMomentModalCinematic({
     // Show success overlay immediately for better UX
     setShowSuccessOverlay(true);
     
+    // Derive files from media (single source of truth)
+    const files = media.map(item => item.file);
+    
     onSubmit({
       caption,
       files,
@@ -604,7 +598,6 @@ export default function EnhancedCreateMomentModalCinematic({
                         id: item.id,
                         type: item.type,
                         previewUrl: item.previewUrl,
-                        url: item.url,
                         file: item.file,
                         alt: `Media item ${item.id}`
                       }))}

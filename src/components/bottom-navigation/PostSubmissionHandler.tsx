@@ -9,8 +9,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 interface PostSubmissionHandlerProps {
   isComposerOpen: boolean;
-  mediaItems: ComposerMediaItem[];
-  selectedFile: File | null; // Keep for backward compatibility
+  mediaItems: ComposerMediaItem[]; // Single source of truth for media
+  selectedFile: File | null; // Deprecated: kept for backward compatibility but not used in composer flow
   selectedCourse: any;
   onCourseSelect: (course: any) => void;
   onClose: () => void;
@@ -39,13 +39,13 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
   const location = useLocation();
 
   const handleSubmit = async (data: any) => {
-    // Get files from mediaItems or fallback to selectedFile for backward compatibility
-    const files = mediaItems.length > 0 
-      ? mediaItems.map(item => item.file)
-      : (selectedFile ? [selectedFile] : []);
+    // Derive files from mediaItems only (single source of truth)
+    const files = mediaItems.map(item => item.file);
     
-    if (files.length === 0) {
+    // Strict validation: no media, no post (except achievements)
+    if (files.length === 0 && !data.achievementId) {
       onShowToast('No media selected');
+      setIsSubmitting(false);
       return;
     }
 
@@ -120,7 +120,6 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
       onClose={onClose}
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
-      initialFiles={mediaItems.length > 0 ? mediaItems.map(item => item.file) : (selectedFile ? [selectedFile] : [])}
       mediaItems={mediaItems}
       selectedCourse={selectedCourse}
       onCourseSelect={onCourseSelect}
