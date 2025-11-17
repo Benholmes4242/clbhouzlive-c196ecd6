@@ -17,8 +17,8 @@ export function FilterBar({ active, onChange }: FilterBarProps) {
           onClick={() => onChange(filter)}
           className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
             active === filter
-              ? 'bg-[#6e9277]/20 text-white'
-              : 'bg-gray-800/60 text-gray-300 hover:bg-gray-800'
+              ? 'bg-primary text-white shadow-sm'
+              : 'bg-[color:var(--surface-input)] text-muted-foreground border border-[color:hsl(var(--input))] hover:bg-[color:var(--surface-input-hover)]'
           }`}
         >
           {filter}

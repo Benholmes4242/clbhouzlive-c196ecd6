@@ -22,17 +22,17 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   return (
     <div className="text-center space-y-2">
       <div className="mt-0">
-        <h1 className="font-display text-2xl font-bold text-black">{displayName}</h1>
+        <h1 className="font-display text-2xl font-bold text-foreground">{displayName}</h1>
       </div>
       
       {/* Show username for all personal profiles */}
       {username && (
-        <p className="font-display text-black text-lg">{username}</p>
+        <p className="font-display text-foreground text-lg">{username}</p>
       )}
       
       {/* Bio - Show for all personal profiles */}
       {bio && (
-        <p className="text-sm max-w-md mx-auto">{bio}</p>
+        <p className="text-sm text-muted-foreground max-w-md mx-auto">{bio}</p>
       )}
     </div>
   );
