@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { devlog } from '@/utils/log';
 import { scrollChildIntoView } from '../utils/scroll';
 import { GameRow, type GameData } from '@/features/games/components/GameRow';
+import '@/features/nearby/components/your-games/YourGames.css';
 import './games/gameAnimations.css';
 import './games/gamesTile.css';
 

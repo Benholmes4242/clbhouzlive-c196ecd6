@@ -10,6 +10,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { Tile } from '../components/Tile';
 import { useHub } from '@/features/hub/useHub';
 import { TapButton } from '@/components/ui/TapButton';
+import { GameStatusPill } from '@/features/hub/components/GameStatusPill';
+import '@/features/nearby/components/your-games/YourGames.css';
 import '../hubTileGames.css';
 
 interface Game {
@@ -81,7 +83,10 @@ function GameRow({
           </span>
         </span>
         <span className="meta">
-          {availableSlots} {availableSlots === 1 ? 'spot' : 'spots'}
+          <GameStatusPill
+            filled={(game.slots_total || 0) - availableSlots}
+            total={game.slots_total || 0}
+          />
           <span className="chev">›</span>
         </span>
       </button>
