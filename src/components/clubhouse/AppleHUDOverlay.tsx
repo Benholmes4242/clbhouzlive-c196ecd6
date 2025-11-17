@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { AppleMetadataCapsule } from './AppleMetadataCapsule';
-import { AppleProgressBar } from './AppleProgressBar';
 import { AppleEngagementRail } from './AppleEngagementRail';
 
 interface AppleHUDOverlayProps {
@@ -77,9 +76,9 @@ export const AppleHUDOverlay = ({
 }: AppleHUDOverlayProps) => {
   return (
     <>
-      {/* Bottom-left: metadata capsule + progress bar */}
+      {/* Bottom-left: metadata capsule */}
       <div
-        className="fixed left-[12px] z-[50] flex flex-col gap-2"
+        className="fixed left-[12px] z-[50]"
         style={{
           bottom: `calc(env(safe-area-inset-bottom) + var(--bottom-nav-height, 72px) + 18px)`,
         }}
@@ -93,11 +92,6 @@ export const AppleHUDOverlay = ({
           onProfileSheetOpen={onProfileSheetOpen}
           onCourseClick={onCourseClick}
           onMoreClick={onMoreClick}
-          isActive={isActive}
-        />
-        
-        <AppleProgressBar
-          progress={0}
           isActive={isActive}
         />
       </div>
