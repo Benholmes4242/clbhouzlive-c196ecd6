@@ -29,14 +29,14 @@ export const OpaqueHeader: React.FC<OpaqueHeaderProps> = ({
       )}
       style={{
         paddingTop: 'max(16px, env(safe-area-inset-top))',
-        background: 'var(--surface-header)',
-        borderColor: 'var(--border-subtle)',
+        background: 'var(--surface-slate)',
+        borderColor: 'rgba(0, 0, 0, 0.1)',
       }}
     >
       {onBack ? (
         <button
           onClick={onBack}
-          className="flex items-center gap-1 text-foreground/90 hover:text-foreground text-[15px] font-medium transition-colors -ml-1"
+          className="flex items-center gap-1 text-white/90 hover:text-white text-[15px] font-medium transition-colors -ml-1"
           aria-label="Back"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -46,7 +46,7 @@ export const OpaqueHeader: React.FC<OpaqueHeaderProps> = ({
         <div className="w-16" />
       )}
       
-      <h1 className="text-foreground/90 text-[17px] font-semibold">
+      <h1 className="text-white/90 text-[17px] font-semibold">
         {title}
       </h1>
       
