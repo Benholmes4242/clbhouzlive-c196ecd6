@@ -1,6 +1,12 @@
 /**
- * AppleEngagementRail - Slimmer, dark glass action rail
+ * AppleEngagementRail - Dark glass action rail
  * Apple-level visual polish with premium interactions
+ * 
+ * Sizing:
+ * - Outer container width: 44px (hit area)
+ * - Inner glass rail: 34px (visible container)
+ * - Inner circle: 26px (button visual)
+ * - Icon: 18px
  */
 
 import React, { useState, useEffect } from 'react';
@@ -31,8 +37,10 @@ const formatCount = (count: number): string => {
   return count.toString();
 };
 
-const BUTTON_SIZE = 30;
-const HIT_AREA = 44;
+const GLASS_RAIL_WIDTH = 34;  // Visible glass container
+const BUTTON_SIZE = 26;       // Inner circle
+const HIT_AREA = 44;          // Touch target
+const ICON_SIZE = 18;         // Icon size
 
 export const AppleEngagementRail = ({
   stats,
@@ -74,6 +82,7 @@ export const AppleEngagementRail = ({
         className
       )}
       style={{
+        width: GLASS_RAIL_WIDTH,
         right: 12,
         bottom: 'calc(env(safe-area-inset-bottom) + var(--bottom-nav-height, 72px) + 22px)',
       }}
@@ -96,9 +105,9 @@ export const AppleEngagementRail = ({
             style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
           >
             {isMuted ? (
-              <VolumeX size={18} className="text-white/80" style={{ display: 'block' }} />
+              <VolumeX size={ICON_SIZE} className="text-white/80" style={{ display: 'block' }} />
             ) : (
-              <Volume2 size={18} className="text-white/80" style={{ display: 'block' }} />
+              <Volume2 size={ICON_SIZE} className="text-white/80" style={{ display: 'block' }} />
             )}
           </div>
         </button>
@@ -122,7 +131,7 @@ export const AppleEngagementRail = ({
             style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
           >
             <Heart
-              size={18}
+              size={ICON_SIZE}
               className={cn(
                 'transition-all',
                 isLiked ? 'fill-white text-white' : 'text-white/80'
@@ -153,7 +162,14 @@ export const AppleEngagementRail = ({
             )}
             style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
           >
-            <MessageCircle size={18} className="text-white/80" style={{ display: 'block' }} />
+            <MessageCircle
+              size={ICON_SIZE}
+              className={cn(
+                'transition-all',
+                hasCommented ? 'fill-white text-white' : 'text-white/80'
+              )}
+              style={{ display: 'block' }}
+            />
           </div>
         </button>
         <span className="text-[11px] text-white/80 font-medium">
@@ -178,9 +194,9 @@ export const AppleEngagementRail = ({
             style={{ width: BUTTON_SIZE, height: BUTTON_SIZE }}
           >
             {showShareCheck ? (
-              <Check size={18} className="text-white/80" style={{ display: 'block' }} />
+              <Check size={ICON_SIZE} className="text-white" style={{ display: 'block' }} />
             ) : (
-              <Share2 size={18} className="text-white/80" style={{ display: 'block' }} />
+              <Share2 size={ICON_SIZE} className="text-white/80" style={{ display: 'block' }} />
             )}
           </div>
         </button>
