@@ -380,6 +380,7 @@ export default function EnhancedCreateMomentModalCinematic({
               aria-modal="true"
               aria-label="Create a Moment"
               className="relative w-full max-w-md h-[100dvh] md:h-[90vh] md:rounded-3xl overflow-hidden"
+              style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
               initial={prefersReducedMotion ? { opacity: 0 } : { y: 30, opacity: 0, scale: 0.95 }}
               animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1, scale: 1 }}
               exit={prefersReducedMotion ? { opacity: 0 } : { y: 12, opacity: 0, scale: 0.98 }}
