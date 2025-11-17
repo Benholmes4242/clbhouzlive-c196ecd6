@@ -330,17 +330,17 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
         </div>
       </div>
 
-      {/* Mute Toggle - Repositioned to Right */}
+      {/* Mute Toggle - Top Right with Glass Dark */}
       <button
         onClick={toggleMute}
-        className="absolute bottom-2 right-2 p-1.5 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 hover:bg-black/60 transition-colors"
+        className="glass-dark absolute top-2 right-2 p-1.5 rounded-full hover:bg-white/10 transition-colors"
         aria-pressed={!muted}
         aria-label={muted ? 'Unmute video' : 'Mute video'}
       >
         {muted ? (
-          <VolumeX className="w-3.5 h-3.5 text-white" />
+          <VolumeX className="w-3.5 h-3.5 text-white/80" />
         ) : (
-          <Volume2 className="w-3.5 h-3.5 text-white" />
+          <Volume2 className="w-3.5 h-3.5 text-white/80" />
         )}
       </button>
 
