@@ -83,7 +83,8 @@ export default function HubEchoTagsPage() {
       <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
       
       {/* Glass Sheet */}
-      <div className="hub-glass-page fixed inset-0"
+      <div
+        className="hub-glass-page fixed inset-0"
         style={{
           background: 'rgba(0, 0, 0, 0.28)',
           backdropFilter: 'blur(22px)',
@@ -92,8 +93,8 @@ export default function HubEchoTagsPage() {
           boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
         }}
       >
-      <div className="p-4 md:p-6">
-      <div className="max-w-3xl mx-auto">
+        <div className="p-4 md:p-6">
+          <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <button
@@ -182,9 +183,9 @@ export default function HubEchoTagsPage() {
               </div>
             </div>
           ))}
+           </div>
+          </div>
         </div>
-      </div>
-      </div>
       </div>
     </div>
   );
