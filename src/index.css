@@ -223,21 +223,22 @@ html, body, #root {
   --border-low: rgba(255,255,255,0.07);
   --border-mid: rgba(255,255,255,0.12);
   
-  /* Text - Phase 2: Dark slate text on pastel background */
-  --text-primary: rgba(42, 47, 51, 0.96);
-  --text-secondary: rgba(42, 47, 51, 0.72);
-  --text-tertiary: rgba(42, 47, 51, 0.52);
+  /* Text - Phase 2: Slate text on light background */
+  --text-primary: #1F2428;
+  --text-secondary: #5E666D;
+  --text-tertiary: #97A1AA;
   
   /* Base backgrounds */
   --bg-modal: #0f0f0f;
   --bg-glass: rgba(0,0,0,0.6);
   --bg-card-border: rgba(255,255,255,0.12);
 
-  /* Accent - keep green only for status indicators */
-  --accent-primary: #6e9277;
+  /* Accent - Phase 1: Brand accent #6E9277 */
+  --accent-primary: #6E9277;
+  --primary-accent: #6E9277;
   --accent-clbhouz: #6E9277;
-  --accent-green: #6e9277;
-  --accent-green-bg: #6e9277;
+  --accent-green: #6E9277;
+  --accent-green-bg: #6E9277;
   --accent-green-text: #ffffff;
   
   /* Frosted white accents */
@@ -257,24 +258,24 @@ html, body, #root {
   --bg-app: #F4F5F7;
   --bg-header: #B1C3CB;
   
-  /* Tab text colors - Phase 2: Dark slate on pastel */
-  --text-tab-active: #2A2F33;
-  --text-tab-inactive: rgba(42, 47, 51, 0.60);
-  --text-tab-hover: rgba(255,255,255,0.85);
+  /* Tab text colors - Phase 2: Slate on light background */
+  --text-tab-active: #1F2428;            /* --text-primary */
+  --text-tab-inactive: #5E666D;          /* --text-secondary */
+  --text-tab-hover: #1F2428;             /* --text-primary */
   
-  /* Pill text colors */
-  --text-pill-active: #ffffff;
-  --text-pill-inactive: rgba(255,255,255,0.65);
-  --text-pill-hover: rgba(255,255,255,0.85);
+  /* Pill text colors - Phase 4 */
+  --text-pill-active: #ffffff;           /* white on slate/accent */
+  --text-pill-inactive: #5E666D;         /* --text-secondary on surface-alt */
+  --text-pill-hover: #1F2428;            /* --text-primary on hover */
   
-  /* Pill backgrounds */
-  --pill-bg-inactive: rgba(255,255,255,0.08);
-  --pill-bg-hover: rgba(255,255,255,0.15);
-  --pill-bg-active: #6E9277;
+  /* Pill backgrounds - Phase 4 */
+  --pill-bg-inactive: #EDEFF2;           /* --surface-alt */
+  --pill-bg-hover: #E8EAEC;              /* slightly darker */
+  --pill-bg-active: #3A3F46;             /* --surface-slate */
   
   /* Shadows / lift */
-  --pill-shadow-hover: 0 0 10px rgba(255,255,255,0.05), 0 8px 24px rgba(0,0,0,0.8);
-  --card-shadow: 0 0 10px rgba(255,255,255,0.05);
+  --pill-shadow-hover: 0 0 10px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.08);
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.06);
 
   /* Z-index layers */
   --z-echo-fab: 1200;
@@ -1559,51 +1560,80 @@ html[data-immersive="true"] .app-shell--topSpacer {
     }
   }
   :root {
-    /* Global Background: #F4F5F7 - Neutral Light Grey */
-    --background: 210 20% 96%;
-    /* Dark slate text for excellent contrast */
-    --foreground: 210 13% 18%;           /* #2A2F33 */
+    /* ========================================
+       PHASE 1: CORE TOKENS & FOUNDATIONS
+       Light Grey + Slate System
+       ======================================== */
     
-    /* Light elevated surfaces - white cards */
-    --card: 0 0% 100%;                   /* #FFFFFF - pure white cards */
-    --card-foreground: 210 13% 18%;      /* #2A2F33 */
+    /* Base canvas */
+    --background: 240 5% 96%;            /* #F4F5F7 */
+    --foreground: 210 13% 18%;           /* #1F2428 (text-primary) */
     
-    /* Header & nav surfaces */
-    --surface-header: #ECEEF0;           /* slightly darker than background */
-    --surface-nav: #E8EAEC;              /* nav bar strip */
+    /* Surfaces */
+    --surface-slate: #3A3F46;            /* headers, footers, active pills */
+    --surface-card: #FAFAFB;             /* cards, tiles */
+    --surface-alt: #EDEFF2;              /* inputs, inactive pills, subtle bands */
     
-    /* Borders & hairlines */
-    --border: 210 11% 88%;               /* #E3E5E7 - soft light border */
-    --border-subtle: rgba(0, 0, 0, 0.08); /* hairline 1px lines */
+    /* Cards */
+    --card: 240 17% 98%;                 /* #FAFAFB */
+    --card-foreground: 210 13% 18%;      /* #1F2428 */
+    
+    /* Borders */
+    --border: 213 7% 84%;                /* #D4D7DB */
+    --border-subtle: #E5E7EA;
     
     /* Shadows for light mode */
-    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.10);
-    --shadow-card: 0 4px 10px rgba(0, 0, 0, 0.08);
+    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-card: 0 4px 10px rgba(0, 0, 0, 0.12);
+    --shadow-medium: 0 4px 10px rgba(0, 0, 0, 0.12);
     
     /* Input / search / dropdown surfaces */
-    --surface-input: #E8EAEC;               /* slightly darker than page */
-    --surface-input-hover: #E0E2E4;        /* hover state */
-    --surface-input-focus: #D8DADC;        /* focus state */
+    --surface-input: #EDEFF2;              /* --surface-alt */
+    --surface-input-hover: #E8EAEC;        /* hover state */
+    --surface-input-focus: #E0E2E4;        /* focus state */
     
     /* Placeholder / helper text */
-    --placeholder-foreground: rgba(42, 47, 51, 0.48);  /* softer slate */
+    --placeholder-foreground: rgba(31, 36, 40, 0.48);  /* softer text-primary */
     
-    --popover: 0 0% 10.2%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 262.1 83.3% 57.8%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 210 9% 40%;      /* #5F6A70 - secondary/muted slate */
-    --accent: 31 93% 54%;
+    /* ========================================
+       PHASE 2: TEXT & ICONS
+       Slate System for Excellent Readability
+       ======================================== */
+    
+    /* Text hierarchy */
+    --text-primary: #1F2428;             /* primary text */
+    --text-secondary: #5E666D;           /* secondary text */
+    --text-tertiary: #97A1AA;            /* meta text, timestamps */
+    
+    /* Icons */
+    --icon-primary: #3A3F46;             /* main icons */
+    --icon-secondary: #747C84;           /* secondary icons */
+    --icon-disabled: #B4BAC0;            /* disabled state */
+    
+    /* Shadcn semantic tokens */
+    --popover: 240 17% 98%;              /* #FAFAFB (same as card) */
+    --popover-foreground: 210 13% 18%;   /* #1F2428 */
+    --primary: 142 15% 51%;              /* #6E9277 - brand accent */
+    --primary-foreground: 0 0% 100%;     /* white text on accent */
+    --secondary: 210 11% 24%;            /* #3A3F46 (surface-slate) */
+    --secondary-foreground: 0 0% 100%;   /* white text on slate */
+    --muted: 240 5% 92%;                 /* #EDEFF2 (surface-alt) */
+    --muted-foreground: 210 10% 38%;     /* #5E666D (text-secondary) */
+    --accent: 31 93% 54%;                /* orange accent (kept as-is) */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --input: 210 11% 82%;                  /* same family as --border */
-    --input-focus: 142 30% 41%;            /* accent green for focus */
-    --ring: 0 0% 14.9%;
+    --destructive-foreground: 0 0% 100%;
+    --input: 210 8% 86%;                 /* #D4D7DB - border for inputs */
+    --input-focus: 142 15% 51%;          /* #6E9277 - brand accent for focus */
+    --ring: 142 15% 51%;                 /* #6E9277 - brand accent */
     --radius: 0.5rem;
+    /* ========================================
+       SHADOWS & EFFECTS
+       ======================================== */
+    
+    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-medium: 0 4px 10px rgba(0, 0, 0, 0.12);
+    
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
