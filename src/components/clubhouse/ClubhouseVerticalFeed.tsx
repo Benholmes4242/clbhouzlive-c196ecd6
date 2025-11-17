@@ -198,6 +198,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const playRef = useRef<IntersectionObserver | null>(null);
   const [shouldAttachMap, setShouldAttachMap] = useState<Record<string, boolean>>({});
   const [autoplayMap, setAutoplayMap] = useState<Record<string, boolean>>({});
+  const [videoProgress, setVideoProgress] = useState(0); // 0-100
   
   // Post reactions
   const { getUserReaction, handleReaction } = usePostReactions();
@@ -274,6 +275,27 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   useEffect(() => {
     onCurrentPostChange?.(currentIndex);
   }, [currentIndex, onCurrentPostChange]);
+
+  // Track video progress for the current video
+  useEffect(() => {
+    const currentPost = filteredPosts[currentIndex];
+    if (!currentPost) return;
+    
+    const videoEl = videoRefs.current[currentPost.id];
+    if (!videoEl) return;
+
+    const handleTimeUpdate = () => {
+      if (videoEl.duration > 0) {
+        const progress = (videoEl.currentTime / videoEl.duration) * 100;
+        setVideoProgress(progress);
+      }
+    };
+
+    videoEl.addEventListener('timeupdate', handleTimeUpdate);
+    return () => {
+      videoEl.removeEventListener('timeupdate', handleTimeUpdate);
+    };
+  }, [currentIndex, filteredPosts]);
 
   // Check which posts the user has liked
   const { data: likedPosts } = useQuery({
@@ -883,6 +905,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 isVideo={item.media?.[0]?.media_type === 'video'}
                 isMuted={isGloballyMuted}
                 isActive={currentIndex === index}
+                videoProgress={currentIndex === index ? videoProgress : 0}
                 onProfileSheetOpen={() => {
                   setSelectedUserId(item.user?.id || null);
                   setShowMiniProfile(true);

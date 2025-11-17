@@ -6,6 +6,7 @@
 import React from 'react';
 import { AppleMetadataCapsule } from './AppleMetadataCapsule';
 import { AppleEngagementRail } from './AppleEngagementRail';
+import { AppleProgressBar } from './AppleProgressBar';
 
 interface AppleHUDOverlayProps {
   // Video ref for progress tracking
@@ -36,6 +37,7 @@ interface AppleHUDOverlayProps {
   isVideo?: boolean;
   isMuted?: boolean;
   isActive?: boolean;
+  videoProgress?: number; // 0-100
   
   // Handlers
   onProfileSheetOpen?: () => void;
@@ -67,6 +69,7 @@ export const AppleHUDOverlay = ({
   isVideo = false,
   isMuted = false,
   isActive = false,
+  videoProgress = 0,
   onProfileSheetOpen,
   onCourseClick,
   onMoreClick,
@@ -80,9 +83,9 @@ export const AppleHUDOverlay = ({
 
   return (
     <>
-      {/* Bottom-left: metadata capsule */}
+      {/* Bottom-left: metadata capsule + progress bar */}
       <div
-        className="fixed left-[12px] z-[50]"
+        className="fixed left-[12px] z-[50] flex flex-col gap-2"
         style={{
           bottom: HUD_BOTTOM,
         }}
@@ -97,6 +100,7 @@ export const AppleHUDOverlay = ({
           onCourseClick={onCourseClick}
           onMoreClick={onMoreClick}
         />
+        <AppleProgressBar progress={videoProgress} />
       </div>
 
       {/* Right-side engagement rail */}
