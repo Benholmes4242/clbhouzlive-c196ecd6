@@ -186,6 +186,13 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [selectedPostId, setSelectedPostId] = useState<string>('');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [showMiniProfile, setShowMiniProfile] = useState(false);
+
+  // Track when any drawer is open to hide footer
+  useEffect(() => {
+    const isAnyDrawerOpen = commentsModalOpen || showMiniProfile;
+    document.body.classList.toggle('drawer-active', isAnyDrawerOpen);
+    return () => document.body.classList.remove('drawer-active');
+  }, [commentsModalOpen, showMiniProfile]);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});

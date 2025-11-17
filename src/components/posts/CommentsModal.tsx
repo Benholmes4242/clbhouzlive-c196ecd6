@@ -167,7 +167,8 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
           style={{ 
             paddingBottom: 'env(safe-area-inset-bottom)',
             height: '80vh',
-            maxHeight: '80vh'
+            maxHeight: '80vh',
+            boxShadow: 'none'
           }}
         >
           {/* Handle */}
