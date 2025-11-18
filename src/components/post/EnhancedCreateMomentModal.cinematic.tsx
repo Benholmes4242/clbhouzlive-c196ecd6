@@ -762,7 +762,7 @@ export default function EnhancedCreateMomentModalCinematic({
                       title={media.length === 0 ? 'Add media to open Studio' : 'Open Studio to edit your media'}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: '#ffa4fd', background: '#ffa4fd', backgroundImage: 'none' }}>
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                           <Sparkles className="w-5 h-5 text-white" />
                         </div>
                         <div className="text-left">
