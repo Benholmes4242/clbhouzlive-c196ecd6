@@ -8,6 +8,7 @@ import SoundToggle from '@/components/ui/sound-toggle';
 import { CardMediaProps } from './CardMediaTypes';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamHLS, getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
+import { getFilterClass } from '@/utils/studioFilters';
 
 /**
  * Portrait Card Media Component
@@ -76,13 +77,16 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
   // Always allow portrait autoplay on desktop + mobile
   const shouldAttach = isNear;
   const shouldAutoPlay = isVisible;
+  
+  // Apply filter class from database
+  const filterClass = getFilterClass((media as any).filter_id);
 
   // If not a video, show fallback image
   if (media.media_type !== 'video') {
     return (
       <div 
         ref={containerRef}
-        className={`relative w-full h-full overflow-hidden cursor-pointer ${className}`}
+        className={`relative w-full h-full overflow-hidden cursor-pointer ${filterClass} ${className}`}
         onClick={onMediaClick}
       >
         <HighQualityImage
@@ -104,7 +108,7 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
   return (
     <div 
       ref={containerRef}
-      className={`relative w-full h-full overflow-hidden cursor-pointer ${className}`}
+      className={`relative w-full h-full overflow-hidden cursor-pointer ${filterClass} ${className}`}
       onClick={onMediaClick}
     >
       {/* Only render video if we have a valid HLS URL */}

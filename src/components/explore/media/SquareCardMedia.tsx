@@ -4,6 +4,7 @@ import HighQualityImage from '@/components/ui/high-quality-image';
 import { CardMediaProps, CardType } from './CardMediaTypes';
 import { getStreamPoster } from '@/utils/stream';
 import { devlog } from '@/utils/log';
+import { getFilterClass } from '@/utils/studioFilters';
 
 /**
  * Square Card Media Component
@@ -28,6 +29,9 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
        media.thumbnail_url ||
        'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=640&h=640&fit=crop&crop=center')
     : media.media_url;
+  
+  // Apply filter class from database
+  const filterClass = getFilterClass((media as any).filter_id);
 
   // DEBUG: Log image load attempts
   React.useEffect(() => {
@@ -41,7 +45,7 @@ const SquareCardMedia: React.FC<CardMediaProps> = memo(({
 
   return (
     <div 
-      className={`relative w-full h-full overflow-hidden cursor-pointer ${className}`}
+      className={`relative w-full h-full overflow-hidden cursor-pointer ${filterClass} ${className}`}
       onClick={onMediaClick}
       data-media-id={media.id}
       data-role="square-card"
