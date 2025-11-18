@@ -8,7 +8,6 @@ import SoundToggle from '@/components/ui/sound-toggle';
 import { CardMediaProps } from './CardMediaTypes';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamHLS, getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
-import { getFilterClass } from '@/utils/studioFilters';
 
 /**
  * Hero Card Media Component (4×4 large features, special highlight slots) - mobile view only
@@ -80,16 +79,13 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
 
   const shouldAttach = isNear; // Attach on both desktop and mobile
   const shouldAutoPlay = isMobile && isVisible; // Play only on mobile
-  
-  // Apply filter class from database
-  const filterClass = getFilterClass((media as any).filter_id);
 
   // If not a video, show fallback image with same sizing
   if (media.media_type !== 'video') {
     return (
       <div 
         ref={containerRef}
-        className={`relative w-full h-full overflow-hidden cursor-pointer ${filterClass} ${className}`}
+        className={`relative w-full h-full overflow-hidden cursor-pointer ${className}`}
         onClick={onMediaClick}
       >
         <HighQualityImage
@@ -108,7 +104,7 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
   return (
     <div 
       ref={containerRef}
-      className={`relative w-full h-full overflow-hidden cursor-pointer ${filterClass} ${className}`}
+      className={`relative w-full h-full overflow-hidden cursor-pointer ${className}`}
       onClick={onMediaClick}
     >
       {/* Only render video if we have a valid HLS URL */}
