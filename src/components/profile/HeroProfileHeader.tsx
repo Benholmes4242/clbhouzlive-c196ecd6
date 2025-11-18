@@ -3,7 +3,7 @@ import { splitName } from '@/utils/name';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { XPRingPopover } from './XPRingPopover';
 import { Button } from '@/components/ui/button';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { Squircle } from '@/components/ui/squircle';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
 import { TbMovie } from 'react-icons/tb';
 import { Camera, MapPin, BarChart3 } from 'lucide-react';
@@ -823,16 +823,17 @@ const HeroProfileHeader = ({
                     onClick={() => openImmersive?.(0)}
                     style={{ padding: 0, border: 'none', background: 'none', overflow: 'visible' }}
                   >
-                    {profile?.profile_photo_url && (
-                      <div style={{ width: '100%', height: '100%' }}>
-                        <AvatarSquircle
-                          size={255}
-                          src={profile.profile_photo_url}
+                  {profile?.profile_photo_url && (
+                    <div style={{ width: '100%', height: '100%' }}>
+                      <Squircle width={255} height={255}>
+                        <img 
+                          src={profile.profile_photo_url} 
                           alt={profile.display_name || 'Profile'}
-                          className="w-full h-full"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                         />
-                      </div>
-                    )}
+                      </Squircle>
+                    </div>
+                  )}
                   </button>
                 </XPRingPopover>
 
@@ -988,14 +989,15 @@ const HeroProfileHeader = ({
                     role="button"
                     aria-label="Open immersive profile"
                   >
-                    {profile?.profile_photo_url ? (
-                      <AvatarSquircle
-                        size={255}
-                        src={profile.profile_photo_url}
+                  {profile?.profile_photo_url ? (
+                    <Squircle width={255} height={255}>
+                      <img 
+                        src={profile.profile_photo_url} 
                         alt={profile.display_name || 'Profile'}
-                        className="w-full h-full"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                       />
-                    ) : null}
+                    </Squircle>
+                  ) : null}
                   </div>
 
 
