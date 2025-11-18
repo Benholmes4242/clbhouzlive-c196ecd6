@@ -92,15 +92,23 @@ const CourseTagInput = ({
       {selectedCourse ? (
         // Show selected course pill that replaces the search input
         <div className="w-full h-11 flex items-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-zinc-200 text-zinc-900 rounded-xl text-sm h-full shadow-sm">
+          <div 
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm h-full"
+            style={{
+              background: 'var(--hub-glass-bg-button)',
+              border: '1px solid var(--hub-stroke)',
+              color: 'var(--hub-text)'
+            }}
+          >
             <span className="text-lg -ml-1" role="img" aria-label="golf">⛳</span>
             <span className="font-medium">{selectedCourse.name}</span>
-            <span className="text-zinc-600 text-xs">
+            <span className="text-xs" style={{ color: 'var(--hub-text-muted)' }}>
               {selectedCourse.region ? `${selectedCourse.region}, ${selectedCourse.country}` : selectedCourse.country}
             </span>
             <button
               onClick={handleRemoveCourse}
-              className="ml-1 hover:bg-zinc-100 rounded-full p-1 transition-colors duration-150 text-zinc-500 hover:text-zinc-700"
+              className="ml-1 hover:bg-white/10 rounded-full p-1 transition-colors duration-150"
+              style={{ color: 'var(--hub-text-muted)' }}
               title="Remove course"
             >
               <X className="h-3 w-3" />
