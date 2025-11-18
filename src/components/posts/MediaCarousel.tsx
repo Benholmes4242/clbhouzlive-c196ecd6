@@ -195,12 +195,6 @@ const MediaCarousel = ({
       <div className="absolute inset-0 pt-[calc(env(safe-area-inset-top,0px))]">
         {(() => {
           const item = items[activeIndex];
-          console.log('[MediaCarousel] rendering slide', {
-            activeIndex,
-            id: item?.id,
-            type: item?.type,
-            filterId: item?.filterId,
-          });
           return (
             <CarouselSlide
               item={item}

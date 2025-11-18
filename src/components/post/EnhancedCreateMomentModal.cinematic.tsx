@@ -607,12 +607,6 @@ export default function EnhancedCreateMomentModalCinematic({
                     <MediaCarousel
                       items={media.map((item, index) => {
                         const edits = getEdits?.(item.id);
-                        console.log('[Composer] media item before carousel', {
-                          index,
-                          id: item.id,
-                          type: item.type,
-                          filterFromEdits: edits?.filter,
-                        });
                         return {
                           id: item.id,
                           type: item.type,

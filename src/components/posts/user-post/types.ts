@@ -5,6 +5,7 @@ export interface PostMedia {
   studio_edits?: {
     filter?: string;
   } | null;
+  filter_id?: string | null;
 }
 
 export interface PostTag {
