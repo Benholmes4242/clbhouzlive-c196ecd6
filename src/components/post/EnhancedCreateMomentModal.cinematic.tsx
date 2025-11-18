@@ -195,10 +195,15 @@ export default function EnhancedCreateMomentModalCinematic({
     mode
   } = useSnapModal();
 
+  // Track previous open state to detect transitions
+  const wasOpenRef = useRef(false);
+
   // Reset state when modal opens for a NEW post (defensive reset on open)
   // This runs regardless of media count - we reset for ALL new posts
   useEffect(() => {
-    if (isOpen && mode === 'create') {
+    const isOpening = isOpen && !wasOpenRef.current;
+
+    if (isOpening && mode === 'create') {
       console.log('[ECM] Resetting composer state for new post');
       setCaption('');
       if (onCourseSelect) {
@@ -206,8 +211,16 @@ export default function EnhancedCreateMomentModalCinematic({
       }
       setSelectedCourse(null);
       setSnapVisibility('public');
+      // Reset Studio edits (filters, crop, etc.) for any existing media
+      mediaItems.forEach(item => {
+        if (hasEdits(item.id)) {
+          clearEdits(item.id);
+        }
+      });
     }
-  }, [isOpen, mode, setCaption, setSelectedCourse, onCourseSelect, setSnapVisibility]);
+
+    wasOpenRef.current = isOpen;
+  }, [isOpen, mode, setCaption, setSelectedCourse, onCourseSelect, setSnapVisibility, mediaItems, hasEdits, clearEdits]);
 
   // Clear studio edits when modal closes
   useEffect(() => {
