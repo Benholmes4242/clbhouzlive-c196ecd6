@@ -90,28 +90,22 @@ const CourseTagInput = ({
       <label className="findLabel">Select a golf club</label>
       
       {selectedCourse ? (
-        // Show selected course pill that replaces the search input
-        <div className="w-full h-11 flex items-center">
+        // Show selected course pill matching Create Game styling
+        <div className="selectedClubRow">
           <div 
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm h-full"
+            className="clubPill"
             style={{
-              background: 'var(--hub-glass-bg-button)',
-              border: '1px solid var(--hub-stroke)',
-              color: 'var(--hub-text)'
+              padding: '6px 10px 6px 14px',
+              borderColor: 'rgba(255, 255, 255, 0.18)',
             }}
           >
-            <span className="text-lg -ml-1" role="img" aria-label="golf">⛳</span>
-            <span className="font-medium">{selectedCourse.name}</span>
-            <span className="text-xs" style={{ color: 'var(--hub-text-muted)' }}>
-              {selectedCourse.region ? `${selectedCourse.region}, ${selectedCourse.country}` : selectedCourse.country}
-            </span>
+            <span className="clubName">{selectedCourse.name}</span>
             <button
               onClick={handleRemoveCourse}
-              className="ml-1 hover:bg-white/10 rounded-full p-1 transition-colors duration-150"
-              style={{ color: 'var(--hub-text-muted)' }}
+              className="x"
               title="Remove course"
             >
-              <X className="h-3 w-3" />
+              ✕
             </button>
           </div>
         </div>
