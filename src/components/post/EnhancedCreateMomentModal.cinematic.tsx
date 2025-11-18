@@ -793,17 +793,17 @@ export default function EnhancedCreateMomentModalCinematic({
                       disabled={media.length === 0}
                       className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200"
                       style={{
-                        background: 'rgba(255, 255, 255, 0.06)',
-                        backdropFilter: 'blur(10px)',
-                        WebkitBackdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        background: 'rgba(255, 147, 30, 0.15)',
+                        backdropFilter: 'blur(12px) saturate(150%)',
+                        WebkitBackdropFilter: 'blur(12px) saturate(150%)',
+                        border: '1px solid rgba(255, 147, 30, 0.3)',
                         opacity: media.length === 0 ? 0.5 : 1,
                         cursor: media.length === 0 ? 'not-allowed' : 'pointer'
                       }}
                       title={media.length === 0 ? 'Add media to open Studio' : 'Open Studio to edit your media'}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: '#FFB366' }}>
                           <Sparkles className="w-5 h-5 text-white" />
                         </div>
                         <div className="text-left">
