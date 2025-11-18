@@ -819,27 +819,6 @@ export default function EnhancedCreateMomentModalCinematic({
                     </button>
                   </div>
 
-                  {/* Visibility status line - hidden when media present */}
-                  {!hasMedia && (
-                    <div className="flex items-center justify-center gap-2 text-xs text-white/70">
-                      <span>Sharing to: Clubhouse</span>
-                      <span>·</span>
-                      <div className="flex items-center gap-1">
-                        {snapVisibility === 'public' ? (
-                          <>
-                            <Globe className="w-3 h-3" />
-                            <span>Public</span>
-                          </>
-                        ) : (
-                          <>
-                            <Lock className="w-3 h-3" />
-                            <span>Private</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
                   {/* Primary Share button */}
                   <button
                     disabled={!canPost}
