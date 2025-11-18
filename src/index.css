@@ -235,11 +235,11 @@ html, body, #root {
   --bg-card-border: rgba(255,255,255,0.12);
 
   /* Accent - Phase 1: Brand accent - Orange logo color */
-  --accent-primary: #FF6B35;
-  --primary-accent: #FF6B35;
-  --accent-clbhouz: #FF6B35;
-  --accent-green: #FF6B35;
-  --accent-green-bg: #FF6B35;
+  --accent-primary: #f7931e;
+  --primary-accent: #f7931e;
+  --accent-clbhouz: #f7931e;
+  --accent-green: #f7931e;
+  --accent-green-bg: #f7931e;
   --accent-green-text: #ffffff;
   
   /* Frosted white accents */
