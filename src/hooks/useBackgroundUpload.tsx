@@ -177,6 +177,7 @@ export const useBackgroundUpload = () => {
 
         // Create media record with studio edits
         const editsForThisIndex = studioEditsByIndex?.[index] ?? null;
+        const filterId = editsForThisIndex?.filter ?? null;
         
         const { data: mediaData, error: mediaError } = await supabase
           .from('post_media')
@@ -185,7 +186,8 @@ export const useBackgroundUpload = () => {
             media_type: mediaType,
             media_url: publicUrl,
             display_order: index,
-            studio_edits: editsForThisIndex
+            studio_edits: editsForThisIndex,
+            filter_id: filterId
           })
           .select()
           .single();

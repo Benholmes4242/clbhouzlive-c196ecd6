@@ -24,9 +24,9 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
   if (!media || media.length === 0) return null;
 
   const carouselItems = media.map((mediaItem) => {
-    // Extract filter from studio_edits if present
-    const filter = (mediaItem.studio_edits as any)?.filter;
-    const filterClass = getFilterClass(filter);
+    // Use filter_id first (new column), fallback to studio_edits.filter (old data)
+    const filterId = mediaItem.filter_id || (mediaItem.studio_edits as any)?.filter;
+    const filterClass = getFilterClass(filterId);
     
     return (
       <div key={mediaItem.id} className="w-full aspect-square relative">

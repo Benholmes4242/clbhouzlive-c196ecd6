@@ -3,7 +3,9 @@ import { FilterId } from '@/types/studio';
 /**
  * Maps a Studio filter ID to its CSS filter class name
  */
-export function getFilterClass(filter?: FilterId | string): string {
+export function getFilterClass(filter?: FilterId | string | null): string {
+  if (!filter) return 'clb-filter-normal';
+  
   switch (filter) {
     case 'vivid':
       return 'clb-filter-vivid';
@@ -20,7 +22,9 @@ export function getFilterClass(filter?: FilterId | string): string {
 /**
  * Gets the CSS filter string directly (for inline styles if needed)
  */
-export function getFilterStyle(filter?: FilterId | string): string {
+export function getFilterStyle(filter?: FilterId | string | null): string {
+  if (!filter) return 'none';
+  
   switch (filter) {
     case 'vivid':
       return 'contrast(1.1) saturate(1.15)';

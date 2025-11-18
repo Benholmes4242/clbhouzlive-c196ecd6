@@ -2187,6 +2187,7 @@ export type Database = {
           duration_ms: number | null
           duration_seconds: number | null
           exif: Json | null
+          filter_id: string | null
           height: number | null
           id: string
           image_orientation: string | null
@@ -2208,6 +2209,7 @@ export type Database = {
           duration_ms?: number | null
           duration_seconds?: number | null
           exif?: Json | null
+          filter_id?: string | null
           height?: number | null
           id?: string
           image_orientation?: string | null
@@ -2229,6 +2231,7 @@ export type Database = {
           duration_ms?: number | null
           duration_seconds?: number | null
           exif?: Json | null
+          filter_id?: string | null
           height?: number | null
           id?: string
           image_orientation?: string | null
