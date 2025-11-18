@@ -34,6 +34,13 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
   const showSkeleton = useCappedLoading(loaded, 600);
   const filterClass = getFilterClass(item.filterId);
   
+  console.log('[CarouselSlide] filter mapping', {
+    id: item.id,
+    type: item.type,
+    filterId: item.filterId,
+    filterClass,
+  });
+  
   const longPressProps = useLongPress(() => {
     onSetCover?.(index);
     toast({ description: 'Cover set' });

@@ -20,6 +20,10 @@ export default function StudioPanelFilter({ edits, updateEdits, onApply, onReset
   const [selectedFilter, setSelectedFilter] = useState<FilterId>(edits?.filter || 'normal');
 
   const handleSelectFilter = (filterId: FilterId) => {
+    console.log('[StudioFilter] applying filter', {
+      filterId,
+      previousFilter: edits?.filter,
+    });
     setSelectedFilter(filterId);
     updateEdits({ filter: filterId });
   };

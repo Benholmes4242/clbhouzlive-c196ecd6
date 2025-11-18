@@ -193,14 +193,25 @@ const MediaCarousel = ({
     >
       {/* Safe area top padding */}
       <div className="absolute inset-0 pt-[calc(env(safe-area-inset-top,0px))]">
-        <CarouselSlide
-          item={items[activeIndex]}
-          index={activeIndex}
-          isActive={true}
-          onVideoRef={registerVideoRef(activeIndex)}
-          onSetCover={onSetCover}
-          coverIndex={coverIndex}
-        />
+        {(() => {
+          const item = items[activeIndex];
+          console.log('[MediaCarousel] rendering slide', {
+            activeIndex,
+            id: item?.id,
+            type: item?.type,
+            filterId: item?.filterId,
+          });
+          return (
+            <CarouselSlide
+              item={item}
+              index={activeIndex}
+              isActive={true}
+              onVideoRef={registerVideoRef(activeIndex)}
+              onSetCover={onSetCover}
+              coverIndex={coverIndex}
+            />
+          );
+        })()}
       </div>
 
       {/* Navigation arrows */}
