@@ -194,6 +194,109 @@
   overflow: hidden;
 }
 
+/* Golf Course Search Styles */
+.clubSearchBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  outline: none;
+  box-shadow: none;
+  cursor: text;
+}
+
+.clubSearchBar:focus-within {
+  outline: none;
+  box-shadow: none;
+}
+
+.clubSearchInput {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  color: var(--hub-text);
+  outline: none;
+  box-shadow: none;
+  font-size: 15px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.clubSearchInput:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.clubSearchInput::placeholder {
+  color: var(--hub-text-dim);
+}
+
+.clubSearchResults {
+  position: relative;
+  z-index: 60;
+  margin-top: 10px;
+  border-radius: 16px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.clubResultRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.clubResultRow:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.clubResultRow:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.clubResultInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.clubResultName {
+  color: var(--hub-text);
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.clubResultLocation {
+  color: var(--hub-text-dim);
+  font-size: 13px;
+}
+
+.noResults {
+  padding: 20px;
+  text-align: center;
+  color: var(--hub-text-dim);
+  font-size: 14px;
+}
+
 .selectedClubRow {
   display: flex;
   align-items: center;

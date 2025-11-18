@@ -337,6 +337,7 @@ export function CreateGameForm({ prefilledClub, onSubmit }: CreateGameFormProps)
 
         {/* Tag Players */}
         <div className="space-y-2">
+          <label className="sectionLabel">Tag players (optional)</label>
           <UserSearchTypeahead
             selectedUsers={selectedUsers}
             onUserAdd={(user) => setSelectedUsers([...selectedUsers, user])}
