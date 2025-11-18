@@ -253,7 +253,7 @@ const CourseExplorer = () => {
               <CourseCard 
                 key={course.id} 
                 course={course}
-                showCountryWithFlag={true}
+                showRankBadge={!!course.global_rank}
               />
             ))}
           </div>
