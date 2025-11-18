@@ -42,8 +42,13 @@ const GlobalTop100 = () => {
   const initialList = getInitialTop100List();
   const [selectedList, setSelectedList] = useState(initialList.value);
   const [listWasAuto, setListWasAuto] = useState(initialList.auto);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  
+  // Initialize search from URL if present
+  const urlQuery = typeof window !== 'undefined' 
+    ? new URLSearchParams(window.location.search).get('query') || '' 
+    : '';
+  const [searchTerm, setSearchTerm] = useState(urlQuery);
+  const [debouncedSearch, setDebouncedSearch] = useState(urlQuery);
 
   // Debounce search input
   useEffect(() => {
@@ -152,7 +157,10 @@ const GlobalTop100 = () => {
           {listWasAuto && ' • Suggested for you'}
         </p>
         <div className="flex flex-wrap gap-2 items-center">
-          <Select value={selectedList} onValueChange={setSelectedList}>
+          <Select value={selectedList} onValueChange={(value) => {
+            setSelectedList(value);
+            setListWasAuto(false);
+          }}>
             <SelectTrigger className="w-[180px] h-11 bg-card border-border/50 rounded-lg text-sm">
               <div className="flex items-center gap-2">
                 <Award className="h-4 w-4 text-muted-foreground" />
@@ -164,7 +172,6 @@ const GlobalTop100 = () => {
                 <SelectItem 
                   key={option.value} 
                   value={option.value}
-                  onClick={() => setListWasAuto(false)}
                 >
                   {option.label}
                 </SelectItem>
