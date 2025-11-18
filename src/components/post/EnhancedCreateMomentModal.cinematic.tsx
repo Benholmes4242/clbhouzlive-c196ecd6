@@ -99,7 +99,6 @@ export default function EnhancedCreateMomentModalCinematic({
 }: Props) {
   const { setCreateMomentModalOpen } = useModalContext();
   const [aiLoading, setAiLoading] = useState(false);
-  const [visibility, setVisibility] = useState<"public" | "private">("public");
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   
@@ -165,6 +164,18 @@ export default function EnhancedCreateMomentModalCinematic({
       document.body.classList.remove('ecm-open');
     };
   }, [isOpen]);
+
+  // Clear studio edits when modal closes
+  useEffect(() => {
+    if (!isOpen && mediaItems && mediaItems.length > 0) {
+      // Clear studio edits for all media items
+      mediaItems.forEach(item => {
+        if (hasEdits(item.id)) {
+          clearEdits(item.id);
+        }
+      });
+    }
+  }, [isOpen, mediaItems, hasEdits, clearEdits]);
   
   console.log('🔍 EnhancedCreateMomentModal state:', { isOpen, hasDataImmersive: document.documentElement.hasAttribute('data-immersive') });
 
@@ -190,7 +201,9 @@ export default function EnhancedCreateMomentModalCinematic({
     setCaption,
     selectedCourse: snapCourse,
     setSelectedCourse,
-    openComposerWithFiles
+    openComposerWithFiles,
+    visibility: snapVisibility,
+    setVisibility: setSnapVisibility
   } = useSnapModal();
 
   // Use the media items from props
@@ -472,8 +485,8 @@ export default function EnhancedCreateMomentModalCinematic({
       files,
       mediaItems: media,
       selectedCourse: course,
-      visibility,
-      isPrivate: visibility === "private",
+      visibility: snapVisibility,
+      isPrivate: snapVisibility === "private",
       backgroundMusic: null,
       coverIndex,
       studioEditsByMediaId
@@ -784,7 +797,7 @@ export default function EnhancedCreateMomentModalCinematic({
                       <span>Sharing to: Clubhouse</span>
                       <span>·</span>
                       <div className="flex items-center gap-1">
-                        {visibility === 'public' ? (
+                        {snapVisibility === 'public' ? (
                           <>
                             <Globe className="w-3 h-3" />
                             <span>Public</span>

@@ -147,15 +147,9 @@ export const useSnapModal = () => {
     }
   };
 
-  const closeComposer = () => {
-    console.log('Closing composer');
-    setIsComposerOpen(false);
-    setCreateMomentModalOpen(false); // Update modal context
-    
-    // Clean up media
-    cleanupPreviousMedia();
-    
-    // Reset state
+  // Reset all transient composer state to defaults
+  const resetComposerState = () => {
+    console.log('Resetting composer state to defaults');
     setMediaItems([]);
     setSelectedFile(null);
     setPreviewUrl('');
@@ -163,8 +157,23 @@ export const useSnapModal = () => {
     setSelectedTags([]);
     setSelectedCourse(null);
     setShowSuggestions(false);
+    setMentionSuggestions([]);
+    setCursorPosition(0);
     setIsSubmitting(false);
     setVisibility("public");
+  };
+
+  const closeComposer = () => {
+    console.log('Closing composer');
+    
+    // Clean up media before clearing state (so we have mediaItems to cleanup)
+    cleanupPreviousMedia();
+    
+    setIsComposerOpen(false);
+    setCreateMomentModalOpen(false); // Update modal context
+    
+    // Reset all transient state
+    resetComposerState();
   };
 
   const showConfirmationToast = (message: string) => {
@@ -212,6 +221,7 @@ export const useSnapModal = () => {
     openComposer,
     openComposerWithFiles, // NEW
     closeComposer,
+    resetComposerState, // Exposed for manual reset if needed
     showConfirmationToast,
     hideToast
   };
