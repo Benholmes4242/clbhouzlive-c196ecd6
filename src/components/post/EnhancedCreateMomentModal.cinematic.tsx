@@ -713,22 +713,6 @@ export default function EnhancedCreateMomentModalCinematic({
                         onChange={(e) => setCaption(e.target.value)}
                         rows={4}
                       />
-
-                      {/* AI Caption Button */}
-                      <button
-                        type="button"
-                        onClick={handleAICaption}
-                        disabled={aiLoading || !hasMedia}
-                        className="mt-2 self-start inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-300 bg-white text-zinc-700 text-sm font-medium hover:bg-zinc-50 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                        aria-label={aiLoading ? "Generating AI caption..." : "Generate AI caption"}
-                      >
-                        {aiLoading ? <StarsLoading /> : (
-                          <>
-                            <Sparkles className="w-3.5 h-3.5" />
-                            <span>AI Caption</span>
-                          </>
-                        )}
-                      </button>
                     </div>
 
                     {/* Course Tagging Section */}

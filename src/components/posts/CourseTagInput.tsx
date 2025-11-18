@@ -1,8 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { X, MapPin, Loader2 } from 'lucide-react';
+import '@/features/nearby/GamesTab.css';
 
 interface GolfCourse {
   id: string;
@@ -86,7 +86,9 @@ const CourseTagInput = ({
   };
 
   return (
-    <div className="relative">
+    <div className="space-y-2">
+      <label className="findLabel">Select a golf club</label>
+      
       {selectedCourse ? (
         // Show selected course pill that replaces the search input
         <div className="w-full h-11 flex items-center">
@@ -108,57 +110,48 @@ const CourseTagInput = ({
       ) : (
         // Show search input when no course is selected
         <div className="relative">
-          <input
-            ref={inputRef}
-            type="text"
-            value={searchQuery}
-            onChange={handleInputChange}
-            onFocus={handleInputFocus}
-            onBlur={handleInputBlur}
-            placeholder={placeholder}
-            className="w-full pr-10 pl-4 h-11 rounded-xl bg-white border border-zinc-200 text-zinc-900 placeholder:text-zinc-400 outline-none shadow-inner focus:ring-2 focus:ring-[rgb(var(--brand-orange-accent))]/30 focus:border-[rgb(var(--brand-orange-accent))]/40 transition-all duration-200"
-          />
-          <MapPin className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400" />
-          {isLoading && searchQuery.length >= 2 && (
-            <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
-              <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />
-            </div>
-          )}
+          <div className="clubSearchBar">
+            <MapPin className="searchBox__icon" style={{ width: '18px', height: '18px' }} />
+            <input
+              ref={inputRef}
+              type="text"
+              className="clubSearchInput"
+              value={searchQuery}
+              onChange={handleInputChange}
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
+              placeholder="Search golf club..."
+            />
+            {isLoading && searchQuery.length >= 2 && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <Loader2 className="h-4 w-4 animate-spin text-white/60" />
+              </div>
+            )}
+          </div>
 
-          {showSuggestions && suggestions.length > 0 && typeof window !== 'undefined' && (
-            createPortal(
-              <div 
-                className="fixed z-[9999] max-h-[40vh] overflow-auto rounded-2xl bg-white border border-zinc-200 shadow-[0_8px_32px_rgba(0,0,0,0.15)] divide-y divide-zinc-100 pointer-events-auto"
-                style={{
-                  top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + window.scrollY + 8 : 0,
-                  left: inputRef.current ? inputRef.current.getBoundingClientRect().left + window.scrollX : 0,
-                  width: inputRef.current ? inputRef.current.getBoundingClientRect().width : 'auto',
-                }}
-              >
-                <div className="py-2">
-                  {suggestions.map((course) => (
-                    <div
-                      key={course.id}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-[rgb(var(--brand-orange-accent))]/5 cursor-pointer transition-colors duration-150"
-                      onClick={() => handleCourseSelect(course)}
-                    >
-                      <div className="flex-shrink-0">
-                        <span className="text-lg" role="img" aria-label="golf">⛳</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-zinc-900 text-sm leading-5 truncate">
-                          {course.name}
-                        </div>
-                        <div className="text-xs text-zinc-600 mt-0.5">
-                          {course.region ? `${course.region}, ${course.country}` : course.country}
-                        </div>
-                      </div>
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="clubSearchResults">
+              {suggestions.map((course) => (
+                <button
+                  key={course.id}
+                  type="button"
+                  className="clubResultRow"
+                  onClick={() => handleCourseSelect(course)}
+                >
+                  <div className="flex-shrink-0">
+                    <span className="text-lg" role="img" aria-label="golf">⛳</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm leading-5 truncate">
+                      {course.name}
                     </div>
-                  ))}
-                </div>
-              </div>,
-              document.body
-            )
+                    <div className="text-xs opacity-70 mt-0.5">
+                      {course.region ? `${course.region}, ${course.country}` : course.country}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
           )}
         </div>
       )}
