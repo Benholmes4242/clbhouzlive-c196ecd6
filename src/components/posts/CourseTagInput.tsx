@@ -130,22 +130,18 @@ const CourseTagInput = ({
           </div>
 
           {showSuggestions && suggestions.length > 0 && (
-            <div className="clubSearchResults">
+            <div className="resultsSheet">
               {suggestions.map((course) => (
                 <button
                   key={course.id}
                   type="button"
-                  className="clubResultRow"
+                  className="resultRow"
                   onClick={() => handleCourseSelect(course)}
                 >
-                  <div className="flex-shrink-0">
-                    <span className="text-lg" role="img" aria-label="golf">⛳</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm leading-5 truncate text-white">
-                      {course.name}
-                    </div>
-                    <div className="text-xs mt-0.5 text-white/70">
+                  <MapPin className="w-5 h-5 text-white/60" />
+                  <div className="rMid">
+                    <div className="rTitle">{course.name}</div>
+                    <div className="rSub">
                       {course.region ? `${course.region}, ${course.country}` : course.country}
                     </div>
                   </div>

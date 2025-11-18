@@ -295,9 +295,9 @@ export function CreateGameForm({ prefilledClub, onSubmit }: CreateGameFormProps)
               </div>
 
               {isCourseDropdownOpen && courseQuery && (
-                <div className="clubSearchResults">
+                <div className="resultsSheet">
                   {isSearchingCourses ? (
-                    <div className="noResults">Searching...</div>
+                    <div className="hint">Searching...</div>
                   ) : courses.length > 0 ? (
                     courses.map((club) => (
                       <button
@@ -312,17 +312,17 @@ export function CreateGameForm({ prefilledClub, onSubmit }: CreateGameFormProps)
                           setCourseError('');
                           haptic('light');
                         }}
-                        className="clubResultRow"
+                        className="resultRow"
                       >
-                        <MapPin className="w-[18px] h-[18px]" style={{ color: 'white' }} />
-                        <div className="clubResultInfo">
-                          <div className="clubResultName">{club.name}</div>
-                          {club.region && <div className="clubResultLocation">{club.region}</div>}
+                        <MapPin className="w-5 h-5 text-white/60" />
+                        <div className="rMid">
+                          <div className="rTitle">{club.name}</div>
+                          {club.region && <div className="rSub">{club.region}</div>}
                         </div>
                       </button>
                     ))
                   ) : (
-                    <div className="noResults">No clubs found</div>
+                    <div className="hint">No clubs found</div>
                   )}
                 </div>
               )}
