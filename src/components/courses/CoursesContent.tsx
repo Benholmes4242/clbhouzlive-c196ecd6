@@ -3,7 +3,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CourseExplorer from './CourseExplorer';
 import GlobalTop100 from './GlobalTop100';
 import MyCourses from './MyCourses';
-import FriendsCourses from './FriendsCourses';
+import FriendsCoursesPanel from './FriendsCoursesPanel';
+import FriendsCoursesSignedOutEmpty from './FriendsCoursesSignedOutEmpty';
 import UserCoursesContent from './UserCoursesContent';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
@@ -159,22 +160,9 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
           <TabsContent value="friends-courses" className="mt-6">
             {user ? (
-              <FriendsCourses />
+              <FriendsCoursesPanel />
             ) : (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
-                  <User className="h-12 w-12 text-muted-foreground" />
-                  <div className="text-center space-y-2">
-                    <h3 className="text-lg font-semibold">Sign in to see friends' courses</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Discover where your friends have played
-                    </p>
-                  </div>
-                  <Button onClick={() => navigate('/auth')}>
-                    Sign In
-                  </Button>
-                </CardContent>
-              </Card>
+              <FriendsCoursesSignedOutEmpty />
             )}
           </TabsContent>
         </Tabs>
