@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useGolfCoursesSearch } from '@/hooks/useGolfCoursesSearch';
+import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, MapPin, X } from 'lucide-react';
+import { Search, Award, X } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const CourseExplorer = () => {
-  const [selectedRegion, setSelectedRegion] = useState<string>('all');
+const GlobalTop100 = () => {
+  const [selectedList, setSelectedList] = useState<string>('global');
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -21,49 +21,14 @@ const CourseExplorer = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Fetch courses with region filtering based on country
-  const { data: courses = [], isLoading } = useQuery({
-    queryKey: ['explore-courses', selectedRegion, debouncedSearch],
-    queryFn: async () => {
-      let query = supabase
-        .from('golf_courses')
-        .select('*');
+  // Fetch available lists
+  const { data: lists = [] } = useTop100Lists();
 
-      // Apply region filter based on country
-      if (selectedRegion !== 'all') {
-        switch (selectedRegion) {
-          case 'gb-i':
-            query = query.in('country', ['Britain & Ireland', 'England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Republic of Ireland']);
-            break;
-          case 'usa':
-            query = query.eq('country', 'USA');
-            break;
-          case 'europe':
-            query = query.eq('country', 'Continental Europe');
-            break;
-          case 'rest':
-            query = query.not('country', 'in', '("Britain & Ireland","England","Scotland","Wales","Northern Ireland","Ireland","Republic of Ireland","USA","Continental Europe")');
-            break;
-        }
-      }
-
-      // Apply search filter
-      if (debouncedSearch) {
-        query = query.or(`name.ilike.%${debouncedSearch}%,country.ilike.%${debouncedSearch}%,sub_country.ilike.%${debouncedSearch}%,region.ilike.%${debouncedSearch}%`);
-      }
-
-      // Order by global rank first (Top 100 courses), then alphabetically
-      query = query.order('global_rank', { ascending: true, nullsFirst: false });
-      query = query.order('name', { ascending: true });
-      
-      // Limit results
-      query = query.limit(200);
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+  // Use the search hook for Top 100 lists
+  const { data: courses = [], isLoading } = useGolfCoursesSearch({
+    searchQuery: debouncedSearch,
+    listSlug: selectedList,
+    limit: 200,
   });
 
   const LoadingSkeleton = () => (
@@ -78,28 +43,30 @@ const CourseExplorer = () => {
     </div>
   );
 
-  const regionOptions = [
-    { value: 'all', label: 'All Regions' },
-    { value: 'gb-i', label: 'Britain & Ireland' },
-    { value: 'usa', label: 'United States' },
-    { value: 'europe', label: 'Continental Europe' },
-    { value: 'rest', label: 'Rest of World' },
-  ];
+  // Build list options - default to 'global' as the main Top 100 list
+  const listOptions = lists.length > 0 
+    ? lists.map(list => ({ value: list.slug, label: list.short_label }))
+    : [
+        { value: 'global', label: 'Global Top 100' },
+        { value: 'gb-i', label: 'GB&I Top 100' },
+        { value: 'usa', label: 'USA Top 100' },
+        { value: 'europe', label: 'Europe Top 100' },
+      ];
 
   const handleResetFilters = () => {
-    setSelectedRegion('all');
+    setSelectedList('global');
     setSearchTerm('');
   };
 
-  const hasActiveFilters = selectedRegion !== 'all' || searchTerm !== '';
+  const hasActiveFilters = selectedList !== 'global' || searchTerm !== '';
 
   return (
     <div className="space-y-6">
-      {/* Search - Apple-like dark input */}
+      {/* Search */}
       <div className="relative max-w-2xl">
         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
         <Input
-          placeholder="Search golf courses..."
+          placeholder="Search Top 100 courses..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-12 h-12 bg-card border-border/50 rounded-xl shadow-sm focus:shadow-md transition-shadow"
@@ -114,17 +81,17 @@ const CourseExplorer = () => {
         )}
       </div>
 
-      {/* Filters - Styled dropdowns */}
+      {/* Top 100 List Selector */}
       <div className="flex flex-wrap gap-3 items-center">
-        <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+        <Select value={selectedList} onValueChange={setSelectedList}>
           <SelectTrigger className="w-[200px] bg-card border-border/50 rounded-lg">
             <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <SelectValue placeholder="Region" />
+              <Award className="h-4 w-4 text-muted-foreground" />
+              <SelectValue placeholder="Top 100 List" />
             </div>
           </SelectTrigger>
           <SelectContent>
-            {regionOptions.map((option) => (
+            {listOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>
@@ -152,7 +119,7 @@ const CourseExplorer = () => {
         <div className="text-center py-12 space-y-4">
           <div className="text-muted-foreground space-y-2">
             <p className="text-lg font-medium">No courses found</p>
-            <p className="text-sm">Try clearing filters or searching another location.</p>
+            <p className="text-sm">Try selecting a different list or clearing your search.</p>
           </div>
           {hasActiveFilters && (
             <Button onClick={handleResetFilters} variant="outline">
@@ -180,4 +147,4 @@ const CourseExplorer = () => {
   );
 };
 
-export default CourseExplorer;
+export default GlobalTop100;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CourseExplorer from './CourseExplorer';
+import GlobalTop100 from './GlobalTop100';
 import MyCourses from './MyCourses';
 import FriendsCourses from './FriendsCourses';
 import UserCoursesContent from './UserCoursesContent';
@@ -31,10 +32,10 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const isUserCoursesPage = location.pathname.includes('/user/') && location.pathname.includes('/courses');
   const isOwnProfile = !username;
 
-  // Check for tab parameter in URL - only allow explore and friends-courses for main page
+  // Check for tab parameter in URL - allow explore, top100, and friends-courses for main page
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && (tabParam === 'explore' || tabParam === 'friends-courses')) {
+    if (tabParam && (tabParam === 'explore' || tabParam === 'top100' || tabParam === 'friends-courses')) {
       setActiveTab(tabParam);
     } else if (username) {
       // Default to my-courses for user profile pages
@@ -123,33 +124,58 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           </TabsContent>
         </Tabs>
       ) : (
-        // Main courses page - show custom navigation with Global Top 100
-        <div className="space-y-6">
-          {/* Custom Navigation Bar */}
-          <div className="grid w-full grid-cols-2 bg-muted p-1 rounded-md">
-            <button
-              onClick={() => setActiveTab('explore')}
-              className={`flex items-center justify-center rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
-                activeTab === 'explore' 
-                  ? 'bg-background text-foreground shadow-sm' 
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
+        /* Main courses page - show Explore, Global Top 100, and Friends' Courses tabs */
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger 
+              value="explore"
+              className="data-[state=active]:text-foreground"
             >
               Explore
-            </button>
-            <button
-              onClick={() => navigate('/global-top100')}
-              className="flex items-center justify-center rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-background/50"
+            </TabsTrigger>
+            <TabsTrigger 
+              value="top100"
+              className="data-[state=active]:text-foreground"
             >
               Global Top 100
-            </button>
-          </div>
-          
-          {/* Tab Content */}
-          <div>
-            {activeTab === 'explore' && <CourseExplorer />}
-          </div>
-        </div>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="friends-courses"
+              className="data-[state=active]:text-foreground"
+            >
+              Friends' Courses
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="explore" className="mt-6">
+            <CourseExplorer />
+          </TabsContent>
+
+          <TabsContent value="top100" className="mt-6">
+            <GlobalTop100 />
+          </TabsContent>
+
+          <TabsContent value="friends-courses" className="mt-6">
+            {user ? (
+              <FriendsCourses />
+            ) : (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
+                  <User className="h-12 w-12 text-muted-foreground" />
+                  <div className="text-center space-y-2">
+                    <h3 className="text-lg font-semibold">Sign in to see friends' courses</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Discover where your friends have played
+                    </p>
+                  </div>
+                  <Button onClick={() => navigate('/auth')}>
+                    Sign In
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
       )}
     </div>
   );
