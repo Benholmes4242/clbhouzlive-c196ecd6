@@ -251,6 +251,7 @@ export function CreateGameForm({ prefilledClub, onSubmit }: CreateGameFormProps)
 
         {/* Golf Course */}
         <div className="findBlock">
+          <label className="sectionLabel">Select a golf club</label>
           {selectedClub ? (
             <div className="selectedClubRow">
               <span className="prefix">Hosting at</span>
@@ -281,7 +282,7 @@ export function CreateGameForm({ prefilledClub, onSubmit }: CreateGameFormProps)
                 <Search className="w-4 h-4" style={{ color: 'var(--hub-text-dim)' }} />
                 <input
                   type="text"
-                  placeholder="Host a game at"
+                  placeholder="Search golf club..."
                   value={courseQuery}
                   onChange={(e) => {
                     setCourseQuery(e.target.value);
