@@ -191,13 +191,15 @@ export default function EnhancedCreateMomentModalCinematic({
     setSelectedCourse,
     openComposerWithFiles,
     visibility: snapVisibility,
-    setVisibility: setSnapVisibility
+    setVisibility: setSnapVisibility,
+    mode
   } = useSnapModal();
 
   // Reset state when modal opens for a NEW post (defensive reset on open)
+  // This runs regardless of media count - we reset for ALL new posts
   useEffect(() => {
-    if (isOpen && mediaItems.length === 0) {
-      // Modal opened with no media - reset all transient state
+    if (isOpen && mode === 'create') {
+      console.log('[ECM] Resetting composer state for new post');
       setCaption('');
       if (onCourseSelect) {
         onCourseSelect(null);
@@ -205,7 +207,7 @@ export default function EnhancedCreateMomentModalCinematic({
       setSelectedCourse(null);
       setSnapVisibility('public');
     }
-  }, [isOpen, mediaItems.length, setCaption, setSelectedCourse, onCourseSelect, setSnapVisibility]);
+  }, [isOpen, mode, setCaption, setSelectedCourse, onCourseSelect, setSnapVisibility]);
 
   // Clear studio edits when modal closes
   useEffect(() => {

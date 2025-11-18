@@ -30,6 +30,7 @@ export interface ComposerMediaItem {
 
 type SnapState = {
   isComposerOpen: boolean;
+  mode: 'create' | 'edit';  // NEW - track if creating new or editing existing
   mediaItems: ComposerMediaItem[];  // NEW - replaces selectedFile
   caption: string;
   selectedCourse: GolfCourse | null;
@@ -54,6 +55,7 @@ export const useSnapModal = () => {
   const captionInputRef = useRef<HTMLDivElement>(null);
   const { setCreateMomentModalOpen } = useModalContext();
   const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const [mode, setMode] = useState<'create' | 'edit'>('create');
   
   // New multi-media state
   const [mediaItems, setMediaItems] = useState<ComposerMediaItem[]>([]);
@@ -81,8 +83,11 @@ export const useSnapModal = () => {
   };
 
   // NEW: Multi-file opener
-  const openComposerWithFiles = async (files: File[]): Promise<void> => {
-    console.log('[composer] received files:', files?.length);
+  const openComposerWithFiles = async (files: File[], composerMode: 'create' | 'edit' = 'create'): Promise<void> => {
+    console.log('[composer] received files:', files?.length, 'mode:', composerMode);
+    
+    // Set mode first
+    setMode(composerMode);
 
     // Clean previous state
     cleanupPreviousMedia();
@@ -190,6 +195,7 @@ export const useSnapModal = () => {
     // Core state
     captionInputRef,
     isComposerOpen,
+    mode,
     mediaItems,
     setMediaItems,
     caption,
