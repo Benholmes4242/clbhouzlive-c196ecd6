@@ -28,6 +28,12 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
     const filterId = mediaItem.filter_id || (mediaItem.studio_edits as any)?.filter;
     const filterClass = getFilterClass(filterId);
     
+    console.log('[Feed] slide filter', {
+      postMediaId: mediaItem.id,
+      filterId,
+      filterClass,
+    });
+    
     return (
       <div key={mediaItem.id} className="w-full aspect-square relative">
         {/* Golf Course Badge overlay on each media item */}
