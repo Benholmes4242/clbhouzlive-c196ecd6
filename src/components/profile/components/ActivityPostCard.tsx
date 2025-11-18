@@ -10,6 +10,8 @@ import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem } from '@/types/media';
+import { getFilterClass } from '@/utils/studioFilters';
+import { cn } from '@/lib/utils';
 
 interface ActivityPostCardProps {
   post: ActivityPost;
@@ -46,6 +48,10 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
   const hasMultipleMedia = hasMedia && post.post_media.length > 1;
   const currentMedia = hasMedia ? post.post_media[currentMediaIndex] : null;
   const isVideo = currentMedia?.media_type === 'video';
+  
+  // Derive filter class from DB field or legacy studio_edits
+  const filterId = (currentMedia as any)?.filter_id || (currentMedia as any)?.studio_edits?.filter;
+  const filterClass = getFilterClass(filterId as any);
   
   // Debug logging removed for performance
   
