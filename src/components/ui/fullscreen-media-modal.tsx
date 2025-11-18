@@ -19,6 +19,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { getFilterClass } from '@/utils/studioFilters';
+import { cn } from '@/lib/utils';
 
 interface FullscreenMediaModalProps {
   isOpen: boolean;
@@ -55,6 +57,8 @@ interface FullscreenMediaModalProps {
   postId?: string;
   onPostDeleted?: () => void;
   onPostEdit?: (postId: string) => void;
+  // Filter data
+  filterIds?: (string | null)[];
 }
 
 // Helper function to check if element is in viewport
@@ -91,7 +95,8 @@ const FullscreenMediaModal = ({
   initialVideoMuted = true,
   postId,
   onPostDeleted,
-  onPostEdit
+  onPostEdit,
+  filterIds
 }: FullscreenMediaModalProps) => {
   // Convert single media to array format for consistent handling
   const mediaUrls = Array.isArray(mediaUrl) ? mediaUrl : [mediaUrl];
@@ -101,6 +106,10 @@ const FullscreenMediaModal = ({
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isMuted, setIsMuted] = useState(initialVideoMuted);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  // Get filter class for current media
+  const currentFilterId = filterIds?.[currentIndex] || null;
+  const filterClass = getFilterClass(currentFilterId);
   const videoRef = useRef<HTMLVideoElement>(null); // Keep for compatibility but EnhancedVideoPlayer manages its own video
   const isMobile = useIsMobile();
   const { isTextExpanded, handleMouseEnter, handleMouseLeave } = useTextExpansion();
@@ -454,7 +463,7 @@ const FullscreenMediaModal = ({
               <img
                 src={mediaUrls[currentIndex]}
                 alt={alt}
-                className="w-full h-full object-contain"
+                className={cn("w-full h-full object-contain", filterClass)}
                 draggable={false}
                 loading="eager"
               />
@@ -464,7 +473,7 @@ const FullscreenMediaModal = ({
               <EnhancedVideoPlayer
                 key={`fullscreen-video-${currentIndex}-${mediaUrls[currentIndex]}`}
                 src={mediaUrls[currentIndex]}
-                className="w-full h-full"
+                className={cn("w-full h-full", filterClass)}
                 muted={isMuted}
                 loop={true}
                 autoplay={true}
