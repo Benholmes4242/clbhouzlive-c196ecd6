@@ -2183,6 +2183,7 @@ export type Database = {
         Row: {
           aspect_ratio: number | null
           created_at: string
+          display_order: number | null
           duration_ms: number | null
           duration_seconds: number | null
           exif: Json | null
@@ -2203,6 +2204,7 @@ export type Database = {
         Insert: {
           aspect_ratio?: number | null
           created_at?: string
+          display_order?: number | null
           duration_ms?: number | null
           duration_seconds?: number | null
           exif?: Json | null
@@ -2223,6 +2225,7 @@ export type Database = {
         Update: {
           aspect_ratio?: number | null
           created_at?: string
+          display_order?: number | null
           duration_ms?: number | null
           duration_seconds?: number | null
           exif?: Json | null
