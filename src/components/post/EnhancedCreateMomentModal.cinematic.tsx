@@ -748,7 +748,7 @@ export default function EnhancedCreateMomentModalCinematic({
                 <div 
                   className="composer-scroll flex h-full flex-col px-4 pt-4 gap-4 overflow-auto"
                   style={{ 
-                    paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
+                    paddingBottom: '12px',
                     maxHeight: 'var(--composer-height)',
                     overscrollBehavior: 'contain',
                     WebkitOverflowScrolling: 'touch',
