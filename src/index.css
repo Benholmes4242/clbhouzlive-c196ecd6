@@ -234,12 +234,12 @@ html, body, #root {
   --bg-glass: rgba(0,0,0,0.6);
   --bg-card-border: rgba(255,255,255,0.12);
 
-  /* Accent - Phase 1: Brand accent #6E9277 */
-  --accent-primary: #6E9277;
-  --primary-accent: #6E9277;
-  --accent-clbhouz: #6E9277;
-  --accent-green: #6E9277;
-  --accent-green-bg: #6E9277;
+  /* Accent - Phase 1: Brand accent - Orange logo color */
+  --accent-primary: #FF6B35;
+  --primary-accent: #FF6B35;
+  --accent-clbhouz: #FF6B35;
+  --accent-green: #FF6B35;
+  --accent-green-bg: #FF6B35;
   --accent-green-text: #ffffff;
   
   /* Frosted white accents */
