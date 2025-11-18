@@ -142,10 +142,10 @@ const CourseTagInput = ({
                     <span className="text-lg" role="img" aria-label="golf">⛳</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm leading-5 truncate">
+                    <div className="font-medium text-sm leading-5 truncate text-white">
                       {course.name}
                     </div>
-                    <div className="text-xs opacity-70 mt-0.5">
+                    <div className="text-xs mt-0.5 text-white/70">
                       {course.region ? `${course.region}, ${course.country}` : course.country}
                     </div>
                   </div>

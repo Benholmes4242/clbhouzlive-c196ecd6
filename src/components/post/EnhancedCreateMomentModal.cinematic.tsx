@@ -585,7 +585,14 @@ export default function EnhancedCreateMomentModalCinematic({
                             type="button"
                             onClick={handlePickFromCamera}
                             aria-label="Open Camera"
-                            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 bg-white/80 text-zinc-900 font-medium backdrop-blur-md border border-white/40"
+                            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 font-medium"
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.08)',
+                              backdropFilter: 'blur(12px) saturate(150%)',
+                              WebkitBackdropFilter: 'blur(12px) saturate(150%)',
+                              border: '1px solid rgba(255, 255, 255, 0.15)',
+                              color: 'rgba(255, 255, 255, 0.96)'
+                            }}
                           >
                             <Camera className="w-5 h-5" />
                             <span className="font-medium">Camera</span>
@@ -595,7 +602,14 @@ export default function EnhancedCreateMomentModalCinematic({
                             type="button"
                             onClick={handlePickFromLibrary}
                             aria-label="Choose Photos and Videos"
-                            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 bg-white/80 text-zinc-900 font-medium backdrop-blur-md border border-white/40"
+                            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 font-medium"
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.08)',
+                              backdropFilter: 'blur(12px) saturate(150%)',
+                              WebkitBackdropFilter: 'blur(12px) saturate(150%)',
+                              border: '1px solid rgba(255, 255, 255, 0.15)',
+                              color: 'rgba(255, 255, 255, 0.96)'
+                            }}
                           >
                             <Sparkles className="w-5 h-5" />
                             <span className="font-medium">Photos &amp; Videos</span>
@@ -789,7 +803,14 @@ export default function EnhancedCreateMomentModalCinematic({
                   <button
                     disabled={!canPost}
                     onClick={handlePost}
-                    className="w-full h-12 rounded-2xl shadow-sm font-semibold transition-all duration-200 active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 bg-white/80 text-zinc-900 backdrop-blur-md border border-white/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full h-12 rounded-2xl shadow-sm font-semibold transition-all duration-200 active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      backdropFilter: 'blur(12px) saturate(150%)',
+                      WebkitBackdropFilter: 'blur(12px) saturate(150%)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      color: 'rgba(255, 255, 255, 0.96)'
+                    }}
                     aria-label="Post your moment"
                   >
                     {isSubmitting ? "Sharing..." : "Share"}
