@@ -194,6 +194,11 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           };
         });
 
+        // Extract filter IDs for FullscreenMediaModal
+        const filterIds = (selectedPost.post_media || []).map(media => 
+          media.filter_id || (media.studio_edits as any)?.filter || null
+        );
+
         console.log('🚨 SOCIAL ACTIVITY MODAL RENDERING!', {
           postId: selectedPost.id,
           mediaCount: mediaItems.length,
@@ -207,6 +212,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
             onClose={() => setSelectedPost(null)}
             mediaUrl={mediaItems.map(m => m.url)}
             mediaType={mediaItems.map(m => m.type)}
+            filterIds={filterIds}
             initialIndex={0}
             alt={`Post media`}
             golfCourse={(() => {

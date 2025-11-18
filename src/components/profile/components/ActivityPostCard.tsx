@@ -76,7 +76,7 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
                 autoplay={true}
                 muted={true}
                 loop={true}
-                className="w-full h-full"
+                className={cn("w-full h-full", filterClass)}
                 enableHLS={currentMedia.media_url.includes('cloudflarestream.com') || currentMedia.media_url.includes('.m3u8')}
                 onClick={handleClick}
               />
@@ -105,7 +105,7 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
             <img
               src={currentMedia.media_url}
               alt="Post media"
-              className="w-full h-full object-cover"
+              className={cn("w-full h-full object-cover", filterClass)}
               onError={(e) => {
                 console.log('Image failed to load:', currentMedia.media_url);
               }}
