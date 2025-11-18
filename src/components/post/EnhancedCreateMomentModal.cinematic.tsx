@@ -164,18 +164,6 @@ export default function EnhancedCreateMomentModalCinematic({
       document.body.classList.remove('ecm-open');
     };
   }, [isOpen]);
-
-  // Clear studio edits when modal closes
-  useEffect(() => {
-    if (!isOpen && mediaItems && mediaItems.length > 0) {
-      // Clear studio edits for all media items
-      mediaItems.forEach(item => {
-        if (hasEdits(item.id)) {
-          clearEdits(item.id);
-        }
-      });
-    }
-  }, [isOpen, mediaItems, hasEdits, clearEdits]);
   
   console.log('🔍 EnhancedCreateMomentModal state:', { isOpen, hasDataImmersive: document.documentElement.hasAttribute('data-immersive') });
 
@@ -205,6 +193,31 @@ export default function EnhancedCreateMomentModalCinematic({
     visibility: snapVisibility,
     setVisibility: setSnapVisibility
   } = useSnapModal();
+
+  // Reset state when modal opens for a NEW post (defensive reset on open)
+  useEffect(() => {
+    if (isOpen && mediaItems.length === 0) {
+      // Modal opened with no media - reset all transient state
+      setCaption('');
+      if (onCourseSelect) {
+        onCourseSelect(null);
+      }
+      setSelectedCourse(null);
+      setSnapVisibility('public');
+    }
+  }, [isOpen, mediaItems.length, setCaption, setSelectedCourse, onCourseSelect, setSnapVisibility]);
+
+  // Clear studio edits when modal closes
+  useEffect(() => {
+    if (!isOpen && mediaItems && mediaItems.length > 0) {
+      // Clear studio edits for all media items
+      mediaItems.forEach(item => {
+        if (hasEdits(item.id)) {
+          clearEdits(item.id);
+        }
+      });
+    }
+  }, [isOpen, mediaItems, hasEdits, clearEdits]);
 
   // Use the media items from props
   const course = selectedCourse || snapCourse;
