@@ -40,7 +40,6 @@ import { ToastHost } from '@/components/toast/ToastHost';
 import { AchievementToastContainer } from '@/components/achievements/AchievementToastContainer';
 import { LevelUpToastContainer } from '@/components/achievements/LevelUpToastContainer';
 import { useAchievementSharing } from '@/hooks/useAchievementSharing';
-import { PostSanityDevPanel } from '@/components/dev/PostSanityDevPanel';
 
 
 
@@ -448,7 +447,6 @@ const App: React.FC = () => {
                     <Toaster />
                     <Sonner />
                     <GlobalBottomNavigation />
-                    <PostSanityDevPanel />
                   </HubProvider>
                 </BrowserRouter>
               </ToastHost>
