@@ -33,23 +33,13 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
   
   const showSkeleton = useCappedLoading(loaded, 600);
   const filterClass = getFilterClass(item.filterId);
-  
+
   console.log('[CarouselSlide] filter mapping', {
     id: item.id,
     type: item.type,
     filterId: item.filterId,
     filterClass,
   });
-
-  // TEMP: inline filter to verify behaviour
-  const testStyle =
-    item.filterId === 'bw'
-      ? { filter: 'grayscale(1) contrast(1.2)' }
-      : item.filterId === 'vivid'
-      ? { filter: 'contrast(1.15) saturate(1.25)' }
-      : item.filterId === 'dramatic'
-      ? { filter: 'contrast(1.25) saturate(1.05) brightness(0.95)' }
-      : undefined;
   
   const longPressProps = useLongPress(() => {
     onSetCover?.(index);
@@ -140,7 +130,6 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
             loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
             filterClass
           )}
-          style={testStyle}
         />
 
         {/* Play overlay */}
@@ -176,7 +165,6 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
           loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
           filterClass
         )}
-        style={testStyle}
         draggable={false}
       />
     </div>

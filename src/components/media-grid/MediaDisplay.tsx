@@ -9,6 +9,7 @@ import HighQualityImage from '@/components/ui/high-quality-image';
 import SmartCardMedia from '@/components/explore/media/SmartCardMedia';
 import { CardType } from '@/components/explore/media/CardMediaTypes';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { getFilterClass } from '@/utils/studioFilters';
 
 import { MediaItem } from '@/types/media';
 
@@ -110,6 +111,9 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
     setMediaLoaded(true);
     onImageErrorRef.current();
   }, []); // No dependencies to prevent re-creation
+  
+  // Apply filter class from database
+  const filterClass = getFilterClass((media as any).filter_id);
 
   // ✅ Now safe to use conditional rendering - all hooks are called above
   // Use smart media logic if enabled
@@ -201,7 +205,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           </div>
         )
       ) : (
-        <div className="relative w-full h-full">
+        <div className={`relative w-full h-full ${filterClass}`}>
            <HighQualityImage
              src={isInvalidSrc ? fallbackImage : (media.media_type === 'video' ? (thumbnailUrl || fallbackImage) : media.media_url)}
              alt={itemTitle || 'Content'}
