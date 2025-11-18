@@ -628,10 +628,10 @@ export default function EnhancedCreateMomentModalCinematic({
                             aria-label="Open Camera"
                             className="inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 font-medium"
                             style={{
-                              background: 'rgba(255, 255, 255, 0.08)',
+                              background: 'rgba(255, 255, 255, 0.18)',
                               backdropFilter: 'blur(12px) saturate(150%)',
                               WebkitBackdropFilter: 'blur(12px) saturate(150%)',
-                              border: '1px solid rgba(255, 255, 255, 0.15)',
+                              border: '1px solid rgba(255, 255, 255, 0.28)',
                               color: 'rgba(255, 255, 255, 0.96)'
                             }}
                           >
@@ -645,10 +645,10 @@ export default function EnhancedCreateMomentModalCinematic({
                             aria-label="Choose Photos and Videos"
                             className="inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 font-medium"
                             style={{
-                              background: 'rgba(255, 255, 255, 0.08)',
+                              background: 'rgba(255, 255, 255, 0.18)',
                               backdropFilter: 'blur(12px) saturate(150%)',
                               WebkitBackdropFilter: 'blur(12px) saturate(150%)',
-                              border: '1px solid rgba(255, 255, 255, 0.15)',
+                              border: '1px solid rgba(255, 255, 255, 0.28)',
                               color: 'rgba(255, 255, 255, 0.96)'
                             }}
                           >
@@ -825,10 +825,10 @@ export default function EnhancedCreateMomentModalCinematic({
                     onClick={handlePost}
                     className="w-full h-12 rounded-2xl shadow-sm font-semibold transition-all duration-200 active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.08)',
+                      background: 'rgba(255, 255, 255, 0.18)',
                       backdropFilter: 'blur(12px) saturate(150%)',
                       WebkitBackdropFilter: 'blur(12px) saturate(150%)',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      border: '1px solid rgba(255, 255, 255, 0.28)',
                       color: 'rgba(255, 255, 255, 0.96)'
                     }}
                     aria-label="Post your moment"
