@@ -116,7 +116,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
         data-chrome="header"
         style={{ 
           '--header-h-mobile': '60px',
-          background: isDarkContext ? 'rgba(10, 10, 10, 0.6)' : 'var(--surface-header)',
+          background: isDarkContext ? 'rgba(10, 10, 10, 0.6)' : 'var(--surface-slate)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           borderBottom: isDarkContext ? 'none' : '1px solid var(--border-subtle)',
