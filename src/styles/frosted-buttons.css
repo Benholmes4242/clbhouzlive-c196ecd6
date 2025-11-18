@@ -65,12 +65,3 @@
     animation: none !important;
   }
 }
-
-/* Frosted Pearl Buttons */
-.frosted-pearl {
-  background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.35) inset;
-}
