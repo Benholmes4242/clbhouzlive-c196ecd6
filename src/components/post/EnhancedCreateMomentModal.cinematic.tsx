@@ -563,8 +563,8 @@ export default function EnhancedCreateMomentModalCinematic({
         onTouchEnd={handleSheetTouchEnd}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Grabber bar - matching Hub page */}
-        <div className="hub-grabber" />
+        {/* Grabber bar - matching Hub page, hidden when media present */}
+        {!hasMedia && <div className="hub-grabber" />}
 
               {/* MEDIA STAGE - full-bleed, top-anchored */}
               <section
@@ -746,8 +746,8 @@ export default function EnhancedCreateMomentModalCinematic({
                 }}
               >
                 <div 
-                  className="composer-scroll flex h-full flex-col px-4 pt-4 gap-4 overflow-auto"
-                  style={{ 
+                  className={`composer-scroll flex h-full flex-col px-4 gap-4 overflow-auto ${hasMedia ? '' : 'pt-4'}`}
+                  style={{
                     paddingBottom: '12px',
                     maxHeight: 'var(--composer-height)',
                     overscrollBehavior: 'contain',
@@ -819,8 +819,8 @@ export default function EnhancedCreateMomentModalCinematic({
                     </button>
                   </div>
 
-                  {/* Visibility status line */}
-                  {hasMedia && (
+                  {/* Visibility status line - hidden when media present */}
+                  {!hasMedia && (
                     <div className="flex items-center justify-center gap-2 text-xs text-white/70">
                       <span>Sharing to: Clubhouse</span>
                       <span>·</span>
