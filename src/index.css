@@ -310,7 +310,7 @@ html, body, #root {
   --bottom-nav-height: 64px;
   
   /* Create Moment composer tokens */
-  --composer-height: 390px;
+  --composer-height: 440px;
 }
 
 /* Sheet animations */
@@ -431,7 +431,7 @@ html, body, #root {
 
 @media (min-width: 768px) {
   :root {
-    --composer-height: 460px;
+    --composer-height: 510px;
   }
 }
 
