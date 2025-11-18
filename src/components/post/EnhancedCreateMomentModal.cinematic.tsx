@@ -542,7 +542,7 @@ export default function EnhancedCreateMomentModalCinematic({
         role="dialog"
         aria-modal="true"
         aria-label="Create a Moment"
-        className="ecm-glass-sheet fixed inset-0 flex flex-col"
+        className="ecm-glass-sheet fixed inset-0"
         style={{
           background: 'rgba(0, 0, 0, 0.28)',
           backdropFilter: 'blur(22px)',
@@ -566,12 +566,13 @@ export default function EnhancedCreateMomentModalCinematic({
         {/* Grabber bar - matching Hub page */}
         <div className="hub-grabber" />
 
-              {/* MEDIA STAGE - constrained height for better scroll behavior */}
+              {/* MEDIA STAGE - full-bleed, top-anchored */}
               <section
                 id="media" 
-                className="flex-shrink-0 w-full max-h-[42vh] sm:max-h-[50vh] overflow-hidden z-[1002] relative"
+                className="absolute inset-x-0 overflow-hidden z-[1002]"
                 style={{ 
-                  marginTop: 'env(safe-area-inset-top, 0px)',
+                  top: 'env(safe-area-inset-top, 0px)',
+                  bottom: 'var(--composer-height)'
                 }}
               >
                 {/* Top scrim for badge readability */}
@@ -733,34 +734,35 @@ export default function EnhancedCreateMomentModalCinematic({
 
               </section>
 
-              {/* Subtle divider between media and meta */}
-              <div className="h-px w-full bg-white/5 flex-shrink-0" />
-
-              {/* COMPOSER PANEL - flex-1 with internal scroll, Share always visible */}
+              {/* COMPOSER PANEL - fixed height, bottom-anchored with glass effect */}
               <section 
-                className="composer flex-1 flex flex-col justify-between z-[1003]"
+                className="composer absolute bottom-0 left-0 right-0 z-[1003] rounded-t-none border-t border-white/35"
                 style={{ 
+                  height: 'var(--composer-height)',
                   background: 'var(--ecm-glass)',
                   backdropFilter: 'blur(var(--ecm-blur))',
                   WebkitBackdropFilter: 'blur(var(--ecm-blur))',
+                  boxShadow: '0 -1px 0 0 rgba(255,255,255,0.35), 0 10px 40px rgba(0,0,0,0.15)'
                 }}
               >
                 <div 
-                  className="composer-scroll flex-1 flex flex-col px-4 pt-4 gap-3 overflow-y-auto"
+                  className="composer-scroll flex h-full flex-col px-4 pt-4 gap-4 overflow-auto"
                   style={{ 
+                    paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
+                    maxHeight: 'var(--composer-height)',
                     overscrollBehavior: 'contain',
                     WebkitOverflowScrolling: 'touch',
                     touchAction: 'pan-y'
                   }}
                 >
-                  {/* Unified Details Section - Consistent spacing */}
-                  <div className="flex flex-col gap-3">
+                  {/* Unified Details Section - No tabs, everything visible */}
+                  <div className="flex flex-col gap-4 flex-1">
                     {/* Caption Section */}
-                    <div className="flex flex-col gap-2">
-                      <label className="block text-sm font-semibold text-white">Add a caption</label>
+                    <div className="flex flex-col">
+                      <label className="block text-base font-semibold text-white mb-3">Add a caption</label>
                       
                       <textarea
-                        className="caption-input w-full rounded-xl px-4 py-3 text-[15px] leading-snug resize-none text-white placeholder:text-white/50 focus:outline-none transition-all duration-200 min-h-[80px]"
+                        className="caption-input w-full rounded-xl px-4 py-3 text-[15px] leading-snug resize-none text-white placeholder:text-white/50 focus:outline-none transition-all duration-200 min-h-[100px]"
                         style={{
                           background: 'rgba(255, 255, 255, 0.06)',
                           backdropFilter: 'blur(10px)',
@@ -774,9 +776,8 @@ export default function EnhancedCreateMomentModalCinematic({
                       />
                     </div>
 
-                    {/* Golf Club Selection */}
-                    <div className="flex flex-col gap-2">
-                      <label className="block text-sm font-semibold text-white">Select a golf club</label>
+                    {/* Course Tagging Section */}
+                    <div className="flex flex-col">
                       <CourseTagInput
                         onCourseSelect={onCourseSelect}
                         selectedCourse={course}
@@ -839,29 +840,22 @@ export default function EnhancedCreateMomentModalCinematic({
                     </div>
                   )}
 
-                  {/* Primary Share button - pinned to bottom */}
-                  <div 
-                    className="pt-4 px-4"
-                    style={{ 
-                      paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
+                  {/* Primary Share button */}
+                  <button
+                    disabled={!canPost}
+                    onClick={handlePost}
+                    className="w-full h-12 rounded-2xl shadow-sm font-semibold transition-all duration-200 active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      backdropFilter: 'blur(12px) saturate(150%)',
+                      WebkitBackdropFilter: 'blur(12px) saturate(150%)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      color: 'rgba(255, 255, 255, 0.96)'
                     }}
+                    aria-label="Post your moment"
                   >
-                    <button
-                      disabled={!canPost}
-                      onClick={handlePost}
-                      className="w-full h-12 rounded-2xl shadow-md hover:shadow-lg active:shadow-lg font-semibold transition-all duration-200 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.08)',
-                        backdropFilter: 'blur(12px) saturate(150%)',
-                        WebkitBackdropFilter: 'blur(12px) saturate(150%)',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        color: 'rgba(255, 255, 255, 0.96)'
-                      }}
-                      aria-label="Post your moment"
-                    >
-                      {isSubmitting ? "Sharing..." : "Share"}
-                    </button>
-                  </div>
+                    {isSubmitting ? "Sharing..." : "Share"}
+                  </button>
                 </div>
               </section>
 
