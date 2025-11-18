@@ -10,6 +10,7 @@ import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/comp
 import Top100Pills from './Top100Pills';
 import { useCourseTop100Memberships } from '@/hooks/useCourseTop100Memberships';
 import CountryFlag from '@/components/ui/country-flag';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface Course {
   id: string;
@@ -51,6 +52,20 @@ interface CourseCardProps {
   currentUserId?: string;
   profileOwnerFirstName?: string;
   badgesOnTop?: boolean;
+  
+  // New context-aware props for unified card design
+  contextTag?: string;
+  secondaryText?: string;
+  showRankBadge?: boolean;
+  friendsMeta?: {
+    count: number;
+    avatars: Array<{
+      id: string;
+      initials: string;
+      profile_photo_url?: string | null;
+    }>;
+  };
+  onClick?: () => void;
 }
 
 
@@ -75,7 +90,12 @@ const CourseCard: React.FC<CourseCardProps> = ({
   showRatingOnRight = false,
   currentUserId,
   profileOwnerFirstName,
-  badgesOnTop = false
+  badgesOnTop = false,
+  contextTag,
+  secondaryText,
+  showRankBadge,
+  friendsMeta,
+  onClick
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -91,6 +111,11 @@ const CourseCard: React.FC<CourseCardProps> = ({
   const { data: top100Memberships = [] } = useCourseTop100Memberships(course.id);
 
   const handleCardClick = useCallback(() => {
+    if (onClick) {
+      onClick();
+      return;
+    }
+    
     if (!disableClick) {
       if (isProfilePage) {
         // On profile pages, open in modal
@@ -101,7 +126,81 @@ const CourseCard: React.FC<CourseCardProps> = ({
         navigate(`/courses/${course.id}`);
       }
     }
-  }, [disableClick, navigate, course.id, isProfilePage, openCourseModal, isFromUserCoursesPage]);
+  }, [onClick, disableClick, navigate, course.id, isProfilePage, openCourseModal, isFromUserCoursesPage]);
+
+  // Compact list card mode (for Explore, Top 100, Friends' Courses)
+  const isCompactMode = contextTag !== undefined || friendsMeta !== undefined;
+  
+  if (isCompactMode) {
+    return (
+      <div
+        className="rounded-xl border border-border/70 bg-card/80 hover:bg-card transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-[1px] p-4 space-y-3 cursor-pointer"
+        onClick={handleCardClick}
+      >
+        {/* Top row */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+            <div className="text-sm font-semibold truncate">
+              {course.name}
+            </div>
+            <div className="text-xs text-muted-foreground truncate">
+              {course.sub_country || course.country || 'Location unknown'}
+            </div>
+            {secondaryText && (
+              <div className="text-xs text-muted-foreground/80 mt-0.5">
+                {secondaryText}
+              </div>
+            )}
+          </div>
+          
+          <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+            {showRankBadge && course.global_rank && (
+              <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary border border-primary/20 whitespace-nowrap">
+                #{course.global_rank}
+              </span>
+            )}
+            {contextTag && (
+              <span className="inline-flex items-center rounded-full bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-muted-foreground whitespace-nowrap">
+                {contextTag}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Bottom row: friends avatars */}
+        {friendsMeta && friendsMeta.count > 0 && (
+          <div className="flex items-center justify-between gap-2 pt-1">
+            <div className="flex -space-x-2">
+              {friendsMeta.avatars.slice(0, 3).map((friend) => (
+                <Avatar
+                  key={friend.id}
+                  className="h-6 w-6 border border-background"
+                >
+                  {friend.profile_photo_url ? (
+                    <AvatarImage src={friend.profile_photo_url} alt={friend.initials} />
+                  ) : (
+                    <AvatarFallback className="text-[10px]">
+                      {friend.initials}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+              ))}
+              {friendsMeta.count > 3 && (
+                <div className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-muted/80 text-[10px] text-muted-foreground">
+                  +{friendsMeta.count - 3}
+                </div>
+              )}
+            </div>
+            <div className="text-[11px] text-muted-foreground">
+              Played by {friendsMeta.count} friend{friendsMeta.count !== 1 ? 's' : ''}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Original complex card rendering
 
   return (
     <>

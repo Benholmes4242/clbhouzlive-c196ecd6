@@ -211,14 +211,16 @@ const GlobalTop100 = () => {
       ) : (
         <div>
           <div className="text-xs text-muted-foreground mb-3">
-            Showing {courses.length} course{courses.length !== 1 ? 's' : ''}
+            Viewing: {listOptions.find((opt) => opt.value === selectedList)?.label || 'Top 100'}
+            {listWasAuto && ' • Suggested for you'}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {courses.map((course) => (
               <CourseCard 
                 key={course.id} 
                 course={course}
-                showCountryWithFlag={true}
+                contextTag={listOptions.find((opt) => opt.value === selectedList)?.label || 'Top 100'}
+                showRankBadge={!!course.global_rank}
               />
             ))}
           </div>

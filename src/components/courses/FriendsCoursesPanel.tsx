@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import CourseCard from './CourseCard';
 
 const FriendsCoursesPanel: React.FC = () => {
   const { user } = useSupabaseSession();
@@ -137,66 +138,39 @@ const FriendsCoursesPanel: React.FC = () => {
 
           <div className="space-y-3">
             {courses.map((course) => {
-              const topFriends = course.friends.slice(0, 3);
-              const extraCount = course.friends.length - topFriends.length;
+              const uniqueFriends = course.friends;
+              const friendsMeta = {
+                count: uniqueFriends.length,
+                avatars: uniqueFriends.slice(0, 3).map((hit) => {
+                  const name =
+                    hit.friend_profile.display_name ||
+                    hit.friend_profile.username ||
+                    '?';
+                  const initials = name.charAt(0).toUpperCase();
+
+                  return {
+                    id: hit.friend_profile.id,
+                    initials,
+                    profile_photo_url: hit.friend_profile.profile_photo_url,
+                  };
+                }),
+              };
 
               return (
-                <button
+                <CourseCard
                   key={course.course_id}
+                  course={{
+                    id: course.course_id,
+                    name: course.course_name,
+                    country: course.country || '',
+                    sub_country: course.sub_country,
+                    global_rank: course.global_rank,
+                  }}
                   onClick={() => navigate(`/courses/${course.course_id}`)}
-                  className="w-full text-left rounded-xl border border-border/60 bg-card/70 hover:bg-card transition-colors px-3.5 py-3 flex flex-col gap-2"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="text-sm font-medium truncate">
-                        {course.course_name}
-                      </div>
-                      <div className="text-xs text-muted-foreground truncate">
-                        {course.sub_country || course.country || 'Location'}
-                      </div>
-                    </div>
-                    <Badge variant="secondary" className="text-[11px] px-2 py-0">
-                      Played by {course.total_friends_played}{' '}
-                      friend{course.total_friends_played !== 1 ? 's' : ''}
-                    </Badge>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex -space-x-2">
-                      {topFriends.map((hit) => (
-                        <Avatar
-                          key={hit.friend_id}
-                          className="h-7 w-7 border border-background"
-                        >
-                          <AvatarImage
-                            src={hit.friend_profile.profile_photo_url || ''}
-                            alt={hit.friend_profile.display_name || ''}
-                          />
-                          <AvatarFallback className="text-[11px]">
-                            {(
-                              hit.friend_profile.display_name ||
-                              hit.friend_profile.username ||
-                              '?'
-                            )
-                              .charAt(0)
-                              .toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                      ))}
-                      {extraCount > 0 && (
-                        <div className="h-7 w-7 rounded-full border border-border bg-muted flex items-center justify-center text-[11px] text-muted-foreground">
-                          +{extraCount}
-                        </div>
-                      )}
-                    </div>
-                    <span className="text-[11px] text-muted-foreground">
-                      Last played{' '}
-                      {formatDistanceToNow(new Date(course.most_recent_play), {
-                        addSuffix: true,
-                      })}
-                    </span>
-                  </div>
-                </button>
+                  contextTag="Hot in your network"
+                  friendsMeta={friendsMeta}
+                  showRankBadge={!!course.global_rank}
+                />
               );
             })}
           </div>
