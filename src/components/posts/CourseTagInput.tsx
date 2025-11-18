@@ -120,7 +120,7 @@ const CourseTagInput = ({
               onChange={handleInputChange}
               onFocus={handleInputFocus}
               onBlur={handleInputBlur}
-              placeholder="Search golf club..."
+              placeholder="Tag a golf club..."
             />
             {isLoading && searchQuery.length >= 2 && (
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
