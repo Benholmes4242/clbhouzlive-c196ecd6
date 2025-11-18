@@ -626,14 +626,7 @@ export default function EnhancedCreateMomentModalCinematic({
                             type="button"
                             onClick={handlePickFromCamera}
                             aria-label="Open Camera"
-                            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 font-medium"
-                            style={{
-                              background: 'rgba(255, 255, 255, 0.08)',
-                              backdropFilter: 'blur(12px) saturate(150%)',
-                              WebkitBackdropFilter: 'blur(12px) saturate(150%)',
-                              border: '1px solid rgba(255, 255, 255, 0.15)',
-                              color: 'rgba(255, 255, 255, 0.96)'
-                            }}
+                            className="frosted-pearl inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 font-medium text-[#111]"
                           >
                             <Camera className="w-5 h-5" />
                             <span className="font-medium">Camera</span>
@@ -643,14 +636,7 @@ export default function EnhancedCreateMomentModalCinematic({
                             type="button"
                             onClick={handlePickFromLibrary}
                             aria-label="Choose Photos and Videos"
-                            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 font-medium"
-                            style={{
-                              background: 'rgba(255, 255, 255, 0.08)',
-                              backdropFilter: 'blur(12px) saturate(150%)',
-                              WebkitBackdropFilter: 'blur(12px) saturate(150%)',
-                              border: '1px solid rgba(255, 255, 255, 0.15)',
-                              color: 'rgba(255, 255, 255, 0.96)'
-                            }}
+                            className="frosted-pearl inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 font-medium text-[#111]"
                           >
                             <Sparkles className="w-5 h-5" />
                             <span className="font-medium">Photos &amp; Videos</span>
@@ -762,13 +748,7 @@ export default function EnhancedCreateMomentModalCinematic({
                       <label className="block text-base font-semibold text-white mb-3">Add a caption</label>
                       
                       <textarea
-                        className="caption-input w-full rounded-xl px-4 py-3 text-[15px] leading-snug resize-none text-white placeholder:text-white/50 focus:outline-none transition-all duration-200 min-h-[100px]"
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.06)',
-                          backdropFilter: 'blur(10px)',
-                          WebkitBackdropFilter: 'blur(10px)',
-                          border: '1px solid rgba(255, 255, 255, 0.08)'
-                        }}
+                        className="frosted-pearl caption-input w-full rounded-2xl px-4 py-3 text-[15px] leading-snug resize-none text-white placeholder:text-white/60 focus:outline-none transition-all duration-200 min-h-[100px]"
                         placeholder="Write a caption..."
                         value={caption}
                         onChange={(e) => setCaption(e.target.value)}
@@ -777,7 +757,7 @@ export default function EnhancedCreateMomentModalCinematic({
                     </div>
 
                     {/* Course Tagging Section */}
-                    <div className="flex flex-col">
+                    <div className="flex flex-col frosted-pearl rounded-2xl px-4 py-3">
                       <CourseTagInput
                         onCourseSelect={onCourseSelect}
                         selectedCourse={course}
@@ -791,20 +771,12 @@ export default function EnhancedCreateMomentModalCinematic({
                     <button
                       onClick={openStudio}
                       disabled={media.length === 0}
-                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200"
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.06)',
-                        backdropFilter: 'blur(10px)',
-                        WebkitBackdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        opacity: media.length === 0 ? 0.5 : 1,
-                        cursor: media.length === 0 ? 'not-allowed' : 'pointer'
-                      }}
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-200 bg-[#ffa4fd]/10 border border-[#ffa4fd]/20 hover:bg-[#ffa4fd]/15 disabled:opacity-50 disabled:cursor-not-allowed"
                       title={media.length === 0 ? 'Add media to open Studio' : 'Open Studio to edit your media'}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                          <Sparkles className="w-5 h-5 text-white" />
+                        <div className="w-9 h-9 rounded-full bg-[#ffa4fd] flex items-center justify-center">
+                          <Sparkles className="w-5 h-5 text-black" />
                         </div>
                         <div className="text-left">
                           <div className="text-sm font-semibold text-white">
@@ -823,14 +795,9 @@ export default function EnhancedCreateMomentModalCinematic({
                   <button
                     disabled={!canPost}
                     onClick={handlePost}
-                    className="w-full h-12 rounded-2xl shadow-sm font-semibold transition-all duration-200 active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.08)',
-                      backdropFilter: 'blur(12px) saturate(150%)',
-                      WebkitBackdropFilter: 'blur(12px) saturate(150%)',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
-                      color: 'rgba(255, 255, 255, 0.96)'
-                    }}
+                    className={`w-full h-12 rounded-2xl shadow-sm font-semibold transition-all duration-200 active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 ${
+                      canPost ? 'frosted-pearl text-[#111]' : 'bg-white/5 border border-white/5 text-white/40 cursor-not-allowed opacity-50'
+                    }`}
                     aria-label="Post your moment"
                   >
                     {isSubmitting ? "Sharing..." : "Share"}
