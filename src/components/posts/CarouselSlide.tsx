@@ -41,6 +41,16 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
     filterClass,
   });
   
+  // Hardcoded inline style test to prove filters work
+  const testStyle = 
+    item.filterId === 'bw' 
+      ? { filter: 'grayscale(1) contrast(1.2)' }
+      : item.filterId === 'vivid'
+      ? { filter: 'contrast(1.15) saturate(1.25)' }
+      : item.filterId === 'dramatic'
+      ? { filter: 'contrast(1.25) saturate(1.05) brightness(0.95)' }
+      : undefined;
+  
   const longPressProps = useLongPress(() => {
     onSetCover?.(index);
     toast({ description: 'Cover set' });
@@ -130,6 +140,7 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
             loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
             filterClass
           )}
+          style={testStyle}
         />
 
         {/* Play overlay */}
@@ -165,6 +176,7 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
           loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
           filterClass
         )}
+        style={testStyle}
         draggable={false}
       />
     </div>
