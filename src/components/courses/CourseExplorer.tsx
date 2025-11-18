@@ -44,8 +44,13 @@ const CourseExplorer = () => {
   const initialRegion = getInitialRegion();
   const [selectedRegion, setSelectedRegion] = useState(initialRegion.value);
   const [regionWasAuto, setRegionWasAuto] = useState(initialRegion.auto);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  
+  // Initialize search from URL if present
+  const urlQuery = typeof window !== 'undefined' 
+    ? new URLSearchParams(window.location.search).get('query') || '' 
+    : '';
+  const [searchTerm, setSearchTerm] = useState(urlQuery);
+  const [debouncedSearch, setDebouncedSearch] = useState(urlQuery);
 
   // Debounce search input
   useEffect(() => {
@@ -183,9 +188,12 @@ const CourseExplorer = () => {
       </div>
 
       {/* Region Filter */}
-      <div className="flex flex-wrap gap-2 items-center">
-        <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-          <SelectTrigger className="w-[180px] h-11 bg-card border-border/50 rounded-lg text-sm">
+        <div className="flex flex-wrap gap-2 items-center">
+          <Select value={selectedRegion} onValueChange={(value) => {
+            setSelectedRegion(value);
+            setRegionWasAuto(false);
+          }}>
+            <SelectTrigger className="w-[180px] h-11 bg-card border-border/50 rounded-lg text-sm">
             <SelectValue placeholder="Select region" />
           </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
@@ -193,7 +201,6 @@ const CourseExplorer = () => {
                 <SelectItem 
                   key={option.value} 
                   value={option.value}
-                  onClick={() => setRegionWasAuto(false)}
                 >
                   {option.label}
                 </SelectItem>
