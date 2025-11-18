@@ -585,7 +585,7 @@ export default function EnhancedCreateMomentModalCinematic({
                             type="button"
                             onClick={handlePickFromCamera}
                             aria-label="Open Camera"
-                            className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
+                            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 bg-white/80 text-zinc-900 font-medium backdrop-blur-md border border-white/40"
                           >
                             <Camera className="w-5 h-5" />
                             <span className="font-medium">Camera</span>
@@ -595,7 +595,7 @@ export default function EnhancedCreateMomentModalCinematic({
                             type="button"
                             onClick={handlePickFromLibrary}
                             aria-label="Choose Photos and Videos"
-                            className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
+                            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 bg-white/80 text-zinc-900 font-medium backdrop-blur-md border border-white/40"
                           >
                             <Sparkles className="w-5 h-5" />
                             <span className="font-medium">Photos &amp; Videos</span>
@@ -707,7 +707,13 @@ export default function EnhancedCreateMomentModalCinematic({
                       <label className="block text-base font-semibold text-white mb-3">Add a caption</label>
                       
                       <textarea
-                        className="caption-input w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 text-[15px] leading-snug resize-none placeholder:text-zinc-400 text-zinc-900 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)] transition-all duration-200 min-h-[100px]"
+                        className="caption-input w-full rounded-xl px-4 py-3 text-[15px] leading-snug resize-none text-white placeholder:text-white/50 focus:outline-none transition-all duration-200 min-h-[100px]"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.06)',
+                          backdropFilter: 'blur(10px)',
+                          WebkitBackdropFilter: 'blur(10px)',
+                          border: '1px solid rgba(255, 255, 255, 0.08)'
+                        }}
                         placeholder="Write a caption..."
                         value={caption}
                         onChange={(e) => setCaption(e.target.value)}
@@ -730,11 +736,15 @@ export default function EnhancedCreateMomentModalCinematic({
                     <button
                       onClick={openStudio}
                       disabled={media.length === 0}
-                      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-200 ${
-                        media.length === 0
-                          ? 'border-zinc-200 bg-zinc-100 cursor-not-allowed'
-                          : 'border-zinc-300 bg-white hover:bg-zinc-50 hover:shadow-sm'
-                      }`}
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200"
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.06)',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        opacity: media.length === 0 ? 0.5 : 1,
+                        cursor: media.length === 0 ? 'not-allowed' : 'pointer'
+                      }}
                       title={media.length === 0 ? 'Add media to open Studio' : 'Open Studio to edit your media'}
                     >
                       <div className="flex items-center gap-3">
@@ -742,15 +752,15 @@ export default function EnhancedCreateMomentModalCinematic({
                           <Sparkles className="w-5 h-5 text-white" />
                         </div>
                         <div className="text-left">
-                          <div className={`text-sm font-semibold ${media.length === 0 ? 'text-zinc-400' : 'text-zinc-900'}`}>
+                          <div className="text-sm font-semibold text-white">
                             Open Studio
                           </div>
-                          <div className={`text-xs ${media.length === 0 ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                          <div className="text-xs text-white/70">
                             Add music, text, filters and edits
                           </div>
                         </div>
                       </div>
-                      <ChevronRight className={`w-5 h-5 ${media.length === 0 ? 'text-zinc-300' : 'text-zinc-400'}`} />
+                      <ChevronRight className="w-5 h-5 text-white/60" />
                     </button>
                   </div>
 
@@ -779,7 +789,7 @@ export default function EnhancedCreateMomentModalCinematic({
                   <button
                     disabled={!canPost}
                     onClick={handlePost}
-                    className="w-full h-12 rounded-2xl bg-white border border-[rgba(255,156,64,0.35)] shadow-sm text-zinc-900 font-semibold transition-all duration-200 hover:bg-zinc-50 hover:border-[rgba(255,156,64,0.5)] active:scale-[.99] disabled:bg-zinc-200 disabled:text-zinc-500 disabled:border-zinc-300 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)]"
+                    className="w-full h-12 rounded-2xl shadow-sm font-semibold transition-all duration-200 active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 bg-white/80 text-zinc-900 backdrop-blur-md border border-white/40 disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-label="Post your moment"
                   >
                     {isSubmitting ? "Sharing..." : "Share"}
