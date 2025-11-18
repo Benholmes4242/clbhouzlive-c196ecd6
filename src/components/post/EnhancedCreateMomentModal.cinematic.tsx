@@ -9,7 +9,7 @@ import PostSuccessOverlay from './PostSuccessOverlay';
 import { useModalContext } from '@/contexts/ModalContext';
 import { useImmersiveHeader } from '@/hooks/useImmersiveHeader';
 import { useChromeState } from '@/hooks/useChromeState';
-import { CourseSearchInput } from "@/components/posts/CourseSearchInput";
+import CourseTagInput from "@/components/posts/CourseTagInput";
 import BackgroundMusicSelector from "@/components/posts/BackgroundMusicSelector";
 import MediaCarousel from "@/components/posts/MediaCarousel";
 import CarouselDots from "@/components/posts/CarouselDots";
@@ -384,7 +384,37 @@ export default function EnhancedCreateMomentModalCinematic({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [animateAndClose, canSlide, isOpen]);
 
-  // AI Caption Generation - function kept for backward compatibility but not exposed in UI
+  // AI Caption Generation
+  const handleAICaption = async () => {
+    try {
+      setAiLoading(true);
+      const firstMedia = media?.[0];
+      if (!firstMedia) return;
+
+      const body = {
+        type: firstMedia.type === 'video' ? "video" : "image",
+        previewUrl: 'previewUrl' in firstMedia ? firstMedia.previewUrl : URL.createObjectURL(firstMedia),
+        captionContext: caption || "",
+      };
+
+      const { data, error } = await supabase.functions.invoke('ai-caption-generator', {
+        body
+      });
+      
+      if (error) throw error;
+      
+      if (data?.caption) {
+        setCaption(data.caption);
+      } else {
+        throw new Error('Failed to generate caption');
+      }
+    } catch (error) {
+      console.error('AI caption error:', error);
+      // No toast here anymore - keep it simple
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   // Camera capture handler
   const handlePickFromCamera = () => {
@@ -540,9 +570,9 @@ export default function EnhancedCreateMomentModalCinematic({
                           className="w-16 h-16 mb-4 opacity-80" 
                           strokeWidth={1.5}
                           aria-hidden="true"
-                          style={{ color: 'var(--icon-primary)' }}
+                          style={{ color: 'white' }}
                         />
-                        <h2 className="text-[18px] font-medium leading-snug max-w-[520px]" style={{ color: 'var(--text-primary)' }}>
+                        <h2 className="text-white/90 text-[18px] font-medium leading-snug max-w-[520px]">
                           Capture your next great golf moment – add a photo or video to share with your community.
                         </h2>
                         
@@ -555,42 +585,20 @@ export default function EnhancedCreateMomentModalCinematic({
                             type="button"
                             onClick={handlePickFromCamera}
                             aria-label="Open Camera"
-                            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 font-medium shadow-sm active:scale-[.99] focus:outline-none transition-all duration-200"
-                            style={{
-                              background: 'var(--surface-card)',
-                              color: 'var(--text-primary)',
-                              border: '1px solid var(--border)',
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.background = 'var(--surface-input)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.background = 'var(--surface-card)';
-                            }}
+                            className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
                           >
                             <Camera className="w-5 h-5" />
-                            <span>Camera</span>
+                            <span className="font-medium">Camera</span>
                           </button>
                           
                           <button
                             type="button"
                             onClick={handlePickFromLibrary}
                             aria-label="Choose Photos and Videos"
-                            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 font-medium shadow-sm active:scale-[.99] focus:outline-none transition-all duration-200"
-                            style={{
-                              background: 'var(--surface-card)',
-                              color: 'var(--text-primary)',
-                              border: '1px solid var(--border)',
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.background = 'var(--surface-input)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.background = 'var(--surface-card)';
-                            }}
+                            className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white text-gray-900 px-4 py-2 shadow-sm active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-orange-300"
                           >
                             <Sparkles className="w-5 h-5" />
-                            <span>Photos &amp; Videos</span>
+                            <span className="font-medium">Photos &amp; Videos</span>
                           </button>
                         </div>
                       </motion.div>
@@ -673,13 +681,13 @@ export default function EnhancedCreateMomentModalCinematic({
 
               {/* COMPOSER PANEL - fixed height, bottom-anchored with glass effect */}
               <section 
-                className="composer absolute bottom-0 left-0 right-0 z-[1003] rounded-t-3xl"
+                className="composer absolute bottom-0 left-0 right-0 z-[1003] rounded-t-none border-t border-white/35"
                 style={{ 
                   height: 'var(--composer-height)',
-                  background: 'var(--surface-card)',
-                  border: '1px solid var(--border)',
-                  borderBottom: 'none',
-                  boxShadow: 'var(--shadow-medium)'
+                  background: 'var(--ecm-glass)',
+                  backdropFilter: 'blur(var(--ecm-blur))',
+                  WebkitBackdropFilter: 'blur(var(--ecm-blur))',
+                  boxShadow: '0 -1px 0 0 rgba(255,255,255,0.35), 0 10px 40px rgba(0,0,0,0.15)'
                 }}
               >
                 <div 
@@ -695,51 +703,41 @@ export default function EnhancedCreateMomentModalCinematic({
                   {/* Unified Details Section - No tabs, everything visible */}
                   <div className="flex flex-col gap-4 flex-1">
                     {/* Caption Section */}
-                    <div className="flex flex-col gap-3">
-                      <label className="block text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
-                        Add a caption
-                      </label>
+                    <div className="flex flex-col">
+                      <label className="block text-base font-semibold text-white mb-3">Add a caption</label>
                       
                       <textarea
-                        className="caption-input w-full rounded-xl px-4 py-3 text-[15px] leading-snug resize-none transition-all duration-200 min-h-[100px]"
-                        style={{
-                          background: 'var(--surface-card)',
-                          border: '1px solid var(--border)',
-                          color: 'var(--text-primary)',
-                        }}
+                        className="caption-input w-full bg-white border border-zinc-200 rounded-xl px-4 py-3 text-[15px] leading-snug resize-none placeholder:text-zinc-400 text-zinc-900 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)] transition-all duration-200 min-h-[100px]"
                         placeholder="Write a caption..."
                         value={caption}
                         onChange={(e) => setCaption(e.target.value)}
                         rows={4}
-                        onFocus={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--primary-accent)';
-                          e.currentTarget.style.boxShadow = '0 0 0 1px var(--primary-accent)';
-                        }}
-                        onBlur={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--border)';
-                          e.currentTarget.style.boxShadow = 'none';
-                        }}
                       />
-                      
-                      <style>{`
-                        .caption-input::placeholder {
-                          color: var(--placeholder-foreground);
-                        }
-                      `}</style>
+
+                      {/* AI Caption Button */}
+                      <button
+                        type="button"
+                        onClick={handleAICaption}
+                        disabled={aiLoading || !hasMedia}
+                        className="mt-2 self-start inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-300 bg-white text-zinc-700 text-sm font-medium hover:bg-zinc-50 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                        aria-label={aiLoading ? "Generating AI caption..." : "Generate AI caption"}
+                      >
+                        {aiLoading ? <StarsLoading /> : (
+                          <>
+                            <Sparkles className="w-3.5 h-3.5" />
+                            <span>AI Caption</span>
+                          </>
+                        )}
+                      </button>
                     </div>
 
                     {/* Course Tagging Section */}
-                    <div className="flex flex-col gap-3">
-                      <label className="block text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
-                        Tag a course
-                      </label>
-                      
-                      <CourseSearchInput
+                    <div className="flex flex-col">
+                      <CourseTagInput
                         onCourseSelect={onCourseSelect}
                         selectedCourse={course}
                       />
-                      
-                      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                      <p className="mt-2 text-xs text-white/60">
                         Tag a course to help other golfers discover your round
                       </p>
                     </div>
@@ -748,23 +746,11 @@ export default function EnhancedCreateMomentModalCinematic({
                     <button
                       onClick={openStudio}
                       disabled={media.length === 0}
-                      className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200"
-                      style={{
-                        background: media.length === 0 ? 'var(--surface-alt)' : 'var(--surface-card)',
-                        border: `1px solid var(--border)`,
-                        cursor: media.length === 0 ? 'not-allowed' : 'pointer',
-                        opacity: media.length === 0 ? 0.6 : 1,
-                      }}
-                      onMouseEnter={(e) => {
-                        if (media.length > 0) {
-                          e.currentTarget.style.background = 'var(--surface-input)';
-                          e.currentTarget.style.boxShadow = 'var(--shadow-soft)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = media.length === 0 ? 'var(--surface-alt)' : 'var(--surface-card)';
-                        e.currentTarget.style.boxShadow = 'none';
-                      }}
+                      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-200 ${
+                        media.length === 0
+                          ? 'border-zinc-200 bg-zinc-100 cursor-not-allowed'
+                          : 'border-zinc-300 bg-white hover:bg-zinc-50 hover:shadow-sm'
+                      }`}
                       title={media.length === 0 ? 'Add media to open Studio' : 'Open Studio to edit your media'}
                     >
                       <div className="flex items-center gap-3">
@@ -772,21 +758,21 @@ export default function EnhancedCreateMomentModalCinematic({
                           <Sparkles className="w-5 h-5 text-white" />
                         </div>
                         <div className="text-left">
-                          <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                          <div className={`text-sm font-semibold ${media.length === 0 ? 'text-zinc-400' : 'text-zinc-900'}`}>
                             Open Studio
                           </div>
-                          <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          <div className={`text-xs ${media.length === 0 ? 'text-zinc-400' : 'text-zinc-500'}`}>
                             Add music, text, filters and edits
                           </div>
                         </div>
                       </div>
-                      <ChevronRight className="w-5 h-5" style={{ color: 'var(--icon-secondary)' }} />
+                      <ChevronRight className={`w-5 h-5 ${media.length === 0 ? 'text-zinc-300' : 'text-zinc-400'}`} />
                     </button>
                   </div>
 
                   {/* Visibility status line */}
                   {hasMedia && (
-                    <div className="flex items-center justify-center gap-2 text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                    <div className="flex items-center justify-center gap-2 text-xs text-white/70">
                       <span>Sharing to: Clubhouse</span>
                       <span>·</span>
                       <div className="flex items-center gap-1">
@@ -809,22 +795,7 @@ export default function EnhancedCreateMomentModalCinematic({
                   <button
                     disabled={!canPost}
                     onClick={handlePost}
-                    className="w-full h-12 rounded-2xl font-semibold transition-all duration-200 active:scale-[.99] focus:outline-none"
-                    style={{
-                      background: canPost ? 'var(--primary-accent)' : 'var(--surface-alt)',
-                      color: canPost ? 'white' : 'var(--text-tertiary)',
-                      border: `1px solid ${canPost ? 'var(--primary-accent)' : 'var(--border)'}`,
-                      cursor: canPost ? 'pointer' : 'not-allowed',
-                      opacity: canPost ? 1 : 0.6,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (canPost) {
-                        e.currentTarget.style.filter = 'brightness(1.1)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.filter = 'brightness(1)';
-                    }}
+                    className="w-full h-12 rounded-2xl bg-white border border-[rgba(255,156,64,0.35)] shadow-sm text-zinc-900 font-semibold transition-all duration-200 hover:bg-zinc-50 hover:border-[rgba(255,156,64,0.5)] active:scale-[.99] disabled:bg-zinc-200 disabled:text-zinc-500 disabled:border-zinc-300 focus:outline-none focus:border-[rgba(255,156,64,0.5)] focus:shadow-[0_0_0_1px_rgba(255,156,64,0.35)]"
                     aria-label="Post your moment"
                   >
                     {isSubmitting ? "Sharing..." : "Share"}
