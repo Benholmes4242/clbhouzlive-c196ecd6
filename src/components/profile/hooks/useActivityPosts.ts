@@ -28,7 +28,9 @@ export const useActivityPosts = (userId?: string) => {
           post_media (
             id,
             media_type,
-            media_url
+            media_url,
+            filter_id,
+            studio_edits
           ),
           post_tags (
             id,
@@ -110,7 +112,9 @@ export const useActivityPosts = (userId?: string) => {
           post_media: (post.post_media || []).map(media => ({
             id: media.id,
             media_type: media.media_type as 'image' | 'video',
-            media_url: media.media_url
+            media_url: media.media_url,
+            filter_id: media.filter_id,
+            studio_edits: media.studio_edits
           })),
           post_tags: tags,
           user: {
