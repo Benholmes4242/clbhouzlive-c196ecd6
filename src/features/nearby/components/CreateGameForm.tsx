@@ -250,7 +250,7 @@ export function CreateGameForm({ prefilledClub, onSubmit }: CreateGameFormProps)
         </div>
 
         {/* Golf Course */}
-        <div className="findBlock">
+        <div className="space-y-2">
           <label className="sectionLabel">Select a golf club</label>
           {selectedClub ? (
             <div className="selectedClubRow">
