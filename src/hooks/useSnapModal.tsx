@@ -166,6 +166,7 @@ export const useSnapModal = () => {
     setCursorPosition(0);
     setIsSubmitting(false);
     setVisibility("public");
+    setMode('create'); // Reset mode to 'create' for next session
   };
 
   const closeComposer = () => {
