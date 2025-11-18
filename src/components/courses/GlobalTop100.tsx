@@ -8,8 +8,40 @@ import { Search, Award, X } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
+const TOP100_STORAGE_KEY = 'clbhouz_top100_list_v1';
+
+function getInitialTop100List(): { value: string; auto: boolean } {
+  const params = new URLSearchParams(window.location.search);
+  const urlList = params.get('list');
+  if (urlList) {
+    return { value: urlList, auto: false };
+  }
+
+  if (typeof window !== 'undefined') {
+    const stored = window.localStorage.getItem(TOP100_STORAGE_KEY);
+    if (stored) {
+      return { value: stored, auto: false };
+    }
+  }
+
+  // Light heuristic similar to regions
+  let autoList = 'global';
+  if (typeof navigator !== 'undefined') {
+    const lang = navigator.language.toLowerCase();
+    if (lang.startsWith('en-gb') || lang.startsWith('en-ie')) {
+      autoList = 'gb-i';
+    } else if (lang.startsWith('en-us')) {
+      autoList = 'usa';
+    }
+  }
+
+  return { value: autoList, auto: autoList !== 'global' };
+}
+
 const GlobalTop100 = () => {
-  const [selectedList, setSelectedList] = useState<string>('global');
+  const initialList = getInitialTop100List();
+  const [selectedList, setSelectedList] = useState(initialList.value);
+  const [listWasAuto, setListWasAuto] = useState(initialList.auto);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -20,6 +52,17 @@ const GlobalTop100 = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  // Persist list selection
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    window.localStorage.setItem(TOP100_STORAGE_KEY, selectedList);
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('list', selectedList);
+    window.history.replaceState({}, '', url.toString());
+  }, [selectedList]);
 
   // Fetch available lists
   const { data: lists = [] } = useTop100Lists();
@@ -55,7 +98,15 @@ const GlobalTop100 = () => {
 
   const handleResetFilters = () => {
     setSelectedList('global');
+    setListWasAuto(false);
     setSearchTerm('');
+
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('list');
+      url.searchParams.delete('query');
+      window.history.replaceState({}, '', url.toString());
+    }
   };
 
   const hasActiveFilters = selectedList !== 'global' || searchTerm !== '';
@@ -68,7 +119,20 @@ const GlobalTop100 = () => {
         <Input
           placeholder="Search within this Top 100 list"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            setSearchTerm(value);
+
+            if (typeof window !== 'undefined') {
+              const url = new URL(window.location.href);
+              if (value) {
+                url.searchParams.set('query', value);
+              } else {
+                url.searchParams.delete('query');
+              }
+              window.history.replaceState({}, '', url.toString());
+            }
+          }}
           className="pl-10 pr-10 h-11 bg-card border-border/50 rounded-xl shadow-sm focus:shadow-md transition-shadow text-sm"
         />
         {searchTerm && (
@@ -83,9 +147,10 @@ const GlobalTop100 = () => {
 
       {/* Top 100 List Selector */}
       <div className="space-y-2">
-        <div className="text-xs text-muted-foreground">
-          Viewing: {listOptions.find(opt => opt.value === selectedList)?.label || 'Global Top 100'}
-        </div>
+        <p className="text-xs text-muted-foreground">
+          Viewing: {listOptions.find((opt) => opt.value === selectedList)?.label || 'Global Top 100'}
+          {listWasAuto && ' • Suggested for you'}
+        </p>
         <div className="flex flex-wrap gap-2 items-center">
           <Select value={selectedList} onValueChange={setSelectedList}>
             <SelectTrigger className="w-[180px] h-11 bg-card border-border/50 rounded-lg text-sm">
@@ -96,7 +161,11 @@ const GlobalTop100 = () => {
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
               {listOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
+                <SelectItem 
+                  key={option.value} 
+                  value={option.value}
+                  onClick={() => setListWasAuto(false)}
+                >
                   {option.label}
                 </SelectItem>
               ))}

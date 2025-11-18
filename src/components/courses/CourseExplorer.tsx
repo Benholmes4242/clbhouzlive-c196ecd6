@@ -8,8 +8,42 @@ import { Search, MapPin, X } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
+const REGION_STORAGE_KEY = 'clbhouz_courses_region_v1';
+
+function getInitialRegion(): { value: string; auto: boolean } {
+  // 1) URL param has priority
+  const params = new URLSearchParams(window.location.search);
+  const urlRegion = params.get('region');
+  if (urlRegion && ['all', 'gb-i', 'usa', 'europe', 'rest'].includes(urlRegion)) {
+    return { value: urlRegion, auto: false };
+  }
+
+  // 2) Local storage from previous visit
+  if (typeof window !== 'undefined') {
+    const stored = window.localStorage.getItem(REGION_STORAGE_KEY);
+    if (stored && ['all', 'gb-i', 'usa', 'europe', 'rest'].includes(stored)) {
+      return { value: stored, auto: false };
+    }
+  }
+
+  // 3) Very light heuristic based on browser locale
+  let autoRegion: string = 'all';
+  if (typeof navigator !== 'undefined') {
+    const lang = navigator.language.toLowerCase();
+    if (lang.startsWith('en-gb') || lang.startsWith('en-ie')) {
+      autoRegion = 'gb-i';
+    } else if (lang.startsWith('en-us')) {
+      autoRegion = 'usa';
+    }
+  }
+
+  return { value: autoRegion, auto: autoRegion !== 'all' };
+}
+
 const CourseExplorer = () => {
-  const [selectedRegion, setSelectedRegion] = useState<string>('all');
+  const initialRegion = getInitialRegion();
+  const [selectedRegion, setSelectedRegion] = useState(initialRegion.value);
+  const [regionWasAuto, setRegionWasAuto] = useState(initialRegion.auto);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -20,6 +54,19 @@ const CourseExplorer = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  // Persist region selection
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // localStorage
+    window.localStorage.setItem(REGION_STORAGE_KEY, selectedRegion);
+
+    // keep URL in sync (non-destructive)
+    const url = new URL(window.location.href);
+    url.searchParams.set('region', selectedRegion);
+    window.history.replaceState({}, '', url.toString());
+  }, [selectedRegion]);
 
   // Fetch courses with region filtering based on country
   const { data: courses = [], isLoading } = useQuery({
@@ -88,7 +135,15 @@ const CourseExplorer = () => {
 
   const handleResetFilters = () => {
     setSelectedRegion('all');
+    setRegionWasAuto(false);
     setSearchTerm('');
+
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('region');
+      url.searchParams.delete('query');
+      window.history.replaceState({}, '', url.toString());
+    }
   };
 
   const hasActiveFilters = selectedRegion !== 'all' || searchTerm !== '';
@@ -101,7 +156,20 @@ const CourseExplorer = () => {
         <Input
           placeholder="Search courses by name or location"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            setSearchTerm(value);
+
+            if (typeof window !== 'undefined') {
+              const url = new URL(window.location.href);
+              if (value) {
+                url.searchParams.set('query', value);
+              } else {
+                url.searchParams.delete('query');
+              }
+              window.history.replaceState({}, '', url.toString());
+            }
+          }}
           className="pl-10 pr-10 h-11 bg-card border-border/50 rounded-xl shadow-sm focus:shadow-md transition-shadow text-sm"
         />
         {searchTerm && (
@@ -120,14 +188,18 @@ const CourseExplorer = () => {
           <SelectTrigger className="w-[180px] h-11 bg-card border-border/50 rounded-lg text-sm">
             <SelectValue placeholder="Select region" />
           </SelectTrigger>
-          <SelectContent className="bg-card border-border z-50">
-            {regionOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+            <SelectContent className="bg-card border-border z-50">
+              {regionOptions.map((option) => (
+                <SelectItem 
+                  key={option.value} 
+                  value={option.value}
+                  onClick={() => setRegionWasAuto(false)}
+                >
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
         {hasActiveFilters && (
           <Button
@@ -141,6 +213,13 @@ const CourseExplorer = () => {
           </Button>
         )}
       </div>
+      {selectedRegion !== 'all' && (
+        <p className="mt-1 text-xs text-muted-foreground">
+          Showing courses in{' '}
+          {regionOptions.find((o) => o.value === selectedRegion)?.label || 'selected region'}
+          {regionWasAuto && ' • Suggested for you'}
+        </p>
+      )}
 
       {/* Results */}
       {isLoading ? (
