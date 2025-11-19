@@ -123,27 +123,27 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
 
   if (loading) {
     return (
-      <div>
+      <>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xl font-semibold">Media</h3>
+          <h2 className="text-base md:text-lg font-semibold">Media</h2>
           <div className="w-12 h-4 bg-muted rounded animate-pulse" />
         </div>
-        <div className={`grid gap-3 ${isMobile ? 'grid-cols-3' : 'grid-cols-3'}`}>
+        <div className="grid grid-cols-3 gap-2">
           {Array.from({ length: maxItems }).map((_, i) => (
-            <div key={i} className="aspect-[4/3] bg-muted rounded-xl animate-pulse" />
+            <div key={i} className="aspect-square bg-muted/70 rounded-xl animate-pulse" />
           ))}
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div>
+    <>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xl font-semibold">Media</h3>
+        <h2 className="text-base md:text-lg font-semibold">Media</h2>
         <button
           type="button"
-          className="text-sm text-muted-foreground hover:text-foreground font-medium transition-colors"
+          className="text-xs font-medium text-primary hover:underline"
           onClick={(e) => {
             e.stopPropagation();
             onSeeAllClick();
@@ -153,7 +153,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         </button>
       </div>
 
-      <div className={`grid gap-3 ${isMobile ? 'grid-cols-3' : 'grid-cols-3'}`}>
+      <div className="grid grid-cols-3 gap-2">
         {Array.from({ length: maxItems }).map((_, i) => {
           const media = mediaTiles[i];
           return media ? (
@@ -164,7 +164,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                 e.stopPropagation();
                 onSeeAllClick();
               }}
-              className="rounded-xl overflow-hidden w-full aspect-[4/3] focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all hover:scale-[1.02]"
+              className="rounded-xl overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all hover:scale-[1.02]"
               aria-label="Open Media tab"
             >
               <SquareCardMedia
@@ -174,11 +174,11 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               />
             </button>
           ) : (
-            <div key={`ph-${i}`} className="rounded-xl bg-muted aspect-[4/3]" />
+            <div key={`ph-${i}`} className="rounded-xl bg-muted/70 aspect-square" />
           );
         })}
       </div>
-    </div>
+    </>
   );
 };
 

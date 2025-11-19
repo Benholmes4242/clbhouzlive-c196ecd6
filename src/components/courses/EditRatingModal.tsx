@@ -170,10 +170,12 @@ const EditRatingModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg w-full rounded-2xl border border-border/60 bg-card shadow-xl">
+      <DialogContent className="max-w-lg w-full rounded-3xl border border-border/80 bg-card shadow-xl p-5 md:p-6">
         <DialogHeader className="space-y-1">
-          <DialogTitle className="text-lg font-semibold">Edit your rating</DialogTitle>
-          <p className="text-xs text-muted-foreground">Rate from 0.5 to 10 and optionally leave a review.</p>
+          <DialogTitle className="text-lg md:text-xl font-semibold text-center">Edit your rating</DialogTitle>
+          <p className="text-xs md:text-sm text-muted-foreground text-center">
+            Rate from 0.5 to 10 and optionally leave a review.
+          </p>
         </DialogHeader>
 
         <div className="space-y-6 mt-4">
@@ -191,11 +193,11 @@ const EditRatingModal = ({
                     onMouseEnter={() => setHoveredRating(rating)}
                     onMouseLeave={() => setHoveredRating(null)}
                     disabled={isSubmitting}
-                    className={`min-w-[44px] px-2 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+                    className={`h-10 w-12 rounded-xl text-sm font-medium border transition-colors ${
                       (hoveredRating !== null && rating <= hoveredRating) ||
                       (hoveredRating === null && isSelected)
-                        ? 'bg-surface-slate text-card-foreground border-transparent'
-                        : 'bg-surface-alt text-foreground border-border/60 hover:bg-card'
+                        ? 'bg-slate-900 text-white border-transparent shadow-sm'
+                        : 'bg-muted border-border/60 hover:bg-card'
                     }`}
                   >
                     {rating}
@@ -204,36 +206,36 @@ const EditRatingModal = ({
               })}
             </div>
 
-            <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-surface-slate text-card-foreground text-xs font-medium">
+            <div className="mt-3 inline-flex px-3 py-1 rounded-full bg-slate-900 text-xs font-medium text-background">
               Selected: {selectedRating}/10
             </div>
           </div>
 
           {/* Review Section */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Share your thoughts (optional)
+            <label className="text-sm font-medium text-foreground">
+              Share your thoughts <span className="text-muted-foreground">(optional)</span>
             </label>
             <Textarea
               value={review}
               onChange={(e) => setReview(e.target.value)}
               placeholder="Tell other golfers what stood out – routing, conditioning, greens, hospitality..."
-              className="mt-3 bg-card border-border/60 text-sm placeholder:text-muted-foreground/70 min-h-[80px] resize-none"
+              className="bg-card border border-border/60 rounded-xl text-sm placeholder:text-muted-foreground min-h-[80px] resize-none"
               disabled={isSubmitting}
               maxLength={500}
             />
-            <p className="mt-1 text-[11px] text-muted-foreground text-right">
+            <p className="text-[11px] text-muted-foreground text-right">
               {review.length}/500
             </p>
           </div>
 
           {/* Breakdown Scores */}
           <div className="space-y-4 pt-4 border-t">
-            <p className="text-sm font-medium text-muted-foreground">Breakdown (Optional)</p>
+            <p className="text-sm md:text-base font-semibold text-foreground">Breakdown (Optional)</p>
             
             {/* Course Design */}
             <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center justify-between">
+              <label className="text-sm font-medium mt-4 mb-2 flex items-center justify-between">
                 <span>Course Design</span>
                 {designScore && <span className="text-muted-foreground">{designScore}/10</span>}
               </label>
@@ -259,7 +261,7 @@ const EditRatingModal = ({
 
             {/* Course Condition */}
             <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center justify-between">
+              <label className="text-sm font-medium mt-4 mb-2 flex items-center justify-between">
                 <span>Course Condition</span>
                 {conditionScore && <span className="text-muted-foreground">{conditionScore}/10</span>}
               </label>
@@ -285,7 +287,7 @@ const EditRatingModal = ({
 
             {/* Facilities */}
             <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center justify-between">
+              <label className="text-sm font-medium mt-4 mb-2 flex items-center justify-between">
                 <span>Facilities</span>
                 {facilitiesScore && <span className="text-muted-foreground">{facilitiesScore}/10</span>}
               </label>
@@ -311,31 +313,29 @@ const EditRatingModal = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="mt-6 flex flex-col sm:flex-row justify-between gap-3">
+          <div className="mt-6 flex flex-col gap-2">
             <Button
-              type="button"
               variant="destructive"
-              className="flex-1 sm:flex-none"
+              className="w-full justify-center"
               onClick={handleDelete}
               disabled={isSubmitting}
             >
               Remove rating
             </Button>
 
-            <div className="flex-1 flex gap-2 justify-end">
+            <div className="flex gap-2">
               <Button
-                type="button"
                 variant="outline"
+                className="flex-1 justify-center border-border/70 bg-card"
                 onClick={onClose}
                 disabled={isSubmitting}
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                variant="default"
-                disabled={isSubmitting}
+              <Button 
+                className="flex-1 justify-center"
                 onClick={handleUpdate}
+                disabled={isSubmitting}
               >
                 {isSubmitting ? "Updating..." : "Update rating"}
               </Button>
