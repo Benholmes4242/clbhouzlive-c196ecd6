@@ -9,6 +9,51 @@ import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const REGION_STORAGE_KEY = 'clbhouz_courses_region_v1';
+const SUBREGION_STORAGE_KEY = 'clbhouz_courses_subregion_v1';
+
+const SUBREGIONS: Record<string, string[]> = {
+  'gb-i': [
+    'England',
+    'Scotland',
+    'Wales',
+    'Ireland',
+    'Northern Ireland',
+    'Isle of Man'
+  ],
+  'europe': [
+    'Andorra', 'Austria', 'Belgium', 'Croatia', 'Czech Republic', 'Denmark',
+    'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Iceland',
+    'Italy', 'Netherlands', 'Norway', 'Poland', 'Portugal', 'Spain',
+    'Sweden', 'Switzerland', 'Turkey'
+  ],
+  'usa': [
+    'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
+    'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana',
+    'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts',
+    'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada',
+    'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota',
+    'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
+    'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
+    'Wisconsin', 'Wyoming'
+  ],
+  'rest': []
+};
+
+function mapPrimaryRegion(key: string) {
+  switch (key) {
+    case 'gb-i': return 'Britain & Ireland';
+    case 'usa': return 'USA';
+    case 'europe': return 'Continental Europe';
+    case 'rest': return 'Rest of World';
+    default: return key;
+  }
+}
+
+function mapSubregionLabel(key: string) {
+  return key
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 function getInitialRegion(): { value: string; auto: boolean } {
   // 1) URL param has priority
@@ -46,6 +91,7 @@ const CourseExplorer = () => {
   const initialRegion = getInitialRegion();
   const [selectedRegion, setSelectedRegion] = useState(initialRegion.value);
   const [regionWasAuto, setRegionWasAuto] = useState(initialRegion.auto);
+  const [selectedSubregion, setSelectedSubregion] = useState('all');
   const [page, setPage] = useState(0);
   
   // Initialize search from URL if present
@@ -63,10 +109,28 @@ const CourseExplorer = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  // Restore subregion from URL/storage on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const url = new URL(window.location.href);
+    const urlSub = url.searchParams.get('sub');
+
+    if (urlSub) {
+      setSelectedSubregion(urlSub);
+      return;
+    }
+
+    const stored = window.localStorage.getItem(SUBREGION_STORAGE_KEY);
+    if (stored) {
+      setSelectedSubregion(stored);
+    }
+  }, []);
+
   // Reset page when filters change
   useEffect(() => {
     setPage(0);
-  }, [selectedRegion, debouncedSearch]);
+  }, [selectedRegion, selectedSubregion, debouncedSearch]);
 
   // Persist region selection
   useEffect(() => {
@@ -81,9 +145,25 @@ const CourseExplorer = () => {
     window.history.replaceState({}, '', url.toString());
   }, [selectedRegion]);
 
+  // Persist sub-region to URL + storage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    window.localStorage.setItem(SUBREGION_STORAGE_KEY, selectedSubregion);
+
+    const url = new URL(window.location.href);
+    if (selectedSubregion && selectedSubregion !== 'all') {
+      url.searchParams.set('sub', selectedSubregion);
+    } else {
+      url.searchParams.delete('sub');
+    }
+
+    window.history.replaceState({}, '', url.toString());
+  }, [selectedSubregion]);
+
   // Fetch courses with region filtering based on country
   const { data, isLoading } = useQuery({
-    queryKey: ['explore-courses', selectedRegion, debouncedSearch, page],
+    queryKey: ['explore-courses', selectedRegion, selectedSubregion, debouncedSearch, page],
     queryFn: async () => {
       let query = supabase
         .from('golf_courses')
@@ -91,25 +171,17 @@ const CourseExplorer = () => {
 
       // Apply region filter based on country
       if (selectedRegion !== 'all') {
-        switch (selectedRegion) {
-          case 'gb-i':
-            query = query.in('country', ['Britain & Ireland', 'England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Republic of Ireland']);
-            break;
-          case 'usa':
-            query = query.eq('country', 'USA');
-            break;
-          case 'europe':
-            query = query.eq('country', 'Continental Europe');
-            break;
-          case 'rest':
-            query = query.not('country', 'in', '("Britain & Ireland","England","Scotland","Wales","Northern Ireland","Ireland","Republic of Ireland","USA","Continental Europe")');
-            break;
-        }
+        query = query.eq('country', mapPrimaryRegion(selectedRegion));
       }
 
-      // Apply search filter
+      // Sub-region filter
+      if (selectedSubregion !== 'all') {
+        query = query.eq('sub_country', mapSubregionLabel(selectedSubregion));
+      }
+
+      // Apply search filter - include local_area
       if (debouncedSearch) {
-        query = query.or(`name.ilike.%${debouncedSearch}%,country.ilike.%${debouncedSearch}%,sub_country.ilike.%${debouncedSearch}%,region.ilike.%${debouncedSearch}%`);
+        query = query.or(`name.ilike.%${debouncedSearch}%,country.ilike.%${debouncedSearch}%,sub_country.ilike.%${debouncedSearch}%`);
       }
 
       // Order by global rank first (Top 100 courses), then alphabetically
@@ -162,24 +234,25 @@ const CourseExplorer = () => {
   };
 
   const hasSearch = debouncedSearch.trim().length > 0;
+  const hasActiveFilters = selectedRegion !== 'all' || selectedSubregion !== 'all' || hasSearch;
 
   const startIndex = totalCount === 0 ? 0 : page * PAGE_SIZE + 1;
   const endIndex = Math.min((page + 1) * PAGE_SIZE, totalCount);
 
   const handleResetFilters = () => {
     setSelectedRegion('all');
+    setSelectedSubregion('all');
     setRegionWasAuto(false);
     setSearchTerm('');
 
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
       url.searchParams.delete('region');
+      url.searchParams.delete('sub');
       url.searchParams.delete('query');
       window.history.replaceState({}, '', url.toString());
     }
   };
-
-  const hasActiveFilters = selectedRegion !== 'all' || searchTerm !== '';
 
   return (
     <div className="space-y-6">
@@ -187,7 +260,7 @@ const CourseExplorer = () => {
       <div className="relative">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
-          placeholder="Search courses by name or location"
+          placeholder="Search by name, county or area..."
           value={searchTerm}
           onChange={(e) => {
             const value = e.target.value;
@@ -219,6 +292,7 @@ const CourseExplorer = () => {
         <div className="flex flex-wrap gap-2 items-center">
           <Select value={selectedRegion} onValueChange={(value) => {
             setSelectedRegion(value);
+            setSelectedSubregion('all');
             setRegionWasAuto(false);
           }}>
             <SelectTrigger className="w-[180px] h-11 bg-card border-border/50 rounded-lg text-sm">
@@ -235,6 +309,23 @@ const CourseExplorer = () => {
               ))}
             </SelectContent>
           </Select>
+
+        {/* Sub-region Filter (only visible if a region is selected) */}
+        {selectedRegion !== 'all' && SUBREGIONS[selectedRegion]?.length > 0 && (
+          <Select value={selectedSubregion} onValueChange={setSelectedSubregion}>
+            <SelectTrigger className="w-[180px] h-11 bg-card border-border/50 rounded-lg text-sm">
+              <SelectValue placeholder="All sub-regions" />
+            </SelectTrigger>
+            <SelectContent className="bg-card border-border z-50">
+              <SelectItem value="all">All sub-regions</SelectItem>
+              {SUBREGIONS[selectedRegion].map((s) => (
+                <SelectItem key={s} value={s.toLowerCase().replace(/ /g, '-')}>
+                  {s}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
 
         {hasActiveFilters && (
           <Button
@@ -275,25 +366,27 @@ const CourseExplorer = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Context line */}
-          {totalCount > 0 && (
-            <p className="mt-2 text-sm text-muted-foreground">
-              {hasSearch ? (
-                <>
-                  Results for "{debouncedSearch}" {selectedRegion === 'all'
-                    ? 'worldwide'
-                    : <>in <span className="font-medium">{getRegionLabel()}</span></>}
-                </>
-              ) : selectedRegion === 'all' ? (
-                'Showing all courses worldwide'
-              ) : (
-                <>
-                  Showing courses in{' '}
-                  <span className="font-medium">{getRegionLabel()}</span>
-                </>
-              )}
-            </p>
-          )}
+        {/* Context line */}
+        {totalCount > 0 && (
+          <p className="mt-2 text-sm text-muted-foreground">
+            {hasSearch ? (
+              <>
+                Results for "{debouncedSearch}" {selectedRegion === 'all'
+                  ? 'worldwide'
+                  : <>in <span className="font-medium">{getRegionLabel()}</span></>}
+                {selectedSubregion !== 'all' && <> → <span className="font-medium">{mapSubregionLabel(selectedSubregion)}</span></>}
+              </>
+            ) : selectedRegion === 'all' ? (
+              'Showing all courses worldwide'
+            ) : (
+              <>
+                Showing courses in{' '}
+                <span className="font-medium">{getRegionLabel()}</span>
+                {selectedSubregion !== 'all' && <> → <span className="font-medium">{mapSubregionLabel(selectedSubregion)}</span></>}
+              </>
+            )}
+          </p>
+        )}
 
           {/* Range line */}
           {totalCount > 0 && (
