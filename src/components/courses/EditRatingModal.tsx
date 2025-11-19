@@ -25,6 +25,7 @@ interface EditRatingModalProps {
 interface ExtendedEditRatingModalProps extends EditRatingModalProps {
   currentDesignScore?: number | null;
   currentConditionScore?: number | null;
+  currentClubhouseScore?: number | null;
   currentFacilitiesScore?: number | null;
 }
 
@@ -35,6 +36,7 @@ const EditRatingModal = ({
   currentReview,
   currentDesignScore,
   currentConditionScore,
+  currentClubhouseScore,
   currentFacilitiesScore,
   isOpen,
   onClose
@@ -45,6 +47,7 @@ const EditRatingModal = ({
   const [review, setReview] = useState(currentReview || '');
   const [designScore, setDesignScore] = useState<number | null>(currentDesignScore || null);
   const [conditionScore, setConditionScore] = useState<number | null>(currentConditionScore || null);
+  const [clubhouseScore, setClubhouseScore] = useState<number | null>(currentClubhouseScore || null);
   const [facilitiesScore, setFacilitiesScore] = useState<number | null>(currentFacilitiesScore || null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -56,12 +59,14 @@ const EditRatingModal = ({
       reviewText, 
       design, 
       condition, 
+      clubhouse,
       facilities 
     }: { 
       rating: number; 
       reviewText: string;
       design: number | null;
       condition: number | null;
+      clubhouse: number | null;
       facilities: number | null;
     }) => {
       const { data: userResponse } = await supabase.auth.getUser();
@@ -74,6 +79,7 @@ const EditRatingModal = ({
           review: reviewText || null,
           design_score: design,
           condition_score: condition,
+          clubhouse_score: clubhouse,
           facilities_score: facilities,
           updated_at: new Date().toISOString() 
         })
@@ -153,6 +159,7 @@ const EditRatingModal = ({
       reviewText: review,
       design: designScore,
       condition: conditionScore,
+      clubhouse: clubhouseScore,
       facilities: facilitiesScore
     });
   };
@@ -279,30 +286,34 @@ const EditRatingModal = ({
             {[
               { key: 'design', label: 'Course Design', score: designScore, setScore: setDesignScore },
               { key: 'condition', label: 'Course Condition', score: conditionScore, setScore: setConditionScore },
+              { key: 'clubhouse', label: 'Clubhouse', score: clubhouseScore, setScore: setClubhouseScore },
               { key: 'facilities', label: 'Facilities', score: facilitiesScore, setScore: setFacilitiesScore },
             ].map(({ key, label, score, setScore }) => {
               const displayValue = score ?? 5; // centre if unset
+              const formatScore = (value: number | null) =>
+                value == null ? '--' : value.toFixed(1);
+              
               return (
                 <div key={key} className="space-y-1.5">
                   <div className="flex items-baseline justify-between">
                     <p className="text-sm font-medium">{label}</p>
                     <span className="text-xs text-muted-foreground">
-                      {score ? `${score}/10` : '-- / 10'}
+                      {formatScore(score)} / 10
                     </span>
                   </div>
 
                   <input
                     type="range"
-                    min={1}
+                    min={0.5}
                     max={10}
-                    step={1}
+                    step={0.5}
                     value={displayValue}
-                    onChange={(e) => setScore(parseInt(e.target.value, 10))}
+                    onChange={(e) => setScore(parseFloat(e.target.value))}
                     className="w-full accent-slate-800"
                   />
 
                   <div className="flex justify-between text-[11px] text-muted-foreground">
-                    <span>1</span>
+                    <span>0.5</span>
                     <span>3</span>
                     <span>5</span>
                     <span>7</span>

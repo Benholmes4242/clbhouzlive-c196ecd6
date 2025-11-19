@@ -130,6 +130,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         currentReview={userRating?.review || null}
         currentDesignScore={userRating?.design_score}
         currentConditionScore={userRating?.condition_score}
+        currentClubhouseScore={userRating?.clubhouse_score}
         currentFacilitiesScore={userRating?.facilities_score}
         isOpen={isRatingModalOpen}
         onClose={() => setIsRatingModalOpen(false)}
