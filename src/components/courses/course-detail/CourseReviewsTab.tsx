@@ -248,6 +248,7 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
         averageRating10={reviewsData.stats.average}
         totalReviews={reviewsData.stats.total}
         reviews={transformedReviews}
+        courseId={courseId}
       />
 
       {selectedReview && (

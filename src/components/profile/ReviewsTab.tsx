@@ -5,6 +5,7 @@ import { Squircle } from "@/components/ui/squircle";
 import ClubhouseLogo from "@/components/ui/clubhouse-logo";
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useQueryClient } from '@tanstack/react-query';
 import { cn } from "@/lib/utils";
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
@@ -34,6 +35,7 @@ type ReviewsTabProps = {
   sentimentLabel?: string;     // e.g. "Very Positive"
   reviews: Review[];
   onThumbClick?: (reviewIndex: number, mediaIndex: number) => void;
+  courseId?: string;           // For query invalidation after voting
 };
 
 export default function ReviewsTab({
@@ -41,6 +43,7 @@ export default function ReviewsTab({
   totalReviews,
   sentimentLabel = sentimentFromAvg(averageRating10),
   reviews,
+  courseId,
 }: ReviewsTabProps) {
   const feed = useVerticalMediaFeed();
 
@@ -90,7 +93,7 @@ export default function ReviewsTab({
         {reviews
           .sort((a, b) => +new Date(b.dateISO) - +new Date(a.dateISO))
           .map((r, reviewIndex) => (
-            <ReviewCard key={r.id} review={r} reviewIndex={reviewIndex} onThumbClick={onThumbClick} />
+            <ReviewCard key={r.id} review={r} reviewIndex={reviewIndex} onThumbClick={onThumbClick} courseId={courseId} />
           ))}
       </div>
 
@@ -148,13 +151,16 @@ function SummaryBar({
 function ReviewCard({ 
   review, 
   reviewIndex, 
-  onThumbClick 
+  onThumbClick,
+  courseId
 }: { 
   review: Review; 
   reviewIndex?: number;
   onThumbClick?: (reviewIndex: number, mediaIndex: number) => void;
+  courseId?: string;
 }) {
   const { user } = useSupabaseSession();
+  const queryClient = useQueryClient();
   const [helpful, setHelpful] = React.useState(review.helpfulCount);
   const [unhelpful, setUnhelpful] = React.useState(review.unhelpfulCount || 0);
   const [userVote, setUserVote] = React.useState<'helpful' | 'unhelpful' | 'none'>(review.userVote || 'none');
@@ -216,12 +222,17 @@ function ReviewCard({
 
       const data = await response.json();
 
-      // Response handled above
-
       // Trust server response
       setHelpful(data.helpfulCount);
       setUnhelpful(data.unhelpfulCount);
       setUserVote(data.userVote);
+
+      // Invalidate queries to refresh counts everywhere
+      if (courseId) {
+        queryClient.invalidateQueries({ queryKey: ['course-reviews', courseId] });
+        queryClient.invalidateQueries({ queryKey: ['course-reviews-full', courseId] });
+        queryClient.invalidateQueries({ queryKey: ['course-reviews-detailed', courseId] });
+      }
     } catch (error) {
       console.error('Error voting:', error);
       // Rollback on failure
