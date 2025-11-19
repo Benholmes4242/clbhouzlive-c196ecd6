@@ -154,11 +154,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
           </div>
           
           <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-            {showRankBadge && course.global_rank && (
-              <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary border border-primary/20 whitespace-nowrap">
-                #{course.global_rank}
-              </span>
-            )}
             {contextTag && (
               <span className="inline-flex items-center rounded-full bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-muted-foreground whitespace-nowrap">
                 {contextTag}

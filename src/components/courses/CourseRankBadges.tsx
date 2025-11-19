@@ -193,7 +193,7 @@ const CourseRankBadges = ({
                 <Tooltip key={index} open={openTooltips.has(tooltipId)}>
                   <TooltipTrigger asChild>
                   <div 
-                    className="glass-badge-tight cursor-pointer" 
+                    className="glass-badge-tight shadow-lg cursor-pointer" 
                     onClick={(e) => handleTooltipToggle(tooltipId, e)}
                     onTouchEnd={(e) => handleTooltipToggle(tooltipId, e)}
                     onMouseEnter={() => handleMouseEnter(tooltipId)}
@@ -222,7 +222,7 @@ const CourseRankBadges = ({
                 <Tooltip key={index} open={openTooltips.has(tooltipId)}>
                   <TooltipTrigger asChild>
                     <div 
-                      className="glass-badge-tight cursor-pointer"
+                      className="glass-badge-tight shadow-lg cursor-pointer"
                       onClick={(e) => handleTooltipToggle(tooltipId, e)}
                       onTouchEnd={(e) => handleTooltipToggle(tooltipId, e)}
                       onMouseEnter={() => handleMouseEnter(tooltipId)}
@@ -255,7 +255,7 @@ const CourseRankBadges = ({
               <Tooltip key={index} open={openTooltips.has(tooltipId)}>
                 <TooltipTrigger asChild>
                   <div 
-                    className="glass-badge-tight cursor-pointer" 
+                    className="glass-badge-tight shadow-lg cursor-pointer" 
                     onClick={(e) => handleTooltipToggle(tooltipId, e)}
                     onTouchEnd={(e) => handleTooltipToggle(tooltipId, e)}
                     onMouseEnter={() => handleMouseEnter(tooltipId)}
@@ -277,7 +277,7 @@ const CourseRankBadges = ({
              <Tooltip open={openTooltips.has('player-rating')}>
                <TooltipTrigger asChild>
                       <div 
-                        className="glass-badge-tight cursor-pointer" 
+                        className="glass-badge-tight shadow-lg cursor-pointer" 
                         onClick={(e) => handleTooltipToggle('player-rating', e)}
                         onTouchEnd={(e) => handleTooltipToggle('player-rating', e)}
                         onMouseEnter={() => handleMouseEnter('player-rating')}
@@ -321,7 +321,7 @@ const CourseRankBadges = ({
           <Tooltip open={openTooltips.has('standalone-rating')}>
             <TooltipTrigger asChild>
                <div 
-                 className="glass-badge-tight cursor-pointer" 
+                 className="glass-badge-tight shadow-lg cursor-pointer" 
                  onClick={(e) => handleTooltipToggle('standalone-rating', e)}
                  onTouchEnd={(e) => handleTooltipToggle('standalone-rating', e)}
                  onMouseEnter={() => handleMouseEnter('standalone-rating')}
