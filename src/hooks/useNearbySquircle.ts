@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
+import { mockGolfers } from '@/features/golfers/mockGolfers';
 
 type VisibilityMode = 'everyone' | 'friends' | 'hidden';
 
@@ -15,6 +16,19 @@ async function fetchNearbySquircleData(
   userLng?: number
 ): Promise<NearbySquircleData> {
   try {
+    // Check if mock mode is enabled
+    const useMockData = true;
+    
+    if (useMockData) {
+      // Return mock data: 2 golfers (Andrew Yetzes + Gary Martyn)
+      return {
+        count: mockGolfers.length,
+        visibility: 'everyone',
+        isOpenToPlay: false,
+      };
+    }
+
+    // Otherwise fetch real data
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return { count: 0, visibility: 'everyone', isOpenToPlay: false };
