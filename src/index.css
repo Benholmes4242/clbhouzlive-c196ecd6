@@ -178,15 +178,28 @@ html, body, #root {
   padding: 0 !important; 
 }
 
+/* CRITICAL: Global header must always be flush to viewport top - no gaps allowed */
 /* Ensure page containers with headers have no top spacing */
-.page-with-header {
+.page-with-header,
+.min-h-screen,
+[class*="min-h-screen"] {
   margin: 0 !important;
-  padding: 0 !important;
+  padding-top: 0 !important;
 }
 
-/* Ensure all headers are anchored flush to viewport top */
+/* Ensure all headers are anchored flush to viewport top - applies to ALL pages */
 .chrome-header,
-header[data-chrome="header"] {
+header[data-chrome="header"],
+header.global-header,
+[data-hides-on-scroll] {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  top: 0 !important;
+}
+
+/* Override any container-level spacing that might create gaps above header */
+body > div:first-child,
+#root > div:first-child {
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
