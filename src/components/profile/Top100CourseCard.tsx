@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Check, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import PostPlayRatingModal from '../courses/PostPlayRatingModal';
 import CourseRankBadges from '../courses/CourseRankBadges';
 
 interface Top100CourseCardProps {
@@ -83,17 +82,17 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
     if (!onToggle) return;
     
     if (!isPlayed) {
-      // If course is not currently played, mark as played and show rating modal for first time
+      // If course is not currently played, mark as played and navigate to rate page
       setWasAlreadyPlayed(false);
       onToggle();
-      // Small delay to let the state update, then show rating modal
+      // Small delay to let the state update, then navigate to rating page
       setTimeout(() => {
-        setShowRatingModal(true);
+        navigate(`/courses/${course.id}/rate`);
       }, 100);
     } else {
-      // If already played, show the rating modal to edit existing rating
+      // If already played, navigate to rating page to edit
       setWasAlreadyPlayed(true);
-      setShowRatingModal(true);
+      navigate(`/courses/${course.id}/rate`);
     }
   };
 
@@ -172,21 +171,6 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
             <div className="absolute inset-0 bg-green-500/10 pointer-events-none z-5" />
           )}
         </div>
-
-        {/* Rating Modal - show for both new ratings and editing existing ones */}
-        {showRatingModal && isOwnProfile && (
-          <PostPlayRatingModal
-            course={{
-              id: course.id,
-              name: course.name,
-              thumbnail_image: course.thumbnail_image
-            }}
-            isOpen={showRatingModal}
-            onClose={() => setShowRatingModal(false)}
-            isEditMode={wasAlreadyPlayed}
-            onRemoveFromPlayed={onToggle}
-          />
-        )}
       </>
     );
   }
@@ -271,21 +255,6 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
           <div className="absolute inset-0 bg-green-500/5 pointer-events-none" />
         )}
       </div>
-
-      {/* Rating Modal - show for both new ratings and editing existing ones */}
-      {showRatingModal && isOwnProfile && (
-        <PostPlayRatingModal
-          course={{
-            id: course.id,
-            name: course.name,
-            thumbnail_image: course.thumbnail_image
-          }}
-          isOpen={showRatingModal}
-          onClose={() => setShowRatingModal(false)}
-          isEditMode={wasAlreadyPlayed}
-          onRemoveFromPlayed={onToggle}
-        />
-      )}
     </>
   );
 };
