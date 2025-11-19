@@ -38,6 +38,7 @@ interface PostPlayRatingModalProps {
   onClose: () => void;
   isEditMode?: boolean;
   onRemoveFromPlayed?: () => void;
+  asPage?: boolean;
 }
 
 const PostPlayRatingModal = ({ 
@@ -45,7 +46,8 @@ const PostPlayRatingModal = ({
   isOpen, 
   onClose, 
   isEditMode = false, 
-  onRemoveFromPlayed 
+  onRemoveFromPlayed,
+  asPage = false
 }: PostPlayRatingModalProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -452,21 +454,17 @@ const PostPlayRatingModal = ({
 
   if (!course) return null;
 
-  return (
-    <>
-      <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="fixed inset-0 z-[999] bg-surface-card !rounded-none sm:!rounded-none max-w-none h-full w-full [&>button]:hidden overflow-y-auto">
+  if (asPage) {
+    return (
+      <div className="fixed inset-0 bg-surface-card overflow-y-auto">
+        <div className="p-4 border-b border-border">
+          <h1 className="text-xl font-semibold">Rate {course.name}</h1>
+        </div>
+        <div className="p-4 space-y-6">
           {!showConfirmation ? (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-xl font-semibold">
-                  Add {course.name} to Played
-                </DialogTitle>
-              </DialogHeader>
-
-              <div className="space-y-6 mt-4">
-                {/* Course Card Preview */}
-                <div className="relative rounded-lg border overflow-hidden bg-green-50 border-green-200">
+            <div className="space-y-6">
+          {/* Course Card Preview */}
+          <div className="relative rounded-lg border overflow-hidden bg-green-50 border-green-200">
                   <div className="relative h-24 overflow-hidden">
                     {course.thumbnail_image ? (
                       <img
@@ -651,10 +649,10 @@ const PostPlayRatingModal = ({
                   )}
                 </div>
               </div>
-            </>
+            </div>
           ) : (
             /* Confirmation Screen */
-            <div className="text-center space-y-4 py-4">
+            <div className="text-center space-y-4 py-4 p-4">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
                 <Check className="h-8 w-8 text-green-600" />
               </div>
@@ -684,13 +682,25 @@ const PostPlayRatingModal = ({
                 )}
               </div>
 
-              <Button onClick={handleClose} className="w-full">
-                Done
-              </Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+          <Button onClick={handleClose} className="w-full">
+            Done
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <>
+      {asPage ? (
+        content
+      ) : (
+        <Dialog open={isOpen} onOpenChange={handleClose}>
+          <DialogContent className={contentClassName}>
+            {content}
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Remove Confirmation Dialog */}
       <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
