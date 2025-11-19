@@ -873,6 +873,7 @@ export type Database = {
       }
       course_ratings: {
         Row: {
+          clubhouse_score: number | null
           condition_score: number | null
           course_id: string
           created_at: string
@@ -888,6 +889,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          clubhouse_score?: number | null
           condition_score?: number | null
           course_id: string
           created_at?: string
@@ -903,6 +905,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          clubhouse_score?: number | null
           condition_score?: number | null
           course_id?: string
           created_at?: string
@@ -4434,6 +4437,7 @@ export type Database = {
     Views: {
       course_rating_aggregates: {
         Row: {
+          avg_clubhouse_score: number | null
           avg_condition_score: number | null
           avg_design_score: number | null
           avg_facilities_score: number | null

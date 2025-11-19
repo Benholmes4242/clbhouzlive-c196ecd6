@@ -6,6 +6,7 @@ export interface CourseRatingAggregate {
   avg_overall_score?: number;
   avg_design_score?: number;
   avg_condition_score?: number;
+  avg_clubhouse_score?: number;
   avg_facilities_score?: number;
   review_count: number;
   text_review_count: number;
@@ -20,7 +21,7 @@ export function useCourseRatingAggregates(courseId: string | undefined) {
 
       const { data, error } = await supabase
         .from('course_rating_aggregates' as any)
-        .select('*')
+        .select('course_id, avg_overall_score, avg_design_score, avg_condition_score, avg_clubhouse_score, avg_facilities_score, review_count, text_review_count')
         .eq('course_id', courseId)
         .maybeSingle();
 
