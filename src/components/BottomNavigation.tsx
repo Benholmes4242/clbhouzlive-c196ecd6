@@ -5,7 +5,6 @@ import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useModalState } from '@/hooks/useModalDetector';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
-import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 
 
@@ -66,19 +65,6 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
         activeTab={activeTab}
         onTabClick={handleTabClickWithCamera}
         variant={variant}
-      />
-
-      <PostSubmissionHandler
-        isComposerOpen={isComposerOpen}
-        mediaItems={mediaItems}
-        selectedFile={selectedFile}
-        selectedCourse={selectedCourse}
-        onCourseSelect={setSelectedCourse}
-        onClose={handleCloseComposer}
-        onShowToast={showConfirmationToast}
-        isSubmitting={isSubmitting}
-        setIsSubmitting={() => {}}
-        onMediaChange={setMediaItems}
       />
 
       <SnapToast
