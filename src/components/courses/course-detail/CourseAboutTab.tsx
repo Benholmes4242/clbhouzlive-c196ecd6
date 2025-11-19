@@ -138,18 +138,18 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseLocationBreadcrumb course={course} />
       
       {/* Community Score Section */}
-      <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
-        <div className="flex items-center justify-between gap-3">
+      <section className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-4 md:px-6 md:py-5">
+        <div className="flex items-center justify-between gap-3 mb-3">
           <div>
-            <h2 className="text-base font-semibold text-foreground">Community Score</h2>
-            <p className="text-xs text-muted-foreground">
+            <h2 className="text-base md:text-lg font-semibold text-foreground">Community Score</h2>
+            <p className="text-xs md:text-sm text-muted-foreground mt-1">
               Based on {ratingAggregates?.review_count || 0} {ratingAggregates?.review_count === 1 ? 'rating' : 'ratings'}
             </p>
           </div>
 
           <div className="flex items-baseline gap-1">
             <ClubhouseLogo size="sm" />
-            <span className="text-lg font-semibold text-foreground">
+            <span className="text-base md:text-lg font-semibold text-foreground">
               {ratingAggregates?.avg_overall_score 
                 ? formatScore(ratingAggregates.avg_overall_score) 
                 : '—'}
@@ -159,26 +159,23 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </div>
         
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-2">
+        <div className="mt-4 flex flex-col sm:flex-row gap-2">
           <Button 
             onClick={handleRateClick}
-            className="flex-1"
-            size="lg"
-            variant="default"
+            className="w-full sm:w-auto justify-center"
           >
             {userRating ? 'Edit Your Rating' : 'Rate this Course'}
           </Button>
           <Button 
             onClick={handlePlayedToggle}
             disabled={isToggling}
-            variant={hasPlayed ? "default" : "outline"}
-            size="lg"
-            className="flex-1"
+            variant="outline"
+            className="w-full sm:w-auto justify-center border-border/70 bg-card"
           >
             {hasPlayed ? (
               <>
                 <Check className="h-4 w-4 mr-2" />
-                You've Played Here
+                Mark as Played
               </>
             ) : (
               <>
@@ -261,7 +258,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             </div>
           </div>
         ) : (
-          <p className="text-xs text-muted-foreground text-center pt-2">
+          <p className="mt-4 text-xs md:text-sm text-muted-foreground text-center">
             No ratings yet – be the first to rate this course!
           </p>
         )}
@@ -270,13 +267,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* About Section */}
       {course.description && (
         <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
-          <h2 className="text-base font-semibold">About</h2>
-          <div className="text-sm text-muted-foreground leading-relaxed">
+          <h2 className="text-base md:text-lg font-semibold">About</h2>
+          <div className="text-sm md:text-base leading-relaxed text-foreground">
             {formatDescription(displayDescription)}
             {shouldShowReadMore && (
               <button
                 onClick={() => setShowFullDescription(!showFullDescription)}
-                className="block mt-2 text-sm text-muted-foreground hover:text-foreground font-medium"
+                className="mt-2 text-sm font-medium text-primary hover:underline"
               >
                 {showFullDescription ? 'Show less' : 'Read more'}
               </button>
@@ -292,8 +289,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
         {/* Location Section */}
         <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
-          <h2 className="text-base font-semibold">Location</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="text-base md:text-lg font-semibold">Location</h2>
+          <p className="text-sm md:text-base text-foreground">
             {[course.sub_country, course.region].filter(Boolean).join(', ')}
           </p>
           

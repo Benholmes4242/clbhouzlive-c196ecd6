@@ -139,11 +139,11 @@ const CourseRatingSystem = ({
                 onMouseEnter={() => setHoveredRating(value)}
                 onMouseLeave={() => setHoveredRating(null)}
                 disabled={isSubmitting}
-                className={`min-w-[44px] px-2 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+                className={`h-10 w-12 rounded-xl text-sm font-medium border transition-colors ${
                   (hoveredRating !== null && value <= hoveredRating) ||
                   (hoveredRating === null && isSelected)
-                    ? 'bg-surface-slate text-card-foreground border-transparent'
-                    : 'bg-surface-alt text-foreground border-border/60 hover:bg-card'
+                    ? 'bg-slate-900 text-white border-transparent shadow-sm'
+                    : 'bg-muted border-border/60 hover:bg-card'
                 }`}
               >
                 {value}
@@ -152,33 +152,33 @@ const CourseRatingSystem = ({
           })}
         </div>
 
-        <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-surface-slate text-card-foreground text-xs font-medium">
+        <div className="mt-3 inline-flex px-3 py-1 rounded-full bg-slate-900 text-xs font-medium text-background">
           Selected: {selectedRating ?? '—'}/10
         </div>
       </div>
 
       {/* Review Section */}
       <div className="space-y-2">
-        <label className="text-sm font-medium">
-          Share your thoughts (optional)
+        <label className="text-sm font-medium text-foreground">
+          Share your thoughts <span className="text-muted-foreground">(optional)</span>
         </label>
         <Textarea
           value={review}
           onChange={(e) => setReview(e.target.value)}
           placeholder="Tell other golfers what stood out – routing, conditioning, greens, hospitality..."
-          className="mt-3 bg-card border-border/60 text-sm placeholder:text-muted-foreground/70 min-h-[80px] resize-none"
+          className="bg-card border border-border/60 rounded-xl text-sm placeholder:text-muted-foreground min-h-[80px] resize-none"
           disabled={isSubmitting}
           maxLength={500}
         />
-        <p className="mt-1 text-[11px] text-muted-foreground text-right">
+        <p className="text-[11px] text-muted-foreground text-right">
           {review.length}/500
         </p>
       </div>
 
       {/* Media Upload Section */}
       <div className="space-y-2">
-        <label className="text-sm font-medium">
-          Upload photos or videos (optional)
+        <label className="text-sm font-medium text-foreground">
+          Upload photos or videos <span className="text-muted-foreground">(optional)</span>
         </label>
         <MediaFileHandler onFilesSelected={handleFilesSelected} />
         <MediaPreview 
@@ -192,7 +192,7 @@ const CourseRatingSystem = ({
         onClick={handleSubmit}
         disabled={isSubmitting || !selectedRating}
         variant="default"
-        className="w-full"
+        className="w-full justify-center"
       >
         {isSubmitting ? "Submitting..." : "Submit rating"}
       </Button>
