@@ -19,16 +19,8 @@ const ProfilePage = () => {
   const queryClient = useQueryClient();
   const [loadoutModalOpen, setLoadoutModalOpen] = useState(false);
   
-  // Only invalidate profile cache on initial page load, not on remounts
-  useEffect(() => {
-    // Only invalidate if we're coming from a different route or initial load
-    const hasInitialized = sessionStorage.getItem('profile-initialized');
-    if (!hasInitialized) {
-      console.log('ProfilePage initial load - invalidating profile cache');
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-      sessionStorage.setItem('profile-initialized', 'true');
-    }
-  }, []); // Remove queryClient dependency to prevent retriggering
+  // Phase 1 Perf: Removed forced cache invalidation - rely on staleTime instead
+  // React Query's built-in caching with 5min staleTime (from perfTuning) is sufficient
   
   const {
     user,

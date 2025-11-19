@@ -13,6 +13,7 @@ import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTa
 import CourseMediaTab from '@/components/courses/course-detail/CourseMediaTab';
 import Top100Pills from '@/components/courses/Top100Pills';
 import { useCourseTop100Memberships } from '@/hooks/useCourseTop100Memberships';
+import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 
 
 interface GolfClubViewProps {
@@ -78,17 +79,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
 
   if (courseLoading || !course) {
-    return (
-      <div className={isInModal ? "p-6 space-y-4" : "min-h-screen bg-background"}>
-        <div className="animate-pulse">
-          <div className="h-96 bg-muted" />
-          <div className="p-6 space-y-4">
-            <div className="h-8 bg-muted rounded w-3/4" />
-            <div className="h-4 bg-muted rounded w-1/2" />
-          </div>
-        </div>
-      </div>
-    );
+    // Phase 1 Perf: Use consistent skeleton loader
+    return <CourseDetailSkeleton />;
   }
 
   return (

@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import ScrollToTop from '@/components/ScrollToTop';
+import { ScrollRestoration } from '@/components/ScrollRestoration';
 import { ThemeProvider } from '@/components/theme-provider';
 import SiteAccessControl from "@/components/SiteAccessControl";
 import AccessGateV2 from "@/components/AccessGateV2";
@@ -28,6 +29,10 @@ import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
+import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
+import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
+import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton';
+import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { HubProvider } from '@/features/hub/useHub';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 import { longPressHandler } from '@/utils/longPressHandler';
@@ -170,10 +175,10 @@ function AppRoutes() {
         <Route path="/profile-test" element={<ProfileTestPage />} />
         <Route path="/profile/:username" element={<UserProfilePage />} />
         <Route path="/settings" element={<SettingsWrapped />} />
-        <Route path="/clubhouse" element={<ClubhouseWrapped />} />
+        <Route path="/clubhouse" element={<Suspense fallback={<ClubhouseSkeleton />}><ClubhouseWrapped /></Suspense>} />
         <Route path="/discover" element={<DiscoverWrapped />} />
-        <Route path="/courses" element={<Courses />} />
-        <Route path="/courses/:courseId" element={<CourseDetailPage />} />
+        <Route path="/courses" element={<Suspense fallback={<CoursesListSkeleton />}><Courses /></Suspense>} />
+        <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
         <Route path="/user/:username/courses" element={<UserCoursesPage />} />
         <Route path="/my-ratings" element={<MyRatings />} />
         <Route path="/news" element={<News />} />
@@ -426,6 +431,7 @@ const App: React.FC = () => {
                 <BrowserRouter>
                   <HubProvider>
                     <ScrollToTop />
+                    <ScrollRestoration />
                     <GlobalAudioProvider>
                       <VideoManagerProvider>
                         <VideoPlaybackManagerProvider>
