@@ -126,44 +126,36 @@ const CourseRatingSystem = ({
 
   return (
     <div className="space-y-4">
-      <div className="text-center">
-        <p className="text-sm font-medium mb-2">Rate your experience</p>
-        <div className="flex items-center justify-center gap-1 mb-2">
-          <ClubhouseLogo size="sm" showTooltip />
-          <span className="text-sm text-muted-foreground">Rate from 0.5 to 10</span>
+      <div className="mt-4 space-y-2">
+        <p className="text-xs font-medium text-muted-foreground">Select a score</p>
+        <div className="flex flex-wrap gap-2">
+          {ratingOptions.map((value) => {
+            const isSelected = value === selectedRating;
+            return (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setSelectedRating(value)}
+                onMouseEnter={() => setHoveredRating(value)}
+                onMouseLeave={() => setHoveredRating(null)}
+                disabled={isSubmitting}
+                className={`min-w-[44px] px-2 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+                  (hoveredRating !== null && value <= hoveredRating) ||
+                  (hoveredRating === null && isSelected)
+                    ? 'bg-surface-slate text-card-foreground border-transparent'
+                    : 'bg-surface-alt text-foreground border-border/60 hover:bg-card'
+                }`}
+              >
+                {value}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-surface-slate text-card-foreground text-xs font-medium">
+          Selected: {selectedRating ?? '—'}/10
         </div>
       </div>
-
-      {/* Rating Buttons */}
-      <div className="flex flex-wrap gap-1 justify-center">
-        {ratingOptions.map((rating) => (
-          <Button
-            key={rating}
-            variant={
-              (hoveredRating !== null && rating <= hoveredRating) ||
-              (hoveredRating === null && selectedRating !== null && rating <= selectedRating)
-                ? "default"
-                : "outline"
-            }
-            size="sm"
-            className="h-8 px-2 text-xs"
-            onClick={() => setSelectedRating(rating)}
-            onMouseEnter={() => setHoveredRating(rating)}
-            onMouseLeave={() => setHoveredRating(null)}
-            disabled={isSubmitting}
-          >
-            {rating}
-          </Button>
-        ))}
-      </div>
-
-      {selectedRating && (
-        <div className="text-center">
-          <Badge variant="secondary" className="text-sm">
-            Selected: {selectedRating}/10
-          </Badge>
-        </div>
-      )}
 
       {/* Review Section */}
       <div className="space-y-2">
@@ -173,14 +165,14 @@ const CourseRatingSystem = ({
         <Textarea
           value={review}
           onChange={(e) => setReview(e.target.value)}
-          placeholder="What made this course stand out for you?"
-          className="min-h-[80px] resize-none"
+          placeholder="Tell other golfers what stood out – routing, conditioning, greens, hospitality..."
+          className="mt-3 bg-card border-border/60 text-sm placeholder:text-muted-foreground/70 min-h-[80px] resize-none"
           disabled={isSubmitting}
           maxLength={500}
         />
-        <div className="text-xs text-muted-foreground text-right">
+        <p className="mt-1 text-[11px] text-muted-foreground text-right">
           {review.length}/500
-        </div>
+        </p>
       </div>
 
       {/* Media Upload Section */}
@@ -199,9 +191,10 @@ const CourseRatingSystem = ({
       <Button 
         onClick={handleSubmit}
         disabled={isSubmitting || !selectedRating}
+        variant="default"
         className="w-full"
       >
-        {isSubmitting ? "Submitting..." : "Submit Rating"}
+        {isSubmitting ? "Submitting..." : "Submit rating"}
       </Button>
     </div>
   );

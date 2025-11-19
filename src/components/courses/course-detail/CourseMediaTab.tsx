@@ -139,12 +139,17 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
 
   if (exploreItems.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-          <ImageIcon className="h-8 w-8 text-muted-foreground" />
+      <div className="flex flex-col items-center justify-center px-6 pt-10 pb-24 text-center text-muted-foreground gap-3">
+        <div className="w-12 h-12 rounded-full bg-surface-alt flex items-center justify-center">
+          <ImageIcon className="w-6 h-6" />
         </div>
-        <h3 className="text-xl font-semibold mb-2">No media yet</h3>
-        <p className="text-muted-foreground">Share photos and videos of this course in your posts or reviews!</p>
+
+        <div>
+          <p className="text-sm font-medium text-foreground">No media yet</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Share photos and videos of this course in your posts or reviews!
+          </p>
+        </div>
       </div>
     );
   }

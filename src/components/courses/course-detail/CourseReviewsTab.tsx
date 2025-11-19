@@ -207,12 +207,37 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
 
   if (!reviewsData?.reviews || reviewsData.reviews.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-          <Star className="h-8 w-8 text-muted-foreground" />
+      <div className="flex flex-col items-center justify-center px-6 pt-10 pb-24 text-center text-muted-foreground gap-3">
+        <div className="w-12 h-12 rounded-full bg-surface-alt flex items-center justify-center">
+          <Star className="w-6 h-6" />
         </div>
-        <h3 className="text-xl font-semibold mb-2">No reviews yet</h3>
-        <p className="text-muted-foreground">Be the first to leave a review for this course!</p>
+
+        <div>
+          <p className="text-sm font-medium text-foreground">No reviews yet</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Be the first to leave a review for this course!
+          </p>
+        </div>
+
+        {!hasUserReviewed && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              if (!user) {
+                toast({
+                  title: "Sign in required",
+                  description: "Please sign in to write a review",
+                });
+                navigate('/auth');
+                return;
+              }
+              // Open rating modal logic here if needed
+            }}
+          >
+            Write a review
+          </Button>
+        )}
       </div>
     );
   }
