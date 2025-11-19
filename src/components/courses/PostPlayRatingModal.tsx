@@ -57,6 +57,9 @@ const PostPlayRatingModal = ({
   const [hasMarkedAsPlayed, setHasMarkedAsPlayed] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
   const [buttonText, setButtonText] = useState('Add to Played');
+  const [designScore, setDesignScore] = useState<number | null>(null);
+  const [conditionScore, setConditionScore] = useState<number | null>(null);
+  const [facilitiesScore, setFacilitiesScore] = useState<number | null>(null);
 
   const { data: existingRating } = useQuery({
     queryKey: ['user-course-rating', course?.id],
@@ -88,6 +91,9 @@ const PostPlayRatingModal = ({
     if (existingRating && isEditMode) {
       setSelectedRating(existingRating.rating);
       setReview(existingRating.review || '');
+      setDesignScore(existingRating.design_score);
+      setConditionScore(existingRating.condition_score);
+      setFacilitiesScore(existingRating.facilities_score);
     }
   }, [existingRating, isEditMode]);
 
@@ -178,7 +184,21 @@ const PostPlayRatingModal = ({
   });
 
   const submitRatingMutation = useMutation({
-    mutationFn: async ({ rating, reviewText, mediaFiles }: { rating: number; reviewText: string; mediaFiles: File[] }) => {
+    mutationFn: async ({ 
+      rating, 
+      reviewText, 
+      mediaFiles,
+      design,
+      condition,
+      facilities
+    }: { 
+      rating: number; 
+      reviewText: string; 
+      mediaFiles: File[];
+      design: number | null;
+      condition: number | null;
+      facilities: number | null;
+    }) => {
       const { data: userResponse } = await supabase.auth.getUser();
       if (!userResponse.user || !course) throw new Error('Not authenticated or no course');
 
@@ -191,6 +211,9 @@ const PostPlayRatingModal = ({
           .update({
             rating,
             review: reviewText || null,
+            design_score: design,
+            condition_score: condition,
+            facilities_score: facilities,
             updated_at: new Date().toISOString()
           })
           .eq('id', existingRating.id);
@@ -205,7 +228,10 @@ const PostPlayRatingModal = ({
             course_id: course.id,
             user_id: userResponse.user.id,
             rating,
-            review: reviewText || null
+            review: reviewText || null,
+            design_score: design,
+            condition_score: condition,
+            facilities_score: facilities
           })
           .select()
           .single();
@@ -247,6 +273,7 @@ const PostPlayRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', course?.id] });
       
       // Show "Added!" text for 1.5 seconds
       setButtonText('Added!');
@@ -365,6 +392,9 @@ const PostPlayRatingModal = ({
     if (!isEditMode) {
       setSelectedRating(null);
       setReview('');
+      setDesignScore(null);
+      setConditionScore(null);
+      setFacilitiesScore(null);
     }
     setShowConfirmation(false);
     setIsSubmitting(false);
@@ -392,7 +422,10 @@ const PostPlayRatingModal = ({
     submitRatingMutation.mutate({ 
       rating: selectedRating, 
       reviewText: review.trim(),
-      mediaFiles: selectedMedia
+      mediaFiles: selectedMedia,
+      design: designScore,
+      condition: conditionScore,
+      facilities: facilitiesScore
     });
   };
 
@@ -404,18 +437,16 @@ const PostPlayRatingModal = ({
     setSelectedMedia(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Handle slider value change (convert from 0-20 to 0.5-10)
-  const handleSliderChange = (value: number[]) => {
-    const rating = value[0] * 0.5;
-    setSelectedRating(rating);
-  };
+  // Format score for display
+  const formatScore = (value: number | null | undefined) =>
+    value == null ? '--' : value.toFixed(1);
 
   if (!course) return null;
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="max-w-md mx-auto !rounded-none [&>button]:hidden">
+        <DialogContent className="fixed inset-0 z-[999] bg-surface-card rounded-none sm:rounded-none max-w-none h-full w-full [&>button]:hidden overflow-y-auto">
           {!showConfirmation ? (
             <>
               <DialogHeader>
@@ -458,46 +489,115 @@ const PostPlayRatingModal = ({
                 {/* Rating Slider Section */}
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Rating</label>
-                    <div className="px-3">
-                      <Slider
-                        value={[selectedRating ? selectedRating * 2 : 1]}
-                        onValueChange={handleSliderChange}
-                        max={20}
-                        min={1}
-                        step={1}
-                        className="w-full review-rating-slider"
-                      />
-                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                        <span>0.5</span>
-                        <span>10.0</span>
+                    <div className="flex items-baseline justify-between mb-1">
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                          Your overall rating
+                        </p>
+                        <p className="text-2xl font-semibold">
+                          {formatScore(selectedRating)}{' '}
+                          <span className="text-sm text-muted-foreground">/ 10</span>
+                        </p>
                       </div>
                     </div>
-                    
-                    {selectedRating && (
-                      <div className="text-center mt-3">
-                        <span className="text-lg font-bold" style={{ color: '#F5A623' }}>
-                          {selectedRating.toFixed(1)}/10
-                        </span>
+
+                    <div className="space-y-1.5">
+                      <input
+                        type="range"
+                        min={0.5}
+                        max={10}
+                        step={0.5}
+                        value={selectedRating || 5}
+                        onChange={(e) => setSelectedRating(parseFloat(e.target.value))}
+                        className="w-full accent-slate-800 focus:outline-none"
+                      />
+
+                      {/* tick labels */}
+                      <div className="flex justify-between text-[11px] text-muted-foreground">
+                        <span>0.5</span>
+                        <span>3</span>
+                        <span>5</span>
+                        <span>7</span>
+                        <span>9</span>
+                        <span>10</span>
                       </div>
-                    )}
+                    </div>
+
+                    {/* selected pill */}
+                    <div className="mt-2 flex justify-center">
+                      <span className="inline-flex items-center rounded-full bg-slate-900 text-white px-3 py-1 text-xs">
+                        {selectedRating !== null ? `Selected: ${formatScore(selectedRating)} / 10` : 'No rating selected yet'}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Review Section */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Review (optional)</label>
-                  <Textarea
-                    value={review}
-                    onChange={(e) => setReview(e.target.value)}
-                    placeholder="Write your review..."
-                    className="min-h-[100px] resize-none rounded-lg border-gray-200"
-                    disabled={isSubmitting}
-                    maxLength={500}
-                  />
-                  <div className="text-xs text-muted-foreground text-right">
-                    {review.length}/500
+                  <div className="flex items-baseline justify-between mb-1.5">
+                    <p className="text-sm font-medium">Share your thoughts</p>
+                    <span className="text-xs text-muted-foreground">(optional)</span>
                   </div>
+                  <div className="relative">
+                    <Textarea
+                      value={review}
+                      onChange={(e) => setReview(e.target.value)}
+                      rows={4}
+                      className="w-full rounded-2xl border border-border bg-surface-alt px-3.5 py-3 text-sm
+                                placeholder:text-muted-foreground/80 focus-visible:outline-none focus-visible:ring-2
+                                focus-visible:ring-primary/60 focus-visible:border-transparent transition-shadow resize-none"
+                      placeholder="Tell other golfers what stood out – routing, conditioning, greens, hospitality..."
+                      disabled={isSubmitting}
+                      maxLength={500}
+                    />
+                    <span className="absolute right-3 bottom-2 text-[11px] text-muted-foreground">
+                      {review.length}/500
+                    </span>
+                  </div>
+                </div>
+
+                {/* Breakdown Section */}
+                <div className="mt-5 border-t border-border pt-4 space-y-4">
+                  <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                    Breakdown (optional)
+                  </p>
+
+                  {[
+                    { key: 'design', label: 'Course Design', score: designScore, setScore: setDesignScore },
+                    { key: 'condition', label: 'Course Condition', score: conditionScore, setScore: setConditionScore },
+                    { key: 'facilities', label: 'Facilities', score: facilitiesScore, setScore: setFacilitiesScore },
+                  ].map(({ key, label, score, setScore }) => {
+                    const displayValue = score ?? 5;
+                    return (
+                      <div key={key} className="space-y-1.5">
+                        <div className="flex items-baseline justify-between">
+                          <p className="text-sm font-medium">{label}</p>
+                          <span className="text-xs text-muted-foreground">
+                            {formatScore(score)} / 10
+                          </span>
+                        </div>
+
+                        <input
+                          type="range"
+                          min={0.5}
+                          max={10}
+                          step={0.5}
+                          value={displayValue}
+                          onChange={(e) => setScore(parseFloat(e.target.value))}
+                          className="w-full accent-slate-800"
+                        />
+
+                        <div className="flex justify-between text-[11px] text-muted-foreground">
+                          <span>0.5</span>
+                          <span>3</span>
+                          <span>5</span>
+                          <span>7</span>
+                          <span>9</span>
+                          <span>10</span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Media Upload Section */}

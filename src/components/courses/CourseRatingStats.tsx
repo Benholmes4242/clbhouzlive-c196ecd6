@@ -11,6 +11,9 @@ interface CourseRatingStatsProps {
 const CourseRatingStats = ({ courseId }: CourseRatingStatsProps) => {
   const { data: aggregates, isLoading } = useCourseRatingAggregates(courseId);
 
+  const formatScore = (value: number | null | undefined) =>
+    value == null ? '--' : value.toFixed(1);
+
   if (isLoading) {
     return (
       <div className="border rounded-lg p-4">
@@ -29,65 +32,29 @@ const CourseRatingStats = ({ courseId }: CourseRatingStatsProps) => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <ClubhouseLogo size="md" showTooltip />
-              <span className="text-2xl font-bold">{aggregates.avg_overall_score}/10</span>
+              <span className="text-2xl font-bold">{formatScore(aggregates.avg_overall_score)}/10</span>
             </div>
             <div className="flex items-center gap-1 text-muted-foreground">
               <Users className="h-4 w-4" />
-              <span>{aggregates.review_count} ratings</span>
+              <span>{aggregates.review_count} {aggregates.review_count === 1 ? 'rating' : 'ratings'}</span>
             </div>
           </div>
 
-          {/* Breakdown sections - only show if data exists */}
-          {(aggregates.avg_design_score || aggregates.avg_condition_score || aggregates.avg_facilities_score) && (
-            <div className="space-y-2 mt-4 pt-4 border-t">
-              <h4 className="text-sm font-medium text-muted-foreground">Rating Breakdown</h4>
-              
-              {aggregates.avg_design_score && (
-                <div className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span>Course Design</span>
-                    <span className="font-medium">{aggregates.avg_design_score}/10</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-primary rounded-full transition-all"
-                      style={{ width: `${(aggregates.avg_design_score / 10) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {aggregates.avg_condition_score && (
-                <div className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span>Course Condition</span>
-                    <span className="font-medium">{aggregates.avg_condition_score}/10</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-primary rounded-full transition-all"
-                      style={{ width: `${(aggregates.avg_condition_score / 10) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {aggregates.avg_facilities_score && (
-                <div className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span>Facilities</span>
-                    <span className="font-medium">{aggregates.avg_facilities_score}/10</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-primary rounded-full transition-all"
-                      style={{ width: `${(aggregates.avg_facilities_score / 10) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              )}
+          {/* Breakdown sections */}
+          <div className="mt-3 space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Design</span>
+              <span className="font-medium">{formatScore(aggregates.avg_design_score)} / 10</span>
             </div>
-          )}
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Condition</span>
+              <span className="font-medium">{formatScore(aggregates.avg_condition_score)} / 10</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Facilities</span>
+              <span className="font-medium">{formatScore(aggregates.avg_facilities_score)} / 10</span>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="text-muted-foreground">
