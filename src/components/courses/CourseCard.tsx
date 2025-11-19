@@ -200,7 +200,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   return (
     <>
       <div 
-        className={`group hover:shadow-lg transition-all duration-200 ${disableClick ? 'cursor-default' : 'cursor-pointer'} overflow-hidden relative ${customHeight}`}
+        className={`group hover:shadow-lg transition-all duration-200 ${disableClick ? 'cursor-default' : 'cursor-pointer'} overflow-hidden relative ${customHeight} rounded-none sm:rounded-xl`}
         onClick={handleCardClick}
       >
         <CourseCardBackground 

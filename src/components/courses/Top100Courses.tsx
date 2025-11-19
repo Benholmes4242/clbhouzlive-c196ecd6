@@ -142,14 +142,17 @@ const Top100Courses = () => {
             {loadingGlobal ? (
               <LoadingSkeleton />
             ) : globalTop100 && globalTop100.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {globalTop100.map((course) => (
-                  <CourseCard 
-                    key={course.id} 
-                    course={course} 
-                    viewContext="global" 
-                  />
-                ))}
+              <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
+                <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
+                  {globalTop100.map((course) => (
+                    <div key={course.id} className="mb-4 sm:mb-0">
+                      <CourseCard 
+                        course={course} 
+                        viewContext="global" 
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : (
               <EmptyState 
@@ -212,14 +215,17 @@ const Top100Courses = () => {
                     </p>
                   </div>
                 )}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {regionalTop100.map((course) => (
-                    <CourseCard 
-                      key={course.id} 
-                      course={course} 
-                      viewContext="regional" 
-                    />
-                  ))}
+                <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
+                  <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
+                    {regionalTop100.map((course) => (
+                      <div key={course.id} className="mb-4 sm:mb-0">
+                        <CourseCard 
+                          course={course} 
+                          viewContext="regional" 
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ) : (

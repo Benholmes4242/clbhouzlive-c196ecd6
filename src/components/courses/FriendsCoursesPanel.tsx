@@ -136,7 +136,7 @@ const FriendsCoursesPanel: React.FC = () => {
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
             {courses.map((course) => {
               const uniqueFriends = course.friends;
               const friendsMeta = {
@@ -157,20 +157,21 @@ const FriendsCoursesPanel: React.FC = () => {
               };
 
               return (
-                <CourseCard
-                  key={course.course_id}
-                  course={{
-                    id: course.course_id,
-                    name: course.course_name,
-                    country: course.country || '',
-                    sub_country: course.sub_country,
-                    global_rank: course.global_rank,
-                  }}
-                  onClick={() => navigate(`/courses/${course.course_id}`)}
-                  contextTag="Hot in your network"
-                  friendsMeta={friendsMeta}
-                  showRankBadge={!!course.global_rank}
-                />
+                <div key={course.course_id} className="mb-4 sm:mb-0">
+                  <CourseCard
+                    course={{
+                      id: course.course_id,
+                      name: course.course_name,
+                      country: course.country || '',
+                      sub_country: course.sub_country,
+                      global_rank: course.global_rank,
+                    }}
+                    onClick={() => navigate(`/courses/${course.course_id}`)}
+                    contextTag="Hot in your network"
+                    friendsMeta={friendsMeta}
+                    showRankBadge={!!course.global_rank}
+                  />
+                </div>
               );
             })}
           </div>
