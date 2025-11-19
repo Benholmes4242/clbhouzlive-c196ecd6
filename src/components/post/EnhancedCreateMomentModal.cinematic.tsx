@@ -542,7 +542,7 @@ export default function EnhancedCreateMomentModalCinematic({
         role="dialog"
         aria-modal="true"
         aria-label="Create a Moment"
-        className="ecm-glass-sheet fixed inset-0"
+        className="ecm-glass-sheet fixed inset-0 !rounded-none"
         style={{
           background: 'rgba(0, 0, 0, 0.28)',
           backdropFilter: 'blur(22px)',
