@@ -463,8 +463,8 @@ const PostPlayRatingModal = ({
         <div className="p-4 space-y-6">
           {!showConfirmation ? (
             <div className="space-y-6">
-          {/* Course Card Preview */}
-          <div className="relative rounded-lg border overflow-hidden bg-green-50 border-green-200">
+              {/* Course Card Preview */}
+              <div className="relative rounded-lg border overflow-hidden bg-green-50 border-green-200">
                   <div className="relative h-24 overflow-hidden">
                     {course.thumbnail_image ? (
                       <img
@@ -682,25 +682,53 @@ const PostPlayRatingModal = ({
                 )}
               </div>
 
-          <Button onClick={handleClose} className="w-full">
-            Done
-          </Button>
+              <Button onClick={handleClose} className="w-full">
+                Done
+              </Button>
+            </div>
+          )}
         </div>
-      )}
-    </div>
-  );
+        
+        {/* Remove Confirmation Dialog for asPage mode */}
+        <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove Course from Played List?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to remove "{course.name}" from your played list? 
+                This will permanently delete your rating and review for this course.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleRemoveFromPlayed}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Remove Course
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    );
+  }
 
   return (
     <>
-      {asPage ? (
-        content
-      ) : (
-        <Dialog open={isOpen} onOpenChange={handleClose}>
-          <DialogContent className={contentClassName}>
-            {content}
-          </DialogContent>
-        </Dialog>
-      )}
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="fixed inset-0 z-[999] bg-surface-card !rounded-none sm:!rounded-none max-w-none h-full w-full [&>button]:hidden overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold">
+              Rate {course.name}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6 mt-4">
+            {/* Content will be added here for modal mode - keeping structure similar to page mode */}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Remove Confirmation Dialog */}
       <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
