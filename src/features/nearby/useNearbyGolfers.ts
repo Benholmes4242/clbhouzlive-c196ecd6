@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { NearbyGolfer } from './types';
 import { calculateDistance } from './distance';
 import { sortGolfers } from './utils/sortGolfers';
+import { isMockNearby } from './config';
+import { mockGolfers } from '@/features/golfers/mockGolfers';
 
 /**
  * Configuration options for the Nearby Golfers hook
@@ -22,6 +24,36 @@ export type NearbyGolfersOptions = {
  */
 async function fetchLiveNearby(options: NearbyGolfersOptions): Promise<NearbyGolfer[]> {
   const { userLat, userLng, radiusKm, onlyOpen = false, visibilityMode = 'all', limit = 999 } = options;
+  
+  // If mock mode is enabled, return ONLY mock data (ignore real database completely)
+  if (isMockNearby && Array.isArray(mockGolfers) && mockGolfers.length > 0) {
+    console.log('[useNearbyGolfers] Mock mode enabled - returning mock golfers:', mockGolfers);
+    const mappedMocks: NearbyGolfer[] = mockGolfers
+      .filter((mock: any) => {
+        // Apply radius filter
+        const distanceKm = mock.distance_m / 1000;
+        if (distanceKm > radiusKm) return false;
+        
+        // Apply onlyOpen filter
+        if (onlyOpen && !mock.open_to_play) return false;
+        
+        return true;
+      })
+      .map((mock: any) => ({
+        id: mock.id || mock.user_id,
+        display_name: mock.display_name,
+        home_club: mock.home_club,
+        avatar_url: mock.profile_photo_url,
+        is_online: true,
+        distance_km: mock.distance_m / 1000,
+        handicap: mock.eg_handicap_index,
+        isOpenToPlay: mock.open_to_play,
+        same_club: mock.same_club,
+      }))
+      .slice(0, limit);
+    
+    return mappedMocks;
+  }
   
   if (!userLat || !userLng) return [];
 
@@ -132,7 +164,7 @@ export function useNearbyGolfers(options: NearbyGolfersOptions) {
     queryFn: () => fetchLiveNearby(options),
     select: (golfers) => sortGolfers(golfers),
     staleTime: 15_000,
-    enabled: !!userLat && !!userLng,
+    enabled: isMockNearby || (!!userLat && !!userLng), // Enable query for mocks even without location
   });
 
   // Realtime subscription for nearby presence
