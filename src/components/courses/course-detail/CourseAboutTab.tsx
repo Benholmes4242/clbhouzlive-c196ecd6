@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import { CourseMilestonesCard } from '@/components/courses/CourseMilestonesCard';
+import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
 
 interface Course {
   id: string;
@@ -25,6 +26,7 @@ interface Course {
   country: string;
   region?: string;
   sub_country?: string;
+  local_area?: string;
   continent?: string;
   global_rank?: number | null;
   regional_rank?: number | null;
@@ -132,6 +134,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         onClose={() => setIsRatingModalOpen(false)}
       />
     <div className="space-y-6">
+      {/* Location Breadcrumb & Quick Filters */}
+      <CourseLocationBreadcrumb course={course} />
+      
       {/* Community Score Section */}
       <div className="bg-card rounded-lg border p-6">
         <div className="mb-6">
