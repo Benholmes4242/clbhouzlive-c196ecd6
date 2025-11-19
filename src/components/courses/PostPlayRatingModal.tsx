@@ -455,7 +455,7 @@ const PostPlayRatingModal = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="fixed inset-0 z-[999] bg-surface-card rounded-none sm:rounded-none max-w-none h-full w-full [&>button]:hidden overflow-y-auto">
+        <DialogContent className="fixed inset-0 z-[999] bg-surface-card !rounded-none sm:!rounded-none max-w-none h-full w-full [&>button]:hidden overflow-y-auto">
           {!showConfirmation ? (
             <>
               <DialogHeader>
