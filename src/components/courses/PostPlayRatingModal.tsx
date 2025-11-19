@@ -544,7 +544,7 @@ const PostPlayRatingModal = ({
                 {/* Review Section */}
                 <div className="space-y-2">
                   <div className="flex items-baseline justify-between mb-1.5">
-                    <p className="text-sm font-medium">Share your thoughts</p>
+                    <p className="text-sm font-medium">Share what stood out to you - from the greens and fairways to the design and facilities...</p>
                     <span className="text-xs text-muted-foreground">(optional)</span>
                   </div>
                   <div className="relative">

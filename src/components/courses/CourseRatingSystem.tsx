@@ -160,7 +160,7 @@ const CourseRatingSystem = ({
       {/* Review Section */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-foreground">
-          Share your thoughts <span className="text-muted-foreground">(optional)</span>
+          Share what stood out to you - from the greens and fairways to the design and facilities... <span className="text-muted-foreground">(optional)</span>
         </label>
         <Textarea
           value={review}
