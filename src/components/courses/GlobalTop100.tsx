@@ -233,7 +233,7 @@ const GlobalTop100 = () => {
             }
           }}
           placeholder="Search within this Top 100 list"
-          className="pl-10 pr-10 h-11 bg-card border-border/50 rounded-xl shadow-sm focus:shadow-md transition-shadow text-sm"
+          className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border transition-shadow text-sm"
         />
         {searchTerm && (
           <button
@@ -268,7 +268,7 @@ const GlobalTop100 = () => {
               }
             }}
           >
-            <SelectTrigger className="w-full h-11 bg-card border-border/60 rounded-xl">
+            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border transition-shadow">
               <SelectValue placeholder="Choose Top 100 list" />
             </SelectTrigger>
             <SelectContent>
@@ -293,7 +293,7 @@ const GlobalTop100 = () => {
                 value={selectedSubregion}
                 onValueChange={setSelectedSubregion}
               >
-                <SelectTrigger className="w-full h-11 bg-card border-border/60 rounded-xl">
+                <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border transition-shadow">
                   <SelectValue placeholder="All sub-regions" />
                 </SelectTrigger>
                 <SelectContent>
@@ -311,22 +311,22 @@ const GlobalTop100 = () => {
       </div>
 
       {/* Stats row */}
-      <div className="max-w-xl mx-auto mt-1 flex flex-col gap-1 text-sm text-muted-foreground">
-        <p>
+      <div className="max-w-xl mx-auto mt-2 space-y-1">
+        <p className="text-xs md:text-sm text-muted-foreground">
           Showing courses in <span className="font-medium">{currentListLabel}</span>
         </p>
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-xs">
-            Showing {startIndex}–{endIndex} of{' '}
-            {totalCount} courses
-          </p>
+        <div className="flex items-center justify-between text-xs md:text-sm text-muted-foreground">
+          <span>
+            Showing {startIndex}–{endIndex} of {totalCount} courses
+          </span>
           {hasActiveFilters && (
             <button
               type="button"
               onClick={handleResetFilters}
-              className="text-xs font-medium text-primary hover:underline"
+              className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-900 text-xs md:text-sm"
             >
-              Reset filters
+              <span className="text-[10px] leading-none">&times;</span>
+              <span>Reset filters</span>
             </button>
           )}
         </div>
