@@ -89,14 +89,25 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
 
           {/* Content */}
           <div className="flex-1 min-w-0 space-y-[3px]">
-            {/* Name line */}
-            <div className="flex items-center gap-2">
+            {/* Name + Distance line */}
+            <div className="flex items-center justify-between gap-2">
               <h3 className="text-[16px] font-semibold truncate" style={{ color: 'var(--hub-text)' }}>
                 {golfer.display_name}
               </h3>
+              {distanceText && (
+                <span 
+                  className="shrink-0 text-[13px] tabular-nums"
+                  style={{ 
+                    fontFeatureSettings: '"tnum"',
+                    color: 'var(--hub-text-sub)'
+                  }}
+                >
+                  {distanceText} away
+                </span>
+              )}
             </div>
             
-            {/* Meta line */}
+            {/* Home club + Handicap line */}
             <div 
               className="flex items-center gap-1.5 text-[13px]"
               style={{ 
@@ -104,22 +115,20 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
                 color: 'var(--hub-text-sub)'
               }}
             >
-              {golfer.handicap !== undefined && (
-                <>
-                  <span className="text-[13px]">
-                    HCP {golfer.handicap.toFixed(1)}
-                  </span>
-                  <span className="text-white/40">•</span>
-                </>
-              )}
               {golfer.home_club && (
                 <>
-                  <span className="truncate">{golfer.home_club}</span>
-                  {distanceText && <span className="text-white/40">•</span>}
+                  <span className="truncate">
+                    {golfer.home_club}
+                  </span>
+                  {golfer.handicap !== undefined && (
+                    <span className="text-white/40">•</span>
+                  )}
                 </>
               )}
-              {distanceText && (
-                <span className="shrink-0 tabular-nums" style={{ color: 'var(--hub-text-muted)' }}>{distanceText}</span>
+              {golfer.handicap !== undefined && (
+                <span className="shrink-0">
+                  HCP {golfer.handicap.toFixed(1)}
+                </span>
               )}
             </div>
 
