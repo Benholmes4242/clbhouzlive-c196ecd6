@@ -3,12 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -454,17 +448,16 @@ const PostPlayRatingModal = ({
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="fixed inset-0 z-[999] bg-surface-card !rounded-none sm:!rounded-none max-w-none h-full w-full [&>button]:hidden overflow-y-auto">
-          {!showConfirmation ? (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-xl font-semibold">
-                  Add {course.name} to Played
-                </DialogTitle>
-              </DialogHeader>
+      <div className="fixed inset-0 z-[999] bg-surface-card overflow-y-auto">
+        {!showConfirmation ? (
+          <div className="pb-24">
+            <div className="px-4 pt-6 pb-4 border-b border-border/60 mb-3">
+              <h1 className="text-xl font-semibold">
+                Rate {course.name}
+              </h1>
+            </div>
 
-              <div className="space-y-6 mt-4">
+              <div className="space-y-6 px-4">
                 {/* Course Card Preview */}
                 <div className="relative rounded-lg border overflow-hidden bg-green-50 border-green-200">
                   <div className="relative h-24 overflow-hidden">
@@ -651,10 +644,10 @@ const PostPlayRatingModal = ({
                   )}
                 </div>
               </div>
-            </>
+            </div>
           ) : (
             /* Confirmation Screen */
-            <div className="text-center space-y-4 py-4">
+            <div className="text-center space-y-4 py-4 px-4">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
                 <Check className="h-8 w-8 text-green-600" />
               </div>
@@ -689,8 +682,7 @@ const PostPlayRatingModal = ({
               </Button>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </div>
 
       {/* Remove Confirmation Dialog */}
       <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>

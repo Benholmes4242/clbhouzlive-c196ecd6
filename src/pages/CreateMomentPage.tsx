@@ -7,6 +7,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { updateRecentMediaFromItems } from '@/hooks/usePostSubmission/recentMediaListener';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { useChromeState } from '@/hooks/useChromeState';
+import AccessControl from '@/components/AccessControl';
 
 export default function CreateMomentPage() {
   const navigate = useNavigate();
@@ -123,15 +124,17 @@ export default function CreateMomentPage() {
   };
 
   return (
-    <EnhancedCreateMomentModal
-      isOpen={true}
-      onClose={handleClose}
-      onSubmit={handleSubmit}
-      isSubmitting={isSubmitting}
-      mediaItems={mediaItems}
-      selectedCourse={selectedCourse}
-      onCourseSelect={handleCourseSelect}
-      onMediaChange={handleMediaChange}
-    />
+    <AccessControl requireAuth={true}>
+      <EnhancedCreateMomentModal
+        isOpen={true}
+        onClose={handleClose}
+        onSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        mediaItems={mediaItems}
+        selectedCourse={selectedCourse}
+        onCourseSelect={handleCourseSelect}
+        onMediaChange={handleMediaChange}
+      />
+    </AccessControl>
   );
 }
