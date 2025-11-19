@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import { Users, MapPin } from 'lucide-react';
 import CourseCard from './CourseCard';
 
 const FriendsCoursesPanel: React.FC = () => {
@@ -21,24 +22,22 @@ const FriendsCoursesPanel: React.FC = () => {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-lg font-semibold">Friends' Courses</h2>
+          <h2 className="text-lg font-semibold tracking-tight">Friends' Courses</h2>
           <p className="text-sm text-muted-foreground">
-            See where your friends have been playing recently.
+            See where your friends have been playing lately.
           </p>
         </div>
-        <div className="grid gap-4 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-          <Card className="p-4 space-y-4">
-            <Skeleton className="h-4 w-32" />
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-16 w-full rounded-xl" />
-            ))}
-          </Card>
-          <Card className="p-4 space-y-4">
-            <Skeleton className="h-4 w-24" />
-            {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-14 w-full rounded-xl" />
-            ))}
-          </Card>
+
+        {/* skeletons */}
+        <div className="grid gap-3">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={`hot-${i}`} className="h-20 rounded-xl" />
+          ))}
+        </div>
+        <div className="grid gap-3">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={`recent-${i}`} className="h-16 rounded-xl" />
+          ))}
         </div>
       </div>
     );
@@ -53,51 +52,44 @@ const FriendsCoursesPanel: React.FC = () => {
   if (totalCourses === 0) {
     if (totalFriendsActive === 0) {
       return (
-        <div className="space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold">Friends' Courses</h2>
-            <p className="text-sm text-muted-foreground">
-              Add friends to see where they've been playing.
-            </p>
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+          <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center text-muted-foreground mb-1">
+            <Users className="w-4 h-4" />
           </div>
-          <Card className="p-6 flex flex-col items-start gap-3">
-            <div className="text-base font-medium">No friends added yet</div>
-            <p className="text-sm text-muted-foreground">
-              Follow or add other golfers to see what courses they're playing
-              and discover new places to play.
-            </p>
-            <Button variant="outline" onClick={() => navigate('/discover/people')}>
-              Find golfers to follow
-            </Button>
-          </Card>
+          <h3 className="text-sm font-semibold">No friends added yet</h3>
+          <p className="text-sm text-muted-foreground max-w-xs">
+            Follow or add other golfers to see what courses they're playing and
+            discover new places to play.
+          </p>
+          <Button
+            size="sm"
+            className="mt-2"
+            onClick={() => navigate('/discover/people')}
+          >
+            Find golfers to follow
+          </Button>
         </div>
       );
     }
 
     return (
-      <div className="space-y-4">
-        <div>
-          <h2 className="text-lg font-semibold">Friends' Courses</h2>
-          <p className="text-sm text-muted-foreground">
-            See where your friends have been playing recently.
-          </p>
+      <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+        <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center text-muted-foreground mb-1">
+          <MapPin className="w-4 h-4" />
         </div>
-        <Card className="p-6 space-y-3">
-          <div className="text-base font-medium">
-            Your friends haven't logged any rounds yet
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Once they start logging courses in Clbhouz, their activity will
-            appear here.
-          </p>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate('/courses?tab=explore')}
-          >
-            Explore courses instead
-          </Button>
-        </Card>
+        <h3 className="text-sm font-semibold">No rounds logged yet</h3>
+        <p className="text-sm text-muted-foreground max-w-xs">
+          Once your friends start logging courses in Clbhouz, their activity will
+          appear here.
+        </p>
+        <Button
+          size="sm"
+          variant="outline"
+          className="mt-2"
+          onClick={() => navigate('/courses?tab=explore')}
+        >
+          Explore courses instead
+        </Button>
       </div>
     );
   }
@@ -105,36 +97,35 @@ const FriendsCoursesPanel: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-2">
+      <div className="flex items-start justify-between gap-3 mb-4">
         <div>
-          <h2 className="text-lg font-semibold">Friends' Courses</h2>
+          <h2 className="text-lg font-semibold tracking-tight">Friends' Courses</h2>
           <p className="text-sm text-muted-foreground">
-            See where your friends have been playing recently.
+            See where your friends have been playing lately.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-          <Badge variant="outline" className="rounded-full">
-            {totalCourses} course{totalCourses !== 1 ? 's' : ''} played
-          </Badge>
-          <Badge variant="outline" className="rounded-full">
-            {totalFriendsActive} friend{totalFriendsActive !== 1 ? 's' : ''}{' '}
-            active in the last 90 days
-          </Badge>
+        <div className="text-right">
+          <p className="text-sm font-medium">
+            {totalCourses} course{totalCourses !== 1 ? 's' : ''}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {totalFriendsActive} friend{totalFriendsActive !== 1 ? 's' : ''} active in
+            the last 90 days
+          </p>
         </div>
       </div>
 
       {/* Two-column layout */}
       <div className="grid gap-6 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start">
         {/* Hot in your network */}
-        <Card className="p-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
+        <section className="mb-6">
+          <Card className="p-4 space-y-4">
+            <div className="flex items-baseline justify-between mb-2">
               <h3 className="text-sm font-semibold">Hot in your network</h3>
               <p className="text-xs text-muted-foreground">
                 Courses multiple friends have played recently.
               </p>
             </div>
-          </div>
 
           <div className="space-y-3 w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
             {courses.map((course) => {
@@ -176,17 +167,17 @@ const FriendsCoursesPanel: React.FC = () => {
             })}
           </div>
         </Card>
+      </section>
 
         {/* Recent rounds */}
-        <Card className="p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <div>
+        <section>
+          <Card className="p-4 space-y-3">
+            <div className="flex items-baseline justify-between mb-2">
               <h3 className="text-sm font-semibold">Recent rounds</h3>
               <p className="text-xs text-muted-foreground">
                 A feed of your friends' latest logged courses.
               </p>
             </div>
-          </div>
 
           <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1">
             {recent.map((hit) => (
@@ -252,6 +243,7 @@ const FriendsCoursesPanel: React.FC = () => {
             ))}
           </div>
         </Card>
+      </section>
       </div>
     </div>
   );
