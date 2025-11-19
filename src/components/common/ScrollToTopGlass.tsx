@@ -5,46 +5,64 @@ const ScrollToTopGlass = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const getScrollY = () => {
-      if (typeof window === 'undefined') return 0;
-
-      // This is the element that actually scrolls in modern browsers
-      const scrollingElement =
-        document.scrollingElement || document.documentElement || document.body;
-
-      return (scrollingElement as HTMLElement).scrollTop || 0;
+    const checkScroll = () => {
+      // Try multiple scroll position sources
+      const scrollY = 
+        window.scrollY ||
+        window.pageYOffset ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop ||
+        0;
+      
+      // DEBUG: Log all scroll sources
+      console.log('🔝 All scroll values:', {
+        'window.scrollY': window.scrollY,
+        'window.pageYOffset': window.pageYOffset,
+        'document.documentElement.scrollTop': document.documentElement.scrollTop,
+        'document.body.scrollTop': document.body.scrollTop,
+        'computed': scrollY
+      });
+      
+      const shouldShow = scrollY > 400;
+      setVisible(shouldShow);
     };
 
+    // Check on mount
+    checkScroll();
+
+    // Add scroll listener with multiple event types
     const handleScroll = () => {
-      const y = getScrollY();
-      setVisible(y > 400);
+      checkScroll();
     };
 
-    // Run once on mount
-    handleScroll();
-
-    // Listen to *document* scroll (captures scroll on inner containers too)
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('wheel', handleScroll, { passive: true });
     document.addEventListener('scroll', handleScroll, { passive: true, capture: true });
 
+    // Also check on resize (in case layout changes)
+    window.addEventListener('resize', checkScroll, { passive: true });
+
     return () => {
-      document.removeEventListener('scroll', handleScroll, { capture: true } as any);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('wheel', handleScroll);
+      document.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', checkScroll);
     };
   }, []);
 
   if (!visible) return null;
 
+  const scrollToTop = () => {
+    // Try multiple methods to scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.documentElement.scrollTo?.({ top: 0, behavior: 'smooth' });
+    document.body.scrollTo?.({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <button
       type="button"
-      onClick={() => {
-        const scrollingElement =
-          document.scrollingElement || document.documentElement || document.body;
-
-        (scrollingElement as HTMLElement).scrollTo({
-          top: 0,
-          behavior: 'smooth',
-        });
-      }}
+      onClick={scrollToTop}
       aria-label="Back to top"
       className="
         fixed
