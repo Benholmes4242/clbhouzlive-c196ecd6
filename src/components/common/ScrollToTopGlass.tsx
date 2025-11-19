@@ -6,9 +6,11 @@ const ScrollToTopGlass = () => {
   const scrollContainerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    // Find the actual scrolling container
+    // Find the actual scrolling container - with delay to let content load
     const findScrollContainer = (): HTMLElement => {
-      // Check common scroll containers
+      console.log('🔝 Searching for scroll container...');
+      
+      // Check all possible containers and log their scroll state
       const candidates = [
         document.querySelector('main'),
         document.querySelector('[data-scroll-container]'),
@@ -18,27 +20,48 @@ const ScrollToTopGlass = () => {
         document.body,
       ].filter(Boolean) as HTMLElement[];
 
-      // Find the one that's actually scrollable
+      console.log('🔝 Checking', candidates.length, 'candidates');
+
+      // Find ALL scrollable elements and log them
       for (const el of candidates) {
         const style = window.getComputedStyle(el);
-        const hasScroll = style.overflowY === 'auto' || 
-                         style.overflowY === 'scroll' || 
-                         style.overflow === 'auto' || 
-                         style.overflow === 'scroll';
-        const canScroll = el.scrollHeight > el.clientHeight;
+        const overflowY = style.overflowY;
+        const overflow = style.overflow;
+        const scrollHeight = el.scrollHeight;
+        const clientHeight = el.clientHeight;
+        const canScroll = scrollHeight > clientHeight;
         
-        if (hasScroll || canScroll) {
-          console.log('🔝 Found scroll container:', el.tagName, { hasScroll, canScroll, scrollHeight: el.scrollHeight, clientHeight: el.clientHeight });
+        console.log('🔝 Candidate:', el.tagName, {
+          overflowY,
+          overflow,
+          scrollHeight,
+          clientHeight,
+          canScroll,
+          className: el.className
+        });
+        
+        if (canScroll) {
+          console.log('🔝 ✅ Selected scroll container:', el.tagName);
           return el;
         }
       }
 
-      // Fallback to documentElement
+      console.log('🔝 ⚠️ No scrollable container found, using documentElement');
       return document.documentElement;
     };
 
     const container = findScrollContainer();
     scrollContainerRef.current = container;
+    
+    // If no scrollable content found yet, retry after a delay
+    if (container.scrollHeight <= container.clientHeight) {
+      console.log('🔝 No scrollable content yet, will retry in 1 second...');
+      setTimeout(() => {
+        const retryContainer = findScrollContainer();
+        scrollContainerRef.current = retryContainer;
+        retryContainer.addEventListener('scroll', handleScroll, { passive: true });
+      }, 1000);
+    }
 
     const checkScroll = () => {
       const scrollTop = container.scrollTop || 0;
