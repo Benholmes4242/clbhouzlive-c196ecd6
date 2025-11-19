@@ -59,6 +59,7 @@ const PostPlayRatingModal = ({
   const [buttonText, setButtonText] = useState('Add to Played');
   const [designScore, setDesignScore] = useState<number | null>(null);
   const [conditionScore, setConditionScore] = useState<number | null>(null);
+  const [clubhouseScore, setClubhouseScore] = useState<number | null>(null);
   const [facilitiesScore, setFacilitiesScore] = useState<number | null>(null);
 
   const { data: existingRating } = useQuery({
@@ -93,6 +94,7 @@ const PostPlayRatingModal = ({
       setReview(existingRating.review || '');
       setDesignScore(existingRating.design_score);
       setConditionScore(existingRating.condition_score);
+      setClubhouseScore(existingRating.clubhouse_score);
       setFacilitiesScore(existingRating.facilities_score);
     }
   }, [existingRating, isEditMode]);
@@ -190,6 +192,7 @@ const PostPlayRatingModal = ({
       mediaFiles,
       design,
       condition,
+      clubhouse,
       facilities
     }: { 
       rating: number; 
@@ -197,6 +200,7 @@ const PostPlayRatingModal = ({
       mediaFiles: File[];
       design: number | null;
       condition: number | null;
+      clubhouse: number | null;
       facilities: number | null;
     }) => {
       const { data: userResponse } = await supabase.auth.getUser();
@@ -213,6 +217,7 @@ const PostPlayRatingModal = ({
             review: reviewText || null,
             design_score: design,
             condition_score: condition,
+            clubhouse_score: clubhouse,
             facilities_score: facilities,
             updated_at: new Date().toISOString()
           })
@@ -231,6 +236,7 @@ const PostPlayRatingModal = ({
             review: reviewText || null,
             design_score: design,
             condition_score: condition,
+            clubhouse_score: clubhouse,
             facilities_score: facilities
           })
           .select()
@@ -425,6 +431,7 @@ const PostPlayRatingModal = ({
       mediaFiles: selectedMedia,
       design: designScore,
       condition: conditionScore,
+      clubhouse: clubhouseScore,
       facilities: facilitiesScore
     });
   };
@@ -565,6 +572,7 @@ const PostPlayRatingModal = ({
                   {[
                     { key: 'design', label: 'Course Design', score: designScore, setScore: setDesignScore },
                     { key: 'condition', label: 'Course Condition', score: conditionScore, setScore: setConditionScore },
+                    { key: 'clubhouse', label: 'Clubhouse', score: clubhouseScore, setScore: setClubhouseScore },
                     { key: 'facilities', label: 'Facilities', score: facilitiesScore, setScore: setFacilitiesScore },
                   ].map(({ key, label, score, setScore }) => {
                     const displayValue = score ?? 5;

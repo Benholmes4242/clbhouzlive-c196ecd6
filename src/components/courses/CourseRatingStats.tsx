@@ -51,6 +51,10 @@ const CourseRatingStats = ({ courseId }: CourseRatingStatsProps) => {
               <span className="font-medium">{formatScore(aggregates.avg_condition_score)} / 10</span>
             </div>
             <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Clubhouse</span>
+              <span className="font-medium">{formatScore(aggregates.avg_clubhouse_score)} / 10</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Facilities</span>
               <span className="font-medium">{formatScore(aggregates.avg_facilities_score)} / 10</span>
             </div>
