@@ -297,43 +297,47 @@ const CourseExplorer = () => {
         )}
       </div>
 
-      {/* Region Filter */}
-      <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
-        <Select value={selectedRegion} onValueChange={(value) => {
-          setSelectedRegion(value as PrimaryRegionKey);
-          setSelectedSubregion('all');
-          setRegionWasAuto(false);
-        }}>
-          <SelectTrigger className="h-11 bg-card border-border/50 rounded-lg text-sm">
-            <SelectValue placeholder="Select region" />
-          </SelectTrigger>
-          <SelectContent className="bg-card border-border z-50">
-            {regionOptions.map((option) => (
-              <SelectItem 
-                key={option.value} 
-                value={option.value}
-              >
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Sub-region Filter (only visible if a region is selected) */}
-        {selectedRegion !== PRIMARY_REGIONS.ALL && SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length > 0 && (
-          <Select value={selectedSubregion} onValueChange={setSelectedSubregion}>
+      {/* Region Filter - Centered on mobile */}
+      <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center">
+        <div className="w-full sm:w-56">
+          <Select value={selectedRegion} onValueChange={(value) => {
+            setSelectedRegion(value as PrimaryRegionKey);
+            setSelectedSubregion('all');
+            setRegionWasAuto(false);
+          }}>
             <SelectTrigger className="h-11 bg-card border-border/50 rounded-lg text-sm">
-              <SelectValue placeholder="All sub-regions" />
+              <SelectValue placeholder="Select region" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
-              <SelectItem value="all">All sub-regions</SelectItem>
-              {SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>].map((s) => (
-                <SelectItem key={s} value={normalizeLabel(s)}>
-                  {s}
+              {regionOptions.map((option) => (
+                <SelectItem 
+                  key={option.value} 
+                  value={option.value}
+                >
+                  {option.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        {/* Sub-region Filter (only visible if a region is selected) */}
+        {selectedRegion !== PRIMARY_REGIONS.ALL && SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length > 0 && (
+          <div className="w-full sm:w-56">
+            <Select value={selectedSubregion} onValueChange={setSelectedSubregion}>
+              <SelectTrigger className="h-11 bg-card border-border/50 rounded-lg text-sm">
+                <SelectValue placeholder="All sub-regions" />
+              </SelectTrigger>
+              <SelectContent className="bg-card border-border z-50">
+                <SelectItem value="all">All sub-regions</SelectItem>
+                {SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>].map((s) => (
+                  <SelectItem key={s} value={normalizeLabel(s)}>
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         )}
       </div>
 
