@@ -5,6 +5,7 @@ import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useModalState } from '@/hooks/useModalDetector';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
+import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 
 
@@ -51,8 +52,8 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
   // Handle tab clicks including camera action
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
-      // Navigate to create moment page
-      handleTabClick({ id: 'post', path: '/create-moment', isAction: false });
+      // Open composer directly with empty state
+      openComposerWithFiles([]);
     } else {
       // Handle regular navigation
       handleTabClick(tab);
@@ -65,6 +66,19 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
         activeTab={activeTab}
         onTabClick={handleTabClickWithCamera}
         variant={variant}
+      />
+
+      <PostSubmissionHandler
+        isComposerOpen={isComposerOpen}
+        mediaItems={mediaItems}
+        selectedFile={selectedFile}
+        selectedCourse={selectedCourse}
+        onCourseSelect={setSelectedCourse}
+        onClose={handleCloseComposer}
+        onShowToast={showConfirmationToast}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={() => {}}
+        onMediaChange={setMediaItems}
       />
 
       <SnapToast

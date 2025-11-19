@@ -33,10 +33,10 @@ export const usePostSubmissionHandlers = (
         return;
       }
       
-      // Navigate to the create post page
+      // Both mobile and desktop now use the new EnhancedCreateMomentModal
       console.log('usePostSubmissionHandlers: Opening composer...');
       setLocalSelectedTags([]);
-      // Open composer - will navigate to /create-moment page
+      // Open composer directly without files - modal will handle file upload UI
       openComposer();
       console.log('usePostSubmissionHandlers: openComposer called');
     } else {

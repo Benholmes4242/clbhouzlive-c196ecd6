@@ -4,6 +4,7 @@ import ClubhouzLoading from '@/components/ClubhouzLoading';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import NavigationBar from '@/components/bottom-navigation/NavigationBar';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
+import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
 import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigationHandlers';
 import { useSnapModal } from '@/hooks/useSnapModal';
@@ -200,9 +201,9 @@ const Clubhouse = () => {
     console.log('[DEBUG] Clubhouse: handleTabClickWithCamera called with:', tab);
     
     if (tab.isAction && tab.id === 'post') {
-      // Navigate to create moment page
-      console.log('[DEBUG] Clubhouse: Navigating to create moment page');
-      handleTabClick({ id: 'post', path: '/create-moment', isAction: false });
+      // Open composer directly with empty state
+      console.log('[DEBUG] Clubhouse: Opening composer directly');
+      openComposerWithFiles([]);
     } else {
       // Handle regular navigation
       console.log('[DEBUG] Clubhouse: Handling regular navigation');
@@ -286,6 +287,20 @@ const Clubhouse = () => {
       </div>
 
       
+      {/* Post Submission Handler */}
+      <PostSubmissionHandler
+        isComposerOpen={isComposerOpen}
+        mediaItems={mediaItems}
+        selectedFile={selectedFile}
+        selectedCourse={selectedCourse}
+        onCourseSelect={setSelectedCourse}
+        onClose={handleCloseComposer}
+        onShowToast={showConfirmationToast}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={() => {}}
+        onMediaChange={setMediaItems}
+      />
+
       <SnapToast
         message={toastMessage}
         isVisible={showToast}

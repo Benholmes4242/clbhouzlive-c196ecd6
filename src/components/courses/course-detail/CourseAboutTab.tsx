@@ -13,6 +13,7 @@ import { Progress } from '@/components/ui/progress';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { useUserPlayedCourse } from '@/hooks/useUserPlayedCourse';
+import EditRatingModal from '@/components/courses/EditRatingModal';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
@@ -57,6 +58,7 @@ const formatDescription = (description: string) => {
 
 const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
   const { toast } = useToast();
@@ -104,7 +106,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       navigate('/auth');
       return;
     }
-    navigate(`/courses/${course.id}/rate`);
+    setIsRatingModalOpen(true);
   };
 
   const handlePlayedToggle = () => {
@@ -120,6 +122,19 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   };
 
   return (
+    <>
+      <EditRatingModal
+        courseId={course.id}
+        courseName={course.name}
+        currentRating={userRating?.rating || 5}
+        currentReview={userRating?.review || null}
+        currentDesignScore={userRating?.design_score}
+        currentConditionScore={userRating?.condition_score}
+        currentClubhouseScore={userRating?.clubhouse_score}
+        currentFacilitiesScore={userRating?.facilities_score}
+        isOpen={isRatingModalOpen}
+        onClose={() => setIsRatingModalOpen(false)}
+      />
     <div className="space-y-6">
       {/* Location Breadcrumb & Quick Filters */}
       <CourseLocationBreadcrumb course={course} />
@@ -372,6 +387,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

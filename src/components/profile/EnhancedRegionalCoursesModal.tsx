@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useEffect, useCallback, useDeferredValue } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Grid3X3, List, ChevronDown, Search, Lock } from 'lucide-react';
@@ -11,6 +10,7 @@ import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import PostPlayRatingModal from '@/components/courses/PostPlayRatingModal';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useUI } from '@/contexts/UIContext';
@@ -115,10 +115,10 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
   const [view, setView] = useState<ViewOption>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('recently-played');
   const [searchQuery, setSearchQuery] = useState('');
+  const [reviewModalCourse, setReviewModalCourse] = useState<any>(null);
   const [entered, setEntered] = useState(false);
   const isMobile = useIsMobile();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const { modalTransition, beginTransition, endTransition } = useUI();
   
   // Register this modal with the modal detector
@@ -351,7 +351,10 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
         action: {
           label: 'Add Review',
           onClick: () => {
-            navigate(`/courses/${courseId}/rate`);
+            const course = allRegionCourses.find(c => c.golf_courses.id === courseId);
+            if (course) {
+              setReviewModalCourse(course.golf_courses);
+            }
           }
         }
       });
@@ -811,6 +814,16 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
           </div>
         )}
               </div>
+
+              {/* Review Modal */}
+              {reviewModalCourse && (
+                <PostPlayRatingModal
+                  course={reviewModalCourse}
+                  isOpen={!!reviewModalCourse}
+                  onClose={() => setReviewModalCourse(null)}
+                  isEditMode={false}
+                />
+              )}
               </div>
             </div>
           </div>
