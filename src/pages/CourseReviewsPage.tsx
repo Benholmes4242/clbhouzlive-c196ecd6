@@ -48,10 +48,7 @@ const CourseReviewsPage: React.FC = () => {
       navigate('/auth');
       return;
     }
-    // Trigger the existing rate course modal via custom event
-    window.dispatchEvent(
-      new CustomEvent('open-rate-course-modal', { detail: { courseId } })
-    );
+    navigate(`/courses/${courseId}/rate`);
   };
 
   const handleMarkHelpful = async (reviewId: string, currentCount: number | null) => {

@@ -74,6 +74,7 @@ const Settings = lazy(() => import("./pages/Settings"));
 const Courses = lazy(() => import("./pages/Courses"));
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const CourseReviewsPage = lazy(() => import("./pages/CourseReviewsPage"));
+const RateCoursePage = lazy(() => import("./pages/RateCoursePage"));
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 const MyRatings = lazy(() => import("./pages/MyRatings"));
 const News = lazy(() => import("./pages/News"));
@@ -183,6 +184,7 @@ function AppRoutes() {
         <Route path="/discover" element={<DiscoverWrapped />} />
         <Route path="/courses" element={<Suspense fallback={<CoursesListSkeleton />}><Courses /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
+        <Route path="/courses/:courseId/rate" element={<Suspense fallback={<div className="fixed inset-0 bg-surface-card" />}><RateCoursePage /></Suspense>} />
         <Route path="/courses/:courseId/reviews" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseReviewsPage /></Suspense>} />
         <Route path="/user/:username/courses" element={<UserCoursesPage />} />
         <Route path="/my-ratings" element={<MyRatings />} />
