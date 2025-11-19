@@ -138,6 +138,7 @@ const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
+const CreateMomentPage = lazy(() => import("./pages/CreateMomentPage"));
 
 // Import season wrap modal
 import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
@@ -246,6 +247,8 @@ function AppRoutes() {
           <Route path="team" element={<TeamPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
         </Route>
+        
+        <Route path="/create-moment" element={<CreateMomentPage />} />
         
         {/* Public Echo Share Page */}
         <Route path="/echo/share/:token" element={<EchoSharePage />} />
