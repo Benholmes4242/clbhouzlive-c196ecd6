@@ -30,7 +30,7 @@ export const mockGolfers = [
     profile_photo_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=GaryMartyn',
     eg_handicap_index: 7.2,
     home_club: 'Chislehurst Golf Club',
-    distance_m: 644, // 0.4 miles = 644 meters
+    distance_m: 400, // 0.4 km = 400 meters (within default 0.5km radius)
     open_to_play: false,
     latitude: 51.41,
     longitude: -0.61,
