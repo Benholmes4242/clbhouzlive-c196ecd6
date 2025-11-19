@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useUserProfileQueries } from '@/hooks/useUserProfileQueries';
+import { usePublicProfileByUsername } from '@/hooks/usePublicProfileByUsername';
 import { useUserCourseReviews } from '@/hooks/useUserCourseReviews';
 import { ArrowLeft, Star, ThumbsUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -10,7 +10,7 @@ const UserReviewsPage: React.FC = () => {
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState<'recent' | 'highest' | 'lowest' | 'helpful'>('recent');
 
-  const { profile, isLoading: loadingProfile } = useUserProfileQueries();
+  const { data: profile, isLoading: loadingProfile } = usePublicProfileByUsername(username);
 
   const userId = profile?.id;
   const { data: reviews = [], isLoading } = useUserCourseReviews({

@@ -22,7 +22,7 @@ export type UserCourseReview = {
   } | null;
 };
 
-type SortBy = 'recent' | 'highest' | 'lowest' | 'helpful';
+export type SortBy = 'recent' | 'highest' | 'lowest' | 'helpful';
 
 export function useUserCourseReviews(params: {
   userId?: string;
