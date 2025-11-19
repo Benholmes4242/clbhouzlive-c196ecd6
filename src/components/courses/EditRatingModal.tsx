@@ -170,68 +170,61 @@ const EditRatingModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto">
-        <DialogHeader>
-          <DialogTitle>Edit Your Rating</DialogTitle>
+      <DialogContent className="max-w-lg w-full rounded-2xl border border-border/60 bg-card shadow-xl">
+        <DialogHeader className="space-y-1">
+          <DialogTitle className="text-lg font-semibold">Edit your rating</DialogTitle>
+          <p className="text-xs text-muted-foreground">Rate from 0.5 to 10 and optionally leave a review.</p>
         </DialogHeader>
 
         <div className="space-y-6 mt-4">
           {/* Rating Section */}
-          <div className="space-y-3">
-            <div className="text-center">
-              <p className="text-sm font-medium mb-2">Update your rating</p>
-              <div className="flex items-center justify-center gap-1 mb-2">
-                <ClubhouseLogo size="sm" showTooltip />
-                <span className="text-sm text-muted-foreground">Rate from 0.5 to 10</span>
-              </div>
+          <div className="mt-4 space-y-2">
+            <p className="text-xs font-medium text-muted-foreground">Select a score</p>
+            <div className="flex flex-wrap gap-2">
+              {ratingOptions.map((rating) => {
+                const isSelected = rating === selectedRating;
+                return (
+                  <button
+                    key={rating}
+                    type="button"
+                    onClick={() => setSelectedRating(rating)}
+                    onMouseEnter={() => setHoveredRating(rating)}
+                    onMouseLeave={() => setHoveredRating(null)}
+                    disabled={isSubmitting}
+                    className={`min-w-[44px] px-2 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+                      (hoveredRating !== null && rating <= hoveredRating) ||
+                      (hoveredRating === null && isSelected)
+                        ? 'bg-surface-slate text-card-foreground border-transparent'
+                        : 'bg-surface-alt text-foreground border-border/60 hover:bg-card'
+                    }`}
+                  >
+                    {rating}
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Rating Buttons */}
-            <div className="flex flex-wrap gap-1 justify-center">
-              {ratingOptions.map((rating) => (
-                <Button
-                  key={rating}
-                  variant={
-                    (hoveredRating !== null && rating <= hoveredRating) ||
-                    (hoveredRating === null && rating <= selectedRating)
-                      ? "default"
-                      : "outline"
-                  }
-                  size="sm"
-                  className="h-8 px-2 text-xs"
-                  onClick={() => setSelectedRating(rating)}
-                  onMouseEnter={() => setHoveredRating(rating)}
-                  onMouseLeave={() => setHoveredRating(null)}
-                  disabled={isSubmitting}
-                >
-                  {rating}
-                </Button>
-              ))}
-            </div>
-
-            <div className="text-center">
-              <Badge variant="secondary" className="text-sm">
-                Selected: {selectedRating}/10
-              </Badge>
+            <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-surface-slate text-card-foreground text-xs font-medium">
+              Selected: {selectedRating}/10
             </div>
           </div>
 
           {/* Review Section */}
           <div className="space-y-2">
             <label className="text-sm font-medium">
-              Review (Optional)
+              Share your thoughts (optional)
             </label>
             <Textarea
               value={review}
               onChange={(e) => setReview(e.target.value)}
-              placeholder="Tell other golfers what stood out – routing, conditioning, greens, hospitality…"
-              className="min-h-[80px] resize-none"
+              placeholder="Tell other golfers what stood out – routing, conditioning, greens, hospitality..."
+              className="mt-3 bg-card border-border/60 text-sm placeholder:text-muted-foreground/70 min-h-[80px] resize-none"
               disabled={isSubmitting}
               maxLength={500}
             />
-            <div className="text-xs text-muted-foreground text-right">
+            <p className="mt-1 text-[11px] text-muted-foreground text-right">
               {review.length}/500
-            </div>
+            </p>
           </div>
 
           {/* Breakdown Scores */}
@@ -253,11 +246,11 @@ const EditRatingModal = ({
                     onMouseEnter={() => setHoveredBreakdown({ type: 'design', value })}
                     onMouseLeave={() => setHoveredBreakdown(null)}
                     disabled={isSubmitting}
-                    className={`flex-1 h-8 rounded transition-all ${
+                    className={`flex-1 h-8 rounded-md text-xs font-medium border transition-colors ${
                       (hoveredBreakdown?.type === 'design' && value <= hoveredBreakdown.value) || 
                       (designScore && value <= designScore)
-                        ? 'bg-primary'
-                        : 'bg-muted hover:bg-muted-foreground/20'
+                        ? 'bg-surface-slate text-card-foreground border-transparent'
+                        : 'bg-surface-alt text-foreground border-border/60 hover:bg-card'
                     }`}
                   />
                 ))}
@@ -279,11 +272,11 @@ const EditRatingModal = ({
                     onMouseEnter={() => setHoveredBreakdown({ type: 'condition', value })}
                     onMouseLeave={() => setHoveredBreakdown(null)}
                     disabled={isSubmitting}
-                    className={`flex-1 h-8 rounded transition-all ${
+                    className={`flex-1 h-8 rounded-md text-xs font-medium border transition-colors ${
                       (hoveredBreakdown?.type === 'condition' && value <= hoveredBreakdown.value) || 
                       (conditionScore && value <= conditionScore)
-                        ? 'bg-primary'
-                        : 'bg-muted hover:bg-muted-foreground/20'
+                        ? 'bg-surface-slate text-card-foreground border-transparent'
+                        : 'bg-surface-alt text-foreground border-border/60 hover:bg-card'
                     }`}
                   />
                 ))}
@@ -305,11 +298,11 @@ const EditRatingModal = ({
                     onMouseEnter={() => setHoveredBreakdown({ type: 'facilities', value })}
                     onMouseLeave={() => setHoveredBreakdown(null)}
                     disabled={isSubmitting}
-                    className={`flex-1 h-8 rounded transition-all ${
+                    className={`flex-1 h-8 rounded-md text-xs font-medium border transition-colors ${
                       (hoveredBreakdown?.type === 'facilities' && value <= hoveredBreakdown.value) || 
                       (facilitiesScore && value <= facilitiesScore)
-                        ? 'bg-primary'
-                        : 'bg-muted hover:bg-muted-foreground/20'
+                        ? 'bg-surface-slate text-card-foreground border-transparent'
+                        : 'bg-surface-alt text-foreground border-border/60 hover:bg-card'
                     }`}
                   />
                 ))}
@@ -318,22 +311,35 @@ const EditRatingModal = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-2">
+          <div className="mt-6 flex flex-col sm:flex-row justify-between gap-3">
             <Button
+              type="button"
               variant="destructive"
+              className="flex-1 sm:flex-none"
               onClick={handleDelete}
               disabled={isSubmitting}
-              className="flex-1"
             >
-              {isSubmitting ? "Removing..." : "Remove Rating"}
+              Remove rating
             </Button>
-            <Button 
-              onClick={handleUpdate}
-              disabled={isSubmitting}
-              className="flex-1"
-            >
-              {isSubmitting ? "Updating..." : "Update Rating"}
-            </Button>
+
+            <div className="flex-1 flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="default"
+                disabled={isSubmitting}
+                onClick={handleUpdate}
+              >
+                {isSubmitting ? "Updating..." : "Update rating"}
+              </Button>
+            </div>
           </div>
         </div>
       </DialogContent>

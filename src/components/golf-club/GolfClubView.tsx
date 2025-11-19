@@ -92,14 +92,14 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   }
 
   return (
-    <div className={isInModal ? "w-full" : "min-h-screen bg-background pb-20 w-full"}>
+    <div className={isInModal ? "w-full" : "min-h-screen bg-muted/60 pb-20 w-full"}>
       {/* Extended Hero Banner - continues behind tabs */}
       <div className="course-hero-container relative overflow-hidden">
         {/* Back button for modal - positioned over hero image */}
         {isInModal && onClose && (
           <button
             onClick={onClose}
-            className="absolute top-3 left-3 md:top-4 md:left-4 z-20 w-8 h-8 rounded-lg flex items-center justify-center backdrop-blur-md bg-white/10 border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-200 focus:outline-none"
+            className="glass-dark absolute top-3 left-3 md:top-4 md:left-4 z-20 rounded-xl p-2 flex items-center justify-center hover:opacity-80 transition-opacity focus:outline-none"
             aria-label="Go back"
           >
             <IoMdArrowBack className="h-5 w-5 text-white" />
@@ -151,20 +151,20 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           )}
         </div>
 
-        {/* Liquid Glass Tab Navigation - overlaid on hero */}
+        {/* Tab Navigation - overlaid on hero */}
         <div className="absolute bottom-0 left-0 right-0 z-30">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 h-12 backdrop-blur-md bg-white/10 border-t border-white/20 rounded-none">
-              <TabsTrigger value="about" className="text-base text-white data-[state=active]:text-white data-[state=active]:bg-white/20">About</TabsTrigger>
-              <TabsTrigger value="reviews" className="text-base text-white data-[state=active]:text-white data-[state=active]:bg-white/20">Reviews</TabsTrigger>
-              <TabsTrigger value="media" className="text-base text-white data-[state=active]:text-white data-[state=active]:bg-white/20">Media</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 h-12 bg-surface-card/95 backdrop-blur-sm border-t border-border/60 rounded-none">
+              <TabsTrigger value="about" className="text-base data-[state=active]:bg-surface-slate data-[state=active]:text-card-foreground">About</TabsTrigger>
+              <TabsTrigger value="reviews" className="text-base data-[state=active]:bg-surface-slate data-[state=active]:text-card-foreground">Reviews</TabsTrigger>
+              <TabsTrigger value="media" className="text-base data-[state=active]:bg-surface-slate data-[state=active]:text-card-foreground">Media</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
       </div>
 
       {/* Tab Content */}
-      <div className="course-hero-wrapper p-6">{/* No separate tab navigation needed - it's now overlaid on hero */}
+      <div className="course-hero-wrapper px-4 pt-4 space-y-4 md:px-6 md:pt-6">{/* No separate tab navigation needed - it's now overlaid on hero */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="about" className="mt-0">
             <CourseAboutTab course={course} onTabChange={setActiveTab} />

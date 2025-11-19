@@ -138,31 +138,33 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseLocationBreadcrumb course={course} />
       
       {/* Community Score Section */}
-      <div className="bg-card rounded-lg border p-6">
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xl font-semibold">Community Score</h3>
-            <div className="flex items-center gap-3">
-              <ClubhouseLogo size="lg" />
-              <div className="text-4xl font-bold">
-                {ratingAggregates?.avg_overall_score 
-                  ? formatScore(ratingAggregates.avg_overall_score) 
-                  : '—'}<span className="text-2xl text-muted-foreground">/10</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-end">
-            <div className="text-sm text-muted-foreground">
+      <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold text-foreground">Community Score</h2>
+            <p className="text-xs text-muted-foreground">
               Based on {ratingAggregates?.review_count || 0} {ratingAggregates?.review_count === 1 ? 'rating' : 'ratings'}
-            </div>
+            </p>
+          </div>
+
+          <div className="flex items-baseline gap-1">
+            <ClubhouseLogo size="sm" />
+            <span className="text-lg font-semibold text-foreground">
+              {ratingAggregates?.avg_overall_score 
+                ? formatScore(ratingAggregates.avg_overall_score) 
+                : '—'}
+            </span>
+            <span className="text-xs text-muted-foreground">/10</span>
           </div>
         </div>
         
         {/* Action Buttons */}
-        <div className="flex gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button 
             onClick={handleRateClick}
             className="flex-1"
+            size="lg"
+            variant="default"
           >
             {userRating ? 'Edit Your Rating' : 'Rate this Course'}
           </Button>
@@ -170,7 +172,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             onClick={handlePlayedToggle}
             disabled={isToggling}
             variant={hasPlayed ? "default" : "outline"}
-            className={hasPlayed ? "flex-1" : "flex-1"}
+            size="lg"
+            className="flex-1"
           >
             {hasPlayed ? (
               <>
@@ -258,58 +261,44 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             </div>
           </div>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            <p className="text-sm">No ratings yet</p>
-            <p className="text-xs mt-1">Be the first to rate this course!</p>
-          </div>
+          <p className="text-xs text-muted-foreground text-center pt-2">
+            No ratings yet – be the first to rate this course!
+          </p>
         )}
-      </div>
+      </section>
 
       {/* About Section */}
       {course.description && (
-        <div className="bg-card rounded-lg border p-6">
-          <h3 className="text-xl font-semibold mb-4">About</h3>
-          <div className="text-muted-foreground leading-relaxed">
+        <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
+          <h2 className="text-base font-semibold">About</h2>
+          <div className="text-sm text-muted-foreground leading-relaxed">
             {formatDescription(displayDescription)}
             {shouldShowReadMore && (
               <button
                 onClick={() => setShowFullDescription(!showFullDescription)}
-                className="block mt-2 text-muted-foreground hover:text-foreground font-medium"
+                className="block mt-2 text-sm text-muted-foreground hover:text-foreground font-medium"
               >
                 {showFullDescription ? 'Show less' : 'Read more'}
               </button>
             )}
           </div>
-        </div>
+        </section>
       )}
 
       {/* Milestones Card */}
       <CourseMilestonesCard courseId={course.id} />
 
       {/* Location and Media sections - side by side on desktop, stacked on mobile */}
-      <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
+      <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
         {/* Location Section */}
-        <div className="bg-card rounded-lg border p-6">
-          <h3 className="text-xl font-semibold mb-4">Location</h3>
+        <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
+          <h2 className="text-base font-semibold">Location</h2>
+          <p className="text-sm text-muted-foreground">
+            {[course.sub_country, course.region].filter(Boolean).join(', ')}
+          </p>
           
-          {/* Row with Country left, Region right */}
-          <div className="flex justify-between items-start mb-4">
-            {course.sub_country && (
-              <div>
-                <div className="text-sm text-muted-foreground">Country</div>
-                <div className="font-medium">{course.sub_country}</div>
-              </div>
-            )}
-            {course.region && (
-              <div className="text-right">
-                <div className="text-sm text-muted-foreground">Region</div>
-                <div className="font-medium">{course.region}</div>
-              </div>
-            )}
-          </div>
-
           {/* Map - full width below */}
-          <div className="w-full">
+          <div className="mt-2 rounded-xl overflow-hidden border border-border/60">
             <MapThumbnail
               clubId={course.id}
               clubName={course.name}
@@ -318,19 +307,19 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               subCountry={course.sub_country}
               latitude={course.latitude}
               longitude={course.longitude}
-              className="w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px] rounded-lg"
+              className="w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px]"
               mapType="hybrid"
             />
           </div>
-        </div>
+        </section>
 
         {/* Media Section */}
-        <div className="bg-card rounded-lg border p-6">
+        <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
           <AboutMediaStrip 
             clubId={course.id} 
             onSeeAllClick={() => onTabChange?.('media')}
           />
-        </div>
+        </section>
       </div>
 
       {/* Mobile: Visit Website Button inline after Media section */}

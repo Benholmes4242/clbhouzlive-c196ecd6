@@ -43,7 +43,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
     <div className="space-y-4">
       {/* Location breadcrumb */}
       {primaryRegionLabel && (
-        <div className="flex flex-wrap items-center gap-1.5 text-xs">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           {/* Level 1 – Primary region */}
           <button
             type="button"
@@ -54,7 +54,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
               });
               navigate(`/courses?${params.toString()}`);
             }}
-            className="inline-flex items-center px-2.5 py-1 rounded-full bg-card border border-border/60 hover:bg-card/80 transition-colors text-muted-foreground"
+            className="inline-flex items-center px-3 py-1 rounded-full bg-surface-alt border border-border/60 hover:bg-surface-card transition-colors"
           >
             {primaryRegionLabel}
           </button>
@@ -62,7 +62,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
           {/* → separator & Level 2 – Sub-country */}
           {subCountryLabel && (
             <>
-              <ChevronRight className="w-3 h-3 opacity-60 text-muted-foreground" />
+              <span className="text-muted-foreground/50">›</span>
               <button
                 type="button"
                 onClick={() => {
@@ -73,7 +73,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
                   });
                   navigate(`/courses?${params.toString()}`);
                 }}
-                className="inline-flex items-center px-2.5 py-1 rounded-full bg-card border border-border/60 hover:bg-card/80 transition-colors text-muted-foreground"
+                className="inline-flex items-center px-3 py-1 rounded-full bg-surface-alt border border-border/60 hover:bg-surface-card transition-colors"
               >
                 {subCountryLabel}
               </button>
@@ -83,7 +83,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
           {/* → separator & Level 3 – Local area / county / state */}
           {localAreaLabel && (
             <>
-              <ChevronRight className="w-3 h-3 opacity-60 text-muted-foreground" />
+              <span className="text-muted-foreground/50">›</span>
               <button
                 type="button"
                 onClick={() => {
@@ -95,7 +95,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
                   });
                   navigate(`/courses?${params.toString()}`);
                 }}
-                className="inline-flex items-center px-2.5 py-1 rounded-full bg-card border border-border/60 hover:bg-card/80 transition-colors text-muted-foreground"
+                className="inline-flex items-center px-3 py-1 rounded-full bg-surface-alt border border-border/60 hover:bg-surface-card transition-colors"
               >
                 {localAreaLabel}
               </button>
@@ -105,66 +105,53 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
       )}
 
       {/* Quick filters from this course's location */}
-      <div className="rounded-xl border border-border/60 bg-card/60 p-3 flex flex-col gap-2">
-        <div className="text-xs font-medium text-muted-foreground mb-1">
+      <section className="rounded-2xl bg-card border border-border/60 shadow-sm overflow-hidden">
+        <div className="px-4 pt-3 pb-2 text-xs font-medium text-muted-foreground tracking-wide uppercase">
           Explore more from here
         </div>
-
-        {/* 1. More courses in this local area / sub-country */}
-        {(localAreaLabel || subCountryLabel) && (
-          <button
-            type="button"
-            onClick={() => {
-              const params = new URLSearchParams({
-                tab: 'explore',
-                region: primaryRegionKey,
-              });
-
-              if (subKey) params.set('sub', subKey);
-
-              if (localAreaLabel) {
-                params.set('query', localAreaLabel);
-              } else if (subCountryLabel) {
-                params.set('query', subCountryLabel);
-              }
-
-              navigate(`/courses?${params.toString()}`);
-            }}
-            className="inline-flex items-center justify-between w-full rounded-lg bg-background/80 hover:bg-background px-3 py-2 text-sm transition-colors"
-          >
-            <span className="text-foreground">
-              See more courses in{' '}
-              <span className="font-medium">
-                {localAreaLabel || subCountryLabel}
+        
+        <div className="divide-y divide-border/60">
+          {/* Sub-country filter */}
+          {subCountryLabel && (
+            <button
+              type="button"
+              onClick={() => {
+                const params = new URLSearchParams({
+                  tab: 'explore',
+                  region: primaryRegionKey,
+                  sub: subKey || '',
+                });
+                navigate(`/courses?${params.toString()}`);
+              }}
+              className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-surface-alt transition-colors"
+            >
+              <span>
+                See more courses in <span className="font-semibold">{subCountryLabel}</span>
               </span>
-            </span>
-            <ChevronRight className="w-4 h-4 opacity-60" />
-          </button>
-        )}
+              <span className="text-muted-foreground">›</span>
+            </button>
+          )}
 
-        {/* 2. Top 100 in primary region (if a list exists) */}
-        {primaryRegionKey !== 'all' && (
+          {/* Primary region Top 100 */}
           <button
             type="button"
             onClick={() => {
-              const listSlug = primaryRegionKeyToTop100Slug(primaryRegionKey);
+              const top100Slug = primaryRegionKeyToTop100Slug(primaryRegionKey);
               const params = new URLSearchParams({
-                tab: 'top100',
+                tab: 'top-100',
+                ...(top100Slug ? { list: top100Slug } : {}),
               });
-              if (listSlug) params.set('list', listSlug);
-
               navigate(`/courses?${params.toString()}`);
             }}
-            className="inline-flex items-center justify-between w-full rounded-lg bg-background/80 hover:bg-background px-3 py-2 text-sm transition-colors"
+            className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-surface-alt transition-colors"
           >
-            <span className="text-foreground">
-              See Top 100 in{' '}
-              <span className="font-medium">{primaryRegionLabel}</span>
+            <span>
+              See Top 100 in <span className="font-semibold">{primaryRegionLabel}</span>
             </span>
-            <ChevronRight className="w-4 h-4 opacity-60" />
+            <span className="text-muted-foreground">›</span>
           </button>
-        )}
-      </div>
+        </div>
+      </section>
     </div>
   );
 };
