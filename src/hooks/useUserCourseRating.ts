@@ -7,6 +7,7 @@ export interface UserCourseRating {
   review: string | null;
   design_score: number | null;
   condition_score: number | null;
+  clubhouse_score: number | null;
   facilities_score: number | null;
   created_at: string;
   updated_at: string;
@@ -21,7 +22,7 @@ export function useUserCourseRating(courseId: string | undefined, userId: string
 
       const { data, error } = await supabase
         .from('course_ratings')
-        .select('*')
+        .select('id, rating, review, design_score, condition_score, clubhouse_score, facilities_score, created_at, updated_at')
         .eq('course_id', courseId)
         .eq('user_id', userId)
         .maybeSingle();

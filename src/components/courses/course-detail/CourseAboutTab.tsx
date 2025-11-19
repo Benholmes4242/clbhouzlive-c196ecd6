@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import { CourseMilestonesCard } from '@/components/courses/CourseMilestonesCard';
 import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
+import RatingComparisonCard from './RatingComparisonCard';
 
 interface Course {
   id: string;
@@ -235,6 +236,28 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               )}
             </div>
 
+            {/* Clubhouse */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-sm font-medium">Clubhouse</span>
+                {ratingAggregates.avg_clubhouse_score && (
+                  <span className="text-sm font-semibold">
+                    {formatScore(ratingAggregates.avg_clubhouse_score)}/10
+                  </span>
+                )}
+              </div>
+              {ratingAggregates.avg_clubhouse_score ? (
+                <Progress 
+                  value={getScorePercentage(ratingAggregates.avg_clubhouse_score)} 
+                  className="h-2"
+                />
+              ) : (
+                <div className="h-2 bg-muted rounded-full flex items-center justify-center">
+                  <span className="text-xs text-muted-foreground">Not yet rated</span>
+                </div>
+              )}
+            </div>
+
             {/* Facilities */}
             <div className="space-y-2">
               <div className="flex justify-between items-center mb-1">
@@ -263,6 +286,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           </p>
         )}
       </section>
+
+      {/* Your Rating vs Community Comparison */}
+      {user && userRating && ratingAggregates && (
+        <RatingComparisonCard userRating={userRating} aggregates={ratingAggregates} />
+      )}
 
       {/* About Section */}
       {course.description && (
