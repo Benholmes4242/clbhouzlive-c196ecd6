@@ -1,95 +1,63 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronUp } from 'lucide-react';
 
 const ScrollToTopGlass = () => {
   const [visible, setVisible] = useState(false);
-  const scrollContainerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    // Find the actual scrolling container - with delay to let content load
-    const findScrollContainer = (): HTMLElement => {
-      console.log('🔝 Searching for scroll container...');
-      
-      // Check all possible containers and log their scroll state
-      const candidates = [
-        document.querySelector('main'),
-        document.querySelector('[data-scroll-container]'),
-        document.querySelector('.page-scroll-container'),
-        document.querySelector('.scroll-container'),
-        document.documentElement,
-        document.body,
-      ].filter(Boolean) as HTMLElement[];
-
-      console.log('🔝 Checking', candidates.length, 'candidates');
-
-      // Find ALL scrollable elements and log them
-      for (const el of candidates) {
-        const style = window.getComputedStyle(el);
-        const overflowY = style.overflowY;
-        const overflow = style.overflow;
-        const scrollHeight = el.scrollHeight;
-        const clientHeight = el.clientHeight;
-        const canScroll = scrollHeight > clientHeight;
-        
-        console.log('🔝 Candidate:', el.tagName, {
-          overflowY,
-          overflow,
-          scrollHeight,
-          clientHeight,
-          canScroll,
-          className: el.className
-        });
-        
-        if (canScroll) {
-          console.log('🔝 ✅ Selected scroll container:', el.tagName);
-          return el;
-        }
-      }
-
-      console.log('🔝 ⚠️ No scrollable container found, using documentElement');
-      return document.documentElement;
-    };
-
-    const container = findScrollContainer();
-    scrollContainerRef.current = container;
-    
-    // If no scrollable content found yet, retry after a delay
-    if (container.scrollHeight <= container.clientHeight) {
-      console.log('🔝 No scrollable content yet, will retry in 1 second...');
-      setTimeout(() => {
-        const retryContainer = findScrollContainer();
-        scrollContainerRef.current = retryContainer;
-        retryContainer.addEventListener('scroll', handleScroll, { passive: true });
-      }, 1000);
-    }
+    let rafId: number | null = null;
 
     const checkScroll = () => {
-      const scrollTop = container.scrollTop || 0;
-      const shouldShow = scrollTop > 400;
-      setVisible(shouldShow);
+      // On mobile Safari, scrollY might be on window, document.documentElement, or body
+      // We need to check all of them during the actual scroll event
+      const scrollY = Math.max(
+        window.scrollY || 0,
+        window.pageYOffset || 0,
+        document.documentElement?.scrollTop || 0,
+        document.body?.scrollTop || 0
+      );
+      
+      setVisible(scrollY > 400);
     };
 
-    // Check on mount
+    const handleScroll = () => {
+      // Use RAF to throttle and ensure we read the latest scroll position
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
+      rafId = requestAnimationFrame(checkScroll);
+    };
+
+    // Initial check
     checkScroll();
 
-    // Add scroll listener to the container
-    const handleScroll = () => {
-      checkScroll();
-    };
-
-    container.addEventListener('scroll', handleScroll, { passive: true });
+    // Listen to window scroll - this works on both desktop and mobile
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Also try document scroll with capture for good measure
+    document.addEventListener('scroll', handleScroll, { passive: true, capture: true });
 
     return () => {
-      container.removeEventListener('scroll', handleScroll);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
+      window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('scroll', handleScroll, true);
     };
   }, []);
 
   if (!visible) return null;
 
   const scrollToTop = () => {
-    const container = scrollContainerRef.current;
-    if (container) {
-      container.scrollTo({ top: 0, behavior: 'smooth' });
+    // Try multiple scroll targets
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Also try these as fallbacks for different browsers
+    if (document.documentElement.scrollTo) {
+      document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    if (document.body.scrollTo) {
+      document.body.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
