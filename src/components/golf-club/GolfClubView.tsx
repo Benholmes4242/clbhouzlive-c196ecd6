@@ -147,9 +147,9 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         <div className="absolute bottom-0 left-0 right-0 z-30">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-3 h-12 bg-surface-card/95 backdrop-blur-sm border-t border-border/60 rounded-none">
-              <TabsTrigger value="about" className="text-base data-[state=active]:bg-surface-slate data-[state=active]:text-card-foreground">About</TabsTrigger>
-              <TabsTrigger value="reviews" className="text-base data-[state=active]:bg-surface-slate data-[state=active]:text-card-foreground">Reviews</TabsTrigger>
-              <TabsTrigger value="media" className="text-base data-[state=active]:bg-surface-slate data-[state=active]:text-card-foreground">Media</TabsTrigger>
+              <TabsTrigger value="about" className="text-base data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">About</TabsTrigger>
+              <TabsTrigger value="reviews" className="text-base data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">Reviews</TabsTrigger>
+              <TabsTrigger value="media" className="text-base data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">Media</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
