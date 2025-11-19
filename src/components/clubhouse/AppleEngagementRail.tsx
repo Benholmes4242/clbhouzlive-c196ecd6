@@ -38,7 +38,7 @@ const formatCount = (count: number): string => {
   return count.toString();
 };
 
-const RAIL_BUTTON_SIZE = 40;   // visual glass container
+const RAIL_BUTTON_SIZE = 50;   // visual glass container
 const HIT_AREA = 56;           // touch target
 const ICON_SIZE = 16;          // icon size
 
