@@ -3,9 +3,9 @@
  * Sits bottom-left, ~70% width on phones
  * 
  * Layout:
- * - 40px squircle avatar (no ring)
- * - Text column: name · time, caption (2-line), course pill
- * - Overall height: 72-80px depending on content
+ * - 52px squircle avatar (no ring)
+ * - Text column: name, caption (2-line), course pill
+ * - Overall height: 80-90px depending on content
  */
 
 import React from 'react';
@@ -46,20 +46,20 @@ export const AppleMetadataCapsule = ({
   return (
     <div
       className={cn(
-        'glass-dark flex min-w-0 items-center gap-3 px-3 py-2',
+        'glass-dark flex min-w-0 items-center gap-3 px-4 py-3 rounded-2xl min-w-[240px] max-w-[300px]',
         className
       )}
     >
-      {/* Avatar – 40px squircle, no ring */}
+      {/* Avatar – 52px squircle, no ring */}
       <button
         type="button"
         onClick={onProfileSheetOpen}
         className="flex-shrink-0"
         aria-label={user?.name ? `View profile for ${user.name}` : 'View profile'}
       >
-        <div className="h-10 w-10 overflow-hidden">
+        <div className="h-[52px] w-[52px] overflow-hidden">
           <SquircleImage
-            size={40}
+            size={52}
             src={user?.avatar || '/placeholder.svg'}
             alt={user?.name ?? 'Golfer'}
             ringWidth={0}
@@ -68,7 +68,7 @@ export const AppleMetadataCapsule = ({
       </button>
 
       {/* Text column - centered within remaining space */}
-      <div className="flex flex-1 min-w-0 flex-col items-center text-center gap-1">
+      <div className="flex flex-1 min-w-0 flex-col items-center text-center gap-0.5">
         {/* Row 1: name (tap → mini profile) */}
         <button
           type="button"
