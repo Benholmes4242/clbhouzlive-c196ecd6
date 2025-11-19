@@ -28,6 +28,6 @@ export function useCourseRatingAggregates(courseId: string | undefined) {
       if (error) throw error;
       return (data || null) as unknown as CourseRatingAggregate | null;
     },
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 0,
   });
 }

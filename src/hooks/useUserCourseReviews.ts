@@ -92,6 +92,6 @@ export function useUserCourseReviews(params: {
       if (error) throw error;
       return (data as any as UserCourseReview[]) || [];
     },
-    staleTime: 60_000,
+    staleTime: 0,
   });
 }

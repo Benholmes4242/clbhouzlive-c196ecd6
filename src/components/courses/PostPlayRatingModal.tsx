@@ -275,6 +275,7 @@ const PostPlayRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
       
       // Show "Added!" text for 1.5 seconds
       setButtonText('Added!');
