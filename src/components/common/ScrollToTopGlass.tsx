@@ -7,22 +7,40 @@ const ScrollToTopGlass = () => {
   useEffect(() => {
     console.log('🔝 ScrollToTopGlass mounted');
     
-    const onScroll = () => {
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
+    const checkScroll = () => {
+      const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
       const shouldShow = scrollY > 400;
-      console.log('🔝 Scroll event:', { scrollY, shouldShow });
+      console.log('🔝 Scroll check:', { scrollY, shouldShow });
       setVisible(shouldShow);
     };
 
     // Check initial position
-    onScroll();
+    checkScroll();
     
-    // Add listener to window
-    window.addEventListener('scroll', onScroll, { passive: true });
+    // Add listeners to both window and document
+    const handleScroll = () => {
+      console.log('🔝 Scroll event triggered!');
+      checkScroll();
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true, capture: true });
+    document.addEventListener('scroll', handleScroll, { passive: true, capture: true });
+    
+    // Also check on resize in case that's what's needed
+    window.addEventListener('resize', checkScroll, { passive: true });
+    
+    // Force check every second for debugging
+    const interval = setInterval(() => {
+      console.log('🔝 Interval check');
+      checkScroll();
+    }, 1000);
     
     return () => {
       console.log('🔝 ScrollToTopGlass unmounting');
-      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scroll', handleScroll, true);
+      document.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', checkScroll);
+      clearInterval(interval);
     };
   }, []);
 
