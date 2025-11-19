@@ -162,7 +162,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <div className="mt-4 flex flex-col sm:flex-row gap-2">
           <Button 
             onClick={handleRateClick}
-            className="w-full sm:w-auto justify-center"
+            className="w-full sm:w-auto justify-center bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
           >
             {userRating ? 'Edit Your Rating' : 'Rate this Course'}
           </Button>
