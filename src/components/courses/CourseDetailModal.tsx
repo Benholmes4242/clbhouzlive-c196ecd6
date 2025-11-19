@@ -16,6 +16,7 @@ import CourseReviews from './CourseReviews';
 import CourseDetailMapSection from './CourseDetailMapSection';
 import PostPlayRatingModal from './PostPlayRatingModal';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 
 interface Course {
   id: string;
@@ -105,34 +106,17 @@ const CourseDetailModal = ({
     enabled: !!(viewingUserId || currentUser?.id) && !!course?.id,
   });
 
-  const { data: ratingStats } = useQuery({
-    queryKey: ['course-rating-stats', course?.id],
-    queryFn: async () => {
-      if (!course?.id) return null;
-
-      const { data, error } = await supabase
-        .from('course_ratings')
-        .select('rating, review')
-        .eq('course_id', course.id);
-
-      if (error) throw error;
-
-      if (!data || data.length === 0) {
-        return null;
-      }
-
-      const totalRatings = data.length;
-      const averageRating = data.reduce((sum, rating) => sum + rating.rating, 0) / totalRatings;
-      const totalReviews = data.filter(r => r.review && r.review.trim() !== '').length;
-
-      return {
-        average_rating: Math.round(averageRating * 100) / 100,
-        total_ratings: totalRatings,
-        total_reviews: totalReviews
-      };
-    },
-    enabled: !!course?.id,
-  });
+  // Use unified rating aggregates hook
+  const { data: ratingAggregates } = useCourseRatingAggregates(course?.id);
+  
+  // Adapt aggregates to legacy format for CourseDetailRatingSection
+  const ratingStats = React.useMemo(() => {
+    if (!ratingAggregates) return null;
+    return {
+      average_rating: ratingAggregates.avg_overall_score ?? 0,
+      total_ratings: ratingAggregates.review_count ?? 0,
+    };
+  }, [ratingAggregates]);
 
   const { data: userRatingData } = useQuery({
     queryKey: ['user-course-rating', course?.id, viewingUserId || currentUser?.id],
