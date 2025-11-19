@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, MapPin, X } from 'lucide-react';
+import { Search, MapPin, X, ArrowUp } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -58,6 +58,7 @@ const CourseExplorer = () => {
   const [regionWasAuto, setRegionWasAuto] = useState(initialRegion.auto);
   const [selectedSubregion, setSelectedSubregion] = useState('all');
   const [page, setPage] = useState(0);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   
   // Initialize search from URL if present
   const urlQuery = typeof window !== 'undefined' 
@@ -73,6 +74,16 @@ const CourseExplorer = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  // Scroll-to-top button visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 600);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Restore subregion from URL/storage on mount
   useEffect(() => {
@@ -224,7 +235,36 @@ const CourseExplorer = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {/* Scroll to top button */}
+      {showScrollTop && (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="
+            fixed
+            top-[10px]
+            left-1/2
+            -translate-x-1/2
+            z-40
+            glass-dark
+            h-9
+            w-9
+            rounded-full
+            flex
+            items-center
+            justify-center
+            shadow-lg
+            border border-white/10
+            transition-opacity
+            animate-in fade-in slide-in-from-top-2
+          "
+          aria-label="Back to top"
+        >
+          <ArrowUp className="h-4 w-4 text-white" />
+        </button>
+      )}
+
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -257,16 +297,17 @@ const CourseExplorer = () => {
         )}
       </div>
 
-      {/* Region Filter */}
-        <div className="flex flex-wrap gap-2 items-center">
+      {/* Region Filter - Centered on mobile */}
+      <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center">
+        <div className="w-full sm:w-56">
           <Select value={selectedRegion} onValueChange={(value) => {
             setSelectedRegion(value as PrimaryRegionKey);
             setSelectedSubregion('all');
             setRegionWasAuto(false);
           }}>
-            <SelectTrigger className="w-[180px] h-11 bg-card border-border/50 rounded-lg text-sm">
-            <SelectValue placeholder="Select region" />
-          </SelectTrigger>
+            <SelectTrigger className="h-11 bg-card border-border/50 rounded-lg text-sm">
+              <SelectValue placeholder="Select region" />
+            </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
               {regionOptions.map((option) => (
                 <SelectItem 
@@ -278,34 +319,25 @@ const CourseExplorer = () => {
               ))}
             </SelectContent>
           </Select>
+        </div>
 
         {/* Sub-region Filter (only visible if a region is selected) */}
         {selectedRegion !== PRIMARY_REGIONS.ALL && SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length > 0 && (
-          <Select value={selectedSubregion} onValueChange={setSelectedSubregion}>
-            <SelectTrigger className="w-[180px] h-11 bg-card border-border/50 rounded-lg text-sm">
-              <SelectValue placeholder="All sub-regions" />
-            </SelectTrigger>
-            <SelectContent className="bg-card border-border z-50">
-              <SelectItem value="all">All sub-regions</SelectItem>
-              {SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>].map((s) => (
-                <SelectItem key={s} value={normalizeLabel(s)}>
-                  {s}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-
-        {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleResetFilters}
-            className="text-muted-foreground hover:text-foreground h-9 text-sm"
-          >
-            <X className="h-3.5 w-3.5 mr-1.5" />
-            Reset filters
-          </Button>
+          <div className="w-full sm:w-56">
+            <Select value={selectedSubregion} onValueChange={setSelectedSubregion}>
+              <SelectTrigger className="h-11 bg-card border-border/50 rounded-lg text-sm">
+                <SelectValue placeholder="All sub-regions" />
+              </SelectTrigger>
+              <SelectContent className="bg-card border-border z-50">
+                <SelectItem value="all">All sub-regions</SelectItem>
+                {SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>].map((s) => (
+                  <SelectItem key={s} value={normalizeLabel(s)}>
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         )}
       </div>
 
@@ -335,40 +367,48 @@ const CourseExplorer = () => {
         </div>
       ) : (
         <div className="space-y-6">
-        {/* Context line */}
+        {/* Compact meta info block: region + range on left, reset on right */}
         {totalCount > 0 && (
-          <p className="mt-2 text-sm text-muted-foreground">
-            {hasSearch ? (
-              <>
-                Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
-                  ? 'worldwide'
-                  : <>in <span className="font-medium">{getRegionLabel()}</span></>}
-                {selectedSubregion !== 'all' && <> → <span className="font-medium">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
-              </>
-            ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
-              'Showing all courses worldwide'
-            ) : (
-              <>
-                Showing courses in{' '}
-                <span className="font-medium">{getRegionLabel()}</span>
-                {selectedSubregion !== 'all' && <> → <span className="font-medium">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
-              </>
-            )}
-          </p>
-        )}
+          <div className="mt-3 flex flex-col gap-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-0.5">
+              <div>
+                {hasSearch ? (
+                  <>
+                    Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
+                      ? 'worldwide'
+                      : <>in <span className="font-medium text-foreground">{getRegionLabel()}</span></>}
+                    {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
+                  </>
+                ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
+                  'Showing all courses worldwide'
+                ) : (
+                  <>
+                    Showing courses in{' '}
+                    <span className="font-medium text-foreground">{getRegionLabel()}</span>
+                    {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
+                  </>
+                )}
+              </div>
+              <div className="text-[11px] text-muted-foreground/80">
+                {totalCount <= PAGE_SIZE && page === 0 ? (
+                  <>Showing all {totalCount} course{totalCount !== 1 && 's'}</>
+                ) : (
+                  <>Showing {startIndex}–{endIndex} of {totalCount.toLocaleString()} courses</>
+                )}
+              </div>
+            </div>
 
-          {/* Range line */}
-          {totalCount > 0 && (
-            <p className="text-sm text-muted-foreground">
-              {totalCount <= PAGE_SIZE && page === 0 ? (
-                <>Showing all {totalCount} course{totalCount !== 1 && 's'}</>
-              ) : (
-                <>
-                  Showing {startIndex}–{endIndex} of {totalCount} courses
-                </>
-              )}
-            </p>
-          )}
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="mt-1 inline-flex items-center text-[11px] font-medium text-muted-foreground hover:text-foreground sm:mt-0"
+              >
+                ✕&nbsp;Reset filters
+              </button>
+            )}
+          </div>
+        )}
           <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
               {courses.map((course) => (
