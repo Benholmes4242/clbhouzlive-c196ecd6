@@ -7,7 +7,7 @@ const Courses = () => {
   return (
     <div className="min-h-screen bg-background page-with-header">
       <ClubhouseHeaderNew />
-      <main className="px-4 md:container md:mx-auto md:px-0 py-6">
+      <main className="px-4 md:container md:mx-auto md:px-0 pt-[72px] pb-6">
         <div className="max-w-6xl mx-auto">
           <CoursesContent />
         </div>

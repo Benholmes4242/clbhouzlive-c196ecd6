@@ -40,10 +40,13 @@ function getInitialRegion(): { value: string; auto: boolean } {
   return { value: autoRegion, auto: autoRegion !== 'all' };
 }
 
+const PAGE_SIZE = 50;
+
 const CourseExplorer = () => {
   const initialRegion = getInitialRegion();
   const [selectedRegion, setSelectedRegion] = useState(initialRegion.value);
   const [regionWasAuto, setRegionWasAuto] = useState(initialRegion.auto);
+  const [page, setPage] = useState(0);
   
   // Initialize search from URL if present
   const urlQuery = typeof window !== 'undefined' 
@@ -60,6 +63,11 @@ const CourseExplorer = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(0);
+  }, [selectedRegion, debouncedSearch]);
+
   // Persist region selection
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -74,12 +82,12 @@ const CourseExplorer = () => {
   }, [selectedRegion]);
 
   // Fetch courses with region filtering based on country
-  const { data: courses = [], isLoading } = useQuery({
-    queryKey: ['explore-courses', selectedRegion, debouncedSearch],
+  const { data, isLoading } = useQuery({
+    queryKey: ['explore-courses', selectedRegion, debouncedSearch, page],
     queryFn: async () => {
       let query = supabase
         .from('golf_courses')
-        .select('*');
+        .select('*', { count: 'exact' });
 
       // Apply region filter based on country
       if (selectedRegion !== 'all') {
@@ -108,15 +116,25 @@ const CourseExplorer = () => {
       query = query.order('global_rank', { ascending: true, nullsFirst: false });
       query = query.order('name', { ascending: true });
       
-      // Limit results
-      query = query.limit(200);
+      // Pagination
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+      query = query.range(from, to);
 
-      const { data, error } = await query;
+      const { data, error, count } = await query;
       if (error) throw error;
-      return data || [];
+
+      return {
+        courses: data || [],
+        totalCount: count ?? 0,
+      };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  const courses = data?.courses || [];
+  const totalCount = data?.totalCount || 0;
+  const hasMore = courses.length === PAGE_SIZE && (page + 1) * PAGE_SIZE < totalCount;
 
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -244,9 +262,11 @@ const CourseExplorer = () => {
           )}
         </div>
       ) : (
-        <div>
-          <div className="text-xs text-muted-foreground mb-3">
-            Showing {courses.length} course{courses.length !== 1 ? 's' : ''}
+        <div className="space-y-6">
+          <div className="text-xs text-muted-foreground">
+            {totalCount > 0
+              ? `Showing ${Math.min((page + 1) * PAGE_SIZE, totalCount)} of ${totalCount} courses`
+              : 'No courses found'}
           </div>
           <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
@@ -260,6 +280,37 @@ const CourseExplorer = () => {
               ))}
             </div>
           </div>
+          
+          {/* Pagination Controls */}
+          {hasMore && (
+            <div className="flex justify-center mt-8 mb-8">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setPage((p) => p + 1);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                disabled={isLoading}
+                className="h-11 px-6 rounded-xl"
+              >
+                Load next {PAGE_SIZE} courses
+              </Button>
+            </div>
+          )}
+          
+          {page > 0 && (
+            <div className="flex justify-center">
+              <button
+                onClick={() => {
+                  setPage(0);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="text-xs text-muted-foreground hover:text-foreground underline transition-colors"
+              >
+                Back to first page
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

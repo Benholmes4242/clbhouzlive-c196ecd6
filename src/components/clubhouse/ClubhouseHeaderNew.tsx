@@ -155,12 +155,12 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
               data-action="search"
               className={cn(
                 "md:hidden p-2 md:p-3 flex-shrink-0 mt-3 transition-colors",
-                isDarkContext && "hover:bg-white/10 text-white/80 hover:text-white",
-                !isDarkContext && "hover:bg-black/10 text-foreground/80 hover:text-foreground"
+                isDarkContext && "hover:bg-white/10",
+                !isDarkContext && "hover:bg-black/10"
               )}
               onClick={() => setSearchOpen(true)}
             >
-              <Search className="h-5 w-5" />
+              <Search className="h-5 w-5 text-white" />
             </button>
             
             {/* Navigation Icons */}
