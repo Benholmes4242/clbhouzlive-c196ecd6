@@ -38,9 +38,9 @@ const formatCount = (count: number): string => {
   return count.toString();
 };
 
-const RAIL_BUTTON_SIZE = 60;   // visual glass container
-const HIT_AREA = 72;           // touch target
-const ICON_SIZE = 24;          // icon size
+const RAIL_BUTTON_SIZE = 40;   // visual glass container
+const HIT_AREA = 56;           // touch target
+const ICON_SIZE = 16;          // icon size
 
 interface RailButtonProps {
   children: React.ReactNode;
