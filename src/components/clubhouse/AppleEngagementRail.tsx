@@ -40,7 +40,7 @@ const formatCount = (count: number): string => {
 
 const RAIL_BUTTON_SIZE = 50;   // visual glass container
 const HIT_AREA = 56;           // touch target
-const ICON_SIZE = 16;          // icon size
+const ICON_SIZE = 28;          // icon size
 
 interface RailButtonProps {
   children: React.ReactNode;
