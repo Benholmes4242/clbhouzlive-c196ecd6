@@ -5,14 +5,26 @@ const ScrollToTopGlass = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    console.log('ScrollToTopGlass mounted');
+    
     const onScroll = () => {
-      // Show after modest scroll so it appears on phones
-      setVisible(window.scrollY > 400);
+      const scrollY = window.scrollY;
+      const shouldShow = scrollY > 400;
+      console.log('Scroll event:', { scrollY, shouldShow, currentVisible: visible });
+      setVisible(shouldShow);
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    // Also check initial position
+    onScroll();
+    
+    return () => {
+      console.log('ScrollToTopGlass unmounting');
+      window.removeEventListener('scroll', onScroll);
+    };
   }, []);
+
+  console.log('ScrollToTopGlass render, visible:', visible);
 
   if (!visible) return null;
 
