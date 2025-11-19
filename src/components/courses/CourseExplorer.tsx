@@ -257,7 +257,7 @@ const CourseExplorer = () => {
               window.history.replaceState({}, '', url.toString());
             }
           }}
-          className="pl-10 pr-10 h-11 bg-card border-border/50 rounded-xl shadow-sm focus:shadow-md transition-shadow text-sm"
+          className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border transition-shadow text-sm"
         />
         {searchTerm && (
           <button
@@ -278,9 +278,11 @@ const CourseExplorer = () => {
             setSelectedSubregion('all');
             setRegionWasAuto(false);
           }}>
-            <SelectTrigger className="w-full h-11 rounded-xl bg-card border-border/50">
-              <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
-              <SelectValue placeholder="Select region" />
+            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border transition-shadow">
+              <div className="flex items-center">
+                <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
+                <SelectValue placeholder="Select region" />
+              </div>
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
               {regionOptions.map((option) => (
@@ -302,7 +304,7 @@ const CourseExplorer = () => {
             onValueChange={setSelectedSubregion}
             disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
-            <SelectTrigger className="w-full h-11 rounded-xl bg-card border-border/50">
+            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border transition-shadow">
               <SelectValue placeholder="All sub-regions" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
@@ -345,44 +347,44 @@ const CourseExplorer = () => {
         <div className="space-y-6">
         {/* Compact meta info block: region + range on left, reset on right */}
         {totalCount > 0 && (
-          <div className="mt-3 flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-0.5">
-              <div>
-                {hasSearch ? (
-                  <>
-                    Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
-                      ? 'worldwide'
-                      : <>in <span className="font-medium text-foreground">{getRegionLabel()}</span></>}
-                    {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
-                  </>
-                ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
-                  'Showing all courses worldwide'
-                ) : (
-                  <>
-                    Showing courses in{' '}
-                    <span className="font-medium text-foreground">{getRegionLabel()}</span>
-                    {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
-                  </>
-                )}
-              </div>
-              <div className="text-xs text-muted-foreground/80">
+          <div className="mt-3 space-y-1">
+            <p className="text-xs md:text-sm text-muted-foreground">
+              {hasSearch ? (
+                <>
+                  Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
+                    ? 'worldwide'
+                    : <>in <span className="font-medium text-foreground">{getRegionLabel()}</span></>}
+                  {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
+                </>
+              ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
+                'Showing all courses worldwide'
+              ) : (
+                <>
+                  Showing courses in{' '}
+                  <span className="font-medium text-foreground">{getRegionLabel()}</span>
+                  {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
+                </>
+              )}
+            </p>
+            <div className="flex items-center justify-between text-xs md:text-sm text-muted-foreground">
+              <span>
                 {totalCount <= PAGE_SIZE && page === 0 ? (
                   <>Showing all {totalCount} course{totalCount !== 1 && 's'}</>
                 ) : (
                   <>Showing {startIndex}–{endIndex} of {totalCount.toLocaleString()} courses</>
                 )}
-              </div>
+              </span>
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={handleResetFilters}
+                  className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-900 text-xs md:text-sm"
+                >
+                  <span className="text-[10px] leading-none">&times;</span>
+                  <span>Reset filters</span>
+                </button>
+              )}
             </div>
-
-            {hasActiveFilters && (
-              <button
-                type="button"
-                onClick={handleResetFilters}
-                className="mt-1 inline-flex items-center text-xs font-medium text-muted-foreground hover:text-foreground sm:mt-0"
-              >
-                ✕&nbsp;Reset filters
-              </button>
-            )}
           </div>
         )}
           <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
