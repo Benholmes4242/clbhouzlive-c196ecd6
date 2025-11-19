@@ -15,8 +15,6 @@ import {
   subregionKeyToLabel,
 } from '@/constants/courseRegions';
 
-const TOP100_STORAGE_KEY = 'clbhouz_top100_list_v1';
-const TOP100_SUB_STORAGE_KEY = 'clbhouz_top100_subregion_v1';
 const PAGE_SIZE = 50;
 
 function listSlugToRegionKey(slug: string): PrimaryRegionKey {
@@ -38,47 +36,13 @@ function listSlugToRegionKey(slug: string): PrimaryRegionKey {
   }
 }
 
-function getInitialTop100List(): { value: string; auto: boolean } {
-  const params = new URLSearchParams(window.location.search);
-  const urlList = params.get('list');
-  if (urlList) {
-    return { value: urlList, auto: false };
-  }
-
-  if (typeof window !== 'undefined') {
-    const stored = window.localStorage.getItem(TOP100_STORAGE_KEY);
-    if (stored) {
-      return { value: stored, auto: false };
-    }
-  }
-
-  // Light heuristic similar to regions
-  let autoList = 'global';
-  if (typeof navigator !== 'undefined') {
-    const lang = navigator.language.toLowerCase();
-    if (lang.startsWith('en-gb') || lang.startsWith('en-ie')) {
-      autoList = 'gb-i';
-    } else if (lang.startsWith('en-us')) {
-      autoList = 'usa';
-    }
-  }
-
-  return { value: autoList, auto: autoList !== 'global' };
-}
-
 const GlobalTop100 = () => {
-  const initialList = getInitialTop100List();
-  const [selectedList, setSelectedList] = useState(initialList.value);
-  const [listWasAuto, setListWasAuto] = useState(initialList.auto);
+  // Always reset to defaults on mount - no persistence
+  const [selectedList, setSelectedList] = useState('global');
   const [selectedSubregion, setSelectedSubregion] = useState<'all' | string>('all');
   const [page, setPage] = useState(0);
-  
-  // Initialize search from URL if present
-  const urlQuery = typeof window !== 'undefined' 
-    ? new URLSearchParams(window.location.search).get('query') || '' 
-    : '';
-  const [searchTerm, setSearchTerm] = useState(urlQuery);
-  const [debouncedSearch, setDebouncedSearch] = useState(urlQuery);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
   // Debounce search input
   useEffect(() => {
@@ -88,55 +52,10 @@ const GlobalTop100 = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Restore subregion from URL/localStorage on mount
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const url = new URL(window.location.href);
-    const urlSub = url.searchParams.get('sub');
-
-    if (urlSub) {
-      setSelectedSubregion(urlSub);
-      return;
-    }
-
-    const stored = window.localStorage.getItem(TOP100_SUB_STORAGE_KEY);
-    if (stored) {
-      setSelectedSubregion(stored);
-    }
-  }, []);
-
   // Reset page when filters change
   useEffect(() => {
     setPage(0);
   }, [selectedList, selectedSubregion, debouncedSearch]);
-
-  // Persist list selection
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    window.localStorage.setItem(TOP100_STORAGE_KEY, selectedList);
-
-    const url = new URL(window.location.href);
-    url.searchParams.set('list', selectedList);
-    window.history.replaceState({}, '', url.toString());
-  }, [selectedList]);
-
-  // Persist sub-region to URL + storage
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    window.localStorage.setItem(TOP100_SUB_STORAGE_KEY, selectedSubregion);
-
-    const url = new URL(window.location.href);
-    if (selectedSubregion && selectedSubregion !== 'all') {
-      url.searchParams.set('sub', selectedSubregion);
-    } else {
-      url.searchParams.delete('sub');
-    }
-
-    window.history.replaceState({}, '', url.toString());
-  }, [selectedSubregion]);
 
   // Fetch available lists
   const { data: lists = [] } = useTop100Lists();
@@ -194,17 +113,9 @@ const GlobalTop100 = () => {
 
   const handleResetFilters = () => {
     setSelectedList('global');
-    setListWasAuto(false);
     setSelectedSubregion('all');
     setSearchTerm('');
-
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href);
-      url.searchParams.delete('list');
-      url.searchParams.delete('sub');
-      url.searchParams.delete('query');
-      window.history.replaceState({}, '', url.toString());
-    }
+    setPage(0);
   };
 
   const hasActiveFilters = selectedList !== 'global' || selectedSubregion !== 'all' || searchTerm !== '';
@@ -218,34 +129,14 @@ const GlobalTop100 = () => {
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           value={searchTerm}
-          onChange={(e) => {
-            const value = e.target.value;
-            setSearchTerm(value);
-
-            if (typeof window !== 'undefined') {
-              const url = new URL(window.location.href);
-              if (value) {
-                url.searchParams.set('query', value);
-              } else {
-                url.searchParams.delete('query');
-              }
-              window.history.replaceState({}, '', url.toString());
-            }
-          }}
+          onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search within this Top 100 list"
           className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border transition-shadow text-sm"
         />
         {searchTerm && (
           <button
             type="button"
-            onClick={() => {
-              setSearchTerm('');
-              if (typeof window !== 'undefined') {
-                const url = new URL(window.location.href);
-                url.searchParams.delete('query');
-                window.history.replaceState({}, '', url.toString());
-              }
-            }}
+            onClick={() => setSearchTerm('')}
             className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <X className="h-4 w-4" />
@@ -260,7 +151,6 @@ const GlobalTop100 = () => {
             value={selectedList}
             onValueChange={(val) => {
               setSelectedList(val);
-              setListWasAuto(false);
               setPage(0);
               const regionKey = listSlugToRegionKey(val);
               if (!SUBREGIONS[regionKey as Exclude<PrimaryRegionKey, 'all'>]?.length) {
