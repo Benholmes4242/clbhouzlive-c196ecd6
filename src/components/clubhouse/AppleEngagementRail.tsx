@@ -38,8 +38,8 @@ const formatCount = (count: number): string => {
   return count.toString();
 };
 
-const RAIL_BUTTON_SIZE = 40;   // visual pill
-const HIT_AREA = 44;           // touch target
+const RAIL_BUTTON_SIZE = 34;   // visual pill
+const HIT_AREA = 48;           // touch target
 const ICON_SIZE = 18;          // icon size
 
 interface RailButtonProps {
@@ -100,7 +100,7 @@ export const AppleEngagementRail = ({
   return (
     <div 
       className={cn(
-        'clubhouse-rail fixed right-[12px] z-50 flex flex-col items-center gap-3',
+        'clubhouse-rail fixed right-[12px] z-50 flex flex-col items-center gap-3.5',
         className
       )}
     >

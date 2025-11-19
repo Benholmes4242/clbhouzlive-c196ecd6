@@ -112,5 +112,5 @@ body.chrome-hidden .chrome-bottom-nav {
 
 body.chrome-hidden .clubhouse-hud,
 body.chrome-hidden .clubhouse-rail {
-  bottom: calc(env(safe-area-inset-bottom) + 10px);
+  bottom: calc(env(safe-area-inset-bottom) + 22px);
 }
