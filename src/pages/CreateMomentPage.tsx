@@ -42,10 +42,7 @@ export default function CreateMomentPage() {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999]">
-      {/* Backdrop - same as Hub */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
-      
+    <div className="fixed inset-0 z-[999]">
       <PostSubmissionHandler
         isComposerOpen={true} // Always open when page is mounted
         mediaItems={mediaItems}
