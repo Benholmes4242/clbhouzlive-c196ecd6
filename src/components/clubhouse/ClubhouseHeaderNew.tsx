@@ -108,7 +108,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
         ref={headerRef}
         className={cn(
           "chrome-header", // Chrome auto-hide class
-          "relative z-header", // Remove transition, handled by chrome-autohide.css
+          "relative z-header m-0", // Remove transition, handled by chrome-autohide.css, ensure no top margin
           "h-16 md:h-18", // 64px mobile, 72px desktop
           className
         )}
