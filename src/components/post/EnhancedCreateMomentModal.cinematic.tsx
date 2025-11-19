@@ -532,7 +532,7 @@ export default function EnhancedCreateMomentModalCinematic({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999]">
+    <>
       {/* Glass Sheet with Hub-style slide animation */}
       <div
         ref={wrapperRef}
@@ -854,7 +854,7 @@ export default function EnhancedCreateMomentModalCinematic({
         updateEdits={(patch) => updateEdits(media[activeIndex]?.id || '', patch)}
         clearEdits={() => clearEdits(media[activeIndex]?.id || '')}
       />
-    </div>
+    </>
   );
 }
 
