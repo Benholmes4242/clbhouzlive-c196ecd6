@@ -38,10 +38,42 @@ const formatCount = (count: number): string => {
   return count.toString();
 };
 
-const GLASS_RAIL_WIDTH = 34;  // Visible glass container
-const BUTTON_SIZE = 26;       // Inner circle
-const HIT_AREA = 44;          // Touch target
-const ICON_SIZE = 18;         // Icon size
+const RAIL_BUTTON_SIZE = 40;   // visual pill
+const HIT_AREA = 44;           // touch target
+const ICON_SIZE = 18;          // icon size
+
+interface RailButtonProps {
+  children: React.ReactNode;
+  count?: number;
+  onClick: () => void;
+  ariaLabel: string;
+}
+
+const RailButton = ({ children, count, onClick, ariaLabel }: RailButtonProps) => (
+  <button
+    type="button"
+    onClick={onClick}
+    aria-label={ariaLabel}
+    className="flex flex-col items-center gap-1"
+  >
+    {/* Glass pill */}
+    <div
+      className="glass-dark rounded-full flex items-center justify-center transition-transform active:scale-95"
+      style={{
+        width: RAIL_BUTTON_SIZE,
+        height: RAIL_BUTTON_SIZE,
+      }}
+    >
+      {children}
+    </div>
+
+    {typeof count === 'number' && (
+      <span className="text-[11px] leading-none text-white/80 font-medium">
+        {formatCount(count)}
+      </span>
+    )}
+  </button>
+);
 
 export const AppleEngagementRail = ({
   stats,
@@ -68,89 +100,62 @@ export const AppleEngagementRail = ({
   return (
     <div 
       className={cn(
-        'clubhouse-rail fixed right-[12px] z-50 flex flex-col items-center gap-3 px-1 py-2 glass-dark',
+        'clubhouse-rail fixed right-[12px] z-50 flex flex-col items-center gap-3',
         className
       )}
-      style={{
-        width: GLASS_RAIL_WIDTH,
-      }}
     >
       {/* Mute Button (video only) */}
       {isVideo && onMuteToggle && (
-        <button
-          type="button"
+        <RailButton
           onClick={onMuteToggle}
-          className="flex items-center justify-center transition-transform active:scale-95"
-          style={{ width: HIT_AREA, height: HIT_AREA }}
-          aria-label={isMuted ? 'Unmute' : 'Mute'}
+          ariaLabel={isMuted ? 'Unmute video' : 'Mute video'}
         >
           {isMuted ? (
             <VolumeX size={ICON_SIZE} className="text-white transition-colors" style={{ display: 'block' }} />
           ) : (
             <Volume2 size={ICON_SIZE} className="text-white transition-colors" style={{ display: 'block' }} />
           )}
-        </button>
+        </RailButton>
       )}
 
       {/* Like Button */}
-      <div className="flex flex-col items-center gap-1">
-        <button
-          type="button"
-          onClick={onLike}
-          className="flex items-center justify-center transition-transform active:scale-95"
-          style={{ width: HIT_AREA, height: HIT_AREA }}
-          aria-label={isLiked ? 'Unlike' : 'Like'}
-        >
-          <Heart
-            size={ICON_SIZE}
-            className={cn('transition-all text-white', isLiked && 'fill-white')}
-            style={{ display: 'block' }}
-          />
-        </button>
-        <span className="text-[11px] text-white/80 font-medium">
-          {formatCount(stats.likes)}
-        </span>
-      </div>
+      <RailButton
+        onClick={onLike}
+        ariaLabel={isLiked ? 'Unlike' : 'Like'}
+        count={stats.likes}
+      >
+        <Heart
+          size={ICON_SIZE}
+          className={cn('transition-all text-white', isLiked && 'fill-white')}
+          style={{ display: 'block' }}
+        />
+      </RailButton>
 
       {/* Comment Button */}
-      <div className="flex flex-col items-center gap-1">
-        <button
-          type="button"
-          onClick={onComment}
-          className="flex items-center justify-center transition-transform active:scale-95"
-          style={{ width: HIT_AREA, height: HIT_AREA }}
-          aria-label="Comment"
-        >
-          <MessageCircle
-            size={ICON_SIZE}
-            className="text-white transition-colors"
-            style={{ display: 'block' }}
-          />
-        </button>
-        <span className="text-[11px] text-white/80 font-medium">
-          {formatCount(stats.comments)}
-        </span>
-      </div>
+      <RailButton
+        onClick={onComment}
+        ariaLabel="Comment"
+        count={stats.comments}
+      >
+        <MessageCircle
+          size={ICON_SIZE}
+          className="text-white transition-colors"
+          style={{ display: 'block' }}
+        />
+      </RailButton>
 
       {/* Share Button */}
-      <div className="flex flex-col items-center gap-1">
-        <button
-          type="button"
-          onClick={handleShare}
-          className="flex items-center justify-center transition-transform active:scale-95"
-          style={{ width: HIT_AREA, height: HIT_AREA }}
-          aria-label="Share"
-        >
-          {showShareCheck ? (
-            <Check size={ICON_SIZE} className="text-white transition-colors" style={{ display: 'block' }} />
-          ) : (
-            <Share2 size={ICON_SIZE} className="text-white transition-colors" style={{ display: 'block' }} />
-          )}
-        </button>
-        <span className="text-[11px] text-white/80 font-medium">
-          {formatCount(stats.shares)}
-        </span>
-      </div>
+      <RailButton
+        onClick={handleShare}
+        ariaLabel="Share"
+        count={stats.shares}
+      >
+        {showShareCheck ? (
+          <Check size={ICON_SIZE} className="text-white transition-colors" style={{ display: 'block' }} />
+        ) : (
+          <Share2 size={ICON_SIZE} className="text-white transition-colors" style={{ display: 'block' }} />
+        )}
+      </RailButton>
     </div>
   );
 };
