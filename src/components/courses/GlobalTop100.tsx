@@ -7,9 +7,36 @@ import { Button } from '@/components/ui/button';
 import { Search, Award, X } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  PRIMARY_REGIONS,
+  SUBREGIONS,
+  type PrimaryRegionKey,
+  normalizeLabel,
+  subregionKeyToLabel,
+} from '@/constants/courseRegions';
 
 const TOP100_STORAGE_KEY = 'clbhouz_top100_list_v1';
+const TOP100_SUB_STORAGE_KEY = 'clbhouz_top100_subregion_v1';
 const PAGE_SIZE = 50;
+
+function listSlugToRegionKey(slug: string): PrimaryRegionKey {
+  switch (slug) {
+    case 'gb-i':
+    case 'gb-i-top100':
+      return PRIMARY_REGIONS.GB_I;
+    case 'usa':
+    case 'usa-top100':
+      return PRIMARY_REGIONS.USA;
+    case 'europe':
+    case 'europe-top100':
+      return PRIMARY_REGIONS.EUROPE;
+    case 'rest':
+    case 'rest-top100':
+      return PRIMARY_REGIONS.REST;
+    default:
+      return PRIMARY_REGIONS.ALL;
+  }
+}
 
 function getInitialTop100List(): { value: string; auto: boolean } {
   const params = new URLSearchParams(window.location.search);
@@ -43,6 +70,7 @@ const GlobalTop100 = () => {
   const initialList = getInitialTop100List();
   const [selectedList, setSelectedList] = useState(initialList.value);
   const [listWasAuto, setListWasAuto] = useState(initialList.auto);
+  const [selectedSubregion, setSelectedSubregion] = useState<'all' | string>('all');
   const [page, setPage] = useState(0);
   
   // Initialize search from URL if present
@@ -60,10 +88,28 @@ const GlobalTop100 = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  // Restore subregion from URL/localStorage on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const url = new URL(window.location.href);
+    const urlSub = url.searchParams.get('sub');
+
+    if (urlSub) {
+      setSelectedSubregion(urlSub);
+      return;
+    }
+
+    const stored = window.localStorage.getItem(TOP100_SUB_STORAGE_KEY);
+    if (stored) {
+      setSelectedSubregion(stored);
+    }
+  }, []);
+
   // Reset page when filters change
   useEffect(() => {
     setPage(0);
-  }, [selectedList, debouncedSearch]);
+  }, [selectedList, selectedSubregion, debouncedSearch]);
 
   // Persist list selection
   useEffect(() => {
@@ -76,6 +122,22 @@ const GlobalTop100 = () => {
     window.history.replaceState({}, '', url.toString());
   }, [selectedList]);
 
+  // Persist sub-region to URL + storage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    window.localStorage.setItem(TOP100_SUB_STORAGE_KEY, selectedSubregion);
+
+    const url = new URL(window.location.href);
+    if (selectedSubregion && selectedSubregion !== 'all') {
+      url.searchParams.set('sub', selectedSubregion);
+    } else {
+      url.searchParams.delete('sub');
+    }
+
+    window.history.replaceState({}, '', url.toString());
+  }, [selectedSubregion]);
+
   // Fetch available lists
   const { data: lists = [] } = useTop100Lists();
 
@@ -86,7 +148,18 @@ const GlobalTop100 = () => {
     limit: 200,
   });
 
-  const totalCount = courses.length;
+  // Apply subregion filter client-side
+  const normalizedSelectedSub = selectedSubregion === 'all' ? null : selectedSubregion;
+
+  const filteredCourses = (courses || []).filter((course) => {
+    if (!normalizedSelectedSub) return true;
+
+    if (!course.sub_country) return false;
+
+    return normalizeLabel(course.sub_country) === normalizedSelectedSub;
+  });
+
+  const totalCount = filteredCourses.length;
   const hasMore = false; // Top 100 lists are limited, no pagination needed
 
   const LoadingSkeleton = () => (
@@ -122,17 +195,19 @@ const GlobalTop100 = () => {
   const handleResetFilters = () => {
     setSelectedList('global');
     setListWasAuto(false);
+    setSelectedSubregion('all');
     setSearchTerm('');
 
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
       url.searchParams.delete('list');
+      url.searchParams.delete('sub');
       url.searchParams.delete('query');
       window.history.replaceState({}, '', url.toString());
     }
   };
 
-  const hasActiveFilters = selectedList !== 'global' || searchTerm !== '';
+  const hasActiveFilters = selectedList !== 'global' || selectedSubregion !== 'all' || searchTerm !== '';
 
   return (
     <div className="space-y-6">
@@ -169,17 +244,29 @@ const GlobalTop100 = () => {
       </div>
 
       {/* Top 100 List Selector */}
-      <div className="space-y-2">
-        <p className="text-xs text-muted-foreground">
-          Viewing: {listOptions.find((opt) => opt.value === selectedList)?.label || 'Global Top 100'}
-          {listWasAuto && ' • Suggested for you'}
-        </p>
-        <div className="flex flex-wrap gap-2 items-center">
-          <Select value={selectedList} onValueChange={(value) => {
-            setSelectedList(value);
-            setListWasAuto(false);
-          }}>
-            <SelectTrigger className="w-[180px] h-11 bg-card border-border/50 rounded-lg text-sm">
+      <div className="flex flex-col gap-2 mb-3">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>
+            Viewing:{' '}
+            {listOptions.find((opt) => opt.value === selectedList)?.label ||
+              'Global Top 100'}
+            {listWasAuto && ' • Suggested for you'}
+          </span>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <Select
+            value={selectedList}
+            onValueChange={(value) => {
+              setSelectedList(value);
+              setListWasAuto(false);
+              const regionKey = listSlugToRegionKey(value);
+              if (!SUBREGIONS[regionKey as Exclude<PrimaryRegionKey, 'all'>]?.length) {
+                setSelectedSubregion('all');
+              }
+            }}
+          >
+            <SelectTrigger className="w-full h-11 bg-card border-border/50 rounded-lg text-sm">
               <div className="flex items-center gap-2">
                 <Award className="h-4 w-4 text-muted-foreground" />
                 <SelectValue placeholder="Top 100 List" />
@@ -197,24 +284,54 @@ const GlobalTop100 = () => {
             </SelectContent>
           </Select>
 
-          {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleResetFilters}
-              className="text-muted-foreground hover:text-foreground h-9 text-sm"
-            >
-              <X className="h-3.5 w-3.5 mr-1.5" />
-              Reset filters
-            </Button>
-          )}
+          {/* Sub-region, only if this Top 100 list maps to a region with subregions */}
+          {(() => {
+            const regionKey = listSlugToRegionKey(selectedList);
+            const subregions = SUBREGIONS[regionKey as Exclude<PrimaryRegionKey, 'all'>] || [];
+
+            if (!subregions.length) return null;
+
+            return (
+              <Select
+                value={selectedSubregion}
+                onValueChange={setSelectedSubregion}
+              >
+                <SelectTrigger className="w-full h-11 bg-card border-border/50 rounded-lg text-sm">
+                  <SelectValue placeholder="All sub-regions" />
+                </SelectTrigger>
+                <SelectContent className="bg-card border-border z-50">
+                  <SelectItem value="all">All sub-regions</SelectItem>
+                  {subregions.map((s) => (
+                    <SelectItem
+                      key={s}
+                      value={normalizeLabel(s)}
+                    >
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            );
+          })()}
         </div>
+
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="self-start px-0 h-auto text-xs text-muted-foreground hover:text-foreground"
+            onClick={handleResetFilters}
+          >
+            <X className="h-3.5 w-3.5 mr-1.5" />
+            Reset filters
+          </Button>
+        )}
       </div>
 
       {/* Results */}
       {isLoading ? (
         <LoadingSkeleton />
-      ) : courses.length === 0 ? (
+      ) : filteredCourses.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
           <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center text-muted-foreground mb-1">
             <Award className="w-4 h-4" />
@@ -243,11 +360,23 @@ const GlobalTop100 = () => {
                 <>
                   Results for "{debouncedSearch}" in{' '}
                   <span className="font-medium">{getListLabel()}</span>
+                  {normalizedSelectedSub && (
+                    <>
+                      {' '}
+                      · filtered by {subregionKeyToLabel(listSlugToRegionKey(selectedList), normalizedSelectedSub)}
+                    </>
+                  )}
                 </>
               ) : (
                 <>
                   Showing{' '}
                   <span className="font-medium">{getListLabel()}</span>
+                  {normalizedSelectedSub && (
+                    <>
+                      {' '}
+                      · filtered by {subregionKeyToLabel(listSlugToRegionKey(selectedList), normalizedSelectedSub)}
+                    </>
+                  )}
                 </>
               )}
             </p>
@@ -265,46 +394,39 @@ const GlobalTop100 = () => {
               )}
             </p>
           )}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map((course) => (
-              <CourseCard 
-                key={course.id} 
-                course={course}
-                contextTag={listOptions.find((opt) => opt.value === selectedList)?.label || 'Top 100'}
-                showRankBadge={!!course.global_rank}
-              />
-            ))}
+
+          <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
+            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
+              {filteredCourses.map((course) => (
+                <div key={course.id} className="mb-4 sm:mb-0">
+                  <CourseCard 
+                    course={course}
+                    showRankBadge={true}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-          
-          {/* Pagination Controls */}
+
           {hasMore && (
-            <div className="flex justify-center mt-8 mb-8">
+            <div className="flex justify-center mt-4 mb-8">
               <Button
                 variant="outline"
-                onClick={() => {
-                  setPage((p) => p + 1);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
+                onClick={() => setPage((p) => p + 1)}
                 disabled={isLoading}
-                className="h-11 px-6 rounded-xl"
               >
                 Load next {PAGE_SIZE} courses
               </Button>
             </div>
           )}
-          
+
           {page > 0 && (
-            <div className="flex justify-center">
-              <button
-                onClick={() => {
-                  setPage(0);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="text-xs text-muted-foreground hover:text-foreground underline transition-colors"
-              >
-                Back to first page
-              </button>
-            </div>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="mt-2 text-xs text-muted-foreground underline"
+            >
+              Back to top
+            </button>
           )}
         </div>
       )}

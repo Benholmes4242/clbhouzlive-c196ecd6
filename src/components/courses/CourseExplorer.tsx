@@ -7,82 +7,47 @@ import { Button } from '@/components/ui/button';
 import { Search, MapPin, X } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  PRIMARY_REGIONS,
+  PRIMARY_REGION_LABELS,
+  SUBREGIONS,
+  type PrimaryRegionKey,
+  normalizeLabel,
+  regionKeyToDbValue,
+  subregionKeyToLabel,
+} from '@/constants/courseRegions';
 
 const REGION_STORAGE_KEY = 'clbhouz_courses_region_v1';
 const SUBREGION_STORAGE_KEY = 'clbhouz_courses_subregion_v1';
 
-const SUBREGIONS: Record<string, string[]> = {
-  'gb-i': [
-    'England',
-    'Scotland',
-    'Wales',
-    'Ireland',
-    'Northern Ireland',
-    'Isle of Man'
-  ],
-  'europe': [
-    'Andorra', 'Austria', 'Belgium', 'Croatia', 'Czech Republic', 'Denmark',
-    'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Iceland',
-    'Italy', 'Netherlands', 'Norway', 'Poland', 'Portugal', 'Spain',
-    'Sweden', 'Switzerland', 'Turkey'
-  ],
-  'usa': [
-    'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
-    'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana',
-    'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts',
-    'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada',
-    'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota',
-    'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
-    'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
-    'Wisconsin', 'Wyoming'
-  ],
-  'rest': []
-};
-
-function mapPrimaryRegion(key: string) {
-  switch (key) {
-    case 'gb-i': return 'Britain & Ireland';
-    case 'usa': return 'USA';
-    case 'europe': return 'Continental Europe';
-    case 'rest': return 'Rest of World';
-    default: return key;
-  }
-}
-
-function mapSubregionLabel(key: string) {
-  return key
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-function getInitialRegion(): { value: string; auto: boolean } {
+function getInitialRegion(): { value: PrimaryRegionKey; auto: boolean } {
   // 1) URL param has priority
   const params = new URLSearchParams(window.location.search);
-  const urlRegion = params.get('region');
-  if (urlRegion && ['all', 'gb-i', 'usa', 'europe', 'rest'].includes(urlRegion)) {
+  const urlRegion = params.get('region') as PrimaryRegionKey;
+  if (urlRegion && Object.values(PRIMARY_REGIONS).includes(urlRegion)) {
     return { value: urlRegion, auto: false };
   }
 
   // 2) Local storage from previous visit
   if (typeof window !== 'undefined') {
-    const stored = window.localStorage.getItem(REGION_STORAGE_KEY);
-    if (stored && ['all', 'gb-i', 'usa', 'europe', 'rest'].includes(stored)) {
+    const stored = window.localStorage.getItem(REGION_STORAGE_KEY) as PrimaryRegionKey;
+    if (stored && Object.values(PRIMARY_REGIONS).includes(stored)) {
       return { value: stored, auto: false };
     }
   }
 
   // 3) Very light heuristic based on browser locale
-  let autoRegion: string = 'all';
+  let autoRegion: PrimaryRegionKey = PRIMARY_REGIONS.ALL;
   if (typeof navigator !== 'undefined') {
     const lang = navigator.language.toLowerCase();
     if (lang.startsWith('en-gb') || lang.startsWith('en-ie')) {
-      autoRegion = 'gb-i';
+      autoRegion = PRIMARY_REGIONS.GB_I;
     } else if (lang.startsWith('en-us')) {
-      autoRegion = 'usa';
+      autoRegion = PRIMARY_REGIONS.USA;
     }
   }
 
-  return { value: autoRegion, auto: autoRegion !== 'all' };
+  return { value: autoRegion, auto: autoRegion !== PRIMARY_REGIONS.ALL };
 }
 
 const PAGE_SIZE = 50;
@@ -170,13 +135,17 @@ const CourseExplorer = () => {
         .select('*', { count: 'exact' });
 
       // Apply region filter based on country
-      if (selectedRegion !== 'all') {
-        query = query.eq('country', mapPrimaryRegion(selectedRegion));
+      if (selectedRegion !== PRIMARY_REGIONS.ALL) {
+        const dbRegion = regionKeyToDbValue(selectedRegion);
+        if (dbRegion) {
+          query = query.eq('country', dbRegion);
+        }
       }
 
       // Sub-region filter
       if (selectedSubregion !== 'all') {
-        query = query.eq('sub_country', mapSubregionLabel(selectedSubregion));
+        const label = subregionKeyToLabel(selectedRegion, selectedSubregion);
+        query = query.eq('sub_country', label);
       }
 
       // Apply search filter - include local_area
@@ -221,26 +190,26 @@ const CourseExplorer = () => {
   );
 
   const regionOptions = [
-    { value: 'all', label: 'All Regions' },
-    { value: 'gb-i', label: 'Britain & Ireland' },
-    { value: 'usa', label: 'United States' },
-    { value: 'europe', label: 'Continental Europe' },
-    { value: 'rest', label: 'Rest of World' },
+    { value: PRIMARY_REGIONS.ALL, label: PRIMARY_REGION_LABELS['all'] },
+    { value: PRIMARY_REGIONS.GB_I, label: PRIMARY_REGION_LABELS['gb-i'] },
+    { value: PRIMARY_REGIONS.USA, label: PRIMARY_REGION_LABELS['usa'] },
+    { value: PRIMARY_REGIONS.EUROPE, label: PRIMARY_REGION_LABELS['europe'] },
+    { value: PRIMARY_REGIONS.REST, label: PRIMARY_REGION_LABELS['rest'] },
   ];
 
   const getRegionLabel = () => {
-    if (selectedRegion === 'all') return 'worldwide';
+    if (selectedRegion === PRIMARY_REGIONS.ALL) return 'worldwide';
     return regionOptions.find((o) => o.value === selectedRegion)?.label || 'this region';
   };
 
   const hasSearch = debouncedSearch.trim().length > 0;
-  const hasActiveFilters = selectedRegion !== 'all' || selectedSubregion !== 'all' || hasSearch;
+  const hasActiveFilters = selectedRegion !== PRIMARY_REGIONS.ALL || selectedSubregion !== 'all' || hasSearch;
 
   const startIndex = totalCount === 0 ? 0 : page * PAGE_SIZE + 1;
   const endIndex = Math.min((page + 1) * PAGE_SIZE, totalCount);
 
   const handleResetFilters = () => {
-    setSelectedRegion('all');
+    setSelectedRegion(PRIMARY_REGIONS.ALL);
     setSelectedSubregion('all');
     setRegionWasAuto(false);
     setSearchTerm('');
@@ -291,7 +260,7 @@ const CourseExplorer = () => {
       {/* Region Filter */}
         <div className="flex flex-wrap gap-2 items-center">
           <Select value={selectedRegion} onValueChange={(value) => {
-            setSelectedRegion(value);
+            setSelectedRegion(value as PrimaryRegionKey);
             setSelectedSubregion('all');
             setRegionWasAuto(false);
           }}>
@@ -311,15 +280,15 @@ const CourseExplorer = () => {
           </Select>
 
         {/* Sub-region Filter (only visible if a region is selected) */}
-        {selectedRegion !== 'all' && SUBREGIONS[selectedRegion]?.length > 0 && (
+        {selectedRegion !== PRIMARY_REGIONS.ALL && SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length > 0 && (
           <Select value={selectedSubregion} onValueChange={setSelectedSubregion}>
             <SelectTrigger className="w-[180px] h-11 bg-card border-border/50 rounded-lg text-sm">
               <SelectValue placeholder="All sub-regions" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
               <SelectItem value="all">All sub-regions</SelectItem>
-              {SUBREGIONS[selectedRegion].map((s) => (
-                <SelectItem key={s} value={s.toLowerCase().replace(/ /g, '-')}>
+              {SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>].map((s) => (
+                <SelectItem key={s} value={normalizeLabel(s)}>
                   {s}
                 </SelectItem>
               ))}
@@ -371,18 +340,18 @@ const CourseExplorer = () => {
           <p className="mt-2 text-sm text-muted-foreground">
             {hasSearch ? (
               <>
-                Results for "{debouncedSearch}" {selectedRegion === 'all'
+                Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
                   ? 'worldwide'
                   : <>in <span className="font-medium">{getRegionLabel()}</span></>}
-                {selectedSubregion !== 'all' && <> → <span className="font-medium">{mapSubregionLabel(selectedSubregion)}</span></>}
+                {selectedSubregion !== 'all' && <> → <span className="font-medium">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
               </>
-            ) : selectedRegion === 'all' ? (
+            ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
               'Showing all courses worldwide'
             ) : (
               <>
                 Showing courses in{' '}
                 <span className="font-medium">{getRegionLabel()}</span>
-                {selectedSubregion !== 'all' && <> → <span className="font-medium">{mapSubregionLabel(selectedSubregion)}</span></>}
+                {selectedSubregion !== 'all' && <> → <span className="font-medium">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
               </>
             )}
           </p>
