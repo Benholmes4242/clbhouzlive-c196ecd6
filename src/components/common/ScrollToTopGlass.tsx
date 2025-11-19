@@ -1,62 +1,73 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { ChevronUp } from 'lucide-react';
 
 const ScrollToTopGlass = () => {
   const [visible, setVisible] = useState(false);
+  const scrollContainerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    // Find the actual scrolling container
+    const findScrollContainer = (): HTMLElement => {
+      // Check common scroll containers
+      const candidates = [
+        document.querySelector('main'),
+        document.querySelector('[data-scroll-container]'),
+        document.querySelector('.page-scroll-container'),
+        document.querySelector('.scroll-container'),
+        document.documentElement,
+        document.body,
+      ].filter(Boolean) as HTMLElement[];
+
+      // Find the one that's actually scrollable
+      for (const el of candidates) {
+        const style = window.getComputedStyle(el);
+        const hasScroll = style.overflowY === 'auto' || 
+                         style.overflowY === 'scroll' || 
+                         style.overflow === 'auto' || 
+                         style.overflow === 'scroll';
+        const canScroll = el.scrollHeight > el.clientHeight;
+        
+        if (hasScroll || canScroll) {
+          console.log('🔝 Found scroll container:', el.tagName, { hasScroll, canScroll, scrollHeight: el.scrollHeight, clientHeight: el.clientHeight });
+          return el;
+        }
+      }
+
+      // Fallback to documentElement
+      return document.documentElement;
+    };
+
+    const container = findScrollContainer();
+    scrollContainerRef.current = container;
+
     const checkScroll = () => {
-      // Try multiple scroll position sources
-      const scrollY = 
-        window.scrollY ||
-        window.pageYOffset ||
-        document.documentElement.scrollTop ||
-        document.body.scrollTop ||
-        0;
-      
-      // DEBUG: Log all scroll sources
-      console.log('🔝 All scroll values:', {
-        'window.scrollY': window.scrollY,
-        'window.pageYOffset': window.pageYOffset,
-        'document.documentElement.scrollTop': document.documentElement.scrollTop,
-        'document.body.scrollTop': document.body.scrollTop,
-        'computed': scrollY
-      });
-      
-      const shouldShow = scrollY > 400;
+      const scrollTop = container.scrollTop || 0;
+      const shouldShow = scrollTop > 400;
       setVisible(shouldShow);
     };
 
     // Check on mount
     checkScroll();
 
-    // Add scroll listener with multiple event types
+    // Add scroll listener to the container
     const handleScroll = () => {
       checkScroll();
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('wheel', handleScroll, { passive: true });
-    document.addEventListener('scroll', handleScroll, { passive: true, capture: true });
-
-    // Also check on resize (in case layout changes)
-    window.addEventListener('resize', checkScroll, { passive: true });
+    container.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('wheel', handleScroll);
-      document.removeEventListener('scroll', handleScroll, true);
-      window.removeEventListener('resize', checkScroll);
+      container.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
   if (!visible) return null;
 
   const scrollToTop = () => {
-    // Try multiple methods to scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    document.documentElement.scrollTo?.({ top: 0, behavior: 'smooth' });
-    document.body.scrollTo?.({ top: 0, behavior: 'smooth' });
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   return (
