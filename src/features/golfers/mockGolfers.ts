@@ -27,7 +27,7 @@ export const mockGolfers = [
     user_id: 'mock-gary-martyn',
     display_name: 'Gary Martyn',
     username: 'garymartyn',
-    profile_photo_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=GaryMartyn',
+    profile_photo_url: '/images/gary-martyn-avatar.png',
     eg_handicap_index: 7.2,
     home_club: 'Chislehurst Golf Club',
     distance_m: 400, // 0.4 km = 400 meters (within default 0.5km radius)
