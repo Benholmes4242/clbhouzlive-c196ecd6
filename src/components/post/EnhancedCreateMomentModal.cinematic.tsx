@@ -533,11 +533,8 @@ export default function EnhancedCreateMomentModalCinematic({
 
   return (
     <div className="fixed inset-0 z-[9999]">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
-      
       {/* Glass Sheet with Hub-style slide animation */}
-      <div 
+      <div
         ref={wrapperRef}
         role="dialog"
         aria-modal="true"
