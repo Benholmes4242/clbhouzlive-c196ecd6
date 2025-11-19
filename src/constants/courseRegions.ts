@@ -143,3 +143,44 @@ export function subregionKeyToLabel(
   );
   return match || subKey;
 }
+
+// Convert DB primary_region value back to region key
+export function dbValueToRegionKey(dbValue?: string | null): PrimaryRegionKey {
+  if (!dbValue) return PRIMARY_REGIONS.ALL;
+
+  const value = dbValue.toLowerCase();
+
+  if (value.includes('britain') || value.includes('ireland')) {
+    return PRIMARY_REGIONS.GB_I;
+  }
+  if (value.includes('continental europe')) {
+    return PRIMARY_REGIONS.EUROPE;
+  }
+  if (value === 'usa' || value.includes('united states')) {
+    return PRIMARY_REGIONS.USA;
+  }
+  if (value.includes('rest of world')) {
+    return PRIMARY_REGIONS.REST;
+  }
+
+  return PRIMARY_REGIONS.ALL;
+}
+
+// Map a primary region key to the default Top 100 list slug
+export function primaryRegionKeyToTop100Slug(
+  key: PrimaryRegionKey
+): string | null {
+  switch (key) {
+    case PRIMARY_REGIONS.GB_I:
+      return 'gb-i';
+    case PRIMARY_REGIONS.EUROPE:
+      return 'europe';
+    case PRIMARY_REGIONS.USA:
+      return 'usa';
+    case PRIMARY_REGIONS.REST:
+      return 'rest';
+    case PRIMARY_REGIONS.ALL:
+    default:
+      return 'global';
+  }
+}
