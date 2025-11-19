@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import PostPlayRatingModal from '@/components/courses/PostPlayRatingModal';
+import AccessControl from '@/components/AccessControl';
 
 const RateCoursePage = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -41,12 +42,14 @@ const RateCoursePage = () => {
   }
 
   return (
-    <PostPlayRatingModal
-      course={course}
-      isOpen={true}
-      onClose={handleClose}
-      isEditMode={false}
-    />
+    <AccessControl requireAuth={true}>
+      <PostPlayRatingModal
+        course={course}
+        isOpen={true}
+        onClose={handleClose}
+        isEditMode={false}
+      />
+    </AccessControl>
   );
 };
 
