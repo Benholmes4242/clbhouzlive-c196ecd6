@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,6 @@ import CourseDetailRatingSection from './CourseDetailRatingSection';
 import CourseRatingStats from './CourseRatingStats';
 import CourseReviews from './CourseReviews';
 import CourseDetailMapSection from './CourseDetailMapSection';
-import PostPlayRatingModal from './PostPlayRatingModal';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 
@@ -55,7 +55,8 @@ const CourseDetailModal = ({
   isFromUserCoursesPage = false
 }: CourseDetailModalProps) => {
   const { user } = useSupabaseSession();
-  const [showRatingModal, setShowRatingModal] = React.useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const { data: currentUserResponse } = useQuery({
     queryKey: ['current-user'],
@@ -138,11 +139,11 @@ const CourseDetailModal = ({
   });
 
   const handleAddToPlayed = () => {
-    setShowRatingModal(true);
+    navigate(`/courses/${course?.id}/rate`, { state: { from: location.pathname } });
   };
 
   const handleEditRating = () => {
-    setShowRatingModal(true);
+    navigate(`/courses/${course?.id}/rate`, { state: { from: location.pathname } });
   };
 
   // Determine if course is already played based on multiple sources
@@ -235,14 +236,6 @@ const CourseDetailModal = ({
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Rating Modal */}
-      <PostPlayRatingModal
-        course={course}
-        isOpen={showRatingModal}
-        onClose={() => setShowRatingModal(false)}
-        isEditMode={isAlreadyPlayed}
-      />
     </>
   );
 };
