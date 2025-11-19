@@ -5,26 +5,19 @@ const ScrollToTopGlass = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    console.log('ScrollToTopGlass mounted');
-    
     const onScroll = () => {
-      const scrollY = window.scrollY;
-      const shouldShow = scrollY > 400;
-      console.log('Scroll event:', { scrollY, shouldShow, currentVisible: visible });
-      setVisible(shouldShow);
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      setVisible(scrollY > 400);
     };
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    // Also check initial position
+    // Check initial position
     onScroll();
     
-    return () => {
-      console.log('ScrollToTopGlass unmounting');
-      window.removeEventListener('scroll', onScroll);
-    };
-  }, []);
-
-  console.log('ScrollToTopGlass render, visible:', visible);
+    // Add listener to window
+    window.addEventListener('scroll', onScroll, { passive: true });
+    
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []); // Empty deps - no stale closure issues
 
   if (!visible) return null;
 
@@ -48,6 +41,8 @@ const ScrollToTopGlass = () => {
         justify-center
         shadow-md
         border border-white/10
+        hover:scale-110
+        transition-transform
       "
     >
       <ChevronUp className="h-4 w-4 text-white" />
