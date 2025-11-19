@@ -9,6 +9,7 @@ import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const TOP100_STORAGE_KEY = 'clbhouz_top100_list_v1';
+const PAGE_SIZE = 50;
 
 function getInitialTop100List(): { value: string; auto: boolean } {
   const params = new URLSearchParams(window.location.search);
@@ -42,6 +43,7 @@ const GlobalTop100 = () => {
   const initialList = getInitialTop100List();
   const [selectedList, setSelectedList] = useState(initialList.value);
   const [listWasAuto, setListWasAuto] = useState(initialList.auto);
+  const [page, setPage] = useState(0);
   
   // Initialize search from URL if present
   const urlQuery = typeof window !== 'undefined' 
@@ -57,6 +59,11 @@ const GlobalTop100 = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(0);
+  }, [selectedList, debouncedSearch]);
 
   // Persist list selection
   useEffect(() => {
@@ -79,6 +86,9 @@ const GlobalTop100 = () => {
     limit: 200,
   });
 
+  const totalCount = courses.length;
+  const hasMore = false; // Top 100 lists are limited, no pagination needed
+
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -100,6 +110,14 @@ const GlobalTop100 = () => {
         { value: 'usa', label: 'USA Top 100' },
         { value: 'europe', label: 'Europe Top 100' },
       ];
+
+  const getListLabel = () =>
+    listOptions.find((o) => o.value === selectedList)?.label || 'this Top 100 list';
+
+  const hasSearch = debouncedSearch.trim().length > 0;
+
+  const startIndex = totalCount === 0 ? 0 : page * PAGE_SIZE + 1;
+  const endIndex = Math.min((page + 1) * PAGE_SIZE, totalCount);
 
   const handleResetFilters = () => {
     setSelectedList('global');
@@ -197,23 +215,56 @@ const GlobalTop100 = () => {
       {isLoading ? (
         <LoadingSkeleton />
       ) : courses.length === 0 ? (
-        <div className="text-center py-16 space-y-4">
-          <div className="text-muted-foreground space-y-2">
-            <p className="text-lg font-semibold text-foreground">No courses found</p>
-            <p className="text-sm">Try selecting a different list or clearing your search.</p>
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+          <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center text-muted-foreground mb-1">
+            <Award className="w-4 h-4" />
           </div>
+          <h3 className="text-sm font-semibold">No courses match this Top 100 search</h3>
+          <p className="text-sm text-muted-foreground max-w-xs">
+            Try clearing your search or choosing a different Top 100 list to browse.
+          </p>
           {hasActiveFilters && (
-            <Button onClick={handleResetFilters} variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-2"
+              onClick={handleResetFilters}
+            >
               Reset filters
             </Button>
           )}
         </div>
       ) : (
-        <div>
-          <div className="text-xs text-muted-foreground mb-3">
-            Viewing: {listOptions.find((opt) => opt.value === selectedList)?.label || 'Top 100'}
-            {listWasAuto && ' • Suggested for you'}
-          </div>
+        <div className="space-y-6">
+          {/* Context line */}
+          {totalCount > 0 && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              {hasSearch ? (
+                <>
+                  Results for "{debouncedSearch}" in{' '}
+                  <span className="font-medium">{getListLabel()}</span>
+                </>
+              ) : (
+                <>
+                  Showing{' '}
+                  <span className="font-medium">{getListLabel()}</span>
+                </>
+              )}
+            </p>
+          )}
+
+          {/* Range line */}
+          {totalCount > 0 && (
+            <p className="text-sm text-muted-foreground">
+              {totalCount <= PAGE_SIZE && page === 0 ? (
+                <>Showing all {totalCount} course{totalCount !== 1 && 's'}</>
+              ) : (
+                <>
+                  Showing {startIndex}–{endIndex} of {totalCount} courses
+                </>
+              )}
+            </p>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {courses.map((course) => (
               <CourseCard 
@@ -224,6 +275,37 @@ const GlobalTop100 = () => {
               />
             ))}
           </div>
+          
+          {/* Pagination Controls */}
+          {hasMore && (
+            <div className="flex justify-center mt-8 mb-8">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setPage((p) => p + 1);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                disabled={isLoading}
+                className="h-11 px-6 rounded-xl"
+              >
+                Load next {PAGE_SIZE} courses
+              </Button>
+            </div>
+          )}
+          
+          {page > 0 && (
+            <div className="flex justify-center">
+              <button
+                onClick={() => {
+                  setPage(0);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="text-xs text-muted-foreground hover:text-foreground underline transition-colors"
+              >
+                Back to first page
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
