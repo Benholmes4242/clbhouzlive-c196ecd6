@@ -1,61 +1,40 @@
 /**
- * Mock golfer data for front-end visual testing
- * To enable: set VITE_USE_MOCK_GOLFERS=true in your environment
- * To remove: delete this file and remove the mock logic from useActiveGolfers.ts
+ * Mock golfer data for testing with exactly 2 golfers
+ * 1. Andrew Yetzes (real user from DB)
+ * 2. Gary Martyn (mock user)
  */
 
-const mockNames = [
-  'James Thompson',
-  'Sarah Mitchell',
-  'Michael Chen',
-  'Emma Wilson',
-  'David Roberts',
-  'Olivia Garcia',
-  'Thomas Anderson',
-  'Sophia Martinez',
-  'William Taylor',
-  'Isabella Brown',
-  'Alexander Lee',
-  'Charlotte Davis',
-  'Benjamin White',
-  'Amelia Johnson',
-  'Daniel Moore',
+export const mockGolfers = [
+  // Andrew Yetzes - Real user from database
+  {
+    id: '91339e15-1a6a-4a45-8a4b-3d032780e5eb',
+    user_id: '91339e15-1a6a-4a45-8a4b-3d032780e5eb',
+    display_name: 'Andrew Yetzes',
+    username: 'andrewyetzes',
+    profile_photo_url: 'https://media.clbhouz.co.uk/91339e15-1a6a-4a45-8a4b-3d032780e5eb/avatar.jpg',
+    eg_handicap_index: 9.8,
+    home_club: 'Sundridge Park Golf Club',
+    distance_m: 160, // 0.1 miles = 160 meters
+    open_to_play: false,
+    latitude: 51.4,
+    longitude: -0.6,
+    updated_at: new Date().toISOString(),
+    same_club: true, // Display "Same Home Club" pill
+  },
+  // Gary Martyn - Mock user (not in database)
+  {
+    id: 'mock-gary-martyn',
+    user_id: 'mock-gary-martyn',
+    display_name: 'Gary Martyn',
+    username: 'garymartyn',
+    profile_photo_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=GaryMartyn',
+    eg_handicap_index: 7.2,
+    home_club: 'Chislehurst Golf Club',
+    distance_m: 644, // 0.4 miles = 644 meters
+    open_to_play: false,
+    latitude: 51.41,
+    longitude: -0.61,
+    updated_at: new Date().toISOString(),
+    same_club: false, // No "Same Home Club" pill
+  },
 ];
-
-const mockClubs = [
-  'Sunningdale',
-  'Wentworth',
-  'The Wisley',
-  'St Andrews',
-  'Royal Birkdale',
-  'Muirfield',
-  'Turnberry',
-];
-
-// Assign clubs so multiple golfers share the same home club
-const clubAssignments = [
-  'Sundridge Park Golf Club', 'Sundridge Park Golf Club', // 2 at Sundridge Park (for badge testing)
-  'Sunningdale',                               // 1 at Sunningdale
-  'Wentworth', 'Wentworth',                    // 2 at Wentworth
-  'The Wisley', 'The Wisley', 'The Wisley',    // 3 at The Wisley
-  'St Andrews', 'St Andrews',                  // 2 at St Andrews
-  'Royal Birkdale',                            // 1 at Royal Birkdale
-  'Muirfield', 'Muirfield',                    // 2 at Muirfield
-  'Turnberry',                                 // 1 at Turnberry
-];
-
-export const mockGolfers = Array.from({ length: 15 }, (_, i) => ({
-  id: `mock-${i + 1}`,
-  user_id: `mock-${i + 1}`,
-  display_name: mockNames[i],
-  username: mockNames[i].toLowerCase().replace(' ', '_'),
-  profile_photo_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${mockNames[i]}`,
-  eg_handicap_index: Number((Math.random() * 20 + 1).toFixed(1)),
-  home_club: clubAssignments[i],
-  distance_m: 200 + i * 150 + Math.floor(Math.random() * 100),
-  open_to_play: i % 3 === 0,
-  latitude: 51.4 + Math.random() * 0.02,
-  longitude: -0.6 + Math.random() * 0.02,
-  updated_at: new Date().toISOString(),
-  same_club: i < 2, // First two golfers have same club badge
-}));

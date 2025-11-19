@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { calculateDistance } from '@/features/nearby/distance';
 import { NEARBY_RADIUS_METERS } from '@/features/nearby/config';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
+import { mockGolfers } from '@/features/golfers/mockGolfers';
 
 /**
  * Lightweight hook that returns ONLY the count of nearby golfers
@@ -15,6 +16,15 @@ export function useNearbyGolfersCount() {
   const { data: count = 0, isLoading } = useQuery({
     queryKey: ['nearbyGolfersCount', currentLocation?.lat, currentLocation?.lng],
     queryFn: async () => {
+      // Check if mock mode is enabled
+      const useMockData = true;
+      
+      if (useMockData) {
+        // Return mock count: 2 golfers (Andrew Yetzes + Gary Martyn)
+        return mockGolfers.length;
+      }
+
+      // Otherwise fetch real data
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return 0;
 
