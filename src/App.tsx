@@ -136,6 +136,8 @@ const EchoSharePage = lazy(() => import("./pages/EchoSharePage").then(m => ({ de
 const VideosPage = lazy(() => import("./features/videos2/pages/VideosPage"));
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
+const CreateMomentPage = lazy(() => import("./pages/CreateMomentPage"));
+const RateCoursePage = lazy(() => import("./pages/RateCoursePage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -183,6 +185,8 @@ function AppRoutes() {
         <Route path="/courses" element={<Suspense fallback={<CoursesListSkeleton />}><Courses /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
         <Route path="/courses/:courseId/reviews" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseReviewsPage /></Suspense>} />
+        <Route path="/courses/:courseId/rate" element={<RateCoursePage />} />
+        <Route path="/create-moment" element={<CreateMomentPage />} />
         <Route path="/user/:username/courses" element={<UserCoursesPage />} />
         <Route path="/my-ratings" element={<MyRatings />} />
         <Route path="/news" element={<News />} />

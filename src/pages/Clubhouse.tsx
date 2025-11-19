@@ -201,9 +201,9 @@ const Clubhouse = () => {
     console.log('[DEBUG] Clubhouse: handleTabClickWithCamera called with:', tab);
     
     if (tab.isAction && tab.id === 'post') {
-      // Open composer directly with empty state
-      console.log('[DEBUG] Clubhouse: Opening composer directly');
-      openComposerWithFiles([]);
+      // Navigate to create moment page
+      console.log('[DEBUG] Clubhouse: Navigating to create moment page');
+      handleTabClick({ id: 'post', path: '/create-moment', isAction: false });
     } else {
       // Handle regular navigation
       console.log('[DEBUG] Clubhouse: Handling regular navigation');

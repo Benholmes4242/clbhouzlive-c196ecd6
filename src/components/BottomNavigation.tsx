@@ -52,8 +52,8 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default'
   // Handle tab clicks including camera action
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
-      // Open composer directly with empty state
-      openComposerWithFiles([]);
+      // Navigate to create moment page
+      handleTabClick({ id: 'post', path: '/create-moment', isAction: false });
     } else {
       // Handle regular navigation
       handleTabClick(tab);
