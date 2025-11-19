@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Star, MessageSquare } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import EditRatingModal from '@/components/courses/EditRatingModal';
 import ReviewsTab from '@/components/profile/ReviewsTab';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem } from '@/types/media';
@@ -36,8 +35,6 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedReview, setSelectedReview] = useState<ReviewData | null>(null);
   
   // Fetch user's rating
   const { data: userRating } = useUserCourseRating(courseId, user?.id);
@@ -161,8 +158,7 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
   };
 
   const handleEditReview = (review: ReviewData) => {
-    setSelectedReview(review);
-    setEditModalOpen(true);
+    navigate(`/courses/${courseId}/rate`);
   };
 
   const isUserReview = (review: ReviewData) => {
@@ -249,20 +245,6 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
         totalReviews={reviewsData.stats.total}
         reviews={transformedReviews}
       />
-
-      {selectedReview && (
-        <EditRatingModal
-          courseId={courseId}
-          courseName={courseName}
-          currentRating={selectedReview.rating}
-          currentReview={selectedReview.review}
-          isOpen={editModalOpen}
-          onClose={() => {
-            setEditModalOpen(false);
-            setSelectedReview(null);
-          }}
-        />
-      )}
     </>
   );
 };
