@@ -9,13 +9,36 @@ const ScrollToTopGlass = () => {
     let rafId: number | null = null;
 
     const checkScroll = () => {
+      // Search through ALL elements to find the one that's actually scrolling
+      const allElements = document.querySelectorAll('*');
+      let actualScrollContainer: Element | null = null;
+      let maxScrollTop = 0;
+      
+      allElements.forEach((el) => {
+        const scrollTop = el.scrollTop;
+        if (scrollTop > maxScrollTop) {
+          maxScrollTop = scrollTop;
+          actualScrollContainer = el;
+        }
+      });
+      
+      if (actualScrollContainer && maxScrollTop > 0) {
+        console.log('🔝 FOUND ACTUAL SCROLL CONTAINER!', {
+          element: actualScrollContainer,
+          tagName: actualScrollContainer.tagName,
+          className: actualScrollContainer.className,
+          scrollTop: maxScrollTop
+        });
+      }
+      
       // On mobile Safari, scrollY might be on window, document.documentElement, or body
       // We need to check all of them during the actual scroll event
       const scrollY = Math.max(
         window.scrollY || 0,
         window.pageYOffset || 0,
         document.documentElement?.scrollTop || 0,
-        document.body?.scrollTop || 0
+        document.body?.scrollTop || 0,
+        maxScrollTop // Include the actual scroll container's value
       );
       
       console.log('🔝 Scroll detected:', {
@@ -24,6 +47,7 @@ const ScrollToTopGlass = () => {
         pageYOffset: window.pageYOffset,
         docElementTop: document.documentElement?.scrollTop,
         bodyTop: document.body?.scrollTop,
+        actualContainerScrollTop: maxScrollTop,
         shouldShow: scrollY > 400
       });
       
