@@ -109,6 +109,6 @@ export function useCourseReviews(
 
       return (data as any as CourseReview[]) ?? [];
     },
-    staleTime: 60_000,
+    staleTime: 0,
   });
 }
