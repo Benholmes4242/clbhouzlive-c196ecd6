@@ -8,7 +8,6 @@ import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useModalContext } from '@/contexts/ModalContext';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
-import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
 import { cn } from '@/lib/utils';
@@ -221,20 +220,6 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Post Submission Handler */}
-      <PostSubmissionHandler
-        isComposerOpen={isComposerOpen}
-        mediaItems={mediaItems}
-        selectedFile={selectedFile}
-        selectedCourse={selectedCourse}
-        onCourseSelect={setSelectedCourse}
-        onClose={handleCloseComposer}
-        onShowToast={showConfirmationToast}
-        isSubmitting={isSubmitting}
-        setIsSubmitting={() => {}}
-        onMediaChange={setMediaItems}
-      />
 
       {/* Snap Toast */}
       <SnapToast
