@@ -237,36 +237,8 @@ const CourseExplorer = () => {
   return (
     <div className="space-y-4">
       {/* Scroll to top button */}
-      {showScrollTop && (
-        <button
-          type="button"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="
-            fixed
-            top-[10px]
-            left-1/2
-            -translate-x-1/2
-            z-40
-            glass-dark
-            h-9
-            w-9
-            rounded-full
-            flex
-            items-center
-            justify-center
-            shadow-lg
-            border border-white/10
-            transition-opacity
-            animate-in fade-in slide-in-from-top-2
-          "
-          aria-label="Back to top"
-        >
-          <ArrowUp className="h-4 w-4 text-white" />
-        </button>
-      )}
-
       {/* Search */}
-      <div className="relative">
+      <div className="relative mx-auto mt-4 w-full max-w-xl">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
           placeholder="Search by name, county or area..."
@@ -297,15 +269,17 @@ const CourseExplorer = () => {
         )}
       </div>
 
-      {/* Region Filter - Centered on mobile */}
-      <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center">
-        <div className="w-full sm:w-56">
+      {/* Region + sub-region filters */}
+      <div className="mx-auto mt-3 flex w-full max-w-xl gap-2">
+        {/* Primary region */}
+        <div className="flex-1">
           <Select value={selectedRegion} onValueChange={(value) => {
             setSelectedRegion(value as PrimaryRegionKey);
             setSelectedSubregion('all');
             setRegionWasAuto(false);
           }}>
-            <SelectTrigger className="h-11 bg-card border-border/50 rounded-lg text-sm">
+            <SelectTrigger className="w-full h-11 rounded-xl bg-card border-border/50">
+              <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
               <SelectValue placeholder="Select region" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
@@ -321,24 +295,26 @@ const CourseExplorer = () => {
           </Select>
         </div>
 
-        {/* Sub-region Filter (only visible if a region is selected) */}
-        {selectedRegion !== PRIMARY_REGIONS.ALL && SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length > 0 && (
-          <div className="w-full sm:w-56">
-            <Select value={selectedSubregion} onValueChange={setSelectedSubregion}>
-              <SelectTrigger className="h-11 bg-card border-border/50 rounded-lg text-sm">
-                <SelectValue placeholder="All sub-regions" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border z-50">
-                <SelectItem value="all">All sub-regions</SelectItem>
-                {SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>].map((s) => (
-                  <SelectItem key={s} value={normalizeLabel(s)}>
-                    {s}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+        {/* Sub-region */}
+        <div className="flex-1">
+          <Select
+            value={selectedSubregion}
+            onValueChange={setSelectedSubregion}
+            disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
+          >
+            <SelectTrigger className="w-full h-11 rounded-xl bg-card border-border/50">
+              <SelectValue placeholder="All sub-regions" />
+            </SelectTrigger>
+            <SelectContent className="bg-card border-border z-50">
+              <SelectItem value="all">All sub-regions</SelectItem>
+              {selectedRegion !== PRIMARY_REGIONS.ALL && SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.map((s) => (
+                <SelectItem key={s} value={normalizeLabel(s)}>
+                  {s}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Results */}
