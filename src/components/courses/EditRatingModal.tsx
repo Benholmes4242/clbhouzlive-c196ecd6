@@ -184,7 +184,7 @@ const EditRatingModal = ({
           <X className="h-5 w-5" />
         </button>
 
-        <DialogHeader className="mb-4 sm:mb-5 text-center">
+        <DialogHeader className="mb-3 text-center">
           <DialogTitle className="text-lg font-semibold">{title}</DialogTitle>
           <p className="mt-1 text-xs text-muted-foreground text-center">
             Choose a score from 0.5 to 10 and optionally leave a review.
@@ -194,10 +194,10 @@ const EditRatingModal = ({
         <div className="space-y-5">
           {/* Your rating readout + slider */}
           <section className="mb-4">
-            <div className="flex items-baseline justify-between mb-2">
+            <div className="flex items-baseline justify-between mb-1">
               <div>
                 <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                  Your rating
+                  Your overall rating
                 </p>
                 <p className="text-2xl font-semibold">
                   {rating !== null ? rating.toFixed(1) : '--'}{' '}
@@ -223,7 +223,7 @@ const EditRatingModal = ({
                 step={0.5}
                 value={displayRating}
                 onChange={(e) => setRating(parseFloat(e.target.value))}
-                className="w-full accent-primary focus:outline-none"
+                className="w-full accent-slate-800 focus:outline-none"
               />
 
               {/* tick labels */}
@@ -271,7 +271,7 @@ const EditRatingModal = ({
           </section>
 
           {/* Breakdown section */}
-          <section className="mt-5 border-t border-border pt-4 space-y-3">
+          <section className="mt-5 border-t border-border pt-4 space-y-4">
             <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
               Breakdown (optional)
             </p>
@@ -280,32 +280,38 @@ const EditRatingModal = ({
               { key: 'design', label: 'Course Design', score: designScore, setScore: setDesignScore },
               { key: 'condition', label: 'Course Condition', score: conditionScore, setScore: setConditionScore },
               { key: 'facilities', label: 'Facilities', score: facilitiesScore, setScore: setFacilitiesScore },
-            ].map(({ key, label, score, setScore }) => (
-              <div key={key}>
-                <p className="mb-1 text-sm font-medium">{label}</p>
-                <div className="flex gap-1.5">
-                  {Array.from({ length: 10 }).map((_, index) => {
-                    const value = index + 1;
-                    const selected = score ? score >= value : false;
-                    return (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => setScore(value)}
-                        className={cn(
-                          'h-7 w-7 rounded-lg border text-[11px] flex items-center justify-center transition-colors',
-                          selected
-                            ? 'bg-primary text-primary-foreground border-primary'
-                            : 'bg-surface-alt border-border hover:bg-surface-muted'
-                        )}
-                      >
-                        {value}
-                      </button>
-                    );
-                  })}
+            ].map(({ key, label, score, setScore }) => {
+              const displayValue = score ?? 5; // centre if unset
+              return (
+                <div key={key} className="space-y-1.5">
+                  <div className="flex items-baseline justify-between">
+                    <p className="text-sm font-medium">{label}</p>
+                    <span className="text-xs text-muted-foreground">
+                      {score ? `${score}/10` : '-- / 10'}
+                    </span>
+                  </div>
+
+                  <input
+                    type="range"
+                    min={1}
+                    max={10}
+                    step={1}
+                    value={displayValue}
+                    onChange={(e) => setScore(parseInt(e.target.value, 10))}
+                    className="w-full accent-slate-800"
+                  />
+
+                  <div className="flex justify-between text-[11px] text-muted-foreground">
+                    <span>1</span>
+                    <span>3</span>
+                    <span>5</span>
+                    <span>7</span>
+                    <span>9</span>
+                    <span>10</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </section>
 
           {/* Buttons */}
@@ -335,8 +341,8 @@ const EditRatingModal = ({
                 type="button"
                 disabled={rating === null || isSubmitting}
                 onClick={handleUpdate}
-                className="flex-1 rounded-2xl bg-primary text-primary-foreground py-3 text-sm font-semibold
-                          disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
+                className="flex-1 rounded-2xl bg-slate-800 text-white py-3 text-sm font-semibold
+                          disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-900 transition-colors"
               >
                 {isSubmitting ? 'Updating...' : 'Update rating'}
               </button>
