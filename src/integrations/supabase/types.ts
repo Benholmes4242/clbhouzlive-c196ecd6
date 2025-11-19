@@ -3384,6 +3384,7 @@ export type Database = {
       user_achievements: {
         Row: {
           achievement_id: string
+          achievement_type: string | null
           id: string
           source_context: Json | null
           unlocked_at: string | null
@@ -3391,6 +3392,7 @@ export type Database = {
         }
         Insert: {
           achievement_id: string
+          achievement_type?: string | null
           id?: string
           source_context?: Json | null
           unlocked_at?: string | null
@@ -3398,6 +3400,7 @@ export type Database = {
         }
         Update: {
           achievement_id?: string
+          achievement_type?: string | null
           id?: string
           source_context?: Json | null
           unlocked_at?: string | null
