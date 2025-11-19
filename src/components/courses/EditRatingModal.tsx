@@ -8,12 +8,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Star } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import ClubhouseLogo from '@/components/ui/clubhouse-logo';
+import { cn } from '@/lib/utils';
 
 interface EditRatingModalProps {
   courseId: string;
@@ -43,18 +41,18 @@ const EditRatingModal = ({
 }: ExtendedEditRatingModalProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedRating, setSelectedRating] = useState<number>(currentRating);
+  const [rating, setRating] = useState<number | null>(currentRating);
   const [review, setReview] = useState(currentReview || '');
   const [designScore, setDesignScore] = useState<number | null>(currentDesignScore || null);
   const [conditionScore, setConditionScore] = useState<number | null>(currentConditionScore || null);
   const [facilitiesScore, setFacilitiesScore] = useState<number | null>(currentFacilitiesScore || null);
-  const [hoveredRating, setHoveredRating] = useState<number | null>(null);
-  const [hoveredBreakdown, setHoveredBreakdown] = useState<{ type: string; value: number } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const displayRating = rating ?? 5; // default thumb position if unset
 
   const updateRatingMutation = useMutation({
     mutationFn: async ({ 
-      rating, 
+      rating: ratingValue, 
       reviewText, 
       design, 
       condition, 
@@ -72,7 +70,7 @@ const EditRatingModal = ({
       const { error } = await supabase
         .from('course_ratings')
         .update({ 
-          rating, 
+          rating: ratingValue, 
           review: reviewText || null,
           design_score: design,
           condition_score: condition,
@@ -93,7 +91,7 @@ const EditRatingModal = ({
       
       toast({
         title: "Rating Updated!",
-        description: `You updated your rating for ${courseName} to ${selectedRating}/10`,
+        description: `You updated your rating for ${courseName} to ${rating}/10`,
       });
       
       setIsSubmitting(false);
@@ -148,9 +146,10 @@ const EditRatingModal = ({
   });
 
   const handleUpdate = () => {
+    if (rating === null) return;
     setIsSubmitting(true);
     updateRatingMutation.mutate({ 
-      rating: selectedRating, 
+      rating, 
       reviewText: review,
       design: designScore,
       condition: conditionScore,
@@ -165,182 +164,184 @@ const EditRatingModal = ({
     }
   };
 
-  // Generate rating options from 0.5 to 10 in 0.5 increments
-  const ratingOptions = Array.from({ length: 20 }, (_, i) => (i + 1) * 0.5);
+  // Truncate course name
+  const MAX_NAME = 28;
+  const shortName =
+    courseName.length > MAX_NAME
+      ? courseName.slice(0, MAX_NAME).trimEnd() + '…'
+      : courseName;
+
+  const title = `Rate ${shortName}`;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg w-full rounded-3xl border border-border/80 bg-card shadow-xl p-5 md:p-6">
-        <DialogHeader className="space-y-1">
-          <DialogTitle className="text-lg md:text-xl font-semibold text-center">Edit your rating</DialogTitle>
-          <p className="text-xs md:text-sm text-muted-foreground text-center">
-            Rate from 0.5 to 10 and optionally leave a review.
+      <DialogContent className="max-w-lg w-full rounded-t-3xl sm:rounded-3xl bg-card border border-border shadow-lg px-4 pb-5 pt-4 sm:px-6 sm:pt-5 sm:pb-6 animate-in fade-in slide-in-from-bottom-4">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-full p-1.5 hover:bg-muted transition-colors"
+        >
+          <X className="h-5 w-5" />
+        </button>
+
+        <DialogHeader className="mb-4 sm:mb-5 text-center">
+          <DialogTitle className="text-lg font-semibold">{title}</DialogTitle>
+          <p className="mt-1 text-xs text-muted-foreground text-center">
+            Choose a score from 0.5 to 10 and optionally leave a review.
           </p>
         </DialogHeader>
 
-        <div className="space-y-6 mt-4">
-          {/* Rating Section */}
-          <div className="mt-4 space-y-2">
-            <p className="text-xs font-medium text-muted-foreground">Select a score</p>
-            <div className="flex flex-wrap gap-2">
-              {ratingOptions.map((rating) => {
-                const isSelected = rating === selectedRating;
-                return (
-                  <button
-                    key={rating}
-                    type="button"
-                    onClick={() => setSelectedRating(rating)}
-                    onMouseEnter={() => setHoveredRating(rating)}
-                    onMouseLeave={() => setHoveredRating(null)}
-                    disabled={isSubmitting}
-                    className={`h-10 w-12 rounded-xl text-sm font-medium border transition-colors ${
-                      (hoveredRating !== null && rating <= hoveredRating) ||
-                      (hoveredRating === null && isSelected)
-                        ? 'bg-slate-900 text-white border-transparent shadow-sm'
-                        : 'bg-muted border-border/60 hover:bg-card'
-                    }`}
-                  >
-                    {rating}
-                  </button>
-                );
-              })}
+        <div className="space-y-5">
+          {/* Your rating readout + slider */}
+          <section className="mb-4">
+            <div className="flex items-baseline justify-between mb-2">
+              <div>
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                  Your rating
+                </p>
+                <p className="text-2xl font-semibold">
+                  {rating !== null ? rating.toFixed(1) : '--'}{' '}
+                  <span className="text-sm text-muted-foreground">/ 10</span>
+                </p>
+              </div>
+              {rating !== null && (
+                <button
+                  type="button"
+                  onClick={() => setRating(null)}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Clear rating
+                </button>
+              )}
             </div>
 
-            <div className="mt-3 inline-flex px-3 py-1 rounded-full bg-slate-900 text-xs font-medium text-background">
-              Selected: {selectedRating}/10
-            </div>
-          </div>
+            <div className="space-y-1.5">
+              <input
+                type="range"
+                min={0.5}
+                max={10}
+                step={0.5}
+                value={displayRating}
+                onChange={(e) => setRating(parseFloat(e.target.value))}
+                className="w-full accent-primary focus:outline-none"
+              />
 
-          {/* Review Section */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">
-              Share your thoughts <span className="text-muted-foreground">(optional)</span>
-            </label>
-            <Textarea
-              value={review}
-              onChange={(e) => setReview(e.target.value)}
-              placeholder="Tell other golfers what stood out – routing, conditioning, greens, hospitality..."
-              className="bg-card border border-border/60 rounded-xl text-sm placeholder:text-muted-foreground min-h-[80px] resize-none"
-              disabled={isSubmitting}
-              maxLength={500}
-            />
-            <p className="text-[11px] text-muted-foreground text-right">
-              {review.length}/500
+              {/* tick labels */}
+              <div className="flex justify-between text-[11px] text-muted-foreground">
+                <span>0.5</span>
+                <span>3</span>
+                <span>5</span>
+                <span>7</span>
+                <span>9</span>
+                <span>10</span>
+              </div>
+            </div>
+
+            {/* selected pill */}
+            <div className="mt-2 flex justify-center">
+              <span className="inline-flex items-center rounded-full bg-slate-900 text-white px-3 py-1 text-xs">
+                {rating !== null ? `Selected: ${rating.toFixed(1)} / 10` : 'No rating selected yet'}
+              </span>
+            </div>
+          </section>
+
+          {/* Review textarea */}
+          <section className="mt-4">
+            <div className="flex items-baseline justify-between mb-1.5">
+              <p className="text-sm font-medium">Share your thoughts</p>
+              <span className="text-xs text-muted-foreground">(optional)</span>
+            </div>
+
+            <div className="relative">
+              <Textarea
+                value={review}
+                onChange={(e) => setReview(e.target.value)}
+                rows={4}
+                className="w-full rounded-2xl border border-border bg-surface-alt px-3.5 py-3 text-sm
+                          placeholder:text-muted-foreground/80 focus-visible:outline-none focus-visible:ring-2
+                          focus-visible:ring-primary/60 focus-visible:border-transparent transition-shadow resize-none"
+                placeholder="Tell other golfers what stood out – routing, conditioning, greens, hospitality..."
+                disabled={isSubmitting}
+                maxLength={500}
+              />
+              <span className="absolute right-3 bottom-2 text-[11px] text-muted-foreground">
+                {review.length}/500
+              </span>
+            </div>
+          </section>
+
+          {/* Breakdown section */}
+          <section className="mt-5 border-t border-border pt-4 space-y-3">
+            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Breakdown (optional)
             </p>
-          </div>
 
-          {/* Breakdown Scores */}
-          <div className="space-y-4 pt-4 border-t">
-            <p className="text-sm md:text-base font-semibold text-foreground">Breakdown (Optional)</p>
-            
-            {/* Course Design */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium mt-4 mb-2 flex items-center justify-between">
-                <span>Course Design</span>
-                {designScore && <span className="text-muted-foreground">{designScore}/10</span>}
-              </label>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setDesignScore(value)}
-                    onMouseEnter={() => setHoveredBreakdown({ type: 'design', value })}
-                    onMouseLeave={() => setHoveredBreakdown(null)}
-                    disabled={isSubmitting}
-                    className={`flex-1 h-8 rounded-md text-xs font-medium border transition-colors ${
-                      (hoveredBreakdown?.type === 'design' && value <= hoveredBreakdown.value) || 
-                      (designScore && value <= designScore)
-                        ? 'bg-surface-slate text-card-foreground border-transparent'
-                        : 'bg-surface-alt text-foreground border-border/60 hover:bg-card'
-                    }`}
-                  />
-                ))}
+            {[
+              { key: 'design', label: 'Course Design', score: designScore, setScore: setDesignScore },
+              { key: 'condition', label: 'Course Condition', score: conditionScore, setScore: setConditionScore },
+              { key: 'facilities', label: 'Facilities', score: facilitiesScore, setScore: setFacilitiesScore },
+            ].map(({ key, label, score, setScore }) => (
+              <div key={key}>
+                <p className="mb-1 text-sm font-medium">{label}</p>
+                <div className="flex gap-1.5">
+                  {Array.from({ length: 10 }).map((_, index) => {
+                    const value = index + 1;
+                    const selected = score ? score >= value : false;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setScore(value)}
+                        className={cn(
+                          'h-7 w-7 rounded-lg border text-[11px] flex items-center justify-center transition-colors',
+                          selected
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-surface-alt border-border hover:bg-surface-muted'
+                        )}
+                      >
+                        {value}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            ))}
+          </section>
 
-            {/* Course Condition */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium mt-4 mb-2 flex items-center justify-between">
-                <span>Course Condition</span>
-                {conditionScore && <span className="text-muted-foreground">{conditionScore}/10</span>}
-              </label>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setConditionScore(value)}
-                    onMouseEnter={() => setHoveredBreakdown({ type: 'condition', value })}
-                    onMouseLeave={() => setHoveredBreakdown(null)}
-                    disabled={isSubmitting}
-                    className={`flex-1 h-8 rounded-md text-xs font-medium border transition-colors ${
-                      (hoveredBreakdown?.type === 'condition' && value <= hoveredBreakdown.value) || 
-                      (conditionScore && value <= conditionScore)
-                        ? 'bg-surface-slate text-card-foreground border-transparent'
-                        : 'bg-surface-alt text-foreground border-border/60 hover:bg-card'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Facilities */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium mt-4 mb-2 flex items-center justify-between">
-                <span>Facilities</span>
-                {facilitiesScore && <span className="text-muted-foreground">{facilitiesScore}/10</span>}
-              </label>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setFacilitiesScore(value)}
-                    onMouseEnter={() => setHoveredBreakdown({ type: 'facilities', value })}
-                    onMouseLeave={() => setHoveredBreakdown(null)}
-                    disabled={isSubmitting}
-                    className={`flex-1 h-8 rounded-md text-xs font-medium border transition-colors ${
-                      (hoveredBreakdown?.type === 'facilities' && value <= hoveredBreakdown.value) || 
-                      (facilitiesScore && value <= facilitiesScore)
-                        ? 'bg-surface-slate text-card-foreground border-transparent'
-                        : 'bg-surface-alt text-foreground border-border/60 hover:bg-card'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="mt-6 flex flex-col gap-2">
-            <Button
-              variant="destructive"
-              className="w-full justify-center"
+          {/* Buttons */}
+          <section className="mt-6 space-y-3">
+            <button
+              type="button"
               onClick={handleDelete}
+              className="w-full rounded-2xl bg-destructive text-destructive-foreground py-3 text-sm font-medium
+                        hover:bg-destructive/90 transition-colors"
               disabled={isSubmitting}
             >
               Remove rating
-            </Button>
+            </button>
 
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1 justify-center border-border/70 bg-card"
+              <button
+                type="button"
                 onClick={onClose}
+                className="flex-1 rounded-2xl border border-border bg-surface-alt py-3 text-sm font-medium
+                          hover:bg-surface-muted transition-colors"
                 disabled={isSubmitting}
               >
                 Cancel
-              </Button>
-              <Button 
-                className="flex-1 justify-center"
+              </button>
+
+              <button
+                type="button"
+                disabled={rating === null || isSubmitting}
                 onClick={handleUpdate}
-                disabled={isSubmitting}
+                className="flex-1 rounded-2xl bg-primary text-primary-foreground py-3 text-sm font-semibold
+                          disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
               >
-                {isSubmitting ? "Updating..." : "Update rating"}
-              </Button>
+                {isSubmitting ? 'Updating...' : 'Update rating'}
+              </button>
             </div>
-          </div>
+          </section>
         </div>
       </DialogContent>
     </Dialog>
