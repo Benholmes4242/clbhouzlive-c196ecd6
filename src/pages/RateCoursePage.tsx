@@ -46,7 +46,6 @@ const RateCoursePage = () => {
       isOpen={true}
       onClose={handleClose}
       isEditMode={false}
-      asPage={true}
     />
   );
 };

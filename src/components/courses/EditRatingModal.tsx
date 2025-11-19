@@ -255,7 +255,7 @@ const EditRatingModal = ({
           {/* Review textarea */}
           <section className="mt-4">
             <div className="flex items-baseline justify-between mb-1.5">
-              <p className="text-sm font-medium">Share what stood out to you - from the greens and fairways to the design and facilities...</p>
+              <p className="text-sm font-medium">Share your thoughts</p>
               <span className="text-xs text-muted-foreground">(optional)</span>
             </div>
 
