@@ -415,7 +415,7 @@ const PostPlayRatingModal = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="max-w-md mx-auto">
+        <DialogContent className="max-w-md mx-auto !rounded-none [&>button]:hidden">
           {!showConfirmation ? (
             <>
               <DialogHeader>
