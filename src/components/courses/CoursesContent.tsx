@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { User } from 'lucide-react';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 interface CoursesContentProps {
   username?: string;
@@ -167,6 +168,9 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           </TabsContent>
         </Tabs>
       )}
+
+      {/* Global scroll-to-top button */}
+      <ScrollToTopGlass />
     </div>
   );
 };
