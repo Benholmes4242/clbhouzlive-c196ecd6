@@ -279,6 +279,7 @@ const PostPlayRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', course?.id] });
       
       // Show "Added!" text for 1.5 seconds
@@ -343,6 +344,7 @@ const PostPlayRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-top100-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['userTop100Courses'] });

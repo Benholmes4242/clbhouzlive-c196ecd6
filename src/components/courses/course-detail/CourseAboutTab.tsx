@@ -279,6 +279,17 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 </div>
               )}
             </div>
+
+            {/* See all reviews link */}
+            <div className="mt-3 flex justify-end">
+              <button
+                type="button"
+                onClick={() => navigate(`/courses/${course.id}/reviews`)}
+                className="text-xs font-medium text-muted-foreground hover:text-foreground underline underline-offset-4 transition-colors"
+              >
+                See all reviews
+              </button>
+            </div>
           </div>
         ) : (
           <p className="mt-4 text-xs md:text-sm text-muted-foreground text-center">
