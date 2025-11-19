@@ -128,20 +128,21 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <section className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-4 md:px-6 md:py-5">
         <div className="flex items-center justify-between gap-3 mb-3">
           <div>
-            <h2 className="text-base md:text-lg font-semibold text-foreground">Community Score</h2>
-            <p className="text-xs md:text-sm text-muted-foreground mt-1">
-              Based on {ratingAggregates?.review_count || 0} {ratingAggregates?.review_count === 1 ? 'rating' : 'ratings'}
+            <p className="text-sm font-bold tracking-[0.01em]">Community Score</p>
+            <p className="text-[11px] text-muted-foreground">
+              {ratingAggregates?.review_count === 1
+                ? 'Based on 1 rating'
+                : `Based on ${ratingAggregates?.review_count || 0} ratings`}
             </p>
           </div>
 
-          <div className="flex items-baseline gap-1">
-            <ClubhouseLogo size="sm" />
-            <span className="text-base md:text-lg font-semibold text-foreground">
+          <div className="inline-flex items-center gap-1 rounded-full bg-card/60 px-2.5 py-1 text-xs font-semibold text-foreground">
+            <ClubhouseLogo size="sm" className="h-3.5 w-3.5" />
+            <span>
               {ratingAggregates?.avg_overall_score 
                 ? formatScore(ratingAggregates.avg_overall_score) 
-                : '—'}
+                : '—'}/10
             </span>
-            <span className="text-xs text-muted-foreground">/10</span>
           </div>
         </div>
         
@@ -177,13 +178,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <CourseFriendsStrip courseId={course.id} courseName={course.name} />
         
         {ratingAggregates && ratingAggregates.review_count > 0 ? (
-          <div className="space-y-5">
+          <div className="mt-4 border-t border-border/60 pt-4 space-y-4">
             {/* Course Design */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center mb-1">
+            <div className="space-y-1.5">
+              <div className="flex items-baseline justify-between">
                 <span className="text-sm font-medium">Course Design</span>
-                {ratingAggregates.avg_design_score && (
-                  <span className="text-sm font-semibold">
+                {ratingAggregates.avg_design_score != null && (
+                  <span className="text-xs font-semibold text-muted-foreground">
                     {formatScore(ratingAggregates.avg_design_score)}/10
                   </span>
                 )}
@@ -191,21 +192,24 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               {ratingAggregates.avg_design_score ? (
                 <Progress 
                   value={getScorePercentage(ratingAggregates.avg_design_score)} 
-                  className="h-2"
+                  className="h-2.5 rounded-full"
                 />
               ) : (
-                <div className="h-2 bg-muted rounded-full flex items-center justify-center">
-                  <span className="text-xs text-muted-foreground">Not yet rated</span>
-                </div>
+                <>
+                  <div className="h-2.5 rounded-full bg-muted" />
+                  <div className="mt-0.5 flex justify-end">
+                    <span className="text-[11px] text-muted-foreground">Not yet rated</span>
+                  </div>
+                </>
               )}
             </div>
 
             {/* Course Condition */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center mb-1">
+            <div className="space-y-1.5">
+              <div className="flex items-baseline justify-between">
                 <span className="text-sm font-medium">Course Condition</span>
-                {ratingAggregates.avg_condition_score && (
-                  <span className="text-sm font-semibold">
+                {ratingAggregates.avg_condition_score != null && (
+                  <span className="text-xs font-semibold text-muted-foreground">
                     {formatScore(ratingAggregates.avg_condition_score)}/10
                   </span>
                 )}
@@ -213,21 +217,24 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               {ratingAggregates.avg_condition_score ? (
                 <Progress 
                   value={getScorePercentage(ratingAggregates.avg_condition_score)} 
-                  className="h-2"
+                  className="h-2.5 rounded-full"
                 />
               ) : (
-                <div className="h-2 bg-muted rounded-full flex items-center justify-center">
-                  <span className="text-xs text-muted-foreground">Not yet rated</span>
-                </div>
+                <>
+                  <div className="h-2.5 rounded-full bg-muted" />
+                  <div className="mt-0.5 flex justify-end">
+                    <span className="text-[11px] text-muted-foreground">Not yet rated</span>
+                  </div>
+                </>
               )}
             </div>
 
             {/* Clubhouse */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center mb-1">
+            <div className="space-y-1.5">
+              <div className="flex items-baseline justify-between">
                 <span className="text-sm font-medium">Clubhouse</span>
-                {ratingAggregates.avg_clubhouse_score && (
-                  <span className="text-sm font-semibold">
+                {ratingAggregates.avg_clubhouse_score != null && (
+                  <span className="text-xs font-semibold text-muted-foreground">
                     {formatScore(ratingAggregates.avg_clubhouse_score)}/10
                   </span>
                 )}
@@ -235,21 +242,24 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               {ratingAggregates.avg_clubhouse_score ? (
                 <Progress 
                   value={getScorePercentage(ratingAggregates.avg_clubhouse_score)} 
-                  className="h-2"
+                  className="h-2.5 rounded-full"
                 />
               ) : (
-                <div className="h-2 bg-muted rounded-full flex items-center justify-center">
-                  <span className="text-xs text-muted-foreground">Not yet rated</span>
-                </div>
+                <>
+                  <div className="h-2.5 rounded-full bg-muted" />
+                  <div className="mt-0.5 flex justify-end">
+                    <span className="text-[11px] text-muted-foreground">Not yet rated</span>
+                  </div>
+                </>
               )}
             </div>
 
             {/* Facilities */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center mb-1">
+            <div className="space-y-1.5">
+              <div className="flex items-baseline justify-between">
                 <span className="text-sm font-medium">Facilities</span>
-                {ratingAggregates.avg_facilities_score && (
-                  <span className="text-sm font-semibold">
+                {ratingAggregates.avg_facilities_score != null && (
+                  <span className="text-xs font-semibold text-muted-foreground">
                     {formatScore(ratingAggregates.avg_facilities_score)}/10
                   </span>
                 )}
@@ -257,12 +267,15 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               {ratingAggregates.avg_facilities_score ? (
                 <Progress 
                   value={getScorePercentage(ratingAggregates.avg_facilities_score)} 
-                  className="h-2"
+                  className="h-2.5 rounded-full"
                 />
               ) : (
-                <div className="h-2 bg-muted rounded-full flex items-center justify-center">
-                  <span className="text-xs text-muted-foreground">Not yet rated</span>
-                </div>
+                <>
+                  <div className="h-2.5 rounded-full bg-muted" />
+                  <div className="mt-0.5 flex justify-end">
+                    <span className="text-[11px] text-muted-foreground">Not yet rated</span>
+                  </div>
+                </>
               )}
             </div>
 
@@ -286,7 +299,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* Your Rating vs Community Comparison */}
       {user && userRating && ratingAggregates && (
-        <RatingComparisonCard userRating={userRating} aggregates={ratingAggregates} />
+        <div className="mt-6">
+          <RatingComparisonCard userRating={userRating} aggregates={ratingAggregates} />
+        </div>
       )}
 
       {/* About Section */}
