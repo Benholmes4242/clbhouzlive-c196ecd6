@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useOpenCourseModal } from '@/hooks/useOpenCourseModal';
+import { useParallax } from '@/hooks/useParallax';
 import CourseRankBadges from './CourseRankBadges';
 import CourseCardBackground from './CourseCardBackground';
 import CourseCardAIQuote from './CourseCardAIQuote';
@@ -100,6 +101,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const openCourseModal = useOpenCourseModal();
+  const { ref: parallaxRef, offset: parallaxOffset } = useParallax(18);
   
   // Memory monitoring for this component
   useMemoryMonitor('CourseCard', process.env.NODE_ENV === 'development');
@@ -200,17 +202,26 @@ const CourseCard: React.FC<CourseCardProps> = ({
   return (
     <>
       <div 
-        className={`group hover:shadow-lg transition-all duration-200 ${disableClick ? 'cursor-default' : 'cursor-pointer'} overflow-hidden relative ${customHeight} rounded-none sm:rounded-xl`}
+        className={`group transition-all duration-200 ${disableClick ? 'cursor-default' : 'cursor-pointer'} overflow-hidden relative ${customHeight} rounded-none shadow-none sm:rounded-xl sm:shadow-md md:shadow-lg border border-border/60 sm:border-border/40`}
         onClick={handleCardClick}
       >
-        <CourseCardBackground 
-          thumbnailImage={course.thumbnail_image}
-          courseName={course.name}
-          disableLazyLoading={isFromUserCoursesPage}
-        />
+        <div
+          ref={parallaxRef}
+          className="absolute inset-0 will-change-transform"
+          style={{
+            transform: `translateY(${parallaxOffset}px)`,
+            transition: 'transform 120ms ease-out',
+          }}
+        >
+          <CourseCardBackground 
+            thumbnailImage={course.thumbnail_image}
+            courseName={course.name}
+            disableLazyLoading={isFromUserCoursesPage}
+          />
+        </div>
 
         {/* Enhanced bottom gradient for better text readability */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none z-0" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none z-0" />
 
         {/* Course ranking badges - new split layout for badgesOnTop */}
         {badgesOnTop ? (

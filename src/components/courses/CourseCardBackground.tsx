@@ -18,7 +18,7 @@ const CourseCardBackground: React.FC<CourseCardBackgroundProps> = ({
           ? thumbnailImage
           : `https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop`}
         alt={`Background image for ${courseName}`}
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover scale-[1.03]"
         loading={disableLazyLoading ? "eager" : "lazy"}
         decoding="async"
       />
