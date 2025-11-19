@@ -42,17 +42,22 @@ export default function CreateMomentPage() {
   };
 
   return (
-    <PostSubmissionHandler
-      isComposerOpen={true} // Always open when page is mounted
-      mediaItems={mediaItems}
-      selectedFile={selectedFile}
-      selectedCourse={selectedCourse}
-      onCourseSelect={setSelectedCourse}
-      onClose={handleClose}
-      onShowToast={handleShowToast}
-      isSubmitting={isSubmitting}
-      setIsSubmitting={setIsSubmitting}
-      onMediaChange={handleMediaChange}
-    />
+    <div className="fixed inset-0 z-[9999]">
+      {/* Backdrop - same as Hub */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+      
+      <PostSubmissionHandler
+        isComposerOpen={true} // Always open when page is mounted
+        mediaItems={mediaItems}
+        selectedFile={selectedFile}
+        selectedCourse={selectedCourse}
+        onCourseSelect={setSelectedCourse}
+        onClose={handleClose}
+        onShowToast={handleShowToast}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={setIsSubmitting}
+        onMediaChange={handleMediaChange}
+      />
+    </div>
   );
 }
