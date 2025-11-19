@@ -21,7 +21,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { Star, Check, Trophy, Trash2, Upload } from 'lucide-react';
+import { Star, Check, Trophy, Trash2, Upload, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ReviewMediaUpload from './ReviewMediaUpload';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
@@ -40,6 +40,8 @@ interface PostPlayRatingModalProps {
   onRemoveFromPlayed?: () => void;
   asPage?: boolean;
 }
+
+const MAX_REVIEW_LENGTH = 500;
 
 const PostPlayRatingModal = ({ 
   course, 
@@ -542,95 +544,97 @@ const PostPlayRatingModal = ({
                 {/* Review Section */}
                 <div className="space-y-2">
                   <div className="flex items-baseline justify-between mb-1.5">
-                    <p className="text-sm font-medium">Share what stood out to you - from the greens and fairways to the design and facilities...</p>
-                    <span className="text-xs text-muted-foreground">(optional)</span>
-                  </div>
-                  <div className="relative">
-                    <Textarea
-                      value={review}
-                      onChange={(e) => setReview(e.target.value)}
-                      rows={4}
-                      className="w-full rounded-2xl border border-border bg-surface-alt px-3.5 py-3 text-sm
-                                placeholder:text-muted-foreground/80 focus-visible:outline-none focus-visible:ring-2
-                                focus-visible:ring-primary/60 focus-visible:border-transparent transition-shadow resize-none"
-                      placeholder="Tell other golfers what stood out – routing, conditioning, greens, hospitality..."
-                      disabled={isSubmitting}
-                      maxLength={500}
-                    />
-                    <span className="absolute right-3 bottom-2 text-[11px] text-muted-foreground">
-                      {review.length}/500
+                    <label className="text-sm font-medium">Review (Optional)</label>
+                    <span className="text-xs text-muted-foreground">
+                      {review.length}/{MAX_REVIEW_LENGTH}
                     </span>
                   </div>
-                </div>
-
-                {/* Breakdown Section */}
-                <div className="mt-5 border-t border-border pt-4 space-y-4">
-                  <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                    Breakdown (optional)
-                  </p>
-
-                  {[
-                    { key: 'design', label: 'Course Design', score: designScore, setScore: setDesignScore },
-                    { key: 'condition', label: 'Course Condition', score: conditionScore, setScore: setConditionScore },
-                    { key: 'clubhouse', label: 'Clubhouse', score: clubhouseScore, setScore: setClubhouseScore },
-                    { key: 'facilities', label: 'Facilities', score: facilitiesScore, setScore: setFacilitiesScore },
-                  ].map(({ key, label, score, setScore }) => {
-                    const displayValue = score ?? 5;
-                    return (
-                      <div key={key} className="space-y-1.5">
-                        <div className="flex items-baseline justify-between">
-                          <p className="text-sm font-medium">{label}</p>
-                          <span className="text-xs text-muted-foreground">
-                            {formatScore(score)} / 10
-                          </span>
-                        </div>
-
-                        <input
-                          type="range"
-                          min={0.5}
-                          max={10}
-                          step={0.5}
-                          value={displayValue}
-                          onChange={(e) => setScore(parseFloat(e.target.value))}
-                          className="w-full accent-slate-800"
-                        />
-
-                        <div className="flex justify-between text-[11px] text-muted-foreground">
-                          <span>0.5</span>
-                          <span>3</span>
-                          <span>5</span>
-                          <span>7</span>
-                          <span>9</span>
-                          <span>10</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Media Upload Section */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Media Upload (optional)</label>
-                  <ReviewMediaUpload
-                    onMediaSelected={handleMediaSelected}
-                    selectedMedia={selectedMedia}
-                    onRemoveMedia={handleRemoveMedia}
+                  <textarea
+                    value={review}
+                    onChange={(e) => setReview(e.target.value.slice(0, MAX_REVIEW_LENGTH))}
+                    placeholder="Share what stood out to you - from the greens and fairways to the design and facilities..."
+                    className="w-full p-3 border border-border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary-accent/20 min-h-[100px] text-sm"
                   />
                 </div>
 
+                {/* Breakdown Scores */}
+                <div className="space-y-3">
+                  <p className="text-sm font-medium">Breakdown</p>
+                  
+                  <div className="space-y-2">
+                    <label className="text-xs text-muted-foreground">Course Design</label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="range"
+                        min={0.5}
+                        max={10}
+                        step={0.5}
+                        value={designScore || 5}
+                        onChange={(e) => setDesignScore(parseFloat(e.target.value))}
+                        className="flex-1 accent-slate-800 focus:outline-none"
+                      />
+                      <span className="text-sm font-medium w-10 text-right">{formatScore(designScore)}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs text-muted-foreground">Course Condition</label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="range"
+                        min={0.5}
+                        max={10}
+                        step={0.5}
+                        value={conditionScore || 5}
+                        onChange={(e) => setConditionScore(parseFloat(e.target.value))}
+                        className="flex-1 accent-slate-800 focus:outline-none"
+                      />
+                      <span className="text-sm font-medium w-10 text-right">{formatScore(conditionScore)}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs text-muted-foreground">Clubhouse</label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="range"
+                        min={0.5}
+                        max={10}
+                        step={0.5}
+                        value={clubhouseScore || 5}
+                        onChange={(e) => setClubhouseScore(parseFloat(e.target.value))}
+                        className="flex-1 accent-slate-800 focus:outline-none"
+                      />
+                      <span className="text-sm font-medium w-10 text-right">{formatScore(clubhouseScore)}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs text-muted-foreground">Facilities</label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="range"
+                        min={0.5}
+                        max={10}
+                        step={0.5}
+                        value={facilitiesScore || 5}
+                        onChange={(e) => setFacilitiesScore(parseFloat(e.target.value))}
+                        className="flex-1 accent-slate-800 focus:outline-none"
+                      />
+                      <span className="text-sm font-medium w-10 text-right">{formatScore(facilitiesScore)}</span>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Submit Button */}
-                <div className="pt-4">
+                <div className="space-y-2 pt-2">
                   <Button 
-                    onClick={isEditMode ? handleSubmit : handleSubmit}
-                    disabled={isSubmitting || !selectedRating}
-                    className="w-full bg-[#EAEAEA] text-[#333333] hover:bg-[#D4D4D4] shadow-sm rounded-lg font-medium"
-                    style={{
-                      backgroundColor: isSubmitting ? '#D4D4D4' : '#EAEAEA',
-                      color: '#333333'
-                    }}
+                    onClick={handleSubmit} 
+                    className="w-full bg-slate-800 hover:bg-slate-700"
+                    disabled={isSubmitting || selectedRating === null}
                   >
-                    {isEditMode ? (
-                      isSubmitting ? "Updating..." : "Update Rating"
+                    {isSubmitting ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {buttonText}</>
                     ) : (
                       buttonText
                     )}
@@ -648,7 +652,6 @@ const PostPlayRatingModal = ({
                     </Button>
                   )}
                 </div>
-              </div>
             </div>
           ) : (
             /* Confirmation Screen */
