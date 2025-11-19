@@ -248,14 +248,17 @@ const CourseExplorer = () => {
           <div className="text-xs text-muted-foreground mb-3">
             Showing {courses.length} course{courses.length !== 1 ? 's' : ''}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map((course) => (
-              <CourseCard 
-                key={course.id} 
-                course={course}
-                showRankBadge={!!course.global_rank}
-              />
-            ))}
+          <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
+            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
+              {courses.map((course) => (
+                <div key={course.id} className="mb-4 sm:mb-0">
+                  <CourseCard 
+                    course={course}
+                    showRankBadge={!!course.global_rank}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
