@@ -5,97 +5,32 @@ const ScrollToTopGlass = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    console.log('🔝 ScrollToTopGlass mounted');
-    let rafId: number | null = null;
+    // The actual scroll container is #root (React root element)
+    const scrollContainer = document.getElementById('root');
+    if (!scrollContainer) return;
 
     const checkScroll = () => {
-      // Search through ALL elements to find the one that's actually scrolling
-      const allElements = document.querySelectorAll('*');
-      let actualScrollContainer: Element | null = null;
-      let maxScrollTop = 0;
-      
-      allElements.forEach((el) => {
-        const scrollTop = el.scrollTop;
-        if (scrollTop > maxScrollTop) {
-          maxScrollTop = scrollTop;
-          actualScrollContainer = el;
-        }
-      });
-      
-      if (actualScrollContainer && maxScrollTop > 0) {
-        console.log('🔝 FOUND ACTUAL SCROLL CONTAINER!', {
-          element: actualScrollContainer,
-          tagName: actualScrollContainer.tagName,
-          className: actualScrollContainer.className,
-          scrollTop: maxScrollTop
-        });
-      }
-      
-      // On mobile Safari, scrollY might be on window, document.documentElement, or body
-      // We need to check all of them during the actual scroll event
-      const scrollY = Math.max(
-        window.scrollY || 0,
-        window.pageYOffset || 0,
-        document.documentElement?.scrollTop || 0,
-        document.body?.scrollTop || 0,
-        maxScrollTop // Include the actual scroll container's value
-      );
-      
-      console.log('🔝 Scroll detected:', {
-        scrollY,
-        windowScrollY: window.scrollY,
-        pageYOffset: window.pageYOffset,
-        docElementTop: document.documentElement?.scrollTop,
-        bodyTop: document.body?.scrollTop,
-        actualContainerScrollTop: maxScrollTop,
-        shouldShow: scrollY > 400
-      });
-      
-      setVisible(scrollY > 400);
-    };
-
-    const handleScroll = () => {
-      console.log('🔝 Scroll event fired!');
-      // Use RAF to throttle and ensure we read the latest scroll position
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-      }
-      rafId = requestAnimationFrame(checkScroll);
+      const scrollTop = scrollContainer.scrollTop || 0;
+      setVisible(scrollTop > 400);
     };
 
     // Initial check
     checkScroll();
 
-    // Listen to window scroll - this works on both desktop and mobile
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    console.log('🔝 Window scroll listener added');
-    
-    // Also try document scroll with capture for good measure
-    document.addEventListener('scroll', handleScroll, { passive: true, capture: true });
-    console.log('🔝 Document scroll listener added');
+    // Listen to scroll events on #root
+    scrollContainer.addEventListener('scroll', checkScroll, { passive: true });
 
     return () => {
-      console.log('🔝 ScrollToTopGlass unmounting');
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-      }
-      window.removeEventListener('scroll', handleScroll);
-      document.removeEventListener('scroll', handleScroll, true);
+      scrollContainer.removeEventListener('scroll', checkScroll);
     };
   }, []);
 
   if (!visible) return null;
 
   const scrollToTop = () => {
-    // Try multiple scroll targets
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // Also try these as fallbacks for different browsers
-    if (document.documentElement.scrollTo) {
-      document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    if (document.body.scrollTo) {
-      document.body.scrollTo({ top: 0, behavior: 'smooth' });
+    const scrollContainer = document.getElementById('root');
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
