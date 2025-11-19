@@ -106,7 +106,7 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
             >
               {golfer.handicap !== undefined && (
                 <>
-                  <span className="px-1.5 py-0.5 rounded bg-white/10 text-[13px] font-semibold">
+                  <span className="text-[13px]">
                     HCP {golfer.handicap.toFixed(1)}
                   </span>
                   <span className="text-white/40">•</span>
