@@ -3,16 +3,17 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useCourseReviews, ReviewsSortBy, ReviewsRatingFilter } from '@/hooks/useCourseReviews';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Star } from 'lucide-react';
+import { ArrowLeft, Star, ThumbsUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 const CourseReviewsPage: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
+  const queryClient = useQueryClient();
 
   const [sortBy, setSortBy] = useState<ReviewsSortBy>('recent');
   const [ratingFilter, setRatingFilter] = useState<ReviewsRatingFilter>('all');
@@ -51,6 +52,39 @@ const CourseReviewsPage: React.FC = () => {
     window.dispatchEvent(
       new CustomEvent('open-rate-course-modal', { detail: { courseId } })
     );
+  };
+
+  const handleMarkHelpful = async (reviewId: string, currentCount: number | null) => {
+    const queryKey = ['course-reviews-full', courseId, sortBy, ratingFilter];
+
+    // Take a snapshot for rollback
+    const previous = queryClient.getQueryData<any>(queryKey);
+
+    const optimisticCount = (currentCount ?? 0) + 1;
+
+    // Optimistic update in cache
+    queryClient.setQueryData<any>(queryKey, (old: any) => {
+      if (!old) return old;
+      return old.map((r: any) =>
+        r.id === reviewId ? { ...r, helpful_count: optimisticCount } : r
+      );
+    });
+
+    // Persist to Supabase
+    const { error } = await supabase
+      .from('course_ratings' as any)
+      .update({ helpful_count: optimisticCount })
+      .eq('id', reviewId);
+
+    if (error) {
+      console.error('Error marking review helpful', error);
+      // Roll back on error
+      queryClient.setQueryData(queryKey, previous);
+    } else {
+      // Light cache refresh
+      queryClient.invalidateQueries({ queryKey: ['course-reviews-full', courseId] });
+      queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', courseId] });
+    }
   };
 
   return (
@@ -220,7 +254,7 @@ const CourseReviewsPage: React.FC = () => {
                   )}
 
                   {/* Breakdown row */}
-                  <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+                  <div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground">
                     {r.design_score !== null && (
                       <span>Design {r.design_score.toFixed(1)}/10</span>
                     )}
@@ -235,13 +269,23 @@ const CourseReviewsPage: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Helpful metrics */}
-                  {r.helpful_count !== null && r.helpful_count > 0 && (
-                    <div className="mt-2 text-[11px] text-muted-foreground">
-                      {r.helpful_count} golfer
-                      {r.helpful_count === 1 ? '' : 's'} found this helpful
+                  {/* Helpful button and count */}
+                  <div className="mt-3 flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() => handleMarkHelpful(r.id, r.helpful_count)}
+                      className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-card/70 px-2.5 py-1 text-[11px] font-medium text-muted-foreground hover:bg-card hover:text-foreground transition-colors"
+                    >
+                      <ThumbsUp className="h-3 w-3" />
+                      Helpful
+                    </button>
+
+                    <div className="text-[11px] text-muted-foreground">
+                      {(r.helpful_count ?? 0) > 0
+                        ? `${r.helpful_count} golfer${(r.helpful_count ?? 0) === 1 ? '' : 's'} found this helpful`
+                        : 'Be the first to mark this review helpful'}
                     </div>
-                  )}
+                  </div>
                 </div>
               );
             })}
