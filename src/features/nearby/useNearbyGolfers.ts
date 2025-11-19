@@ -61,6 +61,15 @@ async function fetchLiveNearby(options: NearbyGolfersOptions): Promise<NearbyGol
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return [];
 
+    // Get current user's home club for comparison
+    const { data: currentUserProfile } = await supabase
+      .from('user_profiles')
+      .select('home_club')
+      .eq('id', user.id)
+      .single();
+    
+    const userHomeClub = currentUserProfile?.home_club;
+
     const radiusMeters = radiusKm * 1000;
     const staleThreshold = new Date(Date.now() - 5 * 60 * 1000).toISOString(); // 5 minutes
 
@@ -134,6 +143,7 @@ async function fetchLiveNearby(options: NearbyGolfersOptions): Promise<NearbyGol
           distance_km: distanceMeters / 1000,
           handicap: profile.show_handicap ? profile.eg_handicap_index : undefined,
           isOpenToPlay,
+          sameHomeClub: userHomeClub && profile.home_club && userHomeClub === profile.home_club,
         };
       })
       .filter((g: NearbyGolfer | null): g is NearbyGolfer => g !== null)

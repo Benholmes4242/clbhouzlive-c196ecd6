@@ -6,6 +6,7 @@ export type NearbyGolfer = {
   is_online: boolean;
   distance_km?: number;
   same_club?: boolean;
+  sameHomeClub?: boolean;
   isOpenToPlay?: boolean;
   handicap?: number;
 };
