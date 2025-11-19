@@ -69,6 +69,7 @@ const CreateProfile = lazy(() => import("./pages/CreateProfile"));
 const ProfileTestPage = lazy(() => import("./pages/ProfileTestPage"));
 const AdminBackfill = lazy(() => import("./pages/AdminBackfill"));
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
+const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Courses = lazy(() => import("./pages/Courses"));
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
@@ -175,6 +176,7 @@ function AppRoutes() {
         <Route path="/profile" element={<ProfileWrapped />} />
         <Route path="/profile-test" element={<ProfileTestPage />} />
         <Route path="/profile/:username" element={<UserProfilePage />} />
+        <Route path="/profile/:username/reviews" element={<UserReviewsPage />} />
         <Route path="/settings" element={<SettingsWrapped />} />
         <Route path="/clubhouse" element={<Suspense fallback={<ClubhouseSkeleton />}><ClubhouseWrapped /></Suspense>} />
         <Route path="/discover" element={<DiscoverWrapped />} />

@@ -2,6 +2,7 @@
 import React, { useState, useCallback } from 'react';
 import HeroProfileHeader from './HeroProfileHeader';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import ProfileReviewsStrip from './ProfileReviewsStrip';
 
 
 interface UserProfileContentProps {
@@ -47,6 +48,15 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
         activeSection={activeSection}
         onSectionChange={handleSectionChange}
       />
+      
+      {/* Reviews strip - shown below the profile header */}
+      <div className="px-4 md:px-6 max-w-[1150px] mx-auto">
+        <ProfileReviewsStrip
+          userId={profile.id}
+          username={profile.username}
+          displayName={profile.display_name}
+        />
+      </div>
     </>
   );
 };
