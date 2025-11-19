@@ -48,10 +48,10 @@ const formatDescription = (description: string) => {
   return description
     .split('\n')
     .map((line, index, array) => (
-      <React.Fragment key={index}>
+      <span key={index}>
         {line}
         {index < array.length - 1 && <br />}
-      </React.Fragment>
+      </span>
     ));
 };
 
