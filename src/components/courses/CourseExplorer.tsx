@@ -345,7 +345,7 @@ const CourseExplorer = () => {
         <div className="space-y-6">
         {/* Compact meta info block: region + range on left, reset on right */}
         {totalCount > 0 && (
-          <div className="mt-3 flex flex-col gap-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-3 flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-0.5">
               <div>
                 {hasSearch ? (
@@ -365,7 +365,7 @@ const CourseExplorer = () => {
                   </>
                 )}
               </div>
-              <div className="text-[11px] text-muted-foreground/80">
+              <div className="text-xs text-muted-foreground/80">
                 {totalCount <= PAGE_SIZE && page === 0 ? (
                   <>Showing all {totalCount} course{totalCount !== 1 && 's'}</>
                 ) : (
@@ -378,7 +378,7 @@ const CourseExplorer = () => {
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="mt-1 inline-flex items-center text-[11px] font-medium text-muted-foreground hover:text-foreground sm:mt-0"
+                className="mt-1 inline-flex items-center text-xs font-medium text-muted-foreground hover:text-foreground sm:mt-0"
               >
                 ✕&nbsp;Reset filters
               </button>
