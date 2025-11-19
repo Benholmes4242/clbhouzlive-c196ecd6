@@ -5,6 +5,7 @@ const ScrollToTopGlass = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    console.log('🔝 ScrollToTopGlass mounted');
     let rafId: number | null = null;
 
     const checkScroll = () => {
@@ -17,10 +18,20 @@ const ScrollToTopGlass = () => {
         document.body?.scrollTop || 0
       );
       
+      console.log('🔝 Scroll detected:', {
+        scrollY,
+        windowScrollY: window.scrollY,
+        pageYOffset: window.pageYOffset,
+        docElementTop: document.documentElement?.scrollTop,
+        bodyTop: document.body?.scrollTop,
+        shouldShow: scrollY > 400
+      });
+      
       setVisible(scrollY > 400);
     };
 
     const handleScroll = () => {
+      console.log('🔝 Scroll event fired!');
       // Use RAF to throttle and ensure we read the latest scroll position
       if (rafId) {
         cancelAnimationFrame(rafId);
@@ -33,11 +44,14 @@ const ScrollToTopGlass = () => {
 
     // Listen to window scroll - this works on both desktop and mobile
     window.addEventListener('scroll', handleScroll, { passive: true });
+    console.log('🔝 Window scroll listener added');
     
     // Also try document scroll with capture for good measure
     document.addEventListener('scroll', handleScroll, { passive: true, capture: true });
+    console.log('🔝 Document scroll listener added');
 
     return () => {
+      console.log('🔝 ScrollToTopGlass unmounting');
       if (rafId) {
         cancelAnimationFrame(rafId);
       }
