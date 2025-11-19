@@ -48,7 +48,7 @@ async function fetchLiveNearby(options: NearbyGolfersOptions): Promise<NearbyGol
         distance_km: mock.distance_m / 1000,
         handicap: mock.eg_handicap_index,
         isOpenToPlay: mock.open_to_play,
-        same_club: mock.same_club,
+        sameHomeClub: mock.same_club,
       }))
       .slice(0, limit);
     
