@@ -5,9 +5,13 @@ const ScrollToTopGlass = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    console.log('🔝 ScrollToTopGlass mounted');
+    
     const onScroll = () => {
       const scrollY = window.scrollY || document.documentElement.scrollTop;
-      setVisible(scrollY > 400);
+      const shouldShow = scrollY > 400;
+      console.log('🔝 Scroll event:', { scrollY, shouldShow });
+      setVisible(shouldShow);
     };
 
     // Check initial position
@@ -16,36 +20,48 @@ const ScrollToTopGlass = () => {
     // Add listener to window
     window.addEventListener('scroll', onScroll, { passive: true });
     
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []); // Empty deps - no stale closure issues
+    return () => {
+      console.log('🔝 ScrollToTopGlass unmounting');
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
 
-  if (!visible) return null;
+  console.log('🔝 ScrollToTopGlass render, visible:', visible);
+
+  if (!visible) {
+    console.log('🔝 Not visible, returning null');
+    return null;
+  }
+
+  console.log('🔝 Rendering button!');
 
   return (
     <button
       type="button"
-      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      onClick={() => {
+        console.log('🔝 Button clicked!');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }}
       aria-label="Back to top"
-      className="
-        fixed
-        top-3
-        left-1/2
-        -translate-x-1/2
-        z-[60]
-        glass-dark
-        rounded-full
-        px-3
-        py-2
-        flex
-        items-center
-        justify-center
-        shadow-md
-        border border-white/10
-        hover:scale-110
-        transition-transform
-      "
+      style={{ 
+        position: 'fixed',
+        top: '12px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 9999,
+        background: 'rgba(0, 0, 0, 0.28)',
+        backdropFilter: 'blur(22px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        borderRadius: '9999px',
+        padding: '8px 12px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        cursor: 'pointer'
+      }}
     >
-      <ChevronUp className="h-4 w-4 text-white" />
+      <ChevronUp style={{ width: '16px', height: '16px', color: 'white' }} />
     </button>
   );
 };
