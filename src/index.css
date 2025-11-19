@@ -174,8 +174,21 @@
 /* Full height baseline - extend background behind status bar */
 html, body, #root { 
   height: 100%; 
-  margin: 0; 
-  padding: 0; 
+  margin: 0 !important; 
+  padding: 0 !important; 
+}
+
+/* Ensure page containers with headers have no top spacing */
+.page-with-header {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Ensure all headers are anchored flush to viewport top */
+.chrome-header,
+header[data-chrome="header"] {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
 }
 
 /* Use dynamic viewport height for mobile stability */
@@ -1549,6 +1562,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
     /* Remove any existing top margins that might create black bars */
     margin-top: 0 !important;
     padding-top: 0 !important;
+    padding-top: 0 !important;
   }
 
   #root {
@@ -2018,6 +2032,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
     position: relative;
     /* Remove any hard-coded top margins that could interfere with edge-to-edge */
     margin: 0 !important;
+    padding: 0 !important;
     padding: 0 !important;
   }
 }
