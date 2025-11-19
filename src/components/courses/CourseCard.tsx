@@ -209,13 +209,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
           disableLazyLoading={isFromUserCoursesPage}
         />
 
-        {/* Top 100 Pills Overlay - Top Left */}
-        {!hideRankingBadges && top100Memberships.length > 0 && (
-          <div className="absolute top-3 left-3 z-10 pointer-events-none">
-            <Top100Pills memberships={top100Memberships} variant="overlay" size="sm" />
-          </div>
-        )}
-
         {/* Enhanced bottom gradient for better text readability */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none z-0" />
 
