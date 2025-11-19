@@ -156,6 +156,16 @@ const CourseExplorer = () => {
     { value: 'rest', label: 'Rest of World' },
   ];
 
+  const getRegionLabel = () => {
+    if (selectedRegion === 'all') return 'worldwide';
+    return regionOptions.find((o) => o.value === selectedRegion)?.label || 'this region';
+  };
+
+  const hasSearch = debouncedSearch.trim().length > 0;
+
+  const startIndex = totalCount === 0 ? 0 : page * PAGE_SIZE + 1;
+  const endIndex = Math.min((page + 1) * PAGE_SIZE, totalCount);
+
   const handleResetFilters = () => {
     setSelectedRegion('all');
     setRegionWasAuto(false);
@@ -238,36 +248,65 @@ const CourseExplorer = () => {
           </Button>
         )}
       </div>
-      {selectedRegion !== 'all' && (
-        <p className="mt-1 text-xs text-muted-foreground">
-          Showing courses in{' '}
-          {regionOptions.find((o) => o.value === selectedRegion)?.label || 'selected region'}
-          {regionWasAuto && ' • Suggested for you'}
-        </p>
-      )}
 
       {/* Results */}
       {isLoading ? (
         <LoadingSkeleton />
       ) : courses.length === 0 ? (
-        <div className="text-center py-16 space-y-4">
-          <div className="text-muted-foreground space-y-2">
-            <p className="text-lg font-semibold text-foreground">No courses found</p>
-            <p className="text-sm">Try clearing filters or searching another location.</p>
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+          <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center text-muted-foreground mb-1">
+            <Search className="w-4 h-4" />
           </div>
+          <h3 className="text-sm font-semibold">No courses match your filters</h3>
+          <p className="text-sm text-muted-foreground max-w-xs">
+            Try clearing filters or searching for a different course name or
+            location.
+          </p>
           {hasActiveFilters && (
-            <Button onClick={handleResetFilters} variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-2"
+              onClick={handleResetFilters}
+            >
               Reset filters
             </Button>
           )}
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="text-xs text-muted-foreground">
-            {totalCount > 0
-              ? `Showing ${Math.min((page + 1) * PAGE_SIZE, totalCount)} of ${totalCount} courses`
-              : 'No courses found'}
-          </div>
+          {/* Context line */}
+          {totalCount > 0 && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              {hasSearch ? (
+                <>
+                  Results for "{debouncedSearch}" {selectedRegion === 'all'
+                    ? 'worldwide'
+                    : <>in <span className="font-medium">{getRegionLabel()}</span></>}
+                </>
+              ) : selectedRegion === 'all' ? (
+                'Showing all courses worldwide'
+              ) : (
+                <>
+                  Showing courses in{' '}
+                  <span className="font-medium">{getRegionLabel()}</span>
+                </>
+              )}
+            </p>
+          )}
+
+          {/* Range line */}
+          {totalCount > 0 && (
+            <p className="text-sm text-muted-foreground">
+              {totalCount <= PAGE_SIZE && page === 0 ? (
+                <>Showing all {totalCount} course{totalCount !== 1 && 's'}</>
+              ) : (
+                <>
+                  Showing {startIndex}–{endIndex} of {totalCount} courses
+                </>
+              )}
+            </p>
+          )}
           <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
               {courses.map((course) => (
