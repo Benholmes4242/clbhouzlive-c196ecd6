@@ -17,55 +17,16 @@ import {
   subregionKeyToLabel,
 } from '@/constants/courseRegions';
 
-const REGION_STORAGE_KEY = 'clbhouz_courses_region_v1';
-const SUBREGION_STORAGE_KEY = 'clbhouz_courses_subregion_v1';
-
-function getInitialRegion(): { value: PrimaryRegionKey; auto: boolean } {
-  // 1) URL param has priority
-  const params = new URLSearchParams(window.location.search);
-  const urlRegion = params.get('region') as PrimaryRegionKey;
-  if (urlRegion && Object.values(PRIMARY_REGIONS).includes(urlRegion)) {
-    return { value: urlRegion, auto: false };
-  }
-
-  // 2) Local storage from previous visit
-  if (typeof window !== 'undefined') {
-    const stored = window.localStorage.getItem(REGION_STORAGE_KEY) as PrimaryRegionKey;
-    if (stored && Object.values(PRIMARY_REGIONS).includes(stored)) {
-      return { value: stored, auto: false };
-    }
-  }
-
-  // 3) Very light heuristic based on browser locale
-  let autoRegion: PrimaryRegionKey = PRIMARY_REGIONS.ALL;
-  if (typeof navigator !== 'undefined') {
-    const lang = navigator.language.toLowerCase();
-    if (lang.startsWith('en-gb') || lang.startsWith('en-ie')) {
-      autoRegion = PRIMARY_REGIONS.GB_I;
-    } else if (lang.startsWith('en-us')) {
-      autoRegion = PRIMARY_REGIONS.USA;
-    }
-  }
-
-  return { value: autoRegion, auto: autoRegion !== PRIMARY_REGIONS.ALL };
-}
-
 const PAGE_SIZE = 50;
 
 const CourseExplorer = () => {
-  const initialRegion = getInitialRegion();
-  const [selectedRegion, setSelectedRegion] = useState(initialRegion.value);
-  const [regionWasAuto, setRegionWasAuto] = useState(initialRegion.auto);
+  // Always reset to defaults on mount - no persistence
+  const [selectedRegion, setSelectedRegion] = useState<PrimaryRegionKey>(PRIMARY_REGIONS.ALL);
   const [selectedSubregion, setSelectedSubregion] = useState('all');
   const [page, setPage] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  
-  // Initialize search from URL if present
-  const urlQuery = typeof window !== 'undefined' 
-    ? new URLSearchParams(window.location.search).get('query') || '' 
-    : '';
-  const [searchTerm, setSearchTerm] = useState(urlQuery);
-  const [debouncedSearch, setDebouncedSearch] = useState(urlQuery);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
   // Debounce search input
   useEffect(() => {
@@ -85,57 +46,10 @@ const CourseExplorer = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Restore subregion from URL/storage on mount
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const url = new URL(window.location.href);
-    const urlSub = url.searchParams.get('sub');
-
-    if (urlSub) {
-      setSelectedSubregion(urlSub);
-      return;
-    }
-
-    const stored = window.localStorage.getItem(SUBREGION_STORAGE_KEY);
-    if (stored) {
-      setSelectedSubregion(stored);
-    }
-  }, []);
-
   // Reset page when filters change
   useEffect(() => {
     setPage(0);
   }, [selectedRegion, selectedSubregion, debouncedSearch]);
-
-  // Persist region selection
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    // localStorage
-    window.localStorage.setItem(REGION_STORAGE_KEY, selectedRegion);
-
-    // keep URL in sync (non-destructive)
-    const url = new URL(window.location.href);
-    url.searchParams.set('region', selectedRegion);
-    window.history.replaceState({}, '', url.toString());
-  }, [selectedRegion]);
-
-  // Persist sub-region to URL + storage
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    window.localStorage.setItem(SUBREGION_STORAGE_KEY, selectedSubregion);
-
-    const url = new URL(window.location.href);
-    if (selectedSubregion && selectedSubregion !== 'all') {
-      url.searchParams.set('sub', selectedSubregion);
-    } else {
-      url.searchParams.delete('sub');
-    }
-
-    window.history.replaceState({}, '', url.toString());
-  }, [selectedSubregion]);
 
   // Fetch courses with region filtering based on country
   const { data, isLoading } = useQuery({
@@ -222,16 +136,7 @@ const CourseExplorer = () => {
   const handleResetFilters = () => {
     setSelectedRegion(PRIMARY_REGIONS.ALL);
     setSelectedSubregion('all');
-    setRegionWasAuto(false);
     setSearchTerm('');
-
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href);
-      url.searchParams.delete('region');
-      url.searchParams.delete('sub');
-      url.searchParams.delete('query');
-      window.history.replaceState({}, '', url.toString());
-    }
   };
 
   return (
@@ -244,18 +149,7 @@ const CourseExplorer = () => {
           placeholder="Search by name, county or area..."
           value={searchTerm}
           onChange={(e) => {
-            const value = e.target.value;
-            setSearchTerm(value);
-
-            if (typeof window !== 'undefined') {
-              const url = new URL(window.location.href);
-              if (value) {
-                url.searchParams.set('query', value);
-              } else {
-                url.searchParams.delete('query');
-              }
-              window.history.replaceState({}, '', url.toString());
-            }
+            setSearchTerm(e.target.value);
           }}
           className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border transition-shadow text-sm"
         />
@@ -276,7 +170,6 @@ const CourseExplorer = () => {
           <Select value={selectedRegion} onValueChange={(value) => {
             setSelectedRegion(value as PrimaryRegionKey);
             setSelectedSubregion('all');
-            setRegionWasAuto(false);
           }}>
             <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-sm focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
               <div className="flex items-center">
