@@ -7,8 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronUp, Star, Edit } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import AvatarSquircle from '@/components/ui/AvatarSquircle';
-import EditRatingModal from './EditRatingModal';
 import ReviewMediaDisplay from './ReviewMediaDisplay';
+import { useNavigate } from 'react-router-dom';
 
 interface CourseReviewsProps {
   courseId: string;
@@ -35,8 +35,7 @@ interface ReviewData {
 
 const CourseReviews = ({ courseId, courseName, currentUser }: CourseReviewsProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedReview, setSelectedReview] = useState<ReviewData | null>(null);
+  const navigate = useNavigate();
 
   const { data: reviews, isLoading } = useQuery({
     queryKey: ['course-reviews', courseId],
@@ -117,8 +116,7 @@ const CourseReviews = ({ courseId, courseName, currentUser }: CourseReviewsProps
   };
 
   const handleEditReview = (review: ReviewData) => {
-    setSelectedReview(review);
-    setEditModalOpen(true);
+    navigate(`/courses/${courseId}/rate`);
   };
 
   const isUserReview = (review: ReviewData) => {
@@ -214,20 +212,6 @@ const CourseReviews = ({ courseId, courseName, currentUser }: CourseReviewsProps
           </CollapsibleContent>
         </Collapsible>
       </div>
-
-      {selectedReview && (
-        <EditRatingModal
-          courseId={courseId}
-          courseName={courseName}
-          currentRating={selectedReview.rating}
-          currentReview={selectedReview.review}
-          isOpen={editModalOpen}
-          onClose={() => {
-            setEditModalOpen(false);
-            setSelectedReview(null);
-          }}
-        />
-      )}
     </>
   );
 };
