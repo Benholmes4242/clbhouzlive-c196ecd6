@@ -11,7 +11,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
 import CourseMediaTab from '@/components/courses/course-detail/CourseMediaTab';
-import CourseRankBadges from '@/components/courses/CourseRankBadges';
+import Top100Pills from '@/components/courses/Top100Pills';
+import { useCourseTop100Memberships } from '@/hooks/useCourseTop100Memberships';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 
 
@@ -24,6 +25,9 @@ interface GolfClubViewProps {
 const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false, onClose }) => {
   const { user } = useSupabaseSession();
   const [activeTab, setActiveTab] = useState('about');
+  
+  // Fetch Top 100 memberships for unified badge display
+  const { data: top100Memberships = [] } = useCourseTop100Memberships(courseId);
 
   const { data: course, isLoading: courseLoading } = useQuery({
     queryKey: ['course-detail', courseId],
@@ -125,24 +129,30 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {/* Gradient overlay for better text visibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         
-        {/* Course Title & Location - Bottom Left */}
-        <div className="absolute bottom-14 left-6 text-white z-10">
-          <h1 className="text-3xl md:text-4xl font-bold drop-shadow-2xl">{course.name}</h1>
-          
-          {/* Top 100 Pills - positioned between name and location */}
-          <div className="mt-2 mb-3 md:mt-3 md:mb-4">
-            <CourseRankBadges 
-              globalRank={course.global_rank ?? null}
-              regionalRank={course.regional_rank ?? null}
-              usaRank={course.usa_rank ?? null}
-              country={course.country}
-              positioning="bottom-left"
-            />
+        {/* Course Title, Location & Rankings - Bottom Left */}
+        <div className="absolute inset-x-0 bottom-6 px-4 sm:px-6 lg:px-10">
+          <div className="max-w-4xl flex flex-col gap-1.5 sm:gap-2">
+            {/* Course name */}
+            <h1 className="text-3xl sm:text-4xl font-semibold text-white drop-shadow-lg">
+              {course.name}
+            </h1>
+
+            {/* Location line */}
+            <div className="text-sm sm:text-base text-white/90 drop-shadow">
+              {course.country}
+              {course.sub_country ? `, ${course.sub_country}` : ''}
+            </div>
+
+            {/* Ranking pills – own row, left-aligned with text */}
+            {top100Memberships.length > 0 && (
+              <div className="mt-1.5">
+                <Top100Pills
+                  memberships={top100Memberships}
+                  variant="overlay"
+                />
+              </div>
+            )}
           </div>
-          
-          <p className="text-lg md:text-xl opacity-90 drop-shadow-lg">
-            {[course.country, course.sub_country, course.region].filter(Boolean).join(', ')}
-          </p>
         </div>
 
         {/* Tab Navigation - overlaid on hero */}
