@@ -142,6 +142,25 @@ const FriendsCoursesPanel: React.FC = () => {
     return courses.filter(c => !hotIds.has(c.course_id));
   }, [courses, hotCourses]);
 
+  // Reset page when filter changes
+  useEffect(() => {
+    setRecentPage(0);
+  }, [timeRange]);
+
+  // Sort recent rounds by played_at descending (most recent first)
+  const sortedRecent = useMemo(() => {
+    return [...recent].sort(
+      (a, b) => new Date(b.played_at).getTime() - new Date(a.played_at).getTime()
+    );
+  }, [recent]);
+
+  // Paginate recent rounds
+  const totalRecent = sortedRecent.length;
+  const totalPages = Math.ceil(totalRecent / PAGE_SIZE);
+  const startIndex = recentPage * PAGE_SIZE;
+  const endIndex = startIndex + PAGE_SIZE;
+  const visibleRecent = sortedRecent.slice(startIndex, endIndex);
+
   // Now conditional returns - no more hooks after this point
   if (!user) return null;
 
@@ -195,25 +214,6 @@ const FriendsCoursesPanel: React.FC = () => {
       </div>
     );
   }
-
-  // Reset page when filter changes
-  useEffect(() => {
-    setRecentPage(0);
-  }, [timeRange]);
-
-  // Sort recent rounds by played_at descending (most recent first)
-  const sortedRecent = useMemo(() => {
-    return [...recent].sort(
-      (a, b) => new Date(b.played_at).getTime() - new Date(a.played_at).getTime()
-    );
-  }, [recent]);
-
-  // Paginate recent rounds
-  const totalRecent = sortedRecent.length;
-  const totalPages = Math.ceil(totalRecent / PAGE_SIZE);
-  const startIndex = recentPage * PAGE_SIZE;
-  const endIndex = startIndex + PAGE_SIZE;
-  const visibleRecent = sortedRecent.slice(startIndex, endIndex);
 
   const formatFriendsList = (friends: FriendCourseHit[], limit = 3) => {
     const names = friends.slice(0, limit).map(f => f.friend_profile.display_name || f.friend_profile.username);
