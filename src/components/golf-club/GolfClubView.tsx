@@ -11,8 +11,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
 import CourseMediaTab from '@/components/courses/course-detail/CourseMediaTab';
-import Top100Pills from '@/components/courses/Top100Pills';
-import { useCourseTop100Memberships } from '@/hooks/useCourseTop100Memberships';
+import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 
 
@@ -42,10 +41,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     },
     enabled: !!courseId,
   });
-
-  // Fetch Top 100 memberships
-  const { data: top100Memberships = [] } = useCourseTop100Memberships(courseId);
-
 
   const { data: ratingStats } = useQuery({
     queryKey: ['course-rating-stats', courseId],
@@ -138,8 +133,14 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           </p>
           
           {/* Top 100 Pills */}
-          {top100Memberships.length > 0 && (
-            <Top100Pills memberships={top100Memberships} variant="overlay" size="md" />
+          {course.global_rank && (
+            <CourseRankBadges 
+              globalRank={course.global_rank ?? null}
+              regionalRank={course.regional_rank ?? null}
+              usaRank={course.usa_rank ?? null}
+              country={course.country}
+              positioning="bottom-left"
+            />
           )}
         </div>
 
