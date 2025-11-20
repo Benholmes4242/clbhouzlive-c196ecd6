@@ -32,8 +32,65 @@ const FriendsCoursesPanel: React.FC = () => {
   
   const PAGE_SIZE = 8;
   
-  // Use mock data when flag is enabled
-  const data = FLAGS.FRIEND_COURSES_MOCK_ENABLED ? MOCK_FRIEND_COURSES : realData;
+  // When mock flag is enabled, use mock friend profiles but real course data
+  const data = useMemo(() => {
+    if (FLAGS.FRIEND_COURSES_MOCK_ENABLED && realData) {
+      // Get unique course IDs from mock data
+      const mockCourseIds = new Set(
+        MOCK_FRIEND_COURSES.recent.map(hit => hit.course_id).filter(Boolean)
+      );
+      
+      // Find real course data for those courses
+      const realCoursesMap = new Map(
+        realData.courses.map(c => [c.course_id, c])
+      );
+      
+      // Merge mock friend data with real course data
+      const enrichedRecent = MOCK_FRIEND_COURSES.recent.map(mockHit => {
+        const realCourse = realCoursesMap.get(mockHit.course_id);
+        if (realCourse) {
+          return {
+            ...mockHit,
+            thumbnail_url: realCourse.thumbnail_url,
+            top100_memberships: realCourse.top100_memberships, // Use real rankings!
+          };
+        }
+        return mockHit;
+      });
+      
+      // Rebuild courses from enriched recent data
+      const courseMap = new Map<string, CourseWithFriends>();
+      for (const hit of enrichedRecent) {
+        if (!hit.course_id) continue;
+        const existing = courseMap.get(hit.course_id);
+        if (!existing) {
+          courseMap.set(hit.course_id, {
+            course_id: hit.course_id,
+            course_name: hit.course_name,
+            country: hit.course_country,
+            sub_country: hit.course_sub_country,
+            thumbnail_url: hit.thumbnail_url,
+            average_rating: hit.rating,
+            top100_memberships: hit.top100_memberships, // Real rankings
+            friends: [hit],
+            most_recent_play: hit.played_at,
+            total_friends_played: 1,
+          });
+        } else {
+          existing.friends.push(hit);
+          existing.total_friends_played = existing.friends.length;
+        }
+      }
+      
+      return {
+        courses: Array.from(courseMap.values()),
+        recent: enrichedRecent,
+        totalCourses: courseMap.size,
+        totalFriendsActive: MOCK_FRIEND_COURSES.totalFriendsActive,
+      };
+    }
+    return FLAGS.FRIEND_COURSES_MOCK_ENABLED ? MOCK_FRIEND_COURSES : realData;
+  }, [realData]);
 
   // Filter data by time range and course type
   const filteredData = useMemo(() => {
