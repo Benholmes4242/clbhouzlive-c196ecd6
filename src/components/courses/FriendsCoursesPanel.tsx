@@ -8,9 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { Users, MapPin, Flame } from 'lucide-react';
+import { Users, MapPin, Flame, Video } from 'lucide-react';
 import { FLAGS } from '@/config/flags';
 import { MOCK_FRIEND_COURSES } from './mockFriendCourses';
+import { FriendsCoursesHero } from './friends/FriendsCoursesHero';
+import { FriendsActivityLeaderboard } from './friends/FriendsActivityLeaderboard';
+import { calculateFriendAchievements } from './friends/achievementUtils';
 import type { CourseWithFriends, FriendCourseHit } from '@/hooks/useFriendsCourses';
 
 type TimeRange = '30' | '90' | 'all';
@@ -171,6 +174,12 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       </div>
 
+      {/* Hero Banner */}
+      <FriendsCoursesHero courses={courses} timeRange={timeRange} />
+
+      {/* Activity Leaderboard */}
+      <FriendsActivityLeaderboard recent={recent} timeRange={timeRange} />
+
       {hotCourses.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -222,6 +231,8 @@ const FriendsCoursesPanel: React.FC = () => {
         <div className="space-y-3">
           {regularCourses.map((course) => {
             const mostRecentFriend = course.friends[0];
+            const achievements = calculateFriendAchievements(mostRecentFriend.friend_id, recent);
+            
             return (
               <Card key={course.course_id} className="relative p-4 hover:shadow-md transition-all cursor-pointer bg-surface-card border-border/60"
                 onClick={() => navigate(`/courses/${course.course_id}`)}>
@@ -233,17 +244,48 @@ const FriendsCoursesPanel: React.FC = () => {
                 </Avatar>
                 <div className="space-y-2 pl-6">
                   <div className="flex items-start justify-between gap-3">
-                    <div>
+                    <div className="flex-1">
                       <h3 className="font-semibold text-base">{course.course_name}</h3>
                       <p className="text-sm text-muted-foreground">{course.country}{course.sub_country ? `, ${course.sub_country}` : ''}</p>
                       <p className="text-xs text-muted-foreground mt-1">
                         Last played by {mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username} · {formatDistanceToNow(new Date(mostRecentFriend.played_at), { addSuffix: true })}
                       </p>
+                      
+                      {/* Achievement Pills */}
+                      {achievements.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mt-2 animate-fadeIn">
+                          {achievements.map((achievement, i) => (
+                            <span
+                              key={i}
+                              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${achievement.gradient} text-slate-700 border border-slate-200/50`}
+                            >
+                              <span>{achievement.icon}</span>
+                              <span>{achievement.label}</span>
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     {course.global_rank && <Badge variant="outline" className="shrink-0 text-xs">#{course.global_rank}</Badge>}
                   </div>
-                  <div className="text-xs text-muted-foreground text-right">
-                    Played by {course.total_friends_played} friend{course.total_friends_played !== 1 ? 's' : ''}
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">
+                      Played by {course.total_friends_played} friend{course.total_friends_played !== 1 ? 's' : ''}
+                    </span>
+                    
+                    {/* Replay Moments Icon - Placeholder for future implementation */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('View moments for course:', course.course_id);
+                        // TODO: Navigate to moments or open moments modal
+                      }}
+                      className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+                      title="View moments"
+                    >
+                      <Video className="w-3.5 h-3.5" />
+                      <span className="text-[10px] font-medium">View moments</span>
+                    </button>
                   </div>
                 </div>
               </Card>
