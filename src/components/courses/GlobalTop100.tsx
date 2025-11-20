@@ -37,12 +37,53 @@ function listSlugToRegionKey(slug: string): PrimaryRegionKey {
 }
 
 const GlobalTop100 = () => {
-  // Always reset to defaults on mount - no persistence
-  const [selectedList, setSelectedList] = useState('global');
-  const [selectedSubregion, setSelectedSubregion] = useState<'all' | string>('all');
+  // Session-based filter persistence - defaults only on first visit
+  const [selectedList, setSelectedList] = useState(() => {
+    const saved = sessionStorage.getItem('top100-last-filters');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return parsed.list || 'global';
+    }
+    return 'global';
+  });
+  const [selectedSubregion, setSelectedSubregion] = useState<'all' | string>(() => {
+    const saved = sessionStorage.getItem('top100-last-filters');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return parsed.subregion || 'all';
+    }
+    return 'all';
+  });
   const [page, setPage] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [searchTerm, setSearchTerm] = useState(() => {
+    const saved = sessionStorage.getItem('top100-last-filters');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return parsed.searchTerm || '';
+    }
+    return '';
+  });
+  const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
+
+  // Save filters to sessionStorage whenever they change
+  useEffect(() => {
+    sessionStorage.setItem('top100-last-filters', JSON.stringify({
+      list: selectedList,
+      subregion: selectedSubregion,
+      searchTerm,
+    }));
+  }, [selectedList, selectedSubregion, searchTerm]);
+
+  // Restore scroll position when returning from course detail
+  useEffect(() => {
+    const savedScroll = sessionStorage.getItem('top100-scroll');
+    if (savedScroll) {
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: parseInt(savedScroll), behavior: 'instant' });
+        sessionStorage.removeItem('top100-scroll');
+      });
+    }
+  }, []);
 
   // Debounce search input
   useEffect(() => {
@@ -116,6 +157,16 @@ const GlobalTop100 = () => {
     setSelectedSubregion('all');
     setSearchTerm('');
     setPage(0);
+    sessionStorage.setItem('top100-last-filters', JSON.stringify({
+      list: 'global',
+      subregion: 'all',
+      searchTerm: '',
+    }));
+  };
+
+  // Capture scroll position when clicking a course card
+  const handleCourseClick = () => {
+    sessionStorage.setItem('top100-scroll', window.scrollY.toString());
   };
 
   const hasActiveFilters = selectedList !== 'global' || selectedSubregion !== 'all' || searchTerm !== '';
@@ -254,6 +305,7 @@ const GlobalTop100 = () => {
                   <CourseCard 
                     course={course}
                     showRankBadge={true}
+                    onClick={handleCourseClick}
                   />
                 </div>
               ))}

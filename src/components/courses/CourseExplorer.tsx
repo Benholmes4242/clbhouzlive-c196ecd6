@@ -20,13 +20,54 @@ import {
 const PAGE_SIZE = 50;
 
 const CourseExplorer = () => {
-  // Always reset to defaults on mount - no persistence
-  const [selectedRegion, setSelectedRegion] = useState<PrimaryRegionKey>(PRIMARY_REGIONS.ALL);
-  const [selectedSubregion, setSelectedSubregion] = useState('all');
+  // Session-based filter persistence - defaults only on first visit
+  const [selectedRegion, setSelectedRegion] = useState<PrimaryRegionKey>(() => {
+    const saved = sessionStorage.getItem('explore-last-filters');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return parsed.region || PRIMARY_REGIONS.ALL;
+    }
+    return PRIMARY_REGIONS.ALL;
+  });
+  const [selectedSubregion, setSelectedSubregion] = useState(() => {
+    const saved = sessionStorage.getItem('explore-last-filters');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return parsed.subregion || 'all';
+    }
+    return 'all';
+  });
   const [page, setPage] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [searchTerm, setSearchTerm] = useState(() => {
+    const saved = sessionStorage.getItem('explore-last-filters');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return parsed.searchTerm || '';
+    }
+    return '';
+  });
+  const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
+
+  // Save filters to sessionStorage whenever they change
+  useEffect(() => {
+    sessionStorage.setItem('explore-last-filters', JSON.stringify({
+      region: selectedRegion,
+      subregion: selectedSubregion,
+      searchTerm,
+    }));
+  }, [selectedRegion, selectedSubregion, searchTerm]);
+
+  // Restore scroll position when returning from course detail
+  useEffect(() => {
+    const savedScroll = sessionStorage.getItem('explore-scroll');
+    if (savedScroll) {
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: parseInt(savedScroll), behavior: 'instant' });
+        sessionStorage.removeItem('explore-scroll');
+      });
+    }
+  }, []);
 
   // Debounce search input
   useEffect(() => {
@@ -137,6 +178,17 @@ const CourseExplorer = () => {
     setSelectedRegion(PRIMARY_REGIONS.ALL);
     setSelectedSubregion('all');
     setSearchTerm('');
+    setPage(0);
+    sessionStorage.setItem('explore-last-filters', JSON.stringify({
+      region: PRIMARY_REGIONS.ALL,
+      subregion: 'all',
+      searchTerm: '',
+    }));
+  };
+
+  // Capture scroll position when clicking a course card
+  const handleCourseClick = () => {
+    sessionStorage.setItem('explore-scroll', window.scrollY.toString());
   };
 
   return (
@@ -287,6 +339,7 @@ const CourseExplorer = () => {
                   <CourseCard 
                     course={course}
                     showRankBadge={!!course.global_rank}
+                    onClick={handleCourseClick}
                   />
                 </div>
               ))}
