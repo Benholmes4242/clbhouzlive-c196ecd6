@@ -53,7 +53,7 @@ const Top100Pills: React.FC<Top100PillsProps> = ({
           className={`${pillClasses} ${textSize} font-semibold px-2 py-0.5 flex items-center gap-1`}
         >
           {getIcon(membership.list_slug)}
-          <span>#{membership.rank}</span>
+          <span>{membership.rank}</span>
         </Badge>
       ))}
     </div>
