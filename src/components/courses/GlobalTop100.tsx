@@ -211,9 +211,9 @@ const GlobalTop100 = () => {
   const currentListLabel = listOptions.find((opt) => opt.value === selectedList)?.label || 'Global Top 100';
 
   return (
-    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-6">
+    <div className="space-y-4">
       {/* Search */}
-      <div className="relative max-w-xl mx-auto">
+      <div className="relative mx-auto mt-4 w-full max-w-xl">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           value={searchTerm}
@@ -233,7 +233,7 @@ const GlobalTop100 = () => {
       </div>
 
       {/* Top 100 List Selector + Sub-region */}
-      <div className="max-w-xl mx-auto flex items-center justify-center gap-3">
+      <div className="mx-auto mt-3 flex w-full max-w-xl gap-2">
         <div className="flex-1">
           <Select
             value={selectedList}
