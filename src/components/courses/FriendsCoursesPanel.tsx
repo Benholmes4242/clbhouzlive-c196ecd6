@@ -345,15 +345,14 @@ const FriendsCoursesPanel: React.FC = () => {
           <p className="text-sm text-muted-foreground">See where your friends have been playing lately</p>
         </div>
         
-        {/* Two Dropdowns */}
-        <div className="flex items-center gap-3">
+        {/* Two Dropdowns - Card Treatment */}
+        <div className="rounded-xl border border-border bg-surface-card shadow-xs px-3 py-2 flex items-center justify-between gap-3">
           {/* Time Range Dropdown */}
           <div className="flex-1">
-            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Time range</label>
             <select
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value as TimeRange)}
-              className="w-full h-10 px-3 text-sm bg-surface-alt border border-border/60 rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary-accent/20"
+              className="w-full h-9 px-3 py-2.5 text-sm bg-surface-alt border border-border/60 rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary-accent/20"
             >
               <option value="week">This week</option>
               <option value="30">Last 30 days</option>
@@ -365,11 +364,10 @@ const FriendsCoursesPanel: React.FC = () => {
           
           {/* Course Type Dropdown */}
           <div className="flex-1">
-            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Course type</label>
             <select
               value={courseTypeFilter}
               onChange={(e) => setCourseTypeFilter(e.target.value as CourseTypeFilter)}
-              className="w-full h-10 px-3 text-sm bg-surface-alt border border-border/60 rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary-accent/20"
+              className="w-full h-9 px-3 py-2.5 text-sm bg-surface-alt border border-border/60 rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary-accent/20"
             >
               <option value="all">All courses</option>
               <option value="top100">Top 100 only</option>
@@ -402,13 +400,27 @@ const FriendsCoursesPanel: React.FC = () => {
 
           {/* Full width breakout for cards */}
           <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-            <div className="space-y-3">
+            <div className="space-y-4">
               {hotCourses.map((course) => (
               <Card key={course.course_id} className="overflow-hidden rounded-none sm:rounded-xl hover:shadow-md transition-all cursor-pointer bg-surface-card border-border/60"
                 onClick={() => navigate(`/courses/${course.course_id}`)}>
-                {/* Course Image */}
+                {/* Course Image - Taller */}
                 {course.thumbnail_url && (
-                  <div className="relative h-32 overflow-hidden">
+                  <div className="relative w-full aspect-[1.7/1] overflow-hidden">
+                    {/* Friend avatar - inward positioning */}
+                    <div className="absolute top-3 left-3 z-20">
+                      <Squircle width={40} height={40}>
+                        <img 
+                          src={course.friends[0]?.friend_profile.profile_photo_url || '/placeholder.svg'} 
+                          alt={course.friends[0]?.friend_profile.display_name || 'Friend'}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder.svg';
+                          }}
+                        />
+                      </Squircle>
+                    </div>
+                    
                     <img
                       src={course.thumbnail_url}
                       alt={course.course_name}
@@ -417,7 +429,8 @@ const FriendsCoursesPanel: React.FC = () => {
                         e.currentTarget.src = '/placeholder.svg';
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    {/* Stronger bottom gradient */}
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
                   </div>
                 )}
                 
@@ -482,9 +495,9 @@ const FriendsCoursesPanel: React.FC = () => {
               return (
                 <Card key={course.course_id} className="relative overflow-hidden rounded-none sm:rounded-xl hover:shadow-md transition-all cursor-pointer bg-card border shadow-sm w-full"
                   onClick={() => navigate(`/courses/${course.course_id}`)}>
-                {/* Course Image */}
+                {/* Course Image - Taller, Full Width */}
                 {course.thumbnail_url && (
-                  <div className="relative h-48 overflow-hidden">
+                  <div className="relative w-full aspect-[1.7/1] overflow-hidden">
                     <img
                       src={course.thumbnail_url}
                       alt={course.course_name}
@@ -493,11 +506,12 @@ const FriendsCoursesPanel: React.FC = () => {
                         e.currentTarget.src = '/placeholder.svg';
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    {/* Stronger bottom gradient */}
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
                   </div>
                 )}
                 
-                {/* Friend avatar overlay (top-left) */}
+                {/* Friend avatar overlay - inward positioning */}
                 <div className="absolute top-3 left-3 z-10">
                   <Squircle width={40} height={40}>
                     <img 
@@ -511,8 +525,8 @@ const FriendsCoursesPanel: React.FC = () => {
                   </Squircle>
                 </div>
                 
-                {/* Rank badges (top-right) */}
-                <div className="absolute top-3 right-3 z-10">
+                {/* Rank badges (top-right) - tighter gap */}
+                <div className="absolute top-3 right-3 z-10 flex gap-1.5">
                   {(() => {
                     const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
                     return (
@@ -571,29 +585,35 @@ const FriendsCoursesPanel: React.FC = () => {
         <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
           <div className="space-y-3">
             <div>
-              <h3 className="text-sm font-semibold">Your friends' recent rounds</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">Rounds played in the last 30 days</p>
+              <h3 className="text-base font-semibold text-foreground">Your friends' recent rounds</h3>
+              <p className="text-xs text-muted-foreground mt-1">Rounds played in the last 30 days</p>
             </div>
-            <div className="divide-y divide-border/60">
+            <div className="space-y-0">
             {visibleRecent.map((hit, idx) => (
               <div key={`${hit.friend_id}-${hit.course_id}-${idx}`}
-                className="flex items-center gap-3 py-3 cursor-pointer hover:bg-surface-alt/30 -mx-2 px-2 rounded transition-colors"
+                className={`flex items-center justify-between py-2 hover:bg-surface-alt/50 transition-colors cursor-pointer ${
+                  idx !== visibleRecent.length - 1 ? 'border-b border-border' : ''
+                }`}
                 onClick={() => navigate(`/courses/${hit.course_id}`)}>
-                <Squircle width={36} height={36} className="shrink-0">
-                  <img 
-                    src={hit.friend_profile.profile_photo_url || '/placeholder.svg'} 
-                    alt={hit.friend_profile.display_name || hit.friend_profile.username}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={(e) => {
-                      e.currentTarget.src = '/placeholder.svg';
-                    }}
-                  />
-                </Squircle>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm">
-                    <span className="font-semibold">{hit.friend_profile.display_name || hit.friend_profile.username}</span> played {hit.course_name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(hit.played_at), { addSuffix: true })}</p>
+                <div className="flex items-center gap-3">
+                  <Squircle width={32} height={32} className="shrink-0">
+                    <img 
+                      src={hit.friend_profile.profile_photo_url || '/placeholder.svg'} 
+                      alt={hit.friend_profile.display_name || hit.friend_profile.username}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder.svg';
+                      }}
+                    />
+                  </Squircle>
+                  <div className="flex flex-col">
+                    <span className="text-sm">
+                      <span className="font-semibold">{hit.friend_profile.display_name || hit.friend_profile.username}</span> played {hit.course_name}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDistanceToNow(new Date(hit.played_at), { addSuffix: true })}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}

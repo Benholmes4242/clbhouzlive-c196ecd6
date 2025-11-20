@@ -58,9 +58,9 @@ export const FriendsCoursesHero: React.FC<FriendsCoursesHeroProps> = ({ courses,
 
   return (
     <div className="space-y-2">
-      {/* Full-width hero card - matches Explore/Top100 style */}
+      {/* Full-width hero card - taller, cinematic */}
       <div
-        className="relative overflow-hidden transition-all duration-300 cursor-pointer h-48 rounded-none sm:rounded-xl"
+        className="relative overflow-hidden cursor-pointer w-full aspect-[1.7/1] rounded-none sm:rounded-xl"
         style={{
           backgroundImage: `url(${currentCourse.thumbnail_url || '/placeholder.svg'})`,
           backgroundSize: 'cover',
@@ -69,8 +69,8 @@ export const FriendsCoursesHero: React.FC<FriendsCoursesHeroProps> = ({ courses,
         }}
         onClick={() => navigate(`/courses/${currentCourse.course_id}`)}
       >
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+        {/* Stronger dark overlay for text readability */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
         {/* Course ranking badges - top right */}
         <div className="absolute top-3 right-3 z-20">
@@ -98,10 +98,10 @@ export const FriendsCoursesHero: React.FC<FriendsCoursesHeroProps> = ({ courses,
           </p>
         </div>
 
-        {/* Smooth fade transition between courses */}
+        {/* Smoother fade transition - 500ms duration */}
         <div 
           key={currentCourse.course_id} 
-          className="absolute inset-0 animate-fade-in pointer-events-none"
+          className="absolute inset-0 transition-opacity duration-500 ease-in-out pointer-events-none"
         />
       </div>
 

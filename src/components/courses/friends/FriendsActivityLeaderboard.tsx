@@ -79,6 +79,13 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
       .slice(0, 3);
   }, [recent]);
 
+  const getRankBadgeClass = (rank: number) => {
+    if (rank === 0) return "bg-amber-100 text-amber-700"; // Gold
+    if (rank === 1) return "bg-slate-100 text-slate-700"; // Silver
+    if (rank === 2) return "bg-orange-100 text-orange-700"; // Bronze
+    return "bg-muted text-muted-foreground";
+  };
+
 
   if (friendStats.length === 0) return null;
 
@@ -106,34 +113,41 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-0">
         {friendStats.map((stats, index) => {
           const lastPlayedText = formatDistanceToNow(new Date(stats.lastPlayedAt), { addSuffix: true });
           const rank = index + 1;
 
           return (
-            <div key={stats.friend_id} className="flex items-center gap-3">
-              <Squircle width={40} height={40}>
-                <img 
-                  src={stats.profile_photo_url || '/placeholder.svg'} 
-                  alt={stats.display_name}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  onError={(e) => {
-                    e.currentTarget.src = '/placeholder.svg';
-                  }}
-                />
-              </Squircle>
+            <div 
+              key={stats.friend_id} 
+              className={`flex items-center justify-between py-2 ${
+                index !== friendStats.length - 1 ? 'border-b border-border' : ''
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Squircle width={36} height={36}>
+                  <img 
+                    src={stats.profile_photo_url || '/placeholder.svg'} 
+                    alt={stats.display_name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
+                  />
+                </Squircle>
 
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">
-                  {stats.display_name}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {stats.totalRounds} {stats.totalRounds === 1 ? 'round' : 'rounds'} · Last played {lastPlayedText}
-                </p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {stats.display_name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {stats.totalRounds} {stats.totalRounds === 1 ? 'round' : 'rounds'} · Last played {lastPlayedText}
+                  </p>
+                </div>
               </div>
 
-              <span className="px-2 py-0.5 rounded-full bg-surface-alt text-xs font-medium text-muted-foreground">
+              <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium ${getRankBadgeClass(index)}`}>
                 #{rank}
               </span>
             </div>
