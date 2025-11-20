@@ -96,7 +96,7 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
   const timeLabel = getTimeLabel();
 
   return (
-    <section className="mt-4 rounded-2xl bg-card border shadow-sm p-4">
+    <section className="mt-4 rounded-none sm:rounded-xl bg-card border shadow-sm p-4">
       <div className="flex items-center justify-between mb-3">
         <div>
           <h3 className="text-sm font-semibold">Friends activity</h3>

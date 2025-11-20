@@ -184,7 +184,7 @@ const FriendsCoursesPanel: React.FC = () => {
           {[1, 2, 3].map(i => (
             <div
               key={i}
-              className="h-20 rounded-2xl bg-muted/80 animate-pulse"
+              className="h-20 rounded-none sm:rounded-xl bg-muted/80 animate-pulse"
             />
           ))}
         </div>
@@ -282,7 +282,7 @@ const FriendsCoursesPanel: React.FC = () => {
 
           <div className="space-y-3">
             {hotCourses.map((course) => (
-              <Card key={course.course_id} className="overflow-hidden hover:shadow-md transition-all cursor-pointer bg-surface-card border-border/60"
+              <Card key={course.course_id} className="overflow-hidden rounded-none sm:rounded-xl hover:shadow-md transition-all cursor-pointer bg-surface-card border-border/60"
                 onClick={() => navigate(`/courses/${course.course_id}`)}>
                 {/* Course Image */}
                 {course.thumbnail_url && (
@@ -355,7 +355,7 @@ const FriendsCoursesPanel: React.FC = () => {
             const hasMedia = false; // course.media_count > 0;
             
             return (
-              <Card key={course.course_id} className="relative overflow-hidden rounded-2xl hover:shadow-md transition-all cursor-pointer bg-card border shadow-sm w-full"
+              <Card key={course.course_id} className="relative overflow-hidden rounded-none sm:rounded-xl hover:shadow-md transition-all cursor-pointer bg-card border shadow-sm w-full"
                 onClick={() => navigate(`/courses/${course.course_id}`)}>
                 {/* Course Image */}
                 {course.thumbnail_url && (
