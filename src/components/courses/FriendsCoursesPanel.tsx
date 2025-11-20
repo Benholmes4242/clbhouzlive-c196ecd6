@@ -17,7 +17,8 @@ import { calculateFriendAchievements } from './friends/achievementUtils';
 import CourseRankBadges from './CourseRankBadges';
 import type { CourseWithFriends, FriendCourseHit } from '@/hooks/useFriendsCourses';
 
-type TimeRange = '30' | '90' | 'all';
+type TimeRange = 'week' | '30' | '90' | 'year' | 'all';
+type CourseTypeFilter = 'all' | 'top100';
 
 const FriendsCoursesPanel: React.FC = () => {
   // All hooks must be called before any conditional returns
@@ -25,41 +26,90 @@ const FriendsCoursesPanel: React.FC = () => {
   const navigate = useNavigate();
   const { data: realData, isLoading } = useFriendsCourses(user?.id);
   const [timeRange, setTimeRange] = useState<TimeRange>('30');
+  const [courseTypeFilter, setCourseTypeFilter] = useState<CourseTypeFilter>('all');
   
   // Use mock data when flag is enabled
   const data = FLAGS.FRIEND_COURSES_MOCK_ENABLED ? MOCK_FRIEND_COURSES : realData;
 
-  // Filter data by time range
+  // Filter data by time range and course type
   const filteredData = useMemo(() => {
     if (!data) return null;
-    if (timeRange === 'all') return data;
     
-    const days = timeRange === '30' ? 30 : 90;
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - days);
+    // Calculate time cutoff
+    let cutoff: Date | null = null;
+    if (timeRange !== 'all') {
+      cutoff = new Date();
+      if (timeRange === 'week') {
+        cutoff.setDate(cutoff.getDate() - 7);
+      } else if (timeRange === '30') {
+        cutoff.setDate(cutoff.getDate() - 30);
+      } else if (timeRange === '90') {
+        cutoff.setDate(cutoff.getDate() - 90);
+      } else if (timeRange === 'year') {
+        cutoff.setFullYear(cutoff.getFullYear() - 1);
+      }
+    }
     
-    const filteredRecent = data.recent.filter(hit => 
-      new Date(hit.played_at) >= cutoff
-    );
+    // Filter by time
+    const timeFilteredRecent = cutoff 
+      ? data.recent.filter(hit => new Date(hit.played_at) >= cutoff)
+      : data.recent;
     
-    const filteredCourses = data.courses
-      .map(course => ({
-        ...course,
-        friends: course.friends.filter(hit => 
-          new Date(hit.played_at) >= cutoff
-        ),
-      }))
-      .filter(course => course.friends.length > 0);
+    // Filter by course type (Top 100 only)
+    const courseTypeFilteredRecent = courseTypeFilter === 'top100'
+      ? timeFilteredRecent.filter(hit => hit.is_top100 || hit.global_rank != null || hit.regional_rank != null || hit.usa_rank != null)
+      : timeFilteredRecent;
     
-    const uniqueFriends = new Set(filteredRecent.map(hit => hit.friend_id));
+    // Group into courses
+    const courseMap = new Map<string, CourseWithFriends>();
+    for (const hit of courseTypeFilteredRecent) {
+      if (!hit.course_id) continue;
+      const existing = courseMap.get(hit.course_id);
+      if (!existing) {
+        courseMap.set(hit.course_id, {
+          course_id: hit.course_id,
+          course_name: hit.course_name,
+          country: hit.course_country,
+          sub_country: hit.course_sub_country,
+          global_rank: hit.global_rank,
+          regional_rank: hit.regional_rank,
+          usa_rank: hit.usa_rank,
+          thumbnail_url: hit.thumbnail_url,
+          average_rating: hit.rating || null,
+          is_top100: hit.is_top100,
+          friends: [hit],
+          most_recent_play: hit.played_at,
+          total_friends_played: 1,
+        });
+      } else {
+        existing.friends.push(hit);
+        existing.total_friends_played = existing.friends.length;
+        if (new Date(hit.played_at) > new Date(existing.most_recent_play)) {
+          existing.most_recent_play = hit.played_at;
+        }
+        const ratings = existing.friends.map(f => f.rating).filter((r): r is number => r != null);
+        if (ratings.length > 0) {
+          existing.average_rating = ratings.reduce((sum, r) => sum + r, 0) / ratings.length;
+        }
+      }
+    }
+    
+    const filteredCourses = Array.from(courseMap.values()).sort((a, b) => {
+      if (b.total_friends_played !== a.total_friends_played) {
+        return b.total_friends_played - a.total_friends_played;
+      }
+      return new Date(b.most_recent_play).getTime() - new Date(a.most_recent_play).getTime();
+    });
+    
+    const uniqueFriends = new Set(courseTypeFilteredRecent.map(hit => hit.friend_id));
     
     return {
       courses: filteredCourses,
-      recent: filteredRecent,
+      recent: courseTypeFilteredRecent,
       totalCourses: filteredCourses.length,
       totalFriendsActive: uniqueFriends.size,
     };
-  }, [data, timeRange]);
+  }, [data, timeRange, courseTypeFilter]);
 
   // Derive lists safely even while loading
   const courses = filteredData?.courses || [];
@@ -156,20 +206,35 @@ const FriendsCoursesPanel: React.FC = () => {
           <p className="text-sm text-muted-foreground">See where your friends have been playing lately</p>
         </div>
         
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="text-xs text-muted-foreground">
-            {timeRange === '30' ? 'This month' : timeRange === '90' ? 'Last 90 days' : 'All time'} · {totalCourses} course{totalCourses !== 1 ? 's' : ''} · {totalFriendsActive} friend{totalFriendsActive !== 1 ? 's' : ''} active
+        {/* Two Dropdowns */}
+        <div className="flex items-center gap-3">
+          {/* Time Range Dropdown */}
+          <div className="flex-1">
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Time range</label>
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value as TimeRange)}
+              className="w-full h-10 px-3 text-sm bg-surface-alt border border-border/60 rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary-accent/20"
+            >
+              <option value="week">This week</option>
+              <option value="30">Last 30 days</option>
+              <option value="90">Last 90 days</option>
+              <option value="year">This year</option>
+              <option value="all">All time</option>
+            </select>
           </div>
           
-          <div className="flex gap-1 p-0.5 bg-surface-alt rounded-lg border border-border/60">
-            {(['30', '90', 'all'] as const).map((range) => (
-              <button key={range} onClick={() => setTimeRange(range)}
-                className={`px-2.5 py-1 text-xs font-medium rounded transition-colors ${
-                  timeRange === range ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
-                }`}>
-                {range === 'all' ? 'All time' : `${range === '30' ? 'Last 30' : '90'} days`}
-              </button>
-            ))}
+          {/* Course Type Dropdown */}
+          <div className="flex-1">
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Course type</label>
+            <select
+              value={courseTypeFilter}
+              onChange={(e) => setCourseTypeFilter(e.target.value as CourseTypeFilter)}
+              className="w-full h-10 px-3 text-sm bg-surface-alt border border-border/60 rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary-accent/20"
+            >
+              <option value="all">All courses</option>
+              <option value="top100">Top 100 only</option>
+            </select>
           </div>
         </div>
       </div>
