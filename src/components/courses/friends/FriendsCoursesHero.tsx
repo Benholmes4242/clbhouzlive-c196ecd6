@@ -12,13 +12,13 @@ export const FriendsCoursesHero: React.FC<FriendsCoursesHeroProps> = ({ courses,
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  // Auto-rotate through ALL courses every 2.5 seconds
+  // Auto-rotate through ALL courses every 4 seconds
   useEffect(() => {
     if (courses.length <= 1) return;
     
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % courses.length);
-    }, 2500);
+    }, 4000); // 4s per course
     
     return () => clearInterval(interval);
   }, [courses.length]);
