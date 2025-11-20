@@ -240,7 +240,7 @@ const FriendsCoursesPanel: React.FC = () => {
       </div>
 
       {/* Hero Banner */}
-      <FriendsCoursesHero courses={courses} timeRange={timeRange} />
+      <FriendsCoursesHero courses={regularCourses} timeRange={timeRange} />
 
       {/* Activity Leaderboard */}
       <FriendsActivityLeaderboard recent={recent} timeRange={timeRange} />
