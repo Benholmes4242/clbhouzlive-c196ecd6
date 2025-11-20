@@ -2,14 +2,12 @@ import React, { useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useOpenCourseModal } from '@/hooks/useOpenCourseModal';
 import { useParallax } from '@/hooks/useParallax';
-// CourseRankBadges removed - now using Top100Pills for unified ranking display
+import CourseRankBadges from './CourseRankBadges';
 import CourseCardBackground from './CourseCardBackground';
 import CourseCardAIQuote from './CourseCardAIQuote';
 import CourseCardLocation from './CourseCardLocation';
 import { useMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import Top100Pills from './Top100Pills';
-import { useCourseTop100Memberships } from '@/hooks/useCourseTop100Memberships';
 import CountryFlag from '@/components/ui/country-flag';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -108,9 +106,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
 
   // Check if we're on a profile page to determine modal vs direct navigation
   const isProfilePage = location.pathname.includes('/profile');
-
-  // Fetch Top 100 memberships for this course
-  const { data: top100Memberships = [] } = useCourseTop100Memberships(course.id);
 
   const handleCardClick = useCallback(() => {
     // Call custom onClick handler if provided (for scroll position tracking, etc.)
@@ -223,15 +218,23 @@ const CourseCard: React.FC<CourseCardProps> = ({
         {/* Enhanced bottom gradient for better text readability */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none z-0" />
 
-        {/* Top 100 ranking badges using unified Top100Pills component */}
-        {!hideRankingBadges && top100Memberships.length > 0 && (
-          <div className={badgesOnTop ? "absolute top-3 left-3 z-20" : "absolute top-3 left-3 z-10"}>
-            <Top100Pills 
-              memberships={top100Memberships} 
-              variant="overlay" 
-              size="sm" 
-            />
-          </div>
+        {/* Frosted glass ranking badges */}
+        {!hideRankingBadges && !badgesOnTop && (
+          <CourseRankBadges 
+            globalRank={course.global_rank ?? null}
+            regionalRank={course.regional_rank ?? null}
+            usaRank={course.usa_rank ?? null}
+            country={course.country}
+            viewContext={viewContext}
+            userRating={userRating}
+            showUserRating={showUserRating}
+            averageRating={course.average_rating}
+            showAverageRating={showAverageRating}
+            positioning={showRatingOnRight ? 'top-right' : 'top-left'}
+            xp={xp}
+            showXP={showXP}
+            splitBadges={showRatingOnRight}
+          />
         )}
 
         {/* User rating, average rating, and XP badges - separate from rankings */}
@@ -287,17 +290,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   mobileTextScale={mobileTextScale}
                 />
               ) : showRatingOnRight ? (
-                // Show ranking badges and average rating for Top 10 Rated cards
+                // Show average rating for Top 10 Rated cards
                 <div className="flex items-center justify-between">
                   <div className="flex flex-wrap gap-2">
-                    {/* Top 100 Pills */}
-                    {top100Memberships.length > 0 && (
-                      <Top100Pills 
-                        memberships={top100Memberships} 
-                        variant="inline" 
-                        size="sm" 
-                      />
-                    )}
                     {/* Average rating badge */}
                     {course.average_rating && (
                       <div className="bg-primary/10 border-primary/20 text-primary text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1">
