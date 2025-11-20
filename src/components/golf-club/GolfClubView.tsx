@@ -127,13 +127,10 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         
         {/* Course Title & Location - Bottom Left */}
         <div className="absolute bottom-14 left-6 text-white z-10">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3 drop-shadow-2xl">{course.name}</h1>
-          <p className="text-lg md:text-xl opacity-90 mb-4 drop-shadow-lg">
-            {[course.country, course.sub_country, course.region].filter(Boolean).join(', ')}
-          </p>
+          <h1 className="text-3xl md:text-4xl font-bold drop-shadow-2xl">{course.name}</h1>
           
-          {/* Top 100 Pills */}
-          {course.global_rank && (
+          {/* Top 100 Pills - positioned between name and location */}
+          <div className="mt-2 mb-3 md:mt-3 md:mb-4">
             <CourseRankBadges 
               globalRank={course.global_rank ?? null}
               regionalRank={course.regional_rank ?? null}
@@ -141,7 +138,11 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
               country={course.country}
               positioning="bottom-left"
             />
-          )}
+          </div>
+          
+          <p className="text-lg md:text-xl opacity-90 drop-shadow-lg">
+            {[course.country, course.sub_country, course.region].filter(Boolean).join(', ')}
+          </p>
         </div>
 
         {/* Tab Navigation - overlaid on hero */}
