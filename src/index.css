@@ -42,6 +42,15 @@
     0 0 1px rgba(255, 255, 255, 0.16);
 }
 
+/* Glass dark variant without shadow (for scroll-to-top button) */
+.glass-dark-no-shadow {
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: var(--radius-tile, 18px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
 /* ECM – subtle glow for frosted pearl buttons */
 .ecm-pearl-button {
   box-shadow:

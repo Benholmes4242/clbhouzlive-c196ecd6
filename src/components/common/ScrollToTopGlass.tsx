@@ -47,7 +47,7 @@ const ScrollToTopGlass = () => {
         flex
         items-center
         justify-center
-        glass-dark
+        glass-dark-no-shadow
         transition-transform
         active:scale-95
       "
