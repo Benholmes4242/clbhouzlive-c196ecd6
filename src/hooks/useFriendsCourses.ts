@@ -14,6 +14,8 @@ export type FriendCourseHit = {
   course_country: string | null;
   course_sub_country: string | null;
   global_rank: number | null;
+  regional_rank: number | null;
+  usa_rank: number | null;
   played_at: string;
   rating?: number | null;
   thumbnail_url?: string | null;
@@ -26,6 +28,8 @@ export type CourseWithFriends = {
   country: string | null;
   sub_country: string | null;
   global_rank: number | null;
+  regional_rank: number | null;
+  usa_rank: number | null;
   thumbnail_url?: string | null;
   average_rating?: number | null;
   is_top100?: boolean;
@@ -96,6 +100,8 @@ export function useFriendsCourses(userId?: string) {
             country,
             sub_country,
             global_rank,
+            regional_rank,
+            usa_rank,
             thumbnail_image
           )
         `
@@ -149,6 +155,8 @@ export function useFriendsCourses(userId?: string) {
             course_country: row.golf_courses?.country ?? null,
             course_sub_country: row.golf_courses?.sub_country ?? null,
             global_rank: row.golf_courses?.global_rank ?? null,
+            regional_rank: row.golf_courses?.regional_rank ?? null,
+            usa_rank: row.golf_courses?.usa_rank ?? null,
             thumbnail_url: row.golf_courses?.thumbnail_image ?? null,
             is_top100: isTop100,
             played_at: row.created_at,
@@ -173,6 +181,8 @@ export function useFriendsCourses(userId?: string) {
             country: hit.course_country,
             sub_country: hit.course_sub_country,
             global_rank: hit.global_rank,
+            regional_rank: hit.regional_rank,
+            usa_rank: hit.usa_rank,
             thumbnail_url: hit.thumbnail_url,
             average_rating: avgRating,
             is_top100: hit.is_top100,
