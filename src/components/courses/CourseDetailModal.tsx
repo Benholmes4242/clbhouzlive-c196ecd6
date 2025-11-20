@@ -159,12 +159,9 @@ const CourseDetailModal = ({
 
           <div className="space-y-6">
             <CourseDetailImage 
+              courseId={course.id}
               thumbnailImage={course.thumbnail_image} 
               courseName={course.name}
-              globalRank={course.global_rank}
-              regionalRank={course.regional_rank}
-              usaRank={course.usa_rank}
-              country={course.country}
               showUserRating={showUserRating}
               userRating={userRating}
             />

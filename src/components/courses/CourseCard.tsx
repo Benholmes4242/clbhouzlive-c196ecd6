@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useOpenCourseModal } from '@/hooks/useOpenCourseModal';
 import { useParallax } from '@/hooks/useParallax';
-import CourseRankBadges from './CourseRankBadges';
+// CourseRankBadges removed - now using Top100Pills for unified ranking display
 import CourseCardBackground from './CourseCardBackground';
 import CourseCardAIQuote from './CourseCardAIQuote';
 import CourseCardLocation from './CourseCardLocation';
@@ -223,40 +223,36 @@ const CourseCard: React.FC<CourseCardProps> = ({
         {/* Enhanced bottom gradient for better text readability */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none z-0" />
 
-        {/* Course ranking badges - new split layout for badgesOnTop */}
-        {badgesOnTop ? (
-          <CourseRankBadges
-            globalRank={course.global_rank}
-            regionalRank={course.regional_rank}
-            usaRank={course.usa_rank}
-            country={course.country}
-            viewContext={viewContext}
-            userRating={userRating}
-            showUserRating={showUserRating}
-            averageRating={course.average_rating}
-            showAverageRating={showAverageRating}
-            splitBadges={true}
-            xp={xp}
-            showXP={showXP}
-          />
-        ) : (
-          /* Original badge layout */
-          !hideRankingBadges && !showRatingOnRight && (
-            <CourseRankBadges
-              globalRank={course.global_rank}
-              regionalRank={course.regional_rank}
-              usaRank={course.usa_rank}
-              country={course.country}
-              viewContext={viewContext}
-              userRating={userRating}
-              showUserRating={showUserRating}
-              averageRating={course.average_rating}
-              showAverageRating={showAverageRating}
-              positioning="top-left"
-              xp={xp}
-              showXP={showXP}
+        {/* Top 100 ranking badges using unified Top100Pills component */}
+        {!hideRankingBadges && top100Memberships.length > 0 && (
+          <div className={badgesOnTop ? "absolute top-3 left-3 z-20" : "absolute top-3 left-3 z-10"}>
+            <Top100Pills 
+              memberships={top100Memberships} 
+              variant="overlay" 
+              size="sm" 
             />
-          )
+          </div>
+        )}
+
+        {/* User rating, average rating, and XP badges - separate from rankings */}
+        {(showUserRating || showAverageRating || showXP) && (
+          <div className="absolute top-3 right-3 z-10 flex flex-col items-end gap-1.5">
+            {showXP && xp && (
+              <div className="bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+                {xp} XP
+              </div>
+            )}
+            {showUserRating && userRating && (
+              <div className="bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+                Your: {userRating}/10
+              </div>
+            )}
+            {showAverageRating && course.average_rating && (
+              <div className="bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+                Avg: {course.average_rating}/10
+              </div>
+            )}
+          </div>
         )}
 
         {/* Course Information Overlay */}
@@ -294,18 +290,21 @@ const CourseCard: React.FC<CourseCardProps> = ({
                 // Show ranking badges and average rating for Top 10 Rated cards
                 <div className="flex items-center justify-between">
                   <div className="flex flex-wrap gap-2">
-                   <CourseRankBadges
-                     globalRank={course.global_rank}
-                     regionalRank={course.regional_rank}
-                     usaRank={course.usa_rank}
-                     country={course.country}
-                     positioning="bottom-left"
-                     showUserRating={false}
-                     averageRating={course.average_rating}
-                     showAverageRating={true}
-                     showXP={false}
-                   />
-                 </div>
+                    {/* Top 100 Pills */}
+                    {top100Memberships.length > 0 && (
+                      <Top100Pills 
+                        memberships={top100Memberships} 
+                        variant="inline" 
+                        size="sm" 
+                      />
+                    )}
+                    {/* Average rating badge */}
+                    {course.average_rating && (
+                      <div className="bg-primary/10 border-primary/20 text-primary text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+                        Avg: {course.average_rating}/10
+                      </div>
+                    )}
+                  </div>
                   {/* User Rating in liquid glass container */}
                   {userRating && showUserRating && (
                     <TooltipProvider>
