@@ -30,13 +30,17 @@ export function extractRanksFromMemberships(
 
   for (const membership of memberships) {
     switch (membership.list_slug) {
+      case 'global':
       case 'global-top-100':
         globalRank = membership.rank;
         break;
+      case 'usa':
       case 'usa-top-100':
         usaRank = membership.rank;
         break;
+      case 'gb-i':
       case 'gb-i-top-100':
+      case 'europe':
       case 'europe-top-100':
         regionalRank = membership.rank;
         break;
