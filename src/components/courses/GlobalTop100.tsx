@@ -151,8 +151,8 @@ const GlobalTop100 = () => {
     ? lists.map(list => ({ value: list.slug, label: list.short_label }))
     : [
         { value: 'global', label: 'Global Top 100' },
-        { value: 'gb-i', label: 'GB&I Top 100' },
         { value: 'usa', label: 'USA Top 100' },
+        { value: 'gb-i', label: 'GB&I Top 100' },
         { value: 'europe', label: 'Europe Top 100' },
       ];
 
