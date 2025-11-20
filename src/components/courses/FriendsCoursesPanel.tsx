@@ -262,11 +262,15 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Hero Banner */}
-      <FriendsCoursesHero courses={regularCourses} timeRange={timeRange} />
+      {/* Hero Banner - Full width breakout */}
+      <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
+        <FriendsCoursesHero courses={regularCourses} timeRange={timeRange} />
+      </div>
 
-      {/* Activity Leaderboard */}
-      <FriendsActivityLeaderboard recent={recent} timeRange={timeRange} />
+      {/* Activity Leaderboard - Full width breakout */}
+      <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
+        <FriendsActivityLeaderboard recent={recent} timeRange={timeRange} />
+      </div>
 
       {hotCourses.length > 0 && (
         <div className="space-y-3">
@@ -280,8 +284,10 @@ const FriendsCoursesPanel: React.FC = () => {
             </span>
           </div>
 
-          <div className="space-y-3">
-            {hotCourses.map((course) => (
+          {/* Full width breakout for cards */}
+          <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
+            <div className="space-y-3">
+              {hotCourses.map((course) => (
               <Card key={course.course_id} className="overflow-hidden rounded-none sm:rounded-xl hover:shadow-md transition-all cursor-pointer bg-surface-card border-border/60"
                 onClick={() => navigate(`/courses/${course.course_id}`)}>
                 {/* Course Image */}
@@ -342,21 +348,24 @@ const FriendsCoursesPanel: React.FC = () => {
                   </div>
                 </div>
               </Card>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
 
+      {/* Regular courses - Full width breakout */}
       {regularCourses.length > 0 && (
-        <div className="mt-4 space-y-4">
-          {regularCourses.map((course) => {
-            const mostRecentFriend = course.friends[0];
-            // TODO: Replace with real media_count from database
-            const hasMedia = false; // course.media_count > 0;
-            
-            return (
-              <Card key={course.course_id} className="relative overflow-hidden rounded-none sm:rounded-xl hover:shadow-md transition-all cursor-pointer bg-card border shadow-sm w-full"
-                onClick={() => navigate(`/courses/${course.course_id}`)}>
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
+          <div className="mt-4 space-y-4">
+            {regularCourses.map((course) => {
+              const mostRecentFriend = course.friends[0];
+              // TODO: Replace with real media_count from database
+              const hasMedia = false; // course.media_count > 0;
+              
+              return (
+                <Card key={course.course_id} className="relative overflow-hidden rounded-none sm:rounded-xl hover:shadow-md transition-all cursor-pointer bg-card border shadow-sm w-full"
+                  onClick={() => navigate(`/courses/${course.course_id}`)}>
                 {/* Course Image */}
                 {course.thumbnail_url && (
                   <div className="relative h-48 overflow-hidden">
@@ -437,16 +446,19 @@ const FriendsCoursesPanel: React.FC = () => {
               </Card>
             );
           })}
+          </div>
         </div>
       )}
 
+      {/* Recent rounds - Full width breakout */}
       {sortedRecent.length > 0 && (
-        <div className="space-y-3">
-          <div>
-            <h3 className="text-sm font-semibold">Your friends' recent rounds</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">Rounds played in the last 30 days</p>
-          </div>
-          <div className="divide-y divide-border/60">
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
+          <div className="space-y-3">
+            <div>
+              <h3 className="text-sm font-semibold">Your friends' recent rounds</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Rounds played in the last 30 days</p>
+            </div>
+            <div className="divide-y divide-border/60">
             {visibleRecent.map((hit, idx) => (
               <div key={`${hit.friend_id}-${hit.course_id}-${idx}`}
                 className="flex items-center gap-3 py-3 cursor-pointer hover:bg-surface-alt/30 -mx-2 px-2 rounded transition-colors"
@@ -499,6 +511,7 @@ const FriendsCoursesPanel: React.FC = () => {
               </button>
             </div>
           )}
+          </div>
         </div>
       )}
     </div>
