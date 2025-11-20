@@ -35,22 +35,18 @@ const FriendsCoursesPanel: React.FC = () => {
   // When mock flag is enabled, use mock friend profiles but real course data
   const data = useMemo(() => {
     if (FLAGS.FRIEND_COURSES_MOCK_ENABLED && realData) {
-      // Get unique course IDs from mock data
-      const mockCourseIds = new Set(
-        MOCK_FRIEND_COURSES.recent.map(hit => hit.course_id).filter(Boolean)
+      // Match courses by name since mock uses string IDs but real uses UUIDs
+      const realCoursesByName = new Map(
+        realData.courses.map(c => [c.course_name.toLowerCase(), c])
       );
       
-      // Find real course data for those courses
-      const realCoursesMap = new Map(
-        realData.courses.map(c => [c.course_id, c])
-      );
-      
-      // Merge mock friend data with real course data
+      // Merge mock friend data with real course data matched by name
       const enrichedRecent = MOCK_FRIEND_COURSES.recent.map(mockHit => {
-        const realCourse = realCoursesMap.get(mockHit.course_id);
+        const realCourse = realCoursesByName.get(mockHit.course_name.toLowerCase());
         if (realCourse) {
           return {
             ...mockHit,
+            course_id: realCourse.course_id, // Use real course ID
             thumbnail_url: realCourse.thumbnail_url,
             top100_memberships: realCourse.top100_memberships, // Use real rankings!
           };
