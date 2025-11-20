@@ -48,7 +48,6 @@ const PostPlayRatingModal = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
-  const [hasMarkedAsPlayed, setHasMarkedAsPlayed] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
   const [buttonText, setButtonText] = useState('Add to Played');
   const [designScore, setDesignScore] = useState<number | null>(null);
@@ -81,7 +80,7 @@ const PostPlayRatingModal = ({
     enabled: isEditMode && !!course?.id,
   });
 
-  // Set initial values when existing rating is loaded
+  // Populate form with existing rating data in edit mode
   useEffect(() => {
     if (existingRating && isEditMode) {
       setSelectedRating(existingRating.rating);
@@ -92,13 +91,6 @@ const PostPlayRatingModal = ({
       setFacilitiesScore(existingRating.facilities_score);
     }
   }, [existingRating, isEditMode]);
-
-  // Mark course as played when modal opens (if not in edit mode)
-  useEffect(() => {
-    if (isOpen && !isEditMode && !hasMarkedAsPlayed && course) {
-      markAsPlayedMutation.mutate();
-    }
-  }, [isOpen, isEditMode, hasMarkedAsPlayed, course]);
 
   const markAsPlayedMutation = useMutation({
     mutationFn: async () => {
@@ -152,12 +144,12 @@ const PostPlayRatingModal = ({
       }
     },
     onSuccess: async () => {
-      setHasMarkedAsPlayed(true);
       queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['my-courses'] });
       queryClient.invalidateQueries({ queryKey: ['trackerStats'] });
       queryClient.invalidateQueries({ queryKey: ['user-top100-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['top100-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
       
       // Trigger badge checking for the user
       try {
@@ -269,13 +261,19 @@ const PostPlayRatingModal = ({
         await Promise.all(uploadPromises);
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      // Mark as played after successful rating (only if not in edit mode)
+      if (!isEditMode) {
+        await markAsPlayedMutation.mutateAsync();
+      }
+      
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
       
       // Show "Added!" text for 1.5 seconds
       setButtonText('Added!');
@@ -406,14 +404,13 @@ const PostPlayRatingModal = ({
   const handleClose = () => {
     onClose();
     resetForm();
-    setHasMarkedAsPlayed(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedRating) {
       toast({
         title: "Rating Required",
-        description: "Please select a rating before submitting.",
+        description: "Please leave at least an overall rating to mark this course as played.",
         variant: "destructive",
       });
       return;
@@ -422,6 +419,7 @@ const PostPlayRatingModal = ({
     setIsSubmitting(true);
     setButtonText('Adding...');
     
+    // Submit rating
     submitRatingMutation.mutate({ 
       rating: selectedRating, 
       reviewText: review.trim(),
