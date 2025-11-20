@@ -101,7 +101,7 @@ const FriendsCoursesPanel: React.FC = () => {
               Friends' Courses
             </h2>
             <p className="text-sm text-muted-foreground">
-              See where your friends have been playing lately.
+              See where your friends have been playing lately
             </p>
           </div>
         </div>
@@ -153,7 +153,7 @@ const FriendsCoursesPanel: React.FC = () => {
       <div className="space-y-3">
         <div>
           <h2 className="text-lg font-semibold tracking-tight">Friends' Courses</h2>
-          <p className="text-sm text-muted-foreground">See where your friends have been playing lately.</p>
+          <p className="text-sm text-muted-foreground">See where your friends have been playing lately</p>
         </div>
         
         <div className="flex items-center justify-between gap-3 flex-wrap">
