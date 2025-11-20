@@ -1,3 +1,4 @@
+import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 import type { FriendCourseHit } from '@/hooks/useFriendsCourses';
 
 export interface FriendAchievement {
@@ -14,7 +15,10 @@ export const calculateFriendAchievements = (
   const achievements: FriendAchievement[] = [];
 
   // Top 100 courses count
-  const top100Count = friendRounds.filter(hit => hit.is_top100).length;
+  const top100Count = friendRounds.filter(hit => {
+    const ranks = extractRanksFromMemberships(hit.top100_memberships, hit.course_country);
+    return ranks.isTop100;
+  }).length;
   if (top100Count >= 5) {
     achievements.push({
       icon: '🏆',

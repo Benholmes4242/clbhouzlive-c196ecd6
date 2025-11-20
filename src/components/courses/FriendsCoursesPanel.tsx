@@ -15,6 +15,7 @@ import { FriendsCoursesHero } from './friends/FriendsCoursesHero';
 import { FriendsActivityLeaderboard } from './friends/FriendsActivityLeaderboard';
 import { calculateFriendAchievements } from './friends/achievementUtils';
 import CourseRankBadges from './CourseRankBadges';
+import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 import type { CourseWithFriends, FriendCourseHit } from '@/hooks/useFriendsCourses';
 
 type TimeRange = 'week' | '30' | '90' | 'year' | 'all';
@@ -57,7 +58,10 @@ const FriendsCoursesPanel: React.FC = () => {
     
     // Filter by course type (Top 100 only)
     const courseTypeFilteredRecent = courseTypeFilter === 'top100'
-      ? timeFilteredRecent.filter(hit => hit.is_top100 || hit.global_rank != null || hit.regional_rank != null || hit.usa_rank != null)
+      ? timeFilteredRecent.filter(hit => {
+          const ranks = extractRanksFromMemberships(hit.top100_memberships, hit.course_country);
+          return ranks.isTop100;
+        })
       : timeFilteredRecent;
     
     // Group into courses
@@ -71,12 +75,9 @@ const FriendsCoursesPanel: React.FC = () => {
           course_name: hit.course_name,
           country: hit.course_country,
           sub_country: hit.course_sub_country,
-          global_rank: hit.global_rank,
-          regional_rank: hit.regional_rank,
-          usa_rank: hit.usa_rank,
           thumbnail_url: hit.thumbnail_url,
           average_rating: hit.rating || null,
-          is_top100: hit.is_top100,
+          top100_memberships: hit.top100_memberships,
           friends: [hit],
           most_recent_play: hit.played_at,
           total_friends_played: 1,
@@ -282,13 +283,18 @@ const FriendsCoursesPanel: React.FC = () => {
                       <h3 className="font-semibold text-base">{course.course_name}</h3>
                       <p className="text-sm text-muted-foreground">{course.country}{course.sub_country ? `, ${course.sub_country}` : ''}</p>
                     </div>
-                    <CourseRankBadges
-                      globalRank={course.global_rank}
-                      regionalRank={course.regional_rank}
-                      usaRank={course.usa_rank}
-                      country={course.country || ''}
-                      positioning="inline"
-                    />
+                    {(() => {
+                      const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
+                      return (
+                        <CourseRankBadges
+                          globalRank={ranks.globalRank}
+                          regionalRank={ranks.regionalRank}
+                          usaRank={ranks.usaRank}
+                          country={course.country || ''}
+                          positioning="inline"
+                        />
+                      );
+                    })()}
                   </div>
                     <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -358,16 +364,20 @@ const FriendsCoursesPanel: React.FC = () => {
                   </Squircle>
                 </div>
                 
-                
                 {/* Rank badges (top-right) */}
                 <div className="absolute top-3 right-3 z-10">
-                  <CourseRankBadges
-                    globalRank={course.global_rank}
-                    regionalRank={course.regional_rank}
-                    usaRank={course.usa_rank}
-                    country={course.country || ''}
-                    positioning="inline"
-                  />
+                  {(() => {
+                    const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
+                    return (
+                      <CourseRankBadges
+                        globalRank={ranks.globalRank}
+                        regionalRank={ranks.regionalRank}
+                        usaRank={ranks.usaRank}
+                        country={course.country || ''}
+                        positioning="inline"
+                      />
+                    );
+                  })()}
                 </div>
                 
                 {/* Course Info */}

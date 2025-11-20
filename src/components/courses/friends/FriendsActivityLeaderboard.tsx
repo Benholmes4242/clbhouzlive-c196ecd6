@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Squircle } from '@/components/ui/squircle';
 import { formatDistanceToNow } from 'date-fns';
+import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 import type { FriendCourseHit } from '@/hooks/useFriendsCourses';
 
 interface FriendStats {
@@ -27,6 +28,7 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
     recent.forEach((hit) => {
       const existing = statsMap.get(hit.friend_id);
       const regionKey = `${hit.course_country}-${hit.course_sub_country || 'none'}`;
+      const ranks = extractRanksFromMemberships(hit.top100_memberships, hit.course_country);
 
       if (!existing) {
         statsMap.set(hit.friend_id, {
@@ -35,7 +37,7 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
           profile_photo_url: hit.friend_profile.profile_photo_url,
           totalRounds: 1,
           lastPlayedAt: hit.played_at,
-          top100Rounds: hit.is_top100 ? 1 : 0,
+          top100Rounds: ranks.isTop100 ? 1 : 0,
           uniqueRegions: 1,
         });
       } else {
@@ -43,7 +45,7 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
         if (new Date(hit.played_at) > new Date(existing.lastPlayedAt)) {
           existing.lastPlayedAt = hit.played_at;
         }
-        if (hit.is_top100) {
+        if (ranks.isTop100) {
           existing.top100Rounds += 1;
         }
       }
