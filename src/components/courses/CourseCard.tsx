@@ -113,9 +113,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
   const { data: top100Memberships = [] } = useCourseTop100Memberships(course.id);
 
   const handleCardClick = useCallback(() => {
+    // Call custom onClick handler if provided (for scroll position tracking, etc.)
     if (onClick) {
       onClick();
-      return;
     }
     
     if (!disableClick) {
@@ -171,7 +171,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
               {friendsMeta.avatars.slice(0, 3).map((friend) => (
                 <Avatar
                   key={friend.id}
-                  className="h-6 w-6 border border-background"
+                  className="h-6 w-6 border border-background pointer-events-none"
                 >
                   {friend.profile_photo_url ? (
                     <AvatarImage src={friend.profile_photo_url} alt={friend.initials} />
@@ -183,7 +183,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                 </Avatar>
               ))}
               {friendsMeta.count > 3 && (
-                <div className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-muted/80 text-[10px] text-muted-foreground">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-muted/80 text-[10px] text-muted-foreground pointer-events-none">
                   +{friendsMeta.count - 3}
                 </div>
               )}

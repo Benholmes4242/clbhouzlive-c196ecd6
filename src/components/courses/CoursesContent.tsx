@@ -145,7 +145,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               value="top100"
               className="text-base data-[state=active]:bg-background data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
             >
-              Global Top 100
+              Top 100
             </TabsTrigger>
             <TabsTrigger 
               value="friends-courses"
