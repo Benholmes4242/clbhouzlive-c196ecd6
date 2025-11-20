@@ -13,10 +13,6 @@ interface FriendStats {
   uniqueRegions: number;
 }
 
-interface Badge {
-  icon: string;
-  label: string;
-}
 
 interface FriendsActivityLeaderboardProps {
   recent: FriendCourseHit[];
@@ -71,31 +67,16 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
     });
 
     return Array.from(statsMap.values())
-      .sort((a, b) => b.totalRounds - a.totalRounds)
+      .sort((a, b) => {
+        // Sort by totalRounds desc, then by lastPlayedAt (most recent first)
+        if (b.totalRounds !== a.totalRounds) {
+          return b.totalRounds - a.totalRounds;
+        }
+        return new Date(b.lastPlayedAt).getTime() - new Date(a.lastPlayedAt).getTime();
+      })
       .slice(0, 3);
   }, [recent]);
 
-  const getBadges = (stats: FriendStats, rank: number): Badge[] => {
-    const badges: Badge[] = [];
-
-    if (rank === 0) {
-      badges.push({ icon: '🥇', label: 'Leader' });
-    }
-
-    if (stats.top100Rounds >= 2) {
-      badges.push({ icon: '🏅', label: 'Top 100 hunter' });
-    }
-
-    if (stats.totalRounds >= 5) {
-      badges.push({ icon: '🔥', label: 'Marathon golfer' });
-    }
-
-    if (stats.uniqueRegions >= 3) {
-      badges.push({ icon: '🌍', label: 'Explorer' });
-    }
-
-    return badges.slice(0, 2); // Max 2 badges
-  };
 
   if (friendStats.length === 0) return null;
 
@@ -105,7 +86,7 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
       case '30': return 'this month';
       case '90': return 'lately';
       case 'year': return 'this year';
-      case 'all': return 'recently';
+      case 'all': return 'overall';
       default: return 'recently';
     }
   };
@@ -125,8 +106,8 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
 
       <div className="space-y-3">
         {friendStats.map((stats, index) => {
-          const badges = getBadges(stats, index);
           const lastPlayedText = formatDistanceToNow(new Date(stats.lastPlayedAt), { addSuffix: true });
+          const rank = index + 1;
 
           return (
             <div key={stats.friend_id} className="flex items-center gap-3">
@@ -150,19 +131,9 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
                 </p>
               </div>
 
-              {badges.length > 0 && (
-                <div className="flex gap-1.5">
-                  {badges.map((badge, i) => (
-                    <span
-                      key={i}
-                      className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
-                    >
-                      <span>{badge.icon}</span>
-                      <span className="hidden sm:inline">{badge.label}</span>
-                    </span>
-                  ))}
-                </div>
-              )}
+              <span className="px-2 py-0.5 rounded-full bg-surface-alt text-xs font-medium text-muted-foreground">
+                #{rank}
+              </span>
             </div>
           );
         })}
