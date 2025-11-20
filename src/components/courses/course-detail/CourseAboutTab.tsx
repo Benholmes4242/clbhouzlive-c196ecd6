@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Check, Target } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AboutMediaStrip from './AboutMediaStrip';
@@ -12,7 +12,6 @@ import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { Progress } from '@/components/ui/progress';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
-import { useUserPlayedCourse } from '@/hooks/useUserPlayedCourse';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
@@ -67,9 +66,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   
   // Fetch user's rating if logged in
   const { data: userRating } = useUserCourseRating(course.id, user?.id);
-  
-  // Fetch and toggle played status
-  const { hasPlayed, togglePlayed, isToggling } = useUserPlayedCourse(course.id, user?.id);
 
   const handleWebsiteClick = () => {
     if (course.website_url) {
@@ -107,18 +103,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     navigate(`/courses/${course.id}/rate`);
   };
 
-  const handlePlayedToggle = () => {
-    if (!user) {
-      toast({
-        title: "Sign in required",
-        description: "Please sign in to track courses",
-      });
-      navigate('/auth');
-      return;
-    }
-    togglePlayed({ played: !hasPlayed });
-  };
-
   return (
     <div className="space-y-6">
       {/* Location Breadcrumb & Quick Filters */}
@@ -146,31 +130,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           </div>
         </div>
         
-        {/* Action Buttons */}
-        <div className="mt-4 flex flex-col sm:flex-row gap-2">
+        {/* Action Button */}
+        <div className="mt-4">
           <Button 
             onClick={handleRateClick}
-            className="w-full sm:w-auto justify-center bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
+            className="w-full justify-center bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
           >
-            {userRating ? 'Edit Your Rating' : 'Rate this Course'}
-          </Button>
-          <Button 
-            onClick={handlePlayedToggle}
-            disabled={isToggling}
-            variant="outline"
-            className="w-full sm:w-auto justify-center border-border/70 bg-card"
-          >
-            {hasPlayed ? (
-              <>
-                <Check className="h-4 w-4 mr-2" />
-                Mark as Played
-              </>
-            ) : (
-              <>
-                <Target className="h-4 w-4 mr-2" />
-                Mark as Played
-              </>
-            )}
+            {userRating ? 'Edit Your Rating' : 'Review & Mark as Played'}
           </Button>
         </div>
 
