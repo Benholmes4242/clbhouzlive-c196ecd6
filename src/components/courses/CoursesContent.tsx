@@ -134,22 +134,22 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       ) : (
         /* Main courses page - show Explore, Global Top 100, and Friends' Courses */
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-muted/70 border border-border/60 p-1.5 mb-5">
+          <TabsList className="grid w-full grid-cols-3 bg-muted/70 border border-border/60 p-1 mb-5">
             <TabsTrigger 
               value="explore"
-              className="text-base data-[state=active]:bg-background data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors py-2"
+              className="text-base data-[state=active]:bg-background data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
             >
               Explore
             </TabsTrigger>
             <TabsTrigger 
               value="top100"
-              className="text-base data-[state=active]:bg-background data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors py-2"
+              className="text-base data-[state=active]:bg-background data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
             >
               Top 100
             </TabsTrigger>
             <TabsTrigger 
               value="friends-courses"
-              className="text-base data-[state=active]:bg-background data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors py-2"
+              className="text-base data-[state=active]:bg-background data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
             >
               Friends' Courses
             </TabsTrigger>
