@@ -94,7 +94,10 @@ const FriendsCoursesPanel: React.FC = () => {
   
   // When mock flag is enabled, use mock friend profiles but real course data
   const data = useMemo(() => {
-    if (FLAGS.FRIEND_COURSES_MOCK_ENABLED && realCoursesForMock) {
+    if (FLAGS.FRIEND_COURSES_MOCK_ENABLED) {
+      // Wait for real course data to load before showing anything
+      if (!realCoursesForMock) return null;
+      
       // Match courses by name
       const realCoursesByName = new Map<string, RealCourseData>(
         realCoursesForMock.map((c) => [c.course_name.toLowerCase(), c])
@@ -145,8 +148,8 @@ const FriendsCoursesPanel: React.FC = () => {
         totalFriendsActive: MOCK_FRIEND_COURSES.totalFriendsActive,
       };
     }
-    return FLAGS.FRIEND_COURSES_MOCK_ENABLED ? MOCK_FRIEND_COURSES : realData;
-  }, [realData]);
+    return realData;
+  }, [realData, realCoursesForMock]);
 
   // Filter data by time range and course type
   const filteredData = useMemo(() => {
