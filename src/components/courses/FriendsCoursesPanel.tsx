@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFriendsCourses } from '@/hooks/useFriendsCourses';
 import { Card } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Squircle } from '@/components/ui/squircle';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,6 +14,7 @@ import { MOCK_FRIEND_COURSES } from './mockFriendCourses';
 import { FriendsCoursesHero } from './friends/FriendsCoursesHero';
 import { FriendsActivityLeaderboard } from './friends/FriendsActivityLeaderboard';
 import { calculateFriendAchievements } from './friends/achievementUtils';
+import CourseRankBadges from './CourseRankBadges';
 import type { CourseWithFriends, FriendCourseHit } from '@/hooks/useFriendsCourses';
 
 type TimeRange = '30' | '90' | 'all';
@@ -141,7 +142,6 @@ const FriendsCoursesPanel: React.FC = () => {
     );
   }
 
-  const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   const formatFriendsList = (friends: FriendCourseHit[], limit = 3) => {
     const names = friends.slice(0, limit).map(f => f.friend_profile.display_name || f.friend_profile.username);
     const remaining = friends.length - limit;
@@ -194,26 +194,53 @@ const FriendsCoursesPanel: React.FC = () => {
 
           <div className="space-y-3">
             {hotCourses.map((course) => (
-              <Card key={course.course_id} className="p-4 hover:shadow-md transition-all cursor-pointer bg-surface-card border-border/60"
+              <Card key={course.course_id} className="overflow-hidden hover:shadow-md transition-all cursor-pointer bg-surface-card border-border/60"
                 onClick={() => navigate(`/courses/${course.course_id}`)}>
-                <div className="space-y-3">
+                {/* Course Image */}
+                {course.thumbnail_url && (
+                  <div className="relative h-32 overflow-hidden">
+                    <img
+                      src={course.thumbnail_url}
+                      alt={course.course_name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder.svg';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                  </div>
+                )}
+                
+                <div className="p-4 space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <h3 className="font-semibold text-base">{course.course_name}</h3>
                       <p className="text-sm text-muted-foreground">{course.country}{course.sub_country ? `, ${course.sub_country}` : ''}</p>
                     </div>
-                    {course.global_rank && <Badge variant="outline" className="shrink-0 text-xs">#{course.global_rank}</Badge>}
+                    <CourseRankBadges
+                      globalRank={course.global_rank}
+                      regionalRank={null}
+                      usaRank={null}
+                      country={course.country || ''}
+                      positioning="inline"
+                    />
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="flex -space-x-2">
                         {course.friends.slice(0, 3).map((friend) => (
-                          <Avatar key={friend.friend_id} className="w-7 h-7 border-2 border-background">
-                            <AvatarImage src={friend.friend_profile.profile_photo_url || ''} />
-                            <AvatarFallback className="text-xs bg-surface-slate text-white">
-                              {getInitials(friend.friend_profile.display_name || friend.friend_profile.username)}
-                            </AvatarFallback>
-                          </Avatar>
+                          <div key={friend.friend_id} className="border-2 border-background" style={{ marginLeft: '-8px' }}>
+                            <Squircle width={28} height={28}>
+                              <img 
+                                src={friend.friend_profile.profile_photo_url || '/placeholder.svg'} 
+                                alt={friend.friend_profile.display_name || friend.friend_profile.username}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                onError={(e) => {
+                                  e.currentTarget.src = '/placeholder.svg';
+                                }}
+                              />
+                            </Squircle>
+                          </div>
                         ))}
                       </div>
                       <span className="text-xs text-muted-foreground">Played by {formatFriendsList(course.friends, 2)}</span>
@@ -234,15 +261,37 @@ const FriendsCoursesPanel: React.FC = () => {
             const achievements = calculateFriendAchievements(mostRecentFriend.friend_id, recent);
             
             return (
-              <Card key={course.course_id} className="relative p-4 hover:shadow-md transition-all cursor-pointer bg-surface-card border-border/60"
+              <Card key={course.course_id} className="relative overflow-hidden hover:shadow-md transition-all cursor-pointer bg-surface-card border-border/60"
                 onClick={() => navigate(`/courses/${course.course_id}`)}>
-                <Avatar className="absolute -top-2 -left-2 w-9 h-9 border-2 border-background shadow-sm">
-                  <AvatarImage src={mostRecentFriend.friend_profile.profile_photo_url || ''} />
-                  <AvatarFallback className="text-xs bg-surface-slate text-white">
-                    {getInitials(mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="space-y-2 pl-6">
+                {/* Course Image */}
+                {course.thumbnail_url && (
+                  <div className="relative h-32 overflow-hidden">
+                    <img
+                      src={course.thumbnail_url}
+                      alt={course.course_name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder.svg';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                  </div>
+                )}
+                
+                <div className="absolute top-2 left-2 border-2 border-background shadow-sm">
+                  <Squircle width={36} height={36}>
+                    <img 
+                      src={mostRecentFriend.friend_profile.profile_photo_url || '/placeholder.svg'} 
+                      alt={mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder.svg';
+                      }}
+                    />
+                  </Squircle>
+                </div>
+                
+                <div className="p-4 space-y-2">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
                       <h3 className="font-semibold text-base">{course.course_name}</h3>
@@ -266,7 +315,13 @@ const FriendsCoursesPanel: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    {course.global_rank && <Badge variant="outline" className="shrink-0 text-xs">#{course.global_rank}</Badge>}
+                    <CourseRankBadges
+                      globalRank={course.global_rank}
+                      regionalRank={null}
+                      usaRank={null}
+                      country={course.country || ''}
+                      positioning="inline"
+                    />
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">
@@ -305,12 +360,16 @@ const FriendsCoursesPanel: React.FC = () => {
               <div key={`${hit.friend_id}-${hit.course_id}-${idx}`}
                 className="flex items-center gap-3 py-3 cursor-pointer hover:bg-surface-alt/30 -mx-2 px-2 rounded transition-colors"
                 onClick={() => navigate(`/courses/${hit.course_id}`)}>
-                <Avatar className="w-9 h-9 shrink-0">
-                  <AvatarImage src={hit.friend_profile.profile_photo_url || ''} />
-                  <AvatarFallback className="text-xs bg-surface-slate text-white">
-                    {getInitials(hit.friend_profile.display_name || hit.friend_profile.username)}
-                  </AvatarFallback>
-                </Avatar>
+                <Squircle width={36} height={36} className="shrink-0">
+                  <img 
+                    src={hit.friend_profile.profile_photo_url || '/placeholder.svg'} 
+                    alt={hit.friend_profile.display_name || hit.friend_profile.username}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
+                  />
+                </Squircle>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm">
                     <span className="font-semibold">{hit.friend_profile.display_name || hit.friend_profile.username}</span> played {hit.course_name}
