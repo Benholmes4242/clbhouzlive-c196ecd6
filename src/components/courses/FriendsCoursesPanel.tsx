@@ -10,11 +10,16 @@ import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Users, MapPin } from 'lucide-react';
 import CourseCard from './CourseCard';
+import { FLAGS } from '@/config/flags';
+import { MOCK_FRIEND_COURSES } from './mockFriendCourses';
 
 const FriendsCoursesPanel: React.FC = () => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
-  const { data, isLoading } = useFriendsCourses(user?.id);
+  const { data: realData, isLoading } = useFriendsCourses(user?.id);
+  
+  // Use mock data when flag is enabled
+  const data = FLAGS.FRIEND_COURSES_MOCK_ENABLED ? MOCK_FRIEND_COURSES : realData;
 
   if (!user) return null;
 
@@ -63,7 +68,7 @@ const FriendsCoursesPanel: React.FC = () => {
           </p>
           <Button
             size="sm"
-            className="mt-2"
+            className="mt-2 bg-[#3A3F46] hover:bg-[#3A3F46]/90 text-white"
             onClick={() => navigate('/discover/people')}
           >
             Find golfers to follow
