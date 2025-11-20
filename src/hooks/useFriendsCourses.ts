@@ -1,6 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+export type Top100Membership = {
+  list_id: string;
+  list_slug: string;
+  short_label: string;
+  rank: number;
+};
+
 export type FriendCourseHit = {
   friend_id: string;
   friend_profile: {
@@ -13,13 +20,10 @@ export type FriendCourseHit = {
   course_name: string;
   course_country: string | null;
   course_sub_country: string | null;
-  global_rank: number | null;
-  regional_rank: number | null;
-  usa_rank: number | null;
   played_at: string;
   rating?: number | null;
   thumbnail_url?: string | null;
-  is_top100?: boolean;
+  top100_memberships: Top100Membership[];
 };
 
 export type CourseWithFriends = {
@@ -27,12 +31,9 @@ export type CourseWithFriends = {
   course_name: string;
   country: string | null;
   sub_country: string | null;
-  global_rank: number | null;
-  regional_rank: number | null;
-  usa_rank: number | null;
   thumbnail_url?: string | null;
   average_rating?: number | null;
-  is_top100?: boolean;
+  top100_memberships: Top100Membership[];
   friends: FriendCourseHit[];
   most_recent_play: string;
   total_friends_played: number;
@@ -99,10 +100,16 @@ export function useFriendsCourses(userId?: string) {
             name,
             country,
             sub_country,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            thumbnail_image
+            thumbnail_image,
+            course_top100_memberships (
+              list_id,
+              rank,
+              top100_lists!inner (
+                id,
+                slug,
+                short_label
+              )
+            )
           )
         `
         )
@@ -140,7 +147,13 @@ export function useFriendsCourses(userId?: string) {
           const profile = profileMap.get(row.user_id);
           if (!profile) return null;
 
-          const isTop100 = row.golf_courses?.global_rank != null && row.golf_courses.global_rank <= 100;
+          // Map Top 100 memberships
+          const memberships: Top100Membership[] = (row.golf_courses?.course_top100_memberships || []).map((m: any) => ({
+            list_id: m.list_id,
+            list_slug: m.top100_lists?.slug || '',
+            short_label: m.top100_lists?.short_label || '',
+            rank: m.rank,
+          }));
           
           return {
             friend_id: row.user_id,
@@ -154,13 +167,10 @@ export function useFriendsCourses(userId?: string) {
             course_name: row.golf_courses?.name,
             course_country: row.golf_courses?.country ?? null,
             course_sub_country: row.golf_courses?.sub_country ?? null,
-            global_rank: row.golf_courses?.global_rank ?? null,
-            regional_rank: row.golf_courses?.regional_rank ?? null,
-            usa_rank: row.golf_courses?.usa_rank ?? null,
             thumbnail_url: row.golf_courses?.thumbnail_image ?? null,
-            is_top100: isTop100,
             played_at: row.created_at,
             rating: row.rating ?? null,
+            top100_memberships: memberships,
           };
         })
         .filter(Boolean) as FriendCourseHit[];
@@ -180,12 +190,9 @@ export function useFriendsCourses(userId?: string) {
             course_name: hit.course_name,
             country: hit.course_country,
             sub_country: hit.course_sub_country,
-            global_rank: hit.global_rank,
-            regional_rank: hit.regional_rank,
-            usa_rank: hit.usa_rank,
             thumbnail_url: hit.thumbnail_url,
             average_rating: avgRating,
-            is_top100: hit.is_top100,
+            top100_memberships: hit.top100_memberships,
             friends: [hit],
             most_recent_play: hit.played_at,
             total_friends_played: 1,

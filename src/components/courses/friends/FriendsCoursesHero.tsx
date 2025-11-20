@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
+import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 import type { CourseWithFriends } from '@/hooks/useFriendsCourses';
 
 interface FriendsCoursesHeroProps {
@@ -73,13 +74,18 @@ export const FriendsCoursesHero: React.FC<FriendsCoursesHeroProps> = ({ courses,
 
         {/* Course ranking badges - top right */}
         <div className="absolute top-3 right-3 z-20">
-          <CourseRankBadges
-            globalRank={currentCourse.global_rank}
-            regionalRank={currentCourse.regional_rank}
-            usaRank={currentCourse.usa_rank}
-            country={currentCourse.country || ''}
-            positioning="inline"
-          />
+          {(() => {
+            const ranks = extractRanksFromMemberships(currentCourse.top100_memberships, currentCourse.country);
+            return (
+              <CourseRankBadges
+                globalRank={ranks.globalRank}
+                regionalRank={ranks.regionalRank}
+                usaRank={ranks.usaRank}
+                country={currentCourse.country || ''}
+                positioning="inline"
+              />
+            );
+          })()}
         </div>
 
         {/* Course info overlay - bottom left */}
