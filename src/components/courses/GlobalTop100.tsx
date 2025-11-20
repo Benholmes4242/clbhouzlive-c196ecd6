@@ -146,9 +146,33 @@ const GlobalTop100 = () => {
     </div>
   );
 
-  // Build list options - default to 'global' as the main Top 100 list
+  // Build list options - transform database labels and set correct order
   const listOptions = lists.length > 0 
-    ? lists.map(list => ({ value: list.slug, label: list.short_label }))
+    ? (() => {
+        // Transform labels to add "Top 100" suffix
+        const transformed = lists.map(list => ({
+          value: list.slug,
+          label: list.short_label.includes('Top 100') ? list.short_label : `${list.short_label} Top 100`
+        }));
+        
+        // Define the desired order
+        const desiredOrder = ['global', 'usa', 'gb-i', 'europe'];
+        
+        // Sort according to desired order
+        return transformed.sort((a, b) => {
+          const indexA = desiredOrder.indexOf(a.value);
+          const indexB = desiredOrder.indexOf(b.value);
+          
+          // If both are in the desired order, sort by their position
+          if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+          // If only A is in the desired order, it comes first
+          if (indexA !== -1) return -1;
+          // If only B is in the desired order, it comes first
+          if (indexB !== -1) return 1;
+          // If neither is in the desired order, keep original order
+          return 0;
+        });
+      })()
     : [
         { value: 'global', label: 'Global Top 100' },
         { value: 'usa', label: 'USA Top 100' },
