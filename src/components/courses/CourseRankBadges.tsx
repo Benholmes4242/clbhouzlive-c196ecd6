@@ -18,7 +18,7 @@ interface CourseRankBadgesProps {
   showUserRating?: boolean;
   averageRating?: number | null;
   showAverageRating?: boolean;
-  positioning?: 'top-left' | 'bottom-left' | 'top-right';
+  positioning?: 'top-left' | 'bottom-left' | 'top-right' | 'inline';
   xp?: number;
   showXP?: boolean;
   splitBadges?: boolean;
@@ -153,6 +153,8 @@ const CourseRankBadges = ({
         return 'absolute bottom-3 left-4 flex flex-row gap-2 z-10';
       case 'top-right':
         return 'absolute top-2 right-2 flex flex-row items-center gap-1.5 z-10';
+      case 'inline':
+        return 'flex flex-row items-center gap-1.5';
       case 'top-left':
       default:
         return 'absolute top-2 left-2 flex flex-row items-center gap-1.5 z-10';

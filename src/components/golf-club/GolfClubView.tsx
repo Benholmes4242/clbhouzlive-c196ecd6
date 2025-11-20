@@ -127,19 +127,19 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         
         {/* Course Title & Location - Bottom Left */}
         <div className="absolute bottom-14 left-6 text-white z-10">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3 drop-shadow-2xl">{course.name}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-3 drop-shadow-2xl">{course.name}</h1>
           <p className="text-lg md:text-xl opacity-90 mb-4 drop-shadow-lg">
             {[course.country, course.sub_country, course.region].filter(Boolean).join(', ')}
           </p>
           
           {/* Top 100 Pills */}
-          {course.global_rank && (
+          {(course.global_rank || course.regional_rank || course.usa_rank) && (
             <CourseRankBadges 
               globalRank={course.global_rank ?? null}
               regionalRank={course.regional_rank ?? null}
               usaRank={course.usa_rank ?? null}
               country={course.country}
-              positioning="bottom-left"
+              positioning="inline"
             />
           )}
         </div>
