@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFriendsCourses } from '@/hooks/useFriendsCourses';
 import { Card } from '@/components/ui/card';
@@ -16,7 +18,7 @@ import { FriendsActivityLeaderboard } from './friends/FriendsActivityLeaderboard
 import { calculateFriendAchievements } from './friends/achievementUtils';
 import CourseRankBadges from './CourseRankBadges';
 import { extractRanksFromMemberships } from '@/utils/rankingUtils';
-import type { CourseWithFriends, FriendCourseHit } from '@/hooks/useFriendsCourses';
+import type { CourseWithFriends, FriendCourseHit, Top100Membership } from '@/hooks/useFriendsCourses';
 
 type TimeRange = 'week' | '30' | '90' | 'year' | 'all';
 type CourseTypeFilter = 'all' | 'top100';
@@ -32,12 +34,70 @@ const FriendsCoursesPanel: React.FC = () => {
   
   const PAGE_SIZE = 8;
   
+  // Fetch real course data directly when using mock friends
+  const mockCourseNames = useMemo(() => {
+    if (!FLAGS.FRIEND_COURSES_MOCK_ENABLED) return [];
+    return [...new Set(MOCK_FRIEND_COURSES.recent.map(hit => hit.course_name))];
+  }, []);
+  
+  const { data: realCoursesForMock } = useQuery({
+    queryKey: ['real-courses-for-mock', mockCourseNames],
+    enabled: FLAGS.FRIEND_COURSES_MOCK_ENABLED && mockCourseNames.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('golf_courses')
+        .select(`
+          id,
+          name,
+          country,
+          sub_country,
+          thumbnail_image,
+          course_top100_memberships (
+            list_id,
+            rank,
+            top100_lists!inner (
+              id,
+              slug,
+              short_label
+            )
+          )
+        `)
+        .in('name', mockCourseNames);
+      
+      if (error) throw error;
+      
+      return (data || []).map((course: any) => ({
+        course_id: course.id,
+        course_name: course.name,
+        country: course.country,
+        sub_country: course.sub_country,
+        thumbnail_url: course.thumbnail_image,
+        top100_memberships: (course.course_top100_memberships || []).map((m: any) => ({
+          list_id: m.list_id,
+          list_slug: m.top100_lists?.slug || '',
+          short_label: m.top100_lists?.short_label || '',
+          rank: m.rank,
+        })),
+      }));
+    },
+    staleTime: 60_000,
+  });
+  
+  type RealCourseData = {
+    course_id: string;
+    course_name: string;
+    country: string | null;
+    sub_country: string | null;
+    thumbnail_url: string | null;
+    top100_memberships: Top100Membership[];
+  };
+  
   // When mock flag is enabled, use mock friend profiles but real course data
   const data = useMemo(() => {
-    if (FLAGS.FRIEND_COURSES_MOCK_ENABLED && realData) {
-      // Match courses by name since mock uses string IDs but real uses UUIDs
-      const realCoursesByName = new Map(
-        realData.courses.map(c => [c.course_name.toLowerCase(), c])
+    if (FLAGS.FRIEND_COURSES_MOCK_ENABLED && realCoursesForMock) {
+      // Match courses by name
+      const realCoursesByName = new Map<string, RealCourseData>(
+        realCoursesForMock.map((c) => [c.course_name.toLowerCase(), c])
       );
       
       // Merge mock friend data with real course data matched by name
