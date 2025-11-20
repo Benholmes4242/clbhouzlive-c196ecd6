@@ -225,11 +225,11 @@ const FriendsCoursesPanel: React.FC = () => {
                       positioning="inline"
                     />
                   </div>
-                  <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="flex -space-x-2">
-                        {course.friends.slice(0, 3).map((friend) => (
-                          <div key={friend.friend_id} className="border-2 border-background" style={{ marginLeft: '-8px' }}>
+                        {course.friends.slice(0, 3).map((friend, idx) => (
+                          <div key={friend.friend_id} className="relative" style={{ zIndex: 10 - idx }}>
                             <Squircle width={28} height={28}>
                               <img 
                                 src={friend.friend_profile.profile_photo_url || '/placeholder.svg'} 
@@ -278,7 +278,7 @@ const FriendsCoursesPanel: React.FC = () => {
                   </div>
                 )}
                 
-                <div className="absolute top-2 left-2 border-2 border-background shadow-sm">
+                <div className="absolute top-2 left-2 shadow-sm">
                   <Squircle width={36} height={36}>
                     <img 
                       src={mostRecentFriend.friend_profile.profile_photo_url || '/placeholder.svg'} 
