@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useGolfCoursesSearch } from '@/hooks/useGolfCoursesSearch';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -37,6 +37,8 @@ function listSlugToRegionKey(slug: string): PrimaryRegionKey {
 }
 
 const GlobalTop100 = () => {
+  const listTopRef = useRef<HTMLDivElement>(null);
+  
   // Session-based filter persistence - defaults only on first visit
   const [selectedList, setSelectedList] = useState(() => {
     const saved = sessionStorage.getItem('top100-last-filters');
@@ -98,6 +100,13 @@ const GlobalTop100 = () => {
     setPage(0);
   }, [selectedList, selectedSubregion, debouncedSearch]);
 
+  // Scroll to top when page changes (for "Load next 50" button)
+  useEffect(() => {
+    if (page > 0 && listTopRef.current) {
+      listTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [page]);
+
   // Fetch available lists
   const { data: lists = [] } = useTop100Lists();
 
@@ -120,7 +129,10 @@ const GlobalTop100 = () => {
   });
 
   const totalCount = filteredCourses.length;
-  const hasMore = false; // Top 100 lists are limited, no pagination needed
+  const hasMore = totalCount > (page + 1) * PAGE_SIZE;
+  
+  // Paginate courses
+  const paginatedCourses = filteredCourses.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -298,9 +310,12 @@ const GlobalTop100 = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
+        {/* Scroll target for pagination */}
+        <div ref={listTopRef} className="h-0" />
+        
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
-              {filteredCourses.map((course) => (
+              {paginatedCourses.map((course) => (
                 <div key={course.id} className="mb-4 sm:mb-0">
                   <CourseCard 
                     course={course}
@@ -311,6 +326,31 @@ const GlobalTop100 = () => {
               ))}
             </div>
           </div>
+          
+          {/* Pagination Controls */}
+          {hasMore && (
+            <div className="flex justify-center mt-8 mb-8">
+              <Button
+                variant="outline"
+                onClick={() => setPage((p) => p + 1)}
+                disabled={isLoading}
+                className="h-11 px-6 rounded-xl"
+              >
+                Load next {PAGE_SIZE} courses
+              </Button>
+            </div>
+          )}
+          
+          {page > 0 && (
+            <div className="flex justify-center">
+              <button
+                onClick={() => setPage(0)}
+                className="text-xs text-muted-foreground hover:text-foreground underline transition-colors"
+              >
+                Back to first page
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
