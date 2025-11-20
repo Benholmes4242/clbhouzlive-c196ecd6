@@ -320,17 +320,18 @@ const FriendsCoursesPanel: React.FC = () => {
       )}
 
       {regularCourses.length > 0 && (
-        <div className="space-y-3">
+        <div className="mt-4 space-y-4">
           {regularCourses.map((course) => {
             const mostRecentFriend = course.friends[0];
-            const achievements = calculateFriendAchievements(mostRecentFriend.friend_id, recent);
+            // TODO: Replace with real media_count from database
+            const hasMedia = false; // course.media_count > 0;
             
             return (
-              <Card key={course.course_id} className="relative overflow-hidden hover:shadow-md transition-all cursor-pointer bg-surface-card border-border/60"
+              <Card key={course.course_id} className="relative overflow-hidden rounded-2xl hover:shadow-md transition-all cursor-pointer bg-card border shadow-sm w-full"
                 onClick={() => navigate(`/courses/${course.course_id}`)}>
                 {/* Course Image */}
                 {course.thumbnail_url && (
-                  <div className="relative h-32 overflow-hidden">
+                  <div className="relative h-48 overflow-hidden">
                     <img
                       src={course.thumbnail_url}
                       alt={course.course_name}
@@ -339,12 +340,13 @@ const FriendsCoursesPanel: React.FC = () => {
                         e.currentTarget.src = '/placeholder.svg';
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                   </div>
                 )}
                 
-                <div className="absolute top-2 left-2 shadow-sm">
-                  <Squircle width={36} height={36}>
+                {/* Friend avatar overlay (top-left) */}
+                <div className="absolute top-3 left-3 z-10">
+                  <Squircle width={40} height={40}>
                     <img 
                       src={mostRecentFriend.friend_profile.profile_photo_url || '/placeholder.svg'} 
                       alt={mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username}
@@ -356,56 +358,48 @@ const FriendsCoursesPanel: React.FC = () => {
                   </Squircle>
                 </div>
                 
-                <div className="p-4 space-y-2">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-base">{course.course_name}</h3>
-                      <p className="text-sm text-muted-foreground">{course.country}{course.sub_country ? `, ${course.sub_country}` : ''}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Last played by {mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username} · {formatDistanceToNow(new Date(mostRecentFriend.played_at), { addSuffix: true })}
-                      </p>
-                      
-                      {/* Achievement Pills */}
-                      {achievements.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mt-2 animate-fadeIn">
-                          {achievements.map((achievement, i) => (
-                            <span
-                              key={i}
-                              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${achievement.gradient} text-slate-700 border border-slate-200/50`}
-                            >
-                              <span>{achievement.icon}</span>
-                              <span>{achievement.label}</span>
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <CourseRankBadges
-                      globalRank={course.global_rank}
-                      regionalRank={course.regional_rank}
-                      usaRank={course.usa_rank}
-                      country={course.country || ''}
-                      positioning="inline"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">
-                      Played by {course.total_friends_played} friend{course.total_friends_played !== 1 ? 's' : ''}
+                
+                {/* Rank badges (top-right) */}
+                <div className="absolute top-3 right-3 z-10">
+                  <CourseRankBadges
+                    globalRank={course.global_rank}
+                    regionalRank={course.regional_rank}
+                    usaRank={course.usa_rank}
+                    country={course.country || ''}
+                    positioning="inline"
+                  />
+                </div>
+                
+                {/* Course Info */}
+                <div className="p-4">
+                  <h3 className="font-semibold text-lg mb-1 text-foreground">
+                    {course.course_name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {course.country}{course.sub_country ? `, ${course.sub_country}` : ''}
+                  </p>
+
+                  {/* Bottom row: "Played by..." and optional media CTA */}
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>
+                      Played by {mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username} · {formatDistanceToNow(new Date(mostRecentFriend.played_at), { addSuffix: true })}
                     </span>
-                    
-                    {/* Replay Moments Icon - Placeholder for future implementation */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        console.log('View moments for course:', course.course_id);
-                        // TODO: Navigate to moments or open moments modal
-                      }}
-                      className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
-                      title="View moments"
-                    >
-                      <Video className="w-3.5 h-3.5" />
-                      <span className="text-[10px] font-medium">View moments</span>
-                    </button>
+
+                    {hasMedia && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log('TODO: View media for course', course.course_id);
+                        }}
+                        className="flex items-center gap-1 text-muted-foreground hover:text-foreground text-sm"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        View media
+                      </button>
+                    )}
                   </div>
                 </div>
               </Card>
