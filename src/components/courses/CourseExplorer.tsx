@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -20,6 +20,8 @@ import {
 const PAGE_SIZE = 50;
 
 const CourseExplorer = () => {
+  const listTopRef = useRef<HTMLDivElement>(null);
+  
   // Session-based filter persistence - defaults only on first visit
   const [selectedRegion, setSelectedRegion] = useState<PrimaryRegionKey>(() => {
     const saved = sessionStorage.getItem('explore-last-filters');
@@ -91,6 +93,13 @@ const CourseExplorer = () => {
   useEffect(() => {
     setPage(0);
   }, [selectedRegion, selectedSubregion, debouncedSearch]);
+
+  // Scroll to top when page changes (for "Load next 50" button)
+  useEffect(() => {
+    if (page > 0 && listTopRef.current) {
+      listTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [page]);
 
   // Fetch courses with region filtering based on country
   const { data, isLoading } = useQuery({
@@ -290,6 +299,9 @@ const CourseExplorer = () => {
         </div>
       ) : (
         <div className="space-y-6">
+        {/* Scroll target for pagination */}
+        <div ref={listTopRef} className="h-0" />
+        
         {/* Compact meta info block: region + range on left, reset on right */}
         {totalCount > 0 && (
           <div className="mt-3 space-y-1">
@@ -351,10 +363,7 @@ const CourseExplorer = () => {
             <div className="flex justify-center mt-8 mb-8">
               <Button
                 variant="outline"
-                onClick={() => {
-                  setPage((p) => p + 1);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
+                onClick={() => setPage((p) => p + 1)}
                 disabled={isLoading}
                 className="h-11 px-6 rounded-xl"
               >
@@ -366,10 +375,7 @@ const CourseExplorer = () => {
           {page > 0 && (
             <div className="flex justify-center">
               <button
-                onClick={() => {
-                  setPage(0);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
+                onClick={() => setPage(0)}
                 className="text-xs text-muted-foreground hover:text-foreground underline transition-colors"
               >
                 Back to first page
