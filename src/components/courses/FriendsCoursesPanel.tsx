@@ -347,7 +347,7 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
         
         {/* Filter Dropdowns - Match Explore/Top100 */}
-        <div className="mx-auto mt-3 flex w-full max-w-xl gap-2">
+        <div className="max-w-xl mx-auto flex items-center justify-center gap-3">
           {/* Time Range Dropdown */}
           <div className="flex-1">
             <Select value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)}>
