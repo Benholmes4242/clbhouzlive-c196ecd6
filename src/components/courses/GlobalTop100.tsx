@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Search, Award, X } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
+import { scrollToTop } from '@/utils/scrollToTop';
 import {
   PRIMARY_REGIONS,
   SUBREGIONS,
@@ -100,10 +101,10 @@ const GlobalTop100 = () => {
     setPage(0);
   }, [selectedList, selectedSubregion, debouncedSearch]);
 
-  // Scroll to top when page changes (for "Load next 50" button)
+  // Scroll to top when page changes (for pagination buttons)
   useEffect(() => {
-    if (page > 0 && listTopRef.current) {
-      listTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (page > 0) {
+      scrollToTop();
     }
   }, [page]);
 
@@ -352,29 +353,28 @@ const GlobalTop100 = () => {
           </div>
           
           {/* Pagination Controls */}
-          {hasMore && (
-            <div className="flex justify-center mt-8 mb-8">
+          <div className="flex justify-center items-center gap-3 mt-8 mb-8">
+            {page > 0 && (
+              <Button
+                variant="outline"
+                onClick={() => setPage((p) => p - 1)}
+                disabled={isLoading}
+                className="h-11 px-6 rounded-xl"
+              >
+                Previous {PAGE_SIZE} courses
+              </Button>
+            )}
+            {hasMore && (
               <Button
                 variant="outline"
                 onClick={() => setPage((p) => p + 1)}
                 disabled={isLoading}
                 className="h-11 px-6 rounded-xl"
               >
-                Load next {PAGE_SIZE} courses
+                Next {PAGE_SIZE} courses
               </Button>
-            </div>
-          )}
-          
-          {page > 0 && (
-            <div className="flex justify-center">
-              <button
-                onClick={() => setPage(0)}
-                className="text-xs text-muted-foreground hover:text-foreground underline transition-colors"
-              >
-                Back to first page
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
     </div>
