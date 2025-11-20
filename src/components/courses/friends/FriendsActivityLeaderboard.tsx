@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Squircle } from '@/components/ui/squircle';
 import { formatDistanceToNow } from 'date-fns';
 import type { FriendCourseHit } from '@/hooks/useFriendsCourses';
 
@@ -23,14 +23,6 @@ interface FriendsActivityLeaderboardProps {
   timeRange: '30' | '90' | 'all';
 }
 
-const getInitials = (name: string): string => {
-  return name
-    .split(' ')
-    .map(part => part.charAt(0))
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-};
 
 export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProps> = ({ recent, timeRange }) => {
   const friendStats = useMemo(() => {
@@ -127,12 +119,16 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
 
           return (
             <div key={stats.friend_id} className="flex items-center gap-3">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={stats.profile_photo_url || undefined} />
-                <AvatarFallback className="text-xs">
-                  {getInitials(stats.display_name)}
-                </AvatarFallback>
-              </Avatar>
+              <Squircle width={40} height={40}>
+                <img 
+                  src={stats.profile_photo_url || '/placeholder.svg'} 
+                  alt={stats.display_name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
+                />
+              </Squircle>
 
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">

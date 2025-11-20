@@ -48,6 +48,9 @@ export const FriendsCoursesHero: React.FC<FriendsCoursesHeroProps> = ({ courses,
             src={mainCourse.thumbnail_url || '/placeholder.svg'}
             alt={mainCourse.course_name}
             className="w-full h-full object-cover animate-fadeIn"
+            onError={(e) => {
+              e.currentTarget.src = '/placeholder.svg';
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           <div className="absolute bottom-2 left-2 right-2">
@@ -69,6 +72,9 @@ export const FriendsCoursesHero: React.FC<FriendsCoursesHeroProps> = ({ courses,
                   src={course.thumbnail_url || '/placeholder.svg'}
                   alt={course.course_name}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
                 />
                 <div className="absolute inset-0 bg-black/20" />
               </div>
