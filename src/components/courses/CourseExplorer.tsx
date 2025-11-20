@@ -202,10 +202,10 @@ const CourseExplorer = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-6">
       {/* Scroll to top button */}
       {/* Search */}
-      <div className="relative mx-auto mt-4 w-full max-w-xl">
+      <div className="relative max-w-xl mx-auto">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
           placeholder="Search by name, county or area..."
@@ -226,7 +226,7 @@ const CourseExplorer = () => {
       </div>
 
       {/* Region + sub-region filters */}
-      <div className="mx-auto mt-3 flex w-full max-w-xl gap-2">
+      <div className="max-w-xl mx-auto flex items-center justify-center gap-3">
         {/* Primary region */}
         <div className="flex-1">
           <Select value={selectedRegion} onValueChange={(value) => {
