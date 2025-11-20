@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import GolfClubView from '@/components/golf-club/GolfClubView';
+import { scrollToTop } from '@/utils/scrollToTop';
 
 const CourseDetailPage = () => {
   const params = useParams();
@@ -11,16 +12,8 @@ const CourseDetailPage = () => {
 
   // Ensure course detail always starts from the top
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'auto',
-    });
-
-    // Extra safety for some mobile browsers
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-  }, []);
+    scrollToTop();
+  }, [courseId]);
 
   // Add defensive check for courseId
   if (!courseId) {
