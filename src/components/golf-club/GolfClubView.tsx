@@ -127,7 +127,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         
         {/* Course Title & Location - Bottom Left */}
         <div className="absolute bottom-16 left-6 text-white z-10">
-          <h1 className="text-3xl md:text-4xl font-bold mb-1.5 drop-shadow-2xl">{course.name}</h1>
+          <h1 className="text-3xl md:text-4xl font-semibold mb-1.5 drop-shadow-2xl">{course.name}</h1>
           <p className="text-lg md:text-xl opacity-90 mb-2.5 drop-shadow-lg">
             {[course.country, course.sub_country, course.region].filter(Boolean).join(', ')}
           </p>
