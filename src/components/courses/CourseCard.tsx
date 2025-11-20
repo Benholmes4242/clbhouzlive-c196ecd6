@@ -197,7 +197,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   return (
     <>
       <div 
-        className={`group transition-all duration-200 ${disableClick ? 'cursor-default' : 'cursor-pointer'} overflow-hidden relative h-[280px] sm:h-64 rounded-none shadow-none sm:rounded-xl sm:shadow-md md:shadow-lg border border-border/60 sm:border-border/40`}
+        className={`group transition-all duration-200 ${disableClick ? 'cursor-default' : 'cursor-pointer'} overflow-hidden relative h-[280px] sm:h-64 rounded-none shadow-none sm:rounded-xl sm:shadow-md md:shadow-lg border border-border/60 sm:border-border/40 animate-fadeIn`}
         onClick={handleCardClick}
       >
         <div
@@ -272,7 +272,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
           
           {/* Course Name - positioned at bottom when badgesOnTop is true */}
           <h3 
-            className={`${mobileTextScale === 'small' ? 'text-lg md:text-xl' : 'text-xl md:text-2xl'} text-white leading-tight ${showRatingOnRight ? 'mb-0' : 'mb-0'} drop-shadow-lg transform-gpu ${showXP && !badgesOnTop ? (isFromUserCoursesPage ? 'max-h-[3.5rem] overflow-hidden break-words cursor-pointer' : 'line-clamp-2 cursor-pointer') : ''}`}
+            className={`${mobileTextScale === 'small' ? 'text-lg md:text-xl' : 'text-xl md:text-2xl'} text-white leading-tight ${showRatingOnRight ? 'mb-0' : 'mb-0'} drop-shadow-lg transform-gpu ${showXP && !badgesOnTop ? (isFromUserCoursesPage ? 'max-h-[3.5rem] overflow-hidden break-words cursor-pointer' : 'line-clamp-2 cursor-pointer') : ''} ${!hideRankingBadges && !badgesOnTop ? 'mt-[20px]' : ''}`}
             title={showXP && !badgesOnTop ? course.name : undefined}
           >
             {course.name}

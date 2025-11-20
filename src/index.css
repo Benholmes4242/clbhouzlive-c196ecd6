@@ -131,6 +131,21 @@
     will-change: opacity, transform;
   }
 
+  /* Course card fade-in animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0.2;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fadeIn {
+    animation: fadeIn 0.25s ease-out both;
+  }
+
 /* Nuke solid Tailwind black backgrounds to new page tone - REMOVED in Phase 1 */
   /* .bg-black was forcing dark backgrounds - now removed to allow global pastel base */
 }
