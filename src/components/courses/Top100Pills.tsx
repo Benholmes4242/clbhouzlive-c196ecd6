@@ -37,8 +37,9 @@ const Top100Pills: React.FC<Top100PillsProps> = ({
     }
   };
 
+  // Frosted white glass styling for overlay variant (matches CourseRankBadges)
   const pillClasses = variant === 'overlay'
-    ? 'bg-black/70 backdrop-blur-sm border-white/20 text-white'
+    ? 'bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)]'
     : 'bg-primary/10 border-primary/20 text-primary';
 
   const textSize = size === 'sm' ? 'text-[10px]' : size === 'md' ? 'text-xs' : 'text-sm';
