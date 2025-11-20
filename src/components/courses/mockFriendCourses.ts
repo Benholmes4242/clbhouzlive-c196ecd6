@@ -18,10 +18,7 @@ const mockFriendHits: FriendCourseHit[] = [
     played_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     rating: 10,
     thumbnail_url: 'https://courses.clbhouz.co.uk/courses/1751276611299-o0zgdrh03f.webp',
-    top100_memberships: [
-      { list_id: 'global', list_slug: 'global-top-100', short_label: 'Global', rank: 1 },
-      { list_id: 'usa', list_slug: 'usa-top-100', short_label: 'USA', rank: 1 }
-    ],
+    top100_memberships: [], // Will be populated from real database
   },
   // Andrew Yetzis - Cypress Point
   {
@@ -39,10 +36,7 @@ const mockFriendHits: FriendCourseHit[] = [
     played_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     rating: 9.5,
     thumbnail_url: 'https://courses.clbhouz.co.uk/courses/1751276189835-wrt1zm4sg.jpeg',
-    top100_memberships: [
-      { list_id: 'global', list_slug: 'global-top-100', short_label: 'Global', rank: 2 },
-      { list_id: 'usa', list_slug: 'usa-top-100', short_label: 'USA', rank: 2 }
-    ],
+    top100_memberships: [], // Will be populated from real database
   },
   // Andrew Yetzis - Kingsbarns
   {
@@ -60,10 +54,7 @@ const mockFriendHits: FriendCourseHit[] = [
     played_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
     rating: 9,
     thumbnail_url: 'https://media.clbhouz.co.uk/courses/1751031782943-po0xpgjl1bj.jpg',
-    top100_memberships: [
-      { list_id: 'global', list_slug: 'global-top-100', short_label: 'Global', rank: 49 },
-      { list_id: 'gbi', list_slug: 'gb-i-top-100', short_label: 'GB&I', rank: 15 }
-    ],
+    top100_memberships: [], // Will be populated from real database
   },
   // Sarah Miles - Royal County Down
   {
@@ -81,10 +72,7 @@ const mockFriendHits: FriendCourseHit[] = [
     played_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     rating: 10,
     thumbnail_url: 'https://media.clbhouz.co.uk/courses/1751019826333-fvps9vadl5.jpg',
-    top100_memberships: [
-      { list_id: 'global', list_slug: 'global-top-100', short_label: 'Global', rank: 3 },
-      { list_id: 'gbi', list_slug: 'gb-i-top-100', short_label: 'GB&I', rank: 1 }
-    ],
+    top100_memberships: [], // Will be populated from real database
   },
   // Sarah Miles - Royal Dornoch
   {
@@ -102,10 +90,7 @@ const mockFriendHits: FriendCourseHit[] = [
     played_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     rating: 9.5,
     thumbnail_url: 'https://courses.clbhouz.co.uk/courses/1751024326684-enjmz2ztth8.jpg',
-    top100_memberships: [
-      { list_id: 'global', list_slug: 'global-top-100', short_label: 'Global', rank: 6 },
-      { list_id: 'gbi', list_slug: 'gb-i-top-100', short_label: 'GB&I', rank: 2 }
-    ],
+    top100_memberships: [], // Will be populated from real database
   },
   // James Porter - Pebble Beach
   {
@@ -123,10 +108,7 @@ const mockFriendHits: FriendCourseHit[] = [
     played_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     rating: 9,
     thumbnail_url: 'https://courses.clbhouz.co.uk/courses/1751281932418-mrfli213o3.jpg',
-    top100_memberships: [
-      { list_id: 'global', list_slug: 'global-top-100', short_label: 'Global', rank: 8 },
-      { list_id: 'usa', list_slug: 'usa-top-100', short_label: 'USA', rank: 5 }
-    ],
+    top100_memberships: [], // Will be populated from real database
   },
   // James Porter - Ballybunion
   {
@@ -144,10 +126,7 @@ const mockFriendHits: FriendCourseHit[] = [
     played_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
     rating: 9.5,
     thumbnail_url: 'https://media.clbhouz.co.uk/courses/1751024716708-ovsjdt1owx9.jpg',
-    top100_memberships: [
-      { list_id: 'global', list_slug: 'global-top-100', short_label: 'Global', rank: 15 },
-      { list_id: 'gbi', list_slug: 'gb-i-top-100', short_label: 'GB&I', rank: 5 }
-    ],
+    top100_memberships: [], // Will be populated from real database
   },
 ];
 
@@ -161,10 +140,7 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     sub_country: 'Down',
     thumbnail_url: 'https://media.clbhouz.co.uk/courses/1751019826333-fvps9vadl5.jpg',
     average_rating: 9.8,
-    top100_memberships: [
-      { list_id: 'global', list_slug: 'global-top-100', short_label: 'Global', rank: 3 },
-      { list_id: 'gbi', list_slug: 'gb-i-top-100', short_label: 'GB&I', rank: 1 }
-    ],
+    top100_memberships: [], // Will be populated from real database
     friends: mockFriendHits.filter(hit => hit.course_id === '8df6dde5-49e2-4b1d-bbec-bd5f6e3c2b66'),
     most_recent_play: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     total_friends_played: 1,
@@ -176,10 +152,7 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     sub_country: 'New Jersey',
     thumbnail_url: 'https://courses.clbhouz.co.uk/courses/1751276611299-o0zgdrh03f.webp',
     average_rating: 9.9,
-    top100_memberships: [
-      { list_id: 'global', list_slug: 'global-top-100', short_label: 'Global', rank: 1 },
-      { list_id: 'usa', list_slug: 'usa-top-100', short_label: 'USA', rank: 1 }
-    ],
+    top100_memberships: [], // Will be populated from real database
     friends: mockFriendHits.filter(hit => hit.course_id === 'd917f7fb-ca74-4813-bc27-35ba95c04e03'),
     most_recent_play: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     total_friends_played: 1,
@@ -191,10 +164,7 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     sub_country: 'California',
     thumbnail_url: 'https://courses.clbhouz.co.uk/courses/1751281932418-mrfli213o3.jpg',
     average_rating: 9.3,
-    top100_memberships: [
-      { list_id: 'global', list_slug: 'global-top-100', short_label: 'Global', rank: 8 },
-      { list_id: 'usa', list_slug: 'usa-top-100', short_label: 'USA', rank: 5 }
-    ],
+    top100_memberships: [], // Will be populated from real database
     friends: mockFriendHits.filter(hit => hit.course_id === 'a2426246-5314-42f7-8637-de23bd8d7665'),
     most_recent_play: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     total_friends_played: 1,
@@ -206,10 +176,7 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     sub_country: 'California',
     thumbnail_url: 'https://courses.clbhouz.co.uk/courses/1751276189835-wrt1zm4sg.jpeg',
     average_rating: 9.7,
-    top100_memberships: [
-      { list_id: 'global', list_slug: 'global-top-100', short_label: 'Global', rank: 2 },
-      { list_id: 'usa', list_slug: 'usa-top-100', short_label: 'USA', rank: 2 }
-    ],
+    top100_memberships: [], // Will be populated from real database
     friends: mockFriendHits.filter(hit => hit.course_id === 'e69aee30-744d-4089-a127-285a62216e2c'),
     most_recent_play: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     total_friends_played: 1,
@@ -221,10 +188,7 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     sub_country: 'Highlands',
     thumbnail_url: 'https://courses.clbhouz.co.uk/courses/1751024326684-enjmz2ztth8.jpg',
     average_rating: 9.5,
-    top100_memberships: [
-      { list_id: 'global', list_slug: 'global-top-100', short_label: 'Global', rank: 6 },
-      { list_id: 'gbi', list_slug: 'gb-i-top-100', short_label: 'GB&I', rank: 2 }
-    ],
+    top100_memberships: [], // Will be populated from real database
     friends: mockFriendHits.filter(hit => hit.course_id === '47f1f73e-6265-4568-8b39-c7babfa22019'),
     most_recent_play: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     total_friends_played: 1,
@@ -236,10 +200,7 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     sub_country: 'Fife',
     thumbnail_url: 'https://media.clbhouz.co.uk/courses/1751031782943-po0xpgjl1bj.jpg',
     average_rating: 9.1,
-    top100_memberships: [
-      { list_id: 'global', list_slug: 'global-top-100', short_label: 'Global', rank: 49 },
-      { list_id: 'gbi', list_slug: 'gb-i-top-100', short_label: 'GB&I', rank: 15 }
-    ],
+    top100_memberships: [], // Will be populated from real database
     friends: mockFriendHits.filter(hit => hit.course_id === '5cdf162c-c3f3-44fa-b1ef-7b30d5d66b96'),
     most_recent_play: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
     total_friends_played: 1,
@@ -251,10 +212,7 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     sub_country: 'Kerry',
     thumbnail_url: 'https://media.clbhouz.co.uk/courses/1751024716708-ovsjdt1owx9.jpg',
     average_rating: 9.4,
-    top100_memberships: [
-      { list_id: 'global', list_slug: 'global-top-100', short_label: 'Global', rank: 15 },
-      { list_id: 'gbi', list_slug: 'gb-i-top-100', short_label: 'GB&I', rank: 5 }
-    ],
+    top100_memberships: [], // Will be populated from real database
     friends: mockFriendHits.filter(hit => hit.course_id === '3674f9c2-3322-4580-bddb-c1123c92ec42'),
     most_recent_play: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
     total_friends_played: 1,
