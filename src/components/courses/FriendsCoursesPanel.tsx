@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFriendsCourses } from '@/hooks/useFriendsCourses';
 import { Card } from '@/components/ui/card';
@@ -28,6 +28,9 @@ const FriendsCoursesPanel: React.FC = () => {
   const { data: realData, isLoading } = useFriendsCourses(user?.id);
   const [timeRange, setTimeRange] = useState<TimeRange>('30');
   const [courseTypeFilter, setCourseTypeFilter] = useState<CourseTypeFilter>('all');
+  const [recentPage, setRecentPage] = useState(0);
+  
+  const PAGE_SIZE = 8;
   
   // Use mock data when flag is enabled
   const data = FLAGS.FRIEND_COURSES_MOCK_ENABLED ? MOCK_FRIEND_COURSES : realData;
@@ -192,6 +195,25 @@ const FriendsCoursesPanel: React.FC = () => {
       </div>
     );
   }
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setRecentPage(0);
+  }, [timeRange]);
+
+  // Sort recent rounds by played_at descending (most recent first)
+  const sortedRecent = useMemo(() => {
+    return [...recent].sort(
+      (a, b) => new Date(b.played_at).getTime() - new Date(a.played_at).getTime()
+    );
+  }, [recent]);
+
+  // Paginate recent rounds
+  const totalRecent = sortedRecent.length;
+  const totalPages = Math.ceil(totalRecent / PAGE_SIZE);
+  const startIndex = recentPage * PAGE_SIZE;
+  const endIndex = startIndex + PAGE_SIZE;
+  const visibleRecent = sortedRecent.slice(startIndex, endIndex);
 
   const formatFriendsList = (friends: FriendCourseHit[], limit = 3) => {
     const names = friends.slice(0, limit).map(f => f.friend_profile.display_name || f.friend_profile.username);
@@ -418,14 +440,14 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       )}
 
-      {recent.length > 0 && (
+      {sortedRecent.length > 0 && (
         <div className="space-y-3">
           <div>
-            <h3 className="text-sm font-semibold">Recent rounds</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">A feed of your friends' latest logged courses</p>
+            <h3 className="text-sm font-semibold">Your friends' recent rounds</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Rounds played in the last 30 days</p>
           </div>
           <div className="divide-y divide-border/60">
-            {recent.slice(0, 15).map((hit, idx) => (
+            {visibleRecent.map((hit, idx) => (
               <div key={`${hit.friend_id}-${hit.course_id}-${idx}`}
                 className="flex items-center gap-3 py-3 cursor-pointer hover:bg-surface-alt/30 -mx-2 px-2 rounded transition-colors"
                 onClick={() => navigate(`/courses/${hit.course_id}`)}>
@@ -448,6 +470,35 @@ const FriendsCoursesPanel: React.FC = () => {
               </div>
             ))}
           </div>
+
+          {/* Pagination controls */}
+          {totalPages > 1 && (
+            <div className="mt-3 flex items-center justify-between gap-2">
+              <button
+                type="button"
+                disabled={recentPage === 0}
+                onClick={() => setRecentPage((p) => Math.max(p - 1, 0))}
+                className="px-3 py-1 rounded-full border border-border text-sm disabled:opacity-40 disabled:cursor-default"
+              >
+                Previous
+              </button>
+
+              <div className="text-xs text-muted-foreground">
+                Page {recentPage + 1} of {totalPages}
+              </div>
+
+              <button
+                type="button"
+                disabled={recentPage >= totalPages - 1}
+                onClick={() =>
+                  setRecentPage((p) => Math.min(p + 1, totalPages - 1))
+                }
+                className="px-3 py-1 rounded-full border border-border text-sm disabled:opacity-40 disabled:cursor-default"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
