@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ChevronUp } from 'lucide-react';
+import { scrollToTop } from '@/utils/scrollToTop';
 
 const ScrollToTopGlass = () => {
   const [visible, setVisible] = useState(false);
@@ -26,13 +27,6 @@ const ScrollToTopGlass = () => {
   }, []);
 
   if (!visible) return null;
-
-  const scrollToTop = () => {
-    const scrollContainer = document.getElementById('root');
-    if (scrollContainer) {
-      scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
 
   return (
     <button
