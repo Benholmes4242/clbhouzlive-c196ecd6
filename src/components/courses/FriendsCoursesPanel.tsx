@@ -44,7 +44,6 @@ const FriendsCoursesPanel: React.FC = () => {
     queryKey: ['real-courses-for-mock', mockCourseNames],
     enabled: FLAGS.FRIEND_COURSES_MOCK_ENABLED && mockCourseNames.length > 0,
     queryFn: async () => {
-      console.log('[FriendsCoursesPanel] Fetching real course data for:', mockCourseNames);
       const { data, error } = await supabase
         .from('golf_courses')
         .select(`
@@ -67,9 +66,7 @@ const FriendsCoursesPanel: React.FC = () => {
       
       if (error) throw error;
       
-      console.log('[FriendsCoursesPanel] Raw database response:', data);
-      
-      const mapped = (data || []).map((course: any) => ({
+      return (data || []).map((course: any) => ({
         course_id: course.id,
         course_name: course.name,
         country: course.country,
@@ -82,9 +79,6 @@ const FriendsCoursesPanel: React.FC = () => {
           rank: m.rank,
         })),
       }));
-      
-      console.log('[FriendsCoursesPanel] Mapped course data:', mapped);
-      return mapped;
     },
     staleTime: 60_000,
   });
@@ -109,21 +103,16 @@ const FriendsCoursesPanel: React.FC = () => {
         realCoursesForMock.map((c) => [c.course_name.toLowerCase(), c])
       );
       
-      console.log('[FriendsCoursesPanel] Real courses map:', Array.from(realCoursesByName.entries()));
-      
       // Merge mock friend data with real course data matched by name
       const enrichedRecent = MOCK_FRIEND_COURSES.recent.map(mockHit => {
         const realCourse = realCoursesByName.get(mockHit.course_name.toLowerCase());
-        console.log('[FriendsCoursesPanel] Matching', mockHit.course_name, 'found real course:', realCourse);
         if (realCourse) {
-          const enriched = {
+          return {
             ...mockHit,
-            course_id: realCourse.course_id, // Use real course ID
+            course_id: realCourse.course_id,
             thumbnail_url: realCourse.thumbnail_url,
-            top100_memberships: realCourse.top100_memberships, // Use real rankings!
+            top100_memberships: realCourse.top100_memberships,
           };
-          console.log('[FriendsCoursesPanel] Enriched hit:', enriched);
-          return enriched;
         }
         return mockHit;
       });
@@ -439,9 +428,7 @@ const FriendsCoursesPanel: React.FC = () => {
                       <p className="text-sm text-muted-foreground">{course.country}{course.sub_country ? `, ${course.sub_country}` : ''}</p>
                     </div>
                     {(() => {
-                      console.log('[FriendsCoursesPanel] Course:', course.course_name, 'Memberships:', course.top100_memberships);
                       const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
-                      console.log('[FriendsCoursesPanel] Extracted ranks:', ranks);
                       return (
                         <CourseRankBadges
                           globalRank={ranks.globalRank}
@@ -527,9 +514,7 @@ const FriendsCoursesPanel: React.FC = () => {
                 {/* Rank badges (top-right) */}
                 <div className="absolute top-3 right-3 z-10">
                   {(() => {
-                    console.log('[FriendsCoursesPanel Regular] Course:', course.course_name, 'Memberships:', course.top100_memberships);
                     const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
-                    console.log('[FriendsCoursesPanel Regular] Extracted ranks:', ranks);
                     return (
                       <CourseRankBadges
                         globalRank={ranks.globalRank}
