@@ -203,7 +203,7 @@ const CourseExplorer = () => {
           onChange={(e) => {
             setSearchTerm(e.target.value);
           }}
-          className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border transition-shadow text-sm"
+          className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border transition-shadow text-base placeholder:text-[15px]"
         />
         {searchTerm && (
           <button
@@ -223,7 +223,7 @@ const CourseExplorer = () => {
             setSelectedRegion(value as PrimaryRegionKey);
             setSelectedSubregion('all');
           }}>
-            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-sm focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
               <div className="flex items-center">
                 <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
                 <SelectValue placeholder="Select region" />
@@ -249,7 +249,7 @@ const CourseExplorer = () => {
             onValueChange={setSelectedSubregion}
             disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
-            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-sm focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
               <SelectValue placeholder="All sub-regions" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
@@ -293,7 +293,7 @@ const CourseExplorer = () => {
         {/* Compact meta info block: region + range on left, reset on right */}
         {totalCount > 0 && (
           <div className="mt-3 space-y-1">
-            <p className="text-xs md:text-sm text-muted-foreground">
+            <p className="text-sm md:text-base text-muted-foreground">
               {hasSearch ? (
                 <>
                   Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
@@ -311,7 +311,7 @@ const CourseExplorer = () => {
                 </>
               )}
             </p>
-            <div className="flex items-center justify-between text-xs md:text-sm text-muted-foreground">
+            <div className="flex items-center justify-between text-sm md:text-base text-muted-foreground">
               <span>
                 {totalCount <= PAGE_SIZE && page === 0 ? (
                   <>Showing all {totalCount} course{totalCount !== 1 && 's'}</>
@@ -323,7 +323,7 @@ const CourseExplorer = () => {
                 <button
                   type="button"
                   onClick={handleResetFilters}
-                  className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-900 text-xs md:text-sm"
+                  className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-900 text-sm md:text-base"
                 >
                   <span className="text-[10px] leading-none">&times;</span>
                   <span>Reset filters</span>

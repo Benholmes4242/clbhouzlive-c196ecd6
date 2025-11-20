@@ -182,7 +182,7 @@ const GlobalTop100 = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search within this Top 100 list"
-          className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border transition-shadow text-sm"
+          className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border transition-shadow text-base placeholder:text-[15px]"
         />
         {searchTerm && (
           <button
@@ -209,7 +209,7 @@ const GlobalTop100 = () => {
               }
             }}
           >
-            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-sm focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
               <SelectValue placeholder="Choose Top 100 list" />
             </SelectTrigger>
             <SelectContent>
@@ -234,7 +234,7 @@ const GlobalTop100 = () => {
                 value={selectedSubregion}
                 onValueChange={setSelectedSubregion}
               >
-                <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-sm focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+                <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
                   <SelectValue placeholder="All sub-regions" />
                 </SelectTrigger>
                 <SelectContent>
@@ -253,10 +253,10 @@ const GlobalTop100 = () => {
 
       {/* Stats row */}
       <div className="max-w-xl mx-auto mt-2 space-y-1">
-        <p className="text-xs md:text-sm text-muted-foreground">
+        <p className="text-sm md:text-base text-muted-foreground">
           Showing courses in <span className="font-medium">{currentListLabel}</span>
         </p>
-        <div className="flex items-center justify-between text-xs md:text-sm text-muted-foreground">
+        <div className="flex items-center justify-between text-sm md:text-base text-muted-foreground">
           <span>
             Showing {startIndex}–{endIndex} of {totalCount} courses
           </span>
@@ -264,7 +264,7 @@ const GlobalTop100 = () => {
             <button
               type="button"
               onClick={handleResetFilters}
-              className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-900 text-xs md:text-sm"
+              className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-900 text-sm md:text-base"
             >
               <span className="text-[10px] leading-none">&times;</span>
               <span>Reset filters</span>
