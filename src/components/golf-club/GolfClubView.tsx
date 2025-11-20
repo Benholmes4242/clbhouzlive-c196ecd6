@@ -130,7 +130,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         
         {/* Course Title, Location & Rankings - Bottom Left */}
-        <div className="absolute inset-x-0 bottom-3 px-4 sm:px-6 lg:px-10">
+        <div className="absolute inset-x-0 bottom-0 px-4 sm:px-6 lg:px-10">
           <div className="max-w-4xl flex flex-col gap-1.5 sm:gap-2">
             {/* Course name */}
             <h1 className="text-3xl sm:text-4xl font-semibold text-white drop-shadow-lg">
