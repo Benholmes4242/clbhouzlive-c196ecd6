@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,19 @@ const CourseDetailPage = () => {
   const params = useParams();
   const courseId = params?.courseId;
   const navigate = useNavigate();
+
+  // Ensure course detail always starts from the top
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto',
+    });
+
+    // Extra safety for some mobile browsers
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
 
   // Add defensive check for courseId
   if (!courseId) {
