@@ -8,6 +8,7 @@ import { Squircle } from '@/components/ui/squircle';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Users, MapPin, Flame, Video } from 'lucide-react';
@@ -345,33 +346,35 @@ const FriendsCoursesPanel: React.FC = () => {
           <p className="text-sm text-muted-foreground">See where your friends have been playing lately</p>
         </div>
         
-        {/* Two Dropdowns - Card Treatment */}
-        <div className="rounded-xl border border-border bg-surface-card shadow-xs px-3 py-2 flex items-center justify-between gap-3">
+        {/* Filter Dropdowns - Match Explore/Top100 */}
+        <div className="mx-auto mt-3 flex w-full max-w-xl gap-2">
           {/* Time Range Dropdown */}
           <div className="flex-1">
-            <select
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value as TimeRange)}
-              className="w-full h-9 px-3 py-2.5 text-sm bg-surface-alt border border-border/60 rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary-accent/20"
-            >
-              <option value="week">This week</option>
-              <option value="30">Last 30 days</option>
-              <option value="90">Last 90 days</option>
-              <option value="year">This year</option>
-              <option value="all">All time</option>
-            </select>
+            <Select value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)}>
+              <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+                <SelectValue placeholder="Select time range" />
+              </SelectTrigger>
+              <SelectContent className="bg-card border-border z-50">
+                <SelectItem value="week">This week</SelectItem>
+                <SelectItem value="30">Last 30 days</SelectItem>
+                <SelectItem value="90">Last 90 days</SelectItem>
+                <SelectItem value="year">This year</SelectItem>
+                <SelectItem value="all">All time</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           
           {/* Course Type Dropdown */}
           <div className="flex-1">
-            <select
-              value={courseTypeFilter}
-              onChange={(e) => setCourseTypeFilter(e.target.value as CourseTypeFilter)}
-              className="w-full h-9 px-3 py-2.5 text-sm bg-surface-alt border border-border/60 rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary-accent/20"
-            >
-              <option value="all">All courses</option>
-              <option value="top100">Top 100 only</option>
-            </select>
+            <Select value={courseTypeFilter} onValueChange={(value) => setCourseTypeFilter(value as CourseTypeFilter)}>
+              <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+                <SelectValue placeholder="Select course type" />
+              </SelectTrigger>
+              <SelectContent className="bg-card border-border z-50">
+                <SelectItem value="all">All courses</SelectItem>
+                <SelectItem value="top100">Top 100 only</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
