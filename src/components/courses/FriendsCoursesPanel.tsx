@@ -16,13 +16,16 @@ import type { CourseWithFriends, FriendCourseHit } from '@/hooks/useFriendsCours
 type TimeRange = '30' | '90' | 'all';
 
 const FriendsCoursesPanel: React.FC = () => {
+  // All hooks must be called before any conditional returns
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const { data: realData, isLoading } = useFriendsCourses(user?.id);
   const [timeRange, setTimeRange] = useState<TimeRange>('30');
   
+  // Use mock data when flag is enabled
   const data = FLAGS.FRIEND_COURSES_MOCK_ENABLED ? MOCK_FRIEND_COURSES : realData;
 
+  // Filter data by time range
   const filteredData = useMemo(() => {
     if (!data) return null;
     if (timeRange === 'all') return data;
@@ -31,45 +34,48 @@ const FriendsCoursesPanel: React.FC = () => {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - days);
     
-    const filteredRecent = data.recent.filter(hit => new Date(hit.played_at) >= cutoff);
-    const filteredCourses = data.courses.map(course => ({
-      ...course,
-      friends: course.friends.filter(hit => new Date(hit.played_at) >= cutoff)
-    })).filter(course => course.friends.length > 0);
+    const filteredRecent = data.recent.filter(hit => 
+      new Date(hit.played_at) >= cutoff
+    );
+    
+    const filteredCourses = data.courses
+      .map(course => ({
+        ...course,
+        friends: course.friends.filter(hit => 
+          new Date(hit.played_at) >= cutoff
+        ),
+      }))
+      .filter(course => course.friends.length > 0);
+    
+    const uniqueFriends = new Set(filteredRecent.map(hit => hit.friend_id));
     
     return {
       courses: filteredCourses,
       recent: filteredRecent,
       totalCourses: filteredCourses.length,
-      totalFriendsActive: new Set(filteredRecent.map(hit => hit.friend_id)).size
+      totalFriendsActive: uniqueFriends.size,
     };
   }, [data, timeRange]);
 
-  if (!user) return null;
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-lg font-semibold tracking-tight">Friends' Courses</h2>
-          <p className="text-sm text-muted-foreground">See where your friends have been playing lately.</p>
-        </div>
-        <div className="grid gap-3">
-          {[1, 2, 3].map((i) => <Skeleton key={`hot-${i}`} className="h-20 rounded-xl" />)}
-        </div>
-      </div>
-    );
-  }
-
+  // Derive lists safely even while loading
   const courses = filteredData?.courses || [];
   const recent = filteredData?.recent || [];
   const totalCourses = filteredData?.totalCourses || 0;
   const totalFriendsActive = filteredData?.totalFriendsActive || 0;
 
+  // Hot courses: courses with 2+ friends, sorted by friends then recency
   const hotCourses = useMemo(() => {
-    return courses.filter(course => course.total_friends_played >= 2)
-      .sort((a, b) => b.total_friends_played - a.total_friends_played || 
-        new Date(b.most_recent_play).getTime() - new Date(a.most_recent_play).getTime())
+    return courses
+      .filter(course => course.total_friends_played >= 2)
+      .sort((a, b) => {
+        if (b.total_friends_played !== a.total_friends_played) {
+          return b.total_friends_played - a.total_friends_played;
+        }
+        return (
+          new Date(b.most_recent_play).getTime() -
+          new Date(a.most_recent_play).getTime()
+        );
+      })
       .slice(0, 4);
   }, [courses]);
 
@@ -78,17 +84,56 @@ const FriendsCoursesPanel: React.FC = () => {
     return courses.filter(c => !hotIds.has(c.course_id));
   }, [courses, hotCourses]);
 
+  // Now conditional returns - no more hooks after this point
+  if (!user) return null;
+
+  // Show skeleton only while loading AND before we have any filtered data
+  if (isLoading && !filteredData) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-baseline justify-between">
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight">
+              Friends' Courses
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              See where your friends have been playing lately.
+            </p>
+          </div>
+        </div>
+
+        {/* simple skeleton cards */}
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => (
+            <div
+              key={i}
+              className="h-20 rounded-2xl bg-muted/80 animate-pulse"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state: no courses from friends in this time range
+
   if (totalCourses === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-        <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center text-muted-foreground mb-1">
-          <Users className="w-4 h-4" />
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+          <span className="text-lg">👥</span>
         </div>
-        <h3 className="text-sm font-semibold">No friends added yet</h3>
-        <p className="text-sm text-muted-foreground max-w-xs">Follow or add golfers to see where they've been playing and discover new places to play.</p>
-        <Button size="sm" className="mt-2 bg-[#3A3F46] hover:bg-[#3A3F46]/90 text-white" onClick={() => navigate('/discover/people')}>
+        <h3 className="text-base font-semibold mb-1">No friends added yet</h3>
+        <p className="text-sm text-muted-foreground mb-4 max-w-xs">
+          Follow or add golfers to see where they've been playing.
+        </p>
+        <button
+          type="button"
+          onClick={() => navigate('/discover/people')}
+          className="inline-flex h-10 items-center rounded-full bg-[#3A3F46] px-5 text-sm font-medium text-white shadow-sm hover:opacity-90 transition"
+        >
           Find golfers to follow
-        </Button>
+        </button>
       </div>
     );
   }
