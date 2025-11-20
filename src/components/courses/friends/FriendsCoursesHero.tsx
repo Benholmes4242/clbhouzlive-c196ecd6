@@ -12,24 +12,30 @@ export const FriendsCoursesHero: React.FC<FriendsCoursesHeroProps> = ({ courses,
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  // Auto-rotate through top 5 courses every 2.5 seconds
+  // Auto-rotate through ALL courses every 2.5 seconds
   useEffect(() => {
     if (courses.length <= 1) return;
     
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % Math.min(courses.length, 5));
+      setCurrentIndex((prev) => (prev + 1) % courses.length);
     }, 2500);
     
     return () => clearInterval(interval);
   }, [courses.length]);
 
+  // Reset index when courses array changes to prevent out of bounds
+  useEffect(() => {
+    if (currentIndex >= courses.length) {
+      setCurrentIndex(0);
+    }
+  }, [courses.length, currentIndex]);
+
   if (courses.length === 0) return null;
 
-  // Get top 5 most-played courses for rotation
-  const displayCourses = courses.slice(0, 5);
-  const currentCourse = displayCourses[currentIndex];
+  // Rotate through ALL courses in regularCourses - no limit
+  const currentCourse = courses[currentIndex];
 
-  // Calculate stats
+  // Calculate stats from ALL courses
   const coursesCount = courses.length;
   const regionsSet = new Set(courses.map(c => `${c.country}-${c.sub_country || 'none'}`));
   const regionsCount = regionsSet.size;
@@ -86,10 +92,10 @@ export const FriendsCoursesHero: React.FC<FriendsCoursesHeroProps> = ({ courses,
           </p>
         </div>
 
-        {/* Fade transition effect */}
+        {/* Smooth fade transition between courses */}
         <div 
           key={currentCourse.course_id} 
-          className="absolute inset-0 animate-fadeIn pointer-events-none"
+          className="absolute inset-0 animate-fade-in pointer-events-none"
         />
       </div>
 
