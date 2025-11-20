@@ -16,9 +16,11 @@ const mockFriendHits: FriendCourseHit[] = [
     course_country: 'USA',
     course_sub_country: 'New Jersey',
     global_rank: 1,
+    regional_rank: null,
+    usa_rank: 1,
     played_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
     rating: 10,
-    thumbnail_url: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop',
+    thumbnail_url: null, // Use real course thumbnail from database
     is_top100: true,
   },
   // Andrew Yetzis - Cypress Point
@@ -35,9 +37,11 @@ const mockFriendHits: FriendCourseHit[] = [
     course_country: 'USA',
     course_sub_country: 'California',
     global_rank: 2,
+    regional_rank: null,
+    usa_rank: 2,
     played_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
     rating: 9.5,
-    thumbnail_url: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&h=600&fit=crop',
+    thumbnail_url: null, // Use real course thumbnail from database
     is_top100: true,
   },
   // Andrew Yetzis - Kingsbarns
@@ -54,9 +58,11 @@ const mockFriendHits: FriendCourseHit[] = [
     course_country: 'Scotland',
     course_sub_country: 'Fife',
     global_rank: 42,
+    regional_rank: 15,
+    usa_rank: null,
     played_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days ago
     rating: 9,
-    thumbnail_url: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=800&h=600&fit=crop',
+    thumbnail_url: null, // Use real course thumbnail from database
     is_top100: true,
   },
   // Sarah Miles - Royal County Down
@@ -73,9 +79,11 @@ const mockFriendHits: FriendCourseHit[] = [
     course_country: 'Northern Ireland',
     course_sub_country: 'Down',
     global_rank: 3,
+    regional_rank: 1,
+    usa_rank: null,
     played_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
     rating: 10,
-    thumbnail_url: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&sat=-10',
+    thumbnail_url: null, // Use real course thumbnail from database
     is_top100: true,
   },
   // Sarah Miles - Royal Dornoch
@@ -92,9 +100,11 @@ const mockFriendHits: FriendCourseHit[] = [
     course_country: 'Scotland',
     course_sub_country: 'Highlands',
     global_rank: 5,
+    regional_rank: 2,
+    usa_rank: null,
     played_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
     rating: 9.5,
-    thumbnail_url: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&hue=30',
+    thumbnail_url: null, // Use real course thumbnail from database
     is_top100: true,
   },
   // James Porter - Pebble Beach
@@ -111,9 +121,11 @@ const mockFriendHits: FriendCourseHit[] = [
     course_country: 'USA',
     course_sub_country: 'California',
     global_rank: 7,
+    regional_rank: null,
+    usa_rank: 5,
     played_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
     rating: 9,
-    thumbnail_url: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&blend=0077FF',
+    thumbnail_url: null, // Use real course thumbnail from database
     is_top100: true,
   },
   // James Porter - Ballybunion
@@ -130,9 +142,11 @@ const mockFriendHits: FriendCourseHit[] = [
     course_country: 'Ireland',
     course_sub_country: 'Kerry',
     global_rank: 15,
+    regional_rank: 5,
+    usa_rank: null,
     played_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days ago
     rating: 9.5,
-    thumbnail_url: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&blend=00FF00',
+    thumbnail_url: null, // Use real course thumbnail from database
     is_top100: true,
   },
 ];
@@ -145,7 +159,9 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     country: 'Northern Ireland',
     sub_country: 'Down',
     global_rank: 3,
-    thumbnail_url: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&sat=-10',
+    regional_rank: 1,
+    usa_rank: null,
+    thumbnail_url: null, // Use real course thumbnail from database
     average_rating: 9.8,
     is_top100: true,
     friends: mockFriendHits.filter(hit => hit.course_id === 'royal-county-down'),
@@ -158,7 +174,9 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     country: 'USA',
     sub_country: 'New Jersey',
     global_rank: 1,
-    thumbnail_url: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop',
+    regional_rank: null,
+    usa_rank: 1,
+    thumbnail_url: null, // Use real course thumbnail from database
     average_rating: 9.9,
     is_top100: true,
     friends: mockFriendHits.filter(hit => hit.course_id === 'pine-valley'),
@@ -171,7 +189,9 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     country: 'USA',
     sub_country: 'California',
     global_rank: 7,
-    thumbnail_url: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&blend=0077FF',
+    regional_rank: null,
+    usa_rank: 5,
+    thumbnail_url: null, // Use real course thumbnail from database
     average_rating: 9.3,
     is_top100: true,
     friends: mockFriendHits.filter(hit => hit.course_id === 'pebble-beach'),
@@ -184,7 +204,9 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     country: 'USA',
     sub_country: 'California',
     global_rank: 2,
-    thumbnail_url: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&h=600&fit=crop',
+    regional_rank: null,
+    usa_rank: 2,
+    thumbnail_url: null, // Use real course thumbnail from database
     average_rating: 9.7,
     is_top100: true,
     friends: mockFriendHits.filter(hit => hit.course_id === 'cypress-point'),
@@ -197,7 +219,9 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     country: 'Scotland',
     sub_country: 'Highlands',
     global_rank: 5,
-    thumbnail_url: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&hue=30',
+    regional_rank: 2,
+    usa_rank: null,
+    thumbnail_url: null, // Use real course thumbnail from database
     average_rating: 9.5,
     is_top100: true,
     friends: mockFriendHits.filter(hit => hit.course_id === 'royal-dornoch'),
@@ -210,7 +234,9 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     country: 'Scotland',
     sub_country: 'Fife',
     global_rank: 42,
-    thumbnail_url: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=800&h=600&fit=crop',
+    regional_rank: 15,
+    usa_rank: null,
+    thumbnail_url: null, // Use real course thumbnail from database
     average_rating: 9.1,
     is_top100: true,
     friends: mockFriendHits.filter(hit => hit.course_id === 'kingsbarns'),
@@ -223,7 +249,9 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     country: 'Ireland',
     sub_country: 'Kerry',
     global_rank: 15,
-    thumbnail_url: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&blend=00FF00',
+    regional_rank: 5,
+    usa_rank: null,
+    thumbnail_url: null, // Use real course thumbnail from database
     average_rating: 9.4,
     is_top100: true,
     friends: mockFriendHits.filter(hit => hit.course_id === 'ballybunion'),

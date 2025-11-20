@@ -219,8 +219,8 @@ const FriendsCoursesPanel: React.FC = () => {
                     </div>
                     <CourseRankBadges
                       globalRank={course.global_rank}
-                      regionalRank={null}
-                      usaRank={null}
+                      regionalRank={course.regional_rank}
+                      usaRank={course.usa_rank}
                       country={course.country || ''}
                       positioning="inline"
                     />
@@ -317,8 +317,8 @@ const FriendsCoursesPanel: React.FC = () => {
                     </div>
                     <CourseRankBadges
                       globalRank={course.global_rank}
-                      regionalRank={null}
-                      usaRank={null}
+                      regionalRank={course.regional_rank}
+                      usaRank={course.usa_rank}
                       country={course.country || ''}
                       positioning="inline"
                     />
