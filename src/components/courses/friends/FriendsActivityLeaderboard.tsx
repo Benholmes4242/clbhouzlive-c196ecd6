@@ -20,7 +20,7 @@ interface Badge {
 
 interface FriendsActivityLeaderboardProps {
   recent: FriendCourseHit[];
-  timeRange: '30' | '90' | 'all';
+  timeRange: 'week' | '30' | '90' | 'year' | 'all';
 }
 
 
@@ -99,7 +99,18 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
 
   if (friendStats.length === 0) return null;
 
-  const timeLabel = timeRange === '30' ? 'this month' : timeRange === '90' ? 'lately' : 'recently';
+  const getTimeLabel = () => {
+    switch (timeRange) {
+      case 'week': return 'this week';
+      case '30': return 'this month';
+      case '90': return 'lately';
+      case 'year': return 'this year';
+      case 'all': return 'recently';
+      default: return 'recently';
+    }
+  };
+
+  const timeLabel = getTimeLabel();
 
   return (
     <section className="mt-4 rounded-2xl bg-card border shadow-sm p-4">
