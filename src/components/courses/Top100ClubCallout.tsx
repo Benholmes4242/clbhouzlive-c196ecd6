@@ -23,7 +23,7 @@ const Top100ClubCallout: React.FC = () => {
 
   return (
     <section className="mb-4">
-      <div className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-card px-4 py-3 shadow-sm sm:px-5 sm:py-4 text-center">
+      <div className="flex flex-col gap-4 rounded-2xl border border-border/60 bg-card px-4 py-3 shadow-sm sm:px-5 sm:py-4 text-center">
         {/* Title + icon */}
         <div className="flex items-center justify-center gap-3">
           <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-accent/10">
