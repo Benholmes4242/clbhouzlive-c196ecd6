@@ -50,10 +50,6 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
       return;
     }
 
-    if (!mapContainerRef.current) {
-      console.warn('[Mapbox Fullscreen] No container ref');
-      return;
-    }
     if (!MAPBOX_TOKEN) {
       console.warn('[Mapbox Fullscreen] No Mapbox token');
       return;
@@ -64,10 +60,25 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
     }
 
     let timeoutId: number | null = null;
+    let retryCount = 0;
+    const maxRetries = 20; // 2 seconds max wait
 
     const initMap = () => {
-      console.log('[Mapbox Fullscreen] initMap called');
+      console.log('[Mapbox Fullscreen] initMap called, retry:', retryCount);
       
+      // Check if container ref is available
+      if (!mapContainerRef.current) {
+        if (retryCount < maxRetries) {
+          console.warn('[Mapbox Fullscreen] Container ref not ready, retrying in 100ms...');
+          retryCount++;
+          timeoutId = window.setTimeout(initMap, 100);
+          return;
+        } else {
+          console.error('[Mapbox Fullscreen] Container ref never became available');
+          return;
+        }
+      }
+
       // If map already exists (e.g. re-open), just recenter + resize
       if (mapRef.current) {
         console.log('[Mapbox Fullscreen] Map exists, recentering');
@@ -76,21 +87,21 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
         return;
       }
 
-      // Check if container has height before initializing
       const container = mapContainerRef.current;
-      if (!container) {
-        console.warn('[Mapbox Fullscreen] Container lost, cannot init');
-        return;
-      }
-      
       const height = container.offsetHeight;
       const width = container.offsetWidth;
       console.log('[Mapbox Fullscreen] Container dimensions:', { width, height });
       
       if (height === 0) {
-        console.warn('[Mapbox Fullscreen] Container has no height, retrying in 100ms...');
-        timeoutId = window.setTimeout(initMap, 100);
-        return;
+        if (retryCount < maxRetries) {
+          console.warn('[Mapbox Fullscreen] Container has no height, retrying in 100ms...');
+          retryCount++;
+          timeoutId = window.setTimeout(initMap, 100);
+          return;
+        } else {
+          console.error('[Mapbox Fullscreen] Container never got height');
+          return;
+        }
       }
 
       console.log('[Mapbox Fullscreen] Initializing Mapbox with token');
@@ -132,9 +143,9 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
       }
     };
 
-    // Longer delay to ensure Sheet animation completes
-    console.log('[Mapbox Fullscreen] Scheduling initMap in 400ms');
-    timeoutId = window.setTimeout(initMap, 400);
+    // Start trying to initialize after a short delay for Sheet animation
+    console.log('[Mapbox Fullscreen] Scheduling initMap in 250ms');
+    timeoutId = window.setTimeout(initMap, 250);
 
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
