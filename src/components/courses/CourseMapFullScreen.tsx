@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { MapPin } from 'lucide-react';
+import { useSwipeable } from 'react-swipeable';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-streets-v12';
@@ -29,9 +30,21 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Detect iOS
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+  // Swipe down to close handlers
+  const swipeHandlers = useSwipeable({
+    onSwipedDown: () => {
+      if (!isDragging) {
+        onOpenChange(false);
+      }
+    },
+    preventScrollOnSwipe: false,
+    trackMouse: false,
+  });
 
   // Generate deep link URLs
   const appleMapsUrl = `maps://maps.apple.com/?q=${encodeURIComponent(courseName)}&ll=${latitude},${longitude}&z=13`;
@@ -158,6 +171,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
       <SheetContent 
         side="bottom" 
         className="h-[85vh] sm:h-[80vh] flex flex-col p-0"
+        {...swipeHandlers}
       >
         <div className="flex flex-col h-full px-4 pt-4 pb-3 gap-4">
           {/* Header */}
@@ -174,7 +188,12 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
           </div>
 
           {/* Map */}
-          <div className="relative flex-1 rounded-2xl overflow-hidden border border-border/60 bg-surface-alt" style={{ minHeight: '320px' }}>
+          <div 
+            className="relative flex-1 rounded-2xl overflow-hidden border border-border/60 bg-surface-alt" 
+            style={{ minHeight: '320px' }}
+            onTouchStart={() => setIsDragging(true)}
+            onTouchEnd={() => setIsDragging(false)}
+          >
             <div ref={mapContainerRef} className="w-full h-full" />
           </div>
 

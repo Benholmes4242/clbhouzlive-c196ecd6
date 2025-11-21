@@ -196,10 +196,7 @@ export function HubHomePage() {
 
   return (
     <div className="fixed inset-0 z-[9999]">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
-      
-      {/* Glass Sheet */}
+      {/* Glass Sheet - unified background and backdrop */}
       <div 
         ref={sheetRef}
         className="hub-glass-page fixed inset-0"
