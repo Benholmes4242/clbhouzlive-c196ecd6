@@ -44,15 +44,6 @@ const MapThumbnail = ({
   const { toast } = useToast();
 
   const generateMapUrl = async (lat: number, lng: number, size: string, zoom: number = 13, mapType?: MapThumbnailProps['mapType']): Promise<string | null> => {
-    // Phase 1 Perf: Check cache first to avoid duplicate map URL generation
-    const { getCachedMapUrl, setCachedMapUrl, generateMapCacheKey } = await import('@/utils/mapUrlCache');
-    const cacheKey = generateMapCacheKey(lat, lng, size, zoom, mapType);
-    const cachedUrl = getCachedMapUrl(cacheKey);
-    
-    if (cachedUrl) {
-      return cachedUrl;
-    }
-    
     try {
       const { data, error } = await supabase.functions.invoke('generate-map-url', {
         body: {
@@ -60,7 +51,7 @@ const MapThumbnail = ({
           longitude: lng,
           size,
           zoom,
-          maptype: mapType // NEW (undefined → backend defaults to 'hybrid')
+          maptype: mapType
         }
       });
 
@@ -69,12 +60,7 @@ const MapThumbnail = ({
         return null;
       }
 
-      const url = data?.mapUrl || null;
-      if (url) {
-        setCachedMapUrl(cacheKey, url);
-      }
-      
-      return url;
+      return data?.mapUrl || null;
     } catch (error) {
       console.error('Error calling generate-map-url function:', error);
       return null;

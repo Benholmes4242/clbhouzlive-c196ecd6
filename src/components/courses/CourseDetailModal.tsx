@@ -13,7 +13,6 @@ import CourseDetailInfo from './CourseDetailInfo';
 import CourseDetailRatingSection from './CourseDetailRatingSection';
 import CourseRatingStats from './CourseRatingStats';
 import CourseReviews from './CourseReviews';
-import CourseDetailMapSection from './CourseDetailMapSection';
 import PostPlayRatingModal from './PostPlayRatingModal';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
@@ -222,12 +221,6 @@ const CourseDetailModal = ({
               courseId={course.id} 
               courseName={course.name}
               currentUser={currentUser}
-            />
-
-            <CourseDetailMapSection
-              latitude={course.latitude}
-              longitude={course.longitude}
-              courseName={course.name}
             />
           </div>
         </DialogContent>

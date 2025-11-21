@@ -1,0 +1,66 @@
+import React, { useEffect, useRef } from 'react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-streets-v12';
+
+interface CourseMapPreviewProps {
+  latitude: number;
+  longitude: number;
+  courseName: string;
+  onOpenFullMap: () => void;
+}
+
+const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
+  latitude,
+  longitude,
+  courseName,
+  onOpenFullMap,
+}) => {
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current) return;
+
+    mapboxgl.accessToken = MAPBOX_TOKEN;
+
+    mapRef.current = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: MAPBOX_STYLE,
+      center: [longitude, latitude],
+      zoom: 13,
+      interactive: false, // Preview only - no interaction
+      attributionControl: false,
+    });
+
+    // Add white marker at course location
+    new mapboxgl.Marker({ color: '#ffffff' })
+      .setLngLat([longitude, latitude])
+      .addTo(mapRef.current);
+
+    return () => {
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
+  }, [latitude, longitude]);
+
+  return (
+    <div
+      onClick={onOpenFullMap}
+      className="relative w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px] rounded-2xl overflow-hidden border border-border/60 cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02]"
+    >
+      <div ref={mapContainerRef} className="w-full h-full" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20" />
+      <div className="pointer-events-none absolute bottom-3 left-3 text-xs font-medium text-white drop-shadow-sm">
+        {courseName}
+      </div>
+      <div className="pointer-events-none absolute bottom-3 right-3 text-[10px] px-2 py-1 rounded-full bg-black/60 text-white">
+        Tap to expand map
+      </div>
+    </div>
+  );
+};
+
+export default CourseMapPreview;
