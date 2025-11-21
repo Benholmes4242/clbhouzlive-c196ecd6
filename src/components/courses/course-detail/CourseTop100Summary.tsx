@@ -56,10 +56,10 @@ const CourseTop100Summary: React.FC = () => {
     data.lists.find((l) => l.listSlug === slug);
 
   const listsToShow = [
-    bySlug('global-top-100'),
-    bySlug('gb-i-top-100'),
-    bySlug('usa-top-100'),
-    bySlug('europe-top-100'),
+    bySlug('global'),
+    bySlug('gb-i'),
+    bySlug('usa'),
+    bySlug('europe'),
   ].filter(Boolean);
 
   return (
