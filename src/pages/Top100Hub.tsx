@@ -104,19 +104,26 @@ const Top100Hub = () => {
 
           {/* Tabs: Courses | My Progress | Leaderboard */}
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-            <div className="flex justify-center mb-6">
-              <TabsList className="inline-flex h-10 items-center justify-center rounded-lg bg-muted p-1">
-                <TabsTrigger value="courses" className="rounded-md px-4">
-                  Courses
-                </TabsTrigger>
-                <TabsTrigger value="my-progress" className="rounded-md px-4">
-                  My Progress
-                </TabsTrigger>
-                <TabsTrigger value="leaderboard" className="rounded-md px-4">
-                  Leaderboard
-                </TabsTrigger>
-              </TabsList>
-            </div>
+            <TabsList className="grid w-full grid-cols-3 bg-muted/70 border border-border/60 px-2 py-[3px] mb-5">
+              <TabsTrigger 
+                value="courses" 
+                className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Courses
+              </TabsTrigger>
+              <TabsTrigger 
+                value="my-progress" 
+                className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
+              >
+                My Progress
+              </TabsTrigger>
+              <TabsTrigger 
+                value="leaderboard" 
+                className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Leaderboard
+              </TabsTrigger>
+            </TabsList>
 
             <TabsContent value="courses" className="mt-0">
               {/* View Mode Toggle */}
