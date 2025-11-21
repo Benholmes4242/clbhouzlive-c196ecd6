@@ -144,9 +144,9 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
           <ImageIcon className="w-7 h-7" />
         </div>
 
-        <div>
+        <div className="text-center">
           <p className="text-base font-medium text-foreground">No media yet</p>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-muted-foreground mt-3">
             Share photos and videos of this course in your posts or reviews!
           </p>
         </div>
