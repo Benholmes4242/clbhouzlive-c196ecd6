@@ -38,24 +38,39 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
   useEffect(() => {
+    console.log('[Mapbox Fullscreen] Effect triggered:', { open, hasContainer: !!mapContainerRef.current, hasToken: !!MAPBOX_TOKEN, latitude, longitude });
+    
     // When sheet is closed, clean up map and bail out
     if (!open) {
       if (mapRef.current) {
+        console.log('[Mapbox Fullscreen] Cleaning up map');
         mapRef.current.remove();
         mapRef.current = null;
       }
       return;
     }
 
-    if (!mapContainerRef.current) return;
-    if (!MAPBOX_TOKEN) return;
-    if (!latitude || !longitude) return;
+    if (!mapContainerRef.current) {
+      console.warn('[Mapbox Fullscreen] No container ref');
+      return;
+    }
+    if (!MAPBOX_TOKEN) {
+      console.warn('[Mapbox Fullscreen] No Mapbox token');
+      return;
+    }
+    if (!latitude || !longitude) {
+      console.warn('[Mapbox Fullscreen] No coordinates:', { latitude, longitude });
+      return;
+    }
 
     let timeoutId: number | null = null;
 
     const initMap = () => {
+      console.log('[Mapbox Fullscreen] initMap called');
+      
       // If map already exists (e.g. re-open), just recenter + resize
       if (mapRef.current) {
+        console.log('[Mapbox Fullscreen] Map exists, recentering');
         mapRef.current.setCenter([longitude, latitude]);
         mapRef.current.resize();
         return;
@@ -63,44 +78,62 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
 
       // Check if container has height before initializing
       const container = mapContainerRef.current;
-      if (!container || container.offsetHeight === 0) {
-        console.warn('Map container has no height, retrying...');
+      if (!container) {
+        console.warn('[Mapbox Fullscreen] Container lost, cannot init');
+        return;
+      }
+      
+      const height = container.offsetHeight;
+      const width = container.offsetWidth;
+      console.log('[Mapbox Fullscreen] Container dimensions:', { width, height });
+      
+      if (height === 0) {
+        console.warn('[Mapbox Fullscreen] Container has no height, retrying in 100ms...');
         timeoutId = window.setTimeout(initMap, 100);
         return;
       }
 
+      console.log('[Mapbox Fullscreen] Initializing Mapbox with token');
       mapboxgl.accessToken = MAPBOX_TOKEN;
 
-      const map = new mapboxgl.Map({
-        container: container,
-        style: MAPBOX_STYLE,
-        center: [longitude, latitude],
-        zoom: 13,
-        interactive: true,
-      });
+      try {
+        const map = new mapboxgl.Map({
+          container: container,
+          style: MAPBOX_STYLE,
+          center: [longitude, latitude],
+          zoom: 13,
+          interactive: true,
+        });
 
-      mapRef.current = map;
+        mapRef.current = map;
+        console.log('[Mapbox Fullscreen] Map instance created');
 
-      // Navigation controls
-      map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
+        // Navigation controls
+        map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
 
-      // Marker
-      new mapboxgl.Marker({ color: '#ffffff' })
-        .setLngLat([longitude, latitude])
-        .addTo(map);
+        // Marker
+        new mapboxgl.Marker({ color: '#ffffff' })
+          .setLngLat([longitude, latitude])
+          .addTo(map);
 
-      // Ensure correct size once everything is loaded
-      map.on('load', () => {
-        map.resize();
-      });
+        // Ensure correct size once everything is loaded
+        map.on('load', () => {
+          console.log('[Mapbox Fullscreen] Map loaded, resizing');
+          map.resize();
+        });
 
-      // Extra safety: resize again shortly after load
-      window.setTimeout(() => {
-        map.resize();
-      }, 200);
+        // Extra safety: resize again shortly after load
+        window.setTimeout(() => {
+          console.log('[Mapbox Fullscreen] Secondary resize');
+          map.resize();
+        }, 200);
+      } catch (error) {
+        console.error('[Mapbox Fullscreen] Error creating map:', error);
+      }
     };
 
     // Longer delay to ensure Sheet animation completes
+    console.log('[Mapbox Fullscreen] Scheduling initMap in 400ms');
     timeoutId = window.setTimeout(initMap, 400);
 
     return () => {
