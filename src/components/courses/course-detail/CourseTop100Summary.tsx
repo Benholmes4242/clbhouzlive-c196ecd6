@@ -2,8 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyTop100Progress } from '@/hooks/useMyTop100Progress';
-import { getRingLabel } from '@/lib/top100Prestige';
+import { getRingLabel, getRingColorClass } from '@/lib/top100Prestige';
 import { cn } from '@/lib/utils';
+import { Trophy } from 'lucide-react';
 
 const CourseTop100Summary: React.FC = () => {
   const { session } = useSupabaseSession();
@@ -23,7 +24,7 @@ const CourseTop100Summary: React.FC = () => {
         </p>
         <button
           onClick={() => navigate('/auth?redirect=/courses')}
-          className="inline-flex items-center justify-center rounded-lg bg-[var(--primary-accent)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity"
+          className="inline-flex items-center justify-center rounded-lg bg-primary-accent px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity"
         >
           Sign in to view your journey
         </button>
@@ -64,29 +65,41 @@ const CourseTop100Summary: React.FC = () => {
   return (
     <section className="rounded-2xl border border-border/60 bg-card p-4 sm:p-5">
       {/* Header */}
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div>
-          <h2 className="text-base font-semibold text-foreground">
-            Your Top 100 Progress
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            You've played {total} Top 100 course{total === 1 ? '' : 's'} across{' '}
-            {regions} region{regions === 1 ? '' : 's'}.
-          </p>
+      <div className="mb-3">
+        <h2 className="text-base font-semibold text-foreground mb-1">
+          Your Top 100 Progress
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          You've played {total} Top 100 course{total === 1 ? '' : 's'} across{' '}
+          {regions} region{regions === 1 ? '' : 's'}.
+        </p>
+        
+        {/* Prestige Ring & Milestone Chips */}
+        <div className="flex flex-wrap items-center gap-2 mt-3">
+          {data.prestige_ring && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 py-1 text-xs">
+              <span className={cn(
+                "h-4 w-4 rounded-full border border-primary-accent/60 ring-2 ring-offset-[1px] ring-offset-background",
+                getRingColorClass(data.prestige_ring)
+              )} />
+              {getRingLabel(data.prestige_ring)}
+            </span>
+          )}
+          
+          {data.prestige_label && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-3 py-1 text-xs text-primary-accent">
+              <Trophy className="h-3 w-3" />
+              {data.prestige_label}
+            </span>
+          )}
+          
           {data.next_milestone && (
-            <p className="mt-1 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-3 py-1 text-xs text-muted-foreground">
               Next milestone: {data.next_milestone.remaining} more{' '}
-              {data.next_milestone.remaining === 1 ? 'course' : 'courses'} to
-              reach {data.next_milestone.label}.
-            </p>
+              {data.next_milestone.remaining === 1 ? 'course' : 'courses'}
+            </span>
           )}
         </div>
-
-        {ringLabel && (
-          <div className="inline-flex items-center rounded-full bg-surface-alt px-3 py-1 text-xs font-medium text-muted-foreground">
-            {ringLabel}
-          </div>
-        )}
       </div>
 
       {/* 4-list grid */}
@@ -99,7 +112,7 @@ const CourseTop100Summary: React.FC = () => {
             }
             className={cn(
               'flex flex-col items-start rounded-xl border border-border/60 bg-background px-3 py-3 text-left transition-colors',
-              'hover:border-[var(--primary-accent)]/70 hover:bg-card'
+              'hover:border-primary-accent/70 hover:bg-card'
             )}
           >
             <span className="text-xs font-medium text-muted-foreground mb-0.5">
@@ -125,8 +138,8 @@ const CourseTop100Summary: React.FC = () => {
 
       {/* Link to full journey */}
       <button
-        onClick={() => navigate(`/profile/${session.user.id}?tab=top100`)}
-        className="mt-3 text-xs font-medium text-[var(--primary-accent)] hover:opacity-80 transition-opacity"
+        onClick={() => navigate('/top100?tab=my-progress')}
+        className="mt-3 text-xs font-medium text-primary-accent hover:text-primary-accent/80 transition-colors"
       >
         View full Top 100 Journey →
       </button>
