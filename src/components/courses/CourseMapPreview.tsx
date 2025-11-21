@@ -84,9 +84,6 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
     >
       <div ref={mapContainerRef} className="w-full h-full" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20" />
-      <div className="pointer-events-none absolute bottom-3 left-3 text-xs font-medium text-white drop-shadow-sm">
-        {courseName}
-      </div>
       <div className="pointer-events-none absolute bottom-3 right-3 text-[10px] px-2 py-1 rounded-full bg-black/60 text-white">
         Tap to expand map
       </div>
