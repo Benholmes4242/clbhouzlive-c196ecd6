@@ -68,7 +68,11 @@ const Top100ClubCallout: React.FC = () => {
 
         {/* CTA */}
         <div>
-          <Button size="sm" className="w-full" onClick={handleClick}>
+          <Button 
+            size="sm" 
+            className="w-full bg-[color:var(--surface-slate)] hover:bg-[color:var(--surface-slate)]/90 text-white" 
+            onClick={handleClick}
+          >
             {session
               ? 'Open your Top 100 Journey'
               : 'Sign in to join the Top 100 Club'}
