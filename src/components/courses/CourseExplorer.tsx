@@ -8,6 +8,7 @@ import { Search, MapPin, X, ArrowUp } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { scrollToTop } from '@/utils/scrollToTop';
+import { useSearchParams } from 'react-router-dom';
 import {
   PRIMARY_REGIONS,
   PRIMARY_REGION_LABELS,
@@ -22,22 +23,48 @@ const PAGE_SIZE = 50;
 
 const CourseExplorer = () => {
   const listTopRef = useRef<HTMLDivElement>(null);
+  const [searchParams] = useSearchParams();
   
-  // Session-based filter persistence - defaults only on first visit
+  // URL params take priority, then sessionStorage, then defaults
   const [selectedRegion, setSelectedRegion] = useState<PrimaryRegionKey>(() => {
+    // 1. Check URL first
+    const urlRegion = searchParams.get('region');
+    if (urlRegion) {
+      return urlRegion as PrimaryRegionKey;
+    }
+    
+    // 2. Fall back to sessionStorage
     const saved = sessionStorage.getItem('explore-last-filters');
     if (saved) {
-      const parsed = JSON.parse(saved);
-      return parsed.region || PRIMARY_REGIONS.ALL;
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.region) return parsed.region;
+      } catch (e) {
+        console.error('Failed to parse explore filters:', e);
+      }
     }
+    
+    // 3. Default
     return PRIMARY_REGIONS.ALL;
   });
+  
   const [selectedSubregion, setSelectedSubregion] = useState(() => {
+    // 1. Check URL first
+    const urlSub = searchParams.get('sub');
+    if (urlSub) return urlSub;
+    
+    // 2. Fall back to sessionStorage
     const saved = sessionStorage.getItem('explore-last-filters');
     if (saved) {
-      const parsed = JSON.parse(saved);
-      return parsed.subregion || 'all';
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.subregion) return parsed.subregion;
+      } catch (e) {
+        console.error('Failed to parse explore filters:', e);
+      }
     }
+    
+    // 3. Default
     return 'all';
   });
   const [page, setPage] = useState(0);

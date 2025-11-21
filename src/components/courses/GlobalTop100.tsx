@@ -9,6 +9,7 @@ import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { scrollToTop } from '@/utils/scrollToTop';
 import Top100ClubCallout from './Top100ClubCallout';
+import { useSearchParams } from 'react-router-dom';
 import {
   PRIMARY_REGIONS,
   SUBREGIONS,
@@ -40,14 +41,26 @@ function listSlugToRegionKey(slug: string): PrimaryRegionKey {
 
 const GlobalTop100 = () => {
   const listTopRef = useRef<HTMLDivElement>(null);
+  const [searchParams] = useSearchParams();
   
-  // Session-based filter persistence - defaults only on first visit
+  // URL params take priority, then sessionStorage, then defaults
   const [selectedList, setSelectedList] = useState(() => {
+    // 1. Check URL first
+    const urlList = searchParams.get('list');
+    if (urlList) return urlList;
+    
+    // 2. Fall back to sessionStorage
     const saved = sessionStorage.getItem('top100-last-filters');
     if (saved) {
-      const parsed = JSON.parse(saved);
-      return parsed.list || 'global';
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.list) return parsed.list;
+      } catch (e) {
+        console.error('Failed to parse top100 filters:', e);
+      }
     }
+    
+    // 3. Default
     return 'global';
   });
   const [selectedSubregion, setSelectedSubregion] = useState<'all' | string>(() => {
