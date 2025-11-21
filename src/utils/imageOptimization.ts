@@ -1,4 +1,5 @@
 // Image optimization utilities for better performance
+import { isValidR2Url } from './r2BucketMapping';
 
 export const getOptimizedImageUrl = (
   originalUrl: string,
@@ -17,14 +18,14 @@ export const getOptimizedImageUrl = (
       return originalUrl;
     }
 
-    // Only optimize R2 image URLs
-    if (!originalUrl.includes('media.clbhouz.co.uk')) {
+    // Only optimize valid R2 image URLs (supports legacy + new buckets)
+    if (!isValidR2Url(originalUrl)) {
       return originalUrl;
     }
 
     const url = new URL(originalUrl);
     
-    // Add optimization parameters for R2 images only
+    // Add optimization parameters for R2 images (works for both legacy and new)
     if (width) url.searchParams.set('w', width.toString());
     if (height) url.searchParams.set('h', height.toString());
     url.searchParams.set('fit', 'cover');
