@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { useMyTop100Progress } from '@/hooks/useMyTop100Progress';
@@ -12,10 +12,20 @@ import Top100LeaderboardPanel from '@/components/courses/Top100LeaderboardPanel'
 
 const Top100Hub = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { session } = useSupabaseSession();
   const { data: lists, isLoading: listsLoading } = useTop100Lists();
   const { data: progress } = useMyTop100Progress();
-  const [activeTab, setActiveTab] = useState<'courses' | 'my-progress' | 'leaderboard'>('courses');
+
+  const tabFromUrl = searchParams.get('tab') as
+    | 'courses'
+    | 'my-progress'
+    | 'leaderboard'
+    | null;
+
+  const [activeTab, setActiveTab] = useState<'courses' | 'my-progress' | 'leaderboard'>(
+    tabFromUrl ?? 'courses'
+  );
 
   const getRegionIcon = (slug: string) => {
     switch (slug) {

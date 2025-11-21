@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import AuthForm from "./auth/AuthForm";
 import ConfirmNotice from "./auth/ConfirmNotice";
 import AuthLayout from "./auth/AuthLayout";
@@ -23,6 +23,7 @@ const Auth: React.FC = () => {
   const [resendMsg, setResendMsg] = useState<string | null>(null);
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const lastResendEmail = useRef(""); // to avoid spamming resend if email field is empty
   
   // Hide bottom navigation and header on auth pages
@@ -40,8 +41,10 @@ const Auth: React.FC = () => {
     if (user) {
       const redirectUser = async () => {
         const hasProfile = await checkProfileExists(user.id);
+        const redirectPath = searchParams.get('redirect');
+        
         if (hasProfile) {
-          navigate("/", { replace: true });
+          navigate(redirectPath || "/", { replace: true });
         } else {
           navigate("/create-profile", { replace: true });
         }
@@ -49,7 +52,7 @@ const Auth: React.FC = () => {
       
       redirectUser();
     }
-  }, [user, navigate]);
+  }, [user, navigate, searchParams]);
 
   return (
     <>

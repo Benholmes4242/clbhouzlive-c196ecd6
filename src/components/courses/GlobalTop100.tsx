@@ -8,6 +8,7 @@ import { Search, Award, X } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { scrollToTop } from '@/utils/scrollToTop';
+import Top100ClubCallout from './Top100ClubCallout';
 import {
   PRIMARY_REGIONS,
   SUBREGIONS,
@@ -212,6 +213,9 @@ const GlobalTop100 = () => {
 
   return (
     <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-6">
+      {/* Top 100 Club Callout */}
+      <Top100ClubCallout />
+
       {/* Search */}
       <div className="relative max-w-xl mx-auto">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
