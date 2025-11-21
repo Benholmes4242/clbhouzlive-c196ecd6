@@ -58,6 +58,8 @@ import ResponsiveImmersiveHeader from './ResponsiveImmersiveHeader';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useProfileAnalytics } from '@/hooks/useProfileAnalytics';
 import { ProfileOpenToPlayStatus } from '@/features/nearby/components/ProfileOpenToPlayStatus';
+import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
+import Top100PublicJourneyPanel from '@/components/top100/Top100PublicJourneyPanel';
 
 interface Course {
   id: string;
@@ -167,6 +169,7 @@ const HeroProfileHeader = ({
   const tabs = [
     { id: 'activity', label: 'Activity' },
     { id: 'courses', label: 'Courses' },
+    { id: 'top100', label: 'Top 100 Journey' },
     { id: 'achievements', label: 'Achievements' },
     { id: 'stats', label: 'Handicap' }
   ];
@@ -231,9 +234,10 @@ const HeroProfileHeader = ({
     const baseClasses = activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-4 md:px-0';
     const sectionClasses = `
       ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
+      ${activeSection === 'top100' ? 'pt-0 pb-8' : ''}
       ${activeSection === 'achievements' || activeSection === 'stats' ? 'pt-0 py-8' : ''}
       ${isMobile && activeSection === 'activity' ? 'pb-4' : ''}
-      ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'py-4' : ''}
+      ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' && activeSection !== 'top100' ? 'py-4' : ''}
     `;
     
     if (isOutgoing) {
@@ -271,6 +275,15 @@ const HeroProfileHeader = ({
             <ProfileCoursesTab 
               userId={profile?.id || ''}
               isOwnProfile={isOwnProfile}
+            />
+          );
+        case 'top100':
+          return isOwnProfile ? (
+            <Top100MyProgressPanel userId={profile?.id} />
+          ) : (
+            <Top100PublicJourneyPanel 
+              profileUserId={profile?.id || ''}
+              profileName={profile?.display_name}
             />
           );
         case 'achievements':
@@ -1266,9 +1279,10 @@ const HeroProfileHeader = ({
           <div className={`
             ${activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-0 md:px-4'}
             ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
+            ${activeSection === 'top100' ? 'pt-0 pb-8' : ''}
             ${activeSection === 'achievements' || activeSection === 'stats' ? 'pt-0 py-8' : ''}
             ${isMobile && activeSection === 'activity' ? 'pb-4' : ''}
-            ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' ? 'py-4' : ''}
+            ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' && activeSection !== 'top100' ? 'py-4' : ''}
           `}>
             <div className={`
               ${activeSection === 'activity' ? 'w-full' : 'md:max-w-[1150px] md:mx-auto'}

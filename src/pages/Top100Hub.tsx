@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
-import { useUserTop100Progress } from '@/hooks/useUserTop100Progress';
+import { useMyTop100Progress } from '@/hooks/useMyTop100Progress';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Globe, MapPin } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
@@ -14,7 +14,7 @@ const Top100Hub = () => {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const { data: lists, isLoading: listsLoading } = useTop100Lists();
-  const { data: progress } = useUserTop100Progress(session?.user?.id);
+  const { data: progress } = useMyTop100Progress();
   const [activeTab, setActiveTab] = useState<'courses' | 'my-progress' | 'leaderboard'>('courses');
 
   const getRegionIcon = (slug: string) => {
@@ -48,8 +48,8 @@ const Top100Hub = () => {
   };
 
   const getProgress = (listId: string) => {
-    if (!progress) return null;
-    return progress.find((p) => p.listId === listId);
+    if (!progress || !progress.lists) return null;
+    return progress.lists.find((p) => p.listId === listId);
   };
 
   if (listsLoading) {
