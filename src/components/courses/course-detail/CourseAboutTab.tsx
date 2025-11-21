@@ -7,7 +7,9 @@ import { ExternalLink } from 'lucide-react';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AboutMediaStrip from './AboutMediaStrip';
-import MapThumbnail from '@/components/ui/map-thumbnail';
+import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
+import CourseMapPreview from '@/components/courses/CourseMapPreview';
+import CourseMapFullScreen from '@/components/courses/CourseMapFullScreen';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { Progress } from '@/components/ui/progress';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -56,10 +58,22 @@ const formatDescription = (description: string) => {
 
 const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Fetch coordinates (with geocoding fallback)
+  const { coords, loading: coordsLoading } = useCourseCoordinates({
+    courseId: course.id,
+    latitude: course.latitude,
+    longitude: course.longitude,
+    name: course.name,
+    country: course.country,
+    subCountry: course.sub_country,
+    region: course.region,
+  });
 
   // Fetch rating aggregates using the new hook
   const { data: ratingAggregates } = useCourseRatingAggregates(course.id);
@@ -301,20 +315,37 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             {[course.sub_country, course.region].filter(Boolean).join(', ')}
           </p>
           
-          {/* Map - full width below */}
-          <div className="mt-2 rounded-xl overflow-hidden border border-border/60">
-            <MapThumbnail
-              clubId={course.id}
-              clubName={course.name}
-              region={course.region}
-              country={course.country}
-              subCountry={course.sub_country}
-              latitude={course.latitude}
-              longitude={course.longitude}
-              className="w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px]"
-              mapType="hybrid"
-            />
-          </div>
+          {/* Map preview */}
+          {!coords && coordsLoading && (
+            <div className="w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px] rounded-2xl bg-surface-alt animate-pulse" />
+          )}
+
+          {coords && (
+            <>
+              <CourseMapPreview
+                latitude={coords.lat}
+                longitude={coords.lng}
+                courseName={course.name}
+                onOpenFullMap={() => setMapOpen(true)}
+              />
+
+              <CourseMapFullScreen
+                open={mapOpen}
+                onOpenChange={setMapOpen}
+                latitude={coords.lat}
+                longitude={coords.lng}
+                courseName={course.name}
+                country={course.country}
+                subCountry={course.sub_country}
+              />
+            </>
+          )}
+
+          {!coords && !coordsLoading && (
+            <p className="text-sm text-muted-foreground">
+              Location data isn't available for this course yet.
+            </p>
+          )}
         </section>
 
         {/* Media Section */}
