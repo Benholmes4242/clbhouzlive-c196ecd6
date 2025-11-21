@@ -6,7 +6,7 @@ const corsHeaders = {
 }
 
 interface GeocodeRequest {
-  clubId: string
+  courseId: string
   clubName: string
   region?: string
   country: string
@@ -32,11 +32,11 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { clubId, clubName, region, country, subCountry }: GeocodeRequest = await req.json()
+    const { courseId, clubName, region, country, subCountry }: GeocodeRequest = await req.json()
 
-    if (!clubId || !clubName || !country) {
+    if (!courseId || !clubName || !country) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: clubId, clubName, country' }),
+        JSON.stringify({ error: 'Missing required fields: courseId, clubName, country' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -112,7 +112,7 @@ Deno.serve(async (req) => {
         longitude: bestResult.longitude,
         updated_at: new Date().toISOString()
       })
-      .eq('id', clubId)
+      .eq('id', courseId)
 
     if (updateError) {
       console.error('Error updating golf course:', updateError)
