@@ -46,8 +46,8 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
 
       console.log('Uploading file to R2 golf courses bucket:', fileName);
 
-      // Upload file to Cloudflare R2 using course-media bucket
-      const result = await uploadToCloudflareR2(file, 'course-media', fileName);
+      // Upload file to Cloudflare R2 using course-images bucket
+      const result = await uploadToCloudflareR2(file, 'clbhouz-course-images', fileName);
 
       if (!result.success) {
         throw new Error(result.error || 'Upload failed');

@@ -99,7 +99,7 @@ const LogosManagement = () => {
 
       // Upload to Cloudflare R2 instead of Supabase storage
       const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
-      const uploadResult = await uploadToCloudflareR2(pendingUpload, 'logos', pendingUpload.name);
+      const uploadResult = await uploadToCloudflareR2(pendingUpload, 'clbhouz-club-logos', pendingUpload.name);
 
       if (!uploadResult.success || !uploadResult.publicUrl) {
         throw new Error(uploadResult.error || 'Upload failed');

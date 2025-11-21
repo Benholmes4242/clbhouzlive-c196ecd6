@@ -53,7 +53,7 @@ export const uploadMediaWithRetry = async (
       const fileExt = file.name.split('.').pop() || 'unknown';
       const fileName = `${postId}-${Date.now()}-${attempt}.${fileExt}`;
       
-      const uploadResult = await uploadToCloudflareR2(file, 'post-media', fileName);
+      const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-post-images', fileName);
       
       if (!uploadResult.success || !uploadResult.publicUrl) {
         throw new Error(uploadResult.error || 'Upload failed');

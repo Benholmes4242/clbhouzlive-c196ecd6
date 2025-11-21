@@ -88,7 +88,7 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
       if (uploadedFiles.length > 0) {
         for (const file of uploadedFiles) {
           // Upload to Cloudflare R2 instead of Supabase storage
-          const uploadResult = await uploadToCloudflareR2(file, 'course-review-media', file.name);
+          const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-review-images', file.name);
           
           if (!uploadResult.success || !uploadResult.publicUrl) {
             throw new Error(uploadResult.error || 'Upload failed');

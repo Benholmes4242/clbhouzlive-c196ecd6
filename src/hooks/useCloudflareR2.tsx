@@ -14,7 +14,7 @@ export const useCloudflareR2 = () => {
   const uploadToR2 = useCallback(async (
     file: File,
     fileName: string,
-    bucketName: string = 'clbhouz-media'
+    bucketName: string = 'clbhouz-post-images'
   ): Promise<R2UploadResult> => {
     setIsUploading(true);
     

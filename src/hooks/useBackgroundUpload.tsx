@@ -138,7 +138,7 @@ export const useBackgroundUpload = () => {
             try {
               // Upload to Cloudflare R2 instead of Supabase storage
               const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
-              const uploadResult = await uploadToCloudflareR2(file, 'post-media', fullFileName);
+              const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-post-images', fullFileName);
 
               if (!uploadResult.success || !uploadResult.publicUrl) {
                 console.error(`Upload attempt ${uploadAttempts} failed for ${file.name}:`, uploadResult.error);

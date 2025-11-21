@@ -207,7 +207,7 @@ export const useEditProfileForm = (
         const fileExt = formData.profilePhoto.name.split('.').pop();
         const fileName = `${userId}/profile-${Date.now()}.${fileExt}`;
         
-        const uploadResult = await uploadToR2Only(formData.profilePhoto, 'profile-images', fileName);
+        const uploadResult = await uploadToR2Only(formData.profilePhoto, 'clbhouz-profile-images', fileName);
         
         if (!uploadResult.success) {
           throw new Error(uploadResult.error || 'Profile photo upload failed');
@@ -221,7 +221,7 @@ export const useEditProfileForm = (
         const fileExt = formData.headerPhoto.name.split('.').pop();
         const fileName = `${userId}/header-${Date.now()}.${fileExt}`;
         
-        const uploadResult = await uploadToR2Only(formData.headerPhoto, 'profile-images', fileName);
+        const uploadResult = await uploadToR2Only(formData.headerPhoto, 'clbhouz-profile-images', fileName);
         
         if (!uploadResult.success) {
           throw new Error(uploadResult.error || 'Header photo upload failed');
