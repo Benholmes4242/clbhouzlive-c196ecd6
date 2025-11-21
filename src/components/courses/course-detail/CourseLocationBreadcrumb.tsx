@@ -16,6 +16,13 @@ interface Course {
   region?: string;
   sub_country?: string;
   local_area?: string;
+  course_top100_memberships?: Array<{
+    list_id: string;
+    top100_lists: {
+      slug: string;
+      name: string;
+    } | null;
+  }>;
 }
 
 interface CourseLocationBreadcrumbProps {
@@ -38,6 +45,11 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
 
   // Normalised keys for URLs
   const subKey = subCountryLabel ? normalizeLabel(subCountryLabel) : null;
+
+  // Derive primary Top 100 list for the CTA
+  const membership = course.course_top100_memberships?.[0];
+  const primaryListSlug = membership?.top100_lists?.slug ?? 'global-top-100';
+  const primaryListName = membership?.top100_lists?.name ?? 'Worldwide';
 
   return (
     <div className="space-y-4">
@@ -132,21 +144,20 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
             </button>
           )}
 
-          {/* Primary region Top 100 */}
+          {/* List-specific Top 100 */}
           <button
             type="button"
             onClick={() => {
-              const top100Slug = primaryRegionKeyToTop100Slug(primaryRegionKey);
               const params = new URLSearchParams({
                 tab: 'top-100',
-                ...(top100Slug ? { list: top100Slug } : {}),
+                list: primaryListSlug,
               });
               navigate(`/courses?${params.toString()}`);
             }}
             className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-surface-alt transition-colors"
           >
             <span>
-              See Top 100 in <span className="font-semibold">{primaryRegionLabel}</span>
+              See Top 100 in <span className="font-semibold">{primaryListName}</span>
             </span>
             <span className="text-muted-foreground">›</span>
           </button>

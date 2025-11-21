@@ -118,7 +118,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-3">
       {/* Location Breadcrumb & Quick Filters */}
       <CourseLocationBreadcrumb course={course} />
       
