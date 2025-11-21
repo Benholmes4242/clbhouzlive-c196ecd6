@@ -107,13 +107,29 @@ export const FriendsCoursesHero: React.FC<FriendsCoursesHeroProps> = ({ courses,
 
       {/* Stats summary below image */}
       <div className="px-1">
-        <p className="text-sm font-semibold text-foreground">
+        <p className="text-sm font-semibold text-foreground mb-1">
           {getTimeLabel()} your friends played…
         </p>
-        <p className="text-xs text-muted-foreground">
-          {coursesCount} {coursesCount === 1 ? 'course' : 'courses'} · {regionsCount} {regionsCount === 1 ? 'region' : 'regions'}
-          {avgRating && ` · Avg rating ${avgRating}`}
-        </p>
+        <div className="space-y-0.5 text-xs text-muted-foreground">
+          <p>
+            Your friends have played{" "}
+            <span className="font-medium text-foreground">
+              {coursesCount} different {coursesCount === 1 ? "course" : "courses"}
+            </span>{" "}
+            {timeRange === 'week' ? 'this week' : timeRange === '30' ? 'this month' : 'recently'}.
+          </p>
+          <p>
+            They've played in{" "}
+            <span className="font-medium text-foreground">
+              {regionsCount} {regionsCount === 1 ? "region" : "regions"}
+            </span>
+            {avgRating
+              ? <> and given an average rating of{" "}
+                <span className="font-medium text-foreground">{avgRating}</span>.
+              </>
+              : "."}
+          </p>
+        </div>
       </div>
     </div>
   );

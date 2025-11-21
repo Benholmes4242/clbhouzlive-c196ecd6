@@ -108,7 +108,7 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
         <div>
           <h3 className="text-sm font-semibold">Friends activity</h3>
           <p className="text-xs text-muted-foreground">
-            Who's been playing the most {timeLabel}
+            Top players {timeLabel === 'this month' ? 'this month' : timeLabel}
           </p>
         </div>
       </div>
@@ -121,12 +121,12 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
           return (
             <div 
               key={stats.friend_id} 
-              className={`flex items-center justify-between py-2 ${
+              className={`flex items-center justify-between gap-3 py-2 ${
                 index !== friendStats.length - 1 ? 'border-b border-border' : ''
               }`}
             >
               <div className="flex items-center gap-3">
-                <Squircle width={36} height={36}>
+                <Squircle width={32} height={32} className="shrink-0">
                   <img 
                     src={stats.profile_photo_url || '/placeholder.svg'} 
                     alt={stats.display_name}
@@ -137,17 +137,23 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
                   />
                 </Squircle>
 
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">
+                <div className="text-xs">
+                  <p className="font-medium text-foreground">
                     {stats.display_name}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground">
                     {stats.totalRounds} {stats.totalRounds === 1 ? 'round' : 'rounds'} · Last played {lastPlayedText}
                   </p>
                 </div>
               </div>
 
-              <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium ${getRankBadgeClass(index)}`}>
+              <span 
+                className={`inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                  index === 0
+                    ? "bg-echo/90 text-echo-foreground shadow-sm"
+                    : "bg-muted text-foreground"
+                }`}
+              >
                 #{rank}
               </span>
             </div>
