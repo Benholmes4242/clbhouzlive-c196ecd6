@@ -144,7 +144,7 @@ export const usePostSubmission = () => {
             
             // Upload to Cloudflare R2 (for images or video fallback)
             const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
-            const uploadResult = await uploadToCloudflareR2(file, 'post-media', fullFileName);
+            const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-post-images', fullFileName);
 
             if (!uploadResult.success || !uploadResult.publicUrl) {
               throw new Error(uploadResult.error || 'Upload failed');

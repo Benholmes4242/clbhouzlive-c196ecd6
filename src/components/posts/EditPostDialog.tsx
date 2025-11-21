@@ -97,7 +97,7 @@ const EditPostDialog = ({ open, onOpenChange, post, onPostUpdated }: EditPostDia
     
     // Upload to Cloudflare R2 instead of Supabase storage
     const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
-    const uploadResult = await uploadToCloudflareR2(file, 'post-media', fileName);
+    const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-post-images', fileName);
 
     if (!uploadResult.success || !uploadResult.publicUrl) {
       throw new Error(uploadResult.error || 'Upload failed');

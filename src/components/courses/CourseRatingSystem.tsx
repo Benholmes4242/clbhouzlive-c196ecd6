@@ -60,7 +60,7 @@ const CourseRatingSystem = ({
           
           // Upload to Cloudflare R2 instead of Supabase storage
           const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
-          const uploadResult = await uploadToCloudflareR2(file, 'course-media', fileName);
+          const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-course-images', fileName);
 
           if (!uploadResult.success || !uploadResult.publicUrl) {
             throw new Error(uploadResult.error || `Failed to upload ${file.name}`);

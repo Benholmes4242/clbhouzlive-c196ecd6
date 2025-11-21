@@ -238,7 +238,7 @@ const PostPlayRatingModal = ({
         const uploadPromises = mediaFiles.map(async (file) => {
           const fileName = `${userResponse.user.id}-${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
           
-          const uploadResult = await uploadToCloudflareR2(file, 'course-review-media', fileName);
+          const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-review-images', fileName);
           
           if (!uploadResult.success) {
             throw new Error(uploadResult.error || `Failed to upload ${file.name}`);

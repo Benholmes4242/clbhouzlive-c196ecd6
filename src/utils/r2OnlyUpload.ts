@@ -14,7 +14,7 @@ export interface R2OnlyUploadResult {
  */
 export const uploadToR2Only = async (
   file: File,
-  bucketType: 'avatars' | 'post-media' | 'course-media' | 'course-review-media' | 'logos' | 'profile-media' | 'profile-backgrounds' | 'profile-images' | 'course-images',
+  bucketType: 'clbhouz-profile-images' | 'clbhouz-profile-banners' | 'clbhouz-post-images' | 'clbhouz-course-images' | 'clbhouz-review-images' | 'clbhouz-club-logos' | 'clbhouz-system-assets',
   originalFileName?: string
 ): Promise<R2OnlyUploadResult> => {
   try {

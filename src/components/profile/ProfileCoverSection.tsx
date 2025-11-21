@@ -33,7 +33,7 @@ const ProfileCoverSection: React.FC<ProfileCoverSectionProps> = ({
       const fileName = `cover_${Date.now()}.${fileExt}`;
 
       // Upload to R2 only
-      const uploadResult = await uploadToR2Only(file, 'profile-backgrounds', fileName);
+      const uploadResult = await uploadToR2Only(file, 'clbhouz-profile-banners', fileName);
 
       if (!uploadResult.success) {
         console.error('Error uploading cover image:', uploadResult.error);

@@ -36,7 +36,7 @@ export const migrateAchievementBadgesToR2 = async (): Promise<Record<string, str
       const file = new File([blob], badge.fileName, { type: 'image/png' });
       
       // Upload to R2
-      const result = await uploadToCloudflareR2(file, 'logos', badge.fileName);
+      const result = await uploadToCloudflareR2(file, 'clbhouz-club-logos', badge.fileName);
       
       if (result.success && result.publicUrl) {
         urlMappings[badge.localPath] = result.publicUrl;
@@ -55,15 +55,15 @@ export const migrateAchievementBadgesToR2 = async (): Promise<Record<string, str
 
 // R2 URLs for achievement badges (will be populated after migration)
 export const ACHIEVEMENT_BADGE_R2_URLS = {
-  '20-club': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/20-club-badge.png',
-  '50-club': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/50-club-badge.png',
-  '100-club': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/100-club-badge.png',
-  '200-club': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/200-club-badge.png',
-  '300-club': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/300-club-badge.png',
-  'eu-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/eu-explorer-badge.png',
-  'uk-ireland-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/uk-ireland-explorer-badge.png',
-  'usa-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/usa-explorer-badge.png',
-  'world-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/world-explorer-badge.png',
-  'gb-ireland-flag': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/gb-ireland-flag.png',
-  'europe-flag': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/europe-flag.png',
+  '20-club': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/clbhouz-club-logos/20-club-badge.png',
+  '50-club': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/clbhouz-club-logos/50-club-badge.png',
+  '100-club': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/clbhouz-club-logos/100-club-badge.png',
+  '200-club': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/clbhouz-club-logos/200-club-badge.png',
+  '300-club': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/clbhouz-club-logos/300-club-badge.png',
+  'eu-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/clbhouz-club-logos/eu-explorer-badge.png',
+  'uk-ireland-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/clbhouz-club-logos/uk-ireland-explorer-badge.png',
+  'usa-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/clbhouz-club-logos/usa-explorer-badge.png',
+  'world-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/clbhouz-club-logos/world-explorer-badge.png',
+  'gb-ireland-flag': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/clbhouz-club-logos/gb-ireland-flag.png',
+  'europe-flag': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/clbhouz-club-logos/europe-flag.png',
 };

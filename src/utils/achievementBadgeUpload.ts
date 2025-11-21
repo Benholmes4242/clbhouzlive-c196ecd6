@@ -18,8 +18,8 @@ export const uploadAchievementBadge = async (
     
     const fileName = `${sanitizedName}-badge.${file.name.split('.').pop()}`;
     
-    // Upload to R2 logos bucket (where all achievement badges are stored)
-    const result = await uploadToCloudflareR2(file, 'logos', fileName);
+    // Upload to R2 club logos bucket (where all achievement badges are stored)
+    const result = await uploadToCloudflareR2(file, 'clbhouz-club-logos', fileName);
     
     if (result.success) {
       console.log(`Achievement badge uploaded successfully: ${result.publicUrl}`);
@@ -56,7 +56,7 @@ export const uploadMultipleAchievementBadges = async (
  * All achievement badges follow this URL structure
  */
 export const getAchievementBadgeUrl = (fileName: string): string => {
-  const baseUrl = 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos';
+  const baseUrl = 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/clbhouz-club-logos';
   return `${baseUrl}/${fileName}`;
 };
 
