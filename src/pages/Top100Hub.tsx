@@ -4,11 +4,13 @@ import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { useMyTop100Progress } from '@/hooks/useMyTop100Progress';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { Globe, MapPin } from 'lucide-react';
+import { Globe, MapPin, List, Map as MapIcon } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100LeaderboardPanel from '@/components/courses/Top100LeaderboardPanel';
+import Top100MapView from '@/components/courses/Top100MapView';
+import { Top100MapScope } from '@/hooks/useTop100MapCourses';
 
 const Top100Hub = () => {
   const navigate = useNavigate();
@@ -22,10 +24,18 @@ const Top100Hub = () => {
     | 'my-progress'
     | 'leaderboard'
     | null;
+  
+  const viewFromUrl = searchParams.get('view') as 'list' | 'map' | null;
 
   const [activeTab, setActiveTab] = useState<'courses' | 'my-progress' | 'leaderboard'>(
     tabFromUrl ?? 'courses'
   );
+  
+  const [coursesViewMode, setCoursesViewMode] = useState<'list' | 'map'>(
+    viewFromUrl ?? 'list'
+  );
+  
+  const [selectedListSlug, setSelectedListSlug] = useState<Top100MapScope>('global-top-100');
 
   const getRegionIcon = (slug: string) => {
     switch (slug) {
@@ -109,9 +119,38 @@ const Top100Hub = () => {
             </div>
 
             <TabsContent value="courses" className="mt-0">
-              {/* Region Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {lists?.map((list) => {
+              {/* View Mode Toggle */}
+              <div className="flex justify-center mb-6">
+                <div className="inline-flex h-10 items-center justify-center rounded-lg bg-muted p-1">
+                  <button
+                    onClick={() => setCoursesViewMode('list')}
+                    className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
+                      coursesViewMode === 'list'
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <List className="h-4 w-4" />
+                    List
+                  </button>
+                  <button
+                    onClick={() => setCoursesViewMode('map')}
+                    className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
+                      coursesViewMode === 'map'
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <MapIcon className="h-4 w-4" />
+                    Map
+                  </button>
+                </div>
+              </div>
+
+              {coursesViewMode === 'list' ? (
+                /* Region Cards */
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {lists?.map((list) => {
                   const progressData = getProgress(list.id);
                   const backgroundImage = getRegionBackground(list.slug);
 
@@ -166,9 +205,38 @@ const Top100Hub = () => {
                         </div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* Map View */
+                <div className="space-y-4">
+                  {/* List Selector for Map */}
+                  <div className="flex justify-center">
+                    <div className="inline-flex h-10 items-center gap-2 rounded-lg bg-muted p-1">
+                      {lists?.map((list) => (
+                        <button
+                          key={list.id}
+                          onClick={() => setSelectedListSlug(list.slug as Top100MapScope)}
+                          className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-all ${
+                            selectedListSlug === list.slug
+                              ? 'bg-background text-foreground shadow-sm'
+                              : 'text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          {list.slug === 'global-top-100' && <Globe className="h-4 w-4" />}
+                          {list.slug === 'gb-i-top-100' && <CountryFlag country="Britain & Ireland" size="sm" />}
+                          {list.slug === 'usa-top-100' && <CountryFlag country="USA" size="sm" />}
+                          {list.slug === 'europe-top-100' && <CountryFlag country="Continental Europe" size="sm" />}
+                          <span className="hidden sm:inline">{list.short_label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Top100MapView scope={selectedListSlug} />
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="my-progress" className="mt-0">
