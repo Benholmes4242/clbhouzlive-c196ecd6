@@ -38,8 +38,8 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
   useEffect(() => {
-    if (!open || !mapContainerRef.current) {
-      // Clean up map when sheet closes
+    // When sheet is closed, clean up map and bail out
+    if (!open) {
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
@@ -47,37 +47,57 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
       return;
     }
 
-    // Don't recreate if already exists
-    if (mapRef.current) return;
+    if (!mapContainerRef.current) return;
+    if (!MAPBOX_TOKEN) return;
+    if (!latitude || !longitude) return;
 
-    mapboxgl.accessToken = MAPBOX_TOKEN;
+    let timeoutId: number | null = null;
 
-    mapRef.current = new mapboxgl.Map({
-      container: mapContainerRef.current,
-      style: MAPBOX_STYLE,
-      center: [longitude, latitude],
-      zoom: 13,
-      interactive: true,
-    });
+    const initMap = () => {
+      // If map already exists (e.g. re-open), just recenter + resize
+      if (mapRef.current) {
+        mapRef.current.setCenter([longitude, latitude]);
+        mapRef.current.resize();
+        return;
+      }
 
-    // Add navigation controls
-    mapRef.current.addControl(
-      new mapboxgl.NavigationControl({
-        visualizePitch: false,
-      }),
-      'top-right'
-    );
+      mapboxgl.accessToken = MAPBOX_TOKEN;
 
-    // Add white marker at course location
-    new mapboxgl.Marker({ color: '#ffffff' })
-      .setLngLat([longitude, latitude])
-      .addTo(mapRef.current);
+      const map = new mapboxgl.Map({
+        container: mapContainerRef.current!,
+        style: MAPBOX_STYLE,
+        center: [longitude, latitude],
+        zoom: 13,
+        interactive: true,
+      });
+
+      mapRef.current = map;
+
+      // Navigation controls
+      map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
+
+      // Marker
+      new mapboxgl.Marker({ color: '#ffffff' })
+        .setLngLat([longitude, latitude])
+        .addTo(map);
+
+      // Ensure correct size once everything is loaded
+      map.on('load', () => {
+        map.resize();
+      });
+
+      // Extra safety: resize again shortly after the sheet finishes animating
+      window.setTimeout(() => {
+        map.resize();
+      }, 200);
+    };
+
+    // Delay init slightly so the Radix Sheet can finish its slide-up animation
+    timeoutId = window.setTimeout(initMap, 250);
 
     return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
+      if (timeoutId) clearTimeout(timeoutId);
+      // Cleanup handled at the top when open becomes false
     };
   }, [open, latitude, longitude]);
 
@@ -102,7 +122,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
           </div>
 
           {/* Map */}
-          <div className="relative flex-1 rounded-2xl overflow-hidden border border-border/60">
+          <div className="relative flex-1 min-h-[260px] rounded-2xl overflow-hidden border border-border/60 bg-surface-alt">
             <div ref={mapContainerRef} className="w-full h-full" />
           </div>
 
