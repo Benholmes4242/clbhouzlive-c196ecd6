@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LeaderboardScope, LeaderboardTimeRange, useTop100Leaderboard } from '@/hooks/useTop100Leaderboard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 
 const Top100LeaderboardPanel = () => {
+  const navigate = useNavigate();
   const [scope, setScope] = useState<LeaderboardScope>('worldwide');
   const [timeRange, setTimeRange] = useState<LeaderboardTimeRange>('all_time');
   const [page, setPage] = useState(0);
@@ -142,7 +144,8 @@ const Top100LeaderboardPanel = () => {
           {data?.entries.map((entry) => (
             <div
               key={entry.user_id}
-              className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border/50"
+              onClick={() => navigate(`/profile/${entry.user_id}?tab=top100`)}
+              className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border/50 cursor-pointer hover:border-primary-accent/50 hover:shadow-lg transition-all"
             >
               {/* Rank */}
               <div className="flex-shrink-0 w-12 text-center">

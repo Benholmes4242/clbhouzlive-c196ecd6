@@ -2,10 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export type Top100ListProgress = {
-  list_slug: 'global-top-100' | 'gb-i-top-100' | 'usa-top-100' | 'europe-top-100';
-  list_name: string;
-  total_courses: number;
-  played_courses: number;
+  listId: string;
+  listSlug: string;
+  listName: string;
+  played: number;
+  total: number;
   course_ids: string[];
 };
 
@@ -32,9 +33,29 @@ export type Top100ProgressResponse = {
   next_milestone: Top100NextMilestone | null;
 };
 
-export function useTop100MyProgress(userId: string | undefined) {
+function getMilestoneLabel(count: number): Top100NextMilestone | null {
+  if (count < 20) {
+    return {
+      label: '20 Club',
+      remaining: 20 - count,
+    };
+  } else if (count < 50) {
+    return {
+      label: '50 Club',
+      remaining: 50 - count,
+    };
+  } else if (count < 100) {
+    return {
+      label: '100 Century Club',
+      remaining: 100 - count,
+    };
+  }
+  return null;
+}
+
+export function useTop100ProgressForUser(userId: string | undefined | null) {
   return useQuery({
-    queryKey: ['top100-my-progress', userId],
+    queryKey: ['top100-progress-user', userId],
     enabled: !!userId,
     queryFn: async (): Promise<Top100ProgressResponse> => {
       if (!userId) {
@@ -116,10 +137,11 @@ export function useTop100MyProgress(userId: string | undefined) {
         }
 
         listProgress.push({
-          list_slug: list.slug as any,
-          list_name: list.name,
-          total_courses: count || 0,
-          played_courses: uniquePlayedInList.length,
+          listId: list.id,
+          listSlug: list.slug,
+          listName: list.name,
+          played: uniquePlayedInList.length,
+          total: count || 0,
           course_ids: uniquePlayedInList,
         });
       }
@@ -163,26 +185,8 @@ export function useTop100MyProgress(userId: string | undefined) {
         });
       }
 
-      // Calculate next milestone
       const totalPlayed = playedTop100Courses.size;
-      let nextMilestone: Top100NextMilestone | null = null;
-
-      if (totalPlayed < 20) {
-        nextMilestone = {
-          label: '20 Club',
-          remaining: 20 - totalPlayed,
-        };
-      } else if (totalPlayed < 50) {
-        nextMilestone = {
-          label: '50 Club',
-          remaining: 50 - totalPlayed,
-        };
-      } else if (totalPlayed < 100) {
-        nextMilestone = {
-          label: '100 Century Club',
-          remaining: 100 - totalPlayed,
-        };
-      }
+      const nextMilestone = getMilestoneLabel(totalPlayed);
 
       return {
         total_played_top100: totalPlayed,
