@@ -60,6 +60,8 @@ import { useProfileAnalytics } from '@/hooks/useProfileAnalytics';
 import { ProfileOpenToPlayStatus } from '@/features/nearby/components/ProfileOpenToPlayStatus';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100PublicJourneyPanel from '@/components/top100/Top100PublicJourneyPanel';
+import { useTop100Overview } from '@/hooks/useTop100Overview';
+import { Trophy } from 'lucide-react';
 
 interface Course {
   id: string;
@@ -155,6 +157,9 @@ const HeroProfileHeader = ({
 
   const [mediaManagerOpen, setMediaManagerOpen] = useState(false);
   const [showStickyHeader, setShowStickyHeader] = useState(false);
+  
+  // Top 100 overview for prestige chip
+  const { data: top100Overview } = useTop100Overview(profile?.id);
   
   // Use intersection observer to detect when profile card is out of view
   const { ref: profileCardRef, isInView: isProfileCardInView } = useIntersectionObserver({
@@ -902,6 +907,33 @@ const HeroProfileHeader = ({
                   </div>
                 </div>
 
+                {/* Top 100 Prestige Chip */}
+                {top100Overview && top100Overview.total_played > 0 && (
+                  <div className="mt-3 flex justify-center">
+                    <button
+                      type="button"
+                      onClick={() => handleTabChange('top100')}
+                      className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary-accent/60 hover:text-foreground transition-colors"
+                    >
+                      <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-alt text-[10px]">
+                        🏆
+                      </span>
+                      <span className="font-medium">
+                        Top 100:
+                      </span>
+                      <span>
+                        {top100Overview.total_played} course{top100Overview.total_played === 1 ? '' : 's'} · {top100Overview.regions_count}{' '}
+                        {top100Overview.regions_count === 1 ? 'region' : 'regions'}
+                      </span>
+                      {top100Overview.milestone_label && (
+                        <span className="text-primary-accent">
+                          · {top100Overview.milestone_label}
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                )}
+
                 {/* Tabs */}
                 <nav className="tabs">
                   {tabs.map((tab) => (
@@ -1091,10 +1123,37 @@ const HeroProfileHeader = ({
                        <span className="text-lg font-semibold text-gray-900">{followersCount}</span>
                        <span className="text-base font-normal text-neutral-800">Followers</span>
                      </div>
-                  </div>
+                   </div>
 
-                  {/* Tab Navigation - pinned to bottom */}
-                  <div className="w-full border-t border-gray-300 mt-4 pt-4">
+                   {/* Top 100 Prestige Chip */}
+                   {top100Overview && top100Overview.total_played > 0 && (
+                     <div className="w-full mt-3 flex justify-center">
+                       <button
+                         type="button"
+                         onClick={() => handleTabChange('top100')}
+                         className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary-accent/60 hover:text-foreground transition-colors"
+                       >
+                         <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-alt text-[10px]">
+                           🏆
+                         </span>
+                         <span className="font-medium">
+                           Top 100:
+                         </span>
+                         <span>
+                           {top100Overview.total_played} course{top100Overview.total_played === 1 ? '' : 's'} · {top100Overview.regions_count}{' '}
+                           {top100Overview.regions_count === 1 ? 'region' : 'regions'}
+                         </span>
+                         {top100Overview.milestone_label && (
+                           <span className="text-primary-accent">
+                             · {top100Overview.milestone_label}
+                           </span>
+                         )}
+                       </button>
+                     </div>
+                   )}
+
+                   {/* Tab Navigation - pinned to bottom */}
+                   <div className="w-full border-t border-gray-300 mt-4 pt-4">
                     <div className="flex" role="tablist" aria-label="Profile sections">
                       {tabs.map((tab) => (
                         <button
