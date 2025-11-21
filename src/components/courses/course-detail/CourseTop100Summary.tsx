@@ -63,7 +63,7 @@ const CourseTop100Summary: React.FC = () => {
   ].filter(Boolean);
 
   return (
-    <section className="rounded-2xl border border-border/60 bg-card p-4 sm:p-5">
+    <section className="rounded-2xl border border-border/60 bg-card p-4 sm:p-5 text-center">
       {/* Header */}
       <div className="mb-3">
         <h2 className="text-base font-semibold text-foreground mb-1">
@@ -75,7 +75,7 @@ const CourseTop100Summary: React.FC = () => {
         </p>
         
         {/* Prestige Ring & Milestone Chips */}
-        <div className="flex flex-wrap items-center gap-2 mt-3">
+        <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
           {data.prestige_ring && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 py-1 text-xs">
               <span className={cn(
@@ -103,7 +103,7 @@ const CourseTop100Summary: React.FC = () => {
       </div>
 
       {/* 4-list grid */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
         {listsToShow.map((list) => (
           <button
             key={list!.listSlug}
@@ -137,12 +137,14 @@ const CourseTop100Summary: React.FC = () => {
       </div>
 
       {/* Link to full journey */}
-      <button
-        onClick={() => navigate('/top100?tab=my-progress')}
-        className="mt-3 text-xs font-medium text-primary-accent hover:text-primary-accent/80 transition-colors"
-      >
-        View full Top 100 Journey →
-      </button>
+      <div className="text-center">
+        <button
+          onClick={() => navigate('/top100?tab=my-progress')}
+          className="mt-3 text-xs font-medium text-primary-accent hover:text-primary-accent/80 transition-colors"
+        >
+          View full Top 100 Journey →
+        </button>
+      </div>
     </section>
   );
 };
