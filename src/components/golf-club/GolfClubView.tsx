@@ -88,7 +88,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   }
 
   return (
-    <div className={isInModal ? "w-full" : "min-h-screen bg-muted/60 pb-20 w-full"}>
+    <div className={isInModal ? "w-full" : "min-h-screen bg-muted/60 pb-3 w-full"}>
       {/* Extended Hero Banner - continues behind tabs */}
       <div className="course-hero-container relative overflow-hidden">
         {/* Back button for modal - positioned over hero image */}
