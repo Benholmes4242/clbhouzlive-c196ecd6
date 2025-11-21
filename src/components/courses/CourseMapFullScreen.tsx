@@ -159,7 +159,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
         side="bottom" 
         className="h-[85vh] sm:h-[80vh] flex flex-col p-0"
       >
-        <div className="flex flex-col h-full p-4 gap-4">
+        <div className="flex flex-col h-full px-4 pt-4 pb-3 gap-4">
           {/* Header */}
           <div className="flex items-start justify-between">
             <div>
@@ -182,18 +182,18 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
           <div className="flex flex-col sm:flex-row gap-2">
             {isIOS && (
               <Button
-                className="flex-1"
+                className="flex-1 bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
                 onClick={() => window.open(appleMapsUrl, '_blank')}
               >
                 Open in Apple Maps
               </Button>
             )}
             <Button
+              className={isIOS ? "flex-1" : "flex-1 bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"}
               variant={isIOS ? 'outline' : 'default'}
-              className="flex-1"
               onClick={() => window.open(googleMapsUrl, '_blank')}
             >
-              Open in Google Maps
+              Open in Maps
             </Button>
           </div>
         </div>
