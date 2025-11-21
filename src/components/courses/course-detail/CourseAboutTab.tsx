@@ -17,9 +17,9 @@ import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
-import { CourseMilestonesCard } from '@/components/courses/CourseMilestonesCard';
 import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
 import RatingComparisonCard from './RatingComparisonCard';
+import CourseTop100Summary from './CourseTop100Summary';
 
 interface Course {
   id: string;
@@ -303,8 +303,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </section>
       )}
 
-      {/* Milestones Card */}
-      <CourseMilestonesCard courseId={course.id} />
+      {/* Top 100 mini-journey summary (replaces milestones) */}
+      <CourseTop100Summary />
 
       {/* Location and Media sections - side by side on desktop, stacked on mobile */}
       <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>

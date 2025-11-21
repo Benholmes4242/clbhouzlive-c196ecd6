@@ -204,8 +204,6 @@ function AppRoutes() {
         <Route path="/global-top100" element={<GlobalTop100 />} />
         <Route path="/top100" element={<Top100Hub />} />
         <Route path="/top100/:slug" element={<Top100List />} />
-        <Route path="/achievements" element={<AchievementsHub />} />
-        <Route path="/achievements/:username" element={<AchievementsHub />} />
         <Route path="/admin-setup" element={<AdminSetupPage />} />
         
         {/* Admin routes wrapped with AdminLayout */}
