@@ -170,15 +170,27 @@ export function useTop100Leaderboard(args: UseTop100LeaderboardArgs) {
       });
 
       // Calculate lists_completed (users who have 100+ in specific lists all-time)
+      // Fetch all list memberships in one query to avoid N+1
+      const { data: allListMemberships, error: allListErr } = await supabase
+        .from('course_top100_memberships')
+        .select('course_id, list_id')
+        .in('list_id', (lists || []).map(l => l.id));
+
+      if (allListErr) throw allListErr;
+
+      // Build map of list_id -> Set of course_ids
+      const listCourseMap = new Map<string, Set<string>>();
+      for (const m of allListMemberships || []) {
+        if (!listCourseMap.has(m.list_id)) {
+          listCourseMap.set(m.list_id, new Set());
+        }
+        listCourseMap.get(m.list_id)!.add(m.course_id);
+      }
+
       const listsCompleted = new Map<string, string[]>();
       
       for (const list of lists || []) {
-        const { data: listMemberships } = await supabase
-          .from('course_top100_memberships')
-          .select('course_id')
-          .eq('list_id', list.id);
-
-        const listCourseIds = new Set((listMemberships || []).map(m => m.course_id));
+        const listCourseIds = listCourseMap.get(list.id) || new Set<string>();
 
         userIds.forEach(userId => {
           const userCourses = worldwideCourses.get(userId) || new Set();

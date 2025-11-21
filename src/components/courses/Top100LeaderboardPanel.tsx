@@ -19,7 +19,7 @@ const Top100LeaderboardPanel = () => {
   });
 
   const scopeLabels: Record<LeaderboardScope, string> = {
-    'worldwide': 'Worldwide',
+    worldwide: 'Worldwide',
     'global-top-100': 'Global Top 100',
     'gb-i-top-100': 'GB&I Top 100',
     'usa-top-100': 'USA Top 100',
@@ -27,9 +27,16 @@ const Top100LeaderboardPanel = () => {
   };
 
   const timeRangeLabels: Record<LeaderboardTimeRange, string> = {
-    'all_time': 'All time',
-    'this_year': 'This year',
-    'this_month': 'This month',
+    all_time: 'All time',
+    this_year: 'This year',
+    this_month: 'This month',
+  };
+
+  const listShortLabels: Record<string, string> = {
+    'global-top-100': 'Global',
+    'gb-i-top-100': 'GB&I',
+    'usa-top-100': 'USA',
+    'europe-top-100': 'Europe',
   };
 
   const handleLoadMore = () => {
@@ -146,7 +153,9 @@ const Top100LeaderboardPanel = () => {
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 <Avatar className="h-12 w-12 flex-shrink-0">
                   <AvatarImage src={entry.avatar_url || undefined} alt={entry.display_name} />
-                  <AvatarFallback>{entry.display_name[0]?.toUpperCase()}</AvatarFallback>
+                  <AvatarFallback>
+                    {(entry.display_name || 'A').charAt(0).toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
                 
                 <div className="flex-1 min-w-0">
@@ -163,12 +172,12 @@ const Top100LeaderboardPanel = () => {
                   </p>
                   {entry.lists_completed.length > 0 && (
                     <div className="flex gap-1.5 mt-1 flex-wrap">
-                      {entry.lists_completed.map((listSlug) => (
+                      {entry.lists_completed.map((slug) => (
                         <span
-                          key={listSlug}
+                          key={slug}
                           className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground"
                         >
-                          {listSlug.replace('-top-100', '').toUpperCase()} 100/100
+                          {listShortLabels[slug] || slug.toUpperCase()} 100/100
                         </span>
                       ))}
                     </div>
