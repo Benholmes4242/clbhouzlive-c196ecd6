@@ -32,7 +32,16 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       
       const { data, error } = await supabase
         .from('golf_courses')
-        .select('*')
+        .select(`
+          *,
+          course_top100_memberships (
+            list_id,
+            top100_lists (
+              slug,
+              name
+            )
+          )
+        `)
         .eq('id', courseId)
         .single();
 

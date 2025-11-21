@@ -126,7 +126,6 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
       <>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base md:text-lg font-semibold">Media</h2>
-          <div className="w-12 h-4 bg-muted rounded animate-pulse" />
         </div>
         <div className="grid grid-cols-3 gap-2">
           {Array.from({ length: maxItems }).map((_, i) => (
@@ -137,26 +136,37 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     );
   }
 
+  const hasMedia = mediaTiles.length > 0;
+
   return (
     <>
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-base md:text-lg font-semibold">Media</h2>
-        <button
-          type="button"
-          className="text-xs font-medium text-primary hover:underline"
-          onClick={(e) => {
-            e.stopPropagation();
-            onSeeAllClick();
-          }}
-        >
-          See all
-        </button>
+        {hasMedia && (
+          <button
+            type="button"
+            className="text-xs font-medium text-primary hover:underline"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSeeAllClick();
+            }}
+          >
+            See all
+          </button>
+        )}
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
-        {Array.from({ length: maxItems }).map((_, i) => {
-          const media = mediaTiles[i];
-          return media ? (
+      {!hasMedia ? (
+        <div className="rounded-xl border border-dashed border-border/60 bg-muted/40 px-4 py-6 text-sm text-muted-foreground">
+          No media for this course yet.
+          <br />
+          <span className="font-medium">
+            Be the first to share a round or post from here.
+          </span>
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-2">
+          {mediaTiles.map((media) => (
             <button
               key={media.id}
               type="button"
@@ -173,11 +183,9 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                 className="w-full h-full"
               />
             </button>
-          ) : (
-            <div key={`ph-${i}`} className="rounded-xl bg-muted/70 aspect-square" />
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </>
   );
 };
