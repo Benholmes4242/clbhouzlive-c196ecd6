@@ -61,10 +61,18 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
         return;
       }
 
+      // Check if container has height before initializing
+      const container = mapContainerRef.current;
+      if (!container || container.offsetHeight === 0) {
+        console.warn('Map container has no height, retrying...');
+        timeoutId = window.setTimeout(initMap, 100);
+        return;
+      }
+
       mapboxgl.accessToken = MAPBOX_TOKEN;
 
       const map = new mapboxgl.Map({
-        container: mapContainerRef.current!,
+        container: container,
         style: MAPBOX_STYLE,
         center: [longitude, latitude],
         zoom: 13,
@@ -86,14 +94,14 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
         map.resize();
       });
 
-      // Extra safety: resize again shortly after the sheet finishes animating
+      // Extra safety: resize again shortly after load
       window.setTimeout(() => {
         map.resize();
       }, 200);
     };
 
-    // Delay init slightly so the Radix Sheet can finish its slide-up animation
-    timeoutId = window.setTimeout(initMap, 250);
+    // Longer delay to ensure Sheet animation completes
+    timeoutId = window.setTimeout(initMap, 400);
 
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
@@ -122,7 +130,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
           </div>
 
           {/* Map */}
-          <div className="relative flex-1 min-h-[260px] rounded-2xl overflow-hidden border border-border/60 bg-surface-alt">
+          <div className="relative flex-1 rounded-2xl overflow-hidden border border-border/60 bg-surface-alt" style={{ minHeight: '320px' }}>
             <div ref={mapContainerRef} className="w-full h-full" />
           </div>
 
