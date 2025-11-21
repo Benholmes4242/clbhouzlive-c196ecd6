@@ -1,7 +1,22 @@
 // Utility functions for handling R2 images correctly
+import { getR2BucketSource, isValidR2Url } from './r2BucketMapping';
 
 export const isR2Url = (url: string): boolean => {
   return url?.includes('media.clbhouz.co.uk') || false;
+};
+
+/**
+ * Validates R2 URL compatibility (supports both legacy and new buckets)
+ */
+export const isCompatibleR2Url = (url: string): boolean => {
+  return isValidR2Url(url);
+};
+
+/**
+ * Gets bucket source type for debugging/monitoring
+ */
+export const getR2Source = (url: string): 'legacy' | 'new' | 'unknown' => {
+  return getR2BucketSource(url);
 };
 
 export const isVideoUrl = (url: string): boolean => {
@@ -32,8 +47,8 @@ export const getDirectImageUrl = (url: string): string => {
     return url;
   }
   
-  // R2 CORS is now configured, so R2 images should load in preview
-  // Return all URLs as-is (including R2 and Supabase storage)
+  // R2 CORS is configured, and both legacy + new buckets are readable
+  // Return all URLs as-is (supports backward compatibility)
   return url;
 };
 
