@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
+import { useTop100Badges } from '@/hooks/useTop100Badges';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -8,6 +9,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { ArrowRight, Trophy } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import Top100Pills from './Top100Pills';
+import { getRingLabel, getRingColorClass } from '@/lib/top100Prestige';
 
 interface Top100MyProgressPanelProps {
   userId?: string | null;
@@ -17,6 +19,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   const { session } = useSupabaseSession();
   const effectiveUserId = userId ?? session?.user?.id ?? null;
   const { data, isLoading } = useTop100ProgressForUser(effectiveUserId);
+  const { data: badges = [] } = useTop100Badges(effectiveUserId);
   const navigate = useNavigate();
   const isOwnProfile = !userId || userId === session?.user?.id;
 
@@ -57,20 +60,35 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         </p>
         <div className="text-sm text-foreground">
           {isOwnProfile ? "You've" : "They've"} played{' '}
-          <span className="font-semibold">{data.total_played_top100}</span> Top 100 courses
-          across <span className="font-semibold">{data.regions_count}</span>{' '}
+          <span className="font-semibold">{data.total_played_top100}</span> Top 100 course
+          {data.total_played_top100 === 1 ? '' : 's'} across{' '}
+          <span className="font-semibold">{data.regions_count}</span>{' '}
           {data.regions_count === 1 ? 'region' : 'regions'}.
         </div>
-        {data.next_milestone && isOwnProfile && (
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-accent/10 border border-primary-accent/20">
-            <Trophy className="w-4 h-4 text-primary-accent" />
-            <span className="text-sm font-medium text-foreground">
-              Next milestone: {data.next_milestone.remaining} more{' '}
-              {data.next_milestone.remaining === 1 ? 'course' : 'courses'} to unlock the{' '}
-              {data.next_milestone.label} badge
+        
+        {/* Prestige Ring & Milestone Chips */}
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {data.prestige_ring && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 py-1 text-xs">
+              <span className={`h-4 w-4 rounded-full border border-primary-accent/60 ring-2 ring-offset-[1px] ring-offset-background ${getRingColorClass(data.prestige_ring)}`} />
+              {getRingLabel(data.prestige_ring)}
             </span>
-          </div>
-        )}
+          )}
+          
+          {data.prestige_label && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-3 py-1 text-xs text-primary-accent">
+              <Trophy className="h-3 w-3" />
+              {data.prestige_label}
+            </span>
+          )}
+          
+          {isOwnProfile && data.next_milestone && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-3 py-1 text-xs text-muted-foreground">
+              Next milestone: {data.next_milestone.remaining} more{' '}
+              {data.next_milestone.remaining === 1 ? 'course' : 'courses'}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Progress Summary Cards */}
@@ -91,6 +109,31 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           </div>
         ))}
       </div>
+
+      {/* Badges Strip */}
+      {badges.length > 0 && (
+        <section className="space-y-3">
+          <h3 className="text-sm font-medium text-foreground">Badges</h3>
+          <div className="flex flex-wrap gap-2">
+            {badges.map((badge) => (
+              <div
+                key={badge.id}
+                className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs"
+              >
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-surface-alt text-[10px]">
+                  {badge.category === 'milestone' ? '🏆' : '🌍'}
+                </span>
+                <div className="flex flex-col">
+                  <span className="font-medium text-foreground">{badge.label}</span>
+                  <span className="text-[11px] text-muted-foreground">
+                    {badge.description}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Per-List Detail */}
       <div className="space-y-3">

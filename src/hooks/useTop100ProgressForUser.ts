@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { getTop100PrestigeRing, getTop100MilestoneLabel, Top100PrestigeRing } from '@/lib/top100Prestige';
 
 export type Top100ListProgress = {
   listId: string;
@@ -31,6 +32,8 @@ export type Top100ProgressResponse = {
   lists: Top100ListProgress[];
   recent_rounds: Top100RecentRound[];
   next_milestone: Top100NextMilestone | null;
+  prestige_ring?: Top100PrestigeRing;
+  prestige_label?: string | null;
 };
 
 function getMilestoneLabel(count: number): Top100NextMilestone | null {
@@ -194,6 +197,8 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
         lists: listProgress,
         recent_rounds: recentRounds,
         next_milestone: nextMilestone,
+        prestige_ring: getTop100PrestigeRing(totalPlayed),
+        prestige_label: getTop100MilestoneLabel(totalPlayed),
       };
     },
     staleTime: 60 * 1000,

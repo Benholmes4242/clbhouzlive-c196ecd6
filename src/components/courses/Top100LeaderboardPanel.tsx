@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Trophy, Award } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { getTop100PrestigeRing, getRingColorClass } from '@/lib/top100Prestige';
 
 const Top100LeaderboardPanel = () => {
   const navigate = useNavigate();
@@ -154,12 +155,19 @@ const Top100LeaderboardPanel = () => {
 
               {/* Avatar + Info */}
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <Avatar className="h-12 w-12 flex-shrink-0">
-                  <AvatarImage src={entry.avatar_url || undefined} alt={entry.display_name} />
-                  <AvatarFallback>
-                    {(entry.display_name || 'A').charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="relative h-12 w-12 flex-shrink-0">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={entry.avatar_url || undefined} alt={entry.display_name} />
+                    <AvatarFallback>
+                      {(entry.display_name || 'A').charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  {getTop100PrestigeRing(entry.total_top100_played) && (
+                    <span 
+                      className={`pointer-events-none absolute inset-0 rounded-full ring-2 ring-offset-[2px] ring-offset-background ${getRingColorClass(getTop100PrestigeRing(entry.total_top100_played))}`}
+                    />
+                  )}
+                </div>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
