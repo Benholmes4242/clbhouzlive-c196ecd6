@@ -8,13 +8,14 @@ import { Globe, MapPin } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
+import Top100LeaderboardPanel from '@/components/courses/Top100LeaderboardPanel';
 
 const Top100Hub = () => {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const { data: lists, isLoading: listsLoading } = useTop100Lists();
   const { data: progress } = useUserTop100Progress(session?.user?.id);
-  const [activeTab, setActiveTab] = useState<'courses' | 'my-progress'>('courses');
+  const [activeTab, setActiveTab] = useState<'courses' | 'my-progress' | 'leaderboard'>('courses');
 
   const getRegionIcon = (slug: string) => {
     switch (slug) {
@@ -81,7 +82,7 @@ const Top100Hub = () => {
             </p>
           </div>
 
-          {/* Tabs: Courses | My Progress */}
+          {/* Tabs: Courses | My Progress | Leaderboard */}
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
             <div className="flex justify-center mb-6">
               <TabsList className="inline-flex h-10 items-center justify-center rounded-lg bg-muted p-1">
@@ -90,6 +91,9 @@ const Top100Hub = () => {
                 </TabsTrigger>
                 <TabsTrigger value="my-progress" className="rounded-md px-4">
                   My Progress
+                </TabsTrigger>
+                <TabsTrigger value="leaderboard" className="rounded-md px-4">
+                  Leaderboard
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -159,6 +163,10 @@ const Top100Hub = () => {
 
             <TabsContent value="my-progress" className="mt-0">
               <Top100MyProgressPanel />
+            </TabsContent>
+
+            <TabsContent value="leaderboard" className="mt-0">
+              <Top100LeaderboardPanel />
             </TabsContent>
           </Tabs>
         </div>
