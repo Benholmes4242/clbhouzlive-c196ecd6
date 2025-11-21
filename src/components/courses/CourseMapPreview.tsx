@@ -22,27 +22,58 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
   const mapRef = useRef<mapboxgl.Map | null>(null);
 
   useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return;
+    if (!mapContainerRef.current) return;
+    if (!MAPBOX_TOKEN) return;
+    if (!latitude || !longitude) return;
 
-    mapboxgl.accessToken = MAPBOX_TOKEN;
+    let frameId: number | null = null;
+    let timeoutId: number | null = null;
 
-    mapRef.current = new mapboxgl.Map({
-      container: mapContainerRef.current,
-      style: MAPBOX_STYLE,
-      center: [longitude, latitude],
-      zoom: 13,
-      interactive: false, // Preview only - no interaction
-      attributionControl: false,
+    const initMap = () => {
+      // If map already exists, just recenter + resize
+      if (mapRef.current) {
+        mapRef.current.setCenter([longitude, latitude]);
+        mapRef.current.resize();
+        return;
+      }
+
+      mapboxgl.accessToken = MAPBOX_TOKEN;
+
+      const map = new mapboxgl.Map({
+        container: mapContainerRef.current!,
+        style: MAPBOX_STYLE,
+        center: [longitude, latitude],
+        zoom: 13,
+        interactive: false, // preview only
+        attributionControl: false,
+      });
+
+      mapRef.current = map;
+
+      // Resize once the style has loaded to avoid partial renders
+      map.on('load', () => {
+        map.resize();
+      });
+
+      // White marker at course location
+      new mapboxgl.Marker({ color: '#ffffff' })
+        .setLngLat([longitude, latitude])
+        .addTo(map);
+    };
+
+    // Give the browser a frame to apply Tailwind heights,
+    // then a tiny timeout to ensure layout is stable
+    frameId = requestAnimationFrame(() => {
+      timeoutId = window.setTimeout(initMap, 50);
     });
 
-    // Add white marker at course location
-    new mapboxgl.Marker({ color: '#ffffff' })
-      .setLngLat([longitude, latitude])
-      .addTo(mapRef.current);
-
     return () => {
-      mapRef.current?.remove();
-      mapRef.current = null;
+      if (frameId) cancelAnimationFrame(frameId);
+      if (timeoutId) clearTimeout(timeoutId);
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
   }, [latitude, longitude]);
 
