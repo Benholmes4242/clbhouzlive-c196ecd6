@@ -208,13 +208,13 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
   if (!reviewsData?.reviews || reviewsData.reviews.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center px-6 pt-10 pb-24 text-center text-muted-foreground gap-3">
-        <div className="w-12 h-12 rounded-full bg-surface-alt flex items-center justify-center">
-          <Star className="w-6 h-6" />
+        <div className="w-14 h-14 rounded-full bg-surface-alt flex items-center justify-center">
+          <Star className="w-7 h-7" />
         </div>
 
         <div>
-          <p className="text-sm font-medium text-foreground">No reviews yet</p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-base font-medium text-foreground">No reviews yet</p>
+          <p className="text-sm text-muted-foreground mt-1">
             Be the first to leave a review for this course!
           </p>
         </div>
