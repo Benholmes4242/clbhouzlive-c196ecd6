@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef } from 'react';
-import ClubhouzLoading from '@/components/ClubhouzLoading';
+import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { MapPin, UserPlus, UserCheck, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { HeartIcon, ChatBubbleOvalLeftEllipsisIcon, PaperAirplaneIcon, SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/solid';
 import { EmojiReactionTray } from './EmojiReactionTray';
@@ -669,7 +669,11 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   }, []);
 
   if (filteredPosts.length === 0) {
-    return <ClubhouzLoading />;
+    return (
+      <div className="fixed inset-0 z-10 bg-black flex items-center justify-center">
+        <InlineSpinner size="lg" className="border-white border-t-transparent" />
+      </div>
+    );
   }
 
   return (

@@ -11,10 +11,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import SiteAccessControl from "@/components/SiteAccessControl";
 import AccessGateV2 from "@/components/AccessGateV2";
 import { SecurityHeaders } from "@/components/security/SecurityHeaders";
-import { GlobalLoadingProvider } from "@/loading/GlobalLoading";
-import GlobalSpinner from "@/loading/GlobalSpinner";
-import BindLoadingBus from "@/loading/BindLoadingBus";
-import ClbhouzPageSpinner from "@/components/ui/ClbhouzPageSpinner";
+import { AppBootstrapLoader } from "@/components/AppBootstrapLoader";
 import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 import { VideoManagerProvider } from './contexts/VideoManagerContext';
@@ -34,6 +31,10 @@ import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
+import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
+import { TourSkeleton } from '@/components/skeletons/TourSkeleton';
+import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+import { HubSkeleton } from '@/components/skeletons/HubSkeleton';
 import { HubProvider } from '@/features/hub/useHub';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 import { longPressHandler } from '@/utils/longPressHandler';
@@ -178,11 +179,11 @@ function AppRoutes() {
         <Route path="/create-profile" element={<CreateProfile />} />
         <Route path="/profile" element={<ProfileWrapped />} />
         <Route path="/profile-test" element={<ProfileTestPage />} />
-        <Route path="/profile/:username" element={<UserProfilePage />} />
+        <Route path="/profile/:username" element={<Suspense fallback={<ProfileSkeleton />}><UserProfilePage /></Suspense>} />
         <Route path="/profile/:username/reviews" element={<UserReviewsPage />} />
         <Route path="/settings" element={<SettingsWrapped />} />
         <Route path="/clubhouse" element={<Suspense fallback={<ClubhouseSkeleton />}><ClubhouseWrapped /></Suspense>} />
-        <Route path="/discover" element={<DiscoverWrapped />} />
+        <Route path="/discover" element={<Suspense fallback={<DiscoverSkeleton />}><DiscoverWrapped /></Suspense>} />
         <Route path="/courses" element={<Suspense fallback={<CoursesListSkeleton />}><Courses /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
         <Route path="/courses/:courseId/rate" element={<Suspense fallback={<div className="fixed inset-0 bg-surface-card" />}><RateCoursePage /></Suspense>} />
@@ -190,16 +191,16 @@ function AppRoutes() {
         <Route path="/user/:username/courses" element={<UserCoursesPage />} />
         <Route path="/my-ratings" element={<MyRatings />} />
         <Route path="/news" element={<News />} />
-        <Route path="/tour-central" element={<TourCentral />} />
-        <Route path="/videos" element={<VideosPage />} />
-          <Route path="/season-shop" element={<SeasonShop />} />
-          <Route path="/challenges" element={<ChallengesPage />} />
+        <Route path="/tour-central" element={<Suspense fallback={<TourSkeleton />}><TourCentral /></Suspense>} />
+        <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />
+          <Route path="/season-shop" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><SeasonShop /></Suspense>} />
+          <Route path="/challenges" element={<Suspense fallback={<GenericPageSkeleton />}><ChallengesPage /></Suspense>} />
         
-        <Route path="/messages" element={<MessagesPage />} />
-        <Route path="/notifications" element={<NotificationsPage />} />
-        <Route path="/friends" element={<FriendsPage />} />
-        <Route path="/followers" element={<FollowersPage />} />
-        <Route path="/following" element={<FollowingPage />} />
+        <Route path="/messages" element={<Suspense fallback={<GenericPageSkeleton />}><MessagesPage /></Suspense>} />
+        <Route path="/notifications" element={<Suspense fallback={<GenericPageSkeleton />}><NotificationsPage /></Suspense>} />
+        <Route path="/friends" element={<Suspense fallback={<GenericPageSkeleton />}><FriendsPage /></Suspense>} />
+        <Route path="/followers" element={<Suspense fallback={<GenericPageSkeleton />}><FollowersPage /></Suspense>} />
+        <Route path="/following" element={<Suspense fallback={<GenericPageSkeleton />}><FollowingPage /></Suspense>} />
         
         <Route path="/global-top100" element={<GlobalTop100 />} />
         <Route path="/top100" element={<Top100Hub />} />
@@ -267,19 +268,19 @@ function AppRoutes() {
         {/* Hub routes - only when NOT using background location */}
         {!showHubOverlay && FEATURE_FLAGS.HUB && (
           <>
-            <Route path="/hub" element={<HubHomePage />} />
-            <Route path="/hub/golfers" element={<HubGolfersPage />} />
-            <Route path="/hub/echo" element={<HubEchoChatPage />} />
-            <Route path="/hub/create-game" element={<HubCreateGamePage />} />
-            <Route path="/hub/games" element={<HubGamesPage />} />
-            <Route path="/hub/your-games" element={<HubYourGamesPage />} />
-            <Route path="/hub/swing" element={<HubSwingPage />} />
-          <Route path="/hub/swing/history" element={<HubSwingHistoryPage />} />
-          <Route path="/hub/swing/history/:id" element={<HubSwingDetailPage />} />
-          <Route path="/hub/echo/history" element={<HubEchoHistoryPage />} />
-          <Route path="/hub/echo/history/chat/:id" element={<HubEchoHistoryDetailPage />} />
-          <Route path="/hub/echo/tags" element={<HubEchoTagsPage />} />
-          <Route path="/echo/share/:token" element={<HubEchoSharePage />} />
+            <Route path="/hub" element={<Suspense fallback={<HubSkeleton />}><HubHomePage /></Suspense>} />
+            <Route path="/hub/golfers" element={<Suspense fallback={<HubSkeleton />}><HubGolfersPage /></Suspense>} />
+            <Route path="/hub/echo" element={<Suspense fallback={<HubSkeleton />}><HubEchoChatPage /></Suspense>} />
+            <Route path="/hub/create-game" element={<Suspense fallback={<HubSkeleton />}><HubCreateGamePage /></Suspense>} />
+            <Route path="/hub/games" element={<Suspense fallback={<HubSkeleton />}><HubGamesPage /></Suspense>} />
+            <Route path="/hub/your-games" element={<Suspense fallback={<HubSkeleton />}><HubYourGamesPage /></Suspense>} />
+            <Route path="/hub/swing" element={<Suspense fallback={<HubSkeleton />}><HubSwingPage /></Suspense>} />
+          <Route path="/hub/swing/history" element={<Suspense fallback={<HubSkeleton />}><HubSwingHistoryPage /></Suspense>} />
+          <Route path="/hub/swing/history/:id" element={<Suspense fallback={<HubSkeleton />}><HubSwingDetailPage /></Suspense>} />
+          <Route path="/hub/echo/history" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryPage /></Suspense>} />
+          <Route path="/hub/echo/history/chat/:id" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryDetailPage /></Suspense>} />
+          <Route path="/hub/echo/tags" element={<Suspense fallback={<HubSkeleton />}><HubEchoTagsPage /></Suspense>} />
+          <Route path="/echo/share/:token" element={<Suspense fallback={<HubSkeleton />}><HubEchoSharePage /></Suspense>} />
           <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
           </>
         )}
@@ -424,8 +425,6 @@ const App: React.FC = () => {
   return (
     <AppShell>
       <ReviewIslandLoader />
-      <GlobalLoadingProvider>
-        <BindLoadingBus />
         <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>
@@ -447,7 +446,7 @@ const App: React.FC = () => {
                             <AuthWrapper>
                               <SeasonWrapModal />
                               <AchievementToastWrapper />
-                              <Suspense fallback={<ClbhouzPageSpinner />}>
+                              <Suspense fallback={<AppBootstrapLoader />}>
                                 <div className="app-depth">
                                   {/* No global header - each page renders its own ClubhouseHeaderNew */}
                                   <AppRoutes />
@@ -472,8 +471,6 @@ const App: React.FC = () => {
         </TooltipProvider>
       </QueryClientProvider>
       </ThemeProvider>
-      <GlobalSpinner />
-    </GlobalLoadingProvider>
     </AppShell>
   );
 };

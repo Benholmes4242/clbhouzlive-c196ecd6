@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useAchievementSharing } from '@/hooks/useAchievementSharing';
 import { formatDistanceToNow } from 'date-fns';
-import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
+import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { getSeasonLevel } from '@/utils/seasonLevels';
 import { SeasonTrophyCabinet } from '@/components/achievements/SeasonTrophyCabinet';
 import { SeasonPassHeader } from '@/components/season-pass/SeasonPassHeader';
@@ -121,7 +121,11 @@ const AchievementsHub = () => {
   }, [achievements, categoryFilter, statusFilter]);
 
   if (isLoadingProfile || isLoadingSummary) {
-    return <ClbhouzPageSpinner />;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <InlineSpinner size="lg" />
+      </div>
+    );
   }
 
   if (!profile) {

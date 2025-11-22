@@ -3,7 +3,7 @@ import { useChannelsFeed } from '@/hooks/channels/useChannelsFeed';
 import { ChannelVideoCard } from './ChannelVideoCard';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { useInView } from 'react-intersection-observer';
-import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
+import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { isMockEnabled, getMockChannels } from '@/mocks/channels.mock';
 
@@ -87,7 +87,11 @@ export const ChannelsFeed: React.FC = () => {
   };
 
   if (isLoading && itemsToRender.length === 0) {
-    return <ClbhouzPageSpinner label="Loading channels..." />;
+    return (
+      <div className="flex items-center justify-center py-20">
+        <InlineSpinner size="lg" />
+      </div>
+    );
   }
 
   if (itemsToRender.length === 0) {

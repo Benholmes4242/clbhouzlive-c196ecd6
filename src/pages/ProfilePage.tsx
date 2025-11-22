@@ -4,7 +4,7 @@ import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
-import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
+import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { LoadoutModal } from '@/components/cosmetics/LoadoutModal';
 import { Button } from '@/components/ui/button';
 import { Sparkles } from 'lucide-react';
@@ -40,9 +40,10 @@ const ProfilePage = () => {
     }
   }, [user, loading, navigate]);
 
-  // Show loading while checking authentication
+  // Loading state handled by route-level Suspense with ProfileSkeleton
+  // Auth check still returns early
   if (loading) {
-    return <ClbhouzPageSpinner label="Loading profile…" />;
+    return null;
   }
 
   // Show error if there's an issue
