@@ -14,7 +14,25 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Prevent pull-to-refresh and overscroll bounce on mobile - GLOBAL */
+/* 
+ * ============================================================================
+ * CRITICAL: PREVENT PULL-TO-REFRESH AND OVERSCROLL - DO NOT MODIFY OR REMOVE
+ * ============================================================================
+ * 
+ * These styles MUST remain in place to prevent the following issues:
+ * 1. Pull-down-to-refresh revealing white gaps at the top of pages
+ * 2. Overscroll bounce effects on iOS/mobile browsers
+ * 3. Headers and pages being pulled down from their fixed positions
+ * 
+ * Requirements:
+ * - Pages and headers MUST stay fixed at the viewport edge
+ * - Swiping down on headers should do nothing
+ * - Swiping down on pages already at the top should do nothing
+ * - No white area should ever be revealed above the page
+ * 
+ * ⚠️ REMOVING OR MODIFYING THESE RULES WILL BREAK MOBILE UX ⚠️
+ * ============================================================================
+ */
 html {
   overscroll-behavior-y: none !important;
   overscroll-behavior-x: none !important;
