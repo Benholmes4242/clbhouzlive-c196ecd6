@@ -49,7 +49,7 @@ export const BulkActionBar: React.FC<BulkActionBarProps> = ({
           {/* Count badge */}
           <div className="flex items-center gap-2">
             <div
-              className="px-3 py-1.5 rounded-full text-[13px] font-medium"
+              className="px-3 py-1.5 rounded-full text-body-sm font-medium"
               style={{
                 background: 'rgba(255,255,255,0.12)',
                 color: 'var(--hub-text)',

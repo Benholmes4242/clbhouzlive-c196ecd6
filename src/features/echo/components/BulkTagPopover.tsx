@@ -29,7 +29,7 @@ export function BulkTagPopover({ onAdd, onRemove, onClose }: Props) {
       onKeyDown={(e) => e.key === 'Escape' && onClose()}
     >
       <div className="p-4">
-        <div className="text-sm font-medium mb-3 text-white/90">
+        <div className="text-body-md font-medium mb-3 text-white/90">
           Bulk tag selected conversations
         </div>
 
@@ -43,7 +43,7 @@ export function BulkTagPopover({ onAdd, onRemove, onClose }: Props) {
         <div className="mt-4 flex gap-2 justify-end">
           <button
             onClick={onClose}
-            className="px-3 py-1.5 rounded-md border border-white/10 hover:bg-white/10 text-sm text-white/70 hover:text-white/90 transition-colors"
+            className="px-3 py-1.5 rounded-md border border-white/10 hover:bg-white/10 text-body-md text-white/70 hover:text-white/90 transition-colors"
           >
             Cancel
           </button>
@@ -56,7 +56,7 @@ export function BulkTagPopover({ onAdd, onRemove, onClose }: Props) {
               onClose(); 
             }}
             className={cn(
-              "px-3 py-1.5 rounded-md text-sm border border-white/10 hover:bg-white/10 text-white/70 hover:text-white/90 transition-colors",
+              "px-3 py-1.5 rounded-md text-body-md border border-white/10 hover:bg-white/10 text-white/70 hover:text-white/90 transition-colors",
               (tags.length === 0 || busy) && "opacity-40 cursor-not-allowed",
               busy === 'remove' && "opacity-60"
             )}
@@ -72,7 +72,7 @@ export function BulkTagPopover({ onAdd, onRemove, onClose }: Props) {
               onClose(); 
             }}
             className={cn(
-              "px-3 py-1.5 rounded-md text-sm bg-white/10 hover:bg-white/14 border border-white/10 text-white/90 transition-colors",
+              "px-3 py-1.5 rounded-md text-body-md bg-white/10 hover:bg-white/14 border border-white/10 text-white/90 transition-colors",
               (tags.length === 0 || busy) && "opacity-40 cursor-not-allowed",
               busy === 'add' && "opacity-60"
             )}

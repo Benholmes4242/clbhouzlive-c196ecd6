@@ -30,10 +30,10 @@ export function ExportHud({ current, total, bytes, onCancel }: ExportHudProps) {
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1">
-          <div className="text-sm font-medium text-foreground mb-1">
+          <div className="text-body-md font-medium text-foreground mb-1">
             Exporting {total} conversation{total !== 1 ? 's' : ''}…
           </div>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-meta text-muted-foreground">
             {current}/{total} • {formatBytes(bytes)}
           </div>
         </div>

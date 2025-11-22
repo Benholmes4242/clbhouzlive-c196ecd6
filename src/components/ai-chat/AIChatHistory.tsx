@@ -220,7 +220,7 @@ interface AIChatHistoryProps {
         <>
           <div className="px-4 py-3 sm:px-5 sm:py-4">
             <div className="flex items-start gap-2">
-              <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center gap-1 rounded-md text-[11px] font-medium bg-white/08 backdrop-blur border border-white/12 text-white/80">
+              <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center gap-1 rounded-md text-meta font-medium bg-white/08 backdrop-blur border border-white/12 text-white/80">
                 <PiWaveform className="h-3.5 w-3.5" />
                 Swing
               </span>
@@ -269,7 +269,7 @@ interface AIChatHistoryProps {
       ) : (
         <div className="px-4 sm:px-5 py-4">{/* Expanded content stays as-is */}
           <div className="flex justify-between items-center mb-3">
-            <h3 className="text-[17px] font-semibold text-white">
+            <h3 className="text-heading-md font-semibold text-white">
               Swing Analysis
             </h3>
             <div className="flex items-center gap-1">
@@ -399,10 +399,10 @@ const EmptyState: React.FC<{
     <div className="h-24 w-24 rounded-full bg-white/08 backdrop-blur border border-white/12 grid place-items-center text-white/60">
       {icon}
     </div>
-    <div className="text-[18px] font-semibold text-white">
+    <div className="text-heading-lg font-semibold text-white">
       {title}
     </div>
-    <div className="text-[14px] text-white/60 max-w-[280px]">
+    <div className="text-body-md text-white/60 max-w-[280px]">
       {subtitle}
     </div>
   </div>
@@ -417,10 +417,10 @@ const ErrorState: React.FC<{
     <div className="h-20 w-20 rounded-full bg-red-900/20 border border-red-500/20 text-red-400 grid place-items-center">
       <AlertCircle className="h-9 w-9" />
     </div>
-    <div className="text-[17px] font-semibold text-white">
+    <div className="text-heading-md font-semibold text-white">
       Something went wrong
     </div>
-    <div className="text-[14px] text-white/60 max-w-[280px]">
+    <div className="text-body-md text-white/60 max-w-[280px]">
       {message}
     </div>
     <button

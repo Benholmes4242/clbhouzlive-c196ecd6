@@ -62,15 +62,15 @@ export function ChatThread({ messages, isStreaming }: ChatThreadProps) {
             : 'bg-secondary text-secondary-foreground'
         }`}
       >
-        <div className="text-sm whitespace-pre-wrap break-words">
+        <div className="text-body-md whitespace-pre-wrap break-words">
           {message.content}
         </div>
         {message.meta?.error && (
-          <div className="mt-2 text-xs text-destructive">
+          <div className="mt-2 text-meta text-destructive">
             Error: {message.meta.error}
           </div>
         )}
-        <div className="mt-1 text-xs opacity-60">
+        <div className="mt-1 text-meta opacity-60">
           {new Date(message.createdAt).toLocaleTimeString([], {
             hour: '2-digit',
             minute: '2-digit',
@@ -89,7 +89,7 @@ export function ChatThread({ messages, isStreaming }: ChatThreadProps) {
             <span className="animate-bounce" style={{ animationDelay: '150ms' }}>●</span>
             <span className="animate-bounce" style={{ animationDelay: '300ms' }}>●</span>
           </div>
-          <span className="text-sm">Echo is thinking...</span>
+          <span className="text-body-md">Echo is thinking...</span>
         </div>
       </div>
     </div>
@@ -100,8 +100,8 @@ export function ChatThread({ messages, isStreaming }: ChatThreadProps) {
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="text-center space-y-2">
           <div className="text-4xl mb-4">💬</div>
-          <h3 className="text-lg font-semibold text-foreground">Start a conversation</h3>
-          <p className="text-sm text-muted-foreground max-w-xs">
+          <h3 className="text-heading-lg font-semibold text-foreground">Start a conversation</h3>
+          <p className="text-body-md text-muted-foreground max-w-xs">
             Ask Echo anything about golf, get tips, or just chat
           </p>
         </div>

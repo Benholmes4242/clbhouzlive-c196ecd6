@@ -59,7 +59,7 @@ export function ChatComposer({ onSend, onStop, disabled, isStreaming }: ChatComp
           placeholder="Message Echo..."
           disabled={disabled}
           rows={1}
-          className="flex-1 resize-none bg-secondary text-foreground rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 resize-none bg-secondary text-foreground rounded-xl px-4 py-3 text-body-md focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
           style={{ maxHeight: '120px' }}
           aria-label="Message input"
         />
@@ -84,7 +84,7 @@ export function ChatComposer({ onSend, onStop, disabled, isStreaming }: ChatComp
         )}
       </div>
       
-      <div className="mt-2 text-xs text-muted-foreground text-center">
+      <div className="mt-2 text-meta text-muted-foreground text-center">
         Press Enter to send, Shift+Enter for new line
       </div>
     </div>

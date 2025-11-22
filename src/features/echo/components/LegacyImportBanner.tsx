@@ -18,10 +18,10 @@ export function LegacyImportBanner({ isMigrating, onAccept, onDismiss }: Props) 
     >
       <div className="flex items-start gap-3">
         <div className="flex-1">
-          <div className="text-sm font-medium text-white">
+          <div className="text-body-md font-medium text-white">
             Import older local conversations
           </div>
-          <div className="text-xs text-white/70 mt-0.5">
+          <div className="text-meta text-white/70 mt-0.5">
             We found Echo chats saved on this device. Import them to your account so they're available across devices.
           </div>
         </div>

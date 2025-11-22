@@ -33,9 +33,9 @@ export const HistoryThreadInline: React.FC<HistoryThreadInlineProps> = ({
     onHeightChange(h);
   }, [messages?.length, onHeightChange]);
 
-  if (isLoading) return <div className="text-[var(--eh-preview)] text-sm p-3">Loading…</div>;
-  if (error) return <div className="text-[var(--eh-preview)] text-sm p-3">Couldn't load messages.</div>;
-  if (!messages.length) return <div className="text-[var(--eh-preview)] text-sm p-3">No messages in this conversation yet.</div>;
+  if (isLoading) return <div className="text-[var(--eh-preview)] text-body-md p-3">Loading…</div>;
+  if (error) return <div className="text-[var(--eh-preview)] text-body-md p-3">Couldn't load messages.</div>;
+  if (!messages.length) return <div className="text-[var(--eh-preview)] text-body-md p-3">No messages in this conversation yet.</div>;
 
   return (
     <div ref={ref} role="log" aria-live="polite">

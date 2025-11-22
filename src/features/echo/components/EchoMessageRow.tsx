@@ -28,7 +28,7 @@ export function EchoMessageRow({ message, onContextMenu }: EchoMessageRowProps) 
     return (
       <div className="flex justify-end mt-3" data-msg-id={message.id}>
         <div className="max-w-[80%] flex items-start gap-3">
-          <div className="echo-bubble-user px-4 py-3 text-[15px] leading-relaxed text-[color:var(--echo-text-primary)] echo-bubble-enter">
+          <div className="echo-bubble-user px-4 py-3 text-body-md leading-relaxed text-[color:var(--echo-text-primary)] echo-bubble-enter">
             {message.content}
           </div>
           <div className="flex-shrink-0">
@@ -54,9 +54,9 @@ export function EchoMessageRow({ message, onContextMenu }: EchoMessageRowProps) 
           <EchoAvatar state="idle" size={42} />
         </div>
         <div className="flex-1">
-          <div className="echo-card px-4 py-3 text-[15px] leading-relaxed text-[color:var(--echo-text-primary)] echo-bubble-enter">
+          <div className="echo-card px-4 py-3 text-body-md leading-relaxed text-[color:var(--echo-text-primary)] echo-bubble-enter">
             <div className="whitespace-pre-wrap break-words">{message.content}</div>
-            {message.meta?.error && <div className="mt-2 text-xs text-red-400">Error: {message.meta.error}</div>}
+            {message.meta?.error && <div className="mt-2 text-meta text-red-400">Error: {message.meta.error}</div>}
           </div>
         </div>
       </div>
