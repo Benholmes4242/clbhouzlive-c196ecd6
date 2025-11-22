@@ -231,7 +231,7 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
           >
             <button
               role="menuitem"
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-left text-[14px]"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-left text-body-md"
               style={{ color: 'var(--hub-text)' }}
               onClick={handleExportJSON}
             >
@@ -241,7 +241,7 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
             
             <button
               role="menuitem"
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-left text-[14px]"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-left text-body-md"
               style={{ color: 'var(--hub-text)' }}
               onClick={handleExportMD}
             >
@@ -255,7 +255,7 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
             <div className="relative">
               <button
                 role="menuitem"
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-left text-[14px]"
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-left text-body-md"
                 style={{ color: 'var(--hub-text)' }}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -279,7 +279,7 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
             
             {threadTags.length > 0 && (
               <div className="px-3 py-2">
-                <div className="text-[11px] font-medium mb-1.5" style={{ color: 'var(--hub-text-dim)' }}>
+                <div className="text-meta font-medium mb-1.5" style={{ color: 'var(--hub-text-dim)' }}>
                   Remove tag:
                 </div>
                 <div className="space-y-1">
@@ -287,7 +287,7 @@ export const RowContextMenu: React.FC<RowContextMenuProps> = ({
                     <button
                       key={tag}
                       role="menuitem"
-                      className="w-full flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-white/10 transition-colors text-left text-[13px]"
+                      className="w-full flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-white/10 transition-colors text-left text-body-sm"
                       style={{ color: 'var(--hub-text)' }}
                       onClick={() => handleRemoveTag(tag)}
                     >

@@ -36,7 +36,7 @@ export function EchoContextMenu({
     >
       <div
         className="absolute z-[61] min-w-[180px] rounded-2xl bg-black/80 
-                   border border-white/10 backdrop-blur-2xl text-[14px]
+                   border border-white/10 backdrop-blur-2xl text-body-md
                    shadow-[0_24px_60px_rgba(0,0,0,0.85)] overflow-hidden"
         style={{
           top: Math.min(position.y, window.innerHeight - 180),

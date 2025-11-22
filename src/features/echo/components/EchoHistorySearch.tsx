@@ -281,7 +281,7 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
             }
           }}
           placeholder="Search conversations…"
-          className="w-full h-10 pl-10 pr-10 rounded-[14px] text-[15px] transition-colors"
+          className="w-full h-10 pl-10 pr-10 rounded-[14px] text-body-md transition-colors"
           style={{
             background: 'rgba(255,255,255,0.06)',
             border: '1px solid rgba(255,255,255,0.08)',
@@ -326,7 +326,7 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
         {/* Tag filter pill (if active) */}
         {activeTag && (
           <div
-            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium"
+            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-body-sm font-medium"
             style={{
               background: 'rgba(110,146,119,0.15)',
               border: '1px solid rgba(110,146,119,0.25)',
@@ -354,7 +354,7 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
             <button
               key={filter.id}
               onClick={() => handleFilterClick(filter.id)}
-              className="flex-shrink-0 h-[34px] px-3 rounded-[10px] text-[14px] font-medium transition-all"
+              className="flex-shrink-0 h-[34px] px-3 rounded-[10px] text-body-md font-medium transition-all"
               style={{
                 background: isActive
                   ? 'rgba(255,255,255,0.12)'
