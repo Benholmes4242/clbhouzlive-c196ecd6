@@ -115,11 +115,22 @@ export const useChromeState = ({ forceHidden = false, disabled = false }: UseChr
     }
   }, [disabled, chromeState]);
 
+  // Debounce scroll handling to reduce overhead during rapid scroll events
+  const lastScrollCall = useRef(0);
+  const SCROLL_THROTTLE_MS = 16; // ~60fps max
+
   // Scroll handler (to be called from rAF)
   const handleScroll = useCallback((scrollTop: number) => {
     if (forceHiddenRef.current || disabled) return;
 
     const now = Date.now();
+    
+    // Throttle scroll processing to reduce CPU during transitions
+    if (now - lastScrollCall.current < SCROLL_THROTTLE_MS) {
+      return;
+    }
+    lastScrollCall.current = now;
+
     const timeDelta = now - lastScrollTime.current;
     const deltaY = scrollTop - lastScrollTop.current;
     const velocity = timeDelta > 0 ? deltaY / timeDelta : 0;

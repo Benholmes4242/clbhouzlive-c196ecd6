@@ -49,6 +49,21 @@ export function HubProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Centralized hub-open class management to prevent race conditions
+  React.useEffect(() => {
+    const isHubRoute = loc.pathname.startsWith('/hub');
+    
+    if (isHubRoute) {
+      document.documentElement.classList.add('hub-open');
+    } else {
+      document.documentElement.classList.remove('hub-open');
+    }
+
+    return () => {
+      document.documentElement.classList.remove('hub-open');
+    };
+  }, [loc.pathname]);
+
   return (
     <HubContext.Provider value={{ open, navigateFromHub, close }}>
       {children}

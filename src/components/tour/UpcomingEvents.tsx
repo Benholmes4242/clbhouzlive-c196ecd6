@@ -6,17 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Bell, MapPin } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getTourLogoSize } from './rankings/utils';
-
-interface Event {
-  id: string;
-  name: string;
-  tour: 'PGA' | 'LIV' | 'DP World' | 'Amateur' | 'University';
-  date: string;
-  location: string;
-  status: 'upcoming' | 'live';
-  prize?: string;
-  image?: string;
-}
+import { MOCK_EVENTS, type Event } from './mockData';
 
 // Tour logo mapping
 const tourLogos: Record<string, string> = {
@@ -26,44 +16,6 @@ const tourLogos: Record<string, string> = {
   'University': '/lovable-uploads/6272d8e2-c43e-49e6-ae7b-667db411c2f8.png',
   'Amateur': '/lovable-uploads/6272d8e2-c43e-49e6-ae7b-667db411c2f8.png',
 };
-
-const mockEvents: Event[] = [
-  {
-    id: '1',
-    name: 'The Masters Tournament',
-    tour: 'PGA',
-    date: '2024-04-11',
-    location: 'Augusta National Golf Club, GA',
-    status: 'upcoming',
-    prize: '$18M',
-  },
-  {
-    id: '2',
-    name: 'LIV Golf Miami',
-    tour: 'LIV',
-    date: '2024-04-05',
-    location: 'Trump National Doral, FL',
-    status: 'live',
-    prize: '$25M',
-  },
-  {
-    id: '3',
-    name: 'NCAA Division I Championship',
-    tour: 'University',
-    date: '2024-05-24',
-    location: 'Various Locations',
-    status: 'upcoming',
-  },
-  {
-    id: '4',
-    name: 'DP World Tour Championship',
-    tour: 'DP World',
-    date: '2024-11-14',
-    location: 'Dubai, UAE',
-    status: 'upcoming',
-    prize: '$10M',
-  },
-];
 
 const UpcomingEvents = () => {
   const [filterTour, setFilterTour] = useState<string>('all');
@@ -80,8 +32,8 @@ const UpcomingEvents = () => {
   };
 
   const filteredEvents = filterTour === 'all' 
-    ? mockEvents 
-    : mockEvents.filter(event => event.tour === filterTour);
+    ? MOCK_EVENTS 
+    : MOCK_EVENTS.filter(event => event.tour === filterTour);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {

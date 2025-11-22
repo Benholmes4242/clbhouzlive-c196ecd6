@@ -53,11 +53,7 @@ export function HubEchoChatPage() {
     { param: 'msg', maxLen: 800, stripOn: 'always' }
   );
 
-  // Apply hub-open class for glass theme
-  useEffect(() => {
-    document.documentElement.classList.add('hub-open');
-    return () => document.documentElement.classList.remove('hub-open');
-  }, []);
+  // hub-open class is now managed by HubProvider to prevent race conditions
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
