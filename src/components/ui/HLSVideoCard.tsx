@@ -402,7 +402,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
 
       {/* Error overlay - only show if video completely failed to load */}
       {hasError && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 px-6 text-center text-[14px] text-white/85">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 px-6 text-center text-body-md text-white/85">
           <p className="mb-3">Couldn't load this round.</p>
           <button
             type="button"
@@ -414,7 +414,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
                 v.load();
               }
             }}
-            className="rounded-full bg-white px-4 py-1.5 text-[13px] font-medium text-black"
+            className="rounded-full bg-white px-4 py-1.5 text-body-sm font-medium text-black"
           >
             Tap to try again
           </button>

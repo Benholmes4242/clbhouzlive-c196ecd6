@@ -121,7 +121,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               disabled={submitting}
               required
               className="w-full rounded-lg bg-[color:var(--surface-input)] text-foreground placeholder:text-[color:var(--placeholder-foreground)]
-                       border border-[color:hsl(var(--input))] px-4 py-3 text-[15px] outline-none
+                       border border-[color:hsl(var(--input))] px-4 py-3 text-body-md outline-none
                        focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-colors
                        disabled:opacity-60"
             />
@@ -139,7 +139,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               placeholder="Your name"
               disabled={submitting}
               className="w-full rounded-lg bg-[color:var(--surface-input)] text-foreground placeholder:text-[color:var(--placeholder-foreground)]
-                       border border-[color:hsl(var(--input))] px-4 py-3 text-[15px] outline-none
+                       border border-[color:hsl(var(--input))] px-4 py-3 text-body-md outline-none
                        focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-colors
                        disabled:opacity-60"
             />
@@ -157,20 +157,20 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               placeholder="Your golf club"
               disabled={submitting}
               className="w-full rounded-lg bg-[color:var(--surface-input)] text-foreground placeholder:text-[color:var(--placeholder-foreground)]
-                       border border-[color:hsl(var(--input))] px-4 py-3 text-[15px] outline-none
+                       border border-[color:hsl(var(--input))] px-4 py-3 text-body-md outline-none
                        focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-colors
                        disabled:opacity-60"
             />
           </div>
 
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-xs text-muted-foreground">
             We'll only use this to contact you about beta access.
           </p>
 
           <button
             type="submit"
             disabled={submitting || !turnstileLoaded}
-            className="w-full rounded-lg bg-[color:var(--surface-slate)] text-white py-3 font-medium text-[15px]
+            className="w-full rounded-lg bg-[color:var(--surface-slate)] text-white py-3 font-medium text-body-md
                      hover:bg-[color:var(--surface-slate)]/90 disabled:opacity-60 transition-colors"
           >
             {submitting ? "Submitting..." : "Request Invite"}

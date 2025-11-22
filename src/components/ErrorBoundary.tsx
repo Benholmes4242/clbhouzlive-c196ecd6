@@ -30,10 +30,10 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
           role="alert"
           style={{ color: 'var(--hub-text)' }}
         >
-          <div className="text-[17px] font-semibold mb-2">
+          <div className="text-body-lg font-semibold mb-2">
             Something went wrong
           </div>
-          <div className="text-[15px]" style={{ color: 'var(--hub-text-dim)' }}>
+          <div className="text-body-md" style={{ color: 'var(--hub-text-dim)' }}>
             Try reloading the page.
           </div>
         </div>
