@@ -7,28 +7,61 @@ const ScrollToTopGlass = () => {
 
   useEffect(() => {
     const checkScroll = () => {
-      // Check both #root element scroll and window scroll
+      // Check multiple scroll sources
       const rootContainer = document.getElementById('root');
+      const mainElement = document.querySelector('main');
+      const pageContainer = document.querySelector('.page-with-header');
+      
       const rootScroll = rootContainer?.scrollTop || 0;
+      const mainScroll = mainElement?.scrollTop || 0;
+      const pageScroll = pageContainer?.scrollTop || 0;
       const windowScroll = window.scrollY || document.documentElement.scrollTop || 0;
       
-      const scrollTop = Math.max(rootScroll, windowScroll);
+      const scrollTop = Math.max(rootScroll, mainScroll, pageScroll, windowScroll);
+      
+      // Debug logging
+      if (scrollTop > 0) {
+        console.log('ScrollToTopGlass scroll detection:', {
+          rootScroll,
+          mainScroll,
+          pageScroll,
+          windowScroll,
+          maxScroll: scrollTop,
+          visible: scrollTop > 400
+        });
+      }
+      
       setVisible(scrollTop > 400);
     };
 
     // Initial check
     checkScroll();
 
-    // Listen to both #root and window scroll events
+    // Listen to all possible scroll sources
     const rootContainer = document.getElementById('root');
+    const mainElement = document.querySelector('main');
+    const pageContainer = document.querySelector('.page-with-header');
+    
     if (rootContainer) {
       rootContainer.addEventListener('scroll', checkScroll, { passive: true });
+    }
+    if (mainElement) {
+      mainElement.addEventListener('scroll', checkScroll, { passive: true });
+    }
+    if (pageContainer) {
+      pageContainer.addEventListener('scroll', checkScroll, { passive: true });
     }
     window.addEventListener('scroll', checkScroll, { passive: true });
 
     return () => {
       if (rootContainer) {
         rootContainer.removeEventListener('scroll', checkScroll);
+      }
+      if (mainElement) {
+        mainElement.removeEventListener('scroll', checkScroll);
+      }
+      if (pageContainer) {
+        pageContainer.removeEventListener('scroll', checkScroll);
       }
       window.removeEventListener('scroll', checkScroll);
     };
