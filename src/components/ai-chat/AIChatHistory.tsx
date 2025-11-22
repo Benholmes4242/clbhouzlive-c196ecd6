@@ -1438,8 +1438,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           if (last7Days.length === 0) return null;
                           
                           return (
-                            <div>
-                              <h3 className="text-[13px] font-medium text-white/80 mb-3">
+                             <div>
+                              <h3 className="text-body-sm font-medium text-white/80 mb-3">
                                 Last 7 Days
                               </h3>
                                 <div className="space-y-4 sm:space-y-5">
@@ -1463,10 +1463,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                      
                                      {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? (
                                        <>
-                                         <div className="flex justify-between items-center mb-3">
-                                           <h3 className="text-[17px] font-semibold text-white">
-                                             {conversation.customTitle || conversation.title}
-                                           </h3>
+                          <div className="flex justify-between items-center mb-3">
+                            <h3 className="text-heading-md font-semibold text-white">
+                              {conversation.customTitle || conversation.title}
+                            </h3>
                               <button 
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -1553,8 +1553,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           if (thisMonth.length === 0) return null;
                           
                           return (
-                            <div>
-                              <h3 className="text-[13px] font-medium text-white/80 mb-3">
+                             <div>
+                              <h3 className="text-body-sm font-medium text-white/80 mb-3">
                                 This Month
                               </h3>
                               <div className="space-y-4 sm:space-y-5">
@@ -1578,10 +1578,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                      
                                      {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? (
                                        <>
-                                         <div className="flex justify-between items-center mb-3">
-                                           <h3 className="text-[17px] font-semibold text-white">
-                                             {conversation.customTitle || conversation.title}
-                                           </h3>
+                          <div className="flex justify-between items-center mb-3">
+                            <h3 className="text-heading-md font-semibold text-white">
+                              {conversation.customTitle || conversation.title}
+                            </h3>
                                            <button 
                                              onClick={(e) => {
                                                e.stopPropagation();
@@ -1626,14 +1626,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                        </>
                                      ) : (
                                        <>
-                                         <div className="flex items-start gap-2">
-                                           <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-md text-[11px] font-medium bg-white/08 backdrop-blur border border-white/12 text-white/80">
-                                             Chat
-                                           </span>
-                                           <div className="min-w-0 flex-1">
-                                             <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-white">
-                                               {conversation.customTitle || conversation.title}
-                                             </div>
+                          <div className="flex items-start gap-2">
+                            <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-md text-meta font-medium bg-white/08 backdrop-blur border border-white/12 text-white/80">
+                              Chat
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate text-body-md font-semibold text-white">
+                                {conversation.customTitle || conversation.title}
+                              </div>
                                              <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-white/60">
                                                <span className="truncate">
                                                  {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
@@ -1668,8 +1668,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           if (older.length === 0) return null;
                           
                           return (
-                            <div>
-                              <h3 className="text-[13px] font-medium text-white/80 mb-3">
+                             <div>
+                              <h3 className="text-body-sm font-medium text-white/80 mb-3">
                                 Older
                               </h3>
                               <div className="space-y-4 sm:space-y-5">
@@ -1693,10 +1693,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                      
                                      {expandedCard?.type === 'chat' && expandedCard?.id === conversation.id ? (
                                        <>
-                                         <div className="flex justify-between items-center mb-3">
-                                           <h3 className="text-[17px] font-semibold text-white">
-                                             {conversation.customTitle || conversation.title}
-                                           </h3>
+                          <div className="flex justify-between items-center mb-3">
+                            <h3 className="text-heading-md font-semibold text-white">
+                              {conversation.customTitle || conversation.title}
+                            </h3>
                                            <button 
                                              onClick={(e) => {
                                                e.stopPropagation();
@@ -1788,7 +1788,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                         
                         {/* End of list marker */}
                         {!hasMore && filteredConversations.length > 0 && (
-                          <div className="py-6 text-center text-[12px] text-white/40 select-none">
+                          <div className="py-6 text-center text-meta text-white/40 select-none">
                             You're all caught up
                           </div>
                         )}

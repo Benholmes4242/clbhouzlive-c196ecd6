@@ -790,17 +790,17 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           <div className="flex justify-between items-center">
             {/* Left side - Title and subtitle */}
             <div className="text-left">
-              <DialogTitle className={`font-display ${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-foreground`}>
+              <DialogTitle className={`font-display ${isMobile ? 'text-heading-lg' : 'text-display-lg'} font-bold text-foreground`}>
                 Achievements
               </DialogTitle>
-              <DialogDescription className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>
+              <DialogDescription className={`${isMobile ? 'text-body-md' : 'text-body-lg'} text-muted-foreground mt-1`}>
                 Defining your game through achievement
               </DialogDescription>
             </div>
             
             {/* Right side - User profile */}
             <div className="flex items-center gap-3">
-              <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
+              <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-body-md' : 'text-heading-md'}`}>
                 {userProfilePhotoUrl ? (
                   <img 
                     src={userProfilePhotoUrl} 
@@ -812,8 +812,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                 )}
               </div>
               <div className="text-left">
-                <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold text-foreground`}>{userDisplayName}</h3>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
+                <h3 className={`${isMobile ? 'text-body-md' : 'text-body-lg'} font-semibold text-foreground`}>{userDisplayName}</h3>
+                <p className={`${isMobile ? 'text-meta' : 'text-body-sm'} text-muted-foreground`}>
                   {userHandicap ? `${typeof userHandicap === 'number' ? userHandicap.toFixed(1) : userHandicap} Handicap` : 'No handicap set'}
                 </p>
               </div>
