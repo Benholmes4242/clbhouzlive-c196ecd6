@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import GolfClubView from '@/components/golf-club/GolfClubView';
 import { scrollToTop } from '@/utils/scrollToTop';
+import { FadeInContent } from '@/components/ui/FadeInContent';
 
 const CourseDetailPage = () => {
   const params = useParams();
@@ -42,7 +43,9 @@ const CourseDetailPage = () => {
         <ArrowLeft className="h-4 w-4" />
       </Button>
 
-      <GolfClubView courseId={courseId} isInModal={false} />
+      <FadeInContent>
+        <GolfClubView courseId={courseId} isInModal={false} />
+      </FadeInContent>
     </div>
   );
 };

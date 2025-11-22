@@ -1,6 +1,7 @@
 import React, { useState, useMemo, lazy, Suspense } from 'react';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+import { FadeInContent } from '@/components/ui/FadeInContent';
 
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import ExploreFilters from '@/components/explore/ExploreFilters';
@@ -165,85 +166,87 @@ const Discover = () => {
   return (
     <div className="min-h-screen bg-background text-foreground page-with-header">
       <ClubhouseHeaderNew />
-      <main className="pb-20">
-          {/* Static Tabs */}
-          <div className="relative z-30">
-            {/* Segmented Control Tabs */}
-            <SegmentedControl 
-              activeTab={activeFilter}
-              onTabChange={() => {}} // No-op: tabs control via URL now
-            />
-            
-            {/* Videos Header - only show for shorts tab */}
-            {main === 'shorts' && (
-              <DiscoverVideosHeader
-                activeDuration={durationFilter}
-                onChangeDuration={setDurationFilter}
-                onOpenShorts={() => setDurationFilter('shorts')}
-                onSearchSubmit={(query) => setSearchQuery(query)}
-                initialQuery={searchQuery}
+      <FadeInContent>
+        <main className="pb-20">
+            {/* Static Tabs */}
+            <div className="relative z-30">
+              {/* Segmented Control Tabs */}
+              <SegmentedControl 
+                activeTab={activeFilter}
+                onTabChange={() => {}} // No-op: tabs control via URL now
               />
-            )}
-            
-            {/* Filter Pills Row - show for non-videos/shorts tabs */}
-            {main !== 'videos' && main !== 'shorts' && (
-              <div className="pt-1 pb-3 border-b border-gray-50 pl-1.5">
-                <ExploreFilters 
-                  activeFilter={activeFilter}
-                  onFilterChange={() => {}} // No-op: pills will be subfilters
-                  main={main}
-                  sub={sub}
+              
+              {/* Videos Header - only show for shorts tab */}
+              {main === 'shorts' && (
+                <DiscoverVideosHeader
+                  activeDuration={durationFilter}
+                  onChangeDuration={setDurationFilter}
+                  onOpenShorts={() => setDurationFilter('shorts')}
+                  onSearchSubmit={(query) => setSearchQuery(query)}
+                  initialQuery={searchQuery}
                 />
-              </div>
-            )}
-          </div>
-
-          {/* Suggested Users - Below Tabs/Search */}
-          {/* <div className="pt-1">
-            <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
-          </div> */}
-          {/* Commented out for future use - SuggestedUsersRedesigned component is stored in /components/discover/ */}
-
-          {/* Main Content - Conditional based on active tab with slide animation */}
-          <SlidingPanels
-            activeKey={main as MainKey}
-            order={['shorts', 'videos', 'channels', 'following'] as const}
-          >
-            {(key: MainKey) => {
-              if (key === 'channels') {
-                return <ChannelsFeed />;
-              }
-              if (key === 'following') {
-                return (
-                  <div className="md:container md:mx-auto md:px-0 mt-4">
-                    <Suspense fallback={null}>
-                      <FollowingFeed onMediaClick={handleMediaClick} />
-                    </Suspense>
-                  </div>
-                );
-              }
-              if (key === 'videos') {
-                return (
-                  <Suspense fallback={null}>
-                    <VideosPage />
-                  </Suspense>
-                );
-              }
-              // 'shorts' uses DiscoverContent
-              return (
-                <div className="md:container md:mx-auto md:px-0">
-                  <DiscoverContent
-                    onLike={handleLike}
-                    onFollow={handleFollow}
-                    onMediaClick={handleMediaClick}
-                    searchQuery={searchQuery}
-                    selectedTags={selectedTags}
+              )}
+              
+              {/* Filter Pills Row - show for non-videos/shorts tabs */}
+              {main !== 'videos' && main !== 'shorts' && (
+                <div className="pt-1 pb-3 border-b border-gray-50 pl-1.5">
+                  <ExploreFilters 
+                    activeFilter={activeFilter}
+                    onFilterChange={() => {}} // No-op: pills will be subfilters
+                    main={main}
+                    sub={sub}
                   />
                 </div>
-              );
-            }}
-          </SlidingPanels>
-      </main>
+              )}
+            </div>
+
+            {/* Suggested Users - Below Tabs/Search */}
+            {/* <div className="pt-1">
+              <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
+            </div> */}
+            {/* Commented out for future use - SuggestedUsersRedesigned component is stored in /components/discover/ */}
+
+            {/* Main Content - Conditional based on active tab with slide animation */}
+            <SlidingPanels
+              activeKey={main as MainKey}
+              order={['shorts', 'videos', 'channels', 'following'] as const}
+            >
+              {(key: MainKey) => {
+                if (key === 'channels') {
+                  return <ChannelsFeed />;
+                }
+                if (key === 'following') {
+                  return (
+                    <div className="md:container md:mx-auto md:px-0 mt-4">
+                      <Suspense fallback={null}>
+                        <FollowingFeed onMediaClick={handleMediaClick} />
+                      </Suspense>
+                    </div>
+                  );
+                }
+                if (key === 'videos') {
+                  return (
+                    <Suspense fallback={null}>
+                      <VideosPage />
+                    </Suspense>
+                  );
+                }
+                // 'shorts' uses DiscoverContent
+                return (
+                  <div className="md:container md:mx-auto md:px-0">
+                    <DiscoverContent
+                      onLike={handleLike}
+                      onFollow={handleFollow}
+                      onMediaClick={handleMediaClick}
+                      searchQuery={searchQuery}
+                      selectedTags={selectedTags}
+                    />
+                  </div>
+                );
+              }}
+            </SlidingPanels>
+        </main>
+      </FadeInContent>
 
 
         {/* Conditional Modal/Feed based on feature flag */}
