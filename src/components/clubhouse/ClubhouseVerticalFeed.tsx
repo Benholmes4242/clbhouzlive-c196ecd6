@@ -186,6 +186,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   const { setActiveVideo } = useVideoManager();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [visualIndex, setVisualIndex] = useState(0);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -486,6 +487,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isScrollingRef = useRef(false);
   const lastIndexChangeTimeRef = useRef(0);
+  const hasIndexChangedOnceRef = useRef(false);
+  const visualIndexTimeoutRef = useRef<number | null>(null);
 
   // Throttled scroll handler for better performance
   const handleScroll = useCallback(() => {
@@ -518,6 +521,18 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
       lastIndexChangeTimeRef.current = now;
       setCurrentIndex(newIndex);
+
+      if (!hasIndexChangedOnceRef.current) {
+        hasIndexChangedOnceRef.current = true;
+      }
+
+      // Soft delay for visual HUD switch - lets scroll snap settle
+      if (visualIndexTimeoutRef.current) {
+        window.clearTimeout(visualIndexTimeoutRef.current);
+      }
+      visualIndexTimeoutRef.current = window.setTimeout(() => {
+        setVisualIndex(newIndex);
+      }, 40);
       
       // If scrolling to a photo post, stop all videos
       const currentPost = filteredPosts[newIndex];
@@ -713,6 +728,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
     return () => {
       resetScrollMetrics();
+      if (visualIndexTimeoutRef.current) {
+        window.clearTimeout(visualIndexTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -971,7 +989,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 isLiked={likedPostSet.has(item.id)}
                 isVideo={item.media?.[0]?.media_type === 'video'}
                 isMuted={isGloballyMuted}
-                isActive={currentIndex === index}
+                isActive={visualIndex === index}
+                shouldAnimate={hasIndexChangedOnceRef.current}
                 videoProgress={currentIndex === index ? videoProgress : 0}
                 onProfileSheetOpen={() => {
                   setSelectedUserId(item.user?.id || null);
