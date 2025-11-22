@@ -200,6 +200,15 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   useEffect(() => {
     onProfileOpenChange?.(showMiniProfile);
   }, [showMiniProfile, onProfileOpenChange]);
+
+  // Cleanup visualIndexTimeout on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (visualIndexTimeoutRef.current) {
+        window.clearTimeout(visualIndexTimeoutRef.current);
+      }
+    };
+  }, []);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
