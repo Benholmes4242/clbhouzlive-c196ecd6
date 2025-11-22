@@ -79,9 +79,9 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
     return (
       <section className="mt-10 px-2">
         <div className="flex items-center gap-2 mb-3">
-          <h2 className="font-display text-xl font-bold">What's in the Bag?</h2>
+          <h2 className="font-display text-heading-lg font-bold">What's in the Bag?</h2>
         </div>
-        <p className="text-muted-foreground text-base">Loading...</p>
+        <p className="text-muted-foreground text-body-md">Loading...</p>
       </section>
     );
   }
@@ -89,7 +89,7 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
   return (
     <section className="mt-10 px-2">
       <div className="flex items-center gap-2 mb-3">
-        <h2 className="font-display text-xl font-bold">What's in the Bag?</h2>
+        <h2 className="font-display text-heading-lg font-bold">What's in the Bag?</h2>
         {isOwnProfile && (
           <>
             <BagEditDialog userId={userId} onBagUpdate={fetchBag} />
@@ -101,7 +101,7 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
               />
               <Label
                 htmlFor="bag-visibility"
-                className="text-sm text-muted-foreground cursor-pointer"
+                className="text-body-sm text-muted-foreground cursor-pointer"
               >
                 Show this section on my public profile
               </Label>
@@ -121,9 +121,9 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
           
           return (
             <div key={bagType.type} className="flex items-start gap-2">
-              <span className="font-bold text-sm min-w-16">{bagType.type}:</span>
+              <span className="font-bold text-body-md min-w-16">{bagType.type}:</span>
               {items.length > 0 ? (
-                <div className="text-sm space-y-1">
+                <div className="text-body-md space-y-1">
                   {items.map((item) => (
                     <div key={item.id}>
                       <span className="font-bold">{item.brand}</span>
@@ -132,7 +132,7 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
                   ))}
                 </div>
               ) : (
-                <span className="text-muted-foreground text-sm">Not set</span>
+                <span className="text-muted-foreground text-body-md">Not set</span>
               )}
             </div>
           );

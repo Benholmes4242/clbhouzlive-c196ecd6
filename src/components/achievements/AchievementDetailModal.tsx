@@ -102,7 +102,7 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       <DialogContent className="max-w-sm mx-auto p-0 overflow-hidden bg-background border shadow-lg [&>button]:border-0 [&>button]:ring-0 [&>button]:outline-0 [&>button]:focus:ring-0 [&>button]:focus:border-0 [&>button]:focus-visible:ring-0 [&>button]:focus-visible:outline-0 [&>button]:!ring-0 [&>button]:!outline-0">
         {/* Header */}
         <DialogHeader className="relative bg-gradient-to-b from-background to-muted p-3 pb-2">
-          <DialogTitle className="text-center text-lg font-semibold text-foreground">
+          <DialogTitle className="text-center text-heading-md font-semibold text-foreground">
             {achievement.name}
           </DialogTitle>
         </DialogHeader>
@@ -120,7 +120,7 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
           
           {/* Status centered */}
           <div className="text-center">
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-body-sm font-medium ${
               achievement.unlocked 
                 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
                 : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
@@ -131,13 +131,13 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
 
           {/* Description */}
           <div className="text-center">
-            <p className="text-muted-foreground text-sm leading-relaxed">
+            <p className="text-muted-foreground text-body-sm leading-relaxed">
               {achievement.description}
             </p>
           </div>
 
           {/* XP and Type */}
-          <div className="flex justify-center gap-6 text-sm">
+          <div className="flex justify-center gap-6 text-body-sm">
             <div className="flex items-center gap-1">
               <span className="text-amber-500">✨</span>
               <span className="font-medium text-primary">+{achievement.xp} XP</span>
@@ -153,7 +153,7 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
           {/* Progress */}
           {achievement.progress && (
             <div className="text-center">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-body-sm text-muted-foreground">
                 Progress: {achievement.progress}
               </p>
             </div>
@@ -162,7 +162,7 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
           {/* Date Earned */}
           {achievement.unlocked && achievement.dateEarned && (
             <div className="text-center">
-              <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+              <p className="text-body-sm text-green-600 dark:text-green-400 font-medium">
                 ✅ Earned: {achievement.dateEarned}
               </p>
             </div>
@@ -174,10 +174,10 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
               <div className="flex items-start gap-2">
                 <Lightbulb className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-blue-700 dark:text-blue-300 mb-1">
+                  <p className="text-body-sm font-medium text-blue-700 dark:text-blue-300 mb-1">
                     How to unlock:
                   </p>
-                  <p className="text-sm text-blue-600 dark:text-blue-400">
+                  <p className="text-body-sm text-blue-600 dark:text-blue-400">
                     {achievement.unlockHint}
                   </p>
                 </div>

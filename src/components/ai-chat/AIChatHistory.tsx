@@ -226,10 +226,10 @@ interface AIChatHistoryProps {
               </span>
               
               <div className="min-w-0 flex-1">
-                <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-white">
+                <div className="truncate text-body-md font-semibold text-white">
                   Swing Analysis
                 </div>
-                <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-white/60">
+                <div className="mt-1.5 flex items-center gap-2 text-meta text-white/60">
                   <span className="truncate">
                     {analysis.tags && analysis.tags.length > 0 ? analysis.tags.slice(0, 2).join(' • ') : analysis.content?.substring(0, 60) || 'Golf swing'}
                   </span>
@@ -352,18 +352,18 @@ interface AIChatHistoryProps {
                       }`}
                     >
                        <div className="flex justify-between items-start mb-2">
-                         <div className={`text-xs px-2 py-1 rounded-full ${
+                         <div className={`text-meta px-2 py-1 rounded-full ${
                            message.role === 'user' ? 'bg-[#3da0a9]/10 text-[#3da0a9]' : 'bg-gray-100 text-gray-600'
                          }`}>
                            {message.role === 'user' ? 'You' : 'Echo Coach'}
                          </div>
                         {message.timestamp && (
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-meta text-muted-foreground">
                             {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         )}
                       </div>
-                      <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                      <div className="text-body-md leading-relaxed whitespace-pre-wrap">
                         {message.content}
                       </div>
                     </div>
@@ -862,7 +862,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 <input
                   type="search"
                   placeholder="Search Echo…"
-                  className="w-full bg-transparent outline-none text-[14px] text-white placeholder:text-white/40"
+                  className="w-full bg-transparent outline-none text-body-md text-white placeholder:text-white/40"
                   onChange={(e) => setSearchQuery(e.target.value)}
                   value={searchQuery}
                   aria-label="Search Echo history"
@@ -885,7 +885,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 type="button"
                 onClick={() => setActiveTab('chat')}
                 className={cn(
-                  "rounded-full px-4 text-[14px] font-medium transition-all",
+                  "rounded-full px-4 text-body-md font-medium transition-all",
                   activeTab === 'chat'
                     ? "bg-white/05 text-white shadow-[0_0_16px_rgba(255,255,255,0.18)] ring-1 ring-inset ring-white/20" 
                     : "text-white/60 hover:bg-white/05"
@@ -897,7 +897,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 type="button"
                 onClick={() => setActiveTab('swing')}
                 className={cn(
-                  "rounded-full px-4 text-[14px] font-medium transition-all",
+                  "rounded-full px-4 text-body-md font-medium transition-all",
                   activeTab === 'swing'
                     ? "bg-white/05 text-white shadow-[0_0_16px_rgba(255,255,255,0.18)] ring-1 ring-inset ring-white/20" 
                     : "text-white/60 hover:bg-white/05"
@@ -972,7 +972,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 
                 {/* End of list marker */}
                 {!hasMore && filteredConversations.length > 0 && (
-                  <div className="py-4 text-center text-[12px] text-white/40 select-none">
+                  <div className="py-4 text-center text-meta text-white/40 select-none">
                     You're all caught up
                   </div>
                 )}
@@ -1019,7 +1019,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                 
                 {/* End of list marker */}
                 {!swingHasMore && filteredSwingAnalyses.length > 0 && (
-                  <div className="py-4 text-center text-[12px] text-white/40 select-none">
+                  <div className="py-4 text-center text-meta text-white/40 select-none">
                     You're all caught up
                   </div>
                 )}
@@ -1271,10 +1271,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
                   {/* Center: title/meta */}
                   <div className="min-w-0 text-center">
-                    <div className="truncate text-[17px] sm:text-[18px] font-semibold text-white">
+                    <div className="truncate text-heading-md font-semibold text-white">
                       Echo History
                     </div>
-                    <div className="truncate text-[12px] sm:text-[13px] text-white/60 leading-tight">
+                    <div className="truncate text-body-sm text-white/60 leading-tight">
                       All chats & swing analyses
                     </div>
                   </div>
@@ -1299,7 +1299,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     <input
                       type="search"
                       placeholder="Search Echo…"
-                      className="w-full bg-transparent outline-none text-[14px] text-white placeholder:text-white/40"
+                      className="w-full bg-transparent outline-none text-body-md text-white placeholder:text-white/40"
                       onChange={(e) => setSearchQuery(e.target.value)}
                       value={searchQuery}
                       aria-label="Search Echo history"
@@ -1317,7 +1317,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
                   {/* Filter button (UI placeholder) */}
                   <button
-                    className="h-11 px-4 rounded-xl bg-white/06 backdrop-blur border border-white/12 hover:bg-white/08 hover:border-white/20 text-[14px] font-medium text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 flex items-center gap-1.5"
+                    className="h-11 px-4 rounded-xl bg-white/06 backdrop-blur border border-white/12 hover:bg-white/08 hover:border-white/20 text-body-md font-medium text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 flex items-center gap-1.5"
                     aria-label="Open filters"
                   >
                     <Filter className="h-4 w-4 text-white/60" />
@@ -1331,7 +1331,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     type="button"
                     onClick={() => setActiveTab('chat')}
                     className={cn(
-                      "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
+                      "rounded-full px-4 text-body-md font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
                       activeTab === 'chat'
                         ? "bg-white/05 text-white shadow-[0_0_16px_rgba(255,255,255,0.18)] ring-1 ring-inset ring-white/20" 
                         : "text-white/60 hover:bg-white/05 hover:ring-1 hover:ring-inset hover:ring-white/10"
@@ -1343,7 +1343,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                     type="button"
                     onClick={() => setActiveTab('swing')}
                     className={cn(
-                      "rounded-full px-4 text-[14px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
+                      "rounded-full px-4 text-body-md font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
                       activeTab === 'swing'
                         ? "bg-white/05 text-white shadow-[0_0_16px_rgba(255,255,255,0.18)] ring-1 ring-inset ring-white/20" 
                         : "text-white/60 hover:bg-white/05 hover:ring-1 hover:ring-inset hover:ring-white/10"
@@ -1355,7 +1355,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
 
                 {/* Results header */}
                 {(searchQuery || filteredConversations.length > 0 || filteredSwingAnalyses.length > 0) && (
-                  <div className="mt-2 text-[12px] text-white/60">
+                  <div className="mt-2 text-meta text-white/60">
                     {searchQuery ? (
                       <>
                         Results for <span className="font-medium text-white">&ldquo;{searchQuery}&rdquo;</span> · {' '}
@@ -1405,13 +1405,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                             <div className="mx-auto mb-3 h-12 w-12 rounded-full grid place-items-center bg-white/08 border border-white/12 shadow-sm text-white/60">
                               <Search className="h-6 w-6" />
                             </div>
-                            <div className="text-[17px] font-semibold text-white">No matches</div>
-                            <div className="mt-1.5 text-[13px] text-white/60">
+                            <div className="text-heading-md font-semibold text-white">No matches</div>
+                            <div className="mt-1.5 text-body-sm text-white/60">
                               Try a different search term or clear filters.
                             </div>
                             <div className="mt-4 flex items-center justify-center gap-2">
                               <button 
-                                className="h-10 px-4 rounded-full bg-white/08 border border-white/12 hover:bg-white/12 hover:border-white/20 shadow-sm text-[14px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 text-white"
+                                className="h-10 px-4 rounded-full bg-white/08 border border-white/12 hover:bg-white/12 hover:border-white/20 shadow-sm text-body-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 text-white"
                                 onClick={() => setSearchQuery('')}
                               >
                                 Clear search
@@ -1512,14 +1512,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                      ) : (
                                        <>
                                          <div className="flex items-start gap-2">
-                                           <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-md text-[11px] font-medium bg-white/08 backdrop-blur border border-white/12 text-white/80">
-                                             Chat
-                                           </span>
-                                           <div className="min-w-0 flex-1">
-                                             <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-white">
-                                               {conversation.customTitle || conversation.title}
-                                             </div>
-                                             <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-white/60">
+                                            <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-md text-meta font-medium bg-white/08 backdrop-blur border border-white/12 text-white/80">
+                                              Chat
+                                            </span>
+                                            <div className="min-w-0 flex-1">
+                                              <div className="truncate text-body-md font-semibold text-white">
+                                                {conversation.customTitle || conversation.title}
+                                              </div>
+                                              <div className="mt-1.5 flex items-center gap-2 text-meta text-white/60">
                                                <span className="truncate">
                                                  {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
                                                </span>
