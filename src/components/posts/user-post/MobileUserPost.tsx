@@ -6,7 +6,7 @@ import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useVideoPreloader } from '@/hooks/useVideoPreloader';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import LazyImage from '@/components/ui/lazy-image';
-import { VideoSkeleton } from '@/components/ui/skeleton-loader';
+import { Skeleton } from '@/components/ui/skeleton';
 import CoursePostBadge from '../CoursePostBadge';
 import { UserPostData, GolfCourse } from './types';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -169,7 +169,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
           <>
             {/* Show skeleton while video is loading */}
             {isVideoLoading && (
-              <VideoSkeleton className="absolute inset-0 z-10" />
+              <Skeleton className="absolute inset-0 z-10" />
             )}
             
             <EnhancedVideoPlayer

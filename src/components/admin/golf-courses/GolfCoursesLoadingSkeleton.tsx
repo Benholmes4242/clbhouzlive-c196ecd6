@@ -1,17 +1,24 @@
 
 import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SkeletonCard } from '@/components/ui/skeleton-card';
 
 const GolfCoursesLoadingSkeleton: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <Skeleton className="h-8 w-48" style={{ backgroundColor: '#6e9277', opacity: 0.3 }} />
-        <Skeleton className="h-10 w-32" style={{ backgroundColor: '#6e9277', opacity: 0.3 }} />
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-10 w-32" />
       </div>
-      <div className="grid gap-4">
+      <div className="space-y-4">
         {[1, 2, 3, 4, 5].map((i) => (
-          <Skeleton key={i} className="h-24 w-full" style={{ backgroundColor: '#6e9277', opacity: 0.3 }} />
+          <SkeletonCard 
+            key={i}
+            showAvatar={false}
+            titleLines={1}
+            contentLines={2}
+            className="h-24"
+          />
         ))}
       </div>
     </div>

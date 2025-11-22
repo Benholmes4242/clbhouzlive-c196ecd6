@@ -1,0 +1,23 @@
+{
+  "rules": {
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "JSXAttribute[name.name='className'][value.value=/bg-\\[#[0-9a-fA-F]{3,8}\\]/]",
+        "message": "🚫 SKELETON TOKEN VIOLATION: Direct hex colors not allowed in skeleton components. Use bg-surface-alt for light mode or bg-white/[0.08] for dark Hub/Clubhouse contexts."
+      },
+      {
+        "selector": "JSXAttribute[name.name='className'][value.value=/bg-\\[rgba?\\(/]",
+        "message": "🚫 SKELETON TOKEN VIOLATION: Direct RGBA colors not allowed in skeleton components. Use bg-surface-alt for light mode or bg-white/[0.08] for dark Hub/Clubhouse contexts."
+      },
+      {
+        "selector": "JSXAttribute[name.name='style'] Property[key.name='backgroundColor']",
+        "message": "🚫 SKELETON TOKEN VIOLATION: Inline backgroundColor styles not allowed in skeleton components. Use Tailwind token classes instead."
+      },
+      {
+        "selector": "JSXAttribute[name.name='className'][value.value=/bg-muted/]",
+        "message": "⚠️ SKELETON DEPRECATION: bg-muted is deprecated for skeletons. Use bg-surface-alt for light mode or bg-white/[0.08] for dark contexts."
+      }
+    ]
+  }
+}
