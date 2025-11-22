@@ -192,6 +192,34 @@ Any new skeleton must:
 
 ---
 
+## Ongoing Enforcement (Post-Phase 7)
+
+### Allowed Primitives Only
+For any new loading states, only use:
+- `Skeleton` from `@/components/ui/skeleton`
+- `SkeletonAvatar` from `@/components/ui/skeleton-avatar`
+- `SkeletonText` from `@/components/ui/skeleton-text`
+- `SkeletonCard` from `@/components/ui/skeleton-card`
+
+**Prohibited**: No new ad-hoc `<div className="animate-pulse ...">` blocks, no custom loaders per page.
+
+### Color & Radius Rules
+- **Light pages**: Must use `bg-surface-alt` / `bg-surface-card` on `bg-background`
+- **Hub/Clubhouse (dark)**: Use existing dark skeleton tokens only
+- **Border radius**: Bars use `rounded-lg`, cards use `rounded-2xl`
+- **No hardcoded colors** or per-component visual tweaks
+
+### Motion & Spacing Rules
+- **Animation**: Standard `animate-pulse` with `duration-motion-medium`, `ease-standard`
+- **Spacing**: `space-y-2` inside groups, `space-y-4` between sections
+
+### PR Checklist for New Loading States
+- ✅ Uses base skeleton primitives (no bespoke loaders)
+- ✅ Uses only design tokens for color & radius
+- ✅ Matches standard skeleton spacing and motion
+
+---
+
 ## Summary
 
 - **17 skeleton components** migrated to unified system
@@ -200,5 +228,6 @@ Any new skeleton must:
 - **Zero hardcoded colors** in skeletons
 - **One visual language** across light and dark themes
 - **Automated enforcement** via ESLint
+- **Ongoing enforcement rules** established for all future work
 
 ✅ Phase 7 Complete - Skeleton Loader Unification Signed Off
