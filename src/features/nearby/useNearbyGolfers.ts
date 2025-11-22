@@ -180,6 +180,8 @@ export function useNearbyGolfers(options: NearbyGolfersOptions) {
   // Realtime subscription for nearby presence
   useEffect(() => {
     if (!userLat || !userLng) return;
+    
+    let isMounted = true;
 
     const channel = supabase
       .channel('nearby_presence_realtime')
@@ -195,8 +197,10 @@ export function useNearbyGolfers(options: NearbyGolfersOptions) {
             const userId = payload.new && typeof payload.new === 'object' && 'user_id' in payload.new ? payload.new.user_id : 'unknown';
             console.log('[NearbyGolfers] realtime event', new Date().toISOString(), payload.eventType, userId);
           }
-          // Invalidate all nearby golfers queries to trigger refetch
-          queryClient.invalidateQueries({ queryKey: ['nearbyGolfers', 'live'] });
+          // Only invalidate if component is still mounted to prevent stale updates after navigation
+          if (isMounted) {
+            queryClient.invalidateQueries({ queryKey: ['nearbyGolfers', 'live'] });
+          }
         }
       )
       .subscribe((status) => {
@@ -206,6 +210,7 @@ export function useNearbyGolfers(options: NearbyGolfersOptions) {
       });
 
     return () => {
+      isMounted = false;
       if (DEBUG_REALTIME) {
         console.log('[NearbyGolfers] unsubscribing from realtime');
       }

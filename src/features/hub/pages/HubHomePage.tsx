@@ -176,13 +176,7 @@ export function HubHomePage() {
     });
   }, []);
 
-  // Mark hub-open on html while mounted
-  useEffect(() => {
-    document.documentElement.classList.add('hub-open');
-    return () => {
-      document.documentElement.classList.remove('hub-open');
-    };
-  }, []);
+  // hub-open class is now managed by HubProvider to prevent race conditions
 
   // Track Hub open on mount
   useEffect(() => {
