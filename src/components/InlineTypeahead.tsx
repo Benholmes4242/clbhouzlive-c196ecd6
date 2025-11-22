@@ -162,7 +162,7 @@ export function InlineTypeahead({
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onPointerDown={(e) => e.stopPropagation()}
-          className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+          className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-tertiary focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
           aria-label="Search courses"
           aria-expanded={isSearchMode}
           aria-controls="search-results"

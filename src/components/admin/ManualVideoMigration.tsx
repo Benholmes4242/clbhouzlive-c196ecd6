@@ -60,7 +60,7 @@ export function ManualVideoMigration() {
           <AlertDescription>
             <strong>Manual Process:</strong>
             <ol className="list-decimal list-inside mt-2 space-y-1">
-              <li>Go to your <a href="https://dash.cloudflare.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Cloudflare Dashboard</a></li>
+              <li>Go to your <a href="https://dash.cloudflare.com" target="_blank" rel="noopener noreferrer" className="text-foreground hover:underline font-medium">Cloudflare Dashboard</a></li>
               <li>Navigate to Stream in the sidebar</li>
               <li>Upload your videos from R2 to Stream</li>
               <li>Copy the Stream URL and paste below to update database references</li>

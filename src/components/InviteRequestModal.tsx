@@ -120,7 +120,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               placeholder="your@email.com"
               disabled={submitting}
               required
-              className="w-full rounded-lg bg-surface-alt text-foreground placeholder:text-text-tertiary
+              className="w-full rounded-lg bg-surface-alt text-foreground placeholder:text-tertiary
                        border border-border px-4 py-3 text-body-md outline-none
                        focus:border-primary-accent focus:ring-0 transition-all duration-motion-fast ease-standard
                        disabled:opacity-60"
@@ -138,7 +138,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
               disabled={submitting}
-              className="w-full rounded-lg bg-surface-alt text-foreground placeholder:text-text-tertiary
+              className="w-full rounded-lg bg-surface-alt text-foreground placeholder:text-tertiary
                        border border-border px-4 py-3 text-body-md outline-none
                        focus:border-primary-accent focus:ring-0 transition-all duration-motion-fast ease-standard
                        disabled:opacity-60"
@@ -156,7 +156,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               onChange={(e) => setClub(e.target.value)}
               placeholder="Your golf club"
               disabled={submitting}
-              className="w-full rounded-lg bg-surface-alt text-foreground placeholder:text-text-tertiary
+              className="w-full rounded-lg bg-surface-alt text-foreground placeholder:text-tertiary
                        border border-border px-4 py-3 text-body-md outline-none
                        focus:border-primary-accent focus:ring-0 transition-all duration-motion-fast ease-standard
                        disabled:opacity-60"

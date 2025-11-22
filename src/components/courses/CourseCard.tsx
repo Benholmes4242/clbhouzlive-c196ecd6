@@ -295,7 +295,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   <div className="flex flex-wrap gap-2">
                     {/* Average rating badge */}
                     {course.average_rating && (
-                      <div className="bg-primary/10 border-primary/20 text-primary text-meta font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+                      <div className="bg-muted border-border text-foreground text-meta font-semibold px-2 py-0.5 rounded flex items-center gap-1">
                         Avg: {course.average_rating}/10
                       </div>
                     )}

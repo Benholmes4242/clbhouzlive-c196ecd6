@@ -16,7 +16,7 @@
       },
       {
         "selector": "JSXAttribute[name.name='className'] Literal[value=/text-\\[#/]",
-        "message": "❌ Direct hex text colors are not allowed. Use tokens: text-primary, text-secondary, text-tertiary"
+        "message": "❌ Direct hex text colors are not allowed. Use semantic tokens: text-foreground, text-secondary, text-tertiary"
       },
       {
         "selector": "JSXAttribute[name.name='className'] Literal[value=/border-\\[#/]",
@@ -29,6 +29,10 @@
       {
         "selector": "JSXAttribute[name.name='style']",
         "message": "⚠️ Inline styles should be avoided. Use className with design system tokens instead."
+      },
+      {
+        "selector": "JSXAttribute[name.name='className'] Literal[value=/\\btext-primary(?!-accent|-foreground)\\b/]",
+        "message": "🚫 ORANGE TEXT VIOLATION: 'text-primary' resolves to orange (#F7931E). Use semantic tokens instead: text-foreground, text-secondary, text-tertiary. Only use text-primary-accent for intentional accent elements."
       }
     ]
   }

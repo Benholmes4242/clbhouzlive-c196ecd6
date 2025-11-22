@@ -317,7 +317,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
             onChange={(e) => setAccessCode(e.target.value)}
             placeholder="••••••••••"
             disabled={submitting}
-            className="w-full rounded-lg bg-surface-alt text-foreground placeholder:text-text-tertiary
+            className="w-full rounded-lg bg-surface-alt text-foreground placeholder:text-tertiary
                      border border-border px-4 py-3 text-body-md outline-none
                      focus:border-primary-accent focus:ring-1 focus:ring-primary-accent transition-all duration-motion-fast ease-standard
                      disabled:opacity-60"

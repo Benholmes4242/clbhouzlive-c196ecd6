@@ -202,7 +202,7 @@ const MyRatingsContent = () => {
                       <div className="flex items-start justify-between">
                         <div>
                           <h3 
-                            className="font-semibold text-lg hover:text-primary transition-colors cursor-pointer"
+                            className="font-semibold text-lg hover:text-secondary transition-colors cursor-pointer"
                             onClick={() => handleCourseClick(ratedCourse.golf_courses)}
                           >
                             {ratedCourse.golf_courses.name}
