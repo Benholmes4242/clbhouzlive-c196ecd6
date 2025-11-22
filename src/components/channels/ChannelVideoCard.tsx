@@ -118,7 +118,7 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
           {/* Metadata content */}
           <div className="px-4 pt-3 pb-3">
             {/* Username */}
-            <div className="text-white font-medium text-[14px] leading-tight mb-2">
+            <div className="text-white font-medium text-body-md leading-tight mb-2">
               {creatorName}
             </div>
             
@@ -132,7 +132,7 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
             <div className="flex items-center gap-1.5">
               <Heart className="w-4 h-4" style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
               <span 
-                className="text-[14px] font-normal"
+                className="text-body-md font-normal"
                 style={{ color: 'rgba(255, 255, 255, 0.7)' }}
               >
                 {formatViews(video.views_count)}
@@ -160,7 +160,7 @@ export const ChannelVideoCard: React.FC<ChannelVideoCardProps> = ({ video, onPla
         {/* Duration badge - below squircle, right-aligned */}
         {duration && (
           <div 
-            className="absolute -bottom-[22px] right-3 rounded px-2 py-1 text-white text-[12px] font-medium"
+            className="absolute -bottom-[22px] right-3 rounded px-2 py-1 text-white text-meta font-medium"
             style={{ background: 'rgba(0, 0, 0, 0.6)' }}
           >
             {formatDuration(duration)}

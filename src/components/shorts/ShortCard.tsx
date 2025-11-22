@@ -119,7 +119,7 @@ export default React.memo(function ShortCard({
               className="liquid-glass liquid-glass--elevated flex flex-col min-w-[180px] max-w-[240px] px-3 py-1 rounded-l-xl rounded-r-none transition-transform duration-200 group-hover:scale-[1.02] border-r-0"
             >
               {/* Creator name */}
-              <div className="text-white font-semibold text-[15px] leading-tight flex items-center gap-2">
+              <div className="text-white font-semibold text-body-md leading-tight flex items-center gap-2">
                 <span className="truncate">
                   {item.user?.name || 'Unknown'}
                 </span>
@@ -129,7 +129,7 @@ export default React.memo(function ShortCard({
               <div className="mt-1 mb-1.5 h-px w-[calc(100%-4px)] bg-white/20" />
 
               {/* Likes row */}
-              <div className="flex items-center gap-2 text-white/90 text-[13px] font-medium leading-none">
+              <div className="flex items-center gap-2 text-white/90 text-body-sm font-medium leading-none">
                 <Heart className="w-3.5 h-3.5" />
                 <span className="tracking-[-0.02em]">{item.likes || 0} likes</span>
               </div>
@@ -152,7 +152,7 @@ export default React.memo(function ShortCard({
             {/* Duration badge - attached to squircle */}
             {item.duration && typeof item.duration === 'number' && (
               <div 
-                className="absolute right-2 bottom-[-8px] text-[13px] font-medium leading-none px-1.5 py-0.5 rounded-[6px] text-white/90 border border-white/25 z-10"
+                className="absolute right-2 bottom-[-8px] text-body-sm font-medium leading-none px-1.5 py-0.5 rounded-[6px] text-white/90 border border-white/25 z-10"
                 style={{
                   background: 'rgba(0, 0, 0, 0.6)',
                   backdropFilter: 'blur(8px)'
@@ -168,14 +168,14 @@ export default React.memo(function ShortCard({
             {/* Text content - bottom left */}
             <div className="absolute left-3 bottom-3 flex flex-col gap-1 max-w-[calc(100%-80px)]">
               {/* User name */}
-              <div className="text-white font-bold text-[15px] leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+              <div className="text-white font-bold text-body-md leading-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
                 <span className="truncate block">
                   {item.user?.name || 'Unknown'}
                 </span>
               </div>
 
               {/* Likes row */}
-              <div className="flex items-center gap-1.5 text-white text-[14px] leading-none font-medium" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+              <div className="flex items-center gap-1.5 text-white text-body-md leading-none font-medium" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
                 <Heart className="w-4 h-4" />
                 <span>{item.likes || 0}</span>
               </div>

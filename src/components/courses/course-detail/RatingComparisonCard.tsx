@@ -60,7 +60,7 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
         <p className="text-xs font-semibold tracking-[0.14em] text-muted-foreground">
           YOUR RATING VS COMMUNITY
         </p>
-        <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+        <div className="flex items-center gap-3 text-meta text-muted-foreground">
           <div className="flex items-center gap-1">
             <span className="inline-block h-2 w-6 rounded-full bg-foreground/80" />
             <span>You</span>
@@ -77,7 +77,7 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
         {visibleRows.map((row) => (
           <div key={row.label} className="space-y-1.5">
             {/* Label row */}
-            <div className="text-[13px] font-medium text-foreground">
+            <div className="text-body-sm font-medium text-foreground">
               {row.label}
             </div>
 
@@ -94,7 +94,7 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
             </div>
 
             {/* Values row */}
-            <div className="mt-0.5 flex justify-between text-[11px] text-muted-foreground">
+            <div className="mt-0.5 flex justify-between text-meta text-muted-foreground">
               <span>You: {formatScore(row.you)}/10</span>
               <span>Community: {formatScore(row.community)}/10</span>
             </div>

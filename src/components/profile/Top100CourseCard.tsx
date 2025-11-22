@@ -252,15 +252,15 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
 
         {/* Course Info */}
         <div className="p-2.5">
-          <h3 className="font-semibold text-xs line-clamp-2 leading-tight mb-1">
+          <h3 className="font-semibold text-body-sm line-clamp-2 leading-tight mb-1">
             {course.name}
           </h3>
-          <div className="flex items-center text-[10px] text-muted-foreground mb-1.5">
+          <div className="flex items-center text-meta text-muted-foreground mb-1.5">
             <MapPin className="h-2.5 w-2.5 mr-1" />
             <span>{formatLocation(course)}</span>
           </div>
           {course.description && (
-            <p className="text-[10px] text-muted-foreground line-clamp-2">
+            <p className="text-meta text-muted-foreground line-clamp-2">
               {formatDescription(course.description)}
             </p>
           )}

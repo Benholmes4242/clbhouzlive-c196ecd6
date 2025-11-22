@@ -97,17 +97,17 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             positioning="absolute"
             course={{
               id: item.golfCourse.id,
-              name: item.golfCourse.name,
-              country: item.golfCourse.country
-            }}
-            className="top-2 right-2 [&>div]:!px-1.5 [&>div]:!py-0.5 [&>div]:!text-[11px] [&_svg]:!w-4 [&_svg]:!h-4"
-          />
+            name: item.golfCourse.name,
+            country: item.golfCourse.country
+          }}
+          className="top-2 right-2 [&>div]:!px-1.5 [&>div]:!py-0.5 [&>div]:!text-meta [&_svg]:!w-4 [&_svg]:!h-4"
+        />
         )}
 
         {/* Duration Badge - Bottom Left */}
         {duration > 0 && (
           <time 
-            className="absolute bottom-2 left-2 inline-flex h-6 items-center rounded-md border border-hud-border bg-hud-bg px-1.5 text-[13px] font-medium text-white backdrop-blur-2xl shadow-hud z-30 pointer-events-none"
+            className="absolute bottom-2 left-2 inline-flex h-6 items-center rounded-md border border-hud-border bg-hud-bg px-1.5 text-body-sm font-medium text-white backdrop-blur-2xl shadow-hud z-30 pointer-events-none"
             aria-hidden="true"
           >
             {formatDuration(duration)}
@@ -135,12 +135,12 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
       {/* Meta Block - Below Video */}
       <div className="px-4 pt-2 pb-3">
         {/* Caption (one line) */}
-        <h3 className="text-[17px] leading-tight line-clamp-2 text-foreground">
+        <h3 className="text-heading-md leading-tight line-clamp-2 text-foreground">
           {item.title || 'No caption'}
         </h3>
 
         {/* Meta row: left = handle, center = date, right = likes */}
-        <div className="mt-1 grid grid-cols-[auto_1fr_auto] items-center gap-3 text-[14px] text-muted-foreground">
+        <div className="mt-1 grid grid-cols-[auto_1fr_auto] items-center gap-3 text-body-md text-muted-foreground">
           {/* Avatar + Handle */}
           <div className="flex items-center gap-2 truncate max-w-[45vw]">
             <Squircle width={24} height={24}>

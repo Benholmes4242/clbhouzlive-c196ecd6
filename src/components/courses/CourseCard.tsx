@@ -137,14 +137,14 @@ const CourseCard: React.FC<CourseCardProps> = ({
         {/* Top row */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-            <div className="text-sm font-semibold truncate">
+            <div className="text-heading-md font-semibold truncate">
               {course.name}
             </div>
-            <div className="text-xs text-muted-foreground truncate">
+            <div className="text-body-sm text-muted-foreground truncate">
               {course.sub_country || course.country || 'Location unknown'}
             </div>
             {secondaryText && (
-              <div className="text-xs text-muted-foreground/80 mt-0.5">
+              <div className="text-body-sm text-muted-foreground/80 mt-0.5">
                 {secondaryText}
               </div>
             )}
@@ -152,7 +152,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
           
           <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
             {contextTag && (
-              <span className="inline-flex items-center rounded-full bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-muted-foreground whitespace-nowrap">
+              <span className="inline-flex items-center rounded-full bg-muted/40 px-2 py-0.5 text-meta font-medium text-muted-foreground whitespace-nowrap">
                 {contextTag}
               </span>
             )}
@@ -171,19 +171,19 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   {friend.profile_photo_url ? (
                     <AvatarImage src={friend.profile_photo_url} alt={friend.initials} />
                   ) : (
-                    <AvatarFallback className="text-[10px]">
+                    <AvatarFallback className="text-meta">
                       {friend.initials}
                     </AvatarFallback>
                   )}
                 </Avatar>
               ))}
               {friendsMeta.count > 3 && (
-                <div className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-muted/80 text-[10px] text-muted-foreground pointer-events-none">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-muted/80 text-meta text-muted-foreground pointer-events-none">
                   +{friendsMeta.count - 3}
                 </div>
               )}
             </div>
-            <div className="text-[11px] text-muted-foreground">
+            <div className="text-meta text-muted-foreground">
               Played by {friendsMeta.count} friend{friendsMeta.count !== 1 ? 's' : ''}
             </div>
           </div>
@@ -241,17 +241,17 @@ const CourseCard: React.FC<CourseCardProps> = ({
         {(showUserRating || showAverageRating || showXP) && (
           <div className="absolute top-3 right-3 z-10 flex flex-col items-end gap-1.5">
             {showXP && xp && (
-              <div className="bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+              <div className="bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] text-meta font-semibold px-2 py-0.5 rounded flex items-center gap-1">
                 {xp} XP
               </div>
             )}
             {showUserRating && userRating && (
-              <div className="bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+              <div className="bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] text-meta font-semibold px-2 py-0.5 rounded flex items-center gap-1">
                 Your: {userRating}/10
               </div>
             )}
             {showAverageRating && course.average_rating && (
-              <div className="bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+              <div className="bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] text-meta font-semibold px-2 py-0.5 rounded flex items-center gap-1">
                 Avg: {course.average_rating}/10
               </div>
             )}
@@ -295,7 +295,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   <div className="flex flex-wrap gap-2">
                     {/* Average rating badge */}
                     {course.average_rating && (
-                      <div className="bg-primary/10 border-primary/20 text-primary text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1">
+                      <div className="bg-primary/10 border-primary/20 text-primary text-meta font-semibold px-2 py-0.5 rounded flex items-center gap-1">
                         Avg: {course.average_rating}/10
                       </div>
                     )}
