@@ -14,14 +14,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Prevent pull-to-refresh and overscroll bounce on mobile */
-html, body {
-  overscroll-behavior-y: none;
-  overscroll-behavior-x: none;
+/* Prevent pull-to-refresh and overscroll bounce on mobile - GLOBAL */
+html {
+  overscroll-behavior-y: none !important;
+  overscroll-behavior-x: none !important;
+  touch-action: pan-y pinch-zoom !important;
+  -webkit-overflow-scrolling: touch;
   position: fixed;
   width: 100%;
   height: 100%;
   overflow: hidden;
+}
+
+body {
+  overscroll-behavior-y: none !important;
+  overscroll-behavior-x: none !important;
+  touch-action: pan-y pinch-zoom !important;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 #root {
@@ -30,8 +44,15 @@ html, body {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: none;
-  overscroll-behavior-x: none;
+  overscroll-behavior-y: none !important;
+  overscroll-behavior-x: none !important;
+  touch-action: pan-y pinch-zoom !important;
+}
+
+/* Ensure all scrollable containers prevent overscroll */
+* {
+  overscroll-behavior-y: none !important;
+  overscroll-behavior-x: none !important;
 }
 
 /* Glass panel utilities for Clubhouse overlays */

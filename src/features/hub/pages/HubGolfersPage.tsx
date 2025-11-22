@@ -10,7 +10,6 @@ import { NearbySkeletonRow } from '@/features/nearby/components/NearbySkeletonRo
 import { OpenToPlayButton } from '@/features/nearby/components/OpenToPlayButton';
 import { NearbyFilterBar } from '@/features/nearby/components/NearbyFilterBar';
 import { useVisibility } from '@/features/nearby/hooks/useVisibility';
-import { PullToRefresh } from '@/components/PullToRefresh';
 import { GolferFilters } from '@/hooks/useActiveGolfers';
 import '../home/hubTheme.css';
 
@@ -31,11 +30,6 @@ export function HubGolfersPage() {
     userLat: currentLocation?.lat,
     userLng: currentLocation?.lng,
   });
-
-
-  const handleRefresh = async () => {
-    await queryClient.invalidateQueries({ queryKey: ['nearbyGolfers', 'live'] });
-  };
 
   return (
     <div className="fixed inset-0 z-[9999]">
@@ -74,7 +68,6 @@ export function HubGolfersPage() {
         <div className="w-16" />
       </header>
       <div ref={listRef} className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
-        <PullToRefresh onRefresh={handleRefresh}>
           <div className="px-4 pt-[calc(env(safe-area-inset-top,0px)+16px)] pb-6 space-y-4">
             <div className="space-y-3">
               <GolferStatusBar value={visibilityMode} onChange={setVisibilityMode} />
@@ -93,7 +86,6 @@ export function HubGolfersPage() {
               </div>
             )}
            </div>
-         </PullToRefresh>
        </div>
       </div>
     </div>
