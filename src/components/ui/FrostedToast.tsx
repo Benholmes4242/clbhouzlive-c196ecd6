@@ -23,7 +23,7 @@ function Toast({ message, type = 'success', onClose }: ToastProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 30 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="px-5 py-3 rounded-2xl backdrop-blur-[28px] border border-white/20 shadow-[0_4px_18px_rgba(0,0,0,0.3)] text-white/90 text-body-md flex items-center gap-2 cursor-pointer"
+      className="px-5 py-3 rounded-2xl backdrop-blur-[28px] border border-white/20 shadow-[0_4px_18px_rgba(0,0,0,0.3)] text-white/90 text-[15px] flex items-center gap-2 cursor-pointer"
       style={{
         background:
           type === 'success'

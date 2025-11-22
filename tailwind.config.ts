@@ -29,17 +29,28 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ['var(--font-sans)'],
-			},
-			fontSize: {
-				'display-xl': ['2.125rem', { lineHeight: '1.15' }],  // 34px - Very large hero headings
-				'display-lg': ['1.75rem', { lineHeight: '1.2' }],    // 28px - Page titles
-				'heading-lg': ['1.375rem', { lineHeight: '1.3' }],   // 22px - Section headings
-				'heading-md': ['1.125rem', { lineHeight: '1.3' }],   // 18px - Card titles, modal titles
-				'body-lg': ['1rem', { lineHeight: '1.5' }],          // 16px - Main body copy
-				'body-md': ['0.875rem', { lineHeight: '1.4' }],      // 14px - Secondary body & UI text
-				'body-sm': ['0.8125rem', { lineHeight: '1.35' }],    // 13px - Compact body/subtitles
-				'meta': ['0.75rem', { lineHeight: '1.25' }],         // 12px - Timestamps, labels, badges
+				// SF Pro Text - For body text, buttons, labels, forms
+				'sans': [
+					'-apple-system',
+					'BlinkMacSystemFont',
+					'"SF Pro Text"',
+					'"Segoe UI"',
+					'Roboto',
+					'"Helvetica Neue"',
+					'Arial',
+					'sans-serif',
+				],
+				// SF Pro Display - For headings and large text (text-xl and above)
+				'display': [
+					'-apple-system',
+					'BlinkMacSystemFont',
+					'"SF Pro Display"',
+					'"Segoe UI"',
+					'Roboto',
+					'"Helvetica Neue"',
+					'Arial',
+					'sans-serif',
+				],
 			},
 			colors: {
 				border: 'hsl(var(--border))',

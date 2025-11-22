@@ -16,20 +16,6 @@
 
 /* 
  * ============================================================================
- * GLOBAL FONT - SF Pro System Stack
- * ============================================================================
- */
-:root {
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-}
-
-html, body {
-  font-family: var(--font-sans);
-}
-
-/* 
- * ============================================================================
  * CRITICAL: PREVENT PULL-TO-REFRESH AND OVERSCROLL - DO NOT MODIFY OR REMOVE
  * ============================================================================
  * 

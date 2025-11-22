@@ -102,14 +102,14 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-card backdrop-blur-xl border text-foreground sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-display-lg font-semibold tracking-wide">
+          <DialogTitle className="text-2xl font-semibold tracking-wide">
             Request Invite
           </DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           <div className="space-y-2">
-            <label htmlFor="email" className="text-body-md text-muted-foreground">
+            <label htmlFor="email" className="text-sm text-muted-foreground">
               Email <span className="text-destructive">*</span>
             </label>
             <input
@@ -121,14 +121,14 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               disabled={submitting}
               required
               className="w-full rounded-lg bg-[color:var(--surface-input)] text-foreground placeholder:text-[color:var(--placeholder-foreground)]
-                       border border-[color:hsl(var(--input))] px-4 py-3 text-body-md outline-none
+                       border border-[color:hsl(var(--input))] px-4 py-3 text-[15px] outline-none
                        focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-colors
                        disabled:opacity-60"
             />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="name" className="text-body-md text-muted-foreground">
+            <label htmlFor="name" className="text-sm text-muted-foreground">
               Name <span className="text-muted-foreground/60">(optional)</span>
             </label>
             <input
@@ -139,14 +139,14 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               placeholder="Your name"
               disabled={submitting}
               className="w-full rounded-lg bg-[color:var(--surface-input)] text-foreground placeholder:text-[color:var(--placeholder-foreground)]
-                       border border-[color:hsl(var(--input))] px-4 py-3 text-body-md outline-none
+                       border border-[color:hsl(var(--input))] px-4 py-3 text-[15px] outline-none
                        focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-colors
                        disabled:opacity-60"
             />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="club" className="text-body-md text-muted-foreground">
+            <label htmlFor="club" className="text-sm text-muted-foreground">
               Home Club <span className="text-muted-foreground/60">(optional)</span>
             </label>
             <input
@@ -157,20 +157,20 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               placeholder="Your golf club"
               disabled={submitting}
               className="w-full rounded-lg bg-[color:var(--surface-input)] text-foreground placeholder:text-[color:var(--placeholder-foreground)]
-                       border border-[color:hsl(var(--input))] px-4 py-3 text-body-md outline-none
+                       border border-[color:hsl(var(--input))] px-4 py-3 text-[15px] outline-none
                        focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-colors
                        disabled:opacity-60"
             />
           </div>
 
-          <p className="text-meta text-muted-foreground leading-relaxed">
+          <p className="text-xs text-muted-foreground leading-relaxed">
             We'll only use this to contact you about beta access.
           </p>
 
           <button
             type="submit"
             disabled={submitting || !turnstileLoaded}
-            className="w-full rounded-lg bg-[color:var(--surface-slate)] text-white py-3 font-medium text-body-md
+            className="w-full rounded-lg bg-[color:var(--surface-slate)] text-white py-3 font-medium text-[15px]
                      hover:bg-[color:var(--surface-slate)]/90 disabled:opacity-60 transition-colors"
           >
             {submitting ? "Submitting..." : "Request Invite"}
