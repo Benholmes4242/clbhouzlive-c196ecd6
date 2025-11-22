@@ -90,7 +90,7 @@ export function HistoryPanel({
           >
             <div className="flex items-center gap-2 mb-1">
               <MessageSquare className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-              <h4 className="font-medium text-foreground text-heading-md line-clamp-1">
+              <h4 className="font-semibold leading-snug text-foreground text-heading-md line-clamp-1">
                 {conversation.title}
               </h4>
             </div>
@@ -126,7 +126,7 @@ export function HistoryPanel({
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-4">
         <div className="text-4xl mb-2">📚</div>
-        <h3 className="text-heading-lg font-semibold text-foreground">No conversations yet</h3>
+        <h3 className="font-display text-heading-lg font-semibold leading-snug text-foreground">No conversations yet</h3>
         <p className="text-body-md text-muted-foreground text-center max-w-xs">
           Start chatting with Echo to build your conversation history
         </p>
@@ -146,7 +146,7 @@ export function HistoryPanel({
       {/* Header with search and new button */}
       <div className="p-4 border-b border-border space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-heading-lg font-semibold text-foreground">Conversations</h3>
+          <h3 className="font-display text-heading-lg font-semibold leading-snug text-foreground">Conversations</h3>
           <TapButton
             onClick={onNew}
             className="bg-primary text-primary-foreground p-2 rounded-lg hover:opacity-90 transition-opacity"

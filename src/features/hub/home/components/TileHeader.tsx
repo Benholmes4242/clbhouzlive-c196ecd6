@@ -17,7 +17,7 @@ export function TileHeader({ title, subtitle, onViewAll }: TileHeaderProps) {
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0 flex-1">
           <h3 
-            className="text-[20px] font-semibold leading-snug truncate tracking-[-0.01em]"
+            className="text-body-lg font-semibold leading-snug truncate"
             style={{ color: 'var(--hub-text)' }}
           >
             {title}

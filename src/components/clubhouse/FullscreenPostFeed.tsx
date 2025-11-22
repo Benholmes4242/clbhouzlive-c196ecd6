@@ -232,11 +232,11 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
             className="w-11 h-11 rounded-full object-cover shadow-sm"
           />
           <div className="flex flex-col leading-tight flex-1 min-w-0">
-            <span className="text-[15px] font-medium tracking-[0.02em] text-white drop-shadow-sm truncate">
+            <span className="text-body-md font-medium text-white drop-shadow-sm truncate">
               {currentPost.user?.name || currentPost.user?.username || 'Anonymous'}
             </span>
             {currentPost.golfCourse && (
-              <span className="text-[14px] text-white/85 leading-snug truncate">
+              <span className="text-body-md text-white/85 leading-snug truncate">
                 📍 {currentPost.golfCourse.name}
               </span>
             )}

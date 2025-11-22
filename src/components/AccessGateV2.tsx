@@ -283,7 +283,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         </div>
 
         {/* Headline */}
-        <h1 className="font-display text-[color:var(--text-primary)] text-display-xl font-semibold tracking-[.02em] mb-3">
+        <h1 className="font-display text-[color:var(--text-primary)] text-display-xl font-bold leading-tight mb-3">
           YOUR HOME<br/>OF GOLF
         </h1>
 

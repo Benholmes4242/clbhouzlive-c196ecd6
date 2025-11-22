@@ -54,8 +54,8 @@ export const PhaseCard: React.FC<PhaseCardProps> = ({ phase }) => {
         <div className="px-4 sm:px-5 py-4 space-y-3">
           {/* Observation */}
           <div>
-            <p className="text-[12px] text-gray-600 mb-1">Observation</p>
-            <p className="text-[14px] leading-[1.45] text-gray-800">{phase.observation}</p>
+            <p className="text-meta font-medium leading-snug text-gray-600 mb-1">Observation</p>
+            <p className="text-body-md font-normal leading-relaxed text-gray-800">{phase.observation}</p>
           </div>
 
           {/* Strength */}
@@ -64,8 +64,8 @@ export const PhaseCard: React.FC<PhaseCardProps> = ({ phase }) => {
               <div className="flex items-start gap-2">
                 <CheckCircle className="h-4 w-4 text-emerald-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-[12px] font-semibold text-emerald-700 mb-0.5">Strength</p>
-                  <p className="text-[13px] text-emerald-900">{phase.strength}</p>
+                  <p className="text-meta font-semibold leading-snug text-emerald-700 mb-0.5">Strength</p>
+                  <p className="text-body-sm font-normal leading-snug text-emerald-900">{phase.strength}</p>
                 </div>
               </div>
             </div>
@@ -77,8 +77,8 @@ export const PhaseCard: React.FC<PhaseCardProps> = ({ phase }) => {
               <div className="flex items-start gap-2">
                 <Target className="h-4 w-4 text-[#2A9D8F] mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-[12px] font-semibold text-gray-700 mb-0.5">Tip</p>
-                  <p className="text-[13px] text-gray-700">{phase.tip}</p>
+                  <p className="text-meta font-semibold leading-snug text-gray-700 mb-0.5">Tip</p>
+                  <p className="text-body-sm font-normal leading-snug text-gray-700">{phase.tip}</p>
                 </div>
               </div>
             </div>
@@ -89,7 +89,7 @@ export const PhaseCard: React.FC<PhaseCardProps> = ({ phase }) => {
         <Collapsible open={showDetail} onOpenChange={setShowDetail}>
           <CollapsibleTrigger asChild>
             <button className="w-full flex items-center justify-between px-4 sm:px-5 py-3 border-t border-black/[0.06] hover:bg-black/[0.02] transition">
-              <span className="text-[14px] font-semibold text-gray-900">Coach notes</span>
+              <span className="text-body-md font-semibold leading-snug text-gray-900">Coach notes</span>
               {showDetail ? (
                 <ChevronUp className="h-4 w-4 text-gray-600" />
               ) : (
@@ -99,10 +99,10 @@ export const PhaseCard: React.FC<PhaseCardProps> = ({ phase }) => {
           </CollapsibleTrigger>
           <CollapsibleContent>
             <div className="px-4 sm:px-5 pb-4 space-y-2">
-              <p className="text-[14px] leading-[1.45] text-gray-800">
+              <p className="text-body-md font-normal leading-relaxed text-gray-800">
                 Detailed analysis and coaching notes would appear here when expanded.
               </p>
-              <div className="text-[13px] text-gray-700 bg-black/[0.02] rounded px-3 py-2">
+              <div className="text-body-sm font-normal leading-snug text-gray-700 bg-black/[0.02] rounded px-3 py-2">
                 • Recommendation bullet points
               </div>
             </div>

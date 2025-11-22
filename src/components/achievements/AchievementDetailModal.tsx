@@ -102,7 +102,7 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       <DialogContent className="max-w-sm mx-auto p-0 overflow-hidden bg-background border shadow-lg [&>button]:border-0 [&>button]:ring-0 [&>button]:outline-0 [&>button]:focus:ring-0 [&>button]:focus:border-0 [&>button]:focus-visible:ring-0 [&>button]:focus-visible:outline-0 [&>button]:!ring-0 [&>button]:!outline-0">
         {/* Header */}
         <DialogHeader className="relative bg-gradient-to-b from-background to-muted p-3 pb-2">
-          <DialogTitle className="text-center text-heading-md font-semibold text-foreground">
+          <DialogTitle className="text-center text-heading-md font-semibold leading-snug text-foreground">
             {achievement.name}
           </DialogTitle>
         </DialogHeader>

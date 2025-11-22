@@ -44,7 +44,7 @@ const CourseCardLocation: React.FC<CourseCardLocationProps> = ({
   mobileFlagSize = 'lg'
 }) => {
   return (
-    <div className={`flex items-center text-white/90 ${mobileTextScale === 'small' ? 'text-heading-md' : 'text-heading-lg'} drop-shadow-lg`}>
+    <div className={`flex items-center text-white/90 ${mobileTextScale === 'small' ? 'text-heading-md' : 'text-heading-lg'} font-normal leading-snug drop-shadow-lg`}>
       <CountryFlag 
         country={getCountryForFlag(course)} 
         size={mobileFlagSize}

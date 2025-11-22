@@ -226,7 +226,7 @@ export default function TopTenCoursesRatedByYou({
     return (
       <div className="w-full">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-display text-heading-lg text-foreground">
+          <h3 className="font-display text-heading-lg font-semibold leading-snug text-foreground">
             {title}
           </h3>
         </div>
@@ -246,7 +246,7 @@ export default function TopTenCoursesRatedByYou({
     <section className="w-full fullbleed md:mx-auto md:px-0 pt-0 pb-0" data-section="top-ten-rated">
       <div className="max-w-none md:max-w-6xl md:mx-auto">
         <div className="flex items-center justify-between mb-0 px-4 md:px-0">
-          <h3 className="font-display text-heading-lg text-foreground">
+          <h3 className="font-display text-heading-lg font-semibold leading-snug text-foreground">
             {title}
             {filled > 0 && (
               <span className="text-body-md text-muted-foreground ml-2">({filled}/10)</span>

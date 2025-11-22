@@ -79,7 +79,7 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
     return (
       <section className="mt-10 px-2">
         <div className="flex items-center gap-2 mb-3">
-          <h2 className="font-display text-heading-lg font-bold">What's in the Bag?</h2>
+          <h2 className="font-display text-heading-lg font-semibold leading-snug">What's in the Bag?</h2>
         </div>
         <p className="text-muted-foreground text-body-md">Loading...</p>
       </section>
@@ -89,7 +89,7 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
   return (
     <section className="mt-10 px-2">
       <div className="flex items-center gap-2 mb-3">
-        <h2 className="font-display text-heading-lg font-bold">What's in the Bag?</h2>
+        <h2 className="font-display text-heading-lg font-semibold leading-snug">What's in the Bag?</h2>
         {isOwnProfile && (
           <>
             <BagEditDialog userId={userId} onBagUpdate={fetchBag} />

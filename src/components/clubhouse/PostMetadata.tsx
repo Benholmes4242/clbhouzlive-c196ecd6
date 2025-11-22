@@ -49,7 +49,7 @@ const PostMetadata = ({ title, description, user, onUserClick, className }: Post
             className="flex-shrink-0 shadow-sm"
           />
           <span 
-            className="text-[15px] font-medium tracking-[0.02em] text-white drop-shadow-sm leading-none"
+            className="text-body-md font-medium text-white drop-shadow-sm leading-snug"
             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
           >
             {user.name}

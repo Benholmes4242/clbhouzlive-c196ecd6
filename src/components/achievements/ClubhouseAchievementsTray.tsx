@@ -263,7 +263,7 @@ const ClubhouseAchievementsTray: React.FC<ClubhouseAchievementsTrayProps> = ({
         <div className="space-y-6">
           {/* Header */}
           <div>
-            <h3 className="font-display text-heading-lg font-bold text-foreground">Clubhouse Achievements</h3>
+            <h3 className="font-display text-heading-lg font-semibold leading-snug text-foreground">Clubhouse Achievements</h3>
             <p className="text-body-sm text-muted-foreground">
               {earnedAchievements.length} of {achievements.length} achievements earned
             </p>
@@ -271,7 +271,7 @@ const ClubhouseAchievementsTray: React.FC<ClubhouseAchievementsTrayProps> = ({
 
           {/* Exploration Achievements */}
           <div>
-            <h4 className="text-heading-md font-semibold text-foreground mb-3">Exploration Achievements</h4>
+            <h4 className="text-heading-md font-semibold leading-snug text-foreground mb-3">Exploration Achievements</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {explorationAchievements.map((achievement) => (
                 <div
