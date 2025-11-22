@@ -56,9 +56,9 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
   return (
     <div className="rounded-2xl border border-border/60 bg-card/90 shadow-sm px-4 py-4">
       {/* Header with Legend */}
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-meta font-medium uppercase tracking-wide leading-snug text-muted-foreground">
-          YOUR RATING VS COMMUNITY
+      <div className="space-y-1 mb-4">
+        <p className="text-heading-md font-semibold leading-snug text-foreground">
+          Your Rating vs Community
         </p>
         <div className="flex items-center gap-3 text-meta font-medium leading-snug text-muted-foreground">
           <div className="flex items-center gap-1">

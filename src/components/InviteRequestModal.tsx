@@ -108,8 +108,8 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-body-sm text-muted-foreground">
+          <div>
+            <label htmlFor="email" className="text-body-sm font-medium text-foreground mb-1 block">
               Email <span className="text-destructive">*</span>
             </label>
             <input
@@ -127,8 +127,8 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
             />
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="name" className="text-body-sm text-muted-foreground">
+          <div>
+            <label htmlFor="name" className="text-body-sm font-medium text-foreground mb-1 block">
               Name <span className="text-muted-foreground/60">(optional)</span>
             </label>
             <input
@@ -145,8 +145,8 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
             />
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="club" className="text-body-sm text-muted-foreground">
+          <div>
+            <label htmlFor="club" className="text-body-sm font-medium text-foreground mb-1 block">
               Home Club <span className="text-muted-foreground/60">(optional)</span>
             </label>
             <input
@@ -163,7 +163,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
             />
           </div>
 
-          <p className="text-xs text-muted-foreground">
+          <p className="text-body-sm text-muted-foreground mt-1">
             We'll only use this to contact you about beta access.
           </p>
 

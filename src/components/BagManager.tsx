@@ -88,25 +88,25 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
 
   return (
     <section className="mt-10 px-2">
-      <div className="flex items-center gap-2 mb-3">
-        <h2 className="font-display text-heading-lg font-semibold leading-snug">What's in the Bag?</h2>
+      <div className="space-y-1 mb-4">
+        <div className="flex items-center gap-2">
+          <h2 className="font-display text-heading-lg font-semibold leading-snug">What's in the Bag?</h2>
+          {isOwnProfile && <BagEditDialog userId={userId} onBagUpdate={fetchBag} />}
+        </div>
         {isOwnProfile && (
-          <>
-            <BagEditDialog userId={userId} onBagUpdate={fetchBag} />
-            <div className="flex items-center space-x-2 ml-auto">
-              <Checkbox
-                id="bag-visibility"
-                checked={isBagVisible}
-                onCheckedChange={handleVisibilityToggle}
-              />
-              <Label
-                htmlFor="bag-visibility"
-                className="text-body-sm text-muted-foreground cursor-pointer"
-              >
-                Show this section on my public profile
-              </Label>
-            </div>
-          </>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="bag-visibility"
+              checked={isBagVisible}
+              onCheckedChange={handleVisibilityToggle}
+            />
+            <Label
+              htmlFor="bag-visibility"
+              className="text-body-sm text-muted-foreground cursor-pointer"
+            >
+              Show this section on my public profile
+            </Label>
+          </div>
         )}
       </div>
 
