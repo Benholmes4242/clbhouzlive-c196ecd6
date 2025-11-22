@@ -367,13 +367,10 @@ html, body, #root {
   --bg-glass: rgba(0,0,0,0.6);
   --bg-card-border: rgba(255,255,255,0.12);
 
-  /* Accent - Phase 1: Brand accent - Orange logo color */
-  --accent-primary: #f7931e;
-  --primary-accent: #f7931e;
-  --accent-clbhouz: #f7931e;
-  --accent-green: #f7931e;
-  --accent-green-bg: #f7931e;
-  --accent-green-text: #ffffff;
+  /* Primary Accent - Orange Brand Color (UNIFIED) */
+  --accent-primary: #F7931E;
+  --primary-accent: #F7931E;
+  --accent-clbhouz: #F7931E;
   
   /* Frosted white accents */
   --accent-frost-bg: rgba(255,255,255,0.08);
@@ -1695,10 +1692,10 @@ html[data-immersive="true"] .app-shell--topSpacer {
     }
   }
   :root {
-    /* ========================================
-       PHASE 1: CORE TOKENS & FOUNDATIONS
-       Light Grey + Slate System
-       ======================================== */
+  /* ========================================
+     PHASE 6: UNIFIED COLOR SYSTEM
+     Light Grey + Slate + Orange Accent
+     ======================================== */
     
     /* Base canvas */
     --background: 240 5% 96%;            /* #F4F5F7 */
@@ -1730,11 +1727,6 @@ html[data-immersive="true"] .app-shell--topSpacer {
     /* Placeholder / helper text */
     --placeholder-foreground: rgba(31, 36, 40, 0.48);  /* softer text-primary */
     
-    /* ========================================
-       PHASE 2: TEXT & ICONS
-       Slate System for Excellent Readability
-       ======================================== */
-    
     /* Text hierarchy */
     --text-primary: #1F2428;             /* primary text */
     --text-secondary: #5E666D;           /* secondary text */
@@ -1745,22 +1737,26 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --icon-secondary: #747C84;           /* secondary icons */
     --icon-disabled: #B4BAC0;            /* disabled state */
     
-    /* Shadcn semantic tokens */
+    /* Primary Accent - Orange Brand Color (UNIFIED) */
+    --primary-accent: #F7931E;           /* THE ONLY ACCENT */
+    --accent-primary: #F7931E;           /* alias */
+    
+    /* Shadcn semantic tokens - updated to use orange accent */
     --popover: 240 17% 98%;              /* #FAFAFB (same as card) */
     --popover-foreground: 210 13% 18%;   /* #1F2428 */
-    --primary: 142 15% 51%;              /* #6E9277 - brand accent */
+    --primary: 31 93% 54%;               /* #F7931E - orange accent (UNIFIED) */
     --primary-foreground: 0 0% 100%;     /* white text on accent */
     --secondary: 210 11% 24%;            /* #3A3F46 (surface-slate) */
     --secondary-foreground: 0 0% 100%;   /* white text on slate */
     --muted: 240 5% 92%;                 /* #EDEFF2 (surface-alt) */
     --muted-foreground: 210 10% 38%;     /* #5E666D (text-secondary) */
-    --accent: 31 93% 54%;                /* orange accent (kept as-is) */
+    --accent: 31 93% 54%;                /* #F7931E - orange accent */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
     --input: 210 8% 86%;                 /* #D4D7DB - border for inputs */
-    --input-focus: 142 15% 51%;          /* #6E9277 - brand accent for focus */
-    --ring: 142 15% 51%;                 /* #6E9277 - brand accent */
+    --input-focus: 31 93% 54%;           /* #F7931E - orange accent for focus */
+    --ring: 31 93% 54%;                  /* #F7931E - orange accent */
     --radius: 0.5rem;
     /* ========================================
        SHADOWS & EFFECTS

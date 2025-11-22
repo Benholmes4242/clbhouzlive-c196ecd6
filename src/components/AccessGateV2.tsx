@@ -272,7 +272,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
       <div className="fixed inset-0 bg-black/60 backdrop-blur-md" />
       
       {/* Content Card */}
-      <section className="relative z-10 w-[90%] max-w-[360px] rounded-[18px] bg-[color:var(--surface-card)] border border-[color:var(--border)] shadow-[var(--shadow-medium)] p-8 text-center">
+      <section className="relative z-10 w-[90%] max-w-[360px] rounded-[18px] bg-surface-card border border-border shadow-shadow-medium p-8 text-center">
         {/* Logo */}
         <div className="flex justify-center items-center mb-6">
           <img
@@ -283,12 +283,12 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         </div>
 
         {/* Headline */}
-        <h1 className="font-display text-[color:var(--text-primary)] text-display-xl font-bold leading-tight mb-3">
+        <h1 className="font-display text-foreground text-display-xl font-bold leading-tight mb-3">
           YOUR HOME<br/>OF GOLF
         </h1>
 
         {/* Subtitle */}
-        <p className="text-[color:var(--text-secondary)] text-body-md mb-6">
+        <p className="text-muted-foreground text-body-md mb-6">
           Enter access code to continue
         </p>
 
@@ -317,16 +317,16 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
             onChange={(e) => setAccessCode(e.target.value)}
             placeholder="••••••••••"
             disabled={submitting}
-            className="w-full rounded-lg bg-[color:var(--surface-alt)] text-[color:var(--text-primary)] placeholder:text-[color:var(--text-tertiary)]
-                     border border-[color:var(--border)] px-4 py-3 text-body-md outline-none
-                     focus:border-[color:var(--primary-accent)] focus:ring-1 focus:ring-[color:var(--primary-accent)] transition-all duration-motion-fast ease-standard
+            className="w-full rounded-lg bg-surface-alt text-foreground placeholder:text-text-tertiary
+                     border border-border px-4 py-3 text-body-md outline-none
+                     focus:border-primary-accent focus:ring-1 focus:ring-primary-accent transition-all duration-motion-fast ease-standard
                      disabled:opacity-60"
           />
           <button
             type="submit"
             disabled={submitting}
             aria-label="Submit access code"
-            className="w-full rounded-lg bg-[color:var(--surface-slate)] text-white py-3 font-medium text-body-md
+            className="w-full rounded-lg bg-primary-accent text-white py-3 font-medium text-body-md
                      hover:opacity-90 disabled:opacity-60 transition-opacity"
           >
             {submitting ? "Checking..." : "ENTER"}
@@ -334,7 +334,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         </form>
 
         {/* Footer */}
-        <p className="mt-6 text-meta text-[color:var(--text-tertiary)]">
+        <p className="mt-6 text-meta text-text-tertiary">
           © 2025 clubhouz
         </p>
       </section>
