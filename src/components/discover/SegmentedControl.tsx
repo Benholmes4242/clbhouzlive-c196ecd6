@@ -45,7 +45,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
               ref={el => tabRefs.current[index] = el}
               onClick={() => handleTabClick(tab.id)}
               className={cn(
-                "discover-tab flex-1 py-[10px] px-4 text-center relative z-10 text-[17px] font-medium leading-tight",
+                "discover-tab flex-1 py-[10px] px-4 text-center relative z-10 text-[17px] font-medium leading-tight transition-all duration-motion-fast ease-standard",
                 main === tab.id 
                   ? "active" 
                   : "hover:text-foreground/70"
@@ -61,7 +61,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
           <button
             aria-label="Search videos"
             onClick={onOpenVideoSearch}
-            className="p-2 mr-2 rounded-full transition-all"
+            className="p-2 mr-2 rounded-full transition-all duration-motion-fast ease-standard hover:scale-[1.1] active:scale-95"
             style={{ 
               color: 'rgba(255,255,255,0.7)',
             }}

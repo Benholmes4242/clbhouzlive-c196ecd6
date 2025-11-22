@@ -61,7 +61,7 @@
   isolation: isolate;
   overflow: hidden;
 
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--motion-fast) var(--ease-standard);
   animation: glass-breathe 4s ease-in-out infinite alternate;
 }
 
@@ -101,9 +101,9 @@
 }
 
 .echo-orb:active {
-  transform: translateY(0) scale(0.985);
+  transform: translateY(0) scale(0.97);
   box-shadow: var(--echo-shadow-active);
-  transition: all 0.1s ease;
+  transition: all var(--motion-ultrafast) var(--ease-pop);
 }
 
 /* Text */

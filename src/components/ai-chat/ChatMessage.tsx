@@ -86,7 +86,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     <div 
       role="article"
       aria-label={`Message from ${isUser ? 'You' : 'Echo'}, ${time}`}
-      className="animate-[fadeInUp_.18s_ease-out_both]"
+      className="opacity-0 translate-y-1 animate-[fadeInUp_var(--motion-medium)_var(--ease-out)_both]"
     >
       <div className={cn(
         "flex items-end gap-2.5",

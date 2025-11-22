@@ -312,7 +312,29 @@ export default {
 					'100%': {
 						transform: 'translateX(100%)'
 					}
+				},
+				'echo-typing-dot': {
+					'0%, 60%, 100%': {
+						transform: 'scale(1)',
+						opacity: '0.6'
+					},
+					'30%': {
+						transform: 'scale(1.2)',
+						opacity: '1'
+					}
 				}
+			},
+			transitionDuration: {
+				'motion-ultrafast': 'var(--motion-ultrafast)',
+				'motion-fast': 'var(--motion-fast)',
+				'motion-medium': 'var(--motion-medium)',
+				'motion-slow': 'var(--motion-slow)',
+			},
+			transitionTimingFunction: {
+				'ease-standard': 'var(--ease-standard)',
+				'ease-pop': 'var(--ease-pop)',
+				'ease-out': 'var(--ease-out)',
+				'ease-in': 'var(--ease-in)',
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -330,7 +352,8 @@ export default {
 				'shimmer': 'shimmer 2s infinite',
 				'slow-spin': 'slow-spin 20s linear infinite',
 				'slide-in-from-right-modal': 'slide-in-from-right-modal 250ms ease-out',
-				'slide-out-to-right-modal': 'slide-out-to-right-modal 250ms ease-out'
+				'slide-out-to-right-modal': 'slide-out-to-right-modal 250ms ease-out',
+				'echo-typing-dot': 'echo-typing-dot 1.4s ease-in-out infinite'
 			}
 		}
 	},
