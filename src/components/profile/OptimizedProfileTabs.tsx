@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import { ProfileTabsSkeleton, ActivityFeedSkeleton } from './ProfileSkeleton';
+import { ProfileTabsSkeleton, ActivityFeedSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import OptimizedActivityFeed from './OptimizedActivityFeed';
 import { OptimizedProfileData } from '@/hooks/useOptimizedProfileData';
 import AchievementsPane from './AchievementsPane';

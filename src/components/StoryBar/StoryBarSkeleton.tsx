@@ -1,5 +1,7 @@
 
 import React from 'react';
+import { SkeletonAvatar } from '@/components/ui/skeleton-avatar';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const StoryBarSkeleton = () => {
   return (
@@ -9,8 +11,8 @@ const StoryBarSkeleton = () => {
           {/* Loading skeleton */}
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="flex flex-col items-center space-y-1 min-w-0">
-              <div className="w-20 h-20 bg-muted rounded-full animate-pulse" />
-              <div className="w-16 h-3 bg-muted rounded animate-pulse" />
+              <SkeletonAvatar size="lg" />
+              <Skeleton className="w-16 h-3" />
             </div>
           ))}
         </div>

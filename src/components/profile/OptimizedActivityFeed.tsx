@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityFeedSkeleton } from './ProfileSkeleton';
+import { ActivityFeedSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ActivityPost {

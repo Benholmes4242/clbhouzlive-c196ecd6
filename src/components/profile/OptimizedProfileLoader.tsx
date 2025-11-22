@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOptimizedProfileData } from '@/hooks/useOptimizedProfileData';
-import { ProfileHeaderSkeleton } from './ProfileSkeleton';
+import { ProfileHeaderSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import HeroProfileHeader from './HeroProfileHeader';
 
 interface OptimizedProfileLoaderProps {

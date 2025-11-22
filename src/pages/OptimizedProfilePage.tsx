@@ -4,7 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOptimizedProfileData } from '@/hooks/useOptimizedProfileData';
 import OptimizedProfileLoader from '@/components/profile/OptimizedProfileLoader';
 import OptimizedProfileTabs from '@/components/profile/OptimizedProfileTabs';
-import { ProfileHeaderSkeleton } from '@/components/profile/ProfileSkeleton';
+import { ProfileHeaderSkeleton } from '@/components/skeletons/ProfileSkeleton';
 
 const OptimizedProfilePage: React.FC = () => {
   const { username } = useParams<{ username: string }>();
