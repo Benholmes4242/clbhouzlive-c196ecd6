@@ -124,10 +124,10 @@ export function HistoryPanel({
 
   if (conversations.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-4">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-1">
         <div className="text-4xl mb-2">📚</div>
         <h3 className="font-display text-heading-lg font-semibold leading-snug text-foreground">No conversations yet</h3>
-        <p className="text-body-md text-muted-foreground text-center max-w-xs">
+        <p className="text-body-md leading-relaxed text-muted-foreground text-center max-w-xs mt-2">
           Start chatting with Echo to build your conversation history
         </p>
         <TapButton

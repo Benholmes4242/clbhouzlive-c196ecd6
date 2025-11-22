@@ -136,7 +136,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
       >
         {/* Top row */}
         <div className="flex items-start justify-between gap-3">
-          <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+          <div className="flex flex-col space-y-1 min-w-0 flex-1">
             <div className="text-heading-md font-semibold leading-snug truncate">
               {course.name}
             </div>
@@ -144,7 +144,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
               {course.sub_country || course.country || 'Location unknown'}
             </div>
             {secondaryText && (
-              <div className="text-body-sm text-muted-foreground/80 mt-0.5">
+              <div className="text-body-sm text-muted-foreground/80 mt-1">
                 {secondaryText}
               </div>
             )}

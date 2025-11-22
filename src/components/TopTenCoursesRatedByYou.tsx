@@ -225,13 +225,13 @@ export default function TopTenCoursesRatedByYou({
   if (loading) {
     return (
       <div className="w-full">
-        <div className="flex items-center justify-between mb-4">
+        <div className="space-y-1 mb-5">
           <h3 className="font-display text-heading-lg font-semibold leading-snug text-foreground">
             {title}
           </h3>
         </div>
         <div className="flex items-center justify-center py-8">
-          <div className="text-muted-foreground">
+          <div className="text-body-md text-muted-foreground">
             {userId ? `Loading ${isOwnProfile ? 'your' : userDisplayName?.split(' ')[0] + "'s"} top 10...` : 'Loading top 10...'}
           </div>
         </div>
