@@ -108,8 +108,8 @@ export const HeaderPhotoSection: React.FC<HeaderPhotoSectionProps> = ({
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-sm font-medium">Mobile Hero Crop</Label>
-                    <p className="text-xs text-muted-foreground">
+                    <Label className="text-body-sm font-medium">Mobile Hero Crop</Label>
+                    <p className="text-meta text-muted-foreground">
                       How your header appears on mobile devices
                     </p>
                   </div>
@@ -139,7 +139,7 @@ export const HeaderPhotoSection: React.FC<HeaderPhotoSectionProps> = ({
                     className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white/80 via-white/40 to-transparent pointer-events-none"
                     style={{ height: `${(PROFILE_PANEL_OVERLAP_PX / 128) * 100}%` }}
                   />
-                  <div className="absolute bottom-2 left-2 text-xs bg-[#0a0a0a]/60 text-white px-2 py-1 rounded">
+                  <div className="absolute bottom-2 left-2 text-meta bg-[#0a0a0a]/60 text-white px-2 py-1 rounded">
                     Panel covers this area
                   </div>
                 </div>
@@ -150,8 +150,8 @@ export const HeaderPhotoSection: React.FC<HeaderPhotoSectionProps> = ({
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-sm font-medium">Desktop Hero Crop</Label>
-                    <p className="text-xs text-muted-foreground">
+                    <Label className="text-body-sm font-medium">Desktop Hero Crop</Label>
+                    <p className="text-meta text-muted-foreground">
                       How your header appears on desktop screens
                     </p>
                   </div>

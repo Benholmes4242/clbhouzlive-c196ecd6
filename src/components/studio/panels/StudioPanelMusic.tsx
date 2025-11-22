@@ -93,7 +93,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
       {selectedTrack && (
         <div className="p-4 border-t border-zinc-200 bg-white space-y-3">
           <div>
-            <label className="block text-sm font-medium text-zinc-700 mb-2">Volume</label>
+            <label className="block text-body-sm font-medium text-zinc-700 mb-2">Volume</label>
             <input
               type="range"
               min="0"

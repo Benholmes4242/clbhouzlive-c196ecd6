@@ -56,7 +56,7 @@ const HandicapActions: React.FC<HandicapActionsProps> = ({ onEGConnect }) => {
     return (
       <div className="space-y-3">
         <div>
-          <Label htmlFor="manual-handicap" className="text-sm font-medium">
+          <Label htmlFor="manual-handicap" className="text-body-sm font-medium">
             Enter your handicap
           </Label>
           <Input

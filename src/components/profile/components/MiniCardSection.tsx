@@ -101,8 +101,8 @@ export const MiniCardSection: React.FC<MiniCardSectionProps> = ({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <Label className="text-sm font-medium">Adjust 3:4 Crop</Label>
-                <p className="text-xs text-muted-foreground">
+                <Label className="text-body-sm font-medium">Adjust 3:4 Crop</Label>
+                <p className="text-meta text-muted-foreground">
                   Choose which part of your photo appears in the mini card
                 </p>
               </div>

@@ -94,7 +94,7 @@ const EchoProtection: React.FC<EchoProtectionProps> = ({
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="echo-password" className="block text-sm font-medium mb-2">
+              <label htmlFor="echo-password" className="block text-body-sm font-medium mb-2">
                 Enter Echo AI Password:
               </label>
               <Input

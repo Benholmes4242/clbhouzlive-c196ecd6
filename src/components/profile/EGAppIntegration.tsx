@@ -109,7 +109,7 @@ const EGAppIntegration: React.FC<EGAppIntegrationProps> = ({
           {isEditing && (
             <div className="space-y-3">
               <div className="bg-muted rounded-lg px-4 py-3">
-                <Label htmlFor="manual-handicap" className="text-sm font-medium">
+                <Label htmlFor="manual-handicap" className="text-body-sm font-medium">
                   Handicap Index
                 </Label>
                 <div className="flex gap-2 mt-2">

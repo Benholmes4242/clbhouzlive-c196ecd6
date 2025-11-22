@@ -62,7 +62,7 @@ const FaviconSection = ({
       
       <div className="space-y-3">
         <div>
-          <Label htmlFor="favicon-file" className="text-sm font-medium">
+          <Label htmlFor="favicon-file" className="text-body-sm font-medium">
             Upload Favicon File (Temporary)
           </Label>
           <div className="mt-1">
@@ -75,18 +75,18 @@ const FaviconSection = ({
             />
           </div>
           {faviconFile && (
-            <p className="text-xs text-orange-600 mt-1">
+            <p className="text-meta text-orange-600 mt-1">
               Selected: {faviconFile.name} (will be lost on page refresh)
             </p>
           )}
         </div>
         
-        <div className="text-center text-sm text-muted-foreground">
+        <div className="text-center text-body-md text-muted-foreground">
           OR
         </div>
         
         <div>
-          <Label htmlFor="favicon-url" className="text-sm font-medium">
+          <Label htmlFor="favicon-url" className="text-body-sm font-medium">
             Favicon URL (Persistent)
           </Label>
           <Input

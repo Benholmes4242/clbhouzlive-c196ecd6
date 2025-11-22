@@ -109,7 +109,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
         
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           <div className="space-y-2">
-            <label htmlFor="email" className="text-sm text-muted-foreground">
+            <label htmlFor="email" className="text-body-sm text-muted-foreground">
               Email <span className="text-destructive">*</span>
             </label>
             <input
@@ -128,7 +128,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="name" className="text-sm text-muted-foreground">
+            <label htmlFor="name" className="text-body-sm text-muted-foreground">
               Name <span className="text-muted-foreground/60">(optional)</span>
             </label>
             <input
@@ -146,7 +146,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="club" className="text-sm text-muted-foreground">
+            <label htmlFor="club" className="text-body-sm text-muted-foreground">
               Home Club <span className="text-muted-foreground/60">(optional)</span>
             </label>
             <input

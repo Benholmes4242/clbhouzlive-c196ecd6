@@ -28,7 +28,7 @@ export default function StudioPanelFilter({ edits, updateEdits, onApply, onReset
     <div className="flex flex-col h-full">
       {/* Filter presets */}
       <div className="p-4 space-y-3">
-        <label className="block text-sm font-medium text-zinc-700">Filter</label>
+        <label className="block text-body-sm font-medium text-zinc-700">Filter</label>
         <div className="grid grid-cols-3 gap-3">
           {FILTER_OPTIONS.map(filter => (
             <button
