@@ -30,7 +30,7 @@ interface AppleMetadataCapsuleProps {
   className?: string;
 }
 
-export const AppleMetadataCapsule = ({
+const AppleMetadataCapsuleBase = ({
   user,
   caption,
   createdAt,
@@ -108,3 +108,6 @@ export const AppleMetadataCapsule = ({
     </div>
   );
 };
+
+export const AppleMetadataCapsule = React.memo(AppleMetadataCapsuleBase);
+AppleMetadataCapsule.displayName = 'AppleMetadataCapsule';

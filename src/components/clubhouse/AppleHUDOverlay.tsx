@@ -7,6 +7,7 @@ import React from 'react';
 import { AppleMetadataCapsule } from './AppleMetadataCapsule';
 import { AppleEngagementRail } from './AppleEngagementRail';
 import { AppleProgressBar } from './AppleProgressBar';
+import { cn } from '@/lib/utils';
 
 interface AppleHUDOverlayProps {
   // Video ref for progress tracking
@@ -56,7 +57,7 @@ interface AppleHUDOverlayProps {
  * Complete HUD overlay for Clubhouse vertical feed
  * Includes metadata capsule, progress bar (integrated), and engagement rail
  */
-export const AppleHUDOverlay = ({
+const AppleHUDOverlayBase = ({
   videoRef,
   user,
   caption,
@@ -84,7 +85,18 @@ export const AppleHUDOverlay = ({
   return (
     <>
       {/* Bottom-left: metadata capsule + progress bar */}
-      <div className="clubhouse-hud fixed left-[12px] z-[50]">
+      <div 
+        className={cn(
+          'clubhouse-hud fixed left-[12px] z-[50]',
+          'transition-all duration-motion-fast ease-out-soft',
+          isActive
+            ? 'opacity-100 translate-y-0'
+            : 'opacity-0 translate-y-[4px]',
+          !isActive && 'pointer-events-none',
+          isActive && 'pointer-events-auto'
+        )}
+        data-active={isActive ? 'true' : 'false'}
+      >
         <div className="flex flex-col gap-2 w-[260px] max-w-[80vw]">
           <AppleMetadataCapsule
             user={user}
@@ -118,3 +130,23 @@ export const AppleHUDOverlay = ({
     </>
   );
 };
+
+export const AppleHUDOverlay = React.memo(
+  AppleHUDOverlayBase,
+  (prev, next) => {
+    // Only re-render when relevant props change
+    return (
+      prev.isActive === next.isActive &&
+      prev.caption === next.caption &&
+      prev.courseName === next.courseName &&
+      prev.videoProgress === next.videoProgress &&
+      prev.isMuted === next.isMuted &&
+      prev.isLiked === next.isLiked &&
+      prev.stats.likes === next.stats.likes &&
+      prev.stats.comments === next.stats.comments &&
+      prev.stats.shares === next.stats.shares
+    );
+  }
+);
+
+AppleHUDOverlay.displayName = 'AppleHUDOverlay';
