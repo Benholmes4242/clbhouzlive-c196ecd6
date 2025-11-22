@@ -74,14 +74,12 @@ const ScrollToTopGlass = () => {
       type="button"
       onClick={scrollToTop}
       aria-label="Back to top"
-      style={{
-        position: 'fixed',
-        top: '2px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 80,
-      }}
       className="
+        fixed
+        top-20
+        left-1/2
+        -translate-x-1/2
+        z-[100]
         rounded-full
         px-3
         py-2
