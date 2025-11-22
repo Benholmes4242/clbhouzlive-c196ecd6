@@ -9,13 +9,19 @@ All remaining full-screen loading screens have been successfully removed from th
 ## 1. Hub Routes (All 13 Routes) ✅
 
 ### Problem
-All Hub routes were wrapped in `<Suspense fallback={<HubSkeleton />}>` where `HubSkeleton` was a full-screen z-[10000] overlay that blocked the entire viewport during navigation.
+All Hub routes were using lazy-loaded components without proper Suspense boundaries, causing blank screens or visible loading delays during code-splitting.
 
 ### Solution
-Removed all Suspense wrappers from Hub routes in `src/App.tsx`. Hub pages are already full-screen glass overlays that:
-- Render their own chrome (header, backdrop, glass structure) immediately
-- Handle loading states internally with in-content skeletons
-- Don't benefit from route-level skeleton since the pages themselves are the "shell"
+Added Suspense wrappers with a minimal `HubSkeleton` component that:
+- Renders the Hub glass overlay structure immediately
+- Shows the grabber bar and glass backdrop instantly
+- Displays subtle skeleton tiles in the content area
+- **Does NOT block the viewport or replace the entire screen**
+- Matches the Hub's visual design (glass effect, dark theme)
+
+The Hub skeleton is fundamentally different from the old full-screen loader:
+- ❌ Old: Blocked entire viewport with z-[10000], opaque background
+- ✅ New: Renders Hub chrome instantly, shows content skeletons only
 
 ### Routes Fixed
 - `/hub`
@@ -33,8 +39,8 @@ Removed all Suspense wrappers from Hub routes in `src/App.tsx`. Hub pages are al
 - `/echo/share/:token`
 
 ### Files Modified
-- `src/App.tsx` (lines 268-286): Removed all `<Suspense fallback={<HubSkeleton />}>` wrappers
-- `src/App.tsx` (line 37): Removed unused `HubSkeleton` import
+- `src/App.tsx` (lines 267-309): Added `<Suspense fallback={<HubSkeleton />}>` wrappers for all Hub routes
+- `src/components/skeletons/HubSkeleton.tsx`: Replaced full-screen spinner with Hub-matching skeleton structure
 
 ---
 
