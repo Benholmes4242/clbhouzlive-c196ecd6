@@ -124,10 +124,10 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
             role="group"
             aria-label={`Message from ${isUser ? 'You' : 'Echo'} at ${time}`}
             className={cn(
-              "text-[15px] relative overflow-hidden backdrop-blur-[var(--glass-blur)] bubble-prose",
+              "text-body-md relative overflow-hidden backdrop-blur-[var(--glass-blur)] bubble-prose",
               isUser 
-                ? "ml-auto text-white/95 leading-[1.5]" 
-                : "text-white/90 leading-[1.55]"
+                ? "ml-auto text-white/95 leading-relaxed font-normal" 
+                : "text-white/90 leading-relaxed font-normal"
             )}
             style={{
               borderRadius: 'var(--bubble-radius)',
@@ -171,17 +171,17 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                         />
                       ),
                       h1: ({ children }) => (
-                        <h3 className="text-[16px] font-semibold mb-2 mt-[10px] first:mt-0 text-white" style={{ letterSpacing: '0.2px' }}>
+                        <h3 className="text-body-md font-semibold mb-2 mt-[10px] first:mt-0 text-white">
                           {children}
                         </h3>
                       ),
                       h2: ({ children }) => (
-                        <h4 className="text-[15.5px] font-semibold mb-2 mt-[10px] text-white" style={{ letterSpacing: '0.2px' }}>
+                        <h4 className="text-body-md font-semibold mb-2 mt-[10px] text-white">
                           {children}
                         </h4>
                       ),
                       h3: ({ children }) => (
-                        <h4 className="text-[15px] font-semibold mb-[6px] mt-[10px] text-white" style={{ fontWeight: 600, letterSpacing: '0.2px' }}>
+                        <h4 className="text-body-md font-semibold mb-[6px] mt-[10px] text-white">
                           {children}
                         </h4>
                       ),
@@ -200,15 +200,15 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                       ),
                       ul: ({ children }) => <ul className="list-disc pl-[18px] my-2 marker:text-white/65">{children}</ul>,
                       ol: ({ children }) => <ol className="list-decimal pl-[18px] my-2 marker:text-white/65">{children}</ol>,
-                      li: ({ children }) => <li className="leading-[1.55] my-0.5">{children}</li>,
+                      li: ({ children }) => <li className="leading-relaxed my-0.5">{children}</li>,
                       strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
                       code: ({ inline, children, ...props }: any) => 
                         inline ? (
-                          <code className="px-1.5 py-0.5 rounded-[4px] bg-white/08 border border-white/12 text-[13px] font-mono text-white" {...props}>
+                          <code className="px-1.5 py-0.5 rounded-[4px] bg-white/08 border border-white/12 text-body-sm font-mono text-white" {...props}>
                             {children}
                           </code>
                         ) : (
-                          <code className="font-mono text-[13px] text-gray-100" {...props}>{children}</code>
+                          <code className="font-mono text-body-sm text-gray-100" {...props}>{children}</code>
                         ),
                       pre: ({ children }) => (
                         <div 
@@ -217,9 +217,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
                           className="mt-2 overflow-x-auto rounded-[10px] bg-black/70 text-white border border-white/10 shadow-[0_16px_40px_rgba(0,0,0,1)]"
                         >
                           <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10">
-                            <span className="text-[11px] text-white/60 font-medium">Code</span>
+                            <span className="text-meta text-white/60 font-medium">Code</span>
                           </div>
-                          <pre className="p-3 text-[13px] leading-[1.5]">
+                          <pre className="p-3 text-body-sm leading-relaxed">
                             {children}
                           </pre>
                         </div>

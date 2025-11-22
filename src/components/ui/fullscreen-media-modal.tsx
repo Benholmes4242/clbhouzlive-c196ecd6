@@ -557,11 +557,11 @@ const FullscreenMediaModal = ({
         {/* Caption Text (matching CaptionOverlay exactly) */}
         {content && removeGolfCourseFromContent(content) && (
           <div 
-            className="text-white text-base font-bold leading-[1.4] cursor-default transition-all duration-300 ease-in-out"
+            className="text-white text-body-lg font-semibold leading-relaxed cursor-default transition-all duration-300 ease-in-out"
             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
           >
             <div className="whitespace-normal">
-              <span className="text-base font-bold">
+              <span className="text-body-lg font-semibold">
                 {isTextExpanded 
                   ? removeGolfCourseFromContent(content)
                   : truncateToWords(removeGolfCourseFromContent(content), 9)

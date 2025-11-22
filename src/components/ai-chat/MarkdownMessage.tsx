@@ -9,14 +9,14 @@ export interface MarkdownMessageProps {
 
 export const MarkdownMessage: React.FC<MarkdownMessageProps> = ({ content, className }) => {
   return (
-    <div className={`text-[15px] leading-[1.35] ${className || ''}`}>
+    <div className={`text-body-md leading-relaxed font-normal ${className || ''}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
           a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-[#2A9D8F] hover:underline break-words" />,
-          h1: ({ children }) => <h3 className="text-[15px] font-semibold mb-2 mt-0">{children}</h3>,
-          h2: ({ children }) => <h4 className="text-[15px] font-semibold mb-2 mt-2">{children}</h4>,
-          h3: ({ children }) => <h4 className="text-[15px] font-semibold mb-2 mt-2">{children}</h4>,
+          h1: ({ children }) => <h3 className="text-body-md font-semibold mb-2 mt-0">{children}</h3>,
+          h2: ({ children }) => <h4 className="text-body-md font-semibold mb-2 mt-2">{children}</h4>,
+          h3: ({ children }) => <h4 className="text-body-md font-semibold mb-2 mt-2">{children}</h4>,
           p: ({ children }) => <p className="my-2 first:mt-0 last:mb-0 break-words">{children}</p>,
           ul: ({ children }) => <ul className="my-2 pl-5">{children}</ul>,
           ol: ({ children }) => <ol className="my-2 pl-5">{children}</ol>,
@@ -31,7 +31,7 @@ export const MarkdownMessage: React.FC<MarkdownMessageProps> = ({ content, class
               <code {...props}>{children}</code>
             ),
           pre: ({ children }) => (
-            <pre className="mt-2 overflow-auto rounded-lg bg-[#0b2537] text-white text-[13px] leading-[1.45] p-3 border border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+            <pre className="mt-2 overflow-auto rounded-lg bg-[#0b2537] text-white text-body-sm leading-relaxed p-3 border border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
               {children}
             </pre>
           ),

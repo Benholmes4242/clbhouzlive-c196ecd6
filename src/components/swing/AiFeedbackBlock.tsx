@@ -32,7 +32,7 @@ export const AiFeedbackBlock: React.FC<AiFeedbackBlockProps> = ({
               {analysis.save_card || 'Swing Analysis'}
             </h4>
             
-            <MarkdownMessage content={analysis.content} className="text-[15px] leading-[1.55]" />
+            <MarkdownMessage content={analysis.content} className="text-body-md leading-relaxed font-normal" />
           </div>
         </div>
       </div>

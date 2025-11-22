@@ -587,7 +587,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               {/* Caption Text */}
               {item.title && removeGolfCourseFromContent(item.title) && (
                 <div 
-                  className="text-white text-base font-bold leading-[1.4] cursor-default"
+                  className="text-white text-body-lg font-semibold leading-relaxed cursor-default"
                   style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
                 >
                   <div 
@@ -597,7 +597,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                         : 'whitespace-normal'
                     }`}
                   >
-                    <span className="text-base font-bold">
+                    <span className="text-body-lg font-semibold">
                       {isTextExpanded 
                         ? removeGolfCourseFromContent(item.title)
                         : truncateToWords(removeGolfCourseFromContent(item.title), 9)

@@ -126,8 +126,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <section className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-4 md:px-6 md:py-5">
         <div className="flex items-center justify-between gap-3 mb-3">
           <div>
-            <p className="text-sm font-bold tracking-[0.01em]">Community Score</p>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-body-sm font-semibold leading-snug">Community Score</p>
+            <p className="text-meta font-medium leading-snug text-muted-foreground">
               {ratingAggregates?.review_count === 1
                 ? 'Based on 1 rating'
                 : `Based on ${ratingAggregates?.review_count || 0} ratings`}

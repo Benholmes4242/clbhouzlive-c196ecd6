@@ -59,7 +59,7 @@ export const DrillCard: React.FC<DrillCardProps> = ({ drill }) => {
                 />
                 <label
                   htmlFor={`step-${index}`}
-                  className={`text-[14px] cursor-pointer leading-[1.45] ${
+                  className={`text-body-md font-normal leading-relaxed cursor-pointer ${
                     completedSteps[index] ? 'line-through text-gray-500' : 'text-gray-800'
                   }`}
                 >

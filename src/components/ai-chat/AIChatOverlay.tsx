@@ -512,7 +512,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-center space-y-6" style={{ paddingTop: '64px', paddingBottom: '64px' }}>
                   <EchoAvatar state="idle" size={80} />
-                  <div className="text-heading-lg font-semibold text-white">
+                  <div className="font-display text-heading-lg font-semibold leading-snug text-white">
                     Start a conversation with Echo
                   </div>
                   <div className="text-body-md text-white/60 max-w-[280px]">
@@ -979,7 +979,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
                 {/* Center: title/meta */}
                 <div className="min-w-0 text-center">
-                  <div className="truncate text-heading-md font-semibold text-white">
+                  <div className="truncate text-heading-md font-semibold leading-snug text-white">
                     Echo
                   </div>
                   <div className="truncate text-meta text-white/60 leading-tight">
@@ -1067,7 +1067,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     {messages.length === 0 ? (
                       <div className="flex flex-col items-center justify-center text-center px-6 py-20 sm:py-28 space-y-6">
                         <EchoAvatar state="idle" size={72} />
-                        <div className="text-heading-lg font-semibold text-white">
+                        <div className="font-display text-heading-lg font-semibold leading-snug text-white">
                           Start a conversation with Echo
                         </div>
                         <div className="text-body-md text-white/60 max-w-[280px]">
@@ -1329,7 +1329,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         autoCorrect="on"
                         autoCapitalize="sentences"
                         rows={1}
-                        className="w-full bg-transparent outline-none text-[15px] leading-[1.4] 
+                        className="w-full bg-transparent outline-none text-body-md leading-relaxed font-normal 
                                    placeholder:text-black/60 text-black font-medium 
                                    resize-none focus-visible:outline-none"
                       />

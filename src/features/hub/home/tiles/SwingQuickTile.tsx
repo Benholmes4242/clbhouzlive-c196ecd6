@@ -53,7 +53,7 @@ export function SwingQuickTile() {
         {/* Upload pill with inline icon */}
         <button
           onClick={openSwingPage}
-          className="mt-3 h-11 w-full rounded-2xl px-4 flex items-center justify-between text-[15px] leading-[15px] transition focus:outline-none focus-visible:ring-2 whitespace-nowrap"
+          className="mt-3 h-11 w-full rounded-2xl px-4 flex items-center justify-between text-body-md font-medium leading-snug transition focus:outline-none focus-visible:ring-2 whitespace-nowrap"
           style={{
             background: 'rgba(255,255,255,0.12)',
             border: '1px solid rgba(255,255,255,0.22)',

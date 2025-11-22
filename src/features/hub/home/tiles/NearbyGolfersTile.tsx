@@ -80,8 +80,8 @@ export function NearbyGolfersTile({ limit = 20 }: NearbyGolfersTileProps) {
           ))}
           {!isLoading && golfers.length === 0 && (
             <div className="flex flex-col items-center text-center mt-8 px-4">
-              <h2 className="text-[20px] font-semibold mb-1" style={{ color: 'var(--hub-text)' }}>No golfers in range</h2>
-              <p className="text-[14px] leading-[1.5]" style={{ color: 'var(--hub-text-muted)' }}>Try increasing your distance or checking back later.</p>
+              <h2 className="text-body-lg font-semibold leading-snug mb-1" style={{ color: 'var(--hub-text)' }}>No golfers in range</h2>
+              <p className="text-body-md font-normal leading-relaxed" style={{ color: 'var(--hub-text-muted)' }}>Try increasing your distance or checking back later.</p>
             </div>
           )}
         </div>

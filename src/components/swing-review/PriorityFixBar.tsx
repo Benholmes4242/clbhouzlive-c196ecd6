@@ -42,11 +42,11 @@ export const PriorityFixBar: React.FC<PriorityFixProps> = ({ fix }) => {
         <CollapsibleContent>
           <div className="px-4 sm:px-5 pb-4 space-y-3 border-t border-amber-200">
             <div className="pt-3 space-y-2">
-              <div className="text-[14px] text-amber-900 leading-[1.45]">
+              <div className="text-body-md font-normal leading-relaxed text-amber-900">
                 <p><strong>Why it matters:</strong> {fix.why}</p>
               </div>
               
-              <div className="text-[14px] text-amber-900 leading-[1.45]">
+              <div className="text-body-md font-normal leading-relaxed text-amber-900">
                 <p><strong>How to feel it:</strong> {fix.howToFeel}</p>
               </div>
             </div>

@@ -42,7 +42,7 @@ export function OverlayFooter({
         </button>
 
         {/* Caption - black text on frosted white background */}
-        <p className="mt-2 text-[12px] leading-[16px] text-black/60 text-center">
+        <p className="mt-2 text-meta font-medium leading-snug text-black/60 text-center">
           {caption}
         </p>
       </div>

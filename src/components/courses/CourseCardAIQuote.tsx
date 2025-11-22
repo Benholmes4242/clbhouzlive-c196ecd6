@@ -79,7 +79,7 @@ const CourseCardAIQuote: React.FC<CourseCardAIQuoteProps> = ({
   if (!enabled) return null;
 
   return (
-    <div className={`text-white/90 ${mobileTextScale === 'small' ? 'text-heading-md' : 'text-heading-lg'} leading-relaxed drop-shadow-lg italic`}>
+    <div className={`text-white/90 ${mobileTextScale === 'small' ? 'text-heading-md' : 'text-heading-lg'} font-normal leading-relaxed drop-shadow-lg italic`}>
       {isLoading ? (
         <span className="animate-pulse">Generating quote...</span>
       ) : (

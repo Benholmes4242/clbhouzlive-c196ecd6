@@ -80,7 +80,7 @@ export function OpenToPlayButton() {
       </TapButton>
 
       {/* Helper copy */}
-      <p className="mt-1 text-[13px] leading-[1.5] text-center max-w-xs mx-auto font-normal" style={{ color: 'var(--hub-text-muted)' }}>
+      <p className="mt-1 text-body-sm font-medium leading-snug text-center max-w-xs mx-auto" style={{ color: 'var(--hub-text-muted)' }}>
         {isActive ? (
           <>Nearby golfers can see you're available. <span className="font-medium">Tap again</span> to turn off.</>
         ) : (

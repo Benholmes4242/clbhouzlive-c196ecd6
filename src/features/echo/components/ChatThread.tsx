@@ -100,7 +100,7 @@ export function ChatThread({ messages, isStreaming }: ChatThreadProps) {
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="text-center space-y-2">
           <div className="text-4xl mb-4">💬</div>
-          <h3 className="text-heading-lg font-semibold text-foreground">Start a conversation</h3>
+          <h3 className="font-display text-heading-lg font-semibold leading-snug text-foreground">Start a conversation</h3>
           <p className="text-body-md text-muted-foreground max-w-xs">
             Ask Echo anything about golf, get tips, or just chat
           </p>

@@ -45,6 +45,7 @@ html {
 }
 
 body {
+  @apply font-sans;
   overscroll-behavior-y: none !important;
   overscroll-behavior-x: none !important;
   touch-action: pan-y pinch-zoom !important;

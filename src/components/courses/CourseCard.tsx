@@ -137,7 +137,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         {/* Top row */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-            <div className="text-heading-md font-semibold truncate">
+            <div className="text-heading-md font-semibold leading-snug truncate">
               {course.name}
             </div>
             <div className="text-body-sm text-muted-foreground truncate">

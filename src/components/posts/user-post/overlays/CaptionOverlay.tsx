@@ -37,15 +37,15 @@ export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
 
       {/* Caption Text */}
       <div 
-        className="text-white text-base font-bold leading-[1.4] pointer-events-none md:pointer-events-auto md:group"
+        className="text-white text-body-lg font-semibold leading-relaxed pointer-events-none md:pointer-events-auto md:group"
         style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
         title={`${cleanContent}${postTags && postTags.length > 0 ? ' ' + postTags.map(tag => `@${tag.name}`).join(' ') : ''}`}
       >
       <div className="line-clamp-2 md:group-hover:line-clamp-none transition-all duration-200">
-        <span className="md:group-hover:hidden text-base font-bold">
+        <span className="md:group-hover:hidden text-body-lg font-semibold">
           {truncatedContent}
         </span>
-        <span className="hidden md:group-hover:inline text-base font-bold">
+        <span className="hidden md:group-hover:inline text-body-lg font-semibold">
           {cleanContent}
         </span>
         {postTags && postTags.length > 0 && (

@@ -790,7 +790,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           <div className="flex justify-between items-center">
             {/* Left side - Title and subtitle */}
             <div className="text-left">
-              <DialogTitle className={`font-display ${isMobile ? 'text-heading-lg' : 'text-display-lg'} font-bold text-foreground`}>
+              <DialogTitle className={`font-display ${isMobile ? 'text-heading-lg' : 'text-display-lg'} font-bold ${isMobile ? 'leading-snug' : 'leading-tight'} text-foreground`}>
                 Achievements
               </DialogTitle>
               <DialogDescription className={`${isMobile ? 'text-body-md' : 'text-body-lg'} text-muted-foreground mt-1`}>
@@ -947,14 +947,14 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                   <div>
                     <div className="flex justify-between items-start mb-6">
                       <div>
-                        <h3 className="font-display text-heading-md font-bold text-foreground mb-1">XP Progress</h3>
+                        <h3 className="font-display text-heading-md font-semibold leading-snug text-foreground mb-1">XP Progress</h3>
                         
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                           <div className="font-display text-display-lg font-bold text-foreground flex items-center gap-2">
-                             {totalXP.toLocaleString()} XP
-                           </div>
+                            <div className="font-display text-display-lg font-bold leading-tight text-foreground flex items-center gap-2">
+                              {totalXP.toLocaleString()} XP
+                            </div>
                         </div>
                         {!isMobile && (
                           <Button
@@ -1152,9 +1152,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                   
                   {/* Latest Achievement Details */}
                   <div className="flex-1">
-                    <h3 className="font-display text-heading-lg font-bold text-white mb-3">Latest Achievement</h3>
+                    <h3 className="font-display text-heading-lg font-semibold leading-snug text-white mb-3">Latest Achievement</h3>
                     
-                    <h4 className="font-display text-display-lg font-bold text-white mb-2">
+                    <h4 className="font-display text-display-lg font-bold leading-tight text-white mb-2">
                       {mostRecentAchievement.title}
                     </h4>
                     
