@@ -39,6 +39,7 @@ interface AppleHUDOverlayProps {
   isMuted?: boolean;
   isActive?: boolean;
   videoProgress?: number; // 0-100
+  shouldAnimate?: boolean;
   
   // Handlers
   onProfileSheetOpen?: () => void;
@@ -71,6 +72,7 @@ const AppleHUDOverlayBase = ({
   isMuted = false,
   isActive = false,
   videoProgress = 0,
+  shouldAnimate = false,
   onProfileSheetOpen,
   onCourseClick,
   onMoreClick,
@@ -88,10 +90,14 @@ const AppleHUDOverlayBase = ({
       <div 
         className={cn(
           'clubhouse-hud fixed left-[12px] z-[50]',
-          'transition-all duration-motion-fast ease-out-soft',
+          shouldAnimate && 'transition-all duration-motion-fast ease-out-soft',
+          shouldAnimate && 'will-change-transform will-change-opacity',
+          'motion-reduce:transition-none motion-reduce:transform-none motion-reduce:opacity-100',
           isActive
             ? 'opacity-100 translate-y-0'
-            : 'opacity-0 translate-y-[4px]',
+            : shouldAnimate
+              ? 'opacity-0 translate-y-[3px]'
+              : 'opacity-100 translate-y-0',
           !isActive && 'pointer-events-none',
           isActive && 'pointer-events-auto'
         )}
@@ -121,6 +127,7 @@ const AppleHUDOverlayBase = ({
         isVideo={isVideo}
         isMuted={isMuted}
         isActive={isActive}
+        shouldAnimate={shouldAnimate}
         onLike={onLike}
         onComment={onComment}
         onShare={onShare}
@@ -137,6 +144,7 @@ export const AppleHUDOverlay = React.memo(
     // Only re-render when relevant props change
     return (
       prev.isActive === next.isActive &&
+      prev.shouldAnimate === next.shouldAnimate &&
       prev.caption === next.caption &&
       prev.courseName === next.courseName &&
       prev.videoProgress === next.videoProgress &&

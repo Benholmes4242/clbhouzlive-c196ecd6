@@ -24,6 +24,7 @@ interface AppleEngagementRailProps {
   isVideo?: boolean;
   isMuted?: boolean;
   isActive?: boolean;
+  shouldAnimate?: boolean;
   onLike: () => void;
   onComment: () => void;
   onShare: () => void;
@@ -82,6 +83,7 @@ const AppleEngagementRailBase = ({
   isVideo = false,
   isMuted = false,
   isActive = false,
+  shouldAnimate = false,
   onLike,
   onComment,
   onShare,
@@ -101,10 +103,14 @@ const AppleEngagementRailBase = ({
     <div 
       className={cn(
         'clubhouse-rail fixed right-[12px] z-50 flex flex-col items-center gap-5',
-        'transition-all duration-motion-fast ease-out-soft',
+        shouldAnimate && 'transition-all duration-motion-fast ease-out-soft',
+        shouldAnimate && 'will-change-transform will-change-opacity',
+        'motion-reduce:transition-none motion-reduce:transform-none motion-reduce:opacity-100',
         isActive
           ? 'opacity-100 translate-y-0'
-          : 'opacity-0 translate-y-[4px]',
+          : shouldAnimate
+            ? 'opacity-0 translate-y-[3px]'
+            : 'opacity-100 translate-y-0',
         !isActive && 'pointer-events-none',
         className
       )}
@@ -176,6 +182,7 @@ export const AppleEngagementRail = React.memo(
   (prev, next) => {
     return (
       prev.isActive === next.isActive &&
+      prev.shouldAnimate === next.shouldAnimate &&
       prev.isLiked === next.isLiked &&
       prev.stats.likes === next.stats.likes &&
       prev.stats.comments === next.stats.comments &&
