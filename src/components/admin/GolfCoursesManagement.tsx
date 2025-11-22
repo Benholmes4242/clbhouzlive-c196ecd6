@@ -8,6 +8,7 @@ import GolfCoursesTable from './golf-courses/GolfCoursesTable';
 import CascadingFilters from './golf-courses/CascadingFilters';
 import EmptyCoursesState from './golf-courses/EmptyCoursesState';
 import GolfCoursesLoadingSkeleton from './golf-courses/GolfCoursesLoadingSkeleton';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 import { useGolfCourses } from './golf-courses/useGolfCourses';
 import { GolfCourse, RegionalFilter } from './golf-courses/types';
@@ -150,6 +151,9 @@ const GolfCoursesManagement = () => {
           )}
         </div>
       </div>
+
+      {/* Scroll to top button */}
+      <ScrollToTopGlass />
     </>
   );
 };
