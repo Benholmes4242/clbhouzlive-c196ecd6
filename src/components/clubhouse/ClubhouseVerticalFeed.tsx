@@ -337,6 +337,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     enabled: !!user?.id && filteredPosts.length > 0
   });
 
+  // Optimize likedPosts lookup with Set for O(1) performance
+  const likedPostSet = useMemo(
+    () => new Set(likedPosts ?? []),
+    [likedPosts]
+  );
+
   // Follow/unfollow mutation
   const followMutation = useMutation({
     mutationFn: async ({ targetUserId, action }: { targetUserId: string; action: 'follow' | 'unfollow' }) => {
@@ -479,6 +485,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const prevScrollTopRef = useRef(0);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isScrollingRef = useRef(false);
+  const lastIndexChangeTimeRef = useRef(0);
 
   // Throttled scroll handler for better performance
   const handleScroll = useCallback(() => {
@@ -498,8 +505,18 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       });
     }
     
-    // Immediate index update for responsiveness
+    // Index update with hysteresis to prevent flicker
+    const now = Date.now();
+    const MIN_INDEX_CHANGE_INTERVAL = 80; // ms
+    
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < filteredPosts.length) {
+      // Small hysteresis window to avoid flicker when hovering between posts
+      if (now - lastIndexChangeTimeRef.current < MIN_INDEX_CHANGE_INTERVAL) {
+        // Too soon after last change – ignore to prevent flicker
+        return;
+      }
+
+      lastIndexChangeTimeRef.current = now;
       setCurrentIndex(newIndex);
       
       // If scrolling to a photo post, stop all videos
@@ -951,7 +968,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   comments: item.comments || 0,
                   shares: item.shares || 0
                 }}
-                isLiked={likedPosts?.includes(item.id) ?? false}
+                isLiked={likedPostSet.has(item.id)}
                 isVideo={item.media?.[0]?.media_type === 'video'}
                 isMuted={isGloballyMuted}
                 isActive={currentIndex === index}

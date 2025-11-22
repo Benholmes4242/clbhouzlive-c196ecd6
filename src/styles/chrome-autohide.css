@@ -103,6 +103,12 @@ body.chrome-hidden .chrome-bottom-nav {
   transform: translate3d(0, var(--chrome-bottom-shift), 0);
 }
 
+/* GPU optimization hints for animated HUD elements */
+.clubhouse-hud,
+.clubhouse-rail {
+  will-change: opacity, transform;
+}
+
 /* Clubhouse HUD + Rail: dynamic positioning based on chrome visibility */
 .clubhouse-hud,
 .clubhouse-rail {

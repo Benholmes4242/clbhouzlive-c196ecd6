@@ -75,7 +75,7 @@ const RailButton = ({ children, count, onClick, ariaLabel }: RailButtonProps) =>
   </button>
 );
 
-export const AppleEngagementRail = ({
+const AppleEngagementRailBase = ({
   stats,
   isLiked = false,
   hasCommented = false,
@@ -101,8 +101,14 @@ export const AppleEngagementRail = ({
     <div 
       className={cn(
         'clubhouse-rail fixed right-[12px] z-50 flex flex-col items-center gap-5',
+        'transition-all duration-motion-fast ease-out-soft',
+        isActive
+          ? 'opacity-100 translate-y-0'
+          : 'opacity-0 translate-y-[4px]',
+        !isActive && 'pointer-events-none',
         className
       )}
+      data-active={isActive ? 'true' : 'false'}
     >
       {/* Mute Button (video only) */}
       {isVideo && onMuteToggle && (
@@ -164,3 +170,19 @@ export const AppleEngagementRail = ({
     </div>
   );
 };
+
+export const AppleEngagementRail = React.memo(
+  AppleEngagementRailBase,
+  (prev, next) => {
+    return (
+      prev.isActive === next.isActive &&
+      prev.isLiked === next.isLiked &&
+      prev.stats.likes === next.stats.likes &&
+      prev.stats.comments === next.stats.comments &&
+      prev.stats.shares === next.stats.shares &&
+      prev.isMuted === next.isMuted
+    );
+  }
+);
+
+AppleEngagementRail.displayName = 'AppleEngagementRail';
