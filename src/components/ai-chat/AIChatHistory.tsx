@@ -1634,7 +1634,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               <div className="truncate text-body-md font-semibold text-white">
                                 {conversation.customTitle || conversation.title}
                               </div>
-                                             <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-white/60">
+                                             <div className="mt-1.5 flex items-center gap-2 text-meta text-white/60">
                                                <span className="truncate">
                                                  {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
                                                </span>
@@ -1740,24 +1740,24 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                                          </div>
                                        </>
                                      ) : (
-                                       <>
-                                         <div className="flex items-start gap-2">
-                                           <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-md text-[11px] font-medium bg-white/08 backdrop-blur border border-white/12 text-white/80">
-                                             Chat
-                                           </span>
-                                           <div className="min-w-0 flex-1">
-                                             <div className="truncate text-[15.5px] sm:text-[16px] font-semibold text-white">
-                                               {conversation.customTitle || conversation.title}
-                                             </div>
-                                             <div className="mt-1.5 flex items-center gap-2 text-[12.5px] text-white/60">
+                                        <>
+                                          <div className="flex items-start gap-2">
+                                            <span className="shrink-0 mt-0.5 px-2 h-6 inline-flex items-center rounded-md text-meta font-medium bg-white/08 backdrop-blur border border-white/12 text-white/80">
+                                              Chat
+                                            </span>
+                                            <div className="min-w-0 flex-1">
+                                              <div className="truncate text-heading-md font-semibold text-white">
+                                                {conversation.customTitle || conversation.title}
+                                              </div>
+                                              <div className="mt-1.5 flex items-center gap-2 text-meta text-white/60">
                                                <span className="truncate">
                                                  {conversation.messages.find(m => m.type === 'user')?.content || 'No messages yet'}
                                                </span>
                                                <span className="mx-1 h-1 w-1 rounded-full bg-white/20 shrink-0"></span>
                                                <time className="shrink-0 text-white/40">{conversation.timestamp.toLocaleDateString()}</time>
                                                <span className="hidden sm:inline text-white/40 shrink-0">• {conversation.messages.length} msgs</span>
-                                             </div>
-                                           </div>
+                                              </div>
+                                            </div>
                                          </div>
                                          
                                          {/* Hover affordance stripe */}
@@ -1829,13 +1829,13 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                             <div className="mx-auto mb-3 h-12 w-12 rounded-full grid place-items-center bg-white border border-black/10 shadow-sm text-gray-700">
                               <Search className="h-6 w-6" />
                             </div>
-                            <div className="text-[17px] font-semibold text-gray-900">No matches</div>
-                            <div className="mt-1.5 text-[13px] text-gray-600/90">
+                            <div className="text-heading-md font-semibold text-gray-900">No matches</div>
+                            <div className="mt-1.5 text-body-sm text-gray-600/90">
                               Try a different search term or clear filters.
                             </div>
                             <div className="mt-4 flex items-center justify-center gap-2">
                              <button 
-                                className="h-10 px-4 rounded-full bg-white border border-black/10 hover:bg-gray-50 shadow-sm text-[14px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                                className="h-10 px-4 rounded-full bg-white border border-black/10 hover:bg-gray-50 shadow-sm text-body-md transition-all duration-motion-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                                 onClick={() => setSearchQuery('')}
                               >
                                 Clear search
@@ -1861,11 +1861,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           
                           if (last7Days.length === 0) return null;
                           
-                           return (
-                             <div>
-                               <h3 className="text-[13px] font-medium text-white/80 mb-3">
-                                 Last 7 Days
-                               </h3>
+                            return (
+                              <div>
+                                <h3 className="text-body-sm font-medium text-white/80 mb-3">
+                                  Last 7 Days
+                                </h3>
                                <div className="space-y-4 sm:space-y-5">
                                  {last7Days.map((analysis) => (
                                    <SwingAnalysisCard
@@ -1891,11 +1891,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           
                           if (thisMonth.length === 0) return null;
                           
-                           return (
-                             <div>
-                               <h3 className="text-[13px] font-medium text-white/80 mb-3">
-                                 This Month
-                               </h3>
+                            return (
+                              <div>
+                                <h3 className="text-body-sm font-medium text-white/80 mb-3">
+                                  This Month
+                                </h3>
                                <div className="space-y-4 sm:space-y-5">
                                  {thisMonth.map((analysis) => (
                                    <SwingAnalysisCard
@@ -1921,11 +1921,11 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                           
                           if (older.length === 0) return null;
                           
-                           return (
-                             <div>
-                               <h3 className="text-[13px] font-medium text-white/80 mb-3">
-                                 Older
-                               </h3>
+                            return (
+                              <div>
+                                <h3 className="text-body-sm font-medium text-white/80 mb-3">
+                                  Older
+                                </h3>
                                <div className="space-y-4 sm:space-y-5">
                                  {older.map((analysis) => (
                                    <SwingAnalysisCard
@@ -1958,7 +1958,7 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                         
                         {/* End of list marker */}
                         {!swingHasMore && filteredSwingAnalyses.length > 0 && (
-                          <div className="py-6 text-center text-[12px] text-white/40 select-none">
+                          <div className="py-6 text-center text-meta text-white/40 select-none">
                             You're all caught up
                           </div>
                         )}

@@ -319,7 +319,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
             disabled={submitting}
             className="w-full rounded-lg bg-[color:var(--surface-alt)] text-[color:var(--text-primary)] placeholder:text-[color:var(--text-tertiary)]
                      border border-[color:var(--border)] px-4 py-3 text-body-md outline-none
-                     focus:border-[color:var(--primary-accent)] focus:ring-1 focus:ring-[color:var(--primary-accent)] transition-colors
+                     focus:border-[color:var(--primary-accent)] focus:ring-1 focus:ring-[color:var(--primary-accent)] transition-all duration-motion-fast ease-standard
                      disabled:opacity-60"
           />
           <button
@@ -334,7 +334,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         </form>
 
         {/* Footer */}
-        <p className="mt-6 text-xs text-[color:var(--text-tertiary)]">
+        <p className="mt-6 text-meta text-[color:var(--text-tertiary)]">
           © 2025 clubhouz
         </p>
       </section>

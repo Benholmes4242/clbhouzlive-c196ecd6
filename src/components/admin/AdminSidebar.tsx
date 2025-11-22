@@ -8,7 +8,7 @@ const LinkItem: React.FC<{ to: string; children: React.ReactNode }> = ({ to, chi
     to={to}
     className={({ isActive }) =>
       [
-        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-motion-fast ease-standard",
         isActive ? "bg-muted text-foreground font-medium" : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
       ].join(" ")
     }

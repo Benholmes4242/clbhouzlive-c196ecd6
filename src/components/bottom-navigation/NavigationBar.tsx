@@ -46,7 +46,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                 }}
                 className={cn(
                   "flex items-center justify-center relative focus:outline-none",
-                  "min-h-[44px] min-w-[44px] p-2 transition-colors duration-200",
+                  "min-h-[44px] min-w-[44px] p-2 transition-all duration-motion-fast ease-standard",
                   // Active state uses accent color for all tabs
                   isActive && "text-[color:var(--primary-accent)]",
                   // Inactive state
@@ -59,7 +59,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
               >
                 <Icon 
                   className={cn(
-                    "h-8 w-8 transition-colors duration-200"
+                    "h-8 w-8 transition-all duration-motion-fast ease-standard"
                   )}
                 />
               </button>

@@ -264,7 +264,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               <button
                 type="button"
                 onClick={() => navigate(`/courses/${course.id}/reviews`)}
-                className="text-xs font-medium text-muted-foreground hover:text-foreground underline underline-offset-4 transition-colors"
+                className="text-xs font-medium text-muted-foreground hover:text-foreground underline underline-offset-4 transition-all duration-motion-fast ease-standard"
               >
                 See all reviews
               </button>

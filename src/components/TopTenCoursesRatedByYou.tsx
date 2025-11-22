@@ -463,7 +463,7 @@ const TopTenSlot: React.FC<{
           {isOwnProfile ? (
             <button
               onClick={onOpenSearch}
-              className="w-full h-full flex flex-col items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors pt-12"
+              className="w-full h-full flex flex-col items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all duration-motion-fast ease-standard pt-12"
               aria-label={`Add course to position ${rank}`}
             >
               <svg 
