@@ -283,12 +283,12 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         </div>
 
         {/* Headline */}
-        <h1 className="font-display text-[color:var(--text-primary)] text-[34px] font-semibold tracking-[.02em] leading-[1.2] mb-3">
+        <h1 className="font-display text-[color:var(--text-primary)] text-display-xl font-semibold tracking-[.02em] mb-3">
           YOUR HOME<br/>OF GOLF
         </h1>
 
         {/* Subtitle */}
-        <p className="text-[color:var(--text-secondary)] text-[15px] mb-6">
+        <p className="text-[color:var(--text-secondary)] text-body-md mb-6">
           Enter access code to continue
         </p>
 
@@ -318,7 +318,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
             placeholder="••••••••••"
             disabled={submitting}
             className="w-full rounded-lg bg-[color:var(--surface-alt)] text-[color:var(--text-primary)] placeholder:text-[color:var(--text-tertiary)]
-                     border border-[color:var(--border)] px-4 py-3 text-[15px] outline-none
+                     border border-[color:var(--border)] px-4 py-3 text-body-md outline-none
                      focus:border-[color:var(--primary-accent)] focus:ring-1 focus:ring-[color:var(--primary-accent)] transition-colors
                      disabled:opacity-60"
           />
@@ -326,7 +326,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
             type="submit"
             disabled={submitting}
             aria-label="Submit access code"
-            className="w-full rounded-lg bg-[color:var(--surface-slate)] text-white py-3 font-medium text-[15px]
+            className="w-full rounded-lg bg-[color:var(--surface-slate)] text-white py-3 font-medium text-body-md
                      hover:opacity-90 disabled:opacity-60 transition-opacity"
           >
             {submitting ? "Checking..." : "ENTER"}

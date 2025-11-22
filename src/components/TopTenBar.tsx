@@ -163,7 +163,7 @@ const TopTenSlot: React.FC<{
         )}
       </div>
       <div className="px-2 py-1 flex-1 min-w-0 flex flex-col justify-center">
-        <div className="text-[10px] font-semibold text-foreground leading-tight">
+        <div className="text-meta font-semibold text-foreground leading-tight">
           {index + 1}. {course.name}
         </div>
       </div>
@@ -172,7 +172,7 @@ const TopTenSlot: React.FC<{
           e.stopPropagation();
           onRemove();
         }}
-        className="absolute top-1 right-1 bg-destructive text-destructive-foreground w-5 h-5 text-[10px] shadow-sm hover:bg-destructive/80 flex items-center justify-center z-10 rounded-full"
+        className="absolute top-1 right-1 bg-destructive text-destructive-foreground w-5 h-5 text-meta shadow-sm hover:bg-destructive/80 flex items-center justify-center z-10 rounded-full"
         aria-label="Remove"
       >
         ✕
@@ -193,7 +193,7 @@ const GhostCard: React.FC<{ course: Course; index: number }> = ({ course, index 
       )}
     </div>
     <div className="px-2 py-1 flex-1 min-w-0 flex flex-col justify-center">
-      <div className="text-[10px] font-semibold text-foreground leading-tight">
+      <div className="text-meta font-semibold text-foreground leading-tight">
         {index + 1}. {course.name}
       </div>
     </div>
