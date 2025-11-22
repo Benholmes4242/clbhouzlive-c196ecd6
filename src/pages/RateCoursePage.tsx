@@ -30,25 +30,24 @@ const RateCoursePage = () => {
     navigate(-1);
   };
 
-  if (isLoading) {
-    return (
-      <div className="fixed inset-0 bg-surface-card flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-sm text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <AccessControl requireAuth={true}>
-      <PostPlayRatingModal
-        course={course}
-        isOpen={true}
-        onClose={handleClose}
-        isEditMode={false}
-      />
+      {isLoading ? (
+        <div className="fixed inset-0 z-50 bg-surface-card flex items-center justify-center">
+          <div className="text-center max-w-sm mx-auto px-4">
+            <div className="h-12 w-12 rounded-full bg-surface-alt animate-pulse mx-auto mb-3"></div>
+            <div className="h-4 w-32 bg-surface-alt animate-pulse mx-auto mb-2 rounded"></div>
+            <div className="h-3 w-48 bg-surface-alt animate-pulse mx-auto rounded"></div>
+          </div>
+        </div>
+      ) : (
+        <PostPlayRatingModal
+          course={course}
+          isOpen={true}
+          onClose={handleClose}
+          isEditMode={false}
+        />
+      )}
     </AccessControl>
   );
 };
