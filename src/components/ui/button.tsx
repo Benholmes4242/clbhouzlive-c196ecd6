@@ -5,38 +5,36 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-motion-fast ease-standard focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-body-md font-medium ring-offset-background transition-all duration-motion-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-accent disabled:pointer-events-none disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.97] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-[1.02] hover:brightness-110",
+        default: "bg-primary-accent text-white hover:brightness-110 hover:shadow-md active:shadow-sm",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:scale-[1.02]",
+          "bg-destructive text-white hover:brightness-110 hover:shadow-md active:shadow-sm",
         outline:
-          "border border-[color:hsl(var(--input))] bg-[color:var(--surface-input)] text-foreground hover:bg-[color:var(--surface-input-hover)] hover:scale-[1.02] hover:brightness-110",
+          "border border-border bg-surface-alt text-primary hover:bg-surface-alt/80 hover:border-border",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:scale-[1.02] hover:brightness-110",
-        ghost: "bg-transparent text-foreground hover:bg-[color:var(--surface-input)] hover:scale-[1.02]",
+          "bg-surface-slate text-white hover:opacity-90 hover:shadow-md active:shadow-sm",
+        ghost: "bg-transparent text-primary hover:bg-surface-alt",
         link: "text-primary underline-offset-4 hover:underline",
-        gradient: 
-          "bg-gradient-to-b from-white to-gray-100 border border-gray-300 text-gray-800 font-semibold hover:from-gray-50 hover:to-gray-200 hover:scale-[1.02] active:from-gray-100 active:to-gray-300",
-        "gradient-primary": 
-          "bg-gradient-to-b from-emerald-50 to-emerald-100 border border-emerald-200 text-emerald-800 font-semibold hover:from-emerald-100 hover:to-emerald-200 hover:scale-[1.02] active:from-emerald-200 active:to-emerald-300",
-        chip: 
-          "bg-gradient-to-b from-white to-gray-50 border border-gray-200 text-gray-700 font-medium hover:from-gray-50 hover:to-gray-100 hover:scale-[1.03] active:from-gray-100 active:to-gray-200 rounded-full",
-        "chip-active":
-          "bg-gradient-to-b from-emerald-50 to-emerald-100 border border-emerald-300 text-emerald-700 font-medium hover:from-emerald-100 hover:to-emerald-200 hover:scale-[1.03] rounded-full",
+        // Legacy variants - to be migrated to Pill component
+        gradient: "bg-surface-card border border-border text-primary hover:bg-surface-alt",
+        "gradient-primary": "bg-primary-accent text-white hover:brightness-110",
+        chip: "bg-surface-alt border border-border text-secondary rounded-full hover:bg-surface-alt/80",
+        "chip-active": "bg-surface-slate text-white rounded-full hover:opacity-90",
+        // Glass variants for Hub/Clubhouse
         glass:
-          "rounded-full bg-white/90 backdrop-blur-md border border-black/10 shadow-sm text-gray-900 font-medium hover:bg-white hover:scale-[1.02] active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/25 disabled:opacity-60 disabled:cursor-not-allowed",
+          "rounded-full bg-white/90 backdrop-blur-md border border-black/10 shadow-sm text-gray-900 font-medium hover:bg-white hover:scale-[1.02] active:translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed",
         "glass-outline":
-          "rounded-full bg-white/70 backdrop-blur-md border border-black/15 shadow text-gray-900 font-medium hover:bg-white/80 hover:scale-[1.02] active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/25",
+          "rounded-full bg-white/70 backdrop-blur-md border border-black/15 shadow text-gray-900 font-medium hover:bg-white/80 hover:scale-[1.02] active:translate-y-[1px]",
       },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
-        chip: "h-8 px-3 py-1.5 text-sm",
+        chip: "h-8 px-3 py-1.5",
       },
     },
     defaultVariants: {
