@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronUp } from 'lucide-react';
 import { scrollToTop } from '@/utils/scrollToTop';
 
@@ -69,7 +70,7 @@ const ScrollToTopGlass = () => {
 
   if (!visible) return null;
 
-  return (
+  return createPortal(
     <button
       type="button"
       onClick={scrollToTop}
@@ -91,7 +92,8 @@ const ScrollToTopGlass = () => {
       "
     >
       <ChevronUp className="h-4 w-4 text-white" />
-    </button>
+    </button>,
+    document.body
   );
 };
 
