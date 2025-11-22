@@ -512,10 +512,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-center space-y-6" style={{ paddingTop: '64px', paddingBottom: '64px' }}>
                   <EchoAvatar state="idle" size={80} />
-                  <div className="text-[17px] font-semibold text-white">
+                  <div className="text-heading-lg font-semibold text-white">
                     Start a conversation with Echo
                   </div>
-                  <div className="text-[14px] text-white/60 max-w-[280px]">
+                  <div className="text-body-md text-white/60 max-w-[280px]">
                     Ask about your swing, your stats, or just chat golf — Echo's always here.
                   </div>
                 </div>
@@ -559,18 +559,18 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                                   ringWidth={1}
                                 />
                               ) : (
-                                <div 
-                                  className="flex items-center justify-center text-[11px] font-medium text-white/90"
-                                  style={{
-                                    width: 28,
-                                    height: 28,
-                                    background: 'rgba(255,255,255,0.1)',
-                                    border: '1px solid rgba(255,255,255,0.2)',
-                                    borderRadius: '8px',
-                                  }}
-                                >
-                                  {userProfile?.display_name?.[0]?.toUpperCase() || userProfile?.username?.[0]?.toUpperCase() || 'U'}
-                                </div>
+                                 <div 
+                                   className="flex items-center justify-center text-meta font-medium text-white/90"
+                                   style={{
+                                     width: 28,
+                                     height: 28,
+                                     background: 'rgba(255,255,255,0.1)',
+                                     border: '1px solid rgba(255,255,255,0.2)',
+                                     borderRadius: '8px',
+                                   }}
+                                 >
+                                   {userProfile?.display_name?.[0]?.toUpperCase() || userProfile?.username?.[0]?.toUpperCase() || 'U'}
+                                 </div>
                               )}
                             </div>
                           ) : (
@@ -611,7 +611,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
               {showScrollToBottom && (
                 <button
                   onClick={scrollToBottom}
-                  className="fixed bottom-[88px] right-3 z-[2] h-10 px-3.5 rounded-full bg-white/08 backdrop-blur border border-white/12 shadow-[0_6px_20px_rgba(0,0,0,0.6)] text-[13px] text-white flex items-center gap-2 hover:bg-white/12 hover:border-white/20 transition"
+                  className="fixed bottom-[88px] right-3 z-[2] h-10 px-3.5 rounded-full bg-white/08 backdrop-blur border border-white/12 shadow-[0_6px_20px_rgba(0,0,0,0.6)] text-body-sm text-white flex items-center gap-2 hover:bg-white/12 hover:border-white/20 transition"
                   aria-label="Jump to latest"
                   type="button"
                 >
@@ -705,7 +705,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     }
                   }}
                   placeholder="Ask Echo…"
-                  className="w-full outline-none text-white placeholder:text-white/70 text-[15px] focus-ring"
+                  className="w-full outline-none text-white placeholder:text-white/70 text-body-md focus-ring"
                   style={{
                     height: '40px',
                     borderRadius: '14px',
@@ -752,7 +752,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     }
                   }}
                   placeholder="Ask Echo…"
-                  className="w-full bg-transparent outline-none text-white placeholder:text-white/70 text-[15px]"
+                  className="w-full bg-transparent outline-none text-white placeholder:text-white/70 text-body-md"
                   disabled={isLoading}
                 />
                 <button
@@ -887,7 +887,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     }
                   }}
                   placeholder="Ask Echo…"
-                  className="w-full bg-transparent outline-none text-white placeholder:text-white/70 text-[15px] py-2"
+                  className="w-full bg-transparent outline-none text-white placeholder:text-white/70 text-body-md py-2"
                   disabled={isLoading}
                 />
                 <button
@@ -979,10 +979,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
                 {/* Center: title/meta */}
                 <div className="min-w-0 text-center">
-                  <div className="truncate text-[17px] sm:text-[18px] font-semibold text-white">
+                  <div className="truncate text-heading-md font-semibold text-white">
                     Echo
                   </div>
-                  <div className="truncate text-[12px] sm:text-[13px] text-white/60 leading-tight">
+                  <div className="truncate text-meta text-white/60 leading-tight">
                     {isLoading ? "Echo is typing…" : "Chat • Private & secure"}
                   </div>
                 </div>
@@ -1005,7 +1005,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 <TabsList className="h-11 w-full rounded-full bg-white/06 backdrop-blur border border-white/12 flex p-1">
                   <TabsTrigger
                     value="chat"
-                    className="flex-1 rounded-full px-4 text-[14px] font-medium 
+                    className="flex-1 rounded-full px-4 text-body-md font-medium 
                                data-[state=active]:bg-white/05 data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_rgba(255,255,255,0.18)] data-[state=active]:ring-1 data-[state=active]:ring-inset data-[state=active]:ring-white/20
                                data-[state=inactive]:text-white/60 data-[state=inactive]:hover:bg-white/05 data-[state=inactive]:hover:ring-1 data-[state=inactive]:hover:ring-inset data-[state=inactive]:hover:ring-white/10
                                transition-all"
@@ -1014,7 +1014,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                   </TabsTrigger>
                   <TabsTrigger
                     value="swing"
-                    className="flex-1 rounded-full px-4 text-[14px] font-medium 
+                    className="flex-1 rounded-full px-4 text-body-md font-medium 
                                data-[state=active]:bg-white/05 data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_rgba(255,255,255,0.18)] data-[state=active]:ring-1 data-[state=active]:ring-inset data-[state=active]:ring-white/20
                                data-[state=inactive]:text-white/60 data-[state=inactive]:hover:bg-white/05 data-[state=inactive]:hover:ring-1 data-[state=inactive]:hover:ring-inset data-[state=inactive]:hover:ring-white/10
                                transition-all"
@@ -1043,7 +1043,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 {showScrollToBottom && newMessageCount > 0 && (
                   <div className="sticky top-2 z-[1] mx-auto w-full max-w-[720px] px-3 sm:px-4 pointer-events-none">
                     <div 
-                      className="mx-auto w-fit px-3 py-1.5 rounded-full bg-white/85 backdrop-blur border border-black/10 text-[12px] text-gray-700 shadow-sm"
+                     className="mx-auto w-fit px-3 py-1.5 rounded-full bg-white/85 backdrop-blur border border-black/10 text-meta text-gray-700 shadow-sm"
                       data-visible="true"
                     >
                       New replies below
@@ -1057,7 +1057,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     className="sticky top-2 z-10 flex justify-center opacity-100 transition-opacity"
                     data-show="true"
                   >
-                    <div className="px-3 py-1.5 rounded-full bg-white/80 backdrop-blur border border-black/10 text-[11px] text-gray-600 shadow-sm">
+                    <div className="px-3 py-1.5 rounded-full bg-white/80 backdrop-blur border border-black/10 text-meta text-gray-600 shadow-sm">
                       Unread messages above
                     </div>
                   </div>
@@ -1067,10 +1067,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     {messages.length === 0 ? (
                       <div className="flex flex-col items-center justify-center text-center px-6 py-20 sm:py-28 space-y-6">
                         <EchoAvatar state="idle" size={72} />
-                        <div className="text-[17px] font-semibold text-white">
+                        <div className="text-heading-lg font-semibold text-white">
                           Start a conversation with Echo
                         </div>
-                        <div className="text-[14px] text-white/60 max-w-[280px]">
+                        <div className="text-body-md text-white/60 max-w-[280px]">
                           Ask about your swing, your stats, or just chat golf — Echo's always here.
                         </div>
                       </div>
@@ -1092,7 +1092,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         {isFirstUnread && (
                           <div className="relative my-6 flex items-center gap-3" role="separator" aria-label="Unread messages">
                             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/15 to-transparent"></div>
-                            <div className="px-2 py-0.5 rounded-full bg-white/85 backdrop-blur border border-black/10 text-[11px] text-gray-600 shadow-sm">
+                            <div className="px-2 py-0.5 rounded-full bg-white/85 backdrop-blur border border-black/10 text-meta text-gray-600 shadow-sm">
                               Unread
                             </div>
                             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-black/15 to-transparent"></div>

@@ -64,14 +64,14 @@ export const CourseCardDraggable: React.FC<{
       {showAddButton && (
         <>
           {inTopTen ? (
-            <div className="absolute bottom-0 right-0 bg-green-600 text-white w-8 h-8 flex items-center justify-center text-[9px] font-medium shadow-sm z-50 rounded-tl-lg">
+            <div className="absolute bottom-0 right-0 bg-green-600 text-white w-8 h-8 flex items-center justify-center text-meta font-medium shadow-sm z-50 rounded-tl-lg">
             </div>
           ) : (
             <Button
               size="sm"
               variant="ghost"
               onClick={handleAddToTopTen}
-              className="absolute bottom-2 right-2 h-6 px-2 text-xs transition-opacity z-50 pointer-events-auto bg-muted/60 hover:bg-muted/80 text-muted-foreground hover:text-foreground border-muted/40 opacity-0 group-hover:opacity-100"
+              className="absolute bottom-2 right-2 h-6 px-2 text-meta transition-opacity z-50 pointer-events-auto bg-muted/60 hover:bg-muted/80 text-muted-foreground hover:text-foreground border-muted/40 opacity-0 group-hover:opacity-100"
             >
               <Plus className="w-3 h-3 mr-1" />
               add this course to my top 10
