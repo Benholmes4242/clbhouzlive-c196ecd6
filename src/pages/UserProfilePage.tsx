@@ -5,6 +5,7 @@ import UserProfileLoader from '@/components/profile/UserProfileLoader';
 import UserProfileContent from '@/components/profile/UserProfileContent';
 import { useUserProfileQueries } from '@/hooks/useUserProfileQueries';
 import { preloadCriticalProfileAssets, preloadCommonBadges, batchPreloadProfileImages } from '@/utils/profileOptimizations';
+import { FadeInContent } from '@/components/ui/FadeInContent';
 
 const UserProfilePage = () => {
   const { username } = useParams<{ username: string }>();
@@ -81,11 +82,13 @@ const UserProfilePage = () => {
         <UserProfileLoader isLoading={isLoading} profile={profile} />
         
         {profile && (
-          <UserProfileContent
-            profile={profile}
-            currentUser={currentUser}
-            relationshipStatus={relationshipStatus}
-          />
+          <FadeInContent>
+            <UserProfileContent
+              profile={profile}
+              currentUser={currentUser}
+              relationshipStatus={relationshipStatus}
+            />
+          </FadeInContent>
         )}
       </div>
       
