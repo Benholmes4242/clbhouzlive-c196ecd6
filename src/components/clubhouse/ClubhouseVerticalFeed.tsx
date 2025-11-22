@@ -219,6 +219,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [reactionTrayPosition, setReactionTrayPosition] = useState({ x: 0, y: 0 });
   const [reactionPostId, setReactionPostId] = useState<string>('');
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  
+  // Double-tap like state
+  const [showTapHeart, setShowTapHeart] = useState<Record<string, boolean>>({});
+  const lastTapRef = useRef<Record<string, number>>({});
 
   // Check if current user follows the displayed user
   const { data: isFollowing, isLoading: isFollowingLoading } = useQuery({
@@ -436,6 +440,33 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       action: isLiked ? 'unlike' : 'like'
     });
   };
+
+  // Double-tap like handler
+  const handleDoubleTap = useCallback((postId: string, e: React.MouseEvent | React.TouchEvent) => {
+    const now = Date.now();
+    const lastTap = lastTapRef.current[postId] || 0;
+    const timeDiff = now - lastTap;
+    
+    lastTapRef.current[postId] = now;
+    
+    // Double-tap detected (within 300ms)
+    if (timeDiff < 300 && timeDiff > 0) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Trigger like if not already liked
+      const isLiked = likedPosts?.includes(postId);
+      if (!isLiked) {
+        handleLike(postId);
+      }
+      
+      // Show heart burst animation
+      setShowTapHeart(prev => ({ ...prev, [postId]: true }));
+      setTimeout(() => {
+        setShowTapHeart(prev => ({ ...prev, [postId]: false }));
+      }, 450);
+    }
+  }, [likedPosts, user?.id]);
 
   // Helper function to truncate text to 9 words
   const truncateToWords = (text: string, wordLimit: number = 9) => {
@@ -783,6 +814,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
             >
               {/* Media Content */}
               <div 
+                onClick={(e) => handleDoubleTap(item.id, e)}
                 onTouchStart={(e) => {
                   if (hasMultipleMedia) {
                     (e.currentTarget as any).touchStartX = e.touches[0].clientX;
@@ -790,6 +822,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   }
                 }}
                 onTouchEnd={(e) => {
+                  // Handle double-tap for likes
+                  handleDoubleTap(item.id, e);
+                  
                   if (!hasMultipleMedia) return;
                   
                   const touchEndX = e.changedTouches[0].clientX;
@@ -817,8 +852,17 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   }
                 }}
                 className="relative w-full h-full z-10"
-                // Removed mouse enter/leave handlers that were causing re-renders
               >
+                {/* Double-tap heart burst */}
+                {showTapHeart[item.id] && (
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center z-50">
+                    <div className="text-white opacity-0 scale-75 animate-[heart-burst_0.45s_ease-out_forwards] motion-reduce:animate-none motion-reduce:opacity-100 motion-reduce:scale-100">
+                      <svg className="w-14 h-14" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                )}
                 {currentMedia.media_type === 'video' ? (
                   <VideoWithAutoplay
                     ref={(el) => {

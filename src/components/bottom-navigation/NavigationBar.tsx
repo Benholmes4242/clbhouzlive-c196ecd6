@@ -46,7 +46,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                 }}
                 className={cn(
                   "flex items-center justify-center relative focus:outline-none",
-                  "min-h-[44px] min-w-[44px] p-2 transition-all duration-motion-fast ease-standard",
+                  "min-h-[44px] min-w-[44px] p-2",
+                  "transition-all duration-motion-fast ease-standard",
+                  "hover:scale-[1.05] active:scale-[0.95]",
+                  "motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100",
                   // Active state uses accent color for all tabs
                   isActive && "text-[color:var(--primary-accent)]",
                   // Inactive state

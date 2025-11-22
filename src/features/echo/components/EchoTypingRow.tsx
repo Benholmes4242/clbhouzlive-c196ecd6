@@ -16,9 +16,15 @@ export function EchoTypingRow() {
         </div>
 
         <div className="echo-card px-3 py-2 flex items-center gap-1.5 w-[72px] justify-center">
-          <span className="w-1.5 h-1.5 rounded-full bg-white/60 animate-[echo-typing-dot_1.4s_ease-in-out_infinite] [animation-delay:0s]" />
-          <span className="w-1.5 h-1.5 rounded-full bg-white/60 animate-[echo-typing-dot_1.4s_ease-in-out_infinite] [animation-delay:0.2s]" />
-          <span className="w-1.5 h-1.5 rounded-full bg-white/60 animate-[echo-typing-dot_1.4s_ease-in-out_infinite] [animation-delay:0.4s]" />
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className="inline-block h-1.5 w-1.5 rounded-full bg-white/60 animate-[echo-typing_1.1s_ease-in-out_infinite] motion-reduce:animate-none"
+              style={{
+                animationDelay: `${i * 0.15}s`
+              }}
+            />
+          ))}
         </div>
       </div>
     </div>
