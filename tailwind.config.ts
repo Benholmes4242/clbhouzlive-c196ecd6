@@ -54,14 +54,14 @@ export default {
 			},
 			fontSize: {
 				// CLBHOUZ SEMANTIC TYPE SCALE - 8 Roles
-				'display-xl': ['34px', { lineHeight: '1.18', fontWeight: '600', letterSpacing: '-0.01em' }],
-				'display-lg': ['28px', { lineHeight: '1.21', fontWeight: '600', letterSpacing: '-0.01em' }],
-				'heading-lg': ['22px', { lineHeight: '1.27', fontWeight: '600' }],
-				'heading-md': ['19px', { lineHeight: '1.32', fontWeight: '600' }],
-				'body-lg': ['17px', { lineHeight: '1.41', fontWeight: '400' }],
-				'body-md': ['15px', { lineHeight: '1.47', fontWeight: '400' }],
-				'body-sm': ['13px', { lineHeight: '1.38', fontWeight: '400' }],
-				'meta': ['11px', { lineHeight: '1.36', fontWeight: '500', letterSpacing: '0.01em' }],
+				'display-xl': ['2.125rem', { lineHeight: '1.15' }],   // 34px
+				'display-lg': ['1.75rem',  { lineHeight: '1.2' }],    // 28px
+				'heading-lg': ['1.375rem', { lineHeight: '1.3' }],    // 22px
+				'heading-md': ['1.125rem', { lineHeight: '1.3' }],    // 18px
+				'body-lg':    ['1rem',     { lineHeight: '1.5' }],    // 16px
+				'body-md':    ['0.875rem', { lineHeight: '1.4' }],    // 14px
+				'body-sm':    ['0.8125rem',{ lineHeight: '1.35' }],   // 13px
+				'meta':       ['0.75rem',  { lineHeight: '1.25' }],   // 12px
 			},
 			colors: {
 				border: 'hsl(var(--border))',
