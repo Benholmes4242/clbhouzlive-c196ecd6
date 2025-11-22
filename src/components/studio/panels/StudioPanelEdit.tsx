@@ -34,13 +34,13 @@ export default function StudioPanelEdit({ edits, updateEdits, onApply, onReset, 
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {/* Crop ratios (images & videos) */}
         <div>
-          <label className="block text-sm font-medium text-zinc-700 mb-3">Crop Ratio</label>
+          <label className="block text-body-sm font-medium text-zinc-700 mb-3">Crop Ratio</label>
           <div className="grid grid-cols-4 gap-2">
             {CROP_RATIOS.map(ratio => (
               <button
                 key={ratio}
                 onClick={() => handleCropRatio(ratio)}
-                className={`py-2 px-3 rounded-lg border text-sm font-medium transition-colors ${
+                className={`py-2 px-3 rounded-lg border text-body-md font-medium transition-colors ${
                   cropRatio === ratio
                     ? 'border-zinc-900 bg-zinc-900 text-white'
                     : 'border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50'
@@ -54,7 +54,7 @@ export default function StudioPanelEdit({ edits, updateEdits, onApply, onReset, 
 
         {/* Rotate (images & videos) */}
         <div>
-          <label className="block text-sm font-medium text-zinc-700 mb-3">Rotate</label>
+          <label className="block text-body-sm font-medium text-zinc-700 mb-3">Rotate</label>
           <button
             onClick={handleRotate}
             className="flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 transition-colors"

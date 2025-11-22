@@ -84,7 +84,7 @@ const CourseScraper = () => {
       
       <CardContent className="space-y-6">
         <div className="space-y-3">
-          <label htmlFor="scrape-url" className="text-sm font-medium">
+          <label htmlFor="scrape-url" className="text-body-sm font-medium">
             Website URL
           </label>
           <div className="flex gap-2">

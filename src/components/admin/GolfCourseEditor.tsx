@@ -691,14 +691,14 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                             <h3 className="font-medium">Primary Location</h3>
                             <div className="space-y-3">
                               <div className="space-y-2">
-                                <Label className="text-sm text-muted-foreground">Region</Label>
-                                <div className="px-3 py-2 bg-muted/30 rounded-md text-sm">
+                                <Label className="text-body-sm text-muted-foreground">Region</Label>
+                                <div className="px-3 py-2 bg-muted/30 rounded-md text-body-md">
                                   {selectedCountry || 'Not selected'}
                                 </div>
                               </div>
                               <div className="space-y-2">
-                                <Label className="text-sm text-muted-foreground">Sub-country</Label>
-                                <div className="px-3 py-2 bg-muted/30 rounded-md text-sm">
+                                <Label className="text-body-sm text-muted-foreground">Sub-country</Label>
+                                <div className="px-3 py-2 bg-muted/30 rounded-md text-body-md">
                                   {selectedSubCountry || 'Not selected'}
                                 </div>
                               </div>
@@ -709,28 +709,26 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                             <h3 className="font-medium">Map & Coordinates</h3>
                             <div className="space-y-3">
                                <div className="space-y-2">
-                                 <Label htmlFor="latitude" className="text-sm">Latitude</Label>
+                                 <Label htmlFor="latitude" className="text-body-sm">Latitude</Label>
                                  <Input
                                    id="latitude"
                                    {...register('latitude', {
                                      onChange: (e) => saveDraft({ latitude: e.target.value })
                                    })}
                                    placeholder="Latitude"
-                                   className="text-sm"
                                  />
                                </div>
                                <div className="space-y-2">
-                                 <Label htmlFor="longitude" className="text-sm">Longitude</Label>
+                                 <Label htmlFor="longitude" className="text-body-sm">Longitude</Label>
                                  <Input
                                    id="longitude"
                                    {...register('longitude', {
                                      onChange: (e) => saveDraft({ longitude: e.target.value })
                                    })}
                                    placeholder="Longitude"
-                                   className="text-sm"
                                  />
                                </div>
-                              <div className="h-32 bg-muted/30 rounded-md flex items-center justify-center text-sm text-muted-foreground">
+                              <div className="h-32 bg-muted/30 rounded-md flex items-center justify-center text-body-md text-muted-foreground">
                                 Map preview
                               </div>
                             </div>
@@ -740,10 +738,10 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                             <h3 className="font-medium">Top 100 Rankings</h3>
                             <div className="space-y-3">
                               <div className="space-y-2">
-                                <Label className="text-sm text-muted-foreground">Rankings Overview</Label>
+                                <Label className="text-body-sm text-muted-foreground">Rankings Overview</Label>
                                 <div className="flex flex-wrap gap-2">
                                   {globalRank ? (
-                                    <div className="px-3 py-1.5 bg-muted/50 text-muted-foreground rounded-md text-sm">
+                                    <div className="px-3 py-1.5 bg-muted/50 text-muted-foreground rounded-md text-meta">
                                       #{globalRank} Global
                                     </div>
                                   ) : null}

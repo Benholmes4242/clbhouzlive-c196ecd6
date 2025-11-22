@@ -120,7 +120,7 @@ const SnapComposerModalWithAchievement = ({
 
           {/* Caption Input */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Caption</label>
+            <label className="text-body-sm font-medium text-foreground">Caption</label>
             <div
               ref={captionInputRef}
               contentEditable

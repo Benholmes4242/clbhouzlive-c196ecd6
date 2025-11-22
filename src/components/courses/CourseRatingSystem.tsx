@@ -159,7 +159,7 @@ const CourseRatingSystem = ({
 
       {/* Review Section */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">
+        <label className="text-body-sm font-medium text-foreground">
           Share your thoughts <span className="text-muted-foreground">(optional)</span>
         </label>
         <Textarea
@@ -170,14 +170,14 @@ const CourseRatingSystem = ({
           disabled={isSubmitting}
           maxLength={500}
         />
-        <p className="text-[11px] text-muted-foreground text-right">
+        <p className="text-meta text-muted-foreground text-right">
           {review.length}/500
         </p>
       </div>
 
       {/* Media Upload Section */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">
+        <label className="text-body-sm font-medium text-foreground">
           Upload photos or videos <span className="text-muted-foreground">(optional)</span>
         </label>
         <MediaFileHandler onFilesSelected={handleFilesSelected} />

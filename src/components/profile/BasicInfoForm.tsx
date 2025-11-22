@@ -37,7 +37,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, onChange }) => 
         onChange={onChange}
         placeholder="Enter your home golf club or 'Not applicable'"
       />
-      <p className="text-sm text-muted-foreground mt-1">
+      <p className="text-body-sm text-muted-foreground mt-1">
         Enter your home golf club name, or type "Not applicable" if you don't have one
       </p>
     </div>

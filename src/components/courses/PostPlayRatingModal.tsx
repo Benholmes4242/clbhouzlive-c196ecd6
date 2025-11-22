@@ -604,7 +604,7 @@ const PostPlayRatingModal = ({
 
                 {/* Media Upload Section */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Media Upload (optional)</label>
+                  <label className="text-body-sm font-medium">Media Upload (optional)</label>
                   <ReviewMediaUpload
                     onMediaSelected={handleMediaSelected}
                     selectedMedia={selectedMedia}

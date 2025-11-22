@@ -94,7 +94,7 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
       {selected && (
         <div className="p-4 border-t border-zinc-200 bg-white space-y-4">
           <div>
-            <label className="block text-sm font-medium text-zinc-700 mb-2">Text</label>
+            <label className="block text-body-sm font-medium text-zinc-700 mb-2">Text</label>
             <input
               type="text"
               value={selected.text}
@@ -104,7 +104,7 @@ export default function StudioPanelText({ edits, updateEdits, onApply, onReset }
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-zinc-700 mb-2">Font</label>
+            <label className="block text-body-sm font-medium text-zinc-700 mb-2">Font</label>
             <div className="flex gap-2">
               {FONTS.map(font => (
                 <button
