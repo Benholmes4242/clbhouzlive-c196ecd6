@@ -61,8 +61,8 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
           )}
         </div>
       </div>
-      <div className="mt-2 px-2 py-1 rounded-md bg-primary/5 inline-block">
-        <span className="text-meta font-medium text-primary">Achievement</span>
+      <div className="mt-2 px-2 py-1 rounded-md bg-muted inline-block">
+        <span className="text-meta font-medium text-secondary">Achievement</span>
       </div>
     </div>
   );

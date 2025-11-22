@@ -69,7 +69,7 @@ export const WeeklyChallengeLadder: React.FC = () => {
               </Avatar>
 
               <div className="flex-1 min-w-0">
-                <p className={`font-medium truncate ${isCurrentUser ? 'text-primary' : ''}`}>
+                <p className={`font-medium truncate ${isCurrentUser ? 'text-foreground font-semibold' : 'text-foreground'}`}>
                   {entry.profile.display_name || entry.profile.username}
                   {isCurrentUser && <span className="ml-2 text-xs">(You)</span>}
                 </p>

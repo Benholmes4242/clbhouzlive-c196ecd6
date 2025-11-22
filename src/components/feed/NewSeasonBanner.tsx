@@ -29,7 +29,7 @@ export const NewSeasonBanner: React.FC = () => {
           <Sparkles className="w-4 h-4 text-primary absolute -top-1 -right-1 animate-pulse" />
         </div>
         <div className="flex-1 text-left">
-          <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+          <h3 className="font-semibold text-foreground group-hover:text-secondary transition-colors">
             {currentSeason.name} has begun!
           </h3>
           <p className="text-sm text-muted-foreground">

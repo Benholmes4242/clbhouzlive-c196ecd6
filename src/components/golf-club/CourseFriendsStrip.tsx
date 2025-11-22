@@ -36,7 +36,7 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
             {displayedFriends.map((friend) => (
               <Avatar key={friend.user_id} className="w-8 h-8 border-2 border-background">
                 <AvatarImage src={friend.profile.profile_photo_url || undefined} />
-                <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                <AvatarFallback className="bg-muted text-foreground text-xs">
                   {friend.profile.display_name?.[0]?.toUpperCase() || 
                    friend.profile.username?.[0]?.toUpperCase() || '?'}
                 </AvatarFallback>
@@ -67,7 +67,7 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
               >
                 <Avatar className="w-10 h-10">
                   <AvatarImage src={friend.profile.profile_photo_url || undefined} />
-                  <AvatarFallback className="bg-primary/10 text-primary">
+                  <AvatarFallback className="bg-muted text-foreground">
                     {friend.profile.display_name?.[0]?.toUpperCase() || 
                      friend.profile.username?.[0]?.toUpperCase() || '?'}
                   </AvatarFallback>

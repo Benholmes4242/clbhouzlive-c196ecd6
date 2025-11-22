@@ -43,7 +43,7 @@ export const Top100AchievementsBlock: React.FC<Top100AchievementsBlockProps> = (
             <div className="flex items-start gap-3 flex-1 text-left">
               <span className="text-2xl mt-0.5">{getCategoryEmoji(prompt.category)}</span>
               <div className="flex-1">
-                <div className="font-medium text-foreground group-hover:text-primary transition-colors">
+                <div className="font-medium text-foreground group-hover:text-secondary transition-colors">
                   {prompt.name}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">
@@ -75,7 +75,7 @@ export const Top100AchievementsBlock: React.FC<Top100AchievementsBlockProps> = (
       <div className="mt-4 pt-4 border-t border-border/30">
         <button
           onClick={handlePromptClick}
-          className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+          className="text-sm text-foreground hover:text-secondary transition-colors font-medium"
         >
           See all your achievements →
         </button>

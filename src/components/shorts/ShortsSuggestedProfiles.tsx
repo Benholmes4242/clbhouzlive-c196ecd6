@@ -81,7 +81,7 @@ export default function ShortsSuggestedProfiles() {
           <p className="text-sm text-muted-foreground">Couldn't load suggestions</p>
           <button
             onClick={handleRetry}
-            className="text-sm text-primary hover:underline font-medium"
+            className="text-sm text-foreground hover:underline font-medium"
           >
             Retry
           </button>

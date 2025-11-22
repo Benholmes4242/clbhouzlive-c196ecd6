@@ -454,7 +454,7 @@ function ReviewText({ text }: { text: string }) {
       {needsTruncation && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="mt-2 text-sm font-medium text-primary hover:underline underline-offset-4 transition-colors"
+          className="mt-2 text-sm font-medium text-foreground hover:underline underline-offset-4 transition-colors"
         >
           {expanded ? "Show less" : "Read more"}
         </button>

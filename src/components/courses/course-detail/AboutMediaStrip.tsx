@@ -145,7 +145,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         {hasMedia && (
           <button
             type="button"
-            className="text-xs font-medium text-primary hover:underline"
+            className="text-xs font-medium text-foreground hover:underline"
             onClick={(e) => {
               e.stopPropagation();
               onSeeAllClick();

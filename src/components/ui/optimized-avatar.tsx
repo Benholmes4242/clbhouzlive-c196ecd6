@@ -89,7 +89,7 @@ const OptimizedAvatarComponent: React.FC<OptimizedAvatarProps> = ({
           onError={handleImageError}
         />
       ) : null}
-      <AvatarFallback className="bg-primary/10 text-primary text-xs">
+      <AvatarFallback className="bg-muted text-foreground text-xs">
         {fallback || alt.charAt(0).toUpperCase()}
       </AvatarFallback>
     </Avatar>

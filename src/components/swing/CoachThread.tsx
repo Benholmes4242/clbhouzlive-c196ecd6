@@ -147,7 +147,7 @@ export const CoachThread: React.FC<CoachThreadProps> = ({
                           href={attachment}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-primary hover:underline"
+                          className="text-xs text-foreground hover:underline"
                         >
                           Attachment {index + 1}
                         </a>

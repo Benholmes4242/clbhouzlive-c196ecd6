@@ -43,7 +43,7 @@ export const CourseMilestonesCard: React.FC<CourseMilestonesCardProps> = ({ cour
             <div className="flex items-center gap-3 flex-1 text-left">
               <span className="text-2xl">{getCategoryEmoji(prompt.category)}</span>
               <div className="flex-1">
-                <div className="font-medium text-foreground group-hover:text-primary transition-all duration-motion-fast ease-standard">
+                <div className="font-medium text-foreground group-hover:text-secondary transition-all duration-motion-fast ease-standard">
                   {prompt.name}
                 </div>
                 {prompt.remainingLabel && (
@@ -72,7 +72,7 @@ export const CourseMilestonesCard: React.FC<CourseMilestonesCardProps> = ({ cour
       <div className="mt-4 pt-4 border-t border-border/30">
         <button
           onClick={handlePromptClick}
-          className="text-sm text-primary hover:text-primary/80 transition-all duration-motion-fast ease-standard font-medium"
+          className="text-sm text-foreground hover:text-secondary transition-all duration-motion-fast ease-standard font-medium"
         >
           See all your achievements →
         </button>
