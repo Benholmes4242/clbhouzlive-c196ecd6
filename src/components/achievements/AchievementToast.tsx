@@ -62,8 +62,9 @@ export const AchievementToast: React.FC<AchievementToastProps> = ({
           rounded-2xl 
           shadow-2xl shadow-primary/10
           p-4
-          transition-all duration-300
-          ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+          transition-all duration-motion-medium ease-out-soft
+          motion-reduce:transition-none
+          ${isVisible ? 'opacity-100 translate-y-0 scale-100 animate-[toast-in_0.22s_ease-out_forwards] motion-reduce:animate-none' : 'opacity-0 translate-y-2 scale-[0.97]'}
         `}
       >
         <div className="flex items-start gap-3">

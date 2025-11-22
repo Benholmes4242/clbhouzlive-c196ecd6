@@ -56,9 +56,9 @@ const RailButton = ({ children, count, onClick, ariaLabel }: RailButtonProps) =>
     aria-label={ariaLabel}
     className="flex flex-col items-center gap-1"
   >
-    {/* Glass pill */}
+    {/* Glass pill with press animation */}
     <div
-      className="glass-dark rounded-full flex items-center justify-center transition-transform active:scale-95"
+      className="glass-dark rounded-full flex items-center justify-center transition-transform duration-motion-fast ease-standard hover:scale-[1.05] active:scale-95 motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100"
       style={{
         width: RAIL_BUTTON_SIZE,
         height: RAIL_BUTTON_SIZE,
@@ -118,17 +118,22 @@ export const AppleEngagementRail = ({
         </RailButton>
       )}
 
-      {/* Like Button */}
+      {/* Like Button with pop animation */}
       <RailButton
         onClick={onLike}
         ariaLabel={isLiked ? 'Unlike' : 'Like'}
         count={stats.likes}
       >
-        <Heart
-          size={ICON_SIZE}
-          className={cn('transition-all text-white', isLiked && 'fill-white')}
-          style={{ display: 'block' }}
-        />
+        <div className={cn(
+          'transition-transform duration-motion-fast ease-out-soft',
+          isLiked && 'scale-110 motion-reduce:scale-100'
+        )}>
+          <Heart
+            size={ICON_SIZE}
+            className={cn('transition-all text-white', isLiked && 'fill-white')}
+            style={{ display: 'block' }}
+          />
+        </div>
       </RailButton>
 
       {/* Comment Button */}

@@ -3707,3 +3707,105 @@ html[data-immersive="true"] .app-shell--topSpacer {
 .eh-panel-inner.eh-in {
   opacity: 1; transform: translateY(0);
 }
+
+/* ============================================================================
+   PHASE 10: MICRO-UX ANIMATIONS
+   All keyframes respect prefers-reduced-motion via utility classes
+   ============================================================================ */
+
+/* Heart burst animation for double-tap like */
+@keyframes heart-burst {
+  0% {
+    transform: scale(0.75);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.0);
+    opacity: 0;
+  }
+}
+
+/* Echo typing indicator - 3 dots pulse */
+@keyframes echo-typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-2px);
+    opacity: 1;
+  }
+}
+
+/* Achievement toast entry animation */
+@keyframes toast-in {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Message bubble entry animation */
+@keyframes message-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Echo orb breathing animation when loading */
+@keyframes echo-breathe {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(247, 147, 30, 0.35);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 8px rgba(247, 147, 30, 0);
+  }
+}
+
+/* XP ring glow on level up */
+@keyframes xp-ring-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(247, 147, 30, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 18px rgba(247, 147, 30, 0);
+  }
+}
+
+/* Fade in with slight translate for page content */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect prefers-reduced-motion globally */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
