@@ -78,7 +78,8 @@ const ScrollToTopGlass = () => {
       className="
         fixed
         top-3
-        right-4
+        left-1/2
+        -translate-x-1/2
         z-[9999]
         rounded-full
         px-3
