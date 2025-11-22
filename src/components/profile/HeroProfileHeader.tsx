@@ -915,7 +915,7 @@ const HeroProfileHeader = ({
                       onClick={() => handleTabChange('top100')}
                       className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary-accent/60 hover:text-foreground transition-colors"
                     >
-                      <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-alt text-[10px]">
+                      <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-alt text-meta">
                         🏆
                       </span>
                       <span className="font-medium">
@@ -1128,17 +1128,17 @@ const HeroProfileHeader = ({
                    {/* Top 100 Prestige Chip */}
                    {top100Overview && top100Overview.total_played > 0 && (
                      <div className="w-full mt-3 flex justify-center">
-                       <button
-                         type="button"
-                         onClick={() => handleTabChange('top100')}
-                         className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary-accent/60 hover:text-foreground transition-colors"
-                       >
-                         <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-alt text-[10px]">
-                           🏆
-                         </span>
-                         <span className="font-medium">
-                           Top 100:
-                         </span>
+                        <button
+                          type="button"
+                          onClick={() => handleTabChange('top100')}
+                          className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary-accent/60 hover:text-foreground transition-colors"
+                        >
+                          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-alt text-meta">
+                            🏆
+                          </span>
+                          <span className="font-medium">
+                            Top 100:
+                          </span>
                          <span>
                            {top100Overview.total_played} course{top100Overview.total_played === 1 ? '' : 's'} · {top100Overview.regions_count}{' '}
                            {top100Overview.regions_count === 1 ? 'region' : 'regions'}

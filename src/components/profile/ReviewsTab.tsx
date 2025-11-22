@@ -385,7 +385,7 @@ function RatingPill({ value10, your }: { value10: number; your?: boolean }) {
       <ClubhouseLogo size="xs" />
       {formatScore(value10)}/10
       {your && (
-        <span className="rounded-full bg-white/70 px-1.5 py-[1px] text-[11px] text-yellow-900 dark:bg-white/10 dark:text-yellow-100">
+        <span className="rounded-full bg-white/70 px-1.5 py-[1px] text-meta text-yellow-900 dark:bg-white/10 dark:text-yellow-100">
           Your Review
         </span>
       )}

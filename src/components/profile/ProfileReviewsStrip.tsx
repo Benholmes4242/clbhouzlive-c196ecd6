@@ -42,10 +42,10 @@ const ProfileReviewsStrip: React.FC<Props> = ({ userId, username, displayName })
   if (!reviews.length) {
     return (
       <section className="mt-4 rounded-2xl border border-border/60 bg-card/80 px-4 py-3">
-        <div className="text-xs font-medium text-foreground">
+        <div className="text-body-sm font-medium text-foreground">
           Latest reviews by {name}
         </div>
-        <p className="mt-1 text-[11px] text-muted-foreground">
+        <p className="mt-1 text-meta text-muted-foreground">
           {name} hasn't reviewed any courses yet.
         </p>
       </section>
@@ -60,13 +60,13 @@ const ProfileReviewsStrip: React.FC<Props> = ({ userId, username, displayName })
     <section className="mt-4 rounded-2xl border border-border/60 bg-card/80 px-4 py-3">
       {/* Header */}
       <div className="mb-2 flex items-center justify-between gap-2">
-        <div className="text-xs font-medium text-foreground">
+        <div className="text-body-sm font-medium text-foreground">
           Latest reviews by {name}
         </div>
         <button
           type="button"
           onClick={handleSeeAll}
-          className="text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+          className="text-meta font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
           See all reviews
         </button>
@@ -100,23 +100,23 @@ const ProfileReviewsStrip: React.FC<Props> = ({ userId, username, displayName })
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <div className="truncate text-xs font-medium text-foreground">
+                  <div className="truncate text-body-sm font-medium text-foreground">
                     {courseName}
                   </div>
                   {location && (
-                    <div className="truncate text-[11px] text-muted-foreground">
+                    <div className="truncate text-meta text-muted-foreground">
                       {location}
                     </div>
                   )}
                 </div>
-                <div className="flex items-center gap-1 text-[11px] text-foreground">
+                <div className="flex items-center gap-1 text-meta text-foreground">
                   <Star className="h-3 w-3 fill-current" />
                   <span>{rating.toFixed(1)}/10</span>
                 </div>
               </div>
 
               {snippet && (
-                <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
+                <p className="mt-1 line-clamp-2 text-meta leading-snug text-muted-foreground">
                   {snippet}
                 </p>
               )}
