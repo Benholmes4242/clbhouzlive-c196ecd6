@@ -1,0 +1,35 @@
+{
+  "rules": {
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "JSXAttribute[name.name='className'] Literal[value=/text-\\[.*px\\]/]",
+        "message": "❌ Direct pixel font sizes are not allowed. Use semantic typography tokens: text-display-lg, text-heading-lg, text-heading-md, text-body-lg, text-body-md, text-body-sm, text-meta"
+      },
+      {
+        "selector": "JSXAttribute[name.name='className'] Literal[value=/text-(xs|sm|base|lg|xl|2xl|3xl)/]",
+        "message": "❌ Tailwind size utilities are not allowed. Use semantic typography tokens: text-display-lg, text-heading-lg, text-heading-md, text-body-lg, text-body-md, text-body-sm, text-meta"
+      },
+      {
+        "selector": "JSXAttribute[name.name='className'] Literal[value=/bg-\\[#/]",
+        "message": "❌ Direct hex background colors are not allowed. Use tokens: bg-background, bg-surface-card, bg-surface-slate, bg-surface-alt, bg-primary-accent"
+      },
+      {
+        "selector": "JSXAttribute[name.name='className'] Literal[value=/text-\\[#/]",
+        "message": "❌ Direct hex text colors are not allowed. Use tokens: text-primary, text-secondary, text-tertiary"
+      },
+      {
+        "selector": "JSXAttribute[name.name='className'] Literal[value=/border-\\[#/]",
+        "message": "❌ Direct hex border colors are not allowed. Use tokens: border, border-subtle"
+      },
+      {
+        "selector": "JSXAttribute[name.name='className'] Literal[value=/duration-\\[/]",
+        "message": "❌ Arbitrary duration values are not allowed. Use motion tokens: duration-motion-ultrafast, duration-motion-fast, duration-motion-medium"
+      },
+      {
+        "selector": "JSXAttribute[name.name='style']",
+        "message": "⚠️ Inline styles should be avoided. Use className with design system tokens instead."
+      }
+    ]
+  }
+}
