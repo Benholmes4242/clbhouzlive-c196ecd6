@@ -76,11 +76,9 @@ const ScrollToTopGlass = () => {
       aria-label="Back to top"
       className="
         fixed
-        top-1/2
-        left-1/2
-        -translate-x-1/2
-        -translate-y-1/2
-        z-[200]
+        bottom-20
+        right-4
+        z-[9999]
         rounded-full
         px-3
         py-2
