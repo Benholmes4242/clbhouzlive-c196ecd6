@@ -81,14 +81,31 @@ Updated `src/pages/admin/GolfCourseEditorPage.tsx`:
 
 ---
 
+## 4. Challenges Page ✅
+
+### Problem
+Full-screen spinner (`<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>`) centered on viewport during data loading.
+
+### Solution
+Updated `src/pages/ChallengesPage.tsx`:
+- Renders page layout immediately with header skeleton
+- Shows inline skeleton cards in grid layout while loading
+- No viewport blocking
+- Matches final page structure
+
+### Files Modified
+- `src/pages/ChallengesPage.tsx` (lines 14-28): Replaced full-screen spinner with inline skeleton structure
+
+---
+
 ## Testing Checklist ✅
 
 ### Hub Navigation
 - [x] Tapping Hub from bottom nav shows Hub immediately with no full-screen loader
-- [x] Navigating between Hub pages (Hub → Golfers → Echo → Games, etc.) shows no full-screen loader
-- [x] Hub chrome (glass structure, header) renders immediately
+- [x] Navigating between Hub pages (Hub → Golfers → Echo → Games, etc.) shows Hub glass structure instantly during code-splitting
+- [x] Hub chrome (glass structure, grabber bar) renders immediately
 - [x] Content loads with in-page skeletons where needed
-- [x] Hub → Hub navigation is instant
+- [x] Hub → Hub navigation shows minimal skeleton delay
 - [x] All 13 Hub routes tested
 
 ### Rate Course Page
@@ -102,6 +119,12 @@ Updated `src/pages/admin/GolfCourseEditorPage.tsx`:
 - [x] Editing existing course shows inline skeleton while loading
 - [x] No full-screen blocking
 - [x] Editor layout renders immediately
+
+### Challenges Page
+- [x] Navigating to `/challenges` shows page layout immediately
+- [x] Header and card grid skeleton show while data loads
+- [x] No full-screen blocking
+- [x] Page structure renders immediately
 
 ### General Navigation
 - [x] No regressions on main bottom nav pages (Clubhouse, Courses, Discover, etc.)
@@ -131,5 +154,6 @@ All loading states use:
 - In-content skeletons only
 - Smooth fade-in via Phase 9
 - No blocking overlays anywhere
+- Hub pages use proper Suspense boundaries with Hub-matching skeletons during code-splitting
 
 The app now feels like a native mobile experience with TikTok/Instagram-level smoothness.

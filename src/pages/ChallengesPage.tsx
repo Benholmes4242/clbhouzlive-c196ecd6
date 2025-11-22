@@ -13,8 +13,19 @@ const ChallengesPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="min-h-screen bg-background py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <div className="h-10 w-48 bg-surface-alt animate-pulse rounded mb-2"></div>
+            <div className="h-5 w-96 bg-surface-alt animate-pulse rounded"></div>
+          </div>
+          
+          <div className="grid gap-4 md:grid-cols-2">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-48 bg-surface-alt animate-pulse rounded-2xl"></div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
