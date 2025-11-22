@@ -77,6 +77,22 @@ body {
 /* Glass panel utilities for Clubhouse overlays */
 :root {
   --radius-tile: 18px;
+  
+  /* ========================================
+     PHASE 4: GLOBAL MOTION TOKENS
+     ======================================== */
+  
+  /* Durations */
+  --motion-ultrafast: 90ms;   /* tiny micro-interactions: hovers, icon nudges */
+  --motion-fast: 150ms;       /* button presses, simple state changes */
+  --motion-medium: 250ms;     /* modals, cards expanding/collapsing */
+  --motion-slow: 350ms;       /* page transitions, more complex movements */
+
+  /* Easing curves */
+  --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-pop: cubic-bezier(0.175, 0.885, 0.32, 1.275);    /* subtle "pop" */
+  --ease-out: cubic-bezier(0.0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
 }
 
 .glass-panel {

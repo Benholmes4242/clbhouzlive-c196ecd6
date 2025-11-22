@@ -131,7 +131,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   if (isCompactMode) {
     return (
       <div
-        className="rounded-xl border border-border/70 bg-card/80 hover:bg-card transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-[1px] p-4 space-y-3 cursor-pointer"
+        className="rounded-xl border border-border/70 bg-card/80 hover:bg-card transition-all duration-motion-medium ease-standard shadow-sm hover:shadow-[var(--shadow-medium)] hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--primary-accent)] p-4 space-y-3 cursor-pointer"
         onClick={handleCardClick}
       >
         {/* Top row */}

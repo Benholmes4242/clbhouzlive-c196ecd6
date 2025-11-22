@@ -61,9 +61,9 @@ export function HistoryPanel({
   };
 
   const renderConversationItem = (conversation: EchoConversation) => (
-    <div
+    <div 
       key={conversation.id}
-      className={`p-4 hover:bg-secondary/50 transition-colors ${
+      className={`p-4 hover:bg-[color:var(--surface-alt)] transition-all duration-motion-fast ease-standard ${
         conversation.id === activeConversationId ? 'bg-secondary' : ''
       }`}
     >
@@ -104,14 +104,14 @@ export function HistoryPanel({
           <div className="flex gap-1">
             <TapButton
               onClick={() => handleStartEdit(conversation)}
-              className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="p-2 text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
               aria-label="Rename conversation"
             >
               <Edit2 className="w-4 h-4" />
             </TapButton>
             <TapButton
               onClick={() => handleDelete(conversation.id)}
-              className="p-2 text-muted-foreground hover:text-destructive transition-colors"
+              className="p-2 text-muted-foreground hover:text-destructive transition-all duration-motion-fast ease-standard"
               aria-label="Delete conversation"
             >
               <Trash2 className="w-4 h-4" />

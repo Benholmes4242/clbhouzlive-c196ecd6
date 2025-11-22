@@ -5,31 +5,31 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-motion-fast ease-standard focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-[1.02] hover:brightness-110",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:scale-[1.02]",
         outline:
-          "border border-[color:hsl(var(--input))] bg-[color:var(--surface-input)] text-foreground hover:bg-[color:var(--surface-input-hover)]",
+          "border border-[color:hsl(var(--input))] bg-[color:var(--surface-input)] text-foreground hover:bg-[color:var(--surface-input-hover)] hover:scale-[1.02] hover:brightness-110",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "bg-transparent text-foreground hover:bg-[color:var(--surface-input)]",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:scale-[1.02] hover:brightness-110",
+        ghost: "bg-transparent text-foreground hover:bg-[color:var(--surface-input)] hover:scale-[1.02]",
         link: "text-primary underline-offset-4 hover:underline",
         gradient: 
-          "bg-gradient-to-b from-white to-gray-100 border border-gray-300 text-gray-800 font-semibold hover:from-gray-50 hover:to-gray-200 active:from-gray-100 active:to-gray-300 transition-all duration-200",
+          "bg-gradient-to-b from-white to-gray-100 border border-gray-300 text-gray-800 font-semibold hover:from-gray-50 hover:to-gray-200 hover:scale-[1.02] active:from-gray-100 active:to-gray-300",
         "gradient-primary": 
-          "bg-gradient-to-b from-emerald-50 to-emerald-100 border border-emerald-200 text-emerald-800 font-semibold hover:from-emerald-100 hover:to-emerald-200 active:from-emerald-200 active:to-emerald-300 transition-all duration-200",
+          "bg-gradient-to-b from-emerald-50 to-emerald-100 border border-emerald-200 text-emerald-800 font-semibold hover:from-emerald-100 hover:to-emerald-200 hover:scale-[1.02] active:from-emerald-200 active:to-emerald-300",
         chip: 
-          "bg-gradient-to-b from-white to-gray-50 border border-gray-200 text-gray-700 font-medium hover:from-gray-50 hover:to-gray-100 active:from-gray-100 active:to-gray-200 transition-all duration-150 rounded-full",
+          "bg-gradient-to-b from-white to-gray-50 border border-gray-200 text-gray-700 font-medium hover:from-gray-50 hover:to-gray-100 hover:scale-[1.03] active:from-gray-100 active:to-gray-200 rounded-full",
         "chip-active":
-          "bg-gradient-to-b from-emerald-50 to-emerald-100 border border-emerald-300 text-emerald-700 font-medium hover:from-emerald-100 hover:to-emerald-200 transition-all duration-150 rounded-full",
+          "bg-gradient-to-b from-emerald-50 to-emerald-100 border border-emerald-300 text-emerald-700 font-medium hover:from-emerald-100 hover:to-emerald-200 hover:scale-[1.03] rounded-full",
         glass:
-          "rounded-full bg-white/90 backdrop-blur-md border border-black/10 shadow-sm text-gray-900 font-medium hover:bg-white active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/25 disabled:opacity-60 disabled:cursor-not-allowed",
+          "rounded-full bg-white/90 backdrop-blur-md border border-black/10 shadow-sm text-gray-900 font-medium hover:bg-white hover:scale-[1.02] active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/25 disabled:opacity-60 disabled:cursor-not-allowed",
         "glass-outline":
-          "rounded-full bg-white/70 backdrop-blur-md border border-black/15 shadow text-gray-900 font-medium hover:bg-white/80 active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/25",
+          "rounded-full bg-white/70 backdrop-blur-md border border-black/15 shadow text-gray-900 font-medium hover:bg-white/80 hover:scale-[1.02] active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]/25",
       },
       size: {
         default: "h-10 px-4 py-2",
