@@ -14,6 +14,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent pull-to-refresh and overscroll bounce on mobile */
+html, body {
+  overscroll-behavior-y: none;
+  overscroll-behavior-x: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+  overscroll-behavior-x: none;
+}
+
 /* Glass panel utilities for Clubhouse overlays */
 :root {
   --radius-tile: 18px;
