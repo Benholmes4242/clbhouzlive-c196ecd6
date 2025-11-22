@@ -78,7 +78,9 @@ export default {
 				'text-tertiary': 'var(--text-tertiary)',
 				'icon-primary': 'var(--icon-primary)',
 				'icon-secondary': 'var(--icon-secondary)',
+				'icon-disabled': 'var(--icon-disabled)',
 				'primary-accent': 'var(--primary-accent)',
+				'border-subtle': 'var(--border-subtle)',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'

@@ -120,9 +120,9 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               placeholder="your@email.com"
               disabled={submitting}
               required
-              className="w-full rounded-lg bg-[color:var(--surface-input)] text-foreground placeholder:text-[color:var(--placeholder-foreground)]
-                       border border-[color:hsl(var(--input))] px-4 py-3 text-body-md outline-none
-                       focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-all duration-motion-fast ease-standard
+              className="w-full rounded-lg bg-surface-alt text-foreground placeholder:text-text-tertiary
+                       border border-border px-4 py-3 text-body-md outline-none
+                       focus:border-primary-accent focus:ring-0 transition-all duration-motion-fast ease-standard
                        disabled:opacity-60"
             />
           </div>
@@ -138,9 +138,9 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
               disabled={submitting}
-              className="w-full rounded-lg bg-[color:var(--surface-input)] text-foreground placeholder:text-[color:var(--placeholder-foreground)]
-                       border border-[color:hsl(var(--input))] px-4 py-3 text-body-md outline-none
-                       focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-all duration-motion-fast ease-standard
+              className="w-full rounded-lg bg-surface-alt text-foreground placeholder:text-text-tertiary
+                       border border-border px-4 py-3 text-body-md outline-none
+                       focus:border-primary-accent focus:ring-0 transition-all duration-motion-fast ease-standard
                        disabled:opacity-60"
             />
           </div>
@@ -156,9 +156,9 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               onChange={(e) => setClub(e.target.value)}
               placeholder="Your golf club"
               disabled={submitting}
-              className="w-full rounded-lg bg-[color:var(--surface-input)] text-foreground placeholder:text-[color:var(--placeholder-foreground)]
-                       border border-[color:hsl(var(--input))] px-4 py-3 text-body-md outline-none
-                       focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-all duration-motion-fast ease-standard
+              className="w-full rounded-lg bg-surface-alt text-foreground placeholder:text-text-tertiary
+                       border border-border px-4 py-3 text-body-md outline-none
+                       focus:border-primary-accent focus:ring-0 transition-all duration-motion-fast ease-standard
                        disabled:opacity-60"
             />
           </div>
@@ -170,8 +170,8 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
           <button
             type="submit"
             disabled={submitting || !turnstileLoaded}
-            className="w-full rounded-lg bg-[color:var(--surface-slate)] text-white py-3 font-medium text-body-md
-                     hover:bg-[color:var(--surface-slate)]/90 disabled:opacity-60 transition-all duration-motion-fast ease-standard"
+            className="w-full rounded-lg bg-primary-accent text-white py-3 font-medium text-body-md
+                     hover:bg-primary-accent/90 disabled:opacity-60 transition-all duration-motion-fast ease-standard"
           >
             {submitting ? "Submitting..." : "Request Invite"}
           </button>

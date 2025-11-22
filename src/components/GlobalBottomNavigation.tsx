@@ -202,7 +202,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               className={cn(
                 "chrome-bottom-nav", // Chrome auto-hide class lives on inner element to avoid Framer inline transform conflicts
                 "backdrop-blur-md",
-                isClubhouseRoute ? "bg-black/60" : "bg-[color:var(--surface-slate)]",
+                isClubhouseRoute ? "bg-black/60" : "bg-surface-slate",
                 // Top border/shadow for separation
                 "relative before:absolute before:inset-x-0 before:top-0 before:h-px",
                 isClubhouseRoute ? "before:bg-white/10" : "before:bg-black/10"
