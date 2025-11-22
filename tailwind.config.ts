@@ -52,6 +52,17 @@ export default {
 					'sans-serif',
 				],
 			},
+			fontSize: {
+				// CLBHOUZ SEMANTIC TYPE SCALE - 8 Roles
+				'display-xl': ['34px', { lineHeight: '1.18', fontWeight: '600', letterSpacing: '-0.01em' }],
+				'display-lg': ['28px', { lineHeight: '1.21', fontWeight: '600', letterSpacing: '-0.01em' }],
+				'heading-lg': ['22px', { lineHeight: '1.27', fontWeight: '600' }],
+				'heading-md': ['19px', { lineHeight: '1.32', fontWeight: '600' }],
+				'body-lg': ['17px', { lineHeight: '1.41', fontWeight: '400' }],
+				'body-md': ['15px', { lineHeight: '1.47', fontWeight: '400' }],
+				'body-sm': ['13px', { lineHeight: '1.38', fontWeight: '400' }],
+				'meta': ['11px', { lineHeight: '1.36', fontWeight: '500', letterSpacing: '0.01em' }],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
