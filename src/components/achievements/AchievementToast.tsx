@@ -74,20 +74,20 @@ export const AchievementToast: React.FC<AchievementToastProps> = ({
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-primary uppercase tracking-wide mb-1">
+            <p className="text-meta font-medium text-primary uppercase tracking-wide mb-1">
               New achievement unlocked!
             </p>
-            <h4 className="font-semibold text-foreground text-base mb-1">
+            <h4 className="font-semibold text-foreground text-body-md mb-1">
               {achievement.name}
             </h4>
-            <p className="text-sm text-muted-foreground line-clamp-2">
+            <p className="text-body-sm text-muted-foreground line-clamp-2">
               {achievement.description}
             </p>
           </div>
 
           {/* XP Badge */}
           {achievement.points > 0 && (
-            <div className="flex-shrink-0 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
+            <div className="flex-shrink-0 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-meta font-semibold">
               +{achievement.points} XP
             </div>
           )}

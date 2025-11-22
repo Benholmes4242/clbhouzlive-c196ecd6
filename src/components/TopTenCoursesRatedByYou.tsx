@@ -226,7 +226,7 @@ export default function TopTenCoursesRatedByYou({
     return (
       <div className="w-full">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-display text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
+          <h3 className="font-display text-heading-lg text-foreground">
             {title}
           </h3>
         </div>
@@ -246,10 +246,10 @@ export default function TopTenCoursesRatedByYou({
     <section className="w-full fullbleed md:mx-auto md:px-0 pt-0 pb-0" data-section="top-ten-rated">
       <div className="max-w-none md:max-w-6xl md:mx-auto">
         <div className="flex items-center justify-between mb-0 px-4 md:px-0">
-          <h3 className="font-display text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
+          <h3 className="font-display text-heading-lg text-foreground">
             {title}
             {filled > 0 && (
-              <span className="text-sm text-muted-foreground ml-2">({filled}/10)</span>
+              <span className="text-body-md text-muted-foreground ml-2">({filled}/10)</span>
             )}
           </h3>
           <div className="flex gap-2 relative z-10">
@@ -451,7 +451,7 @@ const TopTenSlot: React.FC<{
               ${isTopThree ? 'ring-1 ring-white/20' : ''}
             `}>
               <span className={`
-                ${isTopThree ? 'text-white' : 'text-foreground'} font-medium text-sm leading-none
+                ${isTopThree ? 'text-white' : 'text-foreground'} font-medium text-body-md leading-none
                 ${isTopThree ? 'drop-shadow-sm' : ''}
               `}>
                 {rank}
@@ -567,7 +567,7 @@ const TopTenSlot: React.FC<{
             ${isTopThree ? 'ring-1 ring-white/20' : ''}
           `}>
             <span className={`
-              text-white font-medium text-sm leading-none
+              text-white font-medium text-body-md leading-none
               ${isTopThree ? 'drop-shadow-sm' : ''}
             `}>
               {rank}
@@ -646,7 +646,7 @@ const GhostCard: React.FC<{ course: any; index: number; userId?: string }> = ({ 
           ${isTopThree ? 'ring-1 ring-white/20' : ''}
         `}>
           <span className={`
-            text-white font-medium text-sm leading-none
+            text-white font-medium text-body-md leading-none
             ${isTopThree ? 'drop-shadow-sm' : ''}
           `}>
             {index + 1}

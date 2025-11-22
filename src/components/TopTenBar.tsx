@@ -84,8 +84,8 @@ export const TopTenBar: React.FC = () => {
   return (
     <div className="mb-4 p-4 bg-muted/30 rounded-lg border border-border">
       <div className="flex items-center justify-between mb-3">
-        <div className="text-sm font-semibold text-foreground">Your Top 10</div>
-        <div className="text-xs text-muted-foreground">Drag to reorder • Tap ✕ to remove</div>
+        <div className="text-body-md font-semibold text-foreground">Your Top 10</div>
+        <div className="text-meta text-muted-foreground">Drag to reorder • Tap ✕ to remove</div>
       </div>
 
       <DndContext
@@ -138,7 +138,7 @@ const TopTenSlot: React.FC<{
         style={style}
         {...attributes}
         {...listeners}
-        className="relative h-24 rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 flex items-center justify-center text-sm text-muted-foreground hover:border-muted-foreground/50 hover:bg-muted/30 transition-colors cursor-pointer"
+        className="relative h-24 rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 flex items-center justify-center text-body-md text-muted-foreground hover:border-muted-foreground/50 hover:bg-muted/30 transition-colors cursor-pointer"
       >
         {index + 1}
       </li>

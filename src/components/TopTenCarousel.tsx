@@ -24,7 +24,7 @@ export const TopTenCarousel: React.FC<TopTenCarouselProps> = ({
     return (
       <div className="w-full">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-display text-xl font-semibold">Top 10 Rated by You</h3>
+          <h3 className="font-display text-heading-lg font-semibold">Top 10 Rated by You</h3>
         </div>
         <div className="flex items-center justify-center py-8">
           <div className="text-muted-foreground">Loading your top 10...</div>
@@ -40,10 +40,10 @@ export const TopTenCarousel: React.FC<TopTenCarouselProps> = ({
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-display text-xl font-semibold">
+        <h3 className="font-display text-heading-lg font-semibold">
           Top 10 Rated by You
           {hasAnyCourses && (
-            <span className="text-sm text-muted-foreground ml-2">
+            <span className="text-body-md text-muted-foreground ml-2">
               ({filledCount}/10)
             </span>
           )}
@@ -60,14 +60,14 @@ export const TopTenCarousel: React.FC<TopTenCarouselProps> = ({
       {/* Empty state CTA */}
       {!hasAnyCourses && isOwnProfile && (
         <div className="mb-4 p-3 bg-muted/30 rounded-lg border border-dashed border-muted-foreground/30">
-          <p className="text-sm text-muted-foreground text-center">
+          <p className="text-body-md text-muted-foreground text-center">
             Open See All to choose your Top 10
             {onOpenModal && (
               <Button 
                 variant="link" 
                 size="sm" 
                 onClick={onOpenModal}
-                className="ml-1 p-0 h-auto text-sm underline"
+                className="ml-1 p-0 h-auto text-body-md underline"
               >
                 Start building your list
               </Button>
@@ -87,7 +87,7 @@ export const TopTenCarousel: React.FC<TopTenCarouselProps> = ({
               return (
                 <div key={`course-${course.id}-${index}`} className="flex-shrink-0 w-64">
                   <div className="relative">
-                    <div className="absolute -top-2 -left-2 bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold z-10">
+                    <div className="absolute -top-2 -left-2 bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-meta font-bold z-10">
                       {rank}
                     </div>
                     <CourseCard
@@ -118,7 +118,7 @@ export const TopTenCarousel: React.FC<TopTenCarouselProps> = ({
               return (
                 <div key={`placeholder-${index}`} className="flex-shrink-0 w-64">
                   <div className="relative">
-                    <div className="absolute -top-2 -left-2 bg-muted text-muted-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs font-medium z-10 border border-muted-foreground/30">
+                    <div className="absolute -top-2 -left-2 bg-muted text-muted-foreground rounded-full w-6 h-6 flex items-center justify-center text-meta font-medium z-10 border border-muted-foreground/30">
                       {rank}
                     </div>
                     <div 
@@ -138,13 +138,13 @@ export const TopTenCarousel: React.FC<TopTenCarouselProps> = ({
                         {rank}
                       </div>
                       {isOwnProfile && (
-                        <div className="text-xs text-center px-4">
+                        <div className="text-meta text-center px-4">
                           <div className="mb-1">Click to add</div>
                           <div className="opacity-70">Open See All</div>
                         </div>
                       )}
                       {!isOwnProfile && (
-                        <div className="text-xs text-center px-4">
+                        <div className="text-meta text-center px-4">
                           No course selected
                         </div>
                       )}

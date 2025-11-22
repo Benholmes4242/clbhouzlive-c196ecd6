@@ -263,15 +263,15 @@ const ClubhouseAchievementsTray: React.FC<ClubhouseAchievementsTrayProps> = ({
         <div className="space-y-6">
           {/* Header */}
           <div>
-            <h3 className="font-display text-xl font-bold text-foreground">Clubhouse Achievements</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="font-display text-heading-lg font-bold text-foreground">Clubhouse Achievements</h3>
+            <p className="text-body-sm text-muted-foreground">
               {earnedAchievements.length} of {achievements.length} achievements earned
             </p>
           </div>
 
           {/* Exploration Achievements */}
           <div>
-            <h4 className="text-lg font-semibold text-foreground mb-3">Exploration Achievements</h4>
+            <h4 className="text-heading-md font-semibold text-foreground mb-3">Exploration Achievements</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {explorationAchievements.map((achievement) => (
                 <div
@@ -286,14 +286,14 @@ const ClubhouseAchievementsTray: React.FC<ClubhouseAchievementsTrayProps> = ({
                     {renderAchievementBadge(achievement)}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <h5 className="font-medium text-sm truncate">{achievement.title}</h5>
+                        <h5 className="font-medium text-body-sm truncate">{achievement.title}</h5>
                         {achievement.rarity && getRarityBadge(achievement.rarity)}
                       </div>
-                      <p className="text-xs text-muted-foreground mb-2">
+                      <p className="text-meta text-muted-foreground mb-2">
                         {achievement.description}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium">
+                        <span className="text-meta font-medium">
                           {achievement.isEarned ? (
                             <span className="text-green-600">✓ Earned!</span>
                           ) : (

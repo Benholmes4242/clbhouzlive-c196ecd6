@@ -38,31 +38,31 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
               <h4 className={`font-semibold text-foreground ${
-                compact ? 'text-sm' : 'text-base'
+                compact ? 'text-body-sm' : 'text-body-md'
               } truncate`}>
                 {name}
               </h4>
               <p className={`text-muted-foreground mt-1 ${
-                compact ? 'text-xs line-clamp-1' : 'text-sm line-clamp-2'
+                compact ? 'text-meta line-clamp-1' : 'text-body-sm line-clamp-2'
               }`}>
                 {description}
               </p>
             </div>
             {points && points > 0 && (
-              <div className="flex-shrink-0 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+              <div className="flex-shrink-0 px-2 py-1 rounded-full bg-primary/10 text-primary text-meta font-medium">
                 +{points} XP
               </div>
             )}
           </div>
           {unlockedAt && (
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-meta text-muted-foreground mt-2">
               Unlocked {formatDistanceToNow(new Date(unlockedAt), { addSuffix: true })}
             </p>
           )}
         </div>
       </div>
       <div className="mt-2 px-2 py-1 rounded-md bg-primary/5 inline-block">
-        <span className="text-xs font-medium text-primary">Achievement</span>
+        <span className="text-meta font-medium text-primary">Achievement</span>
       </div>
     </div>
   );

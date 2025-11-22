@@ -920,7 +920,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     {/* Header with collapse button */}
                     <div className="flex justify-between items-center">
                       <div className="text-center flex-1">
-                         <div className="font-display text-xl font-bold text-foreground flex items-center justify-center gap-2 mb-1">
+                         <div className="font-display text-heading-lg font-bold text-foreground flex items-center justify-center gap-2 mb-1">
                            {totalXP.toLocaleString()} XP
                          </div>
                         
@@ -938,7 +938,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     </div>
                     
                     {/* Next ring text and toggle */}
-                    <div className="text-center text-xs text-muted-foreground">
+                    <div className="text-center text-meta text-muted-foreground">
                       Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
                     </div>
                   </div>
@@ -947,12 +947,12 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                   <div>
                     <div className="flex justify-between items-start mb-6">
                       <div>
-                        <h3 className="font-display text-lg font-bold text-foreground mb-1">XP Progress</h3>
+                        <h3 className="font-display text-heading-md font-bold text-foreground mb-1">XP Progress</h3>
                         
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                           <div className="font-display text-2xl font-bold text-foreground flex items-center gap-2">
+                           <div className="font-display text-display-lg font-bold text-foreground flex items-center gap-2">
                              {totalXP.toLocaleString()} XP
                            </div>
                         </div>
@@ -1053,16 +1053,16 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         {/* Ring Info */}
                         <div className="w-64 space-y-4">
                           <div className="space-y-2">
-                            <h3 className="font-display font-semibold text-xl text-foreground">
+                            <h3 className="font-display font-semibold text-heading-lg text-foreground">
                               {currentTier ? currentTier.name : 'No Ring Achieved'}
                             </h3>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-body-sm text-muted-foreground">
                               {currentTier ? 
                                 `Congratulations! You've earned the ${currentTier.name}!` :
                                 `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
                               }
                             </p>
-                            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                            <div className="flex items-center gap-2 text-body-sm font-medium text-foreground">
                               <Trophy className="w-4 h-4" />
                               Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
                             </div>
@@ -1152,17 +1152,17 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                   
                   {/* Latest Achievement Details */}
                   <div className="flex-1">
-                    <h3 className="font-display text-xl font-bold text-white mb-3">Latest Achievement</h3>
+                    <h3 className="font-display text-heading-lg font-bold text-white mb-3">Latest Achievement</h3>
                     
-                    <h4 className="font-display text-2xl font-bold text-white mb-2">
+                    <h4 className="font-display text-display-lg font-bold text-white mb-2">
                       {mostRecentAchievement.title}
                     </h4>
                     
-                    <div className="text-sm text-white/70 mb-4">
+                    <div className="text-body-sm text-white/70 mb-4">
                       <span className="text-green-400 font-semibold">+{mostRecentAchievement.xp} XP</span>
                     </div>
                     
-                    <div className="text-sm text-white/60">
+                    <div className="text-body-sm text-white/60">
                       Unlocked {mostRecentAchievement.dateEarned}
                     </div>
                     
@@ -1198,7 +1198,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                   <button
                     key={filter.key}
                     onClick={() => setActiveFilter(filter.key as any)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+                    className={`px-4 py-2 rounded-full text-body-sm font-medium whitespace-nowrap transition-all duration-200 ${
                       activeFilter === filter.key
                         ? 'bg-muted text-black shadow-sm'
                         : 'text-muted-foreground hover:text-black hover:bg-muted/50'
