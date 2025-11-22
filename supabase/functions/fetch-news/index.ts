@@ -14,7 +14,6 @@ interface NewsArticle {
   pub_date: string
   source: string
   image_url?: string
-  content?: string
 }
 
 async function fetchFromNewsAPI(query: string, sources?: string): Promise<NewsArticle[]> {
@@ -61,12 +60,11 @@ async function fetchFromNewsAPI(query: string, sources?: string): Promise<NewsAr
 
     const articles: NewsArticle[] = data.articles.map((article: any) => ({
       title: article.title || 'Untitled',
-      description: article.description || '',
+      description: article.description || article.content || '',
       link: article.url || '',
       pub_date: new Date(article.publishedAt || new Date()).toISOString(),
       source: article.source?.name || 'Unknown Source',
-      image_url: article.urlToImage || null,
-      content: article.content || article.description || ''
+      image_url: article.urlToImage || null
     }))
 
     console.log(`Successfully fetched ${articles.length} articles from NewsAPI for query: ${query}`)
@@ -137,8 +135,7 @@ async function parseRSSFeed(url: string, source: string): Promise<NewsArticle[]>
             link: link.replace(/&amp;/g, '&'),
             pub_date: finalDate.toISOString(),
             source,
-            image_url: imageUrl,
-            content: description || ''
+            image_url: imageUrl
           })
         }
       }
