@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { createPortal } from 'react-dom';
-import ClubhouzLoading from '@/components/ClubhouzLoading';
+import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { useModalState } from '@/hooks/useModalDetector';
 import { MapPin, UserPlus, UserCheck, Loader2, Minimize2, MoreHorizontal, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PaperAirplaneIcon, HeartIcon, SpeakerXMarkIcon, SpeakerWaveIcon, ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/solid';
@@ -551,7 +551,12 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   if (!isOpen) return null;
 
   if (posts.length === 0) {
-    return createPortal(<ClubhouzLoading />, document.body);
+    return createPortal(
+      <div className="fixed inset-0 z-[1000] bg-black flex items-center justify-center">
+        <InlineSpinner size="lg" className="border-white border-t-transparent" />
+      </div>,
+      document.body
+    );
   }
 
   const content = (

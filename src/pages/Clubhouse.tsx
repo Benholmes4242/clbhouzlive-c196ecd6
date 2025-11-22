@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import ClubhouzLoading from '@/components/ClubhouzLoading';
+import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import NavigationBar from '@/components/bottom-navigation/NavigationBar';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
@@ -227,10 +227,8 @@ const Clubhouse = () => {
     return () => document.body.classList.remove('route-clubhouse');
   }, []);
 
-  // Show loading state only for initial posts fetch
-  if (isLoading && posts.length === 0) {
-    return <ClubhouzLoading />;
-  }
+  // No loading state needed - Suspense at route level handles it
+  // if (isLoading && posts.length === 0) return null;
 
   return (
     <div ref={clubhouseRootRef} className="clubhouse-root" style={{ position: 'relative', isolation: 'isolate', zIndex: 0 }}>

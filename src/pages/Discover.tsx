@@ -1,6 +1,6 @@
 import React, { useState, useMemo, lazy, Suspense } from 'react';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
-import ClbhouzPageSpinner from '@/components/ui/ClbhouzPageSpinner';
+import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import ExploreFilters from '@/components/explore/ExploreFilters';
@@ -127,10 +127,8 @@ const Discover = () => {
     });
   }, [allContent]);
 
-  // Show loader on first paint if no content yet
-  if (loading && allContent.length === 0) {
-    return <ClbhouzPageSpinner label="Loading videos…" />;
-  }
+  // No loading state needed - Suspense at route level handles it with GenericPageSkeleton
+  // if (loading && allContent.length === 0) return null;
 
   const handleLike = (contentId: string) => {
     // Update likes optimistically - could be enhanced with actual API call

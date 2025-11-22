@@ -11,7 +11,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import PostPlayRatingModal from '@/components/courses/PostPlayRatingModal';
-import ClubhouzLoading from '@/components/ClubhouzLoading';
+import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useUI } from '@/contexts/UIContext';
 
@@ -645,8 +645,8 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
             <div className="h-24 w-full bg-muted animate-pulse rounded" />
           </div>
         ) : coursesLoading ? (
-          <div className="flex items-center justify-center py-2">
-            <ClubhouzLoading />
+          <div className="flex items-center justify-center py-8">
+            <InlineSpinner size="lg" />
           </div>
         ) : filteredAndSortedCourses.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
