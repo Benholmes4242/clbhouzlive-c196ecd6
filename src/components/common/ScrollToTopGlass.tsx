@@ -6,23 +6,31 @@ const ScrollToTopGlass = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // The actual scroll container is #root (React root element)
-    const scrollContainer = document.getElementById('root');
-    if (!scrollContainer) return;
-
     const checkScroll = () => {
-      const scrollTop = scrollContainer.scrollTop || 0;
+      // Check both #root element scroll and window scroll
+      const rootContainer = document.getElementById('root');
+      const rootScroll = rootContainer?.scrollTop || 0;
+      const windowScroll = window.scrollY || document.documentElement.scrollTop || 0;
+      
+      const scrollTop = Math.max(rootScroll, windowScroll);
       setVisible(scrollTop > 400);
     };
 
     // Initial check
     checkScroll();
 
-    // Listen to scroll events on #root
-    scrollContainer.addEventListener('scroll', checkScroll, { passive: true });
+    // Listen to both #root and window scroll events
+    const rootContainer = document.getElementById('root');
+    if (rootContainer) {
+      rootContainer.addEventListener('scroll', checkScroll, { passive: true });
+    }
+    window.addEventListener('scroll', checkScroll, { passive: true });
 
     return () => {
-      scrollContainer.removeEventListener('scroll', checkScroll);
+      if (rootContainer) {
+        rootContainer.removeEventListener('scroll', checkScroll);
+      }
+      window.removeEventListener('scroll', checkScroll);
     };
   }, []);
 
