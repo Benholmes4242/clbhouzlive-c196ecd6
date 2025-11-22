@@ -122,7 +122,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               required
               className="w-full rounded-lg bg-[color:var(--surface-input)] text-foreground placeholder:text-[color:var(--placeholder-foreground)]
                        border border-[color:hsl(var(--input))] px-4 py-3 text-body-md outline-none
-                       focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-colors
+                       focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-all duration-motion-fast ease-standard
                        disabled:opacity-60"
             />
           </div>
@@ -140,7 +140,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               disabled={submitting}
               className="w-full rounded-lg bg-[color:var(--surface-input)] text-foreground placeholder:text-[color:var(--placeholder-foreground)]
                        border border-[color:hsl(var(--input))] px-4 py-3 text-body-md outline-none
-                       focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-colors
+                       focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-all duration-motion-fast ease-standard
                        disabled:opacity-60"
             />
           </div>
@@ -158,7 +158,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
               disabled={submitting}
               className="w-full rounded-lg bg-[color:var(--surface-input)] text-foreground placeholder:text-[color:var(--placeholder-foreground)]
                        border border-[color:hsl(var(--input))] px-4 py-3 text-body-md outline-none
-                       focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-colors
+                       focus:border-[color:hsl(var(--input-focus))] focus:ring-0 transition-all duration-motion-fast ease-standard
                        disabled:opacity-60"
             />
           </div>
@@ -171,7 +171,7 @@ const InviteRequestModal: React.FC<InviteRequestModalProps> = ({ open, onOpenCha
             type="submit"
             disabled={submitting || !turnstileLoaded}
             className="w-full rounded-lg bg-[color:var(--surface-slate)] text-white py-3 font-medium text-body-md
-                     hover:bg-[color:var(--surface-slate)]/90 disabled:opacity-60 transition-colors"
+                     hover:bg-[color:var(--surface-slate)]/90 disabled:opacity-60 transition-all duration-motion-fast ease-standard"
           >
             {submitting ? "Submitting..." : "Request Invite"}
           </button>

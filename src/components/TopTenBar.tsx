@@ -138,7 +138,7 @@ const TopTenSlot: React.FC<{
         style={style}
         {...attributes}
         {...listeners}
-        className="relative h-24 rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 flex items-center justify-center text-body-md text-muted-foreground hover:border-muted-foreground/50 hover:bg-muted/30 transition-colors cursor-pointer"
+        className="relative h-24 rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 flex items-center justify-center text-body-md text-muted-foreground hover:border-muted-foreground/50 hover:bg-muted/30 transition-all duration-motion-fast ease-standard cursor-pointer"
       >
         {index + 1}
       </li>

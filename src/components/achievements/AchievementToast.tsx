@@ -95,7 +95,7 @@ export const AchievementToast: React.FC<AchievementToastProps> = ({
           {/* Close button */}
           <button
             onClick={onDismiss}
-            className="flex-shrink-0 text-muted-foreground hover:text-foreground transition-colors p-1"
+            className="flex-shrink-0 text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard p-1"
             aria-label="Dismiss"
           >
             <X className="w-4 h-4" />

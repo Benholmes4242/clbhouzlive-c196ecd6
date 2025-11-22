@@ -1141,9 +1141,9 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 {false && ( /* Set to true to show header banner style */
                   <div className="sticky top-0 z-[0] bg-gradient-to-b from-white/40 to-transparent backdrop-blur-sm">
                     <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 py-2">
-                      <div className="h-9 w-full rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm px-3 flex items-center justify-between text-[12px] text-gray-700">
+                      <div className="h-9 w-full rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm px-3 flex items-center justify-between text-meta text-gray-700">
                         <span className="truncate">New since your last visit</span>
-                        <span className="ml-2 rounded-full px-2 py-0.5 bg-black/5 border border-black/10 text-[11px]">3</span>
+                        <span className="ml-2 rounded-full px-2 py-0.5 bg-black/5 border border-black/10 text-meta">3</span>
                       </div>
                     </div>
                   </div>
@@ -1151,7 +1151,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
                 {/* Bottom pill for new messages when at bottom */}
                 {newMessageCount > 0 && !showScrollToBottom && (
-                  <div className="fixed bottom-[96px] left-1/2 -translate-x-1/2 z-20 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[12px] text-gray-700 pointer-events-auto float-in opacity-0 data-[visible=true]:opacity-100 transition-opacity duration-200" data-visible="true">
+                  <div className="fixed bottom-[96px] left-1/2 -translate-x-1/2 z-20 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-meta text-gray-700 pointer-events-auto float-in opacity-0 data-[visible=true]:opacity-100 transition-opacity duration-200" data-visible="true">
                     {newMessageCount} new {newMessageCount === 1 ? 'message' : 'messages'} • Tap to view
                   </div>
                 )}
@@ -1160,7 +1160,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                 {showScrollToBottom && (
                   <button
                     onClick={scrollToBottom}
-                    className="fixed md:absolute bottom-[88px] right-3 md:right-4 z-[2] h-10 px-3.5 rounded-full bg-white/08 backdrop-blur border border-white/12 shadow-[0_6px_20px_rgba(0,0,0,0.6)] text-[13px] text-white flex items-center gap-2 hover:bg-white/12 hover:border-white/20 active:shadow-sm transition will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                    className="fixed md:absolute bottom-[88px] right-3 md:right-4 z-[2] h-10 px-3.5 rounded-full bg-white/08 backdrop-blur border border-white/12 shadow-[0_6px_20px_rgba(0,0,0,0.6)] text-body-sm text-white flex items-center gap-2 hover:bg-white/12 hover:border-white/20 active:shadow-sm transition-all duration-motion-fast ease-standard will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                     aria-label="Jump to latest"
                     type="button"
                     data-visible="true"
@@ -1172,7 +1172,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     <span>Newer messages</span>
                     {/* Optional unread count badge */}
                     {newMessageCount > 0 && (
-                      <span className="ml-0.5 rounded-full bg-white/20 text-white px-2 py-0.5 text-[11px] font-medium">
+                      <span className="ml-0.5 rounded-full bg-white/20 text-white px-2 py-0.5 text-meta font-medium">
                         {newMessageCount}
                       </span>
                     )}
@@ -1231,34 +1231,34 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     <div className="rounded-2xl border border-white/12 bg-white/05 backdrop-blur px-3 py-2.5 grid grid-cols-3 gap-2">
                       {/* Photo tile */}
                       <button 
-                        className="h-20 rounded-xl bg-white/05 border border-white/12 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                        className="h-20 rounded-xl bg-white/05 border border-white/12 shadow-sm hover:-translate-y-0.5 transition-all duration-motion-fast ease-standard flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                         aria-label="Photo"
                         type="button"
                       >
                         <Camera className="h-5 w-5 text-white/80" />
-                        <span className="text-[11px] text-white/60">Photo</span>
+                        <span className="text-meta text-white/60">Photo</span>
                       </button>
                       
                       {/* File tile */}
                       <button 
-                        className="h-20 rounded-xl bg-white/05 border border-white/12 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                        className="h-20 rounded-xl bg-white/05 border border-white/12 shadow-sm hover:-translate-y-0.5 transition-all duration-motion-fast ease-standard flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                         aria-label="File"
                         type="button"
                       >
                         <Paperclip className="h-5 w-5 text-white/80" />
-                        <span className="text-[11px] text-white/60">File</span>
+                        <span className="text-meta text-white/60">File</span>
                       </button>
                       
                       {/* Link tile */}
                       <button 
-                        className="h-20 rounded-xl bg-white/05 border border-white/12 shadow-sm hover:-translate-y-0.5 transition flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                        className="h-20 rounded-xl bg-white/05 border border-white/12 shadow-sm hover:-translate-y-0.5 transition-all duration-motion-fast ease-standard flex flex-col items-center justify-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
                         aria-label="Link"
                         type="button"
                       >
                         <svg className="h-5 w-5 text-white/80" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd" />
                         </svg>
-                        <span className="text-[11px] text-white/60">Link</span>
+                        <span className="text-meta text-white/60">Link</span>
                       </button>
                     </div>
                   </div>
@@ -1277,12 +1277,12 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                     {/* Left tools */}
                     <div className="flex items-center gap-1.5">
                       {isRecording ? (
-                        <div className="h-7 px-2.5 rounded-full bg-red-900/20 border border-red-500/30 text-red-400 text-[12px] inline-flex items-center gap-1.5">
+                        <div className="h-7 px-2.5 rounded-full bg-red-900/20 border border-red-500/30 text-red-400 text-meta inline-flex items-center gap-1.5">
                           <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse"></span>
                           Recording…
                         </div>
                       ) : isProcessing ? (
-                        <div className="h-7 px-2.5 rounded-full bg-black/05 border border-black/12 text-[12px] text-black/80 inline-flex items-center gap-1.5">
+                        <div className="h-7 px-2.5 rounded-full bg-black/05 border border-black/12 text-meta text-black/80 inline-flex items-center gap-1.5">
                           <span className="h-3 w-3 border-2 border-black/60 border-t-transparent rounded-full animate-spin"></span>
                           Processing…
                         </div>
@@ -1381,19 +1381,19 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
         >
           <div className="mx-auto w-full max-w-[720px] rounded-2xl bg-white/95 backdrop-blur border border-black/10 shadow-lg p-2 grid grid-cols-4 gap-2">
             <button 
-              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-body-sm font-medium text-gray-800 transition-all duration-motion-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               type="button"
             >
               Copy
             </button>
             <button 
-              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-body-sm font-medium text-gray-800 transition-all duration-motion-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               type="button"
             >
               Retry
             </button>
             <button 
-              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-[13px] font-medium text-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="h-11 rounded-xl bg-black/5 hover:bg-black/10 text-body-sm font-medium text-gray-800 transition-all duration-motion-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               type="button"
             >
               Share
