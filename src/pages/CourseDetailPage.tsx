@@ -37,7 +37,7 @@ const CourseDetailPage = () => {
       <Button
         variant="ghost"
         size="icon"
-        className="fixed top-4 left-4 h-8 w-8 bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 z-50"
+        className="fixed top-4 left-4 h-10 w-10 bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 z-50"
         onClick={() => navigate('/courses')}
       >
         <ArrowLeft className="h-6 w-6" />
