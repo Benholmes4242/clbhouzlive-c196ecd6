@@ -918,24 +918,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   </div>
                 )}
                 
-                {/* Mute/Unmute button for videos - stays on video */}
-                {currentMedia.media_type === 'video' && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setGlobalMute(!isGloballyMuted);
-                    }}
-                    className="absolute top-4 right-4 z-30 p-3 rounded-full glass-dark transition-all duration-200 hover:bg-white/10 active:scale-95"
-                    aria-label={isGloballyMuted ? 'Unmute' : 'Mute'}
-                  >
-                    {isGloballyMuted ? (
-                      <SpeakerXMarkIcon className="w-5 h-5 text-white" />
-                    ) : (
-                      <SpeakerWaveIcon className="w-5 h-5 text-white" />
-                    )}
-                  </button>
-                )}
-                
                 {currentMedia.media_type === 'video' ? (
                   <VideoWithAutoplay
                     ref={(el) => {
