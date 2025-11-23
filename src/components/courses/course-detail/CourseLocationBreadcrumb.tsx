@@ -125,60 +125,23 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
         </div>
         
         <div className="divide-y divide-border/60">
-          {/* Sub-country filter */}
+          {/* Sub-country filter - TEMPORARILY DISABLED */}
           {subCountryLabel && (
-            <button
-              type="button"
-              onClick={() => {
-                const params = new URLSearchParams({
-                  tab: 'explore',
-                  region: primaryRegionKey,
-                  sub: subKey || '',
-                });
-                navigate(`/courses?${params.toString()}`);
-              }}
-              className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-surface-alt transition-colors"
-            >
+            <div className="w-full flex items-center justify-between px-4 py-3 text-sm opacity-50 cursor-not-allowed">
               <span>
                 See more courses in <span className="font-semibold">{subCountryLabel}</span>
               </span>
               <span className="text-muted-foreground">›</span>
-            </button>
+            </div>
           )}
 
-          {/* List-specific Top 100 */}
-          <button
-            type="button"
-            onClick={() => {
-              // Normalize database list slug to UI-expected format
-              const normalizeListSlug = (dbSlug: string): string => {
-                const slug = dbSlug.toLowerCase();
-                // Check for GB&I variants
-                if (slug.includes('gb-i') || slug.includes('britain') || slug.includes('ireland')) return 'gb-i';
-                // Check for USA variants
-                if (slug.includes('usa') || slug.includes('united-states')) return 'usa';
-                // Check for Europe variants
-                if (slug.includes('europe')) return 'europe';
-                // Check for Rest of World
-                if (slug.includes('rest')) return 'rest';
-                // Check for Global
-                if (slug.includes('global') || slug.includes('world')) return 'global';
-                return 'global'; // fallback
-              };
-              
-              const params = new URLSearchParams({
-                tab: 'top100',
-                list: normalizeListSlug(primaryListSlug),
-              });
-              navigate(`/courses?${params.toString()}`);
-            }}
-            className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-surface-alt transition-colors"
-          >
+          {/* List-specific Top 100 - TEMPORARILY DISABLED */}
+          <div className="w-full flex items-center justify-between px-4 py-3 text-sm opacity-50 cursor-not-allowed">
             <span>
               See Top 100 in <span className="font-semibold">{primaryListName}</span>
             </span>
             <span className="text-muted-foreground">›</span>
-          </button>
+          </div>
         </div>
       </section>
     </div>
