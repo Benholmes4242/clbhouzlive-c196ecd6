@@ -40,6 +40,8 @@ export function useLocationBroadcast() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastWriteRef = useRef<number | null>(null);
   const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);
+  const failureCountRef = useRef<number>(0);
+  const circuitOpenRef = useRef<boolean>(false);
 
   useEffect(() => {
     // Only broadcast if visibility is active (not hidden)
@@ -49,10 +51,23 @@ export function useLocationBroadcast() {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
+      // Reset circuit breaker when disabled
+      failureCountRef.current = 0;
+      circuitOpenRef.current = false;
       return;
     }
 
     const broadcastLocation = async () => {
+      // Circuit breaker: stop trying after 3 consecutive failures
+      if (circuitOpenRef.current) {
+        console.log('[LocationBroadcast] Circuit breaker open - stopping broadcasts');
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+        return;
+      }
+
       try {
         const now = Date.now();
 
@@ -62,7 +77,17 @@ export function useLocationBroadcast() {
         }
 
         const loc = await getCurrentLocation();
-        if (!loc) return;
+        if (!loc) {
+          failureCountRef.current++;
+          if (failureCountRef.current >= 3) {
+            console.warn('[LocationBroadcast] Too many failures, opening circuit breaker');
+            circuitOpenRef.current = true;
+          }
+          return;
+        }
+
+        // Reset failure count on success
+        failureCountRef.current = 0;
 
         // Check if user has moved enough to warrant an update
         if (lastLocationRef.current) {
@@ -97,9 +122,21 @@ export function useLocationBroadcast() {
           // Update refs only on successful write
           lastWriteRef.current = now;
           lastLocationRef.current = { lat: loc.lat, lng: loc.lng };
+          failureCountRef.current = 0;
+        } else {
+          failureCountRef.current++;
+          if (failureCountRef.current >= 3) {
+            console.warn('[LocationBroadcast] Too many DB errors, opening circuit breaker');
+            circuitOpenRef.current = true;
+          }
         }
       } catch (error) {
         console.error('[LocationBroadcast] Error:', error);
+        failureCountRef.current++;
+        if (failureCountRef.current >= 3) {
+          console.warn('[LocationBroadcast] Too many errors, opening circuit breaker');
+          circuitOpenRef.current = true;
+        }
       }
     };
 
