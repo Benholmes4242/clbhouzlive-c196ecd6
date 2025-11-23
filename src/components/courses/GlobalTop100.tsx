@@ -43,6 +43,7 @@ const GlobalTop100 = () => {
   const listTopRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
   const hasInitialisedFromUrlRef = useRef(false);
+  const mountedRef = useRef(true);
   
   // URL params take priority, then sessionStorage, then defaults
   const [selectedList, setSelectedList] = useState(() => {
@@ -89,7 +90,7 @@ const GlobalTop100 = () => {
   // Save filters to sessionStorage whenever they change (only after URL initialization)
   useEffect(() => {
     // Don't immediately overwrite URL-driven state on first render
-    if (!hasInitialisedFromUrlRef.current) return;
+    if (!hasInitialisedFromUrlRef.current || !mountedRef.current) return;
 
     try {
       sessionStorage.setItem('top100-last-filters', JSON.stringify({
@@ -136,6 +137,7 @@ const GlobalTop100 = () => {
   // Cleanup on unmount - clear sessionStorage to prevent stale state on revisit
   useEffect(() => {
     return () => {
+      mountedRef.current = false;
       try {
         sessionStorage.removeItem('top100-scroll');
         sessionStorage.removeItem('top100-last-filters');
