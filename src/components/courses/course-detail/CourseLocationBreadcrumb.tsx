@@ -152,15 +152,22 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
             onClick={() => {
               // Normalize database list slug to UI-expected format
               const normalizeListSlug = (dbSlug: string): string => {
-                if (dbSlug.includes('britain-ireland')) return 'gb-i';
-                if (dbSlug.includes('usa')) return 'usa';
-                if (dbSlug.includes('europe')) return 'europe';
-                if (dbSlug.includes('global')) return 'global';
+                const slug = dbSlug.toLowerCase();
+                // Check for GB&I variants
+                if (slug.includes('gb-i') || slug.includes('britain') || slug.includes('ireland')) return 'gb-i';
+                // Check for USA variants
+                if (slug.includes('usa') || slug.includes('united-states')) return 'usa';
+                // Check for Europe variants
+                if (slug.includes('europe')) return 'europe';
+                // Check for Rest of World
+                if (slug.includes('rest')) return 'rest';
+                // Check for Global
+                if (slug.includes('global') || slug.includes('world')) return 'global';
                 return 'global'; // fallback
               };
               
               const params = new URLSearchParams({
-                tab: 'top100', // Fixed: removed dash to match CoursesContent.tsx expectation
+                tab: 'top100',
                 list: normalizeListSlug(primaryListSlug),
               });
               navigate(`/courses?${params.toString()}`);
