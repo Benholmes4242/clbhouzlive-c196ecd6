@@ -60,7 +60,6 @@ export function useLocationBroadcast() {
     const broadcastLocation = async () => {
       // Circuit breaker: stop trying after 3 consecutive failures
       if (circuitOpenRef.current) {
-        console.log('[LocationBroadcast] Circuit breaker open - stopping broadcasts');
         if (intervalRef.current) {
           clearInterval(intervalRef.current);
           intervalRef.current = null;
@@ -79,8 +78,8 @@ export function useLocationBroadcast() {
         const loc = await getCurrentLocation();
         if (!loc) {
           failureCountRef.current++;
-          if (failureCountRef.current >= 3) {
-            console.warn('[LocationBroadcast] Too many failures, opening circuit breaker');
+          if (failureCountRef.current >= 2) {
+            // Open circuit breaker after just 2 failures to prevent crash
             circuitOpenRef.current = true;
           }
           return;
@@ -125,16 +124,14 @@ export function useLocationBroadcast() {
           failureCountRef.current = 0;
         } else {
           failureCountRef.current++;
-          if (failureCountRef.current >= 3) {
-            console.warn('[LocationBroadcast] Too many DB errors, opening circuit breaker');
+          if (failureCountRef.current >= 2) {
             circuitOpenRef.current = true;
           }
         }
       } catch (error) {
-        console.error('[LocationBroadcast] Error:', error);
+        // Silently handle errors to prevent console spam
         failureCountRef.current++;
-        if (failureCountRef.current >= 3) {
-          console.warn('[LocationBroadcast] Too many errors, opening circuit breaker');
+        if (failureCountRef.current >= 2) {
           circuitOpenRef.current = true;
         }
       }
