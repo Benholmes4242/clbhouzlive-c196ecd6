@@ -6,6 +6,7 @@ interface UseChromeStateOptions {
   forceHidden?: boolean;
   disabled?: boolean;
   onNavOverlayRequest?: () => void;
+  disableDirectionalReveal?: boolean;
 }
 
 interface ScrollMetrics {
@@ -20,7 +21,7 @@ const HIDE_DEBOUNCE_MS = 140;
 const REVEAL_DEBOUNCE_MS = 140;
 const REVEAL_DEBOUNCE_AT_TOP_MS = 0; // Instant reveal at top
 
-export const useChromeState = ({ forceHidden = false, disabled = false, onNavOverlayRequest }: UseChromeStateOptions = {}) => {
+export const useChromeState = ({ forceHidden = false, disabled = false, onNavOverlayRequest, disableDirectionalReveal = false }: UseChromeStateOptions = {}) => {
   const [chromeState, setChromeState] = useState<ChromeState>('visible');
   const scrollMetricsRef = useRef<ScrollMetrics>({ deltaY: 0, scrollTop: 0, velocity: 0 });
   const lastScrollTop = useRef(0);
@@ -156,7 +157,8 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
       scheduleHide(HIDE_DEBOUNCE_MS);
     }
     // Reveal on upward scroll (deltaY < 0 means scrolling up the page = content moving down)
-    else if (deltaY < -6 && timeDelta < 120) {
+    // Only if directional reveal is not disabled
+    else if (!disableDirectionalReveal && deltaY < -6 && timeDelta < 120) {
       scheduleReveal(REVEAL_DEBOUNCE_MS);
     }
   }, [disabled, scheduleHide, scheduleReveal]);

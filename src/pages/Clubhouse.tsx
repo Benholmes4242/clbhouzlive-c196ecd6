@@ -122,7 +122,8 @@ const Clubhouse = () => {
   const chromeControls = useChromeState({
     forceHidden: isAnyOverlayOpen,
     disabled: false, // Set to true via env var for emergency rollback
-    onNavOverlayRequest: showNavOverlay
+    onNavOverlayRequest: showNavOverlay,
+    disableDirectionalReveal: true, // Clubhouse only - swipe between posts should not toggle chrome
   });
   
   // Chrome anchors for dynamic re-positioning
@@ -307,6 +308,7 @@ const Clubhouse = () => {
             chromeState={chromeControls.chromeState}
             onPostDetailsOpen={() => console.log('Post details opened')}
             onDismissNavOverlay={hideNavOverlay}
+            onNavOverlayRequest={showNavOverlay}
           />
         ) : isLoading ? (
           <div className="flex items-center justify-center min-h-screen">
