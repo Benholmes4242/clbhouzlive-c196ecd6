@@ -154,7 +154,7 @@ const GlobalTop100 = () => {
   const { data: courses = [], isLoading } = useGolfCoursesSearch({
     searchQuery: debouncedSearch,
     listSlug: selectedList,
-    limit: 100, // Reduced from 200 to prevent memory pressure on iOS
+    limit: 50, // Reduced to 50 to match pagination and reduce memory pressure
   });
 
   // Apply subregion filter client-side
