@@ -54,49 +54,51 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
   };
 
   return (
-    <div className="rounded-2xl border border-border/60 bg-card/90 shadow-sm px-4 py-4">
+    <div className="rounded-2xl border border-border/60 bg-card shadow-sm px-4 py-4">
       {/* Header with Legend */}
-      <div className="space-y-1 mb-4">
-        <p className="text-heading-md font-semibold leading-snug text-foreground">
-          Your Rating vs Community
-        </p>
-        <div className="flex items-center gap-3 text-meta font-medium leading-snug text-muted-foreground">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base font-semibold">Your Rating vs Community</h3>
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
-            <span className="inline-block h-2 w-6 rounded-full bg-foreground/80" />
+            <span className="inline-flex h-2 w-6 rounded-full bg-foreground" />
             <span>You</span>
           </div>
           <div className="flex items-center gap-1">
-            <span className="inline-block h-2 w-6 rounded-full bg-muted-foreground/30" />
+            <span className="inline-flex h-2 w-6 rounded-full bg-muted" />
             <span>Community</span>
           </div>
         </div>
       </div>
 
-      {/* Metrics */}
-      <div className="space-y-4">
+      {/* Metrics with dual bars */}
+      <div className="space-y-3">
         {visibleRows.map((row) => (
-          <div key={row.label} className="space-y-1.5">
-            {/* Label row */}
-            <div className="text-body-sm font-medium text-foreground">
-              {row.label}
+          <div key={row.label} className="space-y-1">
+            {/* Label and values */}
+            <div className="flex items-baseline justify-between text-sm">
+              <span className="font-medium">{row.label}</span>
+              <span className="text-xs text-muted-foreground">
+                You: {formatScore(row.you)}/10 · Community: {formatScore(row.community)}/10
+              </span>
             </div>
 
-            {/* Bars row */}
-            <div className="flex gap-2">
-              <div
-                className="h-2.5 flex-1 rounded-full bg-foreground/80 transition-[width] duration-300 ease-out"
-                style={{ width: `${getPercentage(row.you)}%` }}
-              />
-              <div
-                className="h-2.5 flex-1 rounded-full bg-muted-foreground/30 transition-[width] duration-300 ease-out"
-                style={{ width: `${getPercentage(row.community)}%` }}
-              />
-            </div>
+            {/* Dual bars */}
+            <div className="relative h-2.5 w-full rounded-full bg-muted overflow-hidden">
+              {/* Community bar (background) */}
+              {row.community !== null && (
+                <div
+                  className="absolute inset-y-0 left-0 rounded-full bg-muted-foreground/40"
+                  style={{ width: `${getPercentage(row.community)}%` }}
+                />
+              )}
 
-            {/* Values row */}
-            <div className="mt-0.5 flex justify-between text-meta text-muted-foreground">
-              <span>You: {formatScore(row.you)}/10</span>
-              <span>Community: {formatScore(row.community)}/10</span>
+              {/* Your bar (foreground) */}
+              {row.you !== null && (
+                <div
+                  className="relative h-full rounded-full bg-foreground transition-[width] duration-500 ease-out"
+                  style={{ width: `${getPercentage(row.you)}%` }}
+                />
+              )}
             </div>
           </div>
         ))}
