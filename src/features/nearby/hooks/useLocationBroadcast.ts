@@ -44,8 +44,11 @@ export function useLocationBroadcast() {
   const circuitOpenRef = useRef<boolean>(false);
 
   useEffect(() => {
-    // Only broadcast if visibility is active (not hidden)
-    if (!user?.id || visibilityMode === 'hidden') {
+    // Disable location broadcasting on course detail pages to prevent crashes
+    const isCourseDetail = document.body.getAttribute('data-course-detail') === 'true';
+    
+    // Only broadcast if visibility is active (not hidden) and not on course detail
+    if (!user?.id || visibilityMode === 'hidden' || isCourseDetail) {
       // Clear any existing interval
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
