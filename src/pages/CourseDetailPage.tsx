@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,10 +10,17 @@ const CourseDetailPage = () => {
   const params = useParams();
   const courseId = params?.courseId;
   const navigate = useNavigate();
+  const mountedRef = useRef(true);
 
   // Ensure course detail always starts from the top
   useEffect(() => {
-    scrollToTop();
+    mountedRef.current = true;
+    if (mountedRef.current) {
+      scrollToTop();
+    }
+    return () => {
+      mountedRef.current = false;
+    };
   }, [courseId]);
 
   // Add defensive check for courseId

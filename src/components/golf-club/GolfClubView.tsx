@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Earth, ArrowLeft } from 'lucide-react';
@@ -26,6 +26,14 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const { user } = useSupabaseSession();
   const [activeTab, setActiveTab] = useState('about');
   const navigate = useNavigate();
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const { data: course, isLoading: courseLoading } = useQuery({
     queryKey: ['course-detail', courseId],
@@ -136,15 +144,19 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           className="course-hero-image w-full h-full object-cover !rounded-bl-none"
           style={{ height: 'calc(100% + 48px)' }} // Extend 48px to go behind tab bar
           onLoad={(e) => {
-            e.currentTarget.classList.add('loaded');
+            if (mountedRef.current) {
+              e.currentTarget.classList.add('loaded');
+            }
           }}
           onError={(e) => {
-            e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop';
-            e.currentTarget.srcset = `
-              https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=768&h=384&fit=crop 768w,
-              https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop 1200w,
-              https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=960&fit=crop 1920w
-            `;
+            if (mountedRef.current) {
+              e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop';
+              e.currentTarget.srcset = `
+                https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=768&h=384&fit=crop 768w,
+                https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop 1200w,
+                https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=960&fit=crop 1920w
+              `;
+            }
           }}
         />
         
