@@ -395,7 +395,7 @@ const GlobalTop100 = () => {
           </div>
           
           {/* Pagination Controls */}
-          <div className="flex justify-center items-center gap-3 mt-6 mb-[48px]">
+          <div className="flex justify-center items-center gap-3 mt-6 mb-0">
             {page > 0 && (
               <Button
                 variant="outline"

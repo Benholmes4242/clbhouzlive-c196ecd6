@@ -9,7 +9,7 @@ const Courses = () => {
     <div className="min-h-screen bg-background page-with-header m-0 p-0">
       <ClubhouseHeaderNew />
       <FadeInContent>
-        <main className="px-4 md:container md:mx-auto md:px-0 pt-[72px]">
+        <main className="px-4 md:container md:mx-auto md:px-0 pt-[72px] pb-[48px]">
           <div className="max-w-6xl mx-auto">
             <CoursesContent />
           </div>
