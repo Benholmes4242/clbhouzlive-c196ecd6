@@ -108,7 +108,8 @@ export const SUBREGIONS: Record<Exclude<PrimaryRegionKey, 'all'>, string[]> = {
 };
 
 // Normalisation helper used everywhere (search + URL <-> labels)
-export function normalizeLabel(label: string): string {
+export function normalizeLabel(label: string | undefined | null): string {
+  if (!label || typeof label !== 'string') return '';
   return label
     .trim()
     .toLowerCase()
@@ -167,9 +168,16 @@ export function dbValueToRegionKey(dbValue?: string | null): PrimaryRegionKey {
 }
 
 // Derive the parent region from a subregion name (e.g., "Northern Ireland" -> "gb-i")
-export function getRegionFromSubregion(subCountry: string): PrimaryRegionKey | null {
+export function getRegionFromSubregion(subCountry: string | undefined | null): PrimaryRegionKey | null {
+  // Safety guards
+  if (!subCountry || typeof subCountry !== 'string' || subCountry.trim() === '') {
+    return null;
+  }
+
+  const normalizedSub = normalizeLabel(subCountry);
+  
   for (const [regionKey, subList] of Object.entries(SUBREGIONS)) {
-    if (subList.some(sub => normalizeLabel(sub) === normalizeLabel(subCountry))) {
+    if (subList.some(sub => normalizeLabel(sub) === normalizedSub)) {
       return regionKey as PrimaryRegionKey;
     }
   }
