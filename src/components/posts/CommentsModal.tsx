@@ -26,7 +26,7 @@ interface CommentsModalProps {
 
 // Animation constants - matches expanded map sheet
 const ENTRY_DURATION = 500;
-const EXIT_DURATION = 300;
+const EXIT_DURATION = 500;
 
 // Mock comments data
 const generateMockComments = (postId: string): Comment[] => {
@@ -189,7 +189,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
       <div 
         className={cn(
           "absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity ease-in-out",
-          hasEntered && !isClosing ? "opacity-100 duration-500" : "opacity-0 duration-300"
+          hasEntered && !isClosing ? "opacity-100 duration-500" : "opacity-0 duration-500"
         )}
         onClick={handleClose}
       />
@@ -203,7 +203,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
           className={cn(
             "clubhouse-comments-sheet glass-dark rounded-t-[24px] flex flex-col w-full",
             "transition-all ease-in-out",
-            hasEntered && !isClosing ? "duration-500 translate-y-0 opacity-100" : "duration-300 translate-y-4 opacity-0"
+            hasEntered && !isClosing ? "duration-500 translate-y-0 opacity-100" : "duration-500 translate-y-4 opacity-0"
           )}
           style={{ 
             paddingBottom: 'env(safe-area-inset-bottom)',

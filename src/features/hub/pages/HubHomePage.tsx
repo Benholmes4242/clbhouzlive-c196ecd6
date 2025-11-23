@@ -17,7 +17,7 @@ import '../home/hubTheme.css';
 
 // Animation constants - matches expanded map sheet
 const HUB_ENTRY_DURATION = 500; // ms – buttery smooth slide-up
-const HUB_EXIT_DURATION = 300;  // ms – quick slide-down
+const HUB_EXIT_DURATION = 500;  // ms – buttery smooth slide-down
 const HUB_ENTRY_EASING = 'ease-in-out'; // smooth standard easing
 const HUB_EXIT_EASING = 'ease-in-out';   // smooth standard easing
 
