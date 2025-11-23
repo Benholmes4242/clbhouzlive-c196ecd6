@@ -220,6 +220,16 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 See all reviews
               </button>
             </div>
+
+            {/* Edit Rating button - only show if user has rated */}
+            {userRating && (
+              <Button 
+                onClick={handleRateClick}
+                className="w-full justify-center bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
+              >
+                Edit Your Rating
+              </Button>
+            )}
           </>
         ) : (
           <>
@@ -228,16 +238,16 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             <p className="text-sm text-muted-foreground mb-4">
               No ratings yet – be the first to rate this course!
             </p>
+            
+            {/* Review button for empty state */}
+            <Button 
+              onClick={handleRateClick}
+              className="w-full justify-center bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
+            >
+              Review & Mark as Played
+            </Button>
           </>
         )}
-
-        {/* Action Button */}
-        <Button 
-          onClick={handleRateClick}
-          className="w-full justify-center bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
-        >
-          {userRating ? 'Edit Your Rating' : 'Review & Mark as Played'}
-        </Button>
 
         {/* Friends Who've Played */}
         <CourseFriendsStrip courseId={course.id} courseName={course.name} />
@@ -265,10 +275,12 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 </p>
               </div>
               <div className="flex flex-col items-end">
-                <span className="text-lg font-semibold">
-                  {formatScore(userOverall)}/10
-                </span>
-                <span className="text-xs text-muted-foreground">Your rating</span>
+                <div className="flex flex-col items-center">
+                  <span className="text-lg font-semibold">
+                    {formatScore(userOverall)}/10
+                  </span>
+                  <span className="text-xs text-muted-foreground">Your rating</span>
+                </div>
               </div>
             </div>
           </section>
