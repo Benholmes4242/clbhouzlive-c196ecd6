@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Earth } from 'lucide-react';
+import { Earth, ArrowLeft } from 'lucide-react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -91,7 +91,18 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     <div className={isInModal ? "w-full" : "min-h-screen w-full"}>
       {/* Extended Hero Banner - continues behind tabs */}
       <div className="course-hero-container relative overflow-hidden">
-        {/* Back button for modal - positioned over hero image */}
+        {/* Back button - positioned over hero image */}
+        {!isInModal && (
+          <button
+            onClick={() => window.history.back()}
+            className="absolute top-3 left-3 md:top-4 md:left-4 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="!h-8 !w-8 text-white" />
+          </button>
+        )}
+        
+        {/* Back button for modal */}
         {isInModal && onClose && (
           <button
             onClick={onClose}
