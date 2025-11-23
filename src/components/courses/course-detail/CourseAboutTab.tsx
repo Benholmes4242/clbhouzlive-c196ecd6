@@ -135,14 +135,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 </p>
               </div>
 
-              <div className="flex flex-col items-end">
-                <div className="flex items-center gap-1.5">
-                  <ClubhouseLogo size="sm" className="h-5 w-5" />
-                  <span className="text-xl md:text-2xl font-semibold transition-opacity duration-300">
-                    {formatScore(ratingAggregates.avg_overall_score || 0)}/10
-                  </span>
-                </div>
-                <span className="mt-0.5 text-xs text-muted-foreground">Community</span>
+              <div className="flex items-center gap-1.5">
+                <ClubhouseLogo size="sm" className="h-5 w-5" />
+                <span className="text-xl md:text-2xl font-semibold transition-opacity duration-300">
+                  {formatScore(ratingAggregates.avg_overall_score || 0)}/10
+                </span>
               </div>
             </div>
 
@@ -217,7 +214,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             <div className="flex justify-end mb-4">
               <button
                 type="button"
-                onClick={() => navigate(`/courses/${course.id}/reviews`)}
+                onClick={() => onTabChange?.('reviews')}
                 className="text-xs font-medium text-muted-foreground hover:text-foreground underline underline-offset-4 transition-all duration-motion-fast ease-standard"
               >
                 See all reviews
@@ -288,10 +285,10 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <section className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-4">
           <h3 className="text-base font-semibold mb-1">How do you rate this course?</h3>
           <p className="text-sm text-muted-foreground mb-3">
-            Add your rating to see how it compares with the Clbhouz community.
+            Add your rating to see how it compares with the clbhouz community.
           </p>
           <Button onClick={handleRateClick} className="w-full bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90">
-            Rate this course
+            Review this course
           </Button>
         </section>
       )}
