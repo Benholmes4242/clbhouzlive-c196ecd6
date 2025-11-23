@@ -241,7 +241,7 @@ const CourseExplorer = () => {
   };
 
   return (
-    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-12">
+    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-0">
       {/* Scroll to top button */}
       {/* Search */}
       <div className="relative max-w-xl mx-auto">
@@ -399,7 +399,7 @@ const CourseExplorer = () => {
           </div>
           
           {/* Pagination Controls */}
-          <div className="flex justify-center items-center gap-3 mt-6 mb-0">
+          <div className="flex justify-center items-center gap-3 mt-6 mb-12">
             {page > 0 && (
               <Button
                 variant="outline"

@@ -250,7 +250,7 @@ const GlobalTop100 = () => {
   const currentListLabel = listOptions.find((opt) => opt.value === selectedList)?.label || 'Global Top 100';
 
   return (
-    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-12">
+    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-0">
       {/* Top 100 Club Callout */}
       <Top100ClubCallout />
 
@@ -395,7 +395,7 @@ const GlobalTop100 = () => {
           </div>
           
           {/* Pagination Controls */}
-          <div className="flex justify-center items-center gap-3 mt-8 mb-8">
+          <div className="flex justify-center items-center gap-3 mt-6 mb-12">
             {page > 0 && (
               <Button
                 variant="outline"
