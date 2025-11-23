@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
 import { Earth, ArrowLeft } from 'lucide-react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { Button } from '@/components/ui/button';
@@ -24,7 +23,6 @@ interface GolfClubViewProps {
 
 const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false, onClose }) => {
   const { user } = useSupabaseSession();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('about');
 
   const { data: course, isLoading: courseLoading } = useQuery({
@@ -96,7 +94,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {/* Back button - positioned over hero image */}
         {!isInModal && (
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => window.history.back()}
             className="absolute top-3 left-3 md:top-4 md:left-4 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
             aria-label="Go back"
           >
