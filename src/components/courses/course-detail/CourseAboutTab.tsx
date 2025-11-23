@@ -305,7 +305,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseTop100Summary />
 
       {/* Location and Media sections - side by side on desktop, stacked on mobile */}
-      <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
+      <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
         {/* Location Section */}
         <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
           <h2 className="text-base md:text-lg font-semibold">Location</h2>
@@ -371,7 +371,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* Desktop: Visit Website Button at bottom */}
       {course.website_url && (
-        <div className="hidden md:block mt-6 mb-3">
+        <div className="hidden md:block mt-6 mb-6">
           <Button
             onClick={handleWebsiteClick}
             className="w-full flex items-center justify-center gap-2 bg-muted hover:bg-muted/80 text-foreground border"
