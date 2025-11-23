@@ -45,7 +45,7 @@ const AdminRouteProtection: React.FC<AdminRouteProtectionProps> = ({
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 rounded-full bg-orange-500/10 flex items-center justify-center">
-                <AlertTriangle className="h-8 w-8 text-orange-500" />
+                <AlertTriangle className="h-8 w-8 text-slate-500" />
               </div>
             </div>
             <CardTitle className="text-xl">Can't Verify Admin Access</CardTitle>
@@ -96,7 +96,7 @@ const AdminRouteProtection: React.FC<AdminRouteProtectionProps> = ({
                 You don't have permission to access this admin area.
               </p>
               <div className="flex items-center justify-center gap-2 p-3 bg-muted/50 rounded-lg">
-                <AlertTriangle className="h-4 w-4 text-orange-500" />
+                <AlertTriangle className="h-4 w-4 text-slate-500" />
                 <span className="text-sm">
                   Required role: <span className="font-medium">{requiredRole}</span>
                 </span>

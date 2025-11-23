@@ -18,7 +18,7 @@ export default function ChannelTabs({ channel }: { channel: MockChannel }) {
             role="tab"
             aria-selected={tab === t}
             className={`pb-3 -mb-px text-sm font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-orange-300/50 outline-none ${
-              tab === t ? 'border-b-2 border-orange-400 text-foreground' : 'text-muted-foreground'
+              tab === t ? 'border-b-2 border-slate-400 text-foreground' : 'text-muted-foreground'
             }`}
             onClick={() => setTab(t)}
           >

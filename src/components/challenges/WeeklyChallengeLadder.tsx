@@ -26,7 +26,7 @@ export const WeeklyChallengeLadder: React.FC = () => {
     if (!rank) return null;
     if (rank === 1) return <Trophy className="w-5 h-5 text-yellow-500" />;
     if (rank === 2) return <Medal className="w-5 h-5 text-gray-400" />;
-    if (rank === 3) return <Award className="w-5 h-5 text-orange-600" />;
+    if (rank === 3) return <Award className="w-5 h-5 text-slate-600" />;
     return null;
   };
 
