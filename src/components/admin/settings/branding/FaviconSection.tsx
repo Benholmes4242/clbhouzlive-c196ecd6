@@ -75,7 +75,7 @@ const FaviconSection = ({
             />
           </div>
           {faviconFile && (
-            <p className="text-meta text-slate-600 mt-1">
+            <p className="text-meta text-orange-600 mt-1">
               Selected: {faviconFile.name} (will be lost on page refresh)
             </p>
           )}

@@ -33,7 +33,7 @@ const getTierColor = (tier: string) => {
     case 'silver':
       return 'from-gray-300/20 to-gray-400/20 border-gray-400/30';
     case 'bronze':
-      return 'from-slate-600/20 to-slate-800/20 border-slate-600/30';
+      return 'from-orange-600/20 to-orange-800/20 border-orange-600/30';
     default:
       return 'from-muted/20 to-muted/30 border-border';
   }

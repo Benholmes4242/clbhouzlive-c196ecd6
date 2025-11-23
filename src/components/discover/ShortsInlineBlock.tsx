@@ -127,7 +127,7 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
             border: '1px solid rgba(255,255,255,.12)'
           }}
         >
-          <Flame className="w-3 h-3 text-slate-400" />
+          <Flame className="w-3 h-3 text-orange-400" />
           <span className="text-[12px] font-semibold text-white">Trending</span>
         </div>
       </button>

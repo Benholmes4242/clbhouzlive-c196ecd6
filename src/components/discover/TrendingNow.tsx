@@ -118,7 +118,7 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
                 <span className="opacity-70">{formatCount(hashtag.postCount)}</span>
                 {isSelected && (
                   <X 
-                    className="w-3 h-3 ml-1 cursor-pointer hover:text-slate-700" 
+                    className="w-3 h-3 ml-1 cursor-pointer hover:text-orange-900" 
                     onClick={(e) => {
                       e.stopPropagation();
                       handleClearSelection();
