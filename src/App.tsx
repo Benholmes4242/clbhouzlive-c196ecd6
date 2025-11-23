@@ -54,6 +54,7 @@ import { useAchievementSharing } from '@/hooks/useAchievementSharing';
 // Direct import for ProfilePage and Discover to avoid dynamic import issues
 import ProfilePage from "./pages/ProfilePage";
 import Discover from "./pages/Discover";
+import ErrorLogPage from "./pages/ErrorLogPage";
 import { HeaderProvider } from '@/contexts/GlobalHeaderContext';
 
 
@@ -143,7 +144,6 @@ const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 const CreateMomentPage = lazy(() => import("./pages/CreateMomentPage"));
-const ErrorLogPage = lazy(() => import("./pages/ErrorLogPage"));
 
 // Import season wrap modal
 import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
