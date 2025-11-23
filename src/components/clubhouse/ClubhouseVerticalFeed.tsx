@@ -1005,42 +1005,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* Social Dock - Only visible when chrome is hidden */}
-              {visualIndex === index && chromeState === 'hidden' && (
-                <SocialDock
-                  post={{
-                    id: item.id,
-                    user: {
-                      id: item.user?.id || '',
-                      name: item.user?.name || 'Unknown User',
-                      avatar: item.user?.avatar
-                    },
-                    caption: removeGolfCourseFromContent(
-                      (item.title as string | null) ?? (item.ctaDescription as string | null) ?? ''
-                    ),
-                    courseName: item.golfCourse?.name,
-                    holeNumber: undefined,
-                    isLiked: likedPostSet.has(item.id),
-                    isSaved: false,
-                    likes: item.likes || 0,
-                    comments: item.comments || 0,
-                    shares: item.shares || 0,
-                    saves: 0
-                  }}
-                  isVisible={true}
-                  onSwipeUp={() => onPostDetailsOpen?.()}
-                  onProfileClick={() => {
-                    setSelectedUserId(item.user?.id || null);
-                    setShowMiniProfile(true);
-                  }}
-                  onCourseClick={() => console.log('Course clicked')}
-                  onLike={() => handleLike(item.id)}
-                  onComment={() => handleComment(item.id)}
-                  onShare={handleShare}
-                  onSave={() => console.log('Save clicked')}
-                  onSearch={() => console.log('Search clicked')}
-                />
-              )}
+              {/* Social Dock removed from here - now rendered as sibling outside the feed */}
             </div>
           );
         })}
@@ -1124,6 +1089,44 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
       {/* Top Bar */}
       <TopBar isVisible={topBarVisible} />
+
+      {/* Fixed Social Dock - Dynamically updates based on currentIndex */}
+      {chromeState === 'hidden' && filteredPosts[currentIndex] && (
+        <SocialDock
+          post={{
+            id: filteredPosts[currentIndex].id,
+            user: {
+              id: filteredPosts[currentIndex].user?.id || '',
+              name: filteredPosts[currentIndex].user?.name || 'Unknown User',
+              avatar: filteredPosts[currentIndex].user?.avatar
+            },
+            caption: removeGolfCourseFromContent(
+              (filteredPosts[currentIndex].title as string | null) ?? 
+              (filteredPosts[currentIndex].ctaDescription as string | null) ?? ''
+            ),
+            courseName: filteredPosts[currentIndex].golfCourse?.name,
+            holeNumber: undefined,
+            isLiked: likedPostSet.has(filteredPosts[currentIndex].id),
+            isSaved: false,
+            likes: filteredPosts[currentIndex].likes || 0,
+            comments: filteredPosts[currentIndex].comments || 0,
+            shares: filteredPosts[currentIndex].shares || 0,
+            saves: 0
+          }}
+          isVisible={true}
+          onSwipeUp={() => onPostDetailsOpen?.()}
+          onProfileClick={() => {
+            setSelectedUserId(filteredPosts[currentIndex].user?.id || null);
+            setShowMiniProfile(true);
+          }}
+          onCourseClick={() => console.log('Course clicked')}
+          onLike={() => handleLike(filteredPosts[currentIndex].id)}
+          onComment={() => handleComment(filteredPosts[currentIndex].id)}
+          onShare={handleShare}
+          onSave={() => console.log('Save clicked')}
+          onSearch={() => console.log('Search clicked')}
+        />
+      )}
 
       {/* Video Reaction Tray */}
       <VideoReactionTray
