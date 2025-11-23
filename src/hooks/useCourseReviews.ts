@@ -109,7 +109,6 @@ export function useCourseReviews(
 
       return (data as any as CourseReview[]) ?? [];
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 0,
   });
 }

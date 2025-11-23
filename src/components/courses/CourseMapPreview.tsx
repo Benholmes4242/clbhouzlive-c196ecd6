@@ -20,25 +20,22 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const mountedRef = useRef(true);
+  const retryTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
-    mountedRef.current = true;
-
     if (!MAPBOX_TOKEN) return;
     if (!latitude || !longitude) return;
-    if (!mapContainerRef.current) return;
 
-    // If map already exists, just recenter + resize
-    if (mapRef.current) {
-      mapRef.current.setCenter([longitude, latitude]);
-      mapRef.current.resize();
-      return;
-    }
+    const initMap = () => {
+      // If unmounted, abort
+      if (!mapContainerRef.current) return;
 
-    // Single delayed initialization (no retry loop)
-    const timeoutId = window.setTimeout(() => {
-      if (!mountedRef.current || !mapContainerRef.current) return;
+      // If map already exists, just recenter + resize
+      if (mapRef.current) {
+        mapRef.current.setCenter([longitude, latitude]);
+        mapRef.current.resize();
+        return;
+      }
 
       mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -49,37 +46,30 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
         zoom: 13,
         interactive: false, // preview only
         attributionControl: false,
-        maxZoom: 17,
-        minZoom: 2,
       });
 
       mapRef.current = map;
 
       // Resize once the style has loaded to avoid partial renders
       map.on('load', () => {
-        if (mountedRef.current) {
-          map.resize();
-        }
-      });
-
-      // Guard against WebGL issues
-      map.on('error', (e) => {
-        if ((e as any)?.error?.message?.includes('WebGL')) {
-          console.error('[Mapbox Preview] WebGL error, removing map instance', e);
-          map.remove();
-          mapRef.current = null;
-        }
+        map.resize();
       });
 
       // White marker at course location
       new mapboxgl.Marker({ color: '#ffffff' })
         .setLngLat([longitude, latitude])
         .addTo(map);
-    }, 150);
+    };
+
+    // Slight delay to let layout settle
+    retryTimeoutRef.current = window.setTimeout(initMap, 100);
 
     return () => {
-      mountedRef.current = false;
-      window.clearTimeout(timeoutId);
+      // Cleanup map + timeout
+      if (retryTimeoutRef.current != null) {
+        window.clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
 
       if (mapRef.current) {
         mapRef.current.remove();

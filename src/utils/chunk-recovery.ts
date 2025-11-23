@@ -1,13 +1,6 @@
 // Runtime safety net to prevent permanent blank screens from chunk loading errors
 let triedReload = false;
 
-// Prevent unhandled promise rejections from crashing iOS Safari
-window.addEventListener('unhandledrejection', (event) => {
-  // Log but don't crash
-  console.warn('[Unhandled Rejection]', event.reason);
-  event.preventDefault();
-});
-
 window.addEventListener('error', (e) => {
   const msg = String((e && (e as any).message) || '');
   if (!triedReload && (

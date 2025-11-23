@@ -40,36 +40,19 @@ export function useLocationBroadcast() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastWriteRef = useRef<number | null>(null);
   const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);
-  const failureCountRef = useRef<number>(0);
-  const circuitOpenRef = useRef<boolean>(false);
 
   useEffect(() => {
-    // Disable location broadcasting on course detail pages to prevent crashes
-    const isCourseDetail = document.body.getAttribute('data-course-detail') === 'true';
-    
-    // Only broadcast if visibility is active (not hidden) and not on course detail
-    if (!user?.id || visibilityMode === 'hidden' || isCourseDetail) {
+    // Only broadcast if visibility is active (not hidden)
+    if (!user?.id || visibilityMode === 'hidden') {
       // Clear any existing interval
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-      // Reset circuit breaker when disabled
-      failureCountRef.current = 0;
-      circuitOpenRef.current = false;
       return;
     }
 
     const broadcastLocation = async () => {
-      // Circuit breaker: stop trying after 3 consecutive failures
-      if (circuitOpenRef.current) {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-        }
-        return;
-      }
-
       try {
         const now = Date.now();
 
@@ -79,17 +62,7 @@ export function useLocationBroadcast() {
         }
 
         const loc = await getCurrentLocation();
-        if (!loc) {
-          failureCountRef.current++;
-          if (failureCountRef.current >= 2) {
-            // Open circuit breaker after just 2 failures to prevent crash
-            circuitOpenRef.current = true;
-          }
-          return;
-        }
-
-        // Reset failure count on success
-        failureCountRef.current = 0;
+        if (!loc) return;
 
         // Check if user has moved enough to warrant an update
         if (lastLocationRef.current) {
@@ -124,19 +97,9 @@ export function useLocationBroadcast() {
           // Update refs only on successful write
           lastWriteRef.current = now;
           lastLocationRef.current = { lat: loc.lat, lng: loc.lng };
-          failureCountRef.current = 0;
-        } else {
-          failureCountRef.current++;
-          if (failureCountRef.current >= 2) {
-            circuitOpenRef.current = true;
-          }
         }
       } catch (error) {
-        // Silently handle errors to prevent console spam
-        failureCountRef.current++;
-        if (failureCountRef.current >= 2) {
-          circuitOpenRef.current = true;
-        }
+        console.error('[LocationBroadcast] Error:', error);
       }
     };
 

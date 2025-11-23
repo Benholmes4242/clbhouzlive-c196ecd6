@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 export type LocationPermissionState = 'prompt' | 'granted' | 'denied' | 'unavailable';
 
@@ -20,7 +20,7 @@ export function useLocationPermission() {
     }
   }, []);
 
-  const requestPermission = useCallback(async (): Promise<UserLocation | null> => {
+  const requestPermission = async (): Promise<UserLocation | null> => {
     if (!('geolocation' in navigator)) {
       setPermissionState('unavailable');
       setError('Geolocation is not supported by your browser');
@@ -28,36 +28,14 @@ export function useLocationPermission() {
     }
 
     try {
-      // Check permission state first to avoid repeated prompts/errors
-      try {
-        const permission = await navigator.permissions.query({ name: 'geolocation' });
-        if (permission.state === 'denied') {
-          setPermissionState('denied');
-          setError('Location permission denied');
-          return null;
-        }
-      } catch (permError) {
-        // permissions.query not supported on all browsers, continue
-      }
-
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        const timeoutId = setTimeout(() => {
-          reject(new Error('TIMEOUT'));
-        }, 8000);
-
         navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            clearTimeout(timeoutId);
-            resolve(pos);
-          },
-          (err) => {
-            clearTimeout(timeoutId);
-            reject(err);
-          },
+          resolve,
+          reject,
           {
-            enableHighAccuracy: false,
-            timeout: 7000,
-            maximumAge: 300000,
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0,
           }
         );
       });
@@ -73,13 +51,17 @@ export function useLocationPermission() {
       setError(null);
       return location;
     } catch (err: any) {
-      // Silently handle errors to prevent console spam that crashes iOS Safari
-      if (err?.code === 1 || err?.message?.includes('denied')) {
+      console.error('Location permission error:', err);
+      
+      if (err.code === 1) {
+        // PERMISSION_DENIED
         setPermissionState('denied');
         setError('Location permission denied');
-      } else if (err?.code === 2) {
+      } else if (err.code === 2) {
+        // POSITION_UNAVAILABLE
         setError('Location information unavailable');
-      } else if (err?.code === 3 || err?.message?.includes('TIMEOUT')) {
+      } else if (err.code === 3) {
+        // TIMEOUT
         setError('Location request timed out');
       } else {
         setError('Failed to get location');
@@ -87,9 +69,9 @@ export function useLocationPermission() {
       
       return null;
     }
-  }, []);
+  };
 
-  const getCurrentLocation = useCallback(async (): Promise<UserLocation | null> => {
+  const getCurrentLocation = async (): Promise<UserLocation | null> => {
     if (permissionState === 'granted' && currentLocation) {
       // If we recently got location (within 30 seconds), return cached
       if (Date.now() - currentLocation.timestamp < 30000) {
@@ -99,7 +81,7 @@ export function useLocationPermission() {
     
     // Otherwise request fresh location
     return requestPermission();
-  }, [permissionState, currentLocation, requestPermission]);
+  };
 
   return {
     permissionState,

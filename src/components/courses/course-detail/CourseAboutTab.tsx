@@ -244,7 +244,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               onClick={handleRateClick}
               className="w-full justify-center bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
             >
-              Review this course
+              Review & Mark as Played
             </Button>
           </>
         )}
