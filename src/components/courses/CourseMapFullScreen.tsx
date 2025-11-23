@@ -30,6 +30,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const retryTimeoutRef = useRef<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   // Detect iOS
@@ -51,50 +52,41 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
   useEffect(() => {
-    console.log('[Mapbox Fullscreen] Effect triggered:', { open, hasContainer: !!mapContainerRef.current, hasToken: !!MAPBOX_TOKEN, latitude, longitude });
-    
-    // When sheet is closed, clean up map and bail out
+    // When sheet is closed, clean up map & timers and bail out
     if (!open) {
+      if (retryTimeoutRef.current != null) {
+        window.clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
       if (mapRef.current) {
-        console.log('[Mapbox Fullscreen] Cleaning up map');
         mapRef.current.remove();
         mapRef.current = null;
       }
       return;
     }
 
-    if (!MAPBOX_TOKEN) {
-      console.warn('[Mapbox Fullscreen] No Mapbox token');
-      return;
-    }
-    if (!latitude || !longitude) {
-      console.warn('[Mapbox Fullscreen] No coordinates:', { latitude, longitude });
-      return;
-    }
+    if (!MAPBOX_TOKEN) return;
+    if (!latitude || !longitude) return;
 
-    let timeoutId: number | null = null;
     let retryCount = 0;
     const maxRetries = 20; // 2 seconds max wait
 
     const initMap = () => {
-      console.log('[Mapbox Fullscreen] initMap called, retry:', retryCount);
+      // If sheet closed mid-retry, abort
+      if (!open) return;
       
       // Check if container ref is available
       if (!mapContainerRef.current) {
         if (retryCount < maxRetries) {
-          console.warn('[Mapbox Fullscreen] Container ref not ready, retrying in 100ms...');
           retryCount++;
-          timeoutId = window.setTimeout(initMap, 100);
-          return;
-        } else {
-          console.error('[Mapbox Fullscreen] Container ref never became available');
+          retryTimeoutRef.current = window.setTimeout(initMap, 100);
           return;
         }
+        return;
       }
 
       // If map already exists (e.g. re-open), just recenter + resize
       if (mapRef.current) {
-        console.log('[Mapbox Fullscreen] Map exists, recentering');
         mapRef.current.setCenter([longitude, latitude]);
         mapRef.current.resize();
         return;
@@ -102,22 +94,16 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
 
       const container = mapContainerRef.current;
       const height = container.offsetHeight;
-      const width = container.offsetWidth;
-      console.log('[Mapbox Fullscreen] Container dimensions:', { width, height });
       
       if (height === 0) {
         if (retryCount < maxRetries) {
-          console.warn('[Mapbox Fullscreen] Container has no height, retrying in 100ms...');
           retryCount++;
-          timeoutId = window.setTimeout(initMap, 100);
-          return;
-        } else {
-          console.error('[Mapbox Fullscreen] Container never got height');
+          retryTimeoutRef.current = window.setTimeout(initMap, 100);
           return;
         }
+        return;
       }
 
-      console.log('[Mapbox Fullscreen] Initializing Mapbox with token');
       mapboxgl.accessToken = MAPBOX_TOKEN;
 
       try {
@@ -130,7 +116,6 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
         });
 
         mapRef.current = map;
-        console.log('[Mapbox Fullscreen] Map instance created');
 
         // Navigation controls
         map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
@@ -142,27 +127,25 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
 
         // Ensure correct size once everything is loaded
         map.on('load', () => {
-          console.log('[Mapbox Fullscreen] Map loaded, resizing');
           map.resize();
         });
-
-        // Extra safety: resize again shortly after load
-        window.setTimeout(() => {
-          console.log('[Mapbox Fullscreen] Secondary resize');
-          map.resize();
-        }, 200);
       } catch (error) {
         console.error('[Mapbox Fullscreen] Error creating map:', error);
       }
     };
 
     // Start trying to initialize after a short delay for Sheet animation
-    console.log('[Mapbox Fullscreen] Scheduling initMap in 250ms');
-    timeoutId = window.setTimeout(initMap, 250);
+    retryTimeoutRef.current = window.setTimeout(initMap, 300);
 
     return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-      // Cleanup handled at the top when open becomes false
+      if (retryTimeoutRef.current != null) {
+        window.clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
   }, [open, latitude, longitude]);
 

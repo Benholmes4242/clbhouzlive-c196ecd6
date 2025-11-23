@@ -56,9 +56,9 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
     setActiveTab(value);
   };
 
-  // Generate reset key based on activeTab and navigation
-  // This will trigger filter resets when switching tabs or navigating back to the page
-  const resetKey = `${activeTab}-${location.key}`;
+  // Generate reset key based on activeTab only
+  // This will trigger filter resets when switching tabs, but not on every navigation
+  const resetKey = activeTab;
 
   // Dynamic subtitle logic
   const getSubtitle = () => {
