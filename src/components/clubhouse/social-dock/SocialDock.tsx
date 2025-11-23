@@ -67,15 +67,16 @@ export const SocialDock: React.FC<SocialDockProps> = ({
   return (
     <div
       className={cn(
-        'fixed left-3 right-3 z-[80] rounded-3xl px-4 py-3',
+        'fixed left-0 right-0 z-[80] rounded-t-3xl px-4 py-3',
         'transition-all duration-200 ease-out',
         isVisible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
       )}
       style={{
-        bottom: 'calc(72px + env(safe-area-inset-bottom, 8px))',
+        bottom: 0,
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
         background: 'rgba(15, 15, 15, 0.75)',
         backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
       }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
