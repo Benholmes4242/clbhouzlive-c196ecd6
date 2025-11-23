@@ -333,7 +333,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
           <h2 className="text-base md:text-lg font-semibold">Location</h2>
           <p className="text-sm md:text-base text-foreground">
-            {[course.sub_country, course.region].filter(Boolean).join(', ')}
+            {[course.sub_country, course.country].filter(Boolean).join(', ')}
           </p>
           
           {/* Map preview */}
