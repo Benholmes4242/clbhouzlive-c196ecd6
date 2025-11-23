@@ -373,7 +373,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* Desktop: Visit Website Button at bottom */}
       {course.website_url && (
-        <div className="hidden md:block mt-6">
+        <div className="hidden md:block mt-6 mb-3">
           <Button
             onClick={handleWebsiteClick}
             className="w-full flex items-center justify-center gap-2 bg-muted hover:bg-muted/80 text-foreground border"

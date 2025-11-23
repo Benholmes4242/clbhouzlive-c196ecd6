@@ -82,7 +82,7 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
   const getRankBadgeClass = (rank: number) => {
     if (rank === 0) return "bg-amber-100 text-amber-700"; // Gold
     if (rank === 1) return "bg-slate-100 text-slate-700"; // Silver
-    if (rank === 2) return "bg-orange-100 text-orange-700"; // Bronze
+    if (rank === 2) return "bg-slate-100 text-slate-700"; // Bronze
     return "bg-muted text-muted-foreground";
   };
 

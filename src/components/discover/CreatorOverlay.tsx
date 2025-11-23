@@ -45,7 +45,7 @@ const CreatorOverlay: React.FC<CreatorOverlayProps> = ({ user, onCreatorClick })
             {displayName}
           </span>
           {user.verified && (
-            <FiCheckCircle className="w-3.5 h-3.5 text-orange-400 flex-shrink-0" />
+            <FiCheckCircle className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
           )}
         </div>
       </button>

@@ -58,7 +58,7 @@ const HashtagAutocomplete: React.FC<HashtagAutocompleteProps> = ({
                   {hashtag.tag}
                 </span>
                 {hashtag.count > 500 && (
-                  <TrendingUp className="w-3 h-3 text-orange-500" />
+                  <TrendingUp className="w-3 h-3 text-slate-500" />
                 )}
               </div>
               <div className="text-xs text-gray-500 truncate">
