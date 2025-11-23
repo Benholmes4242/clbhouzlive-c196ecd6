@@ -80,6 +80,8 @@ export default {
 				'icon-secondary': 'var(--icon-secondary)',
 				'icon-disabled': 'var(--icon-disabled)',
 				'primary-accent': 'var(--primary-accent)',
+				'cta-text': 'var(--cta-text-color)',
+				'cta-text-dark': 'var(--cta-text-color-dark)',
 				'border-subtle': 'var(--border-subtle)',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
