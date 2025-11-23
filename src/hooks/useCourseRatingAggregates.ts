@@ -28,6 +28,7 @@ export function useCourseRatingAggregates(courseId: string | undefined) {
       if (error) throw error;
       return (data || null) as unknown as CourseRatingAggregate | null;
     },
-    staleTime: 0,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 }

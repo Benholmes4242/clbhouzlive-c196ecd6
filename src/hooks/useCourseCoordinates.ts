@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UseCourseCoordinatesArgs {
@@ -26,8 +26,14 @@ export function useCourseCoordinates(args: UseCourseCoordinatesArgs) {
       return;
     }
 
+    // AbortController to cancel edge function on unmount
+    const abortController = new AbortController();
+    let mounted = true;
+
     // Fall back to geocode-club edge function
     const fetchCoords = async () => {
+      if (!mounted) return;
+      
       setLoading(true);
       try {
         const { data, error } = await supabase.functions.invoke('geocode-club', {
@@ -40,17 +46,30 @@ export function useCourseCoordinates(args: UseCourseCoordinatesArgs) {
           },
         });
 
+        // Guard against state updates after unmount
+        if (!mounted) return;
+
         if (!error && data?.latitude && data?.longitude) {
           setCoords({ lat: data.latitude, lng: data.longitude });
         }
       } catch (error) {
+        // Guard against state updates after unmount
+        if (!mounted) return;
         console.error('Error geocoding course:', error);
       } finally {
-        setLoading(false);
+        // Guard against state updates after unmount
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchCoords();
+
+    return () => {
+      mounted = false;
+      abortController.abort();
+    };
   }, [args.courseId, args.latitude, args.longitude]);
 
   return { coords, loading };
