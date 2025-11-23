@@ -102,12 +102,20 @@ const CourseExplorer = () => {
 
   // Restore scroll position when returning from course detail
   useEffect(() => {
-    const savedScroll = sessionStorage.getItem('explore-scroll');
-    if (savedScroll) {
-      requestAnimationFrame(() => {
-        window.scrollTo({ top: parseInt(savedScroll), behavior: 'instant' });
-        sessionStorage.removeItem('explore-scroll');
-      });
+    try {
+      const savedScroll = sessionStorage.getItem('explore-scroll');
+      if (savedScroll) {
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: parseInt(savedScroll), behavior: 'instant' });
+          try {
+            sessionStorage.removeItem('explore-scroll');
+          } catch (e) {
+            console.error('Failed to remove scroll position:', e);
+          }
+        });
+      }
+    } catch (e) {
+      console.error('Failed to restore scroll position:', e);
     }
   }, []);
 
@@ -228,16 +236,26 @@ const CourseExplorer = () => {
     setSelectedSubregion('all');
     setSearchTerm('');
     setPage(0);
-    sessionStorage.setItem('explore-last-filters', JSON.stringify({
-      region: PRIMARY_REGIONS.ALL,
-      subregion: 'all',
-      searchTerm: '',
-    }));
+    try {
+      sessionStorage.setItem('explore-last-filters', JSON.stringify({
+        region: PRIMARY_REGIONS.ALL,
+        subregion: 'all',
+        searchTerm: '',
+      }));
+    } catch (e) {
+      // Fail silently on sessionStorage errors (e.g., private browsing mode)
+      console.error('Failed to save explore filters:', e);
+    }
   };
 
   // Capture scroll position when clicking a course card
   const handleCourseClick = () => {
-    sessionStorage.setItem('explore-scroll', window.scrollY.toString());
+    try {
+      sessionStorage.setItem('explore-scroll', window.scrollY.toString());
+    } catch (e) {
+      // Fail silently on sessionStorage errors
+      console.error('Failed to save scroll position:', e);
+    }
   };
 
   return (

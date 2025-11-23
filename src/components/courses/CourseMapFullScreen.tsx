@@ -68,10 +68,15 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
     if (!MAPBOX_TOKEN) return;
     if (!latitude || !longitude) return;
 
+    // Mounted guard to prevent operations after unmount
+    let mounted = true;
     let retryCount = 0;
     const maxRetries = 20; // 2 seconds max wait
 
     const initMap = () => {
+      // Check if still mounted before any operations
+      if (!mounted) return;
+      
       // If sheet closed mid-retry, abort
       if (!open) return;
       
@@ -115,6 +120,12 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
           interactive: true,
         });
 
+        // Check if still mounted after map creation
+        if (!mounted) {
+          map.remove();
+          return;
+        }
+
         mapRef.current = map;
 
         // Navigation controls
@@ -127,7 +138,9 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
 
         // Ensure correct size once everything is loaded
         map.on('load', () => {
-          map.resize();
+          if (mounted) {
+            map.resize();
+          }
         });
       } catch (error) {
         console.error('[Mapbox Fullscreen] Error creating map:', error);
@@ -138,6 +151,9 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
     retryTimeoutRef.current = window.setTimeout(initMap, 300);
 
     return () => {
+      // Mark as unmounted first
+      mounted = false;
+      
       if (retryTimeoutRef.current != null) {
         window.clearTimeout(retryTimeoutRef.current);
         retryTimeoutRef.current = null;

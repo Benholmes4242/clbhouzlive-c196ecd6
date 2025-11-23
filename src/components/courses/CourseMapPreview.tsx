@@ -26,7 +26,13 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
     if (!MAPBOX_TOKEN) return;
     if (!latitude || !longitude) return;
 
+    // Mounted guard to prevent operations after unmount
+    let mounted = true;
+
     const initMap = () => {
+      // Check if still mounted before initializing
+      if (!mounted) return;
+      
       // If unmounted, abort
       if (!mapContainerRef.current) return;
 
@@ -52,7 +58,9 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
 
       // Resize once the style has loaded to avoid partial renders
       map.on('load', () => {
-        map.resize();
+        if (mounted) {
+          map.resize();
+        }
       });
 
       // White marker at course location
@@ -65,6 +73,9 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
     retryTimeoutRef.current = window.setTimeout(initMap, 100);
 
     return () => {
+      // Mark as unmounted first
+      mounted = false;
+      
       // Cleanup map + timeout
       if (retryTimeoutRef.current != null) {
         window.clearTimeout(retryTimeoutRef.current);
