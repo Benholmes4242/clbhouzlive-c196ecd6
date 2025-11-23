@@ -30,7 +30,6 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const retryTimeoutRef = useRef<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   // Detect iOS
@@ -52,12 +51,8 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
   useEffect(() => {
-    // When sheet is closed, clean up map & timers and bail out
+    // When sheet is closed, clean up map
     if (!open) {
-      if (retryTimeoutRef.current != null) {
-        window.clearTimeout(retryTimeoutRef.current);
-        retryTimeoutRef.current = null;
-      }
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
@@ -67,81 +62,55 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
 
     if (!MAPBOX_TOKEN) return;
     if (!latitude || !longitude) return;
+    if (!mapContainerRef.current) return;
 
-    let retryCount = 0;
-    const maxRetries = 20; // 2 seconds max wait
+    // If map already exists, just recenter + resize
+    if (mapRef.current) {
+      mapRef.current.setCenter([longitude, latitude]);
+      mapRef.current.resize();
+      return;
+    }
 
-    const initMap = () => {
-      // If sheet closed mid-retry, abort
-      if (!open) return;
-      
-      // Check if container ref is available
-      if (!mapContainerRef.current) {
-        if (retryCount < maxRetries) {
-          retryCount++;
-          retryTimeoutRef.current = window.setTimeout(initMap, 100);
-          return;
-        }
-        return;
+    mapboxgl.accessToken = MAPBOX_TOKEN;
+
+    const map = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: MAPBOX_STYLE,
+      center: [longitude, latitude],
+      zoom: 13,
+      interactive: true,
+      maxZoom: 17,
+      minZoom: 2,
+      dragRotate: false,
+      pitchWithRotate: false,
+      touchPitch: false,
+    });
+
+    mapRef.current = map;
+
+    // Navigation controls
+    map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
+
+    // Marker
+    new mapboxgl.Marker({ color: '#ffffff' })
+      .setLngLat([longitude, latitude])
+      .addTo(map);
+
+    // Ensure correct size once everything is loaded
+    map.on('load', () => {
+      map.resize();
+    });
+
+    // Guard against WebGL issues
+    map.on('error', (e) => {
+      if ((e as any)?.error?.message?.includes('WebGL')) {
+        console.error('[Mapbox] WebGL error, removing map instance', e);
+        map.remove();
+        mapRef.current = null;
       }
-
-      // If map already exists (e.g. re-open), just recenter + resize
-      if (mapRef.current) {
-        mapRef.current.setCenter([longitude, latitude]);
-        mapRef.current.resize();
-        return;
-      }
-
-      const container = mapContainerRef.current;
-      const height = container.offsetHeight;
-      
-      if (height === 0) {
-        if (retryCount < maxRetries) {
-          retryCount++;
-          retryTimeoutRef.current = window.setTimeout(initMap, 100);
-          return;
-        }
-        return;
-      }
-
-      mapboxgl.accessToken = MAPBOX_TOKEN;
-
-      try {
-        const map = new mapboxgl.Map({
-          container: container,
-          style: MAPBOX_STYLE,
-          center: [longitude, latitude],
-          zoom: 13,
-          interactive: true,
-        });
-
-        mapRef.current = map;
-
-        // Navigation controls
-        map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
-
-        // Marker
-        new mapboxgl.Marker({ color: '#ffffff' })
-          .setLngLat([longitude, latitude])
-          .addTo(map);
-
-        // Ensure correct size once everything is loaded
-        map.on('load', () => {
-          map.resize();
-        });
-      } catch (error) {
-        console.error('[Mapbox Fullscreen] Error creating map:', error);
-      }
-    };
-
-    // Start trying to initialize after a short delay for Sheet animation
-    retryTimeoutRef.current = window.setTimeout(initMap, 300);
+    });
 
     return () => {
-      if (retryTimeoutRef.current != null) {
-        window.clearTimeout(retryTimeoutRef.current);
-        retryTimeoutRef.current = null;
-      }
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
