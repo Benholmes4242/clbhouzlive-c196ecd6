@@ -253,40 +253,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <CourseFriendsStrip courseId={course.id} courseName={course.name} />
       </section>
 
-      {/* Your Overall Rating Section */}
-      {user && userRating && ratingAggregates && ratingAggregates.review_count > 0 && (() => {
-        const userOverall = userRating.rating;
-        const communityOverall = ratingAggregates.avg_overall_score || 0;
-        const delta = Number((userOverall - communityOverall).toFixed(1));
-
-        return (
-          <section className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
-                  Your Overall Rating
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {delta === 0
-                    ? 'You and the community are almost identical.'
-                    : delta > 0
-                    ? `You rate this course ${delta.toFixed(1)} ${delta === 1 ? 'point' : 'points'} higher than the community.`
-                    : `You rate this course ${Math.abs(delta).toFixed(1)} ${Math.abs(delta) === 1 ? 'point' : 'points'} lower than the community.`}
-                </p>
-              </div>
-              <div className="flex flex-col items-end">
-                <div className="flex flex-col items-center">
-                  <span className="text-lg font-semibold">
-                    {formatScore(userOverall)}/10
-                  </span>
-                  <span className="text-xs text-muted-foreground">Your rating</span>
-                </div>
-              </div>
-            </div>
-          </section>
-        );
-      })()}
-
       {/* Your Rating vs Community Comparison */}
       {user && userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
         <RatingComparisonCard userRating={userRating} aggregates={ratingAggregates} />
