@@ -156,7 +156,18 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
         className="h-[85vh] sm:h-[80vh] flex flex-col p-0"
         {...swipeHandlers}
       >
-        <div className="flex flex-col h-full px-4 pt-4 pb-3 gap-4">
+        {/* Grabber bar */}
+        <div 
+          className="absolute left-1/2 -translate-x-1/2 rounded-full"
+          style={{
+            top: 'calc(8px + env(safe-area-inset-top, 0px))',
+            width: 36,
+            height: 5,
+            background: 'rgba(255, 255, 255, 0.25)',
+          }}
+        />
+        
+        <div className="flex flex-col h-full px-4 pt-[calc(8px+env(safe-area-inset-top,0px)+5px+12px)] pb-3 gap-4">
           {/* Header */}
           <div className="flex items-start justify-between">
             <div>
@@ -181,7 +192,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
           </div>
 
           {/* Navigation CTAs */}
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 pb-3">
             {isIOS && (
               <Button
                 className="flex-1 bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
