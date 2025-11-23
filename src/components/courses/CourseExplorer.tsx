@@ -119,14 +119,37 @@ const CourseExplorer = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Scroll-to-top button visibility
+  // Scroll-to-top button visibility with throttling
   useEffect(() => {
+    let ticking = false;
+    
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 600);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setShowScrollTop(window.scrollY > 600);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  // Cleanup on unmount - clear sessionStorage to prevent stale state on revisit
+  useEffect(() => {
+    return () => {
+      try {
+        sessionStorage.removeItem('explore-scroll');
+        sessionStorage.removeItem('explore-last-filters');
+      } catch (e) {
+        console.error('Failed to clear explore storage:', e);
+      }
+    };
   }, []);
 
   // Reset page when filters change
