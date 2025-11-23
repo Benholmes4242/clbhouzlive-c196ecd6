@@ -21,7 +21,11 @@ import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import CommentsModal from '@/components/posts/CommentsModal';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
 import { AudioStrip } from './AudioStrip';
-import { ClubhouseGlassTile } from './ClubhouseGlassTile';
+import { SocialDock } from './social-dock/SocialDock';
+import { GlobalNav } from './social-dock/GlobalNav';
+import { TopBar } from './social-dock/TopBar';
+import { VideoReactionTray } from './social-dock/VideoReactionTray';
+import { useTopBarVisibility } from '@/hooks/useTopBarVisibility';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
@@ -51,6 +55,7 @@ interface ClubhouseVerticalFeedProps {
   onCommentsOpenChange?: (isOpen: boolean) => void;
   onProfileOpenChange?: (isOpen: boolean) => void;
   chromeState?: 'visible' | 'hidden';
+  onPostDetailsOpen?: () => void;
 }
 
 // VideoWithAutoplay component moved outside to prevent recreation on re-renders
@@ -125,8 +130,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onActiveVideoRefChange,
   onCommentsOpenChange,
   onProfileOpenChange,
-  chromeState = 'visible'
+  chromeState = 'visible',
+  onPostDetailsOpen
 }) => {
+  const { isVisible: topBarVisible, resetTimer: resetTopBar } = useTopBarVisibility();
+  const [showVideoReactions, setShowVideoReactions] = useState(false);
+  const [reactionPosition, setReactionPosition] = useState({ x: 0, y: 0 });
   const { user } = useSupabaseSession();
   
   // Portrait-only aspect ratio constant (height/width >= 1.2)
@@ -997,38 +1006,40 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* Glass Tile - Only visible when chrome is hidden */}
+              {/* Social Dock - Only visible when chrome is hidden */}
               {visualIndex === index && chromeState === 'hidden' && (
-                <ClubhouseGlassTile
+                <SocialDock
                   post={{
                     id: item.id,
                     user: {
                       id: item.user?.id || '',
                       name: item.user?.name || 'Unknown User',
-                      avatar: item.user?.avatar,
-                      username: item.user?.username
+                      avatar: item.user?.avatar
                     },
                     caption: removeGolfCourseFromContent(
                       (item.title as string | null) ?? (item.ctaDescription as string | null) ?? ''
                     ),
-                    stats: {
-                      likes: item.likes || 0,
-                      comments: item.comments || 0,
-                      shares: item.shares || 0,
-                      saves: 0
-                    },
-                    hasLiked: likedPostSet.has(item.id),
-                    hasSaved: false
+                    courseName: item.golfCourse?.name,
+                    holeNumber: undefined,
+                    isLiked: likedPostSet.has(item.id),
+                    isSaved: false,
+                    likes: item.likes || 0,
+                    comments: item.comments || 0,
+                    shares: item.shares || 0,
+                    saves: 0
                   }}
                   isVisible={true}
+                  onSwipeUp={() => onPostDetailsOpen?.()}
                   onProfileClick={() => {
                     setSelectedUserId(item.user?.id || null);
                     setShowMiniProfile(true);
                   }}
-                  onLikeClick={() => handleLike(item.id)}
-                  onCommentClick={() => handleComment(item.id)}
-                  onShareClick={handleShare}
-                  onSaveClick={() => console.log('Save clicked')}
+                  onCourseClick={() => console.log('Course clicked')}
+                  onLike={() => handleLike(item.id)}
+                  onComment={() => handleComment(item.id)}
+                  onShare={handleShare}
+                  onSave={() => console.log('Save clicked')}
+                  onSearch={() => console.log('Search clicked')}
                 />
               )}
             </div>
@@ -1110,6 +1121,23 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         onFollow={() => {
           // Handle follow action - could update local state or refetch
         }}
+      />
+
+      {/* Top Bar */}
+      <TopBar isVisible={topBarVisible} />
+
+      {/* Global Nav */}
+      <GlobalNav />
+
+      {/* Video Reaction Tray */}
+      <VideoReactionTray
+        isVisible={showVideoReactions}
+        position={reactionPosition}
+        onEmojiSelect={(emoji) => {
+          console.log('Emoji selected:', emoji);
+          setShowVideoReactions(false);
+        }}
+        onCancel={() => setShowVideoReactions(false)}
       />
     </div>
   );
