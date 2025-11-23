@@ -67,7 +67,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
     <div
       className={cn(
         'fixed left-0 right-0 z-[80] rounded-t-3xl px-4 py-3',
-        'transition-all duration-200 ease-out',
+        'transition-all ease-[cubic-bezier(0.19,1,0.22,1)]',
         isVisible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
       )}
       style={{
@@ -76,6 +76,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
         background: 'rgba(15, 15, 15, 0.75)',
         backdropFilter: 'blur(20px)',
         borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        transitionDuration: '220ms',
       }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}

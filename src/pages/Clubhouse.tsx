@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
@@ -95,15 +95,48 @@ const Clubhouse = () => {
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
   const [isCommentsDrawerOpen, setIsCommentsDrawerOpen] = useState(false);
   
+  // Nav overlay state for quick recall
+  const [navOverlayVisible, setNavOverlayVisible] = useState(false);
+  const navOverlayTimer = useRef<number | null>(null);
+  
+  const showNavOverlay = useCallback(() => {
+    setNavOverlayVisible(true);
+    if (navOverlayTimer.current) {
+      clearTimeout(navOverlayTimer.current);
+    }
+    navOverlayTimer.current = window.setTimeout(() => {
+      setNavOverlayVisible(false);
+    }, 2500);
+  }, []);
+  
+  const hideNavOverlay = useCallback(() => {
+    setNavOverlayVisible(false);
+    if (navOverlayTimer.current) {
+      clearTimeout(navOverlayTimer.current);
+      navOverlayTimer.current = null;
+    }
+  }, []);
+  
   // Chrome auto-hide state - force hidden when any overlay is open
   const isAnyOverlayOpen = isProfileDrawerOpen || isCommentsDrawerOpen || isComposerOpen;
   const chromeControls = useChromeState({
     forceHidden: isAnyOverlayOpen,
-    disabled: false // Set to true via env var for emergency rollback
+    disabled: false, // Set to true via env var for emergency rollback
+    onNavOverlayRequest: showNavOverlay
   });
   
   // Chrome anchors for dynamic re-positioning
   useChromeAnchors();
+  
+  // Apply nav overlay class to body
+  useEffect(() => {
+    if (navOverlayVisible) {
+      document.body.classList.add('chrome-nav-overlay');
+    } else {
+      document.body.classList.remove('chrome-nav-overlay');
+    }
+    return () => document.body.classList.remove('chrome-nav-overlay');
+  }, [navOverlayVisible]);
 
   // Check which posts the user has liked
   const { data: likedPosts } = useQuery({
@@ -263,7 +296,6 @@ const Clubhouse = () => {
             isLoadingMore={isLoadingMore}
             onCurrentPostChange={handleCurrentPostChange}
             onScroll={chromeControls.handleScroll}
-            onTap={chromeControls.handleTap}
             onTouchStart={chromeControls.handleTouchStart}
             onTouchMove={chromeControls.handleTouchMove}
             onTouchEnd={chromeControls.handleTouchEnd}
@@ -274,6 +306,7 @@ const Clubhouse = () => {
             onProfileOpenChange={setIsProfileDrawerOpen}
             chromeState={chromeControls.chromeState}
             onPostDetailsOpen={() => console.log('Post details opened')}
+            onDismissNavOverlay={hideNavOverlay}
           />
         ) : isLoading ? (
           <div className="flex items-center justify-center min-h-screen">

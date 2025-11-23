@@ -46,7 +46,6 @@ interface ClubhouseVerticalFeedProps {
   isLoadingMore: boolean;
   onCurrentPostChange?: (index: number) => void;
   onScroll?: (scrollTop: number) => void;
-  onTap?: (event: React.MouseEvent | React.TouchEvent) => void;
   onTouchStart?: (event: React.TouchEvent) => void;
   onTouchMove?: (event: React.TouchEvent) => void;
   onTouchEnd?: (event: React.TouchEvent) => void;
@@ -55,6 +54,7 @@ interface ClubhouseVerticalFeedProps {
   onProfileOpenChange?: (isOpen: boolean) => void;
   chromeState?: 'visible' | 'hidden';
   onPostDetailsOpen?: () => void;
+  onDismissNavOverlay?: () => void;
 }
 
 // VideoWithAutoplay component moved outside to prevent recreation on re-renders
@@ -122,7 +122,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   isLoadingMore,
   onCurrentPostChange,
   onScroll,
-  onTap,
   onTouchStart,
   onTouchMove,
   onTouchEnd,
@@ -130,7 +129,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onCommentsOpenChange,
   onProfileOpenChange,
   chromeState = 'visible',
-  onPostDetailsOpen
+  onPostDetailsOpen,
+  onDismissNavOverlay
 }) => {
   const { isVisible: topBarVisible, resetTimer: resetTopBar } = useTopBarVisibility();
   const [showVideoReactions, setShowVideoReactions] = useState(false);
@@ -491,8 +491,86 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       setTimeout(() => {
         setShowTapHeart(prev => ({ ...prev, [postId]: false }));
       }, 450);
+      
+      return true; // Signal that double-tap was handled
     }
+    
+    return false; // Not a double-tap
   }, [likedPosts, user?.id]);
+  
+  // Video play/pause state
+  const [videoControlsVisible, setVideoControlsVisible] = useState<Record<string, boolean>>({});
+  const [videosPlaying, setVideosPlaying] = useState<Record<string, boolean>>({});
+  const controlsHideTimers = useRef<Record<string, number>>({});
+  
+  // Single tap handler for video play/pause
+  const handleVideoSingleTap = useCallback((postId: string, e: React.MouseEvent | React.TouchEvent) => {
+    // Check if this is a double-tap first
+    const isDoubleTap = handleDoubleTap(postId, e);
+    if (isDoubleTap) return;
+    
+    // Dismiss nav overlay if active
+    if (onDismissNavOverlay) {
+      onDismissNavOverlay();
+    }
+    
+    // Wait a tiny bit to ensure this isn't a double-tap
+    setTimeout(() => {
+      const wasDouble = Date.now() - (lastTapRef.current[postId] || 0) < 300;
+      if (wasDouble) return; // Don't execute single tap if double-tap just occurred
+      
+      // Toggle play/pause
+      const videoEl = videoRefs.current[postId];
+      if (!videoEl) return;
+      
+      const isCurrentlyPlaying = !videoEl.paused;
+      if (isCurrentlyPlaying) {
+        videoEl.pause();
+        setVideosPlaying(prev => ({ ...prev, [postId]: false }));
+      } else {
+        videoEl.play();
+        setVideosPlaying(prev => ({ ...prev, [postId]: true }));
+      }
+      
+      // Show controls briefly
+      setVideoControlsVisible(prev => ({ ...prev, [postId]: true }));
+      
+      // Clear existing timer
+      if (controlsHideTimers.current[postId]) {
+        clearTimeout(controlsHideTimers.current[postId]);
+      }
+      
+      // Auto-hide controls after 2s
+      controlsHideTimers.current[postId] = window.setTimeout(() => {
+        setVideoControlsVisible(prev => ({ ...prev, [postId]: false }));
+      }, 2000);
+    }, 320); // Wait just past double-tap window
+  }, [handleDoubleTap, onDismissNavOverlay]);
+  
+  // Video long press handler for reactions
+  const videoLongPressTimers = useRef<Record<string, number>>({});
+  
+  const handleVideoLongPressStart = useCallback((e: React.TouchEvent, postId: string) => {
+    const touch = e.touches[0];
+    const position = {
+      x: touch.clientX,
+      y: touch.clientY
+    };
+    
+    // Start long-press timer
+    videoLongPressTimers.current[postId] = window.setTimeout(() => {
+      setReactionPosition(position);
+      setShowVideoReactions(true);
+      resetTopBar(); // Reset top bar timer on interaction
+    }, 400); // 400ms for long-press
+  }, [resetTopBar]);
+  
+  const handleVideoLongPressEnd = useCallback((postId: string) => {
+    if (videoLongPressTimers.current[postId]) {
+      clearTimeout(videoLongPressTimers.current[postId]);
+      delete videoLongPressTimers.current[postId];
+    }
+  }, []);
 
   // Helper function to truncate text to 9 words
   const truncateToWords = (text: string, wordLimit: number = 9) => {
@@ -768,7 +846,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         ref={scrollViewRef}
         className="h-full w-full overflow-y-auto snap-y snap-mandatory"
         onScroll={handleScroll}
-        onClick={onTap}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
@@ -868,16 +945,25 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
             >
               {/* Media Content */}
               <div 
-                onClick={(e) => handleDoubleTap(item.id, e)}
+                onClick={(e) => {
+                  if (currentMedia.media_type === 'video') {
+                    handleVideoSingleTap(item.id, e);
+                  }
+                }}
                 onTouchStart={(e) => {
+                  if (currentMedia.media_type === 'video') {
+                    handleVideoLongPressStart(e, item.id);
+                  }
+                  
                   if (hasMultipleMedia) {
                     (e.currentTarget as any).touchStartX = e.touches[0].clientX;
                     (e.currentTarget as any).touchStartY = e.touches[0].clientY;
                   }
                 }}
                 onTouchEnd={(e) => {
-                  // Handle double-tap for likes
-                  handleDoubleTap(item.id, e);
+                  if (currentMedia.media_type === 'video') {
+                    handleVideoLongPressEnd(item.id);
+                  }
                   
                   if (!hasMultipleMedia) return;
                   
@@ -919,22 +1005,41 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 )}
                 
                 {currentMedia.media_type === 'video' ? (
-                  <VideoWithAutoplay
-                    ref={(el) => {
-                      videoRefs.current[item.id] = el;
-                      // If this is the current post, notify parent immediately
-                      if (index === currentIndex && el && onActiveVideoRefChange) {
-                        onActiveVideoRefChange(el);
-                      }
-                    }}
-                    src={currentMedia.media_url}
-                    muted={isGloballyMuted}
-                    className="w-full h-full"
-                    isMobile={isMobile}
-                    shouldAttach={!!shouldAttachMap[item.id]}
-                    autoplay={!!autoplayMap[item.id]}
-                    isNearby={isNearby}
-                  />
+                  <>
+                    <VideoWithAutoplay
+                      ref={(el) => {
+                        videoRefs.current[item.id] = el;
+                        // If this is the current post, notify parent immediately
+                        if (index === currentIndex && el && onActiveVideoRefChange) {
+                          onActiveVideoRefChange(el);
+                        }
+                      }}
+                      src={currentMedia.media_url}
+                      muted={isGloballyMuted}
+                      className="w-full h-full"
+                      isMobile={isMobile}
+                      shouldAttach={!!shouldAttachMap[item.id]}
+                      autoplay={!!autoplayMap[item.id]}
+                      isNearby={isNearby}
+                    />
+                    
+                    {/* Simple video controls overlay */}
+                    {videoControlsVisible[item.id] && (
+                      <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-30">
+                        <div className="bg-black/60 rounded-full p-4 backdrop-blur-sm animate-fade-in">
+                          {videosPlaying[item.id] !== false ? (
+                            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                            </svg>
+                          ) : (
+                            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z"/>
+                            </svg>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <div className="relative w-full h-full bg-black overflow-hidden">
                     <img

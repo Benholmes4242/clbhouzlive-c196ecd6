@@ -5,6 +5,7 @@ export type ChromeState = 'visible' | 'hidden';
 interface UseChromeStateOptions {
   forceHidden?: boolean;
   disabled?: boolean;
+  onNavOverlayRequest?: () => void;
 }
 
 interface ScrollMetrics {
@@ -19,7 +20,7 @@ const HIDE_DEBOUNCE_MS = 140;
 const REVEAL_DEBOUNCE_MS = 140;
 const REVEAL_DEBOUNCE_AT_TOP_MS = 0; // Instant reveal at top
 
-export const useChromeState = ({ forceHidden = false, disabled = false }: UseChromeStateOptions = {}) => {
+export const useChromeState = ({ forceHidden = false, disabled = false, onNavOverlayRequest }: UseChromeStateOptions = {}) => {
   const [chromeState, setChromeState] = useState<ChromeState>('visible');
   const scrollMetricsRef = useRef<ScrollMetrics>({ deltaY: 0, scrollTop: 0, velocity: 0 });
   const lastScrollTop = useRef(0);
@@ -197,7 +198,7 @@ export const useChromeState = ({ forceHidden = false, disabled = false }: UseChr
   }, [disabled]);
 
   const handleTouchMove = useCallback((event: React.TouchEvent) => {
-    if (forceHiddenRef.current || disabled) return;
+    if (disabled) return;
     if (!edgeSwipeRef.current.isEdge) return;
 
     const touch = event.touches[0];
@@ -207,17 +208,29 @@ export const useChromeState = ({ forceHidden = false, disabled = false }: UseChr
 
     const SWIPE_THRESHOLD = 12;
 
-    // Top edge: swipe down to reveal
-    if (edgeSwipeRef.current.isTop && distance > 0 && absDistance >= SWIPE_THRESHOLD) {
-      showChrome();
-      edgeSwipeRef.current.isEdge = false;
+    // When chrome is hidden and edge swipe detected, request nav overlay instead
+    if (chromeState === 'hidden' && absDistance >= SWIPE_THRESHOLD) {
+      if (onNavOverlayRequest) {
+        onNavOverlayRequest();
+        edgeSwipeRef.current.isEdge = false;
+      }
+      return;
     }
-    // Bottom edge: swipe up to reveal
-    else if (edgeSwipeRef.current.isBottom && distance < 0 && absDistance >= SWIPE_THRESHOLD) {
-      showChrome();
-      edgeSwipeRef.current.isEdge = false;
+
+    // Normal behavior when chrome is visible
+    if (!forceHiddenRef.current) {
+      // Top edge: swipe down to reveal
+      if (edgeSwipeRef.current.isTop && distance > 0 && absDistance >= SWIPE_THRESHOLD) {
+        showChrome();
+        edgeSwipeRef.current.isEdge = false;
+      }
+      // Bottom edge: swipe up to reveal
+      else if (edgeSwipeRef.current.isBottom && distance < 0 && absDistance >= SWIPE_THRESHOLD) {
+        showChrome();
+        edgeSwipeRef.current.isEdge = false;
+      }
     }
-  }, [disabled, showChrome]);
+  }, [disabled, showChrome, chromeState, onNavOverlayRequest]);
 
   const handleTouchEnd = useCallback(() => {
     edgeSwipeRef.current = { isEdge: false, isTop: false, isBottom: false, startY: 0 };
