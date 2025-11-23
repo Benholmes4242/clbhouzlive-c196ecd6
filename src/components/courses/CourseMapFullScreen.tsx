@@ -130,33 +130,30 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
         side="bottom" 
-        className="h-[85vh] sm:h-[80vh] flex flex-col p-0"
+        className="h-[85vh] sm:h-[80vh] flex flex-col p-0 relative"
       >
-        {/* Grabber bar and header - swipe to close area */}
-        <div {...swipeHandlers}>
-          {/* Grabber bar */}
-          <div 
-            className="absolute left-1/2 -translate-x-1/2 rounded-full"
-            style={{
-              top: 'calc(8px + env(safe-area-inset-top, 0px))',
-              width: 36,
-              height: 5,
-              background: 'rgba(255, 255, 255, 0.25)',
-            }}
-          />
-          
-          <div className="px-4 pt-[calc(8px+env(safe-area-inset-top,0px)+5px+12px)]">
-            {/* Header */}
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h2 className="text-base font-semibold flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  {courseName}
-                </h2>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {subCountry && `${subCountry}, `}{country}
-                </p>
-              </div>
+        {/* Grabber bar */}
+        <div 
+          className="absolute left-1/2 -translate-x-1/2 rounded-full z-50"
+          style={{
+            top: 'calc(8px + env(safe-area-inset-top, 0px))',
+            width: 36,
+            height: 5,
+            background: 'rgba(255, 255, 255, 0.25)',
+          }}
+        />
+        
+        {/* Header - swipe to close area */}
+        <div {...swipeHandlers} className="px-4 pt-[calc(8px+env(safe-area-inset-top,0px)+5px+12px)]">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h2 className="text-base font-semibold flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                {courseName}
+              </h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {subCountry && `${subCountry}, `}{country}
+              </p>
             </div>
           </div>
         </div>
