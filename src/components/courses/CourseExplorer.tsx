@@ -399,7 +399,7 @@ const CourseExplorer = () => {
           </div>
           
           {/* Pagination Controls */}
-          <div className="flex justify-center items-center gap-3 mt-6 mb-24">
+          <div className="flex justify-center items-center gap-3 mt-6 mb-[48px]">
             {page > 0 && (
               <Button
                 variant="outline"
