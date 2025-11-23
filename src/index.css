@@ -372,6 +372,10 @@ html, body, #root {
   --primary-accent: #F7931E;
   --accent-clbhouz: #F7931E;
   
+  /* CTA Text - Slate/neutral for button labels (NOT orange) */
+  --cta-text-color: #1F2428;           /* Matches --text-primary */
+  --cta-text-color-dark: #E8EAEC;      /* For dark backgrounds */
+  
   /* Frosted white accents */
   --accent-frost-bg: rgba(255,255,255,0.08);
   --accent-frost-hover: rgba(255,255,255,0.12);
