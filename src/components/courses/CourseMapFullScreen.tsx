@@ -195,7 +195,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
               variant={isIOS ? 'outline' : 'default'}
               onClick={() => window.open(googleMapsUrl, '_blank')}
             >
-              Open in Maps
+              Open in Google Maps
             </Button>
           </div>
         </div>
