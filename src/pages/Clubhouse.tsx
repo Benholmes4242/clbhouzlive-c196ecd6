@@ -272,6 +272,7 @@ const Clubhouse = () => {
             }}
             onCommentsOpenChange={setIsCommentsDrawerOpen}
             onProfileOpenChange={setIsProfileDrawerOpen}
+            chromeState={chromeControls.chromeState}
           />
         ) : isLoading ? (
           <div className="flex items-center justify-center min-h-screen">
