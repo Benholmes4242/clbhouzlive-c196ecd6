@@ -18,8 +18,9 @@ import {
   regionKeyToDbValue,
   subregionKeyToLabel,
 } from '@/constants/courseRegions';
+import { getOptimalPageSize } from '@/utils/deviceDetection';
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = getOptimalPageSize(50); // 30 on mobile, 50 on desktop
 
 const CourseExplorer = () => {
   const listTopRef = useRef<HTMLDivElement>(null);
@@ -170,6 +171,8 @@ const CourseExplorer = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['explore-courses', selectedRegion, selectedSubregion, debouncedSearch, page],
     queryFn: async () => {
+      if (!mountedRef.current) throw new Error('Component unmounted');
+      
       try {
         let query = supabase
           .from('golf_courses')
@@ -204,6 +207,9 @@ const CourseExplorer = () => {
         query = query.range(from, to);
 
         const { data, error, count } = await query;
+        
+        if (!mountedRef.current) throw new Error('Component unmounted');
+        
         if (error) {
           console.error('CourseExplorer query error:', error);
           throw error;
@@ -214,13 +220,15 @@ const CourseExplorer = () => {
           totalCount: count ?? 0,
         };
       } catch (error) {
+        if (!mountedRef.current) return { courses: [], totalCount: 0 };
         console.error('CourseExplorer error:', error);
         throw error;
       }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 5 * 60 * 1000, // Reduced to 5 minutes for mobile memory
     retry: 1,
+    enabled: mountedRef.current,
   });
 
   const courses = data?.courses || [];

@@ -56,5 +56,7 @@ export function useGolfCoursesSearch(filters: CourseSearchFilters) {
       return (data || []) as unknown as SearchedCourse[];
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 5 * 60 * 1000, // Reduced for mobile memory management
+    retry: 1,
   });
 }
