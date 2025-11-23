@@ -67,54 +67,63 @@ export const SocialDock: React.FC<SocialDockProps> = ({
   return (
     <div
       className={cn(
-        'fixed left-0 right-0 z-[80] px-3 pb-[calc(8px+env(safe-area-inset-bottom,8px))]',
+        'fixed left-3 right-3 z-[80] rounded-3xl px-4 py-3',
         'transition-all duration-200 ease-out',
         isVisible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
       )}
-      style={{ bottom: 'calc(72px + env(safe-area-inset-bottom, 8px))' }}
+      style={{
+        bottom: 'calc(72px + env(safe-area-inset-bottom, 8px))',
+        background: 'rgba(15, 15, 15, 0.75)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+      }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Top Strip: Creator + Caption + Course */}
-      <div className="flex flex-col gap-2 mb-3">
-        {/* Creator */}
+      {/* Top Row: Avatar + Creator + Caption */}
+      <div className="flex items-center gap-3 mb-3">
+        {/* Avatar */}
         <button
           onClick={onProfileClick}
-          className="text-[15px] font-semibold text-white hover:opacity-80 transition-opacity text-left"
+          className="shrink-0"
         >
-          {post.user.name}
+          <img
+            src={post.user.avatar || '/placeholder.svg'}
+            alt={post.user.name}
+            className="w-11 h-11 rounded-xl object-cover"
+          />
         </button>
 
-        {/* Caption */}
-        <div className="text-[13px] text-white/80 leading-snug">
-          {shortCaption}
-          {isTruncated && (
-            <button
-              onClick={onSwipeUp}
-              className="ml-1 text-white/60 hover:text-white/100 transition-colors"
-            >
-              More
-            </button>
-          )}
+        {/* Creator + Caption */}
+        <div className="flex-1 min-w-0">
+          <button
+            onClick={onProfileClick}
+            className="block text-[15px] font-semibold text-white hover:opacity-80 transition-opacity text-left truncate"
+          >
+            {post.user.name}
+          </button>
+          <div className="text-[13px] text-white/80 leading-snug truncate">
+            {shortCaption}
+          </div>
         </div>
 
-        {/* Course Chip */}
+        {/* Course Chip - Right aligned */}
         {post.courseName && (
           <button
             onClick={onCourseClick}
-            className="inline-flex items-center px-3 py-1.5 rounded-full text-[12px] font-medium text-white/90 hover:bg-white/10 transition-all self-start"
+            className="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium text-white/90 hover:bg-white/10 transition-all"
             style={{
               background: 'rgba(255, 255, 255, 0.08)',
-              backdropFilter: 'blur(12px)',
+              backdropFilter: 'blur(8px)',
             }}
           >
-            {post.courseName}{post.holeNumber ? ` · Hole ${post.holeNumber}` : ''}
+            {post.courseName.length > 15 ? post.courseName.slice(0, 15) + '…' : post.courseName}
           </button>
         )}
       </div>
 
       {/* Action Row */}
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-1">
         <ActionButton
           icon={Heart}
           count={post.likes}
@@ -194,15 +203,14 @@ const ActionButton = ({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       className={cn(
-        'relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200',
+        'relative flex items-center justify-center w-11 h-11 rounded-full transition-all duration-200',
         'hover:bg-white/10 active:scale-95',
-        active ? 'bg-white/15' : 'bg-white/8'
+        active ? 'opacity-100' : 'opacity-90'
       )}
-      style={{ backdropFilter: 'blur(12px)' }}
     >
-      <Icon className={cn('w-5 h-5', active ? 'text-accent fill-accent' : 'text-white')} />
+      <Icon className={cn('w-5 h-5', active ? 'text-red-500 fill-red-500' : 'text-white')} />
       {!hideCount && showCount && count !== undefined && (
-        <div className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-accent text-white text-[10px] font-semibold rounded-full">
+        <div className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-semibold rounded-full">
           {count}
         </div>
       )}
