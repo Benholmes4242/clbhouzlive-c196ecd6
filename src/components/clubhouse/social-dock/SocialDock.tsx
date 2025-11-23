@@ -74,7 +74,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
       )}
       style={{
         bottom: 0,
-        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
+        paddingBottom: '12px',
         background: 'rgba(15, 15, 15, 0.75)',
         backdropFilter: 'blur(20px)',
         borderTop: '1px solid rgba(255, 255, 255, 0.08)',
