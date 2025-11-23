@@ -120,3 +120,11 @@ body.chrome-hidden .clubhouse-hud,
 body.chrome-hidden .clubhouse-rail {
   bottom: calc(env(safe-area-inset-bottom) + 22px);
 }
+
+/* Nav overlay: temporarily show chrome even when chrome-hidden is active */
+body.chrome-hidden.chrome-nav-overlay .chrome-header,
+body.chrome-hidden.chrome-nav-overlay .chrome-bottom-nav {
+  transform: translateY(0) translateZ(0);
+  opacity: 1;
+  pointer-events: auto;
+}
