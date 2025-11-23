@@ -108,8 +108,7 @@ export const SUBREGIONS: Record<Exclude<PrimaryRegionKey, 'all'>, string[]> = {
 };
 
 // Normalisation helper used everywhere (search + URL <-> labels)
-export function normalizeLabel(label: string | undefined | null): string {
-  if (!label || typeof label !== 'string') return '';
+export function normalizeLabel(label: string): string {
   return label
     .trim()
     .toLowerCase()
@@ -151,7 +150,7 @@ export function dbValueToRegionKey(dbValue?: string | null): PrimaryRegionKey {
 
   const value = dbValue.toLowerCase();
 
-  if (value.includes('britain') || value.includes('ireland') || value.includes('united kingdom') || value === 'uk') {
+  if (value.includes('britain') || value.includes('ireland')) {
     return PRIMARY_REGIONS.GB_I;
   }
   if (value.includes('continental europe')) {
@@ -165,23 +164,6 @@ export function dbValueToRegionKey(dbValue?: string | null): PrimaryRegionKey {
   }
 
   return PRIMARY_REGIONS.ALL;
-}
-
-// Derive the parent region from a subregion name (e.g., "Northern Ireland" -> "gb-i")
-export function getRegionFromSubregion(subCountry: string | undefined | null): PrimaryRegionKey | null {
-  // Safety guards
-  if (!subCountry || typeof subCountry !== 'string' || subCountry.trim() === '') {
-    return null;
-  }
-
-  const normalizedSub = normalizeLabel(subCountry);
-  
-  for (const [regionKey, subList] of Object.entries(SUBREGIONS)) {
-    if (subList.some(sub => normalizeLabel(sub) === normalizedSub)) {
-      return regionKey as PrimaryRegionKey;
-    }
-  }
-  return null;
 }
 
 // Map a primary region key to the default Top 100 list slug

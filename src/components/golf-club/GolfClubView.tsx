@@ -49,8 +49,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       return data;
     },
     enabled: !!courseId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   const { data: ratingStats } = useQuery({
@@ -80,8 +78,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       };
     },
     enabled: !!courseId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
 
@@ -181,7 +177,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       </div>
 
       {/* Tab Content */}
-      <div className="course-hero-wrapper px-4 pt-4 pb-3 space-y-4 md:px-6 md:pt-6">{/* No separate tab navigation needed - it's now overlaid on hero */}
+      <div className="course-hero-wrapper px-4 pt-4 space-y-4 md:px-6 md:pt-6">{/* No separate tab navigation needed - it's now overlaid on hero */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="about" className="mt-0">
             <CourseAboutTab course={course} onTabChange={setActiveTab} />

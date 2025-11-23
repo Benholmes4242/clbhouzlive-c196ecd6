@@ -24,14 +24,12 @@ const PAGE_SIZE = 50;
 const CourseExplorer = () => {
   const listTopRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
-  const hasInitialisedFromUrlRef = useRef(false);
   
   // URL params take priority, then sessionStorage, then defaults
   const [selectedRegion, setSelectedRegion] = useState<PrimaryRegionKey>(() => {
     // 1. Check URL first
     const urlRegion = searchParams.get('region');
     if (urlRegion) {
-      hasInitialisedFromUrlRef.current = true;
       return urlRegion as PrimaryRegionKey;
     }
     
@@ -53,10 +51,7 @@ const CourseExplorer = () => {
   const [selectedSubregion, setSelectedSubregion] = useState(() => {
     // 1. Check URL first
     const urlSub = searchParams.get('sub');
-    if (urlSub) {
-      hasInitialisedFromUrlRef.current = true;
-      return urlSub;
-    }
+    if (urlSub) return urlSub;
     
     // 2. Fall back to sessionStorage
     const saved = sessionStorage.getItem('explore-last-filters');
@@ -84,38 +79,23 @@ const CourseExplorer = () => {
   });
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
 
-  // Save filters to sessionStorage whenever they change (only after URL initialization)
+  // Save filters to sessionStorage whenever they change
   useEffect(() => {
-    // Don't immediately overwrite URL-driven state on first render
-    if (!hasInitialisedFromUrlRef.current) return;
-
-    try {
-      sessionStorage.setItem('explore-last-filters', JSON.stringify({
-        region: selectedRegion,
-        subregion: selectedSubregion,
-        searchTerm,
-      }));
-    } catch {
-      // fail safe – ignore storage errors
-    }
+    sessionStorage.setItem('explore-last-filters', JSON.stringify({
+      region: selectedRegion,
+      subregion: selectedSubregion,
+      searchTerm,
+    }));
   }, [selectedRegion, selectedSubregion, searchTerm]);
 
   // Restore scroll position when returning from course detail
   useEffect(() => {
-    try {
-      const savedScroll = sessionStorage.getItem('explore-scroll');
-      if (savedScroll) {
-        requestAnimationFrame(() => {
-          window.scrollTo({ top: parseInt(savedScroll), behavior: 'instant' });
-          try {
-            sessionStorage.removeItem('explore-scroll');
-          } catch (e) {
-            console.error('Failed to remove scroll position:', e);
-          }
-        });
-      }
-    } catch (e) {
-      console.error('Failed to restore scroll position:', e);
+    const savedScroll = sessionStorage.getItem('explore-scroll');
+    if (savedScroll) {
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: parseInt(savedScroll), behavior: 'instant' });
+        sessionStorage.removeItem('explore-scroll');
+      });
     }
   }, []);
 
@@ -236,30 +216,20 @@ const CourseExplorer = () => {
     setSelectedSubregion('all');
     setSearchTerm('');
     setPage(0);
-    try {
-      sessionStorage.setItem('explore-last-filters', JSON.stringify({
-        region: PRIMARY_REGIONS.ALL,
-        subregion: 'all',
-        searchTerm: '',
-      }));
-    } catch (e) {
-      // Fail silently on sessionStorage errors (e.g., private browsing mode)
-      console.error('Failed to save explore filters:', e);
-    }
+    sessionStorage.setItem('explore-last-filters', JSON.stringify({
+      region: PRIMARY_REGIONS.ALL,
+      subregion: 'all',
+      searchTerm: '',
+    }));
   };
 
   // Capture scroll position when clicking a course card
   const handleCourseClick = () => {
-    try {
-      sessionStorage.setItem('explore-scroll', window.scrollY.toString());
-    } catch (e) {
-      // Fail silently on sessionStorage errors
-      console.error('Failed to save scroll position:', e);
-    }
+    sessionStorage.setItem('explore-scroll', window.scrollY.toString());
   };
 
   return (
-    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-0">
+    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-[30px]">
       {/* Scroll to top button */}
       {/* Search */}
       <div className="relative max-w-xl mx-auto">
@@ -270,7 +240,7 @@ const CourseExplorer = () => {
           onChange={(e) => {
             setSearchTerm(e.target.value);
           }}
-          className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--slate-secondary)]/70 focus-visible:border-[color:var(--slate-secondary)] transition-shadow text-base placeholder:text-[15px]"
+          className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border transition-shadow text-base placeholder:text-[15px]"
         />
         {searchTerm && (
           <button

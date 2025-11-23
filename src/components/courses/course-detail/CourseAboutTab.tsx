@@ -124,185 +124,162 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       
       {/* Community Score Section */}
       <section className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-4 md:px-6 md:py-5">
-        {ratingAggregates && ratingAggregates.review_count > 0 ? (
-          <>
-            {/* Header with premium score */}
-            <div className="flex items-start justify-between gap-3 mb-5">
-              <div>
-                <h3 className="text-base font-semibold">Community Score</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Based on {ratingAggregates.review_count} {ratingAggregates.review_count === 1 ? 'rating' : 'ratings'}
-                </p>
-              </div>
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <div className="space-y-1">
+            <p className="text-heading-md font-semibold leading-snug">Community Score</p>
+            <p className="text-body-sm text-muted-foreground">
+              {ratingAggregates?.review_count === 1
+                ? 'Based on 1 rating'
+                : `Based on ${ratingAggregates?.review_count || 0} ratings`}
+            </p>
+          </div>
 
-              <div className="flex items-center gap-1.5">
-                <ClubhouseLogo size="sm" className="h-5 w-5" />
-                <span className="text-xl md:text-2xl font-semibold transition-opacity duration-300">
-                  {formatScore(ratingAggregates.avg_overall_score || 0)}/10
-                </span>
+          <div className="inline-flex items-center gap-1 rounded-full bg-card/60 px-2.5 py-1 text-xs font-semibold text-foreground">
+            <ClubhouseLogo size="sm" className="h-3.5 w-3.5" />
+            <span>
+              {ratingAggregates?.avg_overall_score 
+                ? formatScore(ratingAggregates.avg_overall_score) 
+                : '—'}/10
+            </span>
+          </div>
+        </div>
+        
+        {/* Action Button */}
+        <div className="mt-4">
+          <Button 
+            onClick={handleRateClick}
+            className="w-full justify-center bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
+          >
+            {userRating ? 'Edit Your Rating' : 'Review & Mark as Played'}
+          </Button>
+        </div>
+
+        {/* Friends Who've Played */}
+        <CourseFriendsStrip courseId={course.id} courseName={course.name} />
+        
+        {ratingAggregates && ratingAggregates.review_count > 0 ? (
+          <div className="mt-4 border-t border-border/60 pt-4 space-y-4">
+            {/* Course Design */}
+            <div className="space-y-1.5">
+              <div className="flex items-baseline justify-between">
+                <span className="text-sm font-medium">Course Design</span>
+                {ratingAggregates.avg_design_score != null && (
+                  <span className="text-xs font-semibold text-muted-foreground">
+                    {formatScore(ratingAggregates.avg_design_score)}/10
+                  </span>
+                )}
               </div>
+              {ratingAggregates.avg_design_score ? (
+                <Progress 
+                  value={getScorePercentage(ratingAggregates.avg_design_score)} 
+                  className="h-2.5 rounded-full"
+                />
+              ) : (
+                <>
+                  <div className="h-2.5 rounded-full bg-muted" />
+                  <div className="mt-0.5 flex justify-end">
+                    <span className="text-[11px] text-muted-foreground">Not yet rated</span>
+                  </div>
+                </>
+              )}
             </div>
 
-            {/* Category bars with animations */}
-            <div className="space-y-3 mb-5">
-              {/* Course Design */}
-              <div className="space-y-1">
-                <div className="flex items-baseline justify-between text-sm">
-                  <span className="font-medium">Course Design</span>
-                  <span className="text-xs text-muted-foreground">
-                    {ratingAggregates.avg_design_score ? formatScore(ratingAggregates.avg_design_score) : '–'}/10
+            {/* Course Condition */}
+            <div className="space-y-1.5">
+              <div className="flex items-baseline justify-between">
+                <span className="text-sm font-medium">Course Condition</span>
+                {ratingAggregates.avg_condition_score != null && (
+                  <span className="text-xs font-semibold text-muted-foreground">
+                    {formatScore(ratingAggregates.avg_condition_score)}/10
                   </span>
-                </div>
-                <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-foreground transition-[width] duration-500 ease-out"
-                    style={{ width: ratingAggregates.avg_design_score ? `${(ratingAggregates.avg_design_score / 10) * 100}%` : '0%' }}
-                  />
-                </div>
+                )}
               </div>
+              {ratingAggregates.avg_condition_score ? (
+                <Progress 
+                  value={getScorePercentage(ratingAggregates.avg_condition_score)} 
+                  className="h-2.5 rounded-full"
+                />
+              ) : (
+                <>
+                  <div className="h-2.5 rounded-full bg-muted" />
+                  <div className="mt-0.5 flex justify-end">
+                    <span className="text-[11px] text-muted-foreground">Not yet rated</span>
+                  </div>
+                </>
+              )}
+            </div>
 
-              {/* Course Condition */}
-              <div className="space-y-1">
-                <div className="flex items-baseline justify-between text-sm">
-                  <span className="font-medium">Course Condition</span>
-                  <span className="text-xs text-muted-foreground">
-                    {ratingAggregates.avg_condition_score ? formatScore(ratingAggregates.avg_condition_score) : '–'}/10
+            {/* Clubhouse */}
+            <div className="space-y-1.5">
+              <div className="flex items-baseline justify-between">
+                <span className="text-sm font-medium">Clubhouse</span>
+                {ratingAggregates.avg_clubhouse_score != null && (
+                  <span className="text-xs font-semibold text-muted-foreground">
+                    {formatScore(ratingAggregates.avg_clubhouse_score)}/10
                   </span>
-                </div>
-                <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-foreground transition-[width] duration-500 ease-out"
-                    style={{ width: ratingAggregates.avg_condition_score ? `${(ratingAggregates.avg_condition_score / 10) * 100}%` : '0%' }}
-                  />
-                </div>
+                )}
               </div>
+              {ratingAggregates.avg_clubhouse_score ? (
+                <Progress 
+                  value={getScorePercentage(ratingAggregates.avg_clubhouse_score)} 
+                  className="h-2.5 rounded-full"
+                />
+              ) : (
+                <>
+                  <div className="h-2.5 rounded-full bg-muted" />
+                  <div className="mt-0.5 flex justify-end">
+                    <span className="text-[11px] text-muted-foreground">Not yet rated</span>
+                  </div>
+                </>
+              )}
+            </div>
 
-              {/* Clubhouse */}
-              <div className="space-y-1">
-                <div className="flex items-baseline justify-between text-sm">
-                  <span className="font-medium">Clubhouse</span>
-                  <span className="text-xs text-muted-foreground">
-                    {ratingAggregates.avg_clubhouse_score ? formatScore(ratingAggregates.avg_clubhouse_score) : '–'}/10
+            {/* Facilities */}
+            <div className="space-y-1.5">
+              <div className="flex items-baseline justify-between">
+                <span className="text-sm font-medium">Facilities</span>
+                {ratingAggregates.avg_facilities_score != null && (
+                  <span className="text-xs font-semibold text-muted-foreground">
+                    {formatScore(ratingAggregates.avg_facilities_score)}/10
                   </span>
-                </div>
-                <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-foreground transition-[width] duration-500 ease-out"
-                    style={{ width: ratingAggregates.avg_clubhouse_score ? `${(ratingAggregates.avg_clubhouse_score / 10) * 100}%` : '0%' }}
-                  />
-                </div>
+                )}
               </div>
-
-              {/* Facilities */}
-              <div className="space-y-1">
-                <div className="flex items-baseline justify-between text-sm">
-                  <span className="font-medium">Facilities</span>
-                  <span className="text-xs text-muted-foreground">
-                    {ratingAggregates.avg_facilities_score ? formatScore(ratingAggregates.avg_facilities_score) : '–'}/10
-                  </span>
-                </div>
-                <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-foreground transition-[width] duration-500 ease-out"
-                    style={{ width: ratingAggregates.avg_facilities_score ? `${(ratingAggregates.avg_facilities_score / 10) * 100}%` : '0%' }}
-                  />
-                </div>
-              </div>
+              {ratingAggregates.avg_facilities_score ? (
+                <Progress 
+                  value={getScorePercentage(ratingAggregates.avg_facilities_score)} 
+                  className="h-2.5 rounded-full"
+                />
+              ) : (
+                <>
+                  <div className="h-2.5 rounded-full bg-muted" />
+                  <div className="mt-0.5 flex justify-end">
+                    <span className="text-[11px] text-muted-foreground">Not yet rated</span>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* See all reviews link */}
-            <div className="flex justify-end mb-4">
+            <div className="mt-3 flex justify-end">
               <button
                 type="button"
-                onClick={() => onTabChange?.('reviews')}
+                onClick={() => navigate(`/courses/${course.id}/reviews`)}
                 className="text-xs font-medium text-muted-foreground hover:text-foreground underline underline-offset-4 transition-all duration-motion-fast ease-standard"
               >
                 See all reviews
               </button>
             </div>
-
-            {/* Edit Rating button - only show if user has rated */}
-            {userRating && (
-              <Button 
-                onClick={handleRateClick}
-                className="w-full justify-center bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
-              >
-                Edit Your Rating
-              </Button>
-            )}
-          </>
+          </div>
         ) : (
-          <>
-            {/* No ratings yet state */}
-            <h3 className="text-base font-semibold mb-1">Community Score</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              No ratings yet – be the first to rate this course!
-            </p>
-            
-            {/* Review button for empty state */}
-            <Button 
-              onClick={handleRateClick}
-              className="w-full justify-center bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
-            >
-              Review & Mark as Played
-            </Button>
-          </>
+          <p className="mt-4 text-xs md:text-sm text-muted-foreground text-center">
+            No ratings yet – be the first to rate this course!
+          </p>
         )}
-
-        {/* Friends Who've Played */}
-        <CourseFriendsStrip courseId={course.id} courseName={course.name} />
       </section>
 
-      {/* Your Overall Rating Section */}
-      {user && userRating && ratingAggregates && ratingAggregates.review_count > 0 && (() => {
-        const userOverall = userRating.rating;
-        const communityOverall = ratingAggregates.avg_overall_score || 0;
-        const delta = Number((userOverall - communityOverall).toFixed(1));
-
-        return (
-          <section className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
-                  Your Overall Rating
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {delta === 0
-                    ? 'You and the community are almost identical.'
-                    : delta > 0
-                    ? `You rate this course ${delta.toFixed(1)} ${delta === 1 ? 'point' : 'points'} higher than the community.`
-                    : `You rate this course ${Math.abs(delta).toFixed(1)} ${Math.abs(delta) === 1 ? 'point' : 'points'} lower than the community.`}
-                </p>
-              </div>
-              <div className="flex flex-col items-end">
-                <div className="flex flex-col items-center">
-                  <span className="text-lg font-semibold">
-                    {formatScore(userOverall)}/10
-                  </span>
-                  <span className="text-xs text-muted-foreground">Your rating</span>
-                </div>
-              </div>
-            </div>
-          </section>
-        );
-      })()}
-
       {/* Your Rating vs Community Comparison */}
-      {user && userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
+      {user && userRating && ratingAggregates && (
         <RatingComparisonCard userRating={userRating} aggregates={ratingAggregates} />
-      )}
-
-      {/* CTA for users who haven't rated yet */}
-      {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
-        <section className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-4">
-          <h3 className="text-base font-semibold mb-1">How do you rate this course?</h3>
-          <p className="text-sm text-muted-foreground mb-3">
-            Add your rating to see how it compares with the clbhouz community.
-          </p>
-          <Button onClick={handleRateClick} className="w-full bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90">
-            Review this course
-          </Button>
-        </section>
       )}
 
       {/* About Section */}
@@ -333,7 +310,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
           <h2 className="text-base md:text-lg font-semibold">Location</h2>
           <p className="text-sm md:text-base text-foreground">
-            {[course.sub_country, course.country].filter(Boolean).join(', ')}
+            {[course.sub_country, course.region].filter(Boolean).join(', ')}
           </p>
           
           {/* Map preview */}

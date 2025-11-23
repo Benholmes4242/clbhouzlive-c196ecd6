@@ -362,9 +362,6 @@ html, body, #root {
   --text-secondary: #5E666D;
   --text-tertiary: #97A1AA;
   
-  /* Slate - Borders & UI Elements */
-  --slate-secondary: #94a3b8;  /* Secondary slate for borders/inputs */
-  
   /* Base backgrounds */
   --bg-modal: #0f0f0f;
   --bg-glass: rgba(0,0,0,0.6);

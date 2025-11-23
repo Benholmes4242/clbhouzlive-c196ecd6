@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLocationPermission } from './useLocationPermission';
@@ -6,7 +6,6 @@ import { useVisibility } from './useVisibility';
 import { MIN_LOCATION_CHANGE_METERS } from '../constants';
 
 const BROADCAST_INTERVAL_MS = 15 * 1000; // 15 seconds - efficient battery usage
-const MAX_CONSECUTIVE_FAILURES = 3; // Circuit breaker threshold
 
 /**
  * Calculate distance between two points using Haversine formula
@@ -41,24 +40,11 @@ export function useLocationBroadcast() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastWriteRef = useRef<number | null>(null);
   const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);
-  const [consecutiveFailures, setConsecutiveFailures] = useState(0);
 
   useEffect(() => {
     // Only broadcast if visibility is active (not hidden)
     if (!user?.id || visibilityMode === 'hidden') {
       // Clear any existing interval
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      // Reset failure counter when visibility changes
-      setConsecutiveFailures(0);
-      return;
-    }
-
-    // Circuit breaker: Stop broadcasting if too many consecutive failures
-    if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
-      console.warn('[LocationBroadcast] Circuit breaker active: Too many consecutive failures, pausing broadcast');
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -76,11 +62,7 @@ export function useLocationBroadcast() {
         }
 
         const loc = await getCurrentLocation();
-        if (!loc) {
-          // Location permission denied or unavailable - increment failure counter
-          setConsecutiveFailures(prev => prev + 1);
-          return;
-        }
+        if (!loc) return;
 
         // Check if user has moved enough to warrant an update
         if (lastLocationRef.current) {
@@ -115,16 +97,9 @@ export function useLocationBroadcast() {
           // Update refs only on successful write
           lastWriteRef.current = now;
           lastLocationRef.current = { lat: loc.lat, lng: loc.lng };
-          // Reset failure counter on success
-          setConsecutiveFailures(0);
-        } else {
-          // Database error - increment failure counter
-          setConsecutiveFailures(prev => prev + 1);
         }
       } catch (error) {
         console.error('[LocationBroadcast] Error:', error);
-        // Any error - increment failure counter
-        setConsecutiveFailures(prev => prev + 1);
       }
     };
 
@@ -140,7 +115,7 @@ export function useLocationBroadcast() {
         intervalRef.current = null;
       }
     };
-  }, [user?.id, visibilityMode, getCurrentLocation, consecutiveFailures]);
+  }, [user?.id, visibilityMode, getCurrentLocation]);
 
   return null;
 }

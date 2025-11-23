@@ -20,22 +20,16 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const retryTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
+    if (!mapContainerRef.current) return;
     if (!MAPBOX_TOKEN) return;
     if (!latitude || !longitude) return;
 
-    // Mounted guard to prevent operations after unmount
-    let mounted = true;
+    let frameId: number | null = null;
+    let timeoutId: number | null = null;
 
     const initMap = () => {
-      // Check if still mounted before initializing
-      if (!mounted) return;
-      
-      // If unmounted, abort
-      if (!mapContainerRef.current) return;
-
       // If map already exists, just recenter + resize
       if (mapRef.current) {
         mapRef.current.setCenter([longitude, latitude]);
@@ -46,7 +40,7 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
       mapboxgl.accessToken = MAPBOX_TOKEN;
 
       const map = new mapboxgl.Map({
-        container: mapContainerRef.current,
+        container: mapContainerRef.current!,
         style: MAPBOX_STYLE,
         center: [longitude, latitude],
         zoom: 13,
@@ -58,9 +52,7 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
 
       // Resize once the style has loaded to avoid partial renders
       map.on('load', () => {
-        if (mounted) {
-          map.resize();
-        }
+        map.resize();
       });
 
       // White marker at course location
@@ -69,19 +61,15 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
         .addTo(map);
     };
 
-    // Slight delay to let layout settle
-    retryTimeoutRef.current = window.setTimeout(initMap, 100);
+    // Give the browser a frame to apply Tailwind heights,
+    // then a tiny timeout to ensure layout is stable
+    frameId = requestAnimationFrame(() => {
+      timeoutId = window.setTimeout(initMap, 50);
+    });
 
     return () => {
-      // Mark as unmounted first
-      mounted = false;
-      
-      // Cleanup map + timeout
-      if (retryTimeoutRef.current != null) {
-        window.clearTimeout(retryTimeoutRef.current);
-        retryTimeoutRef.current = null;
-      }
-
+      if (frameId) cancelAnimationFrame(frameId);
+      if (timeoutId) clearTimeout(timeoutId);
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;

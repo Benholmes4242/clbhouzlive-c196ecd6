@@ -6,7 +6,6 @@ import {
   dbValueToRegionKey,
   normalizeLabel,
   primaryRegionKeyToTop100Slug,
-  getRegionFromSubregion,
   type PrimaryRegionKey,
 } from '@/constants/courseRegions';
 
@@ -34,10 +33,9 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
   const navigate = useNavigate();
 
   // Derive region / subregion / area for the current course
-  // Prefer deriving from sub_country if available (more reliable)
-  const primaryRegionKey: PrimaryRegionKey = 
-    (course.sub_country ? getRegionFromSubregion(course.sub_country) : null) ||
-    dbValueToRegionKey(course.region || course.country);
+  const primaryRegionKey: PrimaryRegionKey = dbValueToRegionKey(
+    course.region || course.country
+  );
 
   const primaryRegionLabel =
     PRIMARY_REGION_LABELS[primaryRegionKey] || course.region || course.country;
@@ -125,23 +123,44 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
         </div>
         
         <div className="divide-y divide-border/60">
-          {/* Sub-country filter - TEMPORARILY DISABLED */}
+          {/* Sub-country filter */}
           {subCountryLabel && (
-            <div className="w-full flex items-center justify-between px-4 py-3 text-sm opacity-50 cursor-not-allowed">
+            <button
+              type="button"
+              onClick={() => {
+                const params = new URLSearchParams({
+                  tab: 'explore',
+                  region: primaryRegionKey,
+                  sub: subKey || '',
+                });
+                navigate(`/courses?${params.toString()}`);
+              }}
+              className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-surface-alt transition-colors"
+            >
               <span>
                 See more courses in <span className="font-semibold">{subCountryLabel}</span>
               </span>
               <span className="text-muted-foreground">›</span>
-            </div>
+            </button>
           )}
 
-          {/* List-specific Top 100 - TEMPORARILY DISABLED */}
-          <div className="w-full flex items-center justify-between px-4 py-3 text-sm opacity-50 cursor-not-allowed">
+          {/* List-specific Top 100 */}
+          <button
+            type="button"
+            onClick={() => {
+              const params = new URLSearchParams({
+                tab: 'top-100',
+                list: primaryListSlug,
+              });
+              navigate(`/courses?${params.toString()}`);
+            }}
+            className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-surface-alt transition-colors"
+          >
             <span>
               See Top 100 in <span className="font-semibold">{primaryListName}</span>
             </span>
             <span className="text-muted-foreground">›</span>
-          </div>
+          </button>
         </div>
       </section>
     </div>
