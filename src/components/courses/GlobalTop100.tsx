@@ -42,12 +42,16 @@ function listSlugToRegionKey(slug: string): PrimaryRegionKey {
 const GlobalTop100 = () => {
   const listTopRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
+  const hasInitialisedFromUrlRef = useRef(false);
   
   // URL params take priority, then sessionStorage, then defaults
   const [selectedList, setSelectedList] = useState(() => {
     // 1. Check URL first
     const urlList = searchParams.get('list');
-    if (urlList) return urlList;
+    if (urlList) {
+      hasInitialisedFromUrlRef.current = true;
+      return urlList;
+    }
     
     // 2. Fall back to sessionStorage
     const saved = sessionStorage.getItem('top100-last-filters');
@@ -82,13 +86,20 @@ const GlobalTop100 = () => {
   });
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
 
-  // Save filters to sessionStorage whenever they change
+  // Save filters to sessionStorage whenever they change (only after URL initialization)
   useEffect(() => {
-    sessionStorage.setItem('top100-last-filters', JSON.stringify({
-      list: selectedList,
-      subregion: selectedSubregion,
-      searchTerm,
-    }));
+    // Don't immediately overwrite URL-driven state on first render
+    if (!hasInitialisedFromUrlRef.current) return;
+
+    try {
+      sessionStorage.setItem('top100-last-filters', JSON.stringify({
+        list: selectedList,
+        subregion: selectedSubregion,
+        searchTerm,
+      }));
+    } catch {
+      // fail safe – ignore storage errors
+    }
   }, [selectedList, selectedSubregion, searchTerm]);
 
   // Restore scroll position when returning from course detail
@@ -124,6 +135,20 @@ const GlobalTop100 = () => {
 
   // Fetch available lists
   const { data: lists = [] } = useTop100Lists();
+
+  // Validate selectedList against available lists once they're loaded
+  useEffect(() => {
+    if (!lists || !lists.length) return;
+
+    setSelectedList((current) => {
+      // If current is already valid, keep it
+      if (lists.some((list) => list.slug === current)) return current;
+
+      // If not valid, fall back to 'global' or first list
+      const global = lists.find((l) => l.slug === 'global');
+      return global?.slug ?? lists[0].slug;
+    });
+  }, [lists]);
 
   // Use the search hook for Top 100 lists
   const { data: courses = [], isLoading } = useGolfCoursesSearch({
