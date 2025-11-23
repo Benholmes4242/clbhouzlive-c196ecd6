@@ -6,6 +6,7 @@ import {
   dbValueToRegionKey,
   normalizeLabel,
   primaryRegionKeyToTop100Slug,
+  getRegionFromSubregion,
   type PrimaryRegionKey,
 } from '@/constants/courseRegions';
 
@@ -33,9 +34,10 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
   const navigate = useNavigate();
 
   // Derive region / subregion / area for the current course
-  const primaryRegionKey: PrimaryRegionKey = dbValueToRegionKey(
-    course.region || course.country
-  );
+  // Prefer deriving from sub_country if available (more reliable)
+  const primaryRegionKey: PrimaryRegionKey = 
+    (course.sub_country ? getRegionFromSubregion(course.sub_country) : null) ||
+    dbValueToRegionKey(course.region || course.country);
 
   const primaryRegionLabel =
     PRIMARY_REGION_LABELS[primaryRegionKey] || course.region || course.country;
