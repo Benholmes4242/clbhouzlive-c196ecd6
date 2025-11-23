@@ -241,7 +241,7 @@ const CourseExplorer = () => {
   };
 
   return (
-    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-6">
+    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-12">
       {/* Scroll to top button */}
       {/* Search */}
       <div className="relative max-w-xl mx-auto">
