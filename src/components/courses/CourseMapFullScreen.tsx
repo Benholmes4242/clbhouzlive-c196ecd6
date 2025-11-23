@@ -31,7 +31,15 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const retryTimeoutRef = useRef<number | null>(null);
+  const mountedRef = useRef(false);
   const [isDragging, setIsDragging] = useState(false);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   // Detect iOS
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -69,38 +77,32 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
     if (!latitude || !longitude) return;
 
     let retryCount = 0;
-    const maxRetries = 20; // 2 seconds max wait
+    const maxRetries = 10; // 1s total
 
     const initMap = () => {
-      // If sheet closed mid-retry, abort
-      if (!open) return;
-      
-      // Check if container ref is available
-      if (!mapContainerRef.current) {
+      if (!mountedRef.current || !open) return;
+
+      const container = mapContainerRef.current;
+      if (!container) {
         if (retryCount < maxRetries) {
           retryCount++;
           retryTimeoutRef.current = window.setTimeout(initMap, 100);
-          return;
         }
         return;
       }
 
-      // If map already exists (e.g. re-open), just recenter + resize
+      // Container must have a height to avoid 0px maps
+      if (container.offsetHeight === 0) {
+        if (retryCount < maxRetries) {
+          retryCount++;
+          retryTimeoutRef.current = window.setTimeout(initMap, 100);
+        }
+        return;
+      }
+
       if (mapRef.current) {
         mapRef.current.setCenter([longitude, latitude]);
         mapRef.current.resize();
-        return;
-      }
-
-      const container = mapContainerRef.current;
-      const height = container.offsetHeight;
-      
-      if (height === 0) {
-        if (retryCount < maxRetries) {
-          retryCount++;
-          retryTimeoutRef.current = window.setTimeout(initMap, 100);
-          return;
-        }
         return;
       }
 
@@ -108,7 +110,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
 
       try {
         const map = new mapboxgl.Map({
-          container: container,
+          container,
           style: MAPBOX_STYLE,
           center: [longitude, latitude],
           zoom: 13,
@@ -117,20 +119,21 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
 
         mapRef.current = map;
 
-        // Navigation controls
-        map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
+        map.addControl(
+          new mapboxgl.NavigationControl({ visualizePitch: false }),
+          'top-right'
+        );
 
-        // Marker
         new mapboxgl.Marker({ color: '#ffffff' })
           .setLngLat([longitude, latitude])
           .addTo(map);
 
-        // Ensure correct size once everything is loaded
         map.on('load', () => {
+          if (!mountedRef.current || !open) return;
           map.resize();
         });
-      } catch (error) {
-        console.error('[Mapbox Fullscreen] Error creating map:', error);
+      } catch (err) {
+        console.error('[Mapbox Fullscreen] Error creating map:', err);
       }
     };
 

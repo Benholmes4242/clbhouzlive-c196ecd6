@@ -21,14 +21,27 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const retryTimeoutRef = useRef<number | null>(null);
+  const mountedRef = useRef(false);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!MAPBOX_TOKEN) return;
     if (!latitude || !longitude) return;
 
     const initMap = () => {
-      // If unmounted, abort
-      if (!mapContainerRef.current) return;
+      // Abort if component already unmounted
+      if (!mountedRef.current) return;
+
+      if (!mapContainerRef.current) {
+        // If container still isn't ready, skip rather than retrying forever
+        return;
+      }
 
       // If map already exists, just recenter + resize
       if (mapRef.current) {
@@ -52,6 +65,7 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
 
       // Resize once the style has loaded to avoid partial renders
       map.on('load', () => {
+        if (!mountedRef.current) return;
         map.resize();
       });
 
