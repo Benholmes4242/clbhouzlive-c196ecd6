@@ -30,6 +30,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const initTimeoutRef = useRef<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   // Detect iOS
@@ -53,6 +54,10 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
   useEffect(() => {
     // When sheet is closed, clean up map
     if (!open) {
+      if (initTimeoutRef.current != null) {
+        window.clearTimeout(initTimeoutRef.current);
+        initTimeoutRef.current = null;
+      }
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
@@ -62,7 +67,6 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
 
     if (!MAPBOX_TOKEN) return;
     if (!latitude || !longitude) return;
-    if (!mapContainerRef.current) return;
 
     // If map already exists, just recenter + resize
     if (mapRef.current) {
@@ -71,46 +75,55 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
       return;
     }
 
-    mapboxgl.accessToken = MAPBOX_TOKEN;
+    // Delay initialization to allow Sheet to fully render
+    initTimeoutRef.current = window.setTimeout(() => {
+      if (!mapContainerRef.current) return;
 
-    const map = new mapboxgl.Map({
-      container: mapContainerRef.current,
-      style: MAPBOX_STYLE,
-      center: [longitude, latitude],
-      zoom: 13,
-      interactive: true,
-      maxZoom: 17,
-      minZoom: 2,
-      dragRotate: false,
-      pitchWithRotate: false,
-      touchPitch: false,
-    });
+      mapboxgl.accessToken = MAPBOX_TOKEN;
 
-    mapRef.current = map;
+      const map = new mapboxgl.Map({
+        container: mapContainerRef.current,
+        style: MAPBOX_STYLE,
+        center: [longitude, latitude],
+        zoom: 13,
+        interactive: true,
+        maxZoom: 17,
+        minZoom: 2,
+        dragRotate: false,
+        pitchWithRotate: false,
+        touchPitch: false,
+      });
 
-    // Navigation controls
-    map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
+      mapRef.current = map;
 
-    // Marker
-    new mapboxgl.Marker({ color: '#ffffff' })
-      .setLngLat([longitude, latitude])
-      .addTo(map);
+      // Navigation controls
+      map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
 
-    // Ensure correct size once everything is loaded
-    map.on('load', () => {
-      map.resize();
-    });
+      // Marker
+      new mapboxgl.Marker({ color: '#ffffff' })
+        .setLngLat([longitude, latitude])
+        .addTo(map);
 
-    // Guard against WebGL issues
-    map.on('error', (e) => {
-      if ((e as any)?.error?.message?.includes('WebGL')) {
-        console.error('[Mapbox] WebGL error, removing map instance', e);
-        map.remove();
-        mapRef.current = null;
-      }
-    });
+      // Ensure correct size once everything is loaded
+      map.on('load', () => {
+        map.resize();
+      });
+
+      // Guard against WebGL issues
+      map.on('error', (e) => {
+        if ((e as any)?.error?.message?.includes('WebGL')) {
+          console.error('[Mapbox] WebGL error, removing map instance', e);
+          map.remove();
+          mapRef.current = null;
+        }
+      });
+    }, 200);
 
     return () => {
+      if (initTimeoutRef.current != null) {
+        window.clearTimeout(initTimeoutRef.current);
+        initTimeoutRef.current = null;
+      }
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
