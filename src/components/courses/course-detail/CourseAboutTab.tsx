@@ -64,16 +64,16 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // TEMPORARILY DISABLED FOR TESTING
-  // const { coords, loading: coordsLoading } = useCourseCoordinates({
-  //   courseId: course.id,
-  //   latitude: course.latitude,
-  //   longitude: course.longitude,
-  //   name: course.name,
-  //   country: course.country,
-  //   subCountry: course.sub_country,
-  //   region: course.region,
-  // });
+  // Fetch coordinates (with geocoding fallback)
+  const { coords, loading: coordsLoading } = useCourseCoordinates({
+    courseId: course.id,
+    latitude: course.latitude,
+    longitude: course.longitude,
+    name: course.name,
+    country: course.country,
+    subCountry: course.sub_country,
+    region: course.region,
+  });
 
   // Fetch rating aggregates using the new hook
   const { data: ratingAggregates } = useCourseRatingAggregates(course.id);
@@ -336,10 +336,37 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             {[course.sub_country, course.country].filter(Boolean).join(', ')}
           </p>
           
-          {/* MAPBOX TEMPORARILY DISABLED FOR TESTING */}
-          <div className="w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px] rounded-2xl bg-surface-alt flex items-center justify-center">
-            <p className="text-sm text-muted-foreground">Map temporarily disabled for testing</p>
-          </div>
+          {/* Map preview */}
+          {!coords && coordsLoading && (
+            <div className="w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px] rounded-2xl bg-surface-alt animate-pulse" />
+          )}
+
+          {coords && (
+            <>
+              <CourseMapPreview
+                latitude={coords.lat}
+                longitude={coords.lng}
+                courseName={course.name}
+                onOpenFullMap={() => setMapOpen(true)}
+              />
+
+              <CourseMapFullScreen
+                open={mapOpen}
+                onOpenChange={setMapOpen}
+                latitude={coords.lat}
+                longitude={coords.lng}
+                courseName={course.name}
+                country={course.country}
+                subCountry={course.sub_country}
+              />
+            </>
+          )}
+
+          {!coords && !coordsLoading && (
+            <p className="text-sm text-muted-foreground">
+              Location data isn't available for this course yet.
+            </p>
+          )}
         </section>
 
         {/* Media Section */}
