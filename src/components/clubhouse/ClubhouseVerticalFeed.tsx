@@ -22,7 +22,6 @@ import CommentsModal from '@/components/posts/CommentsModal';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
 import { AudioStrip } from './AudioStrip';
 import { SocialDock } from './social-dock/SocialDock';
-import { GlobalNav } from './social-dock/GlobalNav';
 import { TopBar } from './social-dock/TopBar';
 import { VideoReactionTray } from './social-dock/VideoReactionTray';
 import { useTopBarVisibility } from '@/hooks/useTopBarVisibility';
@@ -1125,9 +1124,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
       {/* Top Bar */}
       <TopBar isVisible={topBarVisible} />
-
-      {/* Global Nav */}
-      <GlobalNav />
 
       {/* Video Reaction Tray */}
       <VideoReactionTray
