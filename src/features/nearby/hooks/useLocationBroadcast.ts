@@ -32,18 +32,22 @@ function calculateDistance(
 
 /**
  * Continuously broadcasts user location when visibility is not "hidden"
+ * Includes circuit breaker to stop broadcasts after permission denial
  */
 export function useLocationBroadcast() {
   const { user } = useSupabaseSession();
-  const { getCurrentLocation } = useLocationPermission();
+  const { getCurrentLocation, permissionState } = useLocationPermission();
   const { visibilityMode } = useVisibility();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastWriteRef = useRef<number | null>(null);
   const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
-    // Only broadcast if visibility is active (not hidden)
-    if (!user?.id || visibilityMode === 'hidden') {
+    // Don't broadcast if no user, visibility is hidden, or permission denied/unavailable
+    if (!user?.id || 
+        visibilityMode === 'hidden' || 
+        permissionState === 'denied' || 
+        permissionState === 'unavailable') {
       // Clear any existing interval
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -62,7 +66,15 @@ export function useLocationBroadcast() {
         }
 
         const loc = await getCurrentLocation();
-        if (!loc) return;
+        if (!loc) {
+          // Location unavailable - stop trying
+          if (intervalRef.current) {
+            console.log('[LocationBroadcast] Stopping broadcasts - location unavailable');
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+          return;
+        }
 
         // Check if user has moved enough to warrant an update
         if (lastLocationRef.current) {
@@ -115,7 +127,7 @@ export function useLocationBroadcast() {
         intervalRef.current = null;
       }
     };
-  }, [user?.id, visibilityMode, getCurrentLocation]);
+  }, [user?.id, visibilityMode, permissionState, getCurrentLocation]);
 
   return null;
 }

@@ -56,6 +56,7 @@ export async function updateOpenToPlayStatus(isOpen: boolean) {
 /**
  * Get user's current location with debouncing
  * Uses low-power location tracking suitable for background updates
+ * IMPORTANT: This function will log errors but NOT throw or retry on permission denial
  */
 export function watchUserLocation(
   onLocationUpdate: (coords: { lat: number; lng: number }) => void,
@@ -70,6 +71,8 @@ export function watchUserLocation(
   let lastLat: number | null = null;
   let lastLng: number | null = null;
   let watchId: number | null = null;
+  let errorCount = 0;
+  const MAX_ERRORS = 3; // Stop after 3 consecutive errors
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371e3; // Earth's radius in meters
@@ -91,6 +94,9 @@ export function watchUserLocation(
     const lat = position.coords.latitude;
     const lng = position.coords.longitude;
 
+    // Reset error count on successful position
+    errorCount = 0;
+
     // Check time threshold
     if (now - lastUpdate < minTime) return;
 
@@ -107,10 +113,24 @@ export function watchUserLocation(
     onLocationUpdate({ lat, lng });
   };
 
+  const handleError = (error: GeolocationPositionError) => {
+    errorCount++;
+    console.error('Location watch error:', error);
+
+    // Stop watching after too many errors or permission denial
+    if (error.code === 1 || errorCount >= MAX_ERRORS) {
+      console.log('[watchUserLocation] Stopping watch due to errors');
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      }
+    }
+  };
+
   if ('geolocation' in navigator) {
     watchId = navigator.geolocation.watchPosition(
       handlePosition,
-      (error) => console.error('Location watch error:', error),
+      handleError,
       {
         enableHighAccuracy: false,
         maximumAge: 60000,
