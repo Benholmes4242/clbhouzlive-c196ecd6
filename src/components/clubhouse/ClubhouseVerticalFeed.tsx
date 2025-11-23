@@ -1107,11 +1107,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
             courseName: filteredPosts[currentIndex].golfCourse?.name,
             holeNumber: undefined,
             isLiked: likedPostSet.has(filteredPosts[currentIndex].id),
-            isSaved: false,
+            isMuted: isGloballyMuted,
             likes: filteredPosts[currentIndex].likes || 0,
             comments: filteredPosts[currentIndex].comments || 0,
             shares: filteredPosts[currentIndex].shares || 0,
-            saves: 0
           }}
           isVisible={true}
           onSwipeUp={() => onPostDetailsOpen?.()}
@@ -1123,7 +1122,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           onLike={() => handleLike(filteredPosts[currentIndex].id)}
           onComment={() => handleComment(filteredPosts[currentIndex].id)}
           onShare={handleShare}
-          onSave={() => console.log('Save clicked')}
+          onMuteToggle={() => setGlobalMute(!isGloballyMuted)}
           onSearch={() => console.log('Search clicked')}
         />
       )}
