@@ -13,6 +13,7 @@ import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTa
 import CourseMediaTab from '@/components/courses/course-detail/CourseMediaTab';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
+import { useNavigate } from 'react-router-dom';
 
 
 interface GolfClubViewProps {
@@ -24,6 +25,7 @@ interface GolfClubViewProps {
 const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false, onClose }) => {
   const { user } = useSupabaseSession();
   const [activeTab, setActiveTab] = useState('about');
+  const navigate = useNavigate();
 
   const { data: course, isLoading: courseLoading } = useQuery({
     queryKey: ['course-detail', courseId],
@@ -49,6 +51,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       return data;
     },
     enabled: !!courseId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   const { data: ratingStats } = useQuery({
@@ -78,6 +82,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       };
     },
     enabled: !!courseId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
 
@@ -94,7 +100,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {/* Back button - positioned over hero image */}
         {!isInModal && (
           <button
-            onClick={() => window.history.back()}
+            onClick={() => navigate(-1)}
             className="absolute top-3 left-3 md:top-4 md:left-4 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
             aria-label="Go back"
           >
