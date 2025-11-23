@@ -24,6 +24,7 @@ interface SocialDockProps {
   onShare: () => void;
   onMuteToggle: () => void;
   onSearch: () => void;
+  onNavOverlayRequest?: () => void;
 }
 
 export const SocialDock: React.FC<SocialDockProps> = ({
@@ -37,6 +38,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
   onShare,
   onMuteToggle,
   onSearch,
+  onNavOverlayRequest,
 }) => {
   const [showCounts, setShowCounts] = useState(false);
   const [startY, setStartY] = useState<number | null>(null);
@@ -81,6 +83,13 @@ export const SocialDock: React.FC<SocialDockProps> = ({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
+      {/* Handle Bar for Nav Recall */}
+      <button
+        className="mx-auto mb-2 h-1.5 w-12 rounded-full bg-white/20 hover:bg-white/30 active:bg-white/40 transition-colors"
+        onClick={() => onNavOverlayRequest?.()}
+        aria-label="Show navigation"
+      />
+      
       {/* Top Row: Avatar + Creator + Caption */}
       <div className="flex items-center gap-3 mb-3">
         {/* Avatar */}

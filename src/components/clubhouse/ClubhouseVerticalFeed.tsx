@@ -55,6 +55,7 @@ interface ClubhouseVerticalFeedProps {
   chromeState?: 'visible' | 'hidden';
   onPostDetailsOpen?: () => void;
   onDismissNavOverlay?: () => void;
+  onNavOverlayRequest?: () => void;
 }
 
 // VideoWithAutoplay component moved outside to prevent recreation on re-renders
@@ -130,7 +131,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onProfileOpenChange,
   chromeState = 'visible',
   onPostDetailsOpen,
-  onDismissNavOverlay
+  onDismissNavOverlay,
+  onNavOverlayRequest
 }) => {
   const { isVisible: topBarVisible, resetTimer: resetTopBar } = useTopBarVisibility();
   const [showVideoReactions, setShowVideoReactions] = useState(false);
@@ -1211,6 +1213,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           onShare={handleShare}
           onMuteToggle={() => setGlobalMute(!isGloballyMuted)}
           onSearch={() => console.log('Search clicked')}
+          onNavOverlayRequest={onNavOverlayRequest}
         />
       )}
 
