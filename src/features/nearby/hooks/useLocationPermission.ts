@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export type LocationPermissionState = 'prompt' | 'granted' | 'denied' | 'unavailable';
 
@@ -20,7 +20,7 @@ export function useLocationPermission() {
     }
   }, []);
 
-  const requestPermission = async (): Promise<UserLocation | null> => {
+  const requestPermission = useCallback(async (): Promise<UserLocation | null> => {
     if (!('geolocation' in navigator)) {
       setPermissionState('unavailable');
       setError('Geolocation is not supported by your browser');
@@ -69,9 +69,9 @@ export function useLocationPermission() {
       
       return null;
     }
-  };
+  }, []);
 
-  const getCurrentLocation = async (): Promise<UserLocation | null> => {
+  const getCurrentLocation = useCallback(async (): Promise<UserLocation | null> => {
     if (permissionState === 'granted' && currentLocation) {
       // If we recently got location (within 30 seconds), return cached
       if (Date.now() - currentLocation.timestamp < 30000) {
@@ -81,7 +81,7 @@ export function useLocationPermission() {
     
     // Otherwise request fresh location
     return requestPermission();
-  };
+  }, [permissionState, currentLocation, requestPermission]);
 
   return {
     permissionState,
