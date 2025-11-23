@@ -102,11 +102,11 @@ export default function EnhancedCreateMomentModalCinematic({
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   
-  // Hub-style animation constants
-  const ECM_ENTRY_DURATION = 240;
-  const ECM_EXIT_DURATION = 240;
-  const ECM_ENTRY_EASING = 'cubic-bezier(.2,.8,.2,1)';
-  const ECM_EXIT_EASING = 'cubic-bezier(.2,.8,.2,1)';
+  // Map sheet animation constants (buttery smooth!)
+  const ECM_ENTRY_DURATION = 500;
+  const ECM_EXIT_DURATION = 300;
+  const ECM_ENTRY_EASING = 'ease-in-out';
+  const ECM_EXIT_EASING = 'ease-in-out';
   const DRAG_THRESHOLD = 120;
   
   // Hub-style animation state

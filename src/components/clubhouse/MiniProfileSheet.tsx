@@ -178,7 +178,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
       onClose();
       setIsClosing(false);
       setSheetClosing(false); // Reset for next time
-    }, 300); // Match animation duration
+    }, 300); // Match exit animation duration
   };
 
   const handleBackdropClick = () => {
@@ -276,8 +276,8 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
       <div 
         className={cn(
           "clubhouse-profile-sheet glass-dark rounded-t-[24px] relative flex flex-col overflow-hidden",
-          "transition-all duration-[280ms] ease-[cubic-bezier(0.19,1,0.22,1)]",
-          isClosing ? "translate-y-4 opacity-0" : "translate-y-0 opacity-100"
+          "transition-all ease-in-out",
+          isClosing ? "duration-300 translate-y-4 opacity-0" : "duration-500 translate-y-0 opacity-100"
         )}
         style={{
           paddingBottom: 'env(safe-area-inset-bottom)',
