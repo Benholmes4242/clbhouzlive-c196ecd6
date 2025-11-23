@@ -33,16 +33,6 @@ const CourseDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Back Button - Overlay on golf club view */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="fixed top-4 left-4 h-9 w-9 bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 z-50"
-        onClick={() => navigate('/courses')}
-      >
-        <ArrowLeft className="h-8 w-8" />
-      </Button>
-
       <FadeInContent>
         <GolfClubView courseId={courseId} isInModal={false} />
       </FadeInContent>
