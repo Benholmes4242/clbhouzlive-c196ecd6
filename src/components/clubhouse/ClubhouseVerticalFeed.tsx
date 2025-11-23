@@ -21,7 +21,7 @@ import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import CommentsModal from '@/components/posts/CommentsModal';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
 import { AudioStrip } from './AudioStrip';
-import { AppleHUDOverlay } from './AppleHUDOverlay';
+import { ClubhouseGlassTile } from './ClubhouseGlassTile';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
@@ -50,6 +50,7 @@ interface ClubhouseVerticalFeedProps {
   onActiveVideoRefChange?: (ref: HTMLVideoElement | null) => void;
   onCommentsOpenChange?: (isOpen: boolean) => void;
   onProfileOpenChange?: (isOpen: boolean) => void;
+  chromeState?: 'visible' | 'hidden';
 }
 
 // VideoWithAutoplay component moved outside to prevent recreation on re-renders
@@ -123,7 +124,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onTouchEnd,
   onActiveVideoRefChange,
   onCommentsOpenChange,
-  onProfileOpenChange
+  onProfileOpenChange,
+  chromeState = 'visible'
 }) => {
   const { user } = useSupabaseSession();
   
@@ -907,6 +909,25 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     </div>
                   </div>
                 )}
+                
+                {/* Mute/Unmute button for videos - stays on video */}
+                {currentMedia.media_type === 'video' && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setGlobalMute(!isGloballyMuted);
+                    }}
+                    className="absolute top-4 right-4 z-30 p-3 rounded-full glass-dark transition-all duration-200 hover:bg-white/10 active:scale-95"
+                    aria-label={isGloballyMuted ? 'Unmute' : 'Mute'}
+                  >
+                    {isGloballyMuted ? (
+                      <SpeakerXMarkIcon className="w-5 h-5 text-white" />
+                    ) : (
+                      <SpeakerWaveIcon className="w-5 h-5 text-white" />
+                    )}
+                  </button>
+                )}
+                
                 {currentMedia.media_type === 'video' ? (
                   <VideoWithAutoplay
                     ref={(el) => {
@@ -976,42 +997,40 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* Apple HUD Overlay - Replaces PostMetadata + EngagementRail */}
-              <AppleHUDOverlay
-                videoRef={{ current: videoRefs.current[item.id] || null }}
-                user={{
-                  id: item.user?.id || '',
-                  name: item.user?.name || 'Unknown User',
-                  avatar: item.user?.avatar,
-                  username: item.user?.username
-                }}
-                caption={removeGolfCourseFromContent(
-                  (item.title as string | null) ?? (item.ctaDescription as string | null) ?? ''
-                )}
-                createdAt={typeof item.createdAt === 'string' ? item.createdAt : item.createdAt?.toISOString()}
-                courseName={item.golfCourse?.name}
-                stats={{
-                  likes: item.likes || 0,
-                  comments: item.comments || 0,
-                  shares: item.shares || 0
-                }}
-                isLiked={likedPostSet.has(item.id)}
-                isVideo={item.media?.[0]?.media_type === 'video'}
-                isMuted={isGloballyMuted}
-                isActive={visualIndex === index}
-                shouldAnimate={hasIndexChangedOnceRef.current}
-                videoProgress={currentIndex === index ? videoProgress : 0}
-                onProfileSheetOpen={() => {
-                  setSelectedUserId(item.user?.id || null);
-                  setShowMiniProfile(true);
-                }}
-                onCourseClick={() => {}}
-                onLike={() => handleLike(item.id)}
-                onComment={() => handleComment(item.id)}
-                onShare={handleShare}
-                onMuteToggle={() => setGlobalMute(!isGloballyMuted)}
-                accentColor="#ffffff"
-              />
+              {/* Glass Tile - Only visible when chrome is hidden */}
+              {visualIndex === index && chromeState === 'hidden' && (
+                <ClubhouseGlassTile
+                  post={{
+                    id: item.id,
+                    user: {
+                      id: item.user?.id || '',
+                      name: item.user?.name || 'Unknown User',
+                      avatar: item.user?.avatar,
+                      username: item.user?.username
+                    },
+                    caption: removeGolfCourseFromContent(
+                      (item.title as string | null) ?? (item.ctaDescription as string | null) ?? ''
+                    ),
+                    stats: {
+                      likes: item.likes || 0,
+                      comments: item.comments || 0,
+                      shares: item.shares || 0,
+                      saves: 0
+                    },
+                    hasLiked: likedPostSet.has(item.id),
+                    hasSaved: false
+                  }}
+                  isVisible={true}
+                  onProfileClick={() => {
+                    setSelectedUserId(item.user?.id || null);
+                    setShowMiniProfile(true);
+                  }}
+                  onLikeClick={() => handleLike(item.id)}
+                  onCommentClick={() => handleComment(item.id)}
+                  onShareClick={handleShare}
+                  onSaveClick={() => console.log('Save clicked')}
+                />
+              )}
             </div>
           );
         })}
