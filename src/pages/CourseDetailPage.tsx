@@ -40,7 +40,7 @@ const CourseDetailPage = () => {
         className="fixed top-4 left-4 h-10 w-10 bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 z-50"
         onClick={() => navigate('/courses')}
       >
-        <ArrowLeft className="h-6 w-6" />
+        <ArrowLeft className="h-7 w-7" />
       </Button>
 
       <FadeInContent>
