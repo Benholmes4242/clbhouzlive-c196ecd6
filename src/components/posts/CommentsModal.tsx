@@ -4,6 +4,7 @@ import { X, Heart, Send, Smile } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Z } from '@/config/zIndex';
+import { cn } from '@/lib/utils';
 
 interface Comment {
   id: string;
@@ -22,6 +23,10 @@ interface CommentsModalProps {
   onClose: () => void;
   postId: string;
 }
+
+// Animation constants - matches expanded map sheet
+const ENTRY_DURATION = 500;
+const EXIT_DURATION = 300;
 
 // Mock comments data
 const generateMockComments = (postId: string): Comment[] => {
@@ -113,6 +118,8 @@ const generateMockComments = (postId: string): Comment[] => {
 const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }) => {
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState(() => generateMockComments(postId));
+  const [isClosing, setIsClosing] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
 
   const handleLike = (commentId: string) => {
     setComments(prev => prev.map(comment => 
@@ -152,7 +159,26 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
     }
   };
 
-  if (!isOpen) return null;
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+      setHasEntered(false);
+    }, EXIT_DURATION);
+  };
+
+  // Slide-in animation on mount
+  React.useEffect(() => {
+    if (isOpen && !isClosing) {
+      // Slight delay to ensure DOM is ready
+      requestAnimationFrame(() => {
+        setHasEntered(true);
+      });
+    }
+  }, [isOpen, isClosing]);
+
+  if (!isOpen && !isClosing) return null;
 
   const modalContent = (
     <div 
@@ -161,8 +187,11 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
     >
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300"
-        onClick={onClose}
+        className={cn(
+          "absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity ease-in-out",
+          hasEntered && !isClosing ? "opacity-100 duration-500" : "opacity-0 duration-300"
+        )}
+        onClick={handleClose}
       />
       
       {/* Comments Sheet - Dark Glass */}
@@ -171,7 +200,11 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
         style={{ zIndex: Z.sheet }}
       >
         <div 
-          className="clubhouse-comments-sheet glass-dark rounded-t-[24px] flex flex-col w-full"
+          className={cn(
+            "clubhouse-comments-sheet glass-dark rounded-t-[24px] flex flex-col w-full",
+            "transition-all ease-in-out",
+            hasEntered && !isClosing ? "duration-500 translate-y-0 opacity-100" : "duration-300 translate-y-4 opacity-0"
+          )}
           style={{ 
             paddingBottom: 'env(safe-area-inset-bottom)',
             maxHeight: '72vh',
