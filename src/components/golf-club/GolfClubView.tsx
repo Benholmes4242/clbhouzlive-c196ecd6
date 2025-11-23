@@ -177,7 +177,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       </div>
 
       {/* Tab Content */}
-      <div className="course-hero-wrapper px-4 pt-4 space-y-4 md:px-6 md:pt-6">{/* No separate tab navigation needed - it's now overlaid on hero */}
+      <div className="course-hero-wrapper px-4 pt-4 pb-3 space-y-4 md:px-6 md:pt-6">{/* No separate tab navigation needed - it's now overlaid on hero */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="about" className="mt-0">
             <CourseAboutTab course={course} onTabChange={setActiveTab} />

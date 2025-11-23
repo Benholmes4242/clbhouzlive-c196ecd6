@@ -42,12 +42,16 @@ function listSlugToRegionKey(slug: string): PrimaryRegionKey {
 const GlobalTop100 = () => {
   const listTopRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
+  const hasInitialisedFromUrlRef = useRef(false);
   
   // URL params take priority, then sessionStorage, then defaults
   const [selectedList, setSelectedList] = useState(() => {
     // 1. Check URL first
     const urlList = searchParams.get('list');
-    if (urlList) return urlList;
+    if (urlList) {
+      hasInitialisedFromUrlRef.current = true;
+      return urlList;
+    }
     
     // 2. Fall back to sessionStorage
     const saved = sessionStorage.getItem('top100-last-filters');
@@ -82,13 +86,20 @@ const GlobalTop100 = () => {
   });
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
 
-  // Save filters to sessionStorage whenever they change
+  // Save filters to sessionStorage whenever they change (only after URL initialization)
   useEffect(() => {
-    sessionStorage.setItem('top100-last-filters', JSON.stringify({
-      list: selectedList,
-      subregion: selectedSubregion,
-      searchTerm,
-    }));
+    // Don't immediately overwrite URL-driven state on first render
+    if (!hasInitialisedFromUrlRef.current) return;
+
+    try {
+      sessionStorage.setItem('top100-last-filters', JSON.stringify({
+        list: selectedList,
+        subregion: selectedSubregion,
+        searchTerm,
+      }));
+    } catch {
+      // fail safe – ignore storage errors
+    }
   }, [selectedList, selectedSubregion, searchTerm]);
 
   // Restore scroll position when returning from course detail
@@ -124,6 +135,20 @@ const GlobalTop100 = () => {
 
   // Fetch available lists
   const { data: lists = [] } = useTop100Lists();
+
+  // Validate selectedList against available lists once they're loaded
+  useEffect(() => {
+    if (!lists || !lists.length) return;
+
+    setSelectedList((current) => {
+      // If current is already valid, keep it
+      if (lists.some((list) => list.slug === current)) return current;
+
+      // If not valid, fall back to 'global' or first list
+      const global = lists.find((l) => l.slug === 'global');
+      return global?.slug ?? lists[0].slug;
+    });
+  }, [lists]);
 
   // Use the search hook for Top 100 lists
   const { data: courses = [], isLoading } = useGolfCoursesSearch({
@@ -225,7 +250,7 @@ const GlobalTop100 = () => {
   const currentListLabel = listOptions.find((opt) => opt.value === selectedList)?.label || 'Global Top 100';
 
   return (
-    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-6">
+    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-0">
       {/* Top 100 Club Callout */}
       <Top100ClubCallout />
 
@@ -236,7 +261,7 @@ const GlobalTop100 = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search within this Top 100 list"
-          className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border transition-shadow text-base placeholder:text-[15px]"
+          className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--slate-secondary)]/70 focus-visible:border-[color:var(--slate-secondary)] transition-shadow text-base placeholder:text-[15px]"
         />
         {searchTerm && (
           <button
@@ -370,7 +395,7 @@ const GlobalTop100 = () => {
           </div>
           
           {/* Pagination Controls */}
-          <div className="flex justify-center items-center gap-3 mt-8 mb-8">
+          <div className="flex justify-center items-center gap-3 mt-6 mb-0">
             {page > 0 && (
               <Button
                 variant="outline"

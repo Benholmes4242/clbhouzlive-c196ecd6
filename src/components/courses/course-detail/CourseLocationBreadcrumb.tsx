@@ -6,6 +6,7 @@ import {
   dbValueToRegionKey,
   normalizeLabel,
   primaryRegionKeyToTop100Slug,
+  getRegionFromSubregion,
   type PrimaryRegionKey,
 } from '@/constants/courseRegions';
 
@@ -33,9 +34,10 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
   const navigate = useNavigate();
 
   // Derive region / subregion / area for the current course
-  const primaryRegionKey: PrimaryRegionKey = dbValueToRegionKey(
-    course.region || course.country
-  );
+  // Prefer deriving from sub_country if available (more reliable)
+  const primaryRegionKey: PrimaryRegionKey = 
+    (course.sub_country ? getRegionFromSubregion(course.sub_country) : null) ||
+    dbValueToRegionKey(course.region || course.country);
 
   const primaryRegionLabel =
     PRIMARY_REGION_LABELS[primaryRegionKey] || course.region || course.country;
@@ -148,9 +150,25 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
           <button
             type="button"
             onClick={() => {
+              // Normalize database list slug to UI-expected format
+              const normalizeListSlug = (dbSlug: string): string => {
+                const slug = dbSlug.toLowerCase();
+                // Check for GB&I variants
+                if (slug.includes('gb-i') || slug.includes('britain') || slug.includes('ireland')) return 'gb-i';
+                // Check for USA variants
+                if (slug.includes('usa') || slug.includes('united-states')) return 'usa';
+                // Check for Europe variants
+                if (slug.includes('europe')) return 'europe';
+                // Check for Rest of World
+                if (slug.includes('rest')) return 'rest';
+                // Check for Global
+                if (slug.includes('global') || slug.includes('world')) return 'global';
+                return 'global'; // fallback
+              };
+              
               const params = new URLSearchParams({
-                tab: 'top-100',
-                list: primaryListSlug,
+                tab: 'top100',
+                list: normalizeListSlug(primaryListSlug),
               });
               navigate(`/courses?${params.toString()}`);
             }}

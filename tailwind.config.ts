@@ -83,6 +83,7 @@ export default {
 				'cta-text': 'var(--cta-text-color)',
 				'cta-text-dark': 'var(--cta-text-color-dark)',
 				'border-subtle': 'var(--border-subtle)',
+				'slate-secondary': 'var(--slate-secondary)',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'

@@ -81,9 +81,9 @@ const ScrollToTopGlass = () => {
         left-1/2
         -translate-x-1/2
         z-[9999]
+        h-9
+        w-9
         rounded-full
-        px-3
-        py-2
         flex
         items-center
         justify-center
@@ -92,7 +92,7 @@ const ScrollToTopGlass = () => {
         active:scale-95
       "
     >
-      <ChevronUp className="h-4 w-4 text-white" />
+      <ChevronUp className="h-5 w-5 text-white" />
     </button>,
     document.body
   );

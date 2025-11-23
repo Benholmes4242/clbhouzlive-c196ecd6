@@ -51,118 +51,70 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
   useEffect(() => {
-    console.log('[Mapbox Fullscreen] Effect triggered:', { open, hasContainer: !!mapContainerRef.current, hasToken: !!MAPBOX_TOKEN, latitude, longitude });
-    
-    // When sheet is closed, clean up map and bail out
+    // When sheet is closed, clean up map
     if (!open) {
       if (mapRef.current) {
-        console.log('[Mapbox Fullscreen] Cleaning up map');
         mapRef.current.remove();
         mapRef.current = null;
       }
       return;
     }
 
-    if (!MAPBOX_TOKEN) {
-      console.warn('[Mapbox Fullscreen] No Mapbox token');
+    if (!MAPBOX_TOKEN) return;
+    if (!latitude || !longitude) return;
+    if (!mapContainerRef.current) return;
+
+    // If map already exists, just recenter + resize
+    if (mapRef.current) {
+      mapRef.current.setCenter([longitude, latitude]);
+      mapRef.current.resize();
       return;
     }
-    if (!latitude || !longitude) {
-      console.warn('[Mapbox Fullscreen] No coordinates:', { latitude, longitude });
-      return;
-    }
 
-    let timeoutId: number | null = null;
-    let retryCount = 0;
-    const maxRetries = 20; // 2 seconds max wait
+    mapboxgl.accessToken = MAPBOX_TOKEN;
 
-    const initMap = () => {
-      console.log('[Mapbox Fullscreen] initMap called, retry:', retryCount);
-      
-      // Check if container ref is available
-      if (!mapContainerRef.current) {
-        if (retryCount < maxRetries) {
-          console.warn('[Mapbox Fullscreen] Container ref not ready, retrying in 100ms...');
-          retryCount++;
-          timeoutId = window.setTimeout(initMap, 100);
-          return;
-        } else {
-          console.error('[Mapbox Fullscreen] Container ref never became available');
-          return;
-        }
+    const map = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: MAPBOX_STYLE,
+      center: [longitude, latitude],
+      zoom: 13,
+      interactive: true,
+      maxZoom: 17,
+      minZoom: 2,
+      dragRotate: false,
+      pitchWithRotate: false,
+      touchPitch: false,
+    });
+
+    mapRef.current = map;
+
+    // Navigation controls
+    map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
+
+    // Marker
+    new mapboxgl.Marker({ color: '#ffffff' })
+      .setLngLat([longitude, latitude])
+      .addTo(map);
+
+    // Ensure correct size once everything is loaded
+    map.on('load', () => {
+      map.resize();
+    });
+
+    // Guard against WebGL issues
+    map.on('error', (e) => {
+      if ((e as any)?.error?.message?.includes('WebGL')) {
+        console.error('[Mapbox] WebGL error, removing map instance', e);
+        map.remove();
+        mapRef.current = null;
       }
-
-      // If map already exists (e.g. re-open), just recenter + resize
-      if (mapRef.current) {
-        console.log('[Mapbox Fullscreen] Map exists, recentering');
-        mapRef.current.setCenter([longitude, latitude]);
-        mapRef.current.resize();
-        return;
-      }
-
-      const container = mapContainerRef.current;
-      const height = container.offsetHeight;
-      const width = container.offsetWidth;
-      console.log('[Mapbox Fullscreen] Container dimensions:', { width, height });
-      
-      if (height === 0) {
-        if (retryCount < maxRetries) {
-          console.warn('[Mapbox Fullscreen] Container has no height, retrying in 100ms...');
-          retryCount++;
-          timeoutId = window.setTimeout(initMap, 100);
-          return;
-        } else {
-          console.error('[Mapbox Fullscreen] Container never got height');
-          return;
-        }
-      }
-
-      console.log('[Mapbox Fullscreen] Initializing Mapbox with token');
-      mapboxgl.accessToken = MAPBOX_TOKEN;
-
-      try {
-        const map = new mapboxgl.Map({
-          container: container,
-          style: MAPBOX_STYLE,
-          center: [longitude, latitude],
-          zoom: 13,
-          interactive: true,
-        });
-
-        mapRef.current = map;
-        console.log('[Mapbox Fullscreen] Map instance created');
-
-        // Navigation controls
-        map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
-
-        // Marker
-        new mapboxgl.Marker({ color: '#ffffff' })
-          .setLngLat([longitude, latitude])
-          .addTo(map);
-
-        // Ensure correct size once everything is loaded
-        map.on('load', () => {
-          console.log('[Mapbox Fullscreen] Map loaded, resizing');
-          map.resize();
-        });
-
-        // Extra safety: resize again shortly after load
-        window.setTimeout(() => {
-          console.log('[Mapbox Fullscreen] Secondary resize');
-          map.resize();
-        }, 200);
-      } catch (error) {
-        console.error('[Mapbox Fullscreen] Error creating map:', error);
-      }
-    };
-
-    // Start trying to initialize after a short delay for Sheet animation
-    console.log('[Mapbox Fullscreen] Scheduling initMap in 250ms');
-    timeoutId = window.setTimeout(initMap, 250);
+    });
 
     return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-      // Cleanup handled at the top when open becomes false
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
   }, [open, latitude, longitude]);
 
@@ -173,7 +125,18 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
         className="h-[85vh] sm:h-[80vh] flex flex-col p-0"
         {...swipeHandlers}
       >
-        <div className="flex flex-col h-full px-4 pt-4 pb-3 gap-4">
+        {/* Grabber bar */}
+        <div 
+          className="absolute left-1/2 -translate-x-1/2 rounded-full"
+          style={{
+            top: 'calc(8px + env(safe-area-inset-top, 0px))',
+            width: 36,
+            height: 5,
+            background: 'rgba(255, 255, 255, 0.25)',
+          }}
+        />
+        
+        <div className="flex flex-col h-full px-4 pt-[calc(8px+env(safe-area-inset-top,0px)+5px+12px)] pb-3 gap-4">
           {/* Header */}
           <div className="flex items-start justify-between">
             <div>
@@ -198,7 +161,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
           </div>
 
           {/* Navigation CTAs */}
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 pb-3">
             {isIOS && (
               <Button
                 className="flex-1 bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
@@ -212,7 +175,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
               variant={isIOS ? 'outline' : 'default'}
               onClick={() => window.open(googleMapsUrl, '_blank')}
             >
-              Open in Maps
+              Open in Google Maps
             </Button>
           </div>
         </div>
