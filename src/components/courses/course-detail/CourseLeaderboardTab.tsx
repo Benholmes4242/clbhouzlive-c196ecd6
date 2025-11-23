@@ -94,8 +94,6 @@ const CourseLeaderboardTab = ({ courseId }: CourseLeaderboardTabProps) => {
       return userStats.sort((a, b) => b.total_score - a.total_score);
     },
     enabled: !!courseId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 15 * 60 * 1000, // 15 minutes
   });
 
   const getUserDisplayName = (user: LeaderboardUser) => {

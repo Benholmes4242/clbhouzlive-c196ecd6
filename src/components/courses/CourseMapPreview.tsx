@@ -21,27 +21,14 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const retryTimeoutRef = useRef<number | null>(null);
-  const mountedRef = useRef(false);
-
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
 
   useEffect(() => {
     if (!MAPBOX_TOKEN) return;
     if (!latitude || !longitude) return;
 
     const initMap = () => {
-      // Abort if component already unmounted
-      if (!mountedRef.current) return;
-
-      if (!mapContainerRef.current) {
-        // If container still isn't ready, skip rather than retrying forever
-        return;
-      }
+      // If unmounted, abort
+      if (!mapContainerRef.current) return;
 
       // If map already exists, just recenter + resize
       if (mapRef.current) {
@@ -65,7 +52,6 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
 
       // Resize once the style has loaded to avoid partial renders
       map.on('load', () => {
-        if (!mountedRef.current) return;
         map.resize();
       });
 
@@ -86,20 +72,6 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
       }
 
       if (mapRef.current) {
-        try {
-          // Force WebGL context loss before removing (helps iOS Safari)
-          const canvas = mapRef.current.getCanvas();
-          const gl = canvas?.getContext('webgl') || canvas?.getContext('webgl2');
-          if (gl && typeof (gl as any).getExtension === 'function') {
-            const loseContext = (gl as any).getExtension('WEBGL_lose_context');
-            if (loseContext) {
-              loseContext.loseContext();
-            }
-          }
-        } catch (err) {
-          console.warn('[Mapbox Preview] Error losing WebGL context:', err);
-        }
-
         mapRef.current.remove();
         mapRef.current = null;
       }

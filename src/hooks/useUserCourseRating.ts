@@ -30,7 +30,6 @@ export function useUserCourseRating(courseId: string | undefined, userId: string
       if (error) throw error;
       return data as UserCourseRating | null;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 15 * 60 * 1000, // 15 minutes
+    staleTime: 0,
   });
 }

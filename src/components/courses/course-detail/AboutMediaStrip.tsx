@@ -40,15 +40,11 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
   const maxItems = isMobile ? 3 : 9;
 
   useEffect(() => {
-    let cancelled = false;
-
     const fetchMedia = async () => {
       try {
         const { data, error } = await supabase.functions.invoke('get-club-media', {
           body: { clubId, limit: maxItems }
         });
-
-        if (cancelled) return;
 
         if (error) {
           console.error('Error fetching media:', error);
@@ -60,23 +56,16 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
           setItems(adaptedItems);
         }
       } catch (error) {
-        if (cancelled) return;
         console.error('Error fetching media:', error);
         setItems([]);
       } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
 
     if (clubId) {
       fetchMedia();
     }
-
-    return () => {
-      cancelled = true;
-    };
   }, [clubId, maxItems]);
 
   // Helper to extract Stream UID from HLS URL

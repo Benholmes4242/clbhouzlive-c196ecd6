@@ -49,8 +49,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       return data;
     },
     enabled: !!courseId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 15 * 60 * 1000, // 15 minutes
   });
 
   const { data: ratingStats } = useQuery({
@@ -80,8 +78,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       };
     },
     enabled: !!courseId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 15 * 60 * 1000, // 15 minutes
   });
 
 

@@ -16,15 +16,6 @@ const CourseDetailPage = () => {
     scrollToTop();
   }, [courseId]);
 
-  // Cleanup logging for debugging (remove in production)
-  useEffect(() => {
-    return () => {
-      if (import.meta.env.DEV) {
-        console.log('[CourseDetailPage] unmount');
-      }
-    };
-  }, []);
-
   // Add defensive check for courseId
   if (!courseId) {
     return (

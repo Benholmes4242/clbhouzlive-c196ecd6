@@ -201,7 +201,6 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
         prestige_label: getTop100MilestoneLabel(totalPlayed),
       };
     },
-    staleTime: 60 * 1000, // 1 minute
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 60 * 1000,
   });
 }
