@@ -95,7 +95,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
   return (
     <div className="space-y-6">
-      <div className="text-center space-y-1 -mt-8 md:-mt-7 mb-4">
+      <div className="text-center space-y-1 -mt-[42px] mb-4">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           {username ? `${username}'s Courses` : 'Golf Courses'}
         </h1>
