@@ -68,6 +68,7 @@ export function useFriendsWhoPlayedCourse(userId: string | undefined, courseId: 
         }))
         .filter((a: any) => a.profile) as FriendCourseActivity[];
     },
-    staleTime: 60_000,
+    staleTime: 60_000, // 1 minute
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 }

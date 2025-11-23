@@ -42,5 +42,6 @@ export function useCourseTop100Memberships(courseId: string | undefined) {
       })) as CourseTop100Membership[];
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 15 * 60 * 1000, // 15 minutes
   });
 }
