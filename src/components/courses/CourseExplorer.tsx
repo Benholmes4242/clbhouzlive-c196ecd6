@@ -145,47 +145,57 @@ const CourseExplorer = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['explore-courses', selectedRegion, selectedSubregion, debouncedSearch, page],
     queryFn: async () => {
-      let query = supabase
-        .from('golf_courses')
-        .select('*', { count: 'exact' });
+      try {
+        let query = supabase
+          .from('golf_courses')
+          .select('*', { count: 'exact' });
 
-      // Apply region filter based on country
-      if (selectedRegion !== PRIMARY_REGIONS.ALL) {
-        const dbRegion = regionKeyToDbValue(selectedRegion);
-        if (dbRegion) {
-          query = query.eq('country', dbRegion);
+        // Apply region filter based on country
+        if (selectedRegion !== PRIMARY_REGIONS.ALL) {
+          const dbRegion = regionKeyToDbValue(selectedRegion);
+          if (dbRegion) {
+            query = query.eq('country', dbRegion);
+          }
         }
+
+        // Sub-region filter
+        if (selectedSubregion !== 'all') {
+          const label = subregionKeyToLabel(selectedRegion, selectedSubregion);
+          query = query.eq('sub_country', label);
+        }
+
+        // Apply search filter - safer, primary name search only
+        if (debouncedSearch && debouncedSearch.length >= 2) {
+          query = query.ilike('name', `%${debouncedSearch}%`);
+        }
+
+        // Order by global rank first (Top 100 courses), then alphabetically
+        query = query.order('global_rank', { ascending: true, nullsFirst: false });
+        query = query.order('name', { ascending: true });
+        
+        // Pagination
+        const from = page * PAGE_SIZE;
+        const to = from + PAGE_SIZE - 1;
+        query = query.range(from, to);
+
+        const { data, error, count } = await query;
+        if (error) {
+          console.error('CourseExplorer query error:', error);
+          throw error;
+        }
+
+        return {
+          courses: data || [],
+          totalCount: count ?? 0,
+        };
+      } catch (error) {
+        console.error('CourseExplorer error:', error);
+        throw error;
       }
-
-      // Sub-region filter
-      if (selectedSubregion !== 'all') {
-        const label = subregionKeyToLabel(selectedRegion, selectedSubregion);
-        query = query.eq('sub_country', label);
-      }
-
-      // Apply search filter - include local_area
-      if (debouncedSearch) {
-        query = query.or(`name.ilike.%${debouncedSearch}%,country.ilike.%${debouncedSearch}%,sub_country.ilike.%${debouncedSearch}%`);
-      }
-
-      // Order by global rank first (Top 100 courses), then alphabetically
-      query = query.order('global_rank', { ascending: true, nullsFirst: false });
-      query = query.order('name', { ascending: true });
-      
-      // Pagination
-      const from = page * PAGE_SIZE;
-      const to = from + PAGE_SIZE - 1;
-      query = query.range(from, to);
-
-      const { data, error, count } = await query;
-      if (error) throw error;
-
-      return {
-        courses: data || [],
-        totalCount: count ?? 0,
-      };
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    retry: 1,
   });
 
   const courses = data?.courses || [];

@@ -150,11 +150,11 @@ const GlobalTop100 = () => {
     });
   }, [lists]);
 
-  // Use the search hook for Top 100 lists
+  // Use the search hook for Top 100 lists - reduced limit to prevent memory issues
   const { data: courses = [], isLoading } = useGolfCoursesSearch({
     searchQuery: debouncedSearch,
     listSlug: selectedList,
-    limit: 200,
+    limit: 100, // Reduced from 200 to prevent memory pressure on iOS
   });
 
   // Apply subregion filter client-side

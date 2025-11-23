@@ -12,6 +12,7 @@ import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { User } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import CoursesErrorBoundary from './CoursesErrorBoundary';
 
 interface CoursesContentProps {
   username?: string;
@@ -94,15 +95,16 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center space-y-1 -mt-[42px] mb-4">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          {username ? `${username}'s Courses` : 'Golf Courses'}
-        </h1>
-        <p className="text-muted-foreground text-base">
-          {getSubtitle()}
-        </p>
-      </div>
+    <CoursesErrorBoundary>
+      <div className="space-y-6">
+        <div className="text-center space-y-1 -mt-[42px] mb-4">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            {username ? `${username}'s Courses` : 'Golf Courses'}
+          </h1>
+          <p className="text-muted-foreground text-base">
+            {getSubtitle()}
+          </p>
+        </div>
 
       {/* User profile courses page - show all tabs including My Courses */}
       {username ? (
@@ -173,9 +175,10 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
         </Tabs>
       )}
 
-      {/* Global scroll-to-top button */}
-      <ScrollToTopGlass />
-    </div>
+        {/* Global scroll-to-top button */}
+        <ScrollToTopGlass />
+      </div>
+    </CoursesErrorBoundary>
   );
 };
 
