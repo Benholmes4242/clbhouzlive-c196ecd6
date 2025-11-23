@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { logGeolocationError } from '@/utils/errorLogger';
 
 /**
  * Update user's location in the database
@@ -116,6 +117,13 @@ export function watchUserLocation(
   const handleError = (error: GeolocationPositionError) => {
     errorCount++;
     console.error('Location watch error:', error);
+    
+    // Log to enhanced error logger
+    logGeolocationError(error, {
+      source: 'watchUserLocation',
+      errorCount,
+      willStop: error.code === 1 || errorCount >= MAX_ERRORS,
+    });
 
     // Stop watching after too many errors or permission denial
     if (error.code === 1 || errorCount >= MAX_ERRORS) {

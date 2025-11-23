@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import ScrollToTop from '@/components/ScrollToTop';
 import { ScrollRestoration } from '@/components/ScrollRestoration';
@@ -142,6 +143,7 @@ const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 const CreateMomentPage = lazy(() => import("./pages/CreateMomentPage"));
+const ErrorLogPage = lazy(() => import("./pages/ErrorLogPage"));
 
 // Import season wrap modal
 import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
@@ -251,6 +253,7 @@ function AppRoutes() {
         </Route>
         
         <Route path="/create-moment" element={<CreateMomentPage />} />
+        <Route path="/error-logs" element={<ErrorLogPage />} />
         
         {/* Public Echo Share Page */}
         <Route path="/echo/share/:token" element={<EchoSharePage />} />
@@ -442,17 +445,19 @@ const App: React.FC = () => {
                     <GlobalAudioProvider>
                       <VideoManagerProvider>
                         <VideoPlaybackManagerProvider>
-                          <TopTenProvider>
-                            <AuthWrapper>
-                              <SeasonWrapModal />
-                              <AchievementToastWrapper />
-                              <Suspense fallback={<AppBootstrapLoader />}>
-                                <div className="app-depth">
-                                  {/* No global header - each page renders its own ClubhouseHeaderNew */}
-                                  <AppRoutes />
-                                </div>
-                              </Suspense>
-                            </AuthWrapper>
+                           <TopTenProvider>
+                            <ErrorBoundary>
+                              <AuthWrapper>
+                                <SeasonWrapModal />
+                                <AchievementToastWrapper />
+                                <Suspense fallback={<AppBootstrapLoader />}>
+                                  <div className="app-depth">
+                                    {/* No global header - each page renders its own ClubhouseHeaderNew */}
+                                    <AppRoutes />
+                                  </div>
+                                </Suspense>
+                              </AuthWrapper>
+                            </ErrorBoundary>
                           </TopTenProvider>
                         </VideoPlaybackManagerProvider>
                       </VideoManagerProvider>

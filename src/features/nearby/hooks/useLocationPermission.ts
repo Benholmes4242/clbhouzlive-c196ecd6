@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { logGeolocationError } from '@/utils/errorLogger';
 
 export type LocationPermissionState = 'prompt' | 'granted' | 'denied' | 'unavailable';
 
@@ -81,6 +82,14 @@ export function useLocationPermission() {
       return location;
     } catch (err: any) {
       console.error('Location permission error:', err);
+      
+      // Log to enhanced error logger
+      if (err && typeof err === 'object' && 'code' in err) {
+        logGeolocationError(err as GeolocationPositionError, {
+          hook: 'useLocationPermission',
+          method: 'requestPermission',
+        });
+      }
       
       if (err.code === 1) {
         // PERMISSION_DENIED - Activate circuit breaker
