@@ -17,8 +17,9 @@ import {
   normalizeLabel,
   subregionKeyToLabel,
 } from '@/constants/courseRegions';
+import { getOptimalPageSize } from '@/utils/deviceDetection';
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = getOptimalPageSize(50); // 30 on mobile, 50 on desktop
 
 function listSlugToRegionKey(slug: string): PrimaryRegionKey {
   switch (slug) {
@@ -168,7 +169,7 @@ const GlobalTop100 = () => {
   const { data: courses = [], isLoading } = useGolfCoursesSearch({
     searchQuery: debouncedSearch,
     listSlug: selectedList,
-    limit: 50, // Reduced to 50 to match pagination and reduce memory pressure
+    limit: PAGE_SIZE, // Uses mobile-optimized page size (30 on mobile, 50 on desktop)
   });
 
   // Apply subregion filter client-side
