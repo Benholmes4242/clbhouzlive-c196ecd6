@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
@@ -31,18 +31,13 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const initTimeoutRef = useRef<number | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
 
   // Detect iOS
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-  // Swipe down to close handlers
+  // Swipe down to close handlers (only for header area)
   const swipeHandlers = useSwipeable({
-    onSwipedDown: () => {
-      if (!isDragging) {
-        onOpenChange(false);
-      }
-    },
+    onSwipedDown: () => onOpenChange(false),
     preventScrollOnSwipe: false,
     trackMouse: false,
   });
@@ -136,39 +131,41 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
       <SheetContent 
         side="bottom" 
         className="h-[85vh] sm:h-[80vh] flex flex-col p-0"
-        {...swipeHandlers}
       >
-        {/* Grabber bar */}
-        <div 
-          className="absolute left-1/2 -translate-x-1/2 rounded-full"
-          style={{
-            top: 'calc(8px + env(safe-area-inset-top, 0px))',
-            width: 36,
-            height: 5,
-            background: 'rgba(255, 255, 255, 0.25)',
-          }}
-        />
-        
-        <div className="flex flex-col h-full px-4 pt-[calc(8px+env(safe-area-inset-top,0px)+5px+12px)] pb-3 gap-4">
-          {/* Header */}
-          <div className="flex items-start justify-between">
-            <div>
-              <h2 className="text-base font-semibold flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                {courseName}
-              </h2>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {subCountry && `${subCountry}, `}{country}
-              </p>
+        {/* Grabber bar and header - swipe to close area */}
+        <div {...swipeHandlers}>
+          {/* Grabber bar */}
+          <div 
+            className="absolute left-1/2 -translate-x-1/2 rounded-full"
+            style={{
+              top: 'calc(8px + env(safe-area-inset-top, 0px))',
+              width: 36,
+              height: 5,
+              background: 'rgba(255, 255, 255, 0.25)',
+            }}
+          />
+          
+          <div className="px-4 pt-[calc(8px+env(safe-area-inset-top,0px)+5px+12px)]">
+            {/* Header */}
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h2 className="text-base font-semibold flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  {courseName}
+                </h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {subCountry && `${subCountry}, `}{country}
+                </p>
+              </div>
             </div>
           </div>
-
+        </div>
+        
+        <div className="flex flex-col flex-1 px-4 pb-3 gap-4">
           {/* Map */}
           <div 
             className="relative flex-1 rounded-2xl overflow-hidden border border-border/60 bg-surface-alt" 
             style={{ minHeight: '320px' }}
-            onTouchStart={() => setIsDragging(true)}
-            onTouchEnd={() => setIsDragging(false)}
           >
             <div ref={mapContainerRef} className="w-full h-full" />
           </div>
