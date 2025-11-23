@@ -25,6 +25,7 @@ const CourseExplorer = () => {
   const listTopRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
   const hasInitialisedFromUrlRef = useRef(false);
+  const mountedRef = useRef(true);
   
   // URL params take priority, then sessionStorage, then defaults
   const [selectedRegion, setSelectedRegion] = useState<PrimaryRegionKey>(() => {
@@ -87,7 +88,7 @@ const CourseExplorer = () => {
   // Save filters to sessionStorage whenever they change (only after URL initialization)
   useEffect(() => {
     // Don't immediately overwrite URL-driven state on first render
-    if (!hasInitialisedFromUrlRef.current) return;
+    if (!hasInitialisedFromUrlRef.current || !mountedRef.current) return;
 
     try {
       sessionStorage.setItem('explore-last-filters', JSON.stringify({
@@ -143,6 +144,7 @@ const CourseExplorer = () => {
   // Cleanup on unmount - clear sessionStorage to prevent stale state on revisit
   useEffect(() => {
     return () => {
+      mountedRef.current = false;
       try {
         sessionStorage.removeItem('explore-scroll');
         sessionStorage.removeItem('explore-last-filters');
