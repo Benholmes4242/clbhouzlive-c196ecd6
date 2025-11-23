@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Heart, MessageCircle, Share, Bookmark, Search } from 'lucide-react';
+import { Heart, MessageCircle, Share, Search, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SocialDockProps {
@@ -10,11 +10,10 @@ interface SocialDockProps {
     courseName?: string;
     holeNumber?: number | null | undefined;
     isLiked: boolean;
-    isSaved: boolean;
+    isMuted: boolean;
     likes: number;
     comments: number;
     shares: number;
-    saves: number;
   };
   isVisible: boolean;
   onSwipeUp: () => void;
@@ -23,7 +22,7 @@ interface SocialDockProps {
   onLike: () => void;
   onComment: () => void;
   onShare: () => void;
-  onSave: () => void;
+  onMuteToggle: () => void;
   onSearch: () => void;
 }
 
@@ -36,7 +35,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
   onLike,
   onComment,
   onShare,
-  onSave,
+  onMuteToggle,
   onSearch,
 }) => {
   const [showCounts, setShowCounts] = useState(false);
@@ -148,12 +147,10 @@ export const SocialDock: React.FC<SocialDockProps> = ({
           onLongPress={handleActionLongPress}
         />
         <ActionButton
-          icon={Bookmark}
-          count={post.saves}
-          showCount={showCounts}
-          active={post.isSaved}
-          onClick={onSave}
-          onLongPress={handleActionLongPress}
+          icon={post.isMuted ? VolumeX : Volume2}
+          hideCount
+          active={!post.isMuted}
+          onClick={onMuteToggle}
         />
         <ActionButton
           icon={Search}
