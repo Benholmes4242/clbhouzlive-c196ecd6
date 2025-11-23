@@ -98,7 +98,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             className="absolute top-3 left-3 md:top-4 md:left-4 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
             aria-label="Go back"
           >
-            <ArrowLeft className="!h-6 !w-6 text-white" />
+            <ArrowLeft className="!h-5 !w-5 text-white" />
           </button>
         )}
         

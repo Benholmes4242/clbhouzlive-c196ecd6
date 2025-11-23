@@ -279,9 +279,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* Your Rating vs Community Comparison */}
       {user && userRating && ratingAggregates && (
-        <div className="mt-6">
-          <RatingComparisonCard userRating={userRating} aggregates={ratingAggregates} />
-        </div>
+        <RatingComparisonCard userRating={userRating} aggregates={ratingAggregates} />
       )}
 
       {/* About Section */}
