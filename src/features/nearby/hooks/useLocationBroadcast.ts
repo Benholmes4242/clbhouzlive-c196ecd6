@@ -4,6 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLocationPermission } from './useLocationPermission';
 import { useVisibility } from './useVisibility';
 import { MIN_LOCATION_CHANGE_METERS } from '../constants';
+import { logError } from '@/utils/errorLogger';
 
 const BROADCAST_INTERVAL_MS = 15 * 1000; // 15 seconds - efficient battery usage
 
@@ -109,9 +110,21 @@ export function useLocationBroadcast() {
           // Update refs only on successful write
           lastWriteRef.current = now;
           lastLocationRef.current = { lat: loc.lat, lng: loc.lng };
+        } else {
+          console.error('[LocationBroadcast] Database error:', error);
+          logError(new Error(`LocationBroadcast DB error: ${error.message}`), {
+            type: 'locationBroadcast',
+            visibilityMode,
+            userId: user.id,
+          });
         }
       } catch (error) {
         console.error('[LocationBroadcast] Error:', error);
+        logError(error instanceof Error ? error : new Error(String(error)), {
+          type: 'locationBroadcast',
+          visibilityMode,
+          userId: user.id,
+        });
       }
     };
 
