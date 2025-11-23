@@ -123,11 +123,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseLocationBreadcrumb course={course} />
       
       {/* Community Score Section */}
-      <section className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-4 md:px-6 md:py-5">
+      <section className="rounded-xl bg-card border border-border/60 shadow-sm px-4 py-4 md:px-6 md:py-5">
         {ratingAggregates && ratingAggregates.review_count > 0 ? (
           <>
             {/* Header with premium score */}
-            <div className="flex items-start justify-between gap-3 mb-5">
+            <div className="flex items-start justify-between gap-3 mb-3">
               <div>
                 <h3 className="text-base font-semibold">Community Score</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -142,6 +142,21 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 </span>
               </div>
             </div>
+
+            {/* User's rating summary - integrated into Community Score */}
+            {user && userRating && (() => {
+              const userOverall = userRating.rating;
+              const communityOverall = ratingAggregates.avg_overall_score || 0;
+              const delta = Number((userOverall - communityOverall).toFixed(1));
+              
+              return (
+                <div className="mb-5 text-right">
+                  <p className="text-xs text-muted-foreground">
+                    Your Rating: {formatScore(userOverall)}/10 — {Math.abs(delta).toFixed(1)} {Math.abs(delta) === 1 ? 'point' : 'points'} {delta >= 0 ? 'higher' : 'lower'} than the community
+                  </p>
+                </div>
+              );
+            })()}
 
             {/* Category bars with animations */}
             <div className="space-y-3 mb-5">
@@ -253,40 +268,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <CourseFriendsStrip courseId={course.id} courseName={course.name} />
       </section>
 
-      {/* Your Overall Rating Section */}
-      {user && userRating && ratingAggregates && ratingAggregates.review_count > 0 && (() => {
-        const userOverall = userRating.rating;
-        const communityOverall = ratingAggregates.avg_overall_score || 0;
-        const delta = Number((userOverall - communityOverall).toFixed(1));
-
-        return (
-          <section className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
-                  Your Overall Rating
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {delta === 0
-                    ? 'You and the community are almost identical.'
-                    : delta > 0
-                    ? `You rate this course ${delta.toFixed(1)} ${delta === 1 ? 'point' : 'points'} higher than the community.`
-                    : `You rate this course ${Math.abs(delta).toFixed(1)} ${Math.abs(delta) === 1 ? 'point' : 'points'} lower than the community.`}
-                </p>
-              </div>
-              <div className="flex flex-col items-end">
-                <div className="flex flex-col items-center">
-                  <span className="text-lg font-semibold">
-                    {formatScore(userOverall)}/10
-                  </span>
-                  <span className="text-xs text-muted-foreground">Your rating</span>
-                </div>
-              </div>
-            </div>
-          </section>
-        );
-      })()}
-
       {/* Your Rating vs Community Comparison */}
       {user && userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
         <RatingComparisonCard userRating={userRating} aggregates={ratingAggregates} />
@@ -294,7 +275,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* CTA for users who haven't rated yet */}
       {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
-        <section className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-4">
+        <section className="rounded-xl bg-card border border-border/60 shadow-sm px-4 py-4">
           <h3 className="text-base font-semibold mb-1">How do you rate this course?</h3>
           <p className="text-sm text-muted-foreground mb-3">
             Add your rating to see how it compares with the clbhouz community.
@@ -307,7 +288,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* About Section */}
       {course.description && (
-        <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
+        <section className="rounded-xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
           <h2 className="text-base md:text-lg font-semibold">About</h2>
           <div className="text-sm md:text-base leading-relaxed text-foreground">
             {formatDescription(displayDescription)}
@@ -330,7 +311,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* Location and Media sections - side by side on desktop, stacked on mobile */}
       <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
         {/* Location Section */}
-        <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
+        <section className="rounded-xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
           <h2 className="text-base md:text-lg font-semibold">Location</h2>
           <p className="text-sm md:text-base text-foreground">
             {[course.sub_country, course.country].filter(Boolean).join(', ')}
@@ -370,7 +351,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </section>
 
         {/* Media Section */}
-        <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
+        <section className="rounded-xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
           <AboutMediaStrip 
             clubId={course.id} 
             onSeeAllClick={() => onTabChange?.('media')}
