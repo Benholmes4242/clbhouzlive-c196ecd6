@@ -86,6 +86,20 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
       }
 
       if (mapRef.current) {
+        try {
+          // Force WebGL context loss before removing (helps iOS Safari)
+          const canvas = mapRef.current.getCanvas();
+          const gl = canvas?.getContext('webgl') || canvas?.getContext('webgl2');
+          if (gl && typeof (gl as any).getExtension === 'function') {
+            const loseContext = (gl as any).getExtension('WEBGL_lose_context');
+            if (loseContext) {
+              loseContext.loseContext();
+            }
+          }
+        } catch (err) {
+          console.warn('[Mapbox Preview] Error losing WebGL context:', err);
+        }
+
         mapRef.current.remove();
         mapRef.current = null;
       }

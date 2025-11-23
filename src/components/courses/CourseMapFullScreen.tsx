@@ -67,6 +67,20 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
         retryTimeoutRef.current = null;
       }
       if (mapRef.current) {
+        try {
+          // Force WebGL context loss before removing (helps iOS Safari)
+          const canvas = mapRef.current.getCanvas();
+          const gl = canvas?.getContext('webgl') || canvas?.getContext('webgl2');
+          if (gl && typeof (gl as any).getExtension === 'function') {
+            const loseContext = (gl as any).getExtension('WEBGL_lose_context');
+            if (loseContext) {
+              loseContext.loseContext();
+            }
+          }
+        } catch (err) {
+          console.warn('[Mapbox Fullscreen] Error losing WebGL context:', err);
+        }
+        
         mapRef.current.remove();
         mapRef.current = null;
       }
@@ -76,16 +90,22 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
     if (!MAPBOX_TOKEN) return;
     if (!latitude || !longitude) return;
 
-    let retryCount = 0;
+    let localRetryCount = 0;
     const maxRetries = 10; // 1s total
 
     const initMap = () => {
+      // Clear any previous timeout before scheduling a new one
+      if (retryTimeoutRef.current != null) {
+        window.clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+
       if (!mountedRef.current || !open) return;
 
       const container = mapContainerRef.current;
       if (!container) {
-        if (retryCount < maxRetries) {
-          retryCount++;
+        if (localRetryCount < maxRetries) {
+          localRetryCount++;
           retryTimeoutRef.current = window.setTimeout(initMap, 100);
         }
         return;
@@ -93,8 +113,8 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
 
       // Container must have a height to avoid 0px maps
       if (container.offsetHeight === 0) {
-        if (retryCount < maxRetries) {
-          retryCount++;
+        if (localRetryCount < maxRetries) {
+          localRetryCount++;
           retryTimeoutRef.current = window.setTimeout(initMap, 100);
         }
         return;
@@ -137,7 +157,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
       }
     };
 
-    // Start trying to initialize after a short delay for Sheet animation
+    // Kick off after sheet animation
     retryTimeoutRef.current = window.setTimeout(initMap, 300);
 
     return () => {
@@ -146,6 +166,20 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
         retryTimeoutRef.current = null;
       }
       if (mapRef.current) {
+        try {
+          // Force WebGL context loss before removing (helps iOS Safari)
+          const canvas = mapRef.current.getCanvas();
+          const gl = canvas?.getContext('webgl') || canvas?.getContext('webgl2');
+          if (gl && typeof (gl as any).getExtension === 'function') {
+            const loseContext = (gl as any).getExtension('WEBGL_lose_context');
+            if (loseContext) {
+              loseContext.loseContext();
+            }
+          }
+        } catch (err) {
+          console.warn('[Mapbox Fullscreen] Error losing WebGL context:', err);
+        }
+        
         mapRef.current.remove();
         mapRef.current = null;
       }
