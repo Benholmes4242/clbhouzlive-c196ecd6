@@ -179,32 +179,51 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   const visibleCourses = courses.slice(visibleRange.start, visibleRange.end);
 
   return (
-    <div 
-      ref={containerRef}
-      className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0"
-      style={{ height: totalHeight }}
-    >
-      <div
-        className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6 will-change-transform"
+    <>
+      {/* DEBUG: Red dot to show scroll container - should stay fixed in center */}
+      <div 
         style={{
-          transform: `translateY(${offsetY}px)`,
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '100px',
+          height: '100px',
+          borderRadius: '50%',
+          backgroundColor: 'red',
+          zIndex: 9999,
+          pointerEvents: 'none',
+          opacity: 0.8
         }}
+      />
+      
+      <div 
+        ref={containerRef}
+        className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0"
+        style={{ height: totalHeight }}
       >
-        {visibleCourses.map((course) => (
-          <div 
-            key={course.id} 
-            className="mb-4 sm:mb-0"
-            style={{ height: itemHeight }}
-          >
-            <CourseCard 
-              course={course}
-              showRankBadge={!!course.global_rank}
-              onClick={onCourseClick}
-            />
-          </div>
-        ))}
+        <div
+          className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6 will-change-transform"
+          style={{
+            transform: `translateY(${offsetY}px)`,
+          }}
+        >
+          {visibleCourses.map((course) => (
+            <div 
+              key={course.id} 
+              className="mb-4 sm:mb-0"
+              style={{ height: itemHeight }}
+            >
+              <CourseCard 
+                course={course}
+                showRankBadge={!!course.global_rank}
+                onClick={onCourseClick}
+              />
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
