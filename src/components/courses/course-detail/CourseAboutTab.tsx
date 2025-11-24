@@ -302,24 +302,24 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseTop100Summary />
 
       {/* Location Section - Seamless */}
-      <section className="pt-4 pb-5 bg-slate-50 space-y-3">
-        <div className="px-4 space-y-3">
+      <section className="pt-4 pb-5 bg-slate-50">
+        <div className="px-4 space-y-3 mb-4">
           <h2 className="text-base md:text-lg font-semibold">Location</h2>
           <p className="text-sm md:text-base text-foreground">
             {[course.sub_country, course.country].filter(Boolean).join(', ')}
           </p>
         </div>
         
-        {/* Map preview - with small side gaps */}
+        {/* Map preview - full width on mobile, with padding on desktop */}
         {!coords && coordsLoading && (
-          <div className="px-3.5">
-            <div className="w-full aspect-square bg-surface-alt animate-pulse" />
+          <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:px-4">
+            <div className="w-full h-[280px] sm:h-64 bg-surface-alt animate-pulse rounded-none sm:rounded-xl" />
           </div>
         )}
 
         {coords && (
           <>
-            <div className="px-3.5">
+            <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:px-4">
               <CourseMapPreview
                 latitude={coords.lat}
                 longitude={coords.lng}
