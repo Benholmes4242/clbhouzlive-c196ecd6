@@ -544,7 +544,7 @@ const PostPlayRatingModal = ({
         {!showConfirmation ? (
           <div className="pb-12">
             {/* Full Bleed Header with Glass Back Button */}
-            <div className="relative -mx-0 mb-6 h-[200px] overflow-hidden">
+            <div className="relative -mx-0 mb-6 h-[280px] sm:h-64 overflow-hidden">
               {course.thumbnail_image ? (
                 <img
                   src={course.thumbnail_image}
