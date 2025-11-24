@@ -135,9 +135,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 </p>
               </div>
 
-              <div className="flex items-center gap-0.5 flex-shrink-0">
+              <div className="flex items-center gap-0 flex-shrink-0">
                 <ClubhouseLogo size="md" className="h-7 w-7" />
-                <span className="text-xl md:text-2xl font-semibold transition-opacity duration-300 text-right min-w-[80px]">
+                <span className="text-xl md:text-2xl font-semibold transition-opacity duration-300 text-right">
                   {formatScore(ratingAggregates.avg_overall_score || 0)}/10
                 </span>
               </div>
@@ -218,7 +218,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             )}
 
             {/* See all reviews link */}
-            <div className="flex justify-end mb-4">
+            <div className="flex justify-end mt-3">
               <button
                 type="button"
                 onClick={() => onTabChange?.('reviews')}
@@ -232,7 +232,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             {userRating && (
               <Button 
                 onClick={handleRateClick}
-                className="w-full justify-center"
+                className="w-full justify-center mt-4"
                 variant="outline"
               >
                 Edit Your Rating
@@ -254,7 +254,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 className="w-full justify-center"
                 variant="outline"
               >
-                Review this course
+                Rate this course
               </Button>
             </div>
           </>
@@ -277,7 +277,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             Add your rating to see how it compares with the clbhouz community.
           </p>
           <Button onClick={handleRateClick} className="w-full" variant="outline">
-            Review this course
+            Rate this course
           </Button>
         </section>
       )}
