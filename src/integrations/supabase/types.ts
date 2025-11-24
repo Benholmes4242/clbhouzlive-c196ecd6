@@ -5508,14 +5508,6 @@ export type Database = {
         Returns: boolean
       }
       is_thread_member: { Args: { _thread_id: string }; Returns: boolean }
-      log_user_achievement: {
-        Args: {
-          achievement_data_param: Json
-          achievement_type_param: string
-          user_id_param: string
-        }
-        Returns: undefined
-      }
       longtransactionsenabled: { Args: never; Returns: boolean }
       nearby_golfers: {
         Args: {

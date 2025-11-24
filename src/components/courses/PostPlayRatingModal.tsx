@@ -178,13 +178,15 @@ const PostPlayRatingModal = ({
         console.error('Error checking badges:', error);
       }
     },
-    onError: (error) => {
-      console.error('Error marking course as played:', error);
-      toast({
-        title: "Error",
-        description: "Failed to mark course as played. Please try again.",
-        variant: "destructive",
+    onError: (error: any) => {
+      console.error('[Rating] Error marking course as played:', error);
+      console.error('[Rating] Played marking error details:', {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details
       });
+      // Don't show user error - they already got success toast for rating
+      // This is a secondary operation that shouldn't block the primary success
     },
   });
 
@@ -280,8 +282,14 @@ const PostPlayRatingModal = ({
     },
     onSuccess: async () => {
       // Mark as played after successful rating (only if not in edit mode)
+      // Don't let achievements failures block the rating success
       if (!isEditMode) {
-        await markAsPlayedMutation.mutateAsync();
+        try {
+          await markAsPlayedMutation.mutateAsync();
+        } catch (achievementError) {
+          console.error('[Rating] Achievements failed but rating succeeded:', achievementError);
+          // Continue - rating is still successful even if achievements fail
+        }
       }
       
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
@@ -335,6 +343,12 @@ const PostPlayRatingModal = ({
       const { data: userResponse } = await supabase.auth.getUser();
       if (!userResponse.user || !course) throw new Error('Not authenticated or no course');
 
+      console.log('[Delete Rating] Payload:', { 
+        ratingId: existingRating?.id, 
+        courseId: course.id, 
+        userId: userResponse.user.id 
+      });
+
       // Delete rating if it exists
       if (existingRating) {
         const { error: ratingError } = await supabase
@@ -342,7 +356,11 @@ const PostPlayRatingModal = ({
           .delete()
           .eq('id', existingRating.id);
         
-        if (ratingError) throw ratingError;
+        if (ratingError) {
+          console.error('[Delete Rating] Rating deletion error:', ratingError);
+          throw ratingError;
+        }
+        console.log('[Delete Rating] Rating deleted successfully');
       }
 
       // Remove from user_courses (regular courses)
@@ -351,6 +369,10 @@ const PostPlayRatingModal = ({
         .delete()
         .eq('user_id', userResponse.user.id)
         .eq('course_id', course.id);
+      
+      if (courseError && courseError.code !== 'PGRST116') {
+        console.error('[Delete Rating] User courses deletion error:', courseError);
+      }
       
       // Also try to remove from user_top100_courses (might be in both tables)
       const { error: top100Error } = await supabase
@@ -361,8 +383,10 @@ const PostPlayRatingModal = ({
       
       // Don't throw error if not found in top100 courses
       if (top100Error && top100Error.code !== 'PGRST116') {
-        console.warn('Error updating top100 courses:', top100Error);
+        console.warn('[Delete Rating] Top100 courses update error:', top100Error);
       }
+
+      console.log('[Delete Rating] Result:', { status: 'success' });
     },
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
@@ -375,14 +399,15 @@ const PostPlayRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['userTop100CoursesInRegion'] });
       queryClient.invalidateQueries({ queryKey: ['top100-courses'] });
       
-      // Trigger badge checking for the user
+      // Trigger badge checking for the user (non-blocking)
       try {
         const { data: userResponse } = await supabase.auth.getUser();
         if (userResponse.user) {
           await supabase.rpc('check_and_award_badges', { user_id_param: userResponse.user.id });
         }
       } catch (error) {
-        console.error('Error checking badges:', error);
+        console.error('[Delete Rating] Badges check failed but delete succeeded:', error);
+        // Don't block delete success
       }
       
       toast({
@@ -396,8 +421,13 @@ const PostPlayRatingModal = ({
       onClose();
       resetForm();
     },
-    onError: (error) => {
-      console.error('Error removing course:', error);
+    onError: (error: any) => {
+      console.error('[Delete Rating] Error:', error);
+      console.error('[Delete Rating] Error details:', {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details
+      });
       toast({
         title: "Error",
         description: "Failed to remove course. Please try again.",
