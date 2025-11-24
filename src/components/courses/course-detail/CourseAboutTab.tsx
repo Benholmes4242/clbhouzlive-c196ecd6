@@ -20,6 +20,7 @@ import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
 import RatingComparisonCard from './RatingComparisonCard';
 import CourseTop100Summary from './CourseTop100Summary';
+import { RatingDeltaIcon } from '@/components/RatingDeltaIcon';
 
 interface Course {
   id: string;
@@ -212,8 +213,24 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
             {/* Personal comparison text - if user has rated */}
             {userRating && (
-              <p className="text-sm text-slate-500 mt-3">
-                You rate this course {Math.abs(userRating.rating - (ratingAggregates.avg_overall_score || 0)).toFixed(1)} points {userRating.rating > (ratingAggregates.avg_overall_score || 0) ? 'higher' : 'lower'} than the community.
+              <p className="text-sm text-slate-500 mt-3 flex items-center">
+                <RatingDeltaIcon
+                  direction={
+                    userRating.rating > (ratingAggregates.avg_overall_score || 0)
+                      ? 'up'
+                      : 'down'
+                  }
+                  className="mr-1"
+                />
+                You rate this course{' '}
+                {Math.abs(
+                  userRating.rating - (ratingAggregates.avg_overall_score || 0)
+                ).toFixed(1)}{' '}
+                points{' '}
+                {userRating.rating > (ratingAggregates.avg_overall_score || 0)
+                  ? 'higher'
+                  : 'lower'}{' '}
+                than the community.
               </p>
             )}
 
