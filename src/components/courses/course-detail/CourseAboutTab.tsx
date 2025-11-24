@@ -310,19 +310,23 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           </p>
         </div>
         
-        {/* Map preview - full width */}
+        {/* Map preview - with small side gaps */}
         {!coords && coordsLoading && (
-          <div className="w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px] bg-surface-alt animate-pulse" />
+          <div className="px-3.5">
+            <div className="w-full aspect-square bg-surface-alt animate-pulse" />
+          </div>
         )}
 
         {coords && (
           <>
-            <CourseMapPreview
-              latitude={coords.lat}
-              longitude={coords.lng}
-              courseName={course.name}
-              onOpenFullMap={() => setMapOpen(true)}
-            />
+            <div className="px-3.5">
+              <CourseMapPreview
+                latitude={coords.lat}
+                longitude={coords.lng}
+                courseName={course.name}
+                onOpenFullMap={() => setMapOpen(true)}
+              />
+            </div>
 
             <CourseMapFullScreen
               open={mapOpen}
