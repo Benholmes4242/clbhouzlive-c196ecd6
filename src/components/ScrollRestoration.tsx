@@ -12,14 +12,27 @@ export const ScrollRestoration = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Save current scroll position before leaving
+    // Exclude course detail routes from scroll restoration
+    const isCourseDetail = /^\/courses\/[^/]+$/.test(location.pathname);
+    
+    // Save current scroll position before leaving (only for non-course-detail routes)
     return () => {
-      const currentPath = location.pathname + location.search;
-      scrollPositions.set(currentPath, window.scrollY);
+      if (!isCourseDetail) {
+        const currentPath = location.pathname + location.search;
+        scrollPositions.set(currentPath, window.scrollY);
+      }
     };
   }, [location]);
 
   useEffect(() => {
+    // Exclude course detail routes from scroll restoration
+    const isCourseDetail = /^\/courses\/[^/]+$/.test(location.pathname);
+    
+    if (isCourseDetail) {
+      // Course details handle their own scroll-to-top
+      return;
+    }
+    
     // Restore scroll position for this route
     const currentPath = location.pathname + location.search;
     const savedPosition = scrollPositions.get(currentPath);
