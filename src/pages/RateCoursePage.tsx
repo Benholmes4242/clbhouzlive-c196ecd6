@@ -4,10 +4,12 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import PostPlayRatingModal from '@/components/courses/PostPlayRatingModal';
 import AccessControl from '@/components/AccessControl';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const RateCoursePage = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
+  const { user } = useSupabaseSession();
 
   const { data: course, isLoading } = useQuery({
     queryKey: ['course', courseId],
@@ -26,9 +28,31 @@ const RateCoursePage = () => {
     enabled: !!courseId,
   });
 
+  // Fetch existing rating for this user/course
+  const { data: existingRating } = useQuery({
+    queryKey: ['user-course-rating', courseId, user?.id],
+    queryFn: async () => {
+      if (!courseId || !user?.id) return null;
+      
+      const { data } = await supabase
+        .from('course_ratings')
+        .select('*')
+        .eq('course_id', courseId)
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      return data;
+    },
+    enabled: !!courseId && !!user,
+  });
+
   const handleClose = () => {
     navigate(-1);
   };
+
+  // Debug logging
+  console.log('[Rating Submission Mode]', existingRating ? 'edit' : 'create');
+  console.log('[Existing Rating Detected]', !!existingRating);
 
   return (
     <AccessControl requireAuth={true}>
@@ -45,7 +69,8 @@ const RateCoursePage = () => {
           course={course}
           isOpen={true}
           onClose={handleClose}
-          isEditMode={false}
+          isEditMode={!!existingRating}
+          existingRating={existingRating}
         />
       )}
     </AccessControl>

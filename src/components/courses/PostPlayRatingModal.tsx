@@ -31,6 +31,7 @@ interface PostPlayRatingModalProps {
   isOpen: boolean;
   onClose: () => void;
   isEditMode?: boolean;
+  existingRating?: any;
   onRemoveFromPlayed?: () => void;
 }
 
@@ -38,7 +39,8 @@ const PostPlayRatingModal = ({
   course, 
   isOpen, 
   onClose, 
-  isEditMode = false, 
+  isEditMode = false,
+  existingRating: existingRatingProp,
   onRemoveFromPlayed 
 }: PostPlayRatingModalProps) => {
   const { toast } = useToast();
@@ -61,7 +63,8 @@ const PostPlayRatingModal = ({
   const [clubhouseTouched, setClubhouseTouched] = useState(false);
   const [facilitiesTouched, setFacilitiesTouched] = useState(false);
 
-  const { data: existingRating } = useQuery({
+  // Use passed existingRating or fetch internally as fallback
+  const { data: existingRatingFetched } = useQuery({
     queryKey: ['user-course-rating', course?.id],
     queryFn: async () => {
       if (!course?.id) return null;
@@ -83,8 +86,10 @@ const PostPlayRatingModal = ({
       
       return data;
     },
-    enabled: isEditMode && !!course?.id,
+    enabled: isEditMode && !!course?.id && !existingRatingProp,
   });
+
+  const existingRating = existingRatingProp || existingRatingFetched;
 
   // Populate form with existing rating data in edit mode
   useEffect(() => {
