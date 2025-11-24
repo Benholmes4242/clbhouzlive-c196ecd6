@@ -32,7 +32,7 @@ const CourseDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       <FadeInContent>
         <GolfClubView courseId={courseId} isInModal={false} />
       </FadeInContent>

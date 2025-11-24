@@ -18,7 +18,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
-import { cn } from '@/lib/utils';
 import RatingComparisonCard from './RatingComparisonCard';
 import CourseTop100Summary from './CourseTop100Summary';
 
@@ -350,10 +349,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       </section>
 
       {/* Media Section - Seamless */}
-      <section className={cn(
-        "px-4 pt-4 space-y-3",
-        course.website_url ? "pb-5 bg-slate-100" : "pb-24 bg-slate-100"
-      )}>
+      <section className="px-4 pt-4 pb-5 bg-slate-100 space-y-3">
         <AboutMediaStrip 
           clubId={course.id} 
           onSeeAllClick={() => onTabChange?.('media')}
@@ -362,7 +358,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* Visit Website - Seamless section */}
       {course.website_url && (
-        <section className="px-4 pt-4 pb-24 bg-slate-50">
+        <section className="px-4 pt-4 pb-6 bg-slate-50">
           <Button
             onClick={handleWebsiteClick}
             className="w-full flex items-center justify-center gap-2 bg-muted hover:bg-muted/80 text-foreground border h-11 rounded-xl"
