@@ -195,7 +195,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       </div>
 
       {/* Phase 3: Keep-mounted tabs - render all visited tabs, hide inactive */}
-      <div className="course-hero-wrapper">
+      <div className="course-hero-wrapper bg-slate-50">
         <Tabs value={activeTab} onValueChange={handleTabChange}>
           {/* About Tab - always rendered */}
           <TabsContent 
