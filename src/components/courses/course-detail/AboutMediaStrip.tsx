@@ -127,9 +127,9 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base md:text-lg font-semibold">Media</h2>
         </div>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-1">
           {Array.from({ length: maxItems }).map((_, i) => (
-            <div key={i} className="aspect-square bg-muted/70 rounded-xl animate-pulse" />
+            <div key={i} className="aspect-square bg-muted/70 rounded-xl animate-pulse border border-border/60 sm:border-border/40" />
           ))}
         </div>
       </>
@@ -164,7 +164,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-1">
           {mediaTiles.map((media) => (
             <button
               key={media.id}
@@ -173,7 +173,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                 e.stopPropagation();
                 onSeeAllClick();
               }}
-              className="rounded-xl overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all hover:scale-[1.02]"
+              className="rounded-xl overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all hover:scale-[1.02] border border-border/60 sm:border-border/40"
               aria-label="Open Media tab"
             >
               <SquareCardMedia
