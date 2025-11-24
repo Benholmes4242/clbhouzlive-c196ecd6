@@ -868,9 +868,19 @@ const PostPlayRatingModal = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel
+              onClick={() => {
+                console.log('[Delete Rating] Cancel clicked');
+                setShowRemoveDialog(false);
+              }}
+            >
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction 
-              onClick={handleRemoveFromPlayed}
+              onClick={() => {
+                console.log('[Delete Rating] Confirm clicked – calling handleRemoveFromPlayed');
+                handleRemoveFromPlayed();
+              }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Remove Course
