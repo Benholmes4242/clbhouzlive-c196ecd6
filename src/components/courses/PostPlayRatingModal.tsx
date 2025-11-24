@@ -758,7 +758,7 @@ const PostPlayRatingModal = ({
             </section>
 
             {/* Primary CTA Button */}
-            <footer className="px-4 mt-6 pb-[12px]">
+            <footer className="px-4 mt-6 pb-[24px]">
               <Button
                 type="submit"
                 onClick={handleSubmit}
