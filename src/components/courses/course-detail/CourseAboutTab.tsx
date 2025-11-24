@@ -118,14 +118,12 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   };
 
   return (
-    <div className="space-y-0">
-      {/* Location Breadcrumb & Quick Filters */}
-      <div className="px-4 pt-4 pb-4 bg-slate-50">
-        <CourseLocationBreadcrumb course={course} />
-      </div>
+    <div>
+      {/* Location Breadcrumb & Quick Filters - now handles its own padding */}
+      <CourseLocationBreadcrumb course={course} />
       
       {/* Community Score Section - Seamless with User Rating inline */}
-      <section className="px-4 pt-4 pb-5 bg-slate-50 md:px-6">
+      <section className="px-4 pt-6 pb-5 bg-slate-50 md:px-6">
         {ratingAggregates && ratingAggregates.review_count > 0 ? (
           <>
             {/* Header with premium score + user rating inline */}
