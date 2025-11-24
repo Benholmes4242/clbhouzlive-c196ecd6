@@ -135,18 +135,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 </p>
               </div>
 
-              <div className="flex flex-col items-end gap-1">
-                <div className="flex items-center gap-1.5">
-                  <ClubhouseLogo size="sm" className="h-5 w-5" />
-                  <span className="text-xl md:text-2xl font-semibold transition-opacity duration-300">
-                    {formatScore(ratingAggregates.avg_overall_score || 0)}/10
-                  </span>
-                </div>
-                {userRating && (
-                  <span className="text-xs text-muted-foreground">
-                    You: {formatScore(userRating.rating)}/10
-                  </span>
-                )}
+              <div className="flex items-center gap-1.5">
+                <ClubhouseLogo size="sm" className="h-5 w-5" />
+                <span className="text-xl md:text-2xl font-semibold transition-opacity duration-300">
+                  {formatScore(ratingAggregates.avg_overall_score || 0)}/10
+                </span>
               </div>
             </div>
 
