@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
@@ -39,7 +38,6 @@ const PostPlayRatingModal = ({
   const [review, setReview] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
   const [buttonText, setButtonText] = useState('Add to Played');
   const [designScore, setDesignScore] = useState<number | null>(null);
@@ -98,11 +96,6 @@ const PostPlayRatingModal = ({
       setFacilitiesTouched(existingRating.facilities_score != null);
     }
   }, [existingRating, isEditMode]);
-
-  // Debug log for showRemoveDialog state changes
-  useEffect(() => {
-    console.log('[Delete Rating] showRemoveDialog state changed:', showRemoveDialog);
-  }, [showRemoveDialog]);
 
   const markAsPlayedMutation = useMutation({
     mutationFn: async () => {
@@ -420,7 +413,6 @@ const PostPlayRatingModal = ({
         onRemoveFromPlayed();
       }
       
-      setShowRemoveDialog(false);
       onClose();
       resetForm();
       
@@ -795,37 +787,31 @@ const PostPlayRatingModal = ({
               </button>
 
               {isEditMode && (
-                <>
-                  <Button
-                    variant="destructive"
-                    onClick={() => {
-                      console.log('[Delete Rating] Remove button clicked', { 
-                        courseId: course?.id, 
-                        courseName: course?.name 
-                      });
-                      setShowRemoveDialog(true);
-                      console.log('[Delete Rating] setShowRemoveDialog(true) called - dialog should open');
-                    }}
-                    disabled={isSubmitting}
-                    className="w-full mt-3 flex items-center gap-2 justify-center"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Remove from Played
-                  </Button>
-                  
-                  {/* TEMP DEBUG: Direct delete button */}
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      console.log('[Delete Rating] DEBUG: Direct delete clicked - bypassing dialog');
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    console.log('[Delete Rating] Remove button clicked', { 
+                      courseId: course?.id, 
+                      courseName: course?.name 
+                    });
+                    
+                    const confirmed = window.confirm(
+                      `Are you sure you want to remove "${course?.name}" from your played list? This will permanently delete your rating and review for this course.`
+                    );
+                    
+                    if (confirmed) {
+                      console.log('[Delete Rating] User confirmed deletion');
                       handleRemoveFromPlayed();
-                    }}
-                    disabled={isSubmitting}
-                    className="w-full mt-2 text-xs"
-                  >
-                    🔧 DEBUG: Delete Now (no confirm)
-                  </Button>
-                </>
+                    } else {
+                      console.log('[Delete Rating] User cancelled deletion');
+                    }
+                  }}
+                  disabled={isSubmitting}
+                  className="w-full mt-3 flex items-center gap-2 justify-center"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Remove from Played
+                </Button>
               )}
             </footer>
           </div>
@@ -867,24 +853,6 @@ const PostPlayRatingModal = ({
             </div>
           )}
         </div>
-
-      {/* Remove Confirmation Dialog */}
-      <ConfirmDialog
-        open={showRemoveDialog}
-        onOpenChange={(open) => {
-          console.log('[Delete Rating] ConfirmDialog onOpenChange:', open);
-          setShowRemoveDialog(open);
-        }}
-        title="Remove Course from Played List?"
-        description={`Are you sure you want to remove "${course.name}" from your played list? This will permanently delete your rating and review for this course.`}
-        confirmText="Remove Course"
-        cancelText="Cancel"
-        onConfirm={() => {
-          console.log('[Delete Rating] Confirm clicked – calling handleRemoveFromPlayed');
-          handleRemoveFromPlayed();
-        }}
-        variant="destructive"
-      />
     </>
   );
 };
