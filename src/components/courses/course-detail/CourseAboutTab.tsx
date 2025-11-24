@@ -302,51 +302,57 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseTop100Summary />
 
       {/* Location Section - Seamless */}
-      <section className="px-4 pt-4 pb-5 bg-slate-50 space-y-3">
-        <h2 className="text-base md:text-lg font-semibold">Location</h2>
-        <p className="text-sm md:text-base text-foreground">
-          {[course.sub_country, course.country].filter(Boolean).join(', ')}
-        </p>
-        
-        {/* Map preview */}
-        {!coords && coordsLoading && (
-          <div className="w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px] rounded-2xl bg-surface-alt animate-pulse" />
-        )}
-
-        {coords && (
-          <>
-            <CourseMapPreview
-              latitude={coords.lat}
-              longitude={coords.lng}
-              courseName={course.name}
-              onOpenFullMap={() => setMapOpen(true)}
-            />
-
-            <CourseMapFullScreen
-              open={mapOpen}
-              onOpenChange={setMapOpen}
-              latitude={coords.lat}
-              longitude={coords.lng}
-              courseName={course.name}
-              country={course.country}
-              subCountry={course.sub_country}
-            />
-          </>
-        )}
-
-        {!coords && !coordsLoading && (
-          <p className="text-sm text-muted-foreground">
-            Location data isn't available for this course yet.
+      <section className="pt-6 pb-5 bg-slate-50">
+        <div className="px-4 md:px-6 mb-3">
+          <h2 className="text-base font-semibold">Location</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            {[course.sub_country, course.country].filter(Boolean).join(', ')}
           </p>
-        )}
+        </div>
+        
+        {/* Map preview - full width */}
+        <div className="px-4 md:px-6">
+          {!coords && coordsLoading && (
+            <div className="w-full h-[220px] rounded-[12px] bg-surface-alt animate-pulse" />
+          )}
+
+          {coords && (
+            <>
+              <CourseMapPreview
+                latitude={coords.lat}
+                longitude={coords.lng}
+                courseName={course.name}
+                onOpenFullMap={() => setMapOpen(true)}
+              />
+
+              <CourseMapFullScreen
+                open={mapOpen}
+                onOpenChange={setMapOpen}
+                latitude={coords.lat}
+                longitude={coords.lng}
+                courseName={course.name}
+                country={course.country}
+                subCountry={course.sub_country}
+              />
+            </>
+          )}
+
+          {!coords && !coordsLoading && (
+            <p className="text-sm text-muted-foreground">
+              Location data isn't available for this course yet.
+            </p>
+          )}
+        </div>
       </section>
 
       {/* Media Section - Seamless */}
-      <section className="px-4 pt-4 pb-5 bg-slate-100 space-y-3">
-        <AboutMediaStrip 
-          clubId={course.id} 
-          onSeeAllClick={() => onTabChange?.('media')}
-        />
+      <section className="pt-6 pb-5 bg-slate-100">
+        <div className="px-4 md:px-6">
+          <AboutMediaStrip 
+            clubId={course.id} 
+            onSeeAllClick={() => onTabChange?.('media')}
+          />
+        </div>
       </section>
 
       {/* Visit Website - Seamless section */}
