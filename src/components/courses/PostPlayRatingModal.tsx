@@ -509,7 +509,7 @@ const PostPlayRatingModal = ({
 
             {/* Overall Rating Slider */}
             <section className="px-4 mt-4">
-              <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+              <p className="text-xs font-medium tracking-wide text-slate-500 mb-2">
                 Your overall rating
               </p>
 
@@ -565,7 +565,7 @@ const PostPlayRatingModal = ({
 
             {/* Breakdown Sliders */}
             <section className="px-4 mt-8">
-              <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+              <p className="text-xs font-semibold tracking-wide text-slate-500 mb-2">
                 Breakdown (optional)
               </p>
 
@@ -598,9 +598,10 @@ const PostPlayRatingModal = ({
             </section>
 
             {/* Media Upload Section */}
-            <section className="px-4 mt-8">
-              <p className="text-sm font-medium text-slate-900">Media Upload</p>
-              <p className="mt-1 text-xs text-slate-500">(optional)</p>
+            <section className="px-4 mt-6">
+              <h3 className="text-sm font-medium text-slate-900 mb-1">
+                Media Upload <span className="text-slate-400 text-xs">(optional)</span>
+              </h3>
 
               <div className="mt-3 rounded-xl border border-slate-200 bg-white/60 px-4 py-5">
                 {selectedMedia.length === 0 ? (
@@ -662,15 +663,15 @@ const PostPlayRatingModal = ({
             </section>
 
             {/* Primary CTA Button */}
-            <section className="px-4 mt-8 pb-3">
-              <Button
-                type="button"
+            <footer className="px-4 mt-6 pb-3">
+              <button
+                type="submit"
                 onClick={handleSubmit}
                 disabled={isSubmitting || !selectedRating}
-                className="w-full rounded-xl border border-slate-200 bg-slate-900 text-white text-sm font-semibold py-3 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-11 rounded-full border border-slate-200 bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Submitting...' : ctaLabel}
-              </Button>
+              </button>
 
               {isEditMode && (
                 <Button
@@ -683,7 +684,7 @@ const PostPlayRatingModal = ({
                   Remove from Played
                 </Button>
               )}
-            </section>
+            </footer>
           </div>
           ) : (
             /* Confirmation Screen */
