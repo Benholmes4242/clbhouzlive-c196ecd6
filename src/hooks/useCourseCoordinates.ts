@@ -26,6 +26,10 @@ export function useCourseCoordinates(args: UseCourseCoordinatesArgs) {
       return;
     }
 
+    // AbortController to prevent execution after unmount
+    const abortController = new AbortController();
+    let cancelled = false;
+
     // Fall back to geocode-club edge function
     const fetchCoords = async () => {
       setLoading(true);
@@ -40,18 +44,31 @@ export function useCourseCoordinates(args: UseCourseCoordinatesArgs) {
           },
         });
 
+        // Ignore if component unmounted
+        if (cancelled) return;
+
         if (!error && data?.latitude && data?.longitude) {
           setCoords({ lat: data.latitude, lng: data.longitude });
         }
       } catch (error) {
-        console.error('Error geocoding course:', error);
+        if (!cancelled) {
+          console.error('Error geocoding course:', error);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchCoords();
-  }, [args.courseId, args.latitude, args.longitude]);
+
+    // Cleanup: abort request and mark as cancelled
+    return () => {
+      cancelled = true;
+      abortController.abort();
+    };
+  }, [args.courseId, args.latitude, args.longitude, args.name, args.country, args.subCountry, args.region]);
 
   return { coords, loading };
 }
