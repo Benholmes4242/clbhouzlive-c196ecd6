@@ -109,6 +109,11 @@ const PostPlayRatingModal = ({
     }
   }, [existingRating, isEditMode]);
 
+  // Debug log for showRemoveDialog state changes
+  useEffect(() => {
+    console.log('[Delete Rating] showRemoveDialog state changed:', showRemoveDialog);
+  }, [showRemoveDialog]);
+
   const markAsPlayedMutation = useMutation({
     mutationFn: async () => {
       const { data: userResponse } = await supabase.auth.getUser();
@@ -808,6 +813,7 @@ const PostPlayRatingModal = ({
                       courseName: course?.name 
                     });
                     setShowRemoveDialog(true);
+                    console.log('[Delete Rating] setShowRemoveDialog(true) called - dialog should open');
                   }}
                   disabled={isSubmitting}
                   className="w-full mt-3 flex items-center gap-2 justify-center"
