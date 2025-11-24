@@ -50,6 +50,9 @@ const PostPlayRatingModal = ({
   const [conditionTouched, setConditionTouched] = useState(false);
   const [clubhouseTouched, setClubhouseTouched] = useState(false);
   const [facilitiesTouched, setFacilitiesTouched] = useState(false);
+  
+  // Custom remove confirmation dialog
+  const [showRemoveDialog, setShowRemoveDialog] = useState(false);
 
   // Use passed existingRating or fetch internally as fallback
   const { data: existingRatingFetched } = useQuery({
@@ -407,6 +410,7 @@ const PostPlayRatingModal = ({
       toast({
         title: "Course removed",
         description: `${course?.name} has been removed from your played list. You can add a new rating at any time.`,
+        className: "pointer-events-auto w-full max-w-md rounded-2xl bg-slate-900/80 text-slate-50 border border-white/15 shadow-[0_18px_35px_rgba(15,23,42,0.75)] backdrop-blur-xl",
       });
       
       if (onRemoveFromPlayed) {
@@ -539,52 +543,50 @@ const PostPlayRatingModal = ({
       <div className="fixed inset-0 z-[999] bg-slate-50 overflow-y-auto">
         {!showConfirmation ? (
           <div className="pb-12">
-            {/* Header with Close Button */}
-            <header className="flex items-center justify-between px-4 pt-4 pb-3 bg-slate-50">
-              <h2 className="text-xl font-semibold text-slate-900">
-                {pageTitle}
-              </h2>
+            {/* Full Bleed Header with Glass Exit Button */}
+            <div className="relative -mx-0 mb-6 h-40 overflow-hidden rounded-b-3xl">
+              {course.thumbnail_image ? (
+                <img
+                  src={course.thumbnail_image}
+                  alt={course.name}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="h-full w-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
+                  <Star className="h-8 w-8 text-white opacity-50" />
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-black/0" />
+              
+              {/* Glass exit button */}
               <button
                 type="button"
                 onClick={handleClose}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/4 hover:bg-slate-900/8 transition-colors"
+                className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-slate-900/60 backdrop-blur-md border border-white/20 shadow-md"
                 aria-label="Close"
               >
-                <svg viewBox="0 0 20 20" className="h-3.5 w-3.5 text-slate-500">
-                  <path
-                    d="M5 5l10 10M15 5L5 15"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 text-white"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
                 </svg>
               </button>
-            </header>
 
-            {/* Course Card */}
-            <section className="px-4 mb-4">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-                <div className="h-32 w-full relative">
-                  {course.thumbnail_image ? (
-                    <img
-                      src={course.thumbnail_image}
-                      alt={course.name}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
-                      <Star className="h-8 w-8 text-white opacity-50" />
-                    </div>
-                  )}
-                </div>
-                
-                <div className="px-4 py-3">
-                  <p className="text-sm font-medium text-slate-900">
-                    {course.name}
-                  </p>
-                </div>
+              {/* Overlay text */}
+              <div className="absolute bottom-4 left-4 right-4">
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-100/80">
+                  {isEditMode ? 'Edit your rating' : 'Rate this course'}
+                </p>
+                <h2 className="mt-1 text-xl font-semibold text-white">
+                  {course.name}
+                </h2>
               </div>
-            </section>
+            </div>
 
             {/* Overall Rating Slider */}
             <section className="px-4 mt-6">
@@ -708,48 +710,42 @@ const PostPlayRatingModal = ({
                 Media upload (optional)
               </p>
 
-              <div className="mt-3 rounded-xl border border-slate-200 bg-white/60 px-4 py-5">
+              <div className="mt-3">
                 {selectedMedia.length === 0 ? (
-                  <>
-                    <p className="text-sm text-slate-600">
-                      Add photos or videos from your round.
-                    </p>
-                    <p className="mt-1 text-xs text-slate-400">
-                      JPG, PNG, MP4, MOV · Max 5 items
-                    </p>
-
-                    <div className="mt-4">
-                      <ReviewMediaUpload
-                        onMediaSelected={handleMediaSelected}
-                        selectedMedia={selectedMedia}
-                        onRemoveMedia={handleRemoveMedia}
-                      />
-                    </div>
-                  </>
+                  <ReviewMediaUpload
+                    onMediaSelected={handleMediaSelected}
+                    selectedMedia={selectedMedia}
+                    onRemoveMedia={handleRemoveMedia}
+                  />
                 ) : (
                   <div className="space-y-3">
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-3 gap-[2px] rounded-xl overflow-hidden">
                       {selectedMedia.map((file, index) => {
                         const isVideo = file.type.startsWith('video/');
                         const preview = URL.createObjectURL(file);
                         return (
-                          <div key={index} className="relative aspect-square">
+                          <div key={index} className="relative aspect-square overflow-hidden rounded-xl">
                             {isVideo ? (
-                              <video
-                                src={preview}
-                                className="w-full h-full rounded-2xl object-cover"
-                              />
+                              <>
+                                <video
+                                  src={preview}
+                                  className="h-full w-full object-cover"
+                                />
+                                <div className="absolute bottom-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 shadow-md">
+                                  <div className="ml-[2px] h-0 w-0 border-y-[5px] border-y-transparent border-l-[9px] border-l-white" />
+                                </div>
+                              </>
                             ) : (
                               <img
                                 src={preview}
                                 alt=""
-                                className="w-full h-full rounded-2xl object-cover"
+                                className="h-full w-full object-cover"
                               />
                             )}
                             <button
                               type="button"
                               onClick={() => handleRemoveMedia(index)}
-                              className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs"
+                              className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs shadow-md"
                             >
                               ×
                             </button>
@@ -757,11 +753,14 @@ const PostPlayRatingModal = ({
                         );
                       })}
                     </div>
-                    <ReviewMediaUpload
-                      onMediaSelected={handleMediaSelected}
-                      selectedMedia={selectedMedia}
-                      onRemoveMedia={handleRemoveMedia}
-                    />
+                    {selectedMedia.length < 5 && (
+                      <ReviewMediaUpload
+                        onMediaSelected={handleMediaSelected}
+                        selectedMedia={selectedMedia}
+                        onRemoveMedia={handleRemoveMedia}
+                        showAddMoreButton={true}
+                      />
+                    )}
                   </div>
                 )}
               </div>
@@ -773,7 +772,7 @@ const PostPlayRatingModal = ({
                 type="submit"
                 onClick={handleSubmit}
                 disabled={isSubmitting || !selectedRating}
-                className="w-full h-11 rounded-full text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full h-11 rounded-full text-sm font-semibold bg-slate-900 text-white border border-white/10 shadow-[0_8px_20px_rgba(15,23,42,0.45)] hover:bg-slate-900/90 active:bg-slate-900 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
               >
                 {isSubmitting ? 'Saving…' : (isEditMode ? 'Update rating' : 'Submit rating')}
               </Button>
@@ -781,26 +780,9 @@ const PostPlayRatingModal = ({
               {isEditMode && (
                 <Button
                   type="button"
-                  onClick={() => {
-                    console.log('[Delete Rating] Remove button clicked', { 
-                      courseId: course?.id, 
-                      courseName: course?.name 
-                    });
-                    
-                    const confirmed = window.confirm(
-                      `Are you sure you want to remove "${course?.name}" from your played list?\n\nThis will permanently delete your rating and review for this course.`
-                    );
-                    
-                    if (confirmed) {
-                      console.log('[Delete Rating] User confirmed deletion');
-                      handleRemoveFromPlayed();
-                    } else {
-                      console.log('[Delete Rating] User cancelled deletion');
-                    }
-                  }}
+                  onClick={() => setShowRemoveDialog(true)}
                   disabled={isSubmitting}
-                  variant="outline"
-                  className="w-full mt-3 rounded-full border-red-200 bg-red-50 text-sm font-medium text-red-600 hover:bg-red-100 flex items-center gap-2 justify-center"
+                  className="w-full mt-3 rounded-full bg-red-500 text-white border border-red-500/80 shadow-sm hover:bg-red-600 active:bg-red-700 flex items-center gap-2 justify-center"
                 >
                   <Trash2 className="h-4 w-4" />
                   Remove from played
@@ -815,17 +797,21 @@ const PostPlayRatingModal = ({
                 <Check className="h-10 w-10 text-emerald-600" />
               </div>
               
-              <h1 className="text-xl font-semibold text-slate-900 mb-2">
-                {isEditMode ? 'Rating updated ✔︎' : 'Rating saved ✅'}
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+                <Check className="h-7 w-7 text-emerald-600" />
+              </div>
+
+              <h1 className="mt-10 text-xl font-semibold text-slate-900">
+                {isEditMode ? 'Rating updated ✔' : 'Rating saved 🏆'}
               </h1>
               
-              <p className="mb-6 text-center text-sm text-slate-500 max-w-sm">
+              <p className="mt-2 text-sm text-slate-500 text-center max-w-md px-4">
                 {isEditMode
                   ? `Your updated rating for ${course.name} has been saved.`
-                  : `Your rating for ${course.name} has been added and now counts towards the community score.`}
+                  : `Your rating for ${course.name} has been added.`}
               </p>
 
-              <div className="mb-8 w-full max-w-sm rounded-xl bg-white px-4 py-3 shadow-sm border border-slate-100">
+              <div className="mt-6 w-full max-w-md rounded-2xl bg-white/80 p-4 shadow-sm backdrop-blur">
                 <div className="flex items-center gap-3">
                   <Trophy className="h-6 w-6 text-amber-500" />
                   <div className="flex flex-col">
@@ -842,7 +828,7 @@ const PostPlayRatingModal = ({
               </div>
 
               <Button
-                className="w-full max-w-sm rounded-full text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800"
+                className="mt-8 w-full max-w-md rounded-full text-sm font-semibold bg-slate-900 text-white border border-white/10 shadow-[0_8px_20px_rgba(15,23,42,0.45)] hover:bg-slate-900/90"
                 onClick={handleClose}
               >
                 Back to course
@@ -850,6 +836,38 @@ const PostPlayRatingModal = ({
             </div>
           )}
         </div>
+
+        {/* Custom Remove Confirmation Dialog */}
+        {showRemoveDialog && (
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="w-full max-w-sm mx-4 rounded-2xl bg-slate-900 text-slate-50 border border-white/10 p-5 shadow-xl">
+              <h2 className="text-base font-semibold">Remove rating?</h2>
+              <p className="mt-2 text-sm text-slate-300">
+                This will permanently delete your rating and review for this course.
+              </p>
+              <div className="mt-5 flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1 border border-white/20 bg-transparent text-slate-50 hover:bg-white/5"
+                  onClick={() => setShowRemoveDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  className="flex-1 bg-red-500 text-white border border-red-500/80 shadow-sm hover:bg-red-600 active:bg-red-700"
+                  onClick={() => {
+                    setShowRemoveDialog(false);
+                    handleRemoveFromPlayed();
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
     </>
   );
 };
