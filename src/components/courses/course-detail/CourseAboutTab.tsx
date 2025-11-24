@@ -23,8 +23,8 @@ import CourseTop100Summary from './CourseTop100Summary';
 
 const ArrowUp = () => (
   <svg
-    width="16"
-    height="16"
+    width="18"
+    height="18"
     viewBox="0 0 20 20"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -39,8 +39,8 @@ const ArrowUp = () => (
 
 const ArrowDown = () => (
   <svg
-    width="16"
-    height="16"
+    width="18"
+    height="18"
     viewBox="0 0 20 20"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
