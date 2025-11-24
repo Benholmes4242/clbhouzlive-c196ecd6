@@ -54,7 +54,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
   const primaryListName = membership?.top100_lists?.name ?? 'Worldwide';
 
   return (
-    <div className="px-4 pt-4 pb-4 bg-slate-50 space-y-4">
+    <div className="px-4 pt-4 pb-3 bg-slate-50 space-y-6">
       {/* Location breadcrumb */}
       {primaryRegionLabel && (
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
