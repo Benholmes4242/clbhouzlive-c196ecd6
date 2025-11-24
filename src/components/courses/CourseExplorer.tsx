@@ -20,7 +20,7 @@ import {
 } from '@/constants/courseRegions';
 import { getOptimalPageSize } from '@/utils/deviceDetection';
 
-const PAGE_SIZE = getOptimalPageSize(50); // 30 on mobile, 50 on desktop
+const PAGE_SIZE = 25; // Reduced from 50 to 25 for better performance
 
 const CourseExplorer = () => {
   const listTopRef = useRef<HTMLDivElement>(null);
