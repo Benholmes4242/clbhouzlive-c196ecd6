@@ -570,10 +570,10 @@ const PostPlayRatingModal = ({
 
               {/* Overlay text */}
               <div className="absolute bottom-4 left-4 right-4">
-                <p className="text-sm font-medium uppercase tracking-[0.18em] text-slate-100/80">
+                <p className="text-base font-medium uppercase tracking-[0.18em] text-slate-100/80">
                   {isEditMode ? 'Edit your rating' : 'Rate this course'}
                 </p>
-                <h2 className="mt-1 text-2xl font-semibold text-white">
+                <h2 className="mt-1 text-3xl font-semibold text-white">
                   {course.name}
                 </h2>
               </div>
