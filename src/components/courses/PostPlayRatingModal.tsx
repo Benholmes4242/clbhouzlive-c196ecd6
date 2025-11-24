@@ -389,6 +389,8 @@ const PostPlayRatingModal = ({
       console.log('[Delete Rating] Result:', { status: 'success' });
     },
     onSuccess: async () => {
+      console.log('[Delete Rating] onSuccess - starting invalidations');
+      
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
@@ -398,17 +400,21 @@ const PostPlayRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['userTop100Courses'] });
       queryClient.invalidateQueries({ queryKey: ['userTop100CoursesInRegion'] });
       queryClient.invalidateQueries({ queryKey: ['top100-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['course-detail', course?.id] });
       
       // Trigger badge checking for the user (non-blocking)
       try {
         const { data: userResponse } = await supabase.auth.getUser();
         if (userResponse.user) {
+          console.log('[Delete Rating] Checking badges for user:', userResponse.user.id);
           await supabase.rpc('check_and_award_badges', { user_id_param: userResponse.user.id });
         }
       } catch (error) {
         console.error('[Delete Rating] Badges check failed but delete succeeded:', error);
         // Don't block delete success
       }
+      
+      console.log('[Delete Rating] onSuccess - showing toast and closing modal');
       
       toast({
         title: "Course Removed",
@@ -418,8 +424,12 @@ const PostPlayRatingModal = ({
       if (onRemoveFromPlayed) {
         onRemoveFromPlayed();
       }
+      
+      setShowRemoveDialog(false);
       onClose();
       resetForm();
+      
+      console.log('[Delete Rating] Success - complete');
     },
     onError: (error: any) => {
       console.error('[Delete Rating] Error:', error);
@@ -437,6 +447,12 @@ const PostPlayRatingModal = ({
   });
 
   const handleRemoveFromPlayed = () => {
+    console.log('[Delete Rating] handleRemoveFromPlayed called', { 
+      courseId: course?.id, 
+      courseName: course?.name,
+      hasExistingRating: !!existingRating,
+      ratingId: existingRating?.id 
+    });
     removeFromPlayedMutation.mutate();
   };
 
@@ -786,7 +802,13 @@ const PostPlayRatingModal = ({
               {isEditMode && (
                 <Button
                   variant="destructive"
-                  onClick={() => setShowRemoveDialog(true)}
+                  onClick={() => {
+                    console.log('[Delete Rating] Remove button clicked', { 
+                      courseId: course?.id, 
+                      courseName: course?.name 
+                    });
+                    setShowRemoveDialog(true);
+                  }}
                   disabled={isSubmitting}
                   className="w-full mt-3 flex items-center gap-2 justify-center"
                 >
