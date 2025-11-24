@@ -118,15 +118,17 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-0">
       {/* Location Breadcrumb & Quick Filters */}
-      <CourseLocationBreadcrumb course={course} />
+      <div className="px-4 pt-4 pb-4 bg-slate-50">
+        <CourseLocationBreadcrumb course={course} />
+      </div>
       
-      {/* Community Score Section */}
-      <section className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-4 md:px-6 md:py-5">
+      {/* Community Score Section - Seamless with User Rating inline */}
+      <section className="px-4 pt-4 pb-5 bg-slate-50 md:px-6">
         {ratingAggregates && ratingAggregates.review_count > 0 ? (
           <>
-            {/* Header with premium score */}
+            {/* Header with premium score + user rating inline */}
             <div className="flex items-start justify-between gap-3 mb-5">
               <div>
                 <h3 className="text-base font-semibold">Community Score</h3>
@@ -135,11 +137,18 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 </p>
               </div>
 
-              <div className="flex items-center gap-1.5">
-                <ClubhouseLogo size="sm" className="h-5 w-5" />
-                <span className="text-xl md:text-2xl font-semibold transition-opacity duration-300">
-                  {formatScore(ratingAggregates.avg_overall_score || 0)}/10
-                </span>
+              <div className="flex flex-col items-end gap-1">
+                <div className="flex items-center gap-1.5">
+                  <ClubhouseLogo size="sm" className="h-5 w-5" />
+                  <span className="text-xl md:text-2xl font-semibold transition-opacity duration-300">
+                    {formatScore(ratingAggregates.avg_overall_score || 0)}/10
+                  </span>
+                </div>
+                {userRating && (
+                  <span className="text-xs text-muted-foreground">
+                    You: {formatScore(userRating.rating)}/10
+                  </span>
+                )}
               </div>
             </div>
 
@@ -210,6 +219,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               </div>
             </div>
 
+            {/* Personal comparison text - if user has rated */}
+            {userRating && (
+              <p className="text-sm text-slate-500 mb-4">
+                You rate this course {Math.abs(userRating.rating - (ratingAggregates.avg_overall_score || 0)).toFixed(1)} points {userRating.rating > (ratingAggregates.avg_overall_score || 0) ? 'higher' : 'lower'} than the community.
+              </p>
+            )}
+
             {/* See all reviews link */}
             <div className="flex justify-end mb-4">
               <button
@@ -233,19 +249,21 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           </>
         ) : (
           <>
-            {/* No ratings yet state */}
-            <h3 className="text-base font-semibold mb-1">Community Score</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              No ratings yet – be the first to rate this course!
-            </p>
-            
-            {/* Review button for empty state */}
-            <Button 
-              onClick={handleRateClick}
-              className="w-full justify-center bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
-            >
-              Review this course
-            </Button>
+            {/* No ratings yet state - frosted glass */}
+            <div className="backdrop-blur-md bg-white/6 border border-white/15 rounded-2xl px-4 py-4">
+              <h3 className="text-base font-semibold mb-1">Community Score</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                No ratings yet – be the first to rate this course!
+              </p>
+              
+              {/* Review button for empty state */}
+              <Button 
+                onClick={handleRateClick}
+                className="w-full justify-center bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
+              >
+                Review this course
+              </Button>
+            </div>
           </>
         )}
 
@@ -260,7 +278,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* CTA for users who haven't rated yet */}
       {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
-        <section className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-4">
+        <section className="px-4 pt-4 pb-5 bg-slate-50">
           <h3 className="text-base font-semibold mb-1">How do you rate this course?</h3>
           <p className="text-sm text-muted-foreground mb-3">
             Add your rating to see how it compares with the clbhouz community.
@@ -271,17 +289,16 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </section>
       )}
 
-      {/* About Section */}
+      {/* About Section - Seamless */}
       {course.description && (
-        <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
+        <section className="px-4 pt-4 pb-5 bg-slate-100 space-y-3">
           <h2 className="text-base md:text-lg font-semibold">About</h2>
           <div className="text-sm md:text-base leading-relaxed text-foreground">
             {formatDescription(displayDescription)}
             {shouldShowReadMore && (
               <button
                 onClick={() => setShowFullDescription(!showFullDescription)}
-                className="block mt-4 text-sm font-medium hover:underline"
-                style={{ color: '#3A3F46' }}
+                className="block mt-4 text-sm font-medium hover:underline text-slate-600"
               >
                 {showFullDescription ? 'Show less' : 'Read more'}
               </button>
@@ -293,60 +310,57 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* Top 100 mini-journey summary (replaces milestones) */}
       <CourseTop100Summary />
 
-      {/* Location and Media sections - side by side on desktop, stacked on mobile */}
-      <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
-        {/* Location Section */}
-        <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
-          <h2 className="text-base md:text-lg font-semibold">Location</h2>
-          <p className="text-sm md:text-base text-foreground">
-            {[course.sub_country, course.country].filter(Boolean).join(', ')}
+      {/* Location Section - Seamless */}
+      <section className="px-4 pt-4 pb-5 bg-slate-50 space-y-3">
+        <h2 className="text-base md:text-lg font-semibold">Location</h2>
+        <p className="text-sm md:text-base text-foreground">
+          {[course.sub_country, course.country].filter(Boolean).join(', ')}
+        </p>
+        
+        {/* Map preview */}
+        {!coords && coordsLoading && (
+          <div className="w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px] rounded-2xl bg-surface-alt animate-pulse" />
+        )}
+
+        {coords && (
+          <>
+            <CourseMapPreview
+              latitude={coords.lat}
+              longitude={coords.lng}
+              courseName={course.name}
+              onOpenFullMap={() => setMapOpen(true)}
+            />
+
+            <CourseMapFullScreen
+              open={mapOpen}
+              onOpenChange={setMapOpen}
+              latitude={coords.lat}
+              longitude={coords.lng}
+              courseName={course.name}
+              country={course.country}
+              subCountry={course.sub_country}
+            />
+          </>
+        )}
+
+        {!coords && !coordsLoading && (
+          <p className="text-sm text-muted-foreground">
+            Location data isn't available for this course yet.
           </p>
-          
-          {/* Map preview */}
-          {!coords && coordsLoading && (
-            <div className="w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px] rounded-2xl bg-surface-alt animate-pulse" />
-          )}
+        )}
+      </section>
 
-          {coords && (
-            <>
-              <CourseMapPreview
-                latitude={coords.lat}
-                longitude={coords.lng}
-                courseName={course.name}
-                onOpenFullMap={() => setMapOpen(true)}
-              />
+      {/* Media Section - Seamless */}
+      <section className="px-4 pt-4 pb-5 bg-slate-100 space-y-3">
+        <AboutMediaStrip 
+          clubId={course.id} 
+          onSeeAllClick={() => onTabChange?.('media')}
+        />
+      </section>
 
-              <CourseMapFullScreen
-                open={mapOpen}
-                onOpenChange={setMapOpen}
-                latitude={coords.lat}
-                longitude={coords.lng}
-                courseName={course.name}
-                country={course.country}
-                subCountry={course.sub_country}
-              />
-            </>
-          )}
-
-          {!coords && !coordsLoading && (
-            <p className="text-sm text-muted-foreground">
-              Location data isn't available for this course yet.
-            </p>
-          )}
-        </section>
-
-        {/* Media Section */}
-        <section className="rounded-2xl bg-card border border-border/60 shadow-sm p-4 space-y-3">
-          <AboutMediaStrip 
-            clubId={course.id} 
-            onSeeAllClick={() => onTabChange?.('media')}
-          />
-        </section>
-      </div>
-
-      {/* Mobile: Visit Website Button inline after Media section */}
+      {/* Visit Website - Seamless section */}
       {course.website_url && (
-        <div className="block md:hidden mt-6">
+        <section className="px-4 pt-4 pb-6 bg-slate-50">
           <Button
             onClick={handleWebsiteClick}
             className="w-full flex items-center justify-center gap-2 bg-muted hover:bg-muted/80 text-foreground border h-11 rounded-xl"
@@ -355,21 +369,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             <ExternalLink className="h-4 w-4" />
             Visit Website
           </Button>
-        </div>
-      )}
-
-      {/* Desktop: Visit Website Button at bottom */}
-      {course.website_url && (
-        <div className="hidden md:block mt-6 mb-6">
-          <Button
-            onClick={handleWebsiteClick}
-            className="w-full flex items-center justify-center gap-2 bg-muted hover:bg-muted/80 text-foreground border"
-            variant="outline"
-          >
-            <ExternalLink className="h-4 w-4" />
-            Visit Website
-          </Button>
-        </div>
+        </section>
       )}
     </div>
   );

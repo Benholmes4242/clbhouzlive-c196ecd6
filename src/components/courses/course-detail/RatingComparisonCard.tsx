@@ -54,18 +54,18 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
   };
 
   return (
-    <div className="rounded-2xl border border-border/60 bg-card shadow-sm px-4 py-4">
+    <section className="px-4 pt-4 pb-5 bg-slate-100">
       {/* Header with Legend */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-base font-semibold">Your Rating vs Community</h3>
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <span className="inline-flex h-2 w-6 rounded-full bg-foreground" />
-            <span>You</span>
+            <span className="font-semibold">You</span>
           </div>
           <div className="flex items-center gap-1">
             <span className="inline-flex h-2 w-6 rounded-full bg-muted" />
-            <span>Community</span>
+            <span className="font-semibold">Community</span>
           </div>
         </div>
       </div>
@@ -76,9 +76,9 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
           <div key={row.label} className="space-y-1">
             {/* Label and values */}
             <div className="flex items-baseline justify-between text-sm">
-              <span className="font-medium">{row.label}</span>
+              <span className="font-bold">{row.label}</span>
               <span className="text-xs text-muted-foreground">
-                You: {formatScore(row.you)}/10 · Community: {formatScore(row.community)}/10
+                <span className="font-semibold">You:</span> {formatScore(row.you)}/10 · <span className="font-semibold">Community:</span> {formatScore(row.community)}/10
               </span>
             </div>
 
@@ -103,7 +103,7 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 
