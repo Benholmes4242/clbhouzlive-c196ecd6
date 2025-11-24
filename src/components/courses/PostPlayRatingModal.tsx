@@ -300,14 +300,28 @@ const PostPlayRatingModal = ({
         description: `You ${isEditMode ? 'updated' : 'rated'} ${course?.name} ${selectedRating}/10`,
       });
     },
-    onError: (error) => {
-      console.error('Error submitting rating:', error);
+    onError: (error: any) => {
+      console.error('[Rating Submission] Error:', error);
+      console.error('[Rating Submission] Error details:', {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint
+      });
+      
+      let errorMessage = "Failed to submit rating. Please try again.";
+      
+      if (error?.code === '23514') {
+        errorMessage = "Rating validation failed. Please ensure all scores are between 0.5 and 10.0 with one decimal place.";
+      }
+      
       toast({
-        title: "Error",
-        description: "Failed to submit rating. Please try again.",
+        title: "Error Submitting Rating",
+        description: errorMessage,
         variant: "destructive",
       });
       setIsSubmitting(false);
+      setButtonText('Add to Played');
     },
   });
 
@@ -442,16 +456,27 @@ const PostPlayRatingModal = ({
     setIsSubmitting(true);
     setButtonText('Adding...');
     
-    // Submit rating - only send breakdown scores if touched
-    submitRatingMutation.mutate({ 
-      rating: normalize(selectedRating) || 5, // Fallback to 5 if somehow null
+    // Build payload and log for debugging
+    const payload = {
+      rating: normalize(selectedRating) || 5,
       reviewText: review.trim(),
       mediaFiles: selectedMedia,
       design: designTouched ? normalize(designScore) : null,
       condition: conditionTouched ? normalize(conditionScore) : null,
       clubhouse: clubhouseTouched ? normalize(clubhouseScore) : null,
       facilities: facilitiesTouched ? normalize(facilitiesScore) : null
+    };
+    
+    console.log('[Rating Submission] Payload:', payload);
+    console.log('[Rating Submission] Types:', {
+      rating: typeof payload.rating,
+      design: typeof payload.design,
+      condition: typeof payload.condition,
+      clubhouse: typeof payload.clubhouse,
+      facilities: typeof payload.facilities
     });
+    
+    submitRatingMutation.mutate(payload);
   };
 
   const handleMediaSelected = (files: File[]) => {
