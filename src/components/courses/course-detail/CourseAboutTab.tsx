@@ -350,7 +350,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       </section>
 
       {/* Media Section - Seamless */}
-      <section className="px-4 pt-4 pb-5 bg-slate-100 space-y-3">
+      <section className="pt-4 pb-5 bg-slate-100 space-y-3">
         <AboutMediaStrip 
           clubId={course.id} 
           onSeeAllClick={() => onTabChange?.('media')}
