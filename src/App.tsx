@@ -381,7 +381,8 @@ const AchievementToastWrapper: React.FC = () => {
   );
 };
 
-const App: React.FC = () => {
+// AppInner - All hooks that need React Query context
+const AppInner: React.FC = () => {
   // Feature flag for access gate version
   const useV2Gate = import.meta.env.VITE_ACCESS_GATE_VERSION?.toString().toLowerCase() === "v2";
   const AccessGate = useV2Gate ? AccessGateV2 : SiteAccessControl;
@@ -440,55 +441,62 @@ const App: React.FC = () => {
   }, []);
   
   return (
+    <TooltipProvider>
+      <SecurityHeaders />
+      <AccessGate>
+        <HeaderProvider>
+          <ModalProvider>
+            <BottomNavigationProvider>
+              <UIProvider>
+                <ToastHost>
+                  <BrowserRouter>
+                    <HubProvider>
+                      <ScrollToTop />
+                      <ScrollRestoration />
+                      <GlobalAudioProvider>
+                        <VideoManagerProvider>
+                          <VideoPlaybackManagerProvider>
+                            <TopTenProvider>
+                              <ErrorBoundary>
+                                <AuthWrapper>
+                                  <SeasonWrapModal />
+                                  <AchievementToastWrapper />
+                                  <Suspense fallback={<AppBootstrapLoader />}>
+                                    <div className="app-depth">
+                                      {/* No global header - each page renders its own ClubhouseHeaderNew */}
+                                      <AppRoutes />
+                                    </div>
+                                  </Suspense>
+                                </AuthWrapper>
+                              </ErrorBoundary>
+                            </TopTenProvider>
+                          </VideoPlaybackManagerProvider>
+                        </VideoManagerProvider>
+                      </GlobalAudioProvider>
+                      <Toaster />
+                      <Sonner />
+                      <GlobalBottomNavigation />
+                    </HubProvider>
+                  </BrowserRouter>
+                </ToastHost>
+              </UIProvider>
+            </BottomNavigationProvider>
+          </ModalProvider>
+        </HeaderProvider>
+      </AccessGate>
+    </TooltipProvider>
+  );
+};
+
+// App - Outer wrapper with QueryClientProvider
+const App: React.FC = () => {
+  return (
     <AppShell>
       <ReviewIslandLoader />
-        <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
-          <QueryClientProvider client={queryClient}>
-            <TooltipProvider>
-              <SecurityHeaders />
-              <AccessGate>
-                <HeaderProvider>
-                  <ModalProvider>
-                    <BottomNavigationProvider>
-                      <UIProvider>
-              <ToastHost>
-                <BrowserRouter>
-                  <HubProvider>
-                    <ScrollToTop />
-                    <ScrollRestoration />
-                    <GlobalAudioProvider>
-                      <VideoManagerProvider>
-                        <VideoPlaybackManagerProvider>
-                           <TopTenProvider>
-                            <ErrorBoundary>
-                              <AuthWrapper>
-                                <SeasonWrapModal />
-                                <AchievementToastWrapper />
-                                <Suspense fallback={<AppBootstrapLoader />}>
-                                  <div className="app-depth">
-                                    {/* No global header - each page renders its own ClubhouseHeaderNew */}
-                                    <AppRoutes />
-                                  </div>
-                                </Suspense>
-                              </AuthWrapper>
-                            </ErrorBoundary>
-                          </TopTenProvider>
-                        </VideoPlaybackManagerProvider>
-                      </VideoManagerProvider>
-                    </GlobalAudioProvider>
-                    <Toaster />
-                    <Sonner />
-                    <GlobalBottomNavigation />
-                  </HubProvider>
-                </BrowserRouter>
-              </ToastHost>
-                      </UIProvider>
-                    </BottomNavigationProvider>
-                  </ModalProvider>
-                </HeaderProvider>
-            </AccessGate>
-        </TooltipProvider>
-      </QueryClientProvider>
+      <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
+        <QueryClientProvider client={queryClient}>
+          <AppInner />
+        </QueryClientProvider>
       </ThemeProvider>
     </AppShell>
   );
