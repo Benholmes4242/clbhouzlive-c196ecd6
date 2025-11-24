@@ -476,17 +476,17 @@ const PostPlayRatingModal = ({
             </header>
 
             {/* Course Card */}
-            <section className="px-4 mt-2">
-              <div className="relative rounded-lg border overflow-hidden bg-green-50 border-green-200">
-                <div className="relative h-24 overflow-hidden">
+            <section className="px-4 mb-6">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                <div className="h-32 w-full relative">
                   {course.thumbnail_image ? (
                     <img
                       src={course.thumbnail_image}
                       alt={course.name}
-                      className="w-full h-full object-cover"
+                      className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
+                    <div className="h-full w-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
                       <Star className="h-8 w-8 text-white opacity-50" />
                     </div>
                   )}
@@ -499,10 +499,10 @@ const PostPlayRatingModal = ({
                   </div>
                 </div>
                 
-                <div className="p-3">
-                  <h3 className="font-semibold text-sm line-clamp-1">
+                <div className="px-4 py-3">
+                  <p className="font-medium text-slate-900">
                     {course.name}
-                  </h3>
+                  </p>
                 </div>
               </div>
             </section>
