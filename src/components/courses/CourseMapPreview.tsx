@@ -27,7 +27,7 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
   const [mapInitialized, setMapInitialized] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detect mobile viewport
+  // Detect mobile viewport (for future use if needed)
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
@@ -103,20 +103,7 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
     };
   }, [latitude, longitude, mapInitialized]);
 
-  // On mobile, show lightweight button instead of map preview
-  if (isMobile) {
-    return (
-      <Button
-        onClick={onOpenFullMap}
-        variant="outline"
-        className="w-full h-16 flex items-center justify-center gap-2 text-base"
-      >
-        <MapPin className="h-5 w-5" />
-        View map
-      </Button>
-    );
-  }
-
+  // Always show map preview (removed mobile button to restore Phase 2 behavior)
   return (
     <div
       onClick={onOpenFullMap}
