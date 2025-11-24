@@ -1948,8 +1948,33 @@ html[data-immersive="true"] .app-shell--topSpacer {
     max-width: var(--sheet-max-width);
     margin-inline: auto;
     margin-bottom: var(--sheet-edge-gap);
-    /* Only animate transform and opacity, never width */
-    transition: transform 240ms ease-out, opacity 240ms ease-out;
+  }
+  
+  /* ============================================================================
+     GLOBAL ALERT DIALOG GLASS STYLING - Hub Dark Glass Override
+     Force all alert dialogs to use Hub's dark glass aesthetic
+     ============================================================================ */
+  [role="alertdialog"],
+  [data-radix-alert-dialog-content] {
+    background: rgba(0, 0, 0, 0.65) !important;
+    backdrop-filter: blur(22px) !important;
+    -webkit-backdrop-filter: blur(22px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  }
+  
+  [role="alertdialog"] *,
+  [data-radix-alert-dialog-content] * {
+    color: rgba(255, 255, 255, 0.92);
+  }
+  
+  [role="alertdialog"] [role="alertdialog-title"],
+  [data-radix-alert-dialog-content] h2 {
+    color: rgba(255, 255, 255, 0.96);
+  }
+  
+  [role="alertdialog"] [role="alertdialog-description"],
+  [data-radix-alert-dialog-content] p {
+    color: rgba(255, 255, 255, 0.72);
   }
 
   /* Loading sheet uses same constraints */
@@ -2049,7 +2074,6 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
   .recent-posts-scroll::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5);
-  }
   }
 
   .liquid-glass-button.following {
@@ -3819,4 +3843,5 @@ html[data-immersive="true"] .app-shell--topSpacer {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
 }
