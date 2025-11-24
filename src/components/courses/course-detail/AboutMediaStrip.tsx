@@ -125,11 +125,11 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     return (
       <>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold">Media</h2>
+          <h2 className="text-base md:text-lg font-semibold">Media</h2>
         </div>
-        <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 md:-mx-6 md:px-6">
+        <div className="grid grid-cols-3 gap-2">
           {Array.from({ length: maxItems }).map((_, i) => (
-            <div key={i} className="min-w-[120px] h-[120px] bg-muted/70 rounded-[12px] animate-pulse flex-shrink-0" />
+            <div key={i} className="aspect-square bg-muted/70 rounded-xl animate-pulse" />
           ))}
         </div>
       </>
@@ -141,7 +141,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
   return (
     <>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-base font-semibold">Media</h2>
+        <h2 className="text-base md:text-lg font-semibold">Media</h2>
         {hasMedia && (
           <button
             type="button"
@@ -157,14 +157,14 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
       </div>
 
       {!hasMedia ? (
-        <div className="rounded-[12px] border border-dashed border-border/60 bg-muted/40 px-4 py-6 text-sm text-muted-foreground text-center">
+        <div className="rounded-xl border border-dashed border-border/60 bg-muted/40 px-4 py-6 text-sm text-muted-foreground text-center">
           <p>No media for this course yet.</p>
           <p className="font-medium mt-3">
             Review this course and add media or tag this course to be the first.
           </p>
         </div>
       ) : (
-        <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 md:-mx-6 md:px-6">
+        <div className="grid grid-cols-3 gap-2">
           {mediaTiles.map((media) => (
             <button
               key={media.id}
@@ -173,7 +173,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                 e.stopPropagation();
                 onSeeAllClick();
               }}
-              className="min-w-[120px] h-[120px] rounded-[12px] overflow-hidden flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all hover:opacity-90"
+              className="rounded-xl overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all hover:scale-[1.02]"
               aria-label="Open Media tab"
             >
               <SquareCardMedia

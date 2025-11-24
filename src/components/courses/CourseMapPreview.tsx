@@ -81,7 +81,7 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
   return (
     <div
       onClick={onOpenFullMap}
-      className="relative w-full h-[220px] rounded-[12px] overflow-hidden cursor-pointer transition-all hover:opacity-95"
+      className="relative w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px] rounded-2xl overflow-hidden border border-border/60 cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] mb-3"
     >
       <div ref={mapContainerRef} className="w-full h-full" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20" />

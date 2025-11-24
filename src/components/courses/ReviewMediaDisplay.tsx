@@ -25,11 +25,11 @@ const ReviewMediaDisplay = ({ media }: ReviewMediaDisplayProps) => {
 
   return (
     <>
-      <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 md:-mx-6 md:px-6">
+      <div className="mt-3 flex flex-wrap gap-2">
         {media.map((mediaItem) => (
           <div
             key={mediaItem.id}
-            className="relative min-w-[120px] h-[120px] rounded-[12px] overflow-hidden bg-slate-200 cursor-pointer hover:opacity-90 transition-opacity flex-shrink-0"
+            className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 cursor-pointer hover:opacity-90 transition-opacity"
             onClick={() => handleMediaClick(mediaItem)}
           >
             {mediaItem.media_type === 'video' ? (
@@ -40,8 +40,8 @@ const ReviewMediaDisplay = ({ media }: ReviewMediaDisplayProps) => {
                   preload="metadata"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-8 h-8 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
-                    <Play className="w-4 h-4 text-white fill-white" />
+                  <div className="w-6 h-6 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                    <Play className="w-3 h-3 text-white fill-white" />
                   </div>
                 </div>
               </>
