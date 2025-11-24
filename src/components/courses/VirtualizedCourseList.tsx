@@ -55,16 +55,37 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Detect and use the correct scrolling container
+  const getScrollContainer = useCallback(() => {
+    // Find the actual scrolling element (parent with overflow)
+    let element = containerRef.current?.parentElement;
+    while (element) {
+      const style = window.getComputedStyle(element);
+      const hasScroll = style.overflowY === 'scroll' || style.overflowY === 'auto';
+      if (hasScroll && element.scrollHeight > element.clientHeight) {
+        return element;
+      }
+      element = element.parentElement;
+    }
+    // Fallback to window if no scrolling parent found
+    return window;
+  }, []);
+
   // Update visible range on scroll
   const updateVisibleRange = useCallback(() => {
     if (!containerRef.current) return;
 
-    const scrollTop = window.scrollY;
-    const viewportHeight = window.innerHeight;
+    const scrollContainer = getScrollContainer();
+    const isWindow = scrollContainer === window;
     
-    // Find container's offset from top of document
+    const scrollTop = isWindow ? window.scrollY : (scrollContainer as HTMLElement).scrollTop;
+    const viewportHeight = isWindow ? window.innerHeight : (scrollContainer as HTMLElement).clientHeight;
+    
+    // Find container's offset from top of scroll container
     const containerRect = containerRef.current.getBoundingClientRect();
-    const containerTop = containerRect.top + scrollTop;
+    const containerTop = isWindow 
+      ? containerRect.top + scrollTop
+      : containerRect.top + scrollTop - (scrollContainer as HTMLElement).getBoundingClientRect().top;
     
     // Calculate scroll position relative to container start
     const scrollRelative = Math.max(0, scrollTop - containerTop);
@@ -81,9 +102,9 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     const finalEnd = Math.max(endIndex, 10);
 
     setVisibleRange({ start: startIndex, end: finalEnd });
-  }, [courses.length, itemHeight]);
+  }, [courses.length, itemHeight, getScrollContainer]);
 
-  // Throttled scroll handler
+  // Throttled scroll handler - attach to correct scrolling container
   useEffect(() => {
     let rafId: number | null = null;
     let ticking = false;
@@ -103,11 +124,13 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
       updateVisibleRange();
     }, 100);
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Attach listener to actual scrolling container
+    const scrollContainer = containerRef.current?.parentElement ?? window;
+    scrollContainer.addEventListener('scroll', handleScroll, { passive: true } as any);
     
     return () => {
       clearTimeout(initTimer);
-      window.removeEventListener('scroll', handleScroll);
+      scrollContainer.removeEventListener('scroll', handleScroll as any);
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, [updateVisibleRange]);
