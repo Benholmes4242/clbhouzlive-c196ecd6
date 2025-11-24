@@ -135,7 +135,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 </p>
               </div>
 
-              <div className="flex items-center gap-1 flex-shrink-0">
+              <div className="flex items-center gap-0.5 flex-shrink-0">
                 <ClubhouseLogo size="md" className="h-7 w-7" />
                 <span className="text-xl md:text-2xl font-semibold transition-opacity duration-300 text-right min-w-[80px]">
                   {formatScore(ratingAggregates.avg_overall_score || 0)}/10

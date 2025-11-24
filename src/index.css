@@ -226,15 +226,14 @@ body {
   /* .bg-black was forcing dark backgrounds - now removed to allow global pastel base */
 }
 
-/* Optional depth wash behind pages */
+/* Optional depth wash behind pages - lightened for seamless footer flow */
 .app-depth::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(1200px 800px at 50% -200px, rgba(255,255,255,0.06), transparent 55%),
-    radial-gradient(1000px 600px at 50% 110%, rgba(0,0,0,0.25), transparent 60%);
+    radial-gradient(1200px 800px at 50% -200px, rgba(255,255,255,0.06), transparent 55%);
   z-index: -1;
 }
 
