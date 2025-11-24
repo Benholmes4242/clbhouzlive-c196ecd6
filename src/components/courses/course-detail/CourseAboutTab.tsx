@@ -123,33 +123,33 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseLocationBreadcrumb course={course} />
       
       {/* Community Score Section - Seamless with User Rating inline */}
-      <section className="px-4 pt-3 pb-5 bg-slate-50 md:px-6">
+      <section className="px-4 pt-6 pb-5 bg-slate-50 md:px-6 md:pt-8">
         {ratingAggregates && ratingAggregates.review_count > 0 ? (
           <>
             {/* Header with premium score + user rating inline */}
-            <div className="flex items-start justify-between gap-3 mb-5">
+            <div className="flex items-start justify-between gap-3 mb-3">
               <div>
                 <h3 className="text-base font-semibold">Community Score</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="text-xs text-muted-foreground mt-1">
                   Based on {ratingAggregates.review_count} {ratingAggregates.review_count === 1 ? 'rating' : 'ratings'}
                 </p>
               </div>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 flex-shrink-0">
                 <ClubhouseLogo size="sm" className="h-5 w-5" />
-                <span className="text-xl md:text-2xl font-semibold transition-opacity duration-300">
+                <span className="text-xl md:text-2xl font-semibold transition-opacity duration-300 text-right min-w-[80px]">
                   {formatScore(ratingAggregates.avg_overall_score || 0)}/10
                 </span>
               </div>
             </div>
 
             {/* Category bars with animations */}
-            <div className="space-y-3 mb-5">
+            <div className="space-y-3 mb-3">
               {/* Course Design */}
               <div className="space-y-1">
-                <div className="flex items-baseline justify-between text-sm">
+                <div className="flex items-center justify-between text-sm">
                   <span className="font-medium">Course Design</span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-muted-foreground text-right min-w-[60px]">
                     {ratingAggregates.avg_design_score ? formatScore(ratingAggregates.avg_design_score) : '–'}/10
                   </span>
                 </div>
@@ -163,9 +163,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
               {/* Course Condition */}
               <div className="space-y-1">
-                <div className="flex items-baseline justify-between text-sm">
+                <div className="flex items-center justify-between text-sm">
                   <span className="font-medium">Course Condition</span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-muted-foreground text-right min-w-[60px]">
                     {ratingAggregates.avg_condition_score ? formatScore(ratingAggregates.avg_condition_score) : '–'}/10
                   </span>
                 </div>
@@ -179,9 +179,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
               {/* Clubhouse */}
               <div className="space-y-1">
-                <div className="flex items-baseline justify-between text-sm">
+                <div className="flex items-center justify-between text-sm">
                   <span className="font-medium">Clubhouse</span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-muted-foreground text-right min-w-[60px]">
                     {ratingAggregates.avg_clubhouse_score ? formatScore(ratingAggregates.avg_clubhouse_score) : '–'}/10
                   </span>
                 </div>
@@ -195,9 +195,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
               {/* Facilities */}
               <div className="space-y-1">
-                <div className="flex items-baseline justify-between text-sm">
+                <div className="flex items-center justify-between text-sm">
                   <span className="font-medium">Facilities</span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-muted-foreground text-right min-w-[60px]">
                     {ratingAggregates.avg_facilities_score ? formatScore(ratingAggregates.avg_facilities_score) : '–'}/10
                   </span>
                 </div>
@@ -212,7 +212,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
             {/* Personal comparison text - if user has rated */}
             {userRating && (
-              <p className="text-sm text-slate-500 mb-4">
+              <p className="text-sm text-slate-500 mt-3">
                 You rate this course {Math.abs(userRating.rating - (ratingAggregates.avg_overall_score || 0)).toFixed(1)} points {userRating.rating > (ratingAggregates.avg_overall_score || 0) ? 'higher' : 'lower'} than the community.
               </p>
             )}
@@ -232,7 +232,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             {userRating && (
               <Button 
                 onClick={handleRateClick}
-                className="w-full justify-center bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
+                className="w-full justify-center"
+                variant="outline"
               >
                 Edit Your Rating
               </Button>
@@ -242,15 +243,16 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           <>
             {/* No ratings yet state - Seamless */}
             <div>
-              <h3 className="text-base font-semibold mb-1">Community Score</h3>
-              <p className="text-sm text-muted-foreground mb-4">
+              <h3 className="text-base font-semibold mb-4">Community Score</h3>
+              <p className="text-sm text-muted-foreground mb-4 text-center">
                 No ratings yet – be the first to rate this course!
               </p>
               
               {/* Review button for empty state */}
               <Button 
                 onClick={handleRateClick}
-                className="w-full justify-center bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
+                className="w-full justify-center"
+                variant="outline"
               >
                 Review this course
               </Button>
@@ -269,12 +271,12 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* CTA for users who haven't rated yet */}
       {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
-        <section className="px-4 pt-4 pb-5 bg-slate-50">
+        <section className="px-4 pt-6 pb-5 bg-slate-50 md:pt-8">
           <h3 className="text-base font-semibold mb-1">How do you rate this course?</h3>
-          <p className="text-sm text-muted-foreground mb-3">
+          <p className="text-sm text-slate-500 mb-3">
             Add your rating to see how it compares with the clbhouz community.
           </p>
-          <Button onClick={handleRateClick} className="w-full bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90">
+          <Button onClick={handleRateClick} className="w-full" variant="outline">
             Review this course
           </Button>
         </section>
@@ -282,7 +284,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* About Section - Seamless */}
       {course.description && (
-        <section className="px-4 pt-4 pb-5 bg-slate-100 space-y-3">
+        <section className="px-4 pt-6 pb-5 bg-slate-100 space-y-3 md:pt-8">
           <h2 className="text-base md:text-lg font-semibold">About</h2>
           <div className="text-sm md:text-base leading-relaxed text-foreground">
             {formatDescription(displayDescription)}
@@ -302,7 +304,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseTop100Summary />
 
       {/* Location Section - Seamless */}
-      <section className="pt-4 pb-5 bg-slate-50">
+      <section className="pt-6 pb-5 bg-slate-50 md:pt-8">
         <div className="px-4 space-y-3 mb-4">
           <h2 className="text-base md:text-lg font-semibold">Location</h2>
           <p className="text-sm md:text-base text-foreground">
@@ -350,7 +352,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       </section>
 
       {/* Media Section - Seamless */}
-      <section className="pt-4 pb-5 bg-slate-100 space-y-3">
+      <section className="pt-6 pb-5 bg-slate-100 space-y-3 md:pt-8">
         <AboutMediaStrip 
           clubId={course.id} 
           onSeeAllClick={() => onTabChange?.('media')}
@@ -359,10 +361,10 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* Visit Website - Seamless section */}
       {course.website_url && (
-        <section className="px-4 pt-4 pb-6 bg-slate-50">
+        <section className="px-4 pt-6 pb-12 bg-slate-50 md:pt-8">
           <Button
             onClick={handleWebsiteClick}
-            className="w-full flex items-center justify-center gap-2 bg-muted hover:bg-muted/80 text-foreground border h-11 rounded-xl"
+            className="w-full flex items-center justify-center gap-2 h-11 rounded-xl"
             variant="outline"
           >
             <ExternalLink className="h-4 w-4" />

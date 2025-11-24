@@ -13,7 +13,7 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-white hover:brightness-110 hover:shadow-md active:shadow-sm",
         outline:
-          "border border-[color:var(--slate-secondary)] bg-surface-alt text-[color:var(--cta-text-color)] hover:bg-surface-alt/80 hover:border-[color:var(--slate-secondary)]",
+          "border border-slate-200 bg-white text-slate-800 hover:bg-slate-50 hover:border-slate-300",
         secondary:
           "bg-surface-slate text-white hover:opacity-90 hover:shadow-md active:shadow-sm",
         ghost: "bg-transparent text-[color:var(--cta-text-color)] hover:bg-surface-alt",
