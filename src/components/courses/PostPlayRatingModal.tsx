@@ -521,15 +521,14 @@ const PostPlayRatingModal = ({
                   </span>
                 </div>
 
-                <div className="mt-2">
-                  <input
-                    type="range"
+                <div className="py-3">
+                  <Slider
+                    value={[selectedRating || 5]}
+                    onValueChange={(values) => setSelectedRating(values[0])}
                     min={0.5}
                     max={10}
                     step={0.1}
-                    value={selectedRating || 5}
-                    onChange={(e) => setSelectedRating(parseFloat(e.target.value))}
-                    className="w-full accent-slate-900"
+                    className="w-full"
                   />
                 </div>
 
@@ -584,15 +583,14 @@ const PostPlayRatingModal = ({
                     </span>
                   </div>
 
-                  <div className="mt-2">
-                    <input
-                      type="range"
+                  <div className="py-3">
+                    <Slider
+                      value={[score ?? 5]}
+                      onValueChange={(values) => setScore(values[0])}
                       min={0.5}
                       max={10}
                       step={0.1}
-                      value={score ?? 5}
-                      onChange={(e) => setScore(parseFloat(e.target.value))}
-                      className="w-full accent-slate-900"
+                      className="w-full"
                     />
                   </div>
                 </div>
