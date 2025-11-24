@@ -5,6 +5,7 @@ import { useLocationPermission } from './useLocationPermission';
 import { useVisibility } from './useVisibility';
 import { MIN_LOCATION_CHANGE_METERS } from '../constants';
 import { logError } from '@/utils/errorLogger';
+import { useSafeQueryClient } from '@/lib/useSafeQueryClient';
 
 const BROADCAST_INTERVAL_MS = 15 * 1000; // 15 seconds - efficient battery usage
 
@@ -36,7 +37,10 @@ function calculateDistance(
  * Includes circuit breaker to stop broadcasts after permission denial
  */
 export function useLocationBroadcast() {
-  const { user } = useSupabaseSession();
+  const { hasQueryClient } = useSafeQueryClient({
+    hookName: 'useLocationBroadcast',
+  });
+  const { user, loading } = useSupabaseSession();
   const { getCurrentLocation, permissionState } = useLocationPermission();
   const { visibilityMode } = useVisibility();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -44,8 +48,8 @@ export function useLocationBroadcast() {
   const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
-    // Don't broadcast if no user, visibility is hidden, or permission denied/unavailable
-    if (!user?.id || 
+    // Early exit if no QueryClient, still loading session, or other conditions not met
+    if (!hasQueryClient || loading || !user?.id || 
         visibilityMode === 'hidden' || 
         permissionState === 'denied' || 
         permissionState === 'unavailable') {
@@ -140,7 +144,7 @@ export function useLocationBroadcast() {
         intervalRef.current = null;
       }
     };
-  }, [user?.id, visibilityMode, permissionState, getCurrentLocation]);
+  }, [hasQueryClient, loading, user?.id, visibilityMode, permissionState, getCurrentLocation]);
 
   return null;
 }

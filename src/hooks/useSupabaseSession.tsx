@@ -1,14 +1,26 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
-import { useQueryClient } from '@tanstack/react-query';
+import { useSafeQueryClient } from '@/lib/useSafeQueryClient';
 import { cleanupOnLogout } from '@/utils/reactQueryCleanup';
 
 export function useSupabaseSession() {
+  const { queryClient, hasQueryClient } = useSafeQueryClient({
+    hookName: 'useSupabaseSession',
+  });
+
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const queryClient = useQueryClient();
+
+  // If somehow used outside provider, fail gracefully
+  if (!hasQueryClient) {
+    return {
+      user: null,
+      session: null,
+      loading: false,
+    };
+  }
 
   useEffect(() => {
     let mounted = true;
@@ -17,7 +29,7 @@ export function useSupabaseSession() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (mounted) {
         // Phase 3: Clean up on sign out
-        if (event === 'SIGNED_OUT') {
+        if (event === 'SIGNED_OUT' && queryClient) {
           cleanupOnLogout(queryClient);
         }
         
