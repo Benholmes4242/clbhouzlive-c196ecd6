@@ -529,7 +529,7 @@ const PostPlayRatingModal = ({
                     step={0.1}
                     value={selectedRating || 5}
                     onChange={(e) => setSelectedRating(parseFloat(e.target.value))}
-                    className="w-full accent-red-600"
+                    className="w-full accent-slate-900"
                   />
                 </div>
 
@@ -592,7 +592,7 @@ const PostPlayRatingModal = ({
                       step={0.1}
                       value={score ?? 5}
                       onChange={(e) => setScore(parseFloat(e.target.value))}
-                      className="w-full accent-red-600"
+                      className="w-full accent-slate-900"
                     />
                   </div>
                 </div>
