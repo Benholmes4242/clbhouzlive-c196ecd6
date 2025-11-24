@@ -157,11 +157,8 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
       </div>
 
       {!hasMedia ? (
-        <div className="mx-4 rounded-xl border border-dashed border-border/60 bg-muted/40 px-4 py-6 text-sm text-muted-foreground text-center">
-          <p>No media for this course yet.</p>
-          <p className="font-medium mt-3">
-            Review this course and add media or tag this course to be the first.
-          </p>
+        <div className="mx-4 rounded-xl border border-dashed border-border/60 bg-muted/40 px-4 py-6 text-sm text-muted-foreground">
+          <p className="text-center">No media for this course yet. Review this course and add media or tag this course to be the first.</p>
         </div>
       ) : (
         <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 grid grid-cols-3 gap-0.5">
