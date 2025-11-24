@@ -118,9 +118,9 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
         </div>
       )}
 
-      {/* Quick filters - Frosted glass panel */}
-      <div className="backdrop-blur-lg bg-white/8 border border-white/20 rounded-2xl px-4 py-4 overflow-hidden">
-        <div className="text-xs font-semibold text-slate-400 tracking-wide uppercase mb-3">
+      {/* Quick filters - Card panel for light background */}
+      <div className="bg-white border border-border rounded-2xl px-4 py-4 shadow-sm">
+        <div className="text-xs font-semibold text-muted-foreground tracking-wide uppercase mb-3">
           Explore more from here
         </div>
         
