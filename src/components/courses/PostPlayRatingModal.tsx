@@ -405,8 +405,8 @@ const PostPlayRatingModal = ({
       console.log('[Delete Rating] onSuccess - showing toast and closing modal');
       
       toast({
-        title: "Course Removed",
-        description: `${course?.name} has been removed from your played list`,
+        title: "Course removed",
+        description: `${course?.name} has been removed from your played list. You can add a new rating at any time.`,
       });
       
       if (onRemoveFromPlayed) {
@@ -541,9 +541,9 @@ const PostPlayRatingModal = ({
           <div className="pb-12">
             {/* Header with Close Button */}
             <header className="flex items-center justify-between px-4 pt-4 pb-3 bg-slate-50">
-              <h1 className="text-base font-semibold text-slate-900">
+              <h2 className="text-xl font-semibold text-slate-900">
                 {pageTitle}
-              </h1>
+              </h2>
               <button
                 type="button"
                 onClick={handleClose}
@@ -562,7 +562,7 @@ const PostPlayRatingModal = ({
             </header>
 
             {/* Course Card */}
-            <section className="px-4 mb-6">
+            <section className="px-4 mb-4">
               <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
                 <div className="h-32 w-full relative">
                   {course.thumbnail_image ? (
@@ -576,17 +576,10 @@ const PostPlayRatingModal = ({
                       <Star className="h-8 w-8 text-white opacity-50" />
                     </div>
                   )}
-                  
-                  {/* Played indicator */}
-                  <div className="absolute top-2 right-2">
-                    <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center shadow-sm">
-                      <Check className="h-3 w-3 text-white" />
-                    </div>
-                  </div>
                 </div>
                 
                 <div className="px-4 py-3">
-                  <p className="font-medium text-slate-900">
+                  <p className="text-sm font-medium text-slate-900">
                     {course.name}
                   </p>
                 </div>
@@ -594,17 +587,17 @@ const PostPlayRatingModal = ({
             </section>
 
             {/* Overall Rating Slider */}
-            <section className="px-4 mt-4">
+            <section className="px-4 mt-6">
               <p className="text-xs font-medium tracking-wide text-slate-500 mb-2">
                 Your overall rating
               </p>
 
               <div className="mt-2">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-lg font-semibold text-slate-900">
+                <div className="flex items-baseline justify-between mb-1">
+                  <span className="text-sm font-medium text-slate-900">
                     {selectedRating != null ? selectedRating.toFixed(1) : '--'}
-                    <span className="text-sm text-slate-500">/10</span>
                   </span>
+                  <span className="text-xs text-slate-500">/ 10</span>
                 </div>
 
                 <div className="py-3">
@@ -628,18 +621,17 @@ const PostPlayRatingModal = ({
 
             {/* Share Your Thoughts */}
             <section className="px-4 mt-6">
-              <div className="flex items-baseline justify-between">
-                <p className="text-sm font-medium text-slate-900">Share your thoughts</p>
-                <span className="text-xs text-slate-500">(optional)</span>
-              </div>
+              <p className="text-xs font-medium tracking-wide text-slate-500 mb-2">
+                Share your thoughts
+              </p>
 
               <div className="mt-2">
                 <Textarea
                   value={review}
                   onChange={(e) => setReview(e.target.value)}
                   rows={4}
-                  placeholder="Share your review with the community - Tell other golfers what impressed you about the design, the conditions, the clubhouse, or the overall vibe."
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/60 text-sm placeholder:text-slate-400 resize-none"
+                  placeholder="Share your review with other golfers – what stood out about the design, conditions, clubhouse or overall experience?"
+                  className="w-full rounded-xl border border-slate-200/80 bg-slate-50 text-sm text-slate-900 placeholder:text-slate-400 resize-none focus:outline-none focus:border-slate-300 focus:ring-0 focus:shadow-[0_0_0_3px_rgba(148,163,184,0.25)]"
                   disabled={isSubmitting}
                   maxLength={500}
                 />
@@ -650,8 +642,8 @@ const PostPlayRatingModal = ({
             </section>
 
             {/* Breakdown Sliders */}
-            <section className="px-4 mt-8">
-              <p className="text-xs font-semibold tracking-wide text-slate-500 mb-2">
+            <section className="px-4 mt-6">
+              <p className="text-xs font-medium tracking-wide text-slate-500 mb-2">
                 Breakdown (optional)
               </p>
 
@@ -712,9 +704,9 @@ const PostPlayRatingModal = ({
 
             {/* Media Upload Section */}
             <section className="px-4 mt-6">
-              <h3 className="text-sm font-medium text-slate-900 mb-1">
-                Media Upload <span className="text-slate-400 text-xs">(optional)</span>
-              </h3>
+              <p className="text-xs font-medium tracking-wide text-slate-500 mb-2">
+                Media upload (optional)
+              </p>
 
               <div className="mt-3 rounded-xl border border-slate-200 bg-white/60 px-4 py-5">
                 {selectedMedia.length === 0 ? (
@@ -777,18 +769,18 @@ const PostPlayRatingModal = ({
 
             {/* Primary CTA Button */}
             <footer className="px-4 mt-6 pb-3">
-              <button
+              <Button
                 type="submit"
                 onClick={handleSubmit}
                 disabled={isSubmitting || !selectedRating}
-                className="w-full h-11 rounded-full border border-slate-200 bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-11 rounded-full text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Submitting...' : ctaLabel}
-              </button>
+                {isSubmitting ? 'Saving…' : (isEditMode ? 'Update rating' : 'Submit rating')}
+              </Button>
 
               {isEditMode && (
                 <Button
-                  variant="destructive"
+                  type="button"
                   onClick={() => {
                     console.log('[Delete Rating] Remove button clicked', { 
                       courseId: course?.id, 
@@ -796,7 +788,7 @@ const PostPlayRatingModal = ({
                     });
                     
                     const confirmed = window.confirm(
-                      `Are you sure you want to remove "${course?.name}" from your played list? This will permanently delete your rating and review for this course.`
+                      `Are you sure you want to remove "${course?.name}" from your played list?\n\nThis will permanently delete your rating and review for this course.`
                     );
                     
                     if (confirmed) {
@@ -807,48 +799,53 @@ const PostPlayRatingModal = ({
                     }
                   }}
                   disabled={isSubmitting}
-                  className="w-full mt-3 flex items-center gap-2 justify-center"
+                  variant="outline"
+                  className="w-full mt-3 rounded-full border-red-200 bg-red-50 text-sm font-medium text-red-600 hover:bg-red-100 flex items-center gap-2 justify-center"
                 >
                   <Trash2 className="h-4 w-4" />
-                  Remove from Played
+                  Remove from played
                 </Button>
               )}
             </footer>
           </div>
           ) : (
             /* Confirmation Screen */
-            <div className="text-center space-y-4 py-4 px-4">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                <Check className="h-8 w-8 text-green-600" />
+            <div className="flex min-h-screen flex-col items-center justify-start px-6 pt-20 pb-10 bg-slate-50">
+              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
+                <Check className="h-10 w-10 text-emerald-600" />
               </div>
               
-              <div>
-                <h3 className="font-semibold text-lg mb-2">
-                  {isEditMode ? 'Rating Updated! ✔' : 'Review Saved! ✔'}
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  {isEditMode 
-                    ? `Your updated rating for ${course.name} has been saved`
-                    : `Thank you for sharing your experience with ${course.name}`
-                  }
-                </p>
-              </div>
+              <h1 className="text-xl font-semibold text-slate-900 mb-2">
+                {isEditMode ? 'Rating updated ✔︎' : 'Rating saved ✅'}
+              </h1>
+              
+              <p className="mb-6 text-center text-sm text-slate-500 max-w-sm">
+                {isEditMode
+                  ? `Your updated rating for ${course.name} has been saved.`
+                  : `Your rating for ${course.name} has been added and now counts towards the community score.`}
+              </p>
 
-              {/* Rating Preview */}
-              <div className="bg-muted/30 rounded-lg p-4 space-y-2">
-                <div className="flex items-center justify-center gap-2">
-                  <ClubhouseLogo size="md" showTooltip />
-                  <span className="font-bold text-lg">{selectedRating}/10</span>
+              <div className="mb-8 w-full max-w-sm rounded-xl bg-white px-4 py-3 shadow-sm border border-slate-100">
+                <div className="flex items-center gap-3">
+                  <Trophy className="h-6 w-6 text-amber-500" />
+                  <div className="flex flex-col">
+                    <span className="text-lg font-semibold text-slate-900">
+                      {selectedRating?.toFixed(1)}/10
+                    </span>
+                    {review && (
+                      <span className="mt-0.5 text-xs text-slate-500 line-clamp-1">
+                        "{review}"
+                      </span>
+                    )}
+                  </div>
                 </div>
-                {review && (
-                  <p className="text-sm text-muted-foreground italic">
-                    "{review}"
-                  </p>
-                )}
               </div>
 
-              <Button onClick={handleClose} className="w-full">
-                Done
+              <Button
+                className="w-full max-w-sm rounded-full text-sm font-semibold bg-slate-900 text-white hover:bg-slate-800"
+                onClick={handleClose}
+              >
+                Back to course
               </Button>
             </div>
           )}
