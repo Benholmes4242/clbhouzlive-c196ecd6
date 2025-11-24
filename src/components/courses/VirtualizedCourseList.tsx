@@ -62,18 +62,25 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     const scrollTop = window.scrollY;
     const viewportHeight = window.innerHeight;
     
-    // Find container's offset from top
-    const containerTop = containerRef.current.getBoundingClientRect().top + scrollTop;
+    // Find container's offset from top of document
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const containerTop = containerRect.top + scrollTop;
     
-    // Calculate which items are visible
+    // Calculate scroll position relative to container start
     const scrollRelative = Math.max(0, scrollTop - containerTop);
+    
+    // Calculate visible indices with buffer
     const startIndex = Math.max(0, Math.floor(scrollRelative / itemHeight) - BUFFER_SIZE);
+    const visibleCount = Math.ceil(viewportHeight / itemHeight);
     const endIndex = Math.min(
       courses.length,
-      Math.ceil((scrollRelative + viewportHeight) / itemHeight) + BUFFER_SIZE
+      startIndex + visibleCount + (BUFFER_SIZE * 2)
     );
 
-    setVisibleRange({ start: startIndex, end: endIndex });
+    // Always show at least 10 items initially
+    const finalEnd = Math.max(endIndex, 10);
+
+    setVisibleRange({ start: startIndex, end: finalEnd });
   }, [courses.length, itemHeight]);
 
   // Throttled scroll handler
@@ -91,19 +98,27 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
       }
     };
 
-    // Initial calculation
-    updateVisibleRange();
+    // Initial calculation - delay to ensure container is positioned
+    const initTimer = setTimeout(() => {
+      updateVisibleRange();
+    }, 100);
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    
     return () => {
+      clearTimeout(initTimer);
       window.removeEventListener('scroll', handleScroll);
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, [updateVisibleRange]);
 
-  // Recalculate on courses change
+  // Recalculate on courses change and window resize
   useEffect(() => {
-    updateVisibleRange();
+    const timer = setTimeout(() => {
+      updateVisibleRange();
+    }, 50);
+    
+    return () => clearTimeout(timer);
   }, [courses, updateVisibleRange]);
 
   const totalHeight = courses.length * itemHeight;
