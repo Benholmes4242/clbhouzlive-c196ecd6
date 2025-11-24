@@ -795,22 +795,37 @@ const PostPlayRatingModal = ({
               </button>
 
               {isEditMode && (
-                <Button
-                  variant="destructive"
-                  onClick={() => {
-                    console.log('[Delete Rating] Remove button clicked', { 
-                      courseId: course?.id, 
-                      courseName: course?.name 
-                    });
-                    setShowRemoveDialog(true);
-                    console.log('[Delete Rating] setShowRemoveDialog(true) called - dialog should open');
-                  }}
-                  disabled={isSubmitting}
-                  className="w-full mt-3 flex items-center gap-2 justify-center"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Remove from Played
-                </Button>
+                <>
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      console.log('[Delete Rating] Remove button clicked', { 
+                        courseId: course?.id, 
+                        courseName: course?.name 
+                      });
+                      setShowRemoveDialog(true);
+                      console.log('[Delete Rating] setShowRemoveDialog(true) called - dialog should open');
+                    }}
+                    disabled={isSubmitting}
+                    className="w-full mt-3 flex items-center gap-2 justify-center"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Remove from Played
+                  </Button>
+                  
+                  {/* TEMP DEBUG: Direct delete button */}
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      console.log('[Delete Rating] DEBUG: Direct delete clicked - bypassing dialog');
+                      handleRemoveFromPlayed();
+                    }}
+                    disabled={isSubmitting}
+                    className="w-full mt-2 text-xs"
+                  >
+                    🔧 DEBUG: Delete Now (no confirm)
+                  </Button>
+                </>
               )}
             </footer>
           </div>
