@@ -4,6 +4,7 @@ export const PRIMARY_REGIONS = {
   GB_I: 'gb-i',
   EUROPE: 'europe',
   USA: 'usa',
+  AFRICA: 'africa',
   REST: 'rest',
 } as const;
 
@@ -16,6 +17,7 @@ export const PRIMARY_REGION_LABELS: Record<PrimaryRegionKey, string> = {
   'gb-i': 'Britain & Ireland',
   'europe': 'Continental Europe',
   'usa': 'USA',
+  'africa': 'Africa',
   'rest': 'Rest of World',
 };
 
@@ -104,6 +106,51 @@ export const SUBREGIONS: Record<Exclude<PrimaryRegionKey, 'all'>, string[]> = {
     'Wisconsin',
     'Wyoming',
   ],
+  'africa': [
+    'Algeria',
+    'Angola',
+    'Benin',
+    'Botswana',
+    'Burkina Faso',
+    'Burundi',
+    'Cameroon',
+    'Cape Verde',
+    'Central African Republic',
+    'Chad',
+    'Democratic Republic of Congo',
+    'Djibouti',
+    'Egypt',
+    'Ethiopia',
+    'Gabon',
+    'Gambia',
+    'Ghana',
+    'Ivory Coast',
+    'Kenya',
+    'Lesotho',
+    'Libya',
+    'Madagascar',
+    'Malawi',
+    'Mauritius',
+    'Mayotte',
+    'Morocco',
+    'Mozambique',
+    'Namibia',
+    'Nigeria',
+    'Rwanda',
+    'Saint Helena, Ascension, Tristan Dukana',
+    'Senegal',
+    'Seychelles',
+    'Sierra Leone',
+    'South Africa',
+    'Sudan',
+    'Swaziland',
+    'Tanzania',
+    'Togo',
+    'Tunisia',
+    'Uganda',
+    'Zambia',
+    'Zimbabwe',
+  ],
   'rest': [],
 };
 
@@ -125,6 +172,8 @@ export function regionKeyToDbValue(key: PrimaryRegionKey): string | null {
       return 'Continental Europe';
     case 'usa':
       return 'USA';
+    case 'africa':
+      return 'Africa';
     case 'rest':
       return 'Rest of World';
     case 'all':
@@ -159,6 +208,9 @@ export function dbValueToRegionKey(dbValue?: string | null): PrimaryRegionKey {
   }
   if (value === 'usa' || value.includes('united states')) {
     return PRIMARY_REGIONS.USA;
+  }
+  if (value === 'africa') {
+    return PRIMARY_REGIONS.AFRICA;
   }
   if (value.includes('rest of world')) {
     return PRIMARY_REGIONS.REST;
@@ -195,6 +247,8 @@ export function primaryRegionKeyToTop100Slug(
       return 'europe';
     case PRIMARY_REGIONS.USA:
       return 'usa';
+    case PRIMARY_REGIONS.AFRICA:
+      return 'africa';
     case PRIMARY_REGIONS.REST:
       return 'rest';
     case PRIMARY_REGIONS.ALL:
