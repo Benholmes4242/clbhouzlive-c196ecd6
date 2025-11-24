@@ -1,17 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
@@ -864,36 +854,22 @@ const PostPlayRatingModal = ({
         </div>
 
       {/* Remove Confirmation Dialog */}
-      <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove Course from Played List?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to remove "{course.name}" from your played list? 
-              This will permanently delete your rating and review for this course.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => {
-                console.log('[Delete Rating] Cancel clicked');
-                setShowRemoveDialog(false);
-              }}
-            >
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={() => {
-                console.log('[Delete Rating] Confirm clicked – calling handleRemoveFromPlayed');
-                handleRemoveFromPlayed();
-              }}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Remove Course
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDialog
+        open={showRemoveDialog}
+        onOpenChange={(open) => {
+          console.log('[Delete Rating] ConfirmDialog onOpenChange:', open);
+          setShowRemoveDialog(open);
+        }}
+        title="Remove Course from Played List?"
+        description={`Are you sure you want to remove "${course.name}" from your played list? This will permanently delete your rating and review for this course.`}
+        confirmText="Remove Course"
+        cancelText="Cancel"
+        onConfirm={() => {
+          console.log('[Delete Rating] Confirm clicked – calling handleRemoveFromPlayed');
+          handleRemoveFromPlayed();
+        }}
+        variant="destructive"
+      />
     </>
   );
 };
