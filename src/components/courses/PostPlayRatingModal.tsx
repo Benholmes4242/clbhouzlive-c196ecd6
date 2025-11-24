@@ -710,7 +710,7 @@ const PostPlayRatingModal = ({
                   />
                 ) : (
                   <div className="space-y-3">
-                    <div className="grid grid-cols-3 gap-[2px] rounded-xl overflow-hidden">
+                    <div className="grid grid-cols-3 gap-1.5 rounded-xl overflow-hidden">
                       {selectedMedia.map((file, index) => {
                         const isVideo = file.type.startsWith('video/');
                         const preview = URL.createObjectURL(file);
@@ -736,21 +736,36 @@ const PostPlayRatingModal = ({
                             <button
                               type="button"
                               onClick={() => handleRemoveMedia(index)}
-                              className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs shadow-md"
+                              className="absolute top-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-slate-900/80 shadow-sm hover:bg-slate-900/95 active:scale-95 transition"
                             >
-                              ×
+                              <span className="text-[11px] leading-none text-white">✕</span>
                             </button>
                           </div>
                         );
                       })}
                     </div>
                     {selectedMedia.length < 5 && (
-                      <ReviewMediaUpload
-                        onMediaSelected={handleMediaSelected}
-                        selectedMedia={selectedMedia}
-                        onRemoveMedia={handleRemoveMedia}
-                        showAddMoreButton={true}
-                      />
+                      <div className="mt-2 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            input.accept = 'image/jpeg,image/png,image/heic,image/webp,video/mp4,video/quicktime,video/mov';
+                            input.multiple = true;
+                            input.onchange = (e) => {
+                              const target = e.target as HTMLInputElement;
+                              if (target.files) {
+                                handleMediaSelected(Array.from(target.files));
+                              }
+                            };
+                            input.click();
+                          }}
+                          className="text-xs font-medium text-slate-600 underline-offset-2 hover:text-slate-900 hover:underline"
+                        >
+                          Add more photos or videos
+                        </button>
+                      </div>
                     )}
                   </div>
                 )}
