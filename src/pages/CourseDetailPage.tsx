@@ -14,12 +14,21 @@ const CourseDetailPage = () => {
   // Always scroll to top on every course detail visit
   // Fires when navigating to a new course OR revisiting the same course
   useEffect(() => {
-    // Hard reset, no smooth scroll - avoids jank on iOS Safari
+    // Scroll both window and #root container to ensure it works
     window.scrollTo({
       top: 0,
       left: 0,
       behavior: 'auto',
     });
+    
+    const rootElement = document.getElementById('root');
+    if (rootElement) {
+      rootElement.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'auto',
+      });
+    }
   }, [courseId, location.pathname]);
 
   // Add defensive check for courseId
