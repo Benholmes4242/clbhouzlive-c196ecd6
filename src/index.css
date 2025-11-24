@@ -95,6 +95,11 @@ body {
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
 }
 
+/* Rating slider improvements - larger touch areas, smooth mobile interaction */
+.rating-slider {
+  touch-action: pan-y;
+}
+
 .glass-panel {
   background: rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-tile, 18px);
