@@ -137,7 +137,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
                 });
                 navigate(`/courses?${params.toString()}`);
               }}
-              className="w-full flex items-center justify-between px-0 py-2 text-sm hover:opacity-70 transition-opacity"
+              className="w-full flex items-center justify-between px-0 py-2 text-sm hover:opacity-70 transition-opacity pb-2"
             >
               <span>
                 See more courses in <span className="font-semibold">{subCountryLabel}</span>
@@ -147,7 +147,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
           )}
 
           {/* Divider */}
-          <div className="flex justify-center py-1">
+          <div className="flex justify-center py-2">
             <div className="w-[85%] h-[0.7px] bg-border" />
           </div>
 
@@ -177,7 +177,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
               });
               navigate(`/courses?${params.toString()}`);
             }}
-            className="w-full flex items-center justify-between px-0 py-2 text-sm hover:opacity-70 transition-opacity"
+            className="w-full flex items-center justify-between px-0 py-2 text-sm hover:opacity-70 transition-opacity pt-2"
           >
             <span>
               See Top 100 in <span className="font-semibold">{primaryListName}</span>
