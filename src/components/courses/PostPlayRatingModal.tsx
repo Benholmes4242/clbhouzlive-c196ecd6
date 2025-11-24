@@ -553,7 +553,7 @@ const PostPlayRatingModal = ({
                   value={review}
                   onChange={(e) => setReview(e.target.value)}
                   rows={4}
-                  placeholder="Tell other golfers what stood out – routing, conditioning, greens, hospitality..."
+                  placeholder="Share your review with other golfers — let them know what stood out for you. Whether it's the course design, the conditions, the clubhouse or the overall experience, your insight helps the community."
                   className="w-full rounded-xl border border-slate-200 bg-slate-50/60 text-sm placeholder:text-slate-400 resize-none"
                   disabled={isSubmitting}
                   maxLength={500}
