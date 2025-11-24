@@ -20,7 +20,38 @@ import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
 import RatingComparisonCard from './RatingComparisonCard';
 import CourseTop100Summary from './CourseTop100Summary';
-import { RatingDeltaIcon } from '@/components/RatingDeltaIcon';
+
+const ArrowUp = () => (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="shrink-0"
+  >
+    <path
+      d="M10 3L4 9H8V17H12V9H16L10 3Z"
+      fill="#3CC76A"
+    />
+  </svg>
+);
+
+const ArrowDown = () => (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="shrink-0"
+  >
+    <path
+      d="M10 17L16 11H12V3H8V11H4L10 17Z"
+      fill="#E85151"
+    />
+  </svg>
+);
 
 interface Course {
   id: string;
@@ -213,25 +244,25 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
             {/* Personal comparison text - if user has rated */}
             {userRating && (
-              <p className="text-sm text-slate-500 mt-3 flex items-center">
-                <RatingDeltaIcon
-                  direction={
-                    userRating.rating > (ratingAggregates.avg_overall_score || 0)
-                      ? 'up'
-                      : 'down'
-                  }
-                  className="mr-1"
-                />
-                You rate this course{' '}
-                {Math.abs(
-                  userRating.rating - (ratingAggregates.avg_overall_score || 0)
-                ).toFixed(1)}{' '}
-                points{' '}
-                {userRating.rating > (ratingAggregates.avg_overall_score || 0)
-                  ? 'higher'
-                  : 'lower'}{' '}
-                than the community.
-              </p>
+              <div className="flex items-center gap-2 text-sm text-slate-600 mt-2">
+                {userRating.rating > (ratingAggregates.avg_overall_score || 0) ? (
+                  <ArrowUp />
+                ) : (
+                  <ArrowDown />
+                )}
+
+                <span>
+                  You rate this course{" "}
+                  {Math.abs(
+                    userRating.rating - (ratingAggregates.avg_overall_score || 0)
+                  ).toFixed(1)}{" "}
+                  points{" "}
+                  {userRating.rating > (ratingAggregates.avg_overall_score || 0)
+                    ? "higher"
+                    : "lower"}{" "}
+                  than the community.
+                </span>
+              </div>
             )}
 
             {/* See all reviews link */}
