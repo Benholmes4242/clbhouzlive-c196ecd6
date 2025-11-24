@@ -90,8 +90,13 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
 
 
-  if (courseLoading || !course) {
-    // Phase 1 Perf: Use consistent skeleton loader
+  // Phase 2 Perf: Only show skeleton if both queries are loading
+  // This prevents unnecessary skeleton flash when data is cached
+  if ((courseLoading || !course) && ratingStatsLoading) {
+    return <CourseDetailSkeleton />;
+  }
+
+  if (!course) {
     return <CourseDetailSkeleton />;
   }
 

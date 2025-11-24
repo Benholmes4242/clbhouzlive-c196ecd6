@@ -38,10 +38,27 @@ export const ScrollRestoration = () => {
     const savedPosition = scrollPositions.get(currentPath);
     
     if (savedPosition !== undefined) {
-      // Small delay to ensure content is rendered
-      requestAnimationFrame(() => {
-        window.scrollTo(0, savedPosition);
-      });
+      // Wait for data to load before restoring scroll
+      // Use a longer delay to ensure React Query has hydrated
+      const timeoutId = setTimeout(() => {
+        // Check if content is actually rendered by looking for a minimum body height
+        if (document.body.scrollHeight > savedPosition) {
+          window.scrollTo({
+            top: savedPosition,
+            behavior: 'instant'
+          });
+        } else {
+          // Content not fully rendered, try again with RAF
+          requestAnimationFrame(() => {
+            window.scrollTo({
+              top: savedPosition,
+              behavior: 'instant'
+            });
+          });
+        }
+      }, 100);
+      
+      return () => clearTimeout(timeoutId);
     } else {
       // New route - scroll to top
       window.scrollTo(0, 0);
