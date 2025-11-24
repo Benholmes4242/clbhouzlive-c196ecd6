@@ -64,7 +64,7 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
             <span className="font-bold">You</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="inline-flex h-2 w-6 rounded-full bg-muted" />
+            <span className="inline-flex h-2 w-6 rounded-full bg-muted-foreground/40" />
             <span className="font-bold">Community</span>
           </div>
         </div>
