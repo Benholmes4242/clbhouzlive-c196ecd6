@@ -240,8 +240,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           </>
         ) : (
           <>
-            {/* No ratings yet state - card for light background */}
-            <div className="bg-white border border-border rounded-2xl px-4 py-4 shadow-sm">
+            {/* No ratings yet state - Seamless */}
+            <div>
               <h3 className="text-base font-semibold mb-1">Community Score</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 No ratings yet – be the first to rate this course!
