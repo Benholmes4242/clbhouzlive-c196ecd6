@@ -51,6 +51,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       return data;
     },
     enabled: !!courseId,
+    staleTime: 3 * 60 * 1000, // 3 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   const { data: ratingStats } = useQuery({
@@ -80,6 +82,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       };
     },
     enabled: !!courseId,
+    staleTime: 3 * 60 * 1000, // 3 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
 
@@ -118,11 +122,9 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         <img
           src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop'}
           srcSet={course.thumbnail_image ? `
-            ${course.thumbnail_image}?w=768&h=384&fit=crop 768w,
             ${course.thumbnail_image}?w=1200&h=600&fit=crop 1200w,
             ${course.thumbnail_image}?w=1920&h=960&fit=crop 1920w
           ` : `
-            https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=768&h=384&fit=crop 768w,
             https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop 1200w,
             https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=960&fit=crop 1920w
           `}
@@ -137,7 +139,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           onError={(e) => {
             e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop';
             e.currentTarget.srcset = `
-              https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=768&h=384&fit=crop 768w,
               https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop 1200w,
               https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=960&fit=crop 1920w
             `;
@@ -178,7 +179,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         </div>
       </div>
 
-      {/* Tab Content - No wrapper padding, let sections control their own backgrounds */}
+      {/* Tab Content - Lazy loaded, only mount active tab */}
       <div className="course-hero-wrapper">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="about" className="mt-0">
@@ -186,11 +187,15 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           </TabsContent>
           
           <TabsContent value="reviews" className="mt-0">
-            <CourseReviewsTab courseId={course.id} courseName={course.name} />
+            {activeTab === 'reviews' && (
+              <CourseReviewsTab courseId={course.id} courseName={course.name} />
+            )}
           </TabsContent>
           
           <TabsContent value="media" className="mt-0">
-            <CourseMediaTab courseId={course.id} />
+            {activeTab === 'media' && (
+              <CourseMediaTab courseId={course.id} />
+            )}
           </TabsContent>
           
         </Tabs>

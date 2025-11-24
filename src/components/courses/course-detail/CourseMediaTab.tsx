@@ -80,6 +80,8 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
       return data?.edges ?? [];
     },
     enabled: !!courseId,
+    staleTime: 4 * 60 * 1000, // 4 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   // Use memo so remounts don't flash empty
