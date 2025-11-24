@@ -176,44 +176,16 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   }
 
   // Virtualized rendering for larger lists
-  const visibleCourses = courses.slice(visibleRange.start, visibleRange.end);
-
-  return (
-    <>
-      {/* DEBUG: Red dot to show scroll container - should stay fixed in center */}
-      <div 
-        style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '100px',
-          height: '100px',
-          borderRadius: '50%',
-          backgroundColor: 'red',
-          zIndex: 9999,
-          pointerEvents: 'none',
-          opacity: 0.8
-        }}
-      />
-      
+  // For 25 or fewer courses, skip virtualization and render all at once
+  if (courses.length <= 25) {
+    return (
       <div 
         ref={containerRef}
         className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0"
-        style={{ height: totalHeight }}
       >
-        <div
-          className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6 will-change-transform"
-          style={{
-            transform: `translateY(${offsetY}px)`,
-          }}
-        >
-          {visibleCourses.map((course) => (
-            <div 
-              key={course.id} 
-              className="mb-4 sm:mb-0"
-              style={{ height: itemHeight }}
-            >
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
+          {courses.map((course) => (
+            <div key={course.id} className="mb-4 sm:mb-0">
               <CourseCard 
                 course={course}
                 showRankBadge={!!course.global_rank}
@@ -223,7 +195,39 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
           ))}
         </div>
       </div>
-    </>
+    );
+  }
+
+  // For larger lists (>25), use virtualization
+  const visibleCourses = courses.slice(visibleRange.start, visibleRange.end);
+
+  return (
+    <div 
+      ref={containerRef}
+      className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0"
+      style={{ height: totalHeight }}
+    >
+      <div
+        className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6 will-change-transform"
+        style={{
+          transform: `translateY(${offsetY}px)`,
+        }}
+      >
+        {visibleCourses.map((course) => (
+          <div 
+            key={course.id} 
+            className="mb-4 sm:mb-0"
+            style={{ height: itemHeight }}
+          >
+            <CourseCard 
+              course={course}
+              showRankBadge={!!course.global_rank}
+              onClick={onCourseClick}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 
