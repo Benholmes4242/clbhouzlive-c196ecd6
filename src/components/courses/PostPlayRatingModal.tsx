@@ -542,7 +542,7 @@ const PostPlayRatingModal = ({
     <>
       <div className="fixed inset-0 z-[999] bg-slate-50 overflow-y-auto">
         {!showConfirmation ? (
-          <div className="pb-12">
+          <div>
             {/* Full Bleed Header with Glass Back Button */}
             <div className="relative -mx-0 mb-6 h-[280px] sm:h-64 overflow-hidden border border-border/60 sm:border-border/40">
               {course.thumbnail_image ? (
@@ -758,7 +758,7 @@ const PostPlayRatingModal = ({
             </section>
 
             {/* Primary CTA Button */}
-            <footer className="px-4 mt-6 pb-3">
+            <footer className="px-4 mt-6 pb-[12px]">
               <Button
                 type="submit"
                 onClick={handleSubmit}
