@@ -60,7 +60,7 @@ export const FriendsCoursesHero: React.FC<FriendsCoursesHeroProps> = ({ courses,
     <div className="space-y-2">
       {/* Full-width hero card - taller, cinematic */}
       <div
-        className="relative overflow-hidden cursor-pointer w-full aspect-[1.7/1] rounded-none sm:rounded-xl"
+        className="relative overflow-hidden cursor-pointer w-full aspect-[1.7/1] rounded-none sm:rounded-xl border border-border/60 sm:border-border/40"
         style={{
           backgroundImage: `url(${currentCourse.thumbnail_url || '/placeholder.svg'})`,
           backgroundSize: 'cover',
