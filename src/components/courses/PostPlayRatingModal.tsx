@@ -445,248 +445,205 @@ const PostPlayRatingModal = ({
 
   if (!course) return null;
 
-  const pageTitle = isEditMode ? 'Edit your rating' : 'Rate this course';
-  const ctaLabel = isEditMode ? 'Update Rating' : 'Submit Rating';
-
   return (
     <>
-      <div className="fixed inset-0 z-[999] bg-slate-50 overflow-y-auto">
+      <div className="fixed inset-0 z-[999] bg-surface-card overflow-y-auto">
         {!showConfirmation ? (
-          <div className="pb-12">
-            {/* Header with Close Button */}
-            <header className="flex items-center justify-between px-4 pt-4 pb-3 bg-slate-50">
-              <h1 className="text-base font-semibold text-slate-900">
-                {pageTitle}
+          <div className="pb-24">
+            <div className="px-4 pt-6 pb-4 border-b border-border/60 mb-3">
+              <h1 className="text-xl font-semibold">
+                Rate {course.name}
               </h1>
-              <button
-                type="button"
-                onClick={handleClose}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/4 hover:bg-slate-900/8 transition-colors"
-                aria-label="Close"
-              >
-                <svg viewBox="0 0 20 20" className="h-3.5 w-3.5 text-slate-500">
-                  <path
-                    d="M5 5l10 10M15 5L5 15"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
-            </header>
+            </div>
 
-            {/* Course Card */}
-            <section className="px-4 mt-2">
-              <div className="relative rounded-lg border overflow-hidden bg-green-50 border-green-200">
-                <div className="relative h-24 overflow-hidden">
-                  {course.thumbnail_image ? (
-                    <img
-                      src={course.thumbnail_image}
-                      alt={course.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
-                      <Star className="h-8 w-8 text-white opacity-50" />
+              <div className="space-y-6 px-4">
+                {/* Course Card Preview */}
+                <div className="relative rounded-lg border overflow-hidden bg-green-50 border-green-200">
+                  <div className="relative h-24 overflow-hidden">
+                    {course.thumbnail_image ? (
+                      <img
+                        src={course.thumbnail_image}
+                        alt={course.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
+                        <Star className="h-8 w-8 text-white opacity-50" />
+                      </div>
+                    )}
+                    
+                    {/* Played indicator */}
+                    <div className="absolute top-2 right-2">
+                      <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center shadow-sm">
+                        <Check className="h-3 w-3 text-white" />
+                      </div>
                     </div>
-                  )}
+                  </div>
                   
-                  {/* Played indicator */}
-                  <div className="absolute top-2 right-2">
-                    <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center shadow-sm">
-                      <Check className="h-3 w-3 text-white" />
+                  <div className="p-3">
+                    <h3 className="font-semibold text-sm line-clamp-1">
+                      {course.name}
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Rating Slider Section */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-baseline justify-between mb-1">
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                          Your overall rating
+                        </p>
+                        <p className="text-2xl font-semibold">
+                          {formatScore(selectedRating)}{' '}
+                          <span className="text-sm text-muted-foreground">/ 10</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <input
+                        type="range"
+                        min={0.5}
+                        max={10}
+                        step={0.5}
+                        value={selectedRating || 5}
+                        onChange={(e) => setSelectedRating(parseFloat(e.target.value))}
+                        className="w-full accent-slate-800 focus:outline-none"
+                      />
+
+                      {/* tick labels */}
+                      <div className="flex justify-between text-[11px] text-muted-foreground">
+                        <span>0.5</span>
+                        <span>3</span>
+                        <span>5</span>
+                        <span>7</span>
+                        <span>9</span>
+                        <span>10</span>
+                      </div>
+                    </div>
+
+                    {/* selected pill */}
+                    <div className="mt-2 flex justify-center">
+                      <span className="inline-flex items-center rounded-full bg-slate-900 text-white px-3 py-1 text-xs">
+                        {selectedRating !== null ? `Selected: ${formatScore(selectedRating)} / 10` : 'No rating selected yet'}
+                      </span>
                     </div>
                   </div>
                 </div>
-                
-                <div className="p-3">
-                  <h3 className="font-semibold text-sm line-clamp-1">
-                    {course.name}
-                  </h3>
-                </div>
-              </div>
-            </section>
 
-            {/* Overall Rating Slider */}
-            <section className="px-4 mt-4">
-              <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
-                Your overall rating
-              </p>
-
-              <div className="mt-2">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-lg font-semibold text-slate-900">
-                    {selectedRating != null ? selectedRating.toFixed(1) : '--'}
-                    <span className="text-sm text-slate-500">/10</span>
-                  </span>
-                </div>
-
-                <div className="mt-2">
-                  <input
-                    type="range"
-                    min={0.5}
-                    max={10}
-                    step={0.1}
-                    value={selectedRating || 5}
-                    onChange={(e) => setSelectedRating(parseFloat(e.target.value))}
-                    className="w-full accent-slate-900"
-                  />
-                </div>
-
-                {selectedRating == null && (
-                  <div className="mt-2 inline-flex rounded-full bg-slate-900 text-xs text-white px-3 py-1">
-                    No rating selected yet
+                {/* Review Section */}
+                <div className="space-y-2">
+                  <div className="flex items-baseline justify-between mb-1.5">
+                    <p className="text-sm font-medium">Share your thoughts</p>
+                    <span className="text-xs text-muted-foreground">(optional)</span>
                   </div>
-                )}
-              </div>
-            </section>
-
-            {/* Share Your Thoughts */}
-            <section className="px-4 mt-6">
-              <div className="flex items-baseline justify-between">
-                <p className="text-sm font-medium text-slate-900">Share your thoughts</p>
-                <span className="text-xs text-slate-500">(optional)</span>
-              </div>
-
-              <div className="mt-2">
-                <Textarea
-                  value={review}
-                  onChange={(e) => setReview(e.target.value)}
-                  rows={4}
-                  placeholder="Share your review with other golfers — let them know what stood out for you. Whether it's the course design, the conditions, the clubhouse or the overall experience, your insight helps the community."
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/60 text-sm placeholder:text-slate-400 resize-none"
-                  disabled={isSubmitting}
-                  maxLength={500}
-                />
-                <p className="mt-1 text-xs text-slate-400 text-right">
-                  {review.length}/500
-                </p>
-              </div>
-            </section>
-
-            {/* Breakdown Sliders */}
-            <section className="px-4 mt-8">
-              <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
-                Breakdown (optional)
-              </p>
-
-              {[
-                { key: 'design', label: 'Course Design', score: designScore, setScore: setDesignScore },
-                { key: 'condition', label: 'Course Condition', score: conditionScore, setScore: setConditionScore },
-                { key: 'clubhouse', label: 'Clubhouse', score: clubhouseScore, setScore: setClubhouseScore },
-                { key: 'facilities', label: 'Facilities', score: facilitiesScore, setScore: setFacilitiesScore },
-              ].map(({ key, label, score, setScore }) => (
-                <div key={key} className="mt-5">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-sm font-medium text-slate-900">{label}</span>
-                    <span className="text-xs text-slate-500">
-                      {score != null ? `${score.toFixed(1)} / 10` : '-- / 10'}
+                  <div className="relative">
+                    <Textarea
+                      value={review}
+                      onChange={(e) => setReview(e.target.value)}
+                      rows={4}
+                      className="w-full rounded-2xl border border-border bg-surface-alt px-3.5 py-3 text-sm
+                                placeholder:text-muted-foreground/80 focus-visible:outline-none focus-visible:ring-2
+                                focus-visible:ring-primary/60 focus-visible:border-transparent transition-shadow resize-none"
+                      placeholder="Tell other golfers what stood out – routing, conditioning, greens, hospitality..."
+                      disabled={isSubmitting}
+                      maxLength={500}
+                    />
+                    <span className="absolute right-3 bottom-2 text-[11px] text-muted-foreground">
+                      {review.length}/500
                     </span>
                   </div>
-
-                  <div className="mt-2">
-                    <input
-                      type="range"
-                      min={0.5}
-                      max={10}
-                      step={0.1}
-                      value={score ?? 5}
-                      onChange={(e) => setScore(parseFloat(e.target.value))}
-                      className="w-full accent-slate-900"
-                    />
-                  </div>
                 </div>
-              ))}
-            </section>
 
-            {/* Media Upload Section */}
-            <section className="px-4 mt-8">
-              <p className="text-sm font-medium text-slate-900">Media Upload</p>
-              <p className="mt-1 text-xs text-slate-500">(optional)</p>
+                {/* Breakdown Section */}
+                <div className="mt-5 border-t border-border pt-4 space-y-4">
+                  <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                    Breakdown (optional)
+                  </p>
 
-              <div className="mt-3 rounded-xl border border-slate-200 bg-white/60 px-4 py-5">
-                {selectedMedia.length === 0 ? (
-                  <>
-                    <p className="text-sm text-slate-600">
-                      Add photos or videos from your round.
-                    </p>
-                    <p className="mt-1 text-xs text-slate-400">
-                      JPG, PNG, MP4, MOV · Max 5 items
-                    </p>
+                  {[
+                    { key: 'design', label: 'Course Design', score: designScore, setScore: setDesignScore },
+                    { key: 'condition', label: 'Course Condition', score: conditionScore, setScore: setConditionScore },
+                    { key: 'clubhouse', label: 'Clubhouse', score: clubhouseScore, setScore: setClubhouseScore },
+                    { key: 'facilities', label: 'Facilities', score: facilitiesScore, setScore: setFacilitiesScore },
+                  ].map(({ key, label, score, setScore }) => {
+                    const displayValue = score ?? 5;
+                    return (
+                      <div key={key} className="space-y-1.5">
+                        <div className="flex items-baseline justify-between">
+                          <p className="text-sm font-medium">{label}</p>
+                          <span className="text-xs text-muted-foreground">
+                            {formatScore(score)} / 10
+                          </span>
+                        </div>
 
-                    <div className="mt-4">
-                      <ReviewMediaUpload
-                        onMediaSelected={handleMediaSelected}
-                        selectedMedia={selectedMedia}
-                        onRemoveMedia={handleRemoveMedia}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-3 gap-2">
-                      {selectedMedia.map((file, index) => {
-                        const isVideo = file.type.startsWith('video/');
-                        const preview = URL.createObjectURL(file);
-                        return (
-                          <div key={index} className="relative aspect-square">
-                            {isVideo ? (
-                              <video
-                                src={preview}
-                                className="w-full h-full rounded-2xl object-cover"
-                              />
-                            ) : (
-                              <img
-                                src={preview}
-                                alt=""
-                                className="w-full h-full rounded-2xl object-cover"
-                              />
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveMedia(index)}
-                              className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <ReviewMediaUpload
-                      onMediaSelected={handleMediaSelected}
-                      selectedMedia={selectedMedia}
-                      onRemoveMedia={handleRemoveMedia}
-                    />
-                  </div>
-                )}
+                        <input
+                          type="range"
+                          min={0.5}
+                          max={10}
+                          step={0.5}
+                          value={displayValue}
+                          onChange={(e) => setScore(parseFloat(e.target.value))}
+                          className="w-full accent-slate-800"
+                        />
+
+                        <div className="flex justify-between text-[11px] text-muted-foreground">
+                          <span>0.5</span>
+                          <span>3</span>
+                          <span>5</span>
+                          <span>7</span>
+                          <span>9</span>
+                          <span>10</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Media Upload Section */}
+                <div className="space-y-2">
+                  <label className="text-body-sm font-medium">Media Upload (optional)</label>
+                  <ReviewMediaUpload
+                    onMediaSelected={handleMediaSelected}
+                    selectedMedia={selectedMedia}
+                    onRemoveMedia={handleRemoveMedia}
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <div className="pt-4">
+                  <Button 
+                    onClick={isEditMode ? handleSubmit : handleSubmit}
+                    disabled={isSubmitting || !selectedRating}
+                    className="w-full bg-[#EAEAEA] text-[#333333] hover:bg-[#D4D4D4] shadow-sm rounded-lg font-medium"
+                    style={{
+                      backgroundColor: isSubmitting ? '#D4D4D4' : '#EAEAEA',
+                      color: '#333333'
+                    }}
+                  >
+                    {isEditMode ? (
+                      isSubmitting ? "Updating..." : "Update Rating"
+                    ) : (
+                      buttonText
+                    )}
+                  </Button>
+                  
+                  {isEditMode && (
+                    <Button
+                      variant="destructive"
+                      onClick={() => setShowRemoveDialog(true)}
+                      disabled={isSubmitting}
+                      className="w-full mt-3 flex items-center gap-2"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Remove from Played
+                    </Button>
+                  )}
+                </div>
               </div>
-            </section>
-
-            {/* Primary CTA Button */}
-            <section className="px-4 mt-8 pb-3">
-              <Button
-                type="button"
-                onClick={handleSubmit}
-                disabled={isSubmitting || !selectedRating}
-                className="w-full rounded-xl border border-slate-200 bg-slate-900 text-white text-sm font-semibold py-3 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Submitting...' : ctaLabel}
-              </Button>
-
-              {isEditMode && (
-                <Button
-                  variant="destructive"
-                  onClick={() => setShowRemoveDialog(true)}
-                  disabled={isSubmitting}
-                  className="w-full mt-3 flex items-center gap-2 justify-center"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Remove from Played
-                </Button>
-              )}
-            </section>
-          </div>
+            </div>
           ) : (
             /* Confirmation Screen */
             <div className="text-center space-y-4 py-4 px-4">
