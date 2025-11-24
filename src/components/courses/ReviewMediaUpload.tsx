@@ -8,9 +8,10 @@ interface ReviewMediaUploadProps {
   onMediaSelected: (files: File[]) => void;
   selectedMedia: File[];
   onRemoveMedia: (index: number) => void;
+  showAddMoreButton?: boolean;
 }
 
-const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia }: ReviewMediaUploadProps) => {
+const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, showAddMoreButton = false }: ReviewMediaUploadProps) => {
   const { toast } = useToast();
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -107,6 +108,18 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia }: Re
     );
   };
 
+  if (showAddMoreButton) {
+    return (
+      <button
+        type="button"
+        onClick={() => handleFileSelection('image/jpeg,image/png,image/heic,image/webp,video/mp4,video/quicktime,video/mov')}
+        className="mt-2 text-xs font-medium text-slate-500 underline underline-offset-2"
+      >
+        Add more photos or videos
+      </button>
+    );
+  }
+
   return (
     <div className="space-y-3">
       {/* Drag and Drop Upload Area */}
@@ -138,7 +151,10 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia }: Re
           variant="outline" 
           size="sm" 
           className="gap-2"
-          onClick={() => handleFileSelection('image/jpeg,image/png,image/heic,image/webp')}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleFileSelection('image/jpeg,image/png,image/heic,image/webp');
+          }}
           disabled={selectedMedia.length >= 5}
         >
           <Image className="h-4 w-4" />
@@ -149,28 +165,16 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia }: Re
           variant="outline" 
           size="sm" 
           className="gap-2"
-          onClick={() => handleFileSelection('video/mp4,video/quicktime,video/mov')}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleFileSelection('video/mp4,video/quicktime,video/mov');
+          }}
           disabled={selectedMedia.length >= 5}
         >
           <Video className="h-4 w-4" />
           Videos
         </Button>
       </div>
-      
-      {selectedMedia.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">
-            Selected media ({selectedMedia.length}/5):
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {selectedMedia.map((file, index) => (
-              <div key={index}>
-                {getMediaPreview(file)}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
