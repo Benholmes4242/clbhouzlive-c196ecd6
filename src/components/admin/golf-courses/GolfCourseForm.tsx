@@ -29,6 +29,7 @@ interface GolfCourseFormProps {
 
 // Define the primary countries that have regional Top 100 lists
 const primaryCountryOptions = [
+  'Africa',
   'Britain & Ireland',
   'USA', 
   'Continental Europe'
@@ -36,6 +37,15 @@ const primaryCountryOptions = [
 
 // Map primary countries to their sub-countries
 const subCountryOptions: Record<string, string[]> = {
+  'Africa': [
+    'Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi', 'Cameroon', 
+    'Cape Verde', 'Central African Republic', 'Chad', 'Democratic Republic of Congo', 
+    'Djibouti', 'Egypt', 'Ethiopia', 'Gabon', 'Gambia', 'Ghana', 'Ivory Coast', 
+    'Kenya', 'Lesotho', 'Libya', 'Madagascar', 'Malawi', 'Mauritius', 'Mayotte', 
+    'Morocco', 'Mozambique', 'Namibia', 'Nigeria', 'Rwanda', 'Saint Helena, Ascension, Tristan Dukana', 
+    'Senegal', 'Seychelles', 'Sierra Leone', 'South Africa', 'Sudan', 'Swaziland', 
+    'Tanzania', 'Togo', 'Tunisia', 'Uganda', 'Zambia', 'Zimbabwe'
+  ],
   'Britain & Ireland': [
     'England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man'
   ],
