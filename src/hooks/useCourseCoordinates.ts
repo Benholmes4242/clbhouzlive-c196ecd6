@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UseCourseCoordinatesArgs {
@@ -18,11 +18,16 @@ export function useCourseCoordinates(args: UseCourseCoordinatesArgs) {
       : null
   );
   const [loading, setLoading] = useState(false);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
+    mountedRef.current = true;
+
     // If we already have coordinates, use them
     if (args.latitude && args.longitude) {
-      setCoords({ lat: args.latitude, lng: args.longitude });
+      if (mountedRef.current) {
+        setCoords({ lat: args.latitude, lng: args.longitude });
+      }
       return;
     }
 
@@ -32,6 +37,7 @@ export function useCourseCoordinates(args: UseCourseCoordinatesArgs) {
 
     // Fall back to geocode-club edge function
     const fetchCoords = async () => {
+      if (!mountedRef.current) return;
       setLoading(true);
       try {
         const { data, error } = await supabase.functions.invoke('geocode-club', {
@@ -45,17 +51,17 @@ export function useCourseCoordinates(args: UseCourseCoordinatesArgs) {
         });
 
         // Ignore if component unmounted
-        if (cancelled) return;
+        if (cancelled || !mountedRef.current) return;
 
         if (!error && data?.latitude && data?.longitude) {
           setCoords({ lat: data.latitude, lng: data.longitude });
         }
       } catch (error) {
-        if (!cancelled) {
+        if (!cancelled && mountedRef.current) {
           console.error('Error geocoding course:', error);
         }
       } finally {
-        if (!cancelled) {
+        if (!cancelled && mountedRef.current) {
           setLoading(false);
         }
       }
@@ -65,6 +71,7 @@ export function useCourseCoordinates(args: UseCourseCoordinatesArgs) {
 
     // Cleanup: abort request and mark as cancelled
     return () => {
+      mountedRef.current = false;
       cancelled = true;
       abortController.abort();
     };

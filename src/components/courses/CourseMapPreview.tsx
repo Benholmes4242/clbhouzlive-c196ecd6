@@ -21,14 +21,17 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const retryTimeoutRef = useRef<number | null>(null);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
+    mountedRef.current = true;
+
     if (!MAPBOX_TOKEN) return;
     if (!latitude || !longitude) return;
 
     const initMap = () => {
       // If unmounted, abort
-      if (!mapContainerRef.current) return;
+      if (!mountedRef.current || !mapContainerRef.current) return;
 
       // If map already exists, just recenter + resize
       if (mapRef.current) {
@@ -65,6 +68,7 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
     retryTimeoutRef.current = window.setTimeout(initMap, 100);
 
     return () => {
+      mountedRef.current = false;
       // Cleanup map + timeout
       if (retryTimeoutRef.current != null) {
         window.clearTimeout(retryTimeoutRef.current);

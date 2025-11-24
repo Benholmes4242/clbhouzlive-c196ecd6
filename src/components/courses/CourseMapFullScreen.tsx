@@ -31,6 +31,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const initTimeoutRef = useRef<number | null>(null);
+  const mountedRef = useRef(true);
 
   // Detect iOS
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -47,6 +48,8 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
   useEffect(() => {
+    mountedRef.current = true;
+
     // When sheet is closed, clean up map
     if (!open) {
       if (initTimeoutRef.current != null) {
@@ -72,7 +75,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
 
     // Delay initialization to allow Sheet to fully render
     initTimeoutRef.current = window.setTimeout(() => {
-      if (!mapContainerRef.current) return;
+      if (!mountedRef.current || !mapContainerRef.current) return;
 
       mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -115,6 +118,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
     }, 200);
 
     return () => {
+      mountedRef.current = false;
       if (initTimeoutRef.current != null) {
         window.clearTimeout(initTimeoutRef.current);
         initTimeoutRef.current = null;
