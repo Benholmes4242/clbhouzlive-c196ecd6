@@ -148,7 +148,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
 
           {/* Divider */}
           <div className="flex justify-center py-1">
-            <div className="w-[60%] h-px bg-border" />
+            <div className="w-[75%] h-[0.5px] bg-border" />
           </div>
 
           {/* List-specific Top 100 */}
