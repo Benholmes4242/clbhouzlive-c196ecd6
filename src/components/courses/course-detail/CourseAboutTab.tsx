@@ -135,8 +135,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                 </p>
               </div>
 
-              <div className="flex items-center gap-1.5 flex-shrink-0">
-                <ClubhouseLogo size="sm" className="h-5 w-5" />
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <ClubhouseLogo size="md" className="h-7 w-7" />
                 <span className="text-xl md:text-2xl font-semibold transition-opacity duration-300 text-right min-w-[80px]">
                   {formatScore(ratingAggregates.avg_overall_score || 0)}/10
                 </span>
@@ -361,7 +361,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* Visit Website - Seamless section */}
       {course.website_url && (
-        <section className="px-4 pt-6 pb-12 bg-slate-50 md:pt-8">
+        <section className="px-4 pt-6 pb-20 bg-slate-50 md:pt-8 md:pb-24">
           <Button
             onClick={handleWebsiteClick}
             className="w-full flex items-center justify-center gap-2 h-11 rounded-xl"
