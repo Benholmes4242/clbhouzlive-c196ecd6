@@ -313,7 +313,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         {/* Map preview - full bleed on mobile (0px gaps), with padding on desktop */}
         {!coords && coordsLoading && (
           <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:px-0 md:px-4">
-            <div className="w-full h-[280px] sm:h-64 bg-surface-alt animate-pulse rounded-none sm:rounded-xl" />
+            <div className="w-full h-[280px] sm:h-64 bg-surface-alt animate-pulse rounded-none sm:rounded-xl border border-border/60 sm:border-border/40" />
           </div>
         )}
 
