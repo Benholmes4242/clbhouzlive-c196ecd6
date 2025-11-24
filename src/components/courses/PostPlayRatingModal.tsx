@@ -54,6 +54,12 @@ const PostPlayRatingModal = ({
   const [conditionScore, setConditionScore] = useState<number | null>(null);
   const [clubhouseScore, setClubhouseScore] = useState<number | null>(null);
   const [facilitiesScore, setFacilitiesScore] = useState<number | null>(null);
+  
+  // Track whether breakdown sliders have been touched
+  const [designTouched, setDesignTouched] = useState(false);
+  const [conditionTouched, setConditionTouched] = useState(false);
+  const [clubhouseTouched, setClubhouseTouched] = useState(false);
+  const [facilitiesTouched, setFacilitiesTouched] = useState(false);
 
   const { data: existingRating } = useQuery({
     queryKey: ['user-course-rating', course?.id],
@@ -89,6 +95,12 @@ const PostPlayRatingModal = ({
       setConditionScore(existingRating.condition_score);
       setClubhouseScore(existingRating.clubhouse_score);
       setFacilitiesScore(existingRating.facilities_score);
+      
+      // Mark as touched if they exist
+      setDesignTouched(existingRating.design_score != null);
+      setConditionTouched(existingRating.condition_score != null);
+      setClubhouseTouched(existingRating.clubhouse_score != null);
+      setFacilitiesTouched(existingRating.facilities_score != null);
     }
   }, [existingRating, isEditMode]);
 
@@ -395,7 +407,12 @@ const PostPlayRatingModal = ({
       setReview('');
       setDesignScore(null);
       setConditionScore(null);
+      setClubhouseScore(null);
       setFacilitiesScore(null);
+      setDesignTouched(false);
+      setConditionTouched(false);
+      setClubhouseTouched(false);
+      setFacilitiesTouched(false);
     }
     setShowConfirmation(false);
     setIsSubmitting(false);
@@ -404,6 +421,12 @@ const PostPlayRatingModal = ({
   const handleClose = () => {
     onClose();
     resetForm();
+  };
+
+  // Normalize value to 1 decimal place
+  const normalize = (value: number | null | undefined): number | null => {
+    if (value == null) return null;
+    return parseFloat(value.toFixed(1));
   };
 
   const handleSubmit = async () => {
@@ -419,15 +442,15 @@ const PostPlayRatingModal = ({
     setIsSubmitting(true);
     setButtonText('Adding...');
     
-    // Submit rating
+    // Submit rating - only send breakdown scores if touched
     submitRatingMutation.mutate({ 
-      rating: selectedRating, 
+      rating: normalize(selectedRating) || 5, // Fallback to 5 if somehow null
       reviewText: review.trim(),
       mediaFiles: selectedMedia,
-      design: designScore,
-      condition: conditionScore,
-      clubhouse: clubhouseScore,
-      facilities: facilitiesScore
+      design: designTouched ? normalize(designScore) : null,
+      condition: conditionTouched ? normalize(conditionScore) : null,
+      clubhouse: clubhouseTouched ? normalize(clubhouseScore) : null,
+      facilities: facilitiesTouched ? normalize(facilitiesScore) : null
     });
   };
 
@@ -570,11 +593,35 @@ const PostPlayRatingModal = ({
               </p>
 
               {[
-                { key: 'design', label: 'Course Design', score: designScore, setScore: setDesignScore },
-                { key: 'condition', label: 'Course Condition', score: conditionScore, setScore: setConditionScore },
-                { key: 'clubhouse', label: 'Clubhouse', score: clubhouseScore, setScore: setClubhouseScore },
-                { key: 'facilities', label: 'Facilities', score: facilitiesScore, setScore: setFacilitiesScore },
-              ].map(({ key, label, score, setScore }) => (
+                { 
+                  key: 'design', 
+                  label: 'Course Design', 
+                  score: designScore, 
+                  setScore: setDesignScore,
+                  setTouched: setDesignTouched
+                },
+                { 
+                  key: 'condition', 
+                  label: 'Course Condition', 
+                  score: conditionScore, 
+                  setScore: setConditionScore,
+                  setTouched: setConditionTouched
+                },
+                { 
+                  key: 'clubhouse', 
+                  label: 'Clubhouse', 
+                  score: clubhouseScore, 
+                  setScore: setClubhouseScore,
+                  setTouched: setClubhouseTouched
+                },
+                { 
+                  key: 'facilities', 
+                  label: 'Facilities', 
+                  score: facilitiesScore, 
+                  setScore: setFacilitiesScore,
+                  setTouched: setFacilitiesTouched
+                },
+              ].map(({ key, label, score, setScore, setTouched }) => (
                 <div key={key} className="mt-5">
                   <div className="flex items-baseline justify-between">
                     <span className="text-sm font-medium text-slate-900">{label}</span>
@@ -586,7 +633,10 @@ const PostPlayRatingModal = ({
                   <div className="py-3">
                     <Slider
                       value={[score ?? 5]}
-                      onValueChange={(values) => setScore(values[0])}
+                      onValueChange={(values) => {
+                        setTouched(true);
+                        setScore(values[0]);
+                      }}
                       min={0.5}
                       max={10}
                       step={0.1}
