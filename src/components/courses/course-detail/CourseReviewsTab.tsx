@@ -15,6 +15,11 @@ import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 interface CourseReviewsTabProps {
   courseId: string;
   courseName: string;
+  ratingStats?: {
+    average_rating: number;
+    total_ratings: number;
+    total_reviews: number;
+  } | null;
 }
 
 interface ReviewData {
@@ -32,7 +37,7 @@ interface ReviewData {
   user_vote?: string;
 }
 
-const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
+const CourseReviewsTab = ({ courseId, courseName, ratingStats }: CourseReviewsTabProps) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -43,11 +48,12 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
   const { data: userRating } = useUserCourseRating(courseId, user?.id);
   const hasUserReviewed = !!userRating?.review;
 
+  // Fix N+1 pattern: fetch all data in parallel
   const { data: reviewsData, isLoading } = useQuery({
     queryKey: ['course-reviews-detailed', courseId],
     queryFn: async () => {
-      // First get the ratings with reviews
-      const { data: ratingsData, error: ratingsError } = await supabase
+      // Fetch ratings with reviews
+      const ratingsPromise = supabase
         .from('course_ratings')
         .select('id, rating, review, review_date, user_id, helpful_count, unhelpful_count')
         .eq('course_id', courseId)
@@ -55,60 +61,51 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
         .not('review', 'eq', '')
         .order('review_date', { ascending: false });
 
+      const { data: ratingsData, error: ratingsError } = await ratingsPromise;
+      
       if (ratingsError) throw ratingsError;
-      if (!ratingsData) return { reviews: [], stats: { average: 0, total: 0 } };
+      if (!ratingsData || ratingsData.length === 0) {
+        return { 
+          reviews: [], 
+          stats: ratingStats ? {
+            average: ratingStats.average_rating,
+            total: ratingStats.total_ratings
+          } : { average: 0, total: 0 }
+        };
+      }
 
-      // Get user profiles for the ratings
       const userIds = ratingsData.map(rating => rating.user_id);
-      
-      if (userIds.length === 0) return { reviews: [], stats: { average: 0, total: 0 } };
-
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url')
-        .in('id', userIds);
-
-      if (profilesError) throw profilesError;
-
-      // Get review media for the ratings
       const ratingIds = ratingsData.map(rating => rating.id);
-      let mediaData: any[] = [];
-      
-      if (ratingIds.length > 0) {
-        const { data: reviewMedia, error: mediaError } = await supabase
-          .from('course_review_media')
-          .select('id, review_id, media_url, media_type, file_name')
-          .in('review_id', ratingIds);
+
+      // Fetch all related data in parallel with Promise.all
+      const [profilesResult, mediaResult, votesResult] = await Promise.all([
+        supabase
+          .from('user_profiles')
+          .select('id, display_name, username, profile_photo_url')
+          .in('id', userIds),
         
-        if (mediaError) throw mediaError;
-        mediaData = reviewMedia || [];
-      }
+        ratingIds.length > 0
+          ? supabase
+              .from('course_review_media')
+              .select('id, review_id, media_url, media_type, file_name')
+              .in('review_id', ratingIds)
+          : Promise.resolve({ data: [], error: null }),
+        
+        user?.id && ratingIds.length > 0
+          ? supabase
+              .from('review_votes')
+              .select('review_id, value')
+              .eq('user_id', user.id)
+              .in('review_id', ratingIds)
+          : Promise.resolve({ data: [], error: null }),
+      ]);
 
-      // Get current user's votes for these reviews
-      let userVotes: any[] = [];
-      if (user?.id && ratingIds.length > 0) {
-        const { data: votesData } = await supabase
-          .from('review_votes')
-          .select('review_id, value')
-          .eq('user_id', user.id)
-          .in('review_id', ratingIds);
-        userVotes = votesData || [];
-      }
+      if (profilesResult.error) throw profilesResult.error;
+      if (mediaResult.error) throw mediaResult.error;
 
-      // Get overall course stats for the summary
-      const { data: courseStats, error: statsError } = await supabase
-        .from('course_ratings')
-        .select('rating')
-        .eq('course_id', courseId)
-        .not('rating', 'is', null);
-
-      if (statsError) throw statsError;
-
-      // Calculate stats
-      const totalRatings = courseStats?.length || 0;
-      const averageRating = totalRatings > 0 
-        ? courseStats.reduce((sum, r) => sum + r.rating, 0) / totalRatings 
-        : 0;
+      const profilesData = profilesResult.data || [];
+      const mediaData = mediaResult.data || [];
+      const userVotes = votesResult.data || [];
 
       // Combine the data
       const reviewsWithProfiles = ratingsData.map(rating => {
@@ -147,15 +144,15 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
 
       return {
         reviews: reviewsWithProfiles,
-        stats: {
-          average: averageRating,
-          total: totalRatings
-        }
+        stats: ratingStats ? {
+          average: ratingStats.average_rating,
+          total: ratingStats.total_ratings
+        } : { average: 0, total: 0 }
       };
     },
     enabled: !!courseId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   const getUserDisplayName = (review: ReviewData) => {

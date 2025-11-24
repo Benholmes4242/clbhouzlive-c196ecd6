@@ -27,6 +27,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('about');
 
+  // Fire both queries in parallel for faster initial load
   const { data: course, isLoading: courseLoading } = useQuery({
     queryKey: ['course-detail', courseId],
     queryFn: async () => {
@@ -51,11 +52,12 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       return data;
     },
     enabled: !!courseId,
-    staleTime: 3 * 60 * 1000, // 3 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
-  const { data: ratingStats } = useQuery({
+  // Lifted rating query to parent - will be shared across tabs
+  const { data: ratingStats, isLoading: ratingStatsLoading } = useQuery({
     queryKey: ['course-rating-stats', courseId],
     queryFn: async () => {
       if (!courseId) return null;
@@ -82,7 +84,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       };
     },
     enabled: !!courseId,
-    staleTime: 3 * 60 * 1000, // 3 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
@@ -122,17 +124,17 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         <img
           src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop'}
           srcSet={course.thumbnail_image ? `
-            ${course.thumbnail_image}?w=1200&h=600&fit=crop 1200w,
-            ${course.thumbnail_image}?w=1920&h=960&fit=crop 1920w
+            ${course.thumbnail_image}?w=1200&h=600&fit=crop&q=80 1200w,
+            ${course.thumbnail_image}?w=1920&h=960&fit=crop&q=85 1920w
           ` : `
             https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop 1200w,
             https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=960&fit=crop 1920w
           `}
           sizes="(max-width: 768px) 100vw, 1200px"
           alt={course.name}
-          loading="eager"
+          loading="lazy"
           className="course-hero-image w-full h-full object-cover !rounded-bl-none"
-          style={{ height: 'calc(100% + 48px)' }} // Extend 48px to go behind tab bar
+          style={{ height: 'calc(100% + 48px)' }}
           onLoad={(e) => {
             e.currentTarget.classList.add('loaded');
           }}
@@ -183,12 +185,19 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       <div className="course-hero-wrapper">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="about" className="mt-0">
-            <CourseAboutTab course={course} onTabChange={setActiveTab} />
+            <CourseAboutTab 
+              course={course} 
+              onTabChange={setActiveTab}
+            />
           </TabsContent>
           
           <TabsContent value="reviews" className="mt-0">
             {activeTab === 'reviews' && (
-              <CourseReviewsTab courseId={course.id} courseName={course.name} />
+              <CourseReviewsTab 
+                courseId={course.id} 
+                courseName={course.name}
+                ratingStats={ratingStats}
+              />
             )}
           </TabsContent>
           

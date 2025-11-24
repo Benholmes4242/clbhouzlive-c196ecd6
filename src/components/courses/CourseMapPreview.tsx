@@ -1,6 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { Button } from '@/components/ui/button';
+import { MapPin } from 'lucide-react';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-streets-v12';
@@ -20,25 +22,31 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const retryTimeoutRef = useRef<number | null>(null);
   const mountedRef = useRef(true);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const [mapInitialized, setMapInitialized] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Lazy-load map only when container is visible
   useEffect(() => {
     mountedRef.current = true;
 
     if (!MAPBOX_TOKEN) return;
     if (!latitude || !longitude) return;
+    if (!mapContainerRef.current) return;
+    if (mapInitialized) return; // Already initialized
 
     const initMap = () => {
-      // If unmounted, abort
       if (!mountedRef.current || !mapContainerRef.current) return;
-
-      // If map already exists, just recenter + resize
-      if (mapRef.current) {
-        mapRef.current.setCenter([longitude, latitude]);
-        mapRef.current.resize();
-        return;
-      }
+      if (mapRef.current) return; // Already created
 
       mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -47,32 +55,45 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
         style: MAPBOX_STYLE,
         center: [longitude, latitude],
         zoom: 13,
-        interactive: false, // preview only
+        interactive: false,
         attributionControl: false,
       });
 
       mapRef.current = map;
 
-      // Resize once the style has loaded to avoid partial renders
       map.on('load', () => {
-        map.resize();
+        if (mountedRef.current) {
+          map.resize();
+        }
       });
 
-      // White marker at course location
       new mapboxgl.Marker({ color: '#ffffff' })
         .setLngLat([longitude, latitude])
         .addTo(map);
     };
 
-    // Slight delay to let layout settle
-    retryTimeoutRef.current = window.setTimeout(initMap, 100);
+    // Use IntersectionObserver to lazy-load map
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !mapInitialized && mountedRef.current) {
+            setMapInitialized(true);
+            // Small delay to ensure container is ready
+            setTimeout(initMap, 100);
+          }
+        });
+      },
+      { rootMargin: '50px' } // Start loading 50px before visible
+    );
+
+    observerRef.current.observe(mapContainerRef.current);
 
     return () => {
       mountedRef.current = false;
-      // Cleanup map + timeout
-      if (retryTimeoutRef.current != null) {
-        window.clearTimeout(retryTimeoutRef.current);
-        retryTimeoutRef.current = null;
+      
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
       }
 
       if (mapRef.current) {
@@ -80,7 +101,21 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
         mapRef.current = null;
       }
     };
-  }, [latitude, longitude]);
+  }, [latitude, longitude, mapInitialized]);
+
+  // On mobile, show lightweight button instead of map preview
+  if (isMobile) {
+    return (
+      <Button
+        onClick={onOpenFullMap}
+        variant="outline"
+        className="w-full h-16 flex items-center justify-center gap-2 text-base"
+      >
+        <MapPin className="h-5 w-5" />
+        View map
+      </Button>
+    );
+  }
 
   return (
     <div
