@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { Star, Check, Trophy, Trash2, Upload } from 'lucide-react';
+import { Star, Check, Trophy, Trash2, Upload, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ReviewMediaUpload from './ReviewMediaUpload';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
@@ -543,8 +543,8 @@ const PostPlayRatingModal = ({
       <div className="fixed inset-0 z-[999] bg-slate-50 overflow-y-auto">
         {!showConfirmation ? (
           <div className="pb-12">
-            {/* Full Bleed Header with Glass Exit Button */}
-            <div className="relative -mx-0 mb-6 h-40 overflow-hidden rounded-b-3xl">
+            {/* Full Bleed Header with Glass Back Button */}
+            <div className="relative -mx-0 mb-6 h-[200px] overflow-hidden">
               {course.thumbnail_image ? (
                 <img
                   src={course.thumbnail_image}
@@ -558,23 +558,14 @@ const PostPlayRatingModal = ({
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-black/0" />
               
-              {/* Glass exit button */}
+              {/* Glass back button */}
               <button
                 type="button"
                 onClick={handleClose}
-                className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-slate-900/60 backdrop-blur-md border border-white/20 shadow-md"
-                aria-label="Close"
+                className="absolute left-4 top-4 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors"
+                aria-label="Back"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-white"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  fill="none"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
-                </svg>
+                <ArrowLeft className="h-5 w-5 text-white" />
               </button>
 
               {/* Overlay text */}
