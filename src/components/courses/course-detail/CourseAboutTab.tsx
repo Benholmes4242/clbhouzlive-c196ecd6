@@ -302,15 +302,17 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseTop100Summary />
 
       {/* Location Section - Seamless */}
-      <section className="px-4 pt-4 pb-5 bg-slate-50 space-y-3">
-        <h2 className="text-base md:text-lg font-semibold">Location</h2>
-        <p className="text-sm md:text-base text-foreground">
-          {[course.sub_country, course.country].filter(Boolean).join(', ')}
-        </p>
+      <section className="pt-4 pb-5 bg-slate-50 space-y-3">
+        <div className="px-4 space-y-3">
+          <h2 className="text-base md:text-lg font-semibold">Location</h2>
+          <p className="text-sm md:text-base text-foreground">
+            {[course.sub_country, course.country].filter(Boolean).join(', ')}
+          </p>
+        </div>
         
-        {/* Map preview */}
+        {/* Map preview - full width */}
         {!coords && coordsLoading && (
-          <div className="w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px] rounded-2xl bg-surface-alt animate-pulse" />
+          <div className="w-full h-44 sm:h-52 md:h-[200px] lg:h-[220px] bg-surface-alt animate-pulse" />
         )}
 
         {coords && (
@@ -335,9 +337,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         )}
 
         {!coords && !coordsLoading && (
-          <p className="text-sm text-muted-foreground">
-            Location data isn't available for this course yet.
-          </p>
+          <div className="px-4">
+            <p className="text-sm text-muted-foreground">
+              Location data isn't available for this course yet.
+            </p>
+          </div>
         )}
       </section>
 
