@@ -15,7 +15,7 @@ const CourseTop100Summary: React.FC = () => {
   if (!session) {
     return (
       <section className="px-4 pt-4 pb-5 bg-slate-50">
-        <div className="backdrop-blur-lg bg-white/8 border border-white/20 rounded-2xl px-4 py-4">
+        <div className="bg-white border border-border rounded-2xl px-4 py-4 shadow-sm">
           <h2 className="text-base font-semibold text-foreground mb-1">
             Your Top 100 Progress
           </h2>
@@ -104,7 +104,7 @@ const CourseTop100Summary: React.FC = () => {
         </div>
       </div>
 
-      {/* 4-list grid with frosted glass tiles */}
+      {/* 4-list grid with card tiles */}
       <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
         {listsToShow.map((list) => (
           <button
@@ -112,7 +112,7 @@ const CourseTop100Summary: React.FC = () => {
             onClick={() =>
               navigate(`/courses?tab=top-100&list=${list!.listSlug}`)
             }
-            className="backdrop-blur-md bg-white/6 border border-white/15 rounded-2xl px-3 py-3 text-left transition-colors hover:bg-white/10"
+            className="bg-white border border-border rounded-2xl px-3 py-3 text-left transition-colors hover:bg-muted/50 shadow-sm"
           >
             <span className="text-xs font-medium text-muted-foreground mb-0.5 block">
               {list!.listName}
