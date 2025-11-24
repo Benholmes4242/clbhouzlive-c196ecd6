@@ -14,27 +14,29 @@ const CourseTop100Summary: React.FC = () => {
   // Logged out state
   if (!session) {
     return (
-      <section className="rounded-2xl border border-border/60 bg-card p-4 sm:p-5">
-        <h2 className="text-base font-semibold text-foreground mb-1">
-          Your Top 100 Progress
-        </h2>
-        <p className="text-sm text-muted-foreground mb-3">
-          Sign in to track how this course fits into your Top 100 journey and
-          see your progress across the world's greatest courses.
-        </p>
-        <button
-          onClick={() => navigate('/auth?redirect=/courses')}
-          className="inline-flex items-center justify-center rounded-lg bg-primary-accent px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity"
-        >
-          Sign in to view your journey
-        </button>
+      <section className="px-4 pt-4 pb-5 bg-slate-50">
+        <div className="backdrop-blur-lg bg-white/8 border border-white/20 rounded-2xl px-4 py-4">
+          <h2 className="text-base font-semibold text-foreground mb-1">
+            Your Top 100 Progress
+          </h2>
+          <p className="text-sm text-muted-foreground mb-3">
+            Sign in to track how this course fits into your Top 100 journey and
+            see your progress across the world's greatest courses.
+          </p>
+          <button
+            onClick={() => navigate('/auth?redirect=/courses')}
+            className="inline-flex items-center justify-center rounded-lg bg-primary-accent px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity"
+          >
+            Sign in to view your journey
+          </button>
+        </div>
       </section>
     );
   }
 
   if (isLoading || !data) {
     return (
-      <section className="rounded-2xl border border-border/60 bg-card p-4 sm:p-5">
+      <section className="px-4 pt-4 pb-5 bg-slate-50">
         <div className="h-4 w-40 rounded bg-surface-alt mb-3" />
         <div className="h-3 w-64 rounded bg-surface-alt mb-4" />
         <div className="grid grid-cols-2 gap-3">
@@ -63,7 +65,7 @@ const CourseTop100Summary: React.FC = () => {
   ].filter(Boolean);
 
   return (
-    <section className="rounded-2xl border border-border/60 bg-card p-4 sm:p-5 text-center">
+    <section className="px-4 pt-4 pb-5 bg-slate-50 text-center">
       {/* Header */}
       <div className="mb-3">
         <h2 className="text-base font-semibold text-foreground mb-1">
@@ -102,7 +104,7 @@ const CourseTop100Summary: React.FC = () => {
         </div>
       </div>
 
-      {/* 4-list grid */}
+      {/* 4-list grid with frosted glass tiles */}
       <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
         {listsToShow.map((list) => (
           <button
@@ -110,15 +112,12 @@ const CourseTop100Summary: React.FC = () => {
             onClick={() =>
               navigate(`/courses?tab=top-100&list=${list!.listSlug}`)
             }
-            className={cn(
-              'flex flex-col items-start rounded-xl border border-border/60 bg-background px-3 py-3 text-left transition-colors',
-              'hover:border-primary-accent/70 hover:bg-card'
-            )}
+            className="backdrop-blur-md bg-white/6 border border-white/15 rounded-2xl px-3 py-3 text-left transition-colors hover:bg-white/10"
           >
-            <span className="text-xs font-medium text-muted-foreground mb-0.5">
+            <span className="text-xs font-medium text-muted-foreground mb-0.5 block">
               {list!.listName}
             </span>
-            <span className="text-sm font-semibold text-foreground">
+            <span className="text-sm font-semibold text-foreground block">
               {list!.played} / {list!.total} played
             </span>
             <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-surface-alt">
