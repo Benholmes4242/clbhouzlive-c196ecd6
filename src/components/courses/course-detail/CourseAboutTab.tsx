@@ -361,7 +361,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* Visit Website - Seamless section */}
       {course.website_url && (
-        <section className="px-4 pt-6 pb-20 bg-slate-50 md:pt-8 md:pb-24">
+        <section className="px-4 pt-6 pb-3 bg-slate-50 md:pt-8">
           <Button
             onClick={handleWebsiteClick}
             className="w-full flex items-center justify-center gap-2 h-11 rounded-xl"
