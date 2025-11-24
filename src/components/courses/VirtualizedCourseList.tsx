@@ -55,9 +55,15 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Detect and use the correct scrolling container
-  const getScrollContainer = useCallback(() => {
-    // Find the actual scrolling element (parent with overflow)
+  // Get the actual scrolling container - in this app it's #root, not window
+  const getScrollContainer = useCallback((): HTMLElement => {
+    // In this app, #root is the scrolling container (see index.css)
+    const rootElement = document.getElementById('root');
+    if (rootElement) {
+      return rootElement;
+    }
+    
+    // Fallback: search up the tree for scrolling parent
     let element = containerRef.current?.parentElement;
     while (element) {
       const style = window.getComputedStyle(element);
@@ -67,8 +73,9 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
       }
       element = element.parentElement;
     }
-    // Fallback to window if no scrolling parent found
-    return window;
+    
+    // Last resort fallback to document.body
+    return document.body;
   }, []);
 
   // Update visible range on scroll
@@ -76,16 +83,13 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     if (!containerRef.current) return;
 
     const scrollContainer = getScrollContainer();
-    const isWindow = scrollContainer === window;
-    
-    const scrollTop = isWindow ? window.scrollY : (scrollContainer as HTMLElement).scrollTop;
-    const viewportHeight = isWindow ? window.innerHeight : (scrollContainer as HTMLElement).clientHeight;
+    const scrollTop = scrollContainer.scrollTop;
+    const viewportHeight = scrollContainer.clientHeight;
     
     // Find container's offset from top of scroll container
     const containerRect = containerRef.current.getBoundingClientRect();
-    const containerTop = isWindow 
-      ? containerRect.top + scrollTop
-      : containerRect.top + scrollTop - (scrollContainer as HTMLElement).getBoundingClientRect().top;
+    const scrollContainerRect = scrollContainer.getBoundingClientRect();
+    const containerTop = containerRect.top - scrollContainerRect.top + scrollTop;
     
     // Calculate scroll position relative to container start
     const scrollRelative = Math.max(0, scrollTop - containerTop);
@@ -104,7 +108,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     setVisibleRange({ start: startIndex, end: finalEnd });
   }, [courses.length, itemHeight, getScrollContainer]);
 
-  // Throttled scroll handler - attach to correct scrolling container
+  // Throttled scroll handler - attach to #root (the actual scrolling container)
   useEffect(() => {
     let rafId: number | null = null;
     let ticking = false;
@@ -124,16 +128,16 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
       updateVisibleRange();
     }, 100);
 
-    // Attach listener to actual scrolling container
-    const scrollContainer = containerRef.current?.parentElement ?? window;
-    scrollContainer.addEventListener('scroll', handleScroll, { passive: true } as any);
+    // Attach listener to #root (the actual scrolling container in this app)
+    const scrollContainer = getScrollContainer();
+    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
     
     return () => {
       clearTimeout(initTimer);
-      scrollContainer.removeEventListener('scroll', handleScroll as any);
+      scrollContainer.removeEventListener('scroll', handleScroll);
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [updateVisibleRange]);
+  }, [updateVisibleRange, getScrollContainer]);
 
   // Recalculate on courses change and window resize
   useEffect(() => {
