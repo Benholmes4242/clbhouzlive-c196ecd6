@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, MapPin, X, ArrowUp } from 'lucide-react';
 import CourseCard from './CourseCard';
+import VirtualizedCourseList from './VirtualizedCourseList';
 import { Skeleton } from '@/components/ui/skeleton';
 import { scrollToTop } from '@/utils/scrollToTop';
 import { useSearchParams } from 'react-router-dom';
@@ -235,17 +236,31 @@ const CourseExplorer = () => {
   const totalCount = data?.totalCount || 0;
   const hasMore = courses.length === PAGE_SIZE && (page + 1) * PAGE_SIZE < totalCount;
 
-  const LoadingSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {[1, 2, 3, 4, 5, 6].map((i) => (
-        <div key={i} className="space-y-3">
-          <Skeleton className="h-48 w-full rounded-lg" />
-          <Skeleton className="h-6 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-        </div>
-      ))}
-    </div>
-  );
+  // Phase 2 Perf: Import skeleton component with minimum display time
+  const LoadingSkeleton = () => {
+    const [shouldShow, setShouldShow] = useState(false);
+
+    useEffect(() => {
+      const timer = setTimeout(() => setShouldShow(true), 150);
+      return () => clearTimeout(timer);
+    }, []);
+
+    if (!shouldShow) {
+      return <div className="min-h-[400px]" />;
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-200">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="space-y-3">
+            <Skeleton className="h-48 w-full rounded-lg" />
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   const regionOptions = [
     { value: PRIMARY_REGIONS.ALL, label: PRIMARY_REGION_LABELS['all'] },
@@ -427,19 +442,11 @@ const CourseExplorer = () => {
             </div>
           </div>
         )}
-          <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
-              {courses.map((course) => (
-                <div key={course.id} className="mb-4 sm:mb-0">
-                  <CourseCard 
-                    course={course}
-                    showRankBadge={!!course.global_rank}
-                    onClick={handleCourseClick}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Phase 2 Perf: Use virtualized list for better performance */}
+          <VirtualizedCourseList 
+            courses={courses}
+            onCourseClick={handleCourseClick}
+          />
           
           {/* Pagination Controls */}
           <div className="flex justify-center items-center gap-3 mt-6 mb-0">

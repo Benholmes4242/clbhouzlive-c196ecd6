@@ -1,11 +1,28 @@
 /**
- * Phase 1 Perf: Skeleton loader for Course Detail page
- * Shows hero + tab structure immediately
+ * Phase 2 Perf: Skeleton loader for Course Detail page with minimum display time
+ * Shows hero + tab structure immediately, prevents flash on fast loads
  */
 
+import { useState, useEffect } from 'react';
+
+const MIN_DISPLAY_TIME = 150; // ms - prevents skeleton flash on fast loads
+
 export const CourseDetailSkeleton = () => {
+  const [shouldShow, setShouldShow] = useState(false);
+
+  useEffect(() => {
+    // Show skeleton after a brief moment to prevent flash on instant loads
+    const timer = setTimeout(() => setShouldShow(true), MIN_DISPLAY_TIME);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!shouldShow) {
+    // Return invisible placeholder to maintain layout
+    return <div className="min-h-screen" />;
+  }
+
   return (
-    <div className="min-h-screen bg-muted/60 pb-20">
+    <div className="min-h-screen bg-muted/60 pb-20 animate-in fade-in duration-200">
       {/* Hero skeleton */}
       <div className="relative h-[400px] bg-muted animate-pulse">
         {/* Title area */}
