@@ -23,7 +23,7 @@ export function useCourseCoordinates(args: UseCourseCoordinatesArgs) {
   useEffect(() => {
     mountedRef.current = true;
 
-    // If we already have coordinates, use them
+    // Phase 3: Short-circuit if we already have coordinates
     if (args.latitude && args.longitude) {
       if (mountedRef.current) {
         setCoords({ lat: args.latitude, lng: args.longitude });
@@ -35,7 +35,7 @@ export function useCourseCoordinates(args: UseCourseCoordinatesArgs) {
     const abortController = new AbortController();
     let cancelled = false;
 
-    // Fall back to geocode-club edge function
+    // Fall back to geocode-club edge function only if needed
     const fetchCoords = async () => {
       if (!mountedRef.current) return;
       setLoading(true);

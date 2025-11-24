@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from "@tanstack/react-query";
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import ScrollToTop from '@/components/ScrollToTop';
@@ -338,6 +338,20 @@ const queryClient = new QueryClient({
       networkMode: 'always'
     },
   },
+  // Phase 3: Add error handlers for better debugging
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      console.error('[ReactQuery] Query error:', {
+        queryKey: query.queryKey,
+        error: error instanceof Error ? error.message : error
+      });
+    },
+  }),
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      console.error('[ReactQuery] Mutation error:', error);
+    },
+  }),
 });
 
 // Global focus re-auth to reduce retries

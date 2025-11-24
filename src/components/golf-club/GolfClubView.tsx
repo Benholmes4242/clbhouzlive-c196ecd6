@@ -26,6 +26,9 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('about');
+  
+  // Phase 3: Track which tabs have been visited for keep-mounted pattern
+  const [visitedTabs, setVisitedTabs] = useState<Set<string>>(new Set(['about']));
 
   // Fire both queries in parallel for faster initial load
   const { data: course, isLoading: courseLoading } = useQuery({
@@ -89,6 +92,11 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   });
 
 
+  // Phase 3: Track visited tabs and handle tab changes
+  const handleTabChange = (newTab: string) => {
+    setActiveTab(newTab);
+    setVisitedTabs(prev => new Set(prev).add(newTab));
+  };
 
   // Phase 2 Perf: Only show skeleton if both queries are loading
   // This prevents unnecessary skeleton flash when data is cached
@@ -176,7 +184,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
         {/* Tab Navigation - overlaid on hero */}
         <div className="absolute bottom-0 left-0 right-0 z-30">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="grid w-full grid-cols-3 h-12 bg-black/28 backdrop-blur-[22px] border-t border-white/6 rounded-none shadow-[0_8px_30px_rgba(0,0,0,0.45),0_0_1px_rgba(255,255,255,0.16)]">
               <TabsTrigger value="about" className="text-base text-white data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">About</TabsTrigger>
               <TabsTrigger value="reviews" className="text-base text-white data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">Reviews</TabsTrigger>
@@ -186,32 +194,43 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         </div>
       </div>
 
-      {/* Tab Content - Lazy loaded, only mount active tab */}
+      {/* Phase 3: Keep-mounted tabs - render all visited tabs, hide inactive */}
       <div className="course-hero-wrapper">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsContent value="about" className="mt-0">
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
+          {/* About Tab - always rendered */}
+          <TabsContent 
+            value="about" 
+            className={`mt-0 transition-opacity duration-200 ${activeTab === 'about' ? 'opacity-100' : 'hidden'}`}
+          >
             <CourseAboutTab 
               course={course} 
-              onTabChange={setActiveTab}
+              onTabChange={handleTabChange}
             />
           </TabsContent>
           
-          <TabsContent value="reviews" className="mt-0">
-            {activeTab === 'reviews' && (
+          {/* Reviews Tab - render after first visit */}
+          {visitedTabs.has('reviews') && (
+            <TabsContent 
+              value="reviews" 
+              className={`mt-0 transition-opacity duration-200 ${activeTab === 'reviews' ? 'opacity-100' : 'hidden'}`}
+            >
               <CourseReviewsTab 
                 courseId={course.id} 
                 courseName={course.name}
                 ratingStats={ratingStats}
               />
-            )}
-          </TabsContent>
+            </TabsContent>
+          )}
           
-          <TabsContent value="media" className="mt-0">
-            {activeTab === 'media' && (
+          {/* Media Tab - render after first visit */}
+          {visitedTabs.has('media') && (
+            <TabsContent 
+              value="media" 
+              className={`mt-0 transition-opacity duration-200 ${activeTab === 'media' ? 'opacity-100' : 'hidden'}`}
+            >
               <CourseMediaTab courseId={course.id} />
-            )}
-          </TabsContent>
-          
+            </TabsContent>
+          )}
         </Tabs>
       </div>
 
