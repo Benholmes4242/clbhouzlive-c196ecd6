@@ -1,20 +1,26 @@
 import React, { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import GolfClubView from '@/components/golf-club/GolfClubView';
-import { scrollToTop } from '@/utils/scrollToTop';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 
 const CourseDetailPage = () => {
   const params = useParams();
   const courseId = params?.courseId;
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Ensure course detail always starts from the top
+  // Always scroll to top on every course detail visit
+  // Fires when navigating to a new course OR revisiting the same course
   useEffect(() => {
-    scrollToTop();
-  }, [courseId]);
+    // Hard reset, no smooth scroll - avoids jank on iOS Safari
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto',
+    });
+  }, [courseId, location.pathname]);
 
   // Add defensive check for courseId
   if (!courseId) {
