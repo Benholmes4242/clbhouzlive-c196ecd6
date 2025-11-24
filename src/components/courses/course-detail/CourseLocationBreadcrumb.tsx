@@ -54,7 +54,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
   const primaryListName = membership?.top100_lists?.name ?? 'Worldwide';
 
   return (
-    <div className="space-y-4">
+    <div className="px-4 pt-4 pb-4 bg-slate-50 space-y-4">
       {/* Location breadcrumb */}
       {primaryRegionLabel && (
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
@@ -118,13 +118,13 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
         </div>
       )}
 
-      {/* Quick filters from this course's location */}
-      <section className="rounded-2xl bg-card border border-border/60 shadow-sm overflow-hidden">
-        <div className="px-4 pt-3 pb-2 text-xs font-medium text-muted-foreground tracking-wide uppercase">
+      {/* Quick filters - Frosted glass panel */}
+      <div className="backdrop-blur-lg bg-white/8 border border-white/20 rounded-2xl px-4 py-4 overflow-hidden">
+        <div className="text-xs font-semibold text-slate-400 tracking-wide uppercase mb-3">
           Explore more from here
         </div>
         
-        <div className="divide-y divide-border/60">
+        <div className="space-y-2">
           {/* Sub-country filter */}
           {subCountryLabel && (
             <button
@@ -137,7 +137,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
                 });
                 navigate(`/courses?${params.toString()}`);
               }}
-              className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-surface-alt transition-colors"
+              className="w-full flex items-center justify-between px-0 py-2 text-sm hover:opacity-70 transition-opacity"
             >
               <span>
                 See more courses in <span className="font-semibold">{subCountryLabel}</span>
@@ -172,7 +172,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
               });
               navigate(`/courses?${params.toString()}`);
             }}
-            className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-surface-alt transition-colors"
+            className="w-full flex items-center justify-between px-0 py-2 text-sm hover:opacity-70 transition-opacity"
           >
             <span>
               See Top 100 in <span className="font-semibold">{primaryListName}</span>
@@ -180,7 +180,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
             <span className="text-muted-foreground">›</span>
           </button>
         </div>
-      </section>
+      </div>
     </div>
   );
 };
