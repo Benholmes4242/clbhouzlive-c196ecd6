@@ -310,16 +310,16 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           </p>
         </div>
         
-        {/* Map preview - full width on mobile, with padding on desktop */}
+        {/* Map preview - full bleed on mobile (0px gaps), with padding on desktop */}
         {!coords && coordsLoading && (
-          <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:px-4">
+          <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:px-0 md:px-4">
             <div className="w-full h-[280px] sm:h-64 bg-surface-alt animate-pulse rounded-none sm:rounded-xl" />
           </div>
         )}
 
         {coords && (
           <>
-            <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:px-4">
+            <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:px-0 md:px-4">
               <CourseMapPreview
                 latitude={coords.lat}
                 longitude={coords.lng}
