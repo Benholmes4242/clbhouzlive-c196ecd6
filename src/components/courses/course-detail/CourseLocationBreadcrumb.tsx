@@ -147,7 +147,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
           )}
 
           {/* Divider */}
-          <div className="flex justify-center py-2">
+          <div className="flex justify-center py-0.5">
             <div className="w-[85%] h-[0.7px] bg-border" />
           </div>
 
