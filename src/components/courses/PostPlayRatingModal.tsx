@@ -597,18 +597,11 @@ const PostPlayRatingModal = ({
               </div>
             </div>
 
-            {/* Title Block */}
-            <div className="px-6 pt-4 pb-3">
-              <h2 className="text-lg font-semibold text-slate-900">
-                {isEditMode ? 'Edit your rating' : 'Rate this course'}
-              </h2>
-            </div>
-
             {/* Overall Rating Slider */}
-            <section className="px-6 mt-4">
-              <div className="mb-2 flex items-baseline justify-between">
-                <span className="text-base font-semibold text-slate-900">
-                  Your overall rating
+            <section className="px-6 mt-6">
+              <div className="mb-3 flex items-baseline justify-between">
+                <span className="text-lg font-semibold text-slate-900">
+                  {isEditMode ? 'Edit your overall rating' : 'Add your overall rating'}
                 </span>
                 <span className="text-base font-semibold text-slate-900">
                   {selectedRating != null ? selectedRating.toFixed(1) : '--'} <span className="font-normal text-slate-600">/10</span>
@@ -651,8 +644,8 @@ const PostPlayRatingModal = ({
 
             {/* Breakdown Sliders */}
             <section className="px-6 mt-6">
-              <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-2">
-                Breakdown (optional)
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">
+                {isEditMode ? 'Edit your breakdown' : 'Rate design, condition and more'}
               </h3>
 
               {[
