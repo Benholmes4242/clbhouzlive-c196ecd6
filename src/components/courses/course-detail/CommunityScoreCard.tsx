@@ -28,21 +28,6 @@ const getCommunityRatingLabel = (score: number | null | undefined): { label: str
   return { label: 'Fair', variant: 'fair' };
 };
 
-// Check if a score is "Top rated"
-const TOP_RATED_THRESHOLD = 9.5;
-const isTopRated = (score: number | null | undefined): boolean => {
-  if (score == null) return false;
-  return score >= TOP_RATED_THRESHOLD;
-};
-
-// Top rated pill component
-const TopRatedPill: React.FC = () => {
-  return (
-    <span className="inline-flex items-center justify-center rounded-full px-3 py-1 border bg-amber-50 border-amber-200 text-xs font-semibold uppercase text-amber-700">
-      Top rated
-    </span>
-  );
-};
 
 // Community rating badge component with color variants
 const CommunityRatingBadge: React.FC<{ label: string; variant: 'fair' | 'good' | 'veryGood' | 'excellent' | 'outstanding' }> = ({ label, variant }) => {
@@ -222,12 +207,9 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                     {cat.label}
                   </span>
 
-                  <div className="flex items-center gap-2">
-                    {isTopRated(score) && <TopRatedPill />}
-                    <span className="text-base font-semibold text-slate-900">
-                      {formatScore(score)} /10
-                    </span>
-                  </div>
+                  <span className="text-base font-semibold text-slate-900">
+                    {formatScore(score)} /10
+                  </span>
                 </div>
 
                 {/* Row 2: Full-width bar */}
