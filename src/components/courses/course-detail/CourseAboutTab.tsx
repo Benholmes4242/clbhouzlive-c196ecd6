@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, CheckCircle2, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { ExternalLink, CheckCircle2 } from 'lucide-react';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AboutMediaStrip from './AboutMediaStrip';
@@ -18,10 +18,9 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
+import RatingComparisonCard from './RatingComparisonCard';
 import CourseTop100Summary from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
-import { CategoryScoreCard } from '@/components/ratings/CategoryScoreCard';
-import { getRatingComparisonState } from '@/utils/ratingComparison';
 
 const ArrowUp = () => (
   <svg
@@ -160,116 +159,133 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <section className="px-4 pt-6 pb-5 bg-slate-50 md:px-6 md:pt-8">
         {ratingAggregates && ratingAggregates.review_count > 0 ? (
           <>
-            {/* Top hero card */}
-            <div className="rounded-3xl border border-slate-200/70 bg-white px-4 py-4 shadow-sm sm:px-5 sm:py-5">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex flex-col gap-1">
-                  <h3 className="text-base font-semibold text-slate-900 sm:text-lg">
-                    Community Score
-                  </h3>
-                  <p className="text-xs text-slate-500 sm:text-sm">
-                    {ratingAggregates.review_count === 1
-                      ? 'Based on 1 rating'
-                      : `Based on ${ratingAggregates.review_count} ratings`}
-                  </p>
+            {/* Header with premium score + user rating inline */}
+            <div className="flex items-start justify-between gap-3 mb-3">
+          <div>
+            <h3 className="text-lg font-semibold">Community Score</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Based on {ratingAggregates.review_count} {ratingAggregates.review_count === 1 ? 'rating' : 'ratings'}
+            </p>
+          </div>
 
-                  {/* Only-you message or comparison line */}
-                  {(() => {
-                    const comparison = getRatingComparisonState(
-                      ratingAggregates.review_count,
-                      ratingAggregates.avg_overall_score ?? null,
-                      userRating?.rating ?? null
-                    );
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <ClubhouseLogo size="md" className="h-7 w-7" />
+                <span className="text-xl md:text-2xl font-semibold transition-opacity duration-300 text-right">
+                  {formatScore(ratingAggregates.avg_overall_score || 0)}/10
+                </span>
+              </div>
+            </div>
 
-                    const onlyUser = comparison?.type === 'only-user';
-
-                    if (onlyUser) {
-                      return (
-                        <p className="mt-1 text-xs text-slate-500 sm:text-sm">
-                          Only you have rated this course so far.
-                        </p>
-                      );
-                    }
-
-                    // Show comparison line if user has rated AND there are at least 2 ratings total
-                    const showComparison =
-                      userRating?.rating != null &&
-                      ratingAggregates.review_count > 1 &&
-                      ratingAggregates.avg_overall_score != null &&
-                      comparison;
-
-                    if (!showComparison) return null;
-
-                    const diffOverall = (userRating?.rating ?? 0) - (ratingAggregates.avg_overall_score ?? 0);
-                    const isOnPar = comparison.type === 'on-par';
-
-                    return (
-                      <div className="mt-2 flex items-center gap-2 text-xs">
-                        {isOnPar ? (
-                          <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                        ) : diffOverall < 0 ? (
-                          <ArrowDown />
-                        ) : (
-                          <ArrowUp />
-                        )}
-
-                        <span className="text-slate-600">
-                          {isOnPar
-                            ? 'You rate this course on par with the community.'
-                            : diffOverall < 0
-                            ? `You rate this course ${Math.abs(diffOverall).toFixed(1)} ${Math.abs(diffOverall) === 1 ? 'point' : 'points'} lower than the community.`
-                            : `You rate this course ${diffOverall.toFixed(1)} ${diffOverall === 1 ? 'point' : 'points'} higher than the community.`}
-                        </span>
-                      </div>
-                    );
-                  })()}
-                </div>
-
-                {/* Right: ring + score */}
-                <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 sm:h-10 sm:w-10">
-                    <ClubhouseLogo size="md" className="flex-shrink-0" />
-                  </div>
-                  <span className="text-xl font-semibold text-slate-900 sm:text-2xl">
-                    {ratingAggregates.avg_overall_score != null
-                      ? formatScore(ratingAggregates.avg_overall_score)
-                      : '--'}/10
+            {/* Category bars with animations */}
+            <div className="space-y-3 mb-3">
+              {/* Course Design */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-base">
+                  <span className="font-medium">Course Design</span>
+                  <span className="text-sm text-muted-foreground text-right min-w-[60px]">
+                    {ratingAggregates.avg_design_score ? formatScore(ratingAggregates.avg_design_score) : '–'}/10
                   </span>
+                </div>
+                <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-foreground transition-[width] duration-500 ease-out"
+                    style={{ width: ratingAggregates.avg_design_score ? `${(ratingAggregates.avg_design_score / 10) * 100}%` : '0%' }}
+                  />
+                </div>
+              </div>
+
+              {/* Course Condition */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-base">
+                  <span className="font-medium">Course Condition</span>
+                  <span className="text-sm text-muted-foreground text-right min-w-[60px]">
+                    {ratingAggregates.avg_condition_score ? formatScore(ratingAggregates.avg_condition_score) : '–'}/10
+                  </span>
+                </div>
+                <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-foreground transition-[width] duration-500 ease-out"
+                    style={{ width: ratingAggregates.avg_condition_score ? `${(ratingAggregates.avg_condition_score / 10) * 100}%` : '0%' }}
+                  />
+                </div>
+              </div>
+
+              {/* Clubhouse */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-base">
+                  <span className="font-medium">Clubhouse</span>
+                  <span className="text-sm text-muted-foreground text-right min-w-[60px]">
+                    {ratingAggregates.avg_clubhouse_score ? formatScore(ratingAggregates.avg_clubhouse_score) : '–'}/10
+                  </span>
+                </div>
+                <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-foreground transition-[width] duration-500 ease-out"
+                    style={{ width: ratingAggregates.avg_clubhouse_score ? `${(ratingAggregates.avg_clubhouse_score / 10) * 100}%` : '0%' }}
+                  />
+                </div>
+              </div>
+
+              {/* Facilities */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-base">
+                  <span className="font-medium">Facilities</span>
+                  <span className="text-sm text-muted-foreground text-right min-w-[60px]">
+                    {ratingAggregates.avg_facilities_score ? formatScore(ratingAggregates.avg_facilities_score) : '–'}/10
+                  </span>
+                </div>
+                <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-foreground transition-[width] duration-500 ease-out"
+                    style={{ width: ratingAggregates.avg_facilities_score ? `${(ratingAggregates.avg_facilities_score / 10) * 100}%` : '0%' }}
+                  />
                 </div>
               </div>
             </div>
 
-            {/* Category grid - only show if any breakdowns exist */}
+            {/* Personal comparison text - if user has rated */}
             {(() => {
-              const categories = [
-                { label: 'Course Design', user: userRating?.design_score ?? null, community: ratingAggregates.avg_design_score ?? null },
-                { label: 'Course Condition', user: userRating?.condition_score ?? null, community: ratingAggregates.avg_condition_score ?? null },
-                { label: 'Clubhouse', user: userRating?.clubhouse_score ?? null, community: ratingAggregates.avg_clubhouse_score ?? null },
-                { label: 'Facilities', user: userRating?.facilities_score ?? null, community: ratingAggregates.avg_facilities_score ?? null },
-              ];
+              if (!userRating || !ratingAggregates.avg_overall_score || ratingAggregates.review_count <= 1) {
+                return null;
+              }
 
-              const hasAnyBreakdown = categories.some(cat => cat.user != null || cat.community != null);
+              const diffRaw = userRating.rating - ratingAggregates.avg_overall_score;
+              const diff = Number(diffRaw.toFixed(1));
+              const absDiff = Math.abs(diff);
+              const pointsLabel = absDiff === 1 ? "point" : "points";
 
-              if (!hasAnyBreakdown) return null;
-
-              return (
-                <div className="grid grid-cols-1 gap-3 mt-3 sm:grid-cols-2 sm:gap-4">
-                  {categories.map(cat => {
-                    // Hide individual card if both are null
-                    if (cat.user == null && cat.community == null) return null;
-                    
-                    return (
-                      <CategoryScoreCard
-                        key={cat.label}
-                        label={cat.label}
-                        user={cat.user}
-                        community={cat.community}
-                      />
-                    );
-                  })}
-                </div>
-              );
+              if (absDiff === 0) {
+                // On par with community
+                return (
+                  <div className="flex items-center gap-2 text-base text-emerald-700 mt-2">
+                    <CheckCircle2 className="h-[18px] w-[18px] text-emerald-500 shrink-0" />
+                    <span>You rate this course on par with the community.</span>
+                  </div>
+                );
+              } else if (diff > 0) {
+                // Higher than community
+                return (
+                  <div className="flex items-center gap-2 text-base text-emerald-700 mt-2">
+                    <ArrowUp />
+                    <span>
+                      You rate this course {absDiff.toFixed(1)} {pointsLabel} higher than the community.
+                    </span>
+                  </div>
+                );
+              } else {
+                // Lower than community
+                return (
+                  <div className="flex items-center gap-2 text-base text-slate-600 mt-2">
+                    <ArrowDown />
+                    <span>
+                      You rate this course {absDiff.toFixed(1)} {pointsLabel} lower than the community.
+                    </span>
+                  </div>
+                );
+              }
             })()}
+
+            {/* See all reviews link */}
             <div className="flex justify-end mt-3">
               <button
                 type="button"
@@ -316,7 +332,10 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <CourseFriendsStrip courseId={course.id} courseName={course.name} />
       </section>
 
-      {/* Your Rating vs Community Comparison - removed, now integrated into hero card */}
+      {/* Your Rating vs Community Comparison */}
+      {user && userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
+        <RatingComparisonCard userRating={userRating} aggregates={ratingAggregates} />
+      )}
 
       {/* CTA for users who haven't rated yet */}
       {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
